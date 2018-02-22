@@ -15,6 +15,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
+import sncr.bda.conf.Input;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static sncr.bda.conf.Input.Format.PARQUET;
+
 public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
     private static final Logger logger = Logger.getLogger(Parser.class);
@@ -47,6 +50,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private String tempDir;
     private String outputDataSetName;
     private String outputDataSetLocation;
+    private String outputFormat;
 
     private LongAccumulator errCounter;
     private LongAccumulator recCounter;
@@ -105,7 +109,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         Map.Entry<String, Map<String, String>> ds =  (Map.Entry<String, Map<String, String>>)outputDataSets.entrySet().toArray()[0];
         outputDataSetName = ds.getKey();
         outputDataSetLocation = ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation);
+        outputFormat = ds.getValue().get(DataSetProperties.Format.name());
+        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
         //TODO: If data set exists and flag is not append - error
         // This is good for UI what about pipeline? Talk to Suren
@@ -184,8 +189,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(tempDir);
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+
+//        df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(tempDir);
+//       resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+
+        //TODO: Change here
+        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
+        writeDataset(filteredDataset, outputFormat.toString(), tempDir);
+        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, null));
 
         return 0;
     }
@@ -198,7 +209,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+
+//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,null));
+
                 }
             }
         }
@@ -225,8 +239,46 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(destDir.toString());
+        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
+
+        writeDataset(filteredDataset, outputFormat, destDir.toString());
         return 0;
+    }
+
+    /**
+     *
+     * Writes the given dataset with a given format in the specified path.
+     *
+     * @param dataset Input dataset which needs to be written
+     * @param format Format in which data needs to be written
+     * As of now, the supported data formats are
+     * <ol>
+     *     <li>json</li>
+     *     <li>parquet</li>
+     * </ol>
+     * @param path Fully qualified path to which data needs to be written
+     * @return
+     * @throws XDFException
+     */
+    private boolean writeDataset(Dataset<Row> dataset, String format, String path) throws XDFException {
+        boolean status = true;
+        logger.debug("Writing dataset in " + format + " format");
+
+        switch (format.toLowerCase()) {
+            case "parquet" :
+                System.out.println("Parquet Format");
+                dataset.write().parquet(path);
+                break;
+            case "json" :
+                System.out.println("Json Format");
+                dataset.write().json(path);
+                break;
+            default:
+                throw new XDFException(XDFException.ErrorCodes.UnsupportedDataFormat);
+        }
+
+
+        return status;
     }
 
     private static List<Column> createFieldList(List<Field> fields){
