@@ -35,6 +35,13 @@ public class Transformer {
     @Expose
     private String scriptLocation;
     /**
+     * Standard beginning of script. The preamble pre-populate output record with input values if there is match between fields
+     * 
+     */
+    @SerializedName("scriptPreamble")
+    @Expose
+    private String scriptPreamble;
+    /**
      * Script engine: Jexl/Janino
      * 
      */
@@ -42,40 +49,26 @@ public class Transformer {
     @Expose
     private Transformer.ScriptEngine scriptEngine = Transformer.ScriptEngine.fromValue("janino");
     /**
-     * Scripting level: high or low, the parameter is used only for Janino, it will be ignored for Jexl engine
+     * List of additional import statements for Janino script.s
      * 
      */
-    @SerializedName("scriptingLevel")
+    @SerializedName("additionalImports")
     @Expose
-    private Transformer.ScriptingLevel scriptingLevel = Transformer.ScriptingLevel.fromValue("high");
+    private Set<String> additionalImports = new LinkedHashSet<String>();
     /**
-     * Name of input dataset
+     * If # of failed records exceeds this threshold, processing will be cancelled
      * 
      */
-    @SerializedName("inputDataSet")
+    @SerializedName("threshold")
     @Expose
-    private String inputDataSet;
+    private Integer threshold = 0;
     /**
-     * Name of output dataset
+     * List of output fields: field name, field type.
      * 
      */
-    @SerializedName("outputDataSet")
+    @SerializedName("outputSchema")
     @Expose
-    private String outputDataSet;
-    /**
-     * Name of dataset containing rejected records
-     * 
-     */
-    @SerializedName("rejectedDataSet")
-    @Expose
-    private String rejectedDataSet;
-    /**
-     * List of reference datasets
-     * 
-     */
-    @SerializedName("referenceData")
-    @Expose
-    private Set<String> referenceData = new LinkedHashSet<String>();
+    private Set<OutputSchema> outputSchema = new LinkedHashSet<OutputSchema>();
 
     /**
      * No args constructor for use in serialization
@@ -86,24 +79,22 @@ public class Transformer {
 
     /**
      * 
-     * @param referenceData
-     * @param rejectedDataSet
      * @param scriptLocation
-     * @param outputDataSet
-     * @param scriptingLevel
+     * @param outputSchema
+     * @param scriptPreamble
      * @param scriptEngine
+     * @param threshold
+     * @param additionalImports
      * @param script
-     * @param inputDataSet
      */
-    public Transformer(String script, String scriptLocation, Transformer.ScriptEngine scriptEngine, Transformer.ScriptingLevel scriptingLevel, String inputDataSet, String outputDataSet, String rejectedDataSet, Set<String> referenceData) {
+    public Transformer(String script, String scriptLocation, String scriptPreamble, Transformer.ScriptEngine scriptEngine, Set<String> additionalImports, Integer threshold, Set<OutputSchema> outputSchema) {
         this.script = script;
         this.scriptLocation = scriptLocation;
+        this.scriptPreamble = scriptPreamble;
         this.scriptEngine = scriptEngine;
-        this.scriptingLevel = scriptingLevel;
-        this.inputDataSet = inputDataSet;
-        this.outputDataSet = outputDataSet;
-        this.rejectedDataSet = rejectedDataSet;
-        this.referenceData = referenceData;
+        this.additionalImports = additionalImports;
+        this.threshold = threshold;
+        this.outputSchema = outputSchema;
     }
 
     /**
@@ -157,6 +148,31 @@ public class Transformer {
     }
 
     /**
+     * Standard beginning of script. The preamble pre-populate output record with input values if there is match between fields
+     * 
+     * @return
+     *     The scriptPreamble
+     */
+    public String getScriptPreamble() {
+        return scriptPreamble;
+    }
+
+    /**
+     * Standard beginning of script. The preamble pre-populate output record with input values if there is match between fields
+     * 
+     * @param scriptPreamble
+     *     The scriptPreamble
+     */
+    public void setScriptPreamble(String scriptPreamble) {
+        this.scriptPreamble = scriptPreamble;
+    }
+
+    public Transformer withScriptPreamble(String scriptPreamble) {
+        this.scriptPreamble = scriptPreamble;
+        return this;
+    }
+
+    /**
      * Script engine: Jexl/Janino
      * 
      * @return
@@ -182,127 +198,77 @@ public class Transformer {
     }
 
     /**
-     * Scripting level: high or low, the parameter is used only for Janino, it will be ignored for Jexl engine
+     * List of additional import statements for Janino script.s
      * 
      * @return
-     *     The scriptingLevel
+     *     The additionalImports
      */
-    public Transformer.ScriptingLevel getScriptingLevel() {
-        return scriptingLevel;
+    public Set<String> getAdditionalImports() {
+        return additionalImports;
     }
 
     /**
-     * Scripting level: high or low, the parameter is used only for Janino, it will be ignored for Jexl engine
+     * List of additional import statements for Janino script.s
      * 
-     * @param scriptingLevel
-     *     The scriptingLevel
+     * @param additionalImports
+     *     The additionalImports
      */
-    public void setScriptingLevel(Transformer.ScriptingLevel scriptingLevel) {
-        this.scriptingLevel = scriptingLevel;
+    public void setAdditionalImports(Set<String> additionalImports) {
+        this.additionalImports = additionalImports;
     }
 
-    public Transformer withScriptingLevel(Transformer.ScriptingLevel scriptingLevel) {
-        this.scriptingLevel = scriptingLevel;
+    public Transformer withAdditionalImports(Set<String> additionalImports) {
+        this.additionalImports = additionalImports;
         return this;
     }
 
     /**
-     * Name of input dataset
+     * If # of failed records exceeds this threshold, processing will be cancelled
      * 
      * @return
-     *     The inputDataSet
+     *     The threshold
      */
-    public String getInputDataSet() {
-        return inputDataSet;
+    public Integer getThreshold() {
+        return threshold;
     }
 
     /**
-     * Name of input dataset
+     * If # of failed records exceeds this threshold, processing will be cancelled
      * 
-     * @param inputDataSet
-     *     The inputDataSet
+     * @param threshold
+     *     The threshold
      */
-    public void setInputDataSet(String inputDataSet) {
-        this.inputDataSet = inputDataSet;
+    public void setThreshold(Integer threshold) {
+        this.threshold = threshold;
     }
 
-    public Transformer withInputDataSet(String inputDataSet) {
-        this.inputDataSet = inputDataSet;
+    public Transformer withThreshold(Integer threshold) {
+        this.threshold = threshold;
         return this;
     }
 
     /**
-     * Name of output dataset
+     * List of output fields: field name, field type.
      * 
      * @return
-     *     The outputDataSet
+     *     The outputSchema
      */
-    public String getOutputDataSet() {
-        return outputDataSet;
+    public Set<OutputSchema> getOutputSchema() {
+        return outputSchema;
     }
 
     /**
-     * Name of output dataset
+     * List of output fields: field name, field type.
      * 
-     * @param outputDataSet
-     *     The outputDataSet
+     * @param outputSchema
+     *     The outputSchema
      */
-    public void setOutputDataSet(String outputDataSet) {
-        this.outputDataSet = outputDataSet;
+    public void setOutputSchema(Set<OutputSchema> outputSchema) {
+        this.outputSchema = outputSchema;
     }
 
-    public Transformer withOutputDataSet(String outputDataSet) {
-        this.outputDataSet = outputDataSet;
-        return this;
-    }
-
-    /**
-     * Name of dataset containing rejected records
-     * 
-     * @return
-     *     The rejectedDataSet
-     */
-    public String getRejectedDataSet() {
-        return rejectedDataSet;
-    }
-
-    /**
-     * Name of dataset containing rejected records
-     * 
-     * @param rejectedDataSet
-     *     The rejectedDataSet
-     */
-    public void setRejectedDataSet(String rejectedDataSet) {
-        this.rejectedDataSet = rejectedDataSet;
-    }
-
-    public Transformer withRejectedDataSet(String rejectedDataSet) {
-        this.rejectedDataSet = rejectedDataSet;
-        return this;
-    }
-
-    /**
-     * List of reference datasets
-     * 
-     * @return
-     *     The referenceData
-     */
-    public Set<String> getReferenceData() {
-        return referenceData;
-    }
-
-    /**
-     * List of reference datasets
-     * 
-     * @param referenceData
-     *     The referenceData
-     */
-    public void setReferenceData(Set<String> referenceData) {
-        this.referenceData = referenceData;
-    }
-
-    public Transformer withReferenceData(Set<String> referenceData) {
-        this.referenceData = referenceData;
+    public Transformer withOutputSchema(Set<OutputSchema> outputSchema) {
+        this.outputSchema = outputSchema;
         return this;
     }
 
@@ -313,7 +279,7 @@ public class Transformer {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(script).append(scriptLocation).append(scriptEngine).append(scriptingLevel).append(inputDataSet).append(outputDataSet).append(rejectedDataSet).append(referenceData).toHashCode();
+        return new HashCodeBuilder().append(script).append(scriptLocation).append(scriptPreamble).append(scriptEngine).append(additionalImports).append(threshold).append(outputSchema).toHashCode();
     }
 
     @Override
@@ -325,7 +291,7 @@ public class Transformer {
             return false;
         }
         Transformer rhs = ((Transformer) other);
-        return new EqualsBuilder().append(script, rhs.script).append(scriptLocation, rhs.scriptLocation).append(scriptEngine, rhs.scriptEngine).append(scriptingLevel, rhs.scriptingLevel).append(inputDataSet, rhs.inputDataSet).append(outputDataSet, rhs.outputDataSet).append(rejectedDataSet, rhs.rejectedDataSet).append(referenceData, rhs.referenceData).isEquals();
+        return new EqualsBuilder().append(script, rhs.script).append(scriptLocation, rhs.scriptLocation).append(scriptPreamble, rhs.scriptPreamble).append(scriptEngine, rhs.scriptEngine).append(additionalImports, rhs.additionalImports).append(threshold, rhs.threshold).append(outputSchema, rhs.outputSchema).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
@@ -355,42 +321,6 @@ public class Transformer {
 
         public static Transformer.ScriptEngine fromValue(String value) {
             Transformer.ScriptEngine constant = constants.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public static enum ScriptingLevel {
-
-        @SerializedName("high")
-        HIGH("high"),
-        @SerializedName("low")
-        LOW("low");
-        private final String value;
-        private static Map<String, Transformer.ScriptingLevel> constants = new HashMap<String, Transformer.ScriptingLevel>();
-
-        static {
-            for (Transformer.ScriptingLevel c: values()) {
-                constants.put(c.value, c);
-            }
-        }
-
-        private ScriptingLevel(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        public static Transformer.ScriptingLevel fromValue(String value) {
-            Transformer.ScriptingLevel constant = constants.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

@@ -9,30 +9,30 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Generated("org.jsonschema2pojo")
-public class Parameter {
+public class OutputSchema {
 
     @SerializedName("name")
     @Expose
     private String name;
-    @SerializedName("value")
+    @SerializedName("type")
     @Expose
-    private String value;
+    private String type;
 
     /**
      * No args constructor for use in serialization
      * 
      */
-    public Parameter() {
+    public OutputSchema() {
     }
 
     /**
      * 
      * @param name
-     * @param value
+     * @param type
      */
-    public Parameter(String name, String value) {
+    public OutputSchema(String name, String type) {
         this.name = name;
-        this.value = value;
+        this.type = type;
     }
 
     /**
@@ -53,7 +53,7 @@ public class Parameter {
         this.name = name;
     }
 
-    public Parameter withName(String name) {
+    public OutputSchema withName(String name) {
         this.name = name;
         return this;
     }
@@ -61,23 +61,23 @@ public class Parameter {
     /**
      * 
      * @return
-     *     The value
+     *     The type
      */
-    public String getValue() {
-        return value;
+    public String getType() {
+        return type;
     }
 
     /**
      * 
-     * @param value
-     *     The value
+     * @param type
+     *     The type
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Parameter withValue(String value) {
-        this.value = value;
+    public OutputSchema withType(String type) {
+        this.type = type;
         return this;
     }
 
@@ -88,7 +88,7 @@ public class Parameter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(value).toHashCode();
+        return new HashCodeBuilder().append(name).append(type).toHashCode();
     }
 
     @Override
@@ -96,11 +96,11 @@ public class Parameter {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Parameter) == false) {
+        if ((other instanceof OutputSchema) == false) {
             return false;
         }
-        Parameter rhs = ((Parameter) other);
-        return new EqualsBuilder().append(name, rhs.name).append(value, rhs.value).isEquals();
+        OutputSchema rhs = ((OutputSchema) other);
+        return new EqualsBuilder().append(name, rhs.name).append(type, rhs.type).isEquals();
     }
 
 }

@@ -1,4 +1,3 @@
-
 package sncr.bda.conf;
 
 import java.util.ArrayList;

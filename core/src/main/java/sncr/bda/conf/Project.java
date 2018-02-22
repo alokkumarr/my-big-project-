@@ -1,5 +1,5 @@
 
-package sncr.xdf.conf;
+package sncr.bda.conf;
 
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;

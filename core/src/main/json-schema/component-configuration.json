@@ -265,6 +265,10 @@
           "description" : "Location containing Jexl/Janino script, special value: 'inline' means scripts field itself is base64 encoded Java (Janino-compatible) script or Jexl script",
           "type" : "string"
         },
+        "scriptPreamble" : {
+          "description" : "Standard beginning of script. The preamble pre-populate output record with input values if there is match between fields",
+          "type" : "string"
+        },
         "scriptEngine": {
           "type": "object",
           "description": "Script engine: Jexl/Janino",
@@ -274,38 +278,39 @@
             "janino"
           ]
         },
-        "scriptingLevel": {
-          "type": "string",
-          "description": "Scripting level: high or low, the parameter is used only for Janino, it will be ignored for Jexl engine",
-          "default": "high",
-          "enum": [
-            "high",
-            "low"
-          ]
+        "additionalImports": {
+          "type": "array",
+          "description": "List of additional import statements for Janino script.s",
+          "minItems": 0,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
         },
-        "inputDataSet" : {
-          "description" : "Name of input dataset",
-          "type" : "string"
+        "threshold": {
+          "type": "integer",
+          "description": "If # of failed records exceeds this threshold, processing will be cancelled",
+          "default": 0
         },
-        "outputDataSet" : {
-          "description" : "Name of output dataset",
-          "type" : "string"
-        },
-        "rejectedDataSet" : {
-          "description" : "Name of dataset containing rejected records",
-          "type" : "string"
-        },
-        "referenceData" : {
-          "type" : "array",
-          "description" : "List of reference datasets",
-          "minItems" : 0,
-          "uniqueItems" : true,
-          "items" : {
-            "type" : "string"
+        "outputSchema" : {
+          "type": "array",
+          "description": "List of output fields: field name, field type.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
           }
         }
       }
-    },
+     },
     "es-loader" : {
       "description": "ES Loader specific properties",
       "properties": {

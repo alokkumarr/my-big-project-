@@ -34,7 +34,7 @@ VAR_DIR=$( xdf_info vardir )
 CONF_DIR=$XDF_DIR/conf
 ( cd $CONF_DIR ) || exit
 
-LOG_DIR=/dfs/var/xdf-ngsr/log/meta
+LOG_DIR=/dfs/var/xdf-nextgen/log/meta
 ( cd $LOG_DIR ) || mkdir -p $LOG_DIR
 
 export XDF_DATA_ROOT=hdfs:///data/bda
@@ -43,5 +43,5 @@ JARS=$( echo $LIB_DIR/*.jar | tr ' ' : )
 # CONF_DIR for log4j.dtd, log4j.xml
 CLPATH=$CONF_DIR:$JARS:$(/opt/mapr/bin/mapr classpath)
 
-$JAVA_CMD -cp $CLPATH -DXDF_DATA_ROOT=$XDF_DATA_ROOT -Dcomp.log.dir="$LOG_DIR" -Dlog.dir="$LOG_DIR" -Dxdf.core=meta sncr.xdf.cli.CommandExecutor "$@"
+$JAVA_CMD -cp $CLPATH -DXDF_DATA_ROOT=$XDF_DATA_ROOT -Dcomp.log.dir="$LOG_DIR" -Dlog.dir="$LOG_DIR" -Dxdf.core=meta sncr.bda.cli.CommandExecutor "$@"
 
