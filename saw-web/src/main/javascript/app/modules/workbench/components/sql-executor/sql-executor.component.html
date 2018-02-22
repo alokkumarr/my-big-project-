@@ -5,12 +5,16 @@
       <span class="view-title">SQL_EXECUTOR </span>
     </div>
     <span fxFlex></span>
-    <button mat-icon-button color="primary" matTooltip="Execute Query" (click)="runScript()">
-      <mat-icon fontIcon="icon-play_circle" class="exec-btn-icon"></mat-icon>
-    </button>
-    <button mat-icon-button color="primary" matTooltip="Save" (click)="save()">
+    <div>
+      <button mat-icon-button color="primary" matTooltip="Execute Query" (click)="runScript()">
+        <mat-icon fontIcon="icon-play_circle" class="exec-btn-icon"></mat-icon>
+      </button>
+    </div>
+    <div class="btn-padding">
+      <button mat-icon-button color="primary" matTooltip="Save" (click)="save()">
         <mat-icon fontIcon="icon-save" class="exec-btn-icon"></mat-icon>
       </button>
+    </div>
     <button mat-icon-button mat-dialog-close class="xBtn">
       <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
     </button>
@@ -19,8 +23,11 @@
   <mat-divider></mat-divider>
   <div mat-dialog-content class="exec-body">
     <div class="top-pane">
-      <sql-script #sqlscript [artifacts]="artifacts" (on-save)="onSaveQuery($event)">
+      <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)">
       </sql-script>
+    </div>
+    <div>
+      <sqlpreview-grid-page [updater]="gridData"></sqlpreview-grid-page>
     </div>
   </div>
 </div>

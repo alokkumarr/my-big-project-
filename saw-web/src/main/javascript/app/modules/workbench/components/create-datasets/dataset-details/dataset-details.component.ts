@@ -40,7 +40,7 @@ export class DatasetDetailsComponent implements OnInit {
     this.detailsFormGroup = new FormGroup({
       fieldSeperatorControl: new FormControl('', Validators.required),
       hederSizeControl: new FormControl('1', Validators.required),
-      fieldNamesLineControl: new FormControl('0'),
+      fieldNamesLineControl: new FormControl('1'),
       lineSeperatorControl: new FormControl('\\n', Validators.required),
       quoteCharControl: new FormControl(''),
       escapeCharControl: new FormControl('')

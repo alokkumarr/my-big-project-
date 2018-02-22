@@ -6,6 +6,8 @@ import { MatDialog } from '@angular/material';
 import { debounceTime } from 'rxjs/operators';
 import * as trim from 'lodash/trim';
 import * as uniq from 'lodash/uniq';
+import * as filter from 'lodash/filter';
+import * as get from 'lodash/get';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -74,7 +76,7 @@ export class SelectRawdataComponent implements OnInit {
 
   getPageData() {
     this.workBench.getStagingData(this.userProject, '/').subscribe(data => {
-      const filteredDataFiles = data.data.filter(d => d.isDirectory === false);
+      const filteredDataFiles = filter(data.data, ['isDirectory', false]);
       this.reloadDataGrid(filteredDataFiles);
     });
   }
@@ -91,7 +93,7 @@ export class SelectRawdataComponent implements OnInit {
         return this.workBench.getStagingData(this.userProject, path)
           .toPromise()
           .then(function (data) {
-            const dir = data.data.filter(d => d.isDirectory === true);
+            const dir = filter(data.data, ['isDirectory', true]);
             return dir;
           });
       },
@@ -110,7 +112,7 @@ export class SelectRawdataComponent implements OnInit {
     this.currentPath = path;
     this.nodeID = node.id;
     this.workBench.getStagingData(this.userProject, path).subscribe(data => {
-      const filteredDataFiles = data.data.filter(d => d.isDirectory === false);
+      const filteredDataFiles = filter(data.data, ['isDirectory', false])
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
     });
@@ -266,13 +268,14 @@ export class SelectRawdataComponent implements OnInit {
           const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
           this.workBench.createFolder(this.userProject, path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
-            const currChilds = currentNode.data.children;
+            const currChilds = get(currentNode.data, 'children', []);
             var uniqueResults = data.data.filter(obj => {
               return !currChilds.some(obj2 => {
                 return obj.name == obj2.name;
               });
             });
-            currentNode.data.children.push(uniqueResults[0]);
+            const newDir = filter(uniqueResults, ['isDirectory', true]);
+            currentNode.data.children.push(newDir[0]);
             this.tree.treeModel.update();
           });
         }

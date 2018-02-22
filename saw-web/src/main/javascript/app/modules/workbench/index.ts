@@ -37,6 +37,7 @@ import { DateformatDialogComponent } from './components/create-datasets/dateform
 import { DatasetActionsComponent } from './components/dataset-actions/dataset-actions.component';
 import { SqlExecutorComponent } from './components/sql-executor/sql-executor.component';
 import { SqlScriptComponent } from './components/sql-executor/query/sql-script.component';
+import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 
 import { CommonModule } from '../../common';
 
@@ -61,7 +62,8 @@ const components = [
   DateformatDialogComponent,
   DatasetActionsComponent,
   SqlExecutorComponent,
-  SqlScriptComponent
+  SqlScriptComponent,
+  SqlpreviewGridPageComponent
 ];
 
 @NgModule({

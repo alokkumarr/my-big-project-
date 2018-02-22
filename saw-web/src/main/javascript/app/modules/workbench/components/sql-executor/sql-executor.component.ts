@@ -2,6 +2,8 @@ declare function require(string): string;
 
 import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { ToastService } from '../../../../common/services/toastMessage.service'
 
 import * as get from 'lodash/get';
@@ -19,6 +21,7 @@ export class SqlExecutorComponent implements OnInit {
   private artifacts: any;
   private gridConfig: Array<any>;
   private showProgress: boolean = false;
+  private gridData = new BehaviorSubject([]);
   private userProject: string = 'project2';
   private datasetID: string = '';
 
@@ -49,6 +52,10 @@ export class SqlExecutorComponent implements OnInit {
   }
 
   runScript(): void {
-    this.scriptComponent.submitQuery();
+    this.scriptComponent.executeQuery();
+  }
+
+  sendDataToPreview(data) {
+    this.gridData.next(data);
   }
 }

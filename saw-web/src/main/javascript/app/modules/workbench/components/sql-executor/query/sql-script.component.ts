@@ -20,6 +20,7 @@ import 'brace/theme/sqlserver';
 import 'brace/ext/language_tools';
 import 'brace/mode/sql';
 import { AceEditorComponent } from 'ng2-ace-editor';
+import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./sql-script.component.html');
 require('./sql-script.component.scss');
@@ -30,13 +31,13 @@ require('./sql-script.component.scss');
 })
 export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @Input() model: any;
-  @Output() onSave = new EventEmitter<any>();
+  @Output() onExecute = new EventEmitter<any>();
 
   @ViewChild('editor') editor: AceEditorComponent;
 
   private _artifacts: Array<any>;
   private query: string;
-  
+
   private editorOptions = {
     displayIndentGuides: true,
     enableBasicAutocompletion: true, // the editor completes the statement when you hit Ctrl + Space
@@ -51,7 +52,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   private langTools = ace.acequire('ace/ext/language_tools');
   private completions = [];
 
-  constructor() { }
+  constructor(private workBench: WorkbenchService) { }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -88,7 +89,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
       });
 
       table.columns.forEach(column => {
-        const caption = column.alias || column.aliasName || column.displayName || column.columnName;
+        const caption = column.name;
         this.completions.push({
           name: caption,
           value: caption,
@@ -99,7 +100,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
           /* Custom attribute stores column name.
           This is used to insert this string when matched instead
           of 'value' attribute of this completion. */
-          insertValue: column.columnName
+          insertValue: caption
         });
       });
     });
@@ -138,20 +139,9 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   queryUpdated(query) {
   }
 
-  doSubmit() {
-    this.model.edit = true;
-    this.onSave.emit(this.model);
-  }
-
-  submitQuery() {
-    // if (!this.model.edit) {
-    //   this.warnUser().then(() => {
-    //     this.doSubmit();
-    //   }, () => {
-    //     // do nothing if user hits cancel
-    //   });
-    // } else {
-    //   this.doSubmit();
-    // }
+  executeQuery() {
+    this.workBench.executeSqlQuery(this.query).subscribe(data => {
+      this.onExecute.emit(data);
+    });
   }
 }

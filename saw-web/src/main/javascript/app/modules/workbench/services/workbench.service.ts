@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 
-import { DATASETS, TREE_DATA, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
+import { DATASETS, SQLEXEC_SAMPLE, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
@@ -41,15 +41,15 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${projectName}/raw/directory`;
     return this.http.post(endpoint, { path })
       .pipe(
-        catchError(this.handleError('data', TREE_VIEW_Data)));
+        catchError(this.handleError('data', [])));
   }
 
   /** GET raw preview from the server */
   getRawPreviewData(projectName: string, path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${projectName}/raw/directory/preview`;
-    return this.http.post(endpoint, {path})
+    return this.http.post(endpoint, { path })
       .pipe(
-        catchError(this.handleError('data', RAW_SAMPLE)));
+        catchError(this.handleError('data', [])));
   }
 
   /** GET parsed preview from the server */
@@ -57,7 +57,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${projectName}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-        catchError(this.handleError('data', parser_preview)));
+        catchError(this.handleError('data', [])));
   }
 
   /** File mask search */
@@ -142,9 +142,9 @@ export class WorkbenchService {
 
   createFolder(projectName: string, path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${projectName}/raw/directory/create`;
-    return this.http.post(endpoint, {path})
+    return this.http.post(endpoint, { path })
       .pipe(
-        catchError(this.handleError('data', TREE_VIEW_Data)));
+        catchError(this.handleError('data', [])));
   }
   /**
    * Service to fetch meta data of dataset
@@ -159,6 +159,18 @@ export class WorkbenchService {
     return this.http.get(`${this.wbAPI}/${projectName}/${id}`)
       .pipe(
         catchError(this.handleError('data', ARTIFACT_SAMPLE)));
+  }
+  /**
+   * Calls the sql executor component and fetches the output as data for preview grid 
+   * 
+   * @param {string} query 
+   * @returns {Observable<any>} 
+   * @memberof WorkbenchService
+   */
+  executeSqlQuery(query: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/execute`;
+    return this.http.post(endpoint, { query })
+      .pipe(catchError(this.handleError('data', SQLEXEC_SAMPLE)));
   }
 
 

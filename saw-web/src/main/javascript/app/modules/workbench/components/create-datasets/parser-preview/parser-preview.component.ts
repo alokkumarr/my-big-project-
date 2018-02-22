@@ -41,7 +41,6 @@ export class ParserPreviewComponent implements OnInit {
   private fieldInfo = [];
   private parserData: any;
   private rawFile: any;
-  private tempFields = [];
   private userProject = 'project2';
 
   constructor(
@@ -69,7 +68,7 @@ export class ParserPreviewComponent implements OnInit {
     if (data.samplesParsed) {
       this.parserData = cloneDeep(data);
       const parsedData = data.samplesParsed;
-      this.tempFields = cloneDeep(data.fields);
+      this.fieldInfo = cloneDeep(data.fields);
       this.dataGrid.instance.beginCustomLoading('Loading...');
       setTimeout(() => {
         this.reloadDataGrid(parsedData);
@@ -130,7 +129,6 @@ export class ParserPreviewComponent implements OnInit {
 
   reloadDataGrid(data) {
     this.dataGrid.instance.option('dataSource', data);
-    this.fieldInfo = this.tempFields;
     this.dataGrid.instance.refresh();
     this.dataGrid.instance.endCustomLoading();
   }
