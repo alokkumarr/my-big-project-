@@ -197,7 +197,7 @@ export class CronJobSchedularComponent {
   }
 
   hourToCron(hour, hourType) {
-    return hourType === 'AM' ? (hour === 12 ? 0 : hour) : (hour === 12 ? 12 : hour + 12);
+    return hourType === 'AM' ? (parseInt(hour) === 12 ? 0 : parseInt(hour)) : (parseInt(hour) === 12 ? 12 : parseInt(hour) + 12);
   }
 
   getDaySuffix(num) {
@@ -292,11 +292,9 @@ export class CronJobSchedularComponent {
       }
       break;
     default:
-      console.log('wrong selection');
     }
     if (this.isValid(this.CronExpression)) {
       const cronexpression = this.crondetails;
-      console.log(cronexpression);
       this.onCronChanged.emit(cronexpression);
     }
   }
@@ -308,7 +306,6 @@ export class CronJobSchedularComponent {
   }
 
   loadData() {
-    console.log(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     switch (this.scheduleType) {
     case 'daily':
@@ -320,7 +317,7 @@ export class CronJobSchedularComponent {
         let fetchTime = parseCronValue[1].split(':');
         let meridium = parseCronValue[2].split(',')
         this.dailyTypeDay = {
-          hour: fetchTime[0],
+          hour: parseInt(fetchTime[0]),
           minute: fetchTime[1],
           hourType: meridium[0]
         };
@@ -331,7 +328,7 @@ export class CronJobSchedularComponent {
         let fetchTime = parseCronValue[1].split(':');
         let meridium = parseCronValue[2].split(',')
         this.dailyTypeWeek = {
-          hour: fetchTime[0],
+          hour: parseInt(fetchTime[0]),
           minute: fetchTime[1],
           hourType: meridium[0]
         };
@@ -349,7 +346,7 @@ export class CronJobSchedularComponent {
       let fetchTime = parseCronValue[1].split(':');
       let meridium = parseCronValue[2].split(',')
       this.weeklybasisDate = {
-        hour: fetchTime[0],
+        hour: parseInt(fetchTime[0]),
         minute: fetchTime[1],
         hourType: meridium[0]
       };
@@ -364,7 +361,7 @@ export class CronJobSchedularComponent {
         let fetchTime = parseCronValue[1].split(':');
         let meridium = parseCronValue[2].split(',')
         this.specificDayMonth = {
-          hour: fetchTime[0],
+          hour: parseInt(fetchTime[0]),
           minute: fetchTime[1],
           hourType: meridium[0]
         };
@@ -388,7 +385,7 @@ export class CronJobSchedularComponent {
         let meridium = [];
         meridium = parseCronValue[2].split(',');
         this.specificWeekDayMonth = {
-          hour: fetchTime[0],
+          hour: parseInt(fetchTime[0]),
           minute: fetchTime[1],
           hourType: meridium[0]
         };
@@ -408,7 +405,7 @@ export class CronJobSchedularComponent {
         let meridium = [];
         meridium = parseCronValue[2].split(',');
         this.specificMonthDayYear = {
-          hour: fetchTime[0],
+          hour: parseInt(fetchTime[0]),
           minute: fetchTime[1],
           hourType: meridium[0]
         };
@@ -424,7 +421,7 @@ export class CronJobSchedularComponent {
         let meridium = [];
         meridium = parseCronValue[2].split(',');
         this.specificMonthWeekYear = {
-          hour: fetchTime[0],
+          hour: parseInt(fetchTime[0]),
           minute: fetchTime[1],
           hourType: meridium[0]
         };
@@ -441,7 +438,6 @@ export class CronJobSchedularComponent {
       }
       break;
     default:
-      console.log('wrong selection');
     }
   }
 }

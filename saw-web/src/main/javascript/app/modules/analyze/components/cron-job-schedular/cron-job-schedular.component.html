@@ -21,13 +21,13 @@
 </div>
 
 <div *ngIf="scheduleType == 'weeklybasis'" [ngClass]="{'active': scheduleType == 'weeklybasis'}" class="tabcontent">
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.MON" (click)="regenerateCron()" /> Monday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.TUE" (click)="regenerateCron()" /> Tuesday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.WED" (click)="regenerateCron()" /> Wednesday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.THU" (click)="regenerateCron()" /> Thrusday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.FRI" (click)="regenerateCron()" /> Friday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SAT" (click)="regenerateCron()" /> Saturday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SUN" (click)="regenerateCron()" /> Sunday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.MON" (change)="regenerateCron()" /> Monday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.TUE" (change)="regenerateCron()" /> Tuesday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.WED" (change)="regenerateCron()" /> Wednesday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.THU" (change)="regenerateCron()" /> Thrusday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.FRI" (change)="regenerateCron()" /> Friday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SAT" (change)="regenerateCron()" /> Saturday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SUN" (change)="regenerateCron()" /> Sunday
   <br/>
   Start Time
   <cron-date-picker [model]="weeklybasisDate" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/>
