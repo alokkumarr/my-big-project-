@@ -9,9 +9,9 @@
     <root level="error">
         <appender-ref ref="STDOUT" />
     </root>
-    <logger name="org.springframework" level="WARN">
+    <logger name="org.springframework" level="trace">
     </logger>
 
-    <logger name="com.synchronoss.saw.gateway" level='info'>
+    <logger name="com.synchronoss.saw.gateway" level='trace'>
     </logger>
 </configuration>

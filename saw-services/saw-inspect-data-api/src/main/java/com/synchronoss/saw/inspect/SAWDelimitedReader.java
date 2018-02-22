@@ -1,4 +1,5 @@
 package com.synchronoss.saw.inspect;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,18 +10,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
+
 import sncr.bda.core.file.HFileOperations;
 
 public class SAWDelimitedReader {
@@ -28,17 +33,15 @@ public class SAWDelimitedReader {
   private static final org.apache.log4j.Logger logger =
       org.apache.log4j.Logger.getLogger(SAWDelimitedReader.class);
 
-  private CsvParserSettings settings;
-  private CsvParser parser;
-  private SAWDelimitedRowProcessor rowProcessor;
   private String path;
   private boolean localFileSystem =false;
+  private List<String> fileLines = new ArrayList<String>();
 
   public static void main(String[] args) {
     try {
-      SAWDelimitedReader parser = new SAWDelimitedReader("/Users/spau0004/Desktop/*.csv", 4, true);
-      parser.parseSomeLines();
+      SAWDelimitedReader parser = new SAWDelimitedReader("/Users/spau0004/Desktop/crime.csv", 4, true);
       String str = parser.toJson();
+      System.out.println(str);
       BufferedWriter writer =new BufferedWriter(new FileWriter("/Users/spau0004/Desktop/result.json"));
       writer.write(str);
       writer.close();
@@ -52,7 +55,6 @@ public class SAWDelimitedReader {
   }
 
   public SAWDelimitedReader(String root, long sampleSize, boolean localFileSystem) throws Exception {
-    
     this.localFileSystem = localFileSystem;
     String tmp = "";
     if (root != null) {
@@ -63,12 +65,7 @@ public class SAWDelimitedReader {
       }
     }
     this.path = getFilePath(tmp);
-    this.settings = new CsvParserSettings();
-    this.settings.setIgnoreLeadingWhitespaces(true);
-    this.settings.setIgnoreTrailingWhitespaces(true);
-    this.rowProcessor = new SAWDelimitedRowProcessor(sampleSize);
-    this.settings.setProcessor(this.rowProcessor);
-    parser = new CsvParser(this.settings);
+    fileLines = readStream(getReader(this.path),sampleSize);
   }
 
   private String getFilePath(String path) throws Exception {
@@ -115,15 +112,6 @@ public class SAWDelimitedReader {
     return filePath;
   }
 
-  public void parseSomeLines() throws Exception {
-    Integer numberOfRowsParsed = 0;
-    Reader reader = getReader(path);
-    parser.beginParsing(reader);
-    while (parser.parseNext() != null) {
-      numberOfRowsParsed++;
-    }
-  }
-
   private Reader getReader(String path) throws Exception {
     InputStream inputStream = null;
     if (!this.localFileSystem) {
@@ -136,13 +124,27 @@ public class SAWDelimitedReader {
     }
   }
 
-  public String toJson() {
+  public String toJson() throws IOException {
     Gson gson = new GsonBuilder().setPrettyPrinting().setVersion(1.0).create();
-    JsonObject jo = rowProcessor.toJson();
-    JsonArray samples = jo.get("samples").getAsJsonArray();
-    JsonElement formatElement = gson.toJsonTree(samples);
+    JsonElement formatElement = gson.toJsonTree(fileLines);
     JsonObject object = new JsonObject();
     object.add("samples", formatElement);
     return gson.toJson(object);
   }
-}
+  
+  public List<String> readFirst(final java.nio.file.Path path, final int numLines)
+     throws IOException {
+      try (final Stream<String> lines = Files.lines(path)) {
+          return lines.limit(numLines).collect(Collectors.toList());
+      }
+  }
+  
+  public List<String> readStream(final Reader path, final long numLines)
+      throws IOException {
+    try (BufferedReader buffer = new BufferedReader(path)) {
+      return buffer.lines().limit(numLines).collect(Collectors.toList());
+  }
+   }
+  
+  }
+

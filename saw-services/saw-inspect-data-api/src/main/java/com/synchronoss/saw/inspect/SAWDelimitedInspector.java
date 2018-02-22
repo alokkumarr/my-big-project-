@@ -33,14 +33,16 @@ public class SAWDelimitedInspector {
   private long headerSize;
   private long fieldNamesLine;
   private boolean localFileSystem =false;
+  private String relativePath;
 
   public static void main(String[] args) {
     try {
       String cnf =
           "{\"inspect\":{\"lineSeparator\":\"\\n\",\"delimiter\":\",\",\"quoteChar\":\"'\",\"quoteEscapeChar\":\"\\\\\",\"headerSize\":1,\"fieldNamesLine\":1,\"dateFormats\":[],\"rowsToInspect\":5,\"sampleSize\":5,\"delimiterType\":\"delimited\",\"description\":\"\"}}";
-      SAWDelimitedInspector parser = new SAWDelimitedInspector(cnf, "/Users/spau0004/Desktop/test.csv", true);
+      SAWDelimitedInspector parser = new SAWDelimitedInspector(cnf, "/Users/spau0004/Desktop/sample.csv", true, "Desktop/sample.csv");
       parser.parseSomeLines();
       String str = parser.toJson();
+      System.out.println(str);
       BufferedWriter writer =
           new BufferedWriter(new FileWriter("/Users/spau0004/Desktop/result.json"));
       writer.write(str);
@@ -54,8 +56,9 @@ public class SAWDelimitedInspector {
     System.exit(0);
   }
 
-  public SAWDelimitedInspector(String jsonSettings, String root, boolean localFileSystem) throws Exception {
+  public SAWDelimitedInspector(String jsonSettings, String root, boolean localFileSystem, String relativePath) throws Exception {
     this.localFileSystem = localFileSystem;
+    this.relativePath = relativePath;
     JsonObject conf = new JsonParser().parse(jsonSettings).getAsJsonObject();
     JsonObject inspectorSettings = conf.getAsJsonObject("inspect");
     if (inspectorSettings != null) {
@@ -71,14 +74,13 @@ public class SAWDelimitedInspector {
       logger.info("\nInspecting " + this.path);
       String lineSeparator = getSetting(inspectorSettings, "lineSeparator", "\\n");
       char delimiter = getSetting(inspectorSettings, "delimiter", ",").charAt(0);
-      char quoteChar = getSetting(inspectorSettings, "quoteChar", "\"").charAt(0);
-      char quoteEscapeChar = getSetting(inspectorSettings, "quoteEscape", "\\").charAt(0);
-      char charToEscapeQuoteEscaping =
-          getSetting(inspectorSettings, "charToEscapeQuoteEscaping", "\\").charAt(0);
+      char quoteChar = !getSetting(inspectorSettings, "quoteChar", "\"").isEmpty()? getSetting(inspectorSettings, "quoteChar", "\"").charAt(0): "'".charAt(0);
+      char quoteEscapeChar = !getSetting(inspectorSettings, "quoteEscape", "\\").isEmpty()?getSetting(inspectorSettings, "quoteEscape", "\"").charAt(0): "\\\\".charAt(0);
+      char charToEscapeQuoteEscaping = !getSetting(inspectorSettings, "charToEscapeQuoteEscaping", "\\\\").isEmpty()?getSetting(inspectorSettings, "charToEscapeQuoteEscaping", "\\").charAt(0):"\\".charAt(0);
       this.headerSize = getSetting(inspectorSettings, "headerSize", 0L);
       this.fieldNamesLine = getSetting(inspectorSettings, "fieldNamesLine", 0L);
       long rowsToInspect = getSetting(inspectorSettings, "rowsToInspect", 10000L);
-      long sampleSize = getSetting(inspectorSettings, "sampleSize", 100L);
+      long sampleSize = getSetting(inspectorSettings, "sampleSize", rowsToInspect);
       this.settings = new CsvParserSettings();
       this.settings.getFormat().setLineSeparator(lineSeparator);
       this.settings.getFormat().setDelimiter(delimiter);
@@ -87,6 +89,7 @@ public class SAWDelimitedInspector {
       this.settings.getFormat().setCharToEscapeQuoteEscaping(charToEscapeQuoteEscaping);
       this.settings.setIgnoreLeadingWhitespaces(true);
       this.settings.setIgnoreTrailingWhitespaces(true);
+      this.settings.setEscapeUnquotedValues(true);
       JsonArray formats = conf.getAsJsonObject("inspect").get("dateFormats").getAsJsonArray();
       String[] dateFmt = new String[formats.size()];
       for (int i = 0; i < formats.size(); i++) {
@@ -185,7 +188,7 @@ public class SAWDelimitedInspector {
     Gson gson = new GsonBuilder().setPrettyPrinting().setVersion(1.0).create();
     JsonObject jo = rowProcessor.toJson();
     JsonObject info = jo.get("info").getAsJsonObject();
-    info.addProperty("file", path);
+    info.addProperty("file", relativePath);
     return gson.toJson(jo);
   }
 }

@@ -33,7 +33,7 @@ private Integer fieldNamesLine = 1;
 @JsonProperty("dateFormats")
 private List<String> dateFormats = null;
 @JsonProperty("rowsToInspect")
-private Integer rowsToInspect = 10000;
+private Integer rowsToInspect;
 @JsonProperty("sampleSize")
 private Integer sampleSize;
 @JsonProperty("delimiterType")

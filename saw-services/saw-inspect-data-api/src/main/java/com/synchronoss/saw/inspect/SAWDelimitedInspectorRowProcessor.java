@@ -70,7 +70,7 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         this.deviatedParsedSamples = new ArrayList<>(DEV_SAMPLE_SIZE);
         this.sampleCnt = 0;
         this.devSampleCnt = 0;
-        if(dateFmt.length > 0) {
+        if(dateFmt!=null && dateFmt.length > 0) {
             this.dateFmt = dateFmt;
             this.fmt = new SimpleDateFormat(dateFmt[0]);
         } else{

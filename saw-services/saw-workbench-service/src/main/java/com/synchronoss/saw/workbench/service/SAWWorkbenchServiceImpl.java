@@ -15,6 +15,7 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -138,11 +139,11 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     if (!HFileOperations.exists(defaultProjectRoot + defaultProjectPath + project.getPath())) {
       logger.trace("Path {}", defaultProjectRoot + defaultProjectPath + project.getPath());
       HFileOperations.createDir(defaultProjectRoot + defaultProjectPath + project.getPath());
-      String pathForSubdirectory = FilenameUtils.getFullPathNoEndSeparator(defaultProjectRoot + defaultProjectPath + project.getPath());
+      //String pathForSubdirectory = FilenameUtils.getFullPathNoEndSeparator(defaultProjectRoot + defaultProjectPath + project.getPath());
       logger.trace("After creating folder before reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(project));
-      logger.trace("pathForSubdirectory {}", pathForSubdirectory);
-      project.setPath(pathForSubdirectory);
-      readProject = readDirectoriesByProjectId(project, holdTempPathValue);
+      //logger.trace("pathForSubdirectory {}", pathForSubdirectory);
+      //project.setPath(pathForSubdirectory);
+      readProject = readSubDirectoriesByProjectId(project);
       logger.trace("After creating folder after reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(readProject));
       project.setData(readProject.getData());
     }
@@ -153,7 +154,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   }
 
   @Override
-  public Project uploadFilesDirectoryProjectId(Project project, MultipartFile[] uploadfiles) throws Exception {
+  public Project uploadFilesDirectoryProjectId(Project project, List<File> uploadfiles) throws Exception {
     logger.trace("uploading multiple files the data directory {}", project.getPath());
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
@@ -161,21 +162,24 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     project.setResultFormat(ResultFormat.JSON);
     String projectPath = defaultProjectPath + project.getPath();
     int success =0;
-    for (MultipartFile file : uploadfiles){
-      if(file.isEmpty()){
-        continue;
+    StringBuilder filebuilder = new StringBuilder();
+    for (File file : uploadfiles){
+      if (file.isDirectory()){
+        throw new IOException("It is directory which cannot be uploaded");
       }
-      byte[] bytes = file.getBytes();
-      java.nio.file.Path path = Paths.get(this.tmpDir + file.getOriginalFilename());
-      java.nio.file.Path tmpPath = Files.write(path, bytes);
-      String absolutePath = tmpPath.toAbsolutePath().toString();
-      success = this.mdt.moveToRaw(projectPath, absolutePath, null, file.getOriginalFilename());
+      logger.trace("file name {}", file.getName());
+      filebuilder.append(file.getName());
+      filebuilder.append(": ");
+      String absolutePath = file.getAbsolutePath();
+      logger.trace("file name absolutePath {}", absolutePath);
+      success = this.mdt.moveToRaw(projectPath, absolutePath, null, file.getName());
       if (success!=0){
-        throw new IOException("While copying file " + file.getOriginalFilename() + " from " + tmpPath + " to " + projectPath);
+        throw new IOException("While copying file " + file.getName() + " from " + absolutePath + " to " + projectPath);
       }
     }
     Project readProject = readSubDirectoriesByProjectId(project);
     project.setData(readProject.getData());
+    project.setStatusMessage("Files are successfully uploaded - "+ filebuilder.toString() + " Status :" +HttpStatus.OK);
     logger.trace("response structure {}", objectMapper.writeValueAsString(project));
     return project;
   }
@@ -223,7 +227,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       filePath = defaultProjectRoot + Path.SEPARATOR + defaultProjectPath + Path.SEPARATOR + project.getPath();
       logger.trace("filePath when filesystem is in distributed mode {}", filePath);
         sawDelimitedReader = new SAWDelimitedReader(filePath, Long.parseLong(defaultPreviewLimit), false);
-        sawDelimitedReader.parseSomeLines();
         resultJSON = sawDelimitedReader.toJson();
       logger.trace("resutlJSON from preview service {}", resultJSON);
       Inspect inspect = objectMapper.readValue(resultJSON, Inspect.class);
@@ -233,7 +236,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       filePath = defaultProjectRoot + defaultProjectPath + File.separator + project.getPath();
       logger.trace("filePath when filesystem is not in distributed mode {}", filePath);
         sawDelimitedReader = new SAWDelimitedReader(filePath, Long.parseLong(defaultPreviewLimit), true);
-        sawDelimitedReader.parseSomeLines();
         resultJSON = sawDelimitedReader.toJson();
       logger.trace("resutlJSON from preview service {}", resultJSON);
       Inspect inspect = objectMapper.readValue(resultJSON, Inspect.class);
@@ -257,7 +259,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     if (defaultProjectRoot.startsWith(prefix)){
       filePath = defaultProjectRoot + Path.SEPARATOR + defaultProjectPath + Path.SEPARATOR + inspect.getFile();
       logger.trace("filePath when filesystem is in distributed mode {}", filePath);
-        sawDelimitedInspector = new SAWDelimitedInspector(inspectJSON, filePath, false);
+        sawDelimitedInspector = new SAWDelimitedInspector(inspectJSON, filePath, false,inspect.getFile());
         sawDelimitedInspector.parseSomeLines();
         resultJSON = sawDelimitedInspector.toJson();
       logger.trace("resutlJSON from inspect service {}", resultJSON);
@@ -267,7 +269,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     else {
       filePath = defaultProjectRoot + defaultProjectPath + File.separator + inspect.getFile();
       logger.trace("filePath when filesystem is not in distributed mode {}", filePath);
-        sawDelimitedInspector = new SAWDelimitedInspector(inspectJSON, filePath, true);
+        sawDelimitedInspector = new SAWDelimitedInspector(inspectJSON, filePath, true,inspect.getFile());
         sawDelimitedInspector.parseSomeLines();
         resultJSON = sawDelimitedInspector.toJson();
       logger.trace("resutlJSON from inspect service {}", resultJSON);
