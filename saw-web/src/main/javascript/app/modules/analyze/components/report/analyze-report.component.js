@@ -242,7 +242,7 @@ export const AnalyzeReportComponent = {
       forEach(this.model.sqlBuilder.dataFields, aggregates => {
         forEach(data[0].columns, column => {
           if (column.type === 'string') {
-            const checkStringColumn = aggregates.columnName.split(".");
+            const checkStringColumn = aggregates.columnName.split('.');
             if (checkStringColumn[0] === column.columnName) {
               column.aggregate = aggregates.aggregate;
             }
