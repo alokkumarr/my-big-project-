@@ -239,10 +239,14 @@ export const AnalyzeReportComponent = {
       const defaultSpacing = 300; // canvas pixels
 
       model.clear();
-
       forEach(this.model.sqlBuilder.dataFields, aggregates => {
         forEach(data[0].columns, column => {
-          if (aggregates.columnName === column.columnName) {
+          if (column.type === 'string') {
+            const checkStringColumn = aggregates.columnName.split(".");
+            if (checkStringColumn[0] === column.columnName) {
+              column.aggregate = aggregates.aggregate;
+            }
+          } else if (aggregates.columnName === column.columnName) {
             column.aggregate = aggregates.aggregate;
           }
         });
