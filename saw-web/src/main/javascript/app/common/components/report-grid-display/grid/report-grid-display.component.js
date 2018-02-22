@@ -12,7 +12,8 @@ import DataSource from 'devextreme/data/data_source';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../consts.js';
+import {getFormatter, DEFAULT_PRECISION} from '../../../utils/numberFormatter';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -99,11 +100,6 @@ export const ReportGridDisplayComponent = {
     updateColumns(columns, data) {
       if (this._gridInstance) {
         const cols = this._getDxColumns(columns, data);
-        forEach(cols, column => {
-          if (column.dataType === 'date') {
-            column.dataType = 'string-date';
-          }
-        });
         this._gridInstance.option('columns', cols);
         // this._gridInstance.refresh();
       }
@@ -150,14 +146,21 @@ export const ReportGridDisplayComponent = {
       } else {
         allColumns = this.fillColumns(columns, data);
       }
+
       return map(allColumns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';
         }
+        const isNumberType = NUMBER_TYPES.includes(column.type);
+
         const field = {
           alignment: 'left',
           caption: column.aliasName || column.alias || column.displayName || column.name,
-          format: column.format,
+          format: isNumberType ? {
+            formatter: getFormatter(column.format || (
+              FLOAT_TYPES.includes(column.type) ? {precision: DEFAULT_PRECISION} : {precision: 0}
+            ))
+          } : column.format,
           dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
@@ -168,51 +171,6 @@ export const ReportGridDisplayComponent = {
           field.format = 'yyyy-MM-dd';
         }
 
-        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = {
-            type: 'fixedPoint',
-            comma: false,
-            precision: 2
-          };
-          field.customizeText = (data => {
-            const stringList = data.valueText.split(',');
-            let finalString = '';
-            forEach(stringList, value => {
-              finalString = finalString.concat(value);
-            });
-            return finalString;
-          });
-        }
-        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
-          if (!isUndefined(column.format.currency)) {
-            field.customizeText = (data => {
-              if (!column.format.comma) {
-                const stringList = data.valueText.split(',');
-                let finalString = '';
-                forEach(stringList, value => {
-                  finalString = finalString.concat(value);
-                });
-                data.valueText = finalString;
-              }
-              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
-                return column.format.currencySymbol + ' ' + data.valueText;
-              }
-              return data.valueText;
-            });
-          } else {
-            field.customizeText = (data => {
-              if (!column.format.comma) {
-                const stringList = data.valueText.split(',');
-                let finalString = '';
-                forEach(stringList, value => {
-                  finalString = finalString.concat(value);
-                });
-                data.valueText = finalString;
-              }
-              return data.valueText;
-            });
-          }
-        }
         return field;
       });
     }
