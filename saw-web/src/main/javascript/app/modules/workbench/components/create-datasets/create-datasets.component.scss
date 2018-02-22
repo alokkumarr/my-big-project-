@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 create-datasets {
   width: 100%;
   height: 100%;
@@ -10,7 +12,7 @@ create-datasets {
 
   mat-dialog-content {
     height: 100%;
-    background-color: whitesmoke;
+    background-color: #F5F9FC;
     padding: 3px !important;
     margin: 0 !important;
     max-height: 100% !important;
@@ -18,11 +20,16 @@ create-datasets {
 
   .mat-horizontal-content-container {
     padding: 0 !important;
+    height: calc(100% - 72px);
+  }
+
+  .mat-horizontal-stepper-content {
+    height: 100%;
   }
 
   .mat-stepper-horizontal {
     height: 100%;
-    background-color: whitesmoke;
+    background-color: #F5F9FC;
   }
 
   .mat-horizontal-stepper-header-container {
@@ -30,13 +37,25 @@ create-datasets {
   }
 
   .stepperBtn {
-    margin-top: 5px;
+    margin-top: 3px;
     font-size: 20px;
-    min-width: 13%;
+    min-width: 12%;
 
     .mat-icon {
       height: auto;
     }
+  }
+
+  .previous {
+    width: 143px;
+    height: 42px;
+    border-radius: 2px;
+    background-color: white;
+    border: solid 1px $primary-blue-b2;
+  }
+
+  .Outline {
+    color: $primary-blue-b2;
   }
 
   .xBtn {
@@ -54,7 +73,7 @@ create-datasets {
 
   .preview-icon {
     font-size: 18px;
-    color: #1A89D4;
+    color: $primary-blue-b2;
   }
 
   .mat-card {
@@ -95,7 +114,7 @@ create-datasets {
 
   .list-header {
     padding: 9px;
-    background-color: #1A89D4;
+    background-color: $primary-blue-b2;
     font-size: 16px;
     border-radius: 3px 12px 0 0;
     color: white;
@@ -104,11 +123,19 @@ create-datasets {
   .list-items {
     background-color: white;
     border-radius: 0 3px 3px;
-    border: #1A89D4 0.5px dotted;
+    border: $primary-blue-b2 0.5px dotted;
 
     &:hover {
       box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
       cursor: pointer;
     }
+  }
+
+  .data-details {
+    height: calc(100% - 53px);
+  }
+
+  .top-margin {
+    margin-top: 3px;
   }
 }

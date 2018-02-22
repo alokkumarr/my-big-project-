@@ -28,7 +28,6 @@ export class DateformatDialogComponent {
     if (get(data, 'placeholder')) {
       this.placeholder = data.placeholder;
     }
-    
   }
 
   ngOnInit() {

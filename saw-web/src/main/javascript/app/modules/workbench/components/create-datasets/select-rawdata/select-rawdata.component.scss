@@ -4,6 +4,10 @@
 select-rawdata {
   width: 100%;
 
+  .select-view {
+    height: calc(100% - 43px);
+  }
+
   .border-right-style {
     border-right-style: inset;
     background-color: white;
@@ -44,8 +48,8 @@ select-rawdata {
     padding-right: 18px;
 
     mat-icon {
-      color: #1A89D4;
-      font-size: 22px;
+      color: $primary-blue-b2;
+      font-size: 19px;
     }
 
     .mat-form-field-wrapper {
@@ -64,7 +68,7 @@ select-rawdata {
 
   .selectCard {
     padding: 0;
-    background-color: whitesmoke;
+    background-color: #F5F9FC;
   }
 
   .whiteFrame {
@@ -93,19 +97,29 @@ select-rawdata {
 
   .file-icon {
     color: #00B18D;
+    font-size: 18px;
   }
 
   .tree {
     padding: 25px 0 0 9px;
-    height: 95%;
+    border-right-style: inset;
   }
 
   .preview-icon {
     font-size: 18px;
-    color: #1A89D4;
+    cursor: pointer;
+    color: $primary-blue-b2;
   }
 
   .xBtn {
     color: #E5524C;
+  }
+
+  .staging-content {
+    height: calc(100% - 55px);
+  }
+
+  .mat-icon-button {
+    height: 36px !important;
   }
 }

@@ -97,7 +97,8 @@ export class DatasetsComponent implements OnInit {
 
   addDataSet(): void {
     this.dialog.open(CreateDatasetsComponent, {
-      panelClass: 'full-screen-dialog'
+      panelClass: 'full-screen-dialog',
+      autoFocus: false
     });
   }
 }

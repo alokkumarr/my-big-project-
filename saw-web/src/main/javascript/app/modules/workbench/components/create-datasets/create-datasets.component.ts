@@ -31,10 +31,10 @@ export class CreateDatasetsComponent implements OnInit {
   private toAdd: Subject<any> = new Subject();
   private fieldsConf: any;
   private parserConf: any;
-  private myHeight: Number;
   public nameFormGroup: FormGroup;
 
-  constructor(public dialogRef: MatDialogRef<CreateDatasetsComponent>,
+  constructor(
+    public dialogRef: MatDialogRef<CreateDatasetsComponent>,
     private dialog: MatDialog,
     private workBench: WorkbenchService,
     private formBuilder: FormBuilder
@@ -43,17 +43,12 @@ export class CreateDatasetsComponent implements OnInit {
   @ViewChild('previewComponent') private previewComponent: ParserPreviewComponent;
   
   ngOnInit() {
-    this.myHeight = window.screen.availHeight - 340;
     this.csvConfig = cloneDeep(CSV_CONFIG); 
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
-      nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(12)]),
-      descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(36)])
+      nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(18)]),
+      descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(50)])
     });
-  }
-  
-  onResize(event) {
-    this.myHeight = window.screen.availHeight - 340;
   }
 
   stepChanged(event) {
@@ -67,7 +62,7 @@ export class CreateDatasetsComponent implements OnInit {
   markSelectDone(data): void {
     this.selectFullfilled = data.selectFullfilled;
     this.selectedFiles = data.selectedFiles;
-    this.csvConfig.csvInspector.file = data.filePath;
+    this.csvConfig.file = data.filePath;
   }
 
   markDetailsDone(data): void {
@@ -88,9 +83,11 @@ export class CreateDatasetsComponent implements OnInit {
   }
 
   previewDialog(fileDetails): void {
-    const path = fileDetails.cat === 'root' ? fileDetails.name : `${fileDetails.cat}/${fileDetails.name}`;
+    const path = `${fileDetails.path}/${fileDetails.name}`;
     this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+        minHeight: 500,
+        minWidth: 600,
         data: {
           title: fileDetails.name,
           rawData: data.data

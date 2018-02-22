@@ -1,18 +1,15 @@
 export const CSV_CONFIG = {
-  csvInspector: {
-    file: '',
-    lineSeparator: '\n',
-    delimiter: '',
-    quoteChar: '\"',
-    quoteEscapeChar: '\\',
-    hederSize: 1,
-    fieldNamesLine: 1,
-    dateFormats: ['yyyy-MM-dd HH:mm:ss', 'MM/dd/yyyy HH:mm:ss', 'yyyy-MM-dd'],
-    rowsToInspect: 3333,
-    sampleSize: 33,
-    delimiterType: 'delimited',
-    header: 'yes'
-  }
+  file: '',
+  lineSeparator: '\\n',
+  delimiter: ',',
+  quoteChar: '',
+  quoteEscapeChar: '\\',
+  headerSize: 1,
+  fieldNamesLine: '',
+  dateFormats: [],
+  rowsToInspect: 3333,
+  delimiterType: 'delimited',
+  header: 'yes'
 };
 
 export const PARSER_CONFIG = {
@@ -21,10 +18,10 @@ export const PARSER_CONFIG = {
     file: '',
     lineSeparator: '\\n',
     delimiter: ',',
-    quoteChar: '\"',
+    quoteChar: '',
     quoteEscape: '\\',
     headerSize: 1,
-    fieldNameLine: 0
+    fieldNameLine: ''
   },
   outputs: [{
     dataSet: '',
@@ -40,4 +37,4 @@ export const PARSER_CONFIG = {
   }]
 };
 
-export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'd': true, 'cat': '' }];
+export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'isDirectory': true, 'path': 'root' }];

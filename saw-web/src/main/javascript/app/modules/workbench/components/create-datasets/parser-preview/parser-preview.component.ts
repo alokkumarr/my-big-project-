@@ -13,12 +13,14 @@ import * as replace from 'lodash/replace';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
 import * as has from 'lodash/has';
+import * as take from 'lodash/take';
 
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
 
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component'
+import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./parser-preview.component.html');
 require('./parser-preview.component.scss');
@@ -37,13 +39,15 @@ export class ParserPreviewComponent implements OnInit {
   private updaterSubscribtion: any;
   private toAddSubscribtion: any;
   private fieldInfo = [];
-  private myHeight: Number;
   private parserData: any;
+  private rawFile: any;
+  private tempFields = [];
+  private userProject = 'project2';
 
   constructor(
     private dxDataGrid: dxDataGridService,
     private dialog: MatDialog,
-    public snackBar: MatSnackBar
+    private workBench: WorkbenchService
   ) { }
 
   @Output() parserConfig: EventEmitter<any> = new EventEmitter<any>();
@@ -52,7 +56,6 @@ export class ParserPreviewComponent implements OnInit {
 
   ngOnInit() {
     this.previewgridConfig = this.getPreviewGridConfig();
-    this.myHeight = window.screen.availHeight - 281;
     this.updaterSubscribtion = this.previewObj.subscribe(data => {
       this.onUpdate(data)
     });
@@ -66,21 +69,17 @@ export class ParserPreviewComponent implements OnInit {
     if (data.samplesParsed) {
       this.parserData = cloneDeep(data);
       const parsedData = data.samplesParsed;
-      this.fieldInfo = cloneDeep(data.fields);
+      this.tempFields = cloneDeep(data.fields);
       this.dataGrid.instance.beginCustomLoading('Loading...');
       setTimeout(() => {
         this.reloadDataGrid(parsedData);
       });
+      this.rawPreview('//sample.csv');
     }
   }
 
   ngAfterViewInit() {
     this.dataGrid.instance.option(this.previewgridConfig);
-  }
-
-  onResize(event) {
-    this.myHeight = window.screen.availHeight - 281;
-    this.dataGrid.instance.refresh();
   }
 
   getPreviewGridConfig() {
@@ -111,7 +110,8 @@ export class ParserPreviewComponent implements OnInit {
       },
       scrolling: {
         showScrollbar: 'always',
-        mode: 'virtual'
+        mode: 'virtual',
+        useNative: false
       },
       showRowLines: false,
       showBorders: false,
@@ -130,6 +130,7 @@ export class ParserPreviewComponent implements OnInit {
 
   reloadDataGrid(data) {
     this.dataGrid.instance.option('dataSource', data);
+    this.fieldInfo = this.tempFields;
     this.dataGrid.instance.refresh();
     this.dataGrid.instance.endCustomLoading();
   }
@@ -212,5 +213,11 @@ export class ParserPreviewComponent implements OnInit {
       return 'visible';
     }
     return 'hidden';
+  }
+
+  rawPreview(filePath) {
+    this.workBench.getRawPreviewData(this.userProject, filePath).subscribe(data => {
+      this.rawFile = take(data.data, 50);
+    });
   }
 }

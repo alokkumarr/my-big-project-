@@ -1,0 +1,26 @@
+<div class="executor-container">
+  <div mat-dialog-title class="title-elem">
+    <div>
+      <mat-icon fontIcon="icon-query-mode" style="vertical-align:bottom;"></mat-icon>
+      <span class="view-title">SQL_EXECUTOR </span>
+    </div>
+    <span fxFlex></span>
+    <button mat-icon-button color="primary" matTooltip="Execute Query" (click)="runScript()">
+      <mat-icon fontIcon="icon-play_circle" class="exec-btn-icon"></mat-icon>
+    </button>
+    <button mat-icon-button color="primary" matTooltip="Save" (click)="save()">
+        <mat-icon fontIcon="icon-save" class="exec-btn-icon"></mat-icon>
+      </button>
+    <button mat-icon-button mat-dialog-close class="xBtn">
+      <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
+    </button>
+  </div>
+  <mat-progress-bar *ngIf="showProgress" mode="query" style="height:2px;"></mat-progress-bar>
+  <mat-divider></mat-divider>
+  <div mat-dialog-content class="exec-body">
+    <div class="top-pane">
+      <sql-script #sqlscript [artifacts]="artifacts" (on-save)="onSaveQuery($event)">
+      </sql-script>
+    </div>
+  </div>
+</div>

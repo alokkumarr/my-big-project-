@@ -1,8 +1,5 @@
 import * as angular from 'angular';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
-
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
@@ -10,6 +7,7 @@ import { FlexLayoutModule } from '@angular/flex-layout'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
@@ -36,6 +34,9 @@ import { DatasetDetailsComponent } from './components/create-datasets/dataset-de
 import { RawpreviewDialogComponent } from './components/create-datasets/rawpreview-dialog/rawpreview-dialog.component';
 import { ParserPreviewComponent } from './components/create-datasets/parser-preview/parser-preview.component';
 import { DateformatDialogComponent } from './components/create-datasets/dateformat-dialog/dateformat-dialog.component';
+import { DatasetActionsComponent } from './components/dataset-actions/dataset-actions.component';
+import { SqlExecutorComponent } from './components/sql-executor/sql-executor.component';
+import { SqlScriptComponent } from './components/sql-executor/query/sql-script.component';
 
 import { CommonModule } from '../../common';
 
@@ -57,11 +58,25 @@ const components = [
   DatasetDetailsComponent,
   RawpreviewDialogComponent,
   ParserPreviewComponent,
-  DateformatDialogComponent
+  DateformatDialogComponent,
+  DatasetActionsComponent,
+  SqlExecutorComponent,
+  SqlScriptComponent
 ];
 
 @NgModule({
-  imports: [AngularCommonModule, FormsModule, MaterialModule, ReactiveFormsModule, UIRouterUpgradeModule, DxDataGridModule, DxTemplateModule, FlexLayoutModule, TreeModule],
+  imports: [
+    AngularCommonModule,
+    FormsModule,
+    MaterialModule,
+    ReactiveFormsModule,
+    UIRouterUpgradeModule,
+    DxDataGridModule,
+    DxTemplateModule,
+    FlexLayoutModule,
+    TreeModule,
+    AceEditorModule
+  ],
   declarations: components,
   entryComponents: components,
   providers: [

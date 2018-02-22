@@ -1,0 +1,7 @@
+<ace-editor #editor
+  [(text)]="query"
+  (textChanged)="queryUpdated($event)"
+  [options]="editorOptions"
+  theme="sqlserver"
+  mode="sql">
+</ace-editor>

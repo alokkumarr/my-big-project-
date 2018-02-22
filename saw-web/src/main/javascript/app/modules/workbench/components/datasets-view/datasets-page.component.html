@@ -11,14 +11,14 @@
       <div fxFlex="20" fxLayout="row">
         <div class="dataSets-view_switch-view">
           <mat-radio-group [(ngModel)]="viewState" (ngModelChange)="onViewChange()">
-            <mat-radio-button [value]="LIST_VIEW">
-              <mat-icon fontIcon="icon-Table-view">
+            <mat-radio-button matTooltip="List view" [value]="LIST_VIEW">
+              <mat-icon fontIcon="icon-report" style="font-size:17px;">
                 <span matTooltip="List View"></span>
               </mat-icon>
             </mat-radio-button>
 
-            <mat-radio-button [value]="CARD_VIEW">
-              <mat-icon fontIcon="icon-card-view">
+            <mat-radio-button matTooltip="Card view" [value]="CARD_VIEW">
+              <mat-icon fontIcon="icon-tile-view-solid">
                 <span matTooltip="Card View"></span>
               </mat-icon>
             </mat-radio-button>
@@ -34,7 +34,7 @@
     </div>
   </mat-toolbar>
 
-  <div id="datasets-container" fxLayout="column" [ngSwitch]="viewState" style="background-color: whitesmoke; overflow: auto;">
+  <div class="content" id="datasets-container" fxLayout="column" [ngSwitch]="viewState" style="background-color: #F5F9FC; overflow: auto;">
 
     <!-- LIST VIEW -->
 

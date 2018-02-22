@@ -24,7 +24,6 @@ require('./dataset-details.component.scss');
 export class DatasetDetailsComponent implements OnInit {
   @Input() selFiles: Array<any>;
   @Input() previewConfig: any;
-  private myHeight: Number;
   private userProject: string = 'project2';
   private separatorKeysCodes = [ENTER, COMMA];
   public detailsFormGroup: FormGroup;
@@ -38,14 +37,13 @@ export class DatasetDetailsComponent implements OnInit {
   @Output() onDetailsFilled: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
-    this.myHeight = window.screen.availHeight - 345;
     this.detailsFormGroup = new FormGroup({
       fieldSeperatorControl: new FormControl('', Validators.required),
       hederSizeControl: new FormControl('1', Validators.required),
-      fieldNamesLineControl: new FormControl('1', Validators.required),
-      lineSeperatorControl: new FormControl('\n', Validators.required),
-      quoteCharControl: new FormControl('', Validators.required),
-      escapeCharControl: new FormControl('\\', Validators.required)
+      fieldNamesLineControl: new FormControl('0'),
+      lineSeperatorControl: new FormControl('\\n', Validators.required),
+      quoteCharControl: new FormControl(''),
+      escapeCharControl: new FormControl('')
     });
     this.subcribeToFormChanges();
   }
@@ -61,17 +59,13 @@ export class DatasetDetailsComponent implements OnInit {
     });
   }
 
-  onResize(event) {
-    this.myHeight = window.screen.availHeight - 345;
-  }
-
   addFormat(event: MatChipInputEvent): void {
     let input = event.input;
     let value = event.value;
 
     // Add Format
     if ((value || '').trim()) {
-      this.previewConfig.csvInspector.dateFormats.push(value.trim());
+      this.previewConfig.dateFormats.push(value.trim());
     }
 
     // Reset the input value
@@ -81,17 +75,19 @@ export class DatasetDetailsComponent implements OnInit {
   }
 
   removeFormat(format: any): void {
-    let index = this.previewConfig.csvInspector.dateFormats.indexOf(format);
+    let index = this.previewConfig.dateFormats.indexOf(format);
 
     if (index >= 0) {
-      this.previewConfig.csvInspector.dateFormats.splice(index, 1);
+      this.previewConfig.dateFormats.splice(index, 1);
     }
   }
 
   previewDialog(fileDetails): void {
-    const path = fileDetails.cat === 'root' ? fileDetails.name : `${fileDetails.cat}/${fileDetails.name}`;
+    const path = `${fileDetails.path}/${fileDetails.name}`;
     this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+        minHeight: 500,
+        minWidth: 600,
         data: {
           title: fileDetails.name,
           rawData: data.data
@@ -102,12 +98,12 @@ export class DatasetDetailsComponent implements OnInit {
 
   onFormValid(data) {
     if (!isUndefined(this.selFiles)) {
-      this.previewConfig.csvInspector.delimiter = data.fieldSeperatorControl;
-      this.previewConfig.csvInspector.fieldNamesLine = data.fieldNamesLineControl;
-      this.previewConfig.csvInspector.hederSize = data.hederSizeControl;
-      this.previewConfig.csvInspector.lineSeparator = data.lineSeperatorControl;
-      this.previewConfig.csvInspector.quoteEscapeChar = data.escapeCharControl;
-      this.previewConfig.csvInspector.quoteChar = data.quoteCharControl
+      this.previewConfig.delimiter = data.fieldSeperatorControl;
+      this.previewConfig.fieldNamesLine = data.fieldNamesLineControl;
+      this.previewConfig.headerSize = data.hederSizeControl;
+      this.previewConfig.lineSeparator = data.lineSeperatorControl === '\\n' ? '\n' : data.lineSeperatorControl;
+      this.previewConfig.quoteEscapeChar = data.escapeCharControl;
+      this.previewConfig.quoteChar = data.quoteCharControl === '' ? '"' : data.quoteCharControl;
       this.onDetailsFilled.emit({ detailsFilled: true, details: this.previewConfig });
     }
   }

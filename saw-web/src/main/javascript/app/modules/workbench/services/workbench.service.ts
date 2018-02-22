@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 
-import { DATASETS, TREE_DATA, TREE_VIEW_Data, RAW_SAMPLE, parser_preview } from '../sample-data';
+import { DATASETS, TREE_DATA, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
@@ -30,30 +30,24 @@ export class WorkbenchService {
 
   /** GET datasets from the server */
   getDatasets(projectName: string): Observable<any> {
-    let Params = new HttpParams();
-    Params = Params.append('prj', projectName);
-    return this.http.get(`${this.apiWB}/dl/sets`, { params: Params })
+    const endpoint = `${this.wbAPI}/${projectName}/datasets`;
+    return this.http.post(endpoint, {})
       .pipe(
         catchError(this.handleError('data', DATASETS)));
   }
 
   /** GET Staging area tree list */
-  getTreeData(projectName: string, path: string): Observable<any> {
-    let Params = new HttpParams();
-    Params = Params.append('prj', projectName);
-    if (path !== null) {
-      Params = Params.append('cat', path);
-    }
-    return this.http.get(`${this.apiWB}/dl/raw`, { params: Params })
+  getStagingData(projectName: string, path: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${projectName}/raw/directory`;
+    return this.http.post(endpoint, { path })
       .pipe(
         catchError(this.handleError('data', TREE_VIEW_Data)));
   }
 
   /** GET raw preview from the server */
   getRawPreviewData(projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/preview`;
-    const payload = { path }
-    return this.http.post(endpoint, payload)
+    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/preview`;
+    return this.http.post(endpoint, {path})
       .pipe(
         catchError(this.handleError('data', RAW_SAMPLE)));
   }
@@ -106,11 +100,19 @@ export class WorkbenchService {
   }
 
   uploadFile(filesToUpload: FileList, projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.apiWB}/dl/upload/raw?prj=${projectName}&cat=${path}`;
+    // const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files?cat=${path}`;
+
+    const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files`;
     const formData: FormData = new FormData();
     forEach(filesToUpload, file => {
       formData.append('file', file);
     });
+    // const dirPath = {path};
+
+    const blobOverrides = new Blob([JSON.stringify(path)], {
+      type: 'application/json'
+    });
+    formData.append('path', blobOverrides);
     return this.http.post(endpoint, formData);
   }
 
@@ -139,10 +141,24 @@ export class WorkbenchService {
   }
 
   createFolder(projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.apiWB}/dl/create/raw?prj=${projectName}&cat=${path}`;
-    return this.http.post(endpoint, {})
+    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/create`;
+    return this.http.post(endpoint, {path})
       .pipe(
-        catchError(this.handleError('data', {})));
+        catchError(this.handleError('data', TREE_VIEW_Data)));
+  }
+  /**
+   * Service to fetch meta data of dataset
+   * 
+   * @param {string} projectName 
+   * @param {any} id 
+   * @returns {Observable<any>} 
+   * @memberof WorkbenchService
+   */
+  getDatasetDetails(projectName: string, id): Observable<any> {
+    const endpoint = `${this.wbAPI}/${projectName}/${id}`;
+    return this.http.get(`${this.wbAPI}/${projectName}/${id}`)
+      .pipe(
+        catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }
 
 

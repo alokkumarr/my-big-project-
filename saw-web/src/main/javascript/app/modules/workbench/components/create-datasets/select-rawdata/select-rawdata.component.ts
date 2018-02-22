@@ -1,9 +1,11 @@
 declare function require(string): string;
 
-import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { debounceTime } from 'rxjs/operators';
+import * as trim from 'lodash/trim';
+import * as uniq from 'lodash/uniq';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -29,7 +31,6 @@ export class SelectRawdataComponent implements OnInit {
   private userProject: string = 'project2';
   private treeNodes: Array<any> = STAGING_TREE;
   private treeOptions: ITreeOptions;
-  private myHeight: number;
   private maskHelper: any;
   private gridConfig: Array<any>;
   private selFiles: Array<any> = [];
@@ -37,6 +38,7 @@ export class SelectRawdataComponent implements OnInit {
   private fileMask: string = '';
   private fileMaskControl = new FormControl('', Validators.required);
   private currentPath: string = '';
+  private nodeID = '';
 
   constructor(
     public dialog: MatDialog,
@@ -52,7 +54,6 @@ export class SelectRawdataComponent implements OnInit {
   ngOnInit() {
     this.gridConfig = this.getGridConfig();
     this.treeConfig = this.getTreeConfig();
-    this.myHeight = window.screen.availHeight - 345;
     this.maskHelper = 'INFO_TEXT';
 
   }
@@ -67,13 +68,13 @@ export class SelectRawdataComponent implements OnInit {
       .subscribe(mask => this.maskSearch(mask));
   }
 
-  onResize(event) {
-    this.myHeight = window.screen.availHeight - 345;
+  ngOnDestroy() {
+    this.treeNodes = [];
   }
 
   getPageData() {
-    this.workBench.getTreeData(this.userProject, null).subscribe(data => {
-      const filteredDataFiles = data.filter(d => d.d === false);
+    this.workBench.getStagingData(this.userProject, '/').subscribe(data => {
+      const filteredDataFiles = data.data.filter(d => d.isDirectory === false);
       this.reloadDataGrid(filteredDataFiles);
     });
   }
@@ -81,19 +82,20 @@ export class SelectRawdataComponent implements OnInit {
   getTreeConfig() {
     this.treeOptions = {
       displayField: 'name',
-      hasChildrenField: 'd',
+      hasChildrenField: 'isDirectory',
       getChildren: (node: TreeNode) => {
-        const tempPath = node.data.cat === 'root' ? node.displayField : `${node.data.cat}/${node.displayField}`;
-        const path = tempPath === '/Staging' ? null : tempPath;
+        const parentPath = node.data.path;
+        const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
         this.currentPath = path;
-        return this.workBench.getTreeData(this.userProject, path)
+        this.nodeID = node.id;
+        return this.workBench.getStagingData(this.userProject, path)
           .toPromise()
           .then(function (data) {
-            const dir = data.filter(d => d.d === true);
+            const dir = data.data.filter(d => d.isDirectory === true);
             return dir;
           });
       },
-      useVirtualScroll: true,
+      useVirtualScroll: false,
       animateExpand: true,
       animateSpeed: 30,
       animateAcceleration: 1.2
@@ -103,11 +105,12 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   openFolder(node) {
-    const tempPath = node.data.cat === 'root' ? node.displayField : `${node.data.cat}/${node.displayField}`;
-    const path = tempPath === '/Staging' ? null : tempPath;
+    const parentPath = node.data.path;
+    const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
     this.currentPath = path;
-    this.workBench.getTreeData(this.userProject, path).subscribe(data => {
-      const filteredDataFiles = data.filter(d => d.d === false);
+    this.nodeID = node.id;
+    this.workBench.getStagingData(this.userProject, path).subscribe(data => {
+      const filteredDataFiles = data.data.filter(d => d.isDirectory === false);
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
     });
@@ -179,7 +182,7 @@ export class SelectRawdataComponent implements OnInit {
       onSelectionChanged: selectedItems => {
         const currFile = selectedItems.selectedRowsData[0];
         if (currFile) {
-          this.filePath = currFile.cat === 'root' ? currFile.name : `${currFile.cat}/${currFile.name}`;
+          this.filePath = `${currFile.path}/${currFile.name}`;
           this.fileMask = currFile.name;
         }
         this.selFiles = [];
@@ -197,7 +200,7 @@ export class SelectRawdataComponent implements OnInit {
     const tempFiles = this.dataGrid.instance.option('dataSource');
     this.selFiles = this.workBench.filterFiles(mask, tempFiles);
     if (this.selFiles.length > 0) {
-      this.filePath = this.selFiles[0].cat === 'root' ? `/${this.fileMask}` : `${this.selFiles[0].cat}/${this.fileMask}`;
+      this.filePath = `${this.selFiles[0].path}/${this.fileMask}`;
       this.onSelectFullfilled.emit({ selectFullfilled: true, selectedFiles: this.selFiles, filePath: this.filePath });
     } else {
       this.onSelectFullfilled.emit({ selectFullfilled: false, selectedFiles: this.selFiles, filePath: this.filePath });
@@ -210,9 +213,11 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   previewDialog(title): void {
-    const path = this.currentPath === null ? `/${title}` : `${this.currentPath}/${title}`;
+    const path = `${this.currentPath}/${title}`;
     this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+        minHeight: 500,
+        minWidth: 600,
         data: {
           title: title,
           rawData: data.data
@@ -220,13 +225,19 @@ export class SelectRawdataComponent implements OnInit {
       });
     });
   }
-
+  /**
+   * File upload function.
+   * Validates size and type(Allows only txt/csv)
+   * If valid then only sends the formdata to upload 
+   * @param {any} event 
+   * @memberof SelectRawdataComponent
+   */
   fileInput(event) {
     let filesToUpload = event.srcElement.files;
     const validSize = this.workBench.validateMaxSize(filesToUpload);
     const validType = this.workBench.validateFileTypes(filesToUpload);
     if (validSize && validType) {
-      const path = this.currentPath === null ? '/' : this.currentPath;
+      const path = this.currentPath;
       this.workBench.uploadFile(filesToUpload, this.userProject, path).subscribe(data => {
 
       });
@@ -234,7 +245,12 @@ export class SelectRawdataComponent implements OnInit {
       this.notify.warn('Only ".csv" or ".txt" extension files are supported', 'Unsupported file type');
     }
   }
-
+  /**
+   * Opens dialog to input folder name. Once closed returns the filename entered.
+   * Gets the children of the directory from service output and push only the newly added child to parent.
+   * 
+   * @memberof SelectRawdataComponent
+   */
   createFolder() {
     const dateDialogRef = this.dialog.open(DateformatDialogComponent, {
       hasBackdrop: false,
@@ -246,10 +262,17 @@ export class SelectRawdataComponent implements OnInit {
     dateDialogRef
       .afterClosed()
       .subscribe(name => {
-        if (name !== '') {
-          const path = this.currentPath === null ? `/${name}` : `${this.currentPath}/${name}`;
+        if (trim(name) !== '' && name != 'null') {
+          const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
           this.workBench.createFolder(this.userProject, path).subscribe(data => {
-            // this.nodes.push({ name: 'another node' });
+            const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
+            const currChilds = currentNode.data.children;
+            var uniqueResults = data.data.filter(obj => {
+              return !currChilds.some(obj2 => {
+                return obj.name == obj2.name;
+              });
+            });
+            currentNode.data.children.push(uniqueResults[0]);
             this.tree.treeModel.update();
           });
         }
