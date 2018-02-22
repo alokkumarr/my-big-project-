@@ -1,9 +1,14 @@
 package com.synchronoss.saw.workbench.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import javax.servlet.ServletException;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
@@ -159,40 +164,41 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @param request
    * @param response
    * @return
-   * @throws JsonProcessingException
+   * @throws ServletException 
+   * @throws IOException 
    */
-  @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.TEXT_PLAIN_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
-      @RequestParam("files") MultipartFile[] uploadfiles, @RequestParam("path")  String filePath) 
-      throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", projectId);
+  public String uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
+      @RequestParam("path")  String filePath, @RequestBody Map<String, String> fileList) 
+      throws IOException, ServletException {
+    logger.debug("Retrieve project details By Id {} ", projectId);
     Preconditions.checkNotNull(filePath, "To upload files path attribute cannot be null");
     Project project = new Project();
+    project.setProjectId(projectId);
     project.setPath(filePath);
+    List<File> files = new ArrayList<File>();
     Project responseProject = null;
-    if (uploadfiles!=null && uploadfiles.length==0){
-          project.setStatusMessage("please select a file! " + HttpStatus.OK);
-      return project;
-    }
     long size = 0;
-    for (MultipartFile uploadfile : uploadfiles){
-      size = size + uploadfile.getSize();
+    Iterator<String> fileItr = fileList.keySet().iterator();
+    while(fileItr.hasNext()){
+      String fileName = fileItr.next();
+      File file = new File(fileList.get(fileName));
+      size = size + file.length();
+      files.add(file);
     }
     size = size/ (1024*1024);
     if (size > sizeInMBLimit){
       project.setStatusMessage("files limit exceeds: "+ size);
-      return project;
     }
     try {
-      responseProject = sawWorkbenchService.uploadFilesDirectoryProjectId(project, uploadfiles);
-      responseProject.setStatusMessage("Files are successfully uploaded - "+ HttpStatus.OK);
+      responseProject = sawWorkbenchService.uploadFilesDirectoryProjectId(project, files);
     } catch (Exception e) {
       logger.error("Exception occured while uploading files in the raw data directory", e);
       throw new CreateEntitySAWException("Exception occured while uploading files in the raw data directory", e);
-    } 
-    project.setProjectId(projectId);
-    return responseProject;
+    }
+    logger.trace("upload Data {} ", responseProject);
+    return responseProject.getStatusMessage();
   } 
 
   @RequestMapping(value = "{projectId}/raw/directory/preview", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
