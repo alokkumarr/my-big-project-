@@ -167,8 +167,8 @@ function navigateToHome() {
 
 module.exports = {
   newDialog: {
-    getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
-    getMethod: name => element(by.css(`button[e2e="item-type-${name}"]`)),
+    getMetricRadioButtonElementByName: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
+    getAnalysisTypeButtonElementByType: name => element(by.css(`button[e2e="item-type-${name}"]`)),
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
   },
   designerDialog: {

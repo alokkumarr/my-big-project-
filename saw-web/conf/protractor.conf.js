@@ -136,7 +136,7 @@ exports.config = {
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],

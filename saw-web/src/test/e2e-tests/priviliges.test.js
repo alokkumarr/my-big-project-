@@ -348,12 +348,12 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          element(by.css('md-backdrop')).click();
+          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
           expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
         }
 
         // Go to executed analysis page
-        analyzePage.main.firstCardTitle.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)

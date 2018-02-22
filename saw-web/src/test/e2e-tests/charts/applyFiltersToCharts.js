@@ -1,5 +1,7 @@
 const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
+const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
@@ -9,10 +11,10 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
   const xAxisName = 'Source Manufacturer';
   const yAxisName = 'Available MB';
-  const filterValue = 'APPLE';
+  const filterValue = '123';
   const groupName = 'Source OS';
-  const metric = 'MCT TMO Session ES';
-  const method = 'chart:column';
+  const metricName = 'MCT TMO Session ES';
+  const analysisType = 'chart:column';
 
   beforeAll(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
@@ -45,12 +47,11 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     // Switch to Card view
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
-    // Add analysis
-    analyzePage.analysisElems.addAnalysisBtn.click();
+    // Create analysis
     const newDialog = analyzePage.newDialog;
-    newDialog.getMetric(metric).click();
-    newDialog.getMethod(method).click();
-    newDialog.createBtn.click();
+    const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
+    const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
+    homePage.createAnalysis(metricElement, analysisTypeElement);
 
     // Select axis and grouping and refresh
     const refreshBtn = chartDesigner.refreshBtn;
@@ -65,18 +66,18 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     expect(hasClass(g, 'md-checked')).toBeTruthy();
     const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
-    refreshBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
 
     // Apply filters
     const filters = analyzePage.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
-    const stringFilterInput = filters.getStringFilterInput(0);
-    const fieldName = xAxisName;
+    const fieldName = yAxisName;
 
-    chartDesigner.openFiltersBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.openFiltersBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
-    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    filters.applyBtn.click();
+    designModePage.filters.numberInput.sendKeys(filterValue);
+    commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);

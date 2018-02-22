@@ -20,7 +20,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
-  let metric = 'MCT TMO Session ES';
+  let metricName = 'MCT TMO Session ES';
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
@@ -70,7 +70,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   using(dataProvider, function (data, description) {
     it('should create and delete ' + description, () => {
       if (data.chartType === 'chart:bubble') {
-        metric = 'PTT Subscr Detail';
+        metricName = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
         xAxisName = 'Account Segment';
         groupName = 'Account Name';
@@ -79,18 +79,11 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       login.loginAs(data.user);
       navigateToSubCategory();
 
-      //Create analysis
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
+      // Create analysis
       const newDialog = analyzePage.newDialog;
-      browser.sleep(1000);
-      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMetric(metric));
-      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMetric(metric));
-
-      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMethod(data.chartType));
-      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMethod(data.chartType));
-
-      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.createBtn);
-      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.createBtn);
+      const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
+      const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(data.chartType);
+      homePage.createAnalysis(metricElement, analysisTypeElement);
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox

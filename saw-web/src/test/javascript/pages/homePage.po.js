@@ -18,7 +18,8 @@ module.exports = {
   subCategory: subCategoryName => {
     return element(by.xpath(`(//span[text()='${subCategoryName}'])[1]`));
   },
-  navigateToSubCategory: (categoryName, subCategoryName) => navigateToSubCategory
+  navigateToSubCategory: (categoryName, subCategoryName) => navigateToSubCategory,
+  createAnalysis: (metricName, analysisType) => createAnalysis(metricName, analysisType)
 };
 
 // Navigates to specific category where analysis creation should happen
@@ -31,4 +32,17 @@ const navigateToSubCategory = (categoryName, subCategoryName) => {
   const subCategory = homePage.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
   commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+};
+
+const createAnalysis = (metricName, analysisType) => {
+  commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
+  browser.sleep(1000);
+  commonFunctions.waitFor.elementToBeEnabledAndVisible(metricName);
+  commonFunctions.waitFor.elementToBeClickableAndClick(metricName);
+
+  commonFunctions.waitFor.elementToBeEnabledAndVisible(analysisType);
+  commonFunctions.waitFor.elementToBeClickableAndClick(analysisType);
+
+  commonFunctions.waitFor.elementToBeEnabledAndVisible(analyzePage.newDialog.createBtn);
+  commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.newDialog.createBtn);
 };
