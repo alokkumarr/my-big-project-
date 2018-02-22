@@ -72,7 +72,6 @@
     "indexMappingfile": "file:///path/to/file.json", // Optional
     "documentIDField": "field1", // Optional - Obsolete (not sure), - Not documented in confluence
     "filterString": "col1='STR1' AND length > 10", // Optional - Not documented
-    "inputFormat": "parquet", // Optional
     "aliases": [{
       "aliasName": "alias1",
       "mode": "replace"

@@ -48,6 +48,7 @@
     <mapr.core.version>5.2.0</mapr.core.version>
     <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
     <gson.version>2.2.4</gson.version>
+    <junit.version>4.12</junit.version>
     <!-- XDF package -->
     <!-- RPM properties -->
     <rpm.name>bda-${prod.name}</rpm.name>
@@ -140,6 +141,14 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <!--/dependencyManagement-->

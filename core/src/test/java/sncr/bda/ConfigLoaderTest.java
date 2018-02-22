@@ -1,5 +1,6 @@
 package sncr.bda;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,40 +18,40 @@ public class ConfigLoaderTest {
     String configuration;
     String configFile;
 
+    // Config values
+    String clusterName;
+    String host;
+    int port;
+    String user;
+    String password;
+    String indexName;
+
     @Before
     public void setUp() {
         configFile = "qaconfig.json";
-        File f = new File(configFile);
-        System.out.println(f.getAbsolutePath());
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(configFile).getFile());
+        configuration = ConfigLoader.loadConfiguration("file:///" + file.getAbsolutePath());
 
-        try {
-            BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-
-            String line;
-            StringBuilder build = new StringBuilder();
-            while((line=buf.readLine()) != null) {
-                build.append(line).append("\n");
-            }
-            System.out.println(build.toString());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//        String destinationIndexName = "index1";
-//        String indexMappingFile = "file:///path/to/file.json";
-//        String documentIDField = "field1";
+        clusterName = "elasticsearch";
+        host = "es01.sncr.dev.sncorp.net";
+        port = 9100;
+        user = "esuser";
+        password = "esuser";
+        indexName = "index1";
     }
 
     @Test
     public void parseConfigurationTest() throws Exception {
-
-        String configuration1 = ConfigLoader.loadConfiguration("file:///qaconfig.json");
-        ComponentConfiguration config = ConfigLoader.parseConfiguration(configuration1);
+        ComponentConfiguration config = ConfigLoader.parseConfiguration(configuration);
 
         assertEquals(true, config.getEsLoader() != null);
-        assertEquals("elasticsearch", config.getEsLoader().getEsClusterName());
+        assertEquals(clusterName, config.getEsLoader().getEsClusterName());
+        assertEquals(host, config.getEsLoader().getEsNodes());
+        assertEquals(port, config.getEsLoader().getEsPort());
+        assertEquals(user, config.getEsLoader().getEsUser());
+        assertEquals(password, config.getEsLoader().getEsPass());
+        assertEquals(indexName, config.getEsLoader().getDestinationIndexName());
     }
 
 }
