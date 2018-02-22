@@ -20,7 +20,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
-  let metric = 'MCT TMO Session ES';
+  let metricName = 'MCT TMO Session ES';
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
@@ -70,7 +70,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   using(dataProvider, function (data, description) {
     it('should verify preview for ' + description, () => {
       if (data.chartType === 'chart:bubble') {
-        metric = 'PTT Subscr Detail';
+        metricName = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
         xAxisName = 'Account Segment';
         groupName = 'Account Name';
@@ -80,16 +80,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       navigateToSubCategory();
 
       //Create analysis
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
-      const newDialog = analyzePage.newDialog;
-      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMetricRadioButtonElementByName(metric));
-      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMetricRadioButtonElementByName(metric));
-
-      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getAnalysisTypeButtonElementByType(data.chartType));
-      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getAnalysisTypeButtonElementByType(data.chartType));
-
-      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.createBtn);
-      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.createBtn);
+      homePage.createAnalysis(metricName, data.chartType);
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox

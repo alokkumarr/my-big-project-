@@ -66,10 +66,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
     // Create Report
-    const newDialog = analyzePage.newDialog;
-    const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
-    const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
-    homePage.createAnalysis(metricElement, analysisTypeElement);
+    homePage.createAnalysis(metricName, analysisType);
 
     browser.waitForAngularEnabled(false);
     /*element(by.xpath(`//md-checkbox/div/span[text()='Source OS']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();

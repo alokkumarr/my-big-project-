@@ -21,7 +21,7 @@ module.exports = {
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
       let count = 0;
-      click(element, count);
+      return click(element, count);
     },
     //Deprecated. Should eliminate error: is not clickable at point - but does not work
     elementToBeClickableAndClickByMouseMove: element => {
@@ -68,9 +68,12 @@ function click(element, i) {
         if (i < protractorConf.timeouts.tempts) {
           click(element, i);
         } else {
-          throw new Error("Element '" + element.locator() + "' is not clickable after " +
+          return new Error("Element '" + element.locator() + "' is not clickable after " +
             protractorConf.timeouts.tempts + " tries. Error: " + err);
         }
       }
     });
 }
+
+// TODO write function which will click two elements in sequence.
+// If second is not clickable then click first element again

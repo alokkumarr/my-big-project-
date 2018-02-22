@@ -80,10 +80,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       navigateToSubCategory();
 
       // Create analysis
-      const newDialog = analyzePage.newDialog;
-      const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
-      const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(data.chartType);
-      homePage.createAnalysis(metricElement, analysisTypeElement);
+      homePage.createAnalysis(metricName, data.chartType);
+
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox

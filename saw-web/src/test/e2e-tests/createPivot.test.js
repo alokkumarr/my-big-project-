@@ -47,10 +47,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
     // Create Pivot
-    const newDialog = analyzePage.newDialog;
-    const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
-    const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
-    homePage.createAnalysis(metricElement, analysisTypeElement);
+    homePage.createAnalysis(metricName, analysisType);
 
     // Apply filters
     const filters = analyzePage.filtersDialog;

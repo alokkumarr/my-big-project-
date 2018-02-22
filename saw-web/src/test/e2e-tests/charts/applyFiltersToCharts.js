@@ -48,10 +48,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
     // Create analysis
-    const newDialog = analyzePage.newDialog;
-    const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
-    const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
-    homePage.createAnalysis(metricElement, analysisTypeElement);
+    homePage.createAnalysis(metricName, analysisType);
 
     // Select axis and grouping and refresh
     const refreshBtn = chartDesigner.refreshBtn;
