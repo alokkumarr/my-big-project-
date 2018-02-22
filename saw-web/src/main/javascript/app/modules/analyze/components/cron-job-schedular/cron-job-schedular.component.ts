@@ -128,11 +128,8 @@ export class CronJobSchedularComponent {
       value: 12,
       label:'December'
     }];
-    if (this.crondetails.activeTab === '' || isUndefined(this.crondetails.activeTab)) {
-      this.scheduleType = 'daily';
-    } else {
-      this.loadData();
-    }
+    this.scheduleType = 'daily';
+    this.loadData();
   }
 
   private range(start: number, end: number): number[] {
@@ -141,12 +138,57 @@ export class CronJobSchedularComponent {
   }
 
   resetData() {
-    this.ngOnInit();
+    this.dailyTypeDay = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM'
+    };
+    this.dailyTypeWeek = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM'
+    };
+    this.weeklybasisDate = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM'
+    }
+    this.specificDayMonth = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM' 
+    }
+    this.specificWeekDayMonth = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM'
+    }
+    this.specificMonthDayYear = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM'
+    }
+    this.specificMonthWeekYear = {
+      hour: '',
+      minute: '',
+      second: '',
+      hourType: 'AM'
+    }
+    this.model = {}
+    this.daily = {};
+    this.weekly = {};
+    this.monthly = {};
+    this.yearly = {};
   }
 
   openSchedule(event, scheduleType) {
     this.resetData();
-    this.crondetails = {};
   	this.scheduleType = scheduleType;
   }
 
@@ -253,13 +295,10 @@ export class CronJobSchedularComponent {
       console.log('wrong selection');
     }
     if (this.isValid(this.CronExpression)) {
-      console.log(this.crondetails);
-      this.onCronChange();
+      const cronexpression = this.crondetails;
+      console.log(cronexpression);
+      this.onCronChanged.emit(cronexpression);
     }
-  }
-
-  onCronChange() {
-    this.onCronChanged.emit(this.crondetails);
   }
 
   isValid(expression) {
@@ -269,6 +308,7 @@ export class CronJobSchedularComponent {
   }
 
   loadData() {
+    console.log(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     switch (this.scheduleType) {
     case 'daily':
@@ -302,6 +342,10 @@ export class CronJobSchedularComponent {
       break;
     case 'weeklybasis':
       let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+      let getWeekDays = this.crondetails.cronexp.split(' ');
+      forEach(getWeekDays[5].split(','), day => {
+        this.weekly[day] = true;
+      })
       let fetchTime = parseCronValue[1].split(':');
       let meridium = parseCronValue[2].split(',')
       this.weeklybasisDate = {

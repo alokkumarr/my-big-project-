@@ -40,6 +40,7 @@ export const AnalyzePublishDialogComponent = {
       this.cronexp = '';
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
       const semicolon = 186;
+      console.log(this.model);
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
       if (this.model.isScheduled === 'true') {
         this.emails = get(this.model.schedule, 'emails') || [];
@@ -75,10 +76,11 @@ export const AnalyzePublishDialogComponent = {
     }
 
     $onInit() {
+      //REMINDER: Replace this with API response once BackEnd development is complete.
       this.crondetails = {
-        cronexp: '0 0 3 ? 4 MON#4 *',
-        activeTab: 'yearly',
-        activeRadio: 'specificMonthWeek'
+        cronexp: '0 8 9 9 1/8 ? *',
+        activeTab: 'monthly',
+        activeRadio: 'specificDay'
       }
       this.populateSchedule();
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
@@ -104,22 +106,14 @@ export const AnalyzePublishDialogComponent = {
     generateSchedulePayload() {
       if (!this.hasSchedule) {
         this.model.schedule = null;
-        this.model.scheduleHuman = '';
         return {execute: true, payload: this.model};
       }
 
       this.model.schedule = {
         emails: this.emails,
-        repeatUnit: F2B_DICTIONARY[this.repeatInterval],
-        repeatInterval: this.repeatOrdinal,
-        repeatOnDaysOfWeek: reduce(this.repeatOnDaysOfWeek, (result, day) => {
-          result[day.keyword.toLowerCase()] = day.checked;
-          return result;
-        }, {})
+        cronDetials: this.cronexp
       };
-
-      this.model.scheduleHuman = this._AnalyzeService.scheduleToString(this.model.schedule);
-
+      console.log(this.model.schedule);
       return {execute: true, payload: this.model};
     }
 
@@ -137,20 +131,23 @@ export const AnalyzePublishDialogComponent = {
       this._$mdDialog.cancel();
     }
 
-    onCronChange(cronexpression) {
-      console.log(cronexpression);
+    onCronChanged(cronexpression) {
       this.cronexp = cronexpression;
     }
 
     publish() {
-      console.log(this.cronexp);
-      // if (!this.validateEmails(this.emails)) {
-      //   this.emailValidateFlag = true;
-      //   return;
-      // }
-      // const {payload, execute} = this.generateSchedulePayload();
-      // const promise = this.onPublish({model: payload, execute});
-      // this._$mdDialog.hide(promise);
+      if (!this.validateEmails(this.emails)) {
+        this.emailValidateFlag = true;
+        return;
+      }
+      this.model.schedule = {
+        emails: this.emails,
+        cronDetials: this.cronexp
+      };
+      console.log(this.model.schedule);
+      const {payload, execute} = this.generateSchedulePayload();
+      const promise = this.onPublish({model: payload, execute});
+      this._$mdDialog.hide(promise);
     }
 
     validateEmails(emails) {

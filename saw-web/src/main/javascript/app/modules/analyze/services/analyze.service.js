@@ -67,25 +67,6 @@ export class AnalyzeService {
     return EXECUTION_STATES.ERROR === this._executingAnalyses[analysisId];
   }
 
-  scheduleToString(schedule) {
-    let result;
-    if (schedule.repeatInterval === 1) {
-      result = startCase(schedule.repeatUnit);
-    } else {
-      result = `Every ${schedule.repeatInterval} ${SCHEDULE_B2F_DICTIONARY[schedule.repeatUnit]}`;
-    }
-
-    if (schedule.repeatUnit === 'weekly') {
-      const dayString = trim(reduce(SCHEDULE_DAYS, (res, day) => {
-        res.push(schedule.repeatOnDaysOfWeek[day] ? startCase(day.slice(0, 2)) : '');
-        return res;
-      }, []).join(' '));
-
-      result += dayString ? ` (${trim(dayString)})` : '';
-    }
-    return result;
-  }
-
   /* getRequestParams will generate the base structure and auto-fill it
      with fields common across all request.
 
