@@ -43,3 +43,8 @@ saw_elasticsearch_data_store_limit=10000
 
 [saw-security]
 localhost ansible_connection=local
+
+#
+# generate secret key using command : openssl rand 32 -base64
+#
+saw_security_sso_secret=sncrsaw2
