@@ -142,8 +142,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       String pathForSubdirectory = FilenameUtils.getFullPathNoEndSeparator(defaultProjectRoot + defaultProjectPath + project.getPath());
       logger.trace("After creating folder before reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(project));
       logger.trace("pathForSubdirectory {}", pathForSubdirectory);
-      project.setPath(pathForSubdirectory);
-      readProject = readDirectoriesByProjectId(project, holdTempPathValue);
+      //project.setPath(pathForSubdirectory);
+      //readProject = readDirectoriesByProjectId(project, holdTempPathValue);
+      readProject = readSubDirectoriesByProjectId(project);
       logger.trace("readSubDirectoriesByProjectId(project) {}", project.getPath());
       logger.trace("After creating folder after reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(readProject));
       project.setData(readProject.getData());

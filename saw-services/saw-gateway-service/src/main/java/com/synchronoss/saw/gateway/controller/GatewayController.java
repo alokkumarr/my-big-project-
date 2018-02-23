@@ -163,7 +163,7 @@ public class GatewayController {
                 map.put(fileName, requestfile.getPath());
               }
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", request.getHeader("Authorization"));
             HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
             RestTemplate uploadrestTemplate = new RestTemplate();
@@ -175,9 +175,9 @@ public class GatewayController {
             for (FileSystemResource file : files){
             logger.trace("Filename :" + file.getFilename() + " has been deleted from temp folder after uploading to the destination");
             file.getFile().delete();}
-            responseEntity = new ResponseEntity<>(uploadResponseEntity.getBody(), uploadResponseEntity.getHeaders(), uploadResponseEntity.getStatusCode());
+            responseEntity = new ResponseEntity<>(uploadResponseEntity.getBody(), makeResponseHeadersUpload(), HttpStatus.OK);
             logger.trace("uploadResponseEntity response structure {}",  uploadResponseEntity.getBody() + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
-            logger.trace("responseEntity response structure {}", requestEntity.getBody() + ":"+ responseEntity.getStatusCodeValue());
+            logger.trace("responseEntity response structure {}",  responseEntity.getStatusCodeValue());
             return responseEntity;
           }
         } else {responseEntity = new ResponseEntity<>(validate.getValidityMessage(),makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);}
@@ -201,6 +201,13 @@ public class GatewayController {
     result.set(h.getName(), h.getValue());
     return result;
   }
+
+  private HttpHeaders makeResponseHeadersUpload() {
+    HttpHeaders result = new HttpHeaders();
+    result.set("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+    return result;
+  }
+
   
   private HttpHeaders makeResponseHeadersInvalid() {
 	    HttpHeaders result = new HttpHeaders();
@@ -241,6 +248,8 @@ public class GatewayController {
   	requestHeaders.set("Content-type", request.getHeader("Content-type"));
 	return requestHeaders;  
   }
+  
+
   private HttpUriRequest createHttpUriRequest(HttpServletRequest request) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
     URLRequestTransformer urlRequestTransformer = new URLRequestTransformer(apiGatewayProperties);
     ContentRequestTransformer contentRequestTransformer = new ContentRequestTransformer();

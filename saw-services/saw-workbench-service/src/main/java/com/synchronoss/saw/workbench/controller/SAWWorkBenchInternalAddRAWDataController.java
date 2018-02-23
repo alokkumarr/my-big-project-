@@ -167,9 +167,9 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @throws ServletException 
    * @throws IOException 
    */
-  @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public String uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
+  public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
       @RequestParam("path")  String filePath, @RequestBody Map<String, String> fileList) 
       throws IOException, ServletException {
     logger.debug("Retrieve project details By Id {} ", projectId);
@@ -198,7 +198,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
       throw new CreateEntitySAWException("Exception occured while uploading files in the raw data directory", e);
     }
     logger.trace("upload Data {} ", responseProject);
-    return responseProject.getStatusMessage();
+    return responseProject;
   } 
 
   @RequestMapping(value = "{projectId}/raw/directory/preview", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -244,7 +244,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @return
    */
   @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
-  @RequestMapping(value = "{projectId}/raw/directory/upload/files/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory/upload/files/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public CompletableFuture<Project> retrieveStorageDataAsync(@PathVariable(name = "projectId", required = true) String projectId, @RequestBody Project project, @RequestParam("files") MultipartFile[] uploadfiles) {
     CompletableFuture<Project> responseObjectFuture = null;
