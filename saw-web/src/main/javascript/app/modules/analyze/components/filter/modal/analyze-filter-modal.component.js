@@ -25,6 +25,7 @@ export const AnalyzeFilterModalComponent = {
   styles: [style],
   bindings: {
     filters: '<',
+    options: '<',
     artifacts: '<',
     isRuntime: '<?runtime',
     filterBooleanCriteria: '<'

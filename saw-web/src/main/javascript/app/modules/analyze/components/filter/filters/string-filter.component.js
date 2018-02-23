@@ -3,10 +3,13 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
 import * as template from './string-filter.component.html';
 
+import {AnalyseTypes} from '../../../consts';
+
 export const StringFilterComponent = {
   template,
   bindings: {
     model: '<',
+    options: '<',
     onChange: '&'
   },
   controller: class StringFilterController {
@@ -46,8 +49,15 @@ export const StringFilterComponent = {
     }
 
     $onInit() {
-      this.keywords = this.model || {modelValues: []};
+      this.options = this.options || {};
       this.model = this.model || {};
+      this.keywords = {...{modelValues: []}, ...this.model};
+
+      if (this.options.type === AnalyseTypes.ESReport) {
+        this.disablePresets = true;
+        this.keywords.operator = 'ISIN';
+      }
+
       this.tempModel = {};
       this.tempModel.value = this.keywords.modelValues[0];
     }
@@ -57,10 +67,18 @@ export const StringFilterComponent = {
       this.keywords.modelValues = [];
     }
 
-    onModelChange() {
+    onInputChange() {
       this.keywords.modelValues = [];
       this.keywords.modelValues.push(this.tempModel.value);
       this.onChange({model: this.keywords});
+    }
+
+    onChipsChange() {
+      this.onChange({
+        model: this.options.type === AnalyseTypes.ESReport ?
+          {modelValues: this.keywords.modelValues} :
+          this.keywords
+      });
     }
   }
 };

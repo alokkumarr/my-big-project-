@@ -12,6 +12,7 @@
                     layout="row"
                     layout-align="space-between start">
         <analyze-filter-row filter="filter"
+                            options="$ctrl.options"
                             runtime="$ctrl.isRuntime"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
                             artifact="artifact"
