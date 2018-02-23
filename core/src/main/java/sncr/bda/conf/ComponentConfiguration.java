@@ -53,13 +53,6 @@ public class ComponentConfiguration {
     @Expose
     private Parser parser;
     /**
-     * SCD2 specific properties
-     * 
-     */
-    @SerializedName("scd2")
-    @Expose
-    private Scd2 scd2;
-    /**
      * SQL script executor specific properties
      * 
      */
@@ -87,13 +80,6 @@ public class ComponentConfiguration {
     @SerializedName("es-reader")
     @Expose
     private Object esReader;
-    /**
-     * Converter specific properties
-     * 
-     */
-    @SerializedName("converter")
-    @Expose
-    private Object converter;
     /**
      * DB Loader specific properties
      * 
@@ -126,6 +112,7 @@ public class ComponentConfiguration {
     /**
      * 
      * @param outputs
+     * @param zero
      * @param dbLoader
      * @param inputs
      * @param converter
@@ -141,19 +128,17 @@ public class ComponentConfiguration {
      * @param parameters
      */
     public ComponentConfiguration(List<Input> inputs, List<Output> outputs, String project, List<Parameter> parameters,
-                                  Parser parser, Scd2 scd2, Sql sql, Transformer transformer, ESLoader esLoader,
-                                  Object esReader, Object converter, Object dbLoader, Analyzer analyzer, Object zero) {
+                                  Parser parser, Sql sql, Transformer transformer, ESLoader esLoader,
+                                  Object esReader, Object dbLoader, Analyzer analyzer, Object zero) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.project = project;
         this.parameters = parameters;
         this.parser = parser;
-        this.scd2 = scd2;
         this.sql = sql;
         this.transformer = transformer;
         this.esLoader = esLoader;
         this.esReader = esReader;
-        this.converter = converter;
         this.dbLoader = dbLoader;
         this.analyzer = analyzer;
         this.zero = zero;
@@ -285,31 +270,6 @@ public class ComponentConfiguration {
     }
 
     /**
-     * SCD2 specific properties
-     * 
-     * @return
-     *     The scd2
-     */
-    public Scd2 getScd2() {
-        return scd2;
-    }
-
-    /**
-     * SCD2 specific properties
-     * 
-     * @param scd2
-     *     The scd2
-     */
-    public void setScd2(Scd2 scd2) {
-        this.scd2 = scd2;
-    }
-
-    public ComponentConfiguration withScd2(Scd2 scd2) {
-        this.scd2 = scd2;
-        return this;
-    }
-
-    /**
      * SQL script executor specific properties
      * 
      * @return
@@ -410,31 +370,6 @@ public class ComponentConfiguration {
     }
 
     /**
-     * Converter specific properties
-     * 
-     * @return
-     *     The converter
-     */
-    public Object getConverter() {
-        return converter;
-    }
-
-    /**
-     * Converter specific properties
-     * 
-     * @param converter
-     *     The converter
-     */
-    public void setConverter(Object converter) {
-        this.converter = converter;
-    }
-
-    public ComponentConfiguration withConverter(Object converter) {
-        this.converter = converter;
-        return this;
-    }
-
-    /**
      * DB Loader specific properties
      * 
      * @return
@@ -522,12 +457,10 @@ public class ComponentConfiguration {
                 .append(project)
                 .append(parameters)
                 .append(parser)
-                .append(scd2)
                 .append(sql)
                 .append(transformer)
                 .append(esLoader)
                 .append(esReader)
-                .append(converter)
                 .append(dbLoader)
                 .append(analyzer)
                 .append(zero)
@@ -549,12 +482,10 @@ public class ComponentConfiguration {
                 .append(project, rhs.project)
                 .append(parameters, rhs.parameters)
                 .append(parser, rhs.parser)
-                .append(scd2, rhs.scd2)
                 .append(sql, rhs.sql)
                 .append(transformer, rhs.transformer)
                 .append(esLoader, rhs.esLoader)
                 .append(esReader, rhs.esReader)
-                .append(converter, rhs.converter)
                 .append(dbLoader, rhs.dbLoader)
                 .append(analyzer, rhs.analyzer)
                 .append(zero, rhs.zero)

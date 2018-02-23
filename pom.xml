@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>meta</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.2-SNAPSHOT</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
@@ -191,7 +191,7 @@
   <modules>
     <module>core</module>
     <module>meta-api</module>
-    <module>meta-rpm</module>
+    <module>meta-assembly</module>
   </modules>
   <build>
     <defaultGoal>package</defaultGoal>

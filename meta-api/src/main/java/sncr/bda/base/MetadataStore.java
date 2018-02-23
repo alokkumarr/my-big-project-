@@ -148,4 +148,7 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         table.close();
     }
 
+    public Table getTable() {
+        return table;
+    }
 }
