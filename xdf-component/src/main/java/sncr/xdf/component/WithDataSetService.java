@@ -45,7 +45,10 @@ public interface WithDataSetService {
      */
     default Map<String, Map<String, Object>> discoverDataParametersWithInput(DataSetServiceAux aux) throws Exception {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
-        for (Input in: aux.ctx.componentConfiguration.getInputs()) retval.put(in.getName(), discoverDataSetWithInput(aux, in));
+        for (Input in: aux.ctx.componentConfiguration.getInputs()){
+            if (in.getName() != null)
+                retval.put(in.getName(), discoverDataSetWithInput(aux, in));
+        }
         return retval;
     }
 
@@ -53,7 +56,10 @@ public interface WithDataSetService {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
         String project = aux.ctx.applicationID;
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
-            retval.put(in.getName(), discoverDataSetWithMetaData(aux, project, in.getName()));
+
+            if (in.getName() != null)
+                retval.put(in.getName(), discoverDataSetWithMetaData(aux, project, in.getDataSet()));
+
         }
 
         return retval;
@@ -70,19 +76,26 @@ public interface WithDataSetService {
      */
     default Map<String, Map<String, Object>> discoverInputDataSetsWithInput(DataSetServiceAux aux) throws Exception {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
-        for (Input in: aux.ctx.componentConfiguration.getInputs())
+
+        for (Input in: aux.ctx.componentConfiguration.getInputs()) {
+            if (in.getDataSet() == null)
+                throw new XDFException(XDFException.ErrorCodes.ConfigError, "DataSet parameter cannot be null");
             retval.put(in.getDataSet(), discoverDataSetWithInput(aux, in));
+        }
+
         return retval;
     }
 
     default Map<String, Map<String, Object>> discoverInputDataSetsWithMetadata(DataSetServiceAux aux) throws Exception {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
-
         String project = aux.ctx.applicationID;
 
-        for (Input in: aux.ctx.componentConfiguration.getInputs())
-            retval.put(in.getDataSet(), discoverDataSetWithMetaData(aux, project,  in.getDataSet()));
+        for (Input in: aux.ctx.componentConfiguration.getInputs()) {
+            if (in.getDataSet() == null)
+                throw new XDFException(XDFException.ErrorCodes.ConfigError, "DataSet parameter cannot be null");
 
+            retval.put(in.getDataSet(), discoverDataSetWithMetaData(aux, project, in.getDataSet()));
+        }
         return retval;
     }
 
@@ -144,7 +157,7 @@ public interface WithDataSetService {
                         system.get(DataSetProperties.Type.toString()).getAsString(): Input.Dstype.BASE.toString();
 
                 String catalog = system.has(DataSetProperties.Catalog.toString()) ?
-                        system.get(DataSetProperties.Catalog.toString()).getAsString() : "";
+                        system.get(DataSetProperties.Catalog.toString()).getAsString() : MetadataBase.DEFAULT_CATALOG;
 
                 String datasetName = system.has(DataSetProperties.Name.toString()) ?
                         system.get(DataSetProperties.Name.toString()).getAsString() : dataset;
@@ -320,9 +333,11 @@ public interface WithDataSetService {
 
                 switch (ktype) {
                     case parameter:
-                        resMap.put(output.getName(), res_output); break;
+                        if (output.getName() != null)
+                            resMap.put(output.getName(), res_output); break;
                     case dataset:
-                        resMap.put(output.getDataSet(), res_output); break;
+                        if (output.getDataSet() != null)
+                            resMap.put(output.getDataSet(), res_output); break;
                 }
             }
             return resMap;
@@ -343,13 +358,15 @@ public interface WithDataSetService {
                     Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> srcPartitioning =
                             DLDataSetOperations.getPartitioningInfo(location);
 
+                    logger.debug(String.format("Check partition layout of input dataset %s --> type: %s, final location: %s", dataset, srcPartitioning._4(), srcPartitioning._1() ));
+                    //TODO::Potentially we can add DRILL support to read from DRILL partitions.
                     //Check partitioning structure and match it with metadata/input
                     if (srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
                             srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
                         throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, srcPartitioning._4().toString(), dataset);
                     }
 
-                    if (system != null) {
+                    if (system != null && system.get(DataSetProperties.Keys.toString()) != null) {
                         JsonArray mdKeyListJa = system.get(DataSetProperties.Keys.toString()).getAsJsonArray();
 
                         if (srcPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && srcPartitioning._2() != null) {

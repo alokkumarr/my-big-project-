@@ -145,6 +145,8 @@ public class DLDataSetOperations {
         List<String> kl = new ArrayList<>();
 
         while(i == PARTITION_STRUCTURE.DRILL || i == PARTITION_STRUCTURE.HIVE ){
+            logger.debug("Checking locations: " + glob + " depth: " + depth);
+
             glob += File.separatorChar + "*";
             i = checkLevel(fileSystem, glob, kl);
             switch(i){

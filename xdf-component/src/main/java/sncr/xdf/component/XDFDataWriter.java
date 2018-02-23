@@ -3,6 +3,8 @@ package sncr.xdf.component;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.collection.immutable.Seq;
+
 import java.util.List;
 
 public class XDFDataWriter {
@@ -15,6 +17,10 @@ public class XDFDataWriter {
         this.format = format;
         this.numberOfFiles = numberOfFiles;
         this.keys = keys;
+
+        String m = "Format: " + format + ": "; for (String s : keys) m += s + " ";
+        logger.debug("Writer: " + m);
+
     }
 
     /**
@@ -33,8 +39,9 @@ public class XDFDataWriter {
 
         // This can be an empty collection in case FLAT partition
         // is requested or key definitions omited in configuration file
-        scala.collection.immutable.Seq<String> scalaList=
-                scala.collection.JavaConversions.asScalaBuffer(keys).toList();
+        scala.collection.immutable.Seq<String> scalaList = null;
+        if (keys != null)
+            scalaList = scala.collection.JavaConversions.asScalaBuffer(keys).toList();
 
         // Collect number of records
         // (This may require review - may be we need caching)
@@ -42,7 +49,7 @@ public class XDFDataWriter {
         logger.debug("Processing " + recordCount + " records.");
 
         logger.debug("Requested number of files per partition is " + numberOfFiles + ".");
-        if(scalaList.size() > 0)
+        if(scalaList != null && scalaList.size() > 0)
             // Setup proper number of output files and write partitions
         switch (format){
             case "parquet":

@@ -161,7 +161,7 @@ public abstract class Component {
             return 0;
 
         } catch (Exception e) {
-            error = "component initialization (input-discovery/output-preparation) exception: " + e.getMessage();
+            error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
             logger.error(error);
             return -1;
         }
