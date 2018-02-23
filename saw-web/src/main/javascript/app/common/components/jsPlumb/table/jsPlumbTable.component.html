@@ -19,7 +19,7 @@
       on-select="$ctrl.onSelectAggregateType(aggregateType, field)">
     </aggregate-chooser> -->
 
-    <md-menu ng-if="field.checked && $ctrl.checkType(field)">
+    <md-menu ng-if="field.checked && $ctrl.checkType(field) && field.reportType === 'esReport'">
       <md-button aria-label="TOOLTIP_AGGREGATE_TYPE"
                  class="md-icon-button"
                  e2e="report-aggregate-menu-btn"

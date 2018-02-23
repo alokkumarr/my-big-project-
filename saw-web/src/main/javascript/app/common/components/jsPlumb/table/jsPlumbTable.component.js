@@ -26,7 +26,6 @@ export const JSPlumbTable = {
 
     $onInit() {
       this.model.component = this;
-
       this._canvas = this.model.canvas;
       this._jsPlumbInst = this._canvas.component.getInstance();
 

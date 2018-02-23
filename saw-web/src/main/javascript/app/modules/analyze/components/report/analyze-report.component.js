@@ -249,6 +249,7 @@ export const AnalyzeReportComponent = {
           } else if (aggregates.columnName === column.columnName) {
             column.aggregate = aggregates.aggregate;
           }
+          column.reportType = this.model.type;
         });
       });
 
@@ -283,6 +284,7 @@ export const AnalyzeReportComponent = {
           if (itemB.aggregate) {
             field.aggregate = itemB.aggregate;
           }
+          field.reportType = this.model.type;
           field.displayName = itemB.displayName;
           field.alias = itemB.aliasName;
           field.type = itemB.type;
