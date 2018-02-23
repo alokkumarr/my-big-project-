@@ -26,8 +26,11 @@ import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
+import {CommonModule as CommonModuleAngular4} from '@angular/common';
+import { BrowserModule } from '@angular/platform-browser';
 import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
@@ -41,6 +44,7 @@ import {CommonDirectiveModule} from './directives';
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
 import {ErrorDetailComponent} from './components/error-detail';
+import {DataFormatDialogComponent} from './components/data-format-dialog';
 import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
@@ -91,6 +95,9 @@ angular
 
 @NgModule({
   imports: [
+    CommonModuleAngular4,
+    BrowserModule,
+    FormsModule,
     MaterialModule,
     DndModule,
     DxPivotGridModule
@@ -99,11 +106,13 @@ angular
     PivotGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
-    E2eDirective
+    E2eDirective,
+    DataFormatDialogComponent
   ],
   entryComponents: [
     PivotGridComponent,
-    ErrorDetailComponent
+    ErrorDetailComponent,
+    DataFormatDialogComponent
   ],
   exports: [
     DndModule,
@@ -111,6 +120,7 @@ angular
     DxPivotGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
+    DataFormatDialogComponent,
     E2eDirective
   ],
   providers: [

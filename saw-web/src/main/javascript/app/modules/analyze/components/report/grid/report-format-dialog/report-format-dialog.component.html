@@ -4,35 +4,8 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <div class="number-format" ng-if="$ctrl.modelData.dataType === 'number'">
-      <div class="format-row">
-        <span class="span-label" translate="SHOW_COMMA_SEPARATORS"></span>
-        <md-switch class="md-primary" ng-model="$ctrl.format.commaSeparator" ng-change="$ctrl.modifyNumber()"></md-switch>
-      </div>
-      <div class="format-row">
-        <span class="span-label" translate="SHOW_CURRENCY"></span>
-        <md-switch class="md-primary" ng-model="$ctrl.format.currencyFlag" ng-change="$ctrl.modifyNumber()"></md-switch>
-        <md-select ng-if="$ctrl.format.currencyFlag" ng-change="$ctrl.modifyNumber()"
-		        ng-model="$ctrl.format.currencyCode"> <md-option
-		        ng-repeat="codeList in $ctrl.currencyCodeList" ng-value="codeList.code"
-		        ng-bind="::codeList.code"></md-option>
-          </md-select>
-      </div>
-      <div class="format-row">
-        <span class="span-label" translate="SPECIFY_NUMBER_DECIMALS"></span>
-        <input class="ng-pristine ng-valid md-input ng-empty ng-touched" type="number"
-         ng-model="$ctrl.format.numberDecimal"
-         ng-change="$ctrl.modifyNumber()" ng-maxlength="2"/>
-      </div>
-      
-      <div class="sample-block">
-          <h6>Sample:</h6>
-          {{$ctrl.stringNumber}}
-      </div>
-    </div>
-
-    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date' || $ctrl.modelData.dataType === 'timestamp' || $ctrl.modelData.dataType === 'string-date'">
-      <md-radio-group ng-model="$ctrl.format.dateFormat" > 
+    <div class="date-format">
+      <md-radio-group ng-model="$ctrl.format.dateFormat" >
         <md-radio-button class="row" ng-value="'yyyy-MM-dd'" flex>
           <span>Default </span>
         </md-radio-button>
