@@ -126,7 +126,12 @@ public abstract class Component {
                 {
                     logger.debug("Add output object to data object repository: " + o.getDataSet());
 
-                    mddl.discoverAndvalidateOutputDataSet(outputDataSets.get(o.getDataSet()));
+                    if (!mddl.discoverAndvalidateOutputDataSet(outputDataSets.get(o.getDataSet()))){
+                        error = "Could not validate output dataset: " + o.getDataSet();
+                        logger.error(error);
+                        rc[0] = -1;
+                        return;
+                    }
 
                     JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
                     if (ds == null) {

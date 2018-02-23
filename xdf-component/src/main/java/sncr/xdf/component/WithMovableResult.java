@@ -99,8 +99,6 @@ public interface WithMovableResult {
                     WithMovableResultHelper.logger.trace("Glob depth: " + m);
 
 
-                    // Rename the files & collect list of partitions
-                    //TODO:: Double check
                     FileStatus[] it = HFileOperations.fs.globStatus(new Path(moveTask.source + m ), DLDataSetOperations.FILEDIR_FILTER);
                     WithMovableResultHelper.logger.debug("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
                     for(FileStatus file : it){
