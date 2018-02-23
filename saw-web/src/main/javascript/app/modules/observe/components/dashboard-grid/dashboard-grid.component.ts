@@ -199,7 +199,15 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
       const gFilters = filterGroup[tile.analysis.semanticId] || [];
 
       const filters = unionWith(
-        gFilters,
+        // Global filters are being ignored by backend. Set that property
+        // false to make them execute properly.
+        map(gFilters, f => {
+          if (f.model) {
+            f.isGlobalFilter = false;
+          }
+          return f;
+        }),
+
         tile.origAnalysis.sqlBuilder.filters,
         (gFilt, filt) => (
           gFilt.tableName === filt.tableName &&
