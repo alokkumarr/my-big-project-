@@ -42,8 +42,8 @@ public class AuditLogService {
      */
     public JsonObject generateDSAuditLogEntry(ContextMetadata ctx,
                                               String status,
-                                              Map<String, Map<String, String>> input,
-                                              Map<String, Map<String, String>> output) {
+                                              Map<String, Map<String, Object>> input,
+                                              Map<String, Map<String, Object>> output) {
         JsonObject ale = new JsonObject();
 
         ale.add(DataSetProperties.Creator.toString(), new JsonPrimitive(ctx.user));

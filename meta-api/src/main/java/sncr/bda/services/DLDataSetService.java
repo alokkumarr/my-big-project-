@@ -7,7 +7,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.exceptions.BDAException;
-import sncr.bda.conf.Metadata;
 import sncr.bda.conf.Output;
 import sncr.bda.context.ContextMetadata;
 import sncr.bda.core.file.HFileOperations;
@@ -23,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
+import static sncr.bda.base.MetadataBase.PREDEF_DATA_SOURCE;
 import static sncr.bda.base.MetadataStore.delimiter;
 import static sncr.bda.base.MetadataBase.DEFAULT_CATALOG;
 import static sncr.bda.base.MetadataBase.DEFAULT_DATA_SOURCE;
@@ -52,29 +52,6 @@ public class DLDataSetService {
         repository = new HashMap();
     }
 
-    public void addDataSetToDLFSMeta(Map<String, String> outputDataSet, Output outputDataSetMeta) {
-        if (repository.containsKey(outputDataSet.get(DataSetProperties.Name.name()))) {
-            logger.warn("Data object " + outputDataSet.get(DataSetProperties.Name.name()) + " already registered - overwriting");
-        }
-        HashMap<String, Object> entry = new HashMap<String, Object>();
-        outputDataSet.forEach(entry::put);
-        entry.put(DataSetProperties.isNewDataSet.name(), "true");
-
-        //TODO:: The header info is required only to build linage
-        //header.forEach(entry::put);
-
-        Metadata meta = outputDataSetMeta.getMetadata();
-        if (meta != null) {
-            entry.put(DataSetProperties.MetaCreatedBy.name(), meta.getCreatedBy());
-            entry.put(DataSetProperties.MetaDescription.name(), meta.getDescription());
-        }
-        else{
-            logger.info(String.format("Metadata for dataset: %s are Empty!", outputDataSet.get(DataSetProperties.Name.name())));
-        }
-        logger.debug("Newly added object");
-        entry.forEach( (k, v) -> logger.debug( "Key: " + k + " Value: " + v ));
-        repository.put(outputDataSet.get(DataSetProperties.Name.name()), entry);
-    }
 
     public void writeDLFSMeta(ContextMetadata ctx) throws Exception {
 
@@ -128,7 +105,7 @@ public class DLDataSetService {
         StringBuilder sb = new StringBuilder(dsStore.getRoot());
         sb.append(Path.SEPARATOR + ctx.applicationID)
         .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-        .append(Path.SEPARATOR + ds.get(DataSetProperties.Type.name()))
+        .append(Path.SEPARATOR + PREDEF_DATA_SOURCE)
         .append(Path.SEPARATOR + ds.get(DataSetProperties.Catalog.name()))
         .append(Path.SEPARATOR + ds.get(DataSetProperties.Name.name()))
         .append(Path.SEPARATOR + MetadataBase.FILE_DESCRIPTOR);
@@ -162,17 +139,16 @@ public class DLDataSetService {
      * If processMap dataset is not found - the component creates it with all data available.
      * @param ctx
      * @param o
-     * @param metadata
      * @return
      */
-    public JsonElement readOrCreateDataSet(ContextMetadata ctx, Map<String, String> o, Metadata metadata) {
+    public JsonElement readOrCreateDataSet(ContextMetadata ctx, Map<String, Object> o) {
         try {
             String id = generateDSID(ctx, o);
             if (!o.containsKey(DataSetProperties.Id.toString()))
                 o.put(DataSetProperties.Id.toString(), id);
                 JsonElement ds = dsStore.read(id);
             if ( ds == null ){
-                JsonElement je = createDSDescriptor(id, ctx, o, metadata);
+                JsonElement je = createDSDescriptor(id, ctx, o);
                 dsStore.create(id, je);
                 return je;
             }
@@ -190,42 +166,29 @@ public class DLDataSetService {
      * @param id
      * @param ctx
      * @param o - output dataset descriptor
-     * @param metadata
      * @return result JSON structure
      */
-    private JsonElement createDSDescriptor(String id, ContextMetadata ctx, Map<String, String> o, Metadata metadata){
+    private JsonElement createDSDescriptor(String id, ContextMetadata ctx, Map<String, Object> o){
         JsonObject dl = new JsonObject();
 
-        String ds_type = o.containsKey(DataSetProperties.Type.name())?o.get(DataSetProperties.Type.name()): DEFAULT_DATA_SOURCE ;
-        String catalog = o.containsKey(DataSetProperties.Catalog.name())?o.get(DataSetProperties.Catalog.name()): DEFAULT_CATALOG;
+        String ds_type = o.containsKey(DataSetProperties.Type.name())? (String) o.get(DataSetProperties.Type.name()): DEFAULT_DATA_SOURCE ;
+        String catalog = o.containsKey(DataSetProperties.Catalog.name())? (String) o.get(DataSetProperties.Catalog.name()): DEFAULT_CATALOG;
 
         dl.add(DataSetProperties.User.toString(), new JsonPrimitive(ctx.user));
         dl.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
         dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(ds_type));
-        dl.add(DataSetProperties.Format.toString(), new JsonPrimitive(o.get(DataSetProperties.Format.name())));
-        dl.add(DataSetProperties.Name.toString(), new JsonPrimitive(o.get(DataSetProperties.Name.name())));
-        dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive(o.get(DataSetProperties.PhysicalLocation.name())));
+        dl.add(DataSetProperties.Format.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Format.name())));
+        dl.add(DataSetProperties.Name.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Name.name())));
+        dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive((String) o.get(DataSetProperties.PhysicalLocation.name())));
         dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive( catalog ));
-        dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive(o.get(DataSetProperties.NumberOfFiles.name())));
+        dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((String) o.get(DataSetProperties.NumberOfFiles.name())));
 
-        JsonObject userdata = new JsonObject();
-        if ( metadata != null) {
 
-            userdata.add(DataSetProperties.Creator.toString(), new JsonPrimitive(metadata.getCreatedBy()));
-            if (metadata.getCategory() != null)
-                userdata.add(DataSetProperties.Category.toString(), new JsonPrimitive(metadata.getCategory()));
-
-            if (metadata.getSubCategory() != null)
-                userdata.add(DataSetProperties.SubCategory.toString(), new JsonPrimitive(metadata.getSubCategory()));
-
-            userdata.add(DataSetProperties.Description.toString(), new JsonPrimitive(metadata.getDescription()));
-        }
         //TODO:: Add transformation data from ctx
         JsonArray tr = new JsonArray();
         JsonObject doc = new JsonObject();
         doc.add(DataSetProperties.Id.toString(), new JsonPrimitive(id));
         doc.add(DataSetProperties.System.toString(), dl);
-        doc.add(DataSetProperties.UserData.toString(), userdata);
         doc.add(DataSetProperties.Transformations.toString(), tr);
         return doc;
     }
@@ -245,18 +208,18 @@ public class DLDataSetService {
      * @param o - dataset descriptor
      * @return
      */
-    private String generateDSID(ContextMetadata ctx, Map<String, String> o) {
+    private String generateDSID(ContextMetadata ctx, Map<String, Object> o) {
         StringBuilder sb = new StringBuilder(ctx.applicationID);
         sb.append(delimiter).append(o.get(DataSetProperties.Name.name()));
         logger.debug(String.format("Generated ID for dataset %s: %s ",o.get(DataSetProperties.Name.name()), sb.toString()));
         return sb.toString();
     }
 
-    public Map<String, JsonElement> loadExistingDataSets(ContextMetadata ctx, Map<String, Map<String, String>> inputDataSets) throws Exception {
+    public Map<String, JsonElement> loadExistingDataSets(ContextMetadata ctx, Map<String, Map<String, Object>> inputDataSets) throws Exception {
 
         Map<String, JsonElement> inputDSMetaData = new HashMap<>();
         for(String dsName : inputDataSets.keySet()) {
-            Map<String, String> dsDesc = inputDataSets.get(dsName);
+            Map<String, Object> dsDesc = inputDataSets.get(dsName);
             String id = generateDSID(ctx, dsDesc);
             JsonElement dsJson = dsStore.read(id);
             if (dsJson == null){

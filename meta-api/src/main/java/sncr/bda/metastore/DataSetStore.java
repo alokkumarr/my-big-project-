@@ -119,7 +119,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
             String subCategory
     ) throws Exception {
         if (project.isEmpty()) {
-            throw new Exception("Project is empty");
+            throw new Exception("ProjectService is empty");
         }
         QueryCondition cond = MapRDB.newCondition();
         cond.and();
@@ -138,7 +138,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
         return convertToString(searchAsList(table, cond));
     }
 
-    public String readDataSet(String project, String name) throws Exception {
+    public String  readDataSet(String project, String name) throws Exception {
         if (project.isEmpty() || name == null || name.isEmpty()) {
             throw new Exception("Search parameters are not correct: either project or name are null or empty.");
         }

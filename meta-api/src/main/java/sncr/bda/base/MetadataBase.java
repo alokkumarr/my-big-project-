@@ -33,7 +33,7 @@ public abstract class MetadataBase {
 
     public static String XDF_DATA_ROOT = "XDF_DATA_ROOT";
     public static String FILE_DESCRIPTOR = ".bda_meta";
-    public static String DEFAULT_DATA_SOURCE = "fs";
+    public static String DEFAULT_DATA_SOURCE = "base";
 
     protected final FileSystem fs;
     protected String dlRoot;

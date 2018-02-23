@@ -5,6 +5,7 @@ import com.mapr.db.MapRDB;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
@@ -61,8 +62,7 @@ public class Request {
     private QueryCondition maprDBCondition;
     private JsonArray filter;
     private JsonParser jsonParser;
-    private String prjDescription;
-    private JsonArray plp;
+
 
     public Request(String jStr)
     {
@@ -292,21 +292,13 @@ public class Request {
                 logger.warn("Not implemented yet");
                 break;
             case Project:
-                ProjectStore ps = new ProjectStore(xdfRoot);
+                ProjectAdmin ps = new ProjectAdmin(xdfRoot);
                 switch (action){
                     case create:
-                        if (plp != null)
-                            ps.createProject(id, prjDescription, plp);
-                        else
-                            ps.createProject(id, prjDescription);
+                            ps.createProject(id, src);
                         break;
                     case delete: ps.deleteProject(id); break;
-                    case update:
-                        if (!prjDescription.isEmpty() )
-                            ps.updateProject(id, prjDescription);
-                        if (plp != null)
-                            ps.updateProject(id, plp);
-                        break;
+                    case update: ps.updateProject(id, src); break;
                     case read: result = ps.readProjectData(id); break;
                     default:
                         logger.warn("Action is not supported");
@@ -414,19 +406,7 @@ public class Request {
                 return false;
             }
             src = src0.getAsJsonObject();
-            if (category == Project) {
-                prjDescription = ( src.has("description")? src.get("description").getAsString(): "");
-                plp = ( src.has(ProjectStore.PLP)? src.get(ProjectStore.PLP).getAsJsonArray(): null);
-                if (action == Actions.create && prjDescription.isEmpty() ){
-                    logger.error("Project description must be provided to create project");
-                    return false;
-                }
-                if (action == Actions.update && prjDescription.isEmpty() && plp == null ){
-                    logger.error("Project description and/or project level parameters are not set");
-                    return false;
-                }
 
-            }
         }
         return true;
     }

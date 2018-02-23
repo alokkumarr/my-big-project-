@@ -2,7 +2,9 @@
 package sncr.bda.conf;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -15,7 +17,6 @@ public class Output {
 
     /**
      * Parameter name
-     * (Required)
      * 
      */
     @SerializedName("name")
@@ -23,6 +24,7 @@ public class Output {
     private String name;
     /**
      * Data object name
+     * (Required)
      * 
      */
     @SerializedName("dataSet")
@@ -37,6 +39,7 @@ public class Output {
     private sncr.bda.conf.Input.Format format = sncr.bda.conf.Input.Format.fromValue("parquet");
     /**
      * mode of the partition
+     * (Required)
      * 
      */
     @SerializedName("mode")
@@ -50,12 +53,20 @@ public class Output {
     @Expose
     private Integer numberOfFiles = 1;
     /**
-     * mode of the partition
+     * Type of data source
+     * (Required)
      * 
      */
-    @SerializedName("dataSource")
+    @SerializedName("dstype")
     @Expose
-    private DataSource dataSource = null;
+    private sncr.bda.conf.Input.Dstype dstype = sncr.bda.conf.Input.Dstype.fromValue("base");
+    /**
+     * Partitioning keys
+     * 
+     */
+    @SerializedName("keys")
+    @Expose
+    private Set<String> keys = new LinkedHashSet<String>();
     /**
      * Location in selected container
      * 
@@ -63,9 +74,12 @@ public class Output {
     @SerializedName("catalog")
     @Expose
     private String catalog = "data";
-    @SerializedName("metadata")
+    @SerializedName("parent")
     @Expose
-    private Metadata metadata;
+    private String parent;
+    @SerializedName("userdata")
+    @Expose
+    private Object userdata;
 
     /**
      * No args constructor for use in serialization
@@ -78,27 +92,30 @@ public class Output {
      * 
      * @param mode
      * @param numberOfFiles
-     * @param metadata
+     * @param parent
+     * @param userdata
+     * @param dstype
+     * @param keys
      * @param catalog
      * @param name
      * @param format
      * @param dataSet
-     * @param dataSource
      */
-    public Output(String name, String dataSet, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, DataSource dataSource, String catalog, Metadata metadata) {
+    public Output(String name, String dataSet, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, sncr.bda.conf.Input.Dstype dstype, Set<String> keys, String catalog, String parent, Object userdata) {
         this.name = name;
         this.dataSet = dataSet;
         this.format = format;
         this.mode = mode;
         this.numberOfFiles = numberOfFiles;
-        this.dataSource = dataSource;
+        this.dstype = dstype;
+        this.keys = keys;
         this.catalog = catalog;
-        this.metadata = metadata;
+        this.parent = parent;
+        this.userdata = userdata;
     }
 
     /**
      * Parameter name
-     * (Required)
      * 
      * @return
      *     The name
@@ -109,7 +126,6 @@ public class Output {
 
     /**
      * Parameter name
-     * (Required)
      * 
      * @param name
      *     The name
@@ -125,6 +141,7 @@ public class Output {
 
     /**
      * Data object name
+     * (Required)
      * 
      * @return
      *     The dataSet
@@ -135,6 +152,7 @@ public class Output {
 
     /**
      * Data object name
+     * (Required)
      * 
      * @param dataSet
      *     The dataSet
@@ -175,6 +193,7 @@ public class Output {
 
     /**
      * mode of the partition
+     * (Required)
      * 
      * @return
      *     The mode
@@ -185,6 +204,7 @@ public class Output {
 
     /**
      * mode of the partition
+     * (Required)
      * 
      * @param mode
      *     The mode
@@ -224,27 +244,54 @@ public class Output {
     }
 
     /**
-     * mode of the partition
+     * Type of data source
+     * (Required)
      * 
      * @return
-     *     The dataSource
+     *     The dstype
      */
-    public DataSource getDataSource() {
-        return dataSource;
+    public sncr.bda.conf.Input.Dstype getDstype() {
+        return dstype;
     }
 
     /**
-     * mode of the partition
+     * Type of data source
+     * (Required)
      * 
-     * @param dataSource
-     *     The dataSource
+     * @param dstype
+     *     The dstype
      */
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public void setDstype(sncr.bda.conf.Input.Dstype dstype) {
+        this.dstype = dstype;
     }
 
-    public Output withDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public Output withDstype(sncr.bda.conf.Input.Dstype dstype) {
+        this.dstype = dstype;
+        return this;
+    }
+
+    /**
+     * Partitioning keys
+     * 
+     * @return
+     *     The keys
+     */
+    public Set<String> getKeys() {
+        return keys;
+    }
+
+    /**
+     * Partitioning keys
+     * 
+     * @param keys
+     *     The keys
+     */
+    public void setKeys(Set<String> keys) {
+        this.keys = keys;
+    }
+
+    public Output withKeys(Set<String> keys) {
+        this.keys = keys;
         return this;
     }
 
@@ -276,23 +323,46 @@ public class Output {
     /**
      * 
      * @return
-     *     The metadata
+     *     The parent
      */
-    public Metadata getMetadata() {
-        return metadata;
+    public String getParent() {
+        return parent;
     }
 
     /**
      * 
-     * @param metadata
-     *     The metadata
+     * @param parent
+     *     The parent
      */
-    public void setMetadata(Metadata metadata) {
-        this.metadata = metadata;
+    public void setParent(String parent) {
+        this.parent = parent;
     }
 
-    public Output withMetadata(Metadata metadata) {
-        this.metadata = metadata;
+    public Output withParent(String parent) {
+        this.parent = parent;
+        return this;
+    }
+
+    /**
+     * 
+     * @return
+     *     The userdata
+     */
+    public Object getUserdata() {
+        return userdata;
+    }
+
+    /**
+     * 
+     * @param userdata
+     *     The userdata
+     */
+    public void setUserdata(Object userdata) {
+        this.userdata = userdata;
+    }
+
+    public Output withUserdata(Object userdata) {
+        this.userdata = userdata;
         return this;
     }
 
@@ -303,7 +373,7 @@ public class Output {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(dataSet).append(format).append(mode).append(numberOfFiles).append(dataSource).append(catalog).append(metadata).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(format).append(mode).append(numberOfFiles).append(dstype).append(keys).append(catalog).append(parent).append(userdata).toHashCode();
     }
 
     @Override
@@ -315,7 +385,7 @@ public class Output {
             return false;
         }
         Output rhs = ((Output) other);
-        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dataSource, rhs.dataSource).append(catalog, rhs.catalog).append(metadata, rhs.metadata).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dstype, rhs.dstype).append(keys, rhs.keys).append(catalog, rhs.catalog).append(parent, rhs.parent).append(userdata, rhs.userdata).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
