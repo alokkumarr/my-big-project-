@@ -48,9 +48,26 @@
     <mapr.core.version>5.2.0</mapr.core.version>
     <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
     <gson.version>2.2.4</gson.version>
-
+    <junit.version>4.12</junit.version>
+    <!-- XDF package -->
+    <!-- RPM properties -->
+    <rpm.name>bda-${prod.name}</rpm.name>
+    <rpm.version>${project.version}</rpm.version>
+    <rpm.release>${project.release}</rpm.release>
+    <!-- XDF application -->
+    <app.name>${prod.name}</app.name>
+    <app.version>${rpm.version}</app.version>
+    <app.release>${rpm.release}</app.release>
+    <app.nameVer>${app.name}-${app.version}</app.nameVer>
+    <!-- Directories on the target box -->
+    <app.optParDir>/dfs/opt/bda</app.optParDir>
+    <!-- Application 'home' directory -->
+    <app.optDir>${app.optParDir}/${app.name}/${app.nameVer}</app.optDir>
+    <app.varDir>/dfs/var/bda/${app.name}</app.varDir>
+    <app.user>mapr</app.user>
+    <app.group>mapr</app.group>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <s-value>provided</s-value>
+    <s-value>compile</s-value>
   </properties>
   <!--dependencyManagement-->
   <dependencies>
@@ -124,6 +141,14 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <!--/dependencyManagement-->

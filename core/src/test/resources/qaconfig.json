@@ -1,0 +1,90 @@
+{
+  "inputs":[
+    {
+      "name":"TRTEST01",
+      "dataSet":"TRTEST01",
+      "catalog":"dinp",
+      "format":"parquet"
+    }
+  ],
+  "outputs":[
+    {
+      "name":"TRTEST01DATA",
+      "dataSet":"TRTEST01_RES",
+      "catalog":"dout",
+      "format":"parquet",
+      "mode":"replace",
+      "numberOfFiles":1,
+      "metadata":{
+        "createdBy":"S.Ryabov",
+        "description":"Transformer component test case: transformed records",
+        "category":"cat1",
+        "category":"subcat1"
+      }
+    },
+    {
+      "name":"TRTEST01REJ",
+      "dataSet":"TRTEST01_REJECTED",
+      "catalog":"dout",
+      "format":"json",
+      "mode":"replace",
+      "numberOfFiles":1,
+      "metadata":{
+        "createdBy":"S.Ryabov",
+        "description":"Transformer component test case: rejected records",
+        "category":"cat1",
+        "category":"subcat1"
+      }
+    }
+  ],
+  "parameters":[
+    {
+      "name":"spark.master",
+      "value":"yarn"
+    },
+    {
+      "name":"spark.yarn.queue",
+      "value":"xdf"
+    },
+    {
+      "name":"spark.driver.memory",
+      "value":"1g"
+    },
+    {
+      "name":"spark.executor.memory",
+      "value":"6g"
+    },
+    {
+      "name":"spark.executor.cores",
+      "value":"1"
+    },
+    {
+      "name":"spark.executor.instances",
+      "value":"1"
+    },
+    {
+      "name":"spark.yarn.tags",
+      "value":"XDA-NGSR"
+    }
+  ],
+  "es-loader": {
+    "destinationIndexName": "index1", // Mandatory
+    "indexMappingfile": "file:///path/to/file.json", // Optional
+    "documentIDField": "field1", // Optional - Obsolete (not sure), - Not documented in confluence
+    "filterString": "col1='STR1' AND length > 10", // Optional - Not documented
+    "aliases": [{
+      "aliasName": "alias1",
+      "mode": "replace"
+    }, {
+      "aliasName": "alias2",
+      "mode": "append"
+    }],
+
+    "esPort": 9100, // Mandatory
+    "esClusterName": "elasticsearch", // Mandatory
+    "esNodes": "es01.sncr.dev.sncorp.net", // Mandatory - Comma separated list of host names or IP addresses
+    "esMappingId": "col1", // Mandatory
+    "esUser": "esuser", // Mandatory
+    "esPass": "esuser" // Mandatory
+  }
+}
