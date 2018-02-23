@@ -1,0 +1,11 @@
+- name: Install SAW Quartz Scheduler package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-quartz-scheduler-*.rpm"]
+  notify:
+    - restart saw-quartz-scheduler
+- name: Install SAW Observe Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-quartz-scheduler-service/conf
+  notify:
+    - restart saw-quartz-scheduler
+- name: Enable SAW Quartz Scheduler Service
+  systemd: name=saw-quartz-scheduler enabled=true
