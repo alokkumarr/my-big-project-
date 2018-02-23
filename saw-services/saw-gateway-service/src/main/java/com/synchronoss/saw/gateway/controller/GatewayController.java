@@ -101,7 +101,7 @@ public class GatewayController {
  */
 @RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS, PUT})
   @ResponseBody
-  public ResponseEntity<String> proxyRequest(HttpServletRequest request, HttpServletResponse response,
+  public ResponseEntity<?> proxyRequest(HttpServletRequest request, HttpServletResponse response,
       @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles) throws  IOException, URISyntaxException, ServletException, FileUploadException {
   HttpUriRequest proxiedRequest = null;
     HttpResponse proxiedResponse = null;
@@ -163,7 +163,8 @@ public class GatewayController {
                 map.put(fileName, requestfile.getPath());
               }
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.set("Authorization", request.getHeader("Authorization"));
             HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
             RestTemplate uploadrestTemplate = new RestTemplate();
             uploadResponseEntity = uploadrestTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
@@ -172,9 +173,11 @@ public class GatewayController {
             logger.error("Exception thrown during file upload ", e);
           }
             for (FileSystemResource file : files){
-              logger.trace("Filename :" + file.getFilename() + " has been deleted from temp folder after uploading to the destination");
-              file.getFile().delete();}
+            logger.trace("Filename :" + file.getFilename() + " has been deleted from temp folder after uploading to the destination");
+            file.getFile().delete();}
             responseEntity = new ResponseEntity<>(uploadResponseEntity.getBody(), uploadResponseEntity.getHeaders(), uploadResponseEntity.getStatusCode());
+            logger.trace("uploadResponseEntity response structure {}",  uploadResponseEntity.getBody() + ":" + uploadResponseEntity.getHeaders() + ":" + uploadResponseEntity.getStatusCodeValue());
+            logger.trace("responseEntity response structure {}", requestEntity.getBody() + ":"+ responseEntity.getStatusCodeValue());
             return responseEntity;
           }
         } else {responseEntity = new ResponseEntity<>(validate.getValidityMessage(),makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);}

@@ -139,11 +139,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     if (!HFileOperations.exists(defaultProjectRoot + defaultProjectPath + project.getPath())) {
       logger.trace("Path {}", defaultProjectRoot + defaultProjectPath + project.getPath());
       HFileOperations.createDir(defaultProjectRoot + defaultProjectPath + project.getPath());
-      //String pathForSubdirectory = FilenameUtils.getFullPathNoEndSeparator(defaultProjectRoot + defaultProjectPath + project.getPath());
+      String pathForSubdirectory = FilenameUtils.getFullPathNoEndSeparator(defaultProjectRoot + defaultProjectPath + project.getPath());
       logger.trace("After creating folder before reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(project));
-      //logger.trace("pathForSubdirectory {}", pathForSubdirectory);
-      //project.setPath(pathForSubdirectory);
-      readProject = readSubDirectoriesByProjectId(project);
+      logger.trace("pathForSubdirectory {}", pathForSubdirectory);
+      project.setPath(pathForSubdirectory);
+      readProject = readDirectoriesByProjectId(project, holdTempPathValue);
+      logger.trace("readSubDirectoriesByProjectId(project) {}", project.getPath());
       logger.trace("After creating folder after reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(readProject));
       project.setData(readProject.getData());
     }
@@ -288,7 +289,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     System.out.println(node);
     System.out.println(System.getProperty("java.io.tmpdir"));
     System.out.println("data.csv".substring("data.csv".indexOf('.'), "data.csv".length()));
-    System.out.println(FilenameUtils.getFullPathNoEndSeparator("/User"));
+    System.out.println(FilenameUtils.getFullPathNoEndSeparator("maprfs:///apps/sncr/raw/data"));
     
   }
 }

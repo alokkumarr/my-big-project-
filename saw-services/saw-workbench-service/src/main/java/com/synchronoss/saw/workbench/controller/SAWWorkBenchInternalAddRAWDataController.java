@@ -167,7 +167,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @throws ServletException 
    * @throws IOException 
    */
-  @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.TEXT_PLAIN_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public String uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
       @RequestParam("path")  String filePath, @RequestBody Map<String, String> fileList) 
