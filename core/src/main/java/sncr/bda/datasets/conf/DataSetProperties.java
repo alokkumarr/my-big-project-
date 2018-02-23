@@ -7,7 +7,7 @@ public enum DataSetProperties {
 
     Name("name"),
     PhysicalLocation ("physicalLocation"),
-    Type ("type"),
+    Type ("dstype"),
     Format ("format"),
     Catalog ("catalog"),
     StartTS ("started"),
@@ -31,7 +31,8 @@ public enum DataSetProperties {
     Project ( "project"),
     BatchID ("batchID"),
     User("user"),
-    System("system");
+    System("system"),
+    Keys("keys");
 
     private final String intName;
 

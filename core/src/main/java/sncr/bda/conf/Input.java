@@ -15,7 +15,6 @@ public class Input {
 
     /**
      * Parameter name
-     * (Required)
      * 
      */
     @SerializedName("name")
@@ -23,6 +22,7 @@ public class Input {
     private String name;
     /**
      * Data object name
+     * (Required)
      * 
      */
     @SerializedName("dataSet")
@@ -42,9 +42,9 @@ public class Input {
      * Type of data source
      * 
      */
-    @SerializedName("datasource")
+    @SerializedName("dstype")
     @Expose
-    private String datasource = "fs";
+    private Input.Dstype dstype = Input.Dstype.fromValue("base");
     /**
      * Catalog in data source
      * 
@@ -59,6 +59,9 @@ public class Input {
     @SerializedName("project")
     @Expose
     private String project;
+    @SerializedName("parent")
+    @Expose
+    private String parent;
 
     /**
      * No args constructor for use in serialization
@@ -69,7 +72,8 @@ public class Input {
 
     /**
      * 
-     * @param datasource
+     * @param parent
+     * @param dstype
      * @param catalog
      * @param name
      * @param format
@@ -77,19 +81,19 @@ public class Input {
      * @param dataSet
      * @param fileMask
      */
-    public Input(String name, String dataSet, String fileMask, Input.Format format, String datasource, String catalog, String project) {
+    public Input(String name, String dataSet, String fileMask, Input.Format format, Input.Dstype dstype, String catalog, String project, String parent) {
         this.name = name;
         this.dataSet = dataSet;
         this.fileMask = fileMask;
         this.format = format;
-        this.datasource = datasource;
+        this.dstype = dstype;
         this.catalog = catalog;
         this.project = project;
+        this.parent = parent;
     }
 
     /**
      * Parameter name
-     * (Required)
      * 
      * @return
      *     The name
@@ -100,7 +104,6 @@ public class Input {
 
     /**
      * Parameter name
-     * (Required)
      * 
      * @param name
      *     The name
@@ -116,6 +119,7 @@ public class Input {
 
     /**
      * Data object name
+     * (Required)
      * 
      * @return
      *     The dataSet
@@ -126,6 +130,7 @@ public class Input {
 
     /**
      * Data object name
+     * (Required)
      * 
      * @param dataSet
      *     The dataSet
@@ -191,24 +196,24 @@ public class Input {
      * Type of data source
      * 
      * @return
-     *     The datasource
+     *     The dstype
      */
-    public String getDatasource() {
-        return datasource;
+    public Input.Dstype getDstype() {
+        return dstype;
     }
 
     /**
      * Type of data source
      * 
-     * @param datasource
-     *     The datasource
+     * @param dstype
+     *     The dstype
      */
-    public void setDatasource(String datasource) {
-        this.datasource = datasource;
+    public void setDstype(Input.Dstype dstype) {
+        this.dstype = dstype;
     }
 
-    public Input withDatasource(String datasource) {
-        this.datasource = datasource;
+    public Input withDstype(Input.Dstype dstype) {
+        this.dstype = dstype;
         return this;
     }
 
@@ -262,6 +267,29 @@ public class Input {
         return this;
     }
 
+    /**
+     * 
+     * @return
+     *     The parent
+     */
+    public String getParent() {
+        return parent;
+    }
+
+    /**
+     * 
+     * @param parent
+     *     The parent
+     */
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
+
+    public Input withParent(String parent) {
+        this.parent = parent;
+        return this;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -269,7 +297,7 @@ public class Input {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(dataSet).append(fileMask).append(format).append(datasource).append(catalog).append(project).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(fileMask).append(format).append(dstype).append(catalog).append(project).append(parent).toHashCode();
     }
 
     @Override
@@ -281,7 +309,43 @@ public class Input {
             return false;
         }
         Input rhs = ((Input) other);
-        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).append(format, rhs.format).append(datasource, rhs.datasource).append(catalog, rhs.catalog).append(project, rhs.project).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).append(format, rhs.format).append(dstype, rhs.dstype).append(catalog, rhs.catalog).append(project, rhs.project).append(parent, rhs.parent).isEquals();
+    }
+
+    @Generated("org.jsonschema2pojo")
+    public static enum Dstype {
+
+        @SerializedName("base")
+        BASE("base"),
+        @SerializedName("partition")
+        PARTITION("partition");
+        private final String value;
+        private static Map<String, Input.Dstype> constants = new HashMap<String, Input.Dstype>();
+
+        static {
+            for (Input.Dstype c: values()) {
+                constants.put(c.value, c);
+            }
+        }
+
+        private Dstype(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        public static Input.Dstype fromValue(String value) {
+            Input.Dstype constant = constants.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
     }
 
     @Generated("org.jsonschema2pojo")
