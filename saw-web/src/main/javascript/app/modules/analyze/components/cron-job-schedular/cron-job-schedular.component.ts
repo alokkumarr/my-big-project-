@@ -1,6 +1,7 @@
 declare const require: any;
 
 import { Component, Inject, Input, EventEmitter, Output } from '@angular/core';
+import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
@@ -15,11 +16,11 @@ require('./cron-job-schedular.component.scss');
 
 export class CronJobSchedularComponent {
   constructor() 
-  public state: any;
-  public model: any;
   @Input() public model: any;
   @Input() public crondetails: any;
   @Output() onCronChanged: EventEmitter<any> = new EventEmitter();
+  NumberMapping: any = {'=1': '#st', '=2': '#nd', '=3': '#rd', 'other': '#th'};
+  DayMapping: any = {'=TUE': 'TUESDAY', '=WED': 'WEDNESDAY', '=THU': 'THURSDAY', '=SAT': 'SATURDAY', 'other': '#DAY'};
 
   ngOnInit() {
   	this.dailyTypeDay = {
@@ -28,42 +29,12 @@ export class CronJobSchedularComponent {
   	  second: '',
   	  hourType: 'AM'
   	};
-  	this.dailyTypeWeek = {
-  	  hour: '',
-  	  minute: '',
-  	  second: '',
-  	  hourType: 'AM'
-  	};
-  	this.weeklybasisDate = {
-  	  hour: '',
-  	  minute: '',
-  	  second: '',
-  	  hourType: 'AM'
-  	}
-  	this.specificDayMonth = {
-  	  hour: '',
-  	  minute: '',
-  	  second: '',
-  	  hourType: 'AM' 
-  	}
-  	this.specificWeekDayMonth = {
-  	  hour: '',
-  	  minute: '',
-  	  second: '',
-  	  hourType: 'AM'
-  	}
-  	this.specificMonthDayYear = {
-  	  hour: '',
-  	  minute: '',
-  	  second: '',
-  	  hourType: 'AM'
-  	}
-  	this.specificMonthWeekYear = {
-  	  hour: '',
-  	  minute: '',
-  	  second: '',
-  	  hourType: 'AM'
-  	}
+  	this.dailyTypeWeek = clone(this.dailyTypeDay);
+  	this.weeklybasisDate = clone(this.dailyTypeDay);
+  	this.specificDayMonth = clone(this.dailyTypeDay);
+  	this.specificWeekDayMonth = clone(this.dailyTypeDay);
+  	this.specificMonthDayYear = clone(this.dailyTypeDay);
+  	this.specificMonthWeekYear = clone(this.dailyTypeDay);
   	this.model = {}
   	this.daily = {};
   	this.weekly = {};
@@ -144,42 +115,12 @@ export class CronJobSchedularComponent {
       second: '',
       hourType: 'AM'
     };
-    this.dailyTypeWeek = {
-      hour: '',
-      minute: '',
-      second: '',
-      hourType: 'AM'
-    };
-    this.weeklybasisDate = {
-      hour: '',
-      minute: '',
-      second: '',
-      hourType: 'AM'
-    }
-    this.specificDayMonth = {
-      hour: '',
-      minute: '',
-      second: '',
-      hourType: 'AM' 
-    }
-    this.specificWeekDayMonth = {
-      hour: '',
-      minute: '',
-      second: '',
-      hourType: 'AM'
-    }
-    this.specificMonthDayYear = {
-      hour: '',
-      minute: '',
-      second: '',
-      hourType: 'AM'
-    }
-    this.specificMonthWeekYear = {
-      hour: '',
-      minute: '',
-      second: '',
-      hourType: 'AM'
-    }
+    this.dailyTypeWeek = clone(this.dailyTypeDay);
+    this.weeklybasisDate = clone(this.dailyTypeDay);
+    this.specificDayMonth = clone(this.dailyTypeDay);
+    this.specificWeekDayMonth = clone(this.dailyTypeDay);
+    this.specificMonthDayYear = clone(this.dailyTypeDay);
+    this.specificMonthWeekYear = clone(this.dailyTypeDay);
     this.model = {}
     this.daily = {};
     this.weekly = {};

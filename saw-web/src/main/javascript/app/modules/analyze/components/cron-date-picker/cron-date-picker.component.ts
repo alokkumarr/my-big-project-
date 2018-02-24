@@ -1,6 +1,6 @@
 declare const require: any;
 
-import { Component, Inject, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { model } from '../cron-job-schedular.component';
 const template = require('./cron-date-picker.component.html');
 

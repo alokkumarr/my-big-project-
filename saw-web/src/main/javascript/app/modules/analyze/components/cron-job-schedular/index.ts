@@ -1,6 +1,4 @@
-import {
-  CronJobSchedularComponent
-} from './cron-job-schedular.component';
+export {CronJobScheduler} from './cron-job-scheduler.component';
 export {
   CronJobSchedularComponent
 };

@@ -1,11 +1,11 @@
 <div class="tab">
-  <button class="tablinks" (click)="openSchedule(event, 'daily')" [ngClass]="{'active': scheduleType == 'daily'}">Daily</button>
-  <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')" [ngClass]="{'active': scheduleType == 'weeklybasis'}">Weekly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'monthly')" [ngClass]="{'active': scheduleType == 'monthly'}">Monthly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'yearly')" [ngClass]="{'active': scheduleType == 'yearly'}">Yearly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'daily')" [ngClass]="{'active': scheduleType === 'daily'}">Daily</button>
+  <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')" [ngClass]="{'active': scheduleType === 'weeklybasis'}">Weekly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'monthly')" [ngClass]="{'active': scheduleType === 'monthly'}">Monthly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'yearly')" [ngClass]="{'active': scheduleType === 'yearly'}">Yearly</button>
 </div>
 
-<div *ngIf="scheduleType == 'daily'" [ngClass]="{'scheduleType': selectedItem == 'daily'}" class="tabcontent">
+<div *ngIf="scheduleType === 'daily'" [ngClass]="{'scheduleType': selectedItem === 'daily'}" class="tabcontent">
   <mat-radio-group [(ngModel)]="daily.dailyType">
     <mat-radio-button class="everyDay" value="everyDay" (click)="resetData();">Every </mat-radio-button>
     <mat-select placeholder="Days" [(ngModel)]="daily.days" (selectionChange)="regenerateCron()" [disabled]="daily.dailyType !== 'everyDay'">
@@ -20,25 +20,21 @@
   </mat-radio-group>
 </div>
 
-<div *ngIf="scheduleType == 'weeklybasis'" [ngClass]="{'active': scheduleType == 'weeklybasis'}" class="tabcontent">
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.MON" (change)="regenerateCron()" /> Monday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.TUE" (change)="regenerateCron()" /> Tuesday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.WED" (change)="regenerateCron()" /> Wednesday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.THU" (change)="regenerateCron()" /> Thrusday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.FRI" (change)="regenerateCron()" /> Friday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SAT" (change)="regenerateCron()" /> Saturday
-  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SUN" (change)="regenerateCron()" /> Sunday
+<div *ngIf="scheduleType === 'weeklybasis'" [ngClass]="{'active': scheduleType === 'weeklybasis'}" class="tabcontent">
+  <div *ngFor="let day of dayStrings">
+    <input class="checkbox" type="checkbox" [(ngModel)]="weekly[day]" (change)="regenerateCron()" /> {{day | i18nPlural: DayMapping}}  
+  </div>
   <br/>
   Start Time
   <cron-date-picker [model]="weeklybasisDate" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/>
 </div>
 
-<div *ngIf="scheduleType == 'monthly'" [ngClass]="{'active': scheduleType == 'monthly'}" class="tabcontent">
+<div *ngIf="scheduleType === 'monthly'" [ngClass]="{'active': scheduleType === 'monthly'}" class="tabcontent">
   <mat-radio-group [(ngModel)]="monthly.monthlyType">
     <mat-radio-button class="everyDay" value="specificDay" (click)="resetData();">On the </mat-radio-button>
     <mat-select placeholder="Day" [(ngModel)]="monthly.specificDay" (selectionChange)="regenerateCron()" [disabled]="monthly.monthlyType !== 'specificDay'">
       <mat-option *ngFor="let day of days" [value]="day">
-        {{getDaySuffix(day)}}
+        {{day | i18nPlural: NumberMapping}}
       </mat-option>
     </mat-select> Day of every 
     <mat-select placeholder="Month" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron()" [disabled]="monthly.monthlyType !== 'specificDay'">
@@ -68,7 +64,7 @@
   </mat-radio-group>
 </div>
 
-<div *ngIf="scheduleType == 'yearly'" [ngClass]="{'active': scheduleType == 'yearly'}" class="tabcontent">
+<div *ngIf="scheduleType === 'yearly'" [ngClass]="{'active': scheduleType === 'yearly'}" class="tabcontent">
   <mat-radio-group [(ngModel)]="yearly.yearlyType">
     <mat-radio-button class="everyDay" value="specificMonthDay" (click)="resetData();">Every </mat-radio-button>
     <mat-select placeholder="Month" [(ngModel)]="yearly.specificMonthDayMonth" (selectionChange)="regenerateCron()" [disabled]="yearly.yearlyType !== 'specificMonthDay'">
@@ -78,7 +74,7 @@
     </mat-select> on the  
     <mat-select placeholder="Days" [(ngModel)]="yearly.specificMonthDayDay" (selectionChange)="regenerateCron()" [disabled]="yearly.yearlyType !== 'specificMonthDay'">
       <mat-option *ngFor="let day of days" [value]="day">
-        {{getDaySuffix(day)}}
+        {{day | i18nPlural: NumberMapping}}
       </mat-option>
     </mat-select> Day at <br/>
     <cron-date-picker [model]="specificMonthDayYear" (onDateChange)="onDateChange($event)" [hidden]="yearly.yearlyType !== 'specificMonthDay'"></cron-date-picker><br/><br/><br/>
