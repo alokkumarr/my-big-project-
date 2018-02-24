@@ -656,10 +656,6 @@ export const AnalyzeReportComponent = {
         return;
       }
 
-      if (this.states.sqlMode === this.DESIGNER_MODE) {
-        this.model.query = '';
-      }
-
       this.model = assign(this.model, this.generatePayload());
       this.openSaveModal(ev, this.model);
     }

@@ -1,4 +1,8 @@
-import { DesignerSettingsSingleComponent } from './designer-settings-single.component';
+import {
+  DesignerSettingsSingleComponent,
+  FieldChangeEvent
+} from './designer-settings-single.component';
 export {
-  DesignerSettingsSingleComponent
+  DesignerSettingsSingleComponent,
+  FieldChangeEvent
 };

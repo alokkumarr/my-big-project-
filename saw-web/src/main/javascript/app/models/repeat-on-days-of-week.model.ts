@@ -1,4 +1,4 @@
-export default interface RepeatOnDaysOfWeek {
+export interface RepeatOnDaysOfWeek {
   sunday:    boolean;
   monday:    boolean;
   friday:    boolean;
