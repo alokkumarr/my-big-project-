@@ -21,8 +21,7 @@
 #'  DOUBLE
 #'
 #'@examples
-#'library(dplyr)
-#'library(sparklyr)
+#'#'library(dplyr)
 #'
 #'
 #'# Create toy dataset
@@ -44,24 +43,12 @@
 #'  dat <- rbind(dat, d)
 #'}
 #'
-#'# Create Spark Connection and read in some data
-#'sc <- sparklyr::spark_connect(master="local")
+#'melter(dat,
+#'       id_vars = c("id", "date", "cat1", "cat2"),
+#'       measure_vars = c("metric1", "metric2"),
+#'       variable_name = "metric",
+#'       value_name = "value")
 #'
-#'# Load data into Spark
-#'dat_tbl <- copy_to(sc, dat, overwrite = TRUE)
-#'
-#'spk_long <- melter(dat_tbl,
-#'                   id_vars = c("id", "date", "cat1", "cat2"),
-#'                   measure_vars = c("metric1", "metric2"),
-#'                   variable_name = "metric",
-#'                   value_name = "value")
-#'spk_long
-#'r_long <- melter(dat,
-#'                 id_vars = c("id", "date", "cat1", "cat2"),
-#'                 measure_vars = c("metric1", "metric2"),
-#'                 variable_name = "metric",
-#'                 value_name = "value")
-#'spk_long %>% collect() == r_long
 #'@export
 melter <- function(df, ...) {
   UseMethod("melter", df)
