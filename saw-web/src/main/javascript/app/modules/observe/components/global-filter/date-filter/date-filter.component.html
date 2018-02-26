@@ -13,6 +13,7 @@
   <input matInput
     [value]="model.gte"
     [matDatepicker]="frompicker"
+    [max]="model.lte"
     (dateInput)="onDateChange('gte', $event)"
     (click)="frompicker.open()"
     placeholder="From" />
@@ -23,6 +24,7 @@
 <mat-form-field *ngIf="showDateFields">
   <input matInput
     [value]="model.lte"
+    [min]="model.gte"
     [matDatepicker]="topicker"
     (dateInput)="onDateChange('lte', $event)"
     (click)="topicker.open()"
