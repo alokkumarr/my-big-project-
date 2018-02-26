@@ -1,10 +1,11 @@
 declare const require: any;
 
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete'
 import { FormControl } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 import { startWith } from 'rxjs/operators/startWith';
 import { map } from 'rxjs/operators/map';
 
@@ -17,7 +18,7 @@ const template = require('./string-filter.component.html');
   template
 })
 
-export class GlobalStringFilterComponent implements OnInit {
+export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
 
@@ -25,6 +26,7 @@ export class GlobalStringFilterComponent implements OnInit {
   private _filter;
   private value: Array<string>;
   private suggestions = [];
+  private valueChangeListener: Subscription;
   private filteredSuggestions: Observable<any[]>;
   constructor(
     private observe: ObserveService
@@ -37,6 +39,13 @@ export class GlobalStringFilterComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.valueChangeListener = this.filterCtrl.valueChanges.subscribe(() => {
+      this.filterChanged();
+    });
+  }
+
+  ngOnDestroy() {
+    this.valueChangeListener.unsubscribe();
   }
 
   @Input() set filter(data) {
@@ -46,12 +55,13 @@ export class GlobalStringFilterComponent implements OnInit {
     this.value = [];
   }
 
-  onKeyup(evt) {
+  onInputChange(evt) {
     if (evt.keyCode === 13) { // on pressing 'Enter'
       this.value.push(this.filterCtrl.value);
       this.filterCtrl.setValue('');
-      this.filterChanged();
     }
+
+    this.filterChanged();
   }
 
   loadSuggestions() {
@@ -75,19 +85,26 @@ export class GlobalStringFilterComponent implements OnInit {
     }
   }
 
+  isValid() {
+    return this.filterCtrl.value || (
+      this.value &&
+      this.value.length
+    );
+  }
+
   filterChanged() {
     const payload = {
       ...this._filter,
       ...{
         model: {
-          modelValues: this.value,
+          modelValues: this.filterCtrl.value ? [this.filterCtrl.value, ...this.value] : this.value,
 
           // We don't allow anything else than 'is in' sql operation on strings from dashboards for now
           operator: 'ISIN'
         }
       }
     };
-    this.onModelChange.emit({data: payload, valid: this.value && this.value.length});
+    this.onModelChange.emit({data: payload, valid: this.isValid()});
   }
 }
 

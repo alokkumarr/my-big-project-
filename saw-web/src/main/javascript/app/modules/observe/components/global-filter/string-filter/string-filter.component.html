@@ -3,7 +3,8 @@
     #completeTrigger
     [matAutocomplete]="stringFilter"
     [formControl]="filterCtrl"
-    (keyup)="onKeyup($event)" />
+    (change)="onInputChange($event)"
+    (keyup)="onInputChange($event)" />
   <mat-autocomplete #stringFilter="matAutocomplete">
     <mat-option *ngFor="let str of filteredSuggestions | async" [value]="str" [textContent]="str">
     </mat-option>
