@@ -24,7 +24,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 public abstract class MetadataStore extends MetadataBase  implements DocumentConverter{
 
     private static final Logger logger = Logger.getLogger(MetadataStore.class);
-    protected static final String METASTORE = ".metadata";
+    protected static final String METASTORE = "metadata";
 
     public static final String delimiter = "::";
 
@@ -37,7 +37,8 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
         logger.debug("Open table: " + fullTableName);
-        table = MapRDB.getTable(fullTableName);
+        boolean exists = MapRDB.tableExists(fullTableName);
+        table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
         table.setOption(Table.TableOption.BUFFERWRITE, false);
     }
 
