@@ -3,6 +3,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as get from 'lodash/get';
 import * as moment from 'moment';
 
+import { ObserveService } from '../../../services/observe.service';
+
 import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../../analyze/consts';
 const template = require('./date-filter.component.html');
 
@@ -19,7 +21,7 @@ export class GlobalDateFilterComponent implements OnInit {
 
   @Output() onModelChange = new EventEmitter();
 
-  constructor() { }
+  constructor(private observe: ObserveService) { }
 
   ngOnInit() { }
 
@@ -31,6 +33,7 @@ export class GlobalDateFilterComponent implements OnInit {
     this.model.lte = moment(get(this._filter, 'model.lte'));
 
     this.onPresetChange({value: this.model.preset});
+    this.loadDateRange();
   }
 
   onPresetChange(data) {
@@ -50,6 +53,22 @@ export class GlobalDateFilterComponent implements OnInit {
         filt.model.lte &&
         filt.model.gte
       );
+  }
+
+  /**
+   * Queries the min and max dates present in db for a field and updates the model with it
+   *
+   * @memberof GlobalDateFilterComponent
+   */
+  loadDateRange() {
+    this.observe.getModelValues(this._filter).subscribe((data: {_min: string, _max: string}) => {
+      this.onDateChange('gte', {
+        value: moment(parseInt(data._min))
+      });
+      this.onDateChange('lte', {
+        value: moment(parseInt(data._max))
+      });
+    });
   }
 
   onFilterChange() {
