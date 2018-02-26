@@ -2,14 +2,14 @@
 
 
 
-# melt unit tests ---------------------------------------------------------
+# melter unit tests ---------------------------------------------------------
 
 library(testthat)
 library(a2munge)
 library(sparklyr)
 library(dplyr)
 
-context("melt function unit tests")
+context("melter function unit tests")
 
 # Format Data
 Iris <- iris %>%
@@ -47,3 +47,6 @@ test_that("melter methods return correct df dimensions", {
   expect_equal(nrow(r_melt), nrow(Iris) * length(measure_vars))
   expect_equal(sdf_nrow(spk_melt), nrow(Iris) * length(measure_vars))
 })
+
+
+spark_disconnect(sc)

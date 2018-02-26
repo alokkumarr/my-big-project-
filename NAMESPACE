@@ -2,5 +2,10 @@
 
 S3method(melter,data.frame)
 S3method(melter,tbl_spark)
+S3method(pivoter,data.frame)
+S3method(pivoter,tbl_spark)
 export(melter)
+export(pivoter)
 importFrom(magrittr,"%>%")
+importFrom(stats,as.formula)
+importFrom(stats,setNames)
