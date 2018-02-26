@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+.derby.log
+metastore_db/
+.a2munge.Rproj
