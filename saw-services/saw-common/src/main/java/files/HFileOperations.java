@@ -35,7 +35,6 @@ public class HFileOperations {
 
             String data = new String(IOUtils.toByteArray(stream));
             stream.close();
-            fs.close();
             return data;
         } catch (Exception e) {
             throw new FileNotFoundException("File not found on the provided location :" + e);

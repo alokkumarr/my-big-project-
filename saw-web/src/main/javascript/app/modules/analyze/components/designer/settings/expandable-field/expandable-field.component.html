@@ -44,7 +44,7 @@
      [ngSwitch]="analysisType"
      class="expandable-field__details">
   <expand-detail-pivot *ngSwitchCase="'pivot'"
-                       (change)="change.emit(artifactColumn)"
+                       (change)="change.emit($event)"
                        [artifactColumn]="artifactColumn">
 
   </expand-detail-pivot>

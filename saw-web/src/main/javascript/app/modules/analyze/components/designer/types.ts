@@ -2,7 +2,7 @@
 import {
   SqlBuilder,
   SqlBuilderPivot
-} from '../../models/sql-builder.model';
+} from '../../models';
 import {
   DesignerMode,
   AnalysisStarter,
@@ -18,7 +18,8 @@ import {
   IToolbarActionData,
   DesignerToolbarAciton,
   IToolbarActionResult,
-  Artifact
+  Artifact,
+  Format
 } from '../../types';
 
 export {
@@ -38,7 +39,8 @@ export {
   ArtifactColumns,
   IToolbarActionData,
   DesignerToolbarAciton,
-  IToolbarActionResult
+  IToolbarActionResult,
+  Format
 };
 
 

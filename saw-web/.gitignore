@@ -9,7 +9,8 @@ build/
 dist/
 .awcache
 output/*
-
+../package-lock.json
+local.log
 
 # IDEs and editors
 /.idea

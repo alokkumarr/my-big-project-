@@ -1,19 +1,19 @@
-const login = require('../javascript/pages/loginPage.po.js');
-const sidenav = require('../javascript/pages/components/sidenav.co.js');
-const analyze = require('../javascript/pages/analyzePage.po.js');
+const loginPage = require('../javascript/pages/loginPage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
+const homePage = require('../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
-describe('create a new report type analysis: createReport.test.js', () => {
-  let categoryName;
-  const reportDesigner = analyze.designerDialog.report;
+describe('Create report type analysis: createReport.test.js', () => {
+  const reportDesigner = analyzePage.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
   const reportDescription = 'e2e report description';
   const tables = [{
     name: 'MCT_DN_SESSION_SUMMARY',
     fields: [
-      'Source OS',
       'Available (MB)',
+      'Source OS',
       'Source Model'
     ]
   }/*, {
@@ -29,57 +29,55 @@ describe('create a new report type analysis: createReport.test.js', () => {
     fieldB: 'Session Id'
   };*/
   const filterValue = 'ANDROID';
-  const metric = 'MCT TMO Session DL';
-  const method = 'table:report';
+  const metricName = 'MCT TMO Session DL';
+  const analysisType = 'table:report';
 
-  afterAll(function() {
+  beforeAll(function () {
+    // This test may take some time. Such timeout fixes jasmine DEFAULT_TIMEOUT_INTERVAL interval error
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+
+    // Waiting for results may take some time
+    browser.manage().timeouts().implicitlyWait(protractorConf.timeouts.extendedImplicitlyWait);
+  });
+
+  beforeEach(function (done) {
+    setTimeout(function () {
+      expect(browser.getCurrentUrl()).toContain('/login');
+      done();
+    }, protractorConf.timeouts.pageResolveTimeout);
+  });
+
+  afterEach(function (done) {
+    setTimeout(function () {
+      analyzePage.main.doAccountAction('logout');
+      done();
+    }, protractorConf.timeouts.pageResolveTimeout);
+  });
+
+  afterAll(function () {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');
   });
 
-  it('login as admin', () => {
-    expect(browser.getCurrentUrl()).toContain('/login');
-    login.loginAs('admin');
-  });
+  it('Should apply filter to Report', () => {
+    loginPage.loginAs('admin');
 
-  //Obsolete. Now menu opens automatically with first category expanded
-  /* it('should open the sidenav menu and go to first category', () => {
-    commonFunctions.waitFor.elementToBeClickable(sidenav.menuBtn);
-    sidenav.menuBtn.click();
-    sidenav.publicCategoriesToggle.click();
-    categoryName = sidenav.firstPublicCategory.getText();
-    sidenav.firstPublicCategory.click();
-    expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
-  }); */
+    // Switch to Card View
+    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
-  it('should display list view by default', () => {
-    categoryName = sidenav.firstPublicCategory.getText();
-    analyze.validateListView();
-  });
+    // Create Report
+    homePage.createAnalysis(metricName, analysisType);
 
-  it('should switch to card view', () => {
-    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-    analyze.analysisElems.cardView.click();
-  });
+    browser.waitForAngularEnabled(false);
+    /*element(by.xpath(`//md-checkbox/div/span[text()='Source OS']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
+    element(by.xpath(`//md-checkbox/div/span[text()='Available (MB)']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
+    element(by.xpath(`//md-checkbox/div/span[text()='Source Model']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
+    browser.waitForAngularEnabled(true);*/
 
-  it('should open the new Analysis dialog', () => {
-    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.addAnalysisBtn);
-    analyze.analysisElems.addAnalysisBtn.click();
-    analyze.validateNewAnalyze();
-  });
-
-  it('should select pivot type and proceed', () => {
-    const newDialog = analyze.newDialog;
-    newDialog.getMetric(metric).click();
-    newDialog.getMethod(method).click();
-    newDialog.createBtn.click();
-    expect(reportDesigner.title.isPresent()).toBe(true);
-  });
-
-  it('should select fields and refresh data', () => {
+    // Select fields and refresh
     tables.forEach(table => {
       table.fields.forEach(field => {
-        reportDesigner.getReportFieldCheckbox(table.name, field).click();
+        commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.getReportFieldCheckbox(table.name, field));
       });
     });
 
@@ -99,59 +97,50 @@ describe('create a new report type analysis: createReport.test.js', () => {
         .isPresent()
     ).toBe(true);*/
 
-    reportDesigner.refreshBtn.click();
-  });
+    commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.refreshBtn);
 
-  it('should apply filters', () => {
-    const filters = analyze.filtersDialog;
+    // Should apply filters
+    const filters = analyzePage.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
-    const stringFilterInput = filters.getStringFilterInput(0);
+    const stringFilterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
 
-    commonFunctions.waitFor.elementToBeClickable(reportDesigner.openFiltersBtn);
-    // browser.sleep(100000);
-    reportDesigner.openFiltersBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.openFiltersBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
+    stringFilterInput.sendKeys("123");
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    filters.applyBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
-  });
 
-  it('should attempt to save the report', () => {
-    const save = analyze.saveDialog;
-    const designer = analyze.designerDialog;
-    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-    // browser.actions().mouseMove(designer.saveBtn).click();
-    designer.saveBtn.click();
+    // Save
+    const save = analyzePage.saveDialog;
+    const designer = analyzePage.designerDialog;
+    commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
     expect(designer.saveDialog).toBeTruthy();
-    expect(save.selectedCategory.getText()).toEqual(categoryName);
 
     save.nameInput.clear().sendKeys(reportName);
     save.descriptionInput.clear().sendKeys(reportDescription);
-    save.saveBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
 
-    const createdAnalysis = analyze.main.getCardTitle(reportName);
+    const createdAnalysis = analyzePage.main.getCardTitle(reportName);
 
     commonFunctions.waitFor.elementToBePresent(createdAnalysis)
       .then(() => expect(createdAnalysis.isPresent()).toBe(true));
-  });
 
-  it('should delete the created analysis', () => {
-    const main = analyze.main;
+    // Delete
+    const main = analyzePage.main;
+    const cards = main.getAnalysisCards(reportName);
     main.getAnalysisCards(reportName).count()
       .then(count => {
         main.doAnalysisAction(reportName, 'delete');
-        main.confirmDeleteBtn.click();
+        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
+        commonFunctions.waitFor.cardsCountToUpdate(cards, count);
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
-  });
-
-  it('should log out', () => {
-    analyze.main.doAccountAction('logout');
   });
 });
