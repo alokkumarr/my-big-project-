@@ -21,6 +21,7 @@
         <md-checkbox class="md-secondary"
                      ng-if="$ctrl.type === 'chart'"
                      ng-hide="::$ctrl.isRuntime"
+                     ng-disabled="!filter.column"
                      ng-model="filter.isGlobalFilter"
                      ng-change="$ctrl.onGlobalToggle(filter)">
           <span translate="GLOBAL_FILTER"></span>
