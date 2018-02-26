@@ -336,17 +336,6 @@ public class JobServiceImpl implements JobService{
 						map.put("jobStatus", jobState);
 					}
 
-					/*					Date currentDate = new Date();
-					if (scheduleTime.compareTo(currentDate) > 0) {
-						map.put("jobStatus", "scheduled");
-
-					} else if (scheduleTime.compareTo(currentDate) < 0) {
-						map.put("jobStatus", "Running");
-
-					} else if (scheduleTime.compareTo(currentDate) == 0) {
-						map.put("jobStatus", "Running");
-					}*/
-
 					list.add(map);
                     logger.info("Job details:");
 					logger.debug("Job Name:"+jobName + ", Group Name:"+ groupName + ", Schedule Time:"+scheduleTime);
@@ -358,6 +347,51 @@ public class JobServiceImpl implements JobService{
 
 		}
 		return list;
+	}
+
+
+	/**
+	 * Get all jobs
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getJobDetails(String jobName) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		try {
+			Scheduler scheduler = schedulerFactoryBean.getScheduler();
+
+			for (String groupName : scheduler.getJobGroupNames()) {
+				for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+					if(jobName.equalsIgnoreCase(jobKey.getName())) {
+					String jobGroup = jobKey.getGroup();
+					//get job's trigger
+					List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+					Date scheduleTime = triggers.get(0).getStartTime();
+					Date nextFireTime = triggers.get(0).getNextFireTime();
+					Date lastFiredTime = triggers.get(0).getPreviousFireTime();
+
+					map.put("jobName", jobName);
+					map.put("groupName", jobGroup);
+					map.put("scheduleTime", scheduleTime);
+					map.put("lastFiredTime", lastFiredTime);
+					map.put("nextFireTime", nextFireTime);
+
+					if(isJobRunning(jobName)){
+						map.put("jobStatus", "RUNNING");
+					}else{
+						String jobState = getJobState(jobName);
+						map.put("jobStatus", jobState);
+					}
+					logger.info("Job details:");
+					logger.debug("Job Name:"+jobName + ", Group Name:"+ groupName + ", Schedule Time:"+scheduleTime);
+				}
+				}
+			}
+		} catch (SchedulerException e) {
+			logger.error("SchedulerException while fetching jobs details. error message :"+e.getMessage());
+
+		}
+		return map;
 	}
 
 	/**

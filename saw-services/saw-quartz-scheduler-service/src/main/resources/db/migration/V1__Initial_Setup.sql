@@ -22,7 +22,7 @@ CREATE TABLE qrtz_job_details
     is_nonconcurrent bool not null,
     is_update_data bool not null,
     requests_recovery bool not null,
-    job_data BINARY null,
+    job_data BLOB null,
     primary key (sched_name,job_name,job_group)
 );
 

@@ -2,6 +2,7 @@ package com.synchronoss.saw.scheduler.controller;
 
 import com.synchronoss.saw.scheduler.job.CronJob;
 import com.synchronoss.saw.scheduler.job.SimpleJob;
+import com.synchronoss.saw.scheduler.modal.JobDetail;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
 import org.slf4j.Logger;
@@ -9,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -27,32 +26,33 @@ public class JobController {
 	@Lazy
 	JobService jobService;
 
-	@RequestMapping("schedule")	
-	public SchedulerResponse schedule(@RequestParam("jobName") String jobName, 
-			@RequestParam("jobScheduleTime") @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm") Date jobScheduleTime, 
-			@RequestParam("cronExpression") String cronExpression){
+	@RequestMapping(value ="schedule",method = RequestMethod.POST)
+	public SchedulerResponse schedule(@RequestBody JobDetail jobDetail){
 		logger.info("JobController schedule() start here.");
 
 		//Job Name is mandatory
-		if(jobName == null || jobName.trim().equals("")){
+		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
 
 		logger.info("Check if job Name is unique");
-		if(!jobService.isJobWithNamePresent(jobName)){
+		if(!jobService.isJobWithNamePresent(jobDetail.getJobName())){
 
-			if(cronExpression == null || cronExpression.trim().equals("")){
+			if(jobDetail.getCronExpression() == null || jobDetail.getCronExpression().trim().equals("")){
 				logger.info("Simple job ");
-				boolean status = jobService.scheduleOneTimeJob(jobName, SimpleJob.class, jobScheduleTime);
+				boolean status = jobService.scheduleOneTimeJob(jobDetail.getJobName(), SimpleJob.class,
+						jobDetail.getJobScheduleTime());
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
 					return getServerResponse(ServerResponseCode.ERROR, false);
 				}
 				
-			} else{
+			} else {
 				logger.info("Cron Trigger ");
-				boolean status = jobService.scheduleCronJob(jobName, CronJob.class, jobScheduleTime, cronExpression);
+				boolean status = jobService.scheduleCronJob(jobDetail.getJobName(), CronJob.class,
+						jobDetail.getJobScheduleTime(),
+						jobDetail.getCronExpression());
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
@@ -64,13 +64,13 @@ public class JobController {
 		}
 	}
 
-	@RequestMapping("unschedule")
+	@RequestMapping(value ="unschedule",method = RequestMethod.POST)
 	public void unschedule(@RequestParam("jobName") String jobName) {
 		logger.info("JobController unschedule() method");
 		jobService.unScheduleJob(jobName);
 	}
 
-	@RequestMapping("delete")
+	@RequestMapping(value ="delete",method = RequestMethod.DELETE)
 	public SchedulerResponse delete(@RequestParam("jobName") String jobName) {
         logger.info("JobController delete() method");
 
@@ -93,7 +93,7 @@ public class JobController {
 		}
 	}
 
-	@RequestMapping("pause")
+	@RequestMapping(value ="pause",method = RequestMethod.POST)
 	public SchedulerResponse pause(@RequestParam("jobName") String jobName) {
 		logger.info( "JobController pause() method");
 
@@ -118,7 +118,7 @@ public class JobController {
 		}		
 	}
 
-	@RequestMapping("resume")
+	@RequestMapping(value ="resume",method = RequestMethod.POST)
 	public SchedulerResponse resume(@RequestParam("jobName") String jobName) {
         logger.info("JobController resume() method");
 
@@ -146,7 +146,7 @@ public class JobController {
 		}
 	}
 
-	@RequestMapping("update")
+	@RequestMapping(value ="update",method = RequestMethod.POST)
 	public SchedulerResponse updateJob(@RequestParam("jobName") String jobName, 
 			@RequestParam("jobScheduleTime") @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm") Date jobScheduleTime, 
 			@RequestParam("cronExpression") String cronExpression){
@@ -185,7 +185,7 @@ public class JobController {
 		}
 	}
 
-	@RequestMapping("jobs")
+	@RequestMapping(value ="jobs",method = RequestMethod.GET)
 	public SchedulerResponse getAllJobs(){
         logger.info("JobController getAllJobs() method");
 
@@ -193,20 +193,20 @@ public class JobController {
 		return getServerResponse(ServerResponseCode.SUCCESS, list);
 	}
 
-	@RequestMapping("checkJobName")
-	public SchedulerResponse checkJobName(@RequestParam("jobName") String jobName){
-		logger.info("JobController checkJobName() method");
+	@RequestMapping(value ="fetchJob",method = RequestMethod.POST)
+	public SchedulerResponse getJobDetails(@RequestParam("jobName") String jobName){
+		logger.info("JobController getJobDetails() method");
 
 		//Job Name is mandatory
 		if(jobName == null || jobName.trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
 		
-		boolean status = jobService.isJobWithNamePresent(jobName);
+		Map<String, Object> status = jobService.getJobDetails(jobName);
 		return getServerResponse(ServerResponseCode.SUCCESS, status);
 	}
 
-	@RequestMapping("isJobRunning")
+	@RequestMapping(value ="isJobRunning",method = RequestMethod.POST)
 	public SchedulerResponse isJobRunning(@RequestParam("jobName") String jobName) {
 		logger.info("JobController isJobRunning() method");
 
@@ -214,7 +214,7 @@ public class JobController {
 		return getServerResponse(ServerResponseCode.SUCCESS, status);
 	}
 
-	@RequestMapping("jobState")
+	@RequestMapping(value ="jobState",method = RequestMethod.POST)
 	public SchedulerResponse getJobState(@RequestParam("jobName") String jobName) {
         logger.info("JobController getJobState() method");
 
@@ -222,7 +222,7 @@ public class JobController {
 		return getServerResponse(ServerResponseCode.SUCCESS, jobState);
 	}
 
-	@RequestMapping("stop")
+	@RequestMapping(value ="stop",method = RequestMethod.POST)
 	public SchedulerResponse stopJob(@RequestParam("jobName") String jobName) {
         logger.info("JobController stopJob() method");
 
@@ -248,7 +248,7 @@ public class JobController {
 		}
 	}
 
-	@RequestMapping("start")
+	@RequestMapping(value ="start",method = RequestMethod.POST)
 	public SchedulerResponse startJobNow(@RequestParam("jobName") String jobName) {
 		logger.info("JobController startJobNow() method");
 

@@ -20,6 +20,9 @@ public interface JobService {
 	boolean startJobNow(String jobName);
 	boolean isJobRunning(String jobName);
 	List<Map<String, Object>> getAllJobs();
+
+	Map<String, Object> getJobDetails(String jobName);
+
 	boolean isJobWithNamePresent(String jobName);
 	String getJobState(String jobName);
 	boolean stopJob(String jobName);
