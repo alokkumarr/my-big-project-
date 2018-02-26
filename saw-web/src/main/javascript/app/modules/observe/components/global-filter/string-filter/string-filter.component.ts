@@ -80,7 +80,10 @@ export class GlobalStringFilterComponent implements OnInit {
       ...this._filter,
       ...{
         model: {
-          modelValues: this.value
+          modelValues: this.value,
+
+          // We don't allow anything else than 'is in' sql operation on strings from dashboards for now
+          operator: 'ISIN'
         }
       }
     };
