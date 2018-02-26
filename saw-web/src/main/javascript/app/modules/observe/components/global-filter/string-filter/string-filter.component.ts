@@ -10,6 +10,7 @@ import { startWith } from 'rxjs/operators/startWith';
 import { map } from 'rxjs/operators/map';
 
 import { ObserveService } from '../../../services/observe.service';
+import { GlobalFilterService } from '../../../services/global-filter.service';
 
 const template = require('./string-filter.component.html');
 
@@ -24,12 +25,15 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
 
   filterCtrl: FormControl;
   private _filter;
-  private value: Array<string>;
+  private value: Array<string> = [];
   private suggestions = [];
   private valueChangeListener: Subscription;
+  private clearFiltersListener: Subscription;
   private filteredSuggestions: Observable<any[]>;
+
   constructor(
-    private observe: ObserveService
+    private observe: ObserveService,
+    private filters: GlobalFilterService
   ) {
     this.filterCtrl = new FormControl();
     this.filteredSuggestions = this.filterCtrl.valueChanges.pipe(
@@ -42,33 +46,50 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     this.valueChangeListener = this.filterCtrl.valueChanges.subscribe(() => {
       this.filterChanged();
     });
+
+    this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
+      this.loadDefaults();
+    });
   }
 
   ngOnDestroy() {
     this.valueChangeListener.unsubscribe();
+    this.clearFiltersListener.unsubscribe();
   }
 
   @Input() set filter(data) {
     this._filter = data;
 
     this.loadSuggestions();
-    this.value = [];
   }
 
   onInputChange(evt) {
-    if (evt.keyCode === 13) { // on pressing 'Enter'
-      this.value.push(this.filterCtrl.value);
+    const val = (this.filterCtrl.value || '').replace(/;$/, ''); // remove trailing semicolon
+
+    if ([13, 186].includes(evt.keyCode) && val) { // on pressing 'Enter' or semicolon (;)
+      this.value.push(val);
       this.filterCtrl.setValue('');
     }
 
     this.filterChanged();
   }
 
+  loadDefaults() {
+    this.filterCtrl.reset();
+    this.value = [];
+    this.filterChanged();
+  }
+
+  /**
+   * Loads autocomplete suggestions from backend
+   *
+   * @memberof GlobalStringFilterComponent
+   */
   loadSuggestions() {
     this.observe.getModelValues(this._filter).subscribe((data: Array<string>) => {
       this.suggestions = data;
 
-      this.filterCtrl.reset();
+      this.loadDefaults();
     });
   }
 

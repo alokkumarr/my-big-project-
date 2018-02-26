@@ -32,10 +32,14 @@ global-filter {
   }
 
   .mat-chip-list-wrapper {
-    width: 460px;
+    width: 100%;
 
     mat-chip {
-      margin-top: 5px;
+      margin: 5px;
+    }
+
+    .mat-chip:not(.mat-basic-chip) + .mat-chip:not(.mat-basic-chip) {
+      margin: 5px;
     }
   }
 

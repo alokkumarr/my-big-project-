@@ -1,9 +1,12 @@
 declare const require: any;
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import * as get from 'lodash/get';
 import * as moment from 'moment';
 
+import { Subscription } from 'rxjs/Subscription';
+
 import { ObserveService } from '../../../services/observe.service';
+import { GlobalFilterService } from '../../../services/global-filter.service';
 
 import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../../analyze/consts';
 const template = require('./date-filter.component.html');
@@ -13,17 +16,30 @@ const template = require('./date-filter.component.html');
   template
 })
 
-export class GlobalDateFilterComponent implements OnInit {
+export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   private _filter;
   private model: any = {};
   private presets = DATE_PRESETS;
+  private defaults: {min, max};
   private showDateFields: boolean;
+  private clearFiltersListener: Subscription;
 
   @Output() onModelChange = new EventEmitter();
 
-  constructor(private observe: ObserveService) { }
+  constructor(
+    private observe: ObserveService,
+    private filters: GlobalFilterService
+  ) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
+      this.loadDefaults();
+    });
+  }
+
+  ngOnDestroy() {
+    this.clearFiltersListener.unsubscribe();
+  }
 
   @Input() set filter(data) {
     this._filter = data;
@@ -56,18 +72,38 @@ export class GlobalDateFilterComponent implements OnInit {
   }
 
   /**
+   * Resets the date and preset value to default state
+   *
+   * @returns
+   * @memberof GlobalDateFilterComponent
+   */
+  loadDefaults() {
+    if (!this.defaults) {
+      return;
+    }
+
+    this.onPresetChange({value: CUSTOM_DATE_PRESET_VALUE});
+    this.onDateChange('gte', {
+      value: this.defaults.min
+    });
+    this.onDateChange('lte', {
+      value: this.defaults.max
+    });
+  }
+
+  /**
    * Queries the min and max dates present in db for a field and updates the model with it
    *
    * @memberof GlobalDateFilterComponent
    */
   loadDateRange() {
     this.observe.getModelValues(this._filter).subscribe((data: {_min: string, _max: string}) => {
-      this.onDateChange('gte', {
-        value: moment(parseInt(data._min))
-      });
-      this.onDateChange('lte', {
-        value: moment(parseInt(data._max))
-      });
+      this.defaults = {
+        min: moment(parseInt(data._min)),
+        max: moment(parseInt(data._max))
+      };
+
+      this.loadDefaults();
     });
   }
 

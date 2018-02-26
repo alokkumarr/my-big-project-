@@ -14,6 +14,7 @@ export class GlobalFilterService {
   private updatedFilters = [];
   public onFilterChange = new Subject();
   public onApplyFilter = new Subject();
+  public onClearAllFilters = new Subject();
 
   constructor() { }
 
