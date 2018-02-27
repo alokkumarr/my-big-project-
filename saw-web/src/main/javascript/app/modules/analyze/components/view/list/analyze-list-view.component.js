@@ -2,6 +2,8 @@ import * as isEmpty from 'lodash/isEmpty';
 
 import * as template from './analyze-list-view.component.html';
 import style from './analyze-list-view.component.scss';
+import * as forEach from 'lodash/forEach';
+import cronstrue from 'cronstrue';
 
 export const AnalyzeListViewComponent = {
   template,
@@ -12,7 +14,8 @@ export const AnalyzeListViewComponent = {
     filter: '<',
     onAction: '&',
     searchTerm: '<',
-    updater: '<'
+    updater: '<',
+    cronJobs: '<'
   },
   controller: class AnalyzeListViewController {
     constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService) {
@@ -29,12 +32,13 @@ export const AnalyzeListViewComponent = {
     }
 
     $onInit() {
-      this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
 
       this.canUserFork = this._JwtService.hasPrivilege('FORK', {
         subCategoryId: this.analyses[0].categoryId
       });
+
+      this.gridConfig = this.getGridConfig();
     }
 
     showExecutingFlag(analysisId) {
@@ -57,6 +61,7 @@ export const AnalyzeListViewComponent = {
         this._gridListInstance.clearFilter();
       } else if (analysisType === 'scheduled') {
         this._gridListInstance.filter(itemData => {
+          console.log(itemData);
           return !isEmpty(itemData.scheduleHuman);
         });
       } else {
@@ -122,7 +127,9 @@ export const AnalyzeListViewComponent = {
         cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
-        dataField: 'scheduleHuman',
+        calculateCellValue: rowData => {
+          return this.generateSchedule(rowData);
+        },
         allowSorting: true,
         alignment: 'left',
         width: '12%'
@@ -169,6 +176,16 @@ export const AnalyzeListViewComponent = {
           showInfo: true
         }
       });
+    }
+
+    generateSchedule(rowData) {
+      const scheduleHuman = '';
+      forEach(this.cronJobs, cron => {
+        if (cron.jobDetails.analysisID === rowData.id) {
+          scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);
+        }
+      });
+      return scheduleHuman;
     }
   }
 };

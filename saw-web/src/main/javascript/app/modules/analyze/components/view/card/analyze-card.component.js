@@ -1,5 +1,7 @@
 import * as template from './analyze-card.component.html';
 import style from './analyze-card.component.scss';
+import * as forEach from 'lodash/forEach';
+import cronstrue from 'cronstrue';
 
 export const AnalyzeCardComponent = {
   template,
@@ -7,7 +9,8 @@ export const AnalyzeCardComponent = {
   bindings: {
     model: '<',
     onAction: '&',
-    highlightTerm: '<'
+    highlightTerm: '<',
+    cronJobs: '<'
   },
   controller: class AnalyzeCardController {
 
@@ -25,6 +28,11 @@ export const AnalyzeCardComponent = {
     $onInit() {
       this.canUserFork = this._JwtService.hasPrivilege('FORK', {
         subCategoryId: this.model.categoryId
+      });
+      forEach(this.cronJobs, cron => {
+        if (cron.jobDetails.analysisID === this.model.id) {
+          this.cronReadbleMsg = cronstrue.toString(cron.jobDetails.cronExpression);
+        }
       });
     }
 

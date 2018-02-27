@@ -29,7 +29,7 @@
           <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
           <span>
             <md-icon md-font-icon="icon-calendar"></md-icon>
-            <span ng-bind="$ctrl.model.scheduleHuman || 'No Schedule Set'"></span>
+            <span ng-bind="$ctrl.cronReadbleMsg || 'No Schedule Set'"></span>
           </span>
         </span>
       </md-card-title-text>
