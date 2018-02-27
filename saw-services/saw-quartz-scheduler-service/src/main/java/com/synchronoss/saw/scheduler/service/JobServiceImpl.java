@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.quartz.*;
 import org.quartz.Trigger.TriggerState;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -28,23 +29,22 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Schedule a job by jobName at given date.
-     * @param jobName
+     * @param job
      * @param jobClass
-     * @param date
      * @return
 	 */
 	@Override
-	public boolean scheduleOneTimeJob(String jobName, Class<? extends QuartzJobBean> jobClass, Date date) {
+	public boolean scheduleOneTimeJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass) {
         logger.info("Request received to scheduleJob");
 
-		String jobKey = jobName;
+		String jobKey = job.getJobName();
 		String groupKey = "SampleGroup";	
-		String triggerKey = jobName;		
+		String triggerKey = job.getJobName();
 
-		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, jobKey, groupKey);
+		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
 
-		logger.debug("creating trigger for key :"+jobKey + " at date :"+date);
-		Trigger cronTriggerBean = JobUtil.createSingleTrigger(triggerKey, date, SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+		logger.debug("creating trigger for key :"+jobKey + " at date :"+job.getJobScheduleTime());
+		Trigger cronTriggerBean = JobUtil.createSingleTrigger(triggerKey, job.getJobScheduleTime(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -60,25 +60,23 @@ public class JobServiceImpl implements JobService{
 	
 	/**
 	 * Schedule a job by jobName at given date.
-     * @param jobName
+     * @param job
      * @param jobClass
-     * @param date
-     * @param cronExpression
      * @return
 	 */
 
 	@Override
-	public boolean scheduleCronJob(String jobName, Class<? extends QuartzJobBean> jobClass, Date date, String cronExpression) {
+	public boolean scheduleCronJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass) {
 		logger.info("Request received to scheduleJob");
 
-		String jobKey = jobName;
+		String jobKey = job.getJobName();
 		String groupKey = "SampleGroup";	
-		String triggerKey = jobName;		
+		String triggerKey = job.getJobName();
 
-		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, jobKey, groupKey);
+		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
 
-        logger.debug("creating trigger for key :"+jobKey + " at date :"+date);
-		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, date, cronExpression, SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+        logger.debug("creating trigger for key :"+jobKey + " at date :"+job.getJobScheduleTime());
+		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -314,17 +312,16 @@ public class JobServiceImpl implements JobService{
 				for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
 
 					String jobName = jobKey.getName();
-					String jobGroup = jobKey.getGroup();
-
+					JobDetail jobDetail =  scheduler.getJobDetail(jobKey);
 					//get job's trigger
 					List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
 					Date scheduleTime = triggers.get(0).getStartTime();
 					Date nextFireTime = triggers.get(0).getNextFireTime();
 					Date lastFiredTime = triggers.get(0).getPreviousFireTime();
+					SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
 					
 					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("jobName", jobName);
-					map.put("groupName", jobGroup);
+					map.put("jobDetails",job);
 					map.put("scheduleTime", scheduleTime);
 					map.put("lastFiredTime", lastFiredTime);
 					map.put("nextFireTime", nextFireTime);
@@ -364,14 +361,15 @@ public class JobServiceImpl implements JobService{
 				for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
 					if(jobName.equalsIgnoreCase(jobKey.getName())) {
 					String jobGroup = jobKey.getGroup();
+                    JobDetail jobDetail =  scheduler.getJobDetail(jobKey);
+                  SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
 					//get job's trigger
 					List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
 					Date scheduleTime = triggers.get(0).getStartTime();
 					Date nextFireTime = triggers.get(0).getNextFireTime();
 					Date lastFiredTime = triggers.get(0).getPreviousFireTime();
 
-					map.put("jobName", jobName);
-					map.put("groupName", jobGroup);
+					map.put("jobDetails",job);
 					map.put("scheduleTime", scheduleTime);
 					map.put("lastFiredTime", lastFiredTime);
 					map.put("nextFireTime", nextFireTime);

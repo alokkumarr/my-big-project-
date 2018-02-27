@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.util.Date;
@@ -7,10 +8,12 @@ import java.util.List;
 import java.util.Map;
 
 public interface JobService {
-	boolean scheduleOneTimeJob(String jobName, Class<? extends QuartzJobBean> jobClass, Date date);
-	boolean scheduleCronJob(String jobName, Class<? extends QuartzJobBean> jobClass, Date date, String cronExpression);
-	
-	boolean updateOneTimeJob(String jobName, Date date);
+
+	boolean scheduleOneTimeJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass);
+
+	boolean scheduleCronJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass);
+
+    boolean updateOneTimeJob(String jobName, Date date);
 	boolean updateCronJob(String jobName, Date date, String cronExpression);
 	
 	boolean unScheduleJob(String jobName);

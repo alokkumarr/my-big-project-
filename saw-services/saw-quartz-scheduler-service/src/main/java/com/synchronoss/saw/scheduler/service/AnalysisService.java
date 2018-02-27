@@ -1,8 +1,9 @@
 package com.synchronoss.saw.scheduler.service;
 
-import com.synchronoss.saw.scheduler.modal.JobDetail;
+
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 
 public interface AnalysisService {
     void executeAnalysis(String analysisId);
-    void scheduleDispatch(JobDetail analysis);
+    void scheduleDispatch(SchedulerJobDetail analysis);
 }

@@ -2,10 +2,11 @@ package com.synchronoss.saw.scheduler.modal;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class JobDetail {
+public class SchedulerJobDetail implements Serializable {
 
    private String analysisID;
 
@@ -20,6 +21,11 @@ public class JobDetail {
    private String type;
 
    private String jobName;
+
+   private String jobGroup;
+
+   private String categoryID;
+
    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
    private Date jobScheduleTime;
 
@@ -143,6 +149,38 @@ public class JobDetail {
      */
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    /**
+     * Gets jobGroup
+     *
+     * @return value of jobGroup
+     */
+    public String getJobGroup() {
+        return jobGroup;
+    }
+
+    /**
+     * Sets jobGroup
+     */
+    public void setJobGroup(String jobGroup) {
+        this.jobGroup = jobGroup;
+    }
+
+    /**
+     * Gets categoryID
+     *
+     * @return value of categoryID
+     */
+    public String getCategoryID() {
+        return categoryID;
+    }
+
+    /**
+     * Sets categoryID
+     */
+    public void setCategoryID(String categoryID) {
+        this.categoryID = categoryID;
     }
 
     /**

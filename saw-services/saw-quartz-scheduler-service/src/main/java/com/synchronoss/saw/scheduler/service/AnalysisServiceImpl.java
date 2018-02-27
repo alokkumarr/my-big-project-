@@ -1,6 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
-import com.synchronoss.saw.scheduler.modal.JobDetail;
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         restTemplate.postForObject(url, entity, String.class, analysisId);
     }
 
-    public void scheduleDispatch(JobDetail analysis)
+    public void scheduleDispatch(SchedulerJobDetail analysis)
     {
            if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)
                   ) {

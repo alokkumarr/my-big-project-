@@ -2,17 +2,15 @@ package com.synchronoss.saw.scheduler.controller;
 
 import com.synchronoss.saw.scheduler.job.CronJob;
 import com.synchronoss.saw.scheduler.job.SimpleJob;
-import com.synchronoss.saw.scheduler.modal.JobDetail;
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +25,7 @@ public class JobController {
 	JobService jobService;
 
 	@RequestMapping(value ="schedule",method = RequestMethod.POST)
-	public SchedulerResponse schedule(@RequestBody JobDetail jobDetail){
+	public SchedulerResponse schedule(@RequestBody SchedulerJobDetail jobDetail){
 		logger.info("JobController schedule() start here.");
 
 		//Job Name is mandatory
@@ -40,8 +38,7 @@ public class JobController {
 
 			if(jobDetail.getCronExpression() == null || jobDetail.getCronExpression().trim().equals("")){
 				logger.info("Simple job ");
-				boolean status = jobService.scheduleOneTimeJob(jobDetail.getJobName(), SimpleJob.class,
-						jobDetail.getJobScheduleTime());
+				boolean status = jobService.scheduleOneTimeJob(jobDetail, SimpleJob.class);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
@@ -50,9 +47,7 @@ public class JobController {
 				
 			} else {
 				logger.info("Cron Trigger ");
-				boolean status = jobService.scheduleCronJob(jobDetail.getJobName(), CronJob.class,
-						jobDetail.getJobScheduleTime(),
-						jobDetail.getCronExpression());
+				boolean status = jobService.scheduleCronJob(jobDetail,CronJob.class);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
@@ -147,22 +142,20 @@ public class JobController {
 	}
 
 	@RequestMapping(value ="update",method = RequestMethod.POST)
-	public SchedulerResponse updateJob(@RequestParam("jobName") String jobName, 
-			@RequestParam("jobScheduleTime") @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm") Date jobScheduleTime, 
-			@RequestParam("cronExpression") String cronExpression){
+	public SchedulerResponse updateJob(@RequestBody SchedulerJobDetail jobDetail){
 		logger.info("JobController updateJob() method ");
 
 		//Job Name is mandatory
-		if(jobName == null || jobName.trim().equals("")){
+		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
 
 		//Edit Job
-		if(jobService.isJobWithNamePresent(jobName)){
+		if(jobService.isJobWithNamePresent(jobDetail.getJobName())){
 			
-			if(cronExpression == null || cronExpression.trim().equals("")){
+			if(jobDetail.getCronExpression() == null || jobDetail.getCronExpression().trim().equals("")){
 				//Single Trigger
-				boolean status = jobService.updateOneTimeJob(jobName, jobScheduleTime);
+				boolean status = jobService.updateOneTimeJob(jobDetail.getJobName(), jobDetail.getJobScheduleTime());
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
@@ -171,15 +164,15 @@ public class JobController {
 				
 			}else{
 				//Cron Trigger
-				boolean status = jobService.updateCronJob(jobName, jobScheduleTime, cronExpression);
+				boolean status = jobService.updateCronJob(jobDetail.getJobName(), jobDetail.getJobScheduleTime(),
+						jobDetail.getCronExpression());
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
 				}else{
 					return getServerResponse(ServerResponseCode.ERROR, false);
 				}				
 			}
-			
-			
+
 		}else{
 			return getServerResponse(ServerResponseCode.JOB_DOESNT_EXIST, false);
 		}
