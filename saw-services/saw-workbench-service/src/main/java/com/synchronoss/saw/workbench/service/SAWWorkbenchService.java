@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 
@@ -17,4 +18,5 @@ public interface SAWWorkbenchService {
   public Project previewFromProjectDirectoybyId(Project project)throws Exception;
   public Inspect inspectFromProjectDirectoybyId(Inspect inspect)throws Exception;
   public Project readSubDirectoriesByProjectId(Project project) throws Exception;
+  public List<DataSet> listOfDataSet(Project project) throws Exception;
 }

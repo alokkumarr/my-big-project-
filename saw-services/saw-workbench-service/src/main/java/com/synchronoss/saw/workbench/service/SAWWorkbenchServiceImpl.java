@@ -28,11 +28,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
+import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
 
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.metastore.DataSetStore;
 import sncr.bda.services.DLMetadata;
 
 @Service
@@ -56,9 +58,15 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @NotNull
   private String defaultPreviewLimit;
 
+  @Value("${metastore.base}")
+  @NotNull
+  private String basePath;
+
   private String tmpDir = null;
   private DLMetadata mdt = null;
+  private DataSetStore mdtStore =null;
   private String prefix = "maprfs";
+
   
   @PostConstruct
   private void init() throws Exception {
@@ -83,7 +91,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
     if (defaultProjectRoot.startsWith(prefix)) {
      logger.trace("Initializing defaultProjectRoot {}", defaultProjectRoot); 
-    this.mdt = new DLMetadata(defaultProjectRoot);}
+    this.mdt = new DLMetadata(defaultProjectRoot);
+    this.mdtStore = new DataSetStore(basePath);}
     this.tmpDir = System.getProperty("java.io.tmpdir");
   }
 
@@ -279,7 +288,24 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
     logger.trace("response structure {}", objectMapper.writeValueAsString(inspect));
     return inspect; }
- 
+
+  @Override
+  public List<DataSet> listOfDataSet(Project project) throws Exception {
+    logger.trace("Getting a dataset for the project {} " + project.getProjectId());
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    List<String> dataSetsString = mdtStore.getListOfDS(project.getProjectId(), null, null, null, null);
+    List<DataSet> dataSetsJSON = new ArrayList<>();
+    for (String item : dataSetsString){
+      logger.trace("item from datasets store {} ", item);
+      dataSetsJSON.add(objectMapper.readValue(item, DataSet.class));
+    }
+    logger.trace("response structure {}", objectMapper.writeValueAsString(dataSetsJSON));
+    return dataSetsJSON;
+  }
+  
+
   public static void main(String[] args) throws JsonProcessingException, IOException {
     String json = "{\"name\":\"normal.csv\",\"size\":254743,\"d\":false,\"cat\":\"root\"}";
     ObjectMapper objectMapper = new ObjectMapper();
@@ -290,6 +316,14 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     System.out.println(System.getProperty("java.io.tmpdir"));
     System.out.println("data.csv".substring("data.csv".indexOf('.'), "data.csv".length()));
     System.out.println(FilenameUtils.getFullPathNoEndSeparator("/apps/sncr"));
+    String row1 = "{\"_id\":\"xda-ux-sr-comp-dev::TRTEST_JEXLREF_SS\",\"system\":{\"user\":\"A_user\",\"project\":\"xda-ux-sr-comp-dev\",\"type\":\"fs\",\"format\":\"parquet\",\"name\":\"TRTEST_JEXLREF_SS\",\"physicalLocation\":\"data\",\"catalog\":\"dout\",\"numberOfFiles\":\"1\"},\"userData\":{\"createdBy\":\"S.Ryabov\",\"category\":\"subcat1\",\"description\":\"Transformer component test case: transformed records\"},\"transformations\":[],\"asOutput\":\"xda-ux-sr-comp-dev::transformer::165407713\",\"asOfNow\":{\"status\":\"SUCCESS\",\"started\":\"20180209-195737\",\"finished\":\"20180209-195822\",\"aleId\":\"xda-ux-sr-comp-dev::1518206302595\",\"batchId\":\"BJEXLREFSS\"}}";
+    String row2= "{\"_id\":\"xda-ux-sr-comp-dev::tc220_1\",\"system\":{\"user\":\"A_user\",\"project\":\"xda-ux-sr-comp-dev\",\"type\":\"fs\",\"format\":\"parquet\",\"name\":\"tc220_1\",\"physicalLocation\":\"hdfs:///data/bda/xda-ux-sr-comp-dev/dl/fs/dout/tc220_1/data\",\"catalog\":\"dout\",\"numberOfFiles\":\"2\"},\"userData\":{\"createdBy\":\"S.Ryabov\",\"category\":\"subcat1\",\"description\":\"SQL component test case\"},\"transformations\":[{\"asOutput\":\"xda-ux-sr-comp-dev::sql::1192296717\"}],\"asOutput\":\"xda-ux-sr-comp-dev::sql::522761969\",\"asOfNow\":{\"status\":\"SUCCESS\",\"started\":\"20180223-220236\",\"finished\":\"20180223-220316\",\"aleId\":\"xda-ux-sr-comp-dev::1519423396639\",\"batchId\":\"BSQL10PM\"}}";
+    List<DataSet> sets = new ArrayList<>();
+    sets.add(objectMapper.readValue(row1, DataSet.class));
+    sets.add(objectMapper.readValue(row2, DataSet.class));
+    System.out.println(objectMapper.writeValueAsString(sets));
+    
     
   }
+
 }

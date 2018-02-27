@@ -26,3 +26,5 @@ workbench:
         project-path: "/Desktop" 
         project-root: "/Users/spau0004"
         preview-limit: 10000
+metastore:
+    base:  hdfs:///main        

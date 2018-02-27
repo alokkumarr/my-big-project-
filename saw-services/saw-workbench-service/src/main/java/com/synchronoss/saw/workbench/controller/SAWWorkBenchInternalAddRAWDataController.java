@@ -32,6 +32,7 @@ import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
@@ -233,6 +234,23 @@ public class SAWWorkBenchInternalAddRAWDataController {
     }
     return responseInspect;
   } 
+
+  @RequestMapping(value = "{projectId}/datasets", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public List<DataSet> retrieveDataSets(@PathVariable(name = "projectId", required = true) String projectId) throws JsonProcessingException {
+    logger.debug("Retrieve project details By Id {} ", projectId);
+    List<DataSet> datasets = null;
+    Project project = new Project();
+    project.setProjectId(projectId);
+    try {
+      datasets = sawWorkbenchService.listOfDataSet(project);
+    } catch (Exception e) {
+      logger.error("Exception occured while reading list of datasets", e);
+      throw new ReadEntitySAWException("Exception occured while reading list of datasets", e);
+    }
+    return datasets;
+  } 
+
   
   /**
    * This method is used to get the data based on the storage type<br/>
