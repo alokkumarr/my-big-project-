@@ -14,6 +14,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.re
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
@@ -43,7 +47,7 @@ public class ServicesExecuteIT {
     private RequestSpecification spec;
     private ObjectMapper mapper;
     private String token;
-    private String ssoToken;
+
 
     @BeforeClass
     public static void setUpClass() {
@@ -95,7 +99,7 @@ public class ServicesExecuteIT {
                  .header("Cache-Control", "no-store").
                  filter(document("sso-authentication",
                  preprocessResponse(prettyPrint())))
-            .when().get("/security/authentication?jwt=" +ssoToken)
+            .when().get("/security/authentication?jwt=" +getJWTToken())
             .then().assertThat().statusCode(200)
             .extract().response();
         assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
@@ -123,7 +127,6 @@ public class ServicesExecuteIT {
             .then().assertThat().statusCode(200)
             .body("aToken", startsWith(""))
             .extract().response();
-        ssoToken= response.path("rToken");
         return response.path("aToken");
     }
 
@@ -315,4 +318,19 @@ public class ServicesExecuteIT {
     private RequestSpecification request(String token) {
         return given(spec).header("Authorization", "Bearer " + token);
     }
+   private String getJWTToken() {
+       Long tokenValid = 150l;
+       String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=";
+       Map<String, Object> map = new HashMap();
+       map.put("valid", true);
+       map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
+       map.put("validityReason", "");
+       map.put("masterLoginId", "sawadmin@synchronoss.com");
+       return Jwts.builder()
+               .setSubject("sawadmin@synchronoss.com")
+               .claim("ticket", map)
+               .setIssuedAt(new Date())
+               .signWith(SignatureAlgorithm.HS256, secretKey)
+               .compact();
+   }
 }
