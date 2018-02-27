@@ -58,36 +58,11 @@ summariser.data.frame <- function(df,
                                   measure_vars = NULL,
                                   fun = c("sum"),
                                   ...) {
-  if (!all(
-    fun %in% c(
-      "n_distinct",
-      "min",
-      "max",
-      "sum",
-      "mean",
-      "variance",
-      "sd",
-      "kurtosis",
-      "skewness",
-      "percentile"
-    )
-  )) {
-    stop(cat(
-      "aggregation function should be one of the following functions",
-      c(
-        "n_distinct",
-        "min",
-        "max",
-        "sum",
-        "mean",
-        "variance",
-        "sd",
-        "kurtosis",
-        "skewness",
-        "percentile"
-      )
-    ))
-  }
+  # Arguments
+  args <- summariser_args(group_vars, measure_vars, fun, ...)
+  group_vars <- args$group_vars
+  measure_vars <- args$measure_vars
+  fun <- args$fun
 
 
   # Check for measure variables provided
@@ -137,37 +112,12 @@ summariser.tbl_spark <- function(df,
                                  measure_vars = NULL,
                                  fun = c("sum"),
                                  ...) {
-  if (!all(
-    fun %in% c(
-      "n_distinct",
-      "min",
-      "max",
-      "sum",
-      "mean",
-      "variance",
-      "sd",
-      "kurtosis",
-      "skewness",
-      "percentile"
-    )
-  )) {
-    stop(cat(
-      "aggregation function should be one of the following functions",
-      c(
-        "n_distinct",
-        "min",
-        "max",
-        "sum",
-        "mean",
-        "variance",
-        "sd",
-        "kurtosis",
-        "skewness",
-        "percentile"
-      )
-    ))
-  }
 
+  # Arguments
+  args <- summariser_args(group_vars, measure_vars, fun, ...)
+  group_vars <- args$group_vars
+  measure_vars <- args$measure_vars
+  fun <- args$fun
 
   # Check for measure variables provided
   if (is.null(measure_vars)) {
@@ -203,4 +153,67 @@ summariser.tbl_spark <- function(df,
   }
 
   agg
+}
+
+
+#' Summariser Constructor Function
+#'
+#' Function to create object of summarise_args S3 class
+#'
+#' Used to validate inputs and to simlify the inputs to the summarise_map
+#' function
+new_summariser_args <-
+  function(group_vars, measure_vars, fun, ...) {
+    stopifnot(is.character(group_vars) | is.null(group_vars))
+    stopifnot(is.character(measure_vars) | is.null(measure_vars))
+    stopifnot(is.character(fun))
+
+    structure(list(
+      group_vars = group_vars,
+      measure_vars = measure_vars,
+      fun = fun,
+      ...
+    ),
+    class = "summariser_args")
+  }
+
+
+#' Summariser Validation Function
+#'
+#' Checks for valid inputs to summarise_args class
+validate_summariser_args <- function(x) {
+  funs <- c(
+    "n_distinct",
+    "min",
+    "max",
+    "sum",
+    "mean",
+    "variance",
+    "sd",
+    "kurtosis",
+    "skewness",
+    "percentile"
+  )
+  if (!x$f %in% funs) {
+    stop(
+      "Supplied function not supported.\nPlease use one of following: ",
+      paste(funs, collapse = ", "),
+      .call = FALSE
+    )
+  }
+  if (is.null(x$group_vars) & is.null(x$measure_vars)) {
+    stop(
+      "Both group_vars and measure_vars are NULL.\nNeed to supply one valid column name to one or the other\n",
+      .call = FALSE
+    )
+  }
+  x
+}
+
+
+#' @export
+#' @importFrom magritter %>%
+summariser_args <- function(group_vars, measure_vars, fun, ...) {
+  new_summariser_args(group_vars, measure_vars, fun, ...) %>%
+    validate_summariser_args()
 }
