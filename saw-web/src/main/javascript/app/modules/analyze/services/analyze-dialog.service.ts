@@ -10,11 +10,13 @@ import {
   Filter,
   IToolbarActionData,
   ArtifactColumns,
-  Artifact
+  Artifact,
+  Format
 } from '../types';
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
+import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 
 
 @Injectable()
@@ -96,6 +98,17 @@ export class AnalyzeDialogService {
       height: 'auto',
       data
     } as MatDialogConfig);
+  }
+
+  openDataFormatDialog(format: Format, type) {
+    return this.dialog.open(DataFormatDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: {
+        format,
+        type
+      }
+    } as MatDialogConfig)
   }
 
   openSaveDialog(analysis: Analysis) {

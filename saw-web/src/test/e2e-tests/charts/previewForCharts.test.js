@@ -9,7 +9,7 @@ const previewPage = require('../../javascript/pages/previewPage.po');
 const commonFunctions = require('../../javascript/helpers/commonFunctions');
 const homePage = require('../../javascript/pages/homePage.po');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
@@ -20,7 +20,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
-  let metric = 'MCT TMO Session ES';
+  let metricName = 'MCT TMO Session ES';
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
@@ -51,7 +51,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
@@ -59,7 +59,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
@@ -70,7 +70,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   using(dataProvider, function (data, description) {
     it('should verify preview for ' + description, () => {
       if (data.chartType === 'chart:bubble') {
-        metric = 'PTT Subscr Detail';
+        metricName = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
         xAxisName = 'Account Segment';
         groupName = 'Account Name';
@@ -80,11 +80,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       navigateToSubCategory();
 
       //Create analysis
-      analyzePage.analysisElems.addAnalysisBtn.click();
-      const newDialog = analyzePage.newAnalysisDialog;
-      newDialog.getMetric(metric).click();
-      newDialog.getMethod(data.chartType).click();
-      newDialog.createBtn.click();
+      homePage.createAnalysis(metricName, data.chartType);
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
@@ -98,9 +94,9 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       } else {
         y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
       }
-      chartDesigner.getXRadio(xAxisName).click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
-      chartDesigner.getGroupRadio(groupName).click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
 
       //If Combo then add one more field
       if (data.chartType === 'chart:combo') {
@@ -109,10 +105,10 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       }
 
       //Refresh
-      chartDesigner.refreshBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
 
       // Navigate to Preview
-      designModePage.previewBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
 
       // Verify axis to be present on Preview Mode
       commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(yAxisName));
@@ -122,7 +118,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     // Navigates to specific category where analysis creation should happen
     const navigateToSubCategory = () => {
       //Collapse default category
-      homePage.expandedCategory(defaultCategory).click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
 
       //Navigate to Category/Sub-category
       const collapsedCategory = homePage.collapsedCategory(categoryName);

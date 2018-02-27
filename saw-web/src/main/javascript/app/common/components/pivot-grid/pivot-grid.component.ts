@@ -20,17 +20,22 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpForEach from 'lodash/fp/forEach';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 import {Subject} from 'rxjs/Subject';
-import {Sort} from '../../../modules/analyze/models/sort.model'
+import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import {
-  ArtifactColumnPivot
-} from '../../../modules/analyze/models/artifact-column.model';
+  ArtifactColumnPivot,
+  Sort,
+  Format
+} from '../../../modules/analyze/models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
+  FLOAT_TYPES,
   DATE_INTERVALS_OBJ
 } from '../../../modules/analyze/consts';
+import { getFormatter } from '../../utils/numberFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
@@ -261,8 +266,9 @@ export class PivotGridComponent {
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
           cloned.format = {
-            type: 'fixedPoint',
-            precision: 2
+            formatter: getFormatter(artifactColumn.format || (
+              FLOAT_TYPES.includes(cloned.type) ? {precision: DEFAULT_PRECISION} : {precision: 0}
+            ))
           };
           /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
@@ -274,6 +280,10 @@ export class PivotGridComponent {
 
         if (cloned.type === 'string') {
           cloned.columnName = split(cloned.columnName, '.')[0];
+        }
+        
+        if (!isUndefined(cloned.aliasName) && cloned.aliasName != '') {
+          cloned.displayName = cloned.aliasName;
         }
 
         return cloned;

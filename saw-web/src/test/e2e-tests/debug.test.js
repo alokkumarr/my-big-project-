@@ -1,4 +1,4 @@
-const protractor = require('../../../conf/protractor.conf');
+const protractor = require('../../../../saw-web/conf/protractor.conf');
 
 describe('BrowserStack Local Testing', function() {
   it('can check tunnel working', function() {

@@ -121,7 +121,7 @@
             <md-radio-button role="radio"
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
-                             ng-disabled="attr.checked && attr.checked != 'g'">
+                             ng-disabled="$ctrl.disableGroupBy || (attr.checked && attr.checked != 'g')">
               <span ng-bind="::attr.displayName">
               </span>
             </md-radio-button>

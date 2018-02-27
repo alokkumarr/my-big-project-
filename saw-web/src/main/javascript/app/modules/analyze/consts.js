@@ -4,7 +4,21 @@ import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
-import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE} from '../../common/consts.js';
+import {
+  NUMBER_TYPES,
+  FLOAT_TYPES,
+  DATE_TYPES,
+  CHART_COLORS,
+  BACKEND_TIMEZONE
+} from '../../common/consts.js';
+
+export {
+  NUMBER_TYPES,
+  FLOAT_TYPES,
+  DATE_TYPES,
+  CHART_COLORS,
+  BACKEND_TIMEZONE
+};
 
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'
@@ -24,8 +38,6 @@ export const ENTRY_MODES = {
 };
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
-
-export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE};
 
 export const TYPE_MAP = reduce([
   ...map(NUMBER_TYPES, type => ({type, generalType: 'number'})),

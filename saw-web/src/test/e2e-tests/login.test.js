@@ -3,7 +3,7 @@ const header = require('../javascript/pages/components/header.co.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 describe('Login Tests: login.test.js', () => {
 
@@ -17,7 +17,7 @@ describe('Login Tests: login.test.js', () => {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
@@ -25,7 +25,7 @@ describe('Login Tests: login.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {

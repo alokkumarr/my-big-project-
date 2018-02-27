@@ -33,13 +33,13 @@ const fluentWait = webpackHelper.distRun() ? 600000 : 10000;
  */
 const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 10000;
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 300000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 600000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 60000;
+const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 600000;
 
 /**
  * Waits ms after page is loaded
@@ -57,17 +57,23 @@ const testDir = '../saw-web/src/test';
  */
 const protractorPath = 'target/protractor-reports';
 
+/**
+ * Amount of attempts to retry doing action on element
+ */
+const tempts = 10;
+
 exports.timeouts = {
   fluentWait: fluentWait,
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
-  pageResolveTimeout: pageResolveTimeout
+  pageResolveTimeout: pageResolveTimeout,
+  tempts: tempts
 };
 
 exports.config = {
   framework: 'jasmine2',
   seleniumAddress: 'http://localhost:4444/wd/hub',
-  getPageTimeout: 500000,
+  getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
   capabilities: {
@@ -77,7 +83,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        //'--headless',
+        '--headless',
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -103,7 +109,7 @@ exports.config = {
      * working on fixing the rest.
      */
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/goToAnalyze.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ],
     charts: [
       /*webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
@@ -112,10 +118,11 @@ exports.config = {
     ],
     pivots: [
       /*webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')*/
+       webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')*/
     ],
     root: [
       /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
        webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
        webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),*/
     ]
@@ -123,23 +130,25 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
+    root: [
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
+      //Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
+      //webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
+    ],
     charts: [
-      /*webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')*/
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')
-    ],
-    root: [
-      /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')*/
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
+      webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')
     ],
     authentication: [
-      //webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
   onPrepare() {

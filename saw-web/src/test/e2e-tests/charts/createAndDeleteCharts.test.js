@@ -1,12 +1,12 @@
 /*
-  Created by Alex
+ Created by Alex
  */
 
 const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
@@ -15,12 +15,12 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const chartDesigner = analyzePage.designerDialog.chart;
   const chartName = `e2e chart ${(new Date()).toString()}`;
-  const chartDescription = 'e2e test chart description';
+  const chartDescription = 'descr';
   let xAxisName = 'Source Manufacturer';
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
-  let metric = 'MCT TMO Session ES';
+  let metricName = 'MCT TMO Session ES';
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
@@ -51,7 +51,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
@@ -59,7 +59,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
@@ -70,7 +70,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   using(dataProvider, function (data, description) {
     it('should create and delete ' + description, () => {
       if (data.chartType === 'chart:bubble') {
-        metric = 'PTT Subscr Detail';
+        metricName = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
         xAxisName = 'Account Segment';
         groupName = 'Account Name';
@@ -79,12 +79,9 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       login.loginAs(data.user);
       navigateToSubCategory();
 
-      //Create analysis
-      analyzePage.analysisElems.addAnalysisBtn.click();
-      const newDialog = analyzePage.newAnalysisDialog;
-      newDialog.getMetric(metric).click();
-      newDialog.getMethod(data.chartType).click();
-      newDialog.createBtn.click();
+      // Create analysis
+      homePage.createAnalysis(metricName, data.chartType);
+
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
@@ -98,9 +95,13 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       } else {
         y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
       }
-      chartDesigner.getXRadio(xAxisName).click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
-      chartDesigner.getGroupRadio(groupName).click();
+
+      //If combo chart then do not check group by
+      if (data.chartType !== 'chart:combo') {
+        commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
+      }
 
       //If Combo then add one more field
       if (data.chartType === 'chart:combo') {
@@ -109,7 +110,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       }
 
       //Refresh
-      chartDesigner.refreshBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
 
       //Save
       const save = analyzePage.saveDialog;
@@ -119,7 +120,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
       save.nameInput.clear().sendKeys(chartName);
       save.descriptionInput.clear().sendKeys(chartDescription);
-      save.saveBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
       //Change to Card View
@@ -151,7 +152,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     // Navigates to specific category where analysis creation should happen
     const navigateToSubCategory = () => {
       //Collapse default category
-      homePage.expandedCategory(defaultCategory).click();
+
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
 
       //Navigate to Category/Sub-category
       const collapsedCategory = homePage.collapsedCategory(categoryName);

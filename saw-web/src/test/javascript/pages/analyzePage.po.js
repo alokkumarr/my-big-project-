@@ -1,6 +1,7 @@
 const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const webpackHelper = require('../../../../conf/webpack.helper');
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
@@ -156,7 +157,7 @@ const doAccountAction = action => {
 };
 
 function navigateToHome() {
-  browser.driver.get('http://localhost:3000/');
+  browser.driver.get(webpackHelper.sawWebUrl());
   return browser.driver.wait(() => {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
@@ -165,9 +166,10 @@ function navigateToHome() {
 };
 
 module.exports = {
-  newAnalysisDialog: {
-    getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
-    getMethod: name => element(by.css(`button[e2e="item-type-${name}"]`)),
+  newDialog: {
+    getMetricRadioButtonElementByName: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
+    getMetricSelectedRadioButtonElementByName: name => element(by.xpath(`//md-radio-button[@e2e = 'metric-name-${name}' and @aria-checked='true']`)),
+    getAnalysisTypeButtonElementByType: name => element(by.css(`button[e2e="item-type-${name}"]`)),
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
   },
   designerDialog: {

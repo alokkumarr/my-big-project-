@@ -10,7 +10,7 @@ const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -292,7 +292,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
@@ -300,7 +300,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
@@ -348,13 +348,12 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          //browser.sleep(1000);
-          element(by.css('md-backdrop')).click();
+          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
           expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
         }
 
         // Go to executed analysis page
-        analyzePage.main.firstCardTitle.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
@@ -366,7 +365,7 @@ describe('Privileges tests: privileges.test.js', () => {
         expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
           "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
         expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
-          "Publish button expected to be " + data.publish + " in view mode, but was" + !data.publish);
+          "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
 
         // Validate menu in analysis
         element(executedAnalysis.actionsMenuBtn.isDisplayed().then(function (isVisible) {
@@ -377,21 +376,21 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          executedAnalysis.actionsMenuBtn.click();
+          commonFunctions.waitFor.elementToBeClickableAndClick(executedAnalysis.actionsMenuBtn);
 
           element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.execute,
-              "Execute button expected to be " + data.execute + " in view mode, but was" + !data.execute);
+              "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
           }));
 
           element(executedAnalysis.exportMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.export,
-              "Export button expected to be " + data.export + " in view mode, but was" + !data.export);
+              "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
           }));
 
           element(executedAnalysis.deleteMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.delete,
-              "Delete button expected to be " + data.delete + " in view mode, but was" + !data.delete);
+              "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
           }));
         }
       }
@@ -404,8 +403,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
-      const subCategory = homePage.subCategory(data.subCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
     };
   });
 });
