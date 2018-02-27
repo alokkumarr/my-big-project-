@@ -176,6 +176,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
           ...flt,
           ...{
             semanticId: analysis.semanticId,
+            metricName: analysis.metricName,
             esRepository: analysis.esRepository,
             displayName: this.filters.getDisplayNameFor(columns, flt.columnName, flt.tableName)
           }

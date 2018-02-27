@@ -74,6 +74,10 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
     this.filters.updateFilter(data);
   }
 
+  tableNameFor(f) {
+    return f.tableName + (f.metricName ? ` (${f.metricName})` : '');
+  }
+
   ngOnDestroy() {
     this.filterChangeSubscription.unsubscribe();
   }
