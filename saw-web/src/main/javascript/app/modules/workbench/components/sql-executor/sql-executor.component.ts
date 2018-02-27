@@ -8,6 +8,7 @@ import { ToastService } from '../../../../common/services/toastMessage.service'
 
 import * as get from 'lodash/get';
 import { SqlScriptComponent } from './query/sql-script.component';
+import { DetailsDialogComponent } from './dataset-details-dialog/details-dialog.component';
 import { WorkbenchService } from '../../services/workbench.service';
 
 const template = require('./sql-executor.component.html');
@@ -24,6 +25,9 @@ export class SqlExecutorComponent implements OnInit {
   private gridData = new BehaviorSubject([]);
   private userProject: string = 'project2';
   private datasetID: string = '';
+  private datasetDetails: Array<any>;
+  private scriptHeight: number = 40;
+  private previewHeight: number = 60;
 
   constructor(
     public dialogRef: MatDialogRef<SqlExecutorComponent>,
@@ -57,5 +61,26 @@ export class SqlExecutorComponent implements OnInit {
 
   sendDataToPreview(data) {
     this.gridData.next(data);
+  }
+
+  openSaveDialog() {
+    const detailsDialogRef = this.dialog.open(DetailsDialogComponent, {
+      hasBackdrop: false,
+      width: '400px',
+      height: '300px'
+    });
+
+    detailsDialogRef
+      .afterClosed()
+      .subscribe(data => {
+        if (data !== false) {
+          this.datasetDetails = data;
+        }
+      });
+  }
+
+  toggleViewMode(fullScreenPreview) {
+    this.previewHeight = fullScreenPreview ? 100 : 60;
+    this.scriptHeight = fullScreenPreview ? 0 : 40;
   }
 }

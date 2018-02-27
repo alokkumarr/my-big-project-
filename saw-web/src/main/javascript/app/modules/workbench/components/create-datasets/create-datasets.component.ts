@@ -10,6 +10,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import { CSV_CONFIG , PARSER_CONFIG} from '../../wb-comp-configs'
 
 import { ParserPreviewComponent } from './parser-preview/parser-preview.component';
+import { DatasetDetailsComponent } from './dataset-details/dataset-details.component';
 import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog.component'
 import { WorkbenchService } from '../../services/workbench.service';
 
@@ -27,11 +28,13 @@ export class CreateDatasetsComponent implements OnInit {
   public details: any = [];
   private userProject: string = 'project2';
   private csvConfig: any;
-  private parsedPreview = new BehaviorSubject([]);
+  private parsedPreview = new Subject();
+  private previewData: any;
   private toAdd: Subject<any> = new Subject();
   private fieldsConf: any;
   private parserConf: any;
   public nameFormGroup: FormGroup;
+  private selectedIndex: number = 0;
 
   constructor(
     public dialogRef: MatDialogRef<CreateDatasetsComponent>,
@@ -41,6 +44,7 @@ export class CreateDatasetsComponent implements OnInit {
   ) { }
 
   @ViewChild('previewComponent') private previewComponent: ParserPreviewComponent;
+  @ViewChild('detailsComponent') private detailsComponent: DatasetDetailsComponent;
   
   ngOnInit() {
     this.csvConfig = cloneDeep(CSV_CONFIG); 
@@ -52,28 +56,33 @@ export class CreateDatasetsComponent implements OnInit {
   }
 
   stepChanged(event) {
+    this.selectedIndex = event.selectedIndex;
     if (event.selectedIndex === 2 && event.previouslySelectedIndex !== 3) {
+      this.detailsComponent.toPreview();
       this.getParsedPreview();
     } else if (event.selectedIndex === 3) {
       this.previewComponent.toAdd();
+    } else if (event.selectedIndex === 2 && event.previouslySelectedIndex === 3) {
+      this.parsedPreview.next(this.previewData);
     }
   } 
 
-  markSelectDone(data): void {
+  markSelectDone(data) {
     this.selectFullfilled = data.selectFullfilled;
     this.selectedFiles = data.selectedFiles;
     this.csvConfig.file = data.filePath;
   }
 
-  markDetailsDone(data): void {
+  markDetailsDone(data) {
     this.detailsFilled = data.detailsFilled;
     this.details = data.details;
   }
 
   getParsedPreview() {
-    if (this.detailsFilled) {
+    if (this.selectedIndex === 2) {
       this.workBench.getParsedPreviewData(this.userProject, this.details).subscribe(data => {
-        this.parsedPreview.next(data);
+        this.previewData = data;
+        this.parsedPreview.next(this.previewData);
       });
     }
   }

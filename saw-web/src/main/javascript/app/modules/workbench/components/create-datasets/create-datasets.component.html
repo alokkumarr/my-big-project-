@@ -27,7 +27,7 @@
       </div>
     </mat-step>
     <mat-step [completed]="detailsFilled" label="DETAILS">
-      <dataset-details [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
+      <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
       <div>
         <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
@@ -41,7 +41,7 @@
       </div>
     </mat-step>
     <mat-step label="PREVIEW">
-      <parser-preview [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
+      <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
       <div>
         <button mat-button mat-raised-button mat-primary matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
@@ -103,6 +103,7 @@
                     </mat-error>
                   </mat-form-field>
                 </section>
+                <mat-divider></mat-divider>
                 <section class="input-section">
                   <mat-form-field class="margin20">
                     <mat-select placeholder="SPARK_MASTER" [(value)]="parserConf.parameters[0].value">

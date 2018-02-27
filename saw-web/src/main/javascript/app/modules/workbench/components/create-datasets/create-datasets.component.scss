@@ -39,7 +39,7 @@ create-datasets {
   .stepperBtn {
     margin-top: 3px;
     font-size: 20px;
-    min-width: 12%;
+    width: 145px;
 
     .mat-icon {
       height: auto;
@@ -47,7 +47,6 @@ create-datasets {
   }
 
   .previous {
-    width: 143px;
     height: 42px;
     border-radius: 2px;
     background-color: white;
@@ -132,7 +131,7 @@ create-datasets {
   }
 
   .data-details {
-    height: calc(100% - 53px);
+    height: calc(100% - 47px);
   }
 
   .top-margin {

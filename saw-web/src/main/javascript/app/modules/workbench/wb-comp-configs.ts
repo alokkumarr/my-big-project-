@@ -1,13 +1,13 @@
 export const CSV_CONFIG = {
   file: '',
-  lineSeparator: '\\n',
+  lineSeparator: '\n',
   delimiter: ',',
   quoteChar: '',
   quoteEscapeChar: '\\',
   headerSize: 1,
   fieldNamesLine: '',
   dateFormats: [],
-  rowsToInspect: 3333,
+  rowsToInspect: 100,
   delimiterType: 'delimited',
   header: 'yes'
 };

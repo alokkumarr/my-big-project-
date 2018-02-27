@@ -8,6 +8,7 @@ import * as trim from 'lodash/trim';
 import * as uniq from 'lodash/uniq';
 import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -31,7 +32,7 @@ require('./select-rawdata.component.scss');
 export class SelectRawdataComponent implements OnInit {
   private treeConfig: any;
   private userProject: string = 'project2';
-  private treeNodes: Array<any> = STAGING_TREE;
+  private treeNodes: Array<any>;
   private treeOptions: ITreeOptions;
   private maskHelper: any;
   private gridConfig: Array<any>;
@@ -54,10 +55,10 @@ export class SelectRawdataComponent implements OnInit {
   @Output() onSelectFullfilled: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
+    this.treeNodes = cloneDeep(STAGING_TREE);
     this.gridConfig = this.getGridConfig();
     this.treeConfig = this.getTreeConfig();
     this.maskHelper = 'INFO_TEXT';
-
   }
 
   ngAfterViewInit() {
@@ -65,6 +66,8 @@ export class SelectRawdataComponent implements OnInit {
     this.dataGrid.instance.option(this.gridConfig);
     const stagingNode = this.tree.treeModel.getFirstRoot();
     stagingNode.expand();
+    stagingNode.setIsActive(true);
+    this.nodeID = stagingNode.id;
     this.fileMaskControl.valueChanges
       .debounceTime(1000)
       .subscribe(mask => this.maskSearch(mask));
@@ -88,8 +91,8 @@ export class SelectRawdataComponent implements OnInit {
       getChildren: (node: TreeNode) => {
         const parentPath = node.data.path;
         const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
-        this.currentPath = path;
-        this.nodeID = node.id;
+        // this.currentPath = path;
+        // this.nodeID = node.id;
         return this.workBench.getStagingData(this.userProject, path)
           .toPromise()
           .then(function (data) {
@@ -127,7 +130,7 @@ export class SelectRawdataComponent implements OnInit {
   getGridConfig() {
     const dataSource = [];
     const columns = [{
-      caption: 'Data Object',
+      caption: 'File',
       dataField: 'name',
       dataType: 'string',
       cellTemplate: 'dobjTemplate',
@@ -241,7 +244,9 @@ export class SelectRawdataComponent implements OnInit {
     if (validSize && validType) {
       const path = this.currentPath;
       this.workBench.uploadFile(filesToUpload, this.userProject, path).subscribe(data => {
-
+        const filteredDataFiles = filter(data.data, ['isDirectory', false])
+        this.reloadDataGrid(filteredDataFiles);
+        this.clearSelected();
       });
     } else {
       this.notify.warn('Only ".csv" or ".txt" extension files are supported', 'Unsupported file type');
@@ -275,8 +280,15 @@ export class SelectRawdataComponent implements OnInit {
               });
             });
             const newDir = filter(uniqueResults, ['isDirectory', true]);
-            currentNode.data.children.push(newDir[0]);
+            if (currChilds.length === 0) {
+              currentNode.data.children = newDir;
+            } else {
+              if (newDir.length > 0) {
+                currentNode.data.children.push(newDir[0]);
+              }
+            }
             this.tree.treeModel.update();
+            currentNode.expand();
           });
         }
       });

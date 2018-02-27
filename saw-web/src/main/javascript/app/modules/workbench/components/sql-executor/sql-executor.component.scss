@@ -28,8 +28,11 @@ sql-executor {
     max-height: calc(100% - 41px);
   }
 
-  .top-pane {
-    height: 30%;
+  .script-pane {
+    overflow: scroll;
+  }
+
+  .preview-pane {
     overflow: scroll;
   }
 
