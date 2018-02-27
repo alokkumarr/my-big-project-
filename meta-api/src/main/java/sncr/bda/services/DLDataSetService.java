@@ -181,7 +181,7 @@ public class DLDataSetService {
         dl.add(DataSetProperties.Name.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Name.name())));
         dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive((String) o.get(DataSetProperties.PhysicalLocation.name())));
         dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive( catalog ));
-        dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((String) o.get(DataSetProperties.NumberOfFiles.name())));
+        dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((Integer) o.get(DataSetProperties.NumberOfFiles.name())));
 
 
         //TODO:: Add transformation data from ctx

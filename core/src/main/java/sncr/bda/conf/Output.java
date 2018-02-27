@@ -64,9 +64,9 @@ public class Output {
      * Partitioning keys
      * 
      */
-    @SerializedName("keys")
+    @SerializedName("partitionKeys")
     @Expose
-    private Set<String> keys = new LinkedHashSet<String>();
+    private Set<String> partitionKeys = new LinkedHashSet<String>();
     /**
      * Location in selected container
      * 
@@ -95,20 +95,20 @@ public class Output {
      * @param parent
      * @param userdata
      * @param dstype
-     * @param keys
      * @param catalog
      * @param name
      * @param format
+     * @param partitionKeys
      * @param dataSet
      */
-    public Output(String name, String dataSet, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, sncr.bda.conf.Input.Dstype dstype, Set<String> keys, String catalog, String parent, Object userdata) {
+    public Output(String name, String dataSet, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, sncr.bda.conf.Input.Dstype dstype, Set<String> partitionKeys, String catalog, String parent, Object userdata) {
         this.name = name;
         this.dataSet = dataSet;
         this.format = format;
         this.mode = mode;
         this.numberOfFiles = numberOfFiles;
         this.dstype = dstype;
-        this.keys = keys;
+        this.partitionKeys = partitionKeys;
         this.catalog = catalog;
         this.parent = parent;
         this.userdata = userdata;
@@ -274,24 +274,24 @@ public class Output {
      * Partitioning keys
      * 
      * @return
-     *     The keys
+     *     The partitionKeys
      */
-    public Set<String> getKeys() {
-        return keys;
+    public Set<String> getPartitionKeys() {
+        return partitionKeys;
     }
 
     /**
      * Partitioning keys
      * 
-     * @param keys
-     *     The keys
+     * @param partitionKeys
+     *     The partitionKeys
      */
-    public void setKeys(Set<String> keys) {
-        this.keys = keys;
+    public void setPartitionKeys(Set<String> partitionKeys) {
+        this.partitionKeys = partitionKeys;
     }
 
-    public Output withKeys(Set<String> keys) {
-        this.keys = keys;
+    public Output withPartitionKeys(Set<String> partitionKeys) {
+        this.partitionKeys = partitionKeys;
         return this;
     }
 
@@ -373,7 +373,7 @@ public class Output {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(dataSet).append(format).append(mode).append(numberOfFiles).append(dstype).append(keys).append(catalog).append(parent).append(userdata).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(format).append(mode).append(numberOfFiles).append(dstype).append(partitionKeys).append(catalog).append(parent).append(userdata).toHashCode();
     }
 
     @Override
@@ -385,7 +385,7 @@ public class Output {
             return false;
         }
         Output rhs = ((Output) other);
-        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dstype, rhs.dstype).append(keys, rhs.keys).append(catalog, rhs.catalog).append(parent, rhs.parent).append(userdata, rhs.userdata).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dstype, rhs.dstype).append(partitionKeys, rhs.partitionKeys).append(catalog, rhs.catalog).append(parent, rhs.parent).append(userdata, rhs.userdata).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

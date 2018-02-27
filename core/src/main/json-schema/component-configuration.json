@@ -109,7 +109,7 @@
       "dstype": {
         "$ref" : "#/dstype"
       },
-      "keys": {
+      "partitionKeys": {
         "$ref" : "#/keys"
       },
       "catalog": {
