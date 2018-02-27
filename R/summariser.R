@@ -20,29 +20,10 @@
 #'library(dplyr)
 #'
 #'
-#'# Create toy dataset
-#'set.seed(319)
-#'id_vars <- seq(101, 200, by=1)
-#'dates <- seq(from=Sys.Date()-365, to=Sys.Date(), by="day")
-#'cat1 <- c("A", "B")
-#'cat2 <- c("X", "Y", "Z")
-#'
-#'dat <- data.frame()
-#'for(id in id_vars){
-#'   n <- floor(runif(1)*100)
-#'   d <- data.frame(id = id,
-#'                  date = sample(dates, n, replace = TRUE),
-#'                  cat1 = sample(cat1, n, replace = TRUE),
-#'                  cat2 = sample(cat2, n, replace = TRUE),
-#'                  metric1 = sample(1:5, n, replace = TRUE),
-#'                  metric2 = rnorm(n, mean=50, sd = 5))
-#'  dat <- rbind(dat, d)
-#'}
-#'
-#'summariser(dat,
-#'           group_vars = c("id", "date", "cat1", "cat2"),
-#'           measure_vars = c("metric1", "metric2"),
-#'           fun = c("sum"))
+#'summariser(iris,
+#'           group_vars = c("Species"),
+#'           measure_vars = c("Sepal.Length", "Sepal.Width"),
+#'           fun = c("sum", "mean"))
 #'@export
 summariser <- function(df, ...) {
   UseMethod("summariser", df)
@@ -112,7 +93,6 @@ summariser.tbl_spark <- function(df,
                                  measure_vars = NULL,
                                  fun = c("sum"),
                                  ...) {
-
   # Arguments
   args <- summariser_args(group_vars, measure_vars, fun, ...)
   group_vars <- args$group_vars
@@ -160,8 +140,7 @@ summariser.tbl_spark <- function(df,
 #'
 #' Function to create object of summarise_args S3 class
 #'
-#' Used to validate inputs and to simlify the inputs to the summarise_map
-#' function
+#' @inheritParams summariser
 new_summariser_args <-
   function(group_vars, measure_vars, fun, ...) {
     stopifnot(is.character(group_vars) | is.null(group_vars))
@@ -181,6 +160,8 @@ new_summariser_args <-
 #' Summariser Validation Function
 #'
 #' Checks for valid inputs to summarise_args class
+#'
+#' @param x obj of class summariser_args
 validate_summariser_args <- function(x) {
   funs <- c(
     "n_distinct",
@@ -194,7 +175,7 @@ validate_summariser_args <- function(x) {
     "skewness",
     "percentile"
   )
-  if (!x$f %in% funs) {
+  if (! all(x$f %in% funs)) {
     stop(
       "Supplied function not supported.\nPlease use one of following: ",
       paste(funs, collapse = ", "),
@@ -210,9 +191,16 @@ validate_summariser_args <- function(x) {
   x
 }
 
-
+#' Summariser Argument Helper Function
+#'
+#' Creates a valid object of summarise_args class
+#'
+#' Function should be used to pass nested arguments to the summarise_map, map
+#' argument
+#' @inheritParams summariser
+#'
 #' @export
-#' @importFrom magritter %>%
+#' @importFrom magrittr %>%
 summariser_args <- function(group_vars, measure_vars, fun, ...) {
   new_summariser_args(group_vars, measure_vars, fun, ...) %>%
     validate_summariser_args()

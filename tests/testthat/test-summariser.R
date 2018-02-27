@@ -1,8 +1,5 @@
 
 
-
-
-
 # summariser unit tests ---------------------------------------------------
 
 
@@ -51,10 +48,12 @@ test_that("summariser methods consistent", {
   expect_equal(colnames(spk_agg), colnames(r_agg))
 })
 
+
 test_that("summariser return correct dimensions", {
   expect_equal(nrow(spk_agg), length(unique(Iris[[group_vars]])))
   expect_equal(nrow(r_agg), length(unique(Iris[[group_vars]])))
 })
+
 
 test_that("aggregation function works as expected", {
   expect_equal(summariser(Iris, NULL, measure_vars[1], "sum")[[1]], sum(Iris[[measure_vars[1]]]))
@@ -83,4 +82,20 @@ test_that("column naming logic is consistent", {
   colnames(summariser(
     iris_tbl, NULL, measure_vars[1:2], c("sum", "mean")
   )))
+})
+
+
+test_that("summariser_args correctly checks inputs", {
+  expect_error(summariser(Iris, NULL, NULL, "sum"))
+  expect_error(summariser(Iris, "species", NULL, "bucket"))
+  expect_error(summariser(iris_tbl, "species", NULL, "bucket"))
+})
+
+
+test_that("Count only feature works as expected", {
+
+  d1 <- Iris %>% count_(group_vars) %>% .[[2]]
+
+  expect_equal(d1, summariser(Iris, group_vars, NULL) %>% .[[2]])
+  expect_equal(d1, summariser(iris_tbl, group_vars, NULL) %>% collect() %>% .[[2]])
 })
