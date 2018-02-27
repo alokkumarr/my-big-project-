@@ -366,8 +366,6 @@ public class QueryBuilderUtil {
 		return builder;
 	}
 
-	// ToDo: unify the EQ and ISIN logic
-	// ToDo: unify the NEQ and ISNOTIN logic
 	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
 	{
 		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
@@ -411,4 +409,49 @@ public class QueryBuilderUtil {
 
 		return builder;
 	}
+
+	public static List<QueryBuilder> stringFilterReport (com.synchronoss.querybuilder.model.report.Filter item, List<QueryBuilder> builder)
+	{
+		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			builder.add(termsQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
+		// prefix query builder - not analyzed
+		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+					(String) item.getModel().getModelValues().get(0));
+			builder.add(pqb);
+		}
+
+		// using wildcard as there's no suffix query type provided by
+		// elasticsearch
+		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getModelValues().get(0));
+			builder.add(wqb);
+		}
+
+		// same for contains clause - not analyzed query
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*" + item.getModel().getModelValues().get(0)+"*");
+			builder.add(wqb);
+		}
+
+		return builder;
+	}
+
+
 }
