@@ -134,8 +134,6 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
-      //Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
-      //webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js')
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     charts: [
@@ -144,8 +142,10 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     pivots: [
-      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')
+      // Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
+      //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js'),
+      // WIP
+      //webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')
     ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js')

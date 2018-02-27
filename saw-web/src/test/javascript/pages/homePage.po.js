@@ -1,6 +1,7 @@
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const analyzePage = require('../../javascript/pages/analyzePage.po');
 
 
 module.exports = {

@@ -2,7 +2,6 @@ const loginPage = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('../../../../conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../../javascript/helpers/utils');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
