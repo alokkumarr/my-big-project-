@@ -127,17 +127,18 @@ public class SQLComponent extends Component implements WithMovableResult , WithS
         outputDataSets.forEach(
             (on, obDesc) ->
             {
+                List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
+                String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
+
                 MoveDataDescriptor desc = new SQLMoveDataDescriptor(
                         resultDataSets.get(on),         // SQLDescriptor
-                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),
-                        (List<String>)obDesc.get(DataSetProperties.Keys.name()));
+                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
                 resultDataDesc.add(desc);
 
-                //TODO:: Complete it
-                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: ",
+                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
                         obDesc.get(DataSetProperties.Name.name()),
-                        obDesc.get(DataSetProperties.PhysicalLocation.name())
-                        ));
+                        obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
+
             }
         );
         return super.Move();

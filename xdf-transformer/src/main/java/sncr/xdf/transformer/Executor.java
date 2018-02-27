@@ -14,6 +14,7 @@ import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.component.XDFDataWriter;
 
 import java.util.*;
 
@@ -89,22 +90,14 @@ public abstract class Executor {
         Map<String, Object> outputDS = outputDataSetsDesc.get(resType);
         String name = (String) outputDS.get(DataSetProperties.Name.name());
         String loc = location + Path.SEPARATOR + name;
+
         String format = (String) outputDS.get(DataSetProperties.Format.name());
-        logger.debug("Write result to location: " + loc + " in format: " + format + ". if dataset already exists - remove it first");
+        Integer nof = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
+        List<String> partitionKeys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
 
-        if (HFileOperations.exists(loc)) HFileOperations.deleteEnt(loc);
+        XDFDataWriter xdfDW = new XDFDataWriter(format, nof, partitionKeys);
+        xdfDW.writeToTempLoc(outputResult,  loc);
 
-        switch (format.toLowerCase()) {
-            case "parquet" :
-                outputResult.write().parquet(loc);
-                break;
-            case "csv" :
-                outputResult.write().csv(loc);
-                break;
-            case "json" :
-                outputResult.write().json(loc);
-                break;
-        }
     }
 
     public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
@@ -135,7 +128,7 @@ public abstract class Executor {
         Column trRes = ds.col(TRANSFORMATION_RESULT);
         Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
         Column trRC = ds.col(RECORD_COUNTER);
-        outputResult = ds.filter( trRes.equalTo(0))
+        outputResult = ds.filter( trRes.geq(0))
                 .drop(trRes)
                 .drop(trMsg)
                 .drop(trRC);

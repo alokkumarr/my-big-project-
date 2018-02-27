@@ -45,6 +45,10 @@ public class DLDataSetOperations {
     public final static PathFilter JSON_FILTER = file ->
             (file.getName().endsWith(".json") && (!file.getName().startsWith(".")));
 
+    public final static PathFilter CSV_FILTER = file ->
+            ( (file.getName().endsWith(".csv") || file.getName().endsWith(".dat") || file.getName().endsWith(".txt") )&& (!file.getName().startsWith(".")));
+
+
     private static PARTITION_STRUCTURE checkLevel(FileSystem fileSystem, String glob, List<String> kl) {
         PARTITION_STRUCTURE partitionStructure = PARTITION_STRUCTURE.HIVE;
         try {
@@ -145,6 +149,8 @@ public class DLDataSetOperations {
         List<String> kl = new ArrayList<>();
 
         while(i == PARTITION_STRUCTURE.DRILL || i == PARTITION_STRUCTURE.HIVE ){
+            logger.debug("Checking locations: " + glob + " depth: " + depth);
+
             glob += File.separatorChar + "*";
             i = checkLevel(fileSystem, glob, kl);
             switch(i){
