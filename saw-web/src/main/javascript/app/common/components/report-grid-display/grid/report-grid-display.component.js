@@ -45,6 +45,10 @@ export const ReportGridDisplayComponent = {
             col.width = COLUMN_WIDTH;
           });
         },
+        columnChooser: {
+          enabled: true,
+          mode: 'select'
+        },
         remoteOperations: {
           paging: true
         },
