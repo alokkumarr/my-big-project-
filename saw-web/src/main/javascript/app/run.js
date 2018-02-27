@@ -20,23 +20,8 @@ export function runConfig($q, $rootScope, $state, $location, $window, JwtService
 
     const transitionPromise = $q.defer();
     const loginToken = $location.search().jwt;
-    if (loginToken) {
-      UserService.exchangeLoginToken(loginToken).then(data => {
-        if (data) {
-          // SSO token has been exchanged successfully. Redirect to main app.
-          $window.location.assign('./');
-          transitionPromise.resolve(false);
-        } else {
-          transitionPromise.resolve(true);
-        }
-      }, error => {
-        $log.error(error);
-        transitionPromise.resolve(true);
-      });
-    } else {
-      // In case of no sso token present
 
-      transitionPromise.resolve(true);
+    const checkRoutes = () => {
       const toState = trans.to().name;
       const token = JwtService.getTokenObj();
       /* If no token present, send to login */
@@ -63,6 +48,24 @@ export function runConfig($q, $rootScope, $state, $location, $window, JwtService
       }
 
       return allowed;
+    };
+
+    if (loginToken) {
+      UserService.exchangeLoginToken(loginToken).then(data => {
+        if (data) {
+          // SSO token has been exchanged successfully. Redirect to main app.
+          $window.location.assign('./');
+          transitionPromise.resolve(false);
+        } else {
+          transitionPromise.resolve(checkRoutes());
+        }
+      }, error => {
+        $log.error(error);
+        transitionPromise.resolve(checkRoutes());
+      });
+    } else {
+      // In case of no sso token present
+      return checkRoutes();
     }
     return transitionPromise.promise;
   });
