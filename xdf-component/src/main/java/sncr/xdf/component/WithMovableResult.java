@@ -209,7 +209,22 @@ public interface WithMovableResult {
             HFileOperations.fs.mkdirs(dest);
 
             // Prepare the list of the files
-            FileStatus[] files = HFileOperations.fs.listStatus(source, DLDataSetOperations.PARQUET_FILTER);
+            FileStatus[] files = null;
+            switch (moveDataDesc.format){
+                case "parquet":
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.PARQUET_FILTER);
+                    break;
+                case "json" :
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.JSON_FILTER);
+                    break;
+                case "csv" :
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.CSV_FILTER);
+                    break;
+                default:
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.PARQUET_FILTER);
+                    break;
+            }
+
             for(FileStatus s : files) {
                 try {
                     // Try to copy file by file to get better control on potential copy issues

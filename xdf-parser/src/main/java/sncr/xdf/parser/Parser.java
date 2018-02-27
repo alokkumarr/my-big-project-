@@ -1,5 +1,6 @@
 package sncr.xdf.parser;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -17,10 +18,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import sncr.bda.conf.Input;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.component.Component;
-import sncr.xdf.component.WithDataSetService;
-import sncr.xdf.component.WithMovableResult;
-import sncr.xdf.component.WithSparkContext;
+import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
 import sncr.xdf.core.file.DLDataSetOperations;
@@ -58,7 +56,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private StructType schema;
     private List<String> tsFormats;
     private StructType internalSchema;
+    private Integer outputNOF;
 
+    private List<String> pkeys;
 
     {
         componentName = "parser";
@@ -106,10 +106,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             return -1;
         }
 
-        Map.Entry<String, Map<String, String>> ds =  (Map.Entry<String, Map<String, String>>)outputDataSets.entrySet().toArray()[0];
+        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)outputDataSets.entrySet().toArray()[0];
         outputDataSetName = ds.getKey();
-        outputDataSetLocation = ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-        outputFormat = ds.getValue().get(DataSetProperties.Format.name());
+        outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
+        outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
+        outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
+        pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
+
         logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
         //TODO: If data set exists and flag is not append - error
@@ -241,8 +244,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
 
-        writeDataset(filteredDataset, outputFormat, destDir.toString());
-        return 0;
+        return writeDataset(filteredDataset, outputFormat, destDir.toString());
     }
 
     /**
@@ -260,25 +262,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
      * @return
      * @throws XDFException
      */
-    private boolean writeDataset(Dataset<Row> dataset, String format, String path) throws XDFException {
-        boolean status = true;
-        logger.debug("Writing dataset in " + format + " format");
-
-        switch (format.toLowerCase()) {
-            case "parquet" :
-                System.out.println("Parquet Format");
-                dataset.write().parquet(path);
-                break;
-            case "json" :
-                System.out.println("Json Format");
-                dataset.write().json(path);
-                break;
-            default:
-                throw new XDFException(XDFException.ErrorCodes.UnsupportedDataFormat);
+    private int writeDataset(Dataset<Row> dataset, String format, String path) {
+        try {
+            XDFDataWriter xdfDW = new XDFDataWriter(format, outputNOF, pkeys);
+            xdfDW.writeToTempLoc(dataset,  path);
+            return 0;
+        } catch (Exception e) {
+            error = ExceptionUtils.getFullStackTrace(e);
+            logger.error("Error at writing result: " + error);
+            return -1;
         }
 
-
-        return status;
     }
 
     private static List<Column> createFieldList(List<Field> fields){

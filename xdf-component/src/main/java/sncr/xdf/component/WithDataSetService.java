@@ -215,7 +215,7 @@ public interface WithDataSetService {
             throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
         }
 
-        List<String> system = (List<String>) outDS.get(DataSetProperties.Keys.name());
+        List<String> system = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
 
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
             if (system != null) {
@@ -229,7 +229,7 @@ public interface WithDataSetService {
             {
                 DataSetServiceAux.logger.warn("Output dataset parameter does not provides partitioning keys, but existent dataset is partitioned, set partition configuration from existing dataset");
                 if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
-                    outDS.put(DataSetProperties.Keys.name(), trgDSPartitioning._2());
+                    outDS.put(DataSetProperties.PartitionKeys.name(), trgDSPartitioning._2());
                 }
             }
         }
@@ -316,11 +316,16 @@ public interface WithDataSetService {
                 res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
                 res_output.put(DataSetProperties.Mode.name(), mode);
 
-                //TODO:: Do we really need it??s
+                //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>();
-                kl.addAll(output.getKeys());
+                kl.addAll(output.getPartitionKeys());
 
-                res_output.put(DataSetProperties.Keys.name(), kl);
+                String m = "Configured keys: [" + kl.size()+ "]";
+                for (String s : kl) m += s + " ";
+                logger.trace( m);
+
+
+                res_output.put(DataSetProperties.PartitionKeys.name(), kl);
 
 
                 boolean exists = false;
@@ -366,21 +371,21 @@ public interface WithDataSetService {
                         throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, srcPartitioning._4().toString(), dataset);
                     }
 
-                    if (system != null && system.get(DataSetProperties.Keys.toString()) != null) {
-                        JsonArray mdKeyListJa = system.get(DataSetProperties.Keys.toString()).getAsJsonArray();
+                    if (system != null && system.get(DataSetProperties.PartitionKeys.toString()) != null) {
+                        JsonArray mdKeyListJa = system.get(DataSetProperties.PartitionKeys.toString()).getAsJsonArray();
 
                         if (srcPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && srcPartitioning._2() != null) {
                             for (int i = 0; i < mdKeyListJa.size(); i++)
                                 if (!mdKeyListJa.get(i).getAsString().equalsIgnoreCase(srcPartitioning._2().get(i))) {
                                     throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
                                 }
-                            res.put(DataSetProperties.Keys.name(), srcPartitioning._2());
+                            res.put(DataSetProperties.PartitionKeys.name(), srcPartitioning._2());
                         }
                     }
                     else  //Call is done with input configuration parameters - no match is required.
                     {
                         if (srcPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && srcPartitioning._2() != null) {
-                            res.put(DataSetProperties.Keys.name(), srcPartitioning._2());
+                            res.put(DataSetProperties.PartitionKeys.name(), srcPartitioning._2());
                         }
                     }
 

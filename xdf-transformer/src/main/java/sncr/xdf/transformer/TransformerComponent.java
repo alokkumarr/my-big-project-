@@ -114,12 +114,10 @@ public class TransformerComponent extends Component implements WithMovableResult
 
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
-                    logger.debug("Execute JEXL script: " + engine );
                     JexlExecutorWithSchema jexlExecutorWithSchema  =
                             new JexlExecutorWithSchema(ctx.sparkSession, script, st, tempLocation,0, inputs, outputs);
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
-                    logger.debug("Execute JANINO script: " + engine );
 
                     String preamble = "";
                     if ( ctx.componentConfiguration.getTransformer().getScriptPreamble() != null &&
@@ -127,10 +125,14 @@ public class TransformerComponent extends Component implements WithMovableResult
                         preamble = HFileOperations.readFile(ctx.componentConfiguration.getTransformer().getScriptPreamble());
 
 
-                    logger.trace( "Read script preamble: " + preamble);
                     script = preamble + script;
+                    logger.trace( "Script to execute: " + script);
 
                     String[] odi = ctx.componentConfiguration.getTransformer().getAdditionalImports().toArray(new String[0]);
+                    String m = "Additional imports: ";
+                    for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
+                    logger.debug(m);
+
                      JaninoExecutor janinoExecutor =
                          new JaninoExecutor(ctx.sparkSession, script, st, tempLocation,0, inputs, outputs, odi);
                     janinoExecutor.execute(dsMap);
@@ -221,7 +223,7 @@ public class TransformerComponent extends Component implements WithMovableResult
             String dest = (String) ads.get(DataSetProperties.PhysicalLocation.name());
             String mode = (String) ads.get(DataSetProperties.Mode.name());
             String format = (String) ads.get(DataSetProperties.Format.name());
-            List<String> kl = (List<String>) ads.get(DataSetProperties.Keys.name());
+            List<String> kl = (List<String>) ads.get(DataSetProperties.PartitionKeys.name());
 
             MoveDataDescriptor desc = new MoveDataDescriptor(src, dest, name, mode, format, kl);
             resultDataDesc.add(desc);

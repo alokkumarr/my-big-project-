@@ -316,7 +316,7 @@ public class SQLScriptDescriptor {
                 td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
                 td.format = (String) oDO.get(DataSetProperties.Format.name());
                 td.mode = (String) oDO.get(DataSetProperties.Mode.name());
-                td.keys = (List<String>) oDO.get(DataSetProperties.Keys.name());
+                td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
                 td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
 
                 logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",

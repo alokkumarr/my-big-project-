@@ -69,8 +69,6 @@ public class JaninoExecutor extends Executor{
         //logger.trace("Intermediate result, transformation count  = " + c);
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
-        //df.schema().prettyJson();
-//        logger.trace("Transformation completed: " + df.count() + " Schema: " + df.schema().prettyJson());
         createFinalDS(df.cache());
     }
 

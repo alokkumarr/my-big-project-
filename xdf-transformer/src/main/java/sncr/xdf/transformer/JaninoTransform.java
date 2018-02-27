@@ -36,9 +36,8 @@ public class JaninoTransform implements Function<Row, Row> {
             IllegalArgumentException.class,
             Exception.class
     };
-    private String[] optionalDefaultImports = {"import java.util.Map;", "import java.util.HashMap;" };
-
-
+    //private String[] optionalDefaultImports = {"import java.util.Map;", "import java.util.HashMap;" };
+    private String[] optionalDefaultImports = { };
 
     private Map<String, Class> outRowDesc;
 
@@ -64,7 +63,10 @@ public class JaninoTransform implements Function<Row, Row> {
                            stringToType(inSchema.apply(i).dataType().typeName()));
 
         }
-        optionalDefaultImports = odi;
+        String[] lodi = new String[optionalDefaultImports.length + odi.length];
+        for (int i = 0; i < odi.length; i++) lodi[i] = odi[i];
+        optionalDefaultImports = lodi;
+
         outRowDesc.put(PREDEFINED_SCRIPT_RESULT_KEY, int.class);
         outRowDesc.put(PREDEFINED_SCRIPT_MESSAGE, int.class);
 
@@ -94,6 +96,7 @@ public class JaninoTransform implements Function<Row, Row> {
         Map<String, Class> inRowDesc = new HashMap<>();
 
         try {
+
             for (int i = 0; i < row.schema().fieldNames().length; i++) {
                 Class inClass = stringToType(row.schema().apply(i).dataType().typeName());
                 inRowDesc.put(row.schema().fieldNames()[i],inClass);
@@ -102,11 +105,16 @@ public class JaninoTransform implements Function<Row, Row> {
                 }
             }
 
+
             //TODO:: Add Janino executor
             IScriptEvaluator se = CompilerFactoryFactory.getDefaultCompilerFactory().newScriptEvaluator();
             se.setReturnType(Map.class);
-//            if (optionalDefaultImports != null && optionalDefaultImports.length >0)
-            se.setDefaultImports(optionalDefaultImports);
+            if (optionalDefaultImports != null && optionalDefaultImports.length >0) {
+                String m = "Additional imports: ";
+                for (int i = 0; i < optionalDefaultImports.length; i++) m += " " + optionalDefaultImports[i];
+                System.out.println(m);
+                se.setDefaultImports(optionalDefaultImports);
+            }
 
 /*
             System.out.println("In-Row descriptor");
@@ -132,6 +140,7 @@ public class JaninoTransform implements Function<Row, Row> {
                 System.out.println("Field: " + kk + " value: " + result.get(kk).toString());
             }
 */
+
 
             if (result != null && !result.isEmpty()) {
                 int src = ((result.containsKey(PREDEFINED_SCRIPT_RESULT_KEY)) ? (int) result.get(PREDEFINED_SCRIPT_RESULT_KEY) : -1);

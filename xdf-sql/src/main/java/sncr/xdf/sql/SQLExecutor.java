@@ -144,7 +144,7 @@ public class SQLExecutor implements Serializable {
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
 
                         XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
-                xdfWriter.write( finalResult, descriptor.targetTransactionalLocation);
+                xdfWriter.writeToTempLoc( finalResult, descriptor.targetTransactionalLocation);
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);

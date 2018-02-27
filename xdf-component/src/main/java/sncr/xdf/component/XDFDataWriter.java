@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.collection.immutable.Seq;
+import sncr.bda.core.file.HFileOperations;
 
 import java.util.List;
 
@@ -18,10 +19,20 @@ public class XDFDataWriter {
         this.numberOfFiles = numberOfFiles;
         this.keys = keys;
 
-        String m = "Format: " + format + ": "; for (String s : keys) m += s + " ";
-        logger.debug("Writer: " + m);
-
+        if (keys != null) {
+            String m = "Format: " + format + ": ";
+            for (String s : keys) m += s + " ";
+            logger.debug("Writer: " + m);
+        }
     }
+
+
+    public void writeToTempLoc( Dataset<Row> DS, String tempLocation) throws Exception {
+        write(DS, tempLocation, true);
+    }
+
+
+
 
     /**
      * The only available call is to write transformed data to temporary location
@@ -29,8 +40,11 @@ public class XDFDataWriter {
      * @param DS
      * @param tempLocation
      */
-    public void write( Dataset<Row> DS, String tempLocation) {
+    public void write( Dataset<Row> DS, String tempLocation, boolean replace) throws Exception {
 
+
+        if (replace && HFileOperations.exists(tempLocation))
+            HFileOperations.deleteEnt(tempLocation);
 
         // In HIVE mode we are partitioning by field VALUE only
 //        List<String> fields = (List<String>) outds.get(DataSetProperties.Keys.name());
