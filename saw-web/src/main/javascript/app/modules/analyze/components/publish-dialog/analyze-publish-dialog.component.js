@@ -1,5 +1,4 @@
 import * as map from 'lodash/map';
-import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
@@ -10,11 +9,6 @@ import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
 
 import {PRIVILEGES} from '../../consts';
-
-const B2F_DICTIONARY = {
-  weekly: 'WEEKS',
-  daily: 'DAYS'
-};
 
 export const AnalyzePublishDialogComponent = {
   template,
@@ -37,11 +31,6 @@ export const AnalyzePublishDialogComponent = {
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
       const semicolon = 186;
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
-      // if (this.model.isScheduled === 'true') {
-      //   this.emails = get(this.model.schedule, 'emails') || [];
-      // } else {
-        
-      // }
       this.emails = [];
       this.repeatIntervals = ['DAYS', 'WEEKS'];
       this.repeatInterval = this.repeatIntervals[0];
@@ -54,7 +43,7 @@ export const AnalyzePublishDialogComponent = {
           checked: false
         };
       });
-      this.crondetails = {}
+      this.crondetails = {};
       this.endCriteria = {
         never: {
           keyword: 'NEVER'
@@ -87,7 +76,7 @@ export const AnalyzePublishDialogComponent = {
         jobName: this.model.id,
         categoryId: this.model.categoryId,
         groupName: this.resp.ticket.custCode
-      }
+      };
       this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
         if (response.data.data.jobDetails) {
           this.crondetails = {
@@ -100,10 +89,9 @@ export const AnalyzePublishDialogComponent = {
           }
           this.emails = response.data.data.jobDetails.emailList;
           this.loadCronLayout = true;
-          this.hasSchedule = true;  
+          this.hasSchedule = true;
         }
       });
-
     }
 
     generateSchedulePayload() {
@@ -137,30 +125,28 @@ export const AnalyzePublishDialogComponent = {
         this.emailValidateFlag = true;
         return;
       }
-      console.log(this.crondetails);
       this.model.schedule = {
-        'scheduleState': this.scheduleState,
-        'activeRadio': this.crondetails.activeRadio,
-        'activeTab': this.crondetails.activeTab,
-        'analysisID': this.model.id,
-        'analysisName': this.model.name,
-        'cronExpression': this.crondetails.cronexp,
-        'description': this.description,
-        'emailList': this.emails,
-        'fileType': 'csv',
-        'jobName': this.model.id,
-        'metricName': this.model.metricName,
-        'type': this.model.type,
-        'userFullName': this.model.userFullName,
-        'jobScheduleTime': moment().format(),
-        'categoryID': this.model.categoryId,
-        'jobGroup': this.resp.ticket.custCode
+        scheduleState: this.scheduleState,
+        activeRadio: this.crondetails.activeRadio,
+        activeTab: this.crondetails.activeTab,
+        analysisID: this.model.id,
+        analysisName: this.model.name,
+        cronExpression: this.crondetails.cronexp,
+        description: this.description,
+        emailList: this.emails,
+        fileType: 'csv',
+        jobName: this.model.id,
+        metricName: this.model.metricName,
+        type: this.model.type,
+        userFullName: this.model.userFullName,
+        jobScheduleTime: moment().format(),
+        categoryID: this.model.categoryId,
+        jobGroup: this.resp.ticket.custCode
       };
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
     }
-
 
     validateEmails(emails) {
       if (isEmpty(emails)) {

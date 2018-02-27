@@ -165,10 +165,11 @@ export class AnalyzeService {
     return deferred.promise;
   }
 
-  publishAnalysis(model, execute = false) {
+  publishAnalysis(model) {
     if (model.schedule.scheduleState === 'new') {
       return this._$http.post(`http://localhost:9600/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
-    } else {
+    } 
+    if (model.schedule.scheduleState === 'exist') {
       return this._$http.post(`http://localhost:9600/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
     }
   }
