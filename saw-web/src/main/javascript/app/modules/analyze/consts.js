@@ -264,7 +264,7 @@ export const AREA_TYPES_OBJ = fpPipe(
 
 export const DATE_INTERVALS = [{
   label: 'All',
-  value: undefined
+  value: 'all'
 }, {
   label: 'Year',
   value: 'year'
