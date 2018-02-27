@@ -225,10 +225,12 @@ export class PivotGridComponent {
           cloned.checktype = 'date';
           break;
         case 'year':
-        default:
           cloned.groupInterval = cloned.dateInterval;
-          // the format usually sent bu the backend: 'YYYY-MM-DD' does not work with the pivot grid
+          // the format usually sent by the backend: 'YYYY-MM-DD' does not work with the pivot grid
           unset(cloned, 'format');
+        case 'all':
+        default:
+          // do nothing
           break;
         }
         return cloned;
