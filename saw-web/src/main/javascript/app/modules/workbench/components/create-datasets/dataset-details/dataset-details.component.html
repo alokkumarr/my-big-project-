@@ -5,7 +5,7 @@
       <mat-list-item class="list-items" *ngFor="let file of selFiles; index as i" (click)="previewDialog(file)">
         <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
         <div class="icon-div">
-            <mat-icon fontIcon="icon-show" mat-list-icon class="preview-icon"></mat-icon>
+          <mat-icon fontIcon="icon-show" mat-list-icon class="preview-icon"></mat-icon>
         </div>
         <mat-divider></mat-divider>
       </mat-list-item>
@@ -57,11 +57,11 @@
               </mat-error>
             </mat-form-field>
             <mat-form-field class="margin20">
-              <input matInput placeholder="Line Seperator" name="lineSeperator" formControlName="lineSeperatorControl" required />
-              <mat-error *ngIf="detailsFormGroup.controls.lineSeperatorControl.hasError('required')">
-                Line Seperator is
-                <strong>required</strong>
-              </mat-error>
+              <mat-select placeholder="Line Seperator" [(value)]="lineSeperator">
+                <mat-option value="lineFeed">Line Feed (\n)</mat-option>
+                <mat-option value="carriageReturn">Carriage Return (\r)</mat-option>
+                <mat-option value="eol">End of Line (\r\n)</mat-option>
+              </mat-select>
             </mat-form-field>
           </section>
           <section class="input-section">
@@ -95,8 +95,8 @@
           <mat-divider></mat-divider>
           <section class="input-section">
             <span fxFlex="20">Sample Size</span>
-            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="10000" min="10" step="100"
-              thumb-label="true" tick-interval="500" [(ngModel)]="previewConfig.rowsToInspect" [ngModelOptions]="{standalone: true}">
+            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="1000" min="50" step="50" thumb-label="true"
+              tick-interval="500" [(ngModel)]="previewConfig.rowsToInspect" [ngModelOptions]="{standalone: true}">
             </mat-slider>
             <span>{{previewConfig.rowsToInspect}}</span>
           </section>

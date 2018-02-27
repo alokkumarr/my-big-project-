@@ -1,11 +1,10 @@
 declare function require(string): string;
 
-import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { DxDataGridComponent } from 'devextreme-angular';
-
+import { DxDataGridModule, DxDataGridComponent, DxTemplateModule } from 'devextreme-angular';
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 
@@ -24,6 +23,7 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
   private gridConfig: Array<any>;
   private gridData: Array<any>;
   private updaterSubscribtion: any;
+  private fullScreen: boolean = false;
   
   constructor(
     private dxDataGrid: dxDataGridService,
@@ -31,6 +31,7 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
   ) {  }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @Output() onToggleScreenMode: EventEmitter<any> = new EventEmitter<any>();
 
   ngOnInit() {
     this.gridConfig = this.getGridConfig();
@@ -77,7 +78,8 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
         mode: 'none'
       },
       export: {
-        fileName: 'Parsed_Sample'
+        fileName: 'Preview_Sample',
+        enabled: false
       },
       scrolling: {
         showScrollbar: 'always',
@@ -86,10 +88,16 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
       },
       showRowLines: false,
       showBorders: false,
-      rowAlternationEnabled: true,
-      showColumnLines: false,
+      rowAlternationEnabled: false,
+      showColumnLines: true,
       selection: {
         mode: 'none'
+      },
+      onToolbarPreparing: e => {
+        e.toolbarOptions.items.unshift({
+          location: 'before',
+          template: 'toggleViewTemplate'
+        })
       }
     });
   }
@@ -98,5 +106,13 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
     this.dataGrid.instance.option('dataSource', data);
     this.dataGrid.instance.refresh();
     this.dataGrid.instance.endCustomLoading();
+  }
+
+  togglePreview(fullScrMode: boolean) {
+    this.fullScreen = fullScrMode;
+    this.onToggleScreenMode.emit(fullScrMode);
+    setTimeout(() => {
+      this.dataGrid.instance.refresh();
+    }, 100);
   }
 }

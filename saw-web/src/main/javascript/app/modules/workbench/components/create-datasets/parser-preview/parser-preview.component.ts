@@ -2,7 +2,7 @@ declare function require(string): string;
 
 import * as angular from 'angular';
 import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
@@ -32,7 +32,7 @@ require('./parser-preview.component.scss');
 })
 
 export class ParserPreviewComponent implements OnInit {
-  @Input() previewObj: BehaviorSubject<any>;
+  @Input() previewObj: Subject<any>;
   private gridListInstance: any;
   private previewgridConfig: Array<any>;
   private gridData: Array<any>;
@@ -69,11 +69,11 @@ export class ParserPreviewComponent implements OnInit {
       this.parserData = cloneDeep(data);
       const parsedData = data.samplesParsed;
       this.fieldInfo = cloneDeep(data.fields);
-      this.dataGrid.instance.beginCustomLoading('Loading...');
       setTimeout(() => {
+        this.dataGrid.instance.beginCustomLoading('Loading...');
         this.reloadDataGrid(parsedData);
       });
-      this.rawPreview('//sample.csv');
+      this.rawPreview(data.info.file);
     }
   }
 

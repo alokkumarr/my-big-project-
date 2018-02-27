@@ -27,6 +27,7 @@ export class DatasetDetailsComponent implements OnInit {
   private userProject: string = 'project2';
   private separatorKeysCodes = [ENTER, COMMA];
   public detailsFormGroup: FormGroup;
+  private lineSeperator = 'lineFeed';
 
   constructor(
     public dialog: MatDialog,
@@ -41,7 +42,6 @@ export class DatasetDetailsComponent implements OnInit {
       fieldSeperatorControl: new FormControl('', Validators.required),
       hederSizeControl: new FormControl('1', Validators.required),
       fieldNamesLineControl: new FormControl('1'),
-      lineSeperatorControl: new FormControl('\\n', Validators.required),
       quoteCharControl: new FormControl(''),
       escapeCharControl: new FormControl('')
     });
@@ -98,13 +98,23 @@ export class DatasetDetailsComponent implements OnInit {
 
   onFormValid(data) {
     if (!isUndefined(this.selFiles)) {
-      this.previewConfig.delimiter = data.fieldSeperatorControl;
-      this.previewConfig.fieldNamesLine = data.fieldNamesLineControl;
-      this.previewConfig.headerSize = data.hederSizeControl;
-      this.previewConfig.lineSeparator = data.lineSeperatorControl === '\\n' ? '\n' : data.lineSeperatorControl;
-      this.previewConfig.quoteEscapeChar = data.escapeCharControl;
-      this.previewConfig.quoteChar = data.quoteCharControl === '' ? '"' : data.quoteCharControl;
       this.onDetailsFilled.emit({ detailsFilled: true, details: this.previewConfig });
     }
+  }
+
+  toPreview() {
+    if (this.lineSeperator === 'lineFeed') {
+      this.previewConfig.lineSeparator = '\n';
+    } else if (this.lineSeperator === 'carriageReturn') {
+      this.previewConfig.lineSeparator = '\r';
+    } else {
+      this.previewConfig.lineSeparator = '\r\n';
+    }
+    this.previewConfig.delimiter = this.detailsFormGroup.value.fieldSeperatorControl;
+    this.previewConfig.fieldNamesLine = this.detailsFormGroup.value.fieldNamesLineControl;
+    this.previewConfig.headerSize = this.detailsFormGroup.value.hederSizeControl;
+    this.previewConfig.quoteEscapeChar = this.detailsFormGroup.value.escapeCharControl;
+    this.previewConfig.quoteChar = this.detailsFormGroup.value.quoteCharControl;
+    this.onDetailsFilled.emit({ detailsFilled: true, details: this.previewConfig });
   }
 }

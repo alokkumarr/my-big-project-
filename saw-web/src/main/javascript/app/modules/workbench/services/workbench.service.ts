@@ -100,19 +100,13 @@ export class WorkbenchService {
   }
 
   uploadFile(filesToUpload: FileList, projectName: string, path: string): Observable<any> {
-    // const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files?cat=${path}`;
+    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/upload/files?path=${path}`;
 
-    const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files`;
+    // const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files`;
     const formData: FormData = new FormData();
     forEach(filesToUpload, file => {
-      formData.append('file', file);
+      formData.append('files', file);
     });
-    // const dirPath = {path};
-
-    const blobOverrides = new Blob([JSON.stringify(path)], {
-      type: 'application/json'
-    });
-    formData.append('path', blobOverrides);
     return this.http.post(endpoint, formData);
   }
 
