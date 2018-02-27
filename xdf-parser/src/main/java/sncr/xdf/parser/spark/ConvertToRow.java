@@ -76,7 +76,7 @@ public class ConvertToRow implements Function<String, Row> {
 
         String[] parsed = parser.parseLine(in);
 
-        if(parsed.length != schema.fields().length){
+        if( parsed == null || parsed.length != schema.fields().length){
             // Create record with rejected flag
             errCounter.add(1);
             record[schema.length()] = 1;

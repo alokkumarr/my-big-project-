@@ -199,7 +199,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         //TODO: Change here
         Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
         writeDataset(filteredDataset, outputFormat.toString(), tempDir);
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, null));
+        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
 
         return 0;
     }
@@ -214,7 +214,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
 
 //                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,null));
+                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
 
                 }
             }
