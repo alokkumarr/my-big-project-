@@ -166,12 +166,19 @@ export class AnalyzeService {
   }
 
   publishAnalysis(model, execute = false) {
-    return this.updateAnalysis(model).then(analysis => {
-      if (execute) {
-        this.executeAnalysis(model);
-      }
-      return analysis;
-    });
+    if (model.schedule.scheduleState === 'new') {
+      return this._$http.post(`http://localhost:9600/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+    } else {
+      return this._$http.post(`http://localhost:9600/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+    }
+  }
+
+  getCronDetails(requestBody) {
+    return this._$http.post(`http://localhost:9600/scheduler/fetchJob`, requestBody);
+  }
+
+  getAllCronJobs(model) {
+    return this._$http.post(`http://localhost:9600/scheduler/jobs`, model);
   }
 
   deleteAnalysis(model) {

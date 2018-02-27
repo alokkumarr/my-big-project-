@@ -29,7 +29,7 @@
       </div>
 
       <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
-        <cron-job-schedular [crondetails]="$ctrl.crondetails" (on-cron-changed)="$ctrl.onCronChanged($event)"></cron-job-schedular>
+        <cron-job-schedular ng-if="$ctrl.hasSchedule" [crondetails]="$ctrl.crondetails" (on-cron-changed)="$ctrl.onCronChanged($event)"></cron-job-schedular>
 
         <div class="form-container" layout="column">
           <label translate="EMAIL_TO_COPY"></label>

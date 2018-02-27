@@ -5,6 +5,7 @@ import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 
 import {
   generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid
@@ -104,7 +105,9 @@ export class CronJobSchedularComponent {
       label:'December'
     }];
     this.scheduleType = 'daily';
-    this.loadData();
+    if (!isEmpty(this.crondetails)) {
+      this.loadData();
+    }
   }
 
   private range(start: number, end: number): number[] {
@@ -142,14 +145,14 @@ export class CronJobSchedularComponent {
   }
 
   regenerateCron(dateSelects) {
-    if (this.scheduleType === 'daily') {
+    switch (this.scheduleType) {
+    case 'daily':
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, this.daily.dailyType);
       }
-    }
-
-    if (this.scheduleType === 'weeklybasis') {
+      break;
+    case 'weeklybasis':
       const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
           .reduce((acc, day) => this.weekly[day] ? acc.concat([day]) : acc, [])
           .join(',');
@@ -157,20 +160,19 @@ export class CronJobSchedularComponent {
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, '');
       }
-    }
-
-    if (this.scheduleType === 'monthly') {
+      break;
+    case 'monthly':
       this.CronExpression = generateMonthlyCron(this.monthly, dateSelects);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, this.monthly.monthlyType);
       }
-    }
-
-    if (this.scheduleType === 'yearly') {
+      break;
+    case 'yearly':
       this.CronExpression = generateYearlyCron(this.yearly, dateSelects);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, this.yearly.yearlyType);
       }
+      break;
     }
   }
 
@@ -193,8 +195,9 @@ export class CronJobSchedularComponent {
       minute: fetchTime[1],
       hourType: meridium[0]
     };
-    
-    if (this.scheduleType === 'daily') {
+
+    switch (this.scheduleType) {
+    case 'daily':
       this.daily.dailyType = this.crondetails.activeRadio;
       if (this.daily.dailyType === 'everyDay') {
         this.dailyTypeDay = clone(modelDate);
@@ -202,18 +205,16 @@ export class CronJobSchedularComponent {
       } else {
         this.dailyTypeWeek = clone(modelDate);
       }
-    }
-
-    if (this.scheduleType === 'weeklybasis') {
+      break;
+    case 'weeklybasis':
       let getWeekDays = this.crondetails.cronexp.split(' ');
       forEach(getWeekDays[5].split(','), day => {
         this.weekly[day] = true;
       })
       
       this.weeklybasisDate = clone(modelDate);
-    }
-
-    if (this.scheduleType === 'monthly') {
+      break;
+    case 'monthly':
       this.monthly.monthlyType = this.crondetails.activeRadio;
       if (this.monthly.monthlyType === 'monthlyDay') {
         this.monthly.specificDay = parseInt(parseCronValue[5]);
@@ -232,13 +233,12 @@ export class CronJobSchedularComponent {
         }
         this.specificWeekDayMonth = clone(modelDate);
       }
-    }
-
-    if (this.scheduleType === 'yearly') {
+      break;
+    case 'yearly':
       this.yearly.yearlyType = this.crondetails.activeRadio;
       if (this.yearly.yearlyType === 'yearlyMonth') {
         this.specificMonthDayYear = clone(modelDate);
-        this.yearly.specificMonthDayMonth = new Date(Date.parse(parseCronValue[11] +" 1, 2018")).getMonth() + 1;
+        this.yearly.specificMonthDayMonth = new Date(Date.parse(parseCronValue[11] +' 1, 2018')).getMonth() + 1;
         this.yearly.specificMonthDayDay = parseInt(parseCronValue[5]);
       } else {
         this.specificMonthWeekYear = clone(modelDate);
@@ -248,8 +248,9 @@ export class CronJobSchedularComponent {
           }
         });
         this.yearly.specificMonthWeekDay = parseCronValue[6].substr(0, 3).toUpperCase();
-        this.yearly.specificMonthWeekMonth = new Date(Date.parse(parseCronValue[12] +" 1, 2018")).getMonth() + 1;
+        this.yearly.specificMonthWeekMonth = new Date(Date.parse(parseCronValue[12] +' 1, 2018')).getMonth() + 1;
       }
+      break;
     }
   }
 }
