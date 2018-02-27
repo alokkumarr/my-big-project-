@@ -67,9 +67,9 @@ export const AnalyzeViewComponent = {
 
       this.resp = this._JwtService.getTokenObj();
       this.requestModel = {
-        'categoryId': this.$state.params.id,
-        'groupkey': this.resp.ticket.custCode
-      }
+        categoryId: this.$state.params.id,
+        groupkey: this.resp.ticket.custCode
+      };
       this._AnalyzeService.getAllCronJobs(this.requestModel).then(response => {
         this.loadCards = true;
         if (response.data.data[0].jobDetails) {

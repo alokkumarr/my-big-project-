@@ -61,7 +61,6 @@ export const AnalyzeListViewComponent = {
         this._gridListInstance.clearFilter();
       } else if (analysisType === 'scheduled') {
         this._gridListInstance.filter(itemData => {
-          console.log(itemData);
           return !isEmpty(itemData.scheduleHuman);
         });
       } else {
@@ -179,7 +178,7 @@ export const AnalyzeListViewComponent = {
     }
 
     generateSchedule(rowData) {
-      const scheduleHuman = '';
+      let scheduleHuman = '';
       forEach(this.cronJobs, cron => {
         if (cron.jobDetails.analysisID === rowData.id) {
           scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);
