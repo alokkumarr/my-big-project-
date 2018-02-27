@@ -81,7 +81,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
       //Create analysis
       analyzePage.analysisElems.addAnalysisBtn.click();
-      const newDialog = analyzePage.newDialog;
+      const newDialog = analyzePage.newAnalysisDialog;
       newDialog.getMetric(metric).click();
       newDialog.getMethod(data.chartType).click();
       newDialog.createBtn.click();

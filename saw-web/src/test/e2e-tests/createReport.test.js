@@ -68,7 +68,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Create Report
     commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.addAnalysisBtn);
     analyzePage.analysisElems.addAnalysisBtn.click();
-    const newDialog = analyzePage.newDialog;
+    const newDialog = analyzePage.newAnalysisDialog;
     newDialog.getMetric(metric).click();
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();

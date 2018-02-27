@@ -48,7 +48,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
     // Add analysis
     analyzePage.analysisElems.addAnalysisBtn.click();
-    const newDialog = analyzePage.newDialog;
+    const newDialog = analyzePage.newAnalysisDialog;
     newDialog.getMetric(metric).click();
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();

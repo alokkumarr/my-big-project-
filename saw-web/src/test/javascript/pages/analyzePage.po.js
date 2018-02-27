@@ -165,7 +165,7 @@ function navigateToHome() {
 };
 
 module.exports = {
-  newDialog: {
+  newAnalysisDialog: {
     getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
     getMethod: name => element(by.css(`button[e2e="item-type-${name}"]`)),
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
@@ -173,16 +173,12 @@ module.exports = {
   designerDialog: {
     saveDialog: element(by.css('analyze-save-dialog')),
     chart: {
-      /*
-      g - color by
-      z - size by
-       */
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
       getYCheckBox: name => getChartSettingsCheckBox(name),
       getYCheckBoxParent: name => commonFunctions.find.parent(getChartSettingsCheckBox(name)),
-      getZRadio: name => getChartSettingsRadio('z', name),
-      getGroupRadio: name => getChartSettingsRadio('g', name),
+      getZRadio: name => getChartSettingsRadio('z', name), // z - size by
+      getGroupRadio: name => getChartSettingsRadio('g', name), // g - color by
       container: element(by.css('.highcharts-container ')),
       title: element(by.css('span[e2e="designer-type-chart"]')),
       getAnalysisChartType,
