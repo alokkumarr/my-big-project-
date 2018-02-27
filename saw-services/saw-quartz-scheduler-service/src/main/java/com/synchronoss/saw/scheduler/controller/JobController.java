@@ -2,6 +2,8 @@ package com.synchronoss.saw.scheduler.controller;
 
 import com.synchronoss.saw.scheduler.job.CronJob;
 import com.synchronoss.saw.scheduler.job.SimpleJob;
+import com.synchronoss.saw.scheduler.modal.FetchByCategoryBean;
+import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import com.synchronoss.saw.scheduler.modal.SchedulerResponse;
 import com.synchronoss.saw.scheduler.service.JobService;
@@ -32,15 +34,19 @@ public class JobController {
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
-
+        ScheduleKeys scheduleKeys = new ScheduleKeys();
+		scheduleKeys.setGroupName(jobDetail.getJobGroup());
+		scheduleKeys.setJobName(jobDetail.getJobName());
+		scheduleKeys.setCategoryId(jobDetail.getCategoryID());
 		logger.info("Check if job Name is unique");
-		if(!jobService.isJobWithNamePresent(jobDetail.getJobName())){
+		if(!jobService.isJobWithNamePresent(scheduleKeys)){
 
 			if(jobDetail.getCronExpression() == null || jobDetail.getCronExpression().trim().equals("")){
 				logger.info("Simple job ");
 				boolean status = jobService.scheduleOneTimeJob(jobDetail, SimpleJob.class);
 				if(status){
-					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
+					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs(jobDetail.getJobGroup()
+                            ,jobDetail.getCategoryID()));
 				}else{
 					return getServerResponse(ServerResponseCode.ERROR, false);
 				}
@@ -49,7 +55,8 @@ public class JobController {
 				logger.info("Cron Trigger ");
 				boolean status = jobService.scheduleCronJob(jobDetail,CronJob.class);
 				if(status){
-					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
+					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs(jobDetail.getJobGroup()
+                            ,jobDetail.getCategoryID()));
 				}else{
 					return getServerResponse(ServerResponseCode.ERROR, false);
 				}				
@@ -60,20 +67,20 @@ public class JobController {
 	}
 
 	@RequestMapping(value ="unschedule",method = RequestMethod.POST)
-	public void unschedule(@RequestParam("jobName") String jobName) {
+	public void unschedule(@RequestBody ScheduleKeys schedule) {
 		logger.info("JobController unschedule() method");
-		jobService.unScheduleJob(jobName);
+		jobService.unScheduleJob(schedule);
 	}
 
 	@RequestMapping(value ="delete",method = RequestMethod.DELETE)
-	public SchedulerResponse delete(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse delete(@RequestBody ScheduleKeys schedule ) {
         logger.info("JobController delete() method");
 
-		if(jobService.isJobWithNamePresent(jobName)){
-			boolean isJobRunning = jobService.isJobRunning(jobName);
+		if(jobService.isJobWithNamePresent(schedule)){
+			boolean isJobRunning = jobService.isJobRunning(schedule);
 
 			if(!isJobRunning){
-				boolean status = jobService.deleteJob(jobName);
+				boolean status = jobService.deleteJob(schedule);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, true);
 				}else{
@@ -89,15 +96,15 @@ public class JobController {
 	}
 
 	@RequestMapping(value ="pause",method = RequestMethod.POST)
-	public SchedulerResponse pause(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse pause(@RequestBody ScheduleKeys schedule) {
 		logger.info( "JobController pause() method");
 
-		if(jobService.isJobWithNamePresent(jobName)){
+		if(jobService.isJobWithNamePresent(schedule)){
 
-			boolean isJobRunning = jobService.isJobRunning(jobName);
+			boolean isJobRunning = jobService.isJobRunning(schedule);
 
 			if(!isJobRunning){
-				boolean status = jobService.pauseJob(jobName);
+				boolean status = jobService.pauseJob(schedule);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, true);
 				}else{
@@ -114,15 +121,15 @@ public class JobController {
 	}
 
 	@RequestMapping(value ="resume",method = RequestMethod.POST)
-	public SchedulerResponse resume(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse resume(@RequestBody ScheduleKeys schedule) {
         logger.info("JobController resume() method");
 
-		if(jobService.isJobWithNamePresent(jobName)){
-			String jobState = jobService.getJobState(jobName);
+		if(jobService.isJobWithNamePresent(schedule)){
+			String jobState = jobService.getJobState(schedule);
 
 			if(jobState.equals("PAUSED")){
 				logger.info("Job current state is PAUSED, Resuming job...");
-				boolean status = jobService.resumeJob(jobName);
+				boolean status = jobService.resumeJob(schedule);
 
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, true);
@@ -149,15 +156,20 @@ public class JobController {
 		if(jobDetail.getJobName() == null || jobDetail.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
+        ScheduleKeys scheduleKeys = new ScheduleKeys();
+        scheduleKeys.setGroupName(jobDetail.getJobGroup());
+        scheduleKeys.setJobName(jobDetail.getJobName());
+        scheduleKeys.setCategoryId(jobDetail.getCategoryID());
 
 		//Edit Job
-		if(jobService.isJobWithNamePresent(jobDetail.getJobName())){
+		if(jobService.isJobWithNamePresent(scheduleKeys)){
 			
 			if(jobDetail.getCronExpression() == null || jobDetail.getCronExpression().trim().equals("")){
 				//Single Trigger
 				boolean status = jobService.updateOneTimeJob(jobDetail.getJobName(), jobDetail.getJobScheduleTime());
 				if(status){
-					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
+					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs(jobDetail.getJobGroup()
+                            ,jobDetail.getCategoryID()));
 				}else{
 					return getServerResponse(ServerResponseCode.ERROR, false);
 				}
@@ -167,7 +179,8 @@ public class JobController {
 				boolean status = jobService.updateCronJob(jobDetail.getJobName(), jobDetail.getJobScheduleTime(),
 						jobDetail.getCronExpression());
 				if(status){
-					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs());
+					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs(jobDetail.getJobGroup()
+                            ,jobDetail.getCategoryID()));
 				}else{
 					return getServerResponse(ServerResponseCode.ERROR, false);
 				}				
@@ -178,51 +191,52 @@ public class JobController {
 		}
 	}
 
-	@RequestMapping(value ="jobs",method = RequestMethod.GET)
-	public SchedulerResponse getAllJobs(){
+	@RequestMapping(value ="jobs",method = RequestMethod.POST)
+	public SchedulerResponse getAllJobs(@RequestBody FetchByCategoryBean schedule){
         logger.info("JobController getAllJobs() method");
 
-		List<Map<String, Object>> list = jobService.getAllJobs();
+		List<Map<String, Object>> list = jobService.getAllJobs(schedule.getGroupkey()
+                ,schedule.getCategoryId());
 		return getServerResponse(ServerResponseCode.SUCCESS, list);
 	}
 
 	@RequestMapping(value ="fetchJob",method = RequestMethod.POST)
-	public SchedulerResponse getJobDetails(@RequestParam("jobName") String jobName){
+	public SchedulerResponse getJobDetails(@RequestBody ScheduleKeys schedule){
 		logger.info("JobController getJobDetails() method");
 
 		//Job Name is mandatory
-		if(jobName == null || jobName.trim().equals("")){
+		if(schedule.getJobName() == null || schedule.getJobName().trim().equals("")){
 			return getServerResponse(ServerResponseCode.JOB_NAME_NOT_PRESENT, false);
 		}
 		
-		Map<String, Object> status = jobService.getJobDetails(jobName);
+		Map<String, Object> status = jobService.getJobDetails(schedule);
 		return getServerResponse(ServerResponseCode.SUCCESS, status);
 	}
 
 	@RequestMapping(value ="isJobRunning",method = RequestMethod.POST)
-	public SchedulerResponse isJobRunning(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse isJobRunning(@RequestBody ScheduleKeys schedule) {
 		logger.info("JobController isJobRunning() method");
 
-		boolean status = jobService.isJobRunning(jobName);
+		boolean status = jobService.isJobRunning(schedule);
 		return getServerResponse(ServerResponseCode.SUCCESS, status);
 	}
 
 	@RequestMapping(value ="jobState",method = RequestMethod.POST)
-	public SchedulerResponse getJobState(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse getJobState(@RequestBody ScheduleKeys schedule) {
         logger.info("JobController getJobState() method");
 
-		String jobState = jobService.getJobState(jobName);
+		String jobState = jobService.getJobState(schedule);
 		return getServerResponse(ServerResponseCode.SUCCESS, jobState);
 	}
 
 	@RequestMapping(value ="stop",method = RequestMethod.POST)
-	public SchedulerResponse stopJob(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse stopJob(@RequestBody ScheduleKeys schedule) {
         logger.info("JobController stopJob() method");
 
-		if(jobService.isJobWithNamePresent(jobName)){
+		if(jobService.isJobWithNamePresent(schedule)){
 
-			if(jobService.isJobRunning(jobName)){
-				boolean status = jobService.stopJob(jobName);
+			if(jobService.isJobRunning(schedule)){
+				boolean status = jobService.stopJob(schedule);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, true);
 				}else{
@@ -242,13 +256,13 @@ public class JobController {
 	}
 
 	@RequestMapping(value ="start",method = RequestMethod.POST)
-	public SchedulerResponse startJobNow(@RequestParam("jobName") String jobName) {
+	public SchedulerResponse startJobNow(@RequestBody ScheduleKeys schedule) {
 		logger.info("JobController startJobNow() method");
 
-		if(jobService.isJobWithNamePresent(jobName)){
+		if(jobService.isJobWithNamePresent(schedule)){
 
-			if(!jobService.isJobRunning(jobName)){
-				boolean status = jobService.startJobNow(jobName);
+			if(!jobService.isJobRunning(schedule)){
+				boolean status = jobService.startJobNow(schedule);
 
 				if(status){
 					//Success

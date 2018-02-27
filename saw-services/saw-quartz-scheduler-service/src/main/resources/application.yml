@@ -21,7 +21,7 @@ flyway.baselineOnMigrate: true
 server:
   address: localhost
   port: 9600
-  context-path: '/saw'
+  context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true

@@ -1,5 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.modal.FetchByCategoryBean;
+import com.synchronoss.saw.scheduler.modal.ScheduleKeys;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.quartz.*;
 import org.quartz.Trigger.TriggerState;
@@ -38,7 +40,7 @@ public class JobServiceImpl implements JobService{
         logger.info("Request received to scheduleJob");
 
 		String jobKey = job.getJobName();
-		String groupKey = "SampleGroup";	
+		String groupKey = job.getJobGroup();
 		String triggerKey = job.getJobName();
 
 		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
@@ -70,7 +72,7 @@ public class JobServiceImpl implements JobService{
 		logger.info("Request received to scheduleJob");
 
 		String jobKey = job.getJobName();
-		String groupKey = "SampleGroup";	
+		String groupKey = job.getJobGroup();
 		String triggerKey = job.getJobName();
 
 		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
@@ -147,14 +149,14 @@ public class JobServiceImpl implements JobService{
 	/**
 	 * Remove the indicated Trigger from the scheduler. 
 	 * If the related job does not have any other triggers, and the job is not durable, then the job will also be deleted.
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean unScheduleJob(String jobName) {
+	public boolean unScheduleJob(ScheduleKeys scheduleKeys) {
 		logger.info("Request received for Unscheduleding job.");
 
-		String jobKey = jobName;
+		String jobKey = scheduleKeys.getJobName();
 
 		TriggerKey tkey = new TriggerKey(jobKey);
 		logger.debug("Parameters received for unscheduling job : tkey :"+jobKey);
@@ -170,16 +172,16 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Delete the identified Job from the Scheduler - and any associated Triggers.
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 
 	@Override
-	public boolean deleteJob(String jobName) {
+	public boolean deleteJob(ScheduleKeys scheduleKeys) {
 		logger.info("Request received for deleting job.");
 
-		String jobKey = jobName;
-		String groupKey = "SampleGroup";
+		String jobKey = scheduleKeys.getJobName();
+		String groupKey = scheduleKeys.getGroupName();
 
 		JobKey jkey = new JobKey(jobKey, groupKey); 
 		logger.debug("Parameters received for deleting job : jobKey :"+jobKey);
@@ -196,15 +198,15 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Pause a job
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean pauseJob(String jobName) {
+	public boolean pauseJob(ScheduleKeys scheduleKeys) {
         logger.info("Request received for pausing job.");
 
-		String jobKey = jobName;
-		String groupKey = "SampleGroup";
+		String jobKey = scheduleKeys.getJobName();
+		String groupKey =scheduleKeys.getGroupName();
 		JobKey jkey = new JobKey(jobKey, groupKey); 
 		logger.debug("Parameters received for pausing job : jobKey :"+jobKey+ ", groupKey :"+groupKey);
 
@@ -213,22 +215,22 @@ public class JobServiceImpl implements JobService{
 			logger.debug("Job with jobKey :"+jobKey+ " paused succesfully.");
 			return true;
 		} catch (SchedulerException e) {
-            logger.error("SchedulerException while pausing job with key :"+jobName + " message :"+e.getMessage());
+            logger.error("SchedulerException while pausing job with key :"+ scheduleKeys + " message :"+e.getMessage());
 			return false;
 		}
 	}
 
 	/**
 	 * Resume paused job
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean resumeJob(String jobName) {
+	public boolean resumeJob(ScheduleKeys scheduleKeys) {
 		logger.info("Request received for resuming job.");
 
-		String jobKey = jobName;
-		String groupKey = "SampleGroup";
+		String jobKey = scheduleKeys.getJobName();
+		String groupKey = scheduleKeys.getGroupName();
 
 		JobKey jKey = new JobKey(jobKey, groupKey);
         logger.debug("Parameters received for resuming job : jobKey :"+jobKey);
@@ -244,15 +246,15 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Start a job now
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean startJobNow(String jobName) {
+	public boolean startJobNow(ScheduleKeys scheduleKeys) {
         logger.info("Request received for starting job now.");
 
-		String jobKey = jobName;
-		String groupKey = "SampleGroup";
+		String jobKey = scheduleKeys.getJobName();
+		String groupKey = scheduleKeys.getGroupName();
 
 		JobKey jKey = new JobKey(jobKey, groupKey);
         logger.debug("Parameters received for starting job now : jobKey :"+jobKey);
@@ -268,15 +270,15 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Check if job is already running
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean isJobRunning(String jobName) {
+	public boolean isJobRunning(ScheduleKeys scheduleKeys) {
         logger.info("Request received to check if job is running");
 
-		String jobKey = jobName;
-		String groupKey = "SampleGroup";
+		String jobKey = scheduleKeys.getJobName();
+		String groupKey = scheduleKeys.getGroupName();
 
         logger.debug("Parameters received for checking job is running now : jobKey :"+jobKey);
 		try {
@@ -301,43 +303,51 @@ public class JobServiceImpl implements JobService{
 	/**
 	 * Get all jobs
      * @return
+	 * @param groupkey
+	 * @param categoryID
 	 */
 	@Override
-	public List<Map<String, Object>> getAllJobs() {
+	public List<Map<String, Object>> getAllJobs(String groupkey , String categoryID) {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
 			for (String groupName : scheduler.getJobGroupNames()) {
-				for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+				if (groupName.equalsIgnoreCase(groupkey)) {
+					for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
+						String jobName = jobKey.getName();
+						JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+						SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
+						if (job.getCategoryID().equalsIgnoreCase(categoryID)) {
+							//get job's trigger
+							List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+							Date scheduleTime = triggers.get(0).getStartTime();
+							Date nextFireTime = triggers.get(0).getNextFireTime();
+							Date lastFiredTime = triggers.get(0).getPreviousFireTime();
 
-					String jobName = jobKey.getName();
-					JobDetail jobDetail =  scheduler.getJobDetail(jobKey);
-					//get job's trigger
-					List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-					Date scheduleTime = triggers.get(0).getStartTime();
-					Date nextFireTime = triggers.get(0).getNextFireTime();
-					Date lastFiredTime = triggers.get(0).getPreviousFireTime();
-					SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
-					
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put("jobDetails",job);
-					map.put("scheduleTime", scheduleTime);
-					map.put("lastFiredTime", lastFiredTime);
-					map.put("nextFireTime", nextFireTime);
-					
-					if(isJobRunning(jobName)){
-						map.put("jobStatus", "RUNNING");
-					}else{
-						String jobState = getJobState(jobName);
-						map.put("jobStatus", jobState);
+
+							Map<String, Object> map = new HashMap<String, Object>();
+							map.put("jobDetails", job);
+							map.put("scheduleTime", scheduleTime);
+							map.put("lastFiredTime", lastFiredTime);
+							map.put("nextFireTime", nextFireTime);
+							ScheduleKeys scheduleKeys = new ScheduleKeys();
+							scheduleKeys.setJobName(jobName);
+							scheduleKeys.setGroupName(groupName);
+
+							if (isJobRunning(scheduleKeys)) {
+								map.put("jobStatus", "RUNNING");
+							} else {
+								String jobState = getJobState(scheduleKeys);
+								map.put("jobStatus", jobState);
+							}
+
+							list.add(map);
+							logger.info("Job details:");
+							logger.debug("Job Name:" + jobName + ", Group Name:" + groupName + ", Schedule Time:" + scheduleTime);
+						}
 					}
-
-					list.add(map);
-                    logger.info("Job details:");
-					logger.debug("Job Name:"+jobName + ", Group Name:"+ groupName + ", Schedule Time:"+scheduleTime);
 				}
-
 			}
 		} catch (SchedulerException e) {
             logger.error("SchedulerException while fetching all jobs. error message :"+e.getMessage());
@@ -350,38 +360,42 @@ public class JobServiceImpl implements JobService{
 	/**
 	 * Get all jobs
 	 * @return
+	 * @param scheduleKeys
 	 */
 	@Override
-	public Map<String, Object> getJobDetails(String jobName) {
+	public Map<String, Object> getJobDetails(ScheduleKeys scheduleKeys) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 
 			for (String groupName : scheduler.getJobGroupNames()) {
+				if (groupName.equalsIgnoreCase(scheduleKeys.getGroupName())){
 				for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-					if(jobName.equalsIgnoreCase(jobKey.getName())) {
-					String jobGroup = jobKey.getGroup();
-                    JobDetail jobDetail =  scheduler.getJobDetail(jobKey);
-                  SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
-					//get job's trigger
-					List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
-					Date scheduleTime = triggers.get(0).getStartTime();
-					Date nextFireTime = triggers.get(0).getNextFireTime();
-					Date lastFiredTime = triggers.get(0).getPreviousFireTime();
+					if (scheduleKeys.getJobName().equalsIgnoreCase(jobKey.getName())) {
+						JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+						SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
+						//get job's trigger
+						if (job.getCategoryID().equalsIgnoreCase(scheduleKeys.getCategoryId())) {
+							List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
+							Date scheduleTime = triggers.get(0).getStartTime();
+							Date nextFireTime = triggers.get(0).getNextFireTime();
+							Date lastFiredTime = triggers.get(0).getPreviousFireTime();
 
-					map.put("jobDetails",job);
-					map.put("scheduleTime", scheduleTime);
-					map.put("lastFiredTime", lastFiredTime);
-					map.put("nextFireTime", nextFireTime);
+							map.put("jobDetails", job);
+							map.put("scheduleTime", scheduleTime);
+							map.put("lastFiredTime", lastFiredTime);
+							map.put("nextFireTime", nextFireTime);
 
-					if(isJobRunning(jobName)){
-						map.put("jobStatus", "RUNNING");
-					}else{
-						String jobState = getJobState(jobName);
-						map.put("jobStatus", jobState);
+							if (isJobRunning(scheduleKeys)) {
+								map.put("jobStatus", "RUNNING");
+							} else {
+								String jobState = getJobState(scheduleKeys);
+								map.put("jobStatus", jobState);
+							}
+							logger.info("Job details:");
+							logger.debug("Job Name:" + scheduleKeys + ", Group Name:" + groupName + ", Schedule Time:" + scheduleTime);
+						}
 					}
-					logger.info("Job details:");
-					logger.debug("Job Name:"+jobName + ", Group Name:"+ groupName + ", Schedule Time:"+scheduleTime);
 				}
 				}
 			}
@@ -394,14 +408,14 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Check job exist with given name
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean isJobWithNamePresent(String jobName) {
+	public boolean isJobWithNamePresent(ScheduleKeys scheduleKeys) {
 		try {
-			String groupKey = "SampleGroup";
-			JobKey jobKey = new JobKey(jobName, groupKey);
+			String groupKey = scheduleKeys.getGroupName();
+			JobKey jobKey = new JobKey(scheduleKeys.getJobName(), groupKey);
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			if (scheduler.checkExists(jobKey)){
 				return true;
@@ -414,15 +428,15 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Get the current state of job
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
-	public String getJobState(String jobName) {
+	public String getJobState(ScheduleKeys scheduleKeys) {
         logger.info("JobServiceImpl.getJobState()");
 
 		try {
-			String groupKey = "SampleGroup";
-			JobKey jobKey = new JobKey(jobName, groupKey);
+			String groupKey = scheduleKeys.getGroupName();
+			JobKey jobKey = new JobKey(scheduleKeys.getJobName(), groupKey);
 
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			JobDetail jobDetail = scheduler.getJobDetail(jobKey);
@@ -455,15 +469,15 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Stop a job
-     * @param jobName
+     * @param scheduleKeys
      * @return
 	 */
 	@Override
-	public boolean stopJob(String jobName) {
+	public boolean stopJob(ScheduleKeys scheduleKeys) {
         logger.info("JobServiceImpl.stopJob()");
 		try{	
-			String jobKey = jobName;
-			String groupKey = "SampleGroup";
+			String jobKey = scheduleKeys.getJobName();
+			String groupKey = scheduleKeys.getGroupName();
 
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
 			JobKey jkey = new JobKey(jobKey, groupKey);

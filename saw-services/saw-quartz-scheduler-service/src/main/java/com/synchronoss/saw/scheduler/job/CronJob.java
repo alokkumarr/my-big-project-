@@ -25,8 +25,8 @@ public class CronJob extends QuartzJobBean implements InterruptableJob{
 		logger.info("Cron Job started with key :" + key.getName() + ", Group :"+key.getGroup()
 				+ " , Thread Name :"+Thread.currentThread().getName() + " ,Time now :"+new Date());
 
-		List<Map<String, Object>> list = jobService.getAllJobs();
-		logger.debug("Job list :"+list);
+	/*	List<Map<String, Object>> list = jobService.getAllJobs(schedule);
+		logger.debug("Job list :"+list);*/
 		
 		/**
          *  For retrieving stored key-value pairs
