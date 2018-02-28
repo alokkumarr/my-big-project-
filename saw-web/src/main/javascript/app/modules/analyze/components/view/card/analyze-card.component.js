@@ -23,6 +23,7 @@ export const AnalyzeCardComponent = {
       this._JwtService = JwtService;
 
       this.canUserFork = false;
+      this.cronReadbleMsg = 'No Schedule Set';
     }
 
     $onInit() {
@@ -59,9 +60,11 @@ export const AnalyzeCardComponent = {
     }
 
     onSuccessfulPublish(analysis) {
+      const model = analysis;
       this.onAction({
         type: 'onSuccessfulPublish',
-        model: this.model
+        model: model,
+
       });
     }
   }

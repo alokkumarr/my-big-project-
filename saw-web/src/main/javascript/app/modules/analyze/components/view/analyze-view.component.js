@@ -4,6 +4,7 @@ import style from './analyze-view.component.scss';
 import * as remove from 'lodash/remove';
 import * as findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {Events} from '../../consts';
 import AbstractComponentController from '../../../../common/components/abstractComponent';
@@ -64,7 +65,11 @@ export const AnalyzeViewComponent = {
       this.canUserCreate = this._JwtService.hasPrivilege('CREATE', {
         subCategoryId: this.$state.params.id
       });
+      this.getCronJobs();
+      
+    }
 
+    getCronJobs() {
       this.resp = this._JwtService.getTokenObj();
       this.requestModel = {
         categoryId: this.$state.params.id,
@@ -72,8 +77,10 @@ export const AnalyzeViewComponent = {
       };
       this._AnalyzeService.getAllCronJobs(this.requestModel).then(response => {
         this.loadCards = true;
-        if (response.data.data[0].jobDetails) {
+        if (!isUndefined(response.data.data[0])) {
           this.cronSavedJobs = response.data.data;
+        } else {
+          this.cronSavedJobs = '';
         }
       });
     }
@@ -175,14 +182,16 @@ export const AnalyzeViewComponent = {
     }
 
     onSuccessfulPublish(analysis) {
-      /* Update the new analysis in the current list */
-      const analysisId = findIndex(this.analyses, ({id}) => {
-        return id === analysis.id;
-      });
-      this.analyses.splice(analysisId, 1, analysis);
-      this.updater.next({analyses: this.analyses});
-
-      this._$state.go('analyze.view', {id: analysis.categoryId});
+      this.getCronJobs();
+      if (!isUndefined(analysis)) {
+        /* Update the new analysis in the current list */
+        const analysisId = findIndex(this.analyses, ({id}) => {
+          return id === analysis.id;
+        });
+        this.analyses.splice(analysisId, 1, analysis);
+        this.updater.next({analyses: this.analyses});  
+      }      
+      this._$state.go('analyze.view', {id: this.$state.params.id});
     }
 
     view(analysisId) {

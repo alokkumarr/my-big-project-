@@ -128,7 +128,7 @@ export const AnalyzePublishDialogComponent = {
           groupName: this.resp.ticket.custCode,
           jobName: this.model.id,
           scheduleState: this.scheduleState
-        }
+        };
       } else {
         if (!this.validateEmails(this.emails)) {
           this.emailValidateFlag = true;
@@ -153,7 +153,6 @@ export const AnalyzePublishDialogComponent = {
           jobGroup: this.resp.ticket.custCode
         };
       }
-      
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
