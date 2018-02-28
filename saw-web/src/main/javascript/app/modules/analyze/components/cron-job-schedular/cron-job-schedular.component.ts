@@ -8,7 +8,7 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 
 import {
-  generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid
+  generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
 const template = require('./cron-job-schedular.component.html');
@@ -191,11 +191,13 @@ export class CronJobSchedularComponent {
     let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
     let fetchTime = parseCronValue[1].split(':');
     let meridium = parseCronValue[2].split(',');
-    const modelDate = {
+    let modelDate = {
       hour: parseInt(fetchTime[0]),
       minute: fetchTime[1],
       hourType: meridium[0]
     };
+
+    modelDate = convertToLocal(modelDate);
 
     switch (this.scheduleType) {
     case 'daily':
