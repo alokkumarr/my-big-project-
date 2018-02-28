@@ -23,13 +23,13 @@ import javax.sql.DataSource;
 import static junit.framework.TestCase.fail;
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.H2;
 
-//@RunWith(SpringRunner.class)
+
 @SpringBootTest
 public class QuartzSchedulerApplicationTests {
 
-	/*@Test
+	@Test
 	public void contextLoads() {
-	}*/
+	}
 
     private Scheduler scheduler;
     private static final Logger logger = LoggerFactory.getLogger(QuartzSchedulerApplicationTests.class);
