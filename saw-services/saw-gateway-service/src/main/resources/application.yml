@@ -62,6 +62,9 @@ api:
             path: '[/]observe.*'       
         -   location: ${observe.service.host}
             method: DELETE
-            path: '[/]observe.*'       
+            path: '[/]observe.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]filters.*'
         
         
