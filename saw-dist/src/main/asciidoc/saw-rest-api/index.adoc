@@ -48,10 +48,13 @@ include::{snippets}/list-metrics/http-response.adoc[]
  }
 
 === General guideline for SSO request:
+- The JWT secret key to use is generated and set by the SAW administrator in the environment configuration, as described in the SAW Operations Guide.
+- Signature algorithm should be used as (HS256, symmetric) to generate JWT token.
 - Clients should set "Cache-Control: no-store" to their header requests.
 - Clients should set the token expiration ("validUpto" claim in the JWT) to a low value,
 ensure tickets have a limited lifetime.
-- Signature algorithm should be used as (HS256, symmetric).
+
+
 
 === SSO request sample URL:
 
