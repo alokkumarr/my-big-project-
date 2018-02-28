@@ -24,6 +24,7 @@ export const AnalyzeFilterModalComponent = {
   template,
   styles: [style],
   bindings: {
+    type: '<',
     filters: '<',
     artifacts: '<',
     isRuntime: '<?runtime',
@@ -71,7 +72,8 @@ export const AnalyzeFilterModalComponent = {
       const newFilter = {
         column: null,
         model: null,
-        isRuntimeFilter: false
+        isRuntimeFilter: false,
+        isGlobalFilter: false
       };
       filtersArray.push(newFilter);
     }
@@ -114,6 +116,7 @@ export const AnalyzeFilterModalComponent = {
           } else {
             isValid = isValid && (
               filter.isRuntimeFilter ||
+              filter.isGlobalFilter ||
               !this._FilterService.isFilterEmpty(filter) ||
               !this.isDateFilterInvalid(filter)
             );
@@ -169,6 +172,12 @@ export const AnalyzeFilterModalComponent = {
       }
     }
 
+    onGlobalToggle(filter) {
+      if (filter.isGlobalFilter) {
+        filter.model = null;
+      }
+    }
+
     onRemoveFilter(index, artifactName) {
       this.filters[artifactName].splice(index, 1);
     }
@@ -176,7 +185,7 @@ export const AnalyzeFilterModalComponent = {
     groupFilters(filters) {
       return isEmpty(filters) ?
         this.getInitialFilters() :
-        groupBy(filters, 'column.table');
+        groupBy(filters, 'column.tableName');
     }
 
     getInitialFilters() {
