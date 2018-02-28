@@ -1,0 +1,19 @@
+<mat-chip-list>
+  <mat-chip *ngFor="let str of value" [removable]="true" (remove)="removeInput(str)">
+    {{str}}
+    <mat-icon matChipRemove class="remove-filter-chip" fontIcon="icon-close"></mat-icon>
+  </mat-chip>
+</mat-chip-list>
+
+<mat-form-field class="full-width">
+  <input matInput placeholder="Search" aria-label="Search"
+    #completeTrigger
+    [matAutocomplete]="stringFilter"
+    [formControl]="filterCtrl"
+    (change)="onInputChange($event)"
+    (keyup)="onInputChange($event)" />
+  <mat-autocomplete #stringFilter="matAutocomplete">
+    <mat-option *ngFor="let str of filteredSuggestions | async" [value]="str" [textContent]="str">
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

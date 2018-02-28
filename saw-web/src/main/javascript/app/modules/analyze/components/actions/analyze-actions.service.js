@@ -3,8 +3,9 @@ import * as clone from 'lodash/clone';
 
 import {AnalyseTypes} from '../../consts';
 
-export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, AnalyzeDialogService) {
+export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector) {
   'ngInject';
+
   return {
     execute,
     fork,
@@ -73,6 +74,8 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   }
 
   function openEditModal(analysis, mode) {
+    /* Delayed injection of service to battle issues with downgradeModule */
+    const AnalyzeDialogService = $injector.get('AnalyzeDialogService');
     const openModal = template => {
       showDialog({
         template,
