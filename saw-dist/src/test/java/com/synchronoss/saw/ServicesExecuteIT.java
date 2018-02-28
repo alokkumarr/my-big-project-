@@ -32,10 +32,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
@@ -45,9 +42,9 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  */
 public class ServicesExecuteIT {
     private RequestSpecification spec;
+
     private ObjectMapper mapper;
     private String token;
-
 
     @BeforeClass
     public static void setUpClass() {
@@ -315,9 +312,54 @@ public class ServicesExecuteIT {
             .extract().response().path("data");
     }
 
+    private static ObjectNode globalFilters() {
+       // ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        ArrayNode globalFilters =  objectNode.putArray("globalFilters");
+        ObjectNode globalFilter = globalFilters.addObject();
+        globalFilter.put("tableName", "sample");
+        globalFilter.put("semanticId", "123");
+        ArrayNode filters = globalFilter.putArray("filters");
+        ObjectNode filter = filters.addObject();
+        filter.put("columnName","long");
+        filter.put("type","long");
+        filter.put("size","10");
+        filter.put("order","asc");
+        ObjectNode filter1 = filters.addObject();
+        filter1.put("columnName","string.keyword");
+        filter1.put("type","string");
+        filter1.put("size","10");
+        filter1.put("order","asc");
+        ObjectNode es = mapper.createObjectNode();
+        es.put("storageType","es");
+        es.put("indexName","sample");
+        es.put("type","sample");
+        globalFilter.putPOJO("esRepository",
+                es);
+        return objectNode;
+    }
+
+    @Test
+    public void globalFilterTest()  throws JsonProcessingException {
+        ObjectNode node = globalFilters();
+        String json = mapper.writeValueAsString(node);
+        String field = "string.keyword";
+        Response response = given(spec)
+                .header("Authorization", "Bearer " + token)
+                .body(json)
+                .when().post("/services/filters")
+                .then().assertThat().statusCode(200)
+                .extract().response();
+        ObjectNode root = response.as(ObjectNode.class);
+       JsonNode jsonNode= root.get("long");
+       Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1498);
+       Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
+    }
+
     private RequestSpecification request(String token) {
         return given(spec).header("Authorization", "Bearer " + token);
     }
+
    private String getJWTToken() {
        Long tokenValid = 150l;
        String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=";
@@ -333,4 +375,5 @@ public class ServicesExecuteIT {
                .signWith(SignatureAlgorithm.HS256, secretKey)
                .compact();
    }
+
 }

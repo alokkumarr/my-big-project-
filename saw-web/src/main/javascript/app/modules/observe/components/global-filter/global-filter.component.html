@@ -1,0 +1,36 @@
+<div class="filter-header-actions">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onApply()">Apply Filters</button>
+</div>
+
+<div class="filter-content">
+  <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
+    <mat-expansion-panel-header>
+      <mat-panel-title [textContent]="gFilter.displayName"></mat-panel-title>
+
+      <mat-panel-description [textContent]="tableNameFor(gFilter)"></mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <g-date-filter
+      class="panel-body"
+      *ngSwitchCase="'date'"
+      [filter]="gFilter"
+      (onModelChange)="onFilterUpdate($event)"></g-date-filter>
+
+    <g-number-filter
+      class="panel-body"
+      *ngSwitchCase="'number'"
+      [filter]="gFilter"
+      (onModelChange)="onFilterUpdate($event)"></g-number-filter>
+
+    <g-string-filter
+      class="panel-body"
+      *ngSwitchCase="'string'"
+      [filter]="gFilter"
+      (onModelChange)="onFilterUpdate($event)"></g-string-filter>
+  </mat-expansion-panel>
+</div>
+
+<div class="filter-footer-actions">
+  <button mat-button color="warn" (click)="onClearFilters()">Clear All Filters</button>
+</div>

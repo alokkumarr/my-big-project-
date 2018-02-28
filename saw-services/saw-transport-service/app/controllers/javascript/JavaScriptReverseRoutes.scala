@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/pman0003/Codebase/bda/saw-1335/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Sat Dec 23 13:01:38 IST 2017
+// @SOURCE:/Users/pman0003/Codebase/bda/saw-feature/saw/saw-services/saw-transport-service/conf/routes
+// @DATE:Thu Feb 15 13:04:46 IST 2018
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -23,7 +23,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:16
+    // @LINE:17
     def process: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.Analysis.process",
       """
@@ -55,7 +55,27 @@ package controllers.javascript {
   
   }
 
-  // @LINE:27
+  // @LINE:16
+  class ReverseGlobalFilter(_prefix: => String) {
+
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:16
+    def process: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.GlobalFilter.process",
+      """
+        function() {
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "filters"})
+        }
+      """
+    )
+  
+  }
+
+  // @LINE:28
   class ReverseSemantic(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -63,7 +83,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:27
+    // @LINE:28
     def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.Semantic.handleRequest",
       """
@@ -95,7 +115,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:29
+  // @LINE:30
   class ReverseMCT(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -103,7 +123,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:30
+    // @LINE:31
     def extendedTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MCT.extendedTagRequest",
       """
@@ -113,7 +133,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:29
+    // @LINE:30
     def handleTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MCT.handleTagRequest",
       """
@@ -133,7 +153,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:37
+    // @LINE:38
     def sr: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.sr",
       """
@@ -143,7 +163,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:34
+    // @LINE:35
     def executeCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeCmd",
       """
@@ -153,7 +173,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:35
+    // @LINE:36
     def executeExtendedCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeExtendedCmd",
       """
@@ -175,7 +195,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:18
+  // @LINE:19
   class ReverseAnalysisExecutions(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -183,7 +203,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:23
+    // @LINE:24
     def execute: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.AnalysisExecutions.execute",
       """
@@ -193,7 +213,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:18
+    // @LINE:19
     def list: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.AnalysisExecutions.list",
       """
@@ -207,7 +227,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:21
+    // @LINE:22
     def getExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.AnalysisExecutions.getExecutionData",
       """
