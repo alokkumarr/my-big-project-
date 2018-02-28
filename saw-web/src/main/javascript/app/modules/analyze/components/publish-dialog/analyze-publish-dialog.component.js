@@ -121,28 +121,39 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
-      if (!this.validateEmails(this.emails)) {
-        this.emailValidateFlag = true;
-        return;
+      if (this.hasSchedule === false) {
+        this.scheduleState = 'delete';
+        this.model.schedule = {
+          categoryId: this.model.categoryId,
+          groupName: this.resp.ticket.custCode,
+          jobName: this.model.id,
+          scheduleState: this.scheduleState
+        }
+      } else {
+        if (!this.validateEmails(this.emails)) {
+          this.emailValidateFlag = true;
+          return;
+        }
+        this.model.schedule = {
+          scheduleState: this.scheduleState,
+          activeRadio: this.crondetails.activeRadio,
+          activeTab: this.crondetails.activeTab,
+          analysisID: this.model.id,
+          analysisName: this.model.name,
+          cronExpression: this.crondetails.cronexp,
+          description: this.description,
+          emailList: this.emails,
+          fileType: 'csv',
+          jobName: this.model.id,
+          metricName: this.model.metricName,
+          type: this.model.type,
+          userFullName: this.model.userFullName,
+          jobScheduleTime: moment().format(),
+          categoryID: this.model.categoryId,
+          jobGroup: this.resp.ticket.custCode
+        };
       }
-      this.model.schedule = {
-        scheduleState: this.scheduleState,
-        activeRadio: this.crondetails.activeRadio,
-        activeTab: this.crondetails.activeTab,
-        analysisID: this.model.id,
-        analysisName: this.model.name,
-        cronExpression: this.crondetails.cronexp,
-        description: this.description,
-        emailList: this.emails,
-        fileType: 'csv',
-        jobName: this.model.id,
-        metricName: this.model.metricName,
-        type: this.model.type,
-        userFullName: this.model.userFullName,
-        jobScheduleTime: moment().format(),
-        categoryID: this.model.categoryId,
-        jobGroup: this.resp.ticket.custCode
-      };
+      
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
