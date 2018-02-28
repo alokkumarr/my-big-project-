@@ -30,13 +30,16 @@ export const AnalyzeCardComponent = {
       this.canUserFork = this._JwtService.hasPrivilege('FORK', {
         subCategoryId: this.model.categoryId
       });
+      this.applyCronPropertytoCard();
+    }
+
+    applyCronPropertytoCard() {
       forEach(this.cronJobs, cron => {
         if (cron.jobDetails.analysisID === this.model.id) {
           this.cronReadbleMsg = cronstrue.toString(cron.jobDetails.cronExpression);
         }
       });
     }
-
     showExecutingFlag() {
       return this._AnalyzeService.isExecuting(this.model.id);
     }
@@ -60,6 +63,7 @@ export const AnalyzeCardComponent = {
     }
 
     onSuccessfulPublish(analysis) {
+      this.applyCronPropertytoCard();
       this.onAction({
         type: 'onSuccessfulPublish',
         model: analysis
