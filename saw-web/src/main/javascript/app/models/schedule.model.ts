@@ -1,6 +1,6 @@
-import RepeatOnDaysOfWeek from './repeat-on-days-of-week.model';
+import { RepeatOnDaysOfWeek } from './repeat-on-days-of-week.model';
 
-export default interface Schedule {
+export interface Schedule {
   repeatOnDaysOfWeek: RepeatOnDaysOfWeek;
   repeatInterval:     number;
   repeatUnit:         string;

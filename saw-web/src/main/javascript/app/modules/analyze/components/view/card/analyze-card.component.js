@@ -26,6 +26,10 @@ export const AnalyzeCardComponent = {
       this.canUserFork = this._JwtService.hasPrivilege('FORK', {
         subCategoryId: this.model.categoryId
       });
+      this.analysisType = this.model.type;
+      if (this.model.type === 'esReport') {
+        this.analysisType = 'REPORT';
+      }
     }
 
     showExecutingFlag() {

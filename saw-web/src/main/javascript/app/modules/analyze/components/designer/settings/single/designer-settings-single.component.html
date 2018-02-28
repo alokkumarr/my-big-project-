@@ -37,7 +37,7 @@
         <div class="settings__list-item__name"
              fxLayout="row"
              fxLayoutAlign="space-between center">
-          {{ artifactColumn.aliasName || artifactColumn.displayName }}
+          {{ artifactColumn.displayName }}
           <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
                     class="settings__list-item__icon">
           </mat-icon>
@@ -54,7 +54,7 @@
   <div class="settings__selected-fields">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
                              (fieldsChange)="onFieldsChange()"
-                             (fieldPropChange)="onFieldPropChange()"
+                             (fieldPropChange)="onFieldPropChange($event)"
                              (removeField)="removeFromGroup($event, groupAdapter)"
                              [groupAdapter]="groupAdapter"
                              [artifactColumns]="groupAdapter.artifactColumns">
