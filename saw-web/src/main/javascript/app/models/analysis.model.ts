@@ -3,10 +3,10 @@ import { SqlBuilder } from './sql-builder.model';
 import Schedule from './schedule.model';
 import Repository from './repository.model';
 import EsRepository from './es-repository.model';
-import OutputFile from './output-file.model';
-import LabelOptions from './label-options.model';
-import Legend from './legend.model';
-import Axis from './axis.model';
+import { OutputFile } from './output-file.model';
+import { LabelOptions } from './label-options.model';
+import { Legend } from './legend.model';
+import { Axis } from './axis.model';
 
 export interface Analysis {
   description:      string;
