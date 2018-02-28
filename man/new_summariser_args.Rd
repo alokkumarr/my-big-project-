@@ -2,7 +2,7 @@
 % Please edit documentation in R/summariser.R
 \name{new_summariser_args}
 \alias{new_summariser_args}
-\title{Summariser Constructor Function}
+\title{Summariser Arguments Constructor Function}
 \usage{
 new_summariser_args(group_vars, measure_vars, fun, ...)
 }

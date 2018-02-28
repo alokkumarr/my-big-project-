@@ -136,7 +136,7 @@ summariser.tbl_spark <- function(df,
 }
 
 
-#' Summariser Constructor Function
+#' Summariser Arguments Constructor Function
 #'
 #' Function to create object of summarise_args S3 class
 #'
@@ -157,7 +157,7 @@ new_summariser_args <-
   }
 
 
-#' Summariser Validation Function
+#' Summariser Arguments Validation Function
 #'
 #' Checks for valid inputs to summarise_args class
 #'
@@ -175,7 +175,7 @@ validate_summariser_args <- function(x) {
     "skewness",
     "percentile"
   )
-  if (! all(x$f %in% funs)) {
+  if (! all(x$fun %in% funs)) {
     stop(
       "Supplied function not supported.\nPlease use one of following: ",
       paste(funs, collapse = ", "),
