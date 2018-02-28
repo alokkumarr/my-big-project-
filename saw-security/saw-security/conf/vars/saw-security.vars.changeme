@@ -30,3 +30,4 @@ mail.smtp.auth=CHANGEME # false
 mail.smtp.starttls.enable=CHANGEME # false
 mail.from=CHANGEME # helpdesk@synchronoss.com
 mail.subject=CHANGEME # Request for Reset Password
+sso.secret.key=CHANGEME # SSO login JWT token.

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -13,6 +14,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.re
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
@@ -37,7 +42,8 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  */
 public class ServicesExecuteIT {
     private RequestSpecification spec;
-    private static ObjectMapper mapper;
+
+    private ObjectMapper mapper;
     private String token;
 
     @BeforeClass
@@ -81,6 +87,20 @@ public class ServicesExecuteIT {
          * zero rows.  Update to expected count when implementation
          * changes.  */
         assertThat(data.size(), equalTo(0));
+    }
+
+    @Test
+    public void testSSOAuthentication()
+    {
+         Response response = given(spec)
+                 .header("Cache-Control", "no-store").
+                 filter(document("sso-authentication",
+                 preprocessResponse(prettyPrint())))
+            .when().get("/security/authentication?jwt=" +getJWTToken())
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
+        assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
     }
 
     private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
@@ -274,8 +294,7 @@ public class ServicesExecuteIT {
             .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
     }
 
-    private String listSingleExecution(String token, String analysisId)
-        throws JsonProcessingException {
+    private String listSingleExecution(String token, String analysisId) {
         Response response = request(token)
             .when().get("/services/analysis/" + analysisId + "/executions")
             .then().assertThat().statusCode(200)
@@ -285,8 +304,7 @@ public class ServicesExecuteIT {
     }
 
     private List<Map<String, String>> getExecution(
-        String token, String analysisId, String executionId)
-        throws JsonProcessingException {
+        String token, String analysisId, String executionId) {
         String path = "/services/analysis/" + analysisId + "/executions/"
             + executionId + "/data";
         return request(token).when().get(path)
@@ -294,7 +312,7 @@ public class ServicesExecuteIT {
             .extract().response().path("data");
     }
 
-    private static ObjectNode globalFilters() {
+    private ObjectNode globalFilters() {
        // ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         ArrayNode globalFilters =  objectNode.putArray("globalFilters");
@@ -341,5 +359,21 @@ public class ServicesExecuteIT {
     private RequestSpecification request(String token) {
         return given(spec).header("Authorization", "Bearer " + token);
     }
+
+   private String getJWTToken() {
+       Long tokenValid = 150l;
+       String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=";
+       Map<String, Object> map = new HashMap();
+       map.put("valid", true);
+       map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
+       map.put("validityReason", "");
+       map.put("masterLoginId", "sawadmin@synchronoss.com");
+       return Jwts.builder()
+               .setSubject("sawadmin@synchronoss.com")
+               .claim("ticket", map)
+               .setIssuedAt(new Date())
+               .signWith(SignatureAlgorithm.HS256, secretKey)
+               .compact();
+   }
 
 }
