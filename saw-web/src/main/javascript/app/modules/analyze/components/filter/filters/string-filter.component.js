@@ -3,8 +3,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
 import * as template from './string-filter.component.html';
 
-import {AnalyseTypes} from '../../../consts';
-
 export const StringFilterComponent = {
   template,
   bindings: {
@@ -53,11 +51,6 @@ export const StringFilterComponent = {
       this.model = this.model || {};
       this.keywords = {...{modelValues: []}, ...this.model};
 
-      if (this.options.type === AnalyseTypes.ESReport) {
-        this.disablePresets = true;
-        this.keywords.operator = 'ISIN';
-      }
-
       this.tempModel = {};
       this.tempModel.value = this.keywords.modelValues[0];
     }
@@ -75,9 +68,7 @@ export const StringFilterComponent = {
 
     onChipsChange() {
       this.onChange({
-        model: this.options.type === AnalyseTypes.ESReport ?
-          {modelValues: this.keywords.modelValues} :
-          this.keywords
+        model: this.keywords
       });
     }
   }
