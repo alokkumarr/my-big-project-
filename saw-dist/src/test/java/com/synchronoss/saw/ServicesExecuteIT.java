@@ -312,7 +312,7 @@ public class ServicesExecuteIT {
             .extract().response().path("data");
     }
 
-    private static ObjectNode globalFilters() {
+    private ObjectNode globalFilters() {
        // ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         ArrayNode globalFilters =  objectNode.putArray("globalFilters");
