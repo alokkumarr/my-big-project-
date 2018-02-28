@@ -110,10 +110,10 @@ public class JobServiceImpl implements JobService{
 		try {
 			Trigger newTrigger = JobUtil.createSingleTrigger(jobName,
                     schedulerJobDetail.getJobScheduleTime(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-
-			Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);
+            scheduler.addJob(jobDetail,true,true);
+            Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
 			logger.debug("Trigger associated with jobKey :"+jobName+ " rescheduled successfully for date :"+dt);
 			return true;
 		} catch ( Exception e ) {
@@ -134,20 +134,18 @@ public class JobServiceImpl implements JobService{
 		String jobName = schedulerJobDetail.getJobName();
 		Scheduler scheduler = schedulerFactoryBean.getScheduler();
 		JobKey jobKey = new JobKey(jobName,schedulerJobDetail.getJobGroup());
-
         logger.debug("Parameters received for updating cron job : jobKey :"+jobKey + ", date: "+schedulerJobDetail.getJobScheduleTime());
 		try {
 			Trigger newTrigger = JobUtil.createCronTrigger(jobName, schedulerJobDetail.getJobScheduleTime(),
 					schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
-
-			Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);
+			scheduler.addJob(jobDetail,true,true);
+			Date dt = scheduler.rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
             logger.debug("Trigger associated with jobKey :"+jobName+ " rescheduled successfully for date :"+dt);
 			return true;
 		} catch ( Exception e ) {
             logger.error("SchedulerException while updating cron job with key :"+jobKey + " message :"+e.getMessage());
-
 			return false;
 		}
 	}
