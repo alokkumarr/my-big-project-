@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+# Run initial database setup
+#
+set -eu
+
+dir=$(dirname $0)
+
+# Use a marker file to ensure database setup is only run once.
+marker=/etc/bda/saw-scheduler-initial-setup
+if [ -f $marker ]; then
+    echo "Initial database setup has already been run, so not running again"
+    echo "(Marker file: $marker)"
+    exit
+fi
+touch $marker
+
+# create saw-scheduler db password.
+# extended pattern matching operators
+shopt -s extglob
+
+# Set database password
+db_password_file=/etc/bda/saw-scheduler-db-password
+
+# Generate database passwords
+generate_password() {
+    local password_file=$1
+    if [ -e $password_file ]; then
+        return
+    fi
+    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
+    echo $password > $password_file
+    chmod go-rwx $password_file
+}
+generate_password $db_password_file
+
+# Generate DB passwords ends here.
+
+## Initialize SAW scheduler database
+create_database="CREATE DATABASE saw_scheduler"
+
+#password=$(< /etc/bda/saw-scheduler-db-password)
+# db password needs to parametrize in application.xml file, for now as workaround use password as saw_scheduler.
+password=saw_scheduler
+root_password_f=/etc/bda/mariadb-root-password
+create_user="CREATE USER 'saw_scheduler'@'localhost'"
+#root password might be already initialized run the conditional statement
+# to make sure its work for both cases.
+if [ -f $root_password_f ] ; then
+   # root password
+   root_password=$(< /etc/bda/mariadb-root-password)
+   mysql -u root -p$root_password -e "$create_database"
+   mysql -u root -p$root_password -e "$create_user IDENTIFIED BY '$password'"
+   mysql -u root -p$root_password -e "GRANT ALL ON saw_scheduler.* TO 'saw_scheduler'@'localhost'"
+ else
+   mysql -u root -e "$create_database"
+   mysql -u root -e "$create_user IDENTIFIED BY '$password'"
+   mysql -u root -e "GRANT ALL ON saw_scheduler.* TO 'saw_scheduler'@'localhost'"
+fi
