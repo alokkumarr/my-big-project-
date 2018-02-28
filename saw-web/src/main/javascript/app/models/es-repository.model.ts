@@ -1,4 +1,4 @@
-export default interface EsRepository {
+export interface EsRepository {
   storageType: string;
   indexName:   string;
   type:        string;

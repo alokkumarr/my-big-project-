@@ -17,7 +17,7 @@ module.exports = {
 
     userElem.clear().sendKeys(user);
     passwordElem.clear().sendKeys(password);
-    loginElem.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(loginElem);
     return commonFunctions.waitFor.pageToBeReady(/analyze/);
   },
 

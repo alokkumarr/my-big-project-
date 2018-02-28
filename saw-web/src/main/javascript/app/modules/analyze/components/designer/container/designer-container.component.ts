@@ -31,10 +31,9 @@ import {
   Filter,
   IToolbarActionResult
 } from '../types'
-
 import { NUMBER_TYPES } from '../../../consts';
-
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
+import { FieldChangeEvent } from '../settings/single';
 
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
@@ -154,7 +153,7 @@ export class DesignerContainerComponent {
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
-            this.onSettingsChange();
+            this.onSettingsChange({requiresDataChange: true});
           }
         });
       break;
@@ -164,7 +163,7 @@ export class DesignerContainerComponent {
           if (result) {
             this.filters = result.filters;
             this.booleanCriteria = result.booleanCriteria;
-            this.onSettingsChange();
+            this.onSettingsChange({requiresDataChange: true});
           }
         });
       break;
@@ -229,10 +228,12 @@ export class DesignerContainerComponent {
     }
   }
 
-  onSettingsChange() {
+  onSettingsChange(event: FieldChangeEvent) {
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();
-    this.requestDataIfPossible()
+    if (event.requiresDataChange) {
+      this.requestDataIfPossible()
+    }
   }
 
   canRequestData() {

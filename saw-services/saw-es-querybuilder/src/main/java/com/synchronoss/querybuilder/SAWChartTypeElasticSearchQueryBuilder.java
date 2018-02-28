@@ -97,7 +97,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
 	    dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
     }
     // The below block adding filter block
-    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();;
+    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
     if (sqlBuilderNode.getBooleanCriteria() != null) {
       List<com.synchronoss.querybuilder.model.chart.Filter> filters = sqlBuilderNode.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
@@ -108,7 +108,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
     	      }
       }
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
-        if (!item.getIsRuntimeFilter().value()) {
+        if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
+                && !item.getIsGloblFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())
               || item.getType().value().equals(Type.TIMESTAMP.value())) 
           {
