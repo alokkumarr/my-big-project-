@@ -1,5 +1,7 @@
 package com.synchronoss.saw.scheduler.job;
 
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.saw.scheduler.service.AnalysisService;
 import com.synchronoss.saw.scheduler.service.JobService;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -8,26 +10,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
+
 
 public class CronJob extends QuartzJobBean implements InterruptableJob{
 
 	private static final Logger logger = LoggerFactory.getLogger(CronJob.class);
 	private volatile boolean toStopFlag = true;
+
+	protected final static String JOB_DATA_MAP_ID="JOB_DATA_MAP";
 	
 	@Autowired
 	JobService jobService;
+
+	@Autowired
+	AnalysisService analysisService;
 	
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		JobKey key = jobExecutionContext.getJobDetail().getKey();
-		logger.info("Cron Job started with key :" + key.getName() + ", Group :"+key.getGroup()
+		JobDetail jobDetail =
+				jobExecutionContext.getJobDetail();
+		JobKey key = jobDetail.getKey();
+				logger.info("Cron Job started with key :" + key.getName() + ", Group :"+key.getGroup()
 				+ " , Thread Name :"+Thread.currentThread().getName() + " ,Time now :"+new Date());
+		SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
 
-	/*	List<Map<String, Object>> list = jobService.getAllJobs(schedule);
-		logger.debug("Job list :"+list);*/
-		
+        analysisService.executeAnalysis(job.getAnalysisID());
+        analysisService.scheduleDispatch(job);
 		/**
          *  For retrieving stored key-value pairs
          */

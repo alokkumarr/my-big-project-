@@ -1,5 +1,7 @@
 package com.synchronoss.saw.scheduler.job;
 
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
+import com.synchronoss.saw.scheduler.service.AnalysisService;
 import com.synchronoss.saw.scheduler.service.JobService;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -14,25 +16,28 @@ public class SimpleJob extends QuartzJobBean implements InterruptableJob{
 
 	private static final Logger logger = LoggerFactory.getLogger(SimpleJob.class);
 	private volatile boolean toStopFlag = true;
+
+    protected final static String JOB_DATA_MAP_ID="JOB_DATA_MAP";
 	
 	@Autowired
 	JobService jobService;
-	
+
+	@Autowired
+	AnalysisService analysisService;
+
+
 	@Override
 	protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-		JobKey key = jobExecutionContext.getJobDetail().getKey();
+		JobDetail jobDetail =
+				jobExecutionContext.getJobDetail();
+		JobKey key = jobDetail.getKey();
 		logger.info("Simple Job started with key :" + key.getName() + ", Group :"+key.getGroup()
 				+ " , Thread Name :"+Thread.currentThread().getName());
 
-	/*	List<Map<String, Object>> list = jobService.getAllJobs(schedule);
-		logger.debug("Job list :"+list);*/
-		
-		/**
-         *  For retrieving stored key-value pairs
-         */
-		JobDataMap dataMap = jobExecutionContext.getMergedJobDataMap();
-		String myValue = dataMap.getString("myKey");
-		logger.debug("Value:" + myValue);
+        SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JOB_DATA_MAP_ID);
+
+        analysisService.executeAnalysis(job.getAnalysisID());
+        analysisService.scheduleDispatch(job);
 
 		while(toStopFlag){
 			try {

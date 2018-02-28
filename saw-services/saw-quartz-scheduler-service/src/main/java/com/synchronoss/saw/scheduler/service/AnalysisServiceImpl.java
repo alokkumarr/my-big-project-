@@ -3,21 +3,23 @@ package com.synchronoss.saw.scheduler.service;
 import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-@Component
+@Service
 public class AnalysisServiceImpl implements AnalysisService {
     @Value("${saw-analysis-service-url}")
     private String analysisUrl;
@@ -28,15 +30,11 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
+    @Autowired
     public AnalysisServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder.build();
     }
 
-   /* public AnalysisSchedule[] getAnalysisSchedules() {
-        String url = analysisUrl + "?view=schedule";
-        return restTemplate.getForObject(url, AnalysisSchedulesResponse.class)
-            .analyses();
-    }*/
 
     public void executeAnalysis(String analysisId) {
         AnalysisExecution execution = ImmutableAnalysisExecution.builder()
@@ -133,25 +131,4 @@ public class AnalysisServiceImpl implements AnalysisService {
         return stringBuffer.toString();
     }
 
-    /**
-     *
-     * @param analysis
-     * @return
-     */
-  /*  private boolean isValidDispatch(AnalysisSchedule analysis) {
-        List<String> missingAtribute = new ArrayList<String>();
-        if (analysis.id() == null)
-            missingAtribute.add("id");
-        if (analysis.name() == null)
-            missingAtribute.add("name");
-        if (analysis.metricName() == null)
-            missingAtribute.add("metricName");
-        if (analysis.schedule().emails() == null)
-            missingAtribute.add("email");
-        if (missingAtribute.size() > 0) {
-            log.warn("Some of required attributes are not available " + missingAtribute.toString() + " , Skipping email dispatch for the analysis ");
-          return false;
-        }
-        return true;
-    }*/
 }

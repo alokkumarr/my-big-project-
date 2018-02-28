@@ -27,4 +27,5 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 
-
+saw-analysis-service-url: http://localhost:9200/analysis
+saw-dispatch-service-url: http://localhost:9400/exports
