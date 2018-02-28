@@ -72,7 +72,7 @@ public class JobController {
 		jobService.unScheduleJob(schedule);
 	}
 
-	@RequestMapping(value ="delete",method = RequestMethod.DELETE)
+	@RequestMapping(value ="delete",method = RequestMethod.POST)
 	public SchedulerResponse delete(@RequestBody ScheduleKeys schedule ) {
         logger.info("JobController delete() method");
 
