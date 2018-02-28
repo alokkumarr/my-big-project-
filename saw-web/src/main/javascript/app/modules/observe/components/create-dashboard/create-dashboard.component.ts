@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
