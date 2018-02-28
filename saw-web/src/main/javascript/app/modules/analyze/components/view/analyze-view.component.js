@@ -66,7 +66,6 @@ export const AnalyzeViewComponent = {
         subCategoryId: this.$state.params.id
       });
       this.getCronJobs();
-      
     }
 
     getCronJobs() {
@@ -189,8 +188,8 @@ export const AnalyzeViewComponent = {
           return id === analysis.id;
         });
         this.analyses.splice(analysisId, 1, analysis);
-        this.updater.next({analyses: this.analyses});  
-      }      
+        this.updater.next({analyses: this.analyses});
+      }
       this._$state.go('analyze.view', {id: this.$state.params.id});
     }
 

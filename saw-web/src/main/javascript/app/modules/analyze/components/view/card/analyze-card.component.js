@@ -60,11 +60,9 @@ export const AnalyzeCardComponent = {
     }
 
     onSuccessfulPublish(analysis) {
-      const model = analysis;
       this.onAction({
         type: 'onSuccessfulPublish',
-        model: model,
-
+        model: analysis
       });
     }
   }
