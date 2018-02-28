@@ -182,14 +182,12 @@ export const AnalyzeViewComponent = {
 
     onSuccessfulPublish(analysis) {
       this.getCronJobs();
-      if (!isUndefined(analysis)) {
-        /* Update the new analysis in the current list */
-        const analysisId = findIndex(this.analyses, ({id}) => {
-          return id === analysis.id;
-        });
-        this.analyses.splice(analysisId, 1, analysis);
-        this.updater.next({analyses: this.analyses});
-      }
+      /* Update the new analysis in the current list */
+      const analysisId = findIndex(this.analyses, ({id}) => {
+        return id === analysis.id;
+      });
+      this.analyses.splice(analysisId, 1, analysis);
+      this.updater.next({analyses: this.analyses});
       this._$state.go('analyze.view', {id: this.$state.params.id});
     }
 

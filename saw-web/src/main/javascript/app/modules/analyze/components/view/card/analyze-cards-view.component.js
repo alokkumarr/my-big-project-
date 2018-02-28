@@ -18,6 +18,7 @@ export const AnalyzeCardsViewComponent = {
     }
 
     onCardAction(type, model) {
+      console.log(this.cronJobs);
       this.onAction({type, model});
     }
 
