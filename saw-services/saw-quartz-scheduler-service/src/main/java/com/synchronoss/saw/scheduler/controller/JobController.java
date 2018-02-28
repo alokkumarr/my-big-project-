@@ -166,7 +166,7 @@ public class JobController {
 			
 			if(jobDetail.getCronExpression() == null || jobDetail.getCronExpression().trim().equals("")){
 				//Single Trigger
-				boolean status = jobService.updateOneTimeJob(jobDetail.getJobName(), jobDetail.getJobScheduleTime());
+				boolean status = jobService.updateOneTimeJob(jobDetail);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs(jobDetail.getJobGroup()
                             ,jobDetail.getCategoryID()));
@@ -176,8 +176,7 @@ public class JobController {
 				
 			}else{
 				//Cron Trigger
-				boolean status = jobService.updateCronJob(jobDetail.getJobName(), jobDetail.getJobScheduleTime(),
-						jobDetail.getCronExpression());
+				boolean status = jobService.updateCronJob(jobDetail);
 				if(status){
 					return getServerResponse(ServerResponseCode.SUCCESS, jobService.getAllJobs(jobDetail.getJobGroup()
                             ,jobDetail.getCategoryID()));

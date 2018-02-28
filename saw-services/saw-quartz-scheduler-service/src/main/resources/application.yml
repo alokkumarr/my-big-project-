@@ -5,10 +5,9 @@ spring:
     name: saw-quartz-sechduler-service
   #mariaDB (metadata) DB details
   datasource:
-    url: jdbc:mariadb://10.49.0.169:3306/saw_scheduler
-    username: dev_user
-  # ZGV2cGFzcw== and 1m0PBBfvPVeSR2IlSGwLWg==
-    password: devpass
+    url: jdbc:mariadb://localhost:3306/saw_scheduler
+    username: saw_scheduler
+    password: saw_scheduler
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true

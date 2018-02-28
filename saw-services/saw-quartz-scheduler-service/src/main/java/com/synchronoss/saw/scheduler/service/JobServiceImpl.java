@@ -93,24 +93,28 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Update one time scheduled job.
-     * @param jobName
-     * @param date
+     * @param schedulerJobDetail
      * @return
 	 */
 
 	@Override
-	public boolean updateOneTimeJob(String jobName, Date date) {
+	public boolean updateOneTimeJob(SchedulerJobDetail schedulerJobDetail) {
         logger.info("Request received for updating one time job.");
 
-		String jobKey = jobName;
+		String jobName = schedulerJobDetail.getJobName();
+        Scheduler scheduler = schedulerFactoryBean.getScheduler();
+        JobKey jobKey = new JobKey(jobName,schedulerJobDetail.getJobGroup());
 
-        logger.debug("Parameters received for updating one time job : jobKey :"+jobKey + ", date: "+date);
+        logger.debug("Parameters received for updating one time job : jobKey :"+jobKey + ", date: "+
+                schedulerJobDetail.getJobScheduleTime());
 		try {
-			//Trigger newTrigger = JobUtil.createSingleTrigger(jobKey, date, SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT);
-			Trigger newTrigger = JobUtil.createSingleTrigger(jobKey, date, SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+			Trigger newTrigger = JobUtil.createSingleTrigger(jobName,
+                    schedulerJobDetail.getJobScheduleTime(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
-			Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobKey), newTrigger);
-            logger.debug("Trigger associated with jobKey :"+jobKey+ " rescheduled successfully for date :"+dt);
+			Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+            jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);
+			logger.debug("Trigger associated with jobKey :"+jobName+ " rescheduled successfully for date :"+dt);
 			return true;
 		} catch ( Exception e ) {
             logger.error("SchedulerException while updating one time job with key :"+jobKey + " message :"+e.getMessage());
@@ -120,23 +124,26 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Update scheduled cron job.
-     * @param jobName
-     * @param date
-     * @param cronExpression
+     * @param schedulerJobDetail
      * @return
 	 */
 	@Override
-	public boolean updateCronJob(String jobName, Date date, String cronExpression) {
+	public boolean updateCronJob(SchedulerJobDetail schedulerJobDetail) {
         logger.info("Request received for updating cron job.");
 
-		String jobKey = jobName;
+		String jobName = schedulerJobDetail.getJobName();
+		Scheduler scheduler = schedulerFactoryBean.getScheduler();
+		JobKey jobKey = new JobKey(jobName,schedulerJobDetail.getJobGroup());
 
-        logger.debug("Parameters received for updating cron job : jobKey :"+jobKey + ", date: "+date);
+        logger.debug("Parameters received for updating cron job : jobKey :"+jobKey + ", date: "+schedulerJobDetail.getJobScheduleTime());
 		try {
-			Trigger newTrigger = JobUtil.createCronTrigger(jobKey, date, cronExpression, SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+			Trigger newTrigger = JobUtil.createCronTrigger(jobName, schedulerJobDetail.getJobScheduleTime(),
+					schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
-			Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobKey), newTrigger);
-            logger.debug("Trigger associated with jobKey :"+jobKey+ " rescheduled successfully for date :"+dt);
+			Date dt = schedulerFactoryBean.getScheduler().rescheduleJob(TriggerKey.triggerKey(jobName), newTrigger);
+            JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+            jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);
+            logger.debug("Trigger associated with jobKey :"+jobName+ " rescheduled successfully for date :"+dt);
 			return true;
 		} catch ( Exception e ) {
             logger.error("SchedulerException while updating cron job with key :"+jobKey + " message :"+e.getMessage());

@@ -15,8 +15,8 @@ public interface JobService {
 
 	boolean scheduleCronJob(SchedulerJobDetail job, Class<? extends QuartzJobBean> jobClass);
 
-    boolean updateOneTimeJob(String jobName, Date date);
-	boolean updateCronJob(String jobName, Date date, String cronExpression);
+    boolean updateOneTimeJob(SchedulerJobDetail schedulerJobDetail);
+	boolean updateCronJob(SchedulerJobDetail schedulerJobDetail);
 	
 	boolean unScheduleJob(ScheduleKeys jobName);
 	boolean deleteJob(ScheduleKeys scheduleKeys);
