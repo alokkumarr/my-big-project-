@@ -2,7 +2,7 @@
 % Please edit documentation in R/summariser.R
 \name{validate_summariser_args}
 \alias{validate_summariser_args}
-\title{Summariser Validation Function}
+\title{Summariser Arguments Validation Function}
 \usage{
 validate_summariser_args(x)
 }
