@@ -90,7 +90,7 @@ export class DataFormatDialogComponent {
   }
 
   onPrecisionChange(precision) {
-    this.format.precision = precision;
+    this.format.precision = precision === null ? 0 : precision;
     this.changeSample();
   }
 

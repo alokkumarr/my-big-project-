@@ -26,12 +26,13 @@
                 *ngFor="let aggregateType of AGGREGATE_TYPES; trackBy: index"
                 (click)="onAggregateChange(aggregateType.value)">
           <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
-          <span>{{aggregateType.label}}</span>
+          <span style="margin-left: 20px;">{{aggregateType.label}}</span>
         </button>
       </mat-menu>
     </div>
 
     <button mat-icon-button
+            class="expandable-field__remove-btn"
             (click)="removeRequest.emit()">
       <mat-icon fontIcon="icon-close"
                 class="expandable-field__remove-icon">

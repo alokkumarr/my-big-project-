@@ -29,24 +29,33 @@
        dndSortableContainer
        dndZone="designer-setting-zone">
     <div *ngIf="unselectedArtifactColumns">
-      <div *ngFor="let artifactColumn of (unselectedArtifactColumns | artifactColumnFilter:filterObj); trackBy: index"
-           [dndSortable]="artifactColumn"
-           class="settings__list-item"
-           fxLayout="row"
-           fxLayoutAlign="space-between center">
-        <div class="settings__list-item__name"
+      <div *ngIf="!isEmpty(unselectedArtifactColumns)">
+        <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: index"
+             [dndSortable]="artifactColumn"
+             class="settings__list-item"
              fxLayout="row"
              fxLayoutAlign="space-between center">
-          {{ artifactColumn.displayName }}
-          <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
-                    class="settings__list-item__icon">
-          </mat-icon>
+          <div class="settings__list-item__name"
+               fxLayout="row"
+               fxLayoutAlign="space-between center">
+            {{ artifactColumn.displayName }}
+            <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+                      class="settings__list-item__icon">
+            </mat-icon>
+          </div>
+          <button mat-icon-button
+                  [e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
+                  (click)="addToGroupIfPossible(artifactColumn)">
+            <mat-icon fontIcon="icon-plus"></mat-icon>
+          </button>
         </div>
-        <button mat-icon-button
-                [e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
-                (click)="addToGroupIfPossible(artifactColumn)">
-          <mat-icon fontIcon="icon-plus"></mat-icon>
-        </button>
+      </div>
+      <div *ngIf="isEmpty(unselectedArtifactColumns)"
+           fxLayout="row" fxLayoutAlign="center center">
+        <div class="settings__unselected-fields--empty"
+             i18n>
+          There are no results for this criteria
+        </div>
       </div>
     </div>
   </div>

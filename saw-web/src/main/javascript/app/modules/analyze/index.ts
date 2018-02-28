@@ -87,7 +87,6 @@ import {
   DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   DesignerService,
-  ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 import {
@@ -186,7 +185,6 @@ angular.module(AnalyzeModule, [
     DesignerDateFilterComponent,
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
-    ArtifactColumnFilterPipe,
     ArtifactColumns2PivotFieldsPipe
   ],
   entryComponents: [
