@@ -1,0 +1,2 @@
+- name: restart saw-quartz-scheduler
+  systemd: name=saw-quartz-scheduler state=restarted daemon_reload=true

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.4.RELEASE</version>
+		<relativePath />
+	</parent>
+
+	<groupId>com.synchronoss.saw</groupId>
+	<artifactId>saw-quartz-scheduler-service</artifactId>
+	<version>${revision}</version>
+	<packaging>jar</packaging>
+	<description></description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<json.validate>2.2.6</json.validate>
+		<start-class>com.synchronoss.saw.scheduler.SAWSchedulerServiceApplication</start-class>
+		<java.version>1.8</java.version>
+		<jackson-coreutils>1.8</jackson-coreutils>
+		<json-core>1.2.5</json-core>
+		<jwt.version>0.7.0</jwt.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+		</dependency>
+
+		<!-- flyway dependency to execute sql files automatically on server startup. -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+		<!-- Quartz related dependencies -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.2.3</version>
+		</dependency>
+		<!-- Spting data jpa dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz-jobs</artifactId>
+			<version>2.2.3</version>
+		</dependency>
+
+		<!-- spring context support -->
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-context-support -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+
+		<!-- Joda time is a utility to manage data/time in java-->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.9.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		   <groupId>com.github.tomakehurst</groupId>
+		<artifactId>wiremock</artifactId>
+		<version>2.7.1</version>
+		<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>4.2.3.RELEASE</version>
+        </dependency>
+		<dependency>
+			<groupId>org.immutables</groupId>
+			<artifactId>value</artifactId>
+			<version>2.5.3</version>
+			<scope>provided</scope>
+		</dependency>
+    </dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:-processing</compilerArgument>
+					<testCompilerArgument>-Xlint:all</testCompilerArgument>
+					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*RemoteIT.java</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues 
+						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254), 
+						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
+					<classifier>exec</classifier>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>de.dentrassi.maven</groupId>
+				<artifactId>rpm</artifactId>
+				<version>0.10.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+						<configuration>
+							<packageName>saw-quartz-scheduler</packageName>
+							<entries>
+								<entry>
+									<name>/opt/bda/saw-quartz-scheduler-service</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-quartz-scheduler-service/saw-quartz-scheduler.jar</name>
+									<file>target/saw-quartz-scheduler-service-${revision}-exec.jar</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-quartz-scheduler.service</name>
+									<file>src/main/system/saw-quartz-scheduler.service</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-quartz-scheduler-service/conf/logback.xml</name>
+									<file>src/main/resources/logback.xml</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-quartz-scheduler-service/conf/application.yml</name>
+									<file>src/main/resources/application.yml</file>
+								</entry>
+							</entries>
+							<signature>
+								<skip>true</skip>
+							</signature>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>synchronoss</id>
+			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+	</repositories>
+</project>

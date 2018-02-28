@@ -1,0 +1,31 @@
+info:
+  component: Synchronoss Quartz scheduler Service
+spring:
+  application:
+    name: saw-quartz-sechduler-service
+  #mariaDB (metadata) DB details
+  datasource:
+    url: jdbc:mariadb://10.49.0.169:3306/saw_scheduler
+    username: dev_user
+  # ZGV2cGFzcw== and 1m0PBBfvPVeSR2IlSGwLWg==
+    password: devpass
+    driver-class-name: org.mariadb.jdbc.Driver
+    max-active: 25
+    testOnBorrow: true
+    testOnConnect: true
+    testOnReturn: true
+    validationQuery: SELECT 1
+    testWhileIdle: true
+    logValidationErrors: true
+flyway.baselineOnMigrate: true
+server:
+  address: localhost
+  port: 9600
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+saw-analysis-service-url: http://localhost:9200/analysis
+saw-dispatch-service-url: http://localhost:9400/exports

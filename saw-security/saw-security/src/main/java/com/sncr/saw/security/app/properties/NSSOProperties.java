@@ -41,6 +41,9 @@ public class NSSOProperties {
 	
 	@Value("${mail.password}")
 	private byte[] mailPassword;
+
+	@Value("${sso.secret.key}")
+	private String ssoSecretKey;
 	
 	
 	
@@ -140,5 +143,20 @@ public class NSSOProperties {
 		this.mailPassword = mailPassword;
 	}
 
-	
+
+	/**
+	 * Gets ssoSecretKey
+	 *
+	 * @return value of ssoSecretKey
+	 */
+	public String getSsoSecretKey() {
+		return ssoSecretKey;
+	}
+
+	/**
+	 * Sets ssoSecretKey
+	 */
+	public void setSsoSecretKey(String ssoSecretKey) {
+		this.ssoSecretKey = ssoSecretKey;
+	}
 }
