@@ -10,6 +10,7 @@ import * as getCurrencySymbol from 'currency-symbol-map/currency-symbol-map.js';
 import * as isNumber from 'lodash/isNumber';
 import * as has from 'lodash/has';
 import * as trim from 'lodash/trim';
+import * as isFinite from 'lodash/isFinite';
 
 import { Format } from '../../../models'
 import { FLOAT_TYPES } from '../../consts';
@@ -90,7 +91,7 @@ export class DataFormatDialogComponent {
   }
 
   onPrecisionChange(precision) {
-    this.format.precision = precision === null ? 0 : precision;
+    this.format.precision = isFinite(precision) ? precision : 0;
     this.changeSample();
   }
 
