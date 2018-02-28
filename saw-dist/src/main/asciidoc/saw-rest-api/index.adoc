@@ -51,7 +51,6 @@ include::{snippets}/list-metrics/http-response.adoc[]
 - Clients should set "Cache-Control: no-store" to their header requests.
 - Clients should set the token expiration ("validUpto" claim in the JWT) to a low value,
 ensure tickets have a limited lifetime.
-- JWT secret key should be base64 encoded string as per Synchronoss Global Information Security standards for storing secret keys.
 
 === SSO request sample URL:
 
