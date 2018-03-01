@@ -46,3 +46,52 @@ export const DATE_FORMATS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(DATE_FORMATS);
+
+export const AGGREGATE_TYPES = [{
+  label: 'Total',
+  value: 'sum',
+  icon: 'icon-Sum'
+}, {
+  label: 'Average',
+  value: 'avg',
+  icon: 'icon-AVG'
+}, {
+  label: 'Mininum',
+  value: 'min',
+  icon: 'icon-MIN'
+}, {
+  label: 'Maximum',
+  value: 'max',
+  icon: 'icon-MAX'
+}, {
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-Count'
+}];
+
+export const AGGREGATE_STRING_TYPES = [{
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-Count'
+}];
+
+export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
+
+export const AGGREGATE_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(AGGREGATE_TYPES);
+
+export const COMBO_TYPES = [{
+  label: 'line',
+  value: 'line',
+  icon: 'icon-line-chart'
+}, {
+  label: 'column',
+  value: 'column',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'area',
+  icon: 'icon-area-chart'
+}];

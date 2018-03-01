@@ -1,0 +1,113 @@
+@import "../../../../../../../../themes/base/colors";
+
+$range-handle-dimension: 20px;
+
+global-filter {
+  background-color: whitesmoke;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 400px;
+  padding: 10px;
+
+  .filter-header-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: 36px;
+    padding-bottom: 15px;
+  }
+
+  .filter-content {
+    flex-grow: 1;
+  }
+
+  .filter-footer-actions {
+    display: flex;
+    justify-content: space-around;
+
+    button {
+      flex-grow: 1;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .mat-chip-list-wrapper {
+    width: 100%;
+
+    mat-chip {
+      margin: 5px;
+    }
+
+    .mat-chip:not(.mat-basic-chip) + .mat-chip:not(.mat-basic-chip) {
+      margin: 5px;
+    }
+  }
+
+  mat-icon.remove-filter-chip {
+    text-align: right;
+
+    &::before {
+      font-size: 10px;
+      vertical-align: middle;
+    }
+  }
+
+  g-number-filter {
+    padding: 30px 0 0;
+  }
+
+  nouislider {
+    width: calc(100% - #{$range-handle-dimension});
+  }
+
+  .noUi-target.noUi-horizontal {
+    border: none;
+    box-shadow: none;
+    background-color: $primary-grey-g1;
+    height: 5px;
+
+    .noUi-connect {
+      background-color: $primary-blue-b2;
+    }
+
+    .noUi-origin {
+      top: -2px;
+
+      .noUi-handle {
+        outline: none;
+        width: $range-handle-dimension;
+        height: $range-handle-dimension;
+        border-radius: 50%;
+
+        &::before,
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .mat-expansion-panel-header {
+    color: #464646;
+    font-weight: bold;
+
+    .mat-content {
+      flex-direction: column;
+    }
+
+    .mat-expansion-panel-header-description {
+      font-weight: normal;
+      font-size: 12px;
+    }
+  }
+
+  .panel-body {
+    display: flex;
+    flex-direction: column;
+  }
+}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,51 +27,6 @@ public class SAWElasticSearchQueryExecutor {
   
 
 
-
- /* private static SearchResponse execute(SearchSourceBuilder searchSourceBuilder, String jsonString)
-      throws JsonProcessingException, IOException
-
-  {
-    String host = System.getProperty("host");
-    int port = Integer.parseInt(System.getProperty("port"));
-    String clusterName = System.getProperty("cluster"); // "sncr-salesdemo"
-    SearchResponse response = null;
-    TransportClient client = null;
-    JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
-    String indexName = repository.get("indexName").asText();
-    String type = repository.get("type").textValue();
-
-    try {
-
-      client =
-          new PreBuiltTransportClient(Settings.builder()
-              .put("client.transport.nodes_sampler_interval", "5s")
-              .put("client.transport.sniff", false).put("transport.tcp.compress", true)
-              .put("cluster.name", clusterName).put("request.headers.X-Found-Cluster", clusterName)
-              .build()).addTransportAddress(new InetSocketTransportAddress(InetAddress
-              .getByName(host), port));
-
-      
-       * client = new PreBuiltTransportClient( Settings.builder()
-       * .put("client.transport.nodes_sampler_interval", "5s") .put("client.transport.sniff",
-       * false).put("transport.tcp.compress", true) .put("cluster.name", "sncr-salesdemo")
-       * .put("xpack.security.transport.ssl.enabled", false) .put("request.headers.X-Found-Cluster",
-       * clusterName) .put("xpack.security.user", username+ ":"+ password).build())
-       * .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
-       
-      response =
-          client.prepareSearch(indexName).setTypes(type)
-              .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSource(searchSourceBuilder).get();
-
-    } finally {
-      if (client != null) {
-        client.close();
-      }
-    }
-
-    return response;
-  }
-*/
   /**
    * 
    * @param searchSourceBuilder
@@ -99,6 +55,18 @@ public class SAWElasticSearchQueryExecutor {
     return SAWElasticTransportService.executeReturnDataAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze");
   }
 
+  /**
+   *
+   * @param executionObjectList
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObjectList) throws JsonProcessingException, IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    return SAWElasticTransportService.executeReturnDataAsString(executionObjectList);
+  }
   /**
    * 
    * @param searchSourceBuilder
