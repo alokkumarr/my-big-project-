@@ -33,13 +33,12 @@ export const AnalyzeListViewComponent = {
     }
 
     $onInit() {
+      this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
 
       this.canUserFork = this._JwtService.hasPrivilege('FORK', {
         subCategoryId: this.analyses[0].categoryId
       });
-
-      this.gridConfig = this.getGridConfig();
     }
 
     showExecutingFlag(analysisId) {
