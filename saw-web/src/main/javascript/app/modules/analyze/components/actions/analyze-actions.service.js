@@ -64,7 +64,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     $rootScope.showProgress = true;
     return AnalyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
       if (updatedAnalysis) {
-        $rootScope.showProgress = false;  
+        $rootScope.showProgress = false;
       }
       toastMessage.info(execute ?
         'Analysis has been updated.' :
