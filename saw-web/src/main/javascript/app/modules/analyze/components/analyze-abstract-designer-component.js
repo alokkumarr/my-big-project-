@@ -1,5 +1,5 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
-import * as cloneDeep from 'lodash/cloneDeep';
+import * as clone from 'lodash/clone';
 
 export default class AbstractDesignerComponentController {
   constructor($injector) {
@@ -161,7 +161,7 @@ export default class AbstractDesignerComponentController {
           type: this.model.type
         };
         scope.type = this.model.type;
-        scope.filters = cloneDeep(this.filters);
+        scope.filters = (this.filters || []).map(f => clone(f));
         scope.artifacts = this.model.artifacts;
         scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
       }
