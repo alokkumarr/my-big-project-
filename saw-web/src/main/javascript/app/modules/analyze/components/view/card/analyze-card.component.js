@@ -3,6 +3,7 @@ import style from './analyze-card.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 
 export const AnalyzeCardComponent = {
   template,
@@ -80,7 +81,11 @@ export const AnalyzeCardComponent = {
     }
 
     onSuccessfulPublish(analysis) {
-      this.applyCronPropertytoCard();
+      this.cronReadbleMsg = '';
+      if (!isUndefined(analysis.schedule.cronExpression)) {
+        const cronLocalMsg = this.convertToLocal(analysis.schedule.cronExpression);
+        this.cronReadbleMsg = cronstrue.toString(cronLocalMsg);
+      }
       this.onAction({
         type: 'onSuccessfulPublish',
         model: analysis

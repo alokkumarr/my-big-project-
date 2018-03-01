@@ -188,7 +188,7 @@ export const AnalyzeViewComponent = {
       });
       this.analyses.splice(analysisId, 1, analysis);
       this.updater.next({analyses: this.analyses});
-      this._$state.go('analyze.view', {id: this.$state.params.id});
+      this._$state.go('analyze.view', {id: analysis.categoryId});
     }
 
     view(analysisId) {
