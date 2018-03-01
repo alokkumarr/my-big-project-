@@ -31,6 +31,10 @@ export const AnalyzeCardComponent = {
       this.canUserFork = this._JwtService.hasPrivilege('FORK', {
         subCategoryId: this.model.categoryId
       });
+      this.analysisType = this.model.type;
+      if (this.model.type === 'esReport') {
+        this.analysisType = 'REPORT';
+      }
       this.applyCronPropertytoCard();
     }
 
@@ -51,7 +55,6 @@ export const AnalyzeCardComponent = {
       splitArray[1] = UtcTime[0];
       splitArray[2] = UtcTime[1];
       return splitArray.join(' ');
-
     }
 
     showExecutingFlag() {

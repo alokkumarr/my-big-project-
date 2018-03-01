@@ -484,7 +484,7 @@ class Analysis extends BaseController {
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.ESREPORT, json), json);
+          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json), json);
       }
 
       val finishedTS = System.currentTimeMillis;

@@ -76,7 +76,7 @@
 
         <div layout="row" class="ard_canvas">
           <div ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
-            <js-plumb-canvas id="ard-canvas" on-change="$ctrl.updateJoins(name, params)"></js-plumb-canvas>
+            <js-plumb-canvas id="ard-canvas" did-analysis-change="$ctrl.didAnalysisChange" on-change="$ctrl.updateJoins(name, params)"></js-plumb-canvas>
           </div>
 
           <div class="ard_canvas-query"
