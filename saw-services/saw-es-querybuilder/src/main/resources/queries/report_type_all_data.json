@@ -269,7 +269,8 @@
             "model":{
                "modelValues":[
                   "android"
-               ]
+               ],
+               "operator": "EQ"
             }
          },
          {

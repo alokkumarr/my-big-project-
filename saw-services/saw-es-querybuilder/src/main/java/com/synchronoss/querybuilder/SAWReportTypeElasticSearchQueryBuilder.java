@@ -115,10 +115,9 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                             builder.add(rangeQueryBuilder);
                         }
                     }
+                    // make the query based on the filter given
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                        TermsQueryBuilder termsQueryBuilder =
-                                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-                        builder.add(termsQueryBuilder);
+                        builder = QueryBuilderUtil.stringFilterReport(item, builder);
                     }
 
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
@@ -155,9 +154,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                         }
                     }
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                        TermsQueryBuilder termsQueryBuilder =
-                                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-                        builder.add(termsQueryBuilder);
+                        builder = QueryBuilderUtil.stringFilterReport(item, builder);
                     }
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
                             .getType().value().toLowerCase().equals(Filter.Type.INT.value().toLowerCase()))
