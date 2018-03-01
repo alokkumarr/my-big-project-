@@ -2,10 +2,9 @@ package com.synchronoss.saw.scheduler.service;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.antlr.v4.runtime.misc.Nullable;
 
 import org.immutables.value.Value;
-
-import javax.validation.constraints.Null;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableExecutionBean.class)
@@ -13,7 +12,7 @@ import javax.validation.constraints.Null;
 interface ExecutionBean {
      String id();
      String finished();
-     @Null
+     @Nullable
      String status();
 }
 

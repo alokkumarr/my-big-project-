@@ -14,11 +14,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.re
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Pattern;
-import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -375,5 +372,73 @@ public class ServicesExecuteIT {
                .signWith(SignatureAlgorithm.HS256, secretKey)
                .compact();
    }
+
+    @Test
+    public void schedulerTest() throws JsonProcessingException
+    {
+        ObjectNode node = scheduleData();
+        String json = mapper.writeValueAsString(node);
+        createSchedule(json);
+        updateSchedule(json);
+        String categoryID = node.get("categoryID").asText();
+        String jobGroup = node.get("jobGroup").asText();
+        listSchedule(categoryID,jobGroup);
+    }
+
+    private void createSchedule(String json) {
+        Response response = given(spec).filter(document("create-schedule",
+                preprocessResponse(prettyPrint())))
+                .header("Authorization", "Bearer " + token)
+                .body(json)
+                .when().post("/services/scheduler/schedule")
+                .then().assertThat().statusCode(200)
+                .extract().response();
+    }
+
+    private void updateSchedule(String json) {
+        Response response = given(spec).filter(document("update-schedule",
+                preprocessResponse(prettyPrint())))
+                .header("Authorization", "Bearer " + token)
+                .body(json)
+                .when().post("/services/scheduler/update")
+                .then().assertThat().statusCode(200)
+                .extract().response();
+    }
+
+    private void listSchedule(String categoryID,String groupName) throws JsonProcessingException {
+        ObjectNode node = mapper.createObjectNode();
+        node.put("categoryId",categoryID);
+        node.put("groupkey",groupName);
+        String json = mapper.writeValueAsString(node);
+        Response response = given(spec).filter(document("list-schedule",
+                preprocessResponse(prettyPrint())))
+                .header("Authorization", "Bearer " + token)
+                .body(json)
+                .when().post("/services/scheduler/jobs")
+                .then().assertThat().statusCode(200)
+                .extract().response();
+    }
+
+    private ObjectNode scheduleData()
+    {
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("activeRadio","everyDay");
+        objectNode.put("activeTab","daily");
+        objectNode.put("analysisID","123");
+        objectNode.put("analysisName","Untitled Analysis");
+        objectNode.put("cronExpression","0 31 20 1/1 * ? *");
+        objectNode.put("fileType","csv");
+        objectNode.put("jobName","123");
+        objectNode.put("metricName","Sample (report) - new");
+        objectNode.put("type","report");
+        objectNode.put("userFullName","System");
+        ArrayNode email = objectNode.putArray("emailList");
+        email.add("abc@synchronoss.com");
+        email.add("xyz@synchronoss.com");
+        objectNode.put("jobScheduleTime","2018-03-01T16:24:28+05:30");
+        objectNode.put("categoryID","4");
+        objectNode.put("jobGroup","SYNCHRONOSS");
+     return objectNode;
+    }
 
 }
