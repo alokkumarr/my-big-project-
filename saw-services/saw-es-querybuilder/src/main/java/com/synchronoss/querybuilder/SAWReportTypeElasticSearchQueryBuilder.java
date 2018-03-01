@@ -174,7 +174,6 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                 });
             }
             searchSourceBuilder.query(boolQueryBuilder);
-            System.out.println("PAWAN_BOOL_QUERY_BUILDER:"+boolQueryBuilder.toString());
         }
 
         List<DataField> dataFields =
