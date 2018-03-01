@@ -166,24 +166,23 @@ export class AnalyzeService {
   }
 
   publishAnalysis(model) {
-    //${this.url}
     if (model.schedule.scheduleState === 'new') {
-      return this._$http.post(`http://localhost:9600/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+      return this._$http.post(`${this.url}/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
     }
     if (model.schedule.scheduleState === 'exist') {
-      return this._$http.post(`http://localhost:9600/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+      return this._$http.post(`${this.url}/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
     }
     if (model.schedule.scheduleState === 'delete') {
-      return this._$http.post(`http://localhost:9600/scheduler/delete`, model.schedule);
+      return this._$http.post(`${this.url}/scheduler/delete`, model.schedule);
     }
   }
 
   getCronDetails(requestBody) {
-    return this._$http.post(`http://localhost:9600/scheduler/fetchJob`, requestBody);
+    return this._$http.post(`${this.url}/scheduler/fetchJob`, requestBody);
   }
 
   getAllCronJobs(model) {
-    return this._$http.post(`http://localhost:9600/scheduler/jobs`, model);
+    return this._$http.post(`${this.url}/scheduler/jobs`, model);
   }
 
   deleteAnalysis(model) {
@@ -268,32 +267,8 @@ export class AnalyzeService {
     });
   }
 
-  getColumnName(columnName) {
-    // take out the .keyword form the columnName
-    // if there is one
-    const split = columnName.split('.');
-    if (split[1]) {
-      return split[0];
-    }
-    return columnName;
-  }
-
   getDataBySettings(analysis) {
     return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
-      forEach(analysis.artifacts[0].columns, column => {
-        column.columnName = this.getColumnName(column.columnName);
-      });
-
-      forEach(analysis.sqlBuilder.dataFields, field => {
-        field.columnName = this.getColumnName(field.columnName);
-      });
-
-      forEach(data, row => {
-        forEach(row, (value, key) => {
-          key = this.getColumnName(key);
-          data[key] = value;
-        });
-      });
       return {analysis, data, count};
     });
   }

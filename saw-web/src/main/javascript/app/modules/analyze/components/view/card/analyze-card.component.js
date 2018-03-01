@@ -80,7 +80,6 @@ export const AnalyzeCardComponent = {
     }
 
     onSuccessfulPublish(analysis) {
-      console.log(this.cronJobs);
       this.applyCronPropertytoCard();
       this.onAction({
         type: 'onSuccessfulPublish',
