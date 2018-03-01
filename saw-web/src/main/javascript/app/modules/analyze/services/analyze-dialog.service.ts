@@ -17,6 +17,7 @@ import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
+import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
 
 
 @Injectable()
@@ -108,6 +109,14 @@ export class AnalyzeDialogService {
         format,
         type
       }
+    } as MatDialogConfig)
+  }
+
+  openDateFormatDialog(format: string) {
+    return this.dialog.open(DateFormatDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: { format }
     } as MatDialogConfig)
   }
 

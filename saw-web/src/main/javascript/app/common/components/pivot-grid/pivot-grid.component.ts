@@ -35,7 +35,8 @@ import {
   DATE_TYPES,
   NUMBER_TYPES,
   FLOAT_TYPES,
-  DATE_INTERVALS_OBJ
+  DATE_INTERVALS_OBJ,
+  DATE_FORMATS_OBJ
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
 
@@ -259,17 +260,19 @@ export class PivotGridComponent {
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
       const dataValue = dataPoint[name];
-      forEach(columnsToFormat, ({name, dateInterval}) => {
-        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval);
+      forEach(columnsToFormat, ({name, dateInterval, format}) => {
+        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval, format);
       });
       return clonedDataPoint;
     });
     return formattedData;
   }
 
-  getFormattedDataValue(value, dateInterval) {
-    const format = DATE_INTERVALS_OBJ[dateInterval].format;
-    const formattedValue = moment.utc(value).format(format);
+  getFormattedDataValue(value, dateInterval, format) {
+    const formatToApply = dateInterval === 'day' ?
+      DATE_FORMATS_OBJ[format].momentValue :
+      DATE_INTERVALS_OBJ[dateInterval].format;
+    const formattedValue = moment.utc(value).format(formatToApply);
     if (dateInterval === 'quarter') {
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;

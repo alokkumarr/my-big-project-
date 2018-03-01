@@ -7,7 +7,7 @@ export interface ArtifactColumn {
   displayName:    string;
   filterEligible: boolean;
   type:           string;
-  format:         Format | null;
+  format:         Format | string | null;
   aliasName:      string;
   aggregate?:     string;
   name?:          string;
