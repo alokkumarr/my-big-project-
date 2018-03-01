@@ -18,7 +18,7 @@ export const AnalyzePublishDialogComponent = {
     onPublish: '&'
   },
   controller: class AnalyzePublishDialogController {
-    constructor($mdDialog, AnalyzeService, $mdConstant, JwtService) {
+    constructor($mdDialog, AnalyzeService, $mdConstant, JwtService, $rootScope) {
       'ngInject';
 
       this._$mdDialog = $mdDialog;
@@ -59,6 +59,7 @@ export const AnalyzePublishDialogComponent = {
       };
       this.endCriterion = this.endCriteria.never.keyword;
       this.loadCronLayout = false;
+      this._$rootScope = $rootScope;
     }
 
     $onInit() {
@@ -77,7 +78,9 @@ export const AnalyzePublishDialogComponent = {
         categoryId: this.model.categoryId,
         groupName: this.resp.ticket.custCode
       };
+      this._$rootScope.showProgress = true;
       this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
+        this._$rootScope.showProgress = false;
         this.loadCronLayout = true;
         if (response.data.data.jobDetails) {
           this.crondetails = {
