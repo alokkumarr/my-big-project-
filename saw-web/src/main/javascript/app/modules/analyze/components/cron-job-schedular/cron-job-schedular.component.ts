@@ -204,7 +204,7 @@ export class CronJobSchedularComponent {
       if (this.daily.dailyType === 'everyDay') {
         this.dailyTypeDay = clone(modelDate);
         if (isUndefined(parseCronValue[4])) {
-          parseCronValue[4] = "1";
+          parseCronValue[4] = '1';
         }
         this.daily.days = parseInt(parseCronValue[4]);
       } else {
@@ -224,7 +224,7 @@ export class CronJobSchedularComponent {
       if (this.monthly.monthlyType === 'monthlyDay') {
         this.monthly.specificDay = parseInt(parseCronValue[5]);
         if (isUndefined(parseCronValue[10])) {
-          parseCronValue[10] = "1";
+          parseCronValue[10] = '1';
         }
         this.monthly.specificMonth = parseInt(parseCronValue[10]);
         this.specificDayMonth = clone(modelDate);
