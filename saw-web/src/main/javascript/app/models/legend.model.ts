@@ -1,4 +1,4 @@
-export default interface Legend {
+export interface Legend {
   align:  string;
   layout: string;
 }

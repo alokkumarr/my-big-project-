@@ -1,27 +1,86 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
-// Note: Prefix with "../saw-web" because end-to-end tests are invoked
-// from "saw-dist" when run against the distribution package.  The
-// same path also works when run directly out of "saw-web".
+/**
+ * Note about intervals:
+ * Defined to be dependent on environment where tests are executed. Running against distribution package in CI requires
+ * extended timeouts
+ */
+
+
+/**
+ * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
+ * page loads may be indefinite.
+ */
+const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 30000;
+
+/**
+ * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
+ */
+
+const implicitlyWait = webpackHelper.distRun() ? 600000 : 10000;
+const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 30000; // = 30 sec; Sometimes element will not
+                                                                          // appear so fast
+
+/**
+ * Defines the maximum amount of time to wait for a condition
+ */
+const fluentWait = webpackHelper.distRun() ? 600000 : 10000;
+
+/**
+ * Default time to wait in ms before a test fails
+ * Fixes error: jasmine default timeout interval
+ */
+const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 10000;
+// = 30 | 5 min. Sometimes test can execute for a long time
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 600000;
+
+/**
+ * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
+ * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
+ */
+const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 600000;
+
+/**
+ * Waits ms after page is loaded
+ */
+const pageResolveTimeout = 1000;
+
+/**
+ * Note: Prefix with "../saw-web" because end-to-end tests are invoked from "saw-dist" when run against the
+ * distribution package. The same path also works when run directly out of "saw-web".
+ */
 const testDir = '../saw-web/src/test';
+
+/**
+ * Output path for the junit reports. Folder should be created in advance
+ */
+const protractorPath = 'target/protractor-reports';
+
+/**
+ * Amount of attempts to retry doing action on element
+ */
+const tempts = 10;
+
+exports.timeouts = {
+  fluentWait: fluentWait,
+  extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
+  extendedImplicitlyWait: extendedImplicitlyWait,
+  pageResolveTimeout: pageResolveTimeout,
+  tempts: tempts
+};
 
 exports.config = {
   framework: 'jasmine2',
   seleniumAddress: 'http://localhost:4444/wd/hub',
-  getPageTimeout: 600000,
-  allScriptsTimeout: 500000,
+  getPageTimeout: pageLoadTimeout,
+  allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
-
   capabilities: {
-    // Workaround: If running against distribution package in
-    // continuous integration, use Firefox until Chrome is available
-    // on Bamboo agents.  When changing browser, also update in
-    // "doc/development.md" and "doc/development-mac.md".
-    browserName: webpackHelper.distRun() ? 'firefox' : 'chrome',
+    //browserName: 'chrome',
+    browserName: webpackHelper.distRun() ? 'firefox' : 'chrome', //debug purposes
     chromeOptions: {
       args: [
-        //'incognito',
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
@@ -34,48 +93,57 @@ exports.config = {
       args: ['--headless']
     }
   },
-
   jasmineNodeOpts: {
+    defaultTimeoutInterval: defaultTimeoutInterval,
     isVerbose: true,
-    defaultTimeoutInterval: 120000,
     showTiming: true,
     includeStackTrace: true,
     realtimeFailure: true,
     showColors: true
   },
-
   suites: webpackHelper.distRun() ? {
-    /* Suites for test run invoked from Maven which is used in Bamboo
-     * continuous integration.  Note: In the long term there should
-     * just be a single set of suites used everywhere (for both
-     * continuous integration and local front-end development).
-     * However, for now use a separate suite that allows enabling
-     * known working tests (working reliably without flakiness)
-     * incrementally one by one in continuous integration, while
-     * working on fixing the rest.  */
-    authentication: [],
-    analyses: [
-      webpackHelper.root(testDir + '/e2e-tests/goToAnalyze.test.js')
-    ]
-  } : {
-    /* Suites for test run invoked from Protractor directly on local
-     * saw-web front-end development server */
+    /**
+     * Suites for test run invoked from Maven which is used in Bamboo continuous integration.
+     * Note: In the long term there should just be a single set of suites used everywhere (for both continuous
+     * integration and local front-end development). However, for now use a separate suite that allows enabling known
+     * working tests (working reliably without flakiness) incrementally one by one in continuous integration, while
+     * working on fixing the rest.
+     */
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ],
-    analyses: [
-      /*webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/goToAnalyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createChart.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')*/
+    charts: [
+      /*webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')*/
+    ],
+    root: [
+      /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),*/
+    ]
+  } : {
+    /**
+     * Suites for test run invoked from Protractor directly on local saw-web front-end development server
+     */
+    root: [
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
+      //Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
+      //webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js')
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
-      //webpackHelper.root(testDir + '/javascript/e2e/spec/analyses.test.js'), // obsolete
+    ],
+    charts: [
+      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+    ],
+    authentication: [
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
-
   onPrepare() {
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
@@ -83,14 +151,12 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000000;
-    //jasmine.getEnv().defaultTimeoutInterval = 10000000; //another option if above doesn't work
+    browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
+    browser.manage().timeouts().implicitlyWait(implicitlyWait);
+
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
-
-      // setup the output path for the junit reports
-      // should create folder in advance
-      savePath: 'target/protractor-reports',
+      savePath: protractorPath,
 
       // conslidate all true:
       //   output/junitresults.xml
@@ -99,16 +165,9 @@ exports.config = {
       //   output/junitresults-example1.xml
       //   output/junitresults-example2.xml
       consolidateAll: true
-
     });
     jasmine.getEnv().addReporter(junitReporter);
 
-
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000;
-    jasmine.getEnv().defaultTimeoutInterval = 600000; //another option if above doesn't work
-
-    browser.manage().timeouts().pageLoadTimeout(600000);
-    browser.manage().timeouts().implicitlyWait(600000);
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get(webpackHelper.sawWebUrl());
 
@@ -116,6 +175,6 @@ exports.config = {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
-    }, 600000);
+    }, pageResolveTimeout);
   }
 };

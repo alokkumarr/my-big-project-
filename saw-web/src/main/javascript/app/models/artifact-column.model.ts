@@ -1,4 +1,4 @@
-import Format from './format.model';
+import { Format } from './format.model';
 
 export interface ArtifactColumn {
   checked?:       null | boolean | 'x', 'y', 'z', 'g';

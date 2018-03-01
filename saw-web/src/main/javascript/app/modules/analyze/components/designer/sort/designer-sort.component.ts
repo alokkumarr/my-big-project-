@@ -65,7 +65,7 @@ export class DesignerSortComponent {
     this.checkedFields = filter(this.artifactColumns, 'checked');
     this.availableFields = this.getavailableFields(this.checkedFields, this.sorts);
     this.nameMap = reduce(this.checkedFields, (accumulator, field) => {
-      accumulator[field.columnName] = field.aliaName || field.displayName;
+      accumulator[field.columnName] = field.displayName;
       return accumulator;
     }, {});
   }

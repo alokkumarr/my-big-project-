@@ -152,14 +152,13 @@ export default class AbstractDesignerComponentController {
   }
 
   openFiltersModal(ev) {
-    const tpl = '<analyze-filter-modal options="options" filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
+    const tpl = '<analyze-filter-modal options="options" type="type" filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
 
     this.showModal({
       template: tpl,
       controller: scope => {
-        scope.options = {
-          type: this.model.type
-        };
+        scope.options = {};
+        scope.type = this.model.type;
         scope.filters = cloneDeep(this.filters);
         scope.artifacts = this.model.artifacts;
         scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;

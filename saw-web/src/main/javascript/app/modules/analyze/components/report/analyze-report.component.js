@@ -13,6 +13,7 @@ import * as sortBy from 'lodash/sortBy';
 import * as filter from 'lodash/filter';
 import * as assign from 'lodash/assign';
 import * as uniqBy from 'lodash/uniqBy';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {FieldModel} from '../../../../common/components/jsPlumb/models/fieldModel';
 import * as template from './analyze-report.component.html';
@@ -238,6 +239,19 @@ export const AnalyzeReportComponent = {
       const defaultSpacing = 300; // canvas pixels
 
       model.clear();
+      forEach(this.model.sqlBuilder.dataFields, aggregates => {
+        forEach(data[0].columns, column => {
+          if (column.type === 'string') {
+            const checkStringColumn = aggregates.columnName.split('.');
+            if (checkStringColumn[0] === column.columnName) {
+              column.aggregate = aggregates.aggregate;
+            }
+          } else if (aggregates.columnName === column.columnName) {
+            column.aggregate = aggregates.aggregate;
+          }
+          column.reportType = this.model.type;
+        });
+      });
 
       /* eslint-disable camelcase */
       forEach(data, itemA => {
@@ -267,6 +281,10 @@ export const AnalyzeReportComponent = {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
+          if (itemB.aggregate) {
+            field.aggregate = itemB.aggregate;
+          }
+          field.reportType = this.model.type;
           field.displayName = itemB.displayName;
           field.alias = itemB.aliasName;
           field.type = itemB.type;
@@ -327,6 +345,7 @@ export const AnalyzeReportComponent = {
     generatePayload() {
       /* eslint-disable camelcase */
       const model = this.canvas.model;
+      let columnString = '';
       const result = {
         artifacts: [],
         groupByColumns: [],
@@ -373,10 +392,23 @@ export const AnalyzeReportComponent = {
           tableArtifact.columns.push(fieldArtifact);
 
           if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
-            result.sqlBuilder.dataFields.push({
-              columnName: fieldArtifact.columnName,
-              type: fieldArtifact.type
-            });
+            columnString = fieldArtifact.columnName;
+            if (field.type === 'string') {
+              columnString = `${fieldArtifact.columnName}.keyword`;
+            }
+            if (field.aggregate) {
+              result.sqlBuilder.dataFields.push({
+                columnName: columnString,
+                type: fieldArtifact.type,
+                name: field.meta.columnName,
+                aggregate: field.meta.aggregate
+              });
+            } else {
+              result.sqlBuilder.dataFields.push({
+                columnName: columnString,
+                type: fieldArtifact.type
+              });
+            }
           }
         });
 
@@ -481,6 +513,27 @@ export const AnalyzeReportComponent = {
         });
     }
 
+    checkColumnName(columns) {
+      forEach(columns, field => {
+        field.name = this.getColumnName(field.name);
+        field.meta.name = this.getColumnName(field.meta.name);
+        field.meta.columnName = this.getColumnName(field.meta.columnName);
+      });
+      return columns;
+    }
+
+    getColumnName(columnName) {
+      // take out the .keyword form the columnName
+      // if there is one
+      if (!isUndefined(columnName)) {
+        const split = columnName.split('.');
+        if (split[1]) {
+          return split[0];
+        }
+        return columnName;
+      }
+    }
+
     onRefreshData() {
       this.startProgress();
       this.model = assign(this.model, this.generatePayload());
@@ -501,6 +554,7 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.gridDataTotalCount = count;
           this.model.query = analysis.queryManual || analysis.query;
+          this.columns = this.checkColumnName(this.columns);
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisSynched();
           this.endProgress();
@@ -654,10 +708,6 @@ export const AnalyzeReportComponent = {
     openSaveReportModal(ev) {
       if (!this.canvas) {
         return;
-      }
-
-      if (this.states.sqlMode === this.DESIGNER_MODE) {
-        this.model.query = '';
       }
 
       this.model = assign(this.model, this.generatePayload());

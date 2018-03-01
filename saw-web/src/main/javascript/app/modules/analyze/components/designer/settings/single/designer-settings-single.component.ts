@@ -25,6 +25,10 @@ import {
 const template = require('./designer-settings-single.component.html');
 require('./designer-settings-single.component.scss');
 
+export type FieldChangeEvent = {
+  requiresDataChange: boolean
+}
+
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
 
@@ -37,7 +41,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   template
 })
 export class DesignerSettingsSingleComponent {
-  @Output() public settingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
+  @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
@@ -75,15 +79,15 @@ export class DesignerSettingsSingleComponent {
 
   onFieldsChange() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    this._changeSettingsDebounced();
+    this._changeSettingsDebounced({requiresDataChange: true});
   }
 
-  onFieldPropChange() {
-    this._changeSettingsDebounced();
+  onFieldPropChange(event: FieldChangeEvent) {
+    this._changeSettingsDebounced(event);
   }
 
-  _changeSettingsDebounced() {
-    this.settingsChange.emit();
+  _changeSettingsDebounced(event: FieldChangeEvent) {
+    this.settingsChange.emit(event);
   }
 
   getUnselectedArtifactColumns() {

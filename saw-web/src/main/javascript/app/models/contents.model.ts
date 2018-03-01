@@ -1,4 +1,4 @@
-import Key from './key.model';
+import { Key } from './key.model';
 import { Analysis } from './analysis.model';
 
 export interface Contents {

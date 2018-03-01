@@ -12,6 +12,7 @@ export class FieldModel {
     this.alias = '';
     this.type = 'string';
     this._checked = false;
+    this.aggregate = null;
     this.isHidden = false;
     this.isJoinEligible = false;
     this.isFilterEligible = false;

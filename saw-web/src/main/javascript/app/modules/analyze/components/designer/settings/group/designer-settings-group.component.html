@@ -13,7 +13,7 @@
                       [dndSortableIndex]="i"
                       [dndRemoveFromCallback]="removeFromCallback"
                       [dndContainer]="groupAdapter"
-                      (change)="onFieldPropChange()"
+                      (change)="fieldPropChange.emit($event)"
                       [artifactColumn]="artifactColumn"
                       [analysisType]="groupAdapter.type"
                       (removeRequest)="onRemoveField(artifactColumn)"
