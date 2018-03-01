@@ -157,7 +157,9 @@ export default class AbstractDesignerComponentController {
     this.showModal({
       template: tpl,
       controller: scope => {
-        scope.options = {};
+        scope.options = {
+          type: this.model.type
+        };
         scope.type = this.model.type;
         scope.filters = cloneDeep(this.filters);
         scope.artifacts = this.model.artifacts;
