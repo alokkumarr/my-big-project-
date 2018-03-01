@@ -10,6 +10,7 @@ import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
 
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilters;
 import org.threeten.extra.YearQuarter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -88,6 +89,17 @@ public class BuilderUtil
             objectMapper.treeToValue(objectNode1, com.synchronoss.querybuilder.model.chart.SqlBuilderChart.class);
         com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode = sqlBuilderNodeChart.getSqlBuilder();
         return sqlBuilderNode;
+    }
+
+    public static GlobalFilters getNodeTreeGlobalFilters(String jsonString, String node)
+            throws JsonProcessingException, IOException, ProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        JsonNode objectNode = objectMapper.readTree(jsonString);
+        GlobalFilters globalFilters =
+                objectMapper.treeToValue(objectNode, GlobalFilters.class);
+       return globalFilters;
     }
 
     public static com.synchronoss.querybuilder.model.report.SqlBuilder getNodeTreeReport(String jsonString, String node)
@@ -240,4 +252,5 @@ public class BuilderUtil
 
     return dynamicConvertor;
   }
+
  }

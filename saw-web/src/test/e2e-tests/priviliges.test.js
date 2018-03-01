@@ -2,8 +2,7 @@
   Created by Alex
  */
 
-const login = require('../javascript/pages/loginPage.po.js');
-const analyze = require('../javascript/pages/analyzePage.po.js');
+const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const homePage = require('../javascript/pages/homePage.po.js');
 const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
@@ -11,6 +10,7 @@ const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -19,7 +19,8 @@ const using = require('jasmine-data-provider');
 //TODO add case for making multiple privileges inactive
 //TODO add case for adding new privilege
 describe('Privileges tests: privileges.test.js', () => {
-  const dataProvider = {
+  const dataProvider =  {
+    //TODO change user hardcode name to users object
     'All privileges for user': {
       user: 'userOne',
       subCategory: "All DO NOT TOUCH",
@@ -33,7 +34,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privileges for user': {
+    'Create privilege for user': {
       user: 'userOne',
       subCategory: "Create DO NOT TOUCH",
       cardOptions: false,
@@ -46,7 +47,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Edit privileges for user': {
+    'Edit privilege for user': {
       user: 'userOne',
       subCategory: "Edit DO NOT TOUCH",
       cardOptions: true,
@@ -59,7 +60,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Fork privileges for user': {
+    'Fork privilege for user': {
       user: 'userOne',
       subCategory: "Fork DO NOT TOUCH",
       cardOptions: false,
@@ -72,7 +73,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Publish privileges for user': {
+    'Publish privilege for user': {
       user: 'userOne',
       subCategory: "Publish DO NOT TOUCH",
       cardOptions: true,
@@ -85,7 +86,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Execute privileges for user': {
+    'Execute privilege for user': {
       user: 'userOne',
       subCategory: "Execute DO NOT TOUCH",
       cardOptions: true,
@@ -98,7 +99,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Export privileges for user': {
+    'Export privilege for user': {
       user: 'userOne',
       subCategory: "Export DO NOT TOUCH",
       cardOptions: false,
@@ -111,7 +112,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: false
     },
-    'Delete privileges for user': {
+    'Delete privilege for user': {
       user: 'userOne',
       subCategory: "Delete DO NOT TOUCH",
       cardOptions: true,
@@ -124,7 +125,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: true
     },
-    'View privileges for user': {
+    'View privilege for user': {
       user: 'userOne',
       subCategory: "View DO NOT TOUCH",
       cardOptions: false,
@@ -163,7 +164,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privileges for admin': {
+    'Create privilege for admin': {
       user: 'admin',
       subCategory: "Create DO NOT TOUCH",
       cardOptions: false,
@@ -176,7 +177,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Edit privileges for admin': {
+    'Edit privilege for admin': {
       user: 'admin',
       subCategory: "Edit DO NOT TOUCH",
       cardOptions: true,
@@ -189,7 +190,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Fork privileges for admin': {
+    'Fork privilege for admin': {
       user: 'admin',
       subCategory: "Fork DO NOT TOUCH",
       cardOptions: false,
@@ -202,7 +203,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Publish privileges for admin': {
+    'Publish privilege for admin': {
       user: 'admin',
       subCategory: "Publish DO NOT TOUCH",
       cardOptions: true,
@@ -215,7 +216,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Execute privileges for admin': {
+    'Execute privilege for admin': {
       user: 'admin',
       subCategory: "Execute DO NOT TOUCH",
       cardOptions: true,
@@ -228,7 +229,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Export privileges for admin': {
+    'Export privilege for admin': {
       user: 'admin',
       subCategory: "Export DO NOT TOUCH",
       cardOptions: false,
@@ -241,7 +242,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: false
     },
-    'Delete privileges for admin': {
+    'Delete privilege for admin': {
       user: 'admin',
       subCategory: "Delete DO NOT TOUCH",
       cardOptions: true,
@@ -254,7 +255,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: true
     },
-    'View privileges for admin': {
+    'View privilege for admin': {
       user: 'admin',
       subCategory: "View DO NOT TOUCH",
       cardOptions: false,
@@ -282,19 +283,24 @@ describe('Privileges tests: privileges.test.js', () => {
     },
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  });
 
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, 1000)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, 1000)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
@@ -304,7 +310,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
-        login.loginAs(data.user);
+        loginPage.loginAs(data.user);
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
@@ -314,24 +320,24 @@ describe('Privileges tests: privileges.test.js', () => {
         }));
 
         // Go to Card View
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyze.analysisElems.cardView);
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
         // Validate presence of menu on card
-        element(analyze.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
 
         // Validate presence on menu items in card menu
         if (data.cardOptions) {
-          analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
+          analyzePage.main.getAnalysisActionOptions(analyzePage.main.firstCard).then(options => {
             let analysisOptions = options;
             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
 
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-            expect(analyze.main.getForkBtn(analyze.main.firstCard).isDisplayed()).toBe(data.fork,
+            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isDisplayed()).toBe(data.fork,
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
@@ -342,16 +348,15 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          //browser.sleep(1000);
-          element(by.css('md-backdrop')).click();
+          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
           expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
         }
 
         // Go to executed analysis page
-        analyze.main.firstCardTitle.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
         const condition = ec.urlContains('/executed');
         browser
-          .wait(() => condition, 1000)
+          .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
           .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
 
         // Validate buttons in view mode of analysis
@@ -360,7 +365,7 @@ describe('Privileges tests: privileges.test.js', () => {
         expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
           "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
         expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
-          "Publish button expected to be " + data.publish + " in view mode, but was" + !data.publish);
+          "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
 
         // Validate menu in analysis
         element(executedAnalysis.actionsMenuBtn.isDisplayed().then(function (isVisible) {
@@ -371,35 +376,34 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          executedAnalysis.actionsMenuBtn.click();
+          commonFunctions.waitFor.elementToBeClickableAndClick(executedAnalysis.actionsMenuBtn);
 
           element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.execute,
-              "Execute button expected to be " + data.execute + " in view mode, but was" + !data.execute);
+              "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
           }));
 
           element(executedAnalysis.exportMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.export,
-              "Export button expected to be " + data.export + " in view mode, but was" + !data.export);
+              "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
           }));
 
           element(executedAnalysis.deleteMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.delete,
-              "Delete button expected to be " + data.delete + " in view mode, but was" + !data.delete);
+              "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
           }));
         }
       }
     );
 
     function isOptionPresent(options, optionName) {
-      const option = analyze.main.getAnalysisOption(options, optionName);
+      const option = analyzePage.main.getAnalysisOption(options, optionName);
       return option.isPresent();
     }
 
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
-      const subCategory = homePage.subCategory(data.subCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
     };
   });
 });

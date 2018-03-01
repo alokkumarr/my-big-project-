@@ -1,11 +1,14 @@
-import { Component, OnInit, Inject } from '@angular/core';
+declare const require: any;
 
-import { MatDialog } from '@angular/material';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+
+import { MatDialog, MatSidenav } from '@angular/material';
 import { Transition } from '@uirouter/angular';
 import { Dashboard } from '../../models/dashboard.interface';
 
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
@@ -21,15 +24,18 @@ export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
   private subCategoryId: string;
   private dashboard: Dashboard;
+  private sidenavOpened = false;
   private privileges = {
     create: false,
     delete: false,
     edit: false
   };
+  @ViewChild('filterSidenav') sidenav: MatSidenav;
 
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
+    private filters: GlobalFilterService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
     private transition: Transition
@@ -43,6 +49,7 @@ export class ObserveViewComponent implements OnInit {
   ngOnInit() {
     if (this.dashboardId) {
       this.loadDashboard();
+      this.filters.initialise();
     }
   }
 
@@ -98,6 +105,27 @@ export class ObserveViewComponent implements OnInit {
       },
       maxWidth: '100%'
     });
+  }
+
+  /**
+   * Pushes a new event to global filter service which
+   * individual analyses are listening to. This triggers
+   * updates in those analyses.
+   *
+   * Closes the sidebar.
+   *
+   * @param {any} globalFilters
+   * @returns {void}
+   * @memberof ObserveViewComponent
+   */
+  onApplyGlobalFilter(globalFilters): void {
+    if (!globalFilters) {
+      this.sidenav.close();
+      return;
+    }
+
+    this.filters.onApplyFilter.next(globalFilters);
+    this.sidenav.close();
   }
 
   loadDashboard(): void {

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -13,6 +14,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.re
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
@@ -40,7 +42,9 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  */
 public class ServicesExecuteIT {
     private RequestSpecification spec;
+
     private ObjectMapper mapper;
+    private String token;
 
     @BeforeClass
     public static void setUpClass() {
@@ -57,16 +61,18 @@ public class ServicesExecuteIT {
         new JUnitRestDocumentation();
 
     @Before
-    public void setUp() {
+    public void setUp() throws JsonProcessingException {
         this.spec = new RequestSpecBuilder()
             .addFilter(documentationConfiguration(restDocumentation)).build();
         mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        /* Token is required for all the test cases.
+         Initialize the token before test case run.  */
+        token = authenticate();
     }
 
     @Test
     public void testExecuteAnalysis() throws JsonProcessingException {
-        String token = authenticate();
         String metricId = listMetrics(token);
         ObjectNode analysis = createAnalysis(token, metricId);
         String analysisId = analysis.get("id").asText();
@@ -81,6 +87,20 @@ public class ServicesExecuteIT {
          * zero rows.  Update to expected count when implementation
          * changes.  */
         assertThat(data.size(), equalTo(0));
+    }
+
+    @Test
+    public void testSSOAuthentication()
+    {
+         Response response = given(spec)
+                 .header("Cache-Control", "no-store").
+                 filter(document("sso-authentication",
+                 preprocessResponse(prettyPrint())))
+            .when().get("/security/authentication?jwt=" +getJWTToken())
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
+        assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
     }
 
     private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
@@ -274,8 +294,7 @@ public class ServicesExecuteIT {
             .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
     }
 
-    private String listSingleExecution(String token, String analysisId)
-        throws JsonProcessingException {
+    private String listSingleExecution(String token, String analysisId) {
         Response response = request(token)
             .when().get("/services/analysis/" + analysisId + "/executions")
             .then().assertThat().statusCode(200)
@@ -285,8 +304,7 @@ public class ServicesExecuteIT {
     }
 
     private List<Map<String, String>> getExecution(
-        String token, String analysisId, String executionId)
-        throws JsonProcessingException {
+        String token, String analysisId, String executionId) {
         String path = "/services/analysis/" + analysisId + "/executions/"
             + executionId + "/data";
         return request(token).when().get(path)
@@ -294,7 +312,68 @@ public class ServicesExecuteIT {
             .extract().response().path("data");
     }
 
+    private ObjectNode globalFilters() {
+       // ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        ArrayNode globalFilters =  objectNode.putArray("globalFilters");
+        ObjectNode globalFilter = globalFilters.addObject();
+        globalFilter.put("tableName", "sample");
+        globalFilter.put("semanticId", "123");
+        ArrayNode filters = globalFilter.putArray("filters");
+        ObjectNode filter = filters.addObject();
+        filter.put("columnName","long");
+        filter.put("type","long");
+        filter.put("size","10");
+        filter.put("order","asc");
+        ObjectNode filter1 = filters.addObject();
+        filter1.put("columnName","string.keyword");
+        filter1.put("type","string");
+        filter1.put("size","10");
+        filter1.put("order","asc");
+        ObjectNode es = mapper.createObjectNode();
+        es.put("storageType","es");
+        es.put("indexName","sample");
+        es.put("type","sample");
+        globalFilter.putPOJO("esRepository",
+                es);
+        return objectNode;
+    }
+
+    @Test
+    public void globalFilterTest()  throws JsonProcessingException {
+        ObjectNode node = globalFilters();
+        String json = mapper.writeValueAsString(node);
+        String field = "string.keyword";
+        Response response = given(spec)
+                .header("Authorization", "Bearer " + token)
+                .body(json)
+                .when().post("/services/filters")
+                .then().assertThat().statusCode(200)
+                .extract().response();
+        ObjectNode root = response.as(ObjectNode.class);
+       JsonNode jsonNode= root.get("long");
+       Assert.assertTrue("Range filter max value ",jsonNode.get("_max").asLong()==1498);
+       Assert.assertTrue("Range filter max value ",jsonNode.get("_min").asLong()==1000);
+    }
+
     private RequestSpecification request(String token) {
         return given(spec).header("Authorization", "Bearer " + token);
     }
+
+   private String getJWTToken() {
+       Long tokenValid = 150l;
+       String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=";
+       Map<String, Object> map = new HashMap();
+       map.put("valid", true);
+       map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
+       map.put("validityReason", "");
+       map.put("masterLoginId", "sawadmin@synchronoss.com");
+       return Jwts.builder()
+               .setSubject("sawadmin@synchronoss.com")
+               .claim("ticket", map)
+               .setIssuedAt(new Date())
+               .signWith(SignatureAlgorithm.HS256, secretKey)
+               .compact();
+   }
+
 }

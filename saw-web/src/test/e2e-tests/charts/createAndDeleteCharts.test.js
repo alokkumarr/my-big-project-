@@ -1,26 +1,26 @@
 /*
-  Created by Alex
+ Created by Alex
  */
 
 const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');
-const executedAnalysisPage = require('../../javascript/pages/savedAlaysisPage.po');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
 
-describe('create and delete charts: createAndDeleteCharts.test.js', () => {
+describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const chartDesigner = analyzePage.designerDialog.chart;
   const chartName = `e2e chart ${(new Date()).toString()}`;
-  const chartDescription = 'e2e test chart description';
+  const chartDescription = 'descr';
   let xAxisName = 'Source Manufacturer';
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
-  let metric = 'MCT TMO Session ES';
+  let metricName = 'MCT TMO Session ES';
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
@@ -42,18 +42,24 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  });
+
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, 1000)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, 1000)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
@@ -62,9 +68,9 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
   });
 
   using(dataProvider, function (data, description) {
-    it('should create ' + description, () => {
+    it('should create and delete ' + description, () => {
       if (data.chartType === 'chart:bubble') {
-        metric = 'PTT Subscr Detail';
+        metricName = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
         xAxisName = 'Account Segment';
         groupName = 'Account Name';
@@ -73,12 +79,9 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       login.loginAs(data.user);
       navigateToSubCategory();
 
-      //Create analysis
-      analyzePage.analysisElems.addAnalysisBtn.click();
-      const newDialog = analyzePage.newDialog;
-      newDialog.getMetric(metric).click();
-      newDialog.getMethod(data.chartType).click();
-      newDialog.createBtn.click();
+      // Create analysis
+      homePage.createAnalysis(metricName, data.chartType);
+
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
@@ -92,9 +95,13 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       } else {
         y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
       }
-      chartDesigner.getXRadio(xAxisName).click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
-      chartDesigner.getGroupRadio(groupName).click();
+
+      //If combo chart then do not check group by
+      if (data.chartType !== 'chart:combo') {
+        commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
+      }
 
       //If Combo then add one more field
       if (data.chartType === 'chart:combo') {
@@ -103,7 +110,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       }
 
       //Refresh
-      chartDesigner.refreshBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
 
       //Save
       const save = analyzePage.saveDialog;
@@ -113,7 +120,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
       save.nameInput.clear().sendKeys(chartName);
       save.descriptionInput.clear().sendKeys(chartDescription);
-      save.saveBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
       //Change to Card View
@@ -127,12 +134,8 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
         expect(actualChartType).toEqual(data.chartType,
           "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
-    });
 
-    it('should delete ' + description, () => {
-      login.loginAs(data.user);
-      navigateToSubCategory();
-
+      //Delete created chart
       const main = analyzePage.main;
       const cards = main.getAnalysisCards(chartName);
       cards.count().then(count => {
@@ -149,7 +152,8 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
     // Navigates to specific category where analysis creation should happen
     const navigateToSubCategory = () => {
       //Collapse default category
-      homePage.expandedCategory(defaultCategory).click();
+
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
 
       //Navigate to Category/Sub-category
       const collapsedCategory = homePage.collapsedCategory(categoryName);

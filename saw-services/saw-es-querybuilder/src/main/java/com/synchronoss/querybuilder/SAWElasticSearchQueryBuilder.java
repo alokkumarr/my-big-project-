@@ -1,7 +1,8 @@
 package com.synchronoss.querybuilder;
 
 import java.io.IOException;
-
+import java.util.List;
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
@@ -103,6 +104,22 @@ public class SAWElasticSearchQueryBuilder {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());
     }
     return query;
+  }
+
+    /**
+     *
+     * @param jsonString
+     * @return
+     * @throws IllegalArgumentException
+     */
+  public List<GlobalFilterExecutionObject> getsearchSourceBuilder(String jsonString) throws IllegalArgumentException
+  {
+      try {
+
+           return new GlobalFilterDataQueryBuilder(jsonString).buildQuery();
+      } catch (IOException | ProcessingException e) {
+          throw new IllegalArgumentException("Exception occurred while parsing global filter request :" + e.getMessage());
+      }
   }
 
 }

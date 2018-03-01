@@ -55,7 +55,6 @@ public class HFileOperations {
 
             String data = new String(IOUtils.toByteArray(stream));
             stream.close();
-            fs.close();
             return data;
         } catch (Exception e) {
             logger.error("XDF-Hadoop exception: ", e);
