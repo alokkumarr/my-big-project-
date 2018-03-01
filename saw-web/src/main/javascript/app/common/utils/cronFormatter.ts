@@ -11,21 +11,18 @@ export function convertToUtc(hourValue, minutes) {
   const date = new Date();
   date.setHours(hourValue);
   date.setMinutes(minutes);
-  return moment.utc(date).format("mm HH");
+  return moment(date).utc().format('mm HH');
 }
 
-export function convertToLocal(timeArray) {
-  const hourValue = timeArray.hourType === 'AM' ? (parseInt(timeArray.hour) === 12 ? 0 : parseInt(timeArray.hour)) : (parseInt(timeArray.hour) === 12 ? 12 : parseInt(timeArray.hour) + 12));
+export function convertToLocal(cronUTC) {
+  const splitArray = cronUTC.split(' ');
   const date = new Date();
-  date.setHours(hourValue);
-  date.setMinutes(timeArray.minute);
-  let hourMinute = moment(date).local().format('hh mm').split(' ');
-  const modelDate = {
-    hour: parseInt(hourMinute[0]),
-    minute: hourMinute[1],
-    hourType: timeArray.hourType
-  };
-  return modelDate;
+  date.setUTCHours(splitArray[2], splitArray[1]);
+  const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+  splitArray[1] = UtcTime[0];
+  splitArray[2] = UtcTime[1];
+  return splitArray.join(' ');
+
 }
 
 export function hourToCron(hour, hourType, minutes) {

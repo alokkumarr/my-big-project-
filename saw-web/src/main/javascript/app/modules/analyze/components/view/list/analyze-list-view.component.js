@@ -4,6 +4,7 @@ import * as template from './analyze-list-view.component.html';
 import style from './analyze-list-view.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
+import * as moment from 'moment';
 
 export const AnalyzeListViewComponent = {
   template,
@@ -181,10 +182,22 @@ export const AnalyzeListViewComponent = {
       let scheduleHuman = '';
       forEach(this.cronJobs, cron => {
         if (cron.jobDetails.analysisID === rowData.id) {
-          scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);
+          const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
+          scheduleHuman = cronstrue.toString(localCron);
         }
       });
       return scheduleHuman;
+    }
+
+    convertToLocal(CronUTC) {
+      const splitArray = CronUTC.split(' ');
+      const date = new Date();
+      date.setUTCHours(splitArray[2], splitArray[1]);
+      const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+      splitArray[1] = UtcTime[0];
+      splitArray[2] = UtcTime[1];
+      return splitArray.join(' ');
+
     }
   }
 };

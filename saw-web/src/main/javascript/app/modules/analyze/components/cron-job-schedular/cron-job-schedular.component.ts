@@ -188,7 +188,8 @@ export class CronJobSchedularComponent {
   loadData() {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
-    let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+    const localCronExpression = convertToLocal(this.crondetails.cronexp);
+    let parseCronValue = cronstrue.toString(localCronExpression).split(' ');
     let fetchTime = parseCronValue[1].split(':');
     let meridium = parseCronValue[2].split(',');
     let modelDate = {
@@ -196,8 +197,6 @@ export class CronJobSchedularComponent {
       minute: fetchTime[1],
       hourType: meridium[0]
     };
-
-    modelDate = convertToLocal(modelDate);
 
     switch (this.scheduleType) {
     case 'daily':

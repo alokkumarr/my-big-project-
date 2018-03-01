@@ -78,6 +78,7 @@ export const AnalyzePublishDialogComponent = {
         groupName: this.resp.ticket.custCode
       };
       this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
+        this.loadCronLayout = true;
         if (response.data.data.jobDetails) {
           this.crondetails = {
             cronexp: response.data.data.jobDetails.cronExpression,
@@ -88,7 +89,6 @@ export const AnalyzePublishDialogComponent = {
             this.scheduleState = 'exist';
           }
           this.emails = response.data.data.jobDetails.emailList;
-          this.loadCronLayout = true;
           this.hasSchedule = true;
         }
       });

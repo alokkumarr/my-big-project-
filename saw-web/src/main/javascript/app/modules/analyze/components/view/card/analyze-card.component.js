@@ -2,6 +2,7 @@ import * as template from './analyze-card.component.html';
 import style from './analyze-card.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
+import * as moment from 'moment';
 
 export const AnalyzeCardComponent = {
   template,
@@ -36,10 +37,23 @@ export const AnalyzeCardComponent = {
     applyCronPropertytoCard() {
       forEach(this.cronJobs, cron => {
         if (cron.jobDetails.analysisID === this.model.id) {
-          this.cronReadbleMsg = cronstrue.toString(cron.jobDetails.cronExpression);
+          const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
+          this.cronReadbleMsg = cronstrue.toString(cronLocal);
         }
       });
     }
+
+    convertToLocal(CronUTC) {
+      const splitArray = CronUTC.split(' ');
+      const date = new Date();
+      date.setUTCHours(splitArray[2], splitArray[1]);
+      const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+      splitArray[1] = UtcTime[0];
+      splitArray[2] = UtcTime[1];
+      return splitArray.join(' ');
+
+    }
+
     showExecutingFlag() {
       return this._AnalyzeService.isExecuting(this.model.id);
     }
