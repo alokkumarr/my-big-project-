@@ -25,9 +25,9 @@ public class WorkbenchExecutionServiceImpl
     private String livyUri;
 
     @Override
-    public String execute(String conf) throws Exception {
+    public String execute(String component, String config) throws Exception {
         WorkbenchClient client = new WorkbenchClient();
-        client.submit(livyUri, root, project, conf);
+        client.submit(livyUri, root, project, component, config);
         return "{}";
     }
 }

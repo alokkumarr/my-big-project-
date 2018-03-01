@@ -15,7 +15,7 @@ public class WorkbenchClient {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     public void submit(String livyUri, String root, String project,
-                       String conf) throws Exception {
+                       String component, String config) throws Exception {
         LivyClient client = new LivyClientBuilder()
             .setURI(new URI(livyUri))
             .build();
@@ -24,7 +24,7 @@ public class WorkbenchClient {
             client.uploadJar(new File(WORKBENCH_JAR)).get();
             log.info("Submitting Workbench job");
             JobHandle<Integer> job = client.submit(
-                new WorkbenchJob(root, project, conf));
+                new WorkbenchJob(root, project, component, config));
             log.info("Submitted job");
             Integer result = job.get();
             log.info("Job result: {}", result);

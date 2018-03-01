@@ -15,12 +15,15 @@ public class WorkbenchJob implements Job<Integer> {
     private static final long serialVersionUID = 1L;
     private final String root;
     private final String project;
-    private final String conf;
+    private final String component;
+    private final String config;
 
-    public WorkbenchJob(String root, String project, String conf) {
+    public WorkbenchJob(String root, String project, String component,
+                        String config) {
         this.root = root;
         this.project = project;
-        this.conf = conf;
+        this.component = component;
+        this.config = config;
     }
 
     @Override
@@ -28,7 +31,9 @@ public class WorkbenchJob implements Job<Integer> {
         Logger log = LoggerFactory.getLogger(getClass().getName());
         log.debug("Start Workbench job");
         String batch = "batch-" + Instant.now().toEpochMilli();
-        Parser parser = new Parser() {
+        Component xdfComponent;
+        if (component.equals("parser")) {
+            xdfComponent = new Parser() {
                 @Override
                 public void initSpark(Context ctx) {
                     try {
@@ -38,7 +43,12 @@ public class WorkbenchJob implements Job<Integer> {
                     }
                 }
             };
+        } else {
+            throw new IllegalArgumentException(
+                "Unknown component: " + component);
+        }
         log.debug("Finished Workbench job");
-        return Component.startComponent(parser, root, conf, project, batch);
+        return Component.startComponent(
+            xdfComponent, root, config, project, batch);
     }
 }

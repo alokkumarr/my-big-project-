@@ -9,15 +9,15 @@ dir=$(dirname $0)
 # Load common metrics functions
 . $dir/../lib/common.sh
 
-datalake=$datalake_home/sample-csv
+datalake_raw=/data/bda/datalake/raw
 
 init_datalake() {
-    $sudo_mapr hadoop fs -mkdir -p $datalake
+    $sudo_mapr hadoop fs -mkdir -p $datalake_raw
 }
 
 load_data() {
     echo "Loading sample CSV data"
-    $sudo_mapr $hadoop_put $dir/test.csv $datalake
+    $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
 }
 
 wait_maprfs
