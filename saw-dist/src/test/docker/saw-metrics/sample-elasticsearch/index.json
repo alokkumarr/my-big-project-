@@ -44,7 +44,7 @@
           "type" : "long"
         },
         "string" : {
-          "type" : "text",
+          "type" : "keyword",
           "fields" : {
             "keyword" : {
               "type" : "keyword",

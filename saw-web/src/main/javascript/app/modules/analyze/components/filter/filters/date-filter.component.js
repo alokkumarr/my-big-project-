@@ -8,6 +8,7 @@ export const DateFilterComponent = {
   template,
   bindings: {
     model: '<',
+    options: '<',
     onChange: '&'
   },
   controller: class DateFilterController {

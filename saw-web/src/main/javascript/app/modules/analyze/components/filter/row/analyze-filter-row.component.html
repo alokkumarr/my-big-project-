@@ -22,6 +22,7 @@
 
     <div ng-switch-when="string" style="text-align: center;">
       <string-filter on-change="$ctrl.onFilterChange(model)"
+                     options="$ctrl.options"
                      model="$ctrl.filter.model">
       </string-filter>
     </div>
@@ -30,6 +31,7 @@
          ng-switch-when-separator="|"
          style="text-align: center;">
       <date-filter on-change="$ctrl.onFilterChange(model)"
+                   options="$ctrl.options"
                    model="$ctrl.filter.model">
       </date-filter>
     </div>
@@ -38,6 +40,7 @@
          ng-switch-when-separator="|"
          style="text-align: center;">
       <number-filter on-change="$ctrl.onFilterChange(model)"
+                     options="$ctrl.options"
                      model="$ctrl.filter.model">
       </number-filter>
     </div>
