@@ -1,5 +1,6 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
+import * as deepClone from 'lodash/cloneDeep';
 
 import {AnalyseTypes} from '../../consts';
 
@@ -80,7 +81,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
       showDialog({
         template,
         controller: scope => {
-          scope.model = analysis;
+          scope.model = deepClone(analysis);
         },
         multiple: true
       });
