@@ -26,6 +26,7 @@ export const AnalyzeFilterModalComponent = {
   bindings: {
     type: '<',
     filters: '<',
+    options: '<',
     artifacts: '<',
     isRuntime: '<?runtime',
     filterBooleanCriteria: '<'
@@ -185,7 +186,7 @@ export const AnalyzeFilterModalComponent = {
     groupFilters(filters) {
       return isEmpty(filters) ?
         this.getInitialFilters() :
-        groupBy(filters, 'column.tableName');
+        groupBy(filters, f => (f.column.tableName || f.column.table));
     }
 
     getInitialFilters() {
