@@ -86,10 +86,16 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
           HFileOperations.createDir(defaultProjectRoot + defaultProjectPath);
         }
       }
-      String projectData = defaultProjectRoot + "/" + defaultProjectId +
-          "/dl/fs/data/test/data";
-      if (!HFileOperations.exists(projectData)) {
-          HFileOperations.createDir(projectData);
+      /* Temporary: Replace the below with directory creation */
+      String projectParserData = defaultProjectRoot + "/" + defaultProjectId +
+          "/dl/fs/data/test_parser/data";
+      if (!HFileOperations.exists(projectParserData)) {
+          HFileOperations.createDir(projectParserData);
+      }
+      String projectSqlData = defaultProjectRoot + "/" + defaultProjectId +
+          "/dl/fs/data/test_sql/data";
+      if (!HFileOperations.exists(projectSqlData)) {
+          HFileOperations.createDir(projectSqlData);
       }
     } else {
       File directory = new File(defaultProjectRoot);

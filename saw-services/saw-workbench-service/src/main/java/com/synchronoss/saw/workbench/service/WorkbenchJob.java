@@ -3,6 +3,7 @@ package com.synchronoss.saw.workbench.service;
 import sncr.xdf.component.Component;
 import sncr.xdf.context.Context;
 import sncr.xdf.parser.Parser;
+import sncr.xdf.sql.SQLComponent;
 
 import com.cloudera.livy.Job;
 import com.cloudera.livy.JobContext;
@@ -34,6 +35,17 @@ public class WorkbenchJob implements Job<Integer> {
         Component xdfComponent;
         if (component.equals("parser")) {
             xdfComponent = new Parser() {
+                @Override
+                public void initSpark(Context ctx) {
+                    try {
+                        ctx.sparkSession = jobContext.sparkSession();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+        } else if (component.equals("sql")) {
+            xdfComponent = new SQLComponent() {
                 @Override
                 public void initSpark(Context ctx) {
                     try {
