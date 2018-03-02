@@ -276,6 +276,20 @@ export class AnalyzeService {
 
   getDataBySettings(analysis) {
     return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
+      // forEach(analysis.artifacts[0].columns, column => {
+      //   column.columnName = this.getColumnName(column.columnName);
+      // });
+
+      // forEach(analysis.sqlBuilder.dataFields, field => {
+      //   field.columnName = this.getColumnName(field.columnName);
+      // });
+
+      // forEach(data, row => {
+      //   forEach(row, (value, key) => {
+      //     key = this.getColumnName(key);
+      //     data[key] = value;
+      //   });
+      // });
       return {analysis, data, count};
     });
   }
