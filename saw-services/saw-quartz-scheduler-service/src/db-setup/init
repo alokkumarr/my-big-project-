@@ -11,6 +11,10 @@ marker=/etc/bda/saw-scheduler-initial-setup
 if [ -f $marker ]; then
     echo "Initial database setup has already been run, so not running again"
     echo "(Marker file: $marker)"
+    #change DB password in configuration
+    password=$(< /etc/bda/saw-scheduler-db-password)
+    sed -i "s/<db-password>/${password}/" /opt/bda/saw-quartz-scheduler-service/conf/application.yml
+    echo "db-password update successfully"
     exit
 fi
 touch $marker
@@ -39,9 +43,7 @@ generate_password $db_password_file
 ## Initialize SAW scheduler database
 create_database="CREATE DATABASE saw_scheduler"
 
-#password=$(< /etc/bda/saw-scheduler-db-password)
-# db password needs to parametrize in application.xml file, for now as workaround use password as saw_scheduler.
-password=saw_scheduler
+password=$(< /etc/bda/saw-scheduler-db-password)
 root_password_f=/etc/bda/mariadb-root-password
 create_user="CREATE USER 'saw_scheduler'@'localhost'"
 #root password might be already initialized run the conditional statement
@@ -57,3 +59,7 @@ if [ -f $root_password_f ] ; then
    mysql -u root -e "$create_user IDENTIFIED BY '$password'"
    mysql -u root -e "GRANT ALL ON saw_scheduler.* TO 'saw_scheduler'@'localhost'"
 fi
+#change DB password in configuration
+password=$(< /etc/bda/saw-scheduler-db-password)
+sed -i "s/<db-password>/${password}/" /opt/bda/saw-quartz-scheduler-service/conf/application.yml
+echo "db-password update successfully"
