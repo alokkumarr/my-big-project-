@@ -181,34 +181,17 @@ format and finally provides it to the client.
 
 === SAW Scheduler Service
 
-The SAW Scheduler Service periodically triggers execution of analyses
+The SAW Scheduler Service triggers execution of analyses
 based on their configured schedule.  The SchedulerService is a Spring
-Boot command-line application which is executed once daily by
-operating system services (see `/etc/cron.daily`).  It fetches
-analyses with a schedule from the Analysis Service and triggers
-execution for any analyses that are due for execution.
+Boot based micro-service, which provides Api to create, manage and trigger schedules.
+It also triggers dispatch request to saw-export service, if analysis execution result
+needs to be dispatched.
 
-Internally it uses the MapR-DB to keep track of analyses it has
-already executed with the current time period.  It then uses this
-information, plus the schedule of the analysis to calculate if it is
-time for the analysis to be executed again.  The Scheduler Service
+Internally it uses the Quartz scheduler framework for create, manage and trigger
+analysis schedules with mariaDB as job store. The Scheduler Service
 does not monitor the actual execution or its results, but only
 triggers the start of execution.
 
-The Scheduler Service uses one MapR-DB table that is named
-`saw-scheduler-last-executed`.
-
-When implementing the first version of the Scheduling Service using
-the Quartz scheduler was also considered.  The needs of the Scheduling
-Service are, at least for now, simpler than what the general Quartz
-scheduler provides, so it was considered better to implement that
-functionality self than bringing in the complexity of Quartz.  This
-decision can be revisited later, if the needs come closer to what
-Quartz provides.
-
-Notes: There is currently no catchup of missed periods.  If needed,
-have scheduler store the last processed period and step over each
-remaining time period to catch up until the current moment.
 
 === SAW Observe Service
 
