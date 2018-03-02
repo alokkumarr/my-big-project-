@@ -37,7 +37,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-quartz-scheduler-service</artifactId>
+      <artifactId>saw-scheduler-service</artifactId>
       <version>${revision}</version>
     </dependency>
   </dependencies>

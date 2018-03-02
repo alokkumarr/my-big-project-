@@ -13,7 +13,7 @@ if [ -f $marker ]; then
     echo "(Marker file: $marker)"
     #change DB password in configuration
     password=$(< /etc/bda/saw-scheduler-db-password)
-    sed -i "s/<db-password>/${password}/" /opt/bda/saw-quartz-scheduler-service/conf/application.yml
+    sed -i "s/<db-password>/${password}/" /opt/bda/saw-scheduler-service/conf/application.yml
     echo "db-password update successfully"
     exit
 fi
@@ -61,5 +61,5 @@ if [ -f $root_password_f ] ; then
 fi
 #change DB password in configuration
 password=$(< /etc/bda/saw-scheduler-db-password)
-sed -i "s/<db-password>/${password}/" /opt/bda/saw-quartz-scheduler-service/conf/application.yml
+sed -i "s/<db-password>/${password}/" /opt/bda/saw-scheduler-service/conf/application.yml
 echo "db-password update successfully"

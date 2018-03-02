@@ -1,0 +1,2 @@
+- name: restart saw-scheduler
+  systemd: name=saw-scheduler state=restarted daemon_reload=true

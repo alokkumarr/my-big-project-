@@ -1,0 +1,13 @@
+- name: Install SAW Scheduler package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-scheduler-*.rpm"]
+  notify:
+    - restart saw-scheduler
+- name: Install SAW scheduler Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-scheduler-service/conf
+  notify:
+    - restart saw-scheduler
+- name: Run SAW scheduler initial database setup
+  command: /opt/bda/saw-scheduler-service/db-setup/init
+- name: Enable SAW Scheduler Service
+  systemd: name=saw-scheduler enabled=true

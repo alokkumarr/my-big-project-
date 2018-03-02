@@ -6,4 +6,4 @@
     - saw-gateway
     - saw-export
     - saw-observe
-    - saw-quartz-scheduler
+    - saw-scheduler

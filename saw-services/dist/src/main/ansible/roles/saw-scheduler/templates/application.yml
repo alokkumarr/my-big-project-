@@ -1,13 +1,13 @@
 info:
-  component: Synchronoss Quartz scheduler Service
+  component: Synchronoss scheduler Service
 spring:
   application:
-    name: saw-quartz-sechduler-service
+    name: saw-sechduler-service
   #mariaDB (metadata) DB details
   datasource:
     url: jdbc:mariadb://localhost:3306/saw_scheduler
     username: saw_scheduler
-    password: saw_scheduler
+    password: <db-password>
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true
@@ -28,4 +28,3 @@ server:
 
 saw-analysis-service-url: http://localhost:9200/analysis
 saw-dispatch-service-url: http://localhost:9400/exports
-       

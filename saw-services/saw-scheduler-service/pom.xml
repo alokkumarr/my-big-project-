@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-quartz-scheduler-service</artifactId>
+	<artifactId>saw-scheduler-service</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description></description>
@@ -168,30 +168,30 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-quartz-scheduler</packageName>
+							<packageName>saw-scheduler</packageName>
 							<entries>
 								<entry>
-									<name>/opt/bda/saw-quartz-scheduler-service</name>
+									<name>/opt/bda/saw-scheduler-service</name>
 									<directory>true</directory>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-quartz-scheduler-service/saw-quartz-scheduler.jar</name>
-									<file>target/saw-quartz-scheduler-service-${revision}-exec.jar</file>
+									<name>/opt/bda/saw-scheduler-service/saw-scheduler.jar</name>
+									<file>target/saw-scheduler-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-quartz-scheduler.service</name>
-									<file>src/main/system/saw-quartz-scheduler.service</file>
+									<name>/usr/lib/systemd/system/saw-scheduler.service</name>
+									<file>src/main/system/saw-scheduler.service</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-quartz-scheduler-service/conf/logback.xml</name>
+									<name>/opt/bda/saw-scheduler-service/conf/logback.xml</name>
 									<file>src/main/resources/logback.xml</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-quartz-scheduler-service/conf/application.yml</name>
+									<name>/opt/bda/saw-scheduler-service/conf/application.yml</name>
 									<file>src/main/resources/application.yml</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-quartz-scheduler-service/db-setup/init</name>
+									<name>/opt/bda/saw-scheduler-service/db-setup/init</name>
 									<file>src/db-setup/init</file>
                                     <mode>0755</mode>
 								</entry>
