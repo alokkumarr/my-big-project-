@@ -19,16 +19,16 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <div layout="column" style="min-height: 500px;">
-      <report-grid-display-container id="arp-grid-container"
-        class="arp_details-grid"
-        layout="row"
-        show-checked="$ctrl.showChecked"
-        source="$ctrl.loadGridData(options)"
-        data="$ctrl.model.data"
-        columns="$ctrl.model.columns"
-        groups="$ctrl.model.report.groupByColumns">
-      </report-grid-display-container>
-    </div>
+    <md-card-content>
+      <div layout="column" layout-align="space-between center">
+        <report-grid-display-container id="arp-grid-container"
+          show-checked="$ctrl.showChecked"
+          source="$ctrl.loadGridData(options)"
+          data="$ctrl.model.data"
+          columns="$ctrl.model.columns"
+          groups="$ctrl.model.report.groupByColumns">
+        </report-grid-display-container>
+      </div>
+    </md-card-content>
   </analyze-dialog-content>
 </analyze-dialog>

@@ -85,6 +85,12 @@ export const ReportGridDisplayComponent = {
       });
     }
 
+    $onDestroy() {
+      if (this._gridInstance) {
+        this._gridInstance.hideColumnChooser();
+      }
+    }
+
     _createCustomStore() {
       const store = new DataSource({
         load: options => {
