@@ -1,4 +1,5 @@
 import * as map from 'lodash/map';
+import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
@@ -129,14 +130,43 @@ export const ReportGridDisplayComponent = {
       });
     }
 
-    checkColumndatatype(columnList, columnName) {
-      let datatype = '';
-      forEach(columnList, column => {
-        if (!isEmpty(column) && column.columnName === columnName) {
-          datatype = column.type;
+    /**
+     * Removes .keyword suffix from column names if it exists. This is required
+     * because the grid data coming from backend doesn't have that suffix in
+     * its datafields.
+     *
+     * Returns a new clone of columns array with each column cloned as well.
+     *
+     * @param {any} columns
+     * @returns
+     */
+    checkColumnName(columns) {
+      return map(columns, field => {
+        const col = clone(field);
+        col.name = this.getColumnName(col.name);
+        col.columnName = this.getColumnName(col.columnName);
+
+        if (field.meta) {
+          const meta = clone(field.meta);
+          col.meta = meta;
+
+          col.meta.name = this.getColumnName(col.meta.name);
+          col.meta.columnName = this.getColumnName(col.meta.columnName);
         }
+        return col;
       });
-      return datatype;
+    }
+
+    getColumnName(columnName) {
+      // take out the .keyword form the columnName
+      // if there is one
+      if (!isUndefined(columnName)) {
+        const split = columnName.split('.');
+        if (split[1]) {
+          return split[0];
+        }
+        return columnName;
+      }
     }
 
     _getDxColumns(columns = [], data = []) {
@@ -146,6 +176,8 @@ export const ReportGridDisplayComponent = {
       } else {
         allColumns = this.fillColumns(columns, data);
       }
+
+      allColumns = this.checkColumnName(allColumns);
 
       return map(allColumns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
