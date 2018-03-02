@@ -147,12 +147,14 @@ export class CronJobSchedularComponent {
   regenerateCron(dateSelects) {
     switch (this.scheduleType) {
     case 'daily':
+      //Generating Cron expression for selections made in daily tab
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, this.daily.dailyType);
       }
       break;
     case 'weeklybasis':
+      //Generating Cron expression for selections made in weekly tab
       const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
           .reduce((acc, day) => this.weekly[day] ? acc.concat([day]) : acc, [])
           .join(',');
@@ -162,12 +164,14 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'monthly':
+      //Generating Cron expression for selections made in monthly tab
       this.CronExpression = generateMonthlyCron(this.monthly, dateSelects);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, this.monthly.monthlyType);
       }
       break;
     case 'yearly':
+      //Generating Cron expression for selections made in yearly tab
       this.CronExpression = generateYearlyCron(this.yearly, dateSelects);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, this.yearly.yearlyType);
@@ -200,35 +204,42 @@ export class CronJobSchedularComponent {
 
     switch (this.scheduleType) {
     case 'daily':
+      //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       this.daily.dailyType = this.crondetails.activeRadio;
       if (this.daily.dailyType === 'everyDay') {
-        this.dailyTypeDay = clone(modelDate);
+        //First Radio Button: Under daily tab loading data when first radio button is selected.
+        this.dailyTypeDay = clone(modelDate); //Loading time values for daily tab under first radio button
         if (isUndefined(parseCronValue[4])) {
           parseCronValue[4] = '1';
         }
         this.daily.days = parseInt(parseCronValue[4]);
       } else {
-        this.dailyTypeWeek = clone(modelDate);
+        //Second Raio Button: Under daily tab loading data when second radio button is selected.
+        this.dailyTypeWeek = clone(modelDate);//Loading time values for daily tab under Second radio button
       }
       break;
     case 'weeklybasis':
+      //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       let getWeekDays = this.crondetails.cronexp.split(' ');
       forEach(getWeekDays[5].split(','), day => {
         this.weekly[day] = true;
       })
       
-      this.weeklybasisDate = clone(modelDate);
+      this.weeklybasisDate = clone(modelDate); //Loading time values for weekly tab
       break;
     case 'monthly':
+      //Loading/displying values for Cron expression for monthly tab selection in UI Templete.
       this.monthly.monthlyType = this.crondetails.activeRadio;
       if (this.monthly.monthlyType === 'monthlyDay') {
+        //First Radio Button: Under monthly tab loading data when first radio button is selected.
         this.monthly.specificDay = parseInt(parseCronValue[5]);
         if (isUndefined(parseCronValue[10])) {
           parseCronValue[10] = '1';
         }
         this.monthly.specificMonth = parseInt(parseCronValue[10]);
-        this.specificDayMonth = clone(modelDate);
+        this.specificDayMonth = clone(modelDate); //Loading time values for monthly tab under first radio button
       } else {
+        //Second Raio Button: Under monthly tab loading data when second radio button is selected.
         forEach(this.weeks, week => {
           if (week.label === parseCronValue[5]) {
             this.monthly.specificWeekDayMonth = week.value;
@@ -239,17 +250,20 @@ export class CronJobSchedularComponent {
         if (isNaN(parseInt(parseCronValue[11]))) {
           this.monthly.specificWeekDayMonthWeek = 1;
         }
-        this.specificWeekDayMonth = clone(modelDate);
+        this.specificWeekDayMonth = clone(modelDate); //Loading time values for monthly tab under second radio button
       }
       break;
     case 'yearly':
+      //Loading/displying values for Cron expression for yearly tab selection in UI Templete.
       this.yearly.yearlyType = this.crondetails.activeRadio;
       if (this.yearly.yearlyType === 'yearlyMonth') {
-        this.specificMonthDayYear = clone(modelDate);
+        //First Radio Button: Under yearly tab loading data when first radio button is selected.
+        this.specificMonthDayYear = clone(modelDate); //Loading time values for yearly tab under first radio button
         this.yearly.specificMonthDayMonth = new Date(Date.parse(parseCronValue[11] +' 1, 2018')).getMonth() + 1;
         this.yearly.specificMonthDayDay = parseInt(parseCronValue[5]);
       } else {
-        this.specificMonthWeekYear = clone(modelDate);
+        //Second Raio Button: Under yearly tab loading data when second radio button is selected.
+        this.specificMonthWeekYear = clone(modelDate); //Loading time values for yearly tab under second radio button
         forEach(this.weeks, week => {
           if (week.label === parseCronValue[5]) {
             this.yearly.specificMonthWeekMonthWeek = week.value;
