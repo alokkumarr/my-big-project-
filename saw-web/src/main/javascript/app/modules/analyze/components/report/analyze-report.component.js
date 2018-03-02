@@ -337,6 +337,24 @@ export const AnalyzeReportComponent = {
       /* eslint-enable camelcase */
     }
 
+    /**
+     * This is a hack. Adds .keyword suffix back to names of columns if they're string
+     * and this is an es report.
+     *
+     * @param {any} name
+     * @param {any} dataType
+     * @returns
+     */
+    addKeywordTo(name, dataType) {
+      /* eslint-disable angular/typecheck-string */
+      if (this.model.type === 'report' || dataType !== 'string' || /\.keyword/.test(name)) {
+      /* eslint:enable */
+        return name;
+      }
+
+      return `${name}.keyword`;
+    }
+
     generatePayload() {
       /* eslint-disable camelcase */
       const model = this.canvas.model;
@@ -371,7 +389,7 @@ export const AnalyzeReportComponent = {
 
         forEach(table.fields, field => {
           const fieldArtifact = {
-            columnName: field.meta.columnName,
+            columnName: this.addKeywordTo(field.meta.columnName, field.meta.type),
             displayName: field.meta.displayName,
             table: table.name,
             aliasName: field.alias,
@@ -461,6 +479,10 @@ export const AnalyzeReportComponent = {
       /* eslint-enable camelcase */
       result.sqlBuilder.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
 
+      result.sqlBuilder.filters.forEach(filt => {
+        filt.columnName = this.addKeywordTo(filt.columnName, filt.type);
+      });
+
       return result;
     }
 
@@ -519,16 +541,14 @@ export const AnalyzeReportComponent = {
      * @returns
      */
     checkColumnName(columns) {
-      return map(columns, field => {
-        const meta = clone(field.meta);
-        const col = clone(field);
-        col.meta = meta;
 
-        col.name = this.getColumnName(col.name);
-        col.meta.name = this.getColumnName(col.meta.name);
-        col.meta.columnName = this.getColumnName(col.meta.columnName);
-        return col;
+      forEach(columns, field => {
+        field.name = this.getColumnName(field.name);
+        field.meta.name = this.getColumnName(field.meta.name);
+        field.meta.columnName = this.getColumnName(field.meta.columnName);
       });
+
+      return columns;
     }
 
     getColumnName(columnName) {
@@ -575,7 +595,8 @@ export const AnalyzeReportComponent = {
     applyDataToGrid(columns, sorts, groups, data) {
       const grid = first(this._$componentHandler.get('ard-grid-container'));
       if (grid) {
-        grid.updateColumns(this.checkColumnName(columns));
+        this.columns = this.checkColumnName(this.columns);
+        grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
         grid.updateSource(data);
         forEach(groups, group => grid.groupByColumn(group.column, false));
