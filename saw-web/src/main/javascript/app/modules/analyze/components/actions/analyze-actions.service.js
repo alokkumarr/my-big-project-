@@ -1,6 +1,5 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
-import * as isUndefined from 'lodash/isUndefined';
 
 import {AnalyseTypes} from '../../consts';
 
@@ -65,13 +64,10 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     $rootScope.showProgress = true;
     return AnalyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
       $rootScope.showProgress = false;
-      if (isUndefined(updatedAnalysis)) {
-        updatedAnalysis = analysis;
-      }
       toastMessage.info(execute ?
         'Analysis has been updated.' :
         'Analysis schedule changes have been updated.');
-      return analysis;
+      return updatedAnalysis;
     }, () => {
       $rootScope.showProgress = false;
     });

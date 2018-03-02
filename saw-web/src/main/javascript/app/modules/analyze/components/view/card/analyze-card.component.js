@@ -3,7 +3,9 @@ import style from './analyze-card.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 
+let self;
 export const AnalyzeCardComponent = {
   template,
   styles: [style],
@@ -15,9 +17,10 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, AnalyzeService, $log, AnalyzeActionsService, JwtService) {
+    constructor($timeout, $mdDialog, AnalyzeService, $log, AnalyzeActionsService, JwtService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
+      this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$log = $log;
@@ -25,6 +28,7 @@ export const AnalyzeCardComponent = {
 
       this.canUserFork = false;
       this.cronReadbleMsg = 'No Schedule Set';
+      self = this; // the execution context in onSuccesfulPublish doesn't seem to be same as this
     }
 
     $onInit() {
@@ -80,7 +84,13 @@ export const AnalyzeCardComponent = {
     }
 
     onSuccessfulPublish(analysis) {
-      this.applyCronPropertytoCard();
+      this.cronReadbleMsg = '';
+      if (!isUndefined(analysis.schedule.cronExpression)) {
+        const cronLocalMsg = this.convertToLocal(analysis.schedule.cronExpression);
+        this._$timeout(() => {
+          self.cronReadbleMsg = cronstrue.toString(cronLocalMsg);
+        });
+      }
       this.onAction({
         type: 'onSuccessfulPublish',
         model: analysis

@@ -73,6 +73,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     fetchCronDetails() {
+      this.$dialog.showLoader();
       this.requestCron = {
         jobName: this.model.id,
         categoryId: this.model.categoryId,
@@ -82,6 +83,7 @@ export const AnalyzePublishDialogComponent = {
       this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
         this._$rootScope.showProgress = false;
         this.loadCronLayout = true;
+        this.$dialog.hideLoader();
         if (response.data.data.jobDetails) {
           this.crondetails = {
             cronexp: response.data.data.jobDetails.cronExpression,
