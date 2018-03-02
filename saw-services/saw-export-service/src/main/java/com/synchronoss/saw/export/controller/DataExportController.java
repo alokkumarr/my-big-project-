@@ -50,6 +50,8 @@ public class DataExportController {
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId);
     else if(analysisType.equalsIgnoreCase("pivot"))
       exportService.pivotToBeDispatchedAsync(executionId, request,analysisId);
+    if (analysisType.equalsIgnoreCase("esReport"))
+      exportService.reportToBeDispatchedAsync(executionId, request,analysisId);
   }
 
 }
