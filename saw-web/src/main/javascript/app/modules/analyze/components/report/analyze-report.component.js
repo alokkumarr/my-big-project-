@@ -458,7 +458,7 @@ export const AnalyzeReportComponent = {
           const sortArtifact = {
             tableName: tableArtifact.artifactName,
             type: sort.field.type,
-            columnName: sort.field.name,
+            columnName: this.addKeywordTo(sort.field.name, sort.field.type),
             order: sort.order
           };
 
