@@ -142,7 +142,6 @@
 		<module>saw-data-access</module>
 		<module>saw-transport-service</module>
 		<module>saw-es-querybuilder</module>
-		<module>saw-scheduler-service</module>
 		<module>saw-gateway-service</module>
 		<module>saw-export-service</module>
 		<module>saw-observe-service</module>
