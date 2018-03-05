@@ -27,7 +27,8 @@ public class WorkbenchExecutionServiceImpl
     private String livyUri;
 
     @Override
-    public String execute(String name, String component, String config) throws Exception {
+    public String execute(String name, String component, String config)
+        throws Exception {
         WorkbenchClient client = new WorkbenchClient();
         createDatasetDirectory(name);
         client.submit(livyUri, root, project, component, config);
