@@ -8,4 +8,4 @@
   notify:
     - restart saw-workbench
 - name: Enable SAW Workbench Service
-  systemd: name=saw-workbench enabled=true
+  systemd: name=saw-workbench-proxy.socket enabled=true state=started

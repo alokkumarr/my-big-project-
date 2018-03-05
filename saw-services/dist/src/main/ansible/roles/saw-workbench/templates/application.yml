@@ -5,7 +5,7 @@ spring:
     name: saw-workbench-service
 server:
   address: localhost
-  port: 9700
+  port: 9701
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:

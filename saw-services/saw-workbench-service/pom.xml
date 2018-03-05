@@ -90,7 +90,11 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>info.faljse</groupId>
+			<artifactId>SDNotify</artifactId>
+			<version>1.1</version>
+		</dependency>
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
 			<artifactId>wiremock</artifactId>
@@ -313,6 +317,14 @@
 								<entry>
 									<name>/usr/lib/systemd/system/saw-workbench.service</name>
 									<file>src/main/system/saw-workbench.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-workbench-proxy.service</name>
+									<file>src/main/system/saw-workbench-proxy.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-workbench-proxy.socket</name>
+									<file>src/main/system/saw-workbench-proxy.socket</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-workbench-service/conf/logback.xml</name>
