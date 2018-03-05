@@ -23,12 +23,17 @@ import {
   MatInputModule,
   MatToolbarModule,
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  MatSlideToggleModule,
+  MatExpansionModule,
+  MatButtonToggleModule,
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
   MatCardModule,
-  MatGridListModule,
   MatStepperModule,
   MatSliderModule,
-  MatSlideToggleModule,
   MatTabsModule,
+<<<<<<< HEAD
   MatDividerModule,
   MatExpansionModule,
   MatButtonToggleModule,
@@ -36,6 +41,9 @@ import {
 =======
   MatSlideToggleModule
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+  MatDividerModule
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
 } from '@angular/material';
 
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
@@ -53,6 +61,7 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatIconModule,
     MatDialogModule,
+<<<<<<< HEAD
 =======
     MatIconModule,
     MatDialogModule,
@@ -64,7 +73,12 @@ import '../../../../themes/_angular_next.scss';
     MatMomentDateModule,
     MatDatepickerModule,
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+    MatAutocompleteModule,
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
     MatFormFieldModule,
+    MatSidenavModule,
+    MatDatepickerModule,
     MatProgressBarModule,
     MatChipsModule,
     NouisliderModule,
@@ -72,25 +86,27 @@ import '../../../../themes/_angular_next.scss';
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
-    MatDatepickerModule,
     MatInputModule,
     MatToolbarModule,
-    MatCardModule,
-    MatGridListModule,
-    MatStepperModule,
-    MatDividerModule,
-    MatSliderModule,
     MatSlideToggleModule,
-    MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
+    MatCardModule,
+    MatStepperModule,
+    MatSliderModule,
+    MatTabsModule,
+    MatDividerModule,
     MatMomentDateModule,
+<<<<<<< HEAD
 <<<<<<< HEAD
     MatSnackBarModule
 =======
     MatToolbarModule,
     MatSlideToggleModule
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+    NouisliderModule
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -102,12 +118,18 @@ import '../../../../themes/_angular_next.scss';
 <<<<<<< HEAD
     MatIconModule,
     MatDialogModule,
+<<<<<<< HEAD
 =======
     MatAutocompleteModule,
     MatMomentDateModule,
     MatDatepickerModule,
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+    MatAutocompleteModule,
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
     MatFormFieldModule,
+    MatSidenavModule,
+    MatDatepickerModule,
     MatProgressBarModule,
     MatChipsModule,
     NouisliderModule,
@@ -115,25 +137,27 @@ import '../../../../themes/_angular_next.scss';
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
-    MatDatepickerModule,
     MatInputModule,
     MatToolbarModule,
-    MatCardModule,
-    MatGridListModule,
-    MatStepperModule,
-    MatDividerModule,
-    MatSliderModule,
     MatSlideToggleModule,
-    MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
+    MatCardModule,
+    MatStepperModule,
+    MatSliderModule,
+    MatTabsModule,
+    MatDividerModule,
     MatMomentDateModule,
+<<<<<<< HEAD
 <<<<<<< HEAD
     MatSnackBarModule
 =======
     MatToolbarModule,
     MatSlideToggleModule
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+    NouisliderModule
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
   ]
 })
 export class MaterialModule { }

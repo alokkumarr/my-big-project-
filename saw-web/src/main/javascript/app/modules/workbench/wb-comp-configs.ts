@@ -23,18 +23,29 @@ export const PARSER_CONFIG = {
     headerSize: 1,
     fieldNameLine: ''
   },
-  outputs: [{
-    dataSet: '',
-    mode: 'replace', // append
-    description: ''
-  }],
-  parameters: [{
-    name: 'spark.master',
-    value: 'yarn'
-  }, {
-    name: 'spark.executor.instances',
-    value: '6'
-  }]
+  outputs: [
+    {
+      dataSet: 'test'
+    }
+  ],
+  parameters: [
+    {
+      name: 'spark.master',
+      value: 'spark://foobar'
+    }
+  ]
+  // outputs: [{
+  //   dataSet: '',
+  //   mode: 'replace', // append
+  //   description: ''
+  // }],
+  // parameters: [{
+  //   name: 'spark.master',
+  //   value: 'yarn'
+  // }, {
+  //   name: 'spark.executor.instances',
+  //   value: '6'
+  // }]
 };
 
 export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'isDirectory': true, 'path': 'root' }];

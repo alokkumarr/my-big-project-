@@ -31,7 +31,7 @@ import { CommonModuleTs } from './common';
 import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
 import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
-import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench'
+import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
 
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
@@ -103,7 +103,11 @@ angular
   .component('layoutFooter', LayoutFooterComponent);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 angular.bootstrap(document, [AppModule]);
 =======
 angular.bootstrap(document, [AppModule]);
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+angular.bootstrap(document, [AppModule]);
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a

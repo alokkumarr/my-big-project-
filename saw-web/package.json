@@ -22,16 +22,21 @@
   "dependencies": {
     "@angular/animations": "5.1.2",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "@angular/cdk": "^5.1.0",
 =======
     "@angular/cdk": "5.1.1",
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+    "@angular/cdk": "5.1.1",
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
     "@angular/common": "5.1.2",
     "@angular/compiler": "5.1.2",
     "@angular/core": "5.1.2",
-    "@angular/flex-layout": "2.0.0-beta.10-4905443",
+    "@angular/flex-layout": "5.0.0-beta.13",
     "@angular/forms": "5.1.2",
     "@angular/http": "5.1.2",
+<<<<<<< HEAD
 <<<<<<< HEAD
     "@angular/material": "^5.1.0",
     "@angular/material-moment-adapter": "5.0.3",
@@ -39,6 +44,10 @@
     "@angular/material": "5.1.1",
     "@angular/material-moment-adapter": "5.1.1",
 >>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
+=======
+    "@angular/material": "5.1.1",
+    "@angular/material-moment-adapter": "5.1.1",
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
     "@angular/platform-browser": "5.1.2",
     "@angular/platform-browser-dynamic": "5.1.2",
     "@angular/router": "5.1.2",
@@ -60,6 +69,7 @@
     "angular-toastr": "2.1.1",
     "angular-translate": "2.13.1",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "angular-tree-component": "^7.0.1",
 =======
     "babel-preset-env": "^1.6.1",
@@ -67,10 +77,17 @@
     "blob": "0.0.4",
     "cronstrue": "^1.1.0",
     "browserstack-local": "^1.3.0",
+=======
+    "angular-tree-component": "7.0.1",
+    "babel-preset-env": "^1.6.1",
+    "blob": "0.0.4",
+    "browserstack-local": "^1.3.0",
+    "cronstrue": "^1.1.0",
+>>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
     "devextreme": "17.2.3",
     "devextreme-angular": "17.2.3",
     "file-saver": "1.3.3",
-    "hammerjs": "^2.0.8",
+    "hammerjs": "2.0.8",
     "highcharts": "6.0.3",
     "jasmine": "^3.0.0",
     "jquery": "3.2.1",

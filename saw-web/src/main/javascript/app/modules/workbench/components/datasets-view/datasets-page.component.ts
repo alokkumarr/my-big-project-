@@ -4,6 +4,7 @@ import { Component, Input, OnInit, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as map from 'lodash/map';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
@@ -22,17 +23,17 @@ require('./datasets-page.component.scss');
 })
 
 export class DatasetsComponent implements OnInit {
-  private LIST_VIEW: string = 'list';
-  private CARD_VIEW: string = 'card';
   private userProject: string = 'project2';
   private availableSets: Array<any> = [];
-  private viewState: string = this.CARD_VIEW;
+  private viewState: string = 'card';
   private states = {
     searchTerm: '',
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
-    
+  private dataView: string = 'sets';
+  private contentHeight: number;
+
   constructor(
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
@@ -40,7 +41,7 @@ export class DatasetsComponent implements OnInit {
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private datePipe: DatePipe
-  ) {  }
+  ) { }
 
   ngOnInit() {
     this.getPageData();
@@ -65,6 +66,9 @@ export class DatasetsComponent implements OnInit {
         this.updater.next(data);
       });
     }
+    setTimeout(() => {
+      this.contentHeight = window.innerHeight-165;
+    });
   }
 
   onViewChange(): void {
@@ -77,16 +81,16 @@ export class DatasetsComponent implements OnInit {
 
   applySearchFilter(): void {
     const SEARCH_CONFIG = [
-      {keyword: 'Data Set Name', fieldName: 'set'},
-      {keyword: 'Added By', fieldName: 'meta', accessor: input => input.addedBy},
-      {keyword: 'Data Pods', fieldName: 'meta', accessor: input => input.numFiles},
+      { keyword: 'Data Set Name', fieldName: 'set' },
+      { keyword: 'Added By', fieldName: 'meta', accessor: input => input.addedBy },
+      { keyword: 'Data Pods', fieldName: 'meta', accessor: input => input.numFiles },
       {
         keyword: 'Last Updated',
         fieldName: 'meta',
         accessor: input => this.datePipe.transform(input.lastUpdated, 'MM/dd/yy @ HH:mm')
       },
-      {keyword: 'Updated By', fieldName: 'meta', accessor: input => input.updatedBy},
-      {keyword: 'Data Source', fieldName: 'src'}
+      { keyword: 'Updated By', fieldName: 'meta', accessor: input => input.updatedBy },
+      { keyword: 'Data Source', fieldName: 'src' }
     ];
     const searchCriteria = this.LocalSearch.parseSearchTerm(this.states.searchTerm);
     this.states.searchTermValue = searchCriteria.trimmedTerm;
@@ -100,5 +104,13 @@ export class DatasetsComponent implements OnInit {
       panelClass: 'full-screen-dialog',
       autoFocus: false
     });
+  }
+
+  onDataViewChange() {
+    
+  }
+
+  onResize(event) {
+    this.contentHeight = event.target.innerHeight-165;
   }
 }

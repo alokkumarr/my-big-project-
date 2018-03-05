@@ -1,50 +1,61 @@
-<div class="dataSets-view" fxLayout="column" fxLayoutWrap fxFlex>
+<div class="dataSets-view" fxLayout="column" (window:resize)="onResize($event)">
   <mat-toolbar class="toolbar-white">
-    <div class="md-toolbar-tools">
-      <div fxFlex="50" fxLayout="row">
-        <div class="mat-title">Data Sets</div>
-        &nbsp;
-        <!-- <search-box placeholder="Search Data Sets"
-                    ng-model="$ctrl.states.searchTerm"
-                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box> -->
+    <mat-toolbar-row>
+      <div fxFlex="48" fxLayout="row">
+        <mat-button-toggle-group [(ngModel)]="dataView" [value]="dataView" #viewType="matButtonToggleGroup">
+          <mat-button-toggle matTooltip="Data Sets" value="sets">
+            <mat-icon fontIcon="icon-exchange"></mat-icon>
+            <span>Data Sets</span>
+          </mat-button-toggle>
+          <mat-button-toggle matTooltip="Data Pods" value="pods">
+            <mat-icon fontIcon="icon-portal-libraries"></mat-icon>
+            <span>Data Pods</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
-      <div fxFlex="20" fxLayout="row">
-        <div class="dataSets-view_switch-view">
-          <mat-radio-group [(ngModel)]="viewState" (ngModelChange)="onViewChange()">
-            <mat-radio-button matTooltip="List view" [value]="LIST_VIEW">
-              <mat-icon fontIcon="icon-navicon" style="font-size:18px;">
-                <span matTooltip="List View"></span>
-              </mat-icon>
-            </mat-radio-button>
-
-            <mat-radio-button matTooltip="Card view" [value]="CARD_VIEW">
-              <mat-icon fontIcon="icon-tile-view-solid">
-                <span matTooltip="Card View"></span>
-              </mat-icon>
-            </mat-radio-button>
-          </mat-radio-group>
-        </div>
+      <div fxFlex="20" fxLayout="row" class="view-mode">
+        <mat-button-toggle-group [(ngModel)]="viewState" [value]="viewState" (change)="onViewChange()" #viewMode="matButtonToggleGroup">
+          <mat-button-toggle matTooltip="List view" value="list">
+            <mat-icon fontIcon="icon-navicon"></mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle matTooltip="Card view" value="card">
+            <mat-icon fontIcon="icon-tile-view-solid"></mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
-
-      <div fxFlex="30" class="dataSets-view_action-panel" fxLayout="row" fxLayoutAlign="end center">
-        <button mat-button mat-raised-button mat-primary color="primary" (click)="addDataSet()">
-          + Data Set
+      <span fxFlex></span>
+      <div class="action-buttons">
+        <button mat-icon-button color="primary" matTooltip="Create Datapod" style="font-size:24px;" (click)="null">
+          <mat-icon fontIcon="icon-portal-libraries" class="exec-btn-icon"></mat-icon>
         </button>
+        <button color="primary" mat-icon-button [matMenuTriggerFor]="dataSet" (mouseenter)="dataSetMenuTrigger.openMenu()" #dataSetMenuTrigger="matMenuTrigger">
+          <mat-icon fontIcon="icon-exchange"></mat-icon>
+        </button>
+        <mat-menu color="primary" #dataSet="matMenu">
+          <span (mouseleave)="dataSetMenuTrigger.closeMenu()">
+            <button mat-menu-item (click)="addDataSet()">
+              <span>Add</span>
+            </button>
+            <button mat-menu-item disabled (click)="null">
+              <span>Create</span>
+            </button>
+          </span>
+        </mat-menu>
       </div>
-    </div>
+    </mat-toolbar-row>
   </mat-toolbar>
 
-  <div class="content" id="datasets-container" fxLayout="column" [ngSwitch]="viewState" style="background-color: #F5F9FC; overflow: auto;">
+  <div class="page-content" id="datasets-container" [style.max-height.px]="contentHeight" [ngSwitch]="viewState">
 
     <!-- LIST VIEW -->
 
-    <div class="dataSets-view_sets-list" *ngSwitchCase="'list'">
+    <div class="grid-view" *ngSwitchCase="'list'">
       <datasets-grid-page [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-grid-page>
     </div>
 
     <!-- CARD VIEW -->
-    <div fxFlex *ngSwitchCase="'card'">
-      <datasets-card-page fxLayout="row" fxLayoutAlign="start start" fxLayoutWrap [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-card-page>
+    <div *ngSwitchCase="'card'">
+      <datasets-card-page [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-card-page>
     </div>
   </div>
 </div>

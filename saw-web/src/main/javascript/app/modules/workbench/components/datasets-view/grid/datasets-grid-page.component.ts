@@ -62,14 +62,14 @@ export class DatasetsGridPageComponent implements OnInit {
       dataField: 'set',
       allowSorting: true,
       alignment: 'left',
-      width: '40%',
+      width: '35%',
       cellTemplate: 'nameCellTemplate',
       cssClass: 'branded-column-name'
     }, {
       caption: 'Size',
       dataField: 'meta.size',
       dataType: 'number',
-      width: '8%'
+      width: '10%'
     }, {
       dataField: 'meta.addedBy',
       caption: 'Added By',
@@ -77,27 +77,27 @@ export class DatasetsGridPageComponent implements OnInit {
       dataType: 'string',
       cellTemplate: 'creatorCellTemplate'
     }, {
-      dataField: 'meta.updatedBy',
-      caption: 'Updated By',
+      dataField: 'meta.type',
+      caption: 'Type',
       width: '10%',
       dataType: 'String',
       cellTemplate: 'creatorCellTemplate'
     }, {
       dataField: 'meta.numFiles',
       caption: 'Data Pods',
-      width: '5%',
+      width: '8%',
       dataType: 'number'
     }, {
       dataField: 'meta.lastUpdated',
       caption: 'Last Updated',
       sortOrder: 'desc',
       cellTemplate: 'timecreatedCellTemplate',
-      width: '15%',
+      width: '10%',
       dataType: 'date',
       alignment: 'right'
     }, {
       dataField: 'src',
-      caption: 'Data Source',
+      caption: 'Source',
       cellTemplate: 'dsTypeTemplate',
       width: '7%'
     }, {
@@ -110,28 +110,27 @@ export class DatasetsGridPageComponent implements OnInit {
     return this.dxDataGrid.mergeWithDefaultConfig ({
       columns,
       dataSource,
+      height: '100%',
+      width: '100%',
+      headerFilter: {
+        visible: false
+      },
+      sorting: {
+        mode: 'none'
+      },
       scrolling: {
-        mode: 'standard'
+        showScrollbar: 'always',
+        mode: 'virtual',
+        useNative: false
       },
-      paging: {
-        pageSize: 25
-      },
-      pager: {
-        showPageSizeSelector: true,
-        allowedPageSizes: [10, 20, 50, 100],
-        showInfo: true
-      },
-      bindingOptions: {
-        showRowLines: 'false',
-        showBorders: 'false',
-        rowAlternationEnabled: 'true',
-        showColumnLines: 'true'
-      },
+      showRowLines: false,
+      showBorders: false,
+      rowAlternationEnabled: false,
+      showColumnLines: false,
       selection: {
         mode: 'single'
       },
       hoverStateEnabled: true,
-      // onInitialized: this.onGridInitialized.bind(this),
       onSelectionChanged: selectedItems => {
       }
     });
