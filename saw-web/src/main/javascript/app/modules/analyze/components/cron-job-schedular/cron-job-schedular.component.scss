@@ -1,51 +1,53 @@
-.mat-select-value {
-  width: 90% !important;
-  padding: 8px 15px;
-}
+cron-job-schedular {
+  .mat-select-value {
+    width: 90% !important;
+    padding: 8px 15px;
+  }
 
-.mat-select {
-  position: relative !important;
-  width: 18% !important;
-  margin-left: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  margin-bottom: 10px;
-}
+  .mat-select {
+    position: relative !important;
+    width: 18% !important;
+    margin-left: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 10px;
+  }
 
-.tab {
-  overflow: hidden;
-  border: 1px solid #CCC;
-  background-color: #F1F1F1;
-}
+  .tab {
+    overflow: hidden;
+    border: 1px solid #CCC;
+    background-color: #F1F1F1;
+  }
 
-/* Style the buttons inside the tab */
-.tab button {
-  background-color: inherit;
-  float: left;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 5px 10px;
-  transition: 0.3s;
-}
+  /* Style the buttons inside the tab */
+  .tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: 0.3s;
+  }
 
-/* Change background color of buttons on hover */
-.tab button:hover {
-  background-color: #DDD;
-}
+  /* Change background color of buttons on hover */
+  .tab button:hover {
+    background-color: #DDD;
+  }
 
-/* Create an active/current tablink class */
-.tab button.active {
-  background-color: #CCC;
-}
+  /* Create an active/current tablink class */
+  .tab button.active {
+    background-color: #CCC;
+  }
 
-/* Style the tab content */
-.tabcontent {
-  padding: 6px 12px;
-  border: 1px solid #CCC;
-  border-top: none;
-}
+  /* Style the tab content */
+  .tabcontent {
+    padding: 6px 12px;
+    border: 1px solid #CCC;
+    border-top: none;
+  }
 
-.checkbox {
-  text-align: center;
-  margin: 0 5px 15px 42px;
+  .checkbox {
+    text-align: center;
+    margin: 0 5px 15px 42px;
+  }
 }
