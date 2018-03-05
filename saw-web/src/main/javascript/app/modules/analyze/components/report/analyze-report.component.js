@@ -13,6 +13,7 @@ import * as sortBy from 'lodash/sortBy';
 import * as filter from 'lodash/filter';
 import * as assign from 'lodash/assign';
 import * as uniqBy from 'lodash/uniqBy';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {FieldModel} from '../../../../common/components/jsPlumb/models/fieldModel';
 import * as template from './analyze-report.component.html';
@@ -238,6 +239,14 @@ export const AnalyzeReportComponent = {
       const defaultSpacing = 300; // canvas pixels
 
       model.clear();
+      forEach(this.model.sqlBuilder.dataFields, aggregates => {
+        forEach(data[0].columns, column => {
+          if (aggregates.columnName === column.columnName) {
+            column.aggregate = aggregates.aggregate;
+          }
+          column.reportType = this.model.type;
+        });
+      });
 
       /* eslint-disable camelcase */
       forEach(data, itemA => {
@@ -267,6 +276,10 @@ export const AnalyzeReportComponent = {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
+          if (itemB.aggregate) {
+            field.aggregate = itemB.aggregate;
+          }
+          field.reportType = this.model.type;
           field.displayName = itemB.displayName;
           field.alias = itemB.aliasName;
           field.type = itemB.type;
@@ -324,9 +337,28 @@ export const AnalyzeReportComponent = {
       /* eslint-enable camelcase */
     }
 
+    /**
+     * This is a hack. Adds .keyword suffix back to names of columns if they're string
+     * and this is an es report.
+     *
+     * @param {any} name
+     * @param {any} dataType
+     * @returns
+     */
+    addKeywordTo(name, dataType) {
+      /* eslint-disable angular/typecheck-string */
+      if (this.model.type === 'report' || dataType !== 'string' || /\.keyword/.test(name)) {
+      /* eslint:enable */
+        return name;
+      }
+
+      return `${name}.keyword`;
+    }
+
     generatePayload() {
       /* eslint-disable camelcase */
       const model = this.canvas.model;
+      let columnString = '';
       const result = {
         artifacts: [],
         groupByColumns: [],
@@ -357,7 +389,7 @@ export const AnalyzeReportComponent = {
 
         forEach(table.fields, field => {
           const fieldArtifact = {
-            columnName: field.meta.columnName,
+            columnName: this.addKeywordTo(field.meta.columnName, field.meta.type),
             displayName: field.meta.displayName,
             table: table.name,
             aliasName: field.alias,
@@ -373,10 +405,23 @@ export const AnalyzeReportComponent = {
           tableArtifact.columns.push(fieldArtifact);
 
           if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
-            result.sqlBuilder.dataFields.push({
-              columnName: fieldArtifact.columnName,
-              type: fieldArtifact.type
-            });
+            columnString = fieldArtifact.columnName;
+            if (field.type === 'string' && !/\.keyword/.test(fieldArtifact.columnName)) {
+              columnString = `${fieldArtifact.columnName}.keyword`;
+            }
+            if (field.aggregate) {
+              result.sqlBuilder.dataFields.push({
+                columnName: columnString,
+                type: fieldArtifact.type,
+                name: this.getColumnName(field.meta.columnName),
+                aggregate: field.meta.aggregate
+              });
+            } else {
+              result.sqlBuilder.dataFields.push({
+                columnName: columnString,
+                type: fieldArtifact.type
+              });
+            }
           }
         });
 
@@ -413,7 +458,7 @@ export const AnalyzeReportComponent = {
           const sortArtifact = {
             tableName: tableArtifact.artifactName,
             type: sort.field.type,
-            columnName: sort.field.name,
+            columnName: this.addKeywordTo(sort.field.name, sort.field.type),
             order: sort.order
           };
 
@@ -433,6 +478,10 @@ export const AnalyzeReportComponent = {
       });
       /* eslint-enable camelcase */
       result.sqlBuilder.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
+
+      result.sqlBuilder.filters.forEach(filt => {
+        filt.columnName = this.addKeywordTo(filt.columnName, filt.type);
+      });
 
       return result;
     }
@@ -481,6 +530,39 @@ export const AnalyzeReportComponent = {
         });
     }
 
+    /**
+     * Removes .keyword suffix from column names if it exists. This is required
+     * because the grid data coming from backend doesn't have that suffix in
+     * its datafields.
+     *
+     * Returns a new clone of columns array with each column cloned as well.
+     *
+     * @param {any} columns
+     * @returns
+     */
+    checkColumnName(columns) {
+
+      forEach(columns, field => {
+        field.name = this.getColumnName(field.name);
+        field.meta.name = this.getColumnName(field.meta.name);
+        field.meta.columnName = this.getColumnName(field.meta.columnName);
+      });
+
+      return columns;
+    }
+
+    getColumnName(columnName) {
+      // take out the .keyword form the columnName
+      // if there is one
+      if (!isUndefined(columnName)) {
+        const split = columnName.split('.');
+        if (split[1]) {
+          return split[0];
+        }
+        return columnName;
+      }
+    }
+
     onRefreshData() {
       this.startProgress();
       this.model = assign(this.model, this.generatePayload());
@@ -513,7 +595,8 @@ export const AnalyzeReportComponent = {
     applyDataToGrid(columns, sorts, groups, data) {
       const grid = first(this._$componentHandler.get('ard-grid-container'));
       if (grid) {
-        grid.updateColumns(columns);
+        this.columns = this.checkColumnName(this.columns);
+        grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
         grid.updateSource(data);
         forEach(groups, group => grid.groupByColumn(group.column, false));
@@ -654,10 +737,6 @@ export const AnalyzeReportComponent = {
     openSaveReportModal(ev) {
       if (!this.canvas) {
         return;
-      }
-
-      if (this.states.sqlMode === this.DESIGNER_MODE) {
-        this.model.query = '';
       }
 
       this.model = assign(this.model, this.generatePayload());

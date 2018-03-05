@@ -17,13 +17,13 @@ import {
 
 const template = require('./expandable-field.component.html');
 require('./expandable-field.component.scss');
-
+import { FieldChangeEvent } from '../single';
 @Component({
   selector: 'expandable-field',
   template
 })
 export class ExpandableFieldComponent {
-  @Output() public change: EventEmitter<ArtifactColumn> = new EventEmitter();
+  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
@@ -39,6 +39,6 @@ export class ExpandableFieldComponent {
 
   onAggregateChange(value) {
     this.artifactColumn.aggregate = value;
-    this.change.emit(this.artifactColumn);
+    this.change.emit({requiresDataChange: true});
   }
 }

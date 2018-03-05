@@ -11,4 +11,8 @@ import { Component } from '@angular/core';
 })
 export class ServiceBootstrapComponent{
   constructor() { }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3

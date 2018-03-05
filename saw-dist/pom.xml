@@ -29,6 +29,13 @@
       </exclusions>
     </dependency>
     <dependency>
+      <!-- io.jsonwebtoken -->
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>0.7.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.synchronoss.saw</groupId>
       <artifactId>saw-services-dist</artifactId>
       <version>${project.version}</version>

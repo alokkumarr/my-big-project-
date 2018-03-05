@@ -6,9 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -116,6 +120,22 @@ public class QueryBuilderUtil {
  		
  		return aggregationBuilder;
  	}
+
+	public static AggregationBuilder aggregationBuilderDataFieldReport(com.synchronoss.querybuilder.model.report.DataField data)
+
+	{
+		AggregationBuilder aggregationBuilder = null;
+		switch (data.getAggregate().value())
+		{
+			case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+			case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+			case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+			case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+			case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+		}
+
+		return aggregationBuilder;
+	}
 
     public static AggregationBuilder aggregationBuilderDataFieldChart(com.synchronoss.querybuilder.model.chart.DataField data)
 
@@ -229,7 +249,52 @@ public class QueryBuilderUtil {
 	    }
 	    return builder;
 	  }
+
+	public static List<QueryBuilder> stringFilterChart (Filter item, List<QueryBuilder> builder)
+	{
+		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			builder.add(termsQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
+
+		// prefix query builder - not analyzed
+		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+					(String) item.getModel().getModelValues().get(0));
+			builder.add(pqb);
+		}
+
+		// using wildcard as there's no suffix query type provided by
+		// elasticsearch
+		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getModelValues().get(0));
+			builder.add(wqb);
+		}
+
+		// same for contains clause - not analyzed query
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*" + item.getModel().getModelValues().get(0)+"*");
+			builder.add(wqb);
+		}
+
+		return builder;
+	}
 	
+
 	public static List<QueryBuilder> numericFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
     {
      
@@ -316,5 +381,93 @@ public class QueryBuilderUtil {
 		}
 		return builder;
 	}
-	
+
+	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
+	{
+		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			builder.add(termsQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
+
+		// prefix query builder - not analyzed
+		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+					(String) item.getModel().getModelValues().get(0));
+			builder.add(pqb);
+		}
+
+		// using wildcard as there's no suffix query type provided by
+		// elasticsearch
+		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getModelValues().get(0));
+			builder.add(wqb);
+		}
+
+		// same for contains clause - not analyzed query
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*" + item.getModel().getModelValues().get(0)+"*");
+			builder.add(wqb);
+		}
+
+		return builder;
+	}
+
+	public static List<QueryBuilder> stringFilterReport (com.synchronoss.querybuilder.model.report.Filter item, List<QueryBuilder> builder)
+	{
+		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			builder.add(termsQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
+		// prefix query builder - not analyzed
+		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+					(String) item.getModel().getModelValues().get(0));
+			builder.add(pqb);
+		}
+
+		// using wildcard as there's no suffix query type provided by
+		// elasticsearch
+		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getModelValues().get(0));
+			builder.add(wqb);
+		}
+
+		// same for contains clause - not analyzed query
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*" + item.getModel().getModelValues().get(0)+"*");
+			builder.add(wqb);
+		}
+
+		return builder;
+	}
+
+
 }

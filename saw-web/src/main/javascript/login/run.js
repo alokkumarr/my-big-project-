@@ -1,4 +1,4 @@
-export function runConfig($rootScope, $state, $location, $window, JwtService) {
+export function runConfig($q, $log, $rootScope, $state, $location, $window, JwtService, UserService, $transitions) {
   'ngInject';
 
   $rootScope.getPageTitle = () => {
@@ -10,6 +10,29 @@ export function runConfig($rootScope, $state, $location, $window, JwtService) {
 
     return 'Synchronoss';
   };
+
+  $transitions.onStart({}, () => {
+    const ssoPromise = $q.defer();
+    const loginToken = $location.search().jwt;
+    if (loginToken) {
+      UserService.exchangeLoginToken(loginToken).then(data => {
+        if (data) {
+          // SSO token has been exchanged successfully. Redirect to main app.
+          $window.location.assign('./');
+          ssoPromise.resolve(false);
+        } else {
+          ssoPromise.resolve(true);
+        }
+      }, error => {
+        $log.error(error);
+        ssoPromise.resolve(true);
+      });
+    } else {
+      ssoPromise.resolve(true);
+    }
+
+    return ssoPromise.promise;
+  });
 
   $rootScope.$on('$locationChangeSuccess', event => {
     const restrictedPage = ['/', '/changePwd'];

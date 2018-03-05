@@ -29,6 +29,7 @@ saw_executor_memory_regular=512M
 saw_executor_memory_fast=512M
 saw_executor_cores_regular=2
 saw_executor_cores_fast=2
+saw_executor_result_wait_time=300
 
 #
 # Elasticsearch configuration
@@ -55,3 +56,4 @@ saw_workbench_livy_uri=http://saw-mapr:8998/
 
 [saw-security]
 localhost ansible_connection=local
+

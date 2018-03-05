@@ -15,11 +15,11 @@
             fxLayoutAlign="space-between center"
             class="sort-field">
         <span class="sort-field__name">
-            {{field.aliasName || field.displayName}}
+            {{field.displayName}}
         </span>
         <button mat-icon-button
                 (click)="addSort(field)"
-                [e2e]="'sort-add-btn-' + (field.aliasName || field.displayName)">
+                [e2e]="'sort-add-btn-' + (field.displayName)">
           <mat-icon fontIcon="icon-plus">
           </mat-icon>
         </button>

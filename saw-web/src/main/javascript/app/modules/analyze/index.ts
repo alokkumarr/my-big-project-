@@ -63,6 +63,8 @@ import {AnalyzePublishDialogComponent} from './components/publish-dialog/analyze
 import {AnalyzeChartComponent} from './components/chart/analyze-chart.component';
 import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze-chart-settings.component';
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
+import { CronJobSchedularComponent } from './components/cron-job-schedular/cron-job-schedular.component';
+import { CronDatePickerComponent } from './components/cron-date-picker/cron-date-picker.component';
 import {CommonModule} from '../../common';
 
 import {CommonModuleTs} from '../../common';
@@ -88,7 +90,9 @@ import {
   DesignerPreviewDialogComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe
+  ArtifactColumns2PivotFieldsPipe,
+  CronJobSchedularComponent,
+  CronDatePickerComponent
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -105,6 +109,7 @@ angular.module(AnalyzeModule, [
   .config(routesConfig)
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
+  .filter('uniqueFilter', uniqueFilter)
   .service('FilterService', FilterService)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
@@ -137,6 +142,10 @@ angular.module(AnalyzeModule, [
   .directive(
     'analyzeReportQuery',
     downgradeComponent({component: AnalyzeReportQueryComponent}) as angular.IDirectiveFactory
+  )
+  .directive(
+    'cronJobSchedular',
+    downgradeComponent({component: CronJobSchedularComponent}) as angular.IDirectiveFactory
   )
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeSortDialog', AnalyzeSortDialogComponent)
@@ -186,7 +195,9 @@ angular.module(AnalyzeModule, [
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     ArtifactColumnFilterPipe,
-    ArtifactColumns2PivotFieldsPipe
+    ArtifactColumns2PivotFieldsPipe,
+    CronJobSchedularComponent,
+    CronDatePickerComponent
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -208,7 +219,9 @@ angular.module(AnalyzeModule, [
     DesignerStringFilterComponent,
     DesignerDateFilterComponent,
     DesignerNumberFilterComponent,
-    DesignerPreviewDialogComponent
+    DesignerPreviewDialogComponent,
+    CronJobSchedularComponent,
+    CronDatePickerComponent
   ],
   providers: [
     $mdDialogProvider,

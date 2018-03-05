@@ -1,7 +1,25 @@
-<md-chips ng-model="$ctrl.keywords.modelValues"
+<div layout="row">
+  <md-input-container md-no-float>
+    <md-select ng-model="$ctrl.keywords.operator"
+               ng-hide="$ctrl.disablePresets"
+               ng-change="$ctrl.onPresetSelected()"
+               style="width: 130px">
+      <md-option ng-repeat="operator in $ctrl.presets" ng-value="operator.value">
+        {{operator.label}}
+      </md-option>
+    </md-select>
+  </md-input-container>
+  <div layout="row" layout-align="center" ng-if="['EQ', 'NEQ', 'CONTAINS', 'SW', 'EW'].includes($ctrl.keywords.operator)" flex>
+    <md-input-container >
+      <input ng-model="$ctrl.tempModel.value" md-placeholder="Enter Value" ng-change="$ctrl.onInputChange()"/>
+    </md-input-container>
+  </div>
+</div>
+<md-chips ng-if="$ctrl.keywords.operator === 'ISIN' || $ctrl.keywords.operator === 'ISNOTIN'"
+          ng-model="$ctrl.keywords.modelValues"
           required
-          md-on-add="$ctrl.onChange({model: $ctrl.keywords})"
-          md-on-remove="$ctrl.onChange({model: $ctrl.keywords})"
+          md-on-add="$ctrl.onChipsChange()"
+          md-on-remove="$ctrl.onChipsChange()"
           md-removable="true"
           md-add-on-blur
           md-separator-keys="$ctrl.separatorKeys"

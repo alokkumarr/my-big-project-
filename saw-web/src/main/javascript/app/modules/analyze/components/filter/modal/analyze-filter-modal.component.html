@@ -12,11 +12,21 @@
                     layout="row"
                     layout-align="space-between start">
         <analyze-filter-row filter="filter"
+                            options="$ctrl.options"
                             runtime="$ctrl.isRuntime"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
                             artifact="artifact"
                             style="padding-right: 10px;">
         </analyze-filter-row>
+
+        <md-checkbox class="md-secondary"
+                     ng-if="$ctrl.type === 'chart'"
+                     ng-hide="::$ctrl.isRuntime"
+                     ng-disabled="!filter.column"
+                     ng-model="filter.isGlobalFilter"
+                     ng-change="$ctrl.onGlobalToggle(filter)">
+          <span translate="GLOBAL_FILTER"></span>
+        </md-checkbox>
 
         <md-checkbox class="md-secondary"
                      ng-hide="::$ctrl.isRuntime"
