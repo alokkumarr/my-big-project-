@@ -1,25 +1,14 @@
 import * as map from 'lodash/map';
-import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
-import * as reduce from 'lodash/reduce';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
+import * as moment from 'moment';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
 
 import {PRIVILEGES} from '../../consts';
-
-const F2B_DICTIONARY = {
-  WEEKS: 'weekly',
-  DAYS: 'daily'
-};
-
-const B2F_DICTIONARY = {
-  weekly: 'WEEKS',
-  daily: 'DAYS'
-};
 
 export const AnalyzePublishDialogComponent = {
   template,
@@ -29,7 +18,7 @@ export const AnalyzePublishDialogComponent = {
     onPublish: '&'
   },
   controller: class AnalyzePublishDialogController {
-    constructor($mdDialog, AnalyzeService, $mdConstant) {
+    constructor($mdDialog, AnalyzeService, $mdConstant, JwtService, $rootScope) {
       'ngInject';
 
       this._$mdDialog = $mdDialog;
@@ -37,14 +26,12 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
+      this._JwtService = JwtService;
+      this.resp = this._JwtService.getTokenObj();
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
       const semicolon = 186;
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
-      if (this.model.isScheduled === 'true') {
-        this.emails = get(this.model.schedule, 'emails') || [];
-      } else {
-        this.emails = [];
-      }
+      this.emails = [];
       this.repeatIntervals = ['DAYS', 'WEEKS'];
       this.repeatInterval = this.repeatIntervals[0];
       this.repeatOrdinals = [1, 2, 3, 4, 5, 6, 7];
@@ -56,7 +43,7 @@ export const AnalyzePublishDialogComponent = {
           checked: false
         };
       });
-
+      this.crondetails = {};
       this.endCriteria = {
         never: {
           keyword: 'NEVER'
@@ -71,48 +58,51 @@ export const AnalyzePublishDialogComponent = {
         }
       };
       this.endCriterion = this.endCriteria.never.keyword;
+      this.loadCronLayout = false;
+      this._$rootScope = $rootScope;
     }
 
     $onInit() {
-      this.populateSchedule();
+      this.scheduleState = 'new';
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
         .then(response => {
           this.dataHolder = response;
           this.setDefaultCategory();
+          this.fetchCronDetails();
         });
     }
 
-    populateSchedule() {
-      if (isEmpty(this.model.schedule)) {
-        return;
-      }
-
-      this.hasSchedule = true;
-      this.repeatOrdinal = this.model.schedule.repeatInterval;
-      this.repeatInterval = B2F_DICTIONARY[this.model.schedule.repeatUnit];
-      forEach(this.repeatOnDaysOfWeek, day => {
-        day.checked = Boolean(get(this.model, `schedule.repeatOnDaysOfWeek.${day.keyword.toLowerCase()}`));
+    fetchCronDetails() {
+      this.$dialog.showLoader();
+      this.requestCron = {
+        jobName: this.model.id,
+        categoryId: this.model.categoryId,
+        groupName: this.resp.ticket.custCode
+      };
+      this._$rootScope.showProgress = true;
+      this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
+        this._$rootScope.showProgress = false;
+        this.loadCronLayout = true;
+        this.$dialog.hideLoader();
+        if (response.data.data.jobDetails) {
+          this.crondetails = {
+            cronexp: response.data.data.jobDetails.cronExpression,
+            activeTab: response.data.data.jobDetails.activeTab,
+            activeRadio: response.data.data.jobDetails.activeRadio
+          };
+          if (response.data.data.jobDetails.cronExpression) {
+            this.scheduleState = 'exist';
+          }
+          this.emails = response.data.data.jobDetails.emailList;
+          this.hasSchedule = true;
+        }
       });
     }
 
     generateSchedulePayload() {
       if (!this.hasSchedule) {
-        this.model.schedule = null;
-        this.model.scheduleHuman = '';
         return {execute: true, payload: this.model};
       }
-
-      this.model.schedule = {
-        emails: this.emails,
-        repeatUnit: F2B_DICTIONARY[this.repeatInterval],
-        repeatInterval: this.repeatOrdinal,
-        repeatOnDaysOfWeek: reduce(this.repeatOnDaysOfWeek, (result, day) => {
-          result[day.keyword.toLowerCase()] = day.checked;
-          return result;
-        }, {})
-      };
-
-      this.model.scheduleHuman = this._AnalyzeService.scheduleToString(this.model.schedule);
 
       return {execute: true, payload: this.model};
     }
@@ -131,10 +121,42 @@ export const AnalyzePublishDialogComponent = {
       this._$mdDialog.cancel();
     }
 
+    onCronChanged(cronexpression) {
+      this.crondetails = cronexpression;
+    }
+
     publish() {
-      if (!this.validateEmails(this.emails)) {
-        this.emailValidateFlag = true;
-        return;
+      if (this.hasSchedule === false) {
+        this.scheduleState = 'delete';
+        this.model.schedule = {
+          categoryId: this.model.categoryId,
+          groupName: this.resp.ticket.custCode,
+          jobName: this.model.id,
+          scheduleState: this.scheduleState
+        };
+      } else {
+        if (!this.validateEmails(this.emails)) {
+          this.emailValidateFlag = true;
+          return;
+        }
+        this.model.schedule = {
+          scheduleState: this.scheduleState,
+          activeRadio: this.crondetails.activeRadio,
+          activeTab: this.crondetails.activeTab,
+          analysisID: this.model.id,
+          analysisName: this.model.name,
+          cronExpression: this.crondetails.cronexp,
+          description: this.description,
+          emailList: this.emails,
+          fileType: 'csv',
+          jobName: this.model.id,
+          metricName: this.model.metricName,
+          type: this.model.type,
+          userFullName: this.model.userFullName,
+          jobScheduleTime: moment().format(),
+          categoryID: this.model.categoryId,
+          jobGroup: this.resp.ticket.custCode
+        };
       }
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
@@ -142,6 +164,9 @@ export const AnalyzePublishDialogComponent = {
     }
 
     validateEmails(emails) {
+      if (isEmpty(emails)) {
+        return false;
+      }
       const emailsList = emails;
       let emailsAreValid = true;
       forEach(emailsList, email => {

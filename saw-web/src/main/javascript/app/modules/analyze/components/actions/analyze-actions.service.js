@@ -1,5 +1,6 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
+import * as deepClone from 'lodash/cloneDeep';
 
 import {AnalyseTypes} from '../../consts';
 
@@ -65,7 +66,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     return AnalyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
       $rootScope.showProgress = false;
       toastMessage.info(execute ?
-        'Analysis has been published.' :
+        'Analysis has been updated.' :
         'Analysis schedule changes have been updated.');
       return updatedAnalysis;
     }, () => {
@@ -80,7 +81,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
       showDialog({
         template,
         controller: scope => {
-          scope.model = analysis;
+          scope.model = deepClone(analysis);
         },
         multiple: true
       });

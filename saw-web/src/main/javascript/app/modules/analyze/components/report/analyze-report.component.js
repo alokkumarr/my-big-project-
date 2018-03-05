@@ -241,12 +241,7 @@ export const AnalyzeReportComponent = {
       model.clear();
       forEach(this.model.sqlBuilder.dataFields, aggregates => {
         forEach(data[0].columns, column => {
-          if (column.type === 'string') {
-            const checkStringColumn = aggregates.columnName.split('.');
-            if (checkStringColumn[0] === column.columnName) {
-              column.aggregate = aggregates.aggregate;
-            }
-          } else if (aggregates.columnName === column.columnName) {
+          if (aggregates.columnName === column.columnName) {
             column.aggregate = aggregates.aggregate;
           }
           column.reportType = this.model.type;
@@ -342,6 +337,24 @@ export const AnalyzeReportComponent = {
       /* eslint-enable camelcase */
     }
 
+    /**
+     * This is a hack. Adds .keyword suffix back to names of columns if they're string
+     * and this is an es report.
+     *
+     * @param {any} name
+     * @param {any} dataType
+     * @returns
+     */
+    addKeywordTo(name, dataType) {
+      /* eslint-disable angular/typecheck-string */
+      if (this.model.type === 'report' || dataType !== 'string' || /\.keyword/.test(name)) {
+      /* eslint:enable */
+        return name;
+      }
+
+      return `${name}.keyword`;
+    }
+
     generatePayload() {
       /* eslint-disable camelcase */
       const model = this.canvas.model;
@@ -376,7 +389,7 @@ export const AnalyzeReportComponent = {
 
         forEach(table.fields, field => {
           const fieldArtifact = {
-            columnName: field.meta.columnName,
+            columnName: this.addKeywordTo(field.meta.columnName, field.meta.type),
             displayName: field.meta.displayName,
             table: table.name,
             aliasName: field.alias,
@@ -393,14 +406,14 @@ export const AnalyzeReportComponent = {
 
           if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
             columnString = fieldArtifact.columnName;
-            if (field.type === 'string') {
+            if (field.type === 'string' && !/\.keyword/.test(fieldArtifact.columnName)) {
               columnString = `${fieldArtifact.columnName}.keyword`;
             }
             if (field.aggregate) {
               result.sqlBuilder.dataFields.push({
                 columnName: columnString,
                 type: fieldArtifact.type,
-                name: field.meta.columnName,
+                name: this.getColumnName(field.meta.columnName),
                 aggregate: field.meta.aggregate
               });
             } else {
@@ -445,7 +458,7 @@ export const AnalyzeReportComponent = {
           const sortArtifact = {
             tableName: tableArtifact.artifactName,
             type: sort.field.type,
-            columnName: sort.field.name,
+            columnName: this.addKeywordTo(sort.field.name, sort.field.type),
             order: sort.order
           };
 
@@ -465,6 +478,10 @@ export const AnalyzeReportComponent = {
       });
       /* eslint-enable camelcase */
       result.sqlBuilder.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
+
+      result.sqlBuilder.filters.forEach(filt => {
+        filt.columnName = this.addKeywordTo(filt.columnName, filt.type);
+      });
 
       return result;
     }
@@ -513,12 +530,24 @@ export const AnalyzeReportComponent = {
         });
     }
 
+    /**
+     * Removes .keyword suffix from column names if it exists. This is required
+     * because the grid data coming from backend doesn't have that suffix in
+     * its datafields.
+     *
+     * Returns a new clone of columns array with each column cloned as well.
+     *
+     * @param {any} columns
+     * @returns
+     */
     checkColumnName(columns) {
+
       forEach(columns, field => {
         field.name = this.getColumnName(field.name);
         field.meta.name = this.getColumnName(field.meta.name);
         field.meta.columnName = this.getColumnName(field.meta.columnName);
       });
+
       return columns;
     }
 
@@ -554,7 +583,6 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.gridDataTotalCount = count;
           this.model.query = analysis.queryManual || analysis.query;
-          this.columns = this.checkColumnName(this.columns);
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisSynched();
           this.endProgress();
@@ -567,7 +595,8 @@ export const AnalyzeReportComponent = {
     applyDataToGrid(columns, sorts, groups, data) {
       const grid = first(this._$componentHandler.get('ard-grid-container'));
       if (grid) {
-        grid.updateColumns(columns);
+        this.columns = this.checkColumnName(this.columns);
+        grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
         grid.updateSource(data);
         forEach(groups, group => grid.groupByColumn(group.column, false));

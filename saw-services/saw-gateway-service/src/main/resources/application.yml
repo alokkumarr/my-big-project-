@@ -30,8 +30,10 @@ export:
 
 observe:
     service:
-        host: http://localhost:9500       
-
+        host: http://localhost:9500
+scheduler:
+    service:
+        host: http://localhost:9600
 
 api:
     gateway:
@@ -51,6 +53,15 @@ api:
         -   location: ${export.service.host}
             method : GET
             path : '[/]export.*'
+        -   location: ${scheduler.service.host}
+            method : GET
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : POST
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : DELETE
+            path : '[/]scheduler.*'
         -   location: ${observe.service.host}
             method: POST
             path: '[/]observe.*'       

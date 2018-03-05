@@ -67,3 +67,34 @@ include::{snippets}/sso-authentication/http-request.adoc[]
 The HTTP response:
 
 include::{snippets}/sso-authentication/http-response.adoc[]
+
+== Saw scheduler API :
+
+=== Create schedule
+The HTTP request:
+
+include::{snippets}/create-schedule/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/create-schedule/http-response.adoc[]
+
+=== Update schedule
+The HTTP request:
+
+include::{snippets}/update-schedule/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/update-schedule/http-response.adoc[]
+
+=== List schedule
+
+The HTTP request:
+
+include::{snippets}/list-schedule/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/list-schedule/http-response.adoc[]
+
