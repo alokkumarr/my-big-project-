@@ -1,24 +1,24 @@
 import {
+  Format,
+  Artifact,
   AnalysisChart,
-  AnalysisReport
-} from './models/analysis.model';
-import {
+  AnalysisReport,
   ArtifactColumnPivot,
   ArtifactColumnChart,
-  ArtifactColumnReport
-} from './models/artifact-column.model';
-import { Artifact } from './models/artifact.model';
+  ArtifactColumnReport,
+  Sort,
+  Filter,
+  FilterModel
+} from './models';
 
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
 export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart | ArtifactColumnReport;
-import { Sort } from './models/sort.model';
-import { Filter } from './models/filter.model';
-import { FilterModel } from './models/filter-model.model';
 
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
   Sort,
+  Format,
   Filter,
   FilterModel,
   Artifact

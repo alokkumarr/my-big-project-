@@ -1,7 +1,7 @@
 const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
-
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
@@ -53,7 +53,8 @@ const doAnalysisAction = (name, action) => {
     const actionButton = element(by.id(id))
       .element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
     commonFunctions.waitFor.elementToBeVisible(actionButton);
-    actionButton.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+    // actionButton.click();
   });
 };
 
@@ -86,9 +87,14 @@ const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(inde
 const getFilterAutocomplete = index => getFilterRow(index)
   .element(by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input'));
 
+// If filter value type is String
 const getStringFilterInput = index => getFilterRow(index)
   .element(by.css('string-filter'))
   .element(by.css('input[aria-label="Chips input."]'));
+
+// If filter value type is Number
+const getNumberFilterInput = index => getFilterRow(index)
+  .element(by.xpath("//input[@ng-model='$ctrl.tempModel.value']"));
 
 const getAppliedFilter = name => element(by.css('filter-chips'))
   .element(by.cssContainingText('md-chip-template > span', name));
@@ -121,6 +127,7 @@ const doSelectPivotGroupInterval = (name, groupInterval) => {
 
 const getReportField = (tableName, fieldName) => element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
 const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('md-checkbox'));
+//const getReportFieldCheckbox = (tableName, fieldName) => element(by.xpath(`//md-checkbox/div/span[text()='${fieldName}']/ancestor::*[contains(@e2e, '${tableName}')]`));
 const getReportFieldEndPoint = (tableName, fieldName, side) => {
   const endpoints = getReportField(tableName, fieldName).all(by.css('js-plumb-endpoint'));
   switch (side) {
@@ -146,7 +153,7 @@ const doAccountAction = action => {
     return browser.driver.getCurrentUrl().then(url => {
       return /login/.test(url);
     });
-  }, 600000);
+  }, protractorConf.timeouts.fluentWait);
 };
 
 function navigateToHome() {
@@ -155,13 +162,14 @@ function navigateToHome() {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
     });
-  }, 600000);
+  }, protractorConf.timeouts.fluentWait);
 };
 
 module.exports = {
   newDialog: {
-    getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
-    getMethod: name => element(by.css(`button[e2e="item-type-${name}"]`)),
+    getMetricRadioButtonElementByName: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
+    getMetricSelectedRadioButtonElementByName: name => element(by.xpath(`//md-radio-button[@e2e = 'metric-name-${name}' and @aria-checked='true']`)),
+    getAnalysisTypeButtonElementByType: name => element(by.css(`button[e2e="item-type-${name}"]`)),
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
   },
   designerDialog: {
@@ -206,6 +214,7 @@ module.exports = {
   filtersDialog: {
     getFilterAutocomplete,
     getStringFilterInput,
+    getNumberFilterInput,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
     getAppliedFilter
   },

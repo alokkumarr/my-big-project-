@@ -12,8 +12,8 @@
                   e2e="filter-select">
         <mat-option *ngFor="let artifactColumn of artifactColumns"
                     [value]="artifactColumn.columnName"
-                    [e2e]="'filter-select-option-' + (artifactColumn.aliasName || artifactColumn.displayName)">
-          {{ artifactColumn.aliasName || artifactColumn.displayName }}
+                    [e2e]="'filter-select-option-' + (artifactColumn.displayName)">
+          {{ artifactColumn.displayName }}
         </mat-option>
       </mat-select>
     </mat-form-field>

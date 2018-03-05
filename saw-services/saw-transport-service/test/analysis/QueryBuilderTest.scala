@@ -65,7 +65,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with string filter should have a WHERE clause with condition") {
       query(artifactT)(filters("AND", filterString(
-        "string", "t", "a", "abc", "def"))
+        "string", "t", "a", "isin", "abc", "def"))
       ) must be ("SELECT t.a, t.b FROM t WHERE upper(t.a) IN ('ABC', 'DEF')")
     }
     it("with date between filter should have a WHERE clause with BETWEEN") {
@@ -201,8 +201,8 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   }
 
   private def filterString(filterType: String, tableName: String,
-    columnName: String, values: String*): JObject = {
-    filterCommon(filterType, tableName, columnName, null).merge(
+    columnName: String, operator: String, values: String*): JObject = {
+    filterCommon(filterType, tableName, columnName, operator).merge(
       ("model", ("modelValues", JArray(values.map(JString(_)).toList))): JObject)
   }
 

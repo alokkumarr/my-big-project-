@@ -4,6 +4,7 @@ import style from './analyze-view.component.scss';
 import * as remove from 'lodash/remove';
 import * as findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {Events} from '../../consts';
 import AbstractComponentController from '../../../../common/components/abstractComponent';
@@ -36,6 +37,7 @@ export const AnalyzeViewComponent = {
       this._$rootScope = $rootScope;
       this._JwtService = JwtService;
       this._analysisCache = [];
+      this.resp = this._JwtService.getTokenObj();
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
@@ -50,6 +52,7 @@ export const AnalyzeViewComponent = {
       };
       this.updater = new Subject();
       this.canUserCreate = false;
+      this.loadCards = false;
     }
 
     $onInit() {
@@ -61,6 +64,23 @@ export const AnalyzeViewComponent = {
       this.loadAnalyses();
       this.canUserCreate = this._JwtService.hasPrivilege('CREATE', {
         subCategoryId: this.$state.params.id
+      });
+      this.getCronJobs();
+    }
+
+    getCronJobs() {
+      this.resp = this._JwtService.getTokenObj();
+      this.requestModel = {
+        categoryId: this.$state.params.id,
+        groupkey: this.resp.ticket.custCode
+      };
+      this._AnalyzeService.getAllCronJobs(this.requestModel).then(response => {
+        this.loadCards = true;
+        if (!isUndefined(response.data.data[0])) {
+          this.cronSavedJobs = response.data.data;
+        } else {
+          this.cronSavedJobs = '';
+        }
       });
     }
 
@@ -161,13 +181,13 @@ export const AnalyzeViewComponent = {
     }
 
     onSuccessfulPublish(analysis) {
+      this.getCronJobs();
       /* Update the new analysis in the current list */
       const analysisId = findIndex(this.analyses, ({id}) => {
         return id === analysis.id;
       });
       this.analyses.splice(analysisId, 1, analysis);
       this.updater.next({analyses: this.analyses});
-
       this._$state.go('analyze.view', {id: analysis.categoryId});
     }
 
