@@ -26,9 +26,12 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   filterCtrl: FormControl;
   private _filter;
   private value: Array<string> = [];
+  private filterCache: {values?: Array<string>};
   private suggestions = [];
   private valueChangeListener: Subscription;
   private clearFiltersListener: Subscription;
+  private applyFiltersListener: Subscription;
+  private closeFiltersListener: Subscription;
   private filteredSuggestions: Observable<any[]>;
 
   constructor(
@@ -49,18 +52,36 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
 
     this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
       this.loadDefaults();
+      this.cacheFilters();
+    });
+
+    this.applyFiltersListener = this.filters.onApplyFilter.subscribe(() => {
+      this.cacheFilters();
+    });
+
+    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(state => {
+      if (!state) {
+        this.loadDefaults(true); // load cached filter data since last apply
+      }
     });
   }
 
   ngOnDestroy() {
     this.valueChangeListener.unsubscribe();
     this.clearFiltersListener.unsubscribe();
+    this.applyFiltersListener.unsubscribe();
+    this.closeFiltersListener.unsubscribe();
   }
 
   @Input() set filter(data) {
     this._filter = data;
 
     this.loadSuggestions();
+  }
+
+  filterSuggestions(str: string) {
+    return this.suggestions.filter(sugg =>
+      sugg.toLowerCase().indexOf(str.toLowerCase()) === 0);
   }
 
   onInputChange(evt) {
@@ -74,10 +95,12 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     this.filterChanged();
   }
 
-  loadDefaults() {
-    this.filterCtrl.reset();
-    this.value = [];
-    this.filterChanged();
+  removeInput(str) {
+    const id = this.value.indexOf(str);
+    if (id >= 0) {
+      this.value.splice(id, 1);
+      this.filterChanged();
+    }
   }
 
   /**
@@ -90,29 +113,52 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
       this.suggestions = data;
 
       this.loadDefaults();
+      this.cacheFilters();
     });
   }
 
-  filterSuggestions(str: string) {
-    return this.suggestions.filter(sugg =>
-      sugg.toLowerCase().indexOf(str.toLowerCase()) === 0);
+  /**
+   * Caches filter in-memory. Cache is used to revert to last
+   * applied / default values when needed.
+   *
+   * @memberof GlobalStringFilterComponent
+   */
+  cacheFilters() {
+    this.filterCache = {
+      values: this.value.slice(0)
+    };
   }
 
-  removeInput(str) {
-    const id = this.value.indexOf(str);
-    if (id >= 0) {
-      this.value.splice(id, 1);
-      this.filterChanged();
+  /**
+   * Loads default or cached filter values to the bound model
+   *
+   * @param {boolean} [fromCache=false]
+   * @returns
+   * @memberof GlobalStringFilterComponent
+   */
+  loadDefaults(fromCache = false) {
+    if ((fromCache && !this.filterCache)) {
+      return;
     }
+
+    this.filterCtrl.reset();
+
+    this.value = fromCache ? this.filterCache.values.slice(0) : [];
+    this.filterChanged();
   }
 
-  isValid() {
+  isValid(): boolean {
     return this.filterCtrl.value || (
       this.value &&
       this.value.length
     );
   }
 
+  /**
+   * Communicates the filter value to the parent.
+   *
+   * @memberof GlobalStringFilterComponent
+   */
   filterChanged() {
     const payload = {
       ...this._filter,

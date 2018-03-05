@@ -1,5 +1,9 @@
 <mat-sidenav-container class="filter-container" [autosize]="false">
-  <mat-sidenav #filterSidenav mode="over" [opened]="false" position="end">
+  <mat-sidenav #filterSidenav
+    mode="over"
+    (openedChange)="filterSidenavStateChange($event)"
+    [opened]="false"
+    position="end">
     <global-filter (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
   </mat-sidenav>
   <mat-sidenav-content>
