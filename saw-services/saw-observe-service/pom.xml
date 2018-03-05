@@ -131,6 +131,11 @@
 		  <artifactId>maprdb</artifactId>
 		  <version>5.2.0-mapr</version>
 		</dependency>
+		<dependency>
+			<groupId>info.faljse</groupId>
+			<artifactId>SDNotify</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -198,6 +203,14 @@
 								<entry>
 									<name>/usr/lib/systemd/system/saw-observe.service</name>
 									<file>src/main/system/saw-observe.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-observe-proxy.service</name>
+									<file>src/main/system/saw-observe-proxy.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-observe-proxy.socket</name>
+									<file>src/main/system/saw-observe-proxy.socket</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-observe-service/conf/logback.xml</name>

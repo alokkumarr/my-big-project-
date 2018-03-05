@@ -8,4 +8,4 @@
   notify:
     - restart saw-observe
 - name: Enable SAW Observe Service
-  systemd: name=saw-observe enabled=true
+  systemd: name=saw-observe-proxy.socket enabled=true state=started

@@ -5,7 +5,7 @@ spring:
     name: saw-observe-service
 server:
   address: localhost
-  port: 9500
+  port: 9501
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
