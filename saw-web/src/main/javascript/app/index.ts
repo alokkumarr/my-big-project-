@@ -6,10 +6,7 @@ import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
 
 import 'zone.js/dist/zone';
-<<<<<<< HEAD
 import 'hammerjs';
-=======
->>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
 import 'reflect-metadata';
 import { NgModule, StaticProvider, LOCALE_ID, Injector } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -81,12 +78,8 @@ angular
     ObserveModule,
     AnalyzeModule,
     AlertsModule,
-<<<<<<< HEAD
     AdminModule,
     WorkbenchModule
-=======
-    AdminModule
->>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
   ])
   .config(routesConfig)
   .config(themeConfig)
@@ -102,12 +95,4 @@ angular
   .component('layoutContent', LayoutContentComponent)
   .component('layoutFooter', LayoutFooterComponent);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 angular.bootstrap(document, [AppModule]);
-=======
-angular.bootstrap(document, [AppModule]);
->>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
-=======
-angular.bootstrap(document, [AppModule]);
->>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
