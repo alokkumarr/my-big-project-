@@ -2,13 +2,17 @@ declare const require: any;
 
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NouisliderModule } from 'ng2-nouislider';
 import {
   MatButtonModule,
   MatRadioModule,
   MatSelectModule,
   MatIconModule,
   MatDialogModule,
+  MatAutocompleteModule,
   MatFormFieldModule,
+  MatSidenavModule,
+  MatDatepickerModule,
   MatProgressBarModule,
   MatChipsModule,
   MatIconRegistry,
@@ -16,24 +20,23 @@ import {
   MatCheckboxModule,
   MatMenuModule,
   MatTooltipModule,
-  MatDatepickerModule,
   MatInputModule,
   MatToolbarModule,
-  MatCardModule,
-  MatGridListModule,
-  MatStepperModule,
-  MatSliderModule,
   MatSlideToggleModule,
-  MatTabsModule,
-  MatDividerModule,
   MatExpansionModule,
   MatButtonToggleModule,
-  MatSnackBarModule
+  MatCardModule,
+  MatStepperModule,
+  MatSliderModule,
+  MatTabsModule,
+  MatDividerModule
 } from '@angular/material';
 
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
+require('nouislider/distribute/nouislider.min.css');
+
 import '../../../../themes/_angular_next.scss';
 @NgModule({
   imports: [
@@ -43,27 +46,28 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatIconModule,
     MatDialogModule,
+    MatAutocompleteModule,
     MatFormFieldModule,
+    MatSidenavModule,
+    MatDatepickerModule,
     MatProgressBarModule,
     MatChipsModule,
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
-    MatDatepickerModule,
     MatInputModule,
     MatToolbarModule,
-    MatCardModule,
-    MatGridListModule,
-    MatStepperModule,
-    MatDividerModule,
-    MatSliderModule,
     MatSlideToggleModule,
-    MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
+    MatCardModule,
+    MatStepperModule,
+    MatSliderModule,
+    MatTabsModule,
+    MatDividerModule,
     MatMomentDateModule,
-    MatSnackBarModule
+    NouisliderModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -72,27 +76,28 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatIconModule,
     MatDialogModule,
+    MatAutocompleteModule,
     MatFormFieldModule,
+    MatSidenavModule,
+    MatDatepickerModule,
     MatProgressBarModule,
     MatChipsModule,
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
-    MatDatepickerModule,
     MatInputModule,
     MatToolbarModule,
-    MatCardModule,
-    MatGridListModule,
-    MatStepperModule,
-    MatDividerModule,
-    MatSliderModule,
     MatSlideToggleModule,
-    MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
+    MatCardModule,
+    MatStepperModule,
+    MatSliderModule,
+    MatTabsModule,
+    MatDividerModule,
     MatMomentDateModule,
-    MatSnackBarModule
+    NouisliderModule
   ]
 })
 export class MaterialModule { }

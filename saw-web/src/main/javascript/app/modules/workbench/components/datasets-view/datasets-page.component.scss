@@ -2,12 +2,17 @@
 
 datasets-page {
   width: 100%;
-}
 
-.dataSets-view {
+  .action-buttons {
+    .mat-icon-button {
+      font-size: 22px;
+    }
+  }
+
   .toolbar-white {
     background-color: #FFF;
-    height: 45px;
+    height: 45px !important;
+    min-height: 45px !important;
   }
 
   .md-subhead {
@@ -16,52 +21,34 @@ datasets-page {
     text-transform: uppercase;
   }
 
-  &_search-panel {
-    flex-basis: 40%;
+  .mat-button-toggle-checked {
+    background-color: $primary-blue-b2;
+    color: white;
   }
 
-  &_switch-view {
-    width: 60px;
+  .mat-button-toggle-label-content {
+    padding: 0 7px;
+    line-height: 32px;
+  }
 
-    mat-radio-group {
-      display: inline-flex;
+  .view-mode {
+    .mat-button-toggle-group {
+      box-shadow: none;
+    }
 
-      mat-radio-button {
-        margin: 0;
-        padding-right: 3px;
-
-        &.mat-radio-checked {
-          mat-icon {
-            color: $primary-blue-b2;
-          }
-        }
-
-        .mat-radio-container {
-          display: none;
-        }
-
-        .mat-label {
-          margin: 0;
-
-          mat-icon {
-            text-align: center;
-          }
-        }
-      }
+    .mat-button-toggle-checked {
+      background-color: white;
+      color: $primary-blue-b2;
     }
   }
 
-  &_switch-type {
-    width: 160px;
-    font-size: 16px;
-  }
+  .page-content {
+    background-color: #F5F9FC;
+    overflow: auto;
 
-  &_action-panel {
-    margin-left: auto;
-  }
-
-  &_sets-list {
-    margin: 3px;
+    .grid-view {
+      padding: 3px;
+    }
   }
 }
 

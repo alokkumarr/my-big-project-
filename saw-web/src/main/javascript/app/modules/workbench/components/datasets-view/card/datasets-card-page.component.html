@@ -1,6 +1,6 @@
-<div class="dataSets-cardView" fxLayout="row" fxLayoutAlign="start start" fxLayoutWrap>
+<div class="dataSets-cardView" fxLayout="row wrap" >
   <div fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
-    <mat-card class="datasets-card">
+    <mat-card class="datasets-card" >
       <mat-card-header>
           <div mat-card-avatar class="src-img {{sets.src}}"></div>
         <div class="dataset-name" fxFlex [innerHTML]="sets.set"></div>

@@ -21,7 +21,6 @@ import APP_CONFIG from '../../../../../../../appConfig';
 export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
   private wbAPI = `${this.api}/internal/workbench/projects`;
-  private apiWB = fpGet('wbAPI.url', APP_CONFIG);
 
   constructor(private http: HttpClient,
     private jwt: JwtService,
@@ -141,7 +140,7 @@ export class WorkbenchService {
         catchError(this.handleError('data', [])));
   }
   /**
-   * Service to fetch meta data of dataset
+   * Service to fetch meta data of all datasets
    * 
    * @param {string} projectName 
    * @param {any} id 
@@ -154,6 +153,13 @@ export class WorkbenchService {
       .pipe(
         catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }
+
+  triggerParser(payload) {
+    const endpoint = `${this.api}/internal/workbench/datasets`;
+    return this.http.post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
   /**
    * Calls the sql executor component and fetches the output as data for preview grid 
    * 

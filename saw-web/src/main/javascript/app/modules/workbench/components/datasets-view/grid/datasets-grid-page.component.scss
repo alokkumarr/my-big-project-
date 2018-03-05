@@ -2,10 +2,7 @@
 
 datasets-grid-page {
   width: 100%;
-
-  md-dialog {
-    max-width: 75% !important;
-  }
+  overflow: hidden;
 
   .src-img {
     height: 20px;
@@ -14,131 +11,6 @@ datasets-grid-page {
     float: right;
     background-size: contain;
     background-repeat: no-repeat;
-  }
-}
-
-.toast-primary {
-  position: fixed;
-}
-
-.dataSets-view {
-  .md-subhead {
-    color: #0096D5;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  &_search-panel {
-    flex-basis: 40%;
-  }
-
-  &_switch-view {
-    width: 60px;
-
-    md-radio-group {
-      display: inline-flex;
-
-      md-radio-button {
-        margin: 0;
-        padding-right: 3px;
-
-        &.md-checked {
-          md-icon {
-            color: $primary-blue-b2;
-          }
-        }
-
-        .md-container {
-          display: none;
-        }
-
-        .md-label {
-          margin: 0;
-
-          md-icon {
-            text-align: center;
-          }
-        }
-      }
-    }
-  }
-
-  &_switch-type {
-    width: 160px;
-    font-size: 16px;
-  }
-
-  &_action-panel {
-    margin-left: auto;
-  }
-
-  &_sets-list {
-    md-card {
-      md-card-header {
-        margin: 16px 24px;
-        padding: 0 0 8px;
-        border-bottom: 1px solid #CCC;
-      }
-
-      md-card-title {
-        padding: 0;
-        height: 36px;
-      }
-
-      md-card-actions {
-        md-menu-bar {
-          padding: {
-            left: 0;
-            right: 0;
-          }
-        }
-
-        .md-button {
-          display: inline-flex;
-          min-width: 24px;
-          min-height: 24px;
-          line-height: 24px;
-          height: 24px;
-        }
-      }
-
-      md-card-content {
-        padding: 5px 12px;
-      }
-    }
-  }
-
-  &_no-results {
-    width: 100%;
-    color: #B2B2B2;
-    text-align: center;
-
-    span {
-      font-size: 28px;
-      word-break: break-word;
-    }
-  }
-
-  &_grid {
-    width: 100% !important;
-
-    &_type-label {
-      background-color: #CCC;
-      padding: 3px 5px;
-    }
-
-    &_cell {
-      &:not(.dx-datagrid-action) {
-        padding: 10px !important;
-      }
-    }
-  }
-
-  .md-select-value {
-    .md-text {
-      font-weight: bold;
-      font-size: 16px;
-    }
   }
 
   .btn-card2 {
@@ -160,5 +32,10 @@ datasets-grid-page {
 
   .es {
     background-image: url('../../../../../../../../../assets/svg/elastic.svg');
+  }
+
+  .grid-container {
+    overflow: hidden;
+    display: block;
   }
 }

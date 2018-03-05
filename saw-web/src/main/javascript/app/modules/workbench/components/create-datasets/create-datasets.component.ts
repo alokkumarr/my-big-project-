@@ -6,13 +6,17 @@ import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms'
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as merge from 'lodash/merge';
+import * as omit from 'lodash/omit';
+import * as set from 'lodash/set';
 
-import { CSV_CONFIG , PARSER_CONFIG} from '../../wb-comp-configs'
+import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs'
 
 import { ParserPreviewComponent } from './parser-preview/parser-preview.component';
 import { DatasetDetailsComponent } from './dataset-details/dataset-details.component';
 import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog.component'
 import { WorkbenchService } from '../../services/workbench.service';
+import { Parser } from '@angular/compiler/src/ml_parser/parser';
 
 const template = require('./create-datasets.component.html');
 require('./create-datasets.component.scss');
@@ -45,13 +49,13 @@ export class CreateDatasetsComponent implements OnInit {
 
   @ViewChild('previewComponent') private previewComponent: ParserPreviewComponent;
   @ViewChild('detailsComponent') private detailsComponent: DatasetDetailsComponent;
-  
+
   ngOnInit() {
-    this.csvConfig = cloneDeep(CSV_CONFIG); 
+    this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
       nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(18)]),
-      descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(50)])
+      descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(99)])
     });
   }
 
@@ -65,7 +69,7 @@ export class CreateDatasetsComponent implements OnInit {
     } else if (event.selectedIndex === 2 && event.previouslySelectedIndex === 3) {
       this.parsedPreview.next(this.previewData);
     }
-  } 
+  }
 
   markSelectDone(data) {
     this.selectFullfilled = data.selectFullfilled;
@@ -82,7 +86,9 @@ export class CreateDatasetsComponent implements OnInit {
     if (this.selectedIndex === 2) {
       this.workBench.getParsedPreviewData(this.userProject, this.details).subscribe(data => {
         this.previewData = data;
-        this.parsedPreview.next(this.previewData);
+        setTimeout(() => {
+          this.parsedPreview.next(this.previewData);
+        });
       });
     }
   }
@@ -106,5 +112,24 @@ export class CreateDatasetsComponent implements OnInit {
   }
 
   triggerParser() {
+    const payload = {
+      'name': this.nameFormGroup.value.nameControl,
+      'component': 'parser',
+      'configuration':
+      {
+        'fields': this.fieldsConf.fields,
+        'file': this.fieldsConf.info.file,
+        'lineSeparator': this.fieldsConf.lineSeparator,
+        'delimiter': this.fieldsConf.delimiter,
+        'quoteChar': this.fieldsConf.quoteChar,
+        'quoteEscape': this.fieldsConf.quoteEscapeChar,
+        'headerSize': this.fieldsConf.headerSize
+      }
+    };
+    // this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
+    this.workBench.triggerParser(payload).subscribe(data => {
+      //this.dialogRef.close();
+
+    })
   }
 }

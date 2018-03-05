@@ -75,6 +75,7 @@ export class SqlExecutorComponent implements OnInit {
       .subscribe(data => {
         if (data !== false) {
           this.datasetDetails = data;
+          this.triggerSQL();
         }
       });
   }
@@ -82,5 +83,20 @@ export class SqlExecutorComponent implements OnInit {
   toggleViewMode(fullScreenPreview) {
     this.previewHeight = fullScreenPreview ? 100 : 60;
     this.scriptHeight = fullScreenPreview ? 0 : 40;
+  }
+
+  triggerSQL() {
+    const payload = {
+      'name': 'test_sql',
+      'input': 'test_parser',
+      'component': 'sql',
+      'configuration': {
+        'script': 'CREATE TABLE test_sql AS SELECT 1'
+      }
+    }
+    this.workBench.triggerParser(payload).subscribe(data => {
+      //this.dialogRef.close();
+
+    })
   }
 }

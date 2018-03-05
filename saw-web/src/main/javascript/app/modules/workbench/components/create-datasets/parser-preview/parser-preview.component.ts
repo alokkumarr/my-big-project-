@@ -202,7 +202,13 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   toAdd() {
-    const config = assign(this.parserData, { fields: this.fieldInfo });
+    const fieldsObj = map(this.fieldInfo,  obj => {
+      if (obj.format) {
+        obj.format = obj.format[0];  // Parser component expects format to be a string.
+      }
+      return obj;
+    });
+    const config = assign(this.parserData, { fields: fieldsObj });
     this.parserConfig.emit(config);
   }
 

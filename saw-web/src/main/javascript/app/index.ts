@@ -28,7 +28,7 @@ import { CommonModuleTs } from './common';
 import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
 import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
-import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench'
+import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
 
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';

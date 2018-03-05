@@ -11,7 +11,11 @@
     <link rel="shortcut icon" href="./favicon.ico?v=3" />
   </head>
   <body>
-      <service-bootstrap></service-bootstrap>
+    <!-- In hybrid apps using downgradeModule, the angular module is bootstrapped
+      lazily when the first angular component is rendered. Any downgraded injectors aren't
+      accessible until then. This component is a downgraded component from angular to angularjs
+      meant to force bootstrapping angular module.  -->
+    <service-bootstrap></service-bootstrap>
     <layout-content></layout-content>
   </body>
 </html>
