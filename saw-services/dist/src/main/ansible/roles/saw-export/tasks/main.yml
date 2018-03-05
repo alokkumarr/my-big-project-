@@ -8,4 +8,4 @@
   notify:
     - restart saw-export
 - name: Enable SAW Export Service
-  systemd: name=saw-export enabled=true
+  systemd: name=saw-export-proxy.socket enabled=true state=started
