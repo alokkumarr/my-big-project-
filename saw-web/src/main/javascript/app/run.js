@@ -30,21 +30,10 @@ export function runConfig($q, $rootScope, $state, $location, $window, JwtService
         return false; // this technically doesn't matter, since we're changing the location itself, still...
       }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    /* See if the state we're going to is in the list of supported modules */
-    const allowed = some(modules, moduleName => startsWith(toState, moduleName) || startsWith(toState, 'workbench'));
-=======
-=======
->>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
       /* Allow admin users to visit admin pages */
       if (JwtService.isAdmin(token) && (startsWith(toState, 'admin') || startsWith(toState, 'role') || startsWith(toState, 'privilege') || startsWith(toState, 'categories'))) {
         return true;
       }
-<<<<<<< HEAD
->>>>>>> 47174b002db30c2b4e1bb29001816d702bd958f3
-=======
->>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
 
       const modules = map(
         get(token, 'ticket.products.[0].productModules'),
@@ -52,11 +41,7 @@ export function runConfig($q, $rootScope, $state, $location, $window, JwtService
       );
 
       /* See if the state we're going to is in the list of supported modules */
-<<<<<<< HEAD
-      const allowed = some(modules, moduleName => startsWith(toState, moduleName) || startsWith(toState, 'observe'));
-=======
       const allowed = some(modules, moduleName => startsWith(toState, moduleName) || startsWith(toState, 'workbench'));
->>>>>>> ac1d79e1e5d9ffdf3ec25e91f831c57fef2a0c3a
 
       if (!allowed) {
         $log.error(new Error(`Privilege to access ${toState} not present.`));
