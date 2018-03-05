@@ -6,10 +6,19 @@ set -eu
 
 dir=$(dirname $0)
 
-# Load common metrics functions
-. $dir/../lib/common.sh
+sudo_mapr="sudo -u mapr"
+hadoop_put="hadoop fs -put -f"
+datalake_raw=/data/bda/raw
 
-datalake_raw=/data/bda/datalake/raw
+wait_maprfs() {
+    # The MapR container might still be starting up, so wait until MapR-FS
+    # has been verified being available
+    echo "Waiting for MapR-FS to become available"
+    while ! hadoop fs -ls / > /dev/null 2>&1; do
+        sleep 5
+        echo "Retrying accessing MapR-FS"
+    done
+}
 
 init_datalake() {
     $sudo_mapr hadoop fs -mkdir -p $datalake_raw

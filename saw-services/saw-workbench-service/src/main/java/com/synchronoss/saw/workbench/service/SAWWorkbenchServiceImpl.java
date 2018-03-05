@@ -96,11 +96,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         }
       }
     }
-    if (defaultProjectRoot.startsWith(prefix)) {
-     logger.trace("Initializing defaultProjectRoot {}", defaultProjectRoot); 
-    this.mdt = new DLMetadata(defaultProjectRoot);
-    this.mdtStore = new DataSetStore(basePath);}
-    this.tmpDir = System.getProperty("java.io.tmpdir");
 
     /* Initialize metadata tables */
     HFileOperations.createDir(defaultProjectRoot + "/metadata");
@@ -115,6 +110,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         logger.info("Creating default project: {}", defaultProjectId);
         ps.createProjectRecord(defaultProjectId, "{}");
     }
+
+    if (defaultProjectRoot.startsWith(prefix)) {
+     logger.trace("Initializing defaultProjectRoot {}", defaultProjectRoot); 
+    this.mdt = new DLMetadata(defaultProjectRoot);
+    this.mdtStore = new DataSetStore(basePath);}
+    this.tmpDir = System.getProperty("java.io.tmpdir");
   }
 
   private void createMetadataTable(String table) {
