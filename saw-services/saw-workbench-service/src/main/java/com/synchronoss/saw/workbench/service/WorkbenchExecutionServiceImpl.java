@@ -1,5 +1,7 @@
 package com.synchronoss.saw.workbench.service;
 
+import sncr.bda.core.file.HFileOperations;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +27,17 @@ public class WorkbenchExecutionServiceImpl
     private String livyUri;
 
     @Override
-    public String execute(String component, String config) throws Exception {
+    public String execute(String name, String component, String config) throws Exception {
         WorkbenchClient client = new WorkbenchClient();
+        createDatasetDirectory(name);
         client.submit(livyUri, root, project, component, config);
         return "{}";
+    }
+
+    private void createDatasetDirectory(String name) throws Exception {
+        String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
+        if (!HFileOperations.exists(path)) {
+            HFileOperations.createDir(path);
+        }
     }
 }

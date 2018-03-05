@@ -84,6 +84,6 @@ public class WorkbenchExecutionController {
         xdfOutput.put("dataSet", name);
         /* Invoke XDF component */
         return workbenchExecutionService.execute(
-            component, xdfConfig.toString());
+            name, component, xdfConfig.toString());
     }
 }
