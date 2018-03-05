@@ -78,13 +78,17 @@ RUN systemctl enable saw-deploy
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-deploy
 
-# Add SAW test metrics
-COPY saw-metrics /root/saw-metrics/
 RUN chmod a+x /root
-COPY saw-metrics/saw-metrics.service /etc/systemd/system/
-RUN systemctl enable saw-metrics
+# Add SAW Analyze test data
+COPY saw-metrics /root/saw-metrics/
+COPY saw-metrics/saw-analyze-testdata.service /etc/systemd/system/
+RUN systemctl enable saw-analyze-testdata
+# Add SAW Workbench test data
+COPY saw-workbench /root/saw-workbench/
+COPY saw-workbench/saw-workbench-testdata.service /etc/systemd/system/
+RUN systemctl enable saw-workbench-testdata
 # Workaround: Set execute bit for Windows users
-RUN chmod a+x /root/saw-metrics/sample-*/load-metric
+RUN chmod a+x /root/saw-*/sample-*/load*
 
 # Forward container system logs to Docker logs
 COPY saw-logger/saw-logger.service /etc/systemd/system/
