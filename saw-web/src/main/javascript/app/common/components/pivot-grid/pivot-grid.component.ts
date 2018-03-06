@@ -223,7 +223,7 @@ export class PivotGridComponent {
         case 'quarter':
         case 'month':
           cloned.type = 'string';
-          cloned.checktype = 'date';
+          cloned.realType = 'date';
           break;
         case 'year':
           cloned.groupInterval = cloned.dateInterval;
@@ -252,7 +252,7 @@ export class PivotGridComponent {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-    const columnsToFormat = filter(this.artifactColumns, ({checktype}) => DATE_TYPES.includes(checktype));
+    const columnsToFormat = filter(this.artifactColumns, ({realType}) => DATE_TYPES.includes(realType));
     if (isEmpty(columnsToFormat)) {
       return data;
     }
@@ -302,6 +302,12 @@ export class PivotGridComponent {
 
         if (cloned.type === 'string') {
           cloned.columnName = split(cloned.columnName, '.')[0];
+        }
+
+        if (DATE_TYPES.includes(cloned.realType)) {
+          // disable sorting for the fields that have a type string because of manual formatting
+          // so it doesn't sort the fields accordinbg to the display string
+          cloned.sortBy = 'none';
         }
 
         if (!isUndefined(cloned.aliasName) && cloned.aliasName != '') {

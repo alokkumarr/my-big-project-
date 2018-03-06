@@ -21,7 +21,7 @@ export const DATE_FORMATS = [{
 }, {
   label: 'September 1, 2017',
   value: 'longDate',
-  momentValue: 'MMMM-D-YYYY'
+  momentValue: 'MMMM D, YYYY'
 }, {
   label: '09/01/2017 (MM/DD/YYYY)',
   value: 'shortDate',
