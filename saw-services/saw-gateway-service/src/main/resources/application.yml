@@ -62,6 +62,14 @@ api:
             path : '[/]export.*'
         -   location: ${observe.service.host}
             method: POST
+        -   location: ${scheduler.service.host}
+            method : GET
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : POST
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : DELETE
             path: '[/]observe.*'       
         -   location: ${observe.service.host}
             method: GET
