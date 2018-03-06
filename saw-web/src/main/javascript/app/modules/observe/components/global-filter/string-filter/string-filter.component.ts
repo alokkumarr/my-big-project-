@@ -26,7 +26,7 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   filterCtrl: FormControl;
   private _filter;
   private value: Array<string> = [];
-  private filterCache: {values?: Array<string>};
+  private filterCache: {values?: Array<string>, textValue?: string};
   private suggestions = [];
   private valueChangeListener: Subscription;
   private clearFiltersListener: Subscription;
@@ -125,7 +125,8 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
    */
   cacheFilters() {
     this.filterCache = {
-      values: this.value.slice(0)
+      values: this.value.slice(0),
+      textValue: this.filterCtrl.value
     };
   }
 
@@ -141,7 +142,11 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.filterCtrl.reset();
+    if (fromCache && this.filterCache.textValue) {
+      this.filterCtrl.setValue(this.filterCache.textValue);
+    } else {
+      this.filterCtrl.reset();
+    }
 
     this.value = fromCache ? this.filterCache.values.slice(0) : [];
     this.filterChanged();
