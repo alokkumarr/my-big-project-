@@ -30,6 +30,12 @@
 
       <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
         <cron-job-schedular ng-if="$ctrl.hasSchedule" [crondetails]="$ctrl.crondetails" (on-cron-changed)="$ctrl.onCronChanged($event)"></cron-job-schedular>
+        <div class="form-container" layout="column">
+          <md-checkbox ng-checked="$ctrl.hasDispatch"
+                        ng-click="$ctrl.hasDispatch = !$ctrl.hasDispatch">
+            <span translate="SET_DISPATCH_LABEL"></span>
+          </md-checkbox>
+        </div>
 
         <div class="form-container" layout="column">
           <label translate="EMAIL_TO_COPY"></label>

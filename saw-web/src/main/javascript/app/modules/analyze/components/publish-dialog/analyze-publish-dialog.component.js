@@ -26,6 +26,7 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
+      this.hasDispatch = false;
       this._JwtService = JwtService;
       this.resp = this._JwtService.getTokenObj();
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
@@ -60,6 +61,7 @@ export const AnalyzePublishDialogComponent = {
       this.endCriterion = this.endCriteria.never.keyword;
       this.loadCronLayout = false;
       this._$rootScope = $rootScope;
+      console.log(this.model);
     }
 
     $onInit() {
@@ -135,7 +137,7 @@ export const AnalyzePublishDialogComponent = {
           scheduleState: this.scheduleState
         };
       } else {
-        if (!this.validateEmails(this.emails)) {
+        if (!this.validateEmails(this.emails) && this.hasDispatch === false) {
           this.emailValidateFlag = true;
           return;
         }
