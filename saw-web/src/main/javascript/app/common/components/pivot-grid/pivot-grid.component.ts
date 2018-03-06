@@ -30,7 +30,7 @@ import {
   ArtifactColumnPivot,
   Sort,
   Format
-} from '../../../modules/analyze/models';
+} from '../../../models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,

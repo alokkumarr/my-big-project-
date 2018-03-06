@@ -31,7 +31,12 @@ import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
-import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
+import {
+  DxPivotGridModule,
+  DxPivotGridComponent,
+  DxDataGridModule,
+  DxDataGridComponent
+} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
 
@@ -100,7 +105,8 @@ angular
     FormsModule,
     MaterialModule,
     DndModule,
-    DxPivotGridModule
+    DxPivotGridModule,
+    DxDataGridModule
   ],
   declarations: [
     PivotGridComponent,
@@ -118,6 +124,7 @@ angular
     DndModule,
     PivotGridComponent,
     DxPivotGridComponent,
+    DxDataGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
     DataFormatDialogComponent,
