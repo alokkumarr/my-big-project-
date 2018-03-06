@@ -43,6 +43,9 @@ workbench:
 observe:
     service:
         host: http://localhost:9500
+scheduler:
+    service:
+        host: http://localhost:9600        
 
 api:
   gateway:
