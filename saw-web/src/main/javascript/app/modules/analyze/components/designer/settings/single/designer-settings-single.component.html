@@ -50,7 +50,7 @@
           </button>
         </div>
       </div>
-      <div *ngIf="isEmpty(unselectedArtifactColumns)"
+      <div *ngIf="!isEmpty(artifactColumns) && isEmpty(unselectedArtifactColumns)"
            fxLayout="row" fxLayoutAlign="center center">
         <div class="settings__unselected-fields--empty"
              i18n>

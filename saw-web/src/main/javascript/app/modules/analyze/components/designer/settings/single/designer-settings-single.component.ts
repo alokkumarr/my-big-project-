@@ -44,11 +44,15 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
 })
 export class DesignerSettingsSingleComponent {
   @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
-  @Input() public artifactColumns: ArtifactColumns;
+  @Input('artifactColumns') public set setArtifactColumns(artifactColumns: ArtifactColumns) {
+    this.artifactColumns = artifactColumns;
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  };
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
   public isEmpty = isEmpty;
+  public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
@@ -72,12 +76,6 @@ export class DesignerSettingsSingleComponent {
 
   ngOnInit() {
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
-  }
-
-  ngOnChanges(changes) {
-    if (get(changes, 'artifactColumns.currentValue')) {
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    }
   }
 
   onFieldsChange() {
