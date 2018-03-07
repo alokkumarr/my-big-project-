@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.*;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.ojai.store.DocumentMutation;
 import sncr.bda.base.MetadataBase;
+import sncr.bda.conf.Input;
 import sncr.bda.exceptions.BDAException;
 import sncr.bda.conf.Output;
 import sncr.bda.context.ContextMetadata;
@@ -25,7 +27,7 @@ import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
 import static sncr.bda.base.MetadataBase.PREDEF_DATA_SOURCE;
 import static sncr.bda.base.MetadataStore.delimiter;
 import static sncr.bda.base.MetadataBase.DEFAULT_CATALOG;
-import static sncr.bda.base.MetadataBase.DEFAULT_DATA_SOURCE;
+
 
 /**
  * The class provides
@@ -65,17 +67,6 @@ public class DLDataSetService {
                 logger.trace("New file in Data Object repository: " + metadataFileName );
                 Dataset dataset = new Dataset();
                 dataset.setComponent(ctx.componentName);
-                String crtby = (entry.containsKey(DataSetProperties.MetaCreatedBy.name()))?(String)
-                        entry.get(DataSetProperties.MetaCreatedBy.name()):"nobody";
-                dataset.setCreatedBy(crtby);
-                dataset.setCreatedTs(dt);
-
-                String cat = (entry.containsKey(DataSetProperties.Category.name()))?(String)
-                        entry.get(DataSetProperties.Category.name()):"un-categorized";
-                dataset.setCategory(cat);
-
-                if (entry.containsKey(DataSetProperties.SubCategory.name()))
-                    dataset.setSubCategory(DataSetProperties.SubCategory.name());
 
                 String desc = (entry.containsKey(DataSetProperties.MetaDescription.name()))?(String)
                         entry.get(DataSetProperties.MetaDescription.name()):"__none__";
@@ -171,7 +162,8 @@ public class DLDataSetService {
     private JsonElement createDSDescriptor(String id, ContextMetadata ctx, Map<String, Object> o){
         JsonObject dl = new JsonObject();
 
-        String ds_type = o.containsKey(DataSetProperties.Type.name())? (String) o.get(DataSetProperties.Type.name()): DEFAULT_DATA_SOURCE ;
+        //TODO:: Dormant, for future development
+        String ds_type = o.containsKey(DataSetProperties.Type.name())? (String) o.get(DataSetProperties.Type.name()): Input.Dstype.BASE.toString();
         String catalog = o.containsKey(DataSetProperties.Catalog.name())? (String) o.get(DataSetProperties.Catalog.name()): DEFAULT_CATALOG;
 
         dl.add(DataSetProperties.User.toString(), new JsonPrimitive(ctx.user));
@@ -179,7 +171,6 @@ public class DLDataSetService {
         dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(ds_type));
         dl.add(DataSetProperties.Format.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Format.name())));
         dl.add(DataSetProperties.Name.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Name.name())));
-        dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive((String) o.get(DataSetProperties.PhysicalLocation.name())));
         dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive( catalog ));
         dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((Integer) o.get(DataSetProperties.NumberOfFiles.name())));
 
@@ -191,6 +182,23 @@ public class DLDataSetService {
         doc.add(DataSetProperties.System.toString(), dl);
         doc.add(DataSetProperties.Transformations.toString(), tr);
         return doc;
+    }
+
+
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema) throws Exception {
+
+        if (schema == null || ds == null)
+            throw new IllegalArgumentException("Schema/DS descriptor must not be null");
+
+        JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
+        JsonObject trans = new JsonObject();
+        trans.addProperty("asOutput",  ctx.transformationID);
+        ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        ds.getAsJsonObject().add("transformations", trans);
+        ds.getAsJsonObject().add("asOfNow", status);
+
+        dsStore.update(id, ds);
+        return ds;
     }
 
 

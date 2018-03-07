@@ -3,6 +3,7 @@ package sncr.bda.metastore;
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
 import org.ojai.Document;
+import org.ojai.store.DocumentMutation;
 import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.base.WithSearchInMetastore;
@@ -72,22 +73,12 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @param startTS -- "started":"20171117-214242",                   // Must be right before excution of component changing data of the data set set initiated by UI or pipeline
      * @param finishedTS -- "finished":"20171117-214745",               // Must be updated right after excution of component changing data of the data set set initiated by UI or pipeline
      * @param aleId      --  "aleId":"project1::1510955142031",         // last ALE ID (audit log entry ID - for future use, ALE will contain detailed info about component execution)
-     * @param batchSessionId  -- "batchId":"20174217-211133"            // Must be updated right after excution of component changing data of the data set set initiated by UI or pipeline
+     * @param batchSessionId  -- "batchId":"20174217-211133"            // Must be updated right after execution of component changing data of the data set set initiated by UI or pipeline
      * @throws Exception
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
         JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
         _updatePath(id, null, "asOfNow", src);
-    }
-
-    /**
-     * DS Store specific ( convenience ) method:
-     * data set produced by Transformation3, immutable, only one value allowed here
-     * @param id  - DS ID
-     */
-    public void setTransformationProducer(String id, String tranformationId) throws Exception {
-        JsonPrimitive p = new JsonPrimitive(tranformationId);
-        _updatePath(id, "transformations", "asOutput", p);
     }
 
     public void addTransformationConsumer(String id, String tranformationId) throws Exception {
