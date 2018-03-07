@@ -234,11 +234,21 @@ object QueryBuilder extends {
         }
       }
       case "string" => {
+        val operator = subProperty("model", "operator").toLowerCase
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
            case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String].toUpperCase())
-        "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+        val stringWhereClause = operator match {
+          case "eq" => "= '" + modelValues(0) + "'"
+          case "isin" => "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+          case "neq" => "<> '" + modelValues(0) + "'"
+          case "isnotin" => "NOT IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+          case "sw" => "like '" + modelValues(0) + "%'"
+          case "ew" => "like '%" + modelValues(0) + "'"
+          case "contains" => "like '%" + modelValues(0) + "%'"
+        }
+        stringWhereClause
       }
       case "date" | "timestamp" => {
         var lte :String = null

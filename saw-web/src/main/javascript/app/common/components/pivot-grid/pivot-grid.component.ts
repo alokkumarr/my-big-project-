@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import * as isArray from 'lodash/isArray';
 import * as get from 'lodash/get';
+import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
@@ -17,6 +18,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpPick from 'lodash/fp/pick';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
+import * as filter from 'lodash/filter';
 import * as fpForEach from 'lodash/fp/forEach';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
@@ -215,11 +217,21 @@ export class PivotGridComponent {
       // manually format dates for day quarter and month dateIntervals
       if (DATE_TYPES.includes(column.type)) {
         const cloned = clone(column);
-        if (['day', 'quarter', 'month'].includes(column.dateInterval)) {
+        switch (column.dateInterval) {
+        case 'day':
+        case 'quarter':
+        case 'month':
           cloned.type = 'string';
           cloned.checktype = 'date';
-        } else {
+          break;
+        case 'year':
           cloned.groupInterval = cloned.dateInterval;
+          // the format usually sent by the backend: 'YYYY-MM-DD' does not work with the pivot grid
+          unset(cloned, 'format');
+        case 'all':
+        default:
+          // do nothing
+          break;
         }
         return cloned;
       }
@@ -239,23 +251,30 @@ export class PivotGridComponent {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-    const formattedData = map(data, dataPoint => {
+    const columnsToFormat = filter(this.artifactColumns, ({checktype}) => DATE_TYPES.includes(checktype));
+    if (isEmpty(columnsToFormat)) {
+      return data;
+    }
 
+    const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      fpPipe(
-        fpFilter(({checktype}) => DATE_TYPES.includes(checktype)),
-        fpForEach(({name, dateInterval}) => {
-          const format = DATE_INTERVALS_OBJ[dateInterval].format;
-          clonedDataPoint[name] = moment.utc(dataPoint[name]).format(format);
-          if (dateInterval === 'quarter') {
-            const parts = split(clonedDataPoint[name], '-');
-            clonedDataPoint[name] = `${parts[0]}-Q${parts[1]}`;
-          }
-        })
-      )(this.artifactColumns);
+      const dataValue = dataPoint[name];
+      forEach(columnsToFormat, ({name, dateInterval}) => {
+        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval);
+      });
       return clonedDataPoint;
     });
     return formattedData;
+  }
+
+  getFormattedDataValue(value, dateInterval) {
+    const format = DATE_INTERVALS_OBJ[dateInterval].format;
+    const formattedValue = moment.utc(value).format(format);
+    if (dateInterval === 'quarter') {
+      const parts = split(formattedValue, '-');
+      return `${parts[0]}-Q${parts[1]}`;
+    }
+    return formattedValue;
   }
 
   artifactColumn2PivotField(): any {

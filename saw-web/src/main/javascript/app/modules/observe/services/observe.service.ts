@@ -62,6 +62,24 @@ export class ObserveService {
     return this.http.delete(`${this.api}/observe/dashboards/${dashboard.entityId}`).map(fpGet('contents.observe'));
   }
 
+  getModelValues(filter) {
+    const payload = {
+      globalFilters: [{
+        tableName: filter.tableName,
+        semanticId: filter.semanticId,
+        filters: [{
+          columnName: filter.columnName,
+          type: filter.type,
+          size: 1000,
+          order: 'asc'
+        }],
+        esRepository: filter.esRepository
+      }]
+    };
+
+    return this.http.post(`${this.api}/filters` , payload).map(fpGet(filter.columnName));
+  }
+
   reloadMenu() {
     return Observable.create(observer => {
       this.menu.getMenu('OBSERVE')

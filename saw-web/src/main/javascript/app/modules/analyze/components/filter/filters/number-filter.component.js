@@ -46,6 +46,7 @@ export const NumberFilterComponent = {
   template,
   bindings: {
     model: '<',
+    options: '<',
     onChange: '&'
   },
   controller: class NumberFilterController {

@@ -8,6 +8,7 @@ import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
 import com.synchronoss.querybuilder.model.report.*;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SAWReportTypeElasticSearchQueryBuilder {
-
 
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
     String jsonString;
@@ -115,10 +115,9 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                             builder.add(rangeQueryBuilder);
                         }
                     }
+                    // make the query based on the filter given
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                        TermsQueryBuilder termsQueryBuilder =
-                                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-                        builder.add(termsQueryBuilder);
+                        builder = QueryBuilderUtil.stringFilterReport(item, builder);
                     }
 
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
@@ -155,9 +154,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                         }
                     }
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                        TermsQueryBuilder termsQueryBuilder =
-                                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-                        builder.add(termsQueryBuilder);
+                        builder = QueryBuilderUtil.stringFilterReport(item, builder);
                     }
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
                             .getType().value().toLowerCase().equals(Filter.Type.INT.value().toLowerCase()))
@@ -181,11 +178,31 @@ public class SAWReportTypeElasticSearchQueryBuilder {
 
         List<DataField> dataFields =
                 sqlBuilderNode.getDataFields();
-
+        ReportAggregationBuilder reportAggregationBuilder = new ReportAggregationBuilder(size);
+        List<DataField> aggregationFields = reportAggregationBuilder.getAggregationField(dataFields);
+        AggregationBuilder finalAggregationBuilder =null;
         // Generated Query
-        String[] excludes = null;
-        String[] includes = getFieldsInclude(dataFields);
-        searchSourceBuilder.fetchSource(includes,excludes);
+        if (aggregationFields.size()==0)
+        {
+            String[] excludes = null;
+            String[] includes = getFieldsInclude(dataFields);
+            searchSourceBuilder.fetchSource(includes,excludes);
+        }
+        else {
+            AggregationBuilder aggregationBuilder = null;
+            if (dataFields.size()==aggregationFields.size())
+            {
+                finalAggregationBuilder=  reportAggregationBuilder.reportAggregationBuilder(dataFields
+                ,aggregationFields);
+            }
+            else {
+                finalAggregationBuilder = reportAggregationBuilder.reportAggregationBuilder(
+                        dataFields, aggregationFields, 0, 0, aggregationBuilder);
+            }
+            // set the size zero for aggregation query .
+            searchSourceBuilder.size(0);
+            searchSourceBuilder.aggregation(finalAggregationBuilder);
+        }
         setSearchSourceBuilder(searchSourceBuilder);
         return searchSourceBuilder.toString();
     }
@@ -209,7 +226,17 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         int count =0;
         /** Iterate the Data fields to include */
         for (DataField dataField : dataFields)
-        { fieldsIncludes[count++] = dataField.getColumnName(); }
+        {
+           String columnName = dataField.getColumnName();
+            /** .keyword may present in the es-mapping fields
+             take out form the columnName to get actual column name
+             if present */
+            String [] split = columnName.split("\\.");
+            if (split.length>=2)
+                fieldsIncludes[count++]= split[0];
+            else
+            fieldsIncludes[count++]= columnName;
+        }
         return fieldsIncludes;
     }
 }
