@@ -186,7 +186,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         AggregationBuilder finalAggregationBuilder =null;
 
         boolean isPercentage = dataFields.stream().anyMatch(dataField ->
-                dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
+                dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
 
         //pre-calculation for percentage.
         if(isPercentage)
