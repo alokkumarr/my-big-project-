@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.synchronoss.querybuilder.model.chart.DataField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
@@ -13,6 +14,7 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.index.query.WildcardQueryBuilder;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -23,12 +25,15 @@ import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
 import com.synchronoss.querybuilder.model.pivot.ColumnField;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
+import org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders;
+import org.elasticsearch.search.aggregations.pipeline.bucketscript.BucketScriptPipelineAggregationBuilder;
 
 public class QueryBuilderUtil {
 	
 	public final static String DATE_FORMAT = "yyyy-MM-dd";
 	public final static String SPACE_REGX = "\\s+";
 	public final static String EMPTY_STRING = "";
+    private final static String DATA_FIELDS = "data_fields";
 	public static Map<String,String> dateFormats = new HashMap<String, String>();
 	static {
       Map<String, String> formats = new HashMap<String, String>();
@@ -109,29 +114,36 @@ public class QueryBuilderUtil {
 
  	{
  		AggregationBuilder aggregationBuilder = null;
- 			switch (data.getAggregate().value())
+ 			switch (data.getAggregate())
  			{
- 			case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
- 			case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
- 			case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
- 			case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
- 			case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+				case SUM: aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+				case AVG: aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+				case MIN: aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+				case MAX: aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+				case COUNT: aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+				case PERCENTAGE:
+					Script script = new Script("_value*100/"+data.getAdditionalProperties().get(data.getColumnName()
+                            +"_sum"));
+					aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()).script(script); break;
  			}
  		
  		return aggregationBuilder;
  	}
 
 	public static AggregationBuilder aggregationBuilderDataFieldReport(com.synchronoss.querybuilder.model.report.DataField data)
-
 	{
 		AggregationBuilder aggregationBuilder = null;
-		switch (data.getAggregate().value())
+		switch (data.getAggregate())
 		{
-			case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
-			case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
-			case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
-			case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
-			case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+			case SUM: aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+			case AVG: aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+			case MIN: aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+			case MAX: aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+			case COUNT: aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+			case PERCENTAGE:
+				Script script = new Script("_value*100/"+data.getAdditionalProperties().get(data.getColumnName()
+						+"_sum"));
+				aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()).script(script); break;
 		}
 
 		return aggregationBuilder;
@@ -141,24 +153,29 @@ public class QueryBuilderUtil {
 
     {
         AggregationBuilder aggregationBuilder = null;
-            switch (data.getAggregate().value())
+            switch (data.getAggregate())
             {
-            case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
-            case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
-            case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
-            case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
-            case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+				case SUM: aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+				case AVG: aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+				case MIN: aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+				case MAX: aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+				case COUNT: aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+				case PERCENTAGE:
+					Script script = new Script("_value*100/"+data.getAdditionalProperties().get(data.getColumnName()
+                            +"_sum"));
+					aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()).script(script); break;
             }
         
         return aggregationBuilder;
     }
- 	
- 	
- 	/**
- 	 * This aggregation framework
- 	 * @param splitBy
- 	 * @return
- 	 */
+
+
+	/**
+	 * This aggregation framework
+	 * @param nodeField
+	 * @param nodeName
+	 * @return
+	 */
 	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
 	{
 		AggregationBuilder aggregationBuilder = null;
@@ -469,5 +486,38 @@ public class QueryBuilderUtil {
 		return builder;
 	}
 
-
+    /**
+     *
+     * @param dataFields
+     * @return
+     */
+	public static AggregationBuilder getAggregationBuilder(List<?> dataFields)
+    {
+                AggregationBuilder aggregationBuilder = AggregationBuilders.global(DATA_FIELDS);
+                    for (Object dataField : dataFields) {
+                        if (dataField instanceof com.synchronoss.querybuilder.model.chart.DataField) {
+                            com.synchronoss.querybuilder.model.chart.DataField data =
+                                    (com.synchronoss.querybuilder.model.chart.DataField) dataField;
+                            if (data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
+                                aggregationBuilder.subAggregation(AggregationBuilders.sum(
+                                        data.getName()).field(data.getColumnName()));
+                            }
+                        } else if (dataField instanceof com.synchronoss.querybuilder.model.pivot.DataField) {
+                            com.synchronoss.querybuilder.model.pivot.DataField data =
+                                    (com.synchronoss.querybuilder.model.pivot.DataField) dataField;
+                            if (data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
+                                aggregationBuilder.subAggregation(AggregationBuilders.sum(
+                                        data.getName()).field(data.getColumnName()));
+                            }
+                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.DataField) {
+                            com.synchronoss.querybuilder.model.report.DataField data =
+                                    (com.synchronoss.querybuilder.model.report.DataField) dataField;
+                            if (data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
+                                aggregationBuilder.subAggregation(AggregationBuilders.sum(
+                                        data.getName()).field(data.getColumnName()));
+                            }
+                        }
+                    }
+                return aggregationBuilder;
+    }
 }
