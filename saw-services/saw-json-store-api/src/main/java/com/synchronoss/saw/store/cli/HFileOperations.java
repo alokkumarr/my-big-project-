@@ -44,7 +44,7 @@ public class HFileOperations {
 
             Path path = new Path(fileName);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
             CompressionCodecFactory factory = new CompressionCodecFactory(conf);
             CompressionCodec codec = factory.getCodec(path);
             if(codec != null){
@@ -55,7 +55,6 @@ public class HFileOperations {
 
             String data = new String(IOUtils.toByteArray(stream));
             stream.close();
-            fs.close();
             return data;
         } catch (Exception e) {
             logger.error("XDF-Hadoop exception: ", e);
@@ -71,7 +70,7 @@ public class HFileOperations {
 
             Path path = new Path(fileName);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
             CompressionCodecFactory factory = new CompressionCodecFactory(conf);
             CompressionCodec codec = factory.getCodec(path);
             if(codec != null){
@@ -94,7 +93,7 @@ public class HFileOperations {
         try {
             Path path = new Path(fileName);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
 
             fout_stream = fs.create(path);
 
@@ -112,8 +111,7 @@ public class HFileOperations {
         try {
             Path path = new Path(fileName);
             Configuration conf = new Configuration();
-
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
             if(fs.exists(path)) {
                 if (fs.isDirectory(path))
                     return fs.listStatus(path);
@@ -136,7 +134,7 @@ public class HFileOperations {
         try {
             Path path = new Path(file);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
             fs.delete(path, true);
         } catch (IOException e) {
             logger.error("XDF-Hadoop exception: ", e);
@@ -174,7 +172,7 @@ public class HFileOperations {
         try {
             Path path = new Path(s);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
             //fs.create(path);
             fs.mkdirs(path);
         } catch (IOException e) {
@@ -188,7 +186,7 @@ public class HFileOperations {
         try {
             Path path = new Path(s);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(path.toUri(), conf);
+            fs = getFileSystem(path,conf);
             return fs.exists(path);
         } catch (IOException e) {
             logger.error("Cannot check path:" + e);
@@ -210,4 +208,32 @@ public class HFileOperations {
 
     public static FileContext getFileContext() { return fc;}
 
+    /**
+     * This method is used to get the file System taking the precedence
+     * of hadoop cache , if FileSystem is already closed then get the
+     * new instance and that will be automatically inserted into hadoop
+     * FileSystem cache for reuse.
+     * @param path
+     * @param conf
+     * @return
+     * @throws IOException
+     */
+    private static FileSystem getFileSystem(Path path, Configuration conf) throws IOException {
+        FileSystem fs =null;
+        try {
+            fs = FileSystem.get(path.toUri(), conf);
+            return  fs;
+        } catch (IOException ex)
+        {
+            // File System is already closed then try with new instance
+            // new instance will be inserted into HDFS fileSystem Cache for reuse
+            // So, closing file system is not required.
+            logger.warn("Failed to get FileSystem.", ex);
+        }
+        if(fs==null) {
+            // In case of file system already closed , Attempt to get new instance.
+            fs = FileSystem.newInstance(path.toUri(), conf);
+        }
+        return fs;
+    }
 }

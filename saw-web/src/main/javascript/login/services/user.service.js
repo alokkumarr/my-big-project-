@@ -34,6 +34,33 @@ export class UserService {
       });
   }
 
+  /**
+   * Exchanges a single-sign-on token for actual login tokens
+   *
+   * @param {any} token
+   * @returns
+   * @memberof UserService
+   */
+  exchangeLoginToken(token) {
+    const route = '/authentication';
+
+    return this._$http.get(this._AppConfig.login.url + route, {
+      params: {
+        jwt: token
+      }
+    }).then(response => {
+      const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
+
+      // Store the user's info for easy lookup
+      if (this._JwtService.isValid(resp)) {
+        // this._JwtService.destroy();
+        this._JwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+      }
+
+      return true;
+    });
+  }
+
   logout(path) {
     const route = '/auth/doLogout';
     const token = this._JwtService.get();

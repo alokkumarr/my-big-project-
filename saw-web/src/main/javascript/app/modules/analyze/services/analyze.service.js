@@ -1,11 +1,8 @@
 import * as forEach from 'lodash/forEach';
 import * as floor from 'lodash/floor';
-import * as startCase from 'lodash/startCase';
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
 import * as has from 'lodash/has';
-import * as reduce from 'lodash/reduce';
-import * as trim from 'lodash/trim';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGet from 'lodash/fp/get';
 import * as find from 'lodash/find';
@@ -25,13 +22,6 @@ const EXECUTION_STATES = {
 };
 
 const MODULE_NAME = 'ANALYZE';
-
-const SCHEDULE_B2F_DICTIONARY = {
-  weekly: 'weeks',
-  daily: 'days'
-};
-
-const SCHEDULE_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 export class AnalyzeService {
   constructor($http, $q, AppConfig, JwtService, toastMessage, $translate) {
@@ -65,25 +55,6 @@ export class AnalyzeService {
 
   didExecutionFail(analysisId) {
     return EXECUTION_STATES.ERROR === this._executingAnalyses[analysisId];
-  }
-
-  scheduleToString(schedule) {
-    let result;
-    if (schedule.repeatInterval === 1) {
-      result = startCase(schedule.repeatUnit);
-    } else {
-      result = `Every ${schedule.repeatInterval} ${SCHEDULE_B2F_DICTIONARY[schedule.repeatUnit]}`;
-    }
-
-    if (schedule.repeatUnit === 'weekly') {
-      const dayString = trim(reduce(SCHEDULE_DAYS, (res, day) => {
-        res.push(schedule.repeatOnDaysOfWeek[day] ? startCase(day.slice(0, 2)) : '');
-        return res;
-      }, []).join(' '));
-
-      result += dayString ? ` (${trim(dayString)})` : '';
-    }
-    return result;
   }
 
   /* getRequestParams will generate the base structure and auto-fill it
@@ -195,12 +166,30 @@ export class AnalyzeService {
   }
 
   publishAnalysis(model, execute = false) {
+    if (model.schedule.scheduleState === 'new') {
+      this._$http.post(`${this.url}/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+    }
+    if (model.schedule.scheduleState === 'exist') {
+      this._$http.post(`${this.url}/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+    }
+    if (model.schedule.scheduleState === 'delete') {
+      this._$http.post(`${this.url}/scheduler/delete`, model.schedule);
+    }
+
     return this.updateAnalysis(model).then(analysis => {
       if (execute) {
         this.executeAnalysis(model);
       }
       return analysis;
     });
+  }
+
+  getCronDetails(requestBody) {
+    return this._$http.post(`${this.url}/scheduler/fetchJob`, requestBody);
+  }
+
+  getAllCronJobs(model) {
+    return this._$http.post(`${this.url}/scheduler/jobs`, model);
   }
 
   deleteAnalysis(model) {
@@ -287,6 +276,20 @@ export class AnalyzeService {
 
   getDataBySettings(analysis) {
     return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
+      // forEach(analysis.artifacts[0].columns, column => {
+      //   column.columnName = this.getColumnName(column.columnName);
+      // });
+
+      // forEach(analysis.sqlBuilder.dataFields, field => {
+      //   field.columnName = this.getColumnName(field.columnName);
+      // });
+
+      // forEach(data, row => {
+      //   forEach(row, (value, key) => {
+      //     key = this.getColumnName(key);
+      //     data[key] = value;
+      //   });
+      // });
       return {analysis, data, count};
     });
   }

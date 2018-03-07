@@ -93,10 +93,15 @@
                         "LTE",
                         "EQ",
                         "NEQ",
-                        "BTW"
+                        "BTW",
+                        "SW",
+                        "EW",
+                        "CONTAINS",
+                        "ISIN",
+                        "ISNOTIN"
                       ],
                       "id":"/properties/filters/model/properties/booleanCriteria",
-                      "type":"string"
+                      "type":["integer", "string"]
                     },
                     "value":{
                       "id":"/properties/filters/model/properties/value",

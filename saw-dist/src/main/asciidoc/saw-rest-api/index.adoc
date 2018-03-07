@@ -24,3 +24,77 @@ The HTTP response:
 
 include::{snippets}/list-metrics/http-response.adoc[]
 
+== SSO Authentication using jwt token
+
+=== JWT token preparation for request
+
+ sample java code
+ public String createToken() {
+     Long tokenValid = 5 l;
+     String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U="
+     Map < String, Object > map = new HashMap();
+     map.put("valid", true);
+     map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
+     map.put("validityReason", "");
+     map.put("masterLoginId", "sawadmin@synchronoss.com");
+     logger.info("Request received to process single sign-on");
+     String jwt = Jwts.builder()
+         .setSubject("sawadmin@synchronoss.com")
+         .claim("ticket", map)
+         .setIssuedAt(new Date())
+         .signWith(SignatureAlgorithm.HS256, secretKey)
+         .compact();
+     return jwt;
+ }
+
+=== General guideline for SSO request:
+- The JWT secret key to use is generated and set by the SAW administrator in the environment configuration, as described in the SAW Operations Guide.
+- Signature algorithm should be used as (HS256, symmetric) to generate JWT token.
+- Clients should set "Cache-Control: no-store" to their header requests.
+- Clients should set the token expiration ("validUpto" claim in the JWT) to a low value,
+ensure tickets have a limited lifetime.
+
+
+
+=== SSO request sample URL:
+
+http://localhost/web/#!/authenticate?jwt=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzYXdhZG1pbkBzeW5jaHJvbm9zcy5jb20iLCJ0aWNrZXQiOnsidmFsaWRVcHRvIjoxNTE5MTI3NjkwNzUzLCJ2YWxpZCI6dHJ1ZSwidmFsaWRpdHlSZWFzb24iOm51bGwsIm1hc3RlckxvZ2luSWQiOiJzYXdhZG1pbkBzeW5jaHJvbm9zcy5jb20ifSwiaWF0IjoxNTE5MDQxMjkwfQ.KPQ-tairJG7c7iWPZ-qxwTVwjPd4yo4kBRsNHwenLCw
+
+The HTTP request:
+
+include::{snippets}/sso-authentication/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/sso-authentication/http-response.adoc[]
+
+== Saw scheduler API :
+
+=== Create schedule
+The HTTP request:
+
+include::{snippets}/create-schedule/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/create-schedule/http-response.adoc[]
+
+=== Update schedule
+The HTTP request:
+
+include::{snippets}/update-schedule/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/update-schedule/http-response.adoc[]
+
+=== List schedule
+
+The HTTP request:
+
+include::{snippets}/list-schedule/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/list-schedule/http-response.adoc[]
+

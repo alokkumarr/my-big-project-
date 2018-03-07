@@ -1,23 +1,24 @@
 package com.synchronoss.saw.scheduler.service;
 
+import com.synchronoss.saw.scheduler.modal.SchedulerJobDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-@Component
+@Service
 public class AnalysisServiceImpl implements AnalysisService {
     @Value("${saw-analysis-service-url}")
     private String analysisUrl;
@@ -28,15 +29,11 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
+    @Autowired
     public AnalysisServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder.build();
     }
 
-    public AnalysisSchedule[] getAnalysisSchedules() {
-        String url = analysisUrl + "?view=schedule";
-        return restTemplate.getForObject(url, AnalysisSchedulesResponse.class)
-            .analyses();
-    }
 
     public void executeAnalysis(String analysisId) {
         AnalysisExecution execution = ImmutableAnalysisExecution.builder()
@@ -49,14 +46,15 @@ public class AnalysisServiceImpl implements AnalysisService {
         restTemplate.postForObject(url, entity, String.class, analysisId);
     }
 
-    public void scheduleDispatch(AnalysisSchedule analysis)
+    public void scheduleDispatch(SchedulerJobDetail analysis)
     {
-           if ((analysis.schedule().emails() == null || analysis.schedule().emails().length == 0)
-                   && !(isValidDispatch(analysis))) {
+           if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)
+                  ) {
                return;
            }
-           String recipients = prepareRecipientsList(analysis.schedule().emails());
-           ExecutionBean[] executionBeans = fetchExecutionID(analysis.id());
+           if (analysis.getDescription()==null) analysis.setDescription("");
+           String recipients = prepareRecipientsList(analysis.getEmailList());
+           ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
            String[] latestexection = findLatestExecution(executionBeans);
            Date date = new Date(Long.parseLong(latestexection[1]));
            DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -64,12 +62,12 @@ public class AnalysisServiceImpl implements AnalysisService {
            String formatted = format.format(date);
            DispatchBean execution = ImmutableDispatchBean.builder()
                    .emailList(recipients).fileType("csv")
-                   .description(analysis.description()).name(analysis.name()).userFullName(analysis.userFullName())
-                   .metricName(analysis.metricName()).publishedTime(formatted).build();
+                   .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
+                   .metricName(analysis.getMetricName()).publishedTime(formatted).build();
            String[] param = new String[3];
-           param[0] = analysis.id();
+           param[0] = analysis.getAnalysisID();
            param[1] = latestexection[0];
-           param[2] = analysis.type();
+           param[2] = analysis.getType();
            String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
            HttpHeaders headers = new HttpHeaders();
            headers.setContentType(MediaType.APPLICATION_JSON);
@@ -117,7 +115,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         val[1] = latestFinish;
         return val;
     }
-    private String prepareRecipientsList(String [] recipients) {
+    private String prepareRecipientsList(List<String> recipients) {
         StringBuffer stringBuffer = new StringBuffer();
         boolean first = true;
         for (String recipient :  recipients) {
@@ -133,25 +131,4 @@ public class AnalysisServiceImpl implements AnalysisService {
         return stringBuffer.toString();
     }
 
-    /**
-     *
-     * @param analysis
-     * @return
-     */
-    private boolean isValidDispatch(AnalysisSchedule analysis) {
-        List<String> missingAtribute = new ArrayList<String>();
-        if (analysis.id() == null)
-            missingAtribute.add("id");
-        if (analysis.name() == null)
-            missingAtribute.add("name");
-        if (analysis.metricName() == null)
-            missingAtribute.add("metricName");
-        if (analysis.schedule().emails() == null)
-            missingAtribute.add("email");
-        if (missingAtribute.size() > 0) {
-            log.warn("Some of required attributes are not available " + missingAtribute.toString() + " , Skipping email dispatch for the analysis ");
-          return false;
-        }
-        return true;
-    }
 }

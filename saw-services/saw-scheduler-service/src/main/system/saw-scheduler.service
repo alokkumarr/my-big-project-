@@ -1,8 +1,11 @@
 [Unit]
-Description=SAW Scheduler
+Description=SAW scheduler
 
 [Service]
-Type=oneshot
-ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-scheduler-service/saw-scheduler.jar"
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-scheduler-service/saw-scheduler.jar --spring.config.location=/opt/bda/saw-scheduler-service/conf/application.yml"
 SyslogIdentifier=saw-scheduler
 User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
