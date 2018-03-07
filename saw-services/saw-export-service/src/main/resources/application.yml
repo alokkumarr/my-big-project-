@@ -32,4 +32,12 @@ analysis:
 
 published:
   path: /tmp
-       
+
+ftp:
+  alias: local
+  server: localhost
+  port: 21
+  username: bob
+  password: bob123
+
+

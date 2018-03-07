@@ -51,6 +51,22 @@ public class ExportServiceImpl implements ExportService{
   @Value("${spring.mail.body}")
   private String mailBody;
 
+  // FTP config
+  @Value("${ftp.alias}")
+  private String ftpAlias;
+
+  @Value("${ftp.server}")
+  private String ftpServer;
+
+  @Value("${ftp.port}")
+  private int ftpPort;
+
+  @Value("${ftp.username}")
+  private String ftpUsername;
+
+  @Value("${ftp.password}")
+  private String ftpPassword;
+
   @Autowired
   private ApplicationContext appContext;
 
@@ -142,6 +158,7 @@ public class ExportServiceImpl implements ExportService{
                     serviceUtils.prepareMailBody(exportBean,mailBody)
              ,exportBean.getFileName());
           logger.debug("Email sent successfully : Removing the file from published location");
+          serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword, exportBean.getFileName(), "/", "report_"+exportBean.getReportName());
           serviceUtils.deleteFile(exportBean.getFileName(),true);
         } catch (IOException e) {
          logger.error("Exception occured while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
@@ -203,6 +220,7 @@ public class ExportServiceImpl implements ExportService{
                     serviceUtils.prepareMailBody(exportBean,mailBody)
                     ,exportBean.getFileName());
           logger.debug("Email sent successfully : Removing the file from published location");
+          serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword, exportBean.getFileName(), "/", exportBean.getReportName());
           serviceUtils.deleteFile(exportBean.getFileName(),true);
         } catch (IOException e) {
           logger.error("Exception occured while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");

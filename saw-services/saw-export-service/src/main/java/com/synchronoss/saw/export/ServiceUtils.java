@@ -135,4 +135,27 @@ public class ServiceUtils {
     }
     return true;
   }
+
+  public boolean uploadToFtp(String ftpServer,
+                             int ftpPort,
+                             String ftpUsername,
+                             String ftpPassword,
+                             String localFilePath,
+                             String destinationDir,
+                             String destinationFileName) {
+
+    if (ftpServer==null || ftpUsername==null || ftpPassword==null || localFilePath==null || destinationDir==null || destinationFileName==null) {
+      return false;
+    } else {
+      try {
+        FTPUploader ftp = new FTPUploader(ftpServer, ftpPort, ftpUsername, ftpPassword);
+        ftp.uploadFile(localFilePath, destinationFileName, destinationDir);
+        ftp.disconnect();
+      } catch (Exception e) {
+        logger.error(e.getMessage());
+        return false;
+      }
+    }
+    return true;
+  }
 }
