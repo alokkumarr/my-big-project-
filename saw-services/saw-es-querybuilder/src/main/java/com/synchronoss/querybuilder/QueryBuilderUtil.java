@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.synchronoss.querybuilder.model.chart.DataField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -25,8 +24,7 @@ import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
 import com.synchronoss.querybuilder.model.pivot.ColumnField;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
-import org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders;
-import org.elasticsearch.search.aggregations.pipeline.bucketscript.BucketScriptPipelineAggregationBuilder;
+
 
 public class QueryBuilderUtil {
 	
@@ -512,7 +510,7 @@ public class QueryBuilderUtil {
                         } else if (dataField instanceof com.synchronoss.querybuilder.model.report.DataField) {
                             com.synchronoss.querybuilder.model.report.DataField data =
                                     (com.synchronoss.querybuilder.model.report.DataField) dataField;
-                            if (data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
+                            if (data.getAggregate()!=null && data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
                                 aggregationBuilder.subAggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
