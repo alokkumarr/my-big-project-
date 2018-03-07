@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import sncr.bda.base.MetadataStore;
 import sncr.xdf.context.Context;
 import sncr.bda.conf.Parameter;
 import sncr.xdf.exceptions.XDFException;
@@ -53,6 +54,7 @@ public abstract class Component {
     private Map<String, JsonElement> mdOutputDSMap;
     private Map<String, JsonElement> mdInputDSMap;
     private String transformationID;
+
 
 
     public String getError(){
@@ -340,10 +342,21 @@ public abstract class Component {
             String ale_id = als.createAuditLog(ctx, ale);
             mdOutputDSMap.forEach((id, ds) -> {
                 try {
-                    md.getDSStore().setTransformationProducer(id, transformationID);
-                    md.getDSStore().updateStatus(id, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
+                    //TODO:: Move it after merge to appropriate place
+                    ctx.transformationID = transformationID;
+                    ctx.ale_id = ale_id;
+                    ctx.status = status;
+
+                    //TODO:: Keep it optional, schema might not be available
+                    String dsname = id.substring(id.indexOf(MetadataStore.delimiter) + MetadataStore.delimiter.length());
+                    Map<String, Object> outDS = outputDataSets.get(dsname);
+                    JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
+
+                    logger.trace("Extracted schema: " + schema.toString());
+                    md.updateDS(id, ctx, ds, schema);
+
                 } catch (Exception e) {
-                    error = "Could not write AuditLog entry to document, id = " + id;
+                    error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                     logger.error(error);
                     logger.error("Native exception: ", e);
                     rc[0]=-1;
@@ -352,7 +365,7 @@ public abstract class Component {
             });
             transformationMD.updateStatus(transformationID, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
         } catch (Exception e) {
-            error = "Exception at job finalization: " +  e.getMessage();
+            error = "Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e);
             logger.error(e);
             return -1;
         }

@@ -1,5 +1,6 @@
 package sncr.xdf.transformer;
 
+import com.google.gson.JsonElement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -97,6 +98,9 @@ public abstract class Executor {
 
         XDFDataWriter xdfDW = new XDFDataWriter(format, nof, partitionKeys);
         xdfDW.writeToTempLoc(outputResult,  loc);
+        outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(outputResult));
+
+        logger.trace("Dataset: "  + name + ", Result schema: " + ((JsonElement)outputDS.get(DataSetProperties.Schema.name())).toString());
 
     }
 
