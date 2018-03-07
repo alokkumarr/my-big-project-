@@ -9,7 +9,7 @@ spring:
       max-file-size: 25MB
 server:
   address: localhost
-  port: 9700
+  port: 9701
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
@@ -26,6 +26,7 @@ workbench:
         project-path: "/Desktop" 
         project-root: "/Users/spau0004"
         preview-limit: 10000
-        livy-uri: "http://localhost:8998/"
+        livy-uri: http://localhost:8998
+
 metastore:
-    base:  hdfs:///main        
+    base:  hdfs:///data/bda        

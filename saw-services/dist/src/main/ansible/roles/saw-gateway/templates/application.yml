@@ -17,8 +17,6 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-
-
 analysis:
     service:
         host: http://localhost:9300
@@ -37,16 +35,15 @@ security:
 export:
     service:
         host: http://localhost:9400
-workbench:
-    service:
-        host: http://localhost:9700
 observe:
     service:
         host: http://localhost:9500
 scheduler:
     service:
         host: http://localhost:9600
-
+workbench:
+    service:
+        host: http://localhost:9700
 api:
   gateway:
         endpoints:
@@ -76,6 +73,7 @@ api:
             path : '[/]scheduler.*'
         -   location: ${scheduler.service.host}
             method : DELETE
+            path : '[/]scheduler.*'
         -   location: ${observe.service.host}
             method: POST
             path: '[/]observe.*'
@@ -88,6 +86,9 @@ api:
         -   location: ${observe.service.host}
             method: DELETE
             path: '[/]observe.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]filters.*'
         -   location: ${workbench.service.host}
             method: POST
             path: '[/]internal/workbench.*'

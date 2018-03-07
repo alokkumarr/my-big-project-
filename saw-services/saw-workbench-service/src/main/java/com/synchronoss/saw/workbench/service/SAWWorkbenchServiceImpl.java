@@ -97,12 +97,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       }
     }
 
-    /* Initialize metadata tables */
+    
     HFileOperations.createDir(defaultProjectRoot + "/metadata");
     for (String table : METADATA_TABLES) {
         createMetadataTable(table);
     }
-    /* Initialize default project */
+    
     ProjectStore ps = new ProjectStore(defaultProjectRoot);
     try {
         ps.readProjectData(defaultProjectId);
