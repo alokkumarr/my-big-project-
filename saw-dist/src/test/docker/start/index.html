@@ -27,14 +27,13 @@
           <td><a href="" port="18443" protocol="https">MapR console</a></td>
           <td>MapR Control System (credentials: mapr/mapr)</td>
         </tr>
-        <tr>
-          <td><a href="" port="18088">YARN resource console</a></td>
-          <td>YARN resource manager console</td>
-        </tr>
-        <tr>
-          <td><a href="" port="18042">YARN node console</a></td>
-          <td>YARN node manager console</td>
-        </tr>
+<!--
+    Note: Local Spark contexts are used by default to save memory in
+    development environments.  If Spark standalone or YARN is enabled,
+    the below can be uncommented to enable the Spark and YARN
+    consoles.
+-->
+<!--
         <tr>
           <td><a href="" port="18080">Spark master console</a></td>
           <td>Spark standalone cluster master</td>
@@ -43,6 +42,15 @@
           <td><a href="" port="18081">Spark worker console</a></td>
           <td>Spark standalone cluster worker</td>
         </tr>
+        <tr>
+          <td><a href="" port="18088">YARN resource console</a></td>
+          <td>YARN resource manager console</td>
+        </tr>
+        <tr>
+          <td><a href="" port="18042">YARN node console</a></td>
+          <td>YARN node manager console</td>
+        </tr>
+-->
         <tr>
           <td><a href="" port="18998">Livy console</a></td>
           <td>Spark job REST API</td>

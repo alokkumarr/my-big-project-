@@ -15,11 +15,7 @@ localhost ansible_connection=local
 #
 # Spark configuration
 #
-# Workaround: As Docker DNS lookups do not work inside CentOS 7
-# containers for now, Docker links are used as a workaround.  The
-# hostname and port for Docker links is provided in environment
-# variables, so insert them into the configuration here.
-saw_spark_master_url=spark://saw-mapr:7077
+saw_spark_master_url=local[*]
 saw_zookeeper_quorum=saw-mapr
 saw_metadata_path=/main/metadata/
 report_executor_path=/main/
