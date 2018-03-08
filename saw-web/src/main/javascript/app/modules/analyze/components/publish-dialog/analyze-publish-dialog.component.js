@@ -138,29 +138,27 @@ export const AnalyzePublishDialogComponent = {
           scheduleState: this.scheduleState
         };
         this.triggerSchedule();
-      } else {
-        if (this.validateForm()) {
-          this.model.schedule = {
-            scheduleState: this.scheduleState,
-            activeRadio: this.crondetails.activeRadio,
-            activeTab: this.crondetails.activeTab,
-            analysisID: this.model.id,
-            analysisName: this.model.name,
-            cronExpression: this.crondetails.cronexp,
-            description: this.description,
-            emailList: this.emails,
-            ftp: this.hasDispatch,
-            fileType: 'csv',
-            jobName: this.model.id,
-            metricName: this.model.metricName,
-            type: this.model.type,
-            userFullName: this.model.userFullName,
-            jobScheduleTime: moment().format(),
-            categoryID: this.model.categoryId,
-            jobGroup: this.resp.ticket.custCode
-          };
-          this.triggerSchedule();
-        }
+      } else if (this.validateForm()) {
+        this.model.schedule = {
+          scheduleState: this.scheduleState,
+          activeRadio: this.crondetails.activeRadio,
+          activeTab: this.crondetails.activeTab,
+          analysisID: this.model.id,
+          analysisName: this.model.name,
+          cronExpression: this.crondetails.cronexp,
+          description: this.description,
+          emailList: this.emails,
+          ftp: this.hasDispatch,
+          fileType: 'csv',
+          jobName: this.model.id,
+          metricName: this.model.metricName,
+          type: this.model.type,
+          userFullName: this.model.userFullName,
+          jobScheduleTime: moment().format(),
+          categoryID: this.model.categoryId,
+          jobGroup: this.resp.ticket.custCode
+        };
+        this.triggerSchedule();
       }
     }
 
@@ -171,18 +169,19 @@ export const AnalyzePublishDialogComponent = {
     }
 
     validateForm() {
-      this.errorFlagMsg = this.emailValidateFlag = false;
-      //Validation for: Email entry is mandatory for charts as dispatch is hidden. 
+      this.errorFlagMsg = false;
+      this.emailValidateFlag = false;
+      // Validation for: Email entry is mandatory for charts as dispatch is hidden.
       if (isEmpty(this.emails) && this.model.type === 'chart') {
         this.emailValidateFlag = true;
         return false;
       }
-      //Validation for: user has to select either dispatch to ftp or enter emails or both.
+      // Validation for: user has to select either dispatch to ftp or enter emails or both.
       if (isEmpty(this.emails) && this.hasDispatch === false) {
         this.errorFlagMsg = true;
         return false;
       }
-      //Validation for: User needs to enter correct emails in the list
+      // Validation for: User needs to enter correct emails in the list
       if (!isEmpty(this.emails) && !this.validateEmails(this.emails)) {
         this.emailValidateFlag = true;
         return false;
