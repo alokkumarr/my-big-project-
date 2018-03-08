@@ -15,11 +15,23 @@
   </div>
 </div>
 <div mat-dialog-content>
-  <dashboard-grid [model]="dashboard"
-  [requester]="requester"
-  [mode]="mode"
-  (getDashboard)="onDashboardChange($event)"></dashboard-grid>
+
+  <mat-sidenav-container class="widget-container" [autosize]="false">
+    <mat-sidenav #widgetChoice
+      mode="over"
+      [opened]="false"
+      position="end">
+      <h1>Analysis choice</h1>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <dashboard-grid [model]="dashboard"
+      [requester]="requester"
+      [mode]="mode"
+      (getDashboard)="onDashboardChange($event)"></dashboard-grid>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>
+
 <span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
 <button [@moveButton]="fillState" mat-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
   <mat-icon fontIcon="icon-plus"></mat-icon>

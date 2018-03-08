@@ -1,7 +1,7 @@
 declare const require: any;
 
 import { Component, Inject, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatSidenav } from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -63,6 +63,8 @@ export class CreateDashboardComponent {
   public requester = new BehaviorSubject({});
   public mode = 'create';
 
+  @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
+
   constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
     private router: UIRouter,
@@ -95,16 +97,17 @@ export class CreateDashboardComponent {
   }
 
   chooseAnalysis() {
-    const dialogRef = this.dialog.open(AnalysisChoiceComponent);
+    this.widgetSidenav.open();
+    // const dialogRef = this.dialog.open(AnalysisChoiceComponent);
 
-    dialogRef.afterClosed().subscribe(analysis => {
-      if (!analysis) {
-        return;
-      }
+    // dialogRef.afterClosed().subscribe(analysis => {
+    //   if (!analysis) {
+    //     return;
+    //   }
 
-      const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
-      this.requester.next({action: 'add', data: item})
-    });
+    //   const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
+    //   this.requester.next({action: 'add', data: item})
+    // });
   }
 
   saveDashboard() {
