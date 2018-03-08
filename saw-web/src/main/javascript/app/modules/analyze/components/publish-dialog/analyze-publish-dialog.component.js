@@ -26,7 +26,6 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
-      this.hasDispatch = false;
       this._JwtService = JwtService;
       this.resp = this._JwtService.getTokenObj();
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
@@ -65,6 +64,7 @@ export const AnalyzePublishDialogComponent = {
 
     $onInit() {
       this.scheduleState = 'new';
+      this.hasDispatch = false;
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
         .then(response => {
           this.dataHolder = response;
@@ -75,6 +75,7 @@ export const AnalyzePublishDialogComponent = {
 
     fetchCronDetails() {
       this.$dialog.showLoader();
+      this.hasDispatch = false;
       this.requestCron = {
         jobName: this.model.id,
         categoryId: this.model.categoryId,
@@ -94,6 +95,7 @@ export const AnalyzePublishDialogComponent = {
           if (response.data.data.jobDetails.cronExpression) {
             this.scheduleState = 'exist';
           }
+          this.hasDispatch = response.data.data.jobDetails.ftp;
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
         }
@@ -127,7 +129,6 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
-      this.errorFlagMsg = this.emailValidateFlag = false;
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
         this.model.schedule = {
@@ -136,37 +137,57 @@ export const AnalyzePublishDialogComponent = {
           jobName: this.model.id,
           scheduleState: this.scheduleState
         };
+        this.triggerSchedule();
       } else {
-        if (isEmpty(this.emails) && this.hasDispatch === false) {
-          this.errorFlagMsg = true;
-          return;
+        if (this.validateForm()) {
+          this.model.schedule = {
+            scheduleState: this.scheduleState,
+            activeRadio: this.crondetails.activeRadio,
+            activeTab: this.crondetails.activeTab,
+            analysisID: this.model.id,
+            analysisName: this.model.name,
+            cronExpression: this.crondetails.cronexp,
+            description: this.description,
+            emailList: this.emails,
+            ftp: this.hasDispatch,
+            fileType: 'csv',
+            jobName: this.model.id,
+            metricName: this.model.metricName,
+            type: this.model.type,
+            userFullName: this.model.userFullName,
+            jobScheduleTime: moment().format(),
+            categoryID: this.model.categoryId,
+            jobGroup: this.resp.ticket.custCode
+          };
+          this.triggerSchedule();
         }
-        if (!isEmpty(this.emails) && !this.validateEmails(this.emails)) {
-          this.emailValidateFlag = true;
-          return;
-        }
-        this.model.schedule = {
-          scheduleState: this.scheduleState,
-          activeRadio: this.crondetails.activeRadio,
-          activeTab: this.crondetails.activeTab,
-          analysisID: this.model.id,
-          analysisName: this.model.name,
-          cronExpression: this.crondetails.cronexp,
-          description: this.description,
-          emailList: this.emails,
-          fileType: 'csv',
-          jobName: this.model.id,
-          metricName: this.model.metricName,
-          type: this.model.type,
-          userFullName: this.model.userFullName,
-          jobScheduleTime: moment().format(),
-          categoryID: this.model.categoryId,
-          jobGroup: this.resp.ticket.custCode
-        };
       }
+    }
+
+    triggerSchedule() {
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
+    }
+
+    validateForm() {
+      this.errorFlagMsg = this.emailValidateFlag = false;
+      //Validation for: Email entry is mandatory for charts as dispatch is hidden. 
+      if (isEmpty(this.emails) && this.model.type === 'chart') {
+        this.emailValidateFlag = true;
+        return false;
+      }
+      //Validation for: user has to select either dispatch to ftp or enter emails or both.
+      if (isEmpty(this.emails) && this.hasDispatch === false) {
+        this.errorFlagMsg = true;
+        return false;
+      }
+      //Validation for: User needs to enter correct emails in the list
+      if (!isEmpty(this.emails) && !this.validateEmails(this.emails)) {
+        this.emailValidateFlag = true;
+        return false;
+      }
+      return true;
     }
 
     validateEmails(emails) {

@@ -49,7 +49,7 @@
           </md-input-container>
         </div>
 
-        <div class="form-container" layout="column">
+        <div ng-if="$ctrl.model.type !== 'chart'" class="form-container" layout="column">
           <md-checkbox ng-checked="$ctrl.hasDispatch"
                         ng-click="$ctrl.hasDispatch = !$ctrl.hasDispatch">
             <span translate="SET_DISPATCH_LABEL"></span>
