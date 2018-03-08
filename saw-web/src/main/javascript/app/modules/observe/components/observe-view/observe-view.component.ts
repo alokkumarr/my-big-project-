@@ -137,6 +137,11 @@ export class ObserveViewComponent implements OnInit {
     }, _ => {
       this.headerProgress.hide();
     })
+
+  }
+
+  filterSidenavStateChange(data) {
+    this.filters.onSidenavStateChange.next(data);
   }
 
   loadPrivileges(): void {

@@ -166,10 +166,12 @@ many long-running queries being executed, the queues can be cleared
 using the following commands:
 
         $ ssh <mapr-host>
-        $ stream=/main/saw-transport-executor-regular-stream
+        $ stream=<report-executor-path>/saw-transport-executor-regular-stream
         $ sudo -u mapr maprcli stream topic delete -path $stream -topic executions
-        $ stream=/main/saw-transport-executor-fast-stream
+        $ stream=<report-executor-path>/saw-transport-executor-fast-stream
         $ sudo -u mapr maprcli stream topic delete -path $stream -topic executions
+
+* <report-executor-path> can be found in saw-transport service configuration file.
 
 Please note that clearing the queues affects all users of the system
 and report execution types.
