@@ -6,7 +6,7 @@ import scala.collection.JavaConverters._
 
 import com.mapr.streams.Streams
 import com.mapr.db.exceptions.TableExistsException
-import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configuration
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -16,15 +16,20 @@ import sncr.datalake.engine.Analysis
 import sncr.datalake.engine.ExecutionType
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import files.HFileOperations
+import sncr.saw.common.config.SAWServiceConfig
+
+import scala.reflect.io.File
 
 /**
  * Queue for sending and receiving requests to execute report queries.
  * Implemented using MapR streams.
  */
 class ReportExecutorQueue(val executorType: String) {
-  val ExecutorStream = "/main/saw-transport-executor-" + executorType + "-stream"
+  val MainPath = if (SAWServiceConfig.executorConfig.hasPath("Path"))
+    SAWServiceConfig.executorConfig.getString("Path") else "/main"
+  val ExecutorStream = MainPath+File.separator+"saw-transport-executor-" + executorType + "-stream"
   val ExecutorTopic = ExecutorStream + ":executions"
-  val MainPath = "/main"
+
   val RetrySeconds = 5
   val log: Logger = LoggerFactory.getLogger(classOf[ReportExecutorQueue].getName)
 
@@ -159,7 +164,7 @@ class ReportExecutorQueue(val executorType: String) {
   }
 
   private def markExecutionCompleted(resultId: String) {
-    val path = "/main/saw-transport-executor-result-" + resultId
+    val path = MainPath+File.separator+"saw-transport-executor-result-" + resultId
     try {
       val os = HFileOperations.writeToFile(path)
       os.close

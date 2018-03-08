@@ -31,6 +31,8 @@ saw_spark_master_url=spark://localhost:7077
 #saw_spark_yarn_queue_regular=saw-regular
 #saw_spark_yarn_queue_fast=saw-fast
 saw_zookeeper_quorum=localhost
+saw_metadata_path=/main/metadata
+report_executor_path=/main
 
 #
 # Transport Service Executor configuration
@@ -77,3 +79,6 @@ saw_security_email_from=noreply@example.com
 # generate secret key using command : openssl rand 32 -base64
 #
 saw_security_sso_secret=Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U
+
+[saw-observe:vars]
+saw_observe_metastore=hdfs:///main

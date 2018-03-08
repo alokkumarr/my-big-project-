@@ -21,6 +21,8 @@ localhost ansible_connection=local
 # variables, so insert them into the configuration here.
 saw_spark_master_url=spark://saw-mapr:7077
 saw_zookeeper_quorum=saw-mapr
+saw_metadata_path=/main/metadata/test
+report_executor_path=/main/test
 
 #
 # Transport Service Executor configuration
@@ -43,4 +45,7 @@ saw_elasticsearch_data_store_limit=10000
 
 [saw-security]
 localhost ansible_connection=local
+
+[saw-observe:vars]
+saw_observe_metastore=hdfs:///main/test
 
