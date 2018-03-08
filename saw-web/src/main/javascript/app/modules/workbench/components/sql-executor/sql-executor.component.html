@@ -22,12 +22,30 @@
   <mat-progress-bar *ngIf="showProgress" mode="query" style="height:2px;"></mat-progress-bar>
   <mat-divider></mat-divider>
   <div mat-dialog-content class="exec-body">
-    <div class="script-pane" [style.height.%]="scriptHeight">
-      <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)">
-      </sql-script>
-    </div>
-    <div class="preview-pane" [style.height.%]="previewHeight">
-      <sqlpreview-grid-page [updater]="gridData" (onToggleScreenMode)="toggleViewMode($event)"></sqlpreview-grid-page>
-    </div>
+    <split direction="vertical">
+      <split-area class="script-pane" [size]="scriptHeight">
+        <split direction="horizontal">
+          <split-area size="75">
+            <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)">
+            </sql-script>
+          </split-area>
+          <split-area size="25">
+            <mat-list>
+              <h3 mat-subheader>ACTIONS_LIST</h3>
+              <mat-list-item class="list-items" *ngFor="let action of appliedActions; index as i; last as isLast" (click)="previewDialog(file)">
+                <p mat-line>{{i + 1}}. &ensp; {{ action.statement }}</p>
+                <div class="icon-div" *ngIf="isLast">
+                  <mat-icon mat-list-icon style="color: #E5524C;" fontIcon="icon-delete"></mat-icon>
+                </div>
+                <mat-divider></mat-divider>
+              </mat-list-item>
+            </mat-list>
+          </split-area>
+        </split>
+      </split-area>
+      <split-area class="preview-pane" [size]="previewHeight">
+        <sqlpreview-grid-page [updater]="gridData" (onToggleScreenMode)="toggleViewMode($event)"></sqlpreview-grid-page>
+      </split-area>
+    </split>
   </div>
 </div>

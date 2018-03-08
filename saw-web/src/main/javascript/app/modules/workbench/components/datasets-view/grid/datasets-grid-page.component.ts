@@ -26,11 +26,11 @@ export class DatasetsGridPageComponent implements OnInit {
   private gridConfig: Array<any>;
   private gridData: Array<any>;
   private updaterSubscribtion: any;
-  
+
   constructor(
     private dxDataGrid: dxDataGridService,
     private headerProgress: HeaderProgressService
-  ) {  }
+  ) { }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
@@ -73,7 +73,7 @@ export class DatasetsGridPageComponent implements OnInit {
     }, {
       dataField: 'meta.addedBy',
       caption: 'Added By',
-      width: '10%',
+      width: '13%',
       dataType: 'string',
       cellTemplate: 'creatorCellTemplate'
     }, {
@@ -92,14 +92,15 @@ export class DatasetsGridPageComponent implements OnInit {
       caption: 'Last Updated',
       sortOrder: 'desc',
       cellTemplate: 'timecreatedCellTemplate',
-      width: '10%',
+      width: '12%',
       dataType: 'date',
       alignment: 'right'
     }, {
       dataField: 'src',
       caption: 'Source',
       cellTemplate: 'dsTypeTemplate',
-      width: '7%'
+      width: '7%',
+      alignment: 'center'
     }, {
       dataField: 'set',
       caption: 'Actions',
@@ -107,7 +108,7 @@ export class DatasetsGridPageComponent implements OnInit {
       width: '5%'
     }];
 
-    return this.dxDataGrid.mergeWithDefaultConfig ({
+    return this.dxDataGrid.mergeWithDefaultConfig({
       columns,
       dataSource,
       height: '100%',

@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
+import { AngularSplitModule } from 'angular-split';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
@@ -79,7 +80,8 @@ const components = [
     DxTemplateModule,
     FlexLayoutModule,
     TreeModule,
-    AceEditorModule
+    AceEditorModule,
+    AngularSplitModule
   ],
   declarations: components,
   entryComponents: components,

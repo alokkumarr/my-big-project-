@@ -7,6 +7,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ToastService } from '../../../../common/services/toastMessage.service'
 
 import * as get from 'lodash/get';
+import { SQL_AQCTIONS } from '../../sample-data';
+
 import { SqlScriptComponent } from './query/sql-script.component';
 import { DetailsDialogComponent } from './dataset-details-dialog/details-dialog.component';
 import { WorkbenchService } from '../../services/workbench.service';
@@ -26,6 +28,7 @@ export class SqlExecutorComponent implements OnInit {
   private userProject: string = 'project2';
   private datasetID: string = '';
   private datasetDetails: Array<any>;
+  private appliedActions: Array<any> = SQL_AQCTIONS;
   private scriptHeight: number = 40;
   private previewHeight: number = 60;
 

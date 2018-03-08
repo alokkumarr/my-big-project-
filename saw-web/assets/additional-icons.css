@@ -1,6 +1,3 @@
-.icon-area-chart:before {
-  content: "\e953";
-}
 .icon-area-chart .path2:before {
   content: "\e954";
   margin-left: -1em;
@@ -10,9 +7,6 @@
   content: "\e955";
   margin-left: -1em;
   color: rgb(134, 143, 153);
-}
-.icon-combo-chart:before {
-  content: "\e942";
 }
 
 .icon-row::before {
