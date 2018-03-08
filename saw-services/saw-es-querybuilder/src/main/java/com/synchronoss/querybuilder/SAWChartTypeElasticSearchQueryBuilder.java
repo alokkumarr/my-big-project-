@@ -220,9 +220,9 @@ class SAWChartTypeElasticSearchQueryBuilder {
             JsonNode objectNode = objectMapper.readTree(result).get("data_fields");
                 dataFields.forEach (dataField -> {
                 String columnName = dataField.getColumnName();
+                if(dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
                 dataField.getAdditionalProperties()
-                        .put(columnName+SUM, String.valueOf(objectNode.get(columnName
-                        ).get(VALUE)));
+                        .put(columnName+SUM, String.valueOf(objectNode.get(columnName).get(VALUE)));
             });
         }
       if ((!nodeFields.isEmpty() && nodeFields.size() <=3) && !dataFields.isEmpty()){

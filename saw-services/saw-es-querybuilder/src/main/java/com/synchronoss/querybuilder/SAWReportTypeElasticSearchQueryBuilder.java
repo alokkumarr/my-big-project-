@@ -201,6 +201,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             JsonNode objectNode = objectMapper.readTree(result).get("data_fields");
             dataFields.forEach (dataField -> {
                 String columnName = dataField.getColumnName();
+                if(dataField.getAggregate()!=null && dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
                 dataField.getAdditionalProperties()
                         .put(columnName+SUM, String.valueOf(objectNode.get(columnName
                         ).get(VALUE)));
