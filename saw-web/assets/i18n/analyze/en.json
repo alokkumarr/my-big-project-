@@ -56,6 +56,7 @@
   "WHAT_WOULD_YOU_LIKE_TO_ANALYZE": "What would you like to analyze?",
   "SAVE_REPORT": "Save Analysis",
   "SET_SCHEDULE_LABEL": "Scheduled",
+  "PUBLISH_ERROR_MSG": "Please enter valid Email ids or Select option for Dispatch",
   "SET_DISPATCH_LABEL": "Dispatch to FTP",
   "SHOW_CHART_LABELS": "Show Labels",
   "TOOLTIP_NEW_ANALYSIS": "Create new analysis",

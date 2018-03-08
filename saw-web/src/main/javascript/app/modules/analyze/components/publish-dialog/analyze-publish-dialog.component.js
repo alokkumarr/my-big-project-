@@ -61,7 +61,6 @@ export const AnalyzePublishDialogComponent = {
       this.endCriterion = this.endCriteria.never.keyword;
       this.loadCronLayout = false;
       this._$rootScope = $rootScope;
-      console.log(this.model);
     }
 
     $onInit() {
@@ -128,6 +127,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
+      this.errorFlagMsg = this.emailValidateFlag = false;
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
         this.model.schedule = {
@@ -137,7 +137,11 @@ export const AnalyzePublishDialogComponent = {
           scheduleState: this.scheduleState
         };
       } else {
-        if (!this.validateEmails(this.emails) && this.hasDispatch === false) {
+        if (isEmpty(this.emails) && this.hasDispatch === false) {
+          this.errorFlagMsg = true;
+          return;
+        }
+        if (!isEmpty(this.emails) && !this.validateEmails(this.emails)) {
           this.emailValidateFlag = true;
           return;
         }
