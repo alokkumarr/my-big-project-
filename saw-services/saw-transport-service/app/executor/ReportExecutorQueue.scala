@@ -25,7 +25,7 @@ import scala.reflect.io.File
  * Implemented using MapR streams.
  */
 class ReportExecutorQueue(val executorType: String) {
-  val MainPath = if (SAWServiceConfig.executorConfig.hasPath("Path"))
+  val MainPath = if (SAWServiceConfig.executorConfig.hasPath("path"))
     SAWServiceConfig.executorConfig.getString("Path") else "/main"
   val ExecutorStream = MainPath+File.separator+"saw-transport-executor-" + executorType + "-stream"
   val ExecutorTopic = ExecutorStream + ":executions"

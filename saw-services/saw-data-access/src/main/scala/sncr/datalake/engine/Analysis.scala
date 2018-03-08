@@ -61,7 +61,7 @@ class Analysis(val analysisId : String) {
   }
 
   private def executionCompleted(resultId: String): Boolean = {
-    val mainPath = if (SAWServiceConfig.executorConfig.hasPath("Path"))
+    val mainPath = if (SAWServiceConfig.executorConfig.hasPath("path"))
       SAWServiceConfig.executorConfig.getString("Path") else "/main"
     val path = mainPath+File.separator+"saw-transport-executor-result-" + resultId
     try {
