@@ -63,7 +63,7 @@ public class AnalysisServiceImpl implements AnalysisService {
            DispatchBean execution = ImmutableDispatchBean.builder()
                    .emailList(recipients).fileType("csv")
                    .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
-                   .metricName(analysis.getMetricName()).publishedTime(formatted).build();
+                   .metricName(analysis.getMetricName()).ftp("Something").publishedTime(formatted).build();
            String[] param = new String[3];
            param[0] = analysis.getAnalysisID();
            param[1] = latestexection[0];

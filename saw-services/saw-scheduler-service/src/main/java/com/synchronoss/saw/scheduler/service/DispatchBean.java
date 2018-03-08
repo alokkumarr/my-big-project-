@@ -13,6 +13,8 @@ import org.immutables.value.Value;
  interface DispatchBean {
      String emailList();
      String fileType();
+     @Nullable
+     String ftp();
      String name();
      @Nullable
      String description();
