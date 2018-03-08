@@ -21,7 +21,7 @@ public class WorkbenchClient {
             .build();
         try {
             log.debug("Uploading Workbench JAR");
-            client.uploadJar(new File(WORKBENCH_JAR)).get();
+            client.uploadJar(new File(WORKBENCH_JAR));
             log.info("Submitting Workbench job");
             JobHandle<Integer> job = client.submit(
                 new WorkbenchJob(root, project, component, config));
