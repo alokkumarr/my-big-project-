@@ -55,7 +55,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     const stringFilterInput = filters.getStringFilterInput(0);
     const fieldName = columnField;
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.openFiltersBtn);
+    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);

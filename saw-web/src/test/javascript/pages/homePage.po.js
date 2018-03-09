@@ -3,7 +3,6 @@ const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const analyzePage = require('../../javascript/pages/analyzePage.po');
 
-
 module.exports = {
   accountSettingsMenuBtn: element(by.css('button[e2e="account-settings-menu-btn"]')),
   adminMenuOption: element(by.css('a[e2e="account-settings-selector-admin"]')),
@@ -22,18 +21,23 @@ module.exports = {
   subCategory: subCategoryName => {
     return element(by.xpath(`(//span[text()='${subCategoryName}'])[1]`));
   },
-  navigateToSubCategory: (categoryName, subCategoryName) => navigateToSubCategory,
-  createAnalysis: (metricName, analysisType) => createAnalysis(metricName, analysisType)
+  navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
+  createAnalysis: (metricName, analysisType) => createAnalysis(metricName, analysisType),
 };
 
-// Navigates to specific category where analysis creation should happen
-const navigateToSubCategory = (categoryName, subCategoryName) => {
+/*
+ * Navigates to specific category where analysis creation should happen
+ * @defaultCategory - category which should be collapsed before proceeding next
+ * @categoryName - category to expand to reach subcategory
+ * @subCategoryName - desirable category to expand
+ */
+const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) => {
   //Collapse default category
-  homePage.expandedCategory(defaultCategory).click();
+  module.exports.expandedCategory(defaultCategory).click();
 
   //Navigate to Category/Sub-category
-  const collapsedCategory = homePage.collapsedCategory(categoryName);
-  const subCategory = homePage.subCategory(subCategoryName);
+  const collapsedCategory = module.exports.collapsedCategory(categoryName);
+  const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
   commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
 };
