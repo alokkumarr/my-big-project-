@@ -169,6 +169,13 @@ export const AnalyzeExecutedDetailComponent = {
       }
     }
 
+    checkColumnName(columns) {
+      forEach(columns, column => {
+        column.columnName = this.getColumnName(column.columnName);
+      });
+      return columns;
+    }
+
     exportData() {
       if (this.analysis.type === 'pivot') {
         this.requester.next({
@@ -179,6 +186,7 @@ export const AnalyzeExecutedDetailComponent = {
         const executionId = this._executionId || this.analyses[0].id;
         this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
           const fields = this.getCheckedFieldsForExport(this.analysis, data);
+          fields = this.checkColumnName(fields);
           const keys = map(fields, 'columnName');
           const exportOptions = {
             trimHeaderFields: false,
@@ -200,6 +208,18 @@ export const AnalyzeExecutedDetailComponent = {
             this._fileService.exportCSV(csvWithDisplayNames, this.analysis.name);
           }, exportOptions);
         });
+      }
+    }
+
+    getColumnName(columnName) {
+      // take out the .keyword form the columnName
+      // if there is one
+      if (!isUndefined(columnName)) {
+        const split = columnName.split('.');
+        if (split[1]) {
+          return split[0];
+        }
+        return columnName;
       }
     }
 
