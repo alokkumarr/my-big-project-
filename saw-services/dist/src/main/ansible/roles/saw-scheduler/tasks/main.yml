@@ -1,10 +1,13 @@
-- name: Install SAW Scheduler Service package
+- name: Install SAW Scheduler package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-scheduler-*.rpm"]
   notify:
     - restart saw-scheduler
-# Workaround: SAW RPM packages should possibly run "systemctl
-# daemon-reload" in postinstall scriptlets, but until then just
-# specify daemon_reload=true here
-- name: Enable SAW Scheduler Service timer
-  systemd: name=saw-scheduler.timer enabled=true daemon_reload=true
+- name: Install SAW scheduler Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-scheduler-service/conf
+  notify:
+    - restart saw-scheduler
+- name: Run SAW scheduler initial database setup
+  command: /opt/bda/saw-scheduler-service/db-setup/init
+- name: Enable SAW Scheduler Service
+  systemd: name=saw-scheduler enabled=true

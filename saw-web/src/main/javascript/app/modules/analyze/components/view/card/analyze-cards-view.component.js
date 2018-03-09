@@ -9,7 +9,8 @@ export const AnalyzeCardsViewComponent = {
     analysisType: '<',
     filter: '<',
     onAction: '&',
-    searchTerm: '<'
+    searchTerm: '<',
+    cronJobs: '<'
   },
   controller: class AnalyzeCardsViewController {
     constructor() {

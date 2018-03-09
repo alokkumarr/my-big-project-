@@ -1,6 +1,6 @@
 <div flex-gt-md="33" flex-md="50" flex="100" ng-repeat="report in $ctrl.analyses | filter:$ctrl.filterReports">
   <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"
-                highlight-term="$ctrl.searchTerm"></analyze-card>
+                highlight-term="$ctrl.searchTerm" cron-jobs="$ctrl.cronJobs"></analyze-card>
 </div>
 
 <div class="analyze-view_no-results"

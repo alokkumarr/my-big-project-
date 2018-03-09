@@ -1,5 +1,5 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
-import * as cloneDeep from 'lodash/cloneDeep';
+import * as clone from 'lodash/clone';
 
 export default class AbstractDesignerComponentController {
   constructor($injector) {
@@ -152,13 +152,16 @@ export default class AbstractDesignerComponentController {
   }
 
   openFiltersModal(ev) {
-    const tpl = '<analyze-filter-modal type="type" filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
+    const tpl = '<analyze-filter-modal options="options" type="type" filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
 
     this.showModal({
       template: tpl,
       controller: scope => {
+        scope.options = {
+          type: this.model.type
+        };
         scope.type = this.model.type;
-        scope.filters = cloneDeep(this.filters);
+        scope.filters = (this.filters || []).map(f => clone(f));
         scope.artifacts = this.model.artifacts;
         scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
       }

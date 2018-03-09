@@ -13,6 +13,7 @@ export class GlobalFilterService {
   private rawFilters = [];
   private updatedFilters = [];
   public onFilterChange = new Subject();
+  public onSidenavStateChange = new Subject();
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
 

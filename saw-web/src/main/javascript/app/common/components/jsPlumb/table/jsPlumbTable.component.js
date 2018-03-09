@@ -2,12 +2,14 @@ import * as isEmpty from 'lodash/isEmpty';
 
 import * as template from './jsPlumbTable.component.html';
 import style from './jsPlumbTable.component.scss';
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, AGGREGATE_STRING_TYPES} from '../../../consts';
 
 export const JSPlumbTable = {
   template,
   styles: [style],
   bindings: {
-    model: '<'
+    model: '<',
+    didAnalysisChange: '='
   },
   controller: class JSPlumbTableCtrl {
     constructor($scope, $element, $timeout) {
@@ -16,11 +18,14 @@ export const JSPlumbTable = {
       this._$scope = $scope;
       this._$element = $element;
       this._$timeout = $timeout;
+
+      this.AGGREGATE_TYPES = AGGREGATE_TYPES;
+      this.AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
+      this.DEFAULT_AGGREGATE_TYPE = DEFAULT_AGGREGATE_TYPE;
     }
 
     $onInit() {
       this.model.component = this;
-
       this._canvas = this.model.canvas;
       this._jsPlumbInst = this._canvas.component.getInstance();
 
@@ -68,6 +73,32 @@ export const JSPlumbTable = {
         this._$timeout.cancel(this._fieldActionTimer);
         this._fieldActionTimer = null;
       }
+    }
+
+    openMenu($mdMenu, ev) {
+      $mdMenu.open(ev);
+    }
+
+    checkType(field) {
+      if (field.type === 'string') {
+        this.AGGREGATE_TYPES = AGGREGATE_STRING_TYPES;
+      } else {
+        this.AGGREGATE_TYPES = AGGREGATE_TYPES;
+      }
+      if (NUMBER_TYPES.includes(field.type) || field.type === 'string') {
+        return true;
+      }
+    }
+
+    onSelectAggregateType(aggregateType, field) {
+      this.didAnalysisChange = true;
+      field.aggregate = aggregateType.value;
+      field.meta.aggregate = aggregateType.value;
+    }
+
+    clearAggegate(field) {
+      delete field.aggregate;
+      delete field.meta.aggregate;
     }
   }
 };

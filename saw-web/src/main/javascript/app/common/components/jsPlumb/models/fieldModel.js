@@ -12,6 +12,7 @@ export class FieldModel {
     this.alias = '';
     this.type = 'string';
     this._checked = false;
+    this.aggregate = null;
     this.isHidden = false;
     this.isJoinEligible = false;
     this.isFilterEligible = false;
@@ -40,7 +41,9 @@ export class FieldModel {
 
   set checked(val) {
     this._checked = val;
-    this.table.canvas.component._$eventEmitter.emit('changed');
+    if (this.table.canvas) {
+      this.table.canvas.component._$eventEmitter.emit('changed');
+    }
   }
 
   getIdentifier() {
