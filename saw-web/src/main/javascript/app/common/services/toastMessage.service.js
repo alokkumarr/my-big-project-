@@ -18,13 +18,18 @@ export class ToastService {
     return this._toastr.warning(msg, title, options);
   }
 
+  /* For testing purposes
+   // TODO rollback after e2e for pivot done
+   error(msg, title, options) {
+   return this._toastr.error(msg, title, {
+   ...options,
+   timeOut: 5 * 10 * 1000,
+   extendedTimeOut: 5 * 10 * 1000
+   });
+   } */
+
   error(msg, title, options) {
-    return this._toastr.error(msg, title, {
-      // TODO rollback after e2e for pivot done
-      ...options,
-      timeOut: 5 * 10 * 1000,
-      extendedTimeOut: 5 * 10 * 1000
-    });
+    return this._toastr.error(msg, title, options);
   }
 
   clear(toast) {
