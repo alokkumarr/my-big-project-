@@ -1,13 +1,12 @@
 [Unit]
-Description=SAW Analyze test data loader
+Description=SAW Analyze Elasticsearch test data loader
 Requires=saw-transport.service
 After=saw-transport.service
 
 [Service]
 Type=oneshot
 ExecStart=/root/saw-metrics/sample-elasticsearch/load-metric
-ExecStart=/root/saw-metrics/sample-spark/load-metric
-SyslogIdentifier=saw-analyze-testdata
+SyslogIdentifier=saw-analyze-elasticsearch-testdata
 
 [Install]
 WantedBy=saw-transport.service

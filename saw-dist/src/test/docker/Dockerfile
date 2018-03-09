@@ -81,8 +81,10 @@ RUN chmod a+x /root/saw-deploy
 RUN chmod a+x /root
 # Add SAW Analyze test data
 COPY saw-metrics /root/saw-metrics/
-COPY saw-metrics/saw-analyze-testdata.service /etc/systemd/system/
-RUN systemctl enable saw-analyze-testdata
+COPY saw-metrics/sample-spark/saw-analyze-spark-testdata.service /etc/systemd/system/
+COPY saw-metrics/sample-elasticsearch/saw-analyze-elasticsearch-testdata.service /etc/systemd/system/
+RUN systemctl enable saw-analyze-spark-testdata
+RUN systemctl enable saw-analyze-elasticsearch-testdata
 # Add SAW Workbench test data
 COPY saw-workbench /root/saw-workbench/
 COPY saw-workbench/saw-workbench-testdata.service /etc/systemd/system/
