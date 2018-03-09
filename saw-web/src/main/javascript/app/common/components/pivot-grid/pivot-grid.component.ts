@@ -220,10 +220,14 @@ export class PivotGridComponent {
         const cloned = clone(column);
         switch (column.dateInterval) {
         case 'day':
-        case 'quarter':
+          cloned.groupInterval = 1;
+          break;
         case 'month':
-          cloned.type = 'string';
-          cloned.realType = 'date';
+        case 'quarter':
+          // cloned.manualFormat = cloned.format;
+          // unset(cloned, 'format');
+          cloned.format = DATE_INTERVALS_OBJ[column.dateInterval].format;
+          cloned.groupInterval = 1;
           break;
         case 'year':
           cloned.groupInterval = cloned.dateInterval;
@@ -252,7 +256,7 @@ export class PivotGridComponent {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-    const columnsToFormat = filter(this.artifactColumns, ({realType}) => DATE_TYPES.includes(realType));
+    const columnsToFormat = filter(this.artifactColumns, ({type}) => DATE_TYPES.includes(type));
     if (isEmpty(columnsToFormat)) {
       return data;
     }
@@ -269,15 +273,23 @@ export class PivotGridComponent {
   }
 
   getFormattedDataValue(value, dateInterval, format) {
-    const formatToApply = dateInterval === 'day' ?
-      DATE_FORMATS_OBJ[format].momentValue :
-      DATE_INTERVALS_OBJ[dateInterval].format;
-    const formattedValue = moment.utc(value).format(formatToApply);
-    if (dateInterval === 'quarter') {
+    let formatToApply;
+    switch (dateInterval) {
+    case 'day':
+      formatToApply = DATE_FORMATS_OBJ[format].momentValue;
+      return moment.utc(value).format(formatToApply);
+    case 'quarter':
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
+      const formattedValue = moment.utc(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
+    case 'month':
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].format
+      return moment.utc(value).format(formatToApply);
+    case 'year':
+    default:
+      return value;
     }
-    return formattedValue;
   }
 
   artifactColumn2PivotField(): any {
@@ -304,10 +316,10 @@ export class PivotGridComponent {
           cloned.columnName = split(cloned.columnName, '.')[0];
         }
 
-        if (DATE_TYPES.includes(cloned.realType)) {
+        if (DATE_TYPES.includes(cloned.type)) {
           // disable sorting for the fields that have a type string because of manual formatting
           // so it doesn't sort the fields accordinbg to the display string
-          cloned.sortBy = 'none';
+          cloned.sortBy = 'value';
         }
 
         if (!isUndefined(cloned.aliasName) && cloned.aliasName != '') {

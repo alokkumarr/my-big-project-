@@ -277,15 +277,16 @@ export const DATE_INTERVALS = [{
 }, {
   label: 'Quarter',
   value: 'quarter',
-  format: 'YYYY-Q'
+  format: 'yyyy-QQQ',
+  momentFormat: 'YYYY-Q'
 }, {
   label: 'Month',
   value: 'month',
-  format: 'YYYY-MM'
+  format: 'yyyy-MM',
+  momentFormat: 'YYYY-MM'
 }, {
   label: 'Date',
-  value: 'day',
-  format: 'YYYY-MM-DD'
+  value: 'day'
 }];
 
 export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
