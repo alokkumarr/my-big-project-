@@ -13,6 +13,7 @@ import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
 import * as moment from 'moment';
 import * as forEach from 'lodash/forEach';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {Events} from '../../consts';
 
@@ -185,7 +186,7 @@ export const AnalyzeExecutedDetailComponent = {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
         this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
-          const fields = this.getCheckedFieldsForExport(this.analysis, data);
+          let fields = this.getCheckedFieldsForExport(this.analysis, data);
           fields = this.checkColumnName(fields);
           const keys = map(fields, 'columnName');
           const exportOptions = {
