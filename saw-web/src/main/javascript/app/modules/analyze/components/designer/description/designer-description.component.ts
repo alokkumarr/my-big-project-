@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 
 const template = require('./designer-description.component.html');
+require('./designer-description.component.scss');
 
 @Component({
   selector: 'designer-description',
