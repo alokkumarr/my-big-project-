@@ -58,19 +58,20 @@
     <!-- LIST VIEW -->
 
     <div class="analyze-view_analyses-list"
-         ng-switch-when="list">
+         ng-switch-when="list" ng-if="$ctrl.loadCards">
       <analyze-list-view analyses="$ctrl.analyses"
                          ng-if="$ctrl.analyses"
                          analysis-type="$ctrl.states.analysisType"
                          updater="$ctrl.updater"
                          on-action="$ctrl.onCardAction(type, model)"
-                         search-term="$ctrl.states.searchTermValue">
+                         search-term="$ctrl.states.searchTermValue"
+                         cron-jobs="$ctrl.cronSavedJobs">
       </analyze-list-view>
 
     </div>
 
     <!-- CARD VIEW -->
-    <div ng-switch-when="card">
+    <div ng-switch-when="card" ng-if="$ctrl.loadCards">
       <analyze-cards-view layout="row"
                           layout-align="start start"
                           layout-wrap
@@ -78,7 +79,8 @@
                           analysis-type="$ctrl.states.analysisType"
                           filter="$ctrl.filterReports"
                           on-action="$ctrl.onCardAction(type, model)"
-                          search-term="$ctrl.states.searchTermValue">
+                          search-term="$ctrl.states.searchTermValue"
+                          cron-jobs="$ctrl.cronSavedJobs">
       </analyze-cards-view>
     </div>
   </div>

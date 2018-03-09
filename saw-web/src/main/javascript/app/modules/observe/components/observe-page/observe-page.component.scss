@@ -37,6 +37,10 @@ observe-page {
     }
   }
 
+  .mat-drawer-container {
+    height: 100%;
+  }
+
   .page-content {
     width: 100%;
     height: calc(100% - 62px);

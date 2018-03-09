@@ -1,8 +1,10 @@
 import * as map from 'lodash/map';
+import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as keys from 'lodash/keys';
+import * as split from 'lodash/split';
 import * as filter from 'lodash/filter';
 import * as fpGet from 'lodash/fp/get';
 import * as reduce from 'lodash/reduce';
@@ -12,7 +14,8 @@ import DataSource from 'devextreme/data/data_source';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../consts.js';
+import {getFormatter, DEFAULT_PRECISION} from '../../../utils/numberFormatter';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -45,6 +48,10 @@ export const ReportGridDisplayComponent = {
             col.width = COLUMN_WIDTH;
           });
         },
+        columnChooser: {
+          enabled: true,
+          mode: 'select'
+        },
         remoteOperations: {
           paging: true
         },
@@ -76,9 +83,16 @@ export const ReportGridDisplayComponent = {
           'loadPanel.position.of': `$ctrl.pageSize > ${DEFAULT_PAGE_SIZE} ? window : "${gridSelector}"`
         },
         onInitialized: this.onGridInitialized.bind(this),
+        onContentReady: this.onContentReady.bind(this),
         height: 'auto',
         width: 'auto'
       });
+    }
+
+    $onDestroy() {
+      if (this._gridInstance) {
+        this._gridInstance.hideColumnChooser();
+      }
     }
 
     _createCustomStore() {
@@ -86,9 +100,6 @@ export const ReportGridDisplayComponent = {
         load: options => {
           return this.source({options})
             .then(({data, count}) => {
-              this._$timeout(() => {
-                this.updateColumns(this.columns, data);
-              });
               return {data, totalCount: count};
             });
         }
@@ -99,11 +110,6 @@ export const ReportGridDisplayComponent = {
     updateColumns(columns, data) {
       if (this._gridInstance) {
         const cols = this._getDxColumns(columns, data);
-        forEach(cols, column => {
-          if (column.dataType === 'date') {
-            column.dataType = 'string-date';
-          }
-        });
         this._gridInstance.option('columns', cols);
         // this._gridInstance.refresh();
       }
@@ -133,14 +139,49 @@ export const ReportGridDisplayComponent = {
       });
     }
 
-    checkColumndatatype(columnList, columnName) {
-      let datatype = '';
-      forEach(columnList, column => {
-        if (!isEmpty(column) && column.columnName === columnName) {
-          datatype = column.type;
+    /**
+     * Removes .keyword suffix from column names if it exists. This is required
+     * because the grid data coming from backend doesn't have that suffix in
+     * its datafields.
+     *
+     * Returns a new clone of columns array with each column cloned as well.
+     *
+     * @param {any} columns
+     * @returns
+     */
+    checkColumnName(columns) {
+      return map(columns, field => {
+        const col = clone(field);
+        col.name = this.getColumnName(col.name);
+        col.columnName = this.getColumnName(col.columnName);
+
+        if (field.meta) {
+          const meta = clone(field.meta);
+          col.meta = meta;
+
+          col.meta.name = this.getColumnName(col.meta.name);
+          col.meta.columnName = this.getColumnName(col.meta.columnName);
         }
+        return col;
       });
-      return datatype;
+    }
+
+    getColumnName(columnName) {
+      // take out the .keyword form the columnName
+      // if there is one
+      if (!isUndefined(columnName)) {
+        const split = columnName.split('.');
+        if (split[1]) {
+          return split[0];
+        }
+        return columnName;
+      }
+    }
+
+    getDataField(column) {
+      const dataField = column.columnName || column.name;
+      // trim the .keyword suffix from the column name if it is there
+      return split(dataField, '.')[0];
     }
 
     _getDxColumns(columns = [], data = []) {
@@ -150,15 +191,24 @@ export const ReportGridDisplayComponent = {
       } else {
         allColumns = this.fillColumns(columns, data);
       }
+
+      allColumns = this.checkColumnName(allColumns);
+
       return map(allColumns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';
         }
+        const isNumberType = NUMBER_TYPES.includes(column.type);
+
         const field = {
           alignment: 'left',
           caption: column.aliasName || column.alias || column.displayName || column.name,
-          format: column.format,
-          dataField: column.columnName || column.name,
+          dataField: this.getDataField(column),
+          format: isNumberType ? {
+            formatter: getFormatter(column.format || (
+              FLOAT_TYPES.includes(column.type) ? {precision: DEFAULT_PRECISION} : {precision: 0}
+            ))
+          } : column.format,
           visibleIndex: column.visibleIndex,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
@@ -168,61 +218,45 @@ export const ReportGridDisplayComponent = {
           field.format = 'yyyy-MM-dd';
         }
 
-        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = {
-            type: 'fixedPoint',
-            comma: false,
-            precision: 2
-          };
-          field.customizeText = (data => {
-            const stringList = data.valueText.split(',');
-            let finalString = '';
-            forEach(stringList, value => {
-              finalString = finalString.concat(value);
-            });
-            return finalString;
-          });
-        }
-        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
-          if (!isUndefined(column.format.currency)) {
-            field.customizeText = (data => {
-              if (!column.format.comma) {
-                const stringList = data.valueText.split(',');
-                let finalString = '';
-                forEach(stringList, value => {
-                  finalString = finalString.concat(value);
-                });
-                data.valueText = finalString;
-              }
-              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
-                return column.format.currencySymbol + ' ' + data.valueText;
-              }
-              return data.valueText;
-            });
-          } else {
-            field.customizeText = (data => {
-              if (!column.format.comma) {
-                const stringList = data.valueText.split(',');
-                let finalString = '';
-                forEach(stringList, value => {
-                  finalString = finalString.concat(value);
-                });
-                data.valueText = finalString;
-              }
-              return data.valueText;
-            });
-          }
-        }
         return field;
       });
     }
 
     $onChanges() {
-      this.updateColumns(this.columns, this.data);
+      this._$timeout(() => {
+        this.updateColumns(this.columns, this.data);
+      });
     }
 
     onGridInitialized(e) {
       this._gridInstance = e.component;
+    }
+
+    onContentReady(e) {
+      // close the columnCHoser, when the user clicks outside of it
+      const columnChooserView = e.component.getView('columnChooserView');
+      if (!columnChooserView._popupContainer) {
+        columnChooserView._initializePopupContainer();
+        columnChooserView.render();
+        const onBodyClick = e => {
+          const content = columnChooserView._popupContainer._$content[0];
+          const target = e.target;
+          const clickOutside = !content.contains(target);
+          if (clickOutside) {
+            this._$timeout(() => {
+              this._gridInstance.hideColumnChooser();
+            });
+          }
+        };
+        columnChooserView._popupContainer.on('showing', () => {
+          /* eslint-disable */
+          document.body.addEventListener('click', onBodyClick);
+        });
+        columnChooserView._popupContainer.on('hiding', () => {
+          document.body.removeEventListener('click', onBodyClick);
+          /* eslint-enable */
+        });
+      }
     }
   }
 };

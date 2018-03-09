@@ -14,7 +14,8 @@ export const JSPlumbCanvas = {
   styles: [style],
   bindings: {
     id: '@',
-    onChange: '&'
+    onChange: '&',
+    didAnalysisChange: '='
   },
   controller: class JSPlumbCanvasCtrl {
     constructor($componentHandler, $eventEmitter, $element, $scope) {

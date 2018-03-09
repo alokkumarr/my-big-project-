@@ -1,0 +1,32 @@
+info:
+  component: Synchronoss scheduler Service
+spring:
+  application:
+    name: saw-sechduler-service
+  #mariaDB (metadata) DB details
+  datasource:
+    url: jdbc:mariadb://localhost:3306/saw_scheduler
+  username: saw_scheduler
+  password: saw_scheduler
+  driver-class-name: org.mariadb.jdbc.Driver
+  max-active: 25
+  testOnBorrow: true
+  testOnConnect: true
+  testOnReturn: true
+  validationQuery: SELECT 1
+  testWhileIdle: true
+  logValidationErrors: true
+  
+flyway:
+  baselineOnMigrate: false
+  enabled: false
+server:
+  address: localhost
+  port: 9600
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json    
+
+       

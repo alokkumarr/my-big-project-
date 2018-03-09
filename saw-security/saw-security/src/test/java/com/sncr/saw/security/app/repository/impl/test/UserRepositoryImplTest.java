@@ -1,14 +1,10 @@
 package com.sncr.saw.security.app.repository.impl.test;
 
+import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
-import com.sncr.saw.security.common.bean.Category;
-import com.sncr.saw.security.common.bean.Module;
-import com.sncr.saw.security.common.bean.Product;
-import com.sncr.saw.security.common.bean.ResetValid;
-import com.sncr.saw.security.common.bean.Role;
-import com.sncr.saw.security.common.bean.Ticket;
-import com.sncr.saw.security.common.bean.User;
-import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.app.sso.SSORequestHandler;
+import com.sncr.saw.security.app.sso.SSOResponse;
+import com.sncr.saw.security.common.bean.*;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
@@ -18,8 +14,11 @@ import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.when;
 public class UserRepositoryImplTest {
 
 	private static UserRepository userRepositoryDAO;
-	
+
 	private static User user1;
 	private static User user2;
 	private static List<User> userList = new ArrayList<User>();
@@ -289,8 +288,28 @@ public class UserRepositoryImplTest {
 		boolean[] isValid = userRepositoryDAO.authenticateUser(masterLoginId, password);
 		assertEquals(true, isValid[0]);
 		assertEquals(true, isValid[1]);		
-	}	
-	
+	}
+
+	@Test
+	public void testSSOAuthentication() {
+	    String masterLoginId = "SAWADMIN@Synchronoss.com";
+        RefreshToken rToken = new RefreshToken();
+        rToken.setValid(true);
+        rToken.setMasterLoginId(masterLoginId);
+        rToken.setValidUpto(System.currentTimeMillis() + (20 * 60 * 1000));
+		String token =
+		Jwts.builder().setSubject(masterLoginId).claim("ticket", rToken)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+        NSSOProperties nssoProperties = new NSSOProperties();
+        nssoProperties.setRefreshTokenValidityMins("20");
+        nssoProperties.setSsoSecretKey("sncrsaw2");
+        nssoProperties.setValidityMins("10");
+        SSORequestHandler ssoRequestHandler = new SSORequestHandler(userRepositoryDAO,nssoProperties);
+        SSOResponse ssoResponse = ssoRequestHandler.processSSORequest(token); // Stubbing the methods of mocked userRepo with mocked data.
+		assertNotNull("Valid access Token not found, Authentication failed ",ssoResponse.getaToken());
+		assertNotNull("Valid refresh Token not found, Authentication failed",ssoResponse.getrToken());
+	}
+
 	@Test
 	public void TestRstchangePassword() {
 		String masterLoginId = "SAWADMIN@Synchronoss.com";

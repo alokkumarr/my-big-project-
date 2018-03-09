@@ -336,3 +336,14 @@ It continues with displaying that it's creating the relationships and admin role
     2018-01-03 12:43:28.110  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Generated Privilege ID for Admin user: 43
     shell:>
     shell:>
+
+
+==  SAW SSO Authentication
+
+SAW supports external systems to authenticate users (single sign-on).The shared secret key is read from the SAW environment configuration, as a base64 encoded string (while ensuring Synchronoss Global Information Security standards for storing secret keys are adhered to).
+Recommended key size is 256 bits.
+
+   Command to generate key : openssl rand 32 -base64
+   Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=
+
+After generating the key, add it to the SAW environment configuration ({{saw-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.

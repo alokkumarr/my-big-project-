@@ -1,7 +1,58 @@
 {
-  "mappings": {
-    "sample": {
-      "dynamic_date_formats": ["yyyy-MM-dd HH:mm:ss"]
+  "mappings" : {
+    "sample" : {
+      "dynamic_date_formats" : [
+        "yyyy-MM-dd HH:mm:ss"
+      ],
+      "properties" : {
+        "convert" : {
+          "properties" : {
+            "field" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "type" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            }
+          }
+        },
+        "date" : {
+          "type" : "date",
+          "format" : "yyyy-MM-dd HH:mm:ss"
+        },
+        "double" : {
+          "type" : "double"
+        },
+        "float" : {
+          "type" : "float"
+        },
+        "integer" : {
+          "type" : "integer"
+        },
+        "long" : {
+          "type" : "long"
+        },
+        "string" : {
+          "type" : "keyword",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -4,6 +4,7 @@ export const AnalyzeFilterRowComponent = {
   template,
   bindings: {
     filter: '<',
+    options: '<',
     isRuntime: '<?runtime',
     artifact: '<',
     onChange: '&'

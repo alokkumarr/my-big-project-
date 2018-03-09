@@ -43,3 +43,4 @@ saw_elasticsearch_data_store_limit=10000
 
 [saw-security]
 localhost ansible_connection=local
+

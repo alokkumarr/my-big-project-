@@ -36,6 +36,9 @@ export:
 observe:
     service:
         host: http://localhost:9500
+scheduler:
+    service:
+        host: http://localhost:9600
 
 api:
   gateway:
@@ -58,6 +61,15 @@ api:
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
+        -   location: ${scheduler.service.host}
+            method : GET
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : POST
+            path : '[/]scheduler.*'
+        -   location: ${scheduler.service.host}
+            method : DELETE
+            path : '[/]scheduler.*'
         -   location: ${observe.service.host}
             method: POST
             path: '[/]observe.*'
@@ -70,6 +82,9 @@ api:
         -   location: ${observe.service.host}
             method: DELETE
             path: '[/]observe.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]filters.*'
 
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml
