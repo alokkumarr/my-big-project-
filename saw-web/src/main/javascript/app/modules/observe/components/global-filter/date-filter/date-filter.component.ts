@@ -19,10 +19,13 @@ const template = require('./date-filter.component.html');
 export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   private _filter;
   private model: any = {};
+  private filterCache: {gte?, lte?, preset?};
   private presets = DATE_PRESETS;
   private defaults: {min, max};
   private showDateFields: boolean;
   private clearFiltersListener: Subscription;
+  private applyFiltersListener: Subscription;
+  private closeFiltersListener: Subscription;
 
   @Output() onModelChange = new EventEmitter();
 
@@ -34,11 +37,24 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
       this.loadDefaults();
+      this.cacheFilters();
+    });
+
+    this.applyFiltersListener = this.filters.onApplyFilter.subscribe(() => {
+      this.cacheFilters();
+    });
+
+    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(state => {
+      if (!state) {
+        this.loadDefaults(true); // load cached filter data since last apply
+      }
     });
   }
 
   ngOnDestroy() {
     this.clearFiltersListener.unsubscribe();
+    this.applyFiltersListener.unsubscribe();
+    this.closeFiltersListener.unsubscribe();
   }
 
   @Input() set filter(data) {
@@ -52,43 +68,18 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
     this.loadDateRange();
   }
 
-  onPresetChange(data) {
-    this.model.preset = data.value;
-    this.showDateFields = this.model.preset === CUSTOM_DATE_PRESET_VALUE;
-    this.onFilterChange();
-  }
-
-  onDateChange(field, data) {
-    this.model[field] = data.value;
-    this.onFilterChange();
-  }
-
-  isValid(filt) {
-    return filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
-      (
-        filt.model.lte &&
-        filt.model.gte
-      );
-  }
-
   /**
-   * Resets the date and preset value to default state
+   * Caches filter in-memory. Cache is used to revert to last
+   * applied / default values when needed.
    *
-   * @returns
    * @memberof GlobalDateFilterComponent
    */
-  loadDefaults() {
-    if (!this.defaults) {
-      return;
-    }
-
-    this.onPresetChange({value: CUSTOM_DATE_PRESET_VALUE});
-    this.onDateChange('gte', {
-      value: this.defaults.min
-    });
-    this.onDateChange('lte', {
-      value: this.defaults.max
-    });
+  cacheFilters() {
+    this.filterCache = {
+      preset: this.model.preset,
+      gte: this.model.gte,
+      lte: this.model.lte
+    };
   }
 
   /**
@@ -104,9 +95,70 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       };
 
       this.loadDefaults();
+      this.cacheFilters();
     });
   }
 
+  /**
+   * Resets the date and preset value to default state or last cached
+   * state.
+   *
+   * @param {boolean} [fromCache=false]
+   * @returns
+   * @memberof GlobalDateFilterComponent
+   */
+  loadDefaults(fromCache = false) {
+    if ((!fromCache && !this.defaults) || (fromCache && !this.filterCache)) {
+      return;
+    }
+
+    const loadData = fromCache ? this.filterCache : {
+      preset: CUSTOM_DATE_PRESET_VALUE,
+      gte: this.defaults.min,
+      lte: this.defaults.max
+    };
+
+    this.onPresetChange({value: loadData.preset});
+    this.onDateChange('gte', {
+      value: loadData.gte
+    });
+    this.onDateChange('lte', {
+      value: loadData.lte
+    });
+  }
+
+  onPresetChange(data) {
+    this.model.preset = data.value;
+    this.showDateFields = this.model.preset === CUSTOM_DATE_PRESET_VALUE;
+    this.onFilterChange();
+  }
+
+  onDateChange(field, data) {
+    this.model[field] = data.value;
+    this.onFilterChange();
+  }
+
+  /**
+   * Checks whether filter value is valid.
+   *
+   * @param {any} filt
+   * @returns {boolean}
+   * @memberof GlobalDateFilterComponent
+   */
+  isValid(filt): boolean {
+    return filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
+      (
+        filt.model.lte &&
+        filt.model.gte
+      );
+  }
+
+  /**
+   * Gets the filter model together and communicates the
+   * updated filter to the parent.
+   *
+   * @memberof GlobalDateFilterComponent
+   */
   onFilterChange() {
     const payload = {
       ...this._filter,

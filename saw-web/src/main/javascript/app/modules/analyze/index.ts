@@ -89,10 +89,7 @@ import {
   DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   DesignerService,
-  ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe,
-  CronJobSchedularComponent,
-  CronDatePickerComponent
+  ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -194,7 +191,6 @@ angular.module(AnalyzeModule, [
     DesignerDateFilterComponent,
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
-    ArtifactColumnFilterPipe,
     ArtifactColumns2PivotFieldsPipe,
     CronJobSchedularComponent,
     CronDatePickerComponent
