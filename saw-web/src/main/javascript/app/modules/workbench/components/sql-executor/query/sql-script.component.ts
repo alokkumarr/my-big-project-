@@ -37,6 +37,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
 
   private _artifacts: Array<any>;
   private query: string;
+  private readOnlyMode: boolean = false;
 
   private editorOptions = {
     displayIndentGuides: true,
@@ -143,5 +144,17 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
     this.workBench.executeSqlQuery(this.query).subscribe(data => {
       this.onExecute.emit(data);
     });
+  }
+
+  /**
+   * Shows the preview of an action from list in editor.
+   * shifts the editor in readonly mode.
+   * 
+   * @param {string} action 
+   * @memberof SqlScriptComponent
+   */
+  viewAction(action: string) {
+    this.readOnlyMode = true;
+    this.query = action;
   }
 }

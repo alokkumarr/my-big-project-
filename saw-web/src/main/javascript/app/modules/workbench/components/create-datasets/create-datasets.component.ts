@@ -16,6 +16,8 @@ import { ParserPreviewComponent } from './parser-preview/parser-preview.componen
 import { DatasetDetailsComponent } from './dataset-details/dataset-details.component';
 import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog.component'
 import { WorkbenchService } from '../../services/workbench.service';
+import { ToastService } from '../../../../common/services/toastMessage.service';
+
 import { Parser } from '@angular/compiler/src/ml_parser/parser';
 
 const template = require('./create-datasets.component.html');
@@ -44,7 +46,8 @@ export class CreateDatasetsComponent implements OnInit {
     public dialogRef: MatDialogRef<CreateDatasetsComponent>,
     private dialog: MatDialog,
     private workBench: WorkbenchService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private notify: ToastService
   ) { }
 
   @ViewChild('previewComponent') private previewComponent: ParserPreviewComponent;
@@ -128,8 +131,8 @@ export class CreateDatasetsComponent implements OnInit {
     };
     // this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
     this.workBench.triggerParser(payload).subscribe(data => {
-      //this.dialogRef.close();
-
+      this.dialogRef.close();
+      this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 5000 });
     })
   }
 }

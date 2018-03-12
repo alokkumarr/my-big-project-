@@ -9,8 +9,8 @@ sql-executor {
     border: 3px #F5F9FC solid;
   }
 
-  .view-title {
-    vertical-align: middle;
+  .action-title {
+    color: $primary-blue-b2;
   }
 
   .title-elem {
@@ -53,6 +53,26 @@ sql-executor {
     &:hover {
       box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
       cursor: pointer;
+    }
+  }
+
+  .btn-icon {
+    color: $primary-blue-b2;
+    line-height: 32px !important;
+    height: 32px !important;
+    padding-top: 1px;
+
+    .mat-button {
+      vertical-align: middle;
+      line-height: 32px !important;
+      height: 32px !important;
+      border-radius: 2px;
+      background-color: white;
+      border: solid 1px #1A89D4;
+    }
+
+    .mat-button .mat-button-wrapper > * {
+      vertical-align: initial;
     }
   }
 }

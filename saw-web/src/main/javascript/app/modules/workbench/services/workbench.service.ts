@@ -30,7 +30,7 @@ export class WorkbenchService {
   /** GET datasets from the server */
   getDatasets(projectName: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${projectName}/datasets`;
-    return this.http.post(endpoint, {})
+    return this.http.get(endpoint)
       .pipe(
         catchError(this.handleError('data', DATASETS)));
   }

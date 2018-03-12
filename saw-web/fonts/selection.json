@@ -4,6 +4,68 @@
     {
       "icon": {
         "paths": [
+          "M832 1024h-640c-35.36 0-64-28.608-64-63.872v-800.448c0-35.296 28.64-63.872 64-63.872h192v63.872h-160c-17.664 0-32 14.272-32 31.936v736.576c0 17.632 14.336 31.936 32 31.936h576c17.696 0 32-14.304 32-31.936v-736.576c0-17.664-14.304-31.936-32-31.936h-160v-63.872h192c35.328 0 64 28.608 64 63.872v800.448c0 35.264-28.672 63.872-64 63.872zM800 191.616v736.576h-576v-736.576h32v129.76h512v-129.76h32zM352 417.184h-32v31.936h32v-31.936zM352 481.056h-32v31.936h32v-31.936zM352 544.928h-32v31.936h32v-31.936zM352 608.8h-32v31.936h32v-31.936zM352 672.672h-32v31.936h32v-31.936zM352 736.576h-32v31.936h32v-31.936zM352 800.448h-32v31.936h32v-31.936zM704 417.184h-320v31.936h320v-31.936zM704 481.056h-320v31.936h320v-31.936zM704 544.928h-320v31.936h320v-31.936zM704 608.8h-320v31.936h320v-31.936zM704 672.672h-320v31.936h320v-31.936zM704 736.576h-320v31.936h320v-31.936zM704 800.448h-320v31.936h320v-31.936zM704 191.616c17.696 0 32 14.272 32 31.936 0 17.632 0 63.872 0 63.872h-448c0 0 0-46.24 0-63.872 0-17.664 14.304-31.936 32-31.936h96c0 0 0.384-40.768 0.384-92.672 0-53.888 41.6-98.944 95.616-98.944s97.056 47.36 97.056 99.296c0 55.872-1.056 92.32-1.056 92.32h96zM512 95.808c-17.696 0-32 14.272-32 31.936 0 17.632 14.304 31.936 32 31.936s32-14.304 32-31.936c0-17.664-14.304-31.936-32-31.936z"
+        ],
+        "attrs": [
+          {}
+        ],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "tags": [
+          "clipboard",
+          "list",
+          "board"
+        ],
+        "grid": 32
+      },
+      "attrs": [
+        {}
+      ],
+      "properties": {
+        "order": 1,
+        "id": 1,
+        "prevSize": 32,
+        "code": 59780,
+        "name": "clipboard-solid"
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 0
+    },
+    {
+      "icon": {
+        "paths": [
+          "M768 1025.312h-576c-35.36 0-64-28.576-64-63.872v-771.104c0-35.264 28.64-63.84 64-63.84h160v66.528h-128c-17.664 0-32 14.272-32 31.936v704.544c0 17.696 14.336 31.936 32 31.936h512c17.696 0 32-14.24 32-31.936v-704.544c0-17.664-14.304-31.936-32-31.936h-128v-66.528h160c35.328 0 64 28.608 64 63.84v771.104c0 35.296-28.672 63.872-64 63.872zM352 384.608h352v31.936h-352v-31.936zM352 480.416h352v31.936h-352v-31.936zM352 576.256h352v31.936h-352v-31.936zM352 672.064h352v31.936h-352v-31.936zM704 895.552h-352v-31.872h352v31.872zM352 767.872h352v31.936h-352v-31.936zM256 383.968h32v31.936h-32v-31.936zM256 479.776h32v31.936h-32v-31.936zM256 575.552h32v31.936h-32v-31.936zM256 671.36h32v31.936h-32v-31.936zM288 894.944h-32v-31.936h32v31.936zM256 767.2h32v31.936h-32v-31.936zM672 226.912c17.696 0 32 14.304 32 31.968 0 17.632 0 61.856 0 61.856h-448c0 0 0-44.224 0-61.856 0-17.664 14.304-31.968 32-31.968h96c0 0 0.384-45.408 0.384-97.312 0-53.888 41.6-98.944 95.616-98.944s97.056 47.36 97.056 99.264c0 55.904-1.056 96.992-1.056 96.992h96zM480 126.496c-17.696 0-32 14.272-32 31.904 0 17.664 14.304 31.936 32 31.936s32-14.272 32-31.936c0-17.632-14.304-31.904-32-31.904z"
+        ],
+        "attrs": [
+          {}
+        ],
+        "isMulticolor": false,
+        "isMulticolor2": false,
+        "tags": [
+          "clipboard",
+          "list",
+          "board"
+        ],
+        "grid": 32
+      },
+      "attrs": [
+        {}
+      ],
+      "properties": {
+        "order": 2,
+        "id": 0,
+        "prevSize": 32,
+        "code": 59781,
+        "name": "clipboard"
+      },
+      "setIdx": 0,
+      "setId": 2,
+      "iconIdx": 1
+    },
+    {
+      "icon": {
+        "paths": [
           "M51.2 537.6h947.2c14.138 0 25.6 11.462 25.6 25.6s-11.462 25.6-25.6 25.6h-972.8c-14.138 0-25.6-11.462-25.6-25.6v-550.4c-0-14.138 11.462-25.6 25.6-25.6s25.6 11.462 25.6 25.6v524.8z",
           "M89.6 716.8h12.8c21.208 0 38.4 17.192 38.4 38.4v166.4c0 21.208-17.192 38.4-38.4 38.4h-12.8c-21.208 0-38.4-17.192-38.4-38.4v-166.4c0-21.208 17.192-38.4 38.4-38.4z",
           "M486.4 665.6h12.8c21.208 0 38.4 17.192 38.4 38.4v217.6c0 21.208-17.192 38.4-38.4 38.4h-12.8c-21.208 0-38.4-17.192-38.4-38.4v-217.6c0-21.208 17.192-38.4 38.4-38.4z",
@@ -197,7 +259,7 @@
         "prevSize": 32,
         "code": 59787
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 0
     },
@@ -452,7 +514,7 @@
         "prevSize": 32,
         "code": 59788
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 1
     },
@@ -490,7 +552,7 @@
         "prevSize": 32,
         "code": 59789
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 2
     },
@@ -522,7 +584,7 @@
         "prevSize": 32,
         "code": 59790
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 3
     },
@@ -549,7 +611,7 @@
         "code": 59791,
         "name": "pie-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 4
     },
@@ -572,7 +634,7 @@
         "code": 59792,
         "name": "uniE902"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 5
     },
@@ -595,7 +657,7 @@
         "code": 59793,
         "name": "uniE903"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 6
     },
@@ -622,7 +684,7 @@
         "code": 59794,
         "name": "uniE901"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 7
     },
@@ -645,7 +707,7 @@
         "code": 59795,
         "name": "uniE905"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 8
     },
@@ -668,7 +730,7 @@
         "code": 59796,
         "name": "uniE906"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 9
     },
@@ -695,7 +757,7 @@
         "code": 59797,
         "name": "uniE9022"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 10
     },
@@ -722,7 +784,7 @@
         "code": 59798,
         "name": "arrow-left"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 11
     },
@@ -749,7 +811,7 @@
         "code": 59799,
         "name": "uniE904"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 12
     },
@@ -777,7 +839,7 @@
         "code": 59800,
         "name": "fork"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 13
     },
@@ -804,7 +866,7 @@
         "code": 59801,
         "name": "uniE9052"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 14
     },
@@ -831,7 +893,7 @@
         "code": 59802,
         "name": "bell-list"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 15
     },
@@ -858,7 +920,7 @@
         "code": 59803,
         "name": "bell"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 16
     },
@@ -885,7 +947,7 @@
         "code": 59804,
         "name": "spline-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 17
     },
@@ -912,7 +974,7 @@
         "code": 59805,
         "name": "calendar2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 18
     },
@@ -935,7 +997,7 @@
         "code": 59806,
         "name": "uniE910"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 19
     },
@@ -958,7 +1020,7 @@
         "code": 59807,
         "name": "uniE911"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 20
     },
@@ -985,7 +1047,7 @@
         "code": 59808,
         "name": "card-view"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 21
     },
@@ -1013,7 +1075,7 @@
         "code": 59809,
         "name": "chart-placeholder"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 22
     },
@@ -1040,7 +1102,7 @@
         "code": 59810,
         "name": "chart-view"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 23
     },
@@ -1067,7 +1129,7 @@
         "code": 59811,
         "name": "close"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 24
     },
@@ -1094,7 +1156,7 @@
         "code": 59812,
         "name": "collapse"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 25
     },
@@ -1121,7 +1183,7 @@
         "code": 59813,
         "name": "uniE90F"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 26
     },
@@ -1148,7 +1210,7 @@
         "code": 59814,
         "name": "uniE9102"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 27
     },
@@ -1175,7 +1237,7 @@
         "code": 59815,
         "name": "description"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 28
     },
@@ -1203,7 +1265,7 @@
         "code": 59816,
         "name": "folder2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 29
     },
@@ -1230,7 +1292,7 @@
         "code": 59817,
         "name": "full-screen"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 30
     },
@@ -1257,7 +1319,7 @@
         "code": 59818,
         "name": "group-by-column"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 31
     },
@@ -1280,7 +1342,7 @@
         "code": 59819,
         "name": "uniE91D"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 32
     },
@@ -1303,7 +1365,7 @@
         "code": 59820,
         "name": "uniE91E"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 33
     },
@@ -1326,7 +1388,7 @@
         "code": 59821,
         "name": "uniE91F"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 34
     },
@@ -1353,7 +1415,7 @@
         "code": 59822,
         "name": "hor-bar-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 35
     },
@@ -1380,7 +1442,7 @@
         "code": 59823,
         "name": "uniE91C"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 36
     },
@@ -1406,7 +1468,7 @@
         "code": 59824,
         "name": "uniE922"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 37
     },
@@ -1432,7 +1494,7 @@
         "code": 59825,
         "name": "uniE923"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 38
     },
@@ -1458,7 +1520,7 @@
         "code": 59826,
         "name": "uniE924"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 39
     },
@@ -1485,7 +1547,7 @@
         "code": 59827,
         "name": "uniE91D2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 40
     },
@@ -1512,7 +1574,7 @@
         "code": 59828,
         "name": "key"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 41
     },
@@ -1539,7 +1601,7 @@
         "code": 59829,
         "name": "launchpad"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 42
     },
@@ -1566,7 +1628,7 @@
         "code": 59830,
         "name": "uniE9232"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 43
     },
@@ -1593,7 +1655,7 @@
         "code": 59831,
         "name": "menu"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 44
     },
@@ -1621,7 +1683,7 @@
         "code": 59832,
         "name": "more"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 45
     },
@@ -1648,7 +1710,7 @@
         "code": 59833,
         "name": "navicon"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 46
     },
@@ -1675,7 +1737,7 @@
         "code": 59834,
         "name": "pivot"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 47
     },
@@ -1702,7 +1764,7 @@
         "code": 59835,
         "name": "plus2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 48
     },
@@ -1725,7 +1787,7 @@
         "code": 59836,
         "name": "uniE92E"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 49
     },
@@ -1751,7 +1813,7 @@
         "code": 59837,
         "name": "uniE92F"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 50
     },
@@ -1774,7 +1836,7 @@
         "code": 59838,
         "name": "uniE930"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 51
     },
@@ -1801,7 +1863,7 @@
         "code": 59839,
         "name": "print"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 52
     },
@@ -1827,7 +1889,7 @@
         "code": 59840,
         "name": "Shape-Copy-2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 53
     },
@@ -1854,7 +1916,7 @@
         "code": 59841,
         "name": "Shape-Copy-22"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 54
     },
@@ -1881,7 +1943,7 @@
         "code": 59842,
         "name": "sort2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 55
     },
@@ -1908,7 +1970,7 @@
         "code": 59843,
         "name": "Table-view"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 56
     },
@@ -1935,7 +1997,7 @@
         "code": 59844,
         "name": "trash"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 57
     },
@@ -1962,7 +2024,7 @@
         "code": 59845,
         "name": "upload2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 58
     },
@@ -1989,7 +2051,7 @@
         "code": 59846,
         "name": "user-placeholder"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 59
     },
@@ -2016,7 +2078,7 @@
         "code": 59847,
         "name": "vert-bar-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 60
     },
@@ -2044,7 +2106,7 @@
         "code": 59848,
         "name": "AVG"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 61
     },
@@ -2071,7 +2133,7 @@
         "code": 59849,
         "name": "query-mode"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 62
     },
@@ -2099,7 +2161,7 @@
         "code": 59850,
         "name": "MIN"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 63
     },
@@ -2127,7 +2189,7 @@
         "code": 59851,
         "name": "Sum"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 64
     },
@@ -2154,7 +2216,7 @@
         "code": 59852,
         "name": "bubble-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 65
     },
@@ -2181,7 +2243,7 @@
         "code": 59853,
         "name": "line-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 66
     },
@@ -2208,7 +2270,7 @@
         "code": 59854,
         "name": "scatter-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 67
     },
@@ -2235,7 +2297,7 @@
         "code": 59855,
         "name": "export"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 68
     },
@@ -2262,7 +2324,7 @@
         "code": 59856,
         "name": "combo-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 69
     },
@@ -2289,7 +2351,7 @@
         "code": 59857,
         "name": "designer-mode"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 70
     },
@@ -2316,7 +2378,7 @@
         "code": 59858,
         "name": "remove"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 71
     },
@@ -2343,7 +2405,7 @@
         "code": 59859,
         "name": "download2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 72
     },
@@ -2370,7 +2432,7 @@
         "code": 59860,
         "name": "report"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 73
     },
@@ -2397,7 +2459,7 @@
         "code": 59861,
         "name": "edit2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 74
     },
@@ -2424,7 +2486,7 @@
         "code": 59862,
         "name": "uniE92D"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 75
     },
@@ -2451,7 +2513,7 @@
         "code": 59863,
         "name": "expand"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 76
     },
@@ -2478,7 +2540,7 @@
         "code": 59864,
         "name": "uniE92E2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 77
     },
@@ -2505,7 +2567,7 @@
         "code": 59865,
         "name": "eye-disabled"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 78
     },
@@ -2532,7 +2594,7 @@
         "code": 59866,
         "name": "uniE92F2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 79
     },
@@ -2559,7 +2621,7 @@
         "code": 59867,
         "name": "filter"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 80
     },
@@ -2586,7 +2648,7 @@
         "code": 59868,
         "name": "search2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 81
     },
@@ -2613,7 +2675,7 @@
         "code": 59869,
         "name": "uniE91E2"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 82
     },
@@ -2640,7 +2702,7 @@
         "code": 59870,
         "name": "uniE9222"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 83
     },
@@ -2668,7 +2730,7 @@
         "code": 59871,
         "name": "MAX"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 84
     },
@@ -2695,7 +2757,7 @@
         "code": 59872,
         "name": "uniE921"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 85
     },
@@ -2719,7 +2781,7 @@
         "code": 59873,
         "name": "area-chart"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 86
     },
@@ -2743,7 +2805,7 @@
         "code": 59874,
         "name": "uniE954"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 87
     },
@@ -2767,7 +2829,7 @@
         "code": 59875,
         "name": "uniE955"
       },
-      "setIdx": 0,
+      "setIdx": 1,
       "setId": 1,
       "iconIdx": 88
     },
@@ -2796,7 +2858,7 @@
         "prevSize": 24,
         "code": 59779
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 0
     },
@@ -2825,7 +2887,7 @@
         "prevSize": 24,
         "code": 59776
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 1
     },
@@ -2854,7 +2916,7 @@
         "prevSize": 24,
         "code": 59775
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 2
     },
@@ -2883,7 +2945,7 @@
         "prevSize": 24,
         "code": 59771
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 3
     },
@@ -2912,7 +2974,7 @@
         "prevSize": 24,
         "code": 59774
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 4
     },
@@ -2946,7 +3008,7 @@
         "prevSize": 24,
         "code": 59767
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 5
     },
@@ -2980,7 +3042,7 @@
         "prevSize": 24,
         "code": 59769
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 6
     },
@@ -3014,7 +3076,7 @@
         "prevSize": 24,
         "code": 59770
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 7
     },
@@ -3049,7 +3111,7 @@
         "code": 59782,
         "ligatures": "newspaper-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 8
     },
@@ -3084,7 +3146,7 @@
         "code": 59783,
         "ligatures": "soup-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 9
     },
@@ -3123,7 +3185,7 @@
         "code": 59784,
         "ligatures": "theatre-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 10
     },
@@ -3158,7 +3220,7 @@
         "code": 59785,
         "ligatures": "thinking-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 11
     },
@@ -3197,7 +3259,7 @@
         "code": 59786,
         "ligatures": "tools-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 12
     },
@@ -3232,7 +3294,7 @@
         "code": 59765,
         "ligatures": "comment-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 13
     },
@@ -3267,7 +3329,7 @@
         "code": 59766,
         "ligatures": "emptycat"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 14
     },
@@ -3302,7 +3364,7 @@
         "code": 59768,
         "ligatures": "finance-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 15
     },
@@ -3336,7 +3398,7 @@
         "prevSize": 24,
         "code": 59772
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 16
     },
@@ -3378,7 +3440,7 @@
         "prevSize": 24,
         "code": 59773
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 17
     },
@@ -3413,7 +3475,7 @@
         "code": 59777,
         "ligatures": "userempty"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 18
     },
@@ -3460,7 +3522,7 @@
         "code": 59778,
         "ligatures": "utilities-solid"
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 19
     },
@@ -3490,7 +3552,7 @@
         "id": 20,
         "code": 59764
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 20
     },
@@ -3520,7 +3582,7 @@
         "id": 21,
         "code": 59762
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 21
     },
@@ -3550,7 +3612,7 @@
         "id": 22,
         "code": 59763
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 22
     },
@@ -3580,7 +3642,7 @@
         "id": 23,
         "code": 59761
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 23
     },
@@ -3610,7 +3672,7 @@
         "id": 24,
         "code": 59758
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 24
     },
@@ -3640,7 +3702,7 @@
         "id": 25,
         "code": 59759
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 25
     },
@@ -3670,7 +3732,7 @@
         "id": 26,
         "code": 59760
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 26
     },
@@ -3702,7 +3764,7 @@
         "id": 27,
         "code": 59756
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 27
     },
@@ -3732,7 +3794,7 @@
         "id": 28,
         "code": 59757
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 28
     },
@@ -3762,7 +3824,7 @@
         "id": 29,
         "code": 59687
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 29
     },
@@ -3792,7 +3854,7 @@
         "id": 30,
         "code": 59688
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 30
     },
@@ -3822,7 +3884,7 @@
         "id": 31,
         "code": 59652
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 31
     },
@@ -3852,7 +3914,7 @@
         "id": 32,
         "code": 59658
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 32
     },
@@ -3882,7 +3944,7 @@
         "id": 33,
         "code": 59660
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 33
     },
@@ -3912,7 +3974,7 @@
         "id": 34,
         "code": 59662
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 34
     },
@@ -3942,7 +4004,7 @@
         "id": 35,
         "code": 59663
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 35
     },
@@ -3972,7 +4034,7 @@
         "id": 36,
         "code": 59664
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 36
     },
@@ -4001,7 +4063,7 @@
         "id": 37,
         "code": 59665
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 37
     },
@@ -4031,7 +4093,7 @@
         "id": 38,
         "code": 59666
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 38
     },
@@ -4061,7 +4123,7 @@
         "id": 39,
         "code": 59667
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 39
     },
@@ -4091,7 +4153,7 @@
         "id": 40,
         "code": 59668
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 40
     },
@@ -4121,7 +4183,7 @@
         "id": 41,
         "code": 59669
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 41
     },
@@ -4151,7 +4213,7 @@
         "id": 42,
         "code": 59670
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 42
     },
@@ -4181,7 +4243,7 @@
         "id": 43,
         "code": 59671
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 43
     },
@@ -4211,7 +4273,7 @@
         "id": 44,
         "code": 59672
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 44
     },
@@ -4241,7 +4303,7 @@
         "id": 45,
         "code": 59673
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 45
     },
@@ -4271,7 +4333,7 @@
         "id": 46,
         "code": 59674
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 46
     },
@@ -4301,7 +4363,7 @@
         "id": 47,
         "code": 59675
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 47
     },
@@ -4331,7 +4393,7 @@
         "id": 48,
         "code": 59676
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 48
     },
@@ -4361,7 +4423,7 @@
         "id": 49,
         "code": 59677
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 49
     },
@@ -4391,7 +4453,7 @@
         "id": 50,
         "code": 59678
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 50
     },
@@ -4421,7 +4483,7 @@
         "id": 51,
         "code": 59679
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 51
     },
@@ -4451,7 +4513,7 @@
         "id": 52,
         "code": 59680
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 52
     },
@@ -4481,7 +4543,7 @@
         "id": 53,
         "code": 59681
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 53
     },
@@ -4511,7 +4573,7 @@
         "id": 54,
         "code": 59682
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 54
     },
@@ -4541,7 +4603,7 @@
         "id": 55,
         "code": 59683
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 55
     },
@@ -4571,7 +4633,7 @@
         "id": 56,
         "code": 59684
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 56
     },
@@ -4601,7 +4663,7 @@
         "id": 57,
         "code": 59685
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 57
     },
@@ -4631,7 +4693,7 @@
         "id": 58,
         "code": 59686
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 58
     },
@@ -4661,7 +4723,7 @@
         "id": 59,
         "code": 59689
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 59
     },
@@ -4691,7 +4753,7 @@
         "id": 60,
         "code": 59690
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 60
     },
@@ -4721,7 +4783,7 @@
         "id": 61,
         "code": 59691
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 61
     },
@@ -4751,7 +4813,7 @@
         "id": 62,
         "code": 59692
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 62
     },
@@ -4781,7 +4843,7 @@
         "id": 63,
         "code": 59693
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 63
     },
@@ -4811,7 +4873,7 @@
         "id": 64,
         "code": 59694
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 64
     },
@@ -4841,7 +4903,7 @@
         "id": 65,
         "code": 59695
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 65
     },
@@ -4871,7 +4933,7 @@
         "id": 66,
         "code": 59696
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 66
     },
@@ -4901,7 +4963,7 @@
         "id": 67,
         "code": 59697
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 67
     },
@@ -4931,7 +4993,7 @@
         "id": 68,
         "code": 59698
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 68
     },
@@ -4961,7 +5023,7 @@
         "id": 69,
         "code": 59699
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 69
     },
@@ -4991,7 +5053,7 @@
         "id": 70,
         "code": 59700
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 70
     },
@@ -5021,7 +5083,7 @@
         "id": 71,
         "code": 59701
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 71
     },
@@ -5051,7 +5113,7 @@
         "id": 72,
         "code": 59702
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 72
     },
@@ -5081,7 +5143,7 @@
         "id": 73,
         "code": 59703
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 73
     },
@@ -5111,7 +5173,7 @@
         "id": 74,
         "code": 59704
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 74
     },
@@ -5141,7 +5203,7 @@
         "id": 75,
         "code": 59705
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 75
     },
@@ -5171,7 +5233,7 @@
         "id": 76,
         "code": 59706
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 76
     },
@@ -5201,7 +5263,7 @@
         "id": 77,
         "code": 59707
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 77
     },
@@ -5231,7 +5293,7 @@
         "id": 78,
         "code": 59708
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 78
     },
@@ -5261,7 +5323,7 @@
         "id": 79,
         "code": 59709
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 79
     },
@@ -5291,7 +5353,7 @@
         "id": 80,
         "code": 59710
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 80
     },
@@ -5321,7 +5383,7 @@
         "id": 81,
         "code": 59711
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 81
     },
@@ -5351,7 +5413,7 @@
         "id": 82,
         "code": 59712
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 82
     },
@@ -5381,7 +5443,7 @@
         "id": 83,
         "code": 59713
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 83
     },
@@ -5411,7 +5473,7 @@
         "id": 84,
         "code": 59714
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 84
     },
@@ -5441,7 +5503,7 @@
         "id": 85,
         "code": 59715
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 85
     },
@@ -5471,7 +5533,7 @@
         "id": 86,
         "code": 59716
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 86
     },
@@ -5501,7 +5563,7 @@
         "id": 87,
         "code": 59717
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 87
     },
@@ -5531,7 +5593,7 @@
         "id": 88,
         "code": 59718
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 88
     },
@@ -5561,7 +5623,7 @@
         "id": 89,
         "code": 59719
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 89
     },
@@ -5591,7 +5653,7 @@
         "id": 90,
         "code": 59720
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 90
     },
@@ -5621,7 +5683,7 @@
         "id": 91,
         "code": 59721
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 91
     },
@@ -5651,7 +5713,7 @@
         "id": 92,
         "code": 59722
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 92
     },
@@ -5681,7 +5743,7 @@
         "id": 93,
         "code": 59723
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 93
     },
@@ -5711,7 +5773,7 @@
         "id": 94,
         "code": 59724
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 94
     },
@@ -5741,7 +5803,7 @@
         "id": 95,
         "code": 59725
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 95
     },
@@ -5771,7 +5833,7 @@
         "id": 96,
         "code": 59726
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 96
     },
@@ -5801,7 +5863,7 @@
         "id": 97,
         "code": 59727
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 97
     },
@@ -5831,7 +5893,7 @@
         "id": 98,
         "code": 59728
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 98
     },
@@ -5861,7 +5923,7 @@
         "id": 99,
         "code": 59729
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 99
     },
@@ -5891,7 +5953,7 @@
         "id": 100,
         "code": 59730
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 100
     },
@@ -5921,7 +5983,7 @@
         "id": 101,
         "code": 59731
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 101
     },
@@ -5951,7 +6013,7 @@
         "id": 102,
         "code": 59732
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 102
     },
@@ -5981,7 +6043,7 @@
         "id": 103,
         "code": 59733
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 103
     },
@@ -6011,7 +6073,7 @@
         "id": 104,
         "code": 59734
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 104
     },
@@ -6041,7 +6103,7 @@
         "id": 105,
         "code": 59735
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 105
     },
@@ -6071,7 +6133,7 @@
         "id": 106,
         "code": 59736
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 106
     },
@@ -6101,7 +6163,7 @@
         "id": 107,
         "code": 59737
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 107
     },
@@ -6131,7 +6193,7 @@
         "id": 108,
         "code": 59738
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 108
     },
@@ -6161,7 +6223,7 @@
         "id": 109,
         "code": 59739
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 109
     },
@@ -6191,7 +6253,7 @@
         "id": 110,
         "code": 59740
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 110
     },
@@ -6221,7 +6283,7 @@
         "id": 111,
         "code": 59741
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 111
     },
@@ -6251,7 +6313,7 @@
         "id": 112,
         "code": 59742
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 112
     },
@@ -6281,7 +6343,7 @@
         "id": 113,
         "code": 59743
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 113
     },
@@ -6311,7 +6373,7 @@
         "id": 114,
         "code": 59744
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 114
     },
@@ -6341,7 +6403,7 @@
         "id": 115,
         "code": 59745
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 115
     },
@@ -6371,7 +6433,7 @@
         "id": 116,
         "code": 59746
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 116
     },
@@ -6401,7 +6463,7 @@
         "id": 117,
         "code": 59747
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 117
     },
@@ -6431,7 +6493,7 @@
         "id": 118,
         "code": 59748
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 118
     },
@@ -6461,7 +6523,7 @@
         "id": 119,
         "code": 59749
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 119
     },
@@ -6491,7 +6553,7 @@
         "id": 120,
         "code": 59750
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 120
     },
@@ -6521,7 +6583,7 @@
         "id": 121,
         "code": 59751
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 121
     },
@@ -6551,7 +6613,7 @@
         "id": 122,
         "code": 59752
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 122
     },
@@ -6581,7 +6643,7 @@
         "id": 123,
         "code": 59753
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 123
     },
@@ -6611,7 +6673,7 @@
         "id": 124,
         "code": 59754
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 124
     },
@@ -6641,7 +6703,7 @@
         "id": 125,
         "code": 59755
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 125
     },
@@ -6671,7 +6733,7 @@
         "id": 126,
         "code": 59661
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 126
     },
@@ -6701,7 +6763,7 @@
         "id": 127,
         "code": 59659
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 127
     },
@@ -6731,7 +6793,7 @@
         "id": 128,
         "code": 59656
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 128
     },
@@ -6761,7 +6823,7 @@
         "id": 129,
         "code": 59657
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 129
     },
@@ -6791,7 +6853,7 @@
         "id": 130,
         "code": 59648
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 130
     },
@@ -6821,7 +6883,7 @@
         "id": 131,
         "code": 59649
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 131
     },
@@ -6851,7 +6913,7 @@
         "id": 132,
         "code": 59650
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 132
     },
@@ -6881,7 +6943,7 @@
         "id": 133,
         "code": 59651
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 133
     },
@@ -6911,7 +6973,7 @@
         "id": 134,
         "code": 59653
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 134
     },
@@ -6941,7 +7003,7 @@
         "id": 135,
         "code": 59654
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 135
     },
@@ -6971,7 +7033,7 @@
         "id": 136,
         "code": 59655
       },
-      "setIdx": 1,
+      "setIdx": 2,
       "setId": 0,
       "iconIdx": 136
     }

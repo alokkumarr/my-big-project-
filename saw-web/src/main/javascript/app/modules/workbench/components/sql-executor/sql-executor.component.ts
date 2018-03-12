@@ -4,7 +4,7 @@ import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit } from '@ang
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { ToastService } from '../../../../common/services/toastMessage.service'
+import { ToastService } from '../../../../common/services/toastMessage.service';
 
 import * as get from 'lodash/get';
 import { SQL_AQCTIONS } from '../../sample-data';
@@ -101,5 +101,9 @@ export class SqlExecutorComponent implements OnInit {
       //this.dialogRef.close();
 
     })
+  }
+
+  previewAction(action) {
+    this.scriptComponent.viewAction(action);
   }
 }

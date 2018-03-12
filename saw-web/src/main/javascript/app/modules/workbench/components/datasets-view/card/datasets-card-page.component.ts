@@ -46,8 +46,9 @@ export class DatasetsCardPageComponent implements OnInit {
   onUpdate(data) {
     this.dataSets = data;
     if (this.dataSets.length > 0) {
-      this.headerProgress.hide();
+      
     }
+    this.headerProgress.hide();
   }
 
   openSQLEditor(): void {

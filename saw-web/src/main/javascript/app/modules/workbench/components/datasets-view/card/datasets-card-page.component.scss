@@ -24,7 +24,9 @@ datasets-card-page {
 
   .datasets-card {
     transition: box-shadow 0.5s;
-    border-radius: 5px !important;
+    border-radius: 3px !important;
+    background-color: #FFF;
+    border: solid 1px #D7EAFA;
     padding: 3px !important;
     margin: 7px;
 
