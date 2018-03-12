@@ -1,0 +1,15 @@
+<mat-accordion [multi]="true" [displayMode]="flat">
+
+  <mat-expansion-panel *ngFor="let category of categories">
+    <mat-expansion-panel-header>
+      {{category.name}}
+    </mat-expansion-panel-header>
+
+    <button mat-button
+      class="choose-category"
+      *ngFor="let subCategory of category.subCategories"
+      (click)="onSelectSubCategory(subCategory)">
+      {{subCategory.name}}
+    </button>
+  </mat-expansion-panel>
+</mat-accordion>

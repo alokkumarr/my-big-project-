@@ -19,7 +19,8 @@ import {
 export class AddWidgetComponent implements OnInit {
   widgetTypes = wTypes;
   model: {
-    type?: WidgetType
+    type?: WidgetType,
+    subCategory?: any
   } = {};
 
   @ViewChild('widgetStepper') widgetStepper: MatHorizontalStepper;
@@ -30,6 +31,11 @@ export class AddWidgetComponent implements OnInit {
 
   onSelectWidgetType(data: WidgetType) {
     this.model.type = data;
+    this.widgetStepper.next();
+  }
+
+  onSelectCategory(data) {
+    this.model.subCategory = data;
     this.widgetStepper.next();
   }
 }

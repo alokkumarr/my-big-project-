@@ -3,7 +3,7 @@
     <widget-type [widgetTypes]="widgetTypes" (onSelect)="onSelectWidgetType($event)"></widget-type>
   </mat-step>
   <mat-step label="Category">
-    <h1>Choose category and subcategory</h1>
+    <widget-category (onSelect)="onSelectCategory($event)"></widget-category>
   </mat-step>
   <mat-step label="Analysis">
     <h1>Choose analysis</h1>

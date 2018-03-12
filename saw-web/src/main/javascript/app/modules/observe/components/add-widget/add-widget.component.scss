@@ -25,4 +25,26 @@ add-widget {
       }
     }
   }
+
+  widget-category {
+    mat-expansion-panel.mat-expansion-panel {
+      background-color: transparent;
+      border-bottom: 1px solid $primary-grey-g1;
+
+      mat-expansion-panel-header.mat-expansion-panel-header {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid $primary-grey-g1;
+      }
+
+      &:not([class*=mat-elevation-z]) {
+        box-shadow: none;
+      }
+    }
+
+    button.choose-category {
+      width: 100%;
+      text-align: left;
+    }
+  }
 }
