@@ -19,17 +19,11 @@ public class WorkbenchClient {
         LivyClient client = new LivyClientBuilder()
             .setURI(new URI(livyUri))
             .build();
-        try {
-            log.debug("Uploading Workbench JAR");
-            client.uploadJar(new File(WORKBENCH_JAR));
-            log.info("Submitting Workbench job");
-            JobHandle<Integer> job = client.submit(
-                new WorkbenchJob(root, project, component, config));
-            log.info("Submitted job");
-            Integer result = job.get();
-            log.info("Job result: {}", result);
-        } finally {
-            client.stop(true);
-        }
+        log.debug("Uploading Workbench JAR");
+        client.uploadJar(new File(WORKBENCH_JAR));
+        log.info("Submitting Workbench job");
+        JobHandle<Integer> job = client.submit(
+            new WorkbenchJob(root, project, component, config));
+        log.info("Submitted job");
     }
 }
