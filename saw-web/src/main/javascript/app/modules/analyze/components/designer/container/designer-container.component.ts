@@ -26,6 +26,7 @@ import {
   SqlBuilder,
   SqlBuilderPivot,
   ArtifactColumns,
+  Artifact,
   DesignerToolbarAciton,
   Sort,
   Filter,
@@ -59,7 +60,7 @@ export class DesignerContainerComponent {
   public isInDraftMode: boolean = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
-  public firstArtifactColumns: ArtifactColumns = [];
+  public artifacts: Artifact[] = [];
   public data: any = null;
   public sorts: Sort[] = [];
   public filters: Filter[] = [];
@@ -101,7 +102,7 @@ export class DesignerContainerComponent {
   }
 
   initExistingAnalysis() {
-    this.firstArtifactColumns = this.getFirstArtifactColumns();
+    this.artifacts = this.analysis.artifacts;
     this.filters = this.analysis.sqlBuilder.filters;
     this.sorts = this.analysis.sqlBuilder.sorts;
     this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
@@ -149,7 +150,9 @@ export class DesignerContainerComponent {
   onToolbarAction(action: DesignerToolbarAciton) {
     switch (action) {
     case 'sort':
-      this._analyzeDialogService.openSortDialog(this.sorts, this.firstArtifactColumns)
+    // TODO update sorts for multiple artifacts
+      const firstArtifactCols = this.artifacts[0].columns;
+      this._analyzeDialogService.openSortDialog(this.sorts, firstArtifactCols)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
@@ -229,7 +232,7 @@ export class DesignerContainerComponent {
   }
 
   onSettingsChange(event: FieldChangeEvent) {
-    this.firstArtifactColumns = this.getFirstArtifactColumns();
+    this.artifacts = [...this.artifacts];
     this.cleanSorts();
     if (event.requiresDataChange) {
       this.requestDataIfPossible()
@@ -249,10 +252,6 @@ export class DesignerContainerComponent {
 
   }
 
-  getFirstArtifactColumns() {
-    return [...this.analysis.artifacts[0].columns];
-  }
-
   updateAnalysis() {
     this.analysis.sqlBuilder = this.getSqlBuilder();
   }
@@ -261,7 +260,12 @@ export class DesignerContainerComponent {
    * If an artifactColumn is unselected, it should be cleared out from the sorts.
    */
   cleanSorts() {
-    const checkedFields = filter(this.firstArtifactColumns, 'checked');
+    if (isEmpty(this.artifacts)) {
+      return;
+    }
+    const firstArtifactCols = this.artifacts[0].columns;
+    // TODO update sorts for multiple artifacts
+    const checkedFields = filter(firstArtifactCols, 'checked');
     this.sorts = filter(this.sorts, sort => {
       return Boolean(find(checkedFields, ({columnName}) => columnName === sort.columnName));
     });

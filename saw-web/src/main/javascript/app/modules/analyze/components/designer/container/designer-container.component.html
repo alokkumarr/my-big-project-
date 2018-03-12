@@ -6,14 +6,14 @@
                  (requestAction)="onToolbarAction($event)">
 </designer-header>
 
-<designer-settings-single class="designer__data-settings"
+<designer-settings-single-table class="designer__data-settings"
                    (settingsChange)="onSettingsChange($event)"
-                   [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
-</designer-settings-single>
+                   [artifacts]="analysis ? analysis.artifacts : []">
+</designer-settings-single-table>
 
 <designer-pivot class="designer__main"
                 [data]="data"
                 [sorts]="sorts"
-                [artifactColumns]="firstArtifactColumns"
+                [artifacts]="analysis ? analysis.artifacts : []"
                 [designerState]="designerState">
 </designer-pivot>

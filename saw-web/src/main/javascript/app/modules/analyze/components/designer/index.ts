@@ -7,7 +7,8 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
 import {
-  DesignerSettingsSingleComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent
@@ -32,7 +33,8 @@ export {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
-  DesignerSettingsSingleComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,

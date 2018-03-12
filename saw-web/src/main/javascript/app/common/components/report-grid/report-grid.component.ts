@@ -51,7 +51,8 @@ export class ReportGridComponent {
     this.columns = this.artifacts2Columns(artifacts);
   };
   @Input('queryColumns') set setQueryColumns(queryColumns) {
-    // todo merge with SAW - 2002 for queryColumns
+    // TODO merge with SAW - 2002 for queryColumns
+    // for query mode
     this.columns = this.queryColumns2Columns(queryColumns);
   }
   @Input('data') set setData(data: any[]) {

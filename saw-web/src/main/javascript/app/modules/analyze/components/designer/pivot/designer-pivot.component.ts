@@ -5,10 +5,11 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
+import * as isEmpty from 'lodash/isEmpty';
 import {Subject} from 'rxjs/Subject';
 
 import {
-  ArtifactColumns,
+  Artifact,
   ArtifactColumnPivot
 } from '../types';
 import { DesignerStates } from '../container';
@@ -26,10 +27,16 @@ require('./designer-pivot.component.scss');
   template
 })
 export class DesignerPivotComponent {
-  @Input() artifactColumns: ArtifactColumns;
+  @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
+    if (!isEmpty(artifacts)) {
+      this.artifactColumns = artifacts[0].columns;
+    }
+  };
   @Input() data;
   @Input() sorts: any[];
   @Input() designerState: DesignerStates;
+
+  public artifactColumns: ArtifactColumnPivot[];
 
   public updater: Subject<IPivotGridUpdate> = new Subject();
   public DesignerStates = DesignerStates;

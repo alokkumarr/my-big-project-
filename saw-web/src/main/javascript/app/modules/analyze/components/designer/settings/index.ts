@@ -1,11 +1,13 @@
-import { DesignerSettingsSingleComponent } from './single';
+import { DesignerSettingsSingleTableComponent } from './single';
+import { DesignerSettingsMultiTableComponent } from './multi';
 import { DesignerSettingsGroupComponent } from './group';
 import {
   ExpandableFieldComponent,
   ExpandDetailPivotComponent
 } from './expandable-field';
 export {
-  DesignerSettingsSingleComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent
