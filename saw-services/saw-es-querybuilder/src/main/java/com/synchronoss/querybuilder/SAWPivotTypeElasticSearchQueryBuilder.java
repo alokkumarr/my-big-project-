@@ -210,12 +210,12 @@ public String getJsonString() {
       {
           SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
           preSearchSourceBuilder.query(boolQueryBuilder);
-          preSearchSourceBuilder.aggregation(QueryBuilderUtil.getAggregationBuilder(dataFields));
+          QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
           String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
                   "system","analyse");
           // Set total sum for dataFields will be used for percentage calculation.
           objectMapper = new ObjectMapper();
-          JsonNode objectNode = objectMapper.readTree(result).get("data_fields");
+          JsonNode objectNode = objectMapper.readTree(result);
           dataFields.forEach (dataField -> {
               String columnName = dataField.getColumnName();
               if(dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))

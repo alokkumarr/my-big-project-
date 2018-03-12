@@ -24,6 +24,7 @@ import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
 import com.synchronoss.querybuilder.model.pivot.ColumnField;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 
 public class QueryBuilderUtil {
@@ -31,7 +32,6 @@ public class QueryBuilderUtil {
 	public final static String DATE_FORMAT = "yyyy-MM-dd";
 	public final static String SPACE_REGX = "\\s+";
 	public final static String EMPTY_STRING = "";
-    private final static String DATA_FIELDS = "data_fields";
 	public static Map<String,String> dateFormats = new HashMap<String, String>();
 	static {
       Map<String, String> formats = new HashMap<String, String>();
@@ -487,35 +487,36 @@ public class QueryBuilderUtil {
     /**
      *
      * @param dataFields
+     * @param preSearchSourceBuilder
      * @return
      */
-	public static AggregationBuilder getAggregationBuilder(List<?> dataFields)
+	public static void getAggregationBuilder(List<?> dataFields, SearchSourceBuilder preSearchSourceBuilder)
     {
-                AggregationBuilder aggregationBuilder = AggregationBuilders.global(DATA_FIELDS);
+
                     for (Object dataField : dataFields) {
                         if (dataField instanceof com.synchronoss.querybuilder.model.chart.DataField) {
                             com.synchronoss.querybuilder.model.chart.DataField data =
                                     (com.synchronoss.querybuilder.model.chart.DataField) dataField;
                             if (data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
-                                aggregationBuilder.subAggregation(AggregationBuilders.sum(
+                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
                         } else if (dataField instanceof com.synchronoss.querybuilder.model.pivot.DataField) {
                             com.synchronoss.querybuilder.model.pivot.DataField data =
                                     (com.synchronoss.querybuilder.model.pivot.DataField) dataField;
                             if (data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
-                                aggregationBuilder.subAggregation(AggregationBuilders.sum(
+                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
                         } else if (dataField instanceof com.synchronoss.querybuilder.model.report.DataField) {
                             com.synchronoss.querybuilder.model.report.DataField data =
                                     (com.synchronoss.querybuilder.model.report.DataField) dataField;
                             if (data.getAggregate()!=null && data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
-                                aggregationBuilder.subAggregation(AggregationBuilders.sum(
+                                preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
                         }
                     }
-                return aggregationBuilder;
+              //  return aggregationBuilder;
     }
 }
