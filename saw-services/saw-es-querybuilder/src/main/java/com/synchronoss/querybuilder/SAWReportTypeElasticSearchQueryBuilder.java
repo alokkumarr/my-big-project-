@@ -225,10 +225,10 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             else {
                 finalAggregationBuilder = reportAggregationBuilder.reportAggregationBuilder(
                         dataFields, aggregationFields, 0, 0, aggregationBuilder);
+                searchSourceBuilder.aggregation(finalAggregationBuilder);
             }
             // set the size zero for aggregation query .
             searchSourceBuilder.size(0);
-            searchSourceBuilder.aggregation(finalAggregationBuilder);
         }
         setSearchSourceBuilder(searchSourceBuilder);
         return searchSourceBuilder.toString();
