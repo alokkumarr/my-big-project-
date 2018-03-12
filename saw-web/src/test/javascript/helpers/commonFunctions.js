@@ -62,7 +62,6 @@ function click(element, i) {
     function () {
     }, function (err) {
       if (err) {
-        console.log("Element '" + element.locator() + "' is not clickable. Retrying. Tempts done: " + (i + 1));
         i++;
         browser.sleep(1000);
         if (i < protractorConf.timeouts.tempts) {
