@@ -41,7 +41,9 @@ export class FieldModel {
 
   set checked(val) {
     this._checked = val;
-    this.table.canvas.component._$eventEmitter.emit('changed');
+    if (this.table.canvas) {
+      this.table.canvas.component._$eventEmitter.emit('changed');
+    }
   }
 
   getIdentifier() {

@@ -25,7 +25,6 @@ import { DesignerDescriptionComponent } from './description';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
-import { ArtifactColumnFilterPipe } from './artifact-column-filter.pipe';
 
 export {
   DesignerDialogComponent,
@@ -48,6 +47,5 @@ export {
   DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   DesignerService,
-  ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe
 };

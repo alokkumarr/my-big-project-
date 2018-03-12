@@ -298,6 +298,7 @@ export class PivotGridComponent {
         }
 
         if (cloned.type === 'string') {
+          // trim the .keyword suffix from the column name if it is there
           cloned.columnName = split(cloned.columnName, '.')[0];
         }
 
