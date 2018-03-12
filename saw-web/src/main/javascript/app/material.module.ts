@@ -25,6 +25,7 @@ import {
   MatToolbarModule,
   MatSlideToggleModule
 } from '@angular/material';
+import {MatStepperModule} from '@angular/material/stepper';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -44,6 +45,7 @@ import '../../../../themes/_angular_next.scss';
     MatSidenavModule,
     MatRadioModule,
     MatSelectModule,
+    MatStepperModule,
     MatAutocompleteModule,
     MatExpansionModule,
     MatMomentDateModule,
@@ -71,6 +73,7 @@ import '../../../../themes/_angular_next.scss';
     MatIconModule,
     MatDialogModule,
     MatRadioModule,
+    MatStepperModule,
     MatSidenavModule,
     MatExpansionModule,
     MatSelectModule,

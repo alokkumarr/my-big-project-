@@ -37,6 +37,10 @@ import { ChartComponent } from '../../common/components/charts/chart.component';
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import {
+  AddWidgetComponent,
+  WidgetTypeComponent
+} from './components/add-widget';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
 import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-choice.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
@@ -68,6 +72,8 @@ angular.module(ObserveModule, [
 const components = [
   ObservePageComponent,
   ObserveViewComponent,
+  AddWidgetComponent,
+  WidgetTypeComponent,
   DashboardGridComponent,
   GlobalFilterComponent,
   GlobalNumberFilterComponent,

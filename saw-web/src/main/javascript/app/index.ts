@@ -31,6 +31,10 @@ import { AdminModule } from './modules/admin';
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
+declare global {
+  const require: any;
+}
+
 @NgModule({
   imports: [
     BrowserModule,

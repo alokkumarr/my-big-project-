@@ -1,0 +1,28 @@
+@import "themes/base/colors";
+
+add-widget {
+  background-color: whitesmoke;
+  display: block;
+  height: 100%;
+  max-width: 400px;
+
+  mat-horizontal-stepper.mat-stepper-horizontal {
+    background-color: transparent;
+
+    .mat-horizontal-stepper-header-container {
+      display: none;
+    }
+  }
+
+  widget-type {
+    button.choose-widget-type {
+      background-color: white;
+      margin: 5px 0;
+      width: 100%;
+
+      &:first-child {
+        margin-top: 10px;
+      }
+    }
+  }
+}
