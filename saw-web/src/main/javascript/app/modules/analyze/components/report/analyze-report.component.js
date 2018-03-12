@@ -541,7 +541,10 @@ export const AnalyzeReportComponent = {
      * @returns
      */
     checkColumnName(columns) {
-
+      // there is no .keyword in query mode
+      if (this.model.edit) {
+        return columns;
+      }
       forEach(columns, field => {
         field.name = this.getColumnName(field.name);
         field.meta.name = this.getColumnName(field.meta.name);
