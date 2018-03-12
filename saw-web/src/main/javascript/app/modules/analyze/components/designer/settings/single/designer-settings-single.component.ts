@@ -8,6 +8,7 @@ import {
 import * as filter from 'lodash/filter';
 import * as debounce from 'lodash/debounce';
 import * as get from 'lodash/get';
+import * as isEmpty from 'lodash/isEmpty';
 
 import { DesignerService } from '../../designer.service';
 import {
@@ -19,7 +20,8 @@ import {
 } from '../../types';
 import {
   TYPE_ICONS_OBJ,
-  TYPE_ICONS
+  TYPE_ICONS,
+  TYPE_MAP
 } from '../../../../consts';
 
 const template = require('./designer-settings-single.component.html');
@@ -42,10 +44,15 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
 })
 export class DesignerSettingsSingleComponent {
   @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
-  @Input() public artifactColumns: ArtifactColumns;
+  @Input('artifactColumns') public set setArtifactColumns(artifactColumns: ArtifactColumns) {
+    this.artifactColumns = artifactColumns;
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  };
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
+  public isEmpty = isEmpty;
+  public artifactColumns: ArtifactColumns;
   public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
@@ -71,12 +78,6 @@ export class DesignerSettingsSingleComponent {
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
   }
 
-  ngOnChanges(changes) {
-    if (get(changes, 'artifactColumns.currentValue')) {
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    }
-  }
-
   onFieldsChange() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     this._changeSettingsDebounced({requiresDataChange: true});
@@ -91,11 +92,39 @@ export class DesignerSettingsSingleComponent {
   }
 
   getUnselectedArtifactColumns() {
-    return filter(this.artifactColumns, ({checked}) => !checked);
+    const { types, keyword } = this.filterObj;
+    return filter(this.artifactColumns, ({checked, type, alias, displayName}) => {
+      return !checked &&
+        this.hasType(type, types) &&
+        this.hasKeyword(alias || displayName, keyword)
+    });
+  }
+
+  hasType(type, filterTypes) {
+
+    switch (TYPE_MAP[type]) {
+    case 'number':
+      return filterTypes.includes('number');
+    case 'date':
+      return filterTypes.includes('date');
+    case 'string':
+      return filterTypes.includes('string');
+    default:
+      return true;
+    }
+  }
+
+  hasKeyword(name, keyword) {
+    if (!keyword) {
+      return true;
+    }
+    const regexp = new RegExp(keyword, 'i');
+    return name && name.match(regexp);
   }
 
   onTextFilterChange(value) {
     this.filterObj.keyword = value;
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
   onTypeFilterChange(event) {
@@ -107,6 +136,7 @@ export class DesignerSettingsSingleComponent {
     } else {
       this.filterObj.types = [...this.filterObj.types, value];
     }
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
   }
 
   /**
