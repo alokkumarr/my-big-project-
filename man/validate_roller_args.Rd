@@ -7,7 +7,7 @@
 validate_roller_args(x)
 }
 \arguments{
-\item{x}{obj of class summariser_args}
+\item{x}{obj of class roller_args}
 }
 \description{
 Checks for valid inputs to roller_args class

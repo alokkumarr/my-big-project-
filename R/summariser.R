@@ -126,7 +126,7 @@ summariser.tbl_spark <- function(df,
   # Rename measure variables
   if (length(measure_vars) < 2 | length(fun) < 2) {
     agg <-
-      agg %>% dplyr::select_(.dots = setNames(colnames(agg), c(
+      agg %>% dplyr::select_(.dots = stats::setNames(colnames(agg), c(
         group_vars, paste(measure_vars, fun, sep =
                             "_")
       )))
