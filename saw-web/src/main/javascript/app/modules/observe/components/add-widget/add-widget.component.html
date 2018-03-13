@@ -1,13 +1,32 @@
 <mat-horizontal-stepper #widgetStepper>
+
   <mat-step label="Widget">
+    <widget-header [stepper]="widgetStepper"
+      [container]="container"
+      title="Choose a Widget Type"
+      [showBack]="false"></widget-header>
+
     <widget-type [widgetTypes]="widgetTypes" (onSelect)="onSelectWidgetType($event)"></widget-type>
   </mat-step>
+
   <mat-step label="Category">
+    <widget-header [stepper]="widgetStepper"
+      [container]="container"
+      title="Choose a Category"
+      [showBack]="true"></widget-header>
+
     <widget-category (onSelect)="onSelectCategory($event)"></widget-category>
   </mat-step>
+
   <mat-step label="Analysis">
+    <widget-header [stepper]="widgetStepper"
+      [container]="container"
+      title="Choose an Analysis"
+      [showBack]="true"></widget-header>
+
     <widget-analysis *ngIf="model.subCategory" [category]="model.subCategory.id"
       (onAnalysisAction)="onAnalysisAction($event)">
     </widget-analysis>
   </mat-step>
+
 </mat-horizontal-stepper>

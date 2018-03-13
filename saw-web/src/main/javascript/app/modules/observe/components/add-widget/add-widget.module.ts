@@ -6,12 +6,14 @@ import { AddWidgetComponent } from './add-widget.component';
 import { WidgetTypeComponent } from './widget-type/widget-type.component';
 import { WidgetCategoryComponent } from './widget-category/widget-category.component';
 import { WidgetAnalysisComponent } from './widget-analysis/widget-analysis.component';
+import { WidgetHeaderComponent } from './widget-header/widget-header.component';
 
 const components = [
   AddWidgetComponent,
   WidgetTypeComponent,
   WidgetCategoryComponent,
-  WidgetAnalysisComponent
+  WidgetAnalysisComponent,
+  WidgetHeaderComponent
 ];
 
 @NgModule({

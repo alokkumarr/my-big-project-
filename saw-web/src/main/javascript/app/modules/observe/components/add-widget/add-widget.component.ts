@@ -1,7 +1,8 @@
 declare const require: any;
 
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { MatHorizontalStepper } from '@angular/material/stepper';
+import { MatSidenav } from '@angular/material/sidenav';
 
 const template = require('./add-widget.component.html');
 require('./add-widget.component.scss');
@@ -24,6 +25,7 @@ export class AddWidgetComponent implements OnInit {
     subCategory?: any
   } = {};
 
+  @Input() container: MatSidenav;
   @Output() onWidgetAction = new EventEmitter();
   @ViewChild('widgetStepper') widgetStepper: MatHorizontalStepper;
 
