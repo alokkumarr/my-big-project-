@@ -86,9 +86,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
         tempDir = generateTempLocation(new DataSetServiceAux(ctx, md), null, null);
         lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
-        delimiter = ctx.componentConfiguration.getParser().getDelimiter().charAt(0);
-        quoteChar = ctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
-        quoteEscapeChar = ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0);
+        delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
+        quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
+        quoteEscapeChar = (ctx.componentConfiguration.getParser().getQuoteEscape() != null)? ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
 
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
@@ -266,6 +266,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         try {
             XDFDataWriter xdfDW = new XDFDataWriter(format, outputNOF, pkeys);
             xdfDW.writeToTempLoc(dataset,  path);
+            Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
+            outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
             return 0;
         } catch (Exception e) {
             error = ExceptionUtils.getFullStackTrace(e);

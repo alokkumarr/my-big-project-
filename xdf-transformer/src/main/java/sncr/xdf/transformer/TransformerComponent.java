@@ -1,6 +1,7 @@
 package sncr.xdf.transformer;
 
 import akka.event.Logging;
+import com.google.gson.JsonElement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -18,6 +19,7 @@ import sncr.xdf.exceptions.XDFException;
 import javax.xml.crypto.Data;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -158,6 +160,20 @@ public class TransformerComponent extends Component implements WithMovableResult
                     return -1;
                 }
             }
+
+            Consumer<Map<String, Object>> f = ds ->
+            {
+                if (ds != null) {
+                    String dsname = (String) ds.get(DataSetProperties.Name.name());
+                    JsonElement je = (JsonElement) ds.get(DataSetProperties.Schema.name());
+                    Map<String, Object> outputDS2 = outputDataSets.get(dsname);
+                    outputDS2.put(DataSetProperties.Schema.name(), je);
+                    logger.trace("Update output DS [" + dsname + "] descriptor with schema: " + outputDS2.get(DataSetProperties.Schema.name()));
+                }
+            };
+            f.accept(outputs.get(RequiredNamedParameters.Output.toString()));
+            f.accept(outputs.get(RequiredNamedParameters.Rejected.toString()));
+
         }
         catch(Exception e){
             logger.error("Exception in main transformer module: ", e);

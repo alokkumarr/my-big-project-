@@ -1,5 +1,7 @@
 package sncr.xdf.sql;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -131,7 +133,6 @@ public class SQLExecutor implements Serializable {
                 long lt = System.currentTimeMillis();
                 descriptor.loadTime = (int)((lt-st)/1000);
                 Dataset<Row> sqlResult = ctx.sparkSession.sql(descriptor.SQL);
-
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
 
                 jobDataFrames.put(descriptor.targetTableName, finalResult);
@@ -143,8 +144,10 @@ public class SQLExecutor implements Serializable {
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
 
-                        XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
+                XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
                 xdfWriter.writeToTempLoc( finalResult, descriptor.targetTransactionalLocation);
+
+                descriptor.schema = xdfWriter.extractSchema(finalResult);
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);
@@ -160,8 +163,6 @@ public class SQLExecutor implements Serializable {
         }
         return 0L;
     }
-
-
 
 
 
