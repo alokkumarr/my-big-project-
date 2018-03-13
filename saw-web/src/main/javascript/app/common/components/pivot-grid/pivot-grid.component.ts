@@ -217,16 +217,26 @@ export class PivotGridComponent {
     return fpMap((column: ArtifactColumnPivot) => {
       // manually format dates for day quarter and month dateIntervals
       if (DATE_TYPES.includes(column.type)) {
+        let momentFormat;
         const cloned = clone(column);
         switch (column.dateInterval) {
         case 'day':
           cloned.groupInterval = 1;
+          momentFormat = DATE_FORMATS_OBJ[cloned.format].momentValue
+          cloned.manualFormat = cloned.format;
+          cloned.format = {
+            formatter: this.getFormatter(momentFormat)
+          };
           break;
         case 'month':
+          cloned.groupInterval = 1;
+          momentFormat = DATE_INTERVALS_OBJ[cloned.dateInterval].momentFormat;
+          cloned.format = {
+            formatter: this.getFormatter(momentFormat)
+          };
+          break;
         case 'quarter':
-          // cloned.manualFormat = cloned.format;
-          // unset(cloned, 'format');
-          cloned.format = DATE_INTERVALS_OBJ[column.dateInterval].format;
+          unset(cloned, 'format');
           cloned.groupInterval = 1;
           break;
         case 'year':
@@ -242,6 +252,10 @@ export class PivotGridComponent {
       }
       return column;
     });
+  }
+
+  getFormatter(format) {
+    return value => moment(value).format(format);
   }
 
   preProcessData(data) {
@@ -264,8 +278,8 @@ export class PivotGridComponent {
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
       const dataValue = dataPoint[name];
-      forEach(columnsToFormat, ({name, dateInterval, format}) => {
-        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval, format);
+      forEach(columnsToFormat, ({name, dateInterval, manualFormat}) => {
+        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval, manualFormat);
       });
       return clonedDataPoint;
     });
@@ -277,14 +291,14 @@ export class PivotGridComponent {
     switch (dateInterval) {
     case 'day':
       formatToApply = DATE_FORMATS_OBJ[format].momentValue;
-      return moment.utc(value).format(formatToApply);
+      return moment.utc(value);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
       const formattedValue = moment.utc(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
     case 'month':
-      formatToApply = DATE_INTERVALS_OBJ[dateInterval].format
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
       return moment.utc(value).format(formatToApply);
     case 'year':
     default:
