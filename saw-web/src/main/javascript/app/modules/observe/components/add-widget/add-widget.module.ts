@@ -5,12 +5,13 @@ import { MaterialModule } from '../../../../material.module';
 import { AddWidgetComponent } from './add-widget.component';
 import { WidgetTypeComponent } from './widget-type/widget-type.component';
 import { WidgetCategoryComponent } from './widget-category/widget-category.component';
-
+import { WidgetAnalysisComponent } from './widget-analysis/widget-analysis.component';
 
 const components = [
   AddWidgetComponent,
   WidgetTypeComponent,
-  WidgetCategoryComponent
+  WidgetCategoryComponent,
+  WidgetAnalysisComponent
 ];
 
 @NgModule({
@@ -21,7 +22,6 @@ const components = [
   exports: [
     AddWidgetComponent
   ],
-  entryComponents: components,
   declarations: components,
   providers: []
 })

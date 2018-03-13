@@ -39,7 +39,6 @@ import { ObserveViewComponent } from './components/observe-view/observe-view.com
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
-import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-choice.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
 import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
@@ -75,7 +74,6 @@ const components = [
   GlobalDateFilterComponent,
   GlobalStringFilterComponent,
   CreateDashboardComponent,
-  AnalysisChoiceComponent,
   ObserveChartComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent,

@@ -22,8 +22,6 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
 
-import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
-
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
 
@@ -98,16 +96,31 @@ export class CreateDashboardComponent {
 
   chooseAnalysis() {
     this.widgetSidenav.open();
-    // const dialogRef = this.dialog.open(AnalysisChoiceComponent);
+  }
 
-    // dialogRef.afterClosed().subscribe(analysis => {
-    //   if (!analysis) {
-    //     return;
-    //   }
+  onAnalysisAction(action, data) {
+    switch(action) {
+    case 'ADD':
+      if (!data) return;
+      const item = { cols: 1, rows: 1, analysis: data, updater: new BehaviorSubject({}) };
+      this.requester.next({action: 'add', data: item})
+      break;
+    }
+  }
 
-    //   const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
-    //   this.requester.next({action: 'add', data: item})
-    // });
+  onKPIAction(action, data) {
+    // TODO
+  }
+
+  onWidgetAction({widget, action, data}) {
+    switch(widget) {
+    case 'ANALYSIS':
+      this.onAnalysisAction(action, data);
+      break;
+    case 'KPI':
+      this.onKPIAction(action, data);
+      break;
+    }
   }
 
   saveDashboard() {

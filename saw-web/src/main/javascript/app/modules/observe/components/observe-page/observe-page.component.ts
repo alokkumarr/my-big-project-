@@ -40,7 +40,7 @@ export class ObservePageComponent {
     private router: UIRouter,
     @Inject('$componentHandler') private $componentHandler
   ) {
-    // this.iconRegistry.setDefaultFontSetClass('icomoon');
+    this.iconRegistry.setDefaultFontSetClass('icomoon');
   }
 
 

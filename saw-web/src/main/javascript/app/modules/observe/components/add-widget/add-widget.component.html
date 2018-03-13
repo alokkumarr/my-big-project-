@@ -6,6 +6,8 @@
     <widget-category (onSelect)="onSelectCategory($event)"></widget-category>
   </mat-step>
   <mat-step label="Analysis">
-    <h1>Choose analysis</h1>
+    <widget-analysis *ngIf="model.subCategory" [category]="model.subCategory.id"
+      (onAnalysisAction)="onAnalysisAction($event)">
+    </widget-analysis>
   </mat-step>
 </mat-horizontal-stepper>

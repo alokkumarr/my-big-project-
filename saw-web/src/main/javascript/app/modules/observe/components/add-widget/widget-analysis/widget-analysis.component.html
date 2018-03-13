@@ -1,0 +1,18 @@
+<mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
+
+<div class="choose-analysis"
+  *ngFor="let analysis of analyses">
+
+  <mat-icon [fontIcon]="icons[analysis.chartType || analysis.type]"></mat-icon>
+  <div>
+    <strong [textContent]="analysis.name"></strong>
+    <p [textContent]="analysis.description"></p>
+    <small class="analysis-metric" [textContent]="analysis.metricName"></small>
+
+    <button mat-raised-button
+      color="primary"
+      (click)="addAnalysis(analysis)">
+      Add to Dashboard
+    </button>
+  </div>
+</div>

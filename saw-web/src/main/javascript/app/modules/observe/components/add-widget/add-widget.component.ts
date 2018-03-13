@@ -1,10 +1,11 @@
 declare const require: any;
 
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { MatHorizontalStepper } from '@angular/material/stepper';
 
 const template = require('./add-widget.component.html');
 require('./add-widget.component.scss');
+import { WIDGET_ANALYSIS_ACTIONS } from './widget-analysis/widget-analysis.component';
 
 import {
   widgetTypes as wTypes,
@@ -23,6 +24,7 @@ export class AddWidgetComponent implements OnInit {
     subCategory?: any
   } = {};
 
+  @Output() onWidgetAction = new EventEmitter();
   @ViewChild('widgetStepper') widgetStepper: MatHorizontalStepper;
 
   constructor() { }
@@ -37,5 +39,17 @@ export class AddWidgetComponent implements OnInit {
   onSelectCategory(data) {
     this.model.subCategory = data;
     this.widgetStepper.next();
+  }
+
+  onAnalysisAction({action, analysis}) {
+    switch(action) {
+    case WIDGET_ANALYSIS_ACTIONS.ADD_ANALYSIS:
+      this.onWidgetAction.next({
+        widget: 'ANALYSIS',
+        action: 'ADD',
+        data: analysis
+      });
+      break;
+    }
   }
 }

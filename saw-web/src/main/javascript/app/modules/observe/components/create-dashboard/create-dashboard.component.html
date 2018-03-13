@@ -21,7 +21,7 @@
       mode="over"
       [opened]="false"
       position="end">
-      <add-widget></add-widget>
+      <add-widget (onWidgetAction)="onWidgetAction($event)"></add-widget>
     </mat-sidenav>
     <mat-sidenav-content>
       <dashboard-grid [model]="dashboard"
