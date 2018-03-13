@@ -186,6 +186,8 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         kafkaParams.put(ConsumerConfig.STREAMS_ZEROOFFSET_RECORD_ON_EOF_CONFIG, false);
         kafkaParams.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaParams.put(ConsumerConfig.RECEIVE_BUFFER_CONFIG, 65536);
+        
+        kafkaParams.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 4 * 1024 * 1024);
 
         String originalGroupId = (String)kafkaParams.get(ConsumerConfig.GROUP_ID_CONFIG);
         if (null == originalGroupId) {
