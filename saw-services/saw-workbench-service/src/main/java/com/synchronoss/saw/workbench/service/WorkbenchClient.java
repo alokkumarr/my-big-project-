@@ -42,11 +42,13 @@ public class WorkbenchClient {
           @Override
           public void onJobFailed(JobHandle<Integer> job, Throwable cause) {
             client.stop(true);
+            log.info("Workbench job Failed.");
           }
           
           @Override
           public void onJobCancelled(JobHandle<Integer> job) {
             client.stop(true);
+            log.info("Workbench job Cancelled.");
           }
         });
         log.info("Submitted job");
