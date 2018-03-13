@@ -32,6 +32,7 @@ public enum DataSetProperties {
     BatchID ("batchID"),
     User("user"),
     System("system"),
+    Schema("schema"),
     PartitionKeys("partitionsKeys");
 
     private final String intName;

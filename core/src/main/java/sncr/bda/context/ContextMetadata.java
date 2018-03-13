@@ -35,6 +35,9 @@ public class ContextMetadata {
     public String batchID;
     public String startTs;
     public String componentName;
+    public String transformationID;
+    public String status;
+    public String ale_id;
 
     {
         this.startTs = new SimpleDateFormat("yyyyMMdd-HHmmss")

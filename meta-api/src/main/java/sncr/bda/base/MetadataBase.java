@@ -15,10 +15,10 @@ public abstract class MetadataBase {
     public static final String DS_DL_CATALOGS = "catalogs";
     public static final String DS_DL_SETS = "sets";
     public static final String DS_DL_SET  = "set";
-    public static final String DS_DL_OBS_SETS = "_obs_sets";
+//    public static final String DS_DL_OBS_SETS = "_obs_sets";
 
-    public static final String DS_MD_CATEGORY = "category";
-    public static final String DS_MD_SUBCATEGORY = "subcategory";
+//    public static final String DS_MD_CATEGORY = "category";
+//    public static final String DS_MD_SUBCATEGORY = "subcategory";
 
 
     public static final String PREDEF_DATA_SOURCE = "fs";
@@ -33,7 +33,6 @@ public abstract class MetadataBase {
 
     public static String XDF_DATA_ROOT = "XDF_DATA_ROOT";
     public static String FILE_DESCRIPTOR = ".bda_meta";
-    public static String DEFAULT_DATA_SOURCE = "base";
 
     protected final FileSystem fs;
     protected String dlRoot;

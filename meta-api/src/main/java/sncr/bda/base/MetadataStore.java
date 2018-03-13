@@ -61,6 +61,7 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
 
     protected Document _read(String id) throws Exception
     {
+        logger.debug("Find entity by ID: " + id);
         return table.findById( id );
     }
 
@@ -82,8 +83,10 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
 
     public JsonElement read(String id) throws Exception {
         Document ds = _read(id);
-        if (ds != null)
+        if (ds != null) {
+            logger.trace("Entity: " + ds.asJsonString());
             return toJsonElement(ds);
+        }
         return null;
     }
 
@@ -129,7 +132,8 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         table.flush();
     }
 
-    protected JsonObject createStatusSection(String status, String startTS, String finishedTS, String aleId, String batchSessionId)
+
+    public JsonObject createStatusSection(String status, String startTS, String finishedTS, String aleId, String batchSessionId)
     {
         JsonObject src = new JsonObject();
         src.add("status", new JsonPrimitive(status));

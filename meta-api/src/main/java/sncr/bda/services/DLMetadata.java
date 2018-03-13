@@ -117,7 +117,7 @@ public class DLMetadata extends MetadataBase {
             throw new Exception("ProjectService is not specified");
         }
         if (rqSource == null || rqSource.isEmpty()) {
-            strPath.append(DEFAULT_DATA_SOURCE).append(Path.SEPARATOR_CHAR);
+            strPath.append(PREDEF_DATA_SOURCE).append(Path.SEPARATOR_CHAR);
 
         } else {
             strPath.append(rqSource).append(Path.SEPARATOR_CHAR);
@@ -154,7 +154,7 @@ public class DLMetadata extends MetadataBase {
         if (rqSource != null && !rqSource.isEmpty()) {
             strPath.append(rqSource).append(Path.SEPARATOR_CHAR);
         } else {
-            strPath.append(DEFAULT_DATA_SOURCE).append(Path.SEPARATOR_CHAR);
+            strPath.append(PREDEF_DATA_SOURCE).append(Path.SEPARATOR_CHAR);
         }
         if (rqCatalog != null && !rqCatalog.isEmpty()) {
             strPath.append(rqCatalog).append(Path.SEPARATOR_CHAR);
@@ -288,7 +288,7 @@ public class DLMetadata extends MetadataBase {
             fs.mkdirs(projectPath);
             Path projectDlPath = new Path(dlRoot + Path.SEPARATOR + project + Path.SEPARATOR + PREDEF_DL_DIR);
             fs.mkdirs(projectDlPath);
-            Path fsPath = new Path(projectDlPath + Path.SEPARATOR + DEFAULT_DATA_SOURCE);
+            Path fsPath = new Path(projectDlPath + Path.SEPARATOR + PREDEF_DATA_SOURCE);
             fs.mkdirs(fsPath);
             Path dataCatalogPath = new Path(fsPath + Path.SEPARATOR + DEFAULT_CATALOG );
             fs.mkdirs(dataCatalogPath);
@@ -310,7 +310,7 @@ public class DLMetadata extends MetadataBase {
         }
 
         // Set default data source and catalog
-        String src = (source != null)? source : DEFAULT_DATA_SOURCE;
+        String src = (source != null)? source : PREDEF_DATA_SOURCE;
         String ctlg = (catalog != null)? catalog: DEFAULT_CATALOG;
 
         // Create data set directory
@@ -332,7 +332,7 @@ public class DLMetadata extends MetadataBase {
         }
 
         // Set default data source and catalog
-        String src = (source != null)? source : DEFAULT_DATA_SOURCE;
+        String src = (source != null)? source : PREDEF_DATA_SOURCE;
         String ctlg = (catalog != null)? catalog: DEFAULT_CATALOG;
 
         // Create data set directory
