@@ -56,7 +56,7 @@ saw_workbench_project_path=/raw
 saw_workbench_project_root=maprfs:///data/bda
 saw_workbench_preview_limit=10000
 saw_workbench_livy_uri=http://saw-mapr:8998/
+saw_workbench_metadata=hdfs:///data/bda
 
 [saw-security]
 localhost ansible_connection=local
-

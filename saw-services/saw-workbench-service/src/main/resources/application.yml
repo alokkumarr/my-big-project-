@@ -22,7 +22,7 @@ application:
         queue-capacity: 10000
 
 workbench:
-        project-key: "project2"
+        project-key: "workbench"
         project-path: "/Desktop" 
         project-root: "/Users/spau0004"
         preview-limit: 10000
