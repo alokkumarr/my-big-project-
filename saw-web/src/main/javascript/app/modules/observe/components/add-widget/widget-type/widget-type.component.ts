@@ -1,5 +1,6 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 const template = require('./widget-type.component.html');
+require('./widget-type.component.scss');
 
 import { WidgetType } from '../widget.model';
 
