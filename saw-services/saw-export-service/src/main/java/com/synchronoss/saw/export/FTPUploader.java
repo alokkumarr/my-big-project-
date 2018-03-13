@@ -19,6 +19,7 @@ public class FTPUploader {
         ftp = new FTPClient();
         ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
         int reply;
+        ftp.setControlKeepAliveTimeout(300);
         ftp.connect(host, port);
         reply = ftp.getReplyCode();
         if (!FTPReply.isPositiveCompletion(reply)) {

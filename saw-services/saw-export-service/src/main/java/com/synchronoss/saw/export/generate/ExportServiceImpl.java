@@ -160,7 +160,7 @@ public class ExportServiceImpl implements ExportService{
           file.getParentFile().mkdir();
           iFileExporter.generateFile(exportBean ,entity.getBody().getData());
 
-          if (recipients != null)
+          if (recipients != null && recipients != "")
             MailSender.sendMail(recipients, exportBean.getReportName() + " | " +
                     exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
                     exportBean.getFileName());
@@ -169,7 +169,7 @@ public class ExportServiceImpl implements ExportService{
           // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
           DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
           LocalDateTime now = LocalDateTime.now();
-          if (ftp != null)
+          if (ftp != null && ftp!="")
             serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
                     exportBean.getFileName(), ftpLocation,
                   "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType"));
@@ -235,7 +235,7 @@ public class ExportServiceImpl implements ExportService{
           Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
           CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
           createPivotTable.createPivot(workbook,file);
-          if (recipients!=null)
+          if (recipients != null && recipients == "")
             MailSender.sendMail(recipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
                     serviceUtils.prepareMailBody(exportBean,mailBody)
                     ,exportBean.getFileName());
@@ -244,7 +244,7 @@ public class ExportServiceImpl implements ExportService{
           // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
           DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
           LocalDateTime now = LocalDateTime.now();
-          if (ftp != null)
+          if (ftp != null && ftp != "")
             serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
                     exportBean.getFileName(), ftpLocation,
                     "pivot_" + exportBean.getReportName() + dtf.format(now).toString()

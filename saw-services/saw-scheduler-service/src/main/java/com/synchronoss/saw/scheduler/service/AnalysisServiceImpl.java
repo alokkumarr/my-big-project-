@@ -47,7 +47,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     public void scheduleDispatch(SchedulerJobDetail analysis) {
-        if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)) {
+        if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)
+                ) {
             return;
         }
         if (analysis.getDescription() == null) analysis.setDescription("");
@@ -59,6 +60,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         String formatted = format.format(date);
         DispatchBean execution;
+        // ToDo:during multiple ftp servers this condition needs modification
         if (analysis.getFtp() == null || analysis.getFtp().trim() == "") {
             execution = ImmutableDispatchBean.builder()
                     .emailList(recipients).fileType("csv")
