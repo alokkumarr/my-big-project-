@@ -30,6 +30,8 @@ import com.synchronoss.saw.export.model.DataResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -66,6 +68,9 @@ public class ExportServiceImpl implements ExportService{
 
   @Value("${ftp.password}")
   private String ftpPassword;
+
+  @Value("${ftp.location}")
+  private String ftpLocation;
 
   @Autowired
   private ApplicationContext appContext;
@@ -162,10 +167,12 @@ public class ExportServiceImpl implements ExportService{
           logger.debug("Email sent successfully");
 
           // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
+          DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+          LocalDateTime now = LocalDateTime.now();
           if (ftp != null)
             serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
-                    exportBean.getFileName(), "/",
-                  "report_" + exportBean.getReportName());
+                    exportBean.getFileName(), ftpLocation,
+                  "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType"));
           logger.debug("File successfully dispatched to ftp server");
 
           logger.debug("Deleting exported file.");
@@ -235,10 +242,13 @@ public class ExportServiceImpl implements ExportService{
           logger.debug("Email sent successfully ");
 
           // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
+          DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+          LocalDateTime now = LocalDateTime.now();
           if (ftp != null)
             serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
-                    exportBean.getFileName(), "/",
-                    "pivot_" + exportBean.getReportName());
+                    exportBean.getFileName(), ftpLocation,
+                    "pivot_" + exportBean.getReportName() + dtf.format(now).toString()
+                            + "xlsx");
 
           serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword, exportBean.getFileName(), "/", exportBean.getReportName());
 
