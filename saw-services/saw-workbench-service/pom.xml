@@ -214,7 +214,7 @@
 					<showWarnings>true</showWarnings>
 				</configuration>
 			</plugin>
-			<plugin>
+<!-- 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.0.0</version>
@@ -231,17 +231,17 @@
 						<configuration>
 							<configLocation>src/checkstyle/checkstyle.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
-							<violationSeverity>warning</violationSeverity>
+							<violationSeverity>warning</violationSeverity> -->
 							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
 								make also these files conform to checkstyle rules and remove the exclusions -->
-							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*</excludes>
+							<!-- <excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>  -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
