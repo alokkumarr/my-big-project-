@@ -96,9 +96,9 @@ export const AnalyzePublishDialogComponent = {
             this.scheduleState = 'exist';
           }
           if (response.data.data.jobDetails.ftp === 'true') {
-            this.hasDispatch = true;  
+            this.hasDispatch = true;
           } else {
-            this.hasDispatch = false;  
+            this.hasDispatch = false;
           }
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
