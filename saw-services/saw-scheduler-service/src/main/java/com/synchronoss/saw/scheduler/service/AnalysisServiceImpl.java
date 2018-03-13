@@ -46,38 +46,44 @@ public class AnalysisServiceImpl implements AnalysisService {
         restTemplate.postForObject(url, entity, String.class, analysisId);
     }
 
-    public void scheduleDispatch(SchedulerJobDetail analysis)
-    {
-           if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)
-                  ) {
-               return;
-           }
-           if (analysis.getDescription()==null) analysis.setDescription("");
-           String recipients = prepareRecipientsList(analysis.getEmailList());
-           ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
-           String[] latestexection = findLatestExecution(executionBeans);
-           Date date = new Date(Long.parseLong(latestexection[1]));
-           DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-           format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-           String formatted = format.format(date);
-           DispatchBean execution = ImmutableDispatchBean.builder()
-                   .emailList(recipients).fileType("csv")
-                   .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
-                   .metricName(analysis.getMetricName()).ftp("Something").publishedTime(formatted).build();
-           String[] param = new String[3];
-           param[0] = analysis.getAnalysisID();
-           param[1] = latestexection[0];
-           param[2] = analysis.getType();
-           String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
-           HttpHeaders headers = new HttpHeaders();
-           headers.setContentType(MediaType.APPLICATION_JSON);
-           HttpEntity<DispatchBean> entity = new HttpEntity<>(
-                   execution, headers);
+    public void scheduleDispatch(SchedulerJobDetail analysis) {
+        if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)) {
+            return;
+        }
+        if (analysis.getDescription() == null) analysis.setDescription("");
+        String recipients = prepareRecipientsList(analysis.getEmailList());
+        ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
+        String[] latestexection = findLatestExecution(executionBeans);
+        Date date = new Date(Long.parseLong(latestexection[1]));
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        String formatted = format.format(date);
+        DispatchBean execution;
+        if (analysis.getFtp() == null || analysis.getFtp().trim() == "") {
+            execution = ImmutableDispatchBean.builder()
+                    .emailList(recipients).fileType("csv")
+                    .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName()).publishedTime(formatted).build();
+        } else {
+            execution = ImmutableDispatchBean.builder()
+                    .emailList(recipients).fileType("csv")
+                    .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName()).ftp(analysis.getFtp()).publishedTime(formatted).build();
+        }
+        String[] param = new String[3];
+        param[0] = analysis.getAnalysisID();
+        param[1] = latestexection[0];
+        param[2] = analysis.getType();
+        String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<DispatchBean> entity = new HttpEntity<>(
+                execution, headers);
 
-           if (latestexection[0] != null) {
-               restTemplate.postForObject(url, entity, String.class, param);
-           }
-       }
+        if (latestexection[0] != null) {
+            restTemplate.postForObject(url, entity, String.class, param);
+        }
+    }
 
     private ExecutionBean[] fetchExecutionID(String analysisId)
     {

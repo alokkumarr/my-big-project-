@@ -136,30 +136,42 @@ public class ExportServiceImpl implements ExportService{
         IFileExporter iFileExporter = new CSVReportDataExporter();
         ExportBean exportBean = new ExportBean();
         String recipients =null;
+        String ftp = null;
         String dir = UUID.randomUUID().toString();
-          MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-        if (dispatchBean !=null && dispatchBean instanceof LinkedHashMap)
-        {
-            exportBean.setFileName(publishedPath+ File.separator+dir+File.separator+String.valueOf(((LinkedHashMap)
-                    dispatchBean).get("name"))+"."+((LinkedHashMap) dispatchBean).get("fileType"));
-            exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
-            exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
-            exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
-            exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-            recipients= String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+        MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
+        if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
+          exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                  dispatchBean).get("name")) + "." + ((LinkedHashMap) dispatchBean).get("fileType"));
+          exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
+          exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
+          exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
+          exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+          recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+          ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
         }
         try {
           // create a directory with unique name in published location to avoid file conflict for dispatch.
           File file = new File(exportBean.getFileName());
           file.getParentFile().mkdir();
           iFileExporter.generateFile(exportBean ,entity.getBody().getData());
-          if (recipients!=null)
-            MailSender.sendMail(recipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
-                    serviceUtils.prepareMailBody(exportBean,mailBody)
-             ,exportBean.getFileName());
-          logger.debug("Email sent successfully : Removing the file from published location");
-          serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword, exportBean.getFileName(), "/", "report_"+exportBean.getReportName());
+
+          if (recipients != null)
+            MailSender.sendMail(recipients, exportBean.getReportName() + " | " +
+                    exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
+                    exportBean.getFileName());
+          logger.debug("Email sent successfully");
+
+          // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
+          if (ftp != null)
+            serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
+                    exportBean.getFileName(), "/",
+                  "report_" + exportBean.getReportName());
+          logger.debug("File successfully dispatched to ftp server");
+
+          logger.debug("Deleting exported file.");
+
           serviceUtils.deleteFile(exportBean.getFileName(),true);
+
         } catch (IOException e) {
          logger.error("Exception occured while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
         }
@@ -191,17 +203,18 @@ public class ExportServiceImpl implements ExportService{
         IFileExporter iFileExporter = new XlsxExporter();
         ExportBean exportBean = new ExportBean();
         String recipients =null;
+        String ftp = null;
         String dir = UUID.randomUUID().toString();
         MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-        if (dispatchBean !=null && dispatchBean instanceof LinkedHashMap)
-        {
-          exportBean.setFileName(publishedPath+ File.separator+dir+File.separator+String.valueOf(((LinkedHashMap)
-                  dispatchBean).get("name"))+".xlsx");
+        if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
+          exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                  dispatchBean).get("name")) + ".xlsx");
           exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
           exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
           exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
           exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
-          recipients= String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+          recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+          ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
         }
         try {
           // create a directory with unique name in published location to avoid file conflict for dispatch.
@@ -219,11 +232,20 @@ public class ExportServiceImpl implements ExportService{
             MailSender.sendMail(recipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
                     serviceUtils.prepareMailBody(exportBean,mailBody)
                     ,exportBean.getFileName());
-          logger.debug("Email sent successfully : Removing the file from published location");
+          logger.debug("Email sent successfully ");
+
+          // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
+          if (ftp != null)
+            serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
+                    exportBean.getFileName(), "/",
+                    "pivot_" + exportBean.getReportName());
+
           serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword, exportBean.getFileName(), "/", exportBean.getReportName());
+
+          logger.debug("Removing the file from published location");
           serviceUtils.deleteFile(exportBean.getFileName(),true);
         } catch (IOException e) {
-          logger.error("Exception occured while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
+          logger.error("Exception occured while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
         }
       }
       @Override

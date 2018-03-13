@@ -144,7 +144,8 @@ public class ServiceUtils {
                              String destinationDir,
                              String destinationFileName) {
 
-    if (ftpServer==null || ftpUsername==null || ftpPassword==null || localFilePath==null || destinationDir==null || destinationFileName==null) {
+    if (ftpServer == null || ftpUsername == null || ftpPassword == null ||
+            localFilePath == null || destinationDir == null || destinationFileName == null) {
       return false;
     } else {
       try {
