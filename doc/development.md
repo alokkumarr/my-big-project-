@@ -57,15 +57,16 @@ execute the following commands to start SAW in Docker containers:
 
         $ cd saw
         $ mvn package
-        $ mvn -pl saw-dist docker:build docker:run -P docker-saw
+        $ mvn -Ddocker-start=local
 
 Note: The Docker daemon must be running to be able to build and run
-containers.  Also, the first run will take longer as Docker downloads
-and builds images that will subsequently be available in the image
-build cache.
+containers.  If you are unable to install or run Docker locally, see
+instructions for using the Docker Machine [cloud] alternative.
 
-After the above command has completed the SAW Web application can be
-accessed at [http://localhost/](http://localhost/).
+The first run will take longer as Docker downloads and builds images
+that will subsequently be available in the image build cache.  After
+the command has completed the SAW start page can be accessed
+at [http://localhost/](http://localhost/).
 
 To enter a shell inside the main SAW container, execute the following
 command:
@@ -87,6 +88,8 @@ left behind and prevent running new SAW containers, existing
 containers can be removed by executing the following command:
 
         $ docker rm -f saw saw-dist
+
+[cloud]: development-cloud.md
 
 # Running system tests using local deployment
 

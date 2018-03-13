@@ -164,8 +164,9 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.22.1</version>
+        <version>0.24.0</version>
         <configuration>
+          <!-- Automatically create required Docker networks -->
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
           <!-- Workaround: Remove volumes created for Bamboo agent
                disk space workaround (see the VOLUME directive in
@@ -173,6 +174,37 @@
           <removeVolumes>true</removeVolumes>
           <!-- Start containers in parallel to reduce startup time -->
           <startParallel>true</startParallel>
+          <!-- Ignore the Docker Machine configuration by default, and
+               only enable it from the cloud profile when needed -->
+          <skipMachine>${docker.skip.machine}</skipMachine>
+          <!-- Configure Docker Machine -->
+          <machine>
+            <name>user-${env.SAW_AWS_USERNAME}</name>
+            <autoCreate>true</autoCreate>
+            <createOptions>
+              <driver>amazonec2</driver>
+              <amazonec2-region>${saw.docker.machine.aws.region}</amazonec2-region>
+              <amazonec2-access-key>${env.SAW_AWS_ACCESS_KEY_ID}</amazonec2-access-key>
+              <amazonec2-secret-key>${env.SAW_AWS_SECRET_ACCESS_KEY}</amazonec2-secret-key>
+              <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
+              <amazonec2-root-size>32</amazonec2-root-size>
+              <!-- Use CentOS 7 image, see
+                   https://wiki.centos.org/Cloud/AWS for AMI IDs -->
+              <amazonec2-ami>${saw.docker.machine.aws.ami}</amazonec2-ami>
+              <amazonec2-ssh-user>centos</amazonec2-ssh-user>
+              <amazonec2-userdata>${project.basedir}/user-cloud.yaml</amazonec2-userdata>
+              <amazonec2-monitoring/>
+              <!--
+                  Workaround: Docker Machine defaults to devicemapper,
+                  which has < 10G default base size.  Can't change
+                  base size using daemon.json, due to overlay2 failing
+                  on unknown dm.basesize option at startup.  So use
+                  the overlay2 storage driver, which gets the size of
+                  the backing filesystem.
+              -->
+              <engine-storage-driver>overlay2</engine-storage-driver>
+            </createOptions>
+          </machine>
           <images>
             <image>
               <name>saw:${project.version}</name>
