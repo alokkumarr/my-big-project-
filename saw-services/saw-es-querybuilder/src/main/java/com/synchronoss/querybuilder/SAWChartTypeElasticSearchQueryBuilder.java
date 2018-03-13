@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synchronoss.SAWElasticTransportService;
+import com.synchronoss.querybuilder.model.chart.DataField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -38,6 +40,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
   SearchSourceBuilder searchSourceBuilder;
 
  private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+    private final static String VALUE = "value";
+    private final static String SUM ="_sum";
 
   public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
     super();
@@ -197,8 +201,30 @@ class SAWChartTypeElasticSearchQueryBuilder {
     }
     List<com.synchronoss.querybuilder.model.chart.NodeField>  nodeFields = sqlBuilderNode.getNodeFields();
     List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =  sqlBuilderNode.getDataFields();
+
     if (nodeFields != null && dataFields !=null)
     {
+        boolean isPercentage = dataFields.stream().anyMatch(dataField ->
+                dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
+
+        //pre-calculation for percentage aggregation.
+        if(isPercentage)
+        {
+            SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
+            preSearchSourceBuilder.query(boolQueryBuilder);
+            QueryBuilderUtil.getAggregationBuilder(dataFields,preSearchSourceBuilder);
+            String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
+                    "system","analyse");
+            // Set total sum for dataFields will be used for percentage calculation.
+            objectMapper = new ObjectMapper();
+            JsonNode objectNode = objectMapper.readTree(result);
+                dataFields.forEach (dataField -> {
+                String columnName = dataField.getColumnName();
+                if(dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
+                dataField.getAdditionalProperties()
+                        .put(columnName+SUM, String.valueOf(objectNode.get(columnName).get(VALUE)));
+            });
+        }
       if ((!nodeFields.isEmpty() && nodeFields.size() <=3) && !dataFields.isEmpty()){
       searchSourceBuilder = AxesFieldDataFieldsAvailable.rowDataFieldsAvailable
           (nodeFields, dataFields, searchSourceBuilder, boolQueryBuilder);
