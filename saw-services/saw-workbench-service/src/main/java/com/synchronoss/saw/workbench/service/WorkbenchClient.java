@@ -24,6 +24,31 @@ public class WorkbenchClient {
         log.info("Submitting Workbench job");
         JobHandle<Integer> job = client.submit(
             new WorkbenchJob(root, project, component, config));
+        job.addListener(new JobHandle.Listener<Integer>() {
+          @Override
+          public void onJobSucceeded(JobHandle<Integer> job, Integer result) {
+            client.stop(true);
+            log.info("Workbench job successfully completed");
+          }
+          
+          @Override
+          public void onJobStarted(JobHandle<Integer> job) {
+            log.info("Starting Workbench job");}
+          
+          @Override
+          public void onJobQueued(JobHandle<Integer> job) {
+            log.info("Workbench job queued");}
+          
+          @Override
+          public void onJobFailed(JobHandle<Integer> job, Throwable cause) {
+            client.stop(true);
+          }
+          
+          @Override
+          public void onJobCancelled(JobHandle<Integer> job) {
+            client.stop(true);
+          }
+        });
         log.info("Submitted job");
     }
 }

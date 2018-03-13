@@ -29,6 +29,7 @@ public class WorkbenchExecutionServiceImpl
     @Override
     public String execute(String name, String component, String config)
         throws Exception {
+        log.info("Workbench is about execute job");
         WorkbenchClient client = new WorkbenchClient();
         createDatasetDirectory(name);
         client.submit(livyUri, root, project, component, config);
