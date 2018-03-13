@@ -24,7 +24,6 @@ require('./dataset-details.component.scss');
 export class DatasetDetailsComponent implements OnInit {
   @Input() selFiles: Array<any>;
   @Input() previewConfig: any;
-  private userProject: string = 'project2';
   private separatorKeysCodes = [ENTER, COMMA];
   public detailsFormGroup: FormGroup;
   private lineSeperator = 'lineFeed';
@@ -84,7 +83,7 @@ export class DatasetDetailsComponent implements OnInit {
 
   previewDialog(fileDetails): void {
     const path = `${fileDetails.path}/${fileDetails.name}`;
-    this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
+    this.workBench.getRawPreviewData(path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
         minHeight: 500,
         minWidth: 600,

@@ -23,7 +23,6 @@ require('./datasets-page.component.scss');
 })
 
 export class DatasetsComponent implements OnInit {
-  private userProject: string = 'project2';
   private availableSets: Array<any> = [];
   private viewState: string = 'card';
   private states = {
@@ -49,7 +48,7 @@ export class DatasetsComponent implements OnInit {
 
   getPageData(): void {
     this.headerProgress.show();
-    this.workBench.getDatasets(this.userProject).subscribe((data: any[]) => {
+    this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.loadSets(this.availableSets);
     });
@@ -100,10 +99,15 @@ export class DatasetsComponent implements OnInit {
   }
 
   addDataSet(): void {
-    this.dialog.open(CreateDatasetsComponent, {
+    const detailsDialogRef = this.dialog.open(CreateDatasetsComponent, {
       panelClass: 'full-screen-dialog',
       autoFocus: false
     });
+    detailsDialogRef
+      .afterClosed()
+      .subscribe(() => {
+        this.getPageData();
+      });
   }
 
   onDataViewChange() {

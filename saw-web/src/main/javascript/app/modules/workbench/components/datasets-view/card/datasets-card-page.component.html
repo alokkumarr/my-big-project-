@@ -2,32 +2,32 @@
   <div fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
     <mat-card class="datasets-card" >
       <mat-card-header>
-          <div mat-card-avatar class="src-img {{sets.src}}"></div>
-        <div class="dataset-name" fxFlex [innerHTML]="sets.set"></div>
-        <dataset-actions [id]="sets.set"></dataset-actions>
+          <div mat-card-avatar class="src-img {{sets.system.format}}"></div>
+        <div class="dataset-name" fxFlex [innerHTML]="sets.system.name"></div>
+        <dataset-actions [id]="sets._id"></dataset-actions>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content class="mat-body-1">
         <div class="margin-btm-9" fxLayout="row wrap">
           <div fxFlex="70" class="mat-body-1">Data Pods:
-            <span [innerHTML]="sets.meta.numFiles"></span>
+            <span [innerHTML]="sets?.dataPods?.numberOfPods"></span>
           </div>
-          <div class="mat-caption" fxLayoutAlign="end end" fxFlex="30">Size: {{sets.meta.size}}</div>
+          <div class="mat-caption" fxLayoutAlign="end end" fxFlex="30">Size: {{sets.system.numberOfFiles}}</div>
         </div>
         <div class="descr margin-btm-9">
           <div>Description:
-            <span [innerHTML]="sets.meta.descr"></span>
+            <span [innerHTML]="sets?.userData?.description"></span>
           </div>
         </div>
         <div class="margin-btm-9" fxLayout="row">
           <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added by:
-            <span [innerHTML]="sets.meta.addedBy"></span>
+            <span [innerHTML]="sets.system.user"></span>
           </div>
           <div fxFlex="65
                     " fxLayout="column" fxLayoutAlign="center end">Last updated by:
             <div fxLayout="row" style="align-items: baseline;">
-              <span [innerHTML]="sets.meta.updatedBy"></span> @
-              <span class="mat-caption" [innerHTML]="sets.meta.lastUpdated | date : 'short'"></span>
+              <span [innerHTML]="sets.system.user"></span> @
+              <span class="mat-caption" [innerHTML]="sets.asOfNow.finished"></span>
             </div>
           </div>
         </div>

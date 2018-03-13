@@ -17,6 +17,8 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { MenuService } from '../../../common/services/menu.service';
 import APP_CONFIG from '../../../../../../../appConfig';
 
+const userProject: string = 'workbench';
+
 @Injectable()
 export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
@@ -28,32 +30,32 @@ export class WorkbenchService {
     private menu: MenuService) { }
 
   /** GET datasets from the server */
-  getDatasets(projectName: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/datasets`;
+  getDatasets(): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.get(endpoint)
       .pipe(
         catchError(this.handleError('data', DATASETS)));
   }
 
   /** GET Staging area tree list */
-  getStagingData(projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/directory`;
+  getStagingData(path: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/raw/directory`;
     return this.http.post(endpoint, { path })
       .pipe(
         catchError(this.handleError('data', [])));
   }
 
   /** GET raw preview from the server */
-  getRawPreviewData(projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/preview`;
+  getRawPreviewData(path: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/raw/directory/preview`;
     return this.http.post(endpoint, { path })
       .pipe(
         catchError(this.handleError('data', [])));
   }
 
   /** GET parsed preview from the server */
-  getParsedPreviewData(projectName: string, previewConfig): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/inspect`;
+  getParsedPreviewData(previewConfig): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
         catchError(this.handleError('data', [])));
@@ -98,8 +100,8 @@ export class WorkbenchService {
     return str === suffix;
   }
 
-  uploadFile(filesToUpload: FileList, projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/upload/files?path=${path}`;
+  uploadFile(filesToUpload: FileList, path: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/raw/directory/upload/files?path=${path}`;
 
     // const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files`;
     const formData: FormData = new FormData();
@@ -133,8 +135,8 @@ export class WorkbenchService {
     return isValid;
   }
 
-  createFolder(projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/create`;
+  createFolder(path: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/raw/directory/create`;
     return this.http.post(endpoint, { path })
       .pipe(
         catchError(this.handleError('data', [])));
@@ -147,9 +149,9 @@ export class WorkbenchService {
    * @returns {Observable<any>} 
    * @memberof WorkbenchService
    */
-  getDatasetDetails(projectName: string, id): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/${id}`;
-    return this.http.get(`${this.wbAPI}/${projectName}/${id}`)
+  getDatasetDetails(id): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/${id}`;
+    return this.http.get(`${this.wbAPI}/${userProject}/${id}`)
       .pipe(
         catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }

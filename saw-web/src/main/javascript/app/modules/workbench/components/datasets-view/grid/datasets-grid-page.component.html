@@ -10,7 +10,7 @@
       <span class="clickable" [innerHTML]="data.value"></span>
     </div>
     <div *dxTemplate="let data of 'timecreatedCellTemplate'">
-      <span class="clickable" [innerHTML]="data.value | date : 'MM/dd/yy @ HH:mm'"></span>
+      <span class="clickable" [innerHTML]="data.value"></span>
     </div>
     <div *dxTemplate="let data of 'actionsCellTemplate'">
       <dataset-actions [id]="data.value"></dataset-actions>

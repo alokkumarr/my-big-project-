@@ -1,421 +1,110 @@
 export const DATASETS = [
   {
-    prj: 'project2',
-    set: 'd-set2',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam consectetur venenatis blandit. Praesent vehicula, libero non pretium vulputate, lacus arcu facilisis lectus, sed feugiat tellus nulla eu dolor. Nulla porta bibendum lectus quis euismod. Aliquam volutpat ultricies porttitor. Cras risus nisi, accumsan vel cursus ut, sollicitudin vitae dolor. Fusce scelerisque eleifend lectus in bibendum. Suspendisse lacinia egestas felis a volutpat.',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
+    '_id': 'xda-ux-sr-comp-dev::TRTEST_JEXLREF_SS',
+    'system': {
+      'user': 'A_user',
+      'project': 'xda-ux-sr-comp-dev',
+      'type': 'fs',
+      'format': 'parquet',
+      'name': 'TRTEST_JEXLREF_SS',
+      'physicalLocation': 'data',
+      'catalog': 'dout',
+      'numberOfFiles': '1'
+    },
+    'userData': {
+      'createdBy': 'S.Ryabov',
+      'category': 'subcat1',
+      'description': 'Transformer component test case: transformed records'
+    },
+    'asOfNow': {
+      'status': 'SUCCESS',
+      'started': '20180209-195737',
+      'finished': '20180209-195822',
+      'aleId': 'xda-ux-sr-comp-dev::1518206302595',
+      'batchId': 'BJEXLREFSS'
+    },
+    'dataPods': {
+      'numberOfPods': '3',
+      'list': [
+        'name-dp1-12342',
+        'name-dp2-122342',
+        'name-dp3-12344232'
+      ]
+    },
+    'artifact': {
+      'artifactName': 'MCT_DN_SESSION_SUMMARY',
+      'columns': [
+        {
+          'name': 'TRANSFER_DATE',
+          'type': 'date'
+        },
+        {
+          'name': 'TRANSFER_DATE_ID',
+          'type': 'integer'
+        },
+        {
+          'name': 'TRANSFER_MONTH_ID',
+          'type': 'integer'
+        }
+      ]
+    },
+    'asOutput': 'xda-ux-sr-comp-dev::transformer::165407713',
+    'transformations': []
   },
   {
-    prj: 'project2',
-    set: 'Indirect_Calls',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam consectetur venenatis blandit. Praesent vehicula, libero non pretium vulputate, lacus arcu facilisis lectus, sed feugiat tellus nulla eu dolor. Nulla porta bibendum lectus quis euismod. Aliquam volutpat ultricies porttitor. Cras risus nisi, accumsan vel cursus ut, sollicitudin vitae dolor. Fusce scelerisque eleifend lectus in bibendum. Suspendisse lacinia egestas felis a volutpat.',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Orders',
-    cat: 'data',
-    src: 'madb',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Alerts',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Incidents',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Error',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Event',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Content',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Session',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Content',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Spr_Orders',
-    cat: 'data',
-    src: 'madb',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Spr_Cancels',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Spr_Evt_01',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Spr_Evt_03',
-    cat: 'data',
-    src: 'madb',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Spr_Calls',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Dummy',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'd-set2',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Calls',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Orders',
-    cat: 'data',
-    src: 'madb',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Alerts',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'Indirect_Incidents',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Error',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Event',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Content',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Session',
-    cat: 'data',
-    src: 'es',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
-  },
-  {
-    prj: 'project2',
-    set: 'MCT_Content',
-    cat: 'data',
-    src: 'fs',
-    meta: {
-      addedBy: 'ATT_Admin',
-      lastUpdated: '2017-10-26T14:21:33',
-      descr: 'Sample data for demo. Should be real in real-time. ',
-      type: 'unknown',
-      numFiles: 0,
-      creationDate: '2017/10/26 10:01:17',
-      updatedBy: 'ATT_User',
-      size: '8743213'
-    }
+    '_id': 'xda-ux-sr-comp-dev::TRTEST_JKWNDLW',
+    'system': {
+      'user': 'B_user',
+      'project': 'xda-ux-sr-comp-prod',
+      'type': 'fs',
+      'format': 'parquet',
+      'name': 'SNCR_data',
+      'physicalLocation': 'data',
+      'catalog': 'dout',
+      'numberOfFiles': '3'
+    },
+    'userData': {
+      'createdBy': 'Admin',
+      'category': 'subcat1',
+      'description': 'PROD mode dataset. Just testing'
+    },
+    'asOfNow': {
+      'status': 'SUCCESS',
+      'started': '20180209-195737',
+      'finished': '20180209-195822',
+      'aleId': 'xda-ux-sr-comp-dev::1518206302595',
+      'batchId': 'BJEXLREFSS'
+    },
+    'dataPods': {
+      'numberOfPods': '3',
+      'list': [
+        'name-dp1-678',
+        'name-dp2-6789',
+        'name-dp3-9023'
+      ]
+    },
+    'artifact': {
+      'artifactName': 'MCT_DN_SESSION_SUMMARY',
+      'columns': [
+        {
+          'name': 'TRANSFER_DATE',
+          'type': 'date'
+        },
+        {
+          'name': 'TRANSFER_DATE_ID',
+          'type': 'integer'
+        },
+        {
+          'name': 'TRANSFER_MONTH_ID',
+          'type': 'integer'
+        }
+      ]
+    },
+    'asOutput': 'xda-ux-sr-comp-dev::transformer::34239923',
+    'transformations': []
   }
-];
+]
+;
 
 
 export const TREE_VIEW_Data = [
@@ -430,7 +119,7 @@ export const TREE_VIEW_Data = [
 ];
 
 export const RAW_SAMPLE = {
-  'projectId': 'project2',
+  'projectId': 'workbench',
   'path': 'test.csv',
   'data': [
     'DOJ,Name,ID,ZipCode,Salary,Resignation\r',

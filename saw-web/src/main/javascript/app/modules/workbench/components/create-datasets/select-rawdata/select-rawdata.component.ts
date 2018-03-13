@@ -31,7 +31,6 @@ require('./select-rawdata.component.scss');
 
 export class SelectRawdataComponent implements OnInit {
   private treeConfig: any;
-  private userProject: string = 'project2';
   private treeNodes: Array<any>;
   private treeOptions: ITreeOptions;
   private maskHelper: any;
@@ -78,7 +77,7 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   getPageData() {
-    this.workBench.getStagingData(this.userProject, '/').subscribe(data => {
+    this.workBench.getStagingData('/').subscribe(data => {
       const filteredDataFiles = filter(data.data, ['isDirectory', false]);
       this.reloadDataGrid(filteredDataFiles);
     });
@@ -93,7 +92,7 @@ export class SelectRawdataComponent implements OnInit {
         const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
         // this.currentPath = path;
         // this.nodeID = node.id;
-        return this.workBench.getStagingData(this.userProject, path)
+        return this.workBench.getStagingData(path)
           .toPromise()
           .then(function (data) {
             const dir = filter(data.data, ['isDirectory', true]);
@@ -114,7 +113,7 @@ export class SelectRawdataComponent implements OnInit {
     const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
     this.currentPath = path;
     this.nodeID = node.id;
-    this.workBench.getStagingData(this.userProject, path).subscribe(data => {
+    this.workBench.getStagingData(path).subscribe(data => {
       const filteredDataFiles = filter(data.data, ['isDirectory', false])
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
@@ -219,7 +218,7 @@ export class SelectRawdataComponent implements OnInit {
 
   previewDialog(title): void {
     const path = `${this.currentPath}/${title}`;
-    this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
+    this.workBench.getRawPreviewData(path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
         minHeight: 500,
         minWidth: 600,
@@ -243,7 +242,7 @@ export class SelectRawdataComponent implements OnInit {
     const validType = this.workBench.validateFileTypes(filesToUpload);
     if (validSize && validType) {
       const path = this.currentPath;
-      this.workBench.uploadFile(filesToUpload, this.userProject, path).subscribe(data => {
+      this.workBench.uploadFile(filesToUpload, path).subscribe(data => {
         const filteredDataFiles = filter(data.data, ['isDirectory', false])
         this.reloadDataGrid(filteredDataFiles);
         this.clearSelected();
@@ -271,7 +270,7 @@ export class SelectRawdataComponent implements OnInit {
       .subscribe(name => {
         if (trim(name) !== '' && name != 'null') {
           const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
-          this.workBench.createFolder(this.userProject, path).subscribe(data => {
+          this.workBench.createFolder(path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
             const currChilds = get(currentNode.data, 'children', []);
             var uniqueResults = data.data.filter(obj => {

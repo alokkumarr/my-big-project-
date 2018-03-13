@@ -25,7 +25,6 @@ export class SqlExecutorComponent implements OnInit {
   private gridConfig: Array<any>;
   private showProgress: boolean = false;
   private gridData = new BehaviorSubject([]);
-  private userProject: string = 'project2';
   private datasetID: string = '';
   private datasetDetails: Array<any>;
   private appliedActions: Array<any> = SQL_AQCTIONS;
@@ -52,7 +51,7 @@ export class SqlExecutorComponent implements OnInit {
 
   getPageData(): void {
     this.showProgress = true;
-    this.workBench.getDatasetDetails(this.userProject, this.datasetID).subscribe(data => {
+    this.workBench.getDatasetDetails(this.datasetID).subscribe(data => {
       this.showProgress = false;
       this.artifacts = data.artifacts;
     });

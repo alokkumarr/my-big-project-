@@ -41,7 +41,6 @@ export class ParserPreviewComponent implements OnInit {
   private fieldInfo = [];
   private parserData: any;
   private rawFile: any;
-  private userProject = 'project2';
 
   constructor(
     private dxDataGrid: dxDataGridService,
@@ -220,7 +219,7 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   rawPreview(filePath) {
-    this.workBench.getRawPreviewData(this.userProject, filePath).subscribe(data => {
+    this.workBench.getRawPreviewData(filePath).subscribe(data => {
       this.rawFile = take(data.data, 50);
     });
   }

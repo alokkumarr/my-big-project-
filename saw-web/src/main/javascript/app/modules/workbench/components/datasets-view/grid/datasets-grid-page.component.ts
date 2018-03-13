@@ -59,7 +59,7 @@ export class DatasetsGridPageComponent implements OnInit {
     const dataSource = [];
     const columns = [{
       caption: 'Data Set Name',
-      dataField: 'set',
+      dataField: 'system.name',
       allowSorting: true,
       alignment: 'left',
       width: '35%',
@@ -67,28 +67,28 @@ export class DatasetsGridPageComponent implements OnInit {
       cssClass: 'branded-column-name'
     }, {
       caption: 'Size',
-      dataField: 'meta.size',
+      dataField: 'system.numberOfFiles',
       dataType: 'number',
       width: '10%'
     }, {
-      dataField: 'meta.addedBy',
+      dataField: 'system.user',
       caption: 'Added By',
       width: '13%',
       dataType: 'string',
       cellTemplate: 'creatorCellTemplate'
     }, {
-      dataField: 'meta.type',
+      dataField: 'system.format',
       caption: 'Type',
       width: '10%',
       dataType: 'String',
       cellTemplate: 'creatorCellTemplate'
     }, {
-      dataField: 'meta.numFiles',
+      dataField: 'dataPods.numberOfPods',
       caption: 'Data Pods',
       width: '8%',
       dataType: 'number'
     }, {
-      dataField: 'meta.lastUpdated',
+      dataField: 'asOfNow.finished',
       caption: 'Last Updated',
       sortOrder: 'desc',
       cellTemplate: 'timecreatedCellTemplate',
@@ -96,13 +96,13 @@ export class DatasetsGridPageComponent implements OnInit {
       dataType: 'date',
       alignment: 'right'
     }, {
-      dataField: 'src',
+      dataField: 'system.type',
       caption: 'Source',
       cellTemplate: 'dsTypeTemplate',
       width: '7%',
       alignment: 'center'
     }, {
-      dataField: 'set',
+      dataField: 'sets._id',
       caption: 'Actions',
       cellTemplate: 'actionsCellTemplate',
       width: '5%'

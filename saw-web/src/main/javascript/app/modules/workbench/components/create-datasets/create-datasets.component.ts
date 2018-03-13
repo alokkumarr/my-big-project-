@@ -32,7 +32,6 @@ export class CreateDatasetsComponent implements OnInit {
   public detailsFilled: boolean = false;
   public selectedFiles: Array<any>;
   public details: any = [];
-  private userProject: string = 'project2';
   private csvConfig: any;
   private parsedPreview = new Subject();
   private previewData: any;
@@ -87,7 +86,7 @@ export class CreateDatasetsComponent implements OnInit {
 
   getParsedPreview() {
     if (this.selectedIndex === 2) {
-      this.workBench.getParsedPreviewData(this.userProject, this.details).subscribe(data => {
+      this.workBench.getParsedPreviewData(this.details).subscribe(data => {
         this.previewData = data;
         setTimeout(() => {
           this.parsedPreview.next(this.previewData);
@@ -102,7 +101,7 @@ export class CreateDatasetsComponent implements OnInit {
 
   previewDialog(fileDetails): void {
     const path = `${fileDetails.path}/${fileDetails.name}`;
-    this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
+    this.workBench.getRawPreviewData(path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
         minHeight: 500,
         minWidth: 600,
