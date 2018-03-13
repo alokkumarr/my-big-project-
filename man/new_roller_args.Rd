@@ -4,7 +4,8 @@
 \alias{new_roller_args}
 \title{Roller Arguments Constructor function}
 \usage{
-new_roller_args(order_vars, group_vars, measure_vars, fun, width, by, ...)
+new_roller_args(order_vars, group_vars, measure_vars, fun, width, by, partial,
+  mode, ...)
 }
 \value{
 roller_args object
