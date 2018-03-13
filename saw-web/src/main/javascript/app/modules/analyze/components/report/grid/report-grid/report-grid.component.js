@@ -35,7 +35,7 @@ export const ReportGridComponent = {
       this._AnalyzeDialogService = AnalyzeDialogService;
 
       this.settings = {};
-      this.columns = [];
+      this.columns = null;
       this.sorts = [];
     }
 
@@ -161,6 +161,9 @@ export const ReportGridComponent = {
     }
 
     prepareGridColumns(columns) {
+      if (isEmpty(columns)) {
+        return null;
+      }
       return map(columns, column => {
         const isNumberType = NUMBER_TYPES.includes(column.type);
         if (column.type === 'timestamp') {

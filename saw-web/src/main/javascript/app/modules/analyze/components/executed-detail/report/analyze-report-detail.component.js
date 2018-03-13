@@ -21,7 +21,8 @@ export const AnalyzeReportDetailComponent = {
 
     $onInit() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
-      this.columns = this._getColumns(this.analysis);
+      // no culomns if the in query mode
+      this.columns = this.analysis.edit ? null : this._getColumns(this.analysis);
       this.showChecked = !(get(this.analysis, 'queryManual'));
     }
 

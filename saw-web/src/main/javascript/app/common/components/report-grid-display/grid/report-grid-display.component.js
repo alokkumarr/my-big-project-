@@ -109,6 +109,10 @@ export const ReportGridDisplayComponent = {
 
     updateColumns(columns, data) {
       if (this._gridInstance) {
+        if (!columns) {
+          this._gridInstance.option('columns', null);
+          return;
+        }
         const cols = this._getDxColumns(columns, data);
         this._gridInstance.option('columns', cols);
         // this._gridInstance.refresh();

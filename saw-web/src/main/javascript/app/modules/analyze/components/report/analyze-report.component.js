@@ -520,8 +520,9 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
           this.gridDataTotalCount = count;
-          const columnNames = keys(fpGet('[0]', data));
-          this.columns = this.getColumns(columnNames);
+          // const columnNames = keys(fpGet('[0]', data));
+          // this.columns = this.getColumns(columnNames);
+          this.columns = null;
           this.applyDataToGrid(this.columns, [], [], this.gridData);
           this.endProgress();
           this.toggleDetailsPanel(true);
@@ -681,7 +682,9 @@ export const AnalyzeReportComponent = {
     }
 
     hasSelectedColumns() {
-      return this.columns.length > 0;
+      return this.columns ?
+        this.columns.length > 0 :
+        true;
     }
 
     isSortDisabled() {
