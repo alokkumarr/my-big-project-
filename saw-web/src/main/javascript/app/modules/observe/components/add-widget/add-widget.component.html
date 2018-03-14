@@ -20,8 +20,9 @@
 
   <mat-step label="Analysis">
     <widget-header [stepper]="widgetStepper"
+      *ngIf="model.subCategory"
       [container]="container"
-      title="Choose an Analysis"
+      [title]="model.subCategory.name"
       [showBack]="true"></widget-header>
 
     <widget-analysis *ngIf="model.subCategory"
