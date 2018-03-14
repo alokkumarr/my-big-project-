@@ -4,6 +4,7 @@ import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
+import * as isEmpty from 'lodash/isEmpty';
 
 let self;
 export const AnalyzeCardComponent = {
@@ -44,7 +45,7 @@ export const AnalyzeCardComponent = {
 
     applyCronPropertytoCard() {
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === this.model.id) {
+        if (cron.jobDetails.analysisID === this.model.id && !isEmpty(cron.jobDetails.cronExpression)) {
           const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
           this.cronReadbleMsg = cronstrue.toString(cronLocal);
         }

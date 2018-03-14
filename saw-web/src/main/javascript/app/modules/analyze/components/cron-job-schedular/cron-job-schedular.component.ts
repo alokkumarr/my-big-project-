@@ -192,6 +192,9 @@ export class CronJobSchedularComponent {
   loadData() {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
+    if (isEmpty(this.crondetails.cronexp)) {
+      return;
+    }
     const localCronExpression = convertToLocal(this.crondetails.cronexp);
     let parseCronValue = cronstrue.toString(localCronExpression).split(' ');
     let fetchTime = parseCronValue[1].split(':');

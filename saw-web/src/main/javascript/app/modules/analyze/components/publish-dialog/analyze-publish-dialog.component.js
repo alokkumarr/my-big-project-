@@ -26,6 +26,7 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
+      this.cronValidateField = false;
       this._JwtService = JwtService;
       this.resp = this._JwtService.getTokenObj();
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
@@ -95,7 +96,7 @@ export const AnalyzePublishDialogComponent = {
             activeTab: response.data.data.jobDetails.activeTab,
             activeRadio: response.data.data.jobDetails.activeRadio
           };
-          if (response.data.data.jobDetails.cronExpression) {
+          if (response.data.data.jobDetails.analysisID) {
             this.scheduleState = 'exist';
           }
           // if (response.data.data.jobDetails.ftp === 'true') {
@@ -137,6 +138,8 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
+      this.cronValidateFlag = false;
+      this.emailValidateFlag = false;
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
         this.model.schedule = {
@@ -181,6 +184,11 @@ export const AnalyzePublishDialogComponent = {
     validateForm() {
       this.errorFlagMsg = false;
       this.emailValidateFlag = false;
+      // Validation for: Schedule/CronExp is mandatory any type of schedule/publish.
+      if (isEmpty(this.crondetails.cronexp)) {
+        this.cronValidateField = true;
+        return false;
+      }
       // Validation for: Email entry is mandatory for charts as dispatch is hidden.
       if (isEmpty(this.emails) && this.model.type === 'chart') {
         this.emailValidateFlag = true;

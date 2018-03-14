@@ -22,7 +22,8 @@
                   "sum",
                   "min",
                   "max",
-                  "count"
+                  "count",
+                  "percentage"
                 ],
                 "id":"/properties/sqlBuilder/properties/dataFields/items/properties/aggregate",
                 "type":"string"
