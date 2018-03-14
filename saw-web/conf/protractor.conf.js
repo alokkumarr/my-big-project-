@@ -143,7 +143,7 @@ exports.config = {
     ],
     pivots: [
       // WIP
-      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
       // Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
       //webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')
     ],
