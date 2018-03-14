@@ -35,43 +35,4 @@ add-widget {
       text-align: left;
     }
   }
-
-  widget-analysis {
-    .choose-analysis {
-      color: $primary-grey-g5;
-      padding: 16px 10px;
-      display: flex;
-      margin: 5px 0;
-      background: white;
-
-      mat-icon {
-        font-size: 48px;
-        height: 48px;
-        width: 20%;
-
-        &::before {
-          color: $primary-grey-g2;
-        }
-      }
-
-      & > div {
-        flex-grow: 1;
-        width: 80%;
-        display: flex;
-        flex-direction: column;
-
-        & > * {
-          margin: 5px 0;
-        }
-
-        p {
-          margin: 0;
-        }
-
-        small.analysis-metric {
-          color: $primary-grey-g3;
-        }
-      }
-    }
-  }
 }

@@ -4,6 +4,7 @@ import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 
 const template = require('./widget-analysis.component.html');
+require('./widget-analysis.component.scss');
 
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
@@ -22,6 +23,7 @@ export class WidgetAnalysisComponent implements OnInit {
   @Output() onAnalysisAction = new EventEmitter();
   analyses: Array<any> = [];
   showProgress = false;
+  searchTerm: string;
   icons = {};
 
   constructor(private analyze: AnalyzeService) {

@@ -1,7 +1,14 @@
 <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
 
+<mat-form-field class="search-analysis">
+  <span matPrefix>
+    <mat-icon fontIcon="icon-search"></mat-icon>
+  </span>
+  <input matInput placeholder="Search" [(ngModel)]="searchTerm" />
+</mat-form-field>
+
 <div class="choose-analysis"
-  *ngFor="let analysis of analyses">
+  *ngFor="let analysis of analyses | filter:'name':searchTerm">
 
   <mat-icon [fontIcon]="icons[analysis.chartType || analysis.type]"></mat-icon>
   <div>
