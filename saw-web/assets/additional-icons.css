@@ -37,6 +37,12 @@
   font-weight: bolder;
 }
 
+.icon-Percentage::before {
+  content: "%";
+  font-size: 26px;
+  font-weight: bolder;
+}
+
 .icon-right-join .path1:before {
   content: "\e9bc";
   color: rgb(189, 206, 215);

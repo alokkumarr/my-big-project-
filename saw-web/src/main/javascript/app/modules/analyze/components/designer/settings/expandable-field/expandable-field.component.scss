@@ -28,8 +28,13 @@ expandable-field {
     color: red;
   }
 
+  .expandable-field__remove-btn {
+    margin-left: 10px;
+  }
+
   .expandable-field__option-button {
     width: auto;
+    color: $primary-grey-g3;
 
     & > .mat-button-wrapper {
       width: auto;

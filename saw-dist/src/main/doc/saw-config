@@ -33,7 +33,7 @@ saw_spark_master_url=spark://localhost:7077
 #saw_spark_yarn_queue_fast=saw-fast
 saw_zookeeper_quorum=localhost
 saw_metadata_path=/main/metadata
-report_executor_path=/main
+saw_report_executor_path=/main
 saw_observe_metastore=hdfs:///main
 
 #
