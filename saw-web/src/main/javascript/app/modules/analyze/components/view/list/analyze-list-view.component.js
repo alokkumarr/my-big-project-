@@ -3,6 +3,7 @@ import style from './analyze-list-view.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
+import * as isEmpty from 'lodash/isEmpty';
 
 export const AnalyzeListViewComponent = {
   template,
