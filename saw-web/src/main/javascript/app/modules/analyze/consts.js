@@ -12,7 +12,10 @@ import {
   BACKEND_TIMEZONE,
   DATE_FORMATS,
   DATE_FORMATS_OBJ,
-  DEFAULT_DATE_FORMAT
+  DEFAULT_DATE_FORMAT,
+  AGGREGATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ
 } from '../../common/consts.js';
 
 export {
@@ -23,7 +26,10 @@ export {
   BACKEND_TIMEZONE,
   DATE_FORMATS,
   DATE_FORMATS_OBJ,
-  DEFAULT_DATE_FORMAT
+  DEFAULT_DATE_FORMAT,
+  AGGREGATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ
 };
 
 export const Events = {
@@ -90,35 +96,6 @@ export const PRIVILEGES = {
   DELETE: 'DELETE',
   ALL: 'ALL'
 };
-
-export const AGGREGATE_TYPES = [{
-  label: 'Total',
-  value: 'sum',
-  icon: 'icon-Sum'
-}, {
-  label: 'Average',
-  value: 'avg',
-  icon: 'icon-AVG'
-}, {
-  label: 'Mininum',
-  value: 'min',
-  icon: 'icon-MIN'
-}, {
-  label: 'Maximum',
-  value: 'max',
-  icon: 'icon-MAX'
-}, {
-  label: 'Count',
-  value: 'count',
-  icon: 'icon-Count'
-}];
-
-export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
-
-export const AGGREGATE_TYPES_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(AGGREGATE_TYPES);
 
 export const COMBO_TYPES = [{
   label: 'line',

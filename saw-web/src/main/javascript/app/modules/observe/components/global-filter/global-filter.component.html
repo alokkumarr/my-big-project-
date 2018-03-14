@@ -1,6 +1,11 @@
 <div class="filter-header-actions">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onApply()">Apply Filters</button>
+  <button mat-raised-button
+    color="primary"
+    [disabled]="globalFilters.length <= 0"
+    (click)="onApply()">
+    Apply Filters
+  </button>
 </div>
 
 <div class="filter-content">

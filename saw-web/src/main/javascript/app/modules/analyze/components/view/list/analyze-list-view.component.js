@@ -139,7 +139,7 @@ export const AnalyzeListViewComponent = {
         alignment: 'left',
         width: '8%',
         calculateCellValue: rowData => {
-          return (rowData.type || '').toUpperCase();
+          return this.checkRowType(rowData);
         },
         cellTemplate: 'typeCellTemplate'
       }, {
@@ -180,7 +180,7 @@ export const AnalyzeListViewComponent = {
     generateSchedule(rowData) {
       let scheduleHuman = '';
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === rowData.id) {
+        if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
           const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
           scheduleHuman = cronstrue.toString(localCron);
         }
@@ -197,6 +197,14 @@ export const AnalyzeListViewComponent = {
       splitArray[2] = UtcTime[1];
       return splitArray.join(' ');
 
+    }
+
+    checkRowType(rowData) {
+      let analysisType = rowData.type;
+      if (rowData.type === 'esReport') {
+        analysisType = 'REPORT';
+      }
+      return analysisType.toUpperCase();
     }
   }
 };

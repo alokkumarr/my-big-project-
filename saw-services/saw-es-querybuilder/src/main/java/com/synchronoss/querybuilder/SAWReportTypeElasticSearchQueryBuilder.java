@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
+import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.report.*;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -21,6 +22,8 @@ import java.util.List;
 public class SAWReportTypeElasticSearchQueryBuilder {
 
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+    private final static String VALUE = "value";
+    private final static String SUM ="_sum";
     String jsonString;
     String dataSecurityString;
     SearchSourceBuilder searchSourceBuilder;
@@ -181,6 +184,30 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         ReportAggregationBuilder reportAggregationBuilder = new ReportAggregationBuilder(size);
         List<DataField> aggregationFields = reportAggregationBuilder.getAggregationField(dataFields);
         AggregationBuilder finalAggregationBuilder =null;
+
+        boolean isPercentage = dataFields.stream().anyMatch(dataField ->
+                dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
+
+        //pre-calculation for percentage.
+        if(isPercentage)
+        {
+            SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
+            preSearchSourceBuilder.query(boolQueryBuilder);
+            QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
+            String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
+                    "system","analyse");
+            // Set total sum for dataFields will be used for percentage calculation.
+            objectMapper = new ObjectMapper();
+            JsonNode objectNode = objectMapper.readTree(result);
+            dataFields.forEach (dataField -> {
+                String columnName = dataField.getColumnName();
+                if(dataField.getAggregate()!=null && dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
+                dataField.getAdditionalProperties()
+                        .put(columnName+SUM, String.valueOf(objectNode.get(columnName
+                        ).get(VALUE)));
+            });
+
+        }
         // Generated Query
         if (aggregationFields.size()==0)
         {
@@ -192,16 +219,16 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             AggregationBuilder aggregationBuilder = null;
             if (dataFields.size()==aggregationFields.size())
             {
-                finalAggregationBuilder=  reportAggregationBuilder.reportAggregationBuilder(dataFields
-                ,aggregationFields);
+                reportAggregationBuilder.reportAggregationBuilder(dataFields
+                ,aggregationFields,searchSourceBuilder);
             }
             else {
                 finalAggregationBuilder = reportAggregationBuilder.reportAggregationBuilder(
                         dataFields, aggregationFields, 0, 0, aggregationBuilder);
+                searchSourceBuilder.aggregation(finalAggregationBuilder);
             }
             // set the size zero for aggregation query .
             searchSourceBuilder.size(0);
-            searchSourceBuilder.aggregation(finalAggregationBuilder);
         }
         setSearchSourceBuilder(searchSourceBuilder);
         return searchSourceBuilder.toString();

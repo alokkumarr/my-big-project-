@@ -67,6 +67,10 @@ export const AGGREGATE_TYPES = [{
   label: 'Count',
   value: 'count',
   icon: 'icon-Count'
+}, {
+  label: 'Percentage',
+  value: 'percentage',
+  icon: 'icon-Percentage'
 }];
 
 export const AGGREGATE_STRING_TYPES = [{

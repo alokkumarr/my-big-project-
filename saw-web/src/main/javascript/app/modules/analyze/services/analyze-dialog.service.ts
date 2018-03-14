@@ -95,7 +95,7 @@ export class AnalyzeDialogService {
       description
     }
     return this.dialog.open(ToolbarActionDialogComponent, {
-      width: 'auto',
+      width: '500px',
       height: 'auto',
       data
     } as MatDialogConfig);
