@@ -12,7 +12,7 @@ btyp='c' # build number type 'commit count'
 if (( $# )) ; then
     arg=$1
     # check if it is build number from bamboo
-    if [[ $arg = +([0-9]) ]] ; then
+    if [[ $arg =~ ^[0-9]+$ ]] ; then
             # command in bamboo:
             # ./mk_mvn.sh ${bamboo.buildNumber} clean package
             bnum=$arg
@@ -70,7 +70,7 @@ echo 'EXECUTE MAVEN'
 echo '########################'
 
 # MAVEN COMMAND
-[[ $DRYRUN ]] && {
+[[ ${DRYRUN:-0} != 0 ]] && {
     echo '$' "${mvn_cmd[@]}"
     echo DRYRUN exit
     exit 0
@@ -130,3 +130,15 @@ exit
 # To use in Bamboo task:
 ########
 ./mk_mvn.sh ${bamboo.buildNumber}
+
+########
+# To build XDF with custom name:
+########
+./mk_mvn.sh -Dprod.name=xdf-sv clean package
+# NB: no underscore in custom name
+
+########
+# To build xda-genapp with custom name:
+########
+./mk_mvn.sh -Dprod.shortName=my-own-app clean package
+# NB: no underscore in custom name
