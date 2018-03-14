@@ -83,6 +83,7 @@
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
             <analyze-report-query [model]="$ctrl.model"
                                   [artifacts]="$ctrl.artifacts"
+                                  (on-query-change)="$ctrl.startDraftMode()"
                                   (on-save)="$ctrl.onSaveQuery($event)">
             </analyze-report-query>
           </div>
