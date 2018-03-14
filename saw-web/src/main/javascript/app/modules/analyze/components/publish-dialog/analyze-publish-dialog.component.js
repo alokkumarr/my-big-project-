@@ -71,9 +71,12 @@ export const AnalyzePublishDialogComponent = {
           this.setDefaultCategory();
           this.fetchCronDetails();
         });
+      this.locations = ['alias1','alias2','alias3','alias4'];
+      this.ftp = '';
     }
 
     fetchCronDetails() {
+      this.ftp = ['alias1','alias2','alias3'];
       this.$dialog.showLoader();
       this.hasDispatch = false;
       this.requestCron = {
@@ -95,11 +98,12 @@ export const AnalyzePublishDialogComponent = {
           if (response.data.data.jobDetails.cronExpression) {
             this.scheduleState = 'exist';
           }
-          if (response.data.data.jobDetails.ftp === 'true') {
-            this.hasDispatch = true;
-          } else {
-            this.hasDispatch = false;
-          }
+          // if (response.data.data.jobDetails.ftp === 'true') {
+          //   this.hasDispatch = true;
+          // } else {
+          //   this.hasDispatch = false;
+          // }
+          this.ftp = ['alias1','alias2','alias3'];
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
         }
@@ -143,6 +147,8 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
+        console.log(this.ftp);
+        return;
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -181,11 +187,11 @@ export const AnalyzePublishDialogComponent = {
         return false;
       }
       // Validation for: user has to select either dispatch to ftp or enter emails or both.
-      if (isEmpty(this.emails) && this.hasDispatch === false) {
+      if (isEmpty(this.emails) && isEmpty(this.ftp)) {
         this.errorFlagMsg = true;
         return false;
       }
-      // Validation for: User needs to enter correct emails in the list
+      // Validation for: User needs to enter emails in the correct format in the list
       if (!isEmpty(this.emails) && !this.validateEmails(this.emails)) {
         this.emailValidateFlag = true;
         return false;

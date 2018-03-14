@@ -58,4 +58,18 @@
     margin-top: 3px;
     margin-right: 2px;
   }
+
+  .schedule-container .form-container .publish-form {
+    span.clear {
+      position: relative;
+      margin: 10px;
+      top: 10px;
+      color: #0096D5;
+      cursor: pointer;
+    }
+
+    md-select {
+      float: left;
+    }
+  }
 }
