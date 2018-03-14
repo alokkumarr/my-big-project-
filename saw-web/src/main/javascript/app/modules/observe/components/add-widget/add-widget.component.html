@@ -24,7 +24,8 @@
       title="Choose an Analysis"
       [showBack]="true"></widget-header>
 
-    <widget-analysis *ngIf="model.subCategory" [category]="model.subCategory.id"
+    <widget-analysis *ngIf="model.subCategory"
+      [category]="model.subCategory.id"
       (onAnalysisAction)="onAnalysisAction($event)">
     </widget-analysis>
   </mat-step>

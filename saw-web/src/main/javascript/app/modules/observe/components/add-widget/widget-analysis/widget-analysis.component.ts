@@ -1,7 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
+import { Subscription } from 'rxjs/subscription';
+
+import { DashboardService } from '../../../services/dashboard.service';
 
 const template = require('./widget-analysis.component.html');
 require('./widget-analysis.component.scss');
@@ -19,18 +22,31 @@ const ALLOWED_ANALYSIS_TYPES = ['chart'];
   selector: 'widget-analysis',
   template
 })
-export class WidgetAnalysisComponent implements OnInit {
+export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Output() onAnalysisAction = new EventEmitter();
   analyses: Array<any> = [];
   showProgress = false;
   searchTerm: string;
+  widgetLog = {};
+  dashboardWidgetSubscription: Subscription;
   icons = {};
 
-  constructor(private analyze: AnalyzeService) {
+  constructor(
+    private analyze: AnalyzeService,
+    private dashboard: DashboardService
+  ) {
     this.loadIcons();
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.dashboardWidgetSubscription = this.dashboard.dashboardWidgets.subscribe(data => {
+      this.widgetLog = { ...data };
+    });
+  }
+
+  ngOnDestroy() {
+    this.dashboardWidgetSubscription.unsubscribe();
+  }
 
   loadIcons() {
     const chartTypes = find(ANALYSIS_METHODS, method => method.label === 'CHARTS');

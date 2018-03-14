@@ -7,6 +7,7 @@ import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.compone
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
 import { ObserveService } from '../../services/observe.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import { animations } from './create-dashboard.animations';
 
@@ -38,6 +39,7 @@ export class CreateDashboardComponent {
     private dialog: MatDialog,
     private router: UIRouter,
     private menu: MenuService,
+    private dashboardService: DashboardService,
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) {
@@ -53,9 +55,19 @@ export class CreateDashboardComponent {
   onDashboardChange(data) {
     if (data.changed) {
       this.checkEmpty(data.dashboard);
+      this.updateWidgetLog(data.dashboard);
     } else if (data.save) {
       this.openSaveDialog(data.dashboard);
     }
+  }
+
+  updateWidgetLog(dashboard) {
+    const newLog = {};
+    forEach(dashboard.tiles, tile => {
+      newLog[tile.id] = {type: tile.type}
+    });
+
+    this.dashboardService.dashboardWidgets.next(newLog);
   }
 
   ngOnInit() {
@@ -74,8 +86,12 @@ export class CreateDashboardComponent {
     case 'ADD':
       if (!data) return;
       const item = { cols: 1, rows: 1, analysis: data, updater: new BehaviorSubject({}) };
-      this.requester.next({action: 'add', data: item})
+      this.requester.next({action: 'add', data: item});
       break;
+    case 'REMOVE':
+      if (!data) return;
+      this.requester.next({action: 'remove', data});
+      break
     }
   }
 

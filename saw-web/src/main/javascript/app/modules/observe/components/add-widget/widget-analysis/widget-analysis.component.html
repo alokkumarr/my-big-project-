@@ -18,8 +18,17 @@
 
     <button mat-raised-button
       color="primary"
+      *ngIf="!widgetLog[analysis.id] else removeButton"
       (click)="addAnalysis(analysis)">
       Add to Dashboard
     </button>
+
+    <ng-template #removeButton>
+      <button mat-raised-button
+        color="warn"
+        (click)="removeAnalysis(analysis)">
+        Remove from Dashboard
+      </button>
+    </ng-template>
   </div>
 </div>

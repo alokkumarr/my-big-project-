@@ -44,14 +44,10 @@ export class AddWidgetComponent implements OnInit {
   }
 
   onAnalysisAction({action, analysis}) {
-    switch(action) {
-    case WIDGET_ANALYSIS_ACTIONS.ADD_ANALYSIS:
-      this.onWidgetAction.next({
-        widget: 'ANALYSIS',
-        action: 'ADD',
-        data: analysis
-      });
-      break;
-    }
+    this.onWidgetAction.next({
+      widget: 'ANALYSIS',
+      action: WIDGET_ANALYSIS_ACTIONS.ADD_ANALYSIS === action ? 'ADD' : 'REMOVE',
+      data: analysis
+    });
   }
 }
