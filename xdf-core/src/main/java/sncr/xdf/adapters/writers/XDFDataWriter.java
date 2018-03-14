@@ -1,9 +1,10 @@
-package sncr.xdf.component;
+package sncr.xdf.adapters.writers;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import scala.collection.immutable.Seq;
 import sncr.bda.core.file.HFileOperations;
 
 import java.util.List;
@@ -31,6 +32,10 @@ public class XDFDataWriter {
         write(DS, tempLocation, true);
     }
 
+    public JsonElement extractSchema(Dataset<Row> finalResult) {
+        JsonParser parser = new JsonParser();
+        return parser.parse(finalResult.schema().prettyJson());
+    }
 
 
 
@@ -96,6 +101,14 @@ public class XDFDataWriter {
                     break;
             }
         }
+
+
+    }
+
+    //TODO:: Add sample creation method
+    public void createSample(Dataset<Row> DS, String location, boolean replace){
+
+
 
 
     }

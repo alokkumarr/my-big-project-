@@ -8,8 +8,12 @@ import org.apache.log4j.Logger;
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.Context;
+import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
 import sncr.xdf.core.file.DLDataSetOperations;
-import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.adapters.writers.*;
+
+
 
 import java.io.IOException;
 import java.util.*;
@@ -17,34 +21,34 @@ import java.util.*;
 /**
  * Created by srya0001 on 9/11/2017.
  */
-public interface WithMovableResult {
+public interface WithWrittenResult {
 
 
-    public default int doMove(Context ctx, List<MoveDataDescriptor> resultDataDesc) {
+    default int doMove(InternalContext ctx, NGContext ngctx) {
         try {
 
             WithMovableResultHelper helper = new WithMovableResultHelper();
-            if (resultDataDesc == null || resultDataDesc.isEmpty()) {
+            if (ctx.resultDataDesc == null || ctx.resultDataDesc.isEmpty()) {
                 WithMovableResultHelper.logger.warn("Final file collection is Empty, nothing to move.");
                 return 0;
             }
 
             int fileCounter = 0;
-            for (MoveDataDescriptor moveTask : resultDataDesc) {
+            for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
 
                 if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
                     Path objOutputPath = new Path(moveTask.dest);
                     try {
-                        if (ctx.fs.exists(objOutputPath)) {
+                        if (ngctx.fs.exists(objOutputPath)) {
 
-                            FileStatus[] list = ctx.fs.listStatus(objOutputPath);
+                            FileStatus[] list = ngctx.fs.listStatus(objOutputPath);
                             for (int i = 0; i < list.length; i++) {
-                                ctx.fs.delete(list[i].getPath(), true);
+                                ngctx.fs.delete(list[i].getPath(), true);
                             }
 
                         } else {
                             WithMovableResultHelper.logger.warn("Output directory: " + objOutputPath + " for data object: " + moveTask.objectName + " does not Exists -- create it");
-                            ctx.fs.mkdirs(objOutputPath);
+                            ngctx.fs.mkdirs(objOutputPath);
                         }
                     } catch (IOException e) {
                         WithMovableResultHelper.logger.warn("IO exception in attempt to create/clean up: destination directory", e);
@@ -64,7 +68,7 @@ public interface WithMovableResult {
                     }
 
                     //get list of files to be processed
-                    FileStatus[] files = ctx.fs.listStatus(new Path(moveTask.source));
+                    FileStatus[] files = ngctx.fs.listStatus(new Path(moveTask.source));
 
                     WithMovableResultHelper.logger.debug("Prepare the list of the files, number of files: " + files.length);
                     for (int i = 0; i < files.length; i++) {
@@ -77,14 +81,14 @@ public interface WithMovableResult {
                             Options.Rename opt = (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                             Path src = new Path(srcFileName);
                             Path dst = new Path(destFileName);
-                            ctx.fc.rename(src, dst, opt);
+                            ngctx.fc.rename(src, dst, opt);
                         }
                         fileCounter++;
                     }
                     WithMovableResultHelper.logger.debug("Remove TMP directory if it Exists: " + moveTask.source);
                     Path tmpDIR = new Path(moveTask.source);
-                    if (ctx.fs.exists(tmpDIR))
-                        ctx.fs.delete(tmpDIR, true);
+                    if (ngctx.fs.exists(tmpDIR))
+                        ngctx.fs.delete(tmpDIR, true);
                     WithMovableResultHelper.logger.debug("Data Objects were successfully moved from " + moveTask.source + " into " + moveTask.dest);
 
                 }
@@ -153,12 +157,17 @@ public interface WithMovableResult {
         return moveDesc.dest + Path.SEPARATOR + moveDesc.objectName + "." + ctx.batchID + "." + ctx.startTs + "." + String.format("%05d", fileCounter ) + "." + fileExt;
     }
 
+    default String generateOutputFileName(InternalContext ctx, MoveDataDescriptor moveDesc, int fileCounter)  {
+
+        String fileExt = moveDesc.format;
+        return moveDesc.dest + Path.SEPARATOR + moveDesc.objectName + "." + ctx.batchID + "." + ctx.startTs + "." + String.format("%05d", fileCounter ) + "." + fileExt;
+    }
 
 
 
 
     class WithMovableResultHelper {
-        private static final Logger logger = Logger.getLogger(WithMovableResult.class);
+        private static final Logger logger = Logger.getLogger(WithWrittenResult.class);
 
 
         public int copyMergePartition(String partitionKey,
@@ -207,13 +216,69 @@ public interface WithMovableResult {
                     Path newName = new Path(loc);
                     HFileOperations.fc.rename(s.getPath(), newName);
                     numberOfFilesSuccessfullyCopied++;
-                } catch (IOException e) {
+                } catch (java.io.IOException e) {
                     logger.error(ExceptionUtils.getFullStackTrace(e));
                     throw e;
                 }
             }
             return numberOfFilesSuccessfullyCopied;
         }
+
+
+        public int copyMergePartition(String partitionKey,
+                                      MoveDataDescriptor moveDataDesc,
+                                      InternalContext ctx ) throws Exception {
+            int numberOfFilesSuccessfullyCopied = 0;
+            Path source = new Path(moveDataDesc.source + partitionKey);
+            Path dest = new Path(moveDataDesc.dest +  partitionKey);
+
+            String ext = "." + moveDataDesc.format.toLowerCase();
+
+            // If we have to replace partition - just remove directory
+            // Will do nothing if directory doesn't exists
+            if(! moveDataDesc.mode.toLowerCase().equals("append")) {
+                if(HFileOperations.fs.exists(dest))
+                    HFileOperations.fs.delete(dest, true);
+            }
+
+            // Check if destination folder exists
+            // This will create destination if not exists or do nothing if already exists
+            HFileOperations.fs.mkdirs(dest);
+
+            // Prepare the list of the files
+            FileStatus[] files = null;
+            switch (moveDataDesc.format){
+                case "parquet":
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.PARQUET_FILTER);
+                    break;
+                case "json" :
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.JSON_FILTER);
+                    break;
+                case "csv" :
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.CSV_FILTER);
+                    break;
+                default:
+                    files = HFileOperations.fs.listStatus(source, DLDataSetOperations.PARQUET_FILTER);
+                    break;
+            }
+
+            for(FileStatus s : files) {
+                try {
+                    // Try to copy file by file to get better control on potential copy issues
+                    // If file already exists in destination it will not be replaced with new one
+                    // Appropriate exception will be generated listing all already existent files
+                    String loc = dest + Path.SEPARATOR + moveDataDesc.objectName + "." + ctx.batchID + "." + ctx.startTs + "." + String.format("%05d", ctx.globalFileCount++) + ext;
+                    Path newName = new Path(loc);
+                    HFileOperations.fc.rename(s.getPath(), newName);
+                    numberOfFilesSuccessfullyCopied++;
+                } catch (java.io.IOException e) {
+                    logger.error(ExceptionUtils.getFullStackTrace(e));
+                    throw e;
+                }
+            }
+            return numberOfFilesSuccessfullyCopied;
+        }
+
 
         private Map<String, String> listOfRemovedPartitions = new HashMap<>();
 

@@ -1,6 +1,9 @@
 package sncr.xdf.sql;
 
 
+import com.google.gson.JsonElement;
+import sncr.xdf.sql.ng.NGSQLScriptDescriptor;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -9,7 +12,7 @@ import java.text.SimpleDateFormat;
  */
 public class SQLDescriptor {
 
-    public SQLScriptDescriptor.StatementType statementType;
+    public StatementType statementType;
 
     public String targetTableName;
     public String targetObjectName;
@@ -31,18 +34,20 @@ public class SQLDescriptor {
     public TableDescriptor tableDescriptor;
     public String targetTableMode;
     public String targetTableFormat = "parquet";
+    public JsonElement schema;
 
     public String toString()
     {
         String s=  String.format("{ Statement index: %d, " +
-            "Target table: %s, " +
-            "target object name: %s, " +
-            "is temporary table: %s, " +
-            "target table format: %s " +
-            "target table mode: %s " +
-            "temp location: %s, " +
-            "temp target dir: %s, " +
-            "SQL: %s",
+            "Target table: %s, \n" +
+            "target object name: %s, \n" +
+            "is temporary table: %s, \n" +
+            "target table format: %s \n" +
+            "target table mode: %s \n" +
+            "temp location: %s, \n" +
+            "temp target dir: %s, \n" +
+            "SQL: %s \n" +
+            "Schema: %s",
                 index,
                 targetTableName,
                 targetObjectName,
@@ -51,7 +56,8 @@ public class SQLDescriptor {
                 targetTableMode,
                 transactionalLocation,
                 targetTransactionalLocation,
-                SQL );
+                SQL,
+                schema.toString());
 
         if (startTime > 0) {
 

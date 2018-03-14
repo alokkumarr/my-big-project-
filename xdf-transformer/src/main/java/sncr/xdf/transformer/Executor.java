@@ -1,5 +1,6 @@
 package sncr.xdf.transformer;
 
+import com.google.gson.JsonElement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -12,9 +13,8 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
-import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.component.XDFDataWriter;
+import sncr.xdf.adapters.writers.XDFDataWriter;
 
 import java.util.*;
 
@@ -83,8 +83,6 @@ public abstract class Executor {
         refDataDescriptor = new HashMap<>();
     }
 
-
-    //TODO:: Replace with XDFDataWriter
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
 
         Map<String, Object> outputDS = outputDataSetsDesc.get(resType);
@@ -97,6 +95,9 @@ public abstract class Executor {
 
         XDFDataWriter xdfDW = new XDFDataWriter(format, nof, partitionKeys);
         xdfDW.writeToTempLoc(outputResult,  loc);
+        outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(outputResult));
+
+        logger.trace("Dataset: "  + name + ", Result schema: " + ((JsonElement)outputDS.get(DataSetProperties.Schema.name())).toString());
 
     }
 

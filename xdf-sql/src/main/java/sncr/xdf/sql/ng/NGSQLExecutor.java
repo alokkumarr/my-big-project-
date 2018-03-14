@@ -1,35 +1,40 @@
-package sncr.xdf.sql;
+package sncr.xdf.sql.ng;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.writers.XDFDataWriter;
-import sncr.xdf.exceptions.XDFException;
 import scala.Tuple4;
-import sncr.xdf.context.Context;
+import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.adapters.readers.XDFDataReader;
+import sncr.xdf.context.InternalContext;
 import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.sql.SQLDescriptor;
+import sncr.xdf.sql.TableDescriptor;
+import sncr.xdf.adapters.writers.XDFDataWriter;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 
-public class SQLExecutor implements Serializable {
+public class NGSQLExecutor implements Serializable {
 
+    private final XDFDataReader ngReader;
     private Map<String, Dataset<Row>> jobDataFrames;
-    private static final Logger logger = Logger.getLogger(SQLExecutor.class);
+    private static final Logger logger = Logger.getLogger(NGSQLExecutor.class);
     private SQLDescriptor descriptor;
-    private Context ctx;
+    private InternalContext ctx;
 
-    public SQLExecutor(Context ctx,
-                       SQLDescriptor descriptor,
-                       Map<String, Dataset<Row>> availableDataframes
-                       )
+    public NGSQLExecutor(InternalContext ctx,
+                         SQLDescriptor descriptor,
+                         Map<String, Dataset<Row>> availableDataframes,
+                         XDFDataReader ngReader)
     {
         this.ctx = ctx;
         this.descriptor = descriptor;
         jobDataFrames = availableDataframes;
+        this.ngReader = ngReader;
     }
 
 
@@ -37,7 +42,7 @@ public class SQLExecutor implements Serializable {
         return descriptor.SQL;
     }
 
-    public Long run(SQLScriptDescriptor scriptDescriptor) throws Exception {
+    public Long run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
@@ -94,34 +99,8 @@ public class SQLExecutor implements Serializable {
 
                     logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
                     Dataset<Row> df = null;
-                    boolean loaded = false;
-
-                    switch ( tb.format )
-                    {
-                        case "parquet" :
-                            try{
-                                df = ctx.sparkSession.read().load(loc_desc._1());
-                                loaded = true;
-                            }
-                            catch(Throwable t){
-                                throw new Exception( "Could not load data from location as parquet: " + loc_desc._1() + ", cancel processing.");
-                            }
-                            break;
-
-                        case "json" :
-                            try{
-                                df = ctx.sparkSession.read().json(loc_desc._1());
-                                loaded = true;
-                            }
-                            catch(Throwable t){
-                                throw new Exception( "Could not load data from location as JSON: " + loc_desc._1() + ", cancel processing.");
-                            }
-                            break;
-                        default:
-                            throw new XDFException( XDFException.ErrorCodes.UnsupportedDataFormat);
-                    }
-
-                    if (!loaded || df == null){
+                    df = ngReader.readDataset(tb.format, loc_desc._1());
+                    if (df == null){
                         throw new Exception( "Could not load data neither in parquet nor in JSON, cancel processing");
                     }
                     jobDataFrames.put(tn, df);

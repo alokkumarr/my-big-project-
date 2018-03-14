@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * ZeroComponent is simplest component.
  * It does not do any transformation
  */
-public class ZeroComponent extends Component implements WithMovableResult , WithSparkContext, WithDataSetService {
+public class ZeroComponent extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
     private static final Logger logger = Logger.getLogger(ZeroComponent.class);
 

@@ -20,6 +20,7 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.services.TransformationService;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public abstract class Component {
     protected TransformationService transformationMD;
 
     protected String componentName = "unnamed";
-    protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
+    protected ArrayList<MoveDataDescriptor> resultDataDesc;
     protected Map<String, Map<String, Object>> inputDataSets = null;
     protected Map<String, Map<String, Object>> outputDataSets = null;
 
@@ -284,7 +285,7 @@ public abstract class Component {
         if (this instanceof WithSparkContext) {
             ((WithSparkContext) this).initSpark(ctx);
         }
-        if (this instanceof WithMovableResult) {
+        if (this instanceof WithWrittenResult) {
             resultDataDesc = new ArrayList<>();
         }
 
@@ -340,7 +341,6 @@ public abstract class Component {
             String ale_id = als.createAuditLog(ctx, ale);
             mdOutputDSMap.forEach((id, ds) -> {
                 try {
-                    md.getDSStore().setTransformationProducer(id, transformationID);
                     md.getDSStore().updateStatus(id, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
                 } catch (Exception e) {
                     error = "Could not write AuditLog entry to document, id = " + id;

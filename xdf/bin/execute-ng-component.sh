@@ -17,11 +17,10 @@ SPARK_HOME=/opt/mapr/spark/spark-current
 
 # Component -> main class table
 declare -A COMP_MC=(
-    [sql]=sncr.xdf.sql.SQLComponent
-    [spark-sql]=sncr.xdf.sql.SQLComponent
+    [sql]=sncr.xdf.sql.ng.NGSQLComponent
     [zero]=sncr.xdf.component.ZeroComponent
-    [parser]=sncr.xdf.parser.Parser
-	[transformer]=sncr.xdf.transformer.TransformerComponent
+    [parser]=sncr.xdf.parser.NGParser
+	[transformer]=sncr.xdf.transformer.NGTransformerComponent
     )
 
 function usage()
@@ -172,10 +171,6 @@ ${CMD[@]}"
 export XDF_DATA_ROOT
 "${CMD[@]}"
 RETVAL=$?
-
-### These CMD work if I run directly from terminal ( not through script )
-#XDF_HOME=/dfs/opt/bda/xdf-ngsr-current /opt/mapr/spark/spark-current/bin/spark-submit --verbose --driver-java-options '-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf -DXDF_DATA_ROOT=hdfs:///data/bda -Dlog4j.configuration=file:/dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/conf/log4j.properties' --class sncr.xdf.sql.SQLComponent --jars /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar -b SQLTEST1 -c file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/conf/sqlComponentWithMeta.jconf -a xda-ux-sr-comp-dev
-#XDF_HOME=/dfs/opt/bda/xdf-ngsr-current /opt/mapr/spark/spark-current/bin/spark-submit --verbose --driver-java-options '-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf -DXDF_DATA_ROOT=hdfs:///data/bda -Dlog4j.configuration=file:/dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/conf/log4j.properties' --class sncr.xdf.component.ZeroComponent --jars /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar -b TEST2 -c file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/conf/zeroComponent.jconf -a xda-ux-sr-comp-dev
 
 cat<<EEOORR
 ----------------------------------------------------------------

@@ -10,19 +10,17 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.*;
 import org.apache.spark.util.LongAccumulator;
-import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.component.*;
+import sncr.xdf.context.NGContext;
+import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
@@ -34,9 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
+public class NGParser extends AbstractComponent implements WithWrittenResult, WithSpark, WithDataSetService {
 
-    private static final Logger logger = Logger.getLogger(Parser.class);
+    private static final Logger logger = Logger.getLogger(NGParser.class);
 
     private String lineSeparator;
     private char delimiter;
@@ -59,16 +57,20 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     private List<String> pkeys;
 
+    public NGParser(NGContext ngctx, boolean useMD, boolean useSample) { super(ngctx, useMD, useSample); }
+
+    public NGParser() {  super(); }
+
     {
         componentName = "parser";
     }
 
     public static void main(String[] args){
-        Parser component = new Parser();
+        NGParser component = new NGParser();
         try {
             // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.initWithCMDParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -77,13 +79,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
     }
 
-    protected int Execute(){
+    protected int execute(){
 
         int retval = 0;
 
         sourcePath = ctx.componentConfiguration.getParser().getFile();
         headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
-        tempDir = generateTempLocation(new DataSetServiceAux(ctx, md), null, null);
+        tempDir = generateTempLocation(new DataSetServiceAux(ctx, services.md), null, null);
         lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
         delimiter = ctx.componentConfiguration.getParser().getDelimiter().charAt(0);
         quoteChar = ctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
@@ -99,13 +101,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true);
 
         // Output data set
-        if(outputDataSets.size() != 1){
+        if(ngctx.outputDataSets.size() != 1){
             // error - must be only one for parser
             logger.error("Found multiple output data set definitions");
             return -1;
         }
 
-        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)outputDataSets.entrySet().toArray()[0];
+        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)ngctx.outputDataSets.entrySet().toArray()[0];
         outputDataSetName = ds.getKey();
         outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
         outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
@@ -145,7 +147,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return Parser.analyzeAndValidate(config);
+        return NGParser.analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
@@ -166,7 +168,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         return compConf;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
@@ -195,7 +197,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         //TODO: Change here
         Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
         writeDataset(filteredDataset, outputFormat.toString(), tempDir);
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
 
         return 0;
     }
@@ -208,10 +210,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-
-//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
-
+                   ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
                 }
             }
         }
@@ -262,7 +261,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         try {
             XDFDataWriter xdfDW = new XDFDataWriter(format, outputNOF, pkeys);
             xdfDW.writeToTempLoc(dataset,  path);
-            Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
+            Map<String, Object> outputDS = ngctx.outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
             return 0;
         } catch (Exception e) {
