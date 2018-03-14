@@ -25,7 +25,7 @@ logging:
 workbench:
         project-key: "{{ saw_workbench_project_key | default('workbench') }}"
         project-path: "{{ saw_workbench_project_path | default('/raw') }}"
-        project-root: "{{ saw_workbench_project_root | default('maprfs:///data/bda') }}"
+        project-root: "{{ saw_workbench_project_root | default('maprfs:///main') }}"
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
 metastore:
