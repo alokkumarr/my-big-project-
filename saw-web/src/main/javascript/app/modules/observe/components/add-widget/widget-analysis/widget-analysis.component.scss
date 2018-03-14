@@ -32,8 +32,15 @@ widget-analysis {
         margin: 0;
       }
 
-      small.analysis-metric {
-        color: $primary-grey-g3;
+      .card-base {
+        display: flex;
+        align-items: center;
+
+        small.analysis-metric {
+          color: $primary-grey-g3;
+          flex-grow: 1;
+          padding-right: 5px;
+        }
       }
     }
   }

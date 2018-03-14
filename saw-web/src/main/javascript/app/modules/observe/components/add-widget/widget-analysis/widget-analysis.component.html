@@ -15,24 +15,26 @@
     <div>
       <strong [textContent]="analysis.name"></strong>
       <p [textContent]="analysis.description"></p>
-      <small class="analysis-metric" [textContent]="analysis.metricName"></small>
+      <div class="card-base">
+        <small class="analysis-metric" [textContent]="analysis.metricName"></small>
 
-      <button mat-mini-fab
-        color="primary"
-        class="widget-action-button"
-        *ngIf="!widgetLog[analysis.id] else removeButton"
-        (click)="addAnalysis(analysis)">
-        <mat-icon fontIcon="icon-plus"></mat-icon>
-      </button>
-
-      <ng-template #removeButton>
         <button mat-mini-fab
-          color="warn"
-          class="widget-action-button widget-action-remove"
-          (click)="removeAnalysis(analysis)">
-          <mat-icon fontIcon="icon-close"></mat-icon>
+          color="primary"
+          class="widget-action-button"
+          *ngIf="!widgetLog[analysis.id] else removeButton"
+          (click)="addAnalysis(analysis)">
+          <mat-icon fontIcon="icon-plus"></mat-icon>
         </button>
-      </ng-template>
+
+        <ng-template #removeButton>
+          <button mat-mini-fab
+            color="warn"
+            class="widget-action-button widget-action-remove"
+            (click)="removeAnalysis(analysis)">
+            <mat-icon fontIcon="icon-close"></mat-icon>
+          </button>
+        </ng-template>
+      </div>
     </div>
   </div>
 </div>
