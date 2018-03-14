@@ -91,10 +91,9 @@ public class ESReportAggregationParser {
         else if (groupByFields.length==0 && childNode !=null)
         {
             Map<String,String> flatValues = new LinkedHashMap<>();
-            JsonNode childNode1 = childNode.get(DATA_FIELDS);
             for (DataField dataField : aggregationFields){
                 String columnName = dataField.getName();
-                flatValues.put(columnName, String.valueOf(childNode1.get(columnName).get(VALUE)));
+                flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
             }
             flatStructure.add(flatValues);
         }

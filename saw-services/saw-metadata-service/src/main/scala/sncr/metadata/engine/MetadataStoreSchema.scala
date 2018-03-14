@@ -6,6 +6,7 @@ import org.apache.hadoop.hbase.HTableDescriptor
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.Admin
 import org.slf4j.LoggerFactory
+import sncr.saw.common.config.SAWServiceConfig
 
 /**
  * Utilities for initializing metadata store schema upon application
@@ -18,7 +19,7 @@ object MetadataStoreSchema {
     * Directory in which metadata store tables are created when the
     * metadata store schema is created
     */
-  val TableHome = "/main/metadata"
+  val TableHome = SAWServiceConfig.metadataConfig.getString("path")
 
   /**
    * Initializes metadata store schema: creates MapR-DB binary tables
