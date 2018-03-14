@@ -50,4 +50,34 @@ widget-analysis {
       }
     }
   }
+
+  .mat-mini-fab.widget-action-button {
+    align-self: flex-end;
+    box-shadow: none;
+
+    /*
+      &.widget-action-remove {
+        border: 1px solid #E53935;
+        background: white;
+
+        mat-icon {
+          &::before {
+            color: #E53935;
+          }
+        }
+      }
+    */
+
+    mat-icon {
+      font-size: 12px;
+      vertical-align: baseline;
+      line-height: 24px;
+      font-weight: bold;
+      width: 12px;
+
+      &::before {
+        color: white;
+      }
+    }
+  }
 }

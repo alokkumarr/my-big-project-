@@ -17,18 +17,20 @@
       <p [textContent]="analysis.description"></p>
       <small class="analysis-metric" [textContent]="analysis.metricName"></small>
 
-      <button mat-raised-button
+      <button mat-mini-fab
         color="primary"
+        class="widget-action-button"
         *ngIf="!widgetLog[analysis.id] else removeButton"
         (click)="addAnalysis(analysis)">
-        Add to Dashboard
+        <mat-icon fontIcon="icon-plus"></mat-icon>
       </button>
 
       <ng-template #removeButton>
-        <button mat-raised-button
+        <button mat-mini-fab
           color="warn"
+          class="widget-action-button widget-action-remove"
           (click)="removeAnalysis(analysis)">
-          Remove from Dashboard
+          <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </ng-template>
     </div>
