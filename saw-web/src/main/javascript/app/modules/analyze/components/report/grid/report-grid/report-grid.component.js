@@ -78,6 +78,9 @@ export const ReportGridComponent = {
     }
 
     onContextMenuPreparing(e) {
+      if (isEmpty(this.columns)) {
+        return;
+      }
       if (e.target === 'header') {
         e.items = [];
 
