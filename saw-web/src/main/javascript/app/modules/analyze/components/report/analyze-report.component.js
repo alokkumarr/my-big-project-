@@ -5,7 +5,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpGet from 'lodash/fp/get';
 import * as first from 'lodash/first';
 import * as map from 'lodash/map';
-import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
 import * as reduce from 'lodash/reduce';
