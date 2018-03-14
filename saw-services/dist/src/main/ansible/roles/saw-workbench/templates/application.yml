@@ -29,4 +29,4 @@ workbench:
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
 metastore:
-    base:  {{ saw_workbench_metadata | default('hdfs:///data/bda') }}
+    base:  {{ saw_workbench_metadata | default('hdfs:///main/') }}
