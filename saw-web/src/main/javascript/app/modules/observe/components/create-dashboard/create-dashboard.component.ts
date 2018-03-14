@@ -8,13 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
 import { ObserveService } from '../../services/observe.service';
 import { Dashboard } from '../../models/dashboard.interface';
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition
-} from '@angular/animations';
+import { animations } from './create-dashboard.animations';
 
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
@@ -30,30 +24,7 @@ const MARGIN_BETWEEN_TILES = 10;
 @Component({
   selector: 'create-dashboard',
   template,
-  animations: [
-    trigger('moveButton', [
-      state('empty', style({
-        bottom: '50%',
-        right: '50%',
-        transform: 'translateX(50%)'
-      })),
-      state('filled', style({
-        bottom: '30px',
-        right: '30px',
-        transform: 'translateX(0%)'
-      })),
-      transition('* => *', animate('500ms ease-out'))
-    ]),
-    trigger('hideHelp', [
-      state('empty', style({
-        opacity: 1
-      })),
-      state('filled', style({
-        opacity: 0
-      })),
-      transition('* => *', animate('250ms ease-out'))
-    ])
-  ]
+  animations
 })
 export class CreateDashboardComponent {
   public fillState = 'empty';

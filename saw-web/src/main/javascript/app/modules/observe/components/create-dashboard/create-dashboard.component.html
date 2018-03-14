@@ -30,9 +30,11 @@
       [mode]="mode"
       (getDashboard)="onDashboardChange($event)"></dashboard-grid>
 
-      <span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
-      <button [@moveButton]="fillState" mat-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
-        <mat-icon fontIcon="icon-plus"></mat-icon>
+      <span [@hideHelp]="fillState" class="empty-dashboard-image"></span>
+      <strong [@hideHelp]="fillState" class="add-button-help">There's nothing here yet.</strong>
+      <button [@moveButton]="fillState" mat-raised-button color="primary" class="add-analysis" (click)="chooseAnalysis()">
+        <!-- <mat-icon fontIcon="icon-plus"></mat-icon> -->
+        Add Widget
       </button>
     </mat-sidenav-content>
   </mat-sidenav-container>
