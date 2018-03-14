@@ -211,6 +211,14 @@
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
+                <!-- Restart containers when Docker engine comes up
+                     again.  This allows users to stop the Docker
+                     engine, for example due to a host reboot, and
+                     continue working with the same SAW instance
+                     afterwards -->
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
                 <volumes>
                   <bind>
                     <!-- Bind mount volume for saving system logs in
