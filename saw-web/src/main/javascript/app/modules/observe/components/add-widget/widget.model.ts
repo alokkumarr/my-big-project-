@@ -17,10 +17,10 @@ export const widgetTypes: Array<WidgetType> = [{
   description: 'Capture a metric at any point in time',
   disabled: true,
   icon: 'kpi-widget'
-}, {
+} /*, {
   name: 'Custom Widget',
   id: 'CUSTOM_WIDGET',
   description: 'Embed a URL or add custom scripts',
   disabled: true,
   icon: 'custom-widget'
-}];
+} */ ];
