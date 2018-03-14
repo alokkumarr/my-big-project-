@@ -184,6 +184,7 @@ export const AnalyzePublishDialogComponent = {
     validateForm() {
       this.errorFlagMsg = false;
       this.emailValidateFlag = false;
+      this.cronValidateField = false;
       // Validation for: Schedule/CronExp is mandatory any type of schedule/publish.
       if (isEmpty(this.crondetails.cronexp)) {
         this.cronValidateField = true;
