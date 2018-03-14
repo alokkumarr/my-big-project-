@@ -70,9 +70,9 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const filterAC = filters.getFilterAutocomplete(0);
     const fieldName = yAxisName;
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.openFiltersBtn);
+    commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
-    designModePage.filters.numberInput.sendKeys(filterValue);
+    designModePage.filterWindow.numberInput.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 

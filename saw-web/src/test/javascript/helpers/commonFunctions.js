@@ -68,8 +68,8 @@ function click(element, i) {
         if (i < protractorConf.timeouts.tempts) {
           click(element, i);
         } else {
-          return new Error("Element '" + element.locator() + "' is not clickable after " +
-            protractorConf.timeouts.tempts + " tries. Error: " + err);
+          throw new Error("Element '" + element.locator() + "' is not clickable after " +
+            protractorConf.timeouts.tempts + " attempts. Error: " + err);
         }
       }
     });
