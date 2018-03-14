@@ -21,6 +21,10 @@ import {
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent
 } from './filter';
+import {
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout
+} from './layout';
 import { DesignerSaveComponent } from './save';
 import { DesignerDescriptionComponent } from './description';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
@@ -48,6 +52,8 @@ export {
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 };

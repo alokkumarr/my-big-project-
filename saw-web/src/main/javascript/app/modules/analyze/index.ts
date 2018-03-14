@@ -89,6 +89,8 @@ import {
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
@@ -195,7 +197,9 @@ angular.module(AnalyzeModule, [
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     CronJobSchedularComponent,
-    CronDatePickerComponent
+    CronDatePickerComponent,
+    SingleTableDesignerLayout,
+    MultiTableDesignerLayout
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -220,7 +224,9 @@ angular.module(AnalyzeModule, [
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     CronJobSchedularComponent,
-    CronDatePickerComponent
+    CronDatePickerComponent,
+    SingleTableDesignerLayout,
+    MultiTableDesignerLayout
   ],
   providers: [
     $mdDialogProvider,

@@ -1,0 +1,11 @@
+<designer-settings-single-table class="designer__data-settings"
+                   (settingsChange)="settingsChange.emit($event)"
+                   [artifacts]="artifacts">
+</designer-settings-single-table>
+
+<designer-pivot class="designer__content"
+                [data]="data"
+                [sorts]="sorts"
+                [artifacts]="artifacts"
+                [designerState]="designerState">
+</designer-pivot>

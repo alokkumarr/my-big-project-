@@ -17,7 +17,8 @@ import {
   ArtifactColumn,
   ArtifactColumns,
   ArtifactColumnFilter,
-  ArtifactColumnPivot
+  ArtifactColumnPivot,
+  FieldChangeEvent
 } from '../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -27,10 +28,6 @@ import {
 
 const template = require('./designer-settings-single-table.component.html');
 require('./designer-settings-single-table.component.scss');
-
-export type FieldChangeEvent = {
-  requiresDataChange: boolean
-}
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;

@@ -1,8 +1,6 @@
 import {
-  DesignerSettingsSingleTableComponent,
-  FieldChangeEvent
+  DesignerSettingsSingleTableComponent
 } from './designer-settings-single-table.component';
 export {
-  DesignerSettingsSingleTableComponent,
-  FieldChangeEvent
+  DesignerSettingsSingleTableComponent
 };

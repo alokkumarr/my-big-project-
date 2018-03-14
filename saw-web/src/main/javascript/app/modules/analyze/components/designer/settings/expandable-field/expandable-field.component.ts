@@ -7,7 +7,8 @@ import {
 } from '@angular/core';
 import {
   ArtifactColumn,
-  AnalysisType
+  AnalysisType,
+  FieldChangeEvent
 }  from '../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -17,7 +18,6 @@ import {
 
 const template = require('./expandable-field.component.html');
 require('./expandable-field.component.scss');
-import { FieldChangeEvent } from '../single';
 @Component({
   selector: 'expandable-field',
   template

@@ -7,7 +7,8 @@ import {
 } from '@angular/core';
 import {
   ArtifactColumnPivot,
-  Format
+  Format,
+  FieldChangeEvent
 }  from '../../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -21,8 +22,6 @@ import {
   formatNumber,
   isFormatted
 } from '../../../../../../../common/utils/numberFormatter';
-
-import { FieldChangeEvent } from '../../single';
 
 const template = require('./expand-detail-pivot.component.html');
 

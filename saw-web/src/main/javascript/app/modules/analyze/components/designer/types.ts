@@ -43,6 +43,9 @@ export {
   Format
 };
 
+export type FieldChangeEvent = {
+  requiresDataChange: boolean
+}
 
 export type ArtifactColumnFilter = {
   keyword: string,

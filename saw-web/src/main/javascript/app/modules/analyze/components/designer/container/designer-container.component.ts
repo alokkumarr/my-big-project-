@@ -30,11 +30,11 @@ import {
   DesignerToolbarAciton,
   Sort,
   Filter,
-  IToolbarActionResult
+  IToolbarActionResult,
+  FieldChangeEvent
 } from '../types'
 import { NUMBER_TYPES } from '../../../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
-import { FieldChangeEvent } from '../settings/single';
 
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
@@ -65,6 +65,7 @@ export class DesignerContainerComponent {
   public sorts: Sort[] = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
+  public layoutConfiguration: 'single' | 'multi';
 
   constructor(
     private _designerService: DesignerService,
@@ -88,6 +89,20 @@ export class DesignerContainerComponent {
       });
     default:
       break;
+    }
+    this.layoutConfiguration = this.getLayoutConfiguration(
+      this.analysisStarter || this.analysis
+    );
+  }
+
+  getLayoutConfiguration(analysis: Analysis | AnalysisStarter) {
+    switch (analysis.type) {
+    case 'report':
+      return 'multi';
+    case 'pivot':
+    case 'chart':
+    default:
+      return 'single';
     }
   }
 

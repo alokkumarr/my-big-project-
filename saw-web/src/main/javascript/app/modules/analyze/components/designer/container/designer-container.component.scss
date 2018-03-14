@@ -6,9 +6,8 @@ designer-container {
   max-width: 100vw;
   display: grid;
   grid-template:
-    "header header" 7vh
-    "data-settings content" 93vh
-    / 25vw 75vw;
+    "header" 7vh
+    "content" 93vh;
 
   .designer__header {
     grid-area: header;
@@ -16,17 +15,7 @@ designer-container {
     margin: 0 10px;
   }
 
-  .designer__toolbar {
-    grid-area: toolbar;
-  }
-
-  .designer__data-settings {
-    grid-area: data-settings;
-    border-right: 1px solid $primary-grey-g1;
-    margin: 10px 0;
-  }
-
   .designer__main {
-    padding: 10px;
+    grid-area: content;
   }
 }
