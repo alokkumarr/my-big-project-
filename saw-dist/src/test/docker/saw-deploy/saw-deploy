@@ -18,11 +18,3 @@ tar -xzf saw-*.tgz
 chmod a+x saw/saw-deploy
 
 saw/saw-deploy /root/saw-config
-
-# If deploying to the cloud, log the SAW start page URL as a
-# convenience
-aws_metadata_url=http://169.254.169.254/latest/meta-data/public-hostname
-public_hostname=$(curl $aws_metadata_url 2>/dev/null)
-if [ -n "$public_hostname" ]; then
-    echo "SAW start page URL: http://$public_hostname/"
-fi
