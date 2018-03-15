@@ -1,7 +1,6 @@
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
-import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as keys from 'lodash/keys';
 import * as split from 'lodash/split';
@@ -17,7 +16,6 @@ import * as template from './report-grid-display.component.html';
 import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../consts.js';
 import {getFormatter, DEFAULT_PRECISION} from '../../../utils/numberFormatter';
 
-const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
 
 export const ReportGridDisplayComponent = {
@@ -42,12 +40,6 @@ export const ReportGridDisplayComponent = {
     $onInit() {
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
-        customizeColumns: columns => {
-          forEach(columns, col => {
-            col.alignment = 'left';
-            col.width = COLUMN_WIDTH;
-          });
-        },
         columnChooser: {
           enabled: true,
           mode: 'select'
@@ -83,9 +75,7 @@ export const ReportGridDisplayComponent = {
           'loadPanel.position.of': `$ctrl.pageSize > ${DEFAULT_PAGE_SIZE} ? window : "${gridSelector}"`
         },
         onInitialized: this.onGridInitialized.bind(this),
-        onContentReady: this.onContentReady.bind(this),
-        height: 'auto',
-        width: 'auto'
+        onContentReady: this.onContentReady.bind(this)
       });
     }
 
@@ -205,7 +195,6 @@ export const ReportGridDisplayComponent = {
         const isNumberType = NUMBER_TYPES.includes(column.type);
 
         const field = {
-          alignment: 'left',
           caption: column.aliasName || column.alias || column.displayName || column.name,
           dataField: this.getDataField(column),
           format: isNumberType ? {
@@ -214,8 +203,7 @@ export const ReportGridDisplayComponent = {
             ))
           } : column.format,
           visibleIndex: column.visibleIndex,
-          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
-          width: COLUMN_WIDTH
+          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
