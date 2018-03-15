@@ -36,9 +36,6 @@ public class DataExportController {
 
   @Autowired
   private ExportService exportService;
-
-  @Autowired
-  private FtpCustomer ftpCustomer;
   
   @RequestMapping(value = "/{analysisId}/executions/{executionId}/data", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
