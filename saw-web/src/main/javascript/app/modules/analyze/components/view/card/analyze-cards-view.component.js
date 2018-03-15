@@ -1,5 +1,5 @@
-import * as isEmpty from 'lodash/isEmpty';
 
+import * as forEach from 'lodash/forEach';
 import * as template from './analyze-cards-view.component.html';
 
 export const AnalyzeCardsViewComponent = {
@@ -27,7 +27,13 @@ export const AnalyzeCardsViewComponent = {
       if (this.analysisType === 'all') {
         isIncluded = true;
       } else if (this.analysisType === 'scheduled') {
-        isIncluded = !isEmpty(item.scheduleHuman);
+        isIncluded = false;
+        forEach(this.cronJobs, cron => {
+          if (cron.jobDetails.analysisID === item.id) {
+            isIncluded = true;
+          }
+        });
+        return isIncluded;
       } else {
         isIncluded = this.analysisType === item.type;
       }
