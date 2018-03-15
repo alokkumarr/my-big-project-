@@ -14,22 +14,21 @@ public interface WithSpark {
 
     default void initSpark(InternalContext ctx) {
         WithSparkHelper.logger.debug("Configure spark context: " + ctx.componentName);
-        ctx.sparkConf = new SparkConf().setAppName(ctx.componentName + "::" + ctx.applicationID + "::" + ctx.batchID );
+        SparkConf sparkConf = new SparkConf().setAppName(ctx.componentName + "::" + ctx.applicationID + "::" + ctx.batchID );
 
         /// Overwrite configuration with parameters from component
         List<Parameter> componentSysParams = ctx.componentConfiguration.getParameters();
 
         //TODO: We must have default parameters
         if(componentSysParams != null && componentSysParams.size() > 0) {
-            SparkOps.setSparkConfig(ctx.sparkConf, componentSysParams);
+            SparkOps.setSparkConfig(sparkConf, componentSysParams);
         }
         //ctx = new JavaSparkContext(sparkConf);
-        ctx.sparkSession = SparkSession.builder().config(ctx.sparkConf).getOrCreate();
+        ctx.sparkSession = SparkSession.builder().config(sparkConf).getOrCreate();
     }
 
     default void initSpark(NGContext ngctx, InternalContext ctx) {
         WithSparkHelper.logger.debug("Configure spark context: " + ctx.componentName);
-        ctx.sparkConf = ngctx.sparkConf;
         ctx.sparkSession = ngctx.sparkSession;
         ctx.extSparkCtx = true;
     }

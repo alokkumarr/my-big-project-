@@ -1,40 +1,29 @@
-package sncr.xdf.transformer;
+package sncr.xdf.transformer.ng;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.transformer.TransformWithSchema;
 
 import java.util.List;
 import java.util.Map;
-
-import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 
 
 /**
  * Created by srya0001 on 12/21/2017.
  */
-public class JexlExecutorWithSchema extends Executor{
+public class NGJexlExecutorWithSchema extends NGExecutor{
 
-    private static final Logger logger = Logger.getLogger(JexlExecutorWithSchema.class);
+    private static final Logger logger = Logger.getLogger(NGJexlExecutorWithSchema.class);
 
-    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr,
-                                       Map<String, Map<String, Object>> inputs,
-                                       Map<String, Map<String, Object>> outputs) {
-        super(ctx, script, st, tLoc, thr, inputs, outputs);
-    }
-
-/*
-    public JexlExecutorWithSchema(AbstractComponent parent, String script, int threshold, String tLoc, StructType st)  {
+    public NGJexlExecutorWithSchema(AbstractComponent parent, String script, int threshold, String tLoc, StructType st)  {
         super(parent, script, threshold, tLoc, st);
     }
-*/
 
     protected JavaRDD     transformation(
             JavaRDD dataRdd,
@@ -53,7 +42,7 @@ public class JexlExecutorWithSchema extends Executor{
     }
 
     public void execute(Map<String, Dataset> dsMap) throws Exception {
-        Dataset ds = dsMap.get(inDataSet);
+        Dataset ds = dsMap.get(inDataSetName);
         prepareRefData(dsMap);
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
         Long c = transformationResult.count();

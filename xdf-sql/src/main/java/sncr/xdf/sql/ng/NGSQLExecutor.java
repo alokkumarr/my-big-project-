@@ -5,13 +5,12 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.readers.XDFDataReader;
-import sncr.xdf.context.InternalContext;
+import sncr.xdf.component.WithDLBatchWriter;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
-import sncr.xdf.adapters.writers.XDFDataWriter;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,21 +19,19 @@ import java.util.Map;
 
 public class NGSQLExecutor implements Serializable {
 
-    private final XDFDataReader ngReader;
     private Map<String, Dataset<Row>> jobDataFrames;
     private static final Logger logger = Logger.getLogger(NGSQLExecutor.class);
     private SQLDescriptor descriptor;
-    private InternalContext ctx;
+    private AbstractComponent parent;
 
-    public NGSQLExecutor(InternalContext ctx,
+
+    public NGSQLExecutor(AbstractComponent parent,
                          SQLDescriptor descriptor,
-                         Map<String, Dataset<Row>> availableDataframes,
-                         XDFDataReader ngReader)
+                         Map<String, Dataset<Row>> availableDataframes)
     {
-        this.ctx = ctx;
+        this.parent = parent;
         this.descriptor = descriptor;
         jobDataFrames = availableDataframes;
-        this.ngReader = ngReader;
     }
 
 
@@ -99,7 +96,7 @@ public class NGSQLExecutor implements Serializable {
 
                     logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
                     Dataset<Row> df = null;
-                    df = ngReader.readDataset(tb.format, loc_desc._1());
+                    df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
                     if (df == null){
                         throw new Exception( "Could not load data neither in parquet nor in JSON, cancel processing");
                     }
@@ -109,9 +106,12 @@ public class NGSQLExecutor implements Serializable {
 
                 long lt = System.currentTimeMillis();
                 descriptor.loadTime = (int)((lt-st)/1000);
-                Dataset<Row> sqlResult = ctx.sparkSession.sql(descriptor.SQL);
 
+                Dataset<Row> sqlResult = parent.getNgctx().sparkSession.sql(descriptor.SQL);
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
+
+                WithDLBatchWriter pres = (WithDLBatchWriter) parent;
+                pres.registerDataset(parent.getNgctx(), finalResult, descriptor.targetTableName);
 
                 jobDataFrames.put(descriptor.targetTableName, finalResult);
                 finalResult.createOrReplaceTempView(descriptor.targetTableName);
@@ -122,20 +122,15 @@ public class NGSQLExecutor implements Serializable {
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
 
-                XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
-                xdfWriter.writeToTempLoc( finalResult, descriptor.targetTransactionalLocation);
-
-                descriptor.schema = xdfWriter.extractSchema(finalResult);
+                pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.targetTransactionalLocation);
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);
                 logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt-st)/1000, (lt-st)/1000, (exet -lt)/1000, (wt-exet)/1000));
                 return 0L;
             case DROP_TABLE:
-//                logger.error("NOT SUPPORTED ANY MORE, quitting " + descriptor.SQL);
                 HFileOperations.deleteEnt(descriptor.tableDescriptor.getLocation());
                 logger.error("Removed data set: " + descriptor.SQL);
-
                 return 0L;
             default:
         }

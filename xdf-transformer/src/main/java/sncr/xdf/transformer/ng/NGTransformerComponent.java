@@ -1,6 +1,5 @@
-package sncr.xdf.transformer;
+package sncr.xdf.transformer.ng;
 
-import com.google.gson.JsonElement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -8,14 +7,14 @@ import org.apache.spark.sql.types.*;
 import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.component.*;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;
-import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.transformer.RequiredNamedParameters;
 
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -26,7 +25,7 @@ import java.util.function.Consumer;
  * The component DOES NOT PERFORM any multi-record conversion, use Spark SQL XDF Component
  * if you need to make such transformation.
  */
-public class NGTransformerComponent extends AbstractComponent implements WithWrittenResult, WithSpark, WithDataSetService{
+public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet {
 
     public static String RECORD_COUNTER = "_record_counter";
     public static String TRANSFORMATION_RESULT = "_tr_result";
@@ -63,7 +62,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
     @Override
     protected int execute(){
         try {
-             tempLocation = generateTempLocation(new DataSetServiceAux(ctx, services.md),  null, null);
+             tempLocation = generateTempLocation(new DataSetHelper(ctx, services.md),  null, null);
 
 //1. Read expression/scripts, compile it??
             String script;
@@ -90,17 +89,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
                 Map<String, Object> desc = entry.getValue();
                 String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                 String format = (String) desc.get(DataSetProperties.Format.name());
-                Dataset ds = null;
-                switch (format.toLowerCase()) {
-                    case "json":
-                        ds = ctx.sparkSession.read().json(loc); break;
-                    case "parquet":
-                        ds = ctx.sparkSession.read().parquet(loc); break;
-                    default:
-                        error = "Unsupported data format: " + format;
-                        logger.error(error);
-                        return -1;
-                }
+                Dataset ds = reader.readDataset(entry.getKey(), format, loc);
                 logger.debug("Added to DS map: " + entry.getKey());
                 dsMap.put(entry.getKey(), ds);
             }
@@ -112,8 +101,12 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
 
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
-                    JexlExecutorWithSchema jexlExecutorWithSchema  =
-                            new JexlExecutorWithSchema(ctx.sparkSession, script, st, tempLocation,0, ngctx.inputs, ngctx.outputs);
+                    NGJexlExecutorWithSchema jexlExecutorWithSchema  =
+                            new NGJexlExecutorWithSchema(this,
+                                                         script,
+                                                         ctx.componentConfiguration.getTransformer().getThreshold(),
+                                                         tempLocation,
+                                                         st   );
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
@@ -131,8 +124,13 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
                     for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
                     logger.debug(m);
 
-                     JaninoExecutor janinoExecutor =
-                         new JaninoExecutor(ctx.sparkSession, script, st, tempLocation,0, ngctx.inputs, ngctx.outputs, odi);
+                     NGJaninoExecutor janinoExecutor =
+                         new NGJaninoExecutor(this,
+                                 script,
+                                 ctx.componentConfiguration.getTransformer().getThreshold(),
+                                 tempLocation,
+                                 st,
+                                 odi);
                     janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
@@ -143,8 +141,11 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
             else {
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
-                    JexlExecutor jexlExecutor =
-                            new JexlExecutor(ctx.sparkSession, script, tempLocation, 0, ngctx.inputs, ngctx.outputs);
+                    NGJexlExecutor jexlExecutor =
+                            new NGJexlExecutor(this,
+                                    script,
+                                    ctx.componentConfiguration.getTransformer().getThreshold(),
+                                    tempLocation);
                     jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";
@@ -157,6 +158,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
                 }
             }
 
+/*
             Consumer<Map<String, Object>> f = ds ->
             {
                 if (ds != null) {
@@ -169,7 +171,7 @@ public class NGTransformerComponent extends AbstractComponent implements WithWri
             };
             f.accept(ngctx.outputs.get(RequiredNamedParameters.Output.toString()));
             f.accept(ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()));
-
+*/
 
         }
         catch(Exception e){

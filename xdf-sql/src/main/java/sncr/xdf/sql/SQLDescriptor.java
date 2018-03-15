@@ -57,7 +57,7 @@ public class SQLDescriptor {
                 transactionalLocation,
                 targetTransactionalLocation,
                 SQL,
-                schema.toString());
+                (schema == null)?"N/A":schema.toString());
 
         if (startTime > 0) {
 

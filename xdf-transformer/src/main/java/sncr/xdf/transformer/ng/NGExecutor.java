@@ -1,7 +1,5 @@
-package sncr.xdf.transformer;
+package sncr.xdf.transformer.ng;
 
-import com.google.gson.JsonElement;
-import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
@@ -13,17 +11,15 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
-import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.adapters.writers.DLBatchWriter;
+import sncr.xdf.component.WithDLBatchWriter;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.transformer.RequiredNamedParameters;
 
 import java.util.*;
 
-import static sncr.xdf.transformer.TransformerComponent.RECORD_COUNTER;
-import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_ERRMSG;
-import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
+import static sncr.xdf.transformer.TransformerComponent.*;
 
-public abstract class Executor {
+public abstract class NGExecutor {
 
     protected StructType schema;
     protected final String script;
@@ -31,13 +27,11 @@ public abstract class Executor {
     protected final String tempLoc;
     protected final int threshold;
     protected final HashSet<String> refDataSets;
-    protected final JavaSparkContext jsc;
-    protected final Map<String, Map<String, Object>> outputDataSetsDesc;
     protected final LongAccumulator successTransformationsCount;
     protected final LongAccumulator failedTransformationsCount;
-    protected String rejectedDataSet;
-    protected String outDataSet;
-    protected String inDataSet;
+    protected String rejectedDataSetName;
+    protected String outDataSetName;
+    protected String inDataSetName;
     protected Map<String, Broadcast<List<Row>>> refData;
     protected Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor;
     protected Dataset<Row> outputResult;
@@ -45,66 +39,44 @@ public abstract class Executor {
 
     protected AbstractComponent parent;
 
-    private static final Logger logger = Logger.getLogger(Executor.class);
+    private static final Logger logger = Logger.getLogger(NGExecutor.class);
 
-    public Executor(SparkSession ctx,
-                          String script,
-                          StructType st,
-                          String tLoc,
-                          int thr,
-                          Map<String, Map<String, Object>> inputs,
-                          Map<String, Map<String, Object>> outputs){
+
+    public NGExecutor(AbstractComponent parent, String script, int threshold, String tLoc, StructType st){
         this.script = script;
-        session_ctx = ctx;
-        threshold = thr;
+        session_ctx = parent.getNgctx().sparkSession;
+        this.threshold = threshold;
         refDataSets = new HashSet<>();
-        jsc = new JavaSparkContext(ctx.sparkContext());
-        for( String inpK: inputs.keySet()){
+        for( String inpK: parent.getNgctx().inputs.keySet()){
             if (inpK.equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
-                inDataSet = inpK;
+                inDataSetName = inpK;
             }
             else{
                 refDataSets.add(inpK);
             }
         }
 
-        for( String outK: outputs.keySet()){
+        for( String outK: parent.getNgctx().outputs.keySet()){
             if (outK.equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
-                outDataSet = outK;
+                outDataSetName = outK;
             }
             else if(outK.equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())){
-                rejectedDataSet = outK;
+                rejectedDataSetName = outK;
             }
         }
 
-        this.outputDataSetsDesc = outputs;
         tempLoc = tLoc;
-        this.successTransformationsCount = ctx.sparkContext().longAccumulator("success");
-        this.failedTransformationsCount = ctx.sparkContext().longAccumulator("failed");
+        this.successTransformationsCount = session_ctx.sparkContext().longAccumulator("success");
+        this.failedTransformationsCount = session_ctx.sparkContext().longAccumulator("failed");
         this.schema = st;
         refData = new HashMap<>();
         refDataDescriptor = new HashMap<>();
-        parent = null;
+        this.parent = parent;
     }
 
-
-
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
-
-        Map<String, Object> outputDS = outputDataSetsDesc.get(resType);
-        String name = (String) outputDS.get(DataSetProperties.Name.name());
-        String loc = location + Path.SEPARATOR + name;
-
-        String format = (String) outputDS.get(DataSetProperties.Format.name());
-        Integer nof = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
-        List<String> partitionKeys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
-
-        DLBatchWriter xdfDW = new DLBatchWriter(format, nof, partitionKeys);
-        xdfDW.writeToTempLoc(outputResult,  loc);
-        outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(outputResult));
-
-        logger.trace("Dataset: "  + name + ", Result schema: " + ((JsonElement)outputDS.get(DataSetProperties.Schema.name())).toString());
-
+        WithDLBatchWriter pres = (WithDLBatchWriter) parent;
+        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, location);
     }
 
     public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
@@ -113,6 +85,7 @@ public abstract class Executor {
     protected void prepareRefData(Map<String, Dataset> dsMap){
 
         if (refDataSets != null && refDataSets.size() > 0) {
+            JavaSparkContext jsc = new JavaSparkContext(session_ctx.sparkContext());
             for (String refDataSetName: refDataSets) {
                 logger.debug("Load reference data: " + refDataSetName);
                 Dataset ds = dsMap.get(refDataSetName);
@@ -139,14 +112,14 @@ public abstract class Executor {
                 .drop(trRes)
                 .drop(trMsg)
                 .drop(trRC);
-        if (rejectedDataSet != null && !rejectedDataSet.isEmpty())
+        if (rejectedDataSetName != null && !rejectedDataSetName.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
 
         logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
         logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
 
-        writeResults(outputResult, outDataSet, tempLoc);
-        writeResults(rejectedRecords, rejectedDataSet, tempLoc);
+        writeResults(outputResult, outDataSetName, tempLoc);
+        writeResults(rejectedRecords, rejectedDataSetName, tempLoc);
 
     }
 

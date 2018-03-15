@@ -20,7 +20,7 @@ declare -A COMP_MC=(
     [sql]=sncr.xdf.sql.ng.NGSQLComponent
     [zero]=sncr.xdf.component.ZeroComponent
     [parser]=sncr.xdf.parser.NGParser
-	[transformer]=sncr.xdf.transformer.NGTransformerComponent
+	[transformer]=sncr.xdf.transformer.ng.NGTransformerComponent
     )
 
 function usage()

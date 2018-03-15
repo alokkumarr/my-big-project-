@@ -45,6 +45,6 @@ public interface WithProjectScope {
     }
 
     class WithProjectScopeHelper {
-        private static final Logger logger = Logger.getLogger(WithWrittenResult.class);
+        private static final Logger logger = Logger.getLogger(WithDLBatchWriter.class);
     }
 }

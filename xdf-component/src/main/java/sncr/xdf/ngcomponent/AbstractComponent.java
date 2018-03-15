@@ -16,6 +16,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
+import sncr.xdf.adapters.readers.DLBatchReader;
 import sncr.xdf.component.*;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
@@ -33,7 +34,7 @@ import java.util.Map;
  *   - Component specific class should implement interfaces with given functionality
  *   or using base classes:
  *      - Read data from a source (???)
- *      - Write data (XDFDataWriter)
+ *      - Write data (DLBatchWriter)
  *      - Move data from temp location to permanent location: WithMovableResult
  *      - Read and write result from/to metadata
  *      - Support Spark context
@@ -64,6 +65,7 @@ public abstract class AbstractComponent {
     protected final boolean useSample;
     protected final Services services = new Services();
     private boolean initialized = false;
+    protected DLBatchReader reader;
 
     /**
      * If ngctx is null - we assume Spark context should be created internally and no dataframes should be
@@ -145,7 +147,7 @@ public abstract class AbstractComponent {
             }
 
             if (this instanceof WithDataSetService) {
-                services.mddl = (WithDataSetService) this;
+                services.mddl = (WithDataSet) this;
             }
 
         }
@@ -187,7 +189,7 @@ public abstract class AbstractComponent {
                         ctx.componentConfiguration.getInputs().size() > 0) {
                     logger.info("Extracting meta data");
 
-                    WithDataSetService.DataSetServiceAux dsaux = new WithDataSetService.DataSetServiceAux(ctx, services.md);
+                    WithDataSet.DataSetHelper dsaux = new WithDataSet.DataSetHelper(ctx, services.md);
 
                     if (useMDForInput) {
                         ngctx.inputDataSets = services.mddl.discoverInputDataSetsWithMetadata(dsaux);
@@ -235,7 +237,7 @@ public abstract class AbstractComponent {
             if (ctx.componentConfiguration.getOutputs() != null &&
                     ctx.componentConfiguration.getOutputs().size() > 0) {
 
-                WithDataSetService.DataSetServiceAux dsaux = new WithDataSetService.DataSetServiceAux(ctx, services.md);
+                WithDataSet.DataSetHelper dsaux = new WithDataSet.DataSetHelper(ctx, services.md);
                 ngctx.outputDataSets = services.mddl.ngBuildPathForOutputDataSets(dsaux);
                 ngctx.outputs = services.mddl.ngBuildPathForOutputs(dsaux);
 
@@ -304,7 +306,7 @@ public abstract class AbstractComponent {
     }
 
     protected void initWriter(){
-        if (this instanceof WithWrittenResult) {
+        if (this instanceof WithDLBatchWriter) {
             ctx.resultDataDesc = new ArrayList<>();
         }
     }
@@ -409,10 +411,10 @@ public abstract class AbstractComponent {
             ngctx = new NGContext();
             ngctx.fs = HFileOperations.getFileSystem();
             ngctx.fc = HFileOperations.getFileContext();
-            if (ngctx.sparkConf == null) ngctx.sparkConf = ctx.sparkConf;
             if (ngctx.sparkSession == null) ngctx.sparkSession = ctx.sparkSession;
 
         }
+        reader = new DLBatchReader(ngctx);
 
         //Initialization part-5: Initialize services.
         rc = initServices();
@@ -458,8 +460,8 @@ public abstract class AbstractComponent {
 
     protected int move(){
         int ret = 0;
-        if(this instanceof WithWrittenResult){
-            ret = ((WithWrittenResult)this).doMove(ctx, ngctx);
+        if(this instanceof WithDLBatchWriter){
+            ret = ((WithDLBatchWriter)this).moveData(ctx, ngctx);
         }
         return ret;
     };
@@ -550,13 +552,21 @@ public abstract class AbstractComponent {
         }
     }
 
+    public InternalContext getICtx() {
+        return ctx;
+    }
+
+    public DLBatchReader getReader() {
+        return reader;
+    }
+
 
     /**
      * The class is container for internal services
      */
     public class Services {
         public WithProjectScope prj;
-        public WithDataSetService mddl;
+        public WithDataSet mddl;
 
         public DLDataSetService md;
         public AuditLogService als;

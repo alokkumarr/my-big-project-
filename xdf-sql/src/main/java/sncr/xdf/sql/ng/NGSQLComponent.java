@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Created by asor0002 on 9/11/2017.
  */
-public class NGSQLComponent extends AbstractComponent implements WithWrittenResult, WithSpark, WithDataSetService {
+public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet {
 
     private static final Logger logger = Logger.getLogger(NGSQLComponent.class);
     NGJobExecutor executor;
@@ -37,7 +37,6 @@ public class NGSQLComponent extends AbstractComponent implements WithWrittenResu
 
     protected int execute(){
         try {
-            executor = new NGJobExecutor(ctx, ngctx);
             String script;
             if (ctx.componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline")) {
                 logger.debug("Script is inline encoded");
@@ -53,8 +52,8 @@ public class NGSQLComponent extends AbstractComponent implements WithWrittenResu
                 }
             }
             logger.trace("Script to execute:\n" +  script);
-            executor.analyze(script);
-            String tempDir = ngGenerateTempLocation(new DataSetServiceAux(ctx, services.md),  null, null);
+            executor = new NGJobExecutor(this, script);
+            String tempDir = ngGenerateTempLocation(new DataSetHelper(ctx, services.md),  null, null);
             executor.start(tempDir);
         } catch (Exception e) {
             error = "SQL Executor runtime exception: " + e.getMessage();

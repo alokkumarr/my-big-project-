@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.writers.XDFDataWriter;
+import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.exceptions.XDFException;
 import scala.Tuple4;
 import sncr.xdf.context.Context;
@@ -143,7 +143,7 @@ public class SQLExecutor implements Serializable {
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
 
-                XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
+                DLBatchWriter xdfWriter = new DLBatchWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
                 xdfWriter.writeToTempLoc( finalResult, descriptor.targetTransactionalLocation);
 
                 descriptor.schema = xdfWriter.extractSchema(finalResult);

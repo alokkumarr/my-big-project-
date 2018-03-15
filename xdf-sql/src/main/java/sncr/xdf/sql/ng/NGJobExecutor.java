@@ -5,16 +5,11 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.readers.XDFDataReader;
-import sncr.xdf.context.Context;
-import sncr.xdf.context.InternalContext;
-import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.sql.*;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -27,40 +22,20 @@ import java.util.*;
 public class NGJobExecutor {
 
     private static final Logger logger = Logger.getLogger(NGJobExecutor.class);
-    private final XDFDataReader ngReader;
-
-    private InternalContext ctx;
-
-    Map<String, Map<String, Object>> inputDOs;
-    Map<String, Map<String, Object>> outputDOs;
-
+    private AbstractComponent parent;
     private Map<String, Dataset<Row>> availableDataframes = new HashMap<>();
-    private String now;
-
     private String script;
     private NGSQLScriptDescriptor scriptDescriptor;
     private Map<String, SQLDescriptor> result;
 
-    public NGJobExecutor(InternalContext ictx, NGContext ngctx) throws XDFException
+    public NGJobExecutor(AbstractComponent parent, String script) throws XDFException
     {
         report = new ArrayList<>();
-        ctx = ictx;
+        this.parent = parent;
         result = new HashMap();
-        inputDOs = ngctx.inputDataSets;
-        outputDOs = ngctx.outputDataSets;
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
-        now = format.format(new Timestamp(new Date().getTime()));
-        ngReader = new XDFDataReader(ngctx);
-    }
-
-
-
-    public void analyze(String script)
-    {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
-        this.now = format.format(new Timestamp(new Date().getTime()));
         this.script = script;
     }
+
 
     public Long start(String tempDir) throws XDFException {
 
@@ -68,7 +43,7 @@ public class NGJobExecutor {
         try {
 
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
-            scriptDescriptor = new NGSQLScriptDescriptor(ctx, tempDir, inputDOs, outputDOs);
+            scriptDescriptor = new NGSQLScriptDescriptor(parent.getICtx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
             logger.debug("Step 0: Remove comments: " + script);
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
@@ -91,7 +66,7 @@ public class NGJobExecutor {
                 if (descriptor.statementType  == StatementType.CREATE) {
 
                     try {
-                        NGSQLExecutor executor = new NGSQLExecutor(ctx,descriptor, availableDataframes, ngReader);
+                        NGSQLExecutor executor = new NGSQLExecutor(parent,descriptor, availableDataframes);
                         rc = executor.run(scriptDescriptor);
                         descriptor.result =(rc != 0)?"failed":"success";
                         if (rc != 0){
@@ -111,8 +86,6 @@ public class NGJobExecutor {
 
                 //TODO:: Debug, test and comment the DROP Table functionality
                 else if (descriptor.statementType  == StatementType.DROP_TABLE) {
-                    //TODO:: XDF-1013 implementation
-                    // 1. Drop existing tables (remove data files) -- use resolved existing location
 
                     String destDir;
                     if (descriptor.tableDescriptor != null &&
@@ -157,6 +130,10 @@ public class NGJobExecutor {
                 else{
                     logger.trace("Add result table: " + sqlDescriptor.targetTableName );
                     result.put(sqlDescriptor.targetTableName, sqlDescriptor);
+/*
+                    Map<String, Object> ods = parent.getNgctx().outputDataSets.get(sqlDescriptor.targetTableName);
+                    ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
+*/
                 }
             }
 

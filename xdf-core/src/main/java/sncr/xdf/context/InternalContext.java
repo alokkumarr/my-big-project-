@@ -26,7 +26,6 @@ public class InternalContext extends ContextMetadata {
 
     public String transformationID;
     public final String xdfDataRootSys;
-    public SparkConf sparkConf;
     public SparkSession sparkSession;
     public boolean extSparkCtx = false;
     public int globalFileCount;

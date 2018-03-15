@@ -17,6 +17,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
@@ -27,7 +28,6 @@ import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
-import sncr.xdf.adapters.writers.XDFDataWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -260,7 +260,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
      */
     private int writeDataset(Dataset<Row> dataset, String format, String path) {
         try {
-            XDFDataWriter xdfDW = new XDFDataWriter(format, outputNOF, pkeys);
+            DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, pkeys);
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );

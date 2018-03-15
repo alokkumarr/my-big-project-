@@ -1,12 +1,10 @@
 package sncr.xdf.parser;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -22,17 +20,15 @@ import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.parser.spark.ConvertToRow;
-import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
-import sncr.xdf.adapters.writers.XDFDataWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NGParser extends AbstractComponent implements WithWrittenResult, WithSpark, WithDataSetService {
+public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet {
 
     private static final Logger logger = Logger.getLogger(NGParser.class);
 
@@ -85,7 +81,7 @@ public class NGParser extends AbstractComponent implements WithWrittenResult, Wi
 
         sourcePath = ctx.componentConfiguration.getParser().getFile();
         headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
-        tempDir = generateTempLocation(new DataSetServiceAux(ctx, services.md), null, null);
+        tempDir = generateTempLocation(new DataSetHelper(ctx, services.md), null, null);
         lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
         delimiter = ctx.componentConfiguration.getParser().getDelimiter().charAt(0);
         quoteChar = ctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
@@ -178,30 +174,6 @@ public class NGParser extends AbstractComponent implements WithWrittenResult, Wi
         return s;
     }
 
-    // Parse data without headers
-    int parse(String mode){
-
-        logger.info("Parsing " + sourcePath + " to " + tempDir);
-        logger.info("Header size : " + headerSize);
-
-        JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(sourcePath, 1)
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
-
-
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
-
-        scala.collection.Seq<Column> scalaList=
-            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-
-        //TODO: Change here
-        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
-        writeDataset(filteredDataset, outputFormat.toString(), tempDir);
-        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
-
-        return 0;
-    }
-
 
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
@@ -221,55 +193,38 @@ public class NGParser extends AbstractComponent implements WithWrittenResult, Wi
         logger.info("Parsing " + file + " to " + destDir);
         logger.info("Header size : " + headerSize);
 
-        JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(file.toString(), 1)
-            // Add line numbers
-            .zipWithIndex()
-            // Filter out header based on line number
-            .filter(new HeaderFilter(headerSize))
-            // Get rid of file numbers
-            .keys()
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
+        JavaRDD<Row> rdd = reader.readToRDD(file.toString(), headerSize)
+        .map(new ConvertToRow(  schema,
+                                tsFormats,
+                                lineSeparator,
+                                delimiter,
+                                quoteChar,
+                                quoteEscapeChar,
+                                '\'',
+                                recCounter,
+                                errCounter));
 
 
         Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
         // TODO: Filter out all rejected records
-
-        scala.collection.Seq<Column> scalaList=
+            scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
-
-        return writeDataset(filteredDataset, outputFormat, destDir.toString());
+        int rc = commitDataSetFromDSMap(ngctx, filteredDataset, outputDataSetName, destDir.toString());
+        return rc;
     }
 
-    /**
-     *
-     * Writes the given dataset with a given format in the specified path.
-     *
-     * @param dataset Input dataset which needs to be written
-     * @param format Format in which data needs to be written
-     * As of now, the supported data formats are
-     * <ol>
-     *     <li>json</li>
-     *     <li>parquet</li>
-     * </ol>
-     * @param path Fully qualified path to which data needs to be written
-     * @return
-     * @throws XDFException
-     */
-    private int writeDataset(Dataset<Row> dataset, String format, String path) {
-        try {
-            XDFDataWriter xdfDW = new XDFDataWriter(format, outputNOF, pkeys);
-            xdfDW.writeToTempLoc(dataset,  path);
-            Map<String, Object> outputDS = ngctx.outputDataSets.get(outputDataSetName);
-            outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
-            return 0;
-        } catch (Exception e) {
-            error = ExceptionUtils.getFullStackTrace(e);
-            logger.error("Error at writing result: " + error);
-            return -1;
-        }
+    // Parse data without headers
+    int parse(String mode){
+        int rc = parseSingleFile(new Path(sourcePath), new Path(tempDir));
 
+        if (rc != 0){
+            error = "Could not parse file: " + sourcePath;
+            logger.error(error);
+            return rc;
+        }
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+        return 0;
     }
 
     private static List<Column> createFieldList(List<Field> fields){
