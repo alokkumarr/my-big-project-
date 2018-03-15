@@ -40,7 +40,6 @@ Contents of the machine are preserved and it can be started up again
 if needed.
 
 [Docker Machine]: https://github.com/docker/machine/releases/
-[public IP]: http://ipecho.net/
 
 # Logging in to the remote Docker Machine host
 
@@ -55,3 +54,5 @@ If the connection to the remote host is timing out, please check in
 the AWS console that your [public IP] has been added to
 `docker-machine` security group for all ports.  If it is not there,
 add your public IP to it.
+
+[public IP]: http://ipecho.net/
