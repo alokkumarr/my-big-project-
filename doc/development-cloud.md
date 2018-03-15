@@ -24,7 +24,7 @@ cloud:
    Docker Machine host:
 
         $ mvn package
-        $ mvn -Pdocker-start=cloud
+        $ mvn -Ddocker-start=cloud
 
 6. Get the SAW start page URL by running the following command:
 
