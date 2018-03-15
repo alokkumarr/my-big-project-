@@ -83,7 +83,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        //'--headless',
+        '--headless',
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -142,10 +142,7 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     pivots: [
-      // WIP
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
-      // Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
-      //webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')
     ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js')

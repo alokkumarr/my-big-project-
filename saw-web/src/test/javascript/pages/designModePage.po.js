@@ -2,6 +2,9 @@ module.exports = {
   previewBtn: element(by.css('button[e2e="open-preview-modal"]')),
   filterBtn: element(by.xpath('//button/span[text()="Filter"]')),
   applyFiltersBtn: element(by.xpath('//span[contains(text(),"Apply Filters")]')),
+  // available functions: Sum, AVG, MIN, MAX, Count
+  aggregateFunctionButton: aggregateFunciton => element(by.xpath(`//mat-icon[@class="mat-icon material-icons icon-${aggregateFunciton}"]`)),
+  aggregateFunctionMenuItem: aggregateFunciton => element(by.xpath(`//button[@role="menuitem"]/mat-icon[@class="mat-icon material-icons icon-${aggregateFunciton}"]`)),
   filterWindow: {
     numberInput: element(by.xpath("(//input[@type='number'])[2]")),
     columnDropDown: element(by.xpath('//span[text()="Column"]')),
@@ -10,10 +13,15 @@ module.exports = {
       presetDropDown: element(by.xpath('//span[contains(text(),"Custom")]')),
       presetDropDownItem: presetName => element(by.xpath(`//mat-option[contains(text(),"${presetName}")]`))
     },
-    string:{
+    string: {
       operator: element(by.xpath('//mat-select[@placeholder="OPERATOR"]')),
       operatorDropDownItem: operator => element(by.xpath(`//span[contains(text(),"${operator}")]`)),
       input: element(by.xpath(`//*[@e2e="filter-string-input"]`))
+    },
+    number: {
+      operator: element(by.xpath('//span[text()="Operator"]')),
+      operatorDropDownItem: operator => element(by.xpath(`(//span[contains(text(),"${operator}")])[1]`)),
+      input: element(by.xpath('//input[@type="number"]'))
     }
   },
   pivot: {

@@ -13,10 +13,6 @@ const designModePage = require('../../javascript/pages/designModePage.po.js');
 const Filter = require('../../javascript/data/filter');
 
 describe('Check whether filters throw an error on pivots: pivotFilters.test.js', () => {
-  // TODO rollback after development src/main/javascript/app/common/services/toastMessage.service.js
-  const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
-  const categoryName = 'AT Analysis Category DO NOT TOUCH';
-  const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const metricName = 'MCT TMO Session ES';
   const analysisType = 'table:pivot';
   const dateFieldName = 'Transfer Date';
@@ -25,253 +21,290 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   const dataProvider = {
     // DATES
-    'Date, This Week, Group Interval: not specified, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'This Week'
-    },
-    'Date, MTD (Month to Date), Group Interval: Year, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Year',
-      preset: 'MTD (Month to Date)'
-    },
-    'Date, YTD (Year to Date), Group Interval: Quarter, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Quarter',
-      preset: 'YTD (Year to Date)'
-    },
-    'Date, Last Week, Group Interval: Month, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Month',
-      preset: 'Last Week'
-    },
-    'Date, Last 2 Weeks, Group Interval: Date, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Date',
-      preset: 'Last 2 Weeks'
-    },
-    'Date, Last Month, Group Interval: not specified, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last Month'
-    },
-    'Date, Last Quarter, Group Interval: not specified, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last Quarter'
-    },
-    'Date, Last 3 Months, Group Interval: not specified, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last 3 Months'
-    },
-    'Date, Last 6 Months, Group Interval: not specified, as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last 6 Months'
-    },
-    'Date, This Week, Group Interval: not specified, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'This Week'
-    },
-    'Date, MTD (Month to Date), Group Interval: Year, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Year',
-      preset: 'MTD (Month to Date)'
-    },
-    'Date, YTD (Year to Date), Group Interval: Quarter, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Quarter',
-      preset: 'YTD (Year to Date)'
-    },
-    'Date, Last Week, Group Interval: Month, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Month',
-      preset: 'Last Week'
-    },
-    'Date, Last 2 Weeks, Group Interval: Date, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: true,
-      groupInterval: 'Date',
-      preset: 'Last 2 Weeks'
-    },
-    'Date, Last Month, Group Interval: not specified, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last Month'
-    },
-    'Date, Last Quarter, Group Interval: not specified, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last Quarter'
-    },
-    'Date, Last 3 Months, Group Interval: not specified, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last 3 Months'
-    },
-    'Date, Last 6 Months, Group Interval: not specified, as user': {
-      user: 'userOne',
-      fieldType: 'date',
-      groupIntervalSpecified: false,
-      preset: 'Last 6 Months'
-    }
+    /*'Date, This Week, Group Interval: not specified, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'This Week'
+     },
+     'Date, MTD (Month to Date), Group Interval: Year, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Year',
+     preset: 'MTD (Month to Date)'
+     },
+     'Date, YTD (Year to Date), Group Interval: Quarter, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Quarter',
+     preset: 'YTD (Year to Date)'
+     },
+     'Date, Last Week, Group Interval: Month, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Month',
+     preset: 'Last Week'
+     },
+     'Date, Last 2 Weeks, Group Interval: Date, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Date',
+     preset: 'Last 2 Weeks'
+     },
+     'Date, Last Month, Group Interval: not specified, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last Month'
+     },
+     'Date, Last Quarter, Group Interval: not specified, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last Quarter'
+     },
+     'Date, Last 3 Months, Group Interval: not specified, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last 3 Months'
+     },
+     'Date, Last 6 Months, Group Interval: not specified, as admin': {
+     user: 'admin',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last 6 Months'
+     },
+     'Date, This Week, Group Interval: not specified, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'This Week'
+     },
+     'Date, MTD (Month to Date), Group Interval: Year, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Year',
+     preset: 'MTD (Month to Date)'
+     },
+     'Date, YTD (Year to Date), Group Interval: Quarter, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Quarter',
+     preset: 'YTD (Year to Date)'
+     },
+     'Date, Last Week, Group Interval: Month, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Month',
+     preset: 'Last Week'
+     },
+     'Date, Last 2 Weeks, Group Interval: Date, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: true,
+     groupInterval: 'Date',
+     preset: 'Last 2 Weeks'
+     },
+     'Date, Last Month, Group Interval: not specified, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last Month'
+     },
+     'Date, Last Quarter, Group Interval: not specified, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last Quarter'
+     },
+     'Date, Last 3 Months, Group Interval: not specified, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last 3 Months'
+     },
+     'Date, Last 6 Months, Group Interval: not specified, as user': {
+     user: 'userOne',
+     fieldType: 'date',
+     groupIntervalSpecified: false,
+     preset: 'Last 6 Months'
+     }*/
 
     // STRINGS
     /*'String, EQUALS, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'EQUALS',
-      value: 10
-    },
-    'String, NOT_EQUAL, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'NOT_EQUAL',
-      value: 10
-    },
-    'String, IS_IN, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'IS_IN',
-      value: 10
-    },
-    'String, IS_NOT_IN, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'IS_NOT_IN',
-      value: 10
-    },
-    'String, CONTAINS, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'CONTAINS',
-      value: 10
-    },
-    'String, STARTS_WITH, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'STARTS_WITH',
-      value: 10
-    },
-    'String, ENDS_WITH, as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'ENDS_WITH',
-      value: 10
-    },
-    'String, EQUALS, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'EQUALS',
-      value: 10
-    },
-    'String, NOT_EQUAL, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'NOT_EQUAL',
-      value: 10
-    },
-    'String, IS_IN, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'IS_IN',
-      value: 10
-    },
-    'String, IS_NOT_IN, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'IS_NOT_IN',
-      value: 10
-    },
-    'String, CONTAINS, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'CONTAINS',
-      value: 10
-    },
-    'String, STARTS_WITH, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'STARTS_WITH',
-      value: 10
-    },
-    'String, ENDS_WITH, as user': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'ENDS_WITH',
-      value: 10
-    },*/
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'EQUALS',
+     value: 10
+     },
+     'String, NOT_EQUAL, as admin': {
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'NOT_EQUAL',
+     value: 10
+     },
+     'String, IS_IN, as admin': {
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'IS_IN',
+     value: 10
+     },
+     'String, IS_NOT_IN, as admin': {
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'IS_NOT_IN',
+     value: 10
+     },
+     'String, CONTAINS, as admin': {
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'CONTAINS',
+     value: 10
+     },
+     'String, STARTS_WITH, as admin': {
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'STARTS_WITH',
+     value: 10
+     },
+     'String, ENDS_WITH, as admin': {
+     user: 'admin',
+     fieldType: 'string',
+     operator: 'ENDS_WITH',
+     value: 10
+     },
+     'String, EQUALS, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'EQUALS',
+     value: 10
+     },
+     'String, NOT_EQUAL, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'NOT_EQUAL',
+     value: 10
+     },
+     'String, IS_IN, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'IS_IN',
+     value: 10
+     },
+     'String, IS_NOT_IN, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'IS_NOT_IN',
+     value: 10
+     },
+     'String, CONTAINS, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'CONTAINS',
+     value: 10
+     },
+     'String, STARTS_WITH, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'STARTS_WITH',
+     value: 10
+     },
+     'String, ENDS_WITH, as user': {
+     user: 'userOne',
+     fieldType: 'string',
+     operator: 'ENDS_WITH',
+     value: 10
+     },*/
 
     // NUMBERS
-    /*'Number, Greater than, Aggregate function: default, as admin': {
+    'Number, Greater than, Aggregate function: Average, as admin': {
+      user: 'admin',
+      fieldType: 'number',
+      aggregateFunction: "AVG",
+      operator: 'Greater than',
+      value: 10
+    },
+    'Number, Less than, Aggregate function: Minimum, as admin': {
+      user: 'admin',
+      fieldType: 'number',
+      aggregateFunction: "MIN",
+      operator: 'Less than',
+      value: 10
+    },
+    'Number, Greater than or equal to, Aggregate function: Maximum, as admin': {
+      user: 'admin',
+      fieldType: 'number',
+      aggregateFunction: "MAX",
+      operator: 'Greater than or equal to',
+      value: 10
+    },
+    'Number, Less than or equal to, Aggregate function: Count, as admin': {
+      user: 'admin',
+      fieldType: 'number',
+      aggregateFunction: "Count",
+      operator: 'Less than or equal to',
+      value: 10
+    },
+    'Number, Greater than, Aggregate function: default, as admin': {
       user: 'admin',
       fieldType: 'number',
       aggregateFunction: false,
-      operator: 'Greater than'
+      operator: 'Greater than',
+      value: 10
     },
     'Number, Less than, Aggregate function: default, as admin': {
       user: 'admin',
       fieldType: 'number',
       aggregateFunction: false,
-      operator: 'Less than'
+      operator: 'Less than',
+      value: 10
     },
     'Number, Greater than ot equal to, Aggregate function: default, as admin': {
       user: 'admin',
       fieldType: 'number',
       aggregateFunction: false,
-      operator: 'Greater than ot equal to'
+      operator: 'Greater than or equal to',
+      value: 10
     },
-    'Number, Less than ot equal to, Aggregate function: default, as admin': {
+    'Number, Less than or equal to, Aggregate function: default, as admin': {
       user: 'admin',
       fieldType: 'number',
       aggregateFunction: false,
-      operator: 'Less than ot equal to'
+      operator: 'Less than or equal to',
+      value: 10
     },
     'Number, Equal to, Aggregate function: default, as admin': {
       user: 'admin',
       fieldType: 'number',
       aggregateFunction: false,
-      operator: 'Equal to'
+      operator: 'Equal to',
+      value: 10
     },
     'Number, Not equal to, Aggregate function: default, as admin': {
       user: 'admin',
       fieldType: 'number',
       aggregateFunction: false,
-      operator: 'Not equal to'
-    }*/
+      operator: 'Not equal to',
+      value: 10
+    }
+
     //TODO add between operator for number as admin
     //TODO add custom date for admin
-    //TODO add number with agg functions
+    //TODO add number with between operator as admin
 
     //TODO add between operator for number as user
     //TODO add custom date for user
-    //TODO add number with agg functions
+    //TODO add number with between operator as user
+
+    //TODO add check for multiple filters. Make it as separate test
   };
 
   beforeAll(function () {
@@ -302,8 +335,6 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
   using(dataProvider, function (data, description) {
     it('Should add filter to pivot:  ' + description, () => {
       loginPage.loginAs(data.user);
-      //TODO enable when work under this test is done
-      //homePage.navigateToSubCategory(categoryName, subCategoryName, defaultCategory);
       commonFunctions.waitFor.elementToBeClickableAndClick(homePage.cardViewButton);
 
       // Create Pivot
@@ -333,16 +364,25 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
       }
 
 
-      //Scenario for group intervals
+      // Scenario for group intervals
       if (data.groupIntervalSpecified) {
         designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName).click();
         designModePage.pivot.groupIntervalDropDown.click();
         designModePage.pivot.groupIntervalDropDownElement(data.groupInterval).click();
       }
 
+      // Scenario for aggregate functions
+      if (data.aggregateFunction) {
+        commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.aggregateFunctionButton("Sum"));
+        // Have to add sleep for elements to be rendered. They appear in DOM faster than they can be actually clicked
+        browser.sleep(1000);
+        commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+      }
+
       // Add filter
       const filterWindow = designModePage.filterWindow;
       commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.filterBtn);
+      browser.sleep(1000); // headless mode makes fake click on columnDropDown without wait
       commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.columnDropDown);
       commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.columnNameDropDownItem(filter.columnName));
 
@@ -354,20 +394,19 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
       // Scenario for numbers
       if (data.fieldType === 'number') {
-
+        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.operator);
+        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.operatorDropDownItem(data.operator));
+        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.input);
+        filterWindow.number.input.clear().sendKeys(data.value);
       }
 
-      //Scenario for strings
+      // Scenario for strings
       if (data.fieldType === 'string') {
         commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.operator);
         commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.operatorDropDownItem(data.operator));
         // TODO rewrite since there is layout error
         commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.input);
         filterWindow.string.input.clear().sendKeys(data.value);
-      }
-
-      if (data.filtersAreTrue) {
-
       }
 
       commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.applyFiltersBtn);
