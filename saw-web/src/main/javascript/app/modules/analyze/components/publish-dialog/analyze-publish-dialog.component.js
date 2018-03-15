@@ -4,6 +4,8 @@ import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
 import * as moment from 'moment';
+import * as fpMap from 'lodash/fp/map';
+import * as fpPipe from 'lodash/fp/pipe';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
@@ -61,25 +63,32 @@ export const AnalyzePublishDialogComponent = {
       this.endCriterion = this.endCriteria.never.keyword;
       this.loadCronLayout = false;
       this._$rootScope = $rootScope;
+      this.ftp = [];
+      this.locations = [];
     }
 
     $onInit() {
       this.scheduleState = 'new';
-      this.hasDispatch = false;
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
         .then(response => {
           this.dataHolder = response;
           this.setDefaultCategory();
           this.fetchCronDetails();
         });
-      this.locations = ['alias1','alias2','alias3','alias4'];
-      this.ftp = '';
+    }
+
+    getFTPLocations() {
+      this._AnalyzeService.getlistFTP(this.resp.ticket.custCode).then(response => {
+        console.log(response);
+        this.locations = ['alias1','alias2','alias3','alias4','alias5'];
+      });
     }
 
     fetchCronDetails() {
-      this.ftp = ['alias1','alias2','alias3'];
       this.$dialog.showLoader();
-      this.hasDispatch = false;
+      if (this.model.type !== 'chart') {
+        this.getFTPLocations();
+      }
       this.requestCron = {
         jobName: this.model.id,
         categoryId: this.model.categoryId,
@@ -99,12 +108,9 @@ export const AnalyzePublishDialogComponent = {
           if (response.data.data.jobDetails.analysisID) {
             this.scheduleState = 'exist';
           }
-          // if (response.data.data.jobDetails.ftp === 'true') {
-          //   this.hasDispatch = true;
-          // } else {
-          //   this.hasDispatch = false;
-          // }
-          this.ftp = ['alias1','alias2','alias3'];
+          if (this.model.type !== 'chart') {
+            this.ftp = response.data.data.jobDetails.ftp;
+          }
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
         }
@@ -138,8 +144,6 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
-      this.cronValidateFlag = false;
-      this.emailValidateFlag = false;
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
         this.model.schedule = {
@@ -150,8 +154,6 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
-        console.log(this.ftp);
-        return;
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -161,7 +163,7 @@ export const AnalyzePublishDialogComponent = {
           cronExpression: this.crondetails.cronexp,
           description: this.description,
           emailList: this.emails,
-          ftp: this.hasDispatch,
+          ftp: this.ftp,
           fileType: 'csv',
           jobName: this.model.id,
           metricName: this.model.metricName,
@@ -182,44 +184,52 @@ export const AnalyzePublishDialogComponent = {
     }
 
     validateForm() {
-      this.errorFlagMsg = false;
-      this.emailValidateFlag = false;
-      this.cronValidateField = false;
-      // Validation for: Schedule/CronExp is mandatory any type of schedule/publish.
-      if (isEmpty(this.crondetails.cronexp)) {
-        this.cronValidateField = true;
-        return false;
-      }
-      // Validation for: Email entry is mandatory for charts as dispatch is hidden.
-      if (isEmpty(this.emails) && this.model.type === 'chart') {
-        this.emailValidateFlag = true;
-        return false;
-      }
-      // Validation for: user has to select either dispatch to ftp or enter emails or both.
-      if (isEmpty(this.emails) && isEmpty(this.ftp)) {
+      this.errorFlagMsg = this.emailValidateFlag = this.cronValidateField = false;
+      const validationCheck = true;
+
+      const validateFields = {
+        emails: this.validateEmails(this.emails),
+        schedule: this.validateSchedule(),
+        publish: this.validatePublishSelection()
+      };
+      const validate = fpPipe(
+        fpMap(check => {
+          if (check === false) {
+            validationCheck = false;
+          }
+        })
+      )(validateFields);
+      return validationCheck;
+    }
+
+    validatePublishSelection() {
+      if (isEmpty(this.emails) && isEmpty(this.ftp) && this.model.type !== 'chart') {
         this.errorFlagMsg = true;
-        return false;
-      }
-      // Validation for: User needs to enter emails in the correct format in the list
-      if (!isEmpty(this.emails) && !this.validateEmails(this.emails)) {
-        this.emailValidateFlag = true;
         return false;
       }
       return true;
     }
 
-    validateEmails(emails) {
-      if (isEmpty(emails)) {
+    validateSchedule() {
+      if (isEmpty(this.crondetails.cronexp)) {
+        this.cronValidateField = true;
         return false;
       }
+    }    
+
+    validateEmails(emails) {
       const emailsList = emails;
       let emailsAreValid = true;
+      if (isEmpty(emailsList) && this.model.type === 'chart') {
+        emailsAreValid = false;
+        this.emailValidateFlag = true;
+      }
       forEach(emailsList, email => {
         const isEmailvalid = this.regexOfEmail.test(email.toLowerCase());
         if (!isEmailvalid) {
           emailsAreValid = false;
           // cancel forEach
-          return false;
+          this.emailValidateFlag = true;
         }
       });
       return emailsAreValid;
