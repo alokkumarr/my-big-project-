@@ -44,7 +44,7 @@ export class AddWidgetComponent implements OnInit {
   }
 
   onAnalysisAction({action, analysis}) {
-    this.onWidgetAction.next({
+    this.onWidgetAction.emit({
       widget: 'ANALYSIS',
       action: WIDGET_ANALYSIS_ACTIONS.ADD_ANALYSIS === action ? 'ADD' : 'REMOVE',
       data: analysis

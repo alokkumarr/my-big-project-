@@ -17,6 +17,6 @@ export class WidgetTypeComponent implements OnInit {
   ngOnInit() { }
 
   onChooseType(data: WidgetType) {
-    this.onSelect.next(data);
+    this.onSelect.emit(data);
   }
 }

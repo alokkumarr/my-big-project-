@@ -38,6 +38,6 @@ export class WidgetCategoryComponent implements OnInit {
   }
 
   onSelectSubCategory(data) {
-    this.onSelect.next(data);
+    this.onSelect.emit(data);
   }
 }

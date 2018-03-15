@@ -66,7 +66,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   }
 
   sendAnalysisAction(action, analysis) {
-    this.onAnalysisAction.next({
+    this.onAnalysisAction.emit({
       action, analysis
     });
   }
