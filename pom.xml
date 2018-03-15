@@ -9,6 +9,8 @@
   <name>saw</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Disable Docker Machine configuration by default -->
+    <docker.skip.machine>true</docker.skip.machine>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -136,8 +138,6 @@
         </property>
       </activation>
       <properties>
-        <!-- Disable Docker Machine configuration when local -->
-        <docker.skip.machine>true</docker.skip.machine>
         <!-- Limit access to local machine only by default -->
         <saw.docker.ip>localhost</saw.docker.ip>
       </properties>
