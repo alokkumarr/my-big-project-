@@ -10,6 +10,9 @@ import {
   DATE_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
+  DATE_FORMATS,
+  DATE_FORMATS_OBJ,
+  DEFAULT_DATE_FORMAT,
   AGGREGATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ
@@ -21,6 +24,9 @@ export {
   DATE_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
+  DATE_FORMATS,
+  DATE_FORMATS_OBJ,
+  DEFAULT_DATE_FORMAT,
   AGGREGATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ
@@ -248,15 +254,16 @@ export const DATE_INTERVALS = [{
 }, {
   label: 'Quarter',
   value: 'quarter',
-  format: 'YYYY-Q'
+  format: 'yyyy-QQQ',
+  momentFormat: 'YYYY-Q'
 }, {
   label: 'Month',
   value: 'month',
-  format: 'YYYY-MM'
+  format: 'yyyy-MM',
+  momentFormat: 'YYYY-MM'
 }, {
   label: 'Date',
-  value: 'day',
-  format: 'YYYY-MM-DD'
+  value: 'day'
 }];
 
 export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];

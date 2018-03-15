@@ -1,10 +1,9 @@
-import * as isEmpty from 'lodash/isEmpty';
-
 import * as template from './analyze-list-view.component.html';
 import style from './analyze-list-view.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
+import * as isEmpty from 'lodash/isEmpty';
 
 export const AnalyzeListViewComponent = {
   template,
@@ -57,11 +56,18 @@ export const AnalyzeListViewComponent = {
     }
 
     onUpdateAnalysisType(analysisType) {
+      let scheduleState;
       if (analysisType === 'all') {
         this._gridListInstance.clearFilter();
       } else if (analysisType === 'scheduled') {
         this._gridListInstance.filter(itemData => {
-          return !isEmpty(itemData.scheduleHuman);
+          scheduleState = false;
+          forEach(this.cronJobs, cron => {
+            if (cron.jobDetails.analysisID === itemData.id) {
+              scheduleState = true;
+            }
+          });
+          return scheduleState;
         });
       } else {
         this._gridListInstance.filter(['type', '=', analysisType]);
