@@ -216,20 +216,20 @@ To make a release of the project, execute the following steps:
         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
         $ git push --tags
 
-   Note: The placeholder `<commit>` refers to the revision that has
+3. Note: The placeholder `<commit>` refers to the revision that has
    been selected for the release.
 
-3. Start a customized build of the [project] on the continuous
+4. Start a customized build of the [project] on the continuous
    integration server using the newly created release tag (click the
    "Run" dropdown menu and select "Run customized..." and enter the
    release tag, for example `v1.0.0`, in the Revision field).
 
-4. After starting the build, go to the Build result summary page and
+5. After starting the build, go to the Build result summary page and
    add the label "release" (which ensures it will be available for
    download indefinitely, instead of eventually being expired and
    deleted by the continuous integration server).
 
-5. When the build finishes successfully, announce it by publishing a
+6. When the build finishes successfully, announce it by publishing a
    link to the artifacts page in the project Slack channel.  Also add
    the link to the corresponding [release notes] in Confluence.
 
