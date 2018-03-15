@@ -1,0 +1,6 @@
+{
+  "ftpList": [
+    {"customerName":"SYNCHRONOSS", "alias" : "server1", "host": "107.23.209.12", "port": 21, "username": "chris", "password": "chris123", "location": "/home/chris/", "type": "ftp"},
+    {"customerName":"SYNCHRONOSS", "alias" : "server2", "host": "107.23.209.12", "port": 21, "username": "chris", "password": "chris123", "location": "/home/chris/", "type": "ftp"}
+  ]
+}

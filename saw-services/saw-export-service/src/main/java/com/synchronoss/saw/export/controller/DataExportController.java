@@ -3,6 +3,9 @@ package com.synchronoss.saw.export.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.export.model.ftp.FTPDetails;
+import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.DataResponse;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/exports")
 public class DataExportController {
@@ -28,6 +36,9 @@ public class DataExportController {
 
   @Autowired
   private ExportService exportService;
+
+  @Autowired
+  private FtpCustomer ftpCustomer;
   
   @RequestMapping(value = "/{analysisId}/executions/{executionId}/data", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
@@ -57,10 +68,8 @@ public class DataExportController {
 
   @RequestMapping(value = "/listFTP", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
-  public String[] listFTP() {
-    String[] a = new String[1];
-    a[0] = "a";
-    return a;
+  public List<String> listFTP(RequestEntity request) {
+    return exportService.listFtpsForCustomer(request);
   }
 
 }
