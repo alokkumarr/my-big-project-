@@ -8,7 +8,11 @@ set -eux
 /etc/init.d/rsyslog start
 
 # Start Spark slaves
-/opt/mapr/spark/spark-current/sbin/start-slaves.sh
+#
+# Note: A local Spark context is used to conserve memory in
+# development mode.  If a Spark standalone cluster is enabled,
+# uncomment below to start Spark workers.
+#/opt/mapr/spark/spark-current/sbin/start-slaves.sh
 
 # Wait until MapR-FS is available
 set +x
