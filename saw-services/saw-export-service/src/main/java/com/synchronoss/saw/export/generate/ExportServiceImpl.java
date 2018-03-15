@@ -3,10 +3,13 @@ package com.synchronoss.saw.export.generate;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.AnalysisMetaData;
+import com.synchronoss.saw.export.model.ftp.FTPDetails;
+import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -30,6 +33,9 @@ import com.synchronoss.saw.export.model.DataResponse;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -51,21 +57,8 @@ public class ExportServiceImpl implements ExportService{
   @Value("${spring.mail.body}")
   private String mailBody;
 
-  // FTP config
-  @Value("${ftp.alias}")
-  private String ftpAlias;
-
-  @Value("${ftp.server}")
-  private String ftpServer;
-
-  @Value("${ftp.port}")
-  private int ftpPort;
-
-  @Value("${ftp.username}")
-  private String ftpUsername;
-
-  @Value("${ftp.password}")
-  private String ftpPassword;
+  @Value("${ftp-details-file}")
+  private String ftpDetailsFile;
 
   @Autowired
   private ApplicationContext appContext;
@@ -137,6 +130,7 @@ public class ExportServiceImpl implements ExportService{
         ExportBean exportBean = new ExportBean();
         String recipients =null;
         String ftp = null;
+        String jobGroup = null;
         String dir = UUID.randomUUID().toString();
         MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
         if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
@@ -147,7 +141,10 @@ public class ExportServiceImpl implements ExportService{
           exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
           exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
           recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+          // list of alis ftp servers
           ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
+          // customer unique identifier to limit to that customers ftp servers only
+          jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
         }
         try {
           // create a directory with unique name in published location to avoid file conflict for dispatch.
@@ -155,25 +152,42 @@ public class ExportServiceImpl implements ExportService{
           file.getParentFile().mkdir();
           iFileExporter.generateFile(exportBean ,entity.getBody().getData());
 
-          if (recipients != null)
+          if (recipients != null && recipients != "")
             MailSender.sendMail(recipients, exportBean.getReportName() + " | " +
                     exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
                     exportBean.getFileName());
           logger.debug("Email sent successfully");
 
-          // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
-          if (ftp != null)
-            serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
-                    exportBean.getFileName(), "/",
-                  "report_" + exportBean.getReportName());
-          logger.debug("File successfully dispatched to ftp server");
+          DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+          LocalDateTime now = LocalDateTime.now();
+          if (ftp != null && ftp != "") {
+            for (String aliastemp : ftp.split(",")) {
+              ObjectMapper jsonMapper = new ObjectMapper();
+              try {
+                FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+                for (FTPDetails alias:obj.getFtpList()) {
+                  if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
+                    serviceUtils.uploadToFtp(alias.getHost(),
+                            alias.getPort(),
+                            alias.getUsername(),
+                            alias.getPassword(),
+                            exportBean.getFileName(),
+                            alias.getLocation(),
+                            "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType"));
+                    logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
+                  }
+                }
+              } catch (IOException e) {
+                logger.error(e.toString());
+              }
+            }
+          }
 
           logger.debug("Deleting exported file.");
-
           serviceUtils.deleteFile(exportBean.getFileName(),true);
 
         } catch (IOException e) {
-         logger.error("Exception occured while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
+         logger.error("Exception occurred while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
         }
       }
       @Override
@@ -204,6 +218,7 @@ public class ExportServiceImpl implements ExportService{
         ExportBean exportBean = new ExportBean();
         String recipients =null;
         String ftp = null;
+        String jobGroup = null;
         String dir = UUID.randomUUID().toString();
         MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
         if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
@@ -214,7 +229,10 @@ public class ExportServiceImpl implements ExportService{
           exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
           exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
           recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
+          // list of alis ftp servers
           ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
+          // customer unique identifier to limit to that customers ftp servers only
+          jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
         }
         try {
           // create a directory with unique name in published location to avoid file conflict for dispatch.
@@ -228,24 +246,41 @@ public class ExportServiceImpl implements ExportService{
           Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
           CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
           createPivotTable.createPivot(workbook,file);
-          if (recipients!=null)
+          if (recipients != null && recipients == "")
             MailSender.sendMail(recipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
                     serviceUtils.prepareMailBody(exportBean,mailBody)
                     ,exportBean.getFileName());
           logger.debug("Email sent successfully ");
 
-          // ToDo: as of now doing only in root directory, we will remove this after front end integration is done.
-          if (ftp != null)
-            serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword,
-                    exportBean.getFileName(), "/",
-                    "pivot_" + exportBean.getReportName());
-
-          serviceUtils.uploadToFtp(ftpServer, ftpPort, ftpUsername, ftpPassword, exportBean.getFileName(), "/", exportBean.getReportName());
+          DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
+          LocalDateTime now = LocalDateTime.now();
+          if (ftp != null && ftp != "") {
+            for (String aliastemp : ftp.split(",")) {
+              ObjectMapper jsonMapper = new ObjectMapper();
+              try {
+                FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+                for (FTPDetails alias:obj.getFtpList()) {
+                  if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
+                    serviceUtils.uploadToFtp(alias.getHost(),
+                            alias.getPort(),
+                            alias.getUsername(),
+                            alias.getPassword(),
+                            exportBean.getFileName(),
+                            alias.getLocation(),
+                            "pivot_" + exportBean.getReportName() + dtf.format(now).toString() + "xlsx");
+                    logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
+                  }
+                }
+              } catch (IOException e) {
+                logger.error(e.toString());
+              }
+            }
+          }
 
           logger.debug("Removing the file from published location");
           serviceUtils.deleteFile(exportBean.getFileName(),true);
         } catch (IOException e) {
-          logger.error("Exception occured while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
+          logger.error("Exception occurred while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
         }
       }
       @Override
@@ -263,5 +298,30 @@ public class ExportServiceImpl implements ExportService{
     headers.setContentType(MediaType.APPLICATION_JSON);
     String url = apiExportOtherProperties+"/md?analysisId="+analysisId;
     return restTemplate.getForObject(url, AnalysisMetaData.class);
+  }
+
+  @Override
+  public List<String> listFtpsForCustomer(RequestEntity request) {
+
+    Object dispatchBean = request.getBody();
+    // this job group is customer unique identifier
+    String jobGroup = null;
+    List<String> aliases = new ArrayList<String>();
+
+    if (dispatchBean != null && dispatchBean instanceof LinkedHashMap) {
+      jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
+      ObjectMapper jsonMapper = new ObjectMapper();
+      try {
+        FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+        for (FTPDetails alias:obj.getFtpList()) {
+          if (alias.getCustomerName().equals(jobGroup)) {
+            aliases.add(alias.getAlias());
+          }
+        }
+      } catch (IOException e) {
+        logger.error(e.toString());
+      }
+    }
+    return aliases;
   }
 }

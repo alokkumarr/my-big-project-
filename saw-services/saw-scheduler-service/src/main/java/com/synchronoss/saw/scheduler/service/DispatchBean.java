@@ -11,6 +11,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableDispatchBean.class)
 @JsonDeserialize(as = ImmutableDispatchBean.class)
 interface DispatchBean {
+    @Nullable
     String emailList();
 
     String fileType();

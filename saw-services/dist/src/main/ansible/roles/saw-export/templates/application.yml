@@ -35,3 +35,17 @@ logging:
 
 published:
   path: /tmp
+
+# To configure ftp please modify below configuration
+# the "alias" name will be visible in the front end for
+# users selection.
+#
+#ftp:
+#  alias: front_end_name
+#  server: hostname_or_IP_of_ftp_server
+#  port: 21
+#  username: usr
+#  password: usrpass
+#  location: /home/usr/
+#
+
