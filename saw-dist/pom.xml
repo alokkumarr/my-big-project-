@@ -192,7 +192,7 @@
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
               <amazonec2-ami>${saw.docker.machine.aws.ami}</amazonec2-ami>
               <amazonec2-ssh-user>centos</amazonec2-ssh-user>
-              <amazonec2-userdata>${project.basedir}/user-cloud.yaml</amazonec2-userdata>
+              <amazonec2-userdata>${project.basedir}/src/test/cloud/cloud-config.yaml</amazonec2-userdata>
               <amazonec2-monitoring/>
               <!--
                   Workaround: Docker Machine defaults to devicemapper,

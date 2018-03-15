@@ -110,7 +110,8 @@
       </modules>
       <build>
         <defaultGoal>
-          enforcer:enforce docker:stop docker:build docker:start
+          enforcer:enforce properties:read-project-properties
+          docker:stop docker:build docker:start
         </defaultGoal>
       </build>
       <properties>
@@ -193,35 +194,27 @@
               <fail>true</fail>
             </configuration>
           </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0.0</version>
+            <configuration>
+              <files>
+                <file>${project.parent.basedir}/saw-dist/src/test/cloud/cloud-region-${env.SAW_AWS_REGION}.properties</file>
+              </files>
+              <!-- Workaround: The properties plug-in is invoked for
+                   the parent project too, for which the path above
+                   cannot be found.  As a workaround configure the
+                   plug-in to be quiet to work around that error.  The
+                   Maven profile should perhaps somehow be moved into
+                   the submodule instead, so that dist-related
+                   plug-ins are not invoked at the top-level
+                   -->
+              <quiet>true</quiet>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
-    </profile>
-    <!-- Region-specific cloud Docker Machine profiles -->
-    <profile>
-      <id>docker-start-cloud-us</id>
-      <activation>
-        <property>
-          <name>env.SAW_AWS_REGION</name>
-          <value>us</value>
-        </property>
-      </activation>
-      <properties>
-        <saw.docker.machine.aws.region>us-east-1</saw.docker.machine.aws.region>
-        <saw.docker.machine.aws.ami>ami-4bf3d731</saw.docker.machine.aws.ami>
-      </properties>
-    </profile>
-    <profile>
-      <id>docker-start-cloud-in</id>
-      <activation>
-        <property>
-          <name>env.SAW_AWS_REGION</name>
-          <value>in</value>
-        </property>
-      </activation>
-      <properties>
-        <saw.docker.machine.aws.region>ap-south-1</saw.docker.machine.aws.region>
-        <saw.docker.machine.aws.ami>ami-5d99ce32</saw.docker.machine.aws.ami>
-      </properties>
     </profile>
   </profiles>
 </project>
