@@ -1,26 +1,44 @@
 
 
-
-
-
-
-
+#'DataFrame Roller Function
+#'
+#'Function appends rolling calculated fields to dataframe. Allows for grouping and
+#'ordering calculations.
+#'
+#'
+#'
+#'@param df DataFrame
+#'@param order_vars optional vector of column names to arrange data by. can be
+#'  one or more columns. default is NULL. order matters - arranges left to
+#'  right. supports decreasing ordering - see examples.
+#'@param group_vars optional vector of column names to group data by. can be one
+#'  or more columns. default is NULL
+#'@param measure_vars vector of column names to apply functional transformation
+#'  to. can be one or more columns
+#'@param fun transformation function. accepts either fun name string or a
+#'  expression wrapped in funs() call. see examples for example of using custom
+#'  function with funs()
+#'@param ... additional arguments to pass to the transformation function
+#'
+#'@return DataFrame with additional calculated columns appended
 #'@export
+#'
+#' @examples
 roller <- function(df, ...) {
   UseMethod("roller", df)
 }
 
 
 
+#' @rdname roller
 roller.data.frame <- function(df,
                               order_vars,
-                              group_vars,
+                              group_vars = NULL,
                               measure_vars,
                               fun,
                               width,
-                              by,
-                              partial,
-                              mode,
+                              by = 1,
+                              partial = TRUE,
                               ...) {
   args <- roller_args(order_vars,
                       group_vars,
@@ -28,120 +46,107 @@ roller.data.frame <- function(df,
                       fun,
                       width,
                       by,
-                      mode,
+                      partial,
                       ...)
+
+
+  order_vars <- args$order_vars
+  group_vars <- args$group_vars
+  measure_vars <- args$measure_vars
+  fun <- args$fun
+  width <- args$width
+  by <- args$by
+  partial <- args$partial
+
+
+  .fun <- fun
+  fname <- names(.fun) <- fun
+
+  if (!is.null(group_vars)) {
+    df <- df %>% dplyr::group_by_at(group_vars)
+  }
+
+  if (!is.null(order_vars)) {
+    df <- df %>% dplyr::arrange_at(order_vars)
+  }
+
+  df2 <- df %>%
+    mutate_at(
+      .,
+      measure_vars,
+      funs(var = zoo::rollapply),
+      width = width,
+      by = by,
+      align = "right",
+      FUN = .fun,
+      fill = NA,
+      partial = partial,
+      ...
+    )
+
+
+  if (!is.null(group_vars)) {
+    df2 <- df2 %>% ungroup()
+  }
+
+  # Rename new measure variables
+  new_measure_vars <- setdiff(colnames(df2), colnames(df))
+  df2 <- dplyr::rename_(df2, .dots = setNames(new_measure_vars,
+                                              paste(
+                                                measure_vars, paste0(width, "w"), fname, sep = "_"
+                                              )))
+
+  df2
 }
 
 
+
+#' @rdname roller
 roller.tbl_spark <- function(df,
                              order_vars,
-                             group_vars,
+                             group_vars = NULL,
                              measure_vars,
                              fun,
                              width,
-                             by,
-                             partial = FALSE,
-                             mode = "summarise",
                              ...) {
+
+  stopifnot("tbl_spark" %in% class(df))
+  DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS df"))
+  sparklyr::sdf_register(df, "df")
+  new_tbl_name <- "df_roll"
+
   args <- roller_args(
     order_vars = order_vars,
     group_vars = group_vars,
     measure_vars = measure_vars,
     fun = fun,
     width = width,
-    by = by,
-    partial = partial,
-    mode = mode,
+    by = 1,
+    partial = FALSE,
     ...
   )
 
-  # Define index variables
-  indx_var <- paste(order_vars[1], "rn", sep = "_")
-  indx_grp_var <- paste(indx_var, "grp", sep = "_")
+  order_vars <- args$order_vars
+  group_vars <- args$group_vars
+  measure_vars <- args$measure_vars
+  fun <- args$fun
+  width <- args$width
 
-  # Add row numbers
-  df2 <- df %>%
-    mutater(
-      .,
-      order_vars = args$order_vars,
-      group_vars = args$group_vars,
-      measure_vars = args$order_vars[1],
-      funs(rn = row_number())
-    )
 
-  # Define groupings based on by parameter
-  df3 <- df2 %>%
-    mutater(.,
-            measure_vars = indx_var,
-            fun = funs(grp = args$by * ceil(. / args$by))) %>%
-    # create lags for the width
-    lagger(
-      .,
-      order_vars = args$order_vars[1],
-      group_vars = args$group_vars,
-      measure_vars = indx_var,
-      lags = 1:(args$width - 1)
-    ) %>%
-    # filter to max order var for each group
-    dplyr::group_by_at(indx_grp_var) %>%
-    dplyr::filter_at(indx_var, any_vars(. == max(.))) %>%
-    dplyr::filter_at(indx_var, any_vars(. >= ifelse(partial, 1, args$width))) %>%
-    # convert lag values to long format
-    melter(
-      .,
-      id_vars = c(args$group_vars, indx_grp_var),
-      measure_vars = c(indx_var, paste(indx_var, paste0(
-        "lag", 1:(args$width - 1)
-      ), sep =
-        "_")),
-      value_name = indx_var
-    ) %>%
-    # join back to df and summarise
-    dplyr::inner_join(.,
-                      df2,
-                      by = c(args$group_vars, indx_var)) %>%
-    summariser(
-      .,
-      group_vars = c(args$group_vars, indx_grp_var),
-      measure_vars = args$measure_vars,
-      fun = args$fun
-    )
+  sc <- df %>%
+    sparklyr::spark_dataframe() %>%
+    sparklyr::spark_connection()
 
-  # Rename index group varible
-  df3 <- df3 %>%
-    dplyr::select_(.dots = stats::setNames(colnames(df3),
-                                           c(
-                                             args$group_vars,
-                                             indx_var,
-                                             paste(args$measure_vars,
-                                                   args$fun,
-                                                   sep = "_")
-                                           )))
-
-  # Format output
-  if (mode == "mutate") {
-    df4 <- df3 %>%
-      dplyr::right_join(df2,
-                        by = c(args$group_vars, indx_var)) %>%
-      dplyr::select_at(c(
-        args$order_vars,
-        args$group_vars,
-        args$measure_vars,
-        paste(args$measure_vars, args$fun, sep = "_")
-      ))
+  query <- paste("CREATE TABLE", new_tbl_name, "as SELECT",
+                 paste(colnames(df), collapse=", "))
+  for(var in measure_vars){
+    query <- paste0(query, ", ", sql_over_translator(var, fun, group_vars, order_vars, width))
   }
-  if (mode == "summarise") {
-    df4 <- df3 %>%
-      dplyr::inner_join(df2,
-                        by = c(args$group_vars, indx_var)) %>%
-      dplyr::select_at(c(
-        args$order_vars,
-        args$group_vars,
-        paste(args$measure_vars, args$fun, sep = "_")
-      ))
-  }
+  query <- paste(query, "FROM df")
 
-  df4
+  DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS", new_tbl_name))
+  DBI::dbSendQuery(sc, query)
+  tbl(sc, new_tbl_name)
 }
 
 
@@ -161,7 +166,6 @@ new_roller_args <- function(order_vars,
                             width,
                             by,
                             partial,
-                            mode,
                             ...) {
   stopifnot(is.character(order_vars) | is.null(order_vars))
   stopifnot(is.character(group_vars) | is.null(group_vars))
@@ -170,7 +174,6 @@ new_roller_args <- function(order_vars,
   stopifnot(is.numeric(by))
   stopifnot(is.numeric(width))
   stopifnot(is.logical(partial))
-  stopifnot(is.character(mode))
 
   structure(
     list(
@@ -181,7 +184,6 @@ new_roller_args <- function(order_vars,
       width = width,
       by = by,
       partial = partial,
-      mode = mode,
       ...
     ),
     class = "roller_args"
@@ -202,11 +204,12 @@ validate_roller_args <- function(x) {
     "max",
     "sum",
     "mean",
+    "var",
     "variance",
     "sd",
+    "stddev",
     "kurtosis",
-    "skewness",
-    "percentile"
+    "skewness"
   )
   if (!all(x$fun %in% funs)) {
     stop(
@@ -232,9 +235,6 @@ validate_roller_args <- function(x) {
   if (x$width < 1) {
     stop("width should be >= 1", .call = FALSE)
   }
-  if (!x$mode %in% c("mutate", "summarise")) {
-    stop("mode should be either 'mutate', or 'summarise'")
-  }
 
   x
 }
@@ -257,7 +257,6 @@ roller_args <- function(order_vars,
                         width,
                         by,
                         partial,
-                        mode,
                         ...) {
   new_roller_args(order_vars,
                   group_vars,
@@ -266,7 +265,164 @@ roller_args <- function(order_vars,
                   width,
                   by,
                   partial,
-                  mode,
                   ...) %>%
     validate_roller_args()
 }
+
+
+
+
+sql_fun_translator <- function(fun) {
+  ifelse(fun == "mean", "avg",
+         ifelse(fun == "sd", "stddev",
+                ifelse(fun == "var", "variance", fun)))
+}
+
+
+#' OVER SQL Translation funcion
+#'
+#' Helper function to create OVER sql statement
+sql_over_translator <- function(var,
+                                fun,
+                                group_vars,
+                                order_vars,
+                                width,
+                                new_name = NULL) {
+  paste0(
+    sql_fun_translator(fun),
+    "(",
+    var,
+    ") OVER (",
+    ifelse(is.null(group_vars), "", paste(
+      "PARTITION BY", paste0(group_vars, collapse = ", ")
+    )),
+    ifelse(is.null(order_vars), "", paste(
+      " ORDER BY", paste0(order_vars, collapse = ", ")
+    )),
+    " ROWS BETWEEN ",
+    width - 1,
+    " PRECEDING and CURRENT ROW)",
+    " AS ",
+    ifelse(
+      is.null(new_name),
+      paste(var, paste0(width, "w"), fun, sep = "_"),
+      new_name
+    )
+  )
+}
+
+
+
+
+
+#
+# roller.tbl_spark_dep <- function(df,
+#                              order_vars,
+#                              group_vars,
+#                              measure_vars,
+#                              fun,
+#                              width,
+#                              by,
+#                              partial = FALSE,
+#                              mode = "summarise",
+#                              ...) {
+#   args <- roller_args(
+#     order_vars = order_vars,
+#     group_vars = group_vars,
+#     measure_vars = measure_vars,
+#     fun = fun,
+#     width = width,
+#     by = by,
+#     partial = partial,
+#     mode = mode,
+#     ...
+#   )
+#
+#   # Define index variables
+#   indx_var <- paste(order_vars[1], "rn", sep = "_")
+#   indx_grp_var <- paste(indx_var, "grp", sep = "_")
+#
+#   # Add row numbers
+#   df2 <- df %>%
+#     mutater(
+#       .,
+#       order_vars = args$order_vars,
+#       group_vars = args$group_vars,
+#       measure_vars = args$order_vars[1],
+#       funs(rn = row_number())
+#     )
+#
+#   # Define groupings based on by parameter
+#   df3 <- df2 %>%
+#     mutater(.,
+#             measure_vars = indx_var,
+#             fun = funs(grp = args$by * ceil(. / args$by))) %>%
+#     # create lags for the width
+#     lagger(
+#       .,
+#       order_vars = args$order_vars[1],
+#       group_vars = args$group_vars,
+#       measure_vars = indx_var,
+#       lags = 1:(args$width - 1)
+#     ) %>%
+#     # filter to max order var for each group
+#     dplyr::group_by_at(indx_grp_var) %>%
+#     dplyr::filter_at(indx_var, any_vars(. == max(.))) %>%
+#     dplyr::filter_at(indx_var, any_vars(. >= ifelse(partial, 1, args$width))) %>%
+#     # convert lag values to long format
+#     melter(
+#       .,
+#       id_vars = c(args$group_vars, indx_grp_var),
+#       measure_vars = c(indx_var, paste(indx_var, paste0(
+#         "lag", 1:(args$width - 1)
+#       ), sep =
+#         "_")),
+#       value_name = indx_var
+#     ) %>%
+#     # join back to df and summarise
+#     dplyr::inner_join(.,
+#                       df2,
+#                       by = c(args$group_vars, indx_var)) %>%
+#     summariser(
+#       .,
+#       group_vars = c(args$group_vars, indx_grp_var),
+#       measure_vars = args$measure_vars,
+#       fun = args$fun
+#     )
+#
+#   # Rename index group varible
+#   df3 <- df3 %>%
+#     dplyr::select_(.dots = stats::setNames(colnames(df3),
+#                                            c(
+#                                              args$group_vars,
+#                                              indx_var,
+#                                              paste(args$measure_vars,
+#                                                    args$fun,
+#                                                    sep = "_")
+#                                            )))
+#
+#   # Format output
+#   if (mode == "mutate") {
+#     df4 <- df3 %>%
+#       dplyr::right_join(df2,
+#                         by = c(args$group_vars, indx_var)) %>%
+#       dplyr::select_at(c(
+#         args$order_vars,
+#         args$group_vars,
+#         args$measure_vars,
+#         paste(args$measure_vars, args$fun, sep = "_")
+#       ))
+#   }
+#   if (mode == "summarise") {
+#     df4 <- df3 %>%
+#       dplyr::inner_join(df2,
+#                         by = c(args$group_vars, indx_var)) %>%
+#       dplyr::select_at(c(
+#         args$order_vars,
+#         args$group_vars,
+#         paste(args$measure_vars, args$fun, sep = "_")
+#       ))
+#   }
+#
+#   df4
+# }
