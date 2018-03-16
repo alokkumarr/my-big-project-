@@ -6,6 +6,8 @@ ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-scheduler-service/saw-schedule
 SyslogIdentifier=saw-scheduler
 User=mapr
 Restart=on-failure
+# Allow service to exit on SIGTERM
+SuccessExitStatus=143
 
 [Install]
 WantedBy=default.target

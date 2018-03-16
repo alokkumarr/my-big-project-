@@ -1,17 +1,16 @@
 import * as defaults from 'lodash/defaults';
 import * as forEach from 'lodash/forEach';
 
-export function dxDataGridService() {
-
-  return {
-    mergeWithDefaultConfig
-  };
-
-  function mergeWithDefaultConfig(config) {
-    return defaults({}, config, getDefaultConfig());
+export class dxDataGridService {
+  constructor() {
+    'ngInject';
   }
 
-  function getDefaultConfig() {
+  mergeWithDefaultConfig(config) {
+    return defaults({}, config, this.getDefaultConfig());
+  }
+
+  getDefaultConfig() {
     return {
       columnAutoWidth: true,
       columnMinWidth: 150,

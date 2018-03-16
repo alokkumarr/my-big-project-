@@ -1,0 +1,15 @@
+@import "themes/base/colors";
+
+details-dialog {
+  .margin20 {
+    margin: 3px;
+    width: 100%;
+  }
+
+  .input-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 9vh;
+  }
+}

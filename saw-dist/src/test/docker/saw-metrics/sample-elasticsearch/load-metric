@@ -27,7 +27,7 @@ load_data() {
     echo "Loading sample Elasticsearch data"
     curl_json PUT "$index_url" $dir/index.json
     for data in $dir/data-*.json; do
-        curl_json POST "$index_url/sample" $data
+        curl_json POST "$index_url/sample" $data > /dev/null
     done
 }
 

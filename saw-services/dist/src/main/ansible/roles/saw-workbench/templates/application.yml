@@ -1,0 +1,32 @@
+info:
+  component: Synchronoss Workbench Service
+spring:
+  application:
+    name: saw-workbench-service
+  http:
+    multipart:
+      max-request-size: 25MB
+      max-file-size: 25MB
+server:
+  address: localhost
+  port: 9701
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
+logging:
+  config: /opt/bda/saw-workbench-service/conf/logback.xml
+workbench:
+        project-key: "{{ saw_workbench_project_key | default('workbench') }}"
+        project-path: "{{ saw_workbench_project_path | default('/raw') }}"
+        project-root: "{{ saw_workbench_project_root | default('maprfs:///main') }}"
+        preview-limit: {{ saw_workbench_preview_limit | default('100') }}
+        livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
+metastore:
+    base:  {{ saw_workbench_metadata | default('hdfs:///main/') }}

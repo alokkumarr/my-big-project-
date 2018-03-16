@@ -18,7 +18,7 @@ spring:
        body: "Hello  </br> Attached is an analysis for your review.</br>Analysis Name: $analysis_name </br>Analysis Description: $analysis_description </br>Publish Time : $publish_time </br> Analysis Created By: $created_by </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
 server:
   address: localhost
-  port: 9400
+  port: 9401
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:

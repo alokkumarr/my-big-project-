@@ -1,0 +1,18 @@
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+  <mat-dialog-content>
+    <mat-list class="formatList" *ngIf="formatArr.length > 0">
+        <h3 mat-subheader>Identified formats</h3>
+      <mat-list-item class="list-items" *ngFor="let format of formatArr; index as i">
+        <p mat-line>{{i + 1}}. &ensp; {{ format }}</p>
+        <mat-divider></mat-divider>
+      </mat-list-item>
+    </mat-list>
+    <mat-form-field class="inpElement">
+      <input matInput formControlName="dateformat" placeholder="{{placeholder}}" />
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button type="submit">OK</button>
+    <button mat-button type="button" style="color: #E5524C;" mat-dialog-close>Cancel</button>
+  </mat-dialog-actions>
+</form>

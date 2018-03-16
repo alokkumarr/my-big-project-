@@ -4,6 +4,7 @@
   roles:
     - saw-transport
     - saw-gateway
+    - saw-workbench
     - saw-export
     - saw-observe
     - saw-scheduler
