@@ -45,7 +45,7 @@ To build and test the project execute the following commands:
         $ mvn verify
 
 This includes running both unit and integration tests.  The release
-package will be located at `saw-dist/target/saw-*.tgz`.
+package will be located at `dist/target/saw-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
 integration tests can run.
@@ -87,7 +87,7 @@ process used to start the containers.  In case containers have been
 left behind and prevent running new SAW containers, existing
 containers can be removed by executing the following command:
 
-        $ docker rm -f saw saw-dist
+        $ docker rm -f saw saw-mapr
 
 [cloud]: development-cloud.md
 
@@ -99,7 +99,7 @@ package and starting a new container, it can take minutes to complete.
 To iterate faster on specific system tests against an existing local
 deployment, run the following command:
 
-        mvn -pl saw-dist test-compile failsafe:integration-test
+        mvn -pl dist test-compile failsafe:integration-test
 
 The above command will immediately start executing system tests
 against an existing local SAW deployment.  Therefore it is possible to
@@ -181,17 +181,17 @@ ensure that the documentation accurately reflects the implementation
 taking into account different versions and branches of the product.
 
 The documentation source files are located in the
-[saw-dist/src/main/asciidoc] directory and are automatically rendered
+[dist/src/main/asciidoc] directory and are automatically rendered
 as part of the project build process.  To render the documentation
 without running other parts of the project build, execute the
 following command:
 
-        $ mvn -pl saw-dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
+        $ mvn -pl dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
 
-The output can be inspected in the `saw-dist/target/generated-docs`
+The output can be inspected in the `dist/target/generated-docs`
 directory.
 
-[saw-dist/src/main/asciidoc]: saw-dist/src/main/asciidoc
+[dist/src/main/asciidoc]: dist/src/main/asciidoc
 
 # Continuous integration
 

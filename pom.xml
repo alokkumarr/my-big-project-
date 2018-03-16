@@ -84,10 +84,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>saw-dist</module>
         <module>saw-security</module>
         <module>saw-services</module>
         <module>saw-web</module>
+        <module>dist</module>
       </modules>
     </profile>
     <!-- Profile that uses the preset container name "saw" and binds
@@ -106,7 +106,7 @@
         </property>
       </activation>
       <modules>
-        <module>saw-dist</module>
+        <module>dist</module>
       </modules>
       <build>
         <defaultGoal>

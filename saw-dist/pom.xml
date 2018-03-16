@@ -7,7 +7,7 @@
     <artifactId>saw</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>saw-dist</artifactId>
+  <artifactId>dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <name>saw-dist</name>
@@ -170,7 +170,7 @@
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
           <!-- Workaround: Remove volumes created for Bamboo agent
                disk space workaround (see the VOLUME directive in
-               "saw-dist/src/test/docker-mapr/Dockerfile". -->
+               "dist/src/test/docker-mapr/Dockerfile". -->
           <removeVolumes>true</removeVolumes>
           <!-- Start containers in parallel to reduce startup time -->
           <startParallel>true</startParallel>
