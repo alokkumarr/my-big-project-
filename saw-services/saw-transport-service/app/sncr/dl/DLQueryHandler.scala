@@ -60,7 +60,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
 
     try {
       verb match {
-        case "preview" => {
+        case "preview" | "" => {
 
           if (analysisId != null) {
 

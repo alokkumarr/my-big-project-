@@ -69,6 +69,10 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.executeSQLNoDataLoad()
           analysisNodeExecution.createAnalysisResult(id, null)
         }
+        case ExecutionType.regularExecution => {
+          analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(id, null)
+        }
       }
       analysisNodeExecution.setFinishTime
       finishTS = analysisNodeExecution.finishedTS
@@ -228,6 +232,5 @@ object ExecutionType extends Enumeration{
   val onetime = Value(0, "onetime")
   val scheduled = Value(1, "scheduled")
   val preview = Value(2, "preview")
-
-
+  val regularExecution= Value(3, "regularExecution")
 }

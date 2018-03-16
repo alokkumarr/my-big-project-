@@ -637,6 +637,7 @@ class Analysis extends BaseController {
         case "preview" => ExecutionType.preview
         case "onetime" => ExecutionType.onetime
         case "scheduled" => ExecutionType.scheduled
+        case "regularExecution" => ExecutionType.regularExecution
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       val execution = analysis.executeAndWaitQueue(
@@ -645,6 +646,7 @@ class Analysis extends BaseController {
             case ExecutionType.preview => executorFastQueue
             case ExecutionType.onetime => executorFastQueue
             case ExecutionType.scheduled => executorRegularQueue
+            case ExecutionType.regularExecution => executorRegularQueue
             case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
           executorQueue.send(executionTypeEnum, analysisId, resultId, query)
