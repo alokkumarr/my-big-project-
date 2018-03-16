@@ -33,6 +33,11 @@ designer-settings-single {
     grid-area: unselected-fields;
     overflow-x: hidden;
     overflow-y: auto;
+
+    .settings__unselected-fields--empty {
+      color: $primary-grey-g3;
+      font-size: 26px;
+    }
   }
 
   .settings__selected-fields {

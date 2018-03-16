@@ -233,6 +233,8 @@ export class DesignerContainerComponent {
     this.cleanSorts();
     if (event.requiresDataChange) {
       this.requestDataIfPossible()
+    } else {
+      this.data = [...this.data];
     }
   }
 

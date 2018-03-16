@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.synchronoss.SAWElasticTransportService;
+import com.synchronoss.querybuilder.model.pivot.DataField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -35,6 +37,8 @@ class SAWPivotTypeElasticSearchQueryBuilder {
   SearchSourceBuilder searchSourceBuilder;
 
   private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+    private final static String VALUE = "value";
+    private final static String SUM ="_sum";
 
   public SAWPivotTypeElasticSearchQueryBuilder(String jsonString) {
     super();
@@ -198,6 +202,29 @@ public String getJsonString() {
     List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields =
         sqlBuilderNode.getDataFields();
 
+      boolean isPercentage = dataFields.stream().anyMatch(dataField ->
+              dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
+
+      //pre-calculation for percentage.
+      if(isPercentage)
+      {
+          SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
+          preSearchSourceBuilder.query(boolQueryBuilder);
+          QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
+          String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
+                  "system","analyse");
+          // Set total sum for dataFields will be used for percentage calculation.
+          objectMapper = new ObjectMapper();
+          JsonNode objectNode = objectMapper.readTree(result);
+          dataFields.forEach (dataField -> {
+              String columnName = dataField.getColumnName();
+              if(dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
+              dataField.getAdditionalProperties()
+                      .put(columnName+SUM, String.valueOf(objectNode.get(columnName
+                      ).get(VALUE)));
+          });
+
+      }
     // Use case I: The below block is only when column & Data Field is not empty & row field is
     // empty
     if ((rowfield.isEmpty() && rowfield.size() == 0)) {
@@ -295,8 +322,6 @@ public String getJsonString() {
       }
     }
 
-    
-    
     // Generated Query
     setSearchSourceBuilder(searchSourceBuilder);
     query = searchSourceBuilder.toString();

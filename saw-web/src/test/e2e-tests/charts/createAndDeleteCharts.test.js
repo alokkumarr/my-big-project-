@@ -77,7 +77,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       }
 
       login.loginAs(data.user);
-      navigateToSubCategory();
+      homePage.navigateToSubCategory(categoryName, subCategoryName, defaultCategory);
 
       // Create analysis
       homePage.createAnalysis(metricName, data.chartType);
@@ -148,18 +148,5 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
         expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
       });
     });
-
-    // Navigates to specific category where analysis creation should happen
-    const navigateToSubCategory = () => {
-      //Collapse default category
-
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
-
-      //Navigate to Category/Sub-category
-      const collapsedCategory = homePage.collapsedCategory(categoryName);
-      const subCategory = homePage.subCategory(subCategoryName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
-    };
   });
 });

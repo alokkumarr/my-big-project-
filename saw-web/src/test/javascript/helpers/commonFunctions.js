@@ -62,14 +62,13 @@ function click(element, i) {
     function () {
     }, function (err) {
       if (err) {
-        console.log("Element '" + element.locator() + "' is not clickable. Retrying. Tempts done: " + (i + 1));
         i++;
         browser.sleep(1000);
         if (i < protractorConf.timeouts.tempts) {
           click(element, i);
         } else {
-          return new Error("Element '" + element.locator() + "' is not clickable after " +
-            protractorConf.timeouts.tempts + " tries. Error: " + err);
+          throw new Error("Element '" + element.locator() + "' is not clickable after " +
+            protractorConf.timeouts.tempts + " attempts. Error: " + err);
         }
       }
     });

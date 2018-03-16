@@ -1,10 +1,9 @@
-import * as isEmpty from 'lodash/isEmpty';
-
 import * as template from './analyze-list-view.component.html';
 import style from './analyze-list-view.component.scss';
 import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
+import * as isEmpty from 'lodash/isEmpty';
 
 export const AnalyzeListViewComponent = {
   template,
@@ -57,11 +56,18 @@ export const AnalyzeListViewComponent = {
     }
 
     onUpdateAnalysisType(analysisType) {
+      let scheduleState;
       if (analysisType === 'all') {
         this._gridListInstance.clearFilter();
       } else if (analysisType === 'scheduled') {
         this._gridListInstance.filter(itemData => {
-          return !isEmpty(itemData.scheduleHuman);
+          scheduleState = false;
+          forEach(this.cronJobs, cron => {
+            if (cron.jobDetails.analysisID === itemData.id) {
+              scheduleState = true;
+            }
+          });
+          return scheduleState;
         });
       } else {
         this._gridListInstance.filter(['type', '=', analysisType]);
@@ -139,7 +145,7 @@ export const AnalyzeListViewComponent = {
         alignment: 'left',
         width: '8%',
         calculateCellValue: rowData => {
-          return (rowData.type || '').toUpperCase();
+          return this.checkRowType(rowData);
         },
         cellTemplate: 'typeCellTemplate'
       }, {
@@ -180,7 +186,7 @@ export const AnalyzeListViewComponent = {
     generateSchedule(rowData) {
       let scheduleHuman = '';
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === rowData.id) {
+        if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
           const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
           scheduleHuman = cronstrue.toString(localCron);
         }
@@ -197,6 +203,14 @@ export const AnalyzeListViewComponent = {
       splitArray[2] = UtcTime[1];
       return splitArray.join(' ');
 
+    }
+
+    checkRowType(rowData) {
+      let analysisType = rowData.type;
+      if (rowData.type === 'esReport') {
+        analysisType = 'REPORT';
+      }
+      return analysisType.toUpperCase();
     }
   }
 };

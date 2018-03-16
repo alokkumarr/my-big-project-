@@ -32,7 +32,7 @@ public class BuilderUtil
 
      public static final String SUFFIX = ".keyword";
      public static final int SIZE = ((System.getProperty("aggr.es.size")!=null && !System.getProperty("aggr.es.size").equals("")) ? Integer.parseInt(System.getProperty("aggr.es.size")):1000);
-  
+
 	/**
 	 * This method is used to load the json string to object tree
 	 * @param jsonString

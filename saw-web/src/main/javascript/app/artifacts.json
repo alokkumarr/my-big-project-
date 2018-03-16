@@ -47,7 +47,7 @@
             ]
           }
         ],
-        filters: [
+        "filterWindow": [
           {
             column_name: 'col2',
             boolean_criteria: 'AND',
