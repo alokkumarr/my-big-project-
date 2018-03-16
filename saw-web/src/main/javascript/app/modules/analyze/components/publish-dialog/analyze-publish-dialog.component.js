@@ -80,7 +80,7 @@ export const AnalyzePublishDialogComponent = {
     getFTPLocations() {
       this._AnalyzeService.getlistFTP(this.resp.ticket.custCode).then(response => {
         this.locations = response.data.data.ftps;
-        //this.locations = ['alias1', 'alias2', 'alias3', 'alias4', 'alias5'];
+        // this.locations = ['alias1', 'alias2', 'alias3', 'alias4', 'alias5'];
       });
     }
 
