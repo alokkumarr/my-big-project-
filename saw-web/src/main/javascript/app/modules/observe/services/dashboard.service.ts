@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class DashboardService {
 
-  public dashboardWidgets = new Subject();
+  public dashboardWidgets = new BehaviorSubject([]);
 
   constructor() { }
 }
