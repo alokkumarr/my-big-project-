@@ -18,14 +18,20 @@ public class XDFTimestampconverter implements UDF3<String, String, String, Strin
 
         // Convert xdfTimestamp to string representation and then to specified format
 
-        // Check if null or empty
-        String _dt = (_xdfDate == null || _xdfDate.isEmpty()) ? "10000101" : _xdfDate;
-        String _tm = (_xdfTime == null || _xdfTime.isEmpty()) ? "000000" : _xdfTime;
+        String _dt = null;
+        String _tm = null;
 
-        // Convert
-        DateTimeFormatter srcDtfmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        DateTimeFormatter dstDtfmt = DateTimeFormatter.ofPattern(fmt);
-        TemporalAccessor t = LocalDateTime.parse(_dt + _tm, srcDtfmt);
-        return dstDtfmt.format(t);
+        // Check if null or empty
+        if (_xdfDate == null || _xdfDate.trim().length() == 0) {
+            return null;
+        } else {
+//            _dt = (_xdfDate == null || _xdfDate.isEmpty()) ? "10000101" : _xdfDate;
+            _tm = (_xdfTime == null || _xdfTime.isEmpty()) ? "000000" : _xdfTime;
+            // Convert
+            DateTimeFormatter srcDtfmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+            DateTimeFormatter dstDtfmt = DateTimeFormatter.ofPattern(fmt);
+            TemporalAccessor t = LocalDateTime.parse(_dt + _tm, srcDtfmt);
+            return dstDtfmt.format(t);
+        }
     }
 }
