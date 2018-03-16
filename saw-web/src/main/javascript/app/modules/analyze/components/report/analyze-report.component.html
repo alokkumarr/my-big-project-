@@ -83,6 +83,7 @@
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
             <analyze-report-query [model]="$ctrl.model"
                                   [artifacts]="$ctrl.artifacts"
+                                  (on-query-change)="$ctrl.startDraftMode()"
                                   (on-save)="$ctrl.onSaveQuery($event)">
             </analyze-report-query>
           </div>
@@ -146,7 +147,7 @@
                                columns="$ctrl.columns"
                                show-group-panel="true"
                                show-view-more="true"
-                               ng-show="$ctrl.columns.length">
+                               ng-show="$ctrl.gridData.length">
         </report-grid-container>
         <div class="data-count-limit" ng-if="$ctrl.gridData.length">
           Showing {{$ctrl.gridData.length}} out of {{$ctrl.gridDataTotalCount}} rows. Click on 'Preview' to see more.
