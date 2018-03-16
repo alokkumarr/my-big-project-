@@ -86,10 +86,10 @@ export class FilterService {
         type: column.type,
         tableName: column.table,
         columnName: column.columnName,
-        isRuntimeFilter: frontendFilter.isRuntimeFilter
+        isRuntimeFilter: frontendFilter.isRuntimeFilter,
+        isGlobalFilter: frontendFilter.isGlobalFilter
       };
-
-      if (!frontendFilter.isRuntimeFilter || frontendFilter.model) {
+      if (!(frontendFilter.isRuntimeFilter || frontendFilter.isGlobalFilter) || frontendFilter.model) {
         result.model = frontendFilter.model;
       }
 
@@ -114,7 +114,8 @@ export class FilterService {
       return {
         column,
         model: backendFilter.model,
-        isRuntimeFilter: backendFilter.isRuntimeFilter
+        isRuntimeFilter: backendFilter.isRuntimeFilter,
+        isGlobalFilter: backendFilter.isGlobalFilter
       };
     };
   }
@@ -256,7 +257,7 @@ export class FilterService {
 
       const filterPayload = map(this.frontend2BackendFilter.bind(this)(), result.filters);
       analysis.sqlBuilder.filters = filterPayload.concat(
-        filter(f => !f.isRuntimeFilter, analysis.sqlBuilder.filters)
+        filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
       );
 
       return analysis;

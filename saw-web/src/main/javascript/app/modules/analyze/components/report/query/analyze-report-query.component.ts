@@ -36,6 +36,7 @@ const WARN_DIALOG = {
 export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @Input() model: any;
   @Output() onSave = new EventEmitter<any>();
+  @Output() onQueryChange = new EventEmitter<any>();
 
   @ViewChild('editor') editor: AceEditorComponent;
 
@@ -150,6 +151,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
 
   queryUpdated(query) {
     this.model.queryManual = this.model.query;
+    this.onQueryChange.emit();
   }
 
   doSubmit() {

@@ -20,7 +20,7 @@
 		<url>https://stash.synchronoss.net/scm/bda/sncr_saw.git</url>
 		<tag>HEAD</tag>
   </scm>
-  
+
   <distributionManagement>
 			<repository>
 				<id>client-releases</id>
@@ -33,7 +33,7 @@
 				<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
 			</snapshotRepository>
   </distributionManagement>
-	
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <output.directory>${output}</output.directory>
@@ -167,7 +167,7 @@
         <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 	</dependencies>
---> 
+-->
   <build>
     <plugins>
 	  <plugin>
@@ -195,7 +195,7 @@
          <version>1.3</version>
          <configuration>
 	          <installDirectory>${project.build.directory}</installDirectory>
-	          <workingDirectory>${project.basedir}</workingDirectory> 
+	          <workingDirectory>${project.basedir}</workingDirectory>
 		 </configuration>
         <executions>
           <execution>
@@ -204,8 +204,8 @@
               <goal>install-node-and-npm</goal>
             </goals>
             <configuration>
-              <nodeVersion>v6.9.1</nodeVersion>
-              <npmVersion>3.10.9</npmVersion>
+              <nodeVersion>v8.10.0</nodeVersion>
+              <npmVersion>5.6.0</npmVersion>
             </configuration>
           </execution>
           <execution>
@@ -257,16 +257,16 @@
     </plugins>
   </build>
   <profiles>
-  
-  <!-- 
-  	  profiles : 
-  	   a) default : mvn clean install (for frontend development).	
+
+  <!--
+  	  profiles :
+  	   a) default : mvn clean install (for frontend development).
        b) dev : for full stack development i.e. only war file in target folder deploy it on tomcat from Eclipse.
        c) rpm : for deploying in linux box.
        d) tar : it will generate tar file.
        f) release : This will be used in bamboo for continuous integration & continuous Bamboo.
   -->
-  
+
       <profile>
       <id>release</id>
       <activation>
@@ -289,7 +289,7 @@
               </filesets>
             </configuration>
           </plugin>
-		  
+
 
           <plugin>
             <groupId>com.github.eirslett</groupId>
@@ -307,8 +307,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v6.9.1</nodeVersion>
-                  <npmVersion>3.10.9</npmVersion>
+                  <nodeVersion>v8.10.0</nodeVersion>
+                  <npmVersion>5.6.1</npmVersion>
                 </configuration>
               </execution>
 
@@ -364,12 +364,12 @@
               </execution>
             </executions>
           </plugin>
- 	
+
  		<plugin>
 			<artifactId>maven-war-plugin</artifactId>
 			<version>3.0.0</version>
 			<configuration>
-	
+
 				<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 				<webResources>
 					<resource>
@@ -383,7 +383,7 @@
 					</manifest>
 				</archive>
         	</configuration>
-	   </plugin> 
+	   </plugin>
 	    <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
@@ -392,7 +392,7 @@
      </plugins>
      </build>
     </profile>
-  
+
     <profile>
       <id>dev</id>
       <activation>
@@ -432,8 +432,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v6.9.1</nodeVersion>
-                  <npmVersion>3.10.9</npmVersion>
+                  <nodeVersion>v8.10.0</nodeVersion>
+                  <npmVersion>5.6.0</npmVersion>
                 </configuration>
               </execution>
 
@@ -478,7 +478,7 @@
               </execution>
             </executions>
           </plugin>
- 	
+
  		<plugin>
 			<artifactId>maven-war-plugin</artifactId>
 			<version>3.0.0</version>
@@ -496,11 +496,11 @@
 					</manifest>
 				</archive>
 			</configuration>
-	   </plugin> 
+	   </plugin>
      </plugins>
      </build>
     </profile>
-  
+
     <profile>
       <id>tar</id>
       <activation>
@@ -541,8 +541,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v6.9.1</nodeVersion>
-                  <npmVersion>3.10.9</npmVersion>
+                  <nodeVersion>v8.10.0</nodeVersion>
+                  <npmVersion>5.6.0</npmVersion>
                 </configuration>
               </execution>
 
@@ -587,14 +587,14 @@
               </execution>
             </executions>
           </plugin>
-          
+
         <!--  <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
 				  <configuration>
                       <mainClass>com.sncr.SpringBootWebApplication</mainClass>
                   </configuration>
-              </plugin> 
+              </plugin>
          -->
 
  	<plugin>
@@ -615,7 +615,7 @@
 				</manifest>
 			</archive>
 		</configuration>
-	</plugin> 
+	</plugin>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
@@ -639,7 +639,7 @@
          </plugins>
       </build>
     </profile>
-	
+
       <profile>
       <id>rpm</id>
       <activation>
@@ -680,8 +680,8 @@
                   <goal>install-node-and-npm</goal>
                 </goals>
                 <configuration>
-                  <nodeVersion>v6.9.1</nodeVersion>
-                  <npmVersion>3.10.9</npmVersion>
+                  <nodeVersion>v8.10.0</nodeVersion>
+                  <npmVersion>5.6.0</npmVersion>
                 </configuration>
               </execution>
 
