@@ -447,9 +447,13 @@
       <properties>
         <saw.docker.port>80</saw.docker.port>
         <saw.docker.naming>alias</saw.docker.naming>
-        <saw.mapr.port>18443</saw.mapr.port>
+        <saw.mapr.web.port>18443</saw.mapr.web.port>
+        <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
+        <saw.yarn.resource.port>18088</saw.yarn.resource.port>
+        <saw.yarn.node.port>18042</saw.yarn.node.port>
         <saw.spark.master.port>18080</saw.spark.master.port>
         <saw.spark.worker.port>18081</saw.spark.worker.port>
+        <saw.livy.port>18998</saw.livy.port>
         <saw.kibana.port>15601</saw.kibana.port>
         <saw.journal.port>19531</saw.journal.port>
         <!-- Show Docker image build output by default to keep users
