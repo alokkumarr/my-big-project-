@@ -13,8 +13,6 @@ import style from './report-grid.component.scss';
 import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../../consts';
 import {getFormatter} from '../../../../../../common/utils/numberFormatter';
 
-// const MIN_ROWS_TO_SHOW = 5;
-const COLUMN_WIDTH = 175;
 const DEFAULT_PRECISION = 2;
 
 export const ReportGridComponent = {
@@ -35,7 +33,7 @@ export const ReportGridComponent = {
       this._AnalyzeDialogService = AnalyzeDialogService;
 
       this.settings = {};
-      this.columns = [];
+      this.columns = null;
       this.sorts = [];
     }
 
@@ -78,6 +76,9 @@ export const ReportGridComponent = {
     }
 
     onContextMenuPreparing(e) {
+      if (isEmpty(this.columns)) {
+        return;
+      }
       if (e.target === 'header') {
         e.items = [];
 
@@ -161,6 +162,9 @@ export const ReportGridComponent = {
     }
 
     prepareGridColumns(columns) {
+      if (isEmpty(columns)) {
+        return null;
+      }
       return map(columns, column => {
         const isNumberType = NUMBER_TYPES.includes(column.type);
         if (column.type === 'timestamp') {
@@ -180,9 +184,6 @@ export const ReportGridComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           type: column.type,
           visibleIndex: column.visibleIndex,
-          allowSorting: false,
-          alignment: 'left',
-          width: COLUMN_WIDTH,
           format: isNumberType ? {formatter: getFormatter(column.format)} : column.format
         };
 

@@ -1,4 +1,5 @@
 import * as defaults from 'lodash/defaults';
+import * as forEach from 'lodash/forEach';
 
 export class dxDataGridService {
   constructor() {
@@ -28,7 +29,15 @@ export class dxDataGridService {
       },
       sorting: {
         mode: 'multiple'
-      }
+      },
+      customizeColumns: columns => {
+        forEach(columns, col => {
+          col.allowSorting = false;
+          col.alignment = 'left';
+        });
+      },
+      height: 'auto',
+      width: 'auto'
     };
   }
 }
