@@ -64,7 +64,7 @@
 		<scala.compat.version>2.11</scala.compat.version>
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
-		<metadata.api>1.0.4-SNAPSHOT</metadata.api>
+		<metadata.api>1.0.4-20180316.000610-12</metadata.api>
 	</properties>
   <repositories>
    <repository>
