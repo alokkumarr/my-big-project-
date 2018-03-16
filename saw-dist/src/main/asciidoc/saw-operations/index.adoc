@@ -22,6 +22,10 @@ provided in the environment:
 . Install and configure Apache Spark version 2.1 from the MapR
   Ecosystem Pack on the MapR cluster
 
+. Install and configure Apache Livy from the MapR Ecosystem Pack on
+  the MapR cluster, and set `livy.file.upload.max.size = 500000000` in
+  `livy.conf`
+
 . Provision a MapR user in the MapR cluster (with user ID 500)
 
 . Provision a mail relay host
@@ -91,6 +95,13 @@ To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
 
+==== Upgrading to SAW 2.5
+
+Before upgrading, install and configure Apache Livy from the MapR
+Ecosystem Pack as described in the updated <<Prerequisites>>.  Also
+add the `saw_workbench_livy_uri` parameter to the SAW environment
+configuration (`saw-config`).
+
 === Interfaces
 
 The SAW Web module and supporting services are exposed on port 80 of
@@ -107,6 +118,11 @@ config file to support, HTTP requests with large headers (more than
        client_body_buffer_size 32k;
        client_header_buffer_size 16k;
        large_client_header_buffers 8 64k;
+
+File upload limit settings: Include the below properties in NGINX server
+config file to support larger files upload (more than 1MB) 
+
+       client_max_body_size 25m;
 
 == Maintenance and troubleshooting
 
@@ -204,24 +220,24 @@ objects/artifacts referenced in the metrics.
 
 . Create the security group in the SEC_GROUP table in the SAW Security
 database:
-    
+
     INSERT INTO `SEC_GROUP` (`SEC_GROUP_SYS_ID`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('1', '1', '2017-10-04', 'system');
-    
+
 . Create DSK attribute (fields/columns name) for corresponding
 security group (SEC_GROUP created in step 1):
-    
+
     INSERT INTO `sec_group_dsk_attribute` (`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `SEC_GROUP_SYS_ID`, `ATTRIBUTE_NAME`) VALUES ('1', '1', 'SESSION_ID');
     INSERT INTO `sec_group_dsk_attribute` (`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `SEC_GROUP_SYS_ID`, `ATTRIBUTE_NAME`) VALUES ('2', '1', 'CONTENT_CLASS');
-    
+
 . Create DSK values for corresponding DSK attribute (DSK attribute
 created in step 2):
 
     INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('1', '1', 'AFF2948C-DCFF-4944-8553-51435518AF67');
     INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('2', '1', '945ca612-d3ad-4e6e-9c92-7cff86730235');
-    INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('3', '2', 'VIDEOS'); 
-    
+    INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('3', '2', 'VIDEOS');
+
 . Map the SEC_GROUP to users to apply the DSK filter:
-    
+
     UPDATE USERS SET SEC_GROUP_SYS_ID = '3' WHERE USER_ID = 'analyst.dsk.example_table.report';
 
 NOTE: If any metrics contains more than one data object as analysis

@@ -26,6 +26,7 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
+      this.cronValidateField = false;
       this._JwtService = JwtService;
       this.resp = this._JwtService.getTokenObj();
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
@@ -90,7 +91,7 @@ export const AnalyzePublishDialogComponent = {
             activeTab: response.data.data.jobDetails.activeTab,
             activeRadio: response.data.data.jobDetails.activeRadio
           };
-          if (response.data.data.jobDetails.cronExpression) {
+          if (response.data.data.jobDetails.analysisID) {
             this.scheduleState = 'exist';
           }
           this.emails = response.data.data.jobDetails.emailList;
@@ -126,6 +127,8 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
+      this.cronValidateFlag = false;
+      this.emailValidateFlag = false;
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
         this.model.schedule = {
@@ -139,6 +142,11 @@ export const AnalyzePublishDialogComponent = {
           this.emailValidateFlag = true;
           return;
         }
+        if (isEmpty(this.crondetails.cronexp)) {
+          this.cronValidateField = true;
+          return;
+        }
+
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,

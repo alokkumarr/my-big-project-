@@ -360,7 +360,7 @@ public class ServicesExecuteIT {
    private String getJWTToken() {
        Long tokenValid = 150l;
        String secretKey = "Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=";
-       Map<String, Object> map = new HashMap();
+       Map<String, Object> map = new HashMap<>();
        map.put("valid", true);
        map.put("validUpto", System.currentTimeMillis() + tokenValid * 60 * 1000);
        map.put("validityReason", "");

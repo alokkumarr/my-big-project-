@@ -282,9 +282,13 @@
                   <alias>saw-mapr</alias>
                 </network>
                 <ports>
-                  <port>+saw.docker.ip:saw.mapr.port:8443</port>
+                  <port>+saw.docker.ip:saw.mapr.web.port:8443</port>
+                  <port>+saw.docker.ip:saw.mapr.cldb.port:7222</port>
+                  <port>+saw.docker.ip:saw.yarn.resource.port:8088</port>
+                  <port>+saw.docker.ip:saw.yarn.node.port:8042</port>
                   <port>+saw.docker.ip:saw.spark.master.port:8080</port>
                   <port>+saw.docker.ip:saw.spark.worker.port:8081</port>
+                  <port>+saw.docker.ip:saw.livy.port:8998</port>
                 </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>

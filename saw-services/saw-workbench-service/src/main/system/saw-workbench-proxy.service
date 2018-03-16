@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Workbench Proxy
+Requires=saw-workbench.service
+After=saw-workbench.service
+Requires=saw-workbench-proxy.socket
+After=saw-workbench-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9701
+PrivateTmp=yes

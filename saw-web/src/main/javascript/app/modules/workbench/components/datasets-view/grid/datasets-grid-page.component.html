@@ -1,0 +1,19 @@
+<div class="grid-container">
+  <dx-data-grid id="gridContainer">
+    <div *dxTemplate="let data of 'nameCellTemplate'">
+      <span class="clickable" [innerHTML]="data.value"></span>
+    </div>
+    <div *dxTemplate="let data of 'dsTypeTemplate'">
+      <div class="src-img {{data.value}}"></div>
+    </div>
+    <div *dxTemplate="let data of 'creatorCellTemplate'">
+      <span class="clickable" [innerHTML]="data.value"></span>
+    </div>
+    <div *dxTemplate="let data of 'timecreatedCellTemplate'">
+      <span class="clickable" [innerHTML]="data.value"></span>
+    </div>
+    <div *dxTemplate="let data of 'actionsCellTemplate'">
+      <dataset-actions [id]="data.value"></dataset-actions>
+    </div>
+  </dx-data-grid>
+</div>

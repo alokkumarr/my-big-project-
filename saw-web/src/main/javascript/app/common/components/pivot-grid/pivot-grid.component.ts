@@ -35,7 +35,8 @@ import {
   DATE_TYPES,
   NUMBER_TYPES,
   FLOAT_TYPES,
-  DATE_INTERVALS_OBJ
+  DATE_INTERVALS_OBJ,
+  DATE_FORMATS_OBJ
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
 
@@ -216,13 +217,27 @@ export class PivotGridComponent {
     return fpMap((column: ArtifactColumnPivot) => {
       // manually format dates for day quarter and month dateIntervals
       if (DATE_TYPES.includes(column.type)) {
+        let momentFormat;
         const cloned = clone(column);
         switch (column.dateInterval) {
         case 'day':
-        case 'quarter':
+          cloned.groupInterval = 1;
+          momentFormat = DATE_FORMATS_OBJ[cloned.format].momentValue
+          cloned.manualFormat = cloned.format;
+          cloned.format = {
+            formatter: this.getFormatter(momentFormat)
+          };
+          break;
         case 'month':
-          cloned.type = 'string';
-          cloned.checktype = 'date';
+          cloned.groupInterval = 1;
+          momentFormat = DATE_INTERVALS_OBJ[cloned.dateInterval].momentFormat;
+          cloned.format = {
+            formatter: this.getFormatter(momentFormat)
+          };
+          break;
+        case 'quarter':
+          unset(cloned, 'format');
+          cloned.groupInterval = 1;
           break;
         case 'year':
           cloned.groupInterval = cloned.dateInterval;
@@ -239,6 +254,10 @@ export class PivotGridComponent {
     });
   }
 
+  getFormatter(format) {
+    return value => moment(value).format(format);
+  }
+
   preProcessData(data) {
     if (isPlainObject(data)) {
       data = [data];
@@ -251,7 +270,7 @@ export class PivotGridComponent {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-    const columnsToFormat = filter(this.artifactColumns, ({checktype}) => DATE_TYPES.includes(checktype));
+    const columnsToFormat = filter(this.artifactColumns, ({type}) => DATE_TYPES.includes(type));
     if (isEmpty(columnsToFormat)) {
       return data;
     }
@@ -259,22 +278,32 @@ export class PivotGridComponent {
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
       const dataValue = dataPoint[name];
-      forEach(columnsToFormat, ({name, dateInterval}) => {
-        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval);
+      forEach(columnsToFormat, ({name, dateInterval, manualFormat}) => {
+        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval, manualFormat);
       });
       return clonedDataPoint;
     });
     return formattedData;
   }
 
-  getFormattedDataValue(value, dateInterval) {
-    const format = DATE_INTERVALS_OBJ[dateInterval].format;
-    const formattedValue = moment.utc(value).format(format);
-    if (dateInterval === 'quarter') {
+  getFormattedDataValue(value, dateInterval, format) {
+    let formatToApply;
+    switch (dateInterval) {
+    case 'day':
+      formatToApply = DATE_FORMATS_OBJ[format].momentValue;
+      return moment.utc(value);
+    case 'quarter':
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
+      const formattedValue = moment.utc(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
+    case 'month':
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
+      return moment.utc(value).format(formatToApply);
+    case 'year':
+    default:
+      return value;
     }
-    return formattedValue;
   }
 
   artifactColumn2PivotField(): any {
@@ -300,6 +329,12 @@ export class PivotGridComponent {
         if (cloned.type === 'string') {
           // trim the .keyword suffix from the column name if it is there
           cloned.columnName = split(cloned.columnName, '.')[0];
+        }
+
+        if (DATE_TYPES.includes(cloned.type)) {
+          // disable sorting for the fields that have a type string because of manual formatting
+          // so it doesn't sort the fields accordinbg to the display string
+          cloned.sortBy = 'value';
         }
 
         if (!isUndefined(cloned.aliasName) && cloned.aliasName != '') {

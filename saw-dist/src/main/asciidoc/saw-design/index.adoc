@@ -125,6 +125,20 @@ and Elasticsearch.  Analyses of type report are executed on Apache
 Spark clusters, while analyses of type pivot and chart are executed on
 Elasticsearch clusters.
 
+=== SAW Workbench Service
+
+The SAW Workbench Service enables executing Workbench related operation.  It takes an
+project definition to execute as input, translates it into a Datalake operation and records
+the operation's activity in MaprDB and finally provides the results back to the client.
+
+.Figure: Executing an analysis using the SAW Execution Service
+plantuml::saw-design/figure-workbench-sequence.pum[format=svg]
+
+The SAW Workbench Service supports three types of storage: Apache Spark,
+MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
+semantic metadata configuration REST APU & data wrangling related REST API.
+
+
 ==== Apache Spark
 
 The Apache Spark executor supports analyses of type report.

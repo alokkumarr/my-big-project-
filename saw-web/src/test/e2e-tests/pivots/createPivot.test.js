@@ -1,10 +1,10 @@
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const homePage = require('../javascript/pages/homePage.po.js');
+const loginPage = require('../../javascript/pages/loginPage.po.js');
+const analyzePage = require('../../javascript/pages/analyzePage.po.js');
+const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('../../../../saw-web/conf/protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
-const {hasClass} = require('../javascript/helpers/utils');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const {hasClass} = require('../../javascript/helpers/utils');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 
 describe('Create pivot type analysis: createPivot.test.js', () => {
   const pivotDesigner = analyzePage.designerDialog.pivot;
@@ -55,7 +55,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     const stringFilterInput = filters.getStringFilterInput(0);
     const fieldName = columnField;
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.openFiltersBtn);
+    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
