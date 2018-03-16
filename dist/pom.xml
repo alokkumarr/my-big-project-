@@ -7,7 +7,7 @@
     <artifactId>saw</artifactId>
     <version>${revision}</version>
   </parent>
-  <artifactId>saw-dist</artifactId>
+  <artifactId>dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <name>saw-dist</name>
@@ -164,15 +164,47 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.22.1</version>
+        <version>0.24.0</version>
         <configuration>
+          <!-- Automatically create required Docker networks -->
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
           <!-- Workaround: Remove volumes created for Bamboo agent
                disk space workaround (see the VOLUME directive in
-               "saw-dist/src/test/docker-mapr/Dockerfile". -->
+               "dist/src/test/docker-mapr/Dockerfile". -->
           <removeVolumes>true</removeVolumes>
           <!-- Start containers in parallel to reduce startup time -->
           <startParallel>true</startParallel>
+          <!-- Ignore the Docker Machine configuration by default, and
+               only enable it from the cloud profile when needed -->
+          <skipMachine>${docker.skip.machine}</skipMachine>
+          <!-- Configure Docker Machine -->
+          <machine>
+            <name>user-${env.SAW_AWS_USERNAME}</name>
+            <autoCreate>true</autoCreate>
+            <createOptions>
+              <driver>amazonec2</driver>
+              <amazonec2-region>${saw.docker.machine.aws.region}</amazonec2-region>
+              <amazonec2-access-key>${env.SAW_AWS_ACCESS_KEY_ID}</amazonec2-access-key>
+              <amazonec2-secret-key>${env.SAW_AWS_SECRET_ACCESS_KEY}</amazonec2-secret-key>
+              <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
+              <amazonec2-root-size>32</amazonec2-root-size>
+              <!-- Use CentOS 7 image, see
+                   https://wiki.centos.org/Cloud/AWS for AMI IDs -->
+              <amazonec2-ami>${saw.docker.machine.aws.ami}</amazonec2-ami>
+              <amazonec2-ssh-user>centos</amazonec2-ssh-user>
+              <amazonec2-userdata>${project.basedir}/src/test/cloud/cloud-config.yaml</amazonec2-userdata>
+              <amazonec2-monitoring/>
+              <!--
+                  Workaround: Docker Machine defaults to devicemapper,
+                  which has < 10G default base size.  Can't change
+                  base size using daemon.json, due to overlay2 failing
+                  on unknown dm.basesize option at startup.  So use
+                  the overlay2 storage driver, which gets the size of
+                  the backing filesystem.
+              -->
+              <engine-storage-driver>overlay2</engine-storage-driver>
+            </createOptions>
+          </machine>
           <images>
             <image>
               <name>saw:${project.version}</name>
@@ -211,6 +243,14 @@
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
+                <!-- Restart containers when Docker engine comes up
+                     again.  This allows users to stop the Docker
+                     engine, for example due to a host reboot, and
+                     continue working with the same SAW instance
+                     afterwards -->
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
                 <volumes>
                   <bind>
                     <!-- Bind mount volume for saving system logs in
@@ -395,4 +435,120 @@
       <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
+  <profiles>
+    <!-- Base Docker profile -->
+    <profile>
+      <id>docker-start</id>
+      <activation>
+        <property>
+          <name>docker-start</name>
+        </property>
+      </activation>
+      <properties>
+        <saw.docker.port>80</saw.docker.port>
+        <saw.docker.naming>alias</saw.docker.naming>
+        <saw.mapr.web.port>18443</saw.mapr.web.port>
+        <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
+        <saw.yarn.resource.port>18088</saw.yarn.resource.port>
+        <saw.yarn.node.port>18042</saw.yarn.node.port>
+        <saw.spark.master.port>18080</saw.spark.master.port>
+        <saw.spark.worker.port>18081</saw.spark.worker.port>
+        <saw.livy.port>18998</saw.livy.port>
+        <saw.kibana.port>15601</saw.kibana.port>
+        <saw.journal.port>19531</saw.journal.port>
+        <!-- Show Docker image build output by default to keep users
+             up to date on the progress, as it can take considerable
+             time for the first run and after Dockerfile modifications
+             -->
+        <docker.verbose>true</docker.verbose>
+      </properties>
+    </profile>
+    <!-- Local Docker profile -->
+    <profile>
+      <id>docker-start-local</id>
+      <activation>
+        <property>
+          <name>docker-start</name>
+          <value>local</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- Limit access to local machine only by default -->
+        <saw.docker.ip>localhost</saw.docker.ip>
+      </properties>
+    </profile>
+    <!-- Cloud Docker profile -->
+    <profile>
+      <id>docker-start-cloud</id>
+      <activation>
+        <property>
+          <name>docker-start</name>
+          <value>cloud</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- Enable Docker Machine configuration when using cloud -->
+        <docker.skip.machine>false</docker.skip.machine>
+        <!-- Bind to all interfaces so that environment can be
+             accessed remotely -->
+        <saw.docker.ip>0.0.0.0</saw.docker.ip>
+      </properties>
+      <build>
+        <plugins>
+          <!-- Enable Enforcer plug-in to ensure that required SAW_AWS_*
+               environment variables have been set -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0-M1</version>
+            <configuration>
+              <skip>false</skip>
+              <rules>
+                <requireProperty>
+                  <property>env.SAW_AWS_REGION</property>
+                  <message>The environment variable SAW_AWS_REGION must be set</message>
+                  <regex>(us|in)</regex>
+                  <regexMessage>Region must be one of the supported regions: "us" or "in"</regexMessage>
+                </requireProperty>
+                <requireProperty>
+                  <property>env.SAW_AWS_ACCESS_KEY_ID</property>
+                  <message>The environment variable SAW_AWS_ACCESS_KEY_ID must be set</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>env.SAW_AWS_SECRET_ACCESS_KEY</property>
+                  <message>The environment variable SAW_AWS_SECRET_ACCESS_KEY must be set</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>env.SAW_AWS_USERNAME</property>
+                  <message>The environment variable SAW_AWS_USERNAME must be set</message>
+                  <regex>\w{4}\d{4}</regex>
+                  <regexMessage>Username must be in the form "abcd0001"</regexMessage>
+                </requireProperty>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.0.0</version>
+            <configuration>
+              <files>
+                <file>${project.basedir}/src/test/cloud/cloud-region-${env.SAW_AWS_REGION}.properties</file>
+              </files>
+              <!-- Workaround: The properties plug-in is invoked for
+                   the parent project too, for which the path above
+                   cannot be found.  As a workaround configure the
+                   plug-in to be quiet to work around that error.  The
+                   Maven profile should perhaps somehow be moved into
+                   the submodule instead, so that dist-related
+                   plug-ins are not invoked at the top-level
+              -->
+              <quiet>true</quiet>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

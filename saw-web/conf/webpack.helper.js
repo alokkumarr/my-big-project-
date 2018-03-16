@@ -6,7 +6,7 @@ const path = require('path');
  * server), as opposed to a local saw-web front-end development
  * server */
 function distRun() {
-  return process.env.PWD.endsWith('/saw-dist');
+  return process.env.PWD.endsWith('/dist');
 }
 
 module.exports = {

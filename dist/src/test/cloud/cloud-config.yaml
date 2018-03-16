@@ -1,0 +1,23 @@
+#cloud-config
+bootcmd:
+  # Workaround: If epel-release installed in same command, not yet
+  # available, so do it as separate command earlier
+  - yum -q -y install epel-release
+packages:
+  # Add "smem" utility for measuring memory usage
+  - smem
+write_files:
+  # Add command to get SAW start page URL
+- path: /usr/local/bin/saw-url
+  permissions: '0755'
+  content: |
+      #!/bin/bash
+      aws_url=http://169.254.169.254/latest/meta-data/public-hostname
+      public_hostname=$(curl -sS $aws_url)
+      echo "SAW start page: http://$public_hostname/"
+runcmd:
+  # To limit costs, shut down after certain period (typical working
+  # session).  Only stops the instance, does not terminate it.  Leaves
+  # storage costs, but on the other hand preserves container image
+  # cache.
+  - shutdown +180
