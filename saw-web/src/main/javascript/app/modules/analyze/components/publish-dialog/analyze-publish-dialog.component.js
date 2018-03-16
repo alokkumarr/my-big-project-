@@ -79,7 +79,8 @@ export const AnalyzePublishDialogComponent = {
 
     getFTPLocations() {
       this._AnalyzeService.getlistFTP(this.resp.ticket.custCode).then(response => {
-        this.locations = ['alias1', 'alias2', 'alias3', 'alias4', 'alias5'];
+        this.locations = response.data.data.ftps;
+        //this.locations = ['alias1', 'alias2', 'alias3', 'alias4', 'alias5'];
       });
     }
 
@@ -183,7 +184,9 @@ export const AnalyzePublishDialogComponent = {
     }
 
     validateForm() {
-      this.errorFlagMsg = this.emailValidateFlag = this.cronValidateField = false;
+      this.errorFlagMsg = false;
+      this.emailValidateFlag = false;
+      this.cronValidateField = false;
       let validationCheck = true;
 
       const validateFields = {
