@@ -60,7 +60,7 @@ execute the following commands to start SAW in Docker containers:
         $ mvn -Ddocker-start=local
 
 Note: The Docker daemon must be running to be able to build and run
-containers.  If you are unable to install or run Docker locally, see
+containers.  If you are unable to run Docker containers locally, see
 instructions for using the Docker Machine [cloud] alternative.
 
 The first run will take longer as Docker downloads and builds images
