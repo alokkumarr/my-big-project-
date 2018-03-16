@@ -51,17 +51,17 @@ dat <- data.frame()
 for(id in id_vars){
   n <- floor(runif(1)*100)
   d <- data.frame(id = id,
-                 date = sample(dates, n, replace = T),
-                 cat1 = sample(cat1, n, replace = T),
-                 cat2 = sample(cat2, n, replace = T),
-                 metric1 = sample(1:5, n, replace = T),
+                 date = sample(dates, n, replace = TRUE),
+                 cat1 = sample(cat1, n, replace = TRUE),
+                 cat2 = sample(cat2, n, replace = TRUE),
+                 metric1 = sample(1:5, n, replace = TRUE),
                  metric2 = rnorm(n, mean=50, sd = 5))
  dat <- rbind(dat, d)
 }
 
-df \%>\%
+dat \%>\%
   lagger(order_vars = c("date"),
          group_vars = "id",
-         mutate_vars = c("metric1"),
+         measure_vars = c("metric1"),
          lags = c(1, 3, 5))
 }

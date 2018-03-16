@@ -92,7 +92,7 @@ mutater.data.frame <- function(df,
     dplyr::mutate_at(.vars = measure_vars, .funs = .fun, ...)
 
   if (!is.null(group_vars)) {
-    results <- results %>% ungroup()
+    results <- results %>% dplyr::ungroup()
   }
 
   # Rename measure variables
@@ -137,7 +137,7 @@ mutater.tbl_spark <- function(df,
     dplyr::mutate_at(.vars = measure_vars, .funs = .fun, ...)
 
   if (!is.null(group_vars)) {
-    results <- results %>% ungroup()
+    results <- results %>% dplyr::ungroup()
   }
 
   if (length(measure_vars) < 2) {

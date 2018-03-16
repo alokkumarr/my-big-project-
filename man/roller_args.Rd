@@ -4,8 +4,34 @@
 \alias{roller_args}
 \title{Roller Argument Helper Function}
 \usage{
-roller_args(order_vars, group_vars, measure_vars, fun, width, by, partial, mode,
-  ...)
+roller_args(order_vars, group_vars, measure_vars, fun, width, by, partial, ...)
+}
+\arguments{
+\item{order_vars}{optional vector of column names to arrange data by. can be
+one or more columns. default is NULL. order matters - arranges left to
+right. supports decreasing ordering - see examples.}
+
+\item{group_vars}{optional vector of column names to group data by. can be one
+or more columns. default is NULL}
+
+\item{measure_vars}{vector of column names to apply functional transformation
+to. can be one or more columns}
+
+\item{fun}{transformation function. accepts either fun name string or a
+expression wrapped in funs() call. see examples for example of using custom
+function with funs()}
+
+\item{width}{size of rolling window. Window is aligned right and to current
+row only}
+
+\item{by}{sequence that the rolling calculation should be applied to. Ex - by
+of 2 would compute the rolling calculation for every other record. Only
+enabled for roller.data.frame method. Default is 1.}
+
+\item{partial}{logical argument if partial windows should be calculated. Only
+enabled for roller.data.frame. Default is TRUE.}
+
+\item{...}{additional arguments to pass to the transformation function}
 }
 \description{
 Creates a valid object of roller_args class

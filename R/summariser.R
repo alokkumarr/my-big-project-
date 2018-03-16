@@ -106,7 +106,7 @@ summariser.tbl_spark <- function(df,
     measure_vars <- "rn"
     df <- df %>%
       dplyr::arrange_at(.vars = group_vars) %>%
-      dplyr::mutate(rn = row_number())
+      dplyr::mutate(rn = dplyr::row_number())
   }
 
 

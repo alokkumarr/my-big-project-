@@ -2,8 +2,8 @@
 
 #'DataFrame Roller Function
 #'
-#'Function appends rolling calculated fields to dataframe. Allows for grouping and
-#'ordering calculations.
+#'Function appends rolling calculated fields to dataframe. Allows for grouping
+#'and ordering calculations.
 #'
 #'
 #'
@@ -18,6 +18,13 @@
 #'@param fun transformation function. accepts either fun name string or a
 #'  expression wrapped in funs() call. see examples for example of using custom
 #'  function with funs()
+#'@param width size of rolling window. Window is aligned right and to current
+#'  row only
+#'@param by sequence that the rolling calculation should be applied to. Ex - by
+#'  of 2 would compute the rolling calculation for every other record. Only
+#'  enabled for roller.data.frame method. Default is 1.
+#'@param partial logical argument if partial windows should be calculated. Only
+#'  enabled for roller.data.frame. Default is TRUE.
 #'@param ... additional arguments to pass to the transformation function
 #'
 #'@return DataFrame with additional calculated columns appended
@@ -71,10 +78,9 @@ roller.data.frame <- function(df,
   }
 
   df2 <- df %>%
-    mutate_at(
-      .,
+    dplyr::mutate_at(
       measure_vars,
-      funs(var = zoo::rollapply),
+      dplyr::funs(var = zoo::rollapply),
       width = width,
       by = by,
       align = "right",
@@ -86,7 +92,7 @@ roller.data.frame <- function(df,
 
 
   if (!is.null(group_vars)) {
-    df2 <- df2 %>% ungroup()
+    df2 <- df2 %>% dplyr::ungroup()
   }
 
   # Rename new measure variables
@@ -146,7 +152,7 @@ roller.tbl_spark <- function(df,
 
   DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS", new_tbl_name))
   DBI::dbSendQuery(sc, query)
-  tbl(sc, new_tbl_name)
+  dplyr::tbl(sc, new_tbl_name)
 }
 
 
@@ -271,7 +277,9 @@ roller_args <- function(order_vars,
 
 
 
-
+#' Aggregation Function SQL Translation
+#'
+#' Helper function to translate native r function to spark sql syntax
 sql_fun_translator <- function(fun) {
   ifelse(fun == "mean", "avg",
          ifelse(fun == "sd", "stddev",
