@@ -56,6 +56,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   }
 
   @Input() set category(id: number | string) {
+    this.searchTerm = '';
     this.showProgress = true;
     this.analyze.getAnalysesFor(id.toString()).then(result => {
       this.analyses = filter(result, analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type));
