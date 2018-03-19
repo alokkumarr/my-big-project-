@@ -29,4 +29,5 @@ interface DispatchBean {
     String userFullName();
 
     String publishedTime();
+
 }

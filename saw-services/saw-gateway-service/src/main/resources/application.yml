@@ -53,6 +53,9 @@ api:
         -   location: ${export.service.host}
             method : GET
             path : '[/]export.*'
+        -   location: ${export.service.host}
+            method : POST
+            path : '[/]export.*'
         -   location: ${scheduler.service.host}
             method : GET
             path : '[/]scheduler.*'

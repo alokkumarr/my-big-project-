@@ -303,6 +303,9 @@ public class ExportServiceImpl implements ExportService{
   @Override
   public List<String> listFtpsForCustomer(RequestEntity request) {
 
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    // HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
     Object dispatchBean = request.getBody();
     // this job group is customer unique identifier
     String jobGroup = null;

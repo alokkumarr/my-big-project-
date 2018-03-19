@@ -65,8 +65,8 @@ public class DataExportController {
 
   @RequestMapping(value = "/listFTP", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
-  public List<String> listFTP(RequestEntity request) {
-    return exportService.listFtpsForCustomer(request);
+  public void listFTP(RequestEntity request, HttpServletResponse response) {
+    exportService.listFtpsForCustomer(request);
   }
 
 }
