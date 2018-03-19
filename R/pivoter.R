@@ -1,8 +1,5 @@
 
 
-
-
-
 #'DataFrame Pivoter Function
 #'
 #'Function to pivot data from long to wide format. Simliar to reshape2::dcast

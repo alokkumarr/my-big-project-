@@ -34,6 +34,7 @@ summariser <- function(df, ...) {
 #' @importFrom dplyr n
 #' @importFrom dplyr vars
 #' @rdname summariser
+#' @export
 summariser.data.frame <- function(df,
                                   group_vars,
                                   measure_vars = NULL,
