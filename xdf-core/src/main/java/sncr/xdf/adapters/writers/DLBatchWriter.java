@@ -49,9 +49,9 @@ public class DLBatchWriter {
 
     public JsonElement extractSchema(Dataset<Row> finalResult) {
         JsonParser parser = new JsonParser();
-        return parser.parse(finalResult.schema().prettyJson());
+        // json() was prettyJson()
+        return parser.parse(finalResult.schema().json());
     }
-
 
 
     /**
@@ -145,12 +145,16 @@ public class DLBatchWriter {
                 DS.coalesce(1).sample(false, 0.01).write().parquet(sampleLocation);
                 break;
         }
+    }
 
-
+    protected boolean isPathDir( Path p ) throws IOException {
+        return  ngctx.fs.exists(p) &&
+                ngctx.fs.isDirectory(p) &&
+                ngctx.fs.listStatus(p) != null &&
+                ngctx.fs.listStatus(p).length > 0;
     }
 
     //TODO:: Fix BDA Meta
-
 
     /**
      * The method checks if the dataset sample is presented in temploc (written by baseWrite method.
@@ -159,11 +163,7 @@ public class DLBatchWriter {
      * @throws IOException
      */
     public boolean doesSampleExist(String source) throws IOException {
-        if (ngctx.fs.exists(new Path(source + Path.SEPARATOR + "sample"))  &&
-            ngctx.fs.isDirectory(new Path(source + Path.SEPARATOR + "sample")) &&
-            ngctx.fs.listStatus(new Path(source + Path.SEPARATOR + "sample")) != null &&
-            ngctx.fs.listStatus(new Path(source + Path.SEPARATOR + "sample")).length > 0) return true;
-        return false;
+        return isPathDir( new Path(source + Path.SEPARATOR + "sample") );
     }
 
     /**
@@ -175,11 +175,9 @@ public class DLBatchWriter {
      * @throws IOException
      */
     public String getActualDatasetSourceDir(String source) throws IOException {
-        if (ngctx.fs.exists(new Path(source + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR))  &&
-            ngctx.fs.isDirectory(new Path(source + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR)) &&
-            ngctx.fs.listStatus(new Path(source + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR)) != null &&
-            ngctx.fs.listStatus(new Path(source + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR)).length > 0)
-            return source + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR;
+        String spdd = source + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR;
+        if( isPathDir( new Path( spdd ) ) )
+            return spdd;
         return source;
     }
 
@@ -191,7 +189,6 @@ public class DLBatchWriter {
     public String getSampleSourceDir(MoveDataDescriptor moveTask) {
         return moveTask.source.substring(moveTask.source.lastIndexOf(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR)) + Path.SEPARATOR + "sample";
     }
-
 
     /**
      * The method generates sample destination directory.
