@@ -11,6 +11,7 @@ widget-analysis {
     .analysis-description {
       text-overflow: ellipsis;
       white-space: nowrap;
+      word-wrap: break-word;
       overflow: hidden;
       transition: height 2s;
     }
