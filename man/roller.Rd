@@ -50,3 +50,31 @@ DataFrame with additional calculated columns appended
 Function appends rolling calculated fields to dataframe. Allows for grouping
 and ordering calculations.
 }
+\examples{
+library(dplyr)
+# Create toy dataset
+set.seed(319)
+id_vars <- seq(101, 200, by=1)
+dates <- seq(from=Sys.Date()-365, to=Sys.Date(), by="day")
+cat1 <- c("A", "B")
+cat2 <- c("X", "Y", "Z")
+
+dat <- data.frame()
+for(id in id_vars){
+  n <- floor(runif(1)*100)
+  d <- data.frame(id = id,
+                 date = sample(dates, n, replace = TRUE),
+                 cat1 = sample(cat1, n, replace = TRUE),
+                 cat2 = sample(cat2, n, replace = TRUE),
+                 metric1 = sample(1:5, n, replace = TRUE),
+                 metric2 = rnorm(n, mean=50, sd = 5))
+ dat <- rbind(dat, d)
+}
+
+d1 <- dat \%>\% roller(.,
+order_vars = "date",
+group_vars = c("id", "cat1", "cat2"),
+measure_vars = c("metric1"),
+fun = "mean",
+width=5)
+}

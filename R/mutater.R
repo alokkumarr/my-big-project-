@@ -41,10 +41,10 @@
 #'for(id in id_vars){
 #'   n <- floor(runif(1)*100)
 #'   d <- data.frame(id = id,
-#'                  date = sample(dates, n, replace = T),
-#'                  cat1 = sample(cat1, n, replace = T),
-#'                  cat2 = sample(cat2, n, replace = T),
-#'                  metric1 = sample(1:5, n, replace = T),
+#'                  date = sample(dates, n, replace = TRUE),
+#'                  cat1 = sample(cat1, n, replace = TRUE),
+#'                  cat2 = sample(cat2, n, replace = TRUE),
+#'                  metric1 = sample(1:5, n, replace = TRUE),
 #'                  metric2 = rnorm(n, mean=50, sd = 5))
 #'  dat <- rbind(dat, d)
 #'}
@@ -65,6 +65,7 @@ mutater <- function(df, ...) {
 
 #' @importFrom magrittr %>%
 #' @rdname mutater
+#' @export
 mutater.data.frame <- function(df,
                                order_vars = NULL,
                                group_vars = NULL,
@@ -111,6 +112,7 @@ mutater.data.frame <- function(df,
 
 #' @importFrom magrittr %>%
 #' @rdname mutater
+#' @export
 mutater.tbl_spark <- function(df,
                               order_vars = NULL,
                               group_vars = NULL,

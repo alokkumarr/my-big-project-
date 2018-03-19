@@ -34,6 +34,7 @@ summariser <- function(df, ...) {
 #' @importFrom dplyr n
 #' @importFrom dplyr vars
 #' @rdname summariser
+#' @export
 summariser.data.frame <- function(df,
                                   group_vars,
                                   measure_vars = NULL,
@@ -106,7 +107,7 @@ summariser.tbl_spark <- function(df,
     measure_vars <- "rn"
     df <- df %>%
       dplyr::arrange_at(.vars = group_vars) %>%
-      dplyr::mutate(rn = dplyr::row_number())
+      dplyr::mutate(rn = row_number())
   }
 
 

@@ -20,24 +20,50 @@
 #'  function with funs()
 #'@param width size of rolling window. Window is aligned right and to current
 #'  row only
-#'@param by sequence that the rolling calculation should be applied to. Ex - by
-#'  of 2 would compute the rolling calculation for every other record. Only
-#'  enabled for roller.data.frame method. Default is 1.
-#'@param partial logical argument if partial windows should be calculated. Only
-#'  enabled for roller.data.frame. Default is TRUE.
 #'@param ... additional arguments to pass to the transformation function
 #'
 #'@return DataFrame with additional calculated columns appended
 #'@export
 #'
 #' @examples
+#' library(dplyr)
+#'# Create toy dataset
+#'set.seed(319)
+#'id_vars <- seq(101, 200, by=1)
+#'dates <- seq(from=Sys.Date()-365, to=Sys.Date(), by="day")
+#'cat1 <- c("A", "B")
+#'cat2 <- c("X", "Y", "Z")
+#'
+#'dat <- data.frame()
+#'for(id in id_vars){
+#'   n <- floor(runif(1)*100)
+#'   d <- data.frame(id = id,
+#'                  date = sample(dates, n, replace = TRUE),
+#'                  cat1 = sample(cat1, n, replace = TRUE),
+#'                  cat2 = sample(cat2, n, replace = TRUE),
+#'                  metric1 = sample(1:5, n, replace = TRUE),
+#'                  metric2 = rnorm(n, mean=50, sd = 5))
+#'  dat <- rbind(dat, d)
+#'}
+#'
+#'d1 <- dat %>% roller(.,
+#' order_vars = "date",
+#' group_vars = c("id", "cat1", "cat2"),
+#' measure_vars = c("metric1"),
+#' fun = "mean",
+#' width=5)
 roller <- function(df, ...) {
   UseMethod("roller", df)
 }
 
 
-
-#' @rdname roller
+#'@param by sequence that the rolling calculation should be applied to. Ex - by
+#'  of 2 would compute the rolling calculation for every other record. Only
+#'  enabled for roller.data.frame method. Default is 1.
+#'@param partial logical argument if partial windows should be calculated. Only
+#'  enabled for roller.data.frame. Default is TRUE.
+#'@rdname roller
+#'@export
 roller.data.frame <- function(df,
                               order_vars,
                               group_vars = NULL,
@@ -108,6 +134,7 @@ roller.data.frame <- function(df,
 
 
 #' @rdname roller
+#' @export
 roller.tbl_spark <- function(df,
                              order_vars,
                              group_vars = NULL,
@@ -117,6 +144,8 @@ roller.tbl_spark <- function(df,
                              ...) {
 
   stopifnot("tbl_spark" %in% class(df))
+  sc <- sparklyr::spark_dataframe(df) %>%
+    sparklyr::spark_connection(.)
   DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS df"))
   sparklyr::sdf_register(df, "df")
   new_tbl_name <- "df_roll"

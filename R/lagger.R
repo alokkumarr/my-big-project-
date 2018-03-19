@@ -53,6 +53,7 @@ lagger <- function(df, ...) {
 
 
 #' @rdname lagger
+#' @export
 lagger.data.frame <- function(df,
                               order_vars,
                               group_vars = NULL,
@@ -82,6 +83,7 @@ lagger.data.frame <- function(df,
 
 
 #' @rdname lagger
+#' @export
 lagger.tbl_spark <- function(df,
                              order_vars,
                              group_vars = NULL,
