@@ -79,7 +79,7 @@ export const AnalyzePublishDialogComponent = {
 
     getFTPLocations() {
       const request = {
-        'jobGroup': this.resp.ticket.custCode
+        jobGroup: this.resp.ticket.custCode
       };
       this._AnalyzeService.getlistFTP(request).then(response => {
         this.locations = response.data.data.ftps;
