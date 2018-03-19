@@ -2,6 +2,8 @@ import { MenuService } from './menu.service';
 import { HeaderProgressService } from './header-progress.service';
 import { ToastService } from './toastMessage.service';
 import { SideNavService } from './sidenav.service';
+import { LocalSearchService } from './local-search.service';
+import { dxDataGridService } from './dxDataGrid.service';
 
 /* Menu Service */
 export function menuServiceFactory(i: any) {
@@ -66,5 +68,27 @@ export function $mdDialogFactory(i: any) {
 export const $mdDialogProvider = {
   provide: '$mdDialog',
   useFactory: $mdDialogFactory,
+  deps: ['$injector']
+};
+
+/* LocalSerach Service */
+export function localSearchFactory(i: any) {
+  return i.get('LocalSearchService');
+}
+
+export const localSearchProvider = {
+  provide: LocalSearchService,
+  useFactory: localSearchFactory,
+  deps: ['$injector']
+};
+
+/* Dxdatagrid Service */
+export function dxDataGridFactory(i: any) {
+  return i.get('dxDataGridService');
+}
+
+export const dxDataGridProvider = {
+  provide: dxDataGridService,
+  useFactory: dxDataGridFactory,
   deps: ['$injector']
 };

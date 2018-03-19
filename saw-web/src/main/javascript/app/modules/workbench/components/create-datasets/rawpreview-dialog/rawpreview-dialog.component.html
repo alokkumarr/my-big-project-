@@ -1,0 +1,18 @@
+<div mat-dialog-title>
+  <span [textContent]="title"></span>
+  <span fxFlex></span>
+  <button mat-icon-button mat-dialog-close class="xBtn">
+    <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
+  </button>
+</div>
+<div mat-dialog-content style="background-color: #F5F9FC; min-height:450px;">
+  <!-- <span [textContent]="message"></span> -->
+  <div *ngFor="let line of message">
+    <span [textContent]="line"></span>
+  </div>
+</div>
+<div mat-dialog-actions style="flex-direction: row-reverse">
+  <button style="color: #E5524C;" mat-button mat-raised-button (click)="closeDashboard()">
+    Close
+  </button>
+</div>

@@ -45,7 +45,7 @@ To build and test the project execute the following commands:
         $ mvn verify
 
 This includes running both unit and integration tests.  The release
-package will be located at `saw-dist/target/saw-*.tgz`.
+package will be located at `dist/target/saw-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
 integration tests can run.
@@ -57,15 +57,16 @@ execute the following commands to start SAW in Docker containers:
 
         $ cd saw
         $ mvn package
-        $ mvn -pl saw-dist docker:build docker:run -P docker-saw
+        $ mvn -Ddocker-start=local
 
 Note: The Docker daemon must be running to be able to build and run
-containers.  Also, the first run will take longer as Docker downloads
-and builds images that will subsequently be available in the image
-build cache.
+containers.  If you are unable to run Docker containers locally, see
+instructions for using the Docker Machine [cloud] alternative.
 
-After the above command has completed the SAW Web application can be
-accessed at [http://localhost/](http://localhost/).
+The first run will take longer as Docker downloads and builds images
+that will subsequently be available in the image build cache.  After
+the command has completed the SAW start page can be accessed
+at [http://localhost/](http://localhost/).
 
 To enter a shell inside the main SAW container, execute the following
 command:
@@ -86,7 +87,9 @@ process used to start the containers.  In case containers have been
 left behind and prevent running new SAW containers, existing
 containers can be removed by executing the following command:
 
-        $ docker rm -f saw saw-dist
+        $ docker rm -f saw saw-mapr
+
+[cloud]: development-cloud.md
 
 # Running system tests using local deployment
 
@@ -96,7 +99,7 @@ package and starting a new container, it can take minutes to complete.
 To iterate faster on specific system tests against an existing local
 deployment, run the following command:
 
-        mvn -pl saw-dist test-compile failsafe:integration-test
+        mvn -pl dist test-compile failsafe:integration-test
 
 The above command will immediately start executing system tests
 against an existing local SAW deployment.  Therefore it is possible to
@@ -178,17 +181,17 @@ ensure that the documentation accurately reflects the implementation
 taking into account different versions and branches of the product.
 
 The documentation source files are located in the
-[saw-dist/src/main/asciidoc] directory and are automatically rendered
+[dist/src/main/asciidoc] directory and are automatically rendered
 as part of the project build process.  To render the documentation
 without running other parts of the project build, execute the
 following command:
 
-        $ mvn -pl saw-dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
+        $ mvn -pl dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
 
-The output can be inspected in the `saw-dist/target/generated-docs`
+The output can be inspected in the `dist/target/generated-docs`
 directory.
 
-[saw-dist/src/main/asciidoc]: saw-dist/src/main/asciidoc
+[dist/src/main/asciidoc]: dist/src/main/asciidoc
 
 # Continuous integration
 
@@ -216,20 +219,20 @@ To make a release of the project, execute the following steps:
         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
         $ git push --tags
 
-   Note: The placeholder `<commit>` refers to the revision that has
+3. Note: The placeholder `<commit>` refers to the revision that has
    been selected for the release.
 
-3. Start a customized build of the [project] on the continuous
+4. Start a customized build of the [project] on the continuous
    integration server using the newly created release tag (click the
    "Run" dropdown menu and select "Run customized..." and enter the
    release tag, for example `v1.0.0`, in the Revision field).
 
-4. After starting the build, go to the Build result summary page and
+5. After starting the build, go to the Build result summary page and
    add the label "release" (which ensures it will be available for
    download indefinitely, instead of eventually being expired and
    deleted by the continuous integration server).
 
-5. When the build finishes successfully, announce it by publishing a
+6. When the build finishes successfully, announce it by publishing a
    link to the artifacts page in the project Slack channel.  Also add
    the link to the corresponding [release notes] in Confluence.
 

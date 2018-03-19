@@ -1,0 +1,78 @@
+@import "themes/base/colors";
+
+sql-executor {
+  width: 100%;
+
+  .executor-container {
+    height: 99%;
+    max-height: 100%;
+    border: 3px #F5F9FC solid;
+  }
+
+  .action-title {
+    color: $primary-blue-b2;
+  }
+
+  .title-elem {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .gridContainer {
+    border-right: 3px #F5F9FC solid;
+    padding-top: 3px;
+  }
+
+  .exec-body {
+    height: calc(100% - 41px);
+    max-height: calc(100% - 41px);
+  }
+
+  .script-pane {
+    overflow: scroll;
+  }
+
+  .preview-pane {
+    overflow: scroll;
+  }
+
+  .exec-btn-icon {
+    font-size: 24px;
+  }
+
+  .btn-padding {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .list-items {
+    background-color: white;
+    border-radius: 0 3px 3px;
+    border: $primary-blue-b2 0.5px dotted;
+
+    &:hover {
+      box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+      cursor: pointer;
+    }
+  }
+
+  .btn-icon {
+    color: $primary-blue-b2;
+    line-height: 32px !important;
+    height: 32px !important;
+    padding-top: 1px;
+
+    .mat-button {
+      vertical-align: middle;
+      line-height: 32px !important;
+      height: 32px !important;
+      border-radius: 2px;
+      background-color: white;
+      border: solid 1px #1A89D4;
+    }
+
+    .mat-button .mat-button-wrapper > * {
+      vertical-align: initial;
+    }
+  }
+}

@@ -134,6 +134,11 @@
 			<artifactId>poi-ooxml-schemas</artifactId>
 			<version>3.17</version>
 		</dependency>
+		<dependency>
+			<groupId>info.faljse</groupId>
+			<artifactId>SDNotify</artifactId>
+			<version>1.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -202,6 +207,14 @@
 								<entry>
 									<name>/usr/lib/systemd/system/saw-export.service</name>
 									<file>src/main/system/saw-export.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-export-proxy.service</name>
+									<file>src/main/system/saw-export-proxy.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-export-proxy.socket</name>
+									<file>src/main/system/saw-export-proxy.socket</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-export-service/conf/logback.xml</name>
