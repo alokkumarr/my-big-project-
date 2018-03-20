@@ -1,0 +1,16 @@
+== Authentication ==
+
+Client -> "SAW Security Service": Authentication request
+"SAW Security Service" --> Client: Authentication response
+
+== Workbench ==
+
+Client -> "SAW Gateway Service": Workbench request
+"SAW Gateway Service" -> "SAW Workbench Service": Workbench request
+
+"SAW Workbench Service" -> "XDF nextgen API": Access MapRDB
+"Execute MapRDB API" -> "MapR-FS": Write results
+"MapR-FS" --> "SAW Workbench Service": Read results
+
+"SAW Execution Service" --> "SAW Gateway Service": Execution response
+"SAW Gateway Service" --> Client: Execution response

@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Export Proxy
+Requires=saw-export.service
+After=saw-export.service
+Requires=saw-export-proxy.socket
+After=saw-export-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9401
+PrivateTmp=yes

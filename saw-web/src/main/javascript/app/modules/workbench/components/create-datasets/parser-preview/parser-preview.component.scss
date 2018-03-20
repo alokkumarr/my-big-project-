@@ -1,0 +1,54 @@
+@import "themes/base/colors";
+
+parser-preview {
+  width: 100%;
+
+  mat-tab-group {
+    max-width: 100%;
+  }
+
+  .mat-tab-label-active {
+    color: $primary-blue-b2;
+  }
+
+  .mat-tab-body-wrapper {
+    height: 100%;
+  }
+
+  .fieldType {
+    border-color: #C4C4C4;
+    border-radius: 3px;
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.69);
+  }
+
+  .formatEditIcon {
+    font-size: 18px;
+    padding-top: 7px;
+  }
+
+  .fTypeGroup {
+    margin-top: -17px;
+    padding-bottom: 0.3px;
+    z-index: 99;
+  }
+
+  .mat-form-field-infix {
+    padding: 0 !important;
+  }
+
+  .errorInfoIcon {
+    font-size: 22px;
+    padding-top: 2px;
+    color: $primary-red;
+  }
+
+  .preview-container {
+    height: calc(100% - 47px);
+  }
+
+  .raw-content {
+    padding: 20px;
+    background-color: #F5F9FC;
+  }
+}

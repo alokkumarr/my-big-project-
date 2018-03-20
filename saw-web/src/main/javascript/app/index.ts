@@ -6,6 +6,7 @@ import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
 
 import 'zone.js/dist/zone';
+import 'hammerjs';
 import 'reflect-metadata';
 import { NgModule, StaticProvider, LOCALE_ID, Injector } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -27,6 +28,7 @@ import { CommonModuleTs } from './common';
 import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
 import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
+import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
 
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
@@ -43,7 +45,8 @@ declare global {
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    WorkbenchUpgradeModule
   ],
   exports: [FlexLayoutModule],
   providers: [
@@ -79,7 +82,8 @@ angular
     ObserveModule,
     AnalyzeModule,
     AlertsModule,
-    AdminModule
+    AdminModule,
+    WorkbenchModule
   ])
   .config(routesConfig)
   .config(themeConfig)

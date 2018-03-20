@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Workbench test data loader
+
+[Service]
+Type=oneshot
+ExecStart=/root/saw-workbench/sample-csv/load
+SyslogIdentifier=saw-workbench-testdata
+
+[Install]
+WantedBy=saw-workbench.service

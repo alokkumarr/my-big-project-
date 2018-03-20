@@ -1,0 +1,11 @@
+{
+  "action" : "search",
+  "output" : "hdfs:///var/bda/xdf-srux/query_result.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"query" : {
+		"filter" : [ 
+		   { "field-path" : "datalake.catalog", "condition" : "=", "value" : "asorokin" }  
+		]
+	}
+}

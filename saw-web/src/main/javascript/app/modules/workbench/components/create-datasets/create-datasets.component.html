@@ -1,0 +1,140 @@
+<div mat-dialog-title fxLayout="row" style="margin-bottom:0px;">
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+  </button>
+  <div class="mat-title">Add Data Set</div>
+  <span fxFlex></span>
+  <button mat-icon-button mat-dialog-close class="xBtn">
+    <mat-icon fontIcon="icon-close"></mat-icon>
+  </button>
+</div>
+<mat-dialog-content>
+  <mat-horizontal-stepper fxFill linear="true" (selectionChange)="stepChanged($event)">
+    <ng-template matStepperIcon="edit">
+      <mat-icon fontIcon="icon-checkmark"></mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="done">
+      <mat-icon fontIcon="icon-checkmark"></mat-icon>
+    </ng-template>
+    <mat-step [completed]="selectFullfilled" label="SELECT">
+      <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
+      <div>
+        <div fxFlex></div>
+        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
+          <span>Next</span>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step [completed]="detailsFilled" label="DETAILS">
+      <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
+      <div>
+        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
+          <mat-icon fontIcon="icon-back"></mat-icon>
+          <span>Previous</span>
+        </button>
+        <div fxFlex></div>
+        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
+          <span>Next</span>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step label="PREVIEW">
+      <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
+      <div>
+        <button mat-button mat-raised-button mat-primary matStepperPrevious class="stepperBtn previous Outline">
+          <mat-icon fontIcon="icon-back"></mat-icon>
+          <span>Previous</span>
+        </button>
+        <div fxFlex></div>
+        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
+          <span>Next</span>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <mat-step label="ADD_DATASET" [stepControl]="nameFormGroup">
+      <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
+        <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
+          <span class="list-header">Selected Files</span>
+          <mat-list>
+            <mat-list-item class="list-items" *ngFor="let file of selectedFiles; index as i" (click)="previewDialog(file)">
+              <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
+              <div class="icon-div">
+                <mat-icon mat-list-icon class="preview-icon" fontIcon="icon-show"></mat-icon>
+              </div>
+              <mat-divider></mat-divider>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <mat-card fxFlex class="top-margin">
+          <mat-card-header class="headerGradient">
+            <mat-card-title class="headerText">NAME_DATASET</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="form-div">
+              <form novalidate [formGroup]="nameFormGroup">
+                <section class="input-section">
+                  <mat-form-field class="margin20">
+                    <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" maxlength="18" required />
+                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')">
+                      Dataset Name is
+                      <strong>required</strong>
+                    </mat-error>
+                  </mat-form-field>
+                  <!-- <div class="margin20">
+                    <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">
+                      <mat-radio-button value="replace">
+                        Replace
+                      </mat-radio-button>
+                      <mat-radio-button value="append">
+                        Append
+                      </mat-radio-button>
+                    </mat-radio-group>
+                  </div> -->
+                </section>
+                <section class="input-section">
+                  <mat-form-field class="margin20">
+                    <input matInput placeholder="Description" name="description" formControlName="descControl" maxlength="50" required />
+                    <mat-error *ngIf="nameFormGroup.controls.descControl.hasError('required')">
+                      Dataset description is
+                      <strong>required</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </section>
+                <!-- <mat-divider></mat-divider>
+                <section class="input-section">
+                  <mat-form-field class="margin20">
+                    <mat-select placeholder="SPARK_MASTER" [(value)]="parserConf.parameters[0].value">
+                      <mat-option value="yarn">Yarn</mat-option>
+                      <mat-option value="standard" disabled>Standard</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <div class="margin20">
+                    <span fxFlex="20">Spark Instances</span>
+                    <mat-slider matInput fxFlex name="sparkInstances" class="margin20" max="10" min="2" step="1" thumb-label="true" tick-interval="1"
+                      [(ngModel)]="parserConf.parameters[1].value" [ngModelOptions]="{standalone: true}">
+                    </mat-slider>
+                    <span>{{parserConf.parameters[1].value}}</span>
+                  </div>
+                </section> -->
+              </form>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div>
+        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
+          <mat-icon fontIcon="icon-back"></mat-icon>
+          <span>Previous</span>
+        </button>
+        <div fxFlex></div>
+        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
+          <span>ADD</span>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</mat-dialog-content>

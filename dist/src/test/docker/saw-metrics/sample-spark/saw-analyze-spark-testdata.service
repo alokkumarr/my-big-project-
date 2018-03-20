@@ -1,0 +1,12 @@
+[Unit]
+Description=SAW Analyze Spark test data loader
+Requires=saw-transport.service
+After=saw-transport.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/saw-metrics/sample-spark/load-metric
+SyslogIdentifier=saw-analyze-spark-testdata
+
+[Install]
+WantedBy=saw-transport.service
