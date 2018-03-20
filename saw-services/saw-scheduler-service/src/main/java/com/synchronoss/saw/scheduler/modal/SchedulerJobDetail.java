@@ -37,8 +37,7 @@ public class SchedulerJobDetail implements Serializable {
 
    private List<String> emailList;
 
-   // assume only one ftp server as of now
-   private String ftp;
+   private List<String> ftp;
 
    private String fileType ;
 
@@ -266,11 +265,11 @@ public class SchedulerJobDetail implements Serializable {
         this.emailList = emailList;
     }
 
-    public String getFtp() {
+    public List<String> getFtp() {
         return ftp;
     }
 
-    public void setFtp(String ftp) {
+    public void setFtp(List<String> ftp) {
         this.ftp = ftp;
     }
 

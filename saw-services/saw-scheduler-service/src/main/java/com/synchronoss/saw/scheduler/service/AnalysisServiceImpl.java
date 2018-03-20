@@ -47,12 +47,11 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     public void scheduleDispatch(SchedulerJobDetail analysis) {
-        if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)
-                ) {
-            return;
-        }
         if (analysis.getDescription() == null) analysis.setDescription("");
-        String recipients = prepareRecipientsList(analysis.getEmailList());
+
+        String recipients = prepareStringFromList(analysis.getEmailList());
+        String ftpServers = prepareStringFromList(analysis.getFtp());
+
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);
         Date date = new Date(Long.parseLong(latestexection[1]));
@@ -60,17 +59,39 @@ public class AnalysisServiceImpl implements AnalysisService {
         format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         String formatted = format.format(date);
         DispatchBean execution;
-        // ToDo:during multiple ftp servers this condition needs modification
-        if (analysis.getFtp() == null || analysis.getFtp().trim() == "") {
+
+        if (!recipients.equals("") && !ftpServers.equals("")) {
             execution = ImmutableDispatchBean.builder()
                     .emailList(recipients).fileType("csv")
-                    .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName()).publishedTime(formatted).build();
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .ftp(ftpServers)
+                    .publishedTime(formatted).build();
+        } else if (!recipients.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                    .emailList(recipients).fileType("csv")
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .publishedTime(formatted).build();
+        } else if (!ftpServers.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .ftp(ftpServers)
+                    .publishedTime(formatted).build();
         } else {
             execution = ImmutableDispatchBean.builder()
-                    .emailList(recipients).fileType("csv")
-                    .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
-                    .metricName(analysis.getMetricName()).ftp(analysis.getFtp()).publishedTime(formatted).build();
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .publishedTime(formatted).build();
         }
         String[] param = new String[3];
         param[0] = analysis.getAnalysisID();
@@ -123,20 +144,9 @@ public class AnalysisServiceImpl implements AnalysisService {
         val[1] = latestFinish;
         return val;
     }
-    private String prepareRecipientsList(List<String> recipients) {
-        StringBuffer stringBuffer = new StringBuffer();
-        boolean first = true;
-        for (String recipient :  recipients) {
-            if (first) {
-                stringBuffer.append(recipient);
-                first = false;
-            }
-            else {
-                stringBuffer.append(",");
-                stringBuffer.append(recipient);
-            }
-        }
-        return stringBuffer.toString();
+
+    private String prepareStringFromList(List<String> source) {
+        return String.join(",", source);
     }
 
 }
