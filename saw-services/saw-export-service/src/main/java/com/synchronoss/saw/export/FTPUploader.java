@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
@@ -34,7 +35,7 @@ public class FTPUploader {
     public void uploadFile(String localFileFullName, String fileName, String hostDir)
             throws Exception {
         try (InputStream input = new FileInputStream(new File(localFileFullName))) {
-            this.ftp.storeFile(hostDir + fileName, input);
+            this.ftp.storeFile(hostDir + fileName + ".zip", new ZipInputStream(input));
         }
     }
 

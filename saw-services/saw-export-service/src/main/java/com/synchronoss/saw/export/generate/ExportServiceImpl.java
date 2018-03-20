@@ -315,6 +315,7 @@ public class ExportServiceImpl implements ExportService{
         if (f.exists() && !f.isDirectory()) {
           FtpCustomer obj = jsonMapper.readValue(f, FtpCustomer.class);
           for (FTPDetails alias : obj.getFtpList()) {
+            logger.info("Customer Name: "+alias.getCustomerName());
             if (alias.getCustomerName().equals(jobGroup)) {
               aliases.add(alias.getAlias());
             }
