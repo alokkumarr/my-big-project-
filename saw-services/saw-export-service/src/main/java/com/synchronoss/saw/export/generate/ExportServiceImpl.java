@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
@@ -328,6 +329,6 @@ public class ExportServiceImpl implements ExportService{
         logger.error(e.toString());
       }
     }
-    return "{\"ftp\": " + aliases.toString() + "}";
+    return "{\"ftp\": " + new Gson().toJson(aliases).toString() + "}";
   }
 }
