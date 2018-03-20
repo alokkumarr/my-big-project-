@@ -22,17 +22,24 @@ import java.util.*;
 public class NGJobExecutor {
 
     private static final Logger logger = Logger.getLogger(NGJobExecutor.class);
+
     private AbstractComponent parent;
-    private Map<String, Dataset<Row>> availableDataframes = new HashMap<>();
     private String script;
-    private NGSQLScriptDescriptor scriptDescriptor;
+
+    private Map<String, Dataset<Row>> availableDataframes;
+    //private NGSQLScriptDescriptor scriptDescriptor;
     private Map<String, SQLDescriptor> result;
+    private List<SQLDescriptor> report;
+    {
+        availableDataframes = new HashMap<>();
+        report = new ArrayList<>();
+        result = new HashMap();
+    }
+
 
     public NGJobExecutor(AbstractComponent parent, String script) throws XDFException
     {
-        report = new ArrayList<>();
         this.parent = parent;
-        result = new HashMap();
         this.script = script;
     }
 
@@ -43,7 +50,7 @@ public class NGJobExecutor {
         try {
 
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
-            scriptDescriptor = new NGSQLScriptDescriptor(parent.getICtx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
+            NGSQLScriptDescriptor scriptDescriptor = new NGSQLScriptDescriptor(parent.getICtx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
             logger.debug("Step 0: Remove comments: " + script);
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
@@ -146,8 +153,6 @@ public class NGJobExecutor {
         }
         return rc;
     }
-
-    private List<SQLDescriptor> report;
 
     public Map<String, SQLDescriptor> getResultDataSets() { return result; }
 

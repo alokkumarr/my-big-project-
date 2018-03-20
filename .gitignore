@@ -1,11 +1,11 @@
 # ignore directories
 
-
 out/
 lib/
 log/
 wrk/
 target/
+docx/
 _*/
 
 # ignore all files ending with ~
