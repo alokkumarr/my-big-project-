@@ -7,5 +7,9 @@
   template: src=application.yml dest=/opt/bda/saw-export-service/conf
   notify:
     - restart saw-export
+- name: Install SAW export Service ftp details file
+  template: src=ftp-details.json dest=/opt/bda/saw-export-service/conf
+  notify:
+    - restart saw-export
 - name: Enable SAW Export Service
   systemd: name=saw-export enabled=true

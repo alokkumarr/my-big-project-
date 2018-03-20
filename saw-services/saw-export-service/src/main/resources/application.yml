@@ -34,6 +34,8 @@ published:
   path: /tmp
 
 
-ftp-details-file: ftp-details.json
+ftp:
+  details:
+    file: /opt/bda/saw-export-service/conf/ftp-details.json
 
 

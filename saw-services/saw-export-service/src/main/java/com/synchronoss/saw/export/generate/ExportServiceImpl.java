@@ -57,7 +57,7 @@ public class ExportServiceImpl implements ExportService{
   @Value("${spring.mail.body}")
   private String mailBody;
 
-  @Value("${ftp-details-file}")
+  @Value("${ftp.details.file}")
   private String ftpDetailsFile;
 
   @Autowired
@@ -301,11 +301,7 @@ public class ExportServiceImpl implements ExportService{
   }
 
   @Override
-  public List<String> listFtpsForCustomer(RequestEntity request) {
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    // HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
+  public String listFtpsForCustomer(RequestEntity request) {
     Object dispatchBean = request.getBody();
     // this job group is customer unique identifier
     String jobGroup = null;
@@ -315,16 +311,22 @@ public class ExportServiceImpl implements ExportService{
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
       ObjectMapper jsonMapper = new ObjectMapper();
       try {
-        FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
-        for (FTPDetails alias:obj.getFtpList()) {
-          if (alias.getCustomerName().equals(jobGroup)) {
-            aliases.add(alias.getAlias());
+        File f = new File(ftpDetailsFile);
+        if (f.exists() && !f.isDirectory()) {
+          FtpCustomer obj = jsonMapper.readValue(f, FtpCustomer.class);
+          for (FTPDetails alias : obj.getFtpList()) {
+            if (alias.getCustomerName().equals(jobGroup)) {
+              aliases.add(alias.getAlias());
+            }
           }
+        } else {
+          logger.info("listFTP: inside else");
+          aliases.add("");
         }
       } catch (IOException e) {
         logger.error(e.toString());
       }
     }
-    return aliases;
+    return "{\"ftp\": " + aliases.toString() + "}";
   }
 }

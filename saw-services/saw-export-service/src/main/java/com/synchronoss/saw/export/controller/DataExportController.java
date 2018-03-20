@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -66,7 +67,14 @@ public class DataExportController {
   @RequestMapping(value = "/listFTP", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   public void listFTP(RequestEntity request, HttpServletResponse response) {
-    exportService.listFtpsForCustomer(request);
+    try {
+      response.setContentType("application/json");
+      response.getWriter().write(exportService.listFtpsForCustomer(request).toString());
+      response.getWriter().flush();
+      response.getWriter().close();
+    } catch (IOException e) {
+      logger.error(e.getMessage());
+    }
   }
 
 }
