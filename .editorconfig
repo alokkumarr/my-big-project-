@@ -1,0 +1,15 @@
+#
+# Editor config file for consistent style across developers
+#
+
+root = true
+
+[*]
+indent_style = space
+insert_final_newline = true
+
+[*.java]
+indent_size = 4
+
+[*.xml]
+indent_size = 2
