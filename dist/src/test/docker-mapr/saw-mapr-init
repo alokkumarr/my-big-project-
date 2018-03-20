@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Initialize MapR container
+#
+set -eux
+
+# Start rsyslog to persist system logs
+/etc/init.d/rsyslog start
+
+# Start Spark slaves
+#
+# Note: A local Spark context is used to conserve memory in
+# development mode.  If a Spark standalone cluster is enabled,
+# uncomment below to start Spark workers.
+#/opt/mapr/spark/spark-current/sbin/start-slaves.sh
+
+# Wait until MapR-FS is available
+set +x
+while ! hadoop fs -ls / > /dev/null 2>&1; do
+    sleep 5
+    echo "Retrying accessing MapR-FS"
+done
+set -x
+
+# Create directory for Spark shell and Apache Livy.  Run at boot time
+# when MapR-FS available.
+sudo -u mapr hadoop fs -mkdir -p /apps/spark
+
+# Workaround: Using "/usr/sbin/lsof -i :7222" or similar as
+# healthcheck indicates success too early, as the MapR image
+# /usr/bin/init-script restarts services once, so hook into the init
+# script instead
+touch /saw-mapr-init-done

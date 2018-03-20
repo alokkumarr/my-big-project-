@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Synchronoss Analytics Workbench</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script src="links.js"></script>
+  </head>
+  <body>
+    <h1>Synchronoss Analytics Workbench</h1>
+    <table>
+      <tbody>
+        <tr>
+          <td><a href="" path="/web/">SAW Web</a></td>
+          <td>SAW user interface</td>
+        </tr>
+        <tr>
+          <td><a href="" path="/services/">SAW Services</a></td>
+          <td>SAW Services REST API</td>
+        </tr>
+        <tr>
+          <td><a href="" path="/security/">SAW Security</a></td>
+          <td>SAW Security REST API</td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <td><a href="" port="18443" protocol="https">MapR console</a></td>
+          <td>MapR Control System (credentials: mapr/mapr)</td>
+        </tr>
+<!--
+    Note: Local Spark contexts are used by default to save memory in
+    development environments.  If Spark standalone or YARN is enabled,
+    the below can be uncommented to enable the Spark and YARN
+    consoles.
+-->
+<!--
+        <tr>
+          <td><a href="" port="18080">Spark master console</a></td>
+          <td>Spark standalone cluster master</td>
+        </tr>
+        <tr>
+          <td><a href="" port="18081">Spark worker console</a></td>
+          <td>Spark standalone cluster worker</td>
+        </tr>
+        <tr>
+          <td><a href="" port="18088">YARN resource console</a></td>
+          <td>YARN resource manager console</td>
+        </tr>
+        <tr>
+          <td><a href="" port="18042">YARN node console</a></td>
+          <td>YARN node manager console</td>
+        </tr>
+-->
+        <tr>
+          <td><a href="" port="18998">Livy console</a></td>
+          <td>Spark job REST API</td>
+        </tr>
+        <tr>
+          <td><a href="" port="15601">Kibana console</a></td>
+          <td>Explore Elasticsearch data</td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <td><a href="" port="19531">System logs</a></td>
+          <td>Apply filter to show SAW back-end services</td>
+        </tr>
+        <tr>
+          <td><a href="" port="19531" path="/entries">System logs</a></td>
+          <td>All system logs on single page</td>
+        </tr>
+    </table>
+  </body>
+</html>

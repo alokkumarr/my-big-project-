@@ -47,7 +47,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 600000;
 const pageResolveTimeout = 1000;
 
 /**
- * Note: Prefix with "../saw-web" because end-to-end tests are invoked from "saw-dist" when run against the
+ * Note: Prefix with "../saw-web" because end-to-end tests are invoked from "dist" when run against the
  * distribution package. The same path also works when run directly out of "saw-web".
  */
 const testDir = '../saw-web/src/test';

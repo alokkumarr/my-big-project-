@@ -1,0 +1,140 @@
+@import "themes/base/colors";
+
+create-datasets {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  mat-icon {
+    vertical-align: text-bottom !important;
+  }
+
+  mat-dialog-content {
+    height: 100%;
+    background-color: #F5F9FC;
+    padding: 3px !important;
+    margin: 0 !important;
+    max-height: 100% !important;
+  }
+
+  .mat-horizontal-content-container {
+    padding: 0 !important;
+    height: calc(100% - 72px);
+  }
+
+  .mat-horizontal-stepper-content {
+    height: 100%;
+  }
+
+  .mat-stepper-horizontal {
+    height: 100%;
+    background-color: #F5F9FC;
+  }
+
+  .mat-horizontal-stepper-header-container {
+    background-color: white;
+  }
+
+  .stepperBtn {
+    margin-top: 3px;
+    font-size: 20px;
+    width: 145px;
+
+    .mat-icon {
+      height: auto;
+    }
+  }
+
+  .previous {
+    height: 42px;
+    border-radius: 2px;
+    background-color: white;
+    border: solid 1px $primary-blue-b2;
+  }
+
+  .Outline {
+    color: $primary-blue-b2;
+  }
+
+  .xBtn {
+    color: $primary-red;
+  }
+
+  .whiteFrame {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    background-color: white;
+  }
+
+  .file-icon {
+    color: $primary-green;
+  }
+
+  .preview-icon {
+    font-size: 18px;
+    color: $primary-blue-b2;
+  }
+
+  .mat-card {
+    padding: 0 !important;
+  }
+
+  .margin20 {
+    margin: 3px;
+    width: 100%;
+  }
+
+  .input-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 9vh;
+  }
+
+  .headerGradient {
+    padding: 8px 15px;
+    background-color: white;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+
+  .headerText {
+    margin: 9px !important;
+    font-size: 16px !important;
+  }
+
+  .form-div {
+    padding: 1% 9% 0;
+  }
+
+  .list-margin1 {
+    margin-top: 1%;
+  }
+
+  .list-header {
+    padding: 9px;
+    background-color: $primary-blue-b2;
+    font-size: 16px;
+    border-radius: 3px 12px 0 0;
+    color: white;
+  }
+
+  .list-items {
+    background-color: white;
+    border-radius: 0 3px 3px;
+    border: $primary-blue-b2 0.5px dotted;
+
+    &:hover {
+      box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+      cursor: pointer;
+    }
+  }
+
+  .data-details {
+    height: calc(100% - 47px);
+  }
+
+  .top-margin {
+    margin-top: 3px;
+  }
+}

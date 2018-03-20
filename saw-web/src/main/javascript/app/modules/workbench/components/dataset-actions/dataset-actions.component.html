@@ -1,0 +1,13 @@
+<button mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datasetmenu">
+    <mat-icon fontIcon="icon-action-solid"></mat-icon>
+  </button>
+  <mat-menu #datasetmenu="matMenu">
+    <button mat-menu-item (click)="openSQLEditor()">
+      <mat-icon style="margin-right: 0px !important; vertical-align: baseline;" fontIcon="icon-query-mode"></mat-icon>
+      <span>Execute SQL</span>
+    </button>
+    <button mat-menu-item disabled>
+      <mat-icon style="margin-right: 0px; vertical-align: baseline;" fontIcon="icon-delete"></mat-icon>
+      <span>delete</span>
+    </button>
+  </mat-menu>
