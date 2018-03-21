@@ -14,7 +14,7 @@
 - name: Create Transport Service environment file
   file: path=/etc/bda/saw-transport-service-env state=touch
 - name: Enable SAW Transport Service
-  systemd: name=saw-transport enabled=true daemon_reload=true
+  systemd: name=saw-transport-proxy.socket enabled=true state=started
 - name: Enable SAW Transport Service Executor (regular)
   systemd: name="saw-transport-executor@regular-{{ item }}" enabled=true daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}

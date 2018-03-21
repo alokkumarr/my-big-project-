@@ -1,6 +1,5 @@
 [Unit]
 Description=SAW Analyze Spark test data loader
-Requires=saw-transport.service
 After=saw-transport.service
 
 [Service]
