@@ -60,15 +60,29 @@ create-dashboard {
     position: absolute;
     font-size: 1.5em;
     opacity: 1;
-    bottom: 45%;
+    bottom: 54%;
     right: 50%;
     transform: translateX(50%);
     z-index: 9999;
   }
 
+  .empty-dashboard-image {
+    background-image: url('~img/empty-dashboard.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 90px;
+    height: 90px;
+    z-index: 4;
+    position: absolute;
+    bottom: 58%;
+    right: 50%;
+    transform: translateX(50%);
+  }
+
   .add-analysis {
     position: absolute;
-    bottom: 50%;
+    bottom: 48%;
     right: 50%;
     transform: translateX(50%);
     z-index: 9999;
@@ -76,5 +90,9 @@ create-dashboard {
     mat-icon {
       vertical-align: baseline;
     }
+  }
+
+  .widget-container {
+    height: 100%;
   }
 }

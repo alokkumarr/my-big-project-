@@ -248,13 +248,21 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
     if (this.requester) {
       this.requesterSubscription = this.requester.subscribe((req: any = {}) => {
         switch(req.action) {
+
         case 'add':
           this.dashboard.push(req.data);
           this.getDashboard.emit({changed: true, dashboard: this.prepareDashboard()});
           break;
+
+        case 'remove':
+          const tiles = filter(this.dashboard, tile => get(tile, 'analysis.id') === get(req, 'data.id'));
+          forEach(tiles, this.removeTile.bind(this));
+          break;
+
         case 'get':
           this.getDashboard.emit({save: true, dashboard: this.prepareDashboard()});
           break;
+
         default:
           this.getDashboard.emit({dashboard: this.prepareDashboard()});
         }

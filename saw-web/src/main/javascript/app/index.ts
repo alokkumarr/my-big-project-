@@ -33,6 +33,10 @@ import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
+declare global {
+  const require: any;
+}
+
 @NgModule({
   imports: [
     BrowserModule,
