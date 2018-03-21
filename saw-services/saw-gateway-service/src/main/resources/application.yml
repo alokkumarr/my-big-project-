@@ -69,8 +69,6 @@ api:
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
-            method : GET
-            path : '[/]export.*'
         -   location: ${export.service.host}
             method : POST
             path : '[/]export.*'
