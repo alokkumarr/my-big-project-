@@ -5,7 +5,7 @@
     <parent>
         <artifactId>xdf-nextgen</artifactId>
         <groupId>com.synchronoss.bda</groupId>
-        <version>1.0.0_dev</version>
+        <version>1.0.3_dev</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
