@@ -7,6 +7,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.re
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -20,8 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
-
-import java.util.regex.Pattern;
 
 public class BaseIT {
     @Rule

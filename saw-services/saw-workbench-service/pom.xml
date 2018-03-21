@@ -229,7 +229,7 @@
 					<execution>
 						<phase>test</phase>
 						<configuration>
-							<configLocation>src/checkstyle/checkstyle.xml</configLocation>
+							<configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>warning</violationSeverity>
 							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
