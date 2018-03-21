@@ -19,12 +19,6 @@ yum_install() {
 # Install deployment tools, if not already installed
 if ! command -v ansible-playbook > /dev/null; then
     echo "Installing deployment tools"
-    # Workaround: Ansible is not available from the default
-    # repositories yet, so install it from EPEL for now.  RHEL might
-    # not provide epel-release, so install it directly from URL.
-    pkg=epel-release-latest-7.noarch.rpm
-    url=https://dl.fedoraproject.org/pub/epel/$pkg
-    yum_install $url
     yum_install ansible
 fi
 

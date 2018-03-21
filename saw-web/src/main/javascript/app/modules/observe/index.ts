@@ -36,8 +36,8 @@ import { ChartComponent } from '../../common/components/charts/chart.component';
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { AddWidgetModule } from './components/add-widget/add-widget.module';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
-import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-choice.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
 import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
@@ -48,6 +48,7 @@ import {
   GlobalStringFilterComponent
 } from './components/global-filter';
 import { GlobalFilterService } from './services/global-filter.service';
+import { DashboardService } from './services/dashboard.service';
 import { CommonModule } from '../../common';
 
 export const ObserveModule = 'ObserveModule';
@@ -67,7 +68,6 @@ const components = [
   GlobalDateFilterComponent,
   GlobalStringFilterComponent,
   CreateDashboardComponent,
-  AnalysisChoiceComponent,
   ObserveChartComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent,
@@ -82,7 +82,8 @@ const components = [
     MaterialModule,
     GridsterModule,
     HttpClientModule,
-    UIRouterUpgradeModule
+    UIRouterUpgradeModule,
+    AddWidgetModule
   ],
   declarations: components,
   entryComponents: components,
@@ -91,6 +92,7 @@ const components = [
     { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: RefreshTokenInterceptor, multi: true },
     GlobalFilterService,
+    DashboardService,
     ObserveService,
     jwtServiceProvider,
     userServiceProvider,

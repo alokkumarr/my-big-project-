@@ -1,24 +1,18 @@
 declare const require: any;
 
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { Component, Inject, ViewChild } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatSidenav } from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
 import { ObserveService } from '../../services/observe.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition
-} from '@angular/animations';
+import { animations } from './create-dashboard.animations';
 
 import * as get from 'lodash/get';
-
-import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
+import * as forEach from 'lodash/forEach';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
@@ -26,30 +20,7 @@ require('./create-dashboard.component.scss');
 @Component({
   selector: 'create-dashboard',
   template,
-  animations: [
-    trigger('moveButton', [
-      state('empty', style({
-        bottom: '50%',
-        right: '50%',
-        transform: 'translateX(50%)'
-      })),
-      state('filled', style({
-        bottom: '30px',
-        right: '30px',
-        transform: 'translateX(0%)'
-      })),
-      transition('* => *', animate('500ms ease-out'))
-    ]),
-    trigger('hideHelp', [
-      state('empty', style({
-        opacity: 1
-      })),
-      state('filled', style({
-        opacity: 0
-      })),
-      transition('* => *', animate('250ms ease-out'))
-    ])
-  ]
+  animations
 })
 export class CreateDashboardComponent {
   public fillState = 'empty';
@@ -57,10 +28,13 @@ export class CreateDashboardComponent {
   public requester = new BehaviorSubject({});
   public mode = 'create';
 
+  @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
+
   constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
     private router: UIRouter,
     private menu: MenuService, // tslint:disable-line
+    private dashboardService: DashboardService,
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) {
@@ -76,9 +50,19 @@ export class CreateDashboardComponent {
   onDashboardChange(data) {
     if (data.changed) {
       this.checkEmpty(data.dashboard);
+      this.updateWidgetLog(data.dashboard);
     } else if (data.save) {
       this.openSaveDialog(data.dashboard);
     }
+  }
+
+  updateWidgetLog(dashboard) {
+    const newLog = {};
+    forEach(dashboard.tiles, tile => {
+      newLog[tile.id] = {type: tile.type}
+    });
+
+    this.dashboardService.dashboardWidgets.next(newLog);
   }
 
   ngOnInit() {
@@ -89,16 +73,36 @@ export class CreateDashboardComponent {
   }
 
   chooseAnalysis() {
-    const dialogRef = this.dialog.open(AnalysisChoiceComponent);
+    this.widgetSidenav.open();
+  }
 
-    dialogRef.afterClosed().subscribe(analysis => {
-      if (!analysis) {
-        return;
-      }
+  onAnalysisAction(action, data) {
+    switch(action) {
+    case 'ADD':
+      if (!data) return;
+      const item = { cols: 1, rows: 1, analysis: data, updater: new BehaviorSubject({}) };
+      this.requester.next({action: 'add', data: item});
+      break;
+    case 'REMOVE':
+      if (!data) return;
+      this.requester.next({action: 'remove', data});
+      break
+    }
+  }
 
-      const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
-      this.requester.next({action: 'add', data: item})
-    });
+  onKPIAction(action, data) {
+    // TODO
+  }
+
+  onWidgetAction({widget, action, data}) {
+    switch(widget) {
+    case 'ANALYSIS':
+      this.onAnalysisAction(action, data);
+      break;
+    case 'KPI':
+      this.onKPIAction(action, data);
+      break;
+    }
   }
 
   saveDashboard() {
