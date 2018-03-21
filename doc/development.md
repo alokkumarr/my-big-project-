@@ -99,7 +99,7 @@ package and starting a new container, it can take minutes to complete.
 To iterate faster on specific system tests against an existing local
 deployment, run the following command:
 
-        mvn -pl dist test-compile failsafe:integration-test
+        mvn test-compile failsafe:integration-test -Pdocker-start
 
 The above command will immediately start executing system tests
 against an existing local SAW deployment.  Therefore it is possible to

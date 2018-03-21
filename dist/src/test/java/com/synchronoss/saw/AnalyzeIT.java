@@ -37,37 +37,7 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  * Integration test that lists metrics, creates an analysis, saves it,
  * executes it and lists the execution results.
  */
-public class ServicesExecuteIT {
-    private RequestSpecification spec;
-
-    private ObjectMapper mapper;
-    private String token;
-
-    @BeforeClass
-    public static void setUpClass() {
-        String port = System.getProperty("saw.docker.port");
-        if (port == null) {
-            throw new RuntimeException("Property saw.docker.port unset");
-        }
-        RestAssured.baseURI = "http://localhost:" + port;
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-    }
-
-    @Rule
-    public final JUnitRestDocumentation restDocumentation =
-        new JUnitRestDocumentation();
-
-    @Before
-    public void setUp() throws JsonProcessingException {
-        this.spec = new RequestSpecBuilder()
-            .addFilter(documentationConfiguration(restDocumentation)).build();
-        mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        /* Token is required for all the test cases.
-         Initialize the token before test case run.  */
-        token = authenticate();
-    }
-
+public class AnalyzeIT extends BaseIT {
     @Test
     public void testExecuteAnalysis() throws JsonProcessingException {
         String metricId = listMetrics(token);
@@ -98,34 +68,6 @@ public class ServicesExecuteIT {
             .extract().response();
         assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
         assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
-    }
-
-    private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
-    private static final String TEST_PASSWORD = "Sawsyncnewuser1!";
-
-    private String authenticate() throws JsonProcessingException {
-        ObjectNode node = mapper.createObjectNode();
-        node.put("masterLoginId", TEST_USERNAME);
-        node.put("password", TEST_PASSWORD);
-        String json = mapper.writeValueAsString(node);
-        Response response = given(spec)
-            .accept("application/json")
-            .header("Content-Type", "application/json")
-            .body(json)
-            .filter(document(
-                        "authenticate",
-                        preprocessRequest(
-                            preprocessReplace(TEST_USERNAME, "user@example.com"),
-                            preprocessReplace(TEST_PASSWORD, "password123"))))
-            .when().post("/security/doAuthenticate")
-            .then().assertThat().statusCode(200)
-            .body("aToken", startsWith(""))
-            .extract().response();
-        return response.path("aToken");
-    }
-
-    private OperationPreprocessor preprocessReplace(String from, String to) {
-        return replacePattern(Pattern.compile(Pattern.quote(from)), to);
     }
 
     private String listMetrics(String token) throws JsonProcessingException {
