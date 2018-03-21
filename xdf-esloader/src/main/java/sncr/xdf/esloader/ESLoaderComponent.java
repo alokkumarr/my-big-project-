@@ -26,7 +26,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     //TODO: Remove this
     public static String ESLOADER_DATASET;
 
-    private Map<String, String> esDataset;
+    private Map<String, Object> esDataset;
     private String dataSetName;
     private String inputDataFormat;
 
@@ -53,7 +53,6 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         int retVal = 0;
         try {
             ESLoader esLoaderConfig = this.ctx.componentConfiguration.getEsLoader();
-
             if (this.inputDataSets != null && !this.inputDataSets.isEmpty()) {
                 ESLOADER_DATASET = this.inputDataSets.keySet().iterator().next();
             }
@@ -61,8 +60,8 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
             esDataset = this.inputDataSets.get(ESLOADER_DATASET);
             logger.debug("ES Dataset = " + esDataset);
 
-            dataSetName = esDataset.get(DataSetProperties.Name.name());
-            inputDataFormat = esDataset.get(DataSetProperties.Format.name());
+            dataSetName = (String)esDataset.get(DataSetProperties.Name.name());
+            inputDataFormat = (String)esDataset.get(DataSetProperties.Format.name());
 
             Map<String, Dataset> dataSetMap = createDatasetMap();
 
@@ -129,10 +128,10 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     private Map<String, Dataset> createDatasetMap() {
         Map<String, Dataset> dataSetmap = new HashMap();
 
-        for ( Map.Entry<String, Map<String, String>> entry : this.inputDataSets.entrySet()) {
-            Map<String, String> desc = entry.getValue();
-            String loc = desc.get(DataSetProperties.PhysicalLocation.name());
-            String format = desc.get(DataSetProperties.Format.name());
+        for ( Map.Entry<String, Map<String, Object>> entry : this.inputDataSets.entrySet()) {
+            Map<String, Object> desc = entry.getValue();
+            String loc = (String)desc.get(DataSetProperties.PhysicalLocation.name());
+            String format = (String)desc.get(DataSetProperties.Format.name());
             logger.debug("Physical location = + " + loc + ". Format = " + format);
             Dataset ds = null;
             switch (format.toLowerCase()) {

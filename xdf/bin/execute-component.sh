@@ -23,7 +23,11 @@ declare -A COMP_MC=(
     [zero]=sncr.xdf.component.ZeroComponent
     [parser]=sncr.xdf.parser.Parser
 	[transformer]=sncr.xdf.transformer.TransformerComponent
+<<<<<<< HEAD
 )
+=======
+    )
+>>>>>>> a2ecfcadf167e81cd304ef5470bd145d91fa2c42
 
 function usage()
 {

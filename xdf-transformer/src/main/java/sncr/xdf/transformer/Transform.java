@@ -17,6 +17,7 @@ import sncr.xdf.transformer.jexl.XdfObjectContext;
 import sncr.xdf.transformer.system.StructAccumulator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,41 +26,45 @@ import java.util.Map;
 public class Transform implements Function<Row, Row> {
 
     private static final Logger logger = Logger.getLogger(Transform.class);
-    private final SparkSession sparkSession;
     private final LongAccumulator successTransformationsCount;
     private final LongAccumulator failedTransformationsCount;
     private final StructAccumulator structAccumulator;
-    private final String bcFistRefDataSet;
-    private final StructType schema;
 
-    private Map<String, Broadcast<Dataset>> mapRefData = null;
+    private final StructType schema;
+    private final int threshold;
+
+    private Map<String, Broadcast<List<Row>>> mapRefData = null;
+    private final Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor;
     private Map<String, Object> extFunctions;
     private JexlEngine jexlEngine = null;
     private String script;
     private Script jexlScript;
 
-    public Transform(SparkSession ss,
-                     String scr,
+    public Transform(String scr,
                      StructType inSchema,
-                     Map<String, Broadcast<Dataset>> mapRefData,
+                     Map<String, Broadcast<List<Row>>> mapRefData,
+                     Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor,
                      LongAccumulator successTransformationsCount,
                      LongAccumulator failedTransformationsCount,
                      StructAccumulator structAccumulator,
-                     String  bcFistRefDataSet)
-            throws Exception {
+                     int threshold)
+    {
         script = scr;
         schema = inSchema;
-        sparkSession = ss;
+        this.refDataDescriptor = refDataDescriptor;
         this.successTransformationsCount = successTransformationsCount;
         this.failedTransformationsCount = failedTransformationsCount;
         this.structAccumulator = structAccumulator;
         this.mapRefData = mapRefData;
-        //fieldToIdxMapping = XdfObjectContext.PrepareFieldMapping(objectSchema);
-        this.bcFistRefDataSet = bcFistRefDataSet;
+        this.threshold = threshold;
+
     }
 
-    public Row call(Row arg0) {
+    public Row call(Row arg0) throws Exception {
         Row return_value;
+        if ( threshold != 0 && failedTransformationsCount.value() > threshold)
+            throw new Exception(String.format("Number of invalid records [%d] exceeds threshold value [%d]", failedTransformationsCount.value(), threshold));
+
         try {
             if (jexlEngine == null) {
                 // Initialize
@@ -70,25 +75,23 @@ public class Transform implements Function<Row, Row> {
                 extFunctions.put("extFunctions", new DataManipulationUtil());
                 logger.debug("Jexl script: " + script);
                 jexlEngine.setLenient(true);
-    //        jexlEngine.setFunctions(extFunctions);
-                jexlScript = jexlEngine.createScript(script);
     //Create N (N = length of mapRefData ) DataScanners with name of map key (as mentioned in configuration)
     //The first one make 'ref' as a duplicate for backward compatibility
                 if (this.mapRefData != null && !this.mapRefData.isEmpty()) {
-                    extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData.get(bcFistRefDataSet)));
-                    for (String refDataKey : this.mapRefData.keySet()) {
-                        extFunctions.put(refDataKey, new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData.get(refDataKey)));
-                    }
+                    extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(mapRefData, refDataDescriptor));
                 }
                 jexlEngine.setFunctions(extFunctions);
             }
+
+            //for ( String k: jexlEngine.getFunctions().keySet()) System.out.println("Fk: " + k + " v: " + jexlEngine.getFunctions().get(k));
+
+            jexlScript = jexlEngine.createScript(script);
+
             XdfObjectContext sc1 = new XdfObjectContext( jexlEngine, schema, arg0);
-            System.out.println("Before script execution: ");
             jexlScript.execute(sc1);
             if(sc1.isSuccess()) {
                 successTransformationsCount.add(1);
                 // Transformation finished - create resulting Tuple
-                System.out.println("Script successfully executed -- updated schema");
                 return_value = sc1.createNewRow(0, null, successTransformationsCount.value());
                 //TODO::Update Struct Accumulator
                 Map<String, StructField> newSchema = sc1.getNewOutputSchema();
@@ -97,7 +100,6 @@ public class Transform implements Function<Row, Row> {
                 // Error flag has been set inside the JEXL transformation
                 // Mark record with error state
                 failedTransformationsCount.add(1);
-                System.out.println("Record has been invalidated inside the JEXL script -- before creating row." );
                 return_value = sc1.createNewRow(-3, "Record has been invalidated inside the JEXL script", failedTransformationsCount.value());
                 Map<String, StructField> newSchema = sc1.getNewOutputSchema();
                 newSchema.forEach((k, v) -> structAccumulator.add(new Tuple2<>(k, v)));
@@ -110,6 +112,10 @@ public class Transform implements Function<Row, Row> {
             rv._2().forEach((k, v) -> structAccumulator.add(new Tuple2<>(k, v)));
             return_value = rv._1();
         }
+        if (threshold > 0 && threshold < failedTransformationsCount.value()){
+            throw new RuntimeException("# of failed records exceeded given threshold, cancel processing");
+        }
+
         return return_value;
     }
 

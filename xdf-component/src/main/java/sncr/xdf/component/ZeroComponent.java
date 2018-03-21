@@ -50,15 +50,16 @@ public class ZeroComponent extends Component implements WithMovableResult , With
 
         String inKey  = (String) inputDataSets.keySet().toArray()[0];
         String outKey  = (String) outputDataSets.keySet().toArray()[0];
-        Map<String, String> inDesc = inputDataSets.get(inKey);
-        Map<String, String> outDesc = outputDataSets.get(outKey);
+        Map<String, Object> inDesc = inputDataSets.get(inKey);
+        Map<String, Object> outDesc = outputDataSets.get(outKey);
 
         MoveDataDescriptor desc = new MoveDataDescriptor(
-            inDesc.get(DataSetProperties.PhysicalLocation.name()),
-            outDesc.get(DataSetProperties.PhysicalLocation.name()),
-            outDesc.get(DataSetProperties.Name.name()),
-            outDesc.get(DataSetProperties.Mode.name()),
-            outDesc.get(DataSetProperties.Format.name()));
+                (String)inDesc.get(DataSetProperties.PhysicalLocation.name()),
+                (String) outDesc.get(DataSetProperties.PhysicalLocation.name()),
+                (String) outDesc.get(DataSetProperties.Name.name()),
+                (String) outDesc.get(DataSetProperties.Mode.name()),
+                (String) outDesc.get(DataSetProperties.Format.name()),
+                null);
         resultDataDesc.add(desc);
         logger.debug(String.format("DataSet %s will be moved from %s to %s, format: %s, mode: %s",
             inDesc.get(DataSetProperties.Name.name()),

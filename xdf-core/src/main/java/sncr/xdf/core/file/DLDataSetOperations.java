@@ -9,11 +9,13 @@ import org.apache.log4j.Logger;
 import org.apache.parquet.hadoop.Footer;
 import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.hadoop.metadata.BlockMetaData;
+import org.glassfish.jersey.internal.util.ExceptionUtils;
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +39,17 @@ public class DLDataSetOperations {
     public static final String FORMAT_PARQUET = "parquet";
     public static final String FORMAT_JSON = "json";
 
-    private static PARTITION_STRUCTURE checkLevel(FileSystem fileSystem, String glob) {
+    public final static PathFilter PARQUET_FILTER = file ->
+            (file.getName().endsWith(".parquet") && (!file.getName().startsWith(".")));
+
+    public final static PathFilter JSON_FILTER = file ->
+            (file.getName().endsWith(".json") && (!file.getName().startsWith(".")));
+
+    public final static PathFilter CSV_FILTER = file ->
+            ( (file.getName().endsWith(".csv") || file.getName().endsWith(".dat") || file.getName().endsWith(".txt") )&& (!file.getName().startsWith(".")));
+
+
+    private static PARTITION_STRUCTURE checkLevel(FileSystem fileSystem, String glob, List<String> kl) {
         PARTITION_STRUCTURE partitionStructure = PARTITION_STRUCTURE.HIVE;
         try {
             FileStatus[] it = fileSystem.globStatus(new Path(glob), FILEDIR_FILTER);
@@ -62,18 +74,25 @@ public class DLDataSetOperations {
                         // first directory in iterations initialize
                         firstDirName = fileStatus.getPath().getName();
                         charPosition1 = firstDirName.indexOf('=');
-                        if(charPosition1 > 0) firstFieldName = firstDirName.substring(0, charPosition1);
+                        if(charPosition1 > 0) {
+                            firstFieldName = firstDirName.substring(0, charPosition1);
+                            kl.add(firstFieldName);
+                        }
                     }
 
+
                     if(charPosition1 > 0 && partitionStructure == PARTITION_STRUCTURE.HIVE) {
+
                         String dirName = fileStatus.getPath().getName();
                         int charPosition = dirName.indexOf('=');
                         if( charPosition != charPosition1){
                             partitionStructure = PARTITION_STRUCTURE.DRILL;
+                            break;
                         } else {
                             String fieldName = dirName.substring(0, charPosition1);
                             if(!fieldName.equals(firstFieldName)){
                                 partitionStructure = PARTITION_STRUCTURE.DRILL;
+                                break;
                             }
                         }
                     } else {
@@ -95,7 +114,7 @@ public class DLDataSetOperations {
 
             if (hasDirectories && hasFiles) {
                 // ERROR in data object directory structure
-                System.err.println("Invalid object directory structure - having directories and files on the same level");
+                logger.error("Invalid object directory structure - having directories and files on the same level");
                 return PARTITION_STRUCTURE.ERROR;
             }
             if (hasFiles) {
@@ -111,7 +130,7 @@ public class DLDataSetOperations {
 
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error(ExceptionUtils.exceptionStackTraceAsString(e));
         }
         return PARTITION_STRUCTURE.ERROR;
     }
@@ -121,38 +140,47 @@ public class DLDataSetOperations {
     //  Full glob - to enumerate all files and use with HDFS API
     //  Depth
     //  Partition structure type (DRILL, HIVE, FLAT)
-    public static Tuple4<String, String, Integer, PARTITION_STRUCTURE> getPartitioningInfo(String location){
+    public static Tuple4<String, List<String>, Integer, PARTITION_STRUCTURE> getPartitioningInfo(String location){
         int depth = 0;
         String glob = location;
         PARTITION_STRUCTURE overallStructure = PARTITION_STRUCTURE.HIVE;
         PARTITION_STRUCTURE i = PARTITION_STRUCTURE.HIVE;
         FileSystem fileSystem = HFileOperations.getFileSystem();
+        List<String> kl = new ArrayList<>();
 
-        while((i == PARTITION_STRUCTURE.DRILL || (i == PARTITION_STRUCTURE.HIVE))){
+        while(i == PARTITION_STRUCTURE.DRILL || i == PARTITION_STRUCTURE.HIVE ){
+            logger.debug("Checking locations: " + glob + " depth: " + depth);
+
             glob += File.separatorChar + "*";
-            i = checkLevel(fileSystem, glob);
+            i = checkLevel(fileSystem, glob, kl);
             switch(i){
                 case ERROR:
                     overallStructure = PARTITION_STRUCTURE.ERROR;
                     break;
                 case DRILL:
-                    overallStructure = overallStructure != PARTITION_STRUCTURE.ERROR
-                            ? PARTITION_STRUCTURE.DRILL : overallStructure;
+                    overallStructure = (overallStructure != PARTITION_STRUCTURE.DRILL)
+                            ? PARTITION_STRUCTURE.ERROR : overallStructure;
+                    break;
+                case HIVE:
+                    overallStructure = (overallStructure != PARTITION_STRUCTURE.HIVE)
+                            ? PARTITION_STRUCTURE.ERROR : overallStructure;
                     break;
             }
             depth++;
         }
 
-        Tuple4<String, String, Integer, PARTITION_STRUCTURE> retval = null;
+        Tuple4<String, List<String>, Integer, PARTITION_STRUCTURE> retval = null;
         if(i == PARTITION_STRUCTURE.FLAT && depth == 1){
-            overallStructure = PARTITION_STRUCTURE.FLAT;
-            retval = new Tuple4<>(location, glob, depth, PARTITION_STRUCTURE.FLAT);
+            retval = new Tuple4<>(location, kl, depth, PARTITION_STRUCTURE.FLAT);
         }
-        if(overallStructure == PARTITION_STRUCTURE.DRILL ) {
-            retval = new Tuple4<>(glob, glob, depth, overallStructure);
+        else if(overallStructure == PARTITION_STRUCTURE.DRILL ) {
+            retval = new Tuple4<>(glob, kl, depth, overallStructure);
         }
-        if(overallStructure == PARTITION_STRUCTURE.HIVE ) {
-            retval = new Tuple4<>(location, glob, depth, overallStructure);
+        else if(overallStructure == PARTITION_STRUCTURE.HIVE ) {
+            retval = new Tuple4<>(glob, kl, depth, overallStructure);
+        }
+        else {
+            retval = new Tuple4<>(location, kl, depth, PARTITION_STRUCTURE.ERROR);
         }
         return retval;
     }

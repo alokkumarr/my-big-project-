@@ -51,7 +51,7 @@ public class XDFException extends RuntimeException {
                 +  "application/inputOutput/rejectedDataOutputLocation parameter into configuration");
         messages.put(ErrorCodes.SCD_DataNotFound, "SCD: Neither SCD data not input data found, please check configuration");
         messages.put(ErrorCodes.HDFSOperationFailed, "Could not complete HDFS Operation, see exception");
-        messages.put(ErrorCodes.UnsupportedLocation, "Unsupported location found: %s, terminate job");
+        messages.put(ErrorCodes.UnsupportedPartitioning, "Unsupported partitioning [ %s ] found: %s, terminate job");
         messages.put(ErrorCodes.SQLScriptNotParsable, "The SQL script is not parsable: ");
         messages.put(ErrorCodes.SQLScriptPreProcFailed, "Pre-processing of SQL script has failed, reason: %s");
         messages.put(ErrorCodes.SCD2UnsupportedComparableType, "Unsupported data type is used in SCD combiner to compare two SCD records. Processing canceled.");
@@ -113,7 +113,7 @@ public class XDFException extends RuntimeException {
         CouldNotCleanupDir,
         SCD_DataNotFound,
         HDFSOperationFailed,
-        UnsupportedLocation,
+        UnsupportedPartitioning,
         InvalidData,
         SQLScriptPreProcFailed,
         SQLScriptNotParsable,

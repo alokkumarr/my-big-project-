@@ -5,7 +5,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import sncr.bda.base.MetadataStore;
 import sncr.xdf.context.Context;
 import sncr.bda.conf.Parameter;
 import sncr.xdf.exceptions.XDFException;
@@ -41,11 +43,11 @@ public abstract class Component {
 
     protected String componentName = "unnamed";
     protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
-    protected Map<String, Map<String, String>> inputDataSets = null;
-    protected Map<String, Map<String, String>> outputDataSets = null;
+    protected Map<String, Map<String, Object>> inputDataSets = null;
+    protected Map<String, Map<String, Object>> outputDataSets = null;
 
-    protected Map<String, Map<String, String>> inputs = null;
-    protected Map<String, Map<String, String>> outputs = null;
+    protected Map<String, Map<String, Object>> inputs = null;
+    protected Map<String, Map<String, Object>> outputs = null;
 
 
     protected WithDataSetService.DataSetServiceAux dsaux;
@@ -54,14 +56,13 @@ public abstract class Component {
     private String transformationID;
 
 
+
     public String getError(){
         return error;
     }
 
     public int Run(){
-
-        int ret = processMetadata();
-        logger.debug("Process Metadata Return code = " + ret);
+        int ret = initializeDataSets();
         if ( ret == 0) {
             ret = Execute();
             logger.debug("Execute Return code = " + ret);
@@ -88,7 +89,7 @@ public abstract class Component {
         return ret;
     }
 
-    protected int processMetadata() {
+    protected int initializeDataSets() {
         try {
             transformationID = transformationMD.readOrCreateTransformation(ctx);
             if (this instanceof WithDataSetService) {
@@ -96,12 +97,13 @@ public abstract class Component {
                 WithDataSetService mddl = (WithDataSetService) this;
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
+                    logger.info("Extracting meta data");
+                    inputDataSets = mddl.discoverInputDataSetsWithMetadata(dsaux);
+                    inputs = mddl.discoverDataParametersWithMetaData(dsaux);
 
-                    logger.trace("Resolving dataobjects");
-                    inputDataSets = mddl.resolveDataObjects(dsaux);
-                    logger.debug("Datasets = " + inputDataSets);
+                    logger.debug("Input datasets = " + inputDataSets);
+                    logger.debug("Inputs = " + inputs);
 
-                    inputs = mddl.resolveDataParameters(dsaux);
                     mdInputDSMap = md.loadExistingDataSets(ctx, inputDataSets);
                     mdInputDSMap.forEach((id, ids) -> {
                         try {
@@ -127,7 +129,15 @@ public abstract class Component {
                 ctx.componentConfiguration.getOutputs().forEach(o ->
                 {
                     logger.debug("Add output object to data object repository: " + o.getDataSet());
-                    JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()), o.getMetadata());
+
+                    if (!mddl.discoverAndvalidateOutputDataSet(outputDataSets.get(o.getDataSet()))){
+                        error = "Could not validate output dataset: " + o.getDataSet();
+                        logger.error(error);
+                        rc[0] = -1;
+                        return;
+                    }
+
+                    JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
                     if (ds == null) {
                         error = "Could not create metadata for output dataset: " + o.getDataSet();
                         logger.error(error);
@@ -154,14 +164,13 @@ public abstract class Component {
                         return;
                     }
 
-                    md.addDataSetToDLFSMeta(outputDataSets.get(o.getDataSet()), o);
                 });
                 if (rc[0] != 0) return rc[0];
             }
             return 0;
 
         } catch (Exception e) {
-            error = "component initialization (input-resolving/output-preparation) exception: " + e.getMessage();
+            error = "component initialization (input-discovery/output-preparation) exception: " + ExceptionUtils.getFullStackTrace(e);
             logger.error(error);
             return -1;
         }
@@ -205,13 +214,14 @@ public abstract class Component {
             return Init(configAsStr, appId, batchId, xdfDataRootSys);
         } catch(ParseException e){
             error = "Could not parse CMD line: " +  e.getMessage();
-            logger.error(e);
+            logger.error(ExceptionUtils.getStackTrace(e));
             return -1;
         } catch(XDFException e){
+            logger.error(ExceptionUtils.getStackTrace(e));
             return -1;
         } catch (Exception e) {
             error = "Exception at component initialization " +  e.getMessage();
-            logger.error( e);
+            logger.error(ExceptionUtils.getStackTrace(e));
             return -1;
         }
     }
@@ -242,8 +252,11 @@ public abstract class Component {
             return -1;
         }
 
+        logger.debug("Getting project metadata");
         ProjectStore prjStore = new ProjectStore(xdfDataRootSys);
         JsonElement prj = prjStore.readProjectData(appId);
+        logger.debug("Project metadata for " + appId + " is " + prj);
+
         JsonObject prjJo = prj.getAsJsonObject();
         JsonElement plp;
         List<Parameter> oldList = cfg.getParameters();
@@ -330,10 +343,21 @@ public abstract class Component {
             String ale_id = als.createAuditLog(ctx, ale);
             mdOutputDSMap.forEach((id, ds) -> {
                 try {
-                    md.getDSStore().setTransformationProducer(id, transformationID);
-                    md.getDSStore().updateStatus(id, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
+                    //TODO:: Move it after merge to appropriate place
+                    ctx.transformationID = transformationID;
+                    ctx.ale_id = ale_id;
+                    ctx.status = status;
+
+                    //TODO:: Keep it optional, schema might not be available
+                    String dsname = id.substring(id.indexOf(MetadataStore.delimiter) + MetadataStore.delimiter.length());
+                    Map<String, Object> outDS = outputDataSets.get(dsname);
+                    JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
+
+                    logger.trace("Extracted schema: " + schema.toString());
+                    md.updateDS(id, ctx, ds, schema);
+
                 } catch (Exception e) {
-                    error = "Could not write AuditLog entry to document, id = " + id;
+                    error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                     logger.error(error);
                     logger.error("Native exception: ", e);
                     rc[0]=-1;
@@ -342,7 +366,7 @@ public abstract class Component {
             });
             transformationMD.updateStatus(transformationID, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
         } catch (Exception e) {
-            error = "Exception at job finalization: " +  e.getMessage();
+            error = "Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e);
             logger.error(e);
             return -1;
         }

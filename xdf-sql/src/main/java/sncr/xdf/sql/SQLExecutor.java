@@ -1,15 +1,19 @@
 package sncr.xdf.sql;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.component.XDFDataWriter;
 import sncr.xdf.exceptions.XDFException;
 import scala.Tuple4;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 
@@ -83,7 +87,8 @@ public class SQLExecutor implements Serializable {
 
                     logger.debug("Load data from: " + location  + ", registered table name: " + tn );
 
-                    Tuple4<String, String, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
+                    //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
+                    Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
                             DLDataSetOperations.getPartitioningInfo(location);
 
                     if (loc_desc == null)
@@ -96,7 +101,6 @@ public class SQLExecutor implements Serializable {
                     switch ( tb.format )
                     {
                         case "parquet" :
-                        case "PARQUET" :
                             try{
                                 df = ctx.sparkSession.read().load(loc_desc._1());
                                 loaded = true;
@@ -107,7 +111,6 @@ public class SQLExecutor implements Serializable {
                             break;
 
                         case "json" :
-                        case "JSON" :
                             try{
                                 df = ctx.sparkSession.read().json(loc_desc._1());
                                 loaded = true;
@@ -130,7 +133,6 @@ public class SQLExecutor implements Serializable {
                 long lt = System.currentTimeMillis();
                 descriptor.loadTime = (int)((lt-st)/1000);
                 Dataset<Row> sqlResult = ctx.sparkSession.sql(descriptor.SQL);
-
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
 
                 jobDataFrames.put(descriptor.targetTableName, finalResult);
@@ -141,23 +143,11 @@ public class SQLExecutor implements Serializable {
                 descriptor.executionTime =  (int) ((exet-lt)/1000);
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
-                switch (descriptor.tableDescriptor.format){
-                    case "PARQUET":
-                    case "parquet":
-                        finalResult.write().parquet(descriptor.targetTransactionalLocation);
-                        break;
-                    case "json" :
-                    case "JSON" :
-                        finalResult.write().json(descriptor.targetTransactionalLocation);
-                        break;
-                    case "csv" :
-                    case "CSV" :
-                        finalResult.write().saveAsTable(descriptor.targetTransactionalLocation);
-                        break;
-                    default:
-                        finalResult.write().parquet(descriptor.targetTransactionalLocation);
-                        break;
-                }
+
+                XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
+                xdfWriter.writeToTempLoc( finalResult, descriptor.targetTransactionalLocation);
+
+                descriptor.schema = xdfWriter.extractSchema(finalResult);
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);
@@ -173,8 +163,6 @@ public class SQLExecutor implements Serializable {
         }
         return 0L;
     }
-
-
 
 
 

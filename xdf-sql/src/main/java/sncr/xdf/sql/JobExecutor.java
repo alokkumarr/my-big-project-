@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
 
@@ -26,8 +27,8 @@ public class JobExecutor {
 
     private Context ctx;
 
-    Map<String, Map<String, String>> inputDOs;
-    Map<String, Map<String, String>> outputDOs;
+    Map<String, Map<String, Object>> inputDOs;
+    Map<String, Map<String, Object>> outputDOs;
 
     private Map<String, Dataset<Row>> availableDataframes = new HashMap<>();
     private String now;
@@ -39,8 +40,8 @@ public class JobExecutor {
 
 
     public JobExecutor(Context ctx,
-                       Map<String, Map<String, String>> inputDOLocations,
-                       Map<String, Map<String, String>> outputDOLocations) throws XDFException
+                       Map<String, Map<String, Object>> inputDOLocations,
+                       Map<String, Map<String, Object>> outputDOLocations) throws XDFException
     {
         this.ctx = ctx;
         report = new ArrayList<>();
@@ -154,6 +155,8 @@ public class JobExecutor {
                 else{
                     logger.trace("Add result table: " + sqlDescriptor.targetTableName );
                     result.put(sqlDescriptor.targetTableName, sqlDescriptor);
+                    Map<String, Object> ods = outputDOs.get(sqlDescriptor.targetTableName);
+                    ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
                 }
             }
 

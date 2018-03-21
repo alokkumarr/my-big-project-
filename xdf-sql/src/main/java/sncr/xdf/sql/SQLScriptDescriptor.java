@@ -38,8 +38,8 @@ public class SQLScriptDescriptor {
     private List<SQLDescriptor> statementDescriptors = new ArrayList<>();
     private Map<String, TableDescriptor> scriptWideTableMap = new HashMap<>();
 
-    private Map<String, Map<String, String>> inputDataObjects;
-    private Map<String, Map<String, String>> outputDataObjects;
+    private Map<String, Map<String, Object>> inputDataObjects;
+    private Map<String, Map<String, Object>> outputDataObjects;
 
     public SQLDescriptor getSQLDescriptor(int inx){
         return statementDescriptors.get(inx);
@@ -51,8 +51,8 @@ public class SQLScriptDescriptor {
 
     public SQLScriptDescriptor(Context ctx,
                                String tempDir,
-                               Map<String, Map<String, String>>  inputDOs,
-                               Map<String, Map<String, String>> outputDOs){
+                               Map<String, Map<String, Object>>  inputDOs,
+                               Map<String, Map<String, Object>> outputDOs){
         this.ctx = ctx;
         this.transactionalLocation = tempDir;
         inputDataObjects = inputDOs;
@@ -284,10 +284,10 @@ public class SQLScriptDescriptor {
             //TODO:: Access by DataSet name or by parameter [name] -- Inputs???
             logger.trace("Resolving in table: " + tn);
             if (inputDataObjects.containsKey(tn)) {
-                Map<String, String> doProps = inputDataObjects.get(tn);
-                td.setLocation( doProps.get(DataSetProperties.PhysicalLocation.name()) );
-                td.format = doProps.get( DataSetProperties.Format.name() );
-                td.mode = doProps.get(DataSetProperties.Mode.name());
+                Map<String, Object> doProps = inputDataObjects.get(tn);
+                td.setLocation((String) doProps.get(DataSetProperties.PhysicalLocation.name()));
+                td.format = (String) doProps.get( DataSetProperties.Format.name() );
+                td.mode = (String) doProps.get(DataSetProperties.Mode.name());
                 logger.debug(String.format("Resolved table [%s] at location: %s, storage format: %s", tn, td.getLocation(), td.format));
             } else {
                 throw new XDFException(XDFException.ErrorCodes.ConfigError, "Could not resolveDataParameters source data object: " + tn);
@@ -312,11 +312,12 @@ public class SQLScriptDescriptor {
             //if (outputs.containsKey(tn)) {
             if (outputDataObjects.containsKey(tn)) {
 
-                Map<String, String> oDO = outputDataObjects.get(tn);
-                td.setLocation(oDO.get(DataSetProperties.PhysicalLocation.name()));
-                td.format = oDO.get(DataSetProperties.Format.name());
-                td.mode = oDO.get(DataSetProperties.Mode.name());
-                td.numberOfFiles = Integer.valueOf(oDO.get(DataSetProperties.NumberOfFiles.name()));
+                Map<String, Object> oDO = outputDataObjects.get(tn);
+                td.setLocation((String) oDO.get(DataSetProperties.PhysicalLocation.name()));
+                td.format = (String) oDO.get(DataSetProperties.Format.name());
+                td.mode = (String) oDO.get(DataSetProperties.Mode.name());
+                td.keys = (List<String>) oDO.get(DataSetProperties.PartitionKeys.name());
+                td.numberOfFiles = (Integer) oDO.get(DataSetProperties.NumberOfFiles.name());
 
                 logger.debug(String.format("Resolved target table [%s => %s, storage format: %s, operation mode: %s, number of files %d ] \n  to location: ",
                         tn, td.getLocation(), td.format, td.mode, td.numberOfFiles));

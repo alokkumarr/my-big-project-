@@ -63,16 +63,16 @@ public class DataProfilerComponent extends Component implements WithSparkContext
             // Resolve physical PhysicalLocation
             if (ctx.componentConfiguration.getInputs() != null &&
                     !ctx.componentConfiguration.getInputs().isEmpty())
-                inputDataSets = resolveDataParameters(dsaux);
+                inputDataSets = discoverDataParametersWithInput(dsaux);
 
             // Run component logic here
             // ...
             // Read input file
             if(inputDataSets != null){
                 String fieldSeparator = ctx.componentConfiguration.getAnalyzer().getFieldSeparator();
-                //TODO:: Get correct keys
-                Map<String, String> ds1 = inputDataSets.get((String) inputDataSets.keySet().toArray()[0]);
-                Dataset<String> src = ctx.sparkSession.read().textFile(ds1.get(DataSetProperties.PhysicalLocation));
+                //TODO:: Get correct partitionList
+                Map<String, Object> ds1 = inputDataSets.get((String) inputDataSets.keySet().toArray()[0]);
+                Dataset<String> src = ctx.sparkSession.read().textFile((String)ds1.get(DataSetProperties.PhysicalLocation));
                 src.show(10);
                 src.printSchema();
 

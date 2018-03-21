@@ -1,0 +1,13 @@
+//Test JEXL script
+
+$F1 = $intVal + 200;
+$doubleVal = $intVal * 90.8;
+if ($strVal != null ){
+  $F2 = $strVal.concat(' - updated field');
+}
+else{
+  $F2 = 'Null value';
+}
+
+
+

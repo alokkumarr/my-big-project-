@@ -1,5 +1,6 @@
 package sncr.xdf.parser;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -15,11 +16,9 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
+import sncr.bda.conf.Input;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.component.Component;
-import sncr.xdf.component.WithDataSetService;
-import sncr.xdf.component.WithMovableResult;
-import sncr.xdf.component.WithSparkContext;
+import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
 import sncr.xdf.core.file.DLDataSetOperations;
@@ -34,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static sncr.bda.conf.Input.Format.PARQUET;
+
 public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
 
     private static final Logger logger = Logger.getLogger(Parser.class);
@@ -47,6 +48,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private String tempDir;
     private String outputDataSetName;
     private String outputDataSetLocation;
+    private String outputFormat;
 
     private LongAccumulator errCounter;
     private LongAccumulator recCounter;
@@ -54,7 +56,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private StructType schema;
     private List<String> tsFormats;
     private StructType internalSchema;
+    private Integer outputNOF;
 
+    private List<String> pkeys;
 
     {
         componentName = "parser";
@@ -82,9 +86,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
         tempDir = generateTempLocation(new DataSetServiceAux(ctx, md), null, null);
         lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
-        delimiter = ctx.componentConfiguration.getParser().getDelimiter().charAt(0);
-        quoteChar = ctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
-        quoteEscapeChar = ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0);
+        delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
+        quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
+        quoteEscapeChar = (ctx.componentConfiguration.getParser().getQuoteEscape() != null)? ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
 
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
@@ -102,10 +106,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             return -1;
         }
 
-        Map.Entry<String, Map<String, String>> ds =  (Map.Entry<String, Map<String, String>>)outputDataSets.entrySet().toArray()[0];
+        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)outputDataSets.entrySet().toArray()[0];
         outputDataSetName = ds.getKey();
-        outputDataSetLocation = ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation);
+        outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
+        outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
+        outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
+        pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
+
+        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
         //TODO: If data set exists and flag is not append - error
         // This is good for UI what about pipeline? Talk to Suren
@@ -184,8 +192,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(tempDir);
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET));
+
+//        df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(tempDir);
+//       resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+
+        //TODO: Change here
+        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
+        writeDataset(filteredDataset, outputFormat.toString(), tempDir);
+        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
 
         return 0;
     }
@@ -198,7 +212,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET));
+
+//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+
                 }
             }
         }
@@ -225,8 +242,39 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(destDir.toString());
-        return 0;
+        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
+
+        return writeDataset(filteredDataset, outputFormat, destDir.toString());
+    }
+
+    /**
+     *
+     * Writes the given dataset with a given format in the specified path.
+     *
+     * @param dataset Input dataset which needs to be written
+     * @param format Format in which data needs to be written
+     * As of now, the supported data formats are
+     * <ol>
+     *     <li>json</li>
+     *     <li>parquet</li>
+     * </ol>
+     * @param path Fully qualified path to which data needs to be written
+     * @return
+     * @throws XDFException
+     */
+    private int writeDataset(Dataset<Row> dataset, String format, String path) {
+        try {
+            XDFDataWriter xdfDW = new XDFDataWriter(format, outputNOF, pkeys);
+            xdfDW.writeToTempLoc(dataset,  path);
+            Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
+            outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
+            return 0;
+        } catch (Exception e) {
+            error = ExceptionUtils.getFullStackTrace(e);
+            logger.error("Error at writing result: " + error);
+            return -1;
+        }
+
     }
 
     private static List<Column> createFieldList(List<Field> fields){

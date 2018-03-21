@@ -5,7 +5,6 @@
 #   dl.root
 #   http.port
 #==> bin/xdf_info
-#==> conf/xdf-rest.conf
 
 #
 # Activate application: generate bin/xdf_info
@@ -17,8 +16,6 @@ CMD_DIR=$( cd $(dirname $0) && pwd -P )
 APPL_INFO=$CMD_DIR/xdf_info
 
 [[ ${1:-x} = deactivate ]] && {
-    rm -f $APPL_INFO $CONF_DIR/xdf-rest.conf
-    echo Deactivation completed, removed: $APPL_INFO, $CONF_DIR/xdf-rest.conf
     exit 0
 }
 
@@ -59,15 +56,5 @@ chmod 0755 $APPL_INFO
 CONF_DIR=$( cd $CMD_DIR/../conf && pwd )
 : ${CONF_DIR:?no value}
 
-XDF_REST_CONF=$CONF_DIR/xdf-rest.conf
-# Run mk_conf to create bin/xdf_info
-$MK_CONF >$XDF_REST_CONF \
-    $CONF_DIR/templates/xdf-rest.conf.template \
-    $APPL_INFO || {
-        echo 1>&2 error in $XDF_REST_CONF generation
-        exit 1
-    }
-echo Activation completed, files created:
-ls -l $APPL_INFO $XDF_REST_CONF
 
 exit 0

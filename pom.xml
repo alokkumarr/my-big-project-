@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>xdf-nextgen</artifactId>
-  <version>1.0.0_dev</version>
+  <version>1.0.3_dev</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
@@ -93,6 +93,7 @@
       <version>${spark-version}</version>
       <scope>${s-value}</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-streaming_${scala.version}</artifactId>
@@ -246,11 +247,16 @@
       <scope>test</scope>
     </dependency>
 		
-<!-- BDA Internal dependencies START -->		
+<!-- BDA Internal dependencies START -->
     <dependency>
-			<groupId>com.synchronoss.bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>core</artifactId>
+      <version>1.0.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>meta-api</artifactId>
-      <version>1.0.1_dev</version>
+      <version>1.0.4-SNAPSHOT</version>
     </dependency>
 <!-- BDA Internal dependencies END -->		
 
@@ -303,7 +309,6 @@
     <module>xdf-sql</module>
     <module>xdf-preview</module>
     <module>xdf-parser</module>
-    <module>xdf-rest</module>
     <module>xdf-esloader</module>
     <!-- -->
     <module>xdf</module>
@@ -311,4 +316,23 @@
   <build>
     <defaultGoal>package</defaultGoal>
   </build>
+  
+ 
+  <distributionManagement>
+    <repository>
+      <id>client-releases</id>
+      <name>SNCR Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>client-snapshots</id>
+      <name>SNCR Snapshot Repository</name>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
+    </snapshotRepository>
+    <site>
+      <id>sncr-libs-releases</id>
+      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+    </site>
+  </distributionManagement>
+   
 </project>

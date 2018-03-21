@@ -34,6 +34,7 @@ public class Context extends ContextMetadata {
 
     public SparkSession sparkSession = null;
     public SparkConf sparkConf;
+    public int globalFileCount = 0  ;
 
     public Context(String componentName,
                    String batchId,

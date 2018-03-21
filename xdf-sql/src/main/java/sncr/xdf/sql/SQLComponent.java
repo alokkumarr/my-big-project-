@@ -14,6 +14,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 
 import java.io.FileNotFoundException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -126,13 +127,18 @@ public class SQLComponent extends Component implements WithMovableResult , WithS
         outputDataSets.forEach(
             (on, obDesc) ->
             {
+                List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
+                String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
+
                 MoveDataDescriptor desc = new SQLMoveDataDescriptor(
-                    resultDataSets.get(on),                                     // SQLDescriptor
-                    obDesc.get(DataSetProperties.PhysicalLocation.name()));
+                        resultDataSets.get(on),         // SQLDescriptor
+                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
                 resultDataDesc.add(desc);
-                logger.debug(String.format("DataSet %s will be moved to %s",
+
+                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
                         obDesc.get(DataSetProperties.Name.name()),
-                        obDesc.get(DataSetProperties.PhysicalLocation.name()) ));
+                        obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
+
             }
         );
         return super.Move();
