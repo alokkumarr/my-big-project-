@@ -521,8 +521,9 @@
                 <requireProperty>
                   <property>env.SAW_AWS_USERNAME</property>
                   <message>The environment variable SAW_AWS_USERNAME must be set</message>
-                  <regex>\w{4}\d{4}</regex>
-                  <regexMessage>Username must be in the form "abcd0001"</regexMessage>
+                  <regex>\w{4}\d{4}(-.*)?</regex>
+                  <regexMessage>
+                    Username must be in the form "abcd0001" with an optional suffix</regexMessage>
                 </requireProperty>
               </rules>
               <fail>true</fail>
