@@ -33,13 +33,19 @@ import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.DataResponse;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 public class ExportServiceImpl implements ExportService{
@@ -162,26 +168,46 @@ public class ExportServiceImpl implements ExportService{
           DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
           LocalDateTime now = LocalDateTime.now();
           if (ftp != null && ftp != "") {
-            for (String aliastemp : ftp.split(",")) {
-              ObjectMapper jsonMapper = new ObjectMapper();
-              try {
-                FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
-                for (FTPDetails alias:obj.getFtpList()) {
-                  if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
-                    serviceUtils.uploadToFtp(alias.getHost(),
-                            alias.getPort(),
-                            alias.getUsername(),
-                            alias.getPassword(),
-                            exportBean.getFileName(),
-                            alias.getLocation(),
-                            "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType"),
-                            alias.getType());
-                    logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
+
+            try {
+
+              // compress the file
+              File cfile = new File(exportBean.getFileName());
+              String zipFileName = cfile.getName().concat(".zip");
+
+              FileOutputStream fos = new FileOutputStream(zipFileName);
+              ZipOutputStream zos = new ZipOutputStream(fos);
+
+              zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+              byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
+              zos.write(bytes, 0, bytes.length);
+              zos.closeEntry();
+              zos.close();
+
+              for (String aliastemp : ftp.split(",")) {
+                ObjectMapper jsonMapper = new ObjectMapper();
+                try {
+                  FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+                  for (FTPDetails alias:obj.getFtpList()) {
+                    if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
+                      serviceUtils.uploadToFtp(alias.getHost(),
+                              alias.getPort(),
+                              alias.getUsername(),
+                              alias.getPassword(),
+                              exportBean.getFileName().concat(".zip"),
+                              alias.getLocation(),
+                              "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType")+".zip",
+                              alias.getType());
+                      logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
+                    }
                   }
+                } catch (IOException e) {
+                  logger.error(e.toString());
                 }
-              } catch (IOException e) {
-                logger.error(e.toString());
               }
+            } catch (Exception e) {
+              logger.error("ftp error: "+e.getMessage());
             }
           }
 
@@ -257,31 +283,53 @@ public class ExportServiceImpl implements ExportService{
           DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
           LocalDateTime now = LocalDateTime.now();
           if (ftp != null && ftp != "") {
-            for (String aliastemp : ftp.split(",")) {
-              ObjectMapper jsonMapper = new ObjectMapper();
-              try {
-                FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
-                for (FTPDetails alias:obj.getFtpList()) {
-                  if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
-                    serviceUtils.uploadToFtp(alias.getHost(),
-                            alias.getPort(),
-                            alias.getUsername(),
-                            alias.getPassword(),
-                            exportBean.getFileName(),
-                            alias.getLocation(),
-                            "pivot_" + exportBean.getReportName() + dtf.format(now).toString() + "xlsx",
-                            alias.getType());
-                    logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
+
+            try {
+              // compress the file
+              File cfile = new File(exportBean.getFileName());
+              String zipFileName = cfile.getName().concat(".zip");
+
+              FileOutputStream fos = new FileOutputStream(zipFileName);
+              ZipOutputStream zos = new ZipOutputStream(fos);
+
+              zos.putNextEntry(new ZipEntry(cfile.getName()));
+
+              byte[] bytes = Files.readAllBytes(Paths.get(exportBean.getFileName()));
+              zos.write(bytes, 0, bytes.length);
+              zos.closeEntry();
+              zos.close();
+
+              for (String aliastemp : ftp.split(",")) {
+                ObjectMapper jsonMapper = new ObjectMapper();
+                try {
+                  FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+                  for (FTPDetails alias:obj.getFtpList()) {
+                    if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
+                      serviceUtils.uploadToFtp(alias.getHost(),
+                              alias.getPort(),
+                              alias.getUsername(),
+                              alias.getPassword(),
+                              exportBean.getFileName().concat(".zip"),
+                              alias.getLocation(),
+                              "pivot_" + exportBean.getReportName() + dtf.format(now).toString() + "xlsx" +".zip",
+                              alias.getType());
+                      logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
+                    }
                   }
+                } catch (IOException e) {
+                  logger.error(e.toString());
                 }
-              } catch (IOException e) {
-                logger.error(e.toString());
               }
+            } catch (FileNotFoundException e) {
+              logger.error("Zipping file error  FileNotFound: " + e.getMessage());
+            } catch (IOException e) {
+              logger.error("Zipping file error IOException: " + e.getMessage());
             }
           }
 
           logger.debug("Removing the file from published location");
           serviceUtils.deleteFile(exportBean.getFileName(),true);
+          serviceUtils.deleteFile(exportBean.getFileName().concat(".zip"),true);
         } catch (IOException e) {
           logger.error("Exception occurred while dispatching pivot :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
         }

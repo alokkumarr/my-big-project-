@@ -37,7 +37,7 @@ public class FTPUploader {
     public void uploadFile(String localFileFullName, String fileName, String hostDir)
             throws Exception {
         try (InputStream input = new FileInputStream(new File(localFileFullName))) {
-            this.ftp.storeFile(hostDir + fileName + ".zip", new ZipInputStream(input));
+            this.ftp.storeFile(hostDir + fileName, input);
         }
     }
 

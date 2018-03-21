@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.zip.ZipInputStream;
 
 public class SFTPUploader {
 
@@ -25,9 +24,10 @@ public class SFTPUploader {
 
     public void uploadFile(String localFileFullName, String fileName, String hostDir)
             throws Exception {
-        try (InputStream input = new FileInputStream(new File(localFileFullName))) {
-            // ToDo: change this as it doesn't accepts zip input stream
-            this.ftp.put(new ZipInputStream(input), hostDir + fileName + ".zip");
+        try {
+            this.ftp.put(localFileFullName, hostDir + fileName);
+        } catch (IOException e) {
+            logger.error("SFTP Error: "+ e.getMessage());
         }
     }
 
