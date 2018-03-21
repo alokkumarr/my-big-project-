@@ -1,0 +1,15 @@
+<div>
+  <button mat-button
+    class="choose-widget-type"
+    *ngFor="let type of widgetTypes"
+    [disabled]="type.disabled"
+    (click)="onChooseType(type)">
+
+    <div class="widget-icon" [ngClass]="type.icon"></div>
+    <div class="widget-desc">
+      <strong>{{type.name}}</strong>
+      <p>{{type.description}}</p>
+    </div>
+
+  </button>
+</div>

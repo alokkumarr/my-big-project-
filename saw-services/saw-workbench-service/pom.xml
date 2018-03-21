@@ -23,7 +23,7 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
-		<metadata.api>1.0.4-20180316.000610-12</metadata.api>
+		<metadata.api>1.0.3</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
 	</properties>
 

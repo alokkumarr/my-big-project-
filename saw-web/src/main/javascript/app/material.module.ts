@@ -23,16 +23,15 @@ import {
   MatInputModule,
   MatToolbarModule,
   MatSlideToggleModule,
-  MatExpansionModule,
-  MatButtonToggleModule,
-  MatCardModule,
-  MatStepperModule,
   MatSliderModule,
   MatTabsModule,
   MatDividerModule
 } from '@angular/material';
-
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import {MatStepperModule} from '@angular/material/stepper';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatCardModule} from '@angular/material/card';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 require('nouislider/distribute/nouislider.min.css');
