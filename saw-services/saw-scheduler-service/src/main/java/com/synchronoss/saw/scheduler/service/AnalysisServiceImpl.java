@@ -46,38 +46,67 @@ public class AnalysisServiceImpl implements AnalysisService {
         restTemplate.postForObject(url, entity, String.class, analysisId);
     }
 
-    public void scheduleDispatch(SchedulerJobDetail analysis)
-    {
-           if ((analysis.getEmailList() == null || analysis.getEmailList().size() == 0)
-                  ) {
-               return;
-           }
-           if (analysis.getDescription()==null) analysis.setDescription("");
-           String recipients = prepareRecipientsList(analysis.getEmailList());
-           ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
-           String[] latestexection = findLatestExecution(executionBeans);
-           Date date = new Date(Long.parseLong(latestexection[1]));
-           DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-           format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-           String formatted = format.format(date);
-           DispatchBean execution = ImmutableDispatchBean.builder()
-                   .emailList(recipients).fileType("csv")
-                   .description(analysis.getDescription()).name(analysis.getAnalysisName()).userFullName(analysis.getUserFullName())
-                   .metricName(analysis.getMetricName()).publishedTime(formatted).build();
-           String[] param = new String[3];
-           param[0] = analysis.getAnalysisID();
-           param[1] = latestexection[0];
-           param[2] = analysis.getType();
-           String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
-           HttpHeaders headers = new HttpHeaders();
-           headers.setContentType(MediaType.APPLICATION_JSON);
-           HttpEntity<DispatchBean> entity = new HttpEntity<>(
-                   execution, headers);
+    public void scheduleDispatch(SchedulerJobDetail analysis) {
+        if (analysis.getDescription() == null) analysis.setDescription("");
 
-           if (latestexection[0] != null) {
-               restTemplate.postForObject(url, entity, String.class, param);
-           }
-       }
+        String recipients = prepareStringFromList(analysis.getEmailList());
+        String ftpServers = prepareStringFromList(analysis.getFtp());
+
+        ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
+        String[] latestexection = findLatestExecution(executionBeans);
+        Date date = new Date(Long.parseLong(latestexection[1]));
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        String formatted = format.format(date);
+        DispatchBean execution;
+
+        if (!recipients.equals("") && !ftpServers.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                    .emailList(recipients).fileType("csv")
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .ftp(ftpServers)
+                    .publishedTime(formatted).build();
+        } else if (!recipients.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                    .emailList(recipients).fileType("csv")
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .publishedTime(formatted).build();
+        } else if (!ftpServers.equals("")) {
+            execution = ImmutableDispatchBean.builder()
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .ftp(ftpServers)
+                    .publishedTime(formatted).build();
+        } else {
+            execution = ImmutableDispatchBean.builder()
+                    .description(analysis.getDescription())
+                    .name(analysis.getAnalysisName())
+                    .userFullName(analysis.getUserFullName())
+                    .metricName(analysis.getMetricName())
+                    .publishedTime(formatted).build();
+        }
+        String[] param = new String[3];
+        param[0] = analysis.getAnalysisID();
+        param[1] = latestexection[0];
+        param[2] = analysis.getType();
+        String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<DispatchBean> entity = new HttpEntity<>(
+                execution, headers);
+
+        if (latestexection[0] != null) {
+            restTemplate.postForObject(url, entity, String.class, param);
+        }
+    }
 
     private ExecutionBean[] fetchExecutionID(String analysisId)
     {
@@ -115,20 +144,9 @@ public class AnalysisServiceImpl implements AnalysisService {
         val[1] = latestFinish;
         return val;
     }
-    private String prepareRecipientsList(List<String> recipients) {
-        StringBuffer stringBuffer = new StringBuffer();
-        boolean first = true;
-        for (String recipient :  recipients) {
-            if (first) {
-                stringBuffer.append(recipient);
-                first = false;
-            }
-            else {
-                stringBuffer.append(",");
-                stringBuffer.append(recipient);
-            }
-        }
-        return stringBuffer.toString();
+
+    private String prepareStringFromList(List<String> source) {
+        return String.join(",", source);
     }
 
 }

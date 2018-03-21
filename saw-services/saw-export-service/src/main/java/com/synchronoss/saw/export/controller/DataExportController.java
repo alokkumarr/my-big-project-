@@ -3,10 +3,15 @@ package com.synchronoss.saw.export.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.export.model.ftp.FTPDetails;
+import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -18,6 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.DataResponse;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/exports")
@@ -52,6 +62,19 @@ public class DataExportController {
       exportService.pivotToBeDispatchedAsync(executionId, request,analysisId);
     if (analysisType.equalsIgnoreCase("esReport"))
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId);
+  }
+
+  @RequestMapping(value = "/listFTP", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.OK)
+  public void listFTP(RequestEntity request, HttpServletResponse response) {
+    try {
+      response.setContentType("application/json");
+      response.getWriter().write(exportService.listFtpsForCustomer(request).toString());
+      response.getWriter().flush();
+      response.getWriter().close();
+    } catch (IOException e) {
+      logger.error(e.getMessage());
+    }
   }
 
 }

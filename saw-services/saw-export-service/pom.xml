@@ -139,6 +139,16 @@
 			<artifactId>SDNotify</artifactId>
 			<version>1.1</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-net</groupId>
+			<artifactId>commons-net</artifactId>
+			<version>3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -223,6 +233,10 @@
 								<entry>
 									<name>/opt/bda/saw-export-service/conf/application.yml</name>
 									<file>src/main/resources/application.yml</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-export-service/conf/ftp-details.json</name>
+									<file>src/main/resources/ftp-details.json</file>
 								</entry>
 							</entries>
 							<signature>
