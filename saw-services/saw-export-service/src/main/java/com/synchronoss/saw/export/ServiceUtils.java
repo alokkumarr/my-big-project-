@@ -142,16 +142,27 @@ public class ServiceUtils {
                              String ftpPassword,
                              String localFilePath,
                              String destinationDir,
-                             String destinationFileName) {
+                             String destinationFileName,
+                             String type) {
 
     if (ftpServer == null || ftpUsername == null || ftpPassword == null ||
-            localFilePath == null || destinationDir == null || destinationFileName == null) {
+            localFilePath == null || destinationDir == null || destinationFileName == null || type == null) {
       return false;
     } else {
       try {
-        FTPUploader ftp = new FTPUploader(ftpServer, ftpPort, ftpUsername, ftpPassword);
-        ftp.uploadFile(localFilePath, destinationFileName, destinationDir);
-        ftp.disconnect();
+        if (type.equalsIgnoreCase("ftp")) {
+          FTPUploader ftp = new FTPUploader(ftpServer, ftpPort, ftpUsername, ftpPassword);
+          ftp.uploadFile(localFilePath, destinationFileName, destinationDir);
+          ftp.disconnect();
+        } else if (type.equalsIgnoreCase("ftps")) {
+          FTPSUploader ftp = new FTPSUploader(ftpServer, ftpPort, ftpUsername, ftpPassword);
+          ftp.uploadFile(localFilePath, destinationFileName, destinationDir);
+          ftp.disconnect();
+        } else if (type.equalsIgnoreCase("sftp")) {
+          SFTPUploader ftp = new SFTPUploader(ftpServer, ftpPort, ftpUsername, ftpPassword);
+          ftp.uploadFile(localFilePath, destinationFileName, destinationDir);
+          ftp.disconnect();
+        }
       } catch (Exception e) {
         logger.error(e.getMessage());
         return false;

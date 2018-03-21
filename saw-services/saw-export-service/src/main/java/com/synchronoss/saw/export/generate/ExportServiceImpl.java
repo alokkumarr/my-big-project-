@@ -174,7 +174,8 @@ public class ExportServiceImpl implements ExportService{
                             alias.getPassword(),
                             exportBean.getFileName(),
                             alias.getLocation(),
-                            "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType"));
+                            "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType"),
+                            alias.getType());
                     logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                   }
                 }
@@ -268,7 +269,8 @@ public class ExportServiceImpl implements ExportService{
                             alias.getPassword(),
                             exportBean.getFileName(),
                             alias.getLocation(),
-                            "pivot_" + exportBean.getReportName() + dtf.format(now).toString() + "xlsx");
+                            "pivot_" + exportBean.getReportName() + dtf.format(now).toString() + "xlsx",
+                            alias.getType());
                     logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                   }
                 }
