@@ -11,6 +11,7 @@ import org.json4s.native.JsonMethods.compact
 import org.json4s.native.JsonMethods.render
 import org.json4s.native.JsonMethods.parse
 import play.mvc.Result
+import sncr.saw.common.config.SAWServiceConfig
 
 class GlobalFilter extends BaseController {
 
@@ -28,6 +29,8 @@ class GlobalFilter extends BaseController {
     var data : String= null;
     var result: JValue = JNothing
     val iterator = executionList.iterator();
+    val timeOut :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("timeout"))
+      new Integer(SAWServiceConfig.es_conf.getInt("timeout")) else new java.lang.Integer(3)
     while (iterator.hasNext)
       {
         val obj: GlobalFilterExecutionObject = iterator.next()
