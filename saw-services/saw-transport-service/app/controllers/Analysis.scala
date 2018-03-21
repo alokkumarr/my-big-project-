@@ -404,7 +404,7 @@ class Analysis extends BaseController {
       if (dataSecurityKeyStr!=null) {
         m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr, timeOut), json, timeOut;
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr, timeOut), json, timeOut);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(

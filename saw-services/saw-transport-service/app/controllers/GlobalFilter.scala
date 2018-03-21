@@ -34,7 +34,7 @@ class GlobalFilter extends BaseController {
     while (iterator.hasNext)
       {
         val obj: GlobalFilterExecutionObject = iterator.next()
-        data= SAWElasticSearchQueryExecutor.executeReturnDataAsString(obj)
+        data= SAWElasticSearchQueryExecutor.executeReturnDataAsString(obj,timeOut)
         m_log debug (data)
         val myArray = parse(data);
         if(result==JNothing)
