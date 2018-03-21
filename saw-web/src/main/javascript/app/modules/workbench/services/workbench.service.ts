@@ -1,20 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { UIRouter } from '@uirouter/angular';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 
-import { DATASETS, SQLEXEC_SAMPLE, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
+import { DATASETS, SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
-import * as map from 'lodash/map';
 import * as isUndefined from 'lodash/isUndefined';
 
-import { JwtService } from '../../../../login/services/jwt.service';
-import { MenuService } from '../../../common/services/menu.service';
 import APP_CONFIG from '../../../../../../../appConfig';
 
 const userProject: string = 'workbench';
@@ -24,10 +19,7 @@ export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
   private wbAPI = `${this.api}/internal/workbench/projects`;
 
-  constructor(private http: HttpClient,
-    private jwt: JwtService,
-    private router: UIRouter,
-    private menu: MenuService) { }
+  constructor(private http: HttpClient) { }
 
   /** GET datasets from the server */
   getDatasets(): Observable<any> {
@@ -143,15 +135,15 @@ export class WorkbenchService {
   }
   /**
    * Service to fetch meta data of all datasets
-   * 
-   * @param {string} projectName 
-   * @param {any} id 
-   * @returns {Observable<any>} 
+   *
+   * @param {string} projectName
+   * @param {any} id
+   * @returns {Observable<any>}
    * @memberof WorkbenchService
    */
   getDatasetDetails(id): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/${id}`;
-    return this.http.get(`${this.wbAPI}/${userProject}/${id}`)
+    return this.http.get(endpoint)
       .pipe(
         catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }
@@ -163,10 +155,10 @@ export class WorkbenchService {
   }
 
   /**
-   * Calls the sql executor component and fetches the output as data for preview grid 
-   * 
-   * @param {string} query 
-   * @returns {Observable<any>} 
+   * Calls the sql executor component and fetches the output as data for preview grid
+   *
+   * @param {string} query
+   * @returns {Observable<any>}
    * @memberof WorkbenchService
    */
   executeSqlQuery(query: string): Observable<any> {

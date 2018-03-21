@@ -1,11 +1,9 @@
 declare function require(string): string;
 
-import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
-import { debounceTime } from 'rxjs/operators';
 import * as trim from 'lodash/trim';
-import * as uniq from 'lodash/uniq';
 import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -30,10 +28,10 @@ require('./select-rawdata.component.scss');
 })
 
 export class SelectRawdataComponent implements OnInit {
-  private treeConfig: any;
-  private treeNodes: Array<any>;
+  private treeConfig: any; // tslint:disable-line
+  private treeNodes: Array<any>; // tslint:disable-line
   private treeOptions: ITreeOptions;
-  private maskHelper: any;
+  private maskHelper: any; // tslint:disable-line
   private gridConfig: Array<any>;
   private selFiles: Array<any> = [];
   private filePath: string;
@@ -219,7 +217,7 @@ export class SelectRawdataComponent implements OnInit {
   previewDialog(title): void {
     const path = `${this.currentPath}/${title}`;
     this.workBench.getRawPreviewData(path).subscribe(data => {
-      const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+      this.dialog.open(RawpreviewDialogComponent, {
         minHeight: 500,
         minWidth: 600,
         data: {
@@ -232,8 +230,8 @@ export class SelectRawdataComponent implements OnInit {
   /**
    * File upload function.
    * Validates size and type(Allows only txt/csv)
-   * If valid then only sends the formdata to upload 
-   * @param {any} event 
+   * If valid then only sends the formdata to upload
+   * @param {any} event
    * @memberof SelectRawdataComponent
    */
   fileInput(event) {
@@ -254,7 +252,7 @@ export class SelectRawdataComponent implements OnInit {
   /**
    * Opens dialog to input folder name. Once closed returns the filename entered.
    * Gets the children of the directory from service output and push only the newly added child to parent.
-   * 
+   *
    * @memberof SelectRawdataComponent
    */
   createFolder() {

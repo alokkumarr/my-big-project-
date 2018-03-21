@@ -2,7 +2,6 @@ declare const require: any;
 
 import {
   Component,
-  Input,
   Output,
   EventEmitter
 } from '@angular/core';

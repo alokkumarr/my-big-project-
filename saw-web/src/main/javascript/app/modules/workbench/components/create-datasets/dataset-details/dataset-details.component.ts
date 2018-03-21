@@ -1,11 +1,10 @@
 declare function require(string): string;
 
-import { Component, Input, OnInit, EventEmitter, Output, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import * as isUndefined from 'lodash/isUndefined';
 
@@ -24,14 +23,13 @@ require('./dataset-details.component.scss');
 export class DatasetDetailsComponent implements OnInit {
   @Input() selFiles: Array<any>;
   @Input() previewConfig: any;
-  private separatorKeysCodes = [ENTER, COMMA];
+  private separatorKeysCodes = [ENTER, COMMA]; // tslint:disable-line
   public detailsFormGroup: FormGroup;
   private lineSeperator = 'lineFeed';
 
   constructor(
     public dialog: MatDialog,
-    private workBench: WorkbenchService,
-    private formBuilder: FormBuilder
+    private workBench: WorkbenchService
   ) { }
 
   @Output() onDetailsFilled: EventEmitter<any> = new EventEmitter<any>();
@@ -84,7 +82,7 @@ export class DatasetDetailsComponent implements OnInit {
   previewDialog(fileDetails): void {
     const path = `${fileDetails.path}/${fileDetails.name}`;
     this.workBench.getRawPreviewData(path).subscribe(data => {
-      const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+      this.dialog.open(RawpreviewDialogComponent, {
         minHeight: 500,
         minWidth: 600,
         data: {

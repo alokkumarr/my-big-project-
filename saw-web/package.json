@@ -13,7 +13,7 @@
     "e2e": "protractor conf/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js",
     "prepush": "npm run -s eslint lint",
-    "lint": "tslint --project tsconfig.json -c tslint.json ./src/main/javascript/{app,login}/**/*.ts",
+    "lint": "tslint --project tsconfig.json -c conf/tslint-prod.json",
     "eslint": "eslint -c .eslintrc --ext .js ./src",
     "eslint:fix": "npm run eslint -- --fix",
     "lint:fix": "npm run lint -- --fix",

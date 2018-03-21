@@ -32,7 +32,7 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   private clearFiltersListener: Subscription;
   private applyFiltersListener: Subscription;
   private closeFiltersListener: Subscription;
-  private filteredSuggestions: Observable<any[]>;
+  private filteredSuggestions: Observable<any[]>; // tslint:disable-line
 
   constructor(
     private observe: ObserveService,

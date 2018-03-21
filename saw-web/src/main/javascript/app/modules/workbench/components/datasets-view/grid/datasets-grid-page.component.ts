@@ -1,10 +1,8 @@
 declare function require(string): string;
 
-import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { MatDialog } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
@@ -22,9 +20,7 @@ require('./datasets-grid-page.component.scss');
 export class DatasetsGridPageComponent implements OnInit {
   @Input() searchTerm: string;
   @Input() updater: BehaviorSubject<any>;
-  private gridListInstance: any;
   private gridConfig: Array<any>;
-  private gridData: Array<any>;
   private updaterSubscribtion: any;
 
   constructor(

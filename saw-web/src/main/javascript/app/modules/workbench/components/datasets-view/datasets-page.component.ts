@@ -1,13 +1,11 @@
 declare function require(string): string;
 
-import { Component, Input, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import * as map from 'lodash/map';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
-import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { CreateDatasetsComponent } from '../create-datasets/create-datasets.component';
@@ -30,13 +28,12 @@ export class DatasetsComponent implements OnInit {
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
-  private dataView: string = 'sets';
-  private contentHeight: number;
+  private dataView: string = 'sets'; // tslint:disable-line
+  private contentHeight: number; // tslint:disable-line
 
   constructor(
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
-    private dataGrid: dxDataGridService,
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private datePipe: DatePipe
@@ -111,7 +108,7 @@ export class DatasetsComponent implements OnInit {
   }
 
   onDataViewChange() {
-    
+
   }
 
   onResize(event) {

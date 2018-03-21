@@ -1,10 +1,9 @@
 declare function require(string): string;
 
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-import * as get from 'lodash/get';
 
 const template = require('./details-dialog.component.html');
 require('./details-dialog.component.scss');

@@ -1,6 +1,6 @@
 declare const require: any;
 
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
@@ -16,18 +16,12 @@ import {
   transition
 } from '@angular/animations';
 
-import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
-import * as map from 'lodash/map';
 import * as get from 'lodash/get';
-import * as findIndex from 'lodash/findIndex';
 
 import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
-
-const MARGIN_BETWEEN_TILES = 10;
 
 @Component({
   selector: 'create-dashboard',
@@ -66,7 +60,7 @@ export class CreateDashboardComponent {
   constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
     private router: UIRouter,
-    private menu: MenuService,
+    private menu: MenuService, // tslint:disable-line
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) {

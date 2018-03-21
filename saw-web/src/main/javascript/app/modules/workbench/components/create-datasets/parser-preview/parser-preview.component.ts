@@ -1,14 +1,11 @@
 declare function require(string): string;
 
 import * as angular from 'angular';
-import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
-import * as indexOf from 'lodash/indexOf';
-import * as forEach from 'lodash/forEach';
 import * as replace from 'lodash/replace';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
@@ -33,14 +30,11 @@ require('./parser-preview.component.scss');
 
 export class ParserPreviewComponent implements OnInit {
   @Input() previewObj: Subject<any>;
-  private gridListInstance: any;
   private previewgridConfig: Array<any>;
-  private gridData: Array<any>;
   private updaterSubscribtion: any;
-  private toAddSubscribtion: any;
   private fieldInfo = [];
   private parserData: any;
-  private rawFile: any;
+  private rawFile: any; // tslint:disable-line
 
   constructor(
     private dxDataGrid: dxDataGridService,

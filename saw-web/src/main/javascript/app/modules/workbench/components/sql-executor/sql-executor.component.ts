@@ -1,6 +1,6 @@
 declare function require(string): string;
 
-import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -21,22 +21,21 @@ require('./sql-executor.component.scss');
   template
 })
 export class SqlExecutorComponent implements OnInit {
-  private artifacts: any;
-  private gridConfig: Array<any>;
-  private showProgress: boolean = false;
+  private artifacts: any; // tslint:disable-line
+  private showProgress: boolean = false; // tslint:disable-line
   private gridData = new BehaviorSubject([]);
   private datasetID: string = '';
-  private datasetDetails: Array<any>;
-  private appliedActions: Array<any> = SQL_AQCTIONS;
-  private scriptHeight: number = 40;
-  private previewHeight: number = 60;
+  private datasetDetails: Array<any>; // tslint:disable-line
+  private appliedActions: Array<any> = SQL_AQCTIONS; // tslint:disable-line
+  private scriptHeight: number = 40; // tslint:disable-line
+  private previewHeight: number = 60; // tslint:disable-line
 
   constructor(
     public dialogRef: MatDialogRef<SqlExecutorComponent>,
     public dialog: MatDialog,
     private workBench: WorkbenchService,
-    private notify: ToastService,
-    @Inject(MAT_DIALOG_DATA) private data: any
+    private notify: ToastService, // tslint:disable-line
+    @Inject(MAT_DIALOG_DATA) private data: any // tslint:disable-line
   ) {
     if (get(data, 'id')) {
       this.datasetID = data.id;

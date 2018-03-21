@@ -1,11 +1,9 @@
 declare function require(string): string;
 
 import { Component, Input, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmitter, Output } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { DxDataGridModule, DxDataGridComponent, DxTemplateModule } from 'devextreme-angular';
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
+import { DxDataGridComponent } from 'devextreme-angular';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 
 const template = require('./sqlpreview-grid-page.component.html');
@@ -21,13 +19,11 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
   @Input() updater: BehaviorSubject<any>;
 
   private gridConfig: Array<any>;
-  private gridData: Array<any>;
   private updaterSubscribtion: any;
-  private fullScreen: boolean = false;
-  
+  private fullScreen: boolean = false; // tslint:disable-line
+
   constructor(
-    private dxDataGrid: dxDataGridService,
-    private headerProgress: HeaderProgressService
+    private dxDataGrid: dxDataGridService
   ) {  }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
