@@ -17,7 +17,6 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
 import sncr.xdf.adapters.readers.DLBatchReader;
-import sncr.xdf.component.*;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
@@ -57,14 +56,8 @@ public abstract class AbstractComponent {
     protected NGContext ngctx;
     protected InternalContext ctx;
     protected String componentName = "unnamed";
-
-    protected final boolean useMDForInput;
-    protected final boolean useMDForOutput;
-    protected final boolean useMDPrj;
-    protected final boolean useMDForTransformations;
-    protected final boolean useSample;
     protected final Services services = new Services();
-    private boolean initialized = false;
+    protected Map<ComponentServices, Boolean> serviceStatus = new HashMap<>();
     protected DLBatchReader reader;
 
     /**
@@ -72,81 +65,105 @@ public abstract class AbstractComponent {
      * exported/imported from/to outside
      * @param ngctx
      */
-    public AbstractComponent(NGContext ngctx, boolean useMDForInput, boolean useMDForOutput, boolean useMDPrj, boolean useMDForTransformations, boolean useSample){
+        public AbstractComponent(NGContext ngctx, ComponentServices[] cs){
         this.ngctx = ngctx;
-        this.useMDForInput = useMDForInput;
-        this.useMDForOutput = useMDForOutput;
-        this.useMDPrj = useMDPrj;
-        this.useMDForTransformations = useMDForTransformations;
-        this.useSample = useSample;
-    }
-
-    public AbstractComponent(){
-
-        this.useMDForInput = true;
-        this.useMDForOutput = true;
-        this.useMDPrj = true;
-        this.useMDForTransformations = true;
-        this.useSample = true;
+        for (int i = 0; i < cs.length; i++) {
+            serviceStatus.put(cs[i], false);
+        }
 
     }
 
-    public AbstractComponent(NGContext ngctx, boolean useMD, boolean useSample){
-        this(ngctx, useMD, useMD, useMD, useMD, useSample);
+    public AbstractComponent() {
+
+        serviceStatus.put(ComponentServices.InputDSMetadata, false);
+        serviceStatus.put(ComponentServices.OutputDSMetadata, false);
+        serviceStatus.put(ComponentServices.Project, false);
+        serviceStatus.put(ComponentServices.TransformationMetadata, false);
+        //TODO:: fix it when time comes
+        serviceStatus.put(ComponentServices.Sample, true);
+        serviceStatus.put(ComponentServices.Spark, false);
+
     }
 
+    public AbstractComponent(ComponentServices[] cs) {
+        for (int i = 0; i < cs.length; i++) {
+            serviceStatus.put(cs[i], false);
+        }
+    }
 
 
     public String getError(){
         return error;
     }
 
-    //TODO:: Create NGContext at the start
-    //TODO:: Store all datasets once ( in NGContext )
-    //TODO:: For internal Spark context keep spark* vars null in NGContext
-    //TODO:: Add flags into NGContexts nbased on call, or fallow flags if NGContexts accepted from outside
-
 
     public int run() {
-        if (!initialized) {
-            error = "Component " + componentName + " is not initialized";
+        if (!verifyComponentServices()) {
+            error = "Component " + componentName + " is not serviceStatus";
             return -1;
         }
+
+        // In case of using initMandatoryServices:
+        // ngctx and reader may not be initialized
+        // repeat these steps here, even it looks bulky and not elegant.
+        if (ngctx == null) {
+            ngctx = new NGContext();
+            ngctx.fs = HFileOperations.getFileSystem();
+            ngctx.fc = HFileOperations.getFileContext();
+            if (ngctx.sparkSession == null) ngctx.sparkSession = ctx.sparkSession;
+        }
+        initReader();
+
+
         int ret = execute();
         if (ret == 0) {
             ret = move();
             if (ret == 0) {
                 ret = archive();
                 if (ret == 0) {
+                    ret = Finalize(ret);
                 } else {
                 }
             } else {
-                logger.error("Could not complete archive phase!");
+                logger.error("Could not complete move phase!");
             }
         } else {
             logger.error("Could not complete execution phase!");
         }
-        ret = Finalize(ret);
         return ret;
+    }
+
+    protected boolean verifyComponentServices(){
+        for (ComponentServices cs: serviceStatus.keySet()) {
+            if (!serviceStatus.get(cs)) {
+                logger.error("Component service: " + cs.name() + " is not initialized" );
+                return false;
+            }
+        }
+        return true;
     }
 
     private int initServices(){
 
         try {
 
-            if (useMDForInput || useMDForOutput || useMDForTransformations) {
+            if (serviceStatus.containsKey(ComponentServices.InputDSMetadata) ||
+                serviceStatus.containsKey(ComponentServices.OutputDSMetadata) ||
+                serviceStatus.containsKey(ComponentServices.TransformationMetadata))
+            {
                 services.md = new DLDataSetService(ctx.xdfDataRootSys);
                 services.als = new AuditLogService(services.md.getRoot());
             }
 
-            if (useMDPrj && this instanceof WithProjectScope)
+            if (serviceStatus.containsKey(ComponentServices.Project) &&
+                    this instanceof WithProjectScope)
                 services.prj = (WithProjectScope) this;
 
-            if (useMDForTransformations) {
+            if (serviceStatus.containsKey(ComponentServices.TransformationMetadata)) {
                 services.transformationMD = new TransformationService(ctx.xdfDataRootSys);
             }
 
-            if (this instanceof WithDataSetService) {
+            if (this instanceof WithDataSet) {
                 services.mddl = (WithDataSet) this;
             }
 
@@ -161,11 +178,15 @@ public abstract class AbstractComponent {
     }
 
 
-    protected int initPrj() {
+    public int initProject() {
         try {
 
             if (services.prj != null) {
                 services.prj.getProjectData(ctx);
+                serviceStatus.put(ComponentServices.Project, true);
+            }
+            else{
+                logger.debug("Project service is not serviceStatus.");
             }
 
         } catch (Exception e) {
@@ -177,8 +198,7 @@ public abstract class AbstractComponent {
         return 0;
     }
 
-
-    protected int initInputDataSets() {
+    public int initInputDataSets() {
         int rc = 0;
         try {
 
@@ -191,7 +211,7 @@ public abstract class AbstractComponent {
 
                     WithDataSet.DataSetHelper dsaux = new WithDataSet.DataSetHelper(ctx, services.md);
 
-                    if (useMDForInput) {
+                    if (serviceStatus.containsKey(ComponentServices.InputDSMetadata)) {
                         ngctx.inputDataSets = services.mddl.discoverInputDataSetsWithMetadata(dsaux);
                         ngctx.inputs = services.mddl.discoverDataParametersWithMetaData(dsaux);
 
@@ -199,9 +219,10 @@ public abstract class AbstractComponent {
                         ctx.mdInputDSMap = services.md.loadExistingDataSets(ctx, ngctx.inputDataSets);
                         ctx.mdInputDSMap.forEach((id, ids) -> {
                             try {
-                                if (useMDForTransformations)
+                                if (serviceStatus.containsKey(ComponentServices.TransformationMetadata))
                                     services.md.getDSStore().addTransformationConsumer(id, ctx.transformationID);
                             } catch (Exception e) {
+                                logger.error("INput DS analysis error: " + ExceptionUtils.getFullStackTrace(e));
                                 failed[0] = true;
                                 return;
                             }
@@ -218,6 +239,7 @@ public abstract class AbstractComponent {
 
                     logger.debug("Input datasets = " + ngctx.inputDataSets);
                     logger.debug("Inputs = " + ngctx.inputs);
+                    serviceStatus.put(ComponentServices.InputDSMetadata, true);
                 }
             }
 
@@ -229,7 +251,7 @@ public abstract class AbstractComponent {
         return rc;
     }
 
-    protected int initOutputDataSets() {
+    public int initOutputDataSets() {
 
         final int[] rc2 = {0};
         if (services.mddl != null) {
@@ -241,7 +263,7 @@ public abstract class AbstractComponent {
                 ngctx.outputDataSets = services.mddl.ngBuildPathForOutputDataSets(dsaux);
                 ngctx.outputs = services.mddl.ngBuildPathForOutputs(dsaux);
 
-                if (useMDForOutput) ctx.mdOutputDSMap = new HashMap<>();
+                if (serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) ctx.mdOutputDSMap = new HashMap<>();
 
 
                 final int[] rc = {0};
@@ -249,14 +271,14 @@ public abstract class AbstractComponent {
                 {
                     logger.debug("Add output object to data object repository: " + o.getDataSet());
 
-                    if (services.mddl.discoverAndvalidateOutputDataSet(ngctx.outputDataSets.get(o.getDataSet()))) {
+                    if (!services.mddl.discoverAndvalidateOutputDataSet(ngctx.outputDataSets.get(o.getDataSet()))) {
                         String error = "Could not validate output dataset: " + o.getDataSet();
                         logger.error(error);
                         rc[0] = -1;
                         return;
                     }
 
-                    if (useMDForOutput) {
+                    if (serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
                         JsonElement ds = services.md.readOrCreateDataSet(ctx, ngctx.outputDataSets.get(o.getDataSet()));
                         if (ds == null) {
                             error = "Could not create metadata for output dataset: " + o.getDataSet();
@@ -278,8 +300,8 @@ public abstract class AbstractComponent {
                             step = "Could not update metadata of DataSet: " + o.getDataSet();
                             services.md.getDSStore().updateStatus(id, "INIT", ctx.startTs, null, aleId, ctx.batchID);
                         } catch (Exception e) {
-                            error = step;
-                            logger.error(error, e);
+                            error = step + ExceptionUtils.getFullStackTrace(e);
+                            logger.error(error);
                             rc[0] = -1;
                             return;
                         }
@@ -287,28 +309,57 @@ public abstract class AbstractComponent {
 
 
                 });
+                serviceStatus.put(ComponentServices.OutputDSMetadata, true);
             }
             return rc2[0];
         }
-        return 0;
+        else{
+                error = "Incorrect initialization sequence or dataset service is not available";
+                logger.error(error);
+                return -1;
+        }
     }
 
-    protected int initSpark()
-    {
+    public int initTransformation(){
 
-        if (this instanceof WithSpark) {
-            if (ngctx == null)
-                ((WithSpark) this).initSpark(ctx);
-            else
-                ((WithSpark) this).initSpark(ngctx, ctx);
+        if (ctx == null ||
+            services.transformationMD == null ||
+            !serviceStatus.containsKey(ComponentServices.TransformationMetadata)){
+            logger.error("Incorrect initialization sequence or service is not available");
+            return -1;
         }
+        try {
+            ctx.transformationID = services.transformationMD.readOrCreateTransformation(ctx);
+            serviceStatus.put(ComponentServices.TransformationMetadata, true);
+        } catch (Exception e) {
+            error = "Exception at transformation init: " + ExceptionUtils.getFullStackTrace(e);
+            return -1;
+        }
+        return 0;
+
+    }
+
+    public int initSpark(){
+        if (this instanceof WithSpark && serviceStatus.containsKey(ComponentServices.Spark)) {
+            if (ctx.extSparkCtx) {
+                ((WithSpark) this).initSpark(ctx);
+            }else
+                ((WithSpark) this).initSpark(ngctx, ctx);
+
+        }
+        serviceStatus.put(ComponentServices.Spark, true);
         return 0;
     }
 
     protected void initWriter(){
-        if (this instanceof WithDLBatchWriter) {
+        if (this instanceof WithDLBatchWriter ) {
             ctx.resultDataDesc = new ArrayList<>();
         }
+    }
+
+    protected void initReader(){
+        if (reader == null)
+            reader = new DLBatchReader(ngctx);
     }
 
     /** This method:
@@ -344,7 +395,7 @@ public abstract class AbstractComponent {
                 throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
             }
 
-            return (Init(configAsStr, appId, batchId, xdfDataRootSys)?0:-1);
+            return (initAllServices(configAsStr, appId, batchId, xdfDataRootSys)?0:-1);
         } catch(ParseException e){
             error = "Could not parse CMD line: " +  e.getMessage();
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -368,8 +419,8 @@ public abstract class AbstractComponent {
     // Ideally should never be overwritten
     // and always executed from custom initialization functions
 
-    //TODO:: Init with metadata and without -- create separate calls
-    public final boolean Init(String config, String appId, String batchId, String xdfDataRootSys) throws Exception {
+    //TODO:: initMandatoryServices with metadata and without -- create separate calls
+    public final boolean initMandatoryServices(String config, String appId, String batchId, String xdfDataRootSys) throws Exception {
 
         //Initialization part-1: Read and validate configuration
         logger.trace( "Configuration dump: \n" + config);
@@ -392,47 +443,109 @@ public abstract class AbstractComponent {
         //Initialization part-2: Create context
         try {
             ctx = new InternalContext(componentName, batchId, appId, cfg, xdfDataRootSys);
+            ctx.extSparkCtx = ngctx == null;
         } catch (Exception e) {
             logger.error("Could not create internal context: ", e);
             return false;
         }
 
-
-        //Initialization part-3: Init spark if necessary
-        int rc = initSpark();
-        if (rc != 0){
-            error = "Could not initialize Spark.";
-            logger.error(error);
-            return false;
-        }
-
-        //Initialization part-4: Init external context if not provided.
-        if(ngctx == null) {
-            ngctx = new NGContext();
-            ngctx.fs = HFileOperations.getFileSystem();
-            ngctx.fc = HFileOperations.getFileContext();
-            if (ngctx.sparkSession == null) ngctx.sparkSession = ctx.sparkSession;
-
-        }
-        reader = new DLBatchReader(ngctx);
-
-        //Initialization part-5: Initialize services.
-        rc = initServices();
+        //Initialization part-3: Initialize services.
+        int rc = initServices();
         if (rc != 0){
             error = "Could not initialize component services.";
             logger.error(error);
             return false;
         }
 
-        //Initialization part-6: Initialize project variables.
-        rc = initPrj();
+        //Initialization part-4: Initialize project variables.
+        //Initialization part-5: Initialize spark if necessary
+
+        //Initialization part-7: Initialize input datasets.
+        //Initialization part-8: Initialize output datasets.
+        //Initialization part-9: Initialize writer.
+
+
+        initWriter();
+        return true;
+    }
+
+
+
+    //TODO:: initMandatoryServices with metadata and without -- create separate calls
+    public final boolean initAllServices(String config, String appId, String batchId, String xdfDataRootSys) throws Exception {
+
+        //Initialization part-1: Read and validate configuration
+        logger.trace( "Configuration dump: \n" + config);
+
+        ComponentConfiguration cfg = null;
+        try {
+            cfg = validateConfig(config);
+        } catch (Exception e) {
+            error = "Configuration is not valid, reason : " +  e.getMessage();
+            logger.error(e);
+            return false;
+        }
+        if (cfg == null)
+        {
+            error = "Internal error: validation procedure returns null";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-2: Create context
+        try {
+            ctx = new InternalContext(componentName, batchId, appId, cfg, xdfDataRootSys);
+            ctx.extSparkCtx = ngctx == null;
+        } catch (Exception e) {
+            logger.error("Could not create internal context: ", e);
+            return false;
+        }
+
+        //Initialization part-3: Initialize services.
+        int rc = initServices();
+        if (rc != 0){
+            error = "Could not initialize component services.";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-4: Initialize transformation.
+        rc = initTransformation();
+        if( rc != 0){
+            error = "Could not initialize transformation.";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-5: Initialize project variables.
+        logger.debug("Read project metadata");
+        rc = initProject();
         if (rc != 0){
             error = "Could not initialize project variables.";
             logger.error(error);
             return false;
         }
 
-        //Initialization part-7: Initialize input datasets.
+
+        //Initialization part-6: Initialize spark if necessary
+        rc = initSpark();
+        if (rc != 0){
+            error = "Could not initialize Spark.";
+            logger.error(error);
+            return false;
+        }
+
+        //Initialization part-6: Initialize external context if not provided.
+        if (ngctx == null) {
+            ngctx = new NGContext();
+            ngctx.fs = HFileOperations.getFileSystem();
+            ngctx.fc = HFileOperations.getFileContext();
+            if (ngctx.sparkSession == null) ngctx.sparkSession = ctx.sparkSession;
+        }
+        initReader();
+
+
+        //Initialization part-8: Initialize input datasets.
         rc = initInputDataSets();
         if (rc != 0){
             error = "Could not initialize input datasets.";
@@ -440,7 +553,7 @@ public abstract class AbstractComponent {
             return false;
         }
 
-        //Initialization part-8: Initialize output datasets.
+        //Initialization part-9: Initialize output datasets.
         rc = initOutputDataSets();
         if (rc != 0){
             error = "Could not initialize output datasets.";
@@ -451,8 +564,8 @@ public abstract class AbstractComponent {
         //Initialization part-9: Initialize writer.
         initWriter();
 
-        initialized = true;
-        return initialized;
+
+        return true;
     }
 
     //dev
@@ -488,7 +601,7 @@ public abstract class AbstractComponent {
 
             ctx.setFinishTS();
 
-            if (useMDForOutput) {
+            if (serviceStatus.containsKey(ComponentServices.OutputDSMetadata)) {
                 services.md.writeDLFSMeta(ctx);
                 JsonObject ale = services.als.generateDSAuditLogEntry(ctx, status, ngctx.inputDataSets, ngctx.outputDataSets);
                 String ale_id = services.als.createAuditLog(ctx, ale);
@@ -510,7 +623,7 @@ public abstract class AbstractComponent {
                     } catch (Exception e) {
                         error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                         logger.error(error);
-                        logger.error("Native exception: ", e);
+                        logger.error("Native exception: " + ExceptionUtils.getFullStackTrace(e));
                         rc[0] = -1;
                         return;
                     }
@@ -518,8 +631,8 @@ public abstract class AbstractComponent {
                 services.transformationMD.updateStatus(ctx.transformationID, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
             }
         } catch (Exception e) {
-            error = "Exception at job finalization: " +  e.getMessage();
-            logger.error(e);
+            error = "Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e);
+            logger.error(error);
             return -1;
         }
         return rc[0];
@@ -539,7 +652,7 @@ public abstract class AbstractComponent {
         logger.debug(String.format("Component [%s] has been started...", self.componentName));
 
         try {
-            if (self.Init(config, app, batch, dataLakeRoot)) {
+            if (self.initAllServices(config, app, batch, dataLakeRoot)) {
                 return self.run();
             }
             else{
@@ -574,4 +687,15 @@ public abstract class AbstractComponent {
         public TransformationService transformationMD;
     }
 
+
+    public enum ComponentServices {
+
+        InputDSMetadata,
+        OutputDSMetadata,
+        TransformationMetadata,
+        Spark,
+        Project,
+        Sample
+
+    }
 }

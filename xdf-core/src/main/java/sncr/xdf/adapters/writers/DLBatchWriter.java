@@ -73,12 +73,17 @@ public class DLBatchWriter {
      */
     public void baseWrite( Dataset<Row> DS, String tempLocation, boolean replace, boolean produceSample) throws Exception {
 
-        if (replace && HFileOperations.exists(tempLocation))
+        if (replace && HFileOperations.exists(tempLocation)) {
+            logger.debug("Clean up temp location: " + tempLocation);
             HFileOperations.deleteEnt(tempLocation);
+        }
 
         String dataLocation = (produceSample)? tempLocation + Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR : tempLocation;
         //TODO:: Fix BDA Meta
         String sampleLocation = tempLocation + Path.SEPARATOR + "sample";
+
+
+
         // In HIVE mode we are partitioning by field VALUE only
 //        List<String> fields = (List<String>) outds.get(DataSetProperties.Keys.name());
 //        Integer numberOfFiles = (Integer) outds.get(DataSetProperties.NumberOfFiles.name());
@@ -133,16 +138,16 @@ public class DLBatchWriter {
         if (produceSample)
         switch (format){
             case "parquet":
-                DS.coalesce(1).sample(false, 0.01).write().parquet(sampleLocation);
+                DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                 break;
             case "json" :
-                DS.coalesce(1).sample(false, 0.01).write().json(sampleLocation);
+                DS.coalesce(1).sample(false, 0.1).write().json(sampleLocation);
                 break;
             case "csv" :
-                DS.coalesce(1).sample(false, 0.01).write().csv(sampleLocation);
+                DS.coalesce(1).sample(false, 0.1).write().csv(sampleLocation);
                 break;
             default:
-                DS.coalesce(1).sample(false, 0.01).write().parquet(sampleLocation);
+                DS.coalesce(1).sample(false, 0.1).write().parquet(sampleLocation);
                 break;
         }
 
@@ -189,7 +194,7 @@ public class DLBatchWriter {
      * @return
      */
     public String getSampleSourceDir(MoveDataDescriptor moveTask) {
-        return moveTask.source.substring(moveTask.source.lastIndexOf(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR)) + Path.SEPARATOR + "sample";
+        return moveTask.source + Path.SEPARATOR + "sample";
     }
 
 
@@ -199,6 +204,6 @@ public class DLBatchWriter {
      * @return
      */
     public String getSampleDestDir(MoveDataDescriptor moveTask) {
-        return moveTask.source.substring(moveTask.dest.lastIndexOf(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR)) + Path.SEPARATOR + "sample";
+        return moveTask.dest.substring(0, moveTask.dest.lastIndexOf( MetadataBase.PREDEF_DATA_DIR)) +  "sample";
     }
 }

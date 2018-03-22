@@ -9,7 +9,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.*;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.*;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.SQLMoveDataDescriptor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
@@ -22,12 +22,14 @@ import java.util.Map;
 /**
  * Created by asor0002 on 9/11/2017.
  */
-public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet {
+public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     private static final Logger logger = Logger.getLogger(NGSQLComponent.class);
     NGJobExecutor executor;
 
-    public NGSQLComponent(NGContext ngctx, boolean useMD, boolean useSample) { super(ngctx, useMD, useSample); }
+    public NGSQLComponent(NGContext ngctx, ComponentServices[] cs) {
+        super(ngctx, cs);
+    }
 
     public NGSQLComponent() {  super(); }
 

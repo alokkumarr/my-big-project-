@@ -1,5 +1,6 @@
 package sncr.xdf.transformer;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Row;
@@ -141,7 +142,6 @@ public class JaninoTransform implements Function<Row, Row> {
             }
 */
 
-
             if (result != null && !result.isEmpty()) {
                 int src = ((result.containsKey(PREDEFINED_SCRIPT_RESULT_KEY)) ? (int) result.get(PREDEFINED_SCRIPT_RESULT_KEY) : -1);
                 if (src >= 0) {
@@ -149,7 +149,6 @@ public class JaninoTransform implements Function<Row, Row> {
                     Object[] newRowVals = new Object[schema.length()];
 
                     for (int i = 0; i < schema.length() - 3; i++) {
-                        //            System.out.println(String.format("Process field: %s, index: %d, data type: %s", fn, i, targetRowTypes.get(fn).toString()));
                         String fn = schema.fieldNames()[i];
                         newRowVals[i] = null;
                         if (result.containsKey(fn)) {
@@ -167,12 +166,18 @@ public class JaninoTransform implements Function<Row, Row> {
                             // else newRowVals[i] = null;
                         }
                         // else newRowVals[i] = null;
+//                        System.out.println(String.format("Process field: %s, index: %d, data type: %s", fn, i, newRowVals[i].toString()));
+
                     }
                     newRowVals[schema.length() - 3] = successTransformationsCount.value();
                     newRowVals[schema.length() - 2] = src;
                     newRowVals[schema.length() - 1] = ((result.get(PREDEFINED_SCRIPT_MESSAGE) != null) ? result.get(PREDEFINED_SCRIPT_MESSAGE) : "n/a");
 
-                    return new GenericRowWithSchema(newRowVals, schema);
+                    GenericRowWithSchema newrow = new GenericRowWithSchema(newRowVals, schema);
+                    System.out.println(schema.mkString("[ ", "; ", "]"));
+                    System.out.println((newrow.mkString("[ ", "; ", "]")));
+
+                    return newrow;//new GenericRowWithSchema(newRowVals, schema);
 
                 } else {  // src < 0
                     return createRejectedRecord(row, ((result.get(PREDEFINED_SCRIPT_MESSAGE) != null) ? (String) result.get(PREDEFINED_SCRIPT_MESSAGE) : "n/a"));
@@ -185,6 +190,7 @@ public class JaninoTransform implements Function<Row, Row> {
             //TODO::Create original record + invalid rec fields
             // //Script result is undefined
             // Mark record with error state
+            logger.error(ExceptionUtils.getFullStackTrace(e));
             return createRejectedRecord(row,"Exception has occurred during script execution: " + e.getMessage());
 
         }
@@ -213,7 +219,10 @@ public class JaninoTransform implements Function<Row, Row> {
         newRowVals[schema.length() - 2] = -1;
         newRowVals[schema.length() - 1] = msg;
 
-        return new GenericRowWithSchema(newRowVals, schema);
+        GenericRowWithSchema rejrow = new GenericRowWithSchema(newRowVals, schema);
+        System.out.println(schema.mkString("< ", "; ", " >"));
+        System.out.println((rejrow.mkString("< ", "; ", " >")));
+        return rejrow;
     }
 
 

@@ -39,13 +39,14 @@ public class DLBatchReader {
             default:
                 throw new XDFException( XDFException.ErrorCodes.UnsupportedDataFormat);
         }
-        ngctx.registerDatset(name, ds);
+        ngctx.registerDataset(name, ds);
         return ds;
     }
 
 
     public JavaRDD<String> readToRDD(String location, int headerSize){
 
+        logger.debug("Read data from location: " + location);
         JavaRDD<String> rdd = null;
 
         if (headerSize > 0)
@@ -61,21 +62,10 @@ public class DLBatchReader {
             rdd = new JavaSparkContext(ngctx.sparkSession.sparkContext())
                     .textFile(location, ngctx.defaultPartNumber);
 
-        ngctx.registerInputDatset(rdd);
         return rdd;
     }
 
 
 
-    public class HeaderFilter implements Function<Tuple2<String, Long>, Boolean> {
-
-        Integer headerSize;
-        public HeaderFilter(Integer headerSize){
-            this.headerSize = headerSize;
-        }
-        public Boolean call(Tuple2<String, Long> in){
-            return in._2() >= headerSize;
-        }
-    }
 
 }

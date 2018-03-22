@@ -1,4 +1,4 @@
-package sncr.xdf.component;
+package sncr.xdf.ngcomponent;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -34,7 +34,7 @@ public interface WithSpark {
     }
 
     class WithSparkHelper {
-        private static final Logger logger = Logger.getLogger(sncr.xdf.component.WithSparkContext.class);
+        private static final Logger logger = Logger.getLogger(WithSpark.class);
     }
 
 }

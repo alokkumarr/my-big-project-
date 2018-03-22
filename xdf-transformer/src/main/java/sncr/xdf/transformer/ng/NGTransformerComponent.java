@@ -10,7 +10,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.component.*;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.*;
 import sncr.xdf.transformer.RequiredNamedParameters;
 
 import java.io.FileNotFoundException;
@@ -25,7 +25,7 @@ import java.util.*;
  * The component DOES NOT PERFORM any multi-record conversion, use Spark SQL XDF Component
  * if you need to make such transformation.
  */
-public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet {
+public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     public static String RECORD_COUNTER = "_record_counter";
     public static String TRANSFORMATION_RESULT = "_tr_result";

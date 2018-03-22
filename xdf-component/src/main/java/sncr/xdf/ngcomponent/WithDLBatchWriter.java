@@ -1,4 +1,4 @@
-package sncr.xdf.component;
+package sncr.xdf.ngcomponent;
 
 import com.google.gson.JsonElement;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -27,17 +27,17 @@ import java.util.*;
 public interface WithDLBatchWriter {
 
     default void registerDataset(NGContext ngctx, Dataset dataset, String dataSetName){
-        ngctx.registerDatset(dataSetName, dataset);
+        ngctx.registerDataset(dataSetName, dataset);
     }
 
-    default int commitDataSetFromOutputMap(NGContext ngctx, Dataset dataset, String dataSetName, String location){
+    default int commitDataSetFromOutputMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
         DataPortHelper helper = new DataPortHelper(ngctx);
-        return helper.writeDataset(DSMapKey.parameter, dataset, dataSetName, location);
+        return helper.writeDataset(DSMapKey.parameter, dataset, dataSetName, location, mode);
     }
 
-    default int commitDataSetFromDSMap(NGContext ngctx, Dataset dataset, String dataSetName, String location){
+    default int commitDataSetFromDSMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
         DataPortHelper helper = new DataPortHelper(ngctx);
-        return helper.writeDataset(DSMapKey.dataset, dataset, dataSetName, location);
+        return helper.writeDataset(DSMapKey.dataset, dataset, dataSetName, location, mode);
     }
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
@@ -54,10 +54,8 @@ public interface WithDLBatchWriter {
             //TODO:: Instead of removing data - rename it to _old, _archived or anything else.
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
 
-                //Remove existing data if they are presented
-                if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
-                    if (helper.removeExistingData(moveTask.dest, moveTask.objectName) < 0) return -1;
-                }
+                DataPortHelper.logger.debug(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
+                        moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
 
                 // TODO:: Fix BDA Meta
                 // Check if we have created data sample to move to final destination,
@@ -70,7 +68,7 @@ public interface WithDLBatchWriter {
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
                     DataPortHelper.logger.info("Clean up sample for " + moveTask.objectName);
-                    if (helper.removeExistingData(sampleDirDest, moveTask.objectName) < 0) return -1;
+                    if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
 
                     DataPortHelper.logger.info("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
                     helper.moveFilesForDataset(sampleDirSource, sampleDirDest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
@@ -82,6 +80,11 @@ public interface WithDLBatchWriter {
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
                 if(moveTask.partitionList == null || moveTask.partitionList.size() == 0) {
+
+                    //Remove existing data if they are presented
+                    if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
+                        if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName) < 0) return -1;
+                    }
 
                     DataPortHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
                     helper.moveFilesForDataset(moveTask.source, moveTask.dest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
@@ -225,7 +228,7 @@ public interface WithDLBatchWriter {
             return 0;
         }
 
-        public int writeDataset(DSMapKey mapType, Dataset dataset, String dataSetName, String location) {
+        public int writeDataset(DSMapKey mapType, Dataset dataset, String dataSetName, String location, String mode) {
 
         try{
 
@@ -240,15 +243,12 @@ public interface WithDLBatchWriter {
 
             String name = (String) outputDS.get(DataSetProperties.Name.name());
 
-            String loc = (String) outputDS.get(DataSetProperties.PhysicalLocation.name());
-            if (location != null)
-                loc = location + Path.SEPARATOR + name;
+            String loc = location + Path.SEPARATOR + name;
 
             format = (String) outputDS.get(DataSetProperties.Format.name());
             numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
             keys = (List<String>) outputDS.get(DataSetProperties.PartitionKeys.name());
 
-            String mode = (String) outputDS.get(DataSetProperties.Mode.name());
 
 
             //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
@@ -262,14 +262,17 @@ public interface WithDLBatchWriter {
             // All final data should go to outputDataSets, to make a single source of
             // dataset descriptors.
 
-            if (mapType == DSMapKey.dataset)
+            if (mapType == DSMapKey.dataset) {
                 outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
+                logger.trace("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
+            }
             else{
                 Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
                 outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
+                logger.trace("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
             }
 
-            logger.trace("Dataset: "  + name + ", Result schema: " + ((JsonElement)outputDS.get(DataSetProperties.Schema.name())).toString());
+
 
             return 0;
         } catch (Exception e) {
@@ -289,6 +292,9 @@ public interface WithDLBatchWriter {
                 DLDataSetOperations.cleanupDataDirectory(source);
             } else if (format.equalsIgnoreCase(DLDataSetOperations.FORMAT_JSON)) {
             }
+
+            createOrCleanUpDestDir(dest, objectName);
+
 
             //get list of files to be processed
             FileStatus[] files = ngctx.fs.listStatus(new Path(source));
@@ -322,7 +328,7 @@ public interface WithDLBatchWriter {
 
         }
 
-        public int removeExistingData(String dest, String objectName) {
+        public int createOrCleanUpDestDir(String dest, String objectName) {
             Path objOutputPath = new Path(dest);
             try {
                 if (ngctx.fs.exists(objOutputPath)) {
@@ -333,7 +339,7 @@ public interface WithDLBatchWriter {
                     }
 
                 } else {
-                    logger.warn("Output directory: " + objOutputPath + " for data object/ data sample: " + objectName + " does not Exists -- create it");
+                    logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
                     ngctx.fs.mkdirs(objOutputPath);
                 }
             } catch (IOException e) {

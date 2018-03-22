@@ -1,5 +1,6 @@
 package sncr.xdf.parser;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -18,7 +19,7 @@ import sncr.xdf.component.*;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.*;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet {
+public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     private static final Logger logger = Logger.getLogger(NGParser.class);
 
@@ -53,9 +54,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private List<String> pkeys;
 
-    public NGParser(NGContext ngctx, boolean useMD, boolean useSample) { super(ngctx, useMD, useSample); }
+    public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
-    public NGParser() {  super(); }
+    public NGParser() {
+        super();
+        serviceStatus.remove(ComponentServices.InputDSMetadata);
+    }
 
     {
         componentName = "parser";
@@ -74,6 +78,9 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             System.exit(-1);
         }
     }
+
+
+
 
     protected int execute(){
 
@@ -99,8 +106,8 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         // Output data set
         if(ngctx.outputDataSets.size() != 1){
             // error - must be only one for parser
-            logger.error("Found multiple output data set definitions");
-            return -1;
+            logger.error("Found multiple output data set definitions "+ ngctx.outputDataSets.size());
+            //return -1;
         }
 
         Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)ngctx.outputDataSets.entrySet().toArray()[0];
@@ -112,17 +119,14 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
-        //TODO: If data set exists and flag is not append - error
-        // This is good for UI what about pipeline? Talk to Suren
-
-
-        // Check what sourcePath referring
         FileSystem fs = HFileOperations.getFileSystem();
 
-        //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
-        //System.exit(0);
-
         try {
+
+            if (ngctx.fs.exists(new Path(tempDir)))
+                HFileOperations.deleteEnt(tempDir);
+
+
             if(headerSize >= 1) {
                 FileStatus[] files = fs.globStatus(new Path(sourcePath));
                 // Check if directory has been given
@@ -137,6 +141,10 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
                 retval = parse(DLDataSetOperations.MODE_APPEND);
             }
         }catch (IOException e){
+            logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
+            retval =  -1;
+        } catch (Exception e) {
+            logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
             retval =  -1;
         }
         return retval;
@@ -178,14 +186,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
         // Files
+        String tempPath = tempDir;
         for (FileStatus file : files) {
             if (file.isFile()) {
-                String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
+                 // + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-                   ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
                 }
             }
         }
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
         return 0;
     }
 
@@ -194,7 +203,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
         logger.info("Header size : " + headerSize);
 
         JavaRDD<Row> rdd = reader.readToRDD(file.toString(), headerSize)
-        .map(new ConvertToRow(  schema,
+                .map(new ConvertToRow(  schema,
                                 tsFormats,
                                 lineSeparator,
                                 delimiter,
@@ -207,10 +216,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
         // TODO: Filter out all rejected records
+//        logger.debug ( "Created rdd:  " + rdd.rdd().count());
+        logger.debug ( "Created df:  " + df.count() + " schema: " + df.schema().prettyJson());
+
             scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
-        int rc = commitDataSetFromDSMap(ngctx, filteredDataset, outputDataSetName, destDir.toString());
+        Column cond = df.col("__REJ_FLAG").isNull().or(df.col("__REJ_FLAG").equalTo(0));
+        Dataset<Row> filteredDataset = df.select(scalaList).where(cond);
+        logger.debug ( "Filtered df:  " + filteredDataset.count());
+        int rc = commitDataSetFromDSMap(ngctx, filteredDataset, outputDataSetName, destDir.toString(), "append");
         return rc;
     }
 

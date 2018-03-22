@@ -5,7 +5,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.component.WithDLBatchWriter;
+import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;
@@ -122,7 +122,7 @@ public class NGSQLExecutor implements Serializable {
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
 
-                pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.targetTransactionalLocation);
+                pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.targetTransactionalLocation, "reaplce");
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);

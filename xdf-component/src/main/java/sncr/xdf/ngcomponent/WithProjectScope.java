@@ -1,4 +1,4 @@
-package sncr.xdf.component;
+package sncr.xdf.ngcomponent;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -29,6 +29,7 @@ public interface WithProjectScope {
             plpJA.forEach(plpen -> {
                 JsonObject plpJO = plpen.getAsJsonObject();
                 Parameter parameter = new Parameter(plpJO.get("name").getAsString(), plpJO.get("value").getAsString());
+                WithProjectScopeHelper.logger.debug("Process parameter  " + parameter.getName() + " value: " + parameter.getValue());
                 newList.add(parameter);
             });
             for (Parameter pn : newList) {

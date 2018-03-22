@@ -35,7 +35,7 @@ public class NGContext {
     //Spark session and config
     public SparkSession sparkSession = null;
     public int sampleSize = 10000;
-    private Map<String, Object> datasetRegistry = new HashMap<>();
+    private Map<String, Dataset<Row>> datasetRegistry = new HashMap<>();
 
 
     public NGContext(SparkSession ss){
@@ -53,15 +53,15 @@ public class NGContext {
 
     public int defaultPartNumber = 1;
 
-    public void registerDatset(String name, Object dobj) {
+    public void registerDataset(String name, Dataset<Row> dobj) {
         datasetRegistry.put(name, dobj);
     }
 
-    public void registerInputDatset(Object dobj) {
+    public void registerInputDataset(Dataset<Row> dobj) {
         datasetRegistry.put("input", dobj);
     }
 
-    public void registerOutputDatset(String name, Object dobj) {
+    public void registerOutputDataset(Dataset<Row> dobj) {
         datasetRegistry.put("output", dobj);
     }
 

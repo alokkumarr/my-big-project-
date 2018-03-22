@@ -45,8 +45,8 @@ public class NGJaninoExecutor extends NGExecutor{
 
         Dataset ds = dsMap.get(inDataSetName);
         JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
-        //Long c = transformationResult.count();
-        //logger.trace("Intermediate result, transformation count  = " + c);
+        logger.debug("Intermediate result, transformation count  = " + transformationResult.count());
+
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         createFinalDS(df.cache());

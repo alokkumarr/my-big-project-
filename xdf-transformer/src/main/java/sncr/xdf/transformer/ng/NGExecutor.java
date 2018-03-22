@@ -11,7 +11,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
-import sncr.xdf.component.WithDLBatchWriter;
+import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.transformer.RequiredNamedParameters;
 
@@ -76,7 +76,7 @@ public abstract class NGExecutor {
 
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
         WithDLBatchWriter pres = (WithDLBatchWriter) parent;
-        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, location);
+        pres.commitDataSetFromOutputMap(parent.getNgctx(), outputResult, resType, location, "replace");
     }
 
     public abstract void execute(Map<String, Dataset> dsMap) throws Exception;

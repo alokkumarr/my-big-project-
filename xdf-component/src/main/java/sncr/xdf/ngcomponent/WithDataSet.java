@@ -1,4 +1,4 @@
-package sncr.xdf.component;
+package sncr.xdf.ngcomponent;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -340,6 +340,9 @@ public interface WithDataSet {
                 res_output.put(DataSetProperties.Format.name(), format);
                 res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
                 res_output.put(DataSetProperties.Mode.name(), mode);
+
+                //TODO:: Fix BDA Meta
+                res_output.put("sample", DLDataSetOperations.SIMPLE_SAMPLING);
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>();
