@@ -1,33 +1,28 @@
 <mat-horizontal-stepper #widgetStepper>
 
   <mat-step label="Widget">
-    <widget-header [stepper]="widgetStepper"
-      [container]="container"
-      title="Choose a Widget Type"
-      [showBack]="false"></widget-header>
+    <widget-header [stepper]="widgetStepper" [container]="container" title="Choose a Widget Type" [showBack]="false"></widget-header>
 
     <widget-type [widgetTypes]="widgetTypes" (onSelect)="onSelectWidgetType($event)"></widget-type>
   </mat-step>
 
   <mat-step label="Category">
-    <widget-header [stepper]="widgetStepper"
-      [container]="container"
-      title="Choose a Category"
-      [showBack]="true"></widget-header>
+    <widget-header [stepper]="widgetStepper" [container]="container" title="Choose a Category" [showBack]="true"></widget-header>
 
-    <widget-category (onSelect)="onSelectCategory($event)"></widget-category>
+    <ng-container *ngIf="model.type" [ngSwitch]="model.type.id">
+      <widget-category *ngSwitchCase="widgets.ANALYSIS" (onSelect)="onSelectCategory($event)">
+      </widget-category>
+
+      <widget-metric *ngSwitchCase="widgets.KPI" (onSelect)="onSelectMetric($event)">
+      </widget-metric>
+    </ng-container>
   </mat-step>
 
   <mat-step label="Analysis">
-    <widget-header [stepper]="widgetStepper"
-      *ngIf="model.subCategory"
-      [container]="container"
-      [title]="model.subCategory.name"
+    <widget-header [stepper]="widgetStepper" *ngIf="model.subCategory" [container]="container" [title]="model.subCategory.name"
       [showBack]="true"></widget-header>
 
-    <widget-analysis *ngIf="model.subCategory"
-      [category]="model.subCategory.id"
-      (onAnalysisAction)="onAnalysisAction($event)">
+    <widget-analysis *ngIf="model.subCategory" [category]="model.subCategory.id" (onAnalysisAction)="onAnalysisAction($event)">
     </widget-analysis>
   </mat-step>
 

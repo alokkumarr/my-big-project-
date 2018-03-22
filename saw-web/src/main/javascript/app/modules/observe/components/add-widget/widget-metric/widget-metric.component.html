@@ -1,0 +1,12 @@
+<mat-accordion [multi]="true" [displayMode]="flat">
+
+  <mat-expansion-panel *ngFor="let metric of metrics | async">
+    <mat-expansion-panel-header>
+      {{metric.metricName}}
+    </mat-expansion-panel-header>
+
+    <button mat-button class="choose-metric" *ngFor="let column of metric.kpiColumns" (click)="onSelectMetricColumn(column, metric)">
+      {{column.displayName || column.columnName}}
+    </button>
+  </mat-expansion-panel>
+</mat-accordion>

@@ -1,6 +1,12 @@
+export enum Widget {
+  ANALYSIS,
+  KPI,
+  CUSTOM
+};
+
 export interface WidgetType {
   name: string;
-  id: string;
+  id: Widget;
   description: string;
   disabled?: boolean;
   icon: string;
@@ -8,18 +14,18 @@ export interface WidgetType {
 
 export const widgetTypes: Array<WidgetType> = [{
   name: 'Existing Analysis',
-  id: 'ANALYSIS_WIDGET',
+  id: Widget.ANALYSIS,
   description: 'Add a chart to your dashboard',
   icon: 'analysis-widget'
 }, {
   name: 'Snapshot KPI',
-  id: 'KPI_WIDGET',
+  id: Widget.KPI,
   description: 'Capture a metric at any point in time',
-  disabled: true,
+  disabled: false,
   icon: 'kpi-widget'
 } /*, {
   name: 'Custom Widget',
-  id: 'CUSTOM_WIDGET',
+  id: Widget.CUSTOM,
   description: 'Embed a URL or add custom scripts',
   disabled: true,
   icon: 'custom-widget'
