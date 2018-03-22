@@ -195,7 +195,7 @@ public class ExportServiceImpl implements ExportService{
                               alias.getPort(),
                               alias.getUsername(),
                               alias.getPassword(),
-                              exportBean.getFileName().concat(".zip"),
+                              zipFileName,
                               alias.getLocation(),
                               "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType")+".zip",
                               alias.getType());
@@ -309,9 +309,9 @@ public class ExportServiceImpl implements ExportService{
                               alias.getPort(),
                               alias.getUsername(),
                               alias.getPassword(),
-                              exportBean.getFileName().concat(".zip"),
+                              zipFileName,
                               alias.getLocation(),
-                              "pivot_" + exportBean.getReportName() + dtf.format(now).toString() + "xlsx" +".zip",
+                              "pivot_" + exportBean.getFileName() + dtf.format(now).toString() + "xlsx" +".zip",
                               alias.getType());
                       logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                     }
@@ -321,9 +321,9 @@ public class ExportServiceImpl implements ExportService{
                 }
               }
             } catch (FileNotFoundException e) {
-              logger.error("Zipping file error  FileNotFound: " + e.getMessage());
+              logger.error("Zip file error FileNotFound: " + e.getMessage());
             } catch (IOException e) {
-              logger.error("Zipping file error IOException: " + e.getMessage());
+              logger.error("Zip file error IOException: " + e.getMessage());
             }
           }
 
