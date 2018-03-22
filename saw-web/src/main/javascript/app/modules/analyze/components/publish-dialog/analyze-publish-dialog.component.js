@@ -82,7 +82,7 @@ export const AnalyzePublishDialogComponent = {
         jobGroup: this.resp.ticket.custCode
       };
       this._AnalyzeService.getlistFTP(request).then(response => {
-        this.locations = response.data.data.ftps;
+        this.locations = response.data.ftp;
       });
     }
 
