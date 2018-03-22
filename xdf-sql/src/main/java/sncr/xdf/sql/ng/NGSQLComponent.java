@@ -25,6 +25,11 @@ import java.util.Map;
 public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     private static final Logger logger = Logger.getLogger(NGSQLComponent.class);
+    // Set name
+    {
+        componentName = "sql";
+    }
+
     NGJobExecutor executor;
 
     public NGSQLComponent(NGContext ngctx, ComponentServices[] cs) {
@@ -32,10 +37,6 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
     }
 
     public NGSQLComponent() {  super(); }
-
-    {
-        componentName = "sql";
-    }
 
     protected int execute(){
         try {
@@ -139,10 +140,14 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
     public static void main(String[] args){
         NGSQLComponent component = new NGSQLComponent();
         try {
-            if (component.initWithCMDParameters(args) == 0) {
-                int r = component.run();
-                System.exit(r);
+            int rc = component.initWithCMDParameters(args);
+            if (rc == 0) {
+                rc = component.run();
+            } else {
+                logger.error(String.format("RC:%d from initWithCMDParameters()", rc));
             }
+            System.exit(rc);
+
         } catch (Exception e){
             e.printStackTrace();
             System.exit(-1);

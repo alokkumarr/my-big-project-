@@ -137,8 +137,4 @@ public class NGSQLExecutor implements Serializable {
         return 0L;
     }
 
-
-
-
-
 }

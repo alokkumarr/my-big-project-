@@ -30,22 +30,23 @@ public interface WithDLBatchWriter {
         ngctx.registerDataset(dataSetName, dataset);
     }
 
+
     default int commitDataSetFromOutputMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
-        DataPortHelper helper = new DataPortHelper(ngctx);
+        WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
         return helper.writeDataset(DSMapKey.parameter, dataset, dataSetName, location, mode);
     }
 
     default int commitDataSetFromDSMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
-        DataPortHelper helper = new DataPortHelper(ngctx);
+        WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
         return helper.writeDataset(DSMapKey.dataset, dataset, dataSetName, location, mode);
     }
 
     default int moveData(InternalContext ctx, NGContext ngctx) {
         try {
 
-            DataPortHelper helper = new DataPortHelper(ngctx);
+            WithDLBatchWriterHelper helper = new WithDLBatchWriterHelper(ngctx);
             if (ctx.resultDataDesc == null || ctx.resultDataDesc.isEmpty()) {
-                DataPortHelper.logger.warn("Final file collection is Empty, nothing to move.");
+                WithDLBatchWriterHelper.logger.warn("Final file collection is Empty, nothing to move.");
                 return 0;
             }
 
@@ -54,7 +55,7 @@ public interface WithDLBatchWriter {
             //TODO:: Instead of removing data - rename it to _old, _archived or anything else.
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
 
-                DataPortHelper.logger.debug(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
+                WithDLBatchWriterHelper.logger.debug(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
                         moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
 
                 // TODO:: Fix BDA Meta
@@ -67,15 +68,16 @@ public interface WithDLBatchWriter {
                     String sampleDirSource = helper.getSampleSourceDir(moveTask);
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
-                    DataPortHelper.logger.info("Clean up sample for " + moveTask.objectName);
+
+                    WithDLBatchWriterHelper.logger.info("Clean up sample for " + moveTask.objectName);
                     if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
 
-                    DataPortHelper.logger.info("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
+                    WithDLBatchWriterHelper.logger.info("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
                     helper.moveFilesForDataset(sampleDirSource, sampleDirDest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
 
                 }
                 else{
-                    DataPortHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
+                    WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
@@ -85,8 +87,7 @@ public interface WithDLBatchWriter {
                     if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
                         if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName) < 0) return -1;
                     }
-
-                    DataPortHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
+                    WithDLBatchWriterHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
                     helper.moveFilesForDataset(moveTask.source, moveTask.dest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
                 }
                 else // else - move partitions result
@@ -96,11 +97,11 @@ public interface WithDLBatchWriter {
                     Path lp = new Path(moveTask.source);
 
                     String m = "/"; for (String s : moveTask.partitionList) m += s + "*/"; m += "*/";
-                    DataPortHelper.logger.trace("Glob depth: " + m);
+                    WithDLBatchWriterHelper.logger.trace("Glob depth: " + m);
 
 
                     FileStatus[] it = HFileOperations.fs.globStatus(new Path(moveTask.source + m ), DLDataSetOperations.FILEDIR_FILTER);
-                    DataPortHelper.logger.debug("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
+                    WithDLBatchWriterHelper.logger.debug("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
                     for(FileStatus file : it){
                         if(file.isFile()){
                             // We also need list of partitions (directories) for reporting and appending/replacing
@@ -113,18 +114,18 @@ public interface WithDLBatchWriter {
                             // Store full partition path for future use in unique collection
                             // Should <set> to be used instead of <map>?
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
-                            DataPortHelper.logger.debug("Add partition to result set: " + p);
+                            WithDLBatchWriterHelper.logger.debug("Add partition to result set: " + p);
                             partitions.add(p);
                             // Update file counter for reporting purposes
                             ctx.globalFileCount++;
                         }
                     }
-                    DataPortHelper.logger.debug("Done.");
+                    WithDLBatchWriterHelper.logger.debug("Done.");
                     Integer completedFileCount = 0;
                     Map<String, Tuple3<Long, Integer, Integer>> partitionsInfo = new HashMap<>();
                     // Check if configuration asks data to be copied
                     // to final processed location
-                    DataPortHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
+                    WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
@@ -139,18 +140,18 @@ public interface WithDLBatchWriter {
             return 0;
         }
         catch(IOException e){
-            DataPortHelper.logger.error("IO exception during move operation, cancel moving stage: ", e);
+            WithDLBatchWriterHelper.logger.error("IO exception during move operation, cancel moving stage: ", e);
         }
         catch(Exception e){
-            DataPortHelper.logger.error("Exception during move operation, cancel moving stage: ", e);
+            WithDLBatchWriterHelper.logger.error("Exception during move operation, cancel moving stage: ", e);
         }
         return -1;
     }
 
-    class DataPortHelper extends DLBatchWriter {
+    class WithDLBatchWriterHelper extends DLBatchWriter {
         private static final Logger logger = Logger.getLogger(WithDLBatchWriter.class);
 
-         public DataPortHelper(NGContext ngctx) {
+        public WithDLBatchWriterHelper(NGContext ngctx) {
             super(ngctx);
         }
 
@@ -299,7 +300,7 @@ public interface WithDLBatchWriter {
             //get list of files to be processed
             FileStatus[] files = ngctx.fs.listStatus(new Path(source));
 
-            DataPortHelper.logger.debug("Prepare the list of the files, number of files: " + files.length);
+            WithDLBatchWriterHelper.logger.debug("Prepare the list of the files, number of files: " + files.length);
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getLen() > 0) {
                     String srcFileName = source + Path.SEPARATOR + files[i].getPath().getName();
@@ -312,7 +313,7 @@ public interface WithDLBatchWriter {
                                             "." + format;
 
                     Path fdest = new Path(destFileName);
-                    DataPortHelper.logger.debug(String.format("move from: %s to %s", srcFileName, fdest.toString()));
+                    WithDLBatchWriterHelper.logger.debug(String.format("move from: %s to %s", srcFileName, fdest.toString()));
                     Options.Rename opt = (mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
