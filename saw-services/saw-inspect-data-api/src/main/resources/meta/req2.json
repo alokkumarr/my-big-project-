@@ -1,0 +1,32 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/req2r.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::test2::meta",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "A.Sorokin",
+					"description" : "sample",
+					"tags" : [ "Preview", "XDF", "DataProfiler" ]
+					
+			},
+			
+			"dataLake" : { 
+			
+				"name" : "DS10", 
+				"type" : "fs", 
+				"catalog" : "defcatalog", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 20 
+				
+			}, 
+	   
+			"transformations" : [ "transformation::spark-sql::1" ]
+	}
+	
+}

@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Observe Proxy
+Requires=saw-observe.service
+After=saw-observe.service
+Requires=saw-observe-proxy.socket
+After=saw-observe-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9501
+PrivateTmp=yes

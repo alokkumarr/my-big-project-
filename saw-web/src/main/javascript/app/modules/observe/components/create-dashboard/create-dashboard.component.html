@@ -15,12 +15,28 @@
   </div>
 </div>
 <div mat-dialog-content>
-  <dashboard-grid [model]="dashboard"
-  [requester]="requester"
-  [mode]="mode"
-  (getDashboard)="onDashboardChange($event)"></dashboard-grid>
+
+  <mat-sidenav-container class="widget-container" [autosize]="false">
+    <mat-sidenav #widgetChoice
+      mode="over"
+      [opened]="false"
+      position="end">
+      <add-widget [container]="widgetChoice" (onWidgetAction)="onWidgetAction($event)"></add-widget>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <dashboard-grid [model]="dashboard"
+      [requester]="requester"
+      [mode]="mode"
+      (getDashboard)="onDashboardChange($event)"></dashboard-grid>
+
+      <span [@hideHelp]="fillState" class="empty-dashboard-image"></span>
+      <strong [@hideHelp]="fillState" class="add-button-help">There's nothing here yet.</strong>
+      <button [@moveButton]="fillState" mat-raised-button color="primary" class="add-analysis" (click)="chooseAnalysis()">
+        <!-- <mat-icon fontIcon="icon-plus"></mat-icon> -->
+        Add Widget
+      </button>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>
-<span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
-<button [@moveButton]="fillState" mat-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
-  <mat-icon fontIcon="icon-plus"></mat-icon>
-</button>
+
