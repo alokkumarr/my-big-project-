@@ -147,6 +147,8 @@ public class ServiceUtils {
 
     if (ftpServer == null || ftpUsername == null || ftpPassword == null ||
             localFilePath == null || destinationDir == null || destinationFileName == null || type == null) {
+      logger.error("One of the required fields for File transfer is absent. " +
+              "Please enter all the fields like FTP server host, port, username, password and type.");
       return false;
     } else {
       try {

@@ -17,14 +17,13 @@ public class FTPSUploader {
 
     public FTPSUploader(String host, int port, String user, String pwd) throws Exception {
         ftp = new FTPSClient();
-        ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
         int reply;
         ftp.setControlKeepAliveTimeout(300);
         ftp.connect(host, port);
         reply = ftp.getReplyCode();
         if (!FTPReply.isPositiveCompletion(reply)) {
             ftp.disconnect();
-            throw new Exception("Exception in connecting to SFTP Server");
+            throw new Exception("Exception in connecting to FTPS Server");
         }
         ftp.login(user, pwd);
         ftp.setFileType(FTP.BINARY_FILE_TYPE);

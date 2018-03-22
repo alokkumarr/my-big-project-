@@ -20,6 +20,9 @@ import java.util.TimeZone;
 
 @Service
 public class AnalysisServiceImpl implements AnalysisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisServiceImpl.class);
+
     @Value("${saw-analysis-service-url}")
     private String analysisUrl;
 
@@ -49,8 +52,23 @@ public class AnalysisServiceImpl implements AnalysisService {
     public void scheduleDispatch(SchedulerJobDetail analysis) {
         if (analysis.getDescription() == null) analysis.setDescription("");
 
-        String recipients = prepareStringFromList(analysis.getEmailList());
-        String ftpServers = prepareStringFromList(analysis.getFtp());
+        // in case if reading recipients list raises exception. Don't skip the scheduler processing
+        String recipients = null;
+        try {
+            recipients = prepareStringFromList(analysis.getEmailList());
+        } catch (Exception e) {
+            logger.error("Error reading recipients list: "+ e.getMessage());
+            recipients = "";
+        }
+
+        // in case if reading of ftp servers raises exception. Don't skip the scheduler processing
+        String ftpServers = null;
+        try {
+            ftpServers = prepareStringFromList(analysis.getFtp());
+        } catch (Exception e) {
+            logger.error("Error reading ftp servers list: "+ e.getMessage());
+            ftpServers = "";
+        }
 
         ExecutionBean[] executionBeans = fetchExecutionID(analysis.getAnalysisID());
         String[] latestexection = findLatestExecution(executionBeans);

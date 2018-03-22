@@ -203,7 +203,7 @@ public class ExportServiceImpl implements ExportService{
                     }
                   }
                 } catch (IOException e) {
-                  logger.error(e.toString());
+                  logger.error(e.getMessage());
                 }
               }
             } catch (Exception e) {
@@ -371,9 +371,6 @@ public class ExportServiceImpl implements ExportService{
               aliases.add(alias.getAlias());
             }
           }
-        } else {
-          logger.info("listFTP: inside else");
-          aliases.add("");
         }
       } catch (IOException e) {
         logger.error(e.toString());
