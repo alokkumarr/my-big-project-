@@ -39,7 +39,7 @@ type ReportGridColumn = {
 }
 
 @Component({
-  selector: 'pivot-grid',
+  selector: 'report-grid-upgraded',
   template
 })
 
@@ -55,6 +55,7 @@ export class ReportGridComponent {
     // for query mode
     this.columns = this.queryColumns2Columns(queryColumns);
   }
+  @Input() query: string;
   @Input('data') set setData(data: any[]) {
     this.data = data;
   };

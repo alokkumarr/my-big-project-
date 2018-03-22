@@ -7,7 +7,8 @@ import {
 } from '@angular/core';
 
 import {
-  Artifact
+  Artifact,
+  FieldChangeEvent
 } from '../types';
 import { DesignerStates } from '../container';
 
@@ -19,6 +20,7 @@ require('./designer-report.component.scss');
   template
 })
 export class DesignerReportComponent {
+  @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() data;
   @Input() designerState: DesignerStates;

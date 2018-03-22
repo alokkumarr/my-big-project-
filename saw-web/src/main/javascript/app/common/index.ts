@@ -50,6 +50,11 @@ import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
 import {ErrorDetailComponent} from './components/error-detail';
 import {DataFormatDialogComponent} from './components/data-format-dialog';
+import {ReportGridComponent} from './components/report-grid';
+import {
+  JsPlumbCanvasComponent,
+  JsPlumbTableComponent
+} from './components/js-plumb';
 import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
@@ -110,24 +115,33 @@ angular
   ],
   declarations: [
     PivotGridComponent,
+    ReportGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
     E2eDirective,
-    DataFormatDialogComponent
+    DataFormatDialogComponent,
+    JsPlumbCanvasComponent,
+    JsPlumbTableComponent
   ],
   entryComponents: [
     PivotGridComponent,
+    ReportGridComponent,
     ErrorDetailComponent,
-    DataFormatDialogComponent
+    DataFormatDialogComponent,
+    JsPlumbCanvasComponent,
+    JsPlumbTableComponent
   ],
   exports: [
     DndModule,
     PivotGridComponent,
+    ReportGridComponent,
     DxPivotGridComponent,
     DxDataGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
     DataFormatDialogComponent,
+    JsPlumbCanvasComponent,
+    JsPlumbTableComponent,
     E2eDirective
   ],
   providers: [

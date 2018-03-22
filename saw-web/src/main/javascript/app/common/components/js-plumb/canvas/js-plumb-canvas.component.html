@@ -1,0 +1,6 @@
+<js-plumb-table-u *ngFor="let artifact of artifacts; trackBy: index"
+                  class="jsp-table"
+                  (change)="onChange($event)"
+                  [artifact]="artifact"
+                  [plumbInstance]="_jsPlumbInst">
+</js-plumb-table-u>

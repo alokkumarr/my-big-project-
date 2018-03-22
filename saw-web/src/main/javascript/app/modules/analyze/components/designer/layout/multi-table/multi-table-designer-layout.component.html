@@ -1,1 +1,27 @@
-<div>multi</div>
+<div class="designer__data-settings"
+     [ngClass]="{'expanded': !isGridPanelExpanded}">
+
+  <designer-settings-query *ngIf="isInQueryMode"
+                           [artifacts]="artifacts">
+  </designer-settings-query>
+
+  <designer-settings-multi-table *ngIf="!isInQueryMode"
+                                 [artifacts]="artifacts">
+  </designer-settings-multi-table>
+
+  <button mat-icon-button
+          class="grid-panel-toggle__btn"
+          (click)="toggleGridPanel()">
+    <mat-icon fontIcon="icon-expand"
+              class="grid-panel-toggle__icon"
+              [ngClass]="{'expanded': isGridPanelExpanded}">
+    </mat-icon>
+  </button>
+</div>
+<div *ngIf="isGridPanelExpanded"
+     class="designer__data-grid">
+  <report-grid-upgraded [artifacts]="artifacts"
+                        [query]="query"
+                        [data]="data">
+  </report-grid-upgraded>
+</div>

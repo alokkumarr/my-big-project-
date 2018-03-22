@@ -1,0 +1,20 @@
+<mat-list role="list">
+
+  <div>
+    <span class="table-name">{{artifact.artifactName}}</span>
+  </div>
+
+  <mat-list-item *ngFor="let column of artifact.columns; trackBy: index"
+                 role="listitem">
+    <mat-checkbox [checked]="column.checked"
+                  (change)="onCheckBoxToggle(column, $event.checked)">
+      <span class="jsp-table-column-name">
+        {{getColumnLabel(column)}}
+      </span>
+    </mat-checkbox>
+<!--
+    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by $index"
+                       model="endpoint">
+    </js-plumb-endpoint> -->
+  </mat-list-item>
+</mat-list>

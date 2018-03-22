@@ -23,7 +23,14 @@ require('./multi-table-designer-layout.component.scss');
 export class MultiTableDesignerLayout {
   @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
+  @Input() isInQueryMode: boolean;
+  @Input() query: boolean;
   @Input() data;
   @Input() sorts: Sort[];
   @Input() designerState: DesignerStates;
+  public isGridPanelExpanded: boolean = false;
+
+  toggleGridPanel() {
+    this.isGridPanelExpanded = !this.isGridPanelExpanded;
+  }
 }

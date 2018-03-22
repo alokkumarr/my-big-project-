@@ -51,6 +51,11 @@
                  ng-click="$ctrl.createAnalysis()"
                  translate="CREATE_ANALYSIS">
       </md-button>
+      <md-button class="btn-primary"
+                 ng-disabled="!$ctrl.selectedAnalysisMethod || !$ctrl.selectedMetric"
+                 ng-click="$ctrl.openUpgradedModal()">
+                 Upgraded report
+      </md-button>
 
       <md-button class="btn-card"
                  ng-click="$ctrl.$dialog.hide()" translate="CANCEL">

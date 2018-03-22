@@ -17,7 +17,9 @@
 
   <multi-table-designer-layout *ngSwitchCase="'multi'"
                                (settingsChange)="onSettingsChange($event)"
+                               [isInQueryMode]="analysis ? analysis.edit : false"
                                [artifacts]="analysis ? analysis.artifacts : []"
+                               [query]="analysis ? analysis.queryManual : ''"
                                [data]="data"
                                [sorts]="sorts"
                                [designerState]="designerState">

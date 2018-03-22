@@ -1,0 +1,57 @@
+@import "themes/base/colors";
+
+.jsp-table {
+  position: absolute;
+  box-shadow: initial;
+  background: #FFF;
+  border: 1px solid #D1D3D3;
+  border-radius: 3px;
+  width: 265px;
+
+  .table-name {
+    background-color: #FFF;
+    font-weight: bold;
+    color: $primary-blue-b2;
+  }
+
+  mat-checkbox {
+    //margin-bottom: 8px;
+    .mat-label {
+      display: block !important;
+    }
+  }
+
+  mat-list > mat-list-item.mat-list-item {
+    height: 32px;
+  }
+
+  .jsp-endpoint-TopCenter,
+  .jsp-endpoint-BottomCenter,
+  .jsp-endpoint-LeftMiddle,
+  .jsp-endpoint-RightMiddle {
+    display: inline-block;
+  }
+
+  .jsp-endpoint-LeftMiddle {
+    position: absolute;
+    top: 50%;
+    left: 0;
+  }
+
+  .jsp-endpoint-RightMiddle {
+    position: absolute;
+    top: 50%;
+    right: 0;
+  }
+
+  .jsp-table-column-name {
+    font-size: 14px;
+    line-height: 16px;
+    word-wrap: break-word;
+    width: 90%;
+  }
+
+  .icon-close {
+    padding-left: 12px;
+  }
+}

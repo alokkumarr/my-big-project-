@@ -9,6 +9,7 @@ import {
 import {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent
@@ -39,6 +40,7 @@ export {
   DesignerPivotComponent,
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
