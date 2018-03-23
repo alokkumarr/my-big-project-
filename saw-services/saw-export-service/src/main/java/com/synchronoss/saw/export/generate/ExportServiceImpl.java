@@ -188,7 +188,7 @@ public class ExportServiceImpl implements ExportService{
               for (String aliastemp : ftp.split(",")) {
                 ObjectMapper jsonMapper = new ObjectMapper();
                 try {
-                  FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+                  FtpCustomer obj = jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
                   for (FTPDetails alias:obj.getFtpList()) {
                     if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
                       serviceUtils.uploadToFtp(alias.getHost(),
@@ -238,6 +238,7 @@ public class ExportServiceImpl implements ExportService{
     ListenableFuture<ResponseEntity<JsonNode>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, JsonNode.class);
     Object dispatchBean = request.getBody();
+    logger.debug("dispatchBean for Pivot: "+ dispatchBean.toString());
     responseStringFuture.addCallback(new ListenableFutureCallback<ResponseEntity<JsonNode>>() {
       @Override
       public void onSuccess(ResponseEntity<JsonNode> entity) {
@@ -261,6 +262,7 @@ public class ExportServiceImpl implements ExportService{
           ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
           // customer unique identifier to limit to that customers ftp servers only
           jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
+          logger.debug("jobGroup outside of try: "+ jobGroup);
         }
         try {
           // create a directory with unique name in published location to avoid file conflict for dispatch.
@@ -286,8 +288,9 @@ public class ExportServiceImpl implements ExportService{
 
             try {
               // compress the file
+              logger.info("ExportBean Filename: "+exportBean.getFileName());
               File cfile = new File(exportBean.getFileName());
-              String zipFileName = cfile.getName().concat(".zip");
+              String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
               FileOutputStream fos = new FileOutputStream(zipFileName);
               ZipOutputStream zos = new ZipOutputStream(fos);
@@ -299,12 +302,18 @@ public class ExportServiceImpl implements ExportService{
               zos.closeEntry();
               zos.close();
 
+              logger.debug("ftp servers: " + ftp);
+
               for (String aliastemp : ftp.split(",")) {
                 ObjectMapper jsonMapper = new ObjectMapper();
                 try {
-                  FtpCustomer obj = jsonMapper.readValue(new File(getClass().getResource(ftpDetailsFile).getFile()), FtpCustomer.class);
+                  FtpCustomer obj = jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
                   for (FTPDetails alias:obj.getFtpList()) {
+                    logger.debug("Processing Host: " + alias.getHost());
+                    logger.debug("jobGroup: "+ alias.getCustomerName());
+                    logger.debug("Alias: " + aliastemp.equals(alias.getAlias()));
                     if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
+                      logger.debug("Inside If");
                       serviceUtils.uploadToFtp(alias.getHost(),
                               alias.getPort(),
                               alias.getUsername(),
@@ -317,7 +326,9 @@ public class ExportServiceImpl implements ExportService{
                     }
                   }
                 } catch (IOException e) {
-                  logger.error(e.toString());
+                  logger.error(e.getMessage());
+                } catch (Exception e) {
+                  logger.error(e.getMessage());
                 }
               }
             } catch (FileNotFoundException e) {

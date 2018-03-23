@@ -14,6 +14,7 @@ interface DispatchBean {
     @Nullable
     String emailList();
 
+    @Nullable
     String fileType();
 
     @Nullable
@@ -29,5 +30,7 @@ interface DispatchBean {
     String userFullName();
 
     String publishedTime();
+
+    String jobGroup();
 
 }

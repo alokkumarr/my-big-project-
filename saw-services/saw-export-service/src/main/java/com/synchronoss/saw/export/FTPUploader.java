@@ -32,12 +32,14 @@ public class FTPUploader {
         ftp.login(user, pwd);
         ftp.setFileType(FTP.BINARY_FILE_TYPE);
         ftp.enterLocalPassiveMode();
-}
+    }
 
     public void uploadFile(String localFileFullName, String fileName, String hostDir)
             throws Exception {
         try (InputStream input = new FileInputStream(new File(localFileFullName))) {
             this.ftp.storeFile(hostDir + fileName, input);
+        } catch (Exception e) {
+            logger.error("Error while uploading to FTP: "+ e.getMessage());
         }
     }
 

@@ -86,6 +86,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
                     .ftp(ftpServers)
+                    .jobGroup(analysis.getJobGroup())
                     .publishedTime(formatted).build();
         } else if (!recipients.equals("")) {
             execution = ImmutableDispatchBean.builder()
@@ -94,6 +95,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
+                    .jobGroup(analysis.getJobGroup())
                     .publishedTime(formatted).build();
         } else if (!ftpServers.equals("")) {
             execution = ImmutableDispatchBean.builder()
@@ -102,6 +104,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
                     .ftp(ftpServers)
+                    .jobGroup(analysis.getJobGroup())
                     .publishedTime(formatted).build();
         } else {
             execution = ImmutableDispatchBean.builder()
@@ -109,6 +112,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .name(analysis.getAnalysisName())
                     .userFullName(analysis.getUserFullName())
                     .metricName(analysis.getMetricName())
+                    .jobGroup(analysis.getJobGroup())
                     .publishedTime(formatted).build();
         }
         String[] param = new String[3];
