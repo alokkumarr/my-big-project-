@@ -287,7 +287,7 @@ public class AnalyzeIT extends BaseIT {
         return objectNode;
     }
 
-    @Test
+    @Test(timeout=300000)
     public void testGlobalFilter()  throws JsonProcessingException {
         /* Use list metrics method, which waits for sample metrics to
          * be loaded before returning, to ensure sample metrics are
