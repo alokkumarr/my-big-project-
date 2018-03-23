@@ -1,2 +1,7 @@
 - name: restart saw-scheduler
+  # Note: Use state=restarted despite being socket-activated, to
+  # ensure the service is up to execute scheduled tasks
   systemd: name=saw-scheduler state=restarted daemon_reload=true
+  # However, skip starting in development mode as tasks do not exist
+  # and instead let socket activation start it on demand
+  when: lookup('env', 'container') != 'docker'

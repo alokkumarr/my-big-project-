@@ -19,7 +19,7 @@ spring:
 flyway.baselineOnMigrate: true
 server:
   address: localhost
-  port: 9600
+  port: 9601
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
