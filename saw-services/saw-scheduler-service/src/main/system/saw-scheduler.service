@@ -1,7 +1,8 @@
 [Unit]
-Description=SAW scheduler
+Description=SAW Scheduler
 
 [Service]
+Type=notify
 ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-scheduler-service/saw-scheduler.jar --spring.config.location=/opt/bda/saw-scheduler-service/conf/application.yml"
 SyslogIdentifier=saw-scheduler
 User=mapr
@@ -10,4 +11,7 @@ Restart=on-failure
 SuccessExitStatus=143
 
 [Install]
+# Note: Leave the service as wanted by default.target despite being
+# socket-activated, so that it comes up when system starts in case
+# there are scheduled tasks
 WantedBy=default.target

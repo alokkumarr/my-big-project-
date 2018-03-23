@@ -2,13 +2,13 @@
 Description=SAW Transport
 
 [Service]
+Type=notify
 ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj
 SyslogIdentifier=saw-transport
 User=mapr
 Restart=on-failure
+# Allow service to exit on SIGTERM, if socket-activated
+SuccessExitStatus=143
 # Read environment variables from optional file, for example to set
 # JAVA_OPTS during development
 EnvironmentFile=/etc/bda/saw-transport-service-env
-
-[Install]
-WantedBy=default.target

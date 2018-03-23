@@ -38,7 +38,7 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  * executes it and lists the execution results.
  */
 public class AnalyzeIT extends BaseIT {
-    @Test
+    @Test(timeout=300000)
     public void testExecuteAnalysis() throws JsonProcessingException {
         String metricId = listMetrics(token);
         ObjectNode analysis = createAnalysis(token, metricId);
@@ -90,9 +90,27 @@ public class AnalyzeIT extends BaseIT {
             .body(json)
             .when().post("/services/md")
             .then().assertThat().statusCode(200)
-            .body(path, instanceOf(String.class))
             .extract().response();
-        return response.path(path);
+        try {
+            String metricId = response.path(path);
+            if (metricId == null) {
+                return retryListMetrics(token);
+            }
+            return metricId;
+        } catch (IllegalArgumentException e) {
+            return retryListMetrics(token);
+        }
+    }
+
+    private String retryListMetrics(String token)
+        throws JsonProcessingException {
+        /* Path was not found, so wait and retry.  The sample metrics
+         * are loaded asynchronously, so wait until the loading
+         * finishes before proceeding.  */
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {}
+        return listMetrics(token);
     }
 
     private ObjectNode createAnalysis(String token, String metricId)
@@ -278,8 +296,13 @@ public class AnalyzeIT extends BaseIT {
         return objectNode;
     }
 
-    @Test
-    public void globalFilterTest()  throws JsonProcessingException {
+    @Test(timeout=300000)
+    public void testGlobalFilter()  throws JsonProcessingException {
+        /* Use list metrics method, which waits for sample metrics to
+         * be loaded before returning, to ensure sample metrics are
+         * available before creating filters */
+        listMetrics(token);
+        /* Proceed to creating filters */
         ObjectNode node = globalFilters();
         String json = mapper.writeValueAsString(node);
         String field = "string.keyword";

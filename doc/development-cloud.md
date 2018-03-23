@@ -103,3 +103,11 @@ Then retry deploying again.
 If everything else fails or you get a difficult to troubleshoot error,
 execute `docker-machine rm user-$SAW_AWS_USERNAME` to delete the
 Docker Machine host and start again from scratch.
+
+# Deploying from the continuous integration server
+
+If you cannot deploy using Docker Machine from your own development
+machine, see instructions for deploying from the [continuous
+integration server].
+
+[continuous integration server]: development-cloud-ci.md
