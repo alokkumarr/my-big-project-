@@ -288,7 +288,12 @@ public class AnalyzeIT extends BaseIT {
     }
 
     @Test
-    public void globalFilterTest()  throws JsonProcessingException {
+    public void testGlobalFilter()  throws JsonProcessingException {
+        /* Use list metrics method, which waits for sample metrics to
+         * be loaded before returning, to ensure sample metrics are
+         * available before creating filters */
+        listMetrics(token);
+        /* Proceed to creating filters */
         ObjectNode node = globalFilters();
         String json = mapper.writeValueAsString(node);
         String field = "string.keyword";
