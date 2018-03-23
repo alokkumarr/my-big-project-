@@ -23,12 +23,12 @@
 
         <md-menu-bar>
           <md-menu>
+            {{$ctrl.resp}}
             <md-button class="md-icon-button"
                        aria-label="User"
                        e2e="account-settings-menu-btn"
                        ng-click="$mdMenu.open()">
-
-              <md-tooltip ng-bind="'TOOLTIP_ACCOUNT_SETTINGS' | translate"></md-tooltip>
+              <md-tooltip ng-bind="$ctrl.UserDetails.ticket.userFullName | uppercase"></md-tooltip>
               <md-icon md-font-icon="icon-user-placeholder"></md-icon>
             </md-button>
             <md-menu-content>
