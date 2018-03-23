@@ -38,7 +38,7 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  * executes it and lists the execution results.
  */
 public class AnalyzeIT extends BaseIT {
-    @Test
+    @Test(timeout=300000)
     public void testExecuteAnalysis() throws JsonProcessingException {
         String metricId = listMetrics(token);
         ObjectNode analysis = createAnalysis(token, metricId);
@@ -90,9 +90,18 @@ public class AnalyzeIT extends BaseIT {
             .body(json)
             .when().post("/services/md")
             .then().assertThat().statusCode(200)
-            .body(path, instanceOf(String.class))
             .extract().response();
-        return response.path(path);
+        try {
+            return response.path(path);
+        } catch (IllegalArgumentException e) {
+            /* Path was not found, so wait and retry.  The sample
+             * metrics are loaded asynchronously, so the test has to
+             * wait until the loading finishes before proceeding.  */
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) {}
+            return listMetrics(token);
+        }
     }
 
     private ObjectNode createAnalysis(String token, String metricId)
