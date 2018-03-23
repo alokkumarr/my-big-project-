@@ -82,10 +82,13 @@ starting points to investigate installed SAW services and packages:
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
-To stop the SAW containers, simply send an interrupt to the Maven
-process used to start the containers.  In case containers have been
-left behind and prevent running new SAW containers, existing
-containers can be removed by executing the following command:
+The SAW containers can be stopped using the following command:
+
+        $ docker stop saw saw-mapr
+
+In case containers have been left behind and prevent running new SAW
+containers, existing containers can be removed by executing the
+following command:
 
         $ docker rm -f saw saw-mapr
 
