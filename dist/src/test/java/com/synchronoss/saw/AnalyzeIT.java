@@ -92,16 +92,25 @@ public class AnalyzeIT extends BaseIT {
             .then().assertThat().statusCode(200)
             .extract().response();
         try {
-            return response.path(path);
+            String metricId = response.path(path);
+            if (metricId == null) {
+                return retryListMetrics(token);
+            }
+            return metricId;
         } catch (IllegalArgumentException e) {
-            /* Path was not found, so wait and retry.  The sample
-             * metrics are loaded asynchronously, so the test has to
-             * wait until the loading finishes before proceeding.  */
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ex) {}
-            return listMetrics(token);
+            return retryListMetrics(token);
         }
+    }
+
+    private String retryListMetrics(String token)
+        throws JsonProcessingException {
+        /* Path was not found, so wait and retry.  The sample metrics
+         * are loaded asynchronously, so wait until the loading
+         * finishes before proceeding.  */
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {}
+        return listMetrics(token);
     }
 
     private ObjectNode createAnalysis(String token, String metricId)
