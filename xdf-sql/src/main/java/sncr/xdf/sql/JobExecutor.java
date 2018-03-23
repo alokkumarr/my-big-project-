@@ -6,8 +6,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.context.InternalContext;
-import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
 

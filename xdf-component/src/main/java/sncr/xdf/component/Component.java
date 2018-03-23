@@ -57,6 +57,7 @@ public abstract class Component {
     private String transformationID;
 
 
+
     public String getError(){
         return error;
     }
@@ -367,7 +368,7 @@ public abstract class Component {
             });
             transformationMD.updateStatus(transformationID, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
         } catch (Exception e) {
-            error = "Exception at job finalization: " +  e.getMessage();
+            error = "Exception at job finalization: " +  ExceptionUtils.getFullStackTrace(e);
             logger.error(e);
             return -1;
         }

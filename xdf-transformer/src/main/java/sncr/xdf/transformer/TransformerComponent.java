@@ -1,5 +1,6 @@
 package sncr.xdf.transformer;
 
+
 import com.google.gson.JsonElement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
@@ -172,7 +173,6 @@ public class TransformerComponent extends Component implements WithMovableResult
             };
             f.accept(outputs.get(RequiredNamedParameters.Output.toString()));
             f.accept(outputs.get(RequiredNamedParameters.Rejected.toString()));
-
 
         }
         catch(Exception e){

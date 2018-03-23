@@ -3,12 +3,12 @@ package sncr.xdf.sql;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.adapters.writers.DLBatchWriter;
-import sncr.xdf.exceptions.XDFException;
-import scala.Tuple4;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.exceptions.XDFException;
 
 import java.io.Serializable;
 import java.util.List;
@@ -131,7 +131,6 @@ public class SQLExecutor implements Serializable {
                 long lt = System.currentTimeMillis();
                 descriptor.loadTime = (int)((lt-st)/1000);
                 Dataset<Row> sqlResult = ctx.sparkSession.sql(descriptor.SQL);
-
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
 
                 jobDataFrames.put(descriptor.targetTableName, finalResult);
@@ -162,8 +161,6 @@ public class SQLExecutor implements Serializable {
         }
         return 0L;
     }
-
-
 
 
 

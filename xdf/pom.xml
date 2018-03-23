@@ -4,7 +4,7 @@
   <parent>
 		<groupId>com.synchronoss.bda</groupId>
 		<artifactId>xdf-nextgen</artifactId>
-		<version>1.0.1_dev</version>
+		<version>1.0.3_dev</version>
   </parent>
 
   <!-- use app.name from parent pom -->
@@ -41,11 +41,6 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-preview</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-transformer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

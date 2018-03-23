@@ -2,10 +2,9 @@ package sncr.xdf.sql;
 
 
 import com.google.gson.JsonElement;
-import sncr.xdf.sql.ng.NGSQLScriptDescriptor;
-
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * Created by srya0001 on 8/22/2016.
