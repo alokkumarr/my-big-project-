@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.export.model.ftp.FTP;
 import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import org.slf4j.Logger;
@@ -64,17 +65,12 @@ public class DataExportController {
       exportService.reportToBeDispatchedAsync(executionId, request,analysisId);
   }
 
-  @RequestMapping(value = "/listFTP", method = RequestMethod.POST)
+  @RequestMapping(value = "/listFTP", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public void listFTP(RequestEntity request, HttpServletResponse response) {
-    try {
-      response.setContentType("application/json");
-      response.getWriter().write(exportService.listFtpsForCustomer(request).toString());
-      response.getWriter().flush();
-      response.getWriter().close();
-    } catch (IOException e) {
-      logger.error(e.getMessage());
-    }
+  public FTP listFTP(RequestEntity request) {
+    // FTP is JSON model
+    FTP ftpList = new FTP();
+    ftpList.setFtp(exportService.listFtpsForCustomer(request));
+    return ftpList;
   }
-
 }

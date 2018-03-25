@@ -18,7 +18,7 @@ public interface ExportService {
   public ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(String executionId, HttpServletRequest request, String analysisId)throws JSONValidationSAWException;
   public void reportToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)throws JSONValidationSAWException;
   public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)throws JSONValidationSAWException;
-  public String listFtpsForCustomer(RequestEntity request);
+  public List<String> listFtpsForCustomer(RequestEntity request);
 
   AnalysisMetaData getAnalysisMetadata(String analysisId);
 }

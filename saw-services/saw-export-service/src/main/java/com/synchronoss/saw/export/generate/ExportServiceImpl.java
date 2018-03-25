@@ -363,7 +363,7 @@ public class ExportServiceImpl implements ExportService{
   }
 
   @Override
-  public String listFtpsForCustomer(RequestEntity request) {
+  public List<String> listFtpsForCustomer(RequestEntity request) {
     Object dispatchBean = request.getBody();
     // this job group is customer unique identifier
     String jobGroup = null;
@@ -377,16 +377,15 @@ public class ExportServiceImpl implements ExportService{
         if (f.exists() && !f.isDirectory()) {
           FtpCustomer obj = jsonMapper.readValue(f, FtpCustomer.class);
           for (FTPDetails alias : obj.getFtpList()) {
-            logger.info("Customer Name: "+alias.getCustomerName());
             if (alias.getCustomerName().equals(jobGroup)) {
               aliases.add(alias.getAlias());
             }
           }
         }
       } catch (IOException e) {
-        logger.error(e.toString());
+        logger.error(e.getMessage());
       }
     }
-    return "{\"ftp\": " + new Gson().toJson(aliases).toString() + "}";
+    return aliases;
   }
 }
