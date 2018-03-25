@@ -365,3 +365,64 @@ Recommended key size is 256 bits.
    Dgus5PoaEHm2tKEjy0cUGnzQlx86qiutmBZjPbI4y0U=
 
 After generating the key, add it to the SAW environment configuration ({{saw-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.
+
+
+== FTP server configuration
+
+SAW supports exporting of pivots and reports to ftp/sftp servers. By default an empty configuration is installed at default location i.e. `/opt/bda/saw-export-service/conf/ftp-details.json` file.
+
+Example File:
+
+.ftp-details.json
+[source, json]
+----
+{
+  "ftpList": [
+    {
+        "customerName":"UNIQUE_IDENTIFIER1",
+        "alias" : "server1",
+        "host": "server1.customer1.com",
+        "port": 21,
+        "username": "usr1",
+        "password": "pwd1",
+        "location": "/some/location/",
+        "type": "ftp"
+    },
+    {
+        "customerName":"UNIQUE_IDENTIFIER1",
+        "alias" : "server2",
+        "host": "server2.customer1.com",
+        "port": 22,
+        "username": "usr2",
+        "password": "pwd2",
+        "location": "/some/location/",
+        "type": "sftp"
+    },
+    {
+        "customerName":"UNIQUE_IDENTIFIER2",
+        "alias" : "server1",
+        "host": "server1.customer2.com",
+        "port": 21,
+        "username": "imuser1",
+        "password": "pwd3",
+        "location": "/home/ubuntu",
+        "type": "ftp"
+    }
+  ]
+}
+----
+
+In above source, `customerName` is the unique identifier given at the time of onboarding customer. Note that based on this unique identifier, different customers are differentiated. Each FTP/SFTP server is required to have unique entry which gets presented to front end, this is maintained by means of `alias` entry. *Note* that each server entry per customer is required to have a unique alias entry which gets presented in front end.
+
+[Note]
+====
+The default location of ftp-details.json file can be changed from application.yml file for export service.
+
+Keys to be modified for ftp config location:
+[source, yaml]
+----
+ftp:
+  details:
+    file: /opt/bda/saw-export-service/conf/ftp-details.json
+----
+====
