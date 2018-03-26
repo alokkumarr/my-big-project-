@@ -11,6 +11,7 @@ import sncr.bda.conf.ComponentConfiguration;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * Created by srya0001 on 9/6/2017.
@@ -35,6 +36,7 @@ public class Context extends ContextMetadata {
     public SparkSession sparkSession = null;
     public SparkConf sparkConf;
     public int globalFileCount = 0  ;
+
 
     public Context(String componentName,
                    String batchId,

@@ -1,17 +1,15 @@
-package sncr.xdf.sql;
+package sncr.xdf.sql.ng;
 
 import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
-import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.Context;
+import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.sql.*;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -21,42 +19,30 @@ import java.util.*;
  * creates an SQL Executor objects.
  * The Job executor keeps track of all executed SQLs and their results.
  */
-public class JobExecutor {
+public class NGJobExecutor {
 
-    private static final Logger logger = Logger.getLogger(JobExecutor.class);
+    private static final Logger logger = Logger.getLogger(NGJobExecutor.class);
 
-    private Context ctx;
-
-    Map<String, Map<String, Object>> inputDOs;
-    Map<String, Map<String, Object>> outputDOs;
-
-    private Map<String, Dataset<Row>> availableDataframes = new HashMap<>();
-    private String now;
-
+    private AbstractComponent parent;
     private String script;
-    private SQLScriptDescriptor scriptDescriptor;
-    private Map<String, SQLDescriptor> result;
 
-    public JobExecutor(Context ctx,
-                       Map<String, Map<String, Object>> inputDOLocations,
-                       Map<String, Map<String, Object>> outputDOLocations) throws XDFException
+    private Map<String, Dataset<Row>> availableDataframes;
+    //private NGSQLScriptDescriptor scriptDescriptor;
+    private Map<String, SQLDescriptor> result;
+    private List<SQLDescriptor> report;
     {
-        this.ctx = ctx;
+        availableDataframes = new HashMap<>();
         report = new ArrayList<>();
         result = new HashMap();
-        inputDOs = inputDOLocations;
-        outputDOs = outputDOLocations;
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
-        now = format.format(new Timestamp(new Date().getTime()));
     }
 
 
-    public void analyze(String script)
+    public NGJobExecutor(AbstractComponent parent, String script) throws XDFException
     {
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-HHmmss");
-        this.now = format.format(new Timestamp(new Date().getTime()));
+        this.parent = parent;
         this.script = script;
     }
+
 
     public Long start(String tempDir) throws XDFException {
 
@@ -64,9 +50,9 @@ public class JobExecutor {
         try {
 
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
-            scriptDescriptor = new SQLScriptDescriptor(ctx, tempDir, inputDOs, outputDOs);
+            NGSQLScriptDescriptor scriptDescriptor = new NGSQLScriptDescriptor(parent.getICtx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
             logger.debug("Step 0: Remove comments: " + script);
-            script = SQLScriptDescriptor.removeComments(script);
+            script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);
             scriptDescriptor.parseSQLScript();
             scriptDescriptor.resolveTableNames();
@@ -87,7 +73,7 @@ public class JobExecutor {
                 if (descriptor.statementType  == StatementType.CREATE) {
 
                     try {
-                        SQLExecutor executor = new SQLExecutor(ctx,descriptor, availableDataframes);
+                        NGSQLExecutor executor = new NGSQLExecutor(parent,descriptor, availableDataframes);
                         rc = executor.run(scriptDescriptor);
                         descriptor.result =(rc != 0)?"failed":"success";
                         if (rc != 0){
@@ -107,8 +93,6 @@ public class JobExecutor {
 
                 //TODO:: Debug, test and comment the DROP Table functionality
                 else if (descriptor.statementType  == StatementType.DROP_TABLE) {
-                    //TODO:: XDF-1013 implementation
-                    // 1. Drop existing tables (remove data files) -- use resolved existing location
 
                     String destDir;
                     if (descriptor.tableDescriptor != null &&
@@ -151,10 +135,12 @@ public class JobExecutor {
                     continue;
                 }
                 else{
-                    logger.debug("Add result table: " + sqlDescriptor.targetTableName );
+                    logger.trace("Add result table: " + sqlDescriptor.targetTableName );
                     result.put(sqlDescriptor.targetTableName, sqlDescriptor);
-                    Map<String, Object> ods = outputDOs.get(sqlDescriptor.targetTableName);
+/*
+                    Map<String, Object> ods = parent.getNgctx().outputDataSets.get(sqlDescriptor.targetTableName);
                     ods.put(DataSetProperties.Schema.name(), sqlDescriptor.schema);
+*/
                 }
             }
 
@@ -167,8 +153,6 @@ public class JobExecutor {
         }
         return rc;
     }
-
-    private List<SQLDescriptor> report;
 
     public Map<String, SQLDescriptor> getResultDataSets() { return result; }
 

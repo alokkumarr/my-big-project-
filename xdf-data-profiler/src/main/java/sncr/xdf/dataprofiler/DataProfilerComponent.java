@@ -29,29 +29,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
         }
 
     }
-/*
-    public static int main(String config, String app, String batch){
 
-        DataProfilerComponent component = new DataProfilerComponent();
-        try {
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put(CliHandler.OPTIONS.CONFIG.name(), config);
-            parameters.put(CliHandler.OPTIONS.APP_ID.name(), app);
-            parameters.put(CliHandler.OPTIONS.BATCH_ID.name(), batch);
-
-            // Spark based component
-            if (component.init(config, app, batch, null ) == 0) {
-                return component.Run();
-            } else {
-                return -2;
-            }
-        } catch (Exception e){
-            System.out.println("Exception " + e.getMessage());
-            e.printStackTrace();
-            return -1;
-        }
-    }
-*/
     public DataProfilerComponent(){
         componentName = "DataProfiler";
     }
@@ -65,7 +43,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
                     !ctx.componentConfiguration.getInputs().isEmpty())
                 inputDataSets = discoverDataParametersWithInput(dsaux);
 
-            // Run component logic here
+            // run component logic here
             // ...
             // Read input file
             if(inputDataSets != null){

@@ -6,26 +6,21 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.types.DataType;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.Metadata;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.*;
 import org.apache.spark.util.LongAccumulator;
-import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.writers.DLBatchWriter;
-import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.component.*;
+import sncr.xdf.context.NGContext;
+import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.*;
 import sncr.xdf.parser.spark.ConvertToRow;
-import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
@@ -34,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Parser extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
+public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
-    private static final Logger logger = Logger.getLogger(Parser.class);
+    private static final Logger logger = Logger.getLogger(NGParser.class);
 
     private String lineSeparator;
     private char delimiter;
@@ -59,16 +54,23 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     private List<String> pkeys;
 
+    public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
+
+    public NGParser() {
+        super();
+        serviceStatus.remove(ComponentServices.InputDSMetadata);
+    }
+
     {
         componentName = "parser";
     }
 
     public static void main(String[] args){
-        Parser component = new Parser();
+        NGParser component = new NGParser();
         try {
             // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.initWithCMDParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -77,17 +79,20 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
     }
 
-    protected int Execute(){
+
+
+
+    protected int execute(){
 
         int retval = 0;
 
         sourcePath = ctx.componentConfiguration.getParser().getFile();
         headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
-        tempDir = generateTempLocation(new DataSetServiceAux(ctx, md), null, null);
+        tempDir = generateTempLocation(new DataSetHelper(ctx, services.md), null, null);
         lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
-        delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
-        quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
-        quoteEscapeChar = (ctx.componentConfiguration.getParser().getQuoteEscape() != null)? ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0): '\"';
+        delimiter = ctx.componentConfiguration.getParser().getDelimiter().charAt(0);
+        quoteChar = ctx.componentConfiguration.getParser().getQuoteChar().charAt(0);
+        quoteEscapeChar = ctx.componentConfiguration.getParser().getQuoteEscape().charAt(0);
 
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
@@ -99,13 +104,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true);
 
         // Output data set
-        if(outputDataSets.size() != 1){
+        if(ngctx.outputDataSets.size() != 1){
             // error - must be only one for parser
-            logger.error("Found multiple output data set definitions");
-            return -1;
+            logger.error("Found multiple output data set definitions "+ ngctx.outputDataSets.size());
+            //return -1;
         }
 
-        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)outputDataSets.entrySet().toArray()[0];
+        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)ngctx.outputDataSets.entrySet().toArray()[0];
         outputDataSetName = ds.getKey();
         outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
         outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
@@ -114,17 +119,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
-        //TODO: If data set exists and flag is not append - error
-        // This is good for UI what about pipeline? Talk to Suren
-
-
-        // Check what sourcePath referring
         FileSystem fs = HFileOperations.getFileSystem();
 
-        //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
-        //System.exit(0);
-
         try {
+
+            if (ngctx.fs.exists(new Path(tempDir)))
+                HFileOperations.deleteEnt(tempDir);
+
+
             if(headerSize >= 1) {
                 FileStatus[] files = fs.globStatus(new Path(sourcePath));
                 // Check if directory has been given
@@ -139,13 +141,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 retval = parse(DLDataSetOperations.MODE_APPEND);
             }
         }catch (IOException e){
+            logger.error("IO error: " + ExceptionUtils.getFullStackTrace(e));
+            retval =  -1;
+        } catch (Exception e) {
+            logger.error("Error: " + ExceptionUtils.getFullStackTrace(e));
             retval =  -1;
         }
         return retval;
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return Parser.analyzeAndValidate(config);
+        return NGParser.analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
@@ -166,7 +172,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         return compConf;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
@@ -176,45 +182,19 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         return s;
     }
 
-    // Parse data without headers
-    int parse(String mode){
-
-        logger.info("Parsing " + sourcePath + " to " + tempDir);
-        logger.info("Header size : " + headerSize);
-
-        JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(sourcePath, 1)
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
-
-
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
-
-        scala.collection.Seq<Column> scalaList=
-            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-
-        //TODO: Change here
-        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
-        writeDataset(filteredDataset, outputFormat.toString(), tempDir);
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
-
-        return 0;
-    }
-
 
     // Parse data with headers - we have to do this file by file
     private int parseFiles(FileStatus[] files, String mode){
         // Files
+        String tempPath = tempDir;
         for (FileStatus file : files) {
             if (file.isFile()) {
-                String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
+                 // + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-
-//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
-
                 }
             }
         }
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempPath + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
         return 0;
     }
 
@@ -222,55 +202,43 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         logger.info("Parsing " + file + " to " + destDir);
         logger.info("Header size : " + headerSize);
 
-        JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(file.toString(), 1)
-            // Add line numbers
-            .zipWithIndex()
-            // Filter out header based on line number
-            .filter(new HeaderFilter(headerSize))
-            // Get rid of file numbers
-            .keys()
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
+        JavaRDD<Row> rdd = reader.readToRDD(file.toString(), headerSize)
+                .map(new ConvertToRow(  schema,
+                                tsFormats,
+                                lineSeparator,
+                                delimiter,
+                                quoteChar,
+                                quoteEscapeChar,
+                                '\'',
+                                recCounter,
+                                errCounter));
 
 
         Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
         // TODO: Filter out all rejected records
+//        logger.debug ( "Created rdd:  " + rdd.rdd().count());
+        logger.debug ( "Created df:  " + df.count() + " schema: " + df.schema().prettyJson());
 
-        scala.collection.Seq<Column> scalaList=
+            scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
-
-        return writeDataset(filteredDataset, outputFormat, destDir.toString());
+        Column cond = df.col("__REJ_FLAG").isNull().or(df.col("__REJ_FLAG").equalTo(0));
+        Dataset<Row> filteredDataset = df.select(scalaList).where(cond);
+        logger.debug ( "Filtered df:  " + filteredDataset.count());
+        int rc = commitDataSetFromDSMap(ngctx, filteredDataset, outputDataSetName, destDir.toString(), "append");
+        return rc;
     }
 
-    /**
-     *
-     * Writes the given dataset with a given format in the specified path.
-     *
-     * @param dataset Input dataset which needs to be written
-     * @param format Format in which data needs to be written
-     * As of now, the supported data formats are
-     * <ol>
-     *     <li>json</li>
-     *     <li>parquet</li>
-     * </ol>
-     * @param path Fully qualified path to which data needs to be written
-     * @return
-     * @throws XDFException
-     */
-    private int writeDataset(Dataset<Row> dataset, String format, String path) {
-        try {
-            DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, pkeys);
-            xdfDW.writeToTempLoc(dataset,  path);
-            Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
-            outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
-            return 0;
-        } catch (Exception e) {
-            error = ExceptionUtils.getFullStackTrace(e);
-            logger.error("Error at writing result: " + error);
-            return -1;
-        }
+    // Parse data without headers
+    int parse(String mode){
+        int rc = parseSingleFile(new Path(sourcePath), new Path(tempDir));
 
+        if (rc != 0){
+            error = "Could not parse file: " + sourcePath;
+            logger.error(error);
+            return rc;
+        }
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+        return 0;
     }
 
     private static List<Column> createFieldList(List<Field> fields){

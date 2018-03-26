@@ -9,8 +9,8 @@ import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -70,10 +70,10 @@ public interface WithMovableResult {
                     for (int i = 0; i < files.length; i++) {
                         if (files[i].getLen() > 0) {
                             String srcFileName = moveTask.source + Path.SEPARATOR + files[i].getPath().getName();
-                            //Move data files with new name to output location
+                            //move data files with new name to output location
                             String destFileName = generateOutputFileName(ctx, moveTask, fileCounter);
                             Path dest = new Path(destFileName);
-                            WithMovableResultHelper.logger.debug(String.format("Move from: %s to %s", srcFileName, dest.toString()));
+                            WithMovableResultHelper.logger.debug(String.format("move from: %s to %s", srcFileName, dest.toString()));
                             Options.Rename opt = (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                             Path src = new Path(srcFileName);
                             Path dst = new Path(destFileName);
@@ -155,34 +155,7 @@ public interface WithMovableResult {
 
 
 
-    class MoveDataDescriptor {
 
-        public String source;
-        public String dest;
-        public String mode;
-        public String format;
-        public String objectName;
-        public List<String> partitionList;
-
-        {
-            mode = DLDataSetOperations.MODE_APPEND;
-            format = DLDataSetOperations.FORMAT_PARQUET;
-        }
-
-        public MoveDataDescriptor(String src,
-                                  String dest,
-                                  String objectName,
-                                  String mode,
-                                  String format,
-                                  List<String> partitionList) {
-            this.source = src;
-            this.dest = dest;
-            this.mode = mode.toLowerCase();
-            this.format = format.toLowerCase();
-            this.objectName = objectName;
-            this.partitionList = partitionList;
-        }
-    }
 
     class WithMovableResultHelper {
         private static final Logger logger = Logger.getLogger(WithMovableResult.class);
@@ -234,7 +207,7 @@ public interface WithMovableResult {
                     Path newName = new Path(loc);
                     HFileOperations.fc.rename(s.getPath(), newName);
                     numberOfFilesSuccessfullyCopied++;
-                } catch (java.io.IOException e) {
+                } catch (IOException e) {
                     logger.error(ExceptionUtils.getFullStackTrace(e));
                     throw e;
                 }

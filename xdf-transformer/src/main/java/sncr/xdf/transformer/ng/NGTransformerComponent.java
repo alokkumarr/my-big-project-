@@ -1,22 +1,20 @@
-package sncr.xdf.transformer;
+package sncr.xdf.transformer.ng;
 
-
-import com.google.gson.JsonElement;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.types.*;
-import org.apache.spark.sql.types.Metadata;
 import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.component.*;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.component.*;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.*;
+import sncr.xdf.transformer.RequiredNamedParameters;
 
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by srya0001 on 12/19/2017.
@@ -27,13 +25,13 @@ import java.util.function.Consumer;
  * The component DOES NOT PERFORM any multi-record conversion, use Spark SQL XDF Component
  * if you need to make such transformation.
  */
-public class TransformerComponent extends Component implements WithMovableResult, WithSparkContext, WithDataSetService{
+public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     public static String RECORD_COUNTER = "_record_counter";
     public static String TRANSFORMATION_RESULT = "_tr_result";
     public static String TRANSFORMATION_ERRMSG = "_tr_errmsg";
 
-    private static final Logger logger = Logger.getLogger(TransformerComponent.class);
+    private static final Logger logger = Logger.getLogger(NGTransformerComponent.class);
     private String tempLocation;
 
     {
@@ -41,10 +39,10 @@ public class TransformerComponent extends Component implements WithMovableResult
     }
 
     public static void main(String[] args){
-        TransformerComponent component = new TransformerComponent();
+        NGTransformerComponent component = new NGTransformerComponent();
         try {
-           if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+           if (component.initWithCMDParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
            }
         } catch (Exception e){
@@ -62,9 +60,9 @@ public class TransformerComponent extends Component implements WithMovableResult
     }
 
     @Override
-    protected int Execute(){
+    protected int execute(){
         try {
-             tempLocation = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
+             tempLocation = generateTempLocation(new DataSetHelper(ctx, services.md),  null, null);
 
 //1. Read expression/scripts, compile it??
             String script;
@@ -87,21 +85,11 @@ public class TransformerComponent extends Component implements WithMovableResult
 //2. Read input datasets
 
             Map<String, Dataset> dsMap = new HashMap();
-            for ( Map.Entry<String, Map<String, Object>> entry : inputs.entrySet()) {
+            for ( Map.Entry<String, Map<String, Object>> entry : ngctx.inputs.entrySet()) {
                 Map<String, Object> desc = entry.getValue();
                 String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
                 String format = (String) desc.get(DataSetProperties.Format.name());
-                Dataset ds = null;
-                switch (format.toLowerCase()) {
-                    case "json":
-                        ds = ctx.sparkSession.read().json(loc); break;
-                    case "parquet":
-                        ds = ctx.sparkSession.read().parquet(loc); break;
-                    default:
-                        error = "Unsupported data format: " + format;
-                        logger.error(error);
-                        return -1;
-                }
+                Dataset ds = reader.readDataset(entry.getKey(), format, loc);
                 logger.debug("Added to DS map: " + entry.getKey());
                 dsMap.put(entry.getKey(), ds);
             }
@@ -113,9 +101,12 @@ public class TransformerComponent extends Component implements WithMovableResult
 
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
-                    JexlExecutorWithSchema jexlExecutorWithSchema  =
-                            new JexlExecutorWithSchema(ctx.sparkSession, script, st,
-                                    tempLocation,ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs);
+                    NGJexlExecutorWithSchema jexlExecutorWithSchema  =
+                            new NGJexlExecutorWithSchema(this,
+                                                         script,
+                                                         ctx.componentConfiguration.getTransformer().getThreshold(),
+                                                         tempLocation,
+                                                         st   );
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
@@ -133,9 +124,13 @@ public class TransformerComponent extends Component implements WithMovableResult
                     for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
                     logger.debug(m);
 
-                     JaninoExecutor janinoExecutor =
-                         new JaninoExecutor(ctx.sparkSession, script, st,
-                                 tempLocation,ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs, odi);
+                     NGJaninoExecutor janinoExecutor =
+                         new NGJaninoExecutor(this,
+                                 script,
+                                 ctx.componentConfiguration.getTransformer().getThreshold(),
+                                 tempLocation,
+                                 st,
+                                 odi);
                     janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
@@ -146,9 +141,11 @@ public class TransformerComponent extends Component implements WithMovableResult
             else {
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
-                    JexlExecutor jexlExecutor =
-                            new JexlExecutor(ctx.sparkSession, script,
-                                    tempLocation, ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs);
+                    NGJexlExecutor jexlExecutor =
+                            new NGJexlExecutor(this,
+                                    script,
+                                    ctx.componentConfiguration.getTransformer().getThreshold(),
+                                    tempLocation);
                     jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";
@@ -161,18 +158,20 @@ public class TransformerComponent extends Component implements WithMovableResult
                 }
             }
 
+/*
             Consumer<Map<String, Object>> f = ds ->
             {
                 if (ds != null) {
                     String dsname = (String) ds.get(DataSetProperties.Name.name());
                     JsonElement je = (JsonElement) ds.get(DataSetProperties.Schema.name());
-                    Map<String, Object> outputDS2 = outputDataSets.get(dsname);
+                    Map<String, Object> outputDS2 = ngctx.outputDataSets.get(dsname);
                     outputDS2.put(DataSetProperties.Schema.name(), je);
                     logger.trace("Update output DS [" + dsname + "] descriptor with schema: " + outputDS2.get(DataSetProperties.Schema.name()));
                 }
             };
-            f.accept(outputs.get(RequiredNamedParameters.Output.toString()));
-            f.accept(outputs.get(RequiredNamedParameters.Rejected.toString()));
+            f.accept(ngctx.outputs.get(RequiredNamedParameters.Output.toString()));
+            f.accept(ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()));
+*/
 
         }
         catch(Exception e){
@@ -182,6 +181,7 @@ public class TransformerComponent extends Component implements WithMovableResult
         }
         return 0;
     }
+
 
     private StructType createSchema(Set<OutputSchema> outputSchema) throws Exception {
 
@@ -223,16 +223,16 @@ public class TransformerComponent extends Component implements WithMovableResult
         return dt;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
     @Override
-    protected int Move(){
+    protected int move(){
 
         List<Map<String, Object>> dss = new ArrayList<>();
-        dss.add(outputs.get(RequiredNamedParameters.Output.toString()));
-        dss.add(outputs.get(RequiredNamedParameters.Rejected.toString()));
+        dss.add(ngctx.outputs.get(RequiredNamedParameters.Output.toString()));
+        dss.add(ngctx.outputs.get(RequiredNamedParameters.Rejected.toString()));
         for ( Map<String, Object> ads : dss) {
             String name = (String) ads.get(DataSetProperties.Name.name());
             String src = tempLocation + Path.SEPARATOR + name;
@@ -242,14 +242,14 @@ public class TransformerComponent extends Component implements WithMovableResult
             List<String> kl = (List<String>) ads.get(DataSetProperties.PartitionKeys.name());
 
             MoveDataDescriptor desc = new MoveDataDescriptor(src, dest, name, mode, format, kl);
-            resultDataDesc.add(desc);
+            ctx.resultDataDesc .add(desc);
             logger.debug(String.format("DataSet %s will be moved to %s", name, dest));
         }
-        return super.Move();
+        return super.move();
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return TransformerComponent.analyzeAndValidate(config);
+        return NGTransformerComponent.analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {

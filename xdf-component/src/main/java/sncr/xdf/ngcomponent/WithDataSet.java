@@ -1,4 +1,4 @@
-package sncr.xdf.component;
+package sncr.xdf.ngcomponent;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,8 +13,8 @@ import sncr.bda.conf.Output;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.DLDataSetService;
-import sncr.xdf.context.Context;
 import sncr.xdf.context.DSMapKey;
+import sncr.xdf.context.InternalContext;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
@@ -23,12 +23,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by asor0002 on 9/8/2017.
  * Interface provides
  *
  */
-public interface WithDataSetService {
+public interface WithDataSet {
 
     /**
      * The method creates Map of Input/Output parameter name to Map of data object attributes
@@ -42,7 +43,7 @@ public interface WithDataSetService {
      * The method uses Input[n].Name attribute not Input[n].Object attribute.
      * Use discoverDataSetWithInput to get Map with Data Object (Object names) as partitionList.
      */
-    default Map<String, Map<String, Object>> discoverDataParametersWithInput(DataSetServiceAux aux) throws Exception {
+    default Map<String, Map<String, Object>> discoverDataParametersWithInput(DataSetHelper aux) throws Exception {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
         for (Input in: aux.ctx.componentConfiguration.getInputs()){
             if (in.getName() != null)
@@ -51,7 +52,7 @@ public interface WithDataSetService {
         return retval;
     }
 
-    default Map<String, Map<String, Object>> discoverDataParametersWithMetaData(DataSetServiceAux aux) throws Exception {
+    default Map<String, Map<String, Object>> discoverDataParametersWithMetaData(DataSetHelper aux) throws Exception {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
         String project = aux.ctx.applicationID;
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
@@ -73,7 +74,7 @@ public interface WithDataSetService {
      * - indicates if it is Empty
      * - indicates if it is Exists ???
      */
-    default Map<String, Map<String, Object>> discoverInputDataSetsWithInput(DataSetServiceAux aux) throws Exception {
+    default Map<String, Map<String, Object>> discoverInputDataSetsWithInput(DataSetHelper aux) throws Exception {
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
@@ -85,10 +86,10 @@ public interface WithDataSetService {
         return retval;
     }
 
-    default Map<String, Map<String, Object>> discoverInputDataSetsWithMetadata(DataSetServiceAux aux) throws Exception {
+    default Map<String, Map<String, Object>> discoverInputDataSetsWithMetadata(DataSetHelper aux) throws Exception {
 
         String project = aux.ctx.applicationID;
-        DataSetServiceAux.logger.debug("Set projects " + project);
+        DataSetHelper.logger.debug("Set projects " + project);
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
@@ -109,9 +110,9 @@ public interface WithDataSetService {
      * - indicates if it is Empty
      * - indicates if it is Exists ???
      */
-    default Map<String, Object> discoverDataSetWithInput(DataSetServiceAux aux, Input in) throws Exception {
-        String prj = ((in.getProject() != null && !in.getProject().isEmpty()) ?
-                Path.SEPARATOR + in.getProject() :
+    default Map<String, Object> discoverDataSetWithInput(DataSetHelper aux, Input in) throws Exception {
+        String prj = ((in.getProject() != null && !in.getProject().isEmpty())?
+                Path.SEPARATOR + in.getProject():
                 Path.SEPARATOR + aux.ctx.applicationID);
 
         StringBuilder sb = new StringBuilder(aux.dl.getRoot());
@@ -121,37 +122,24 @@ public interface WithDataSetService {
 
         sb.append(Path.SEPARATOR + in.getDataSet()).append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
+        DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
+
+
+        Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
+
+        res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+        res.put(DataSetProperties.Name.name(), in.getDataSet());
         if (in.getCatalog() != null && !in.getCatalog().isEmpty())
-            sb.append(Path.SEPARATOR + in.getCatalog());
-        sb
-                .append(Path.SEPARATOR + in.getDataSet())
-                .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
-
-        DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
-
-        if (!HFileOperations.exists(sb.toString())) {
-            //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
-            throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, in.getDataSet());
-        } else {
-            DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
+            res.put(DataSetProperties.Catalog.name(), in.getCatalog());
+        res.put(DataSetProperties.Type.name(), in.getDstype().toString());
+        //TODO:: Get actual format reading data descriptor
+        res.put(DataSetProperties.Format.name(), in.getFormat().name());
+        return res;
 
 
-            Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
-
-            res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-            res.put(DataSetProperties.Name.name(), in.getDataSet());
-            if (in.getCatalog() != null && !in.getCatalog().isEmpty())
-                res.put(DataSetProperties.Catalog.name(), in.getCatalog());
-            res.put(DataSetProperties.Type.name(), in.getDstype().toString());
-            //TODO:: Get actual format reading data descriptor
-            res.put(DataSetProperties.Format.name(), in.getFormat().name());
-            return res;
-
-
-        }
     }
 
-    default Map<String, Object> discoverDataSetWithMetaData(DataSetServiceAux aux, String projectName, String dataset) throws Exception {
+    default Map<String, Object> discoverDataSetWithMetaData(DataSetHelper aux, String projectName, String dataset) throws Exception {
 //        DLDataSetService md = aux.ctx.md;
         String datasetId = projectName + "::" + dataset;
         JsonElement element = aux.dl.getDSStore().read(datasetId);
@@ -185,7 +173,7 @@ public interface WithDataSetService {
                         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR + catalog
                         + Path.SEPARATOR + datasetName + Path.SEPARATOR + dataDir;
 
-                DataSetServiceAux.logger.debug("Dataset location = " + location);
+                DataSetHelper.logger.debug("Dataset location = " + location);
 
                 //TODO:: Fix BDA Meta
                 String sampling = system.has("sample") ?
@@ -205,7 +193,7 @@ public interface WithDataSetService {
 
                 //TODO:: Fix BDA Meta
                 res.put("sample", sampling);
-                DataSetServiceAux.logger.debug("Result Map = " + res);
+                DataSetHelper.logger.debug("Result Map = " + res);
 
                 return res;
             }
@@ -229,28 +217,29 @@ public interface WithDataSetService {
         String mode = (String) outDS.get(DataSetProperties.Mode.name());
         boolean exists = (boolean) outDS.get(DataSetProperties.Exists.name());
 
-        Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
-                DLDataSetOperations.getPartitioningInfo(location);
-
-        //Check partitioning structure and match it with metadata/input
-        if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
-                trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
-            throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
-        }
-
-        List<String> system = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
-
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
-            if (system != null) {
+
+            Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
+                    DLDataSetOperations.getPartitioningInfo(location);
+
+            //Check partitioning structure and match it with metadata/input
+            if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
+                    trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
+                throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
+            }
+
+            List<String> pk = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
+
+            if (pk != null) {
                 if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
-                    for (int i = 0; i < system.size(); i++)
-                        if (!system.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
+                    for (int i = 0; i < pk.size(); i++)
+                        if (!pk.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
                             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
                         }
                 }
             } else  //No key were provided in Output Dataset configuration: add them from existing dataset
             {
-                DataSetServiceAux.logger.warn("Output dataset parameter does not provides partitioning keys, but existent dataset is partitioned, set partition configuration from existing dataset");
+                DataSetHelper.logger.warn("Output dataset parameter does not provides partitioning keys, but existent dataset is partitioned, set partition configuration from existing dataset");
                 if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
                     outDS.put(DataSetProperties.PartitionKeys.name(), trgDSPartitioning._2());
                 }
@@ -281,7 +270,7 @@ public interface WithDataSetService {
     }
 
 
-    default String  generateTempLocation(DataSetServiceAux aux, String tempDS, String tempCatalog) {
+    default String  generateTempLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
         StringBuilder sb = new StringBuilder(aux.dl.getRoot());
         sb.append(Path.SEPARATOR + aux.ctx.applicationID)
                 .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
@@ -289,42 +278,42 @@ public interface WithDataSetService {
                 .append(Path.SEPARATOR + aux.ctx.batchID)
                 .append(Path.SEPARATOR + aux.ctx.componentName);
 
-        DataSetServiceAux.logger.debug(String.format("Generated temp location: %s", sb.toString()));
+        DataSetHelper.logger.debug(String.format("Generated temp location: %s", sb.toString()));
         return sb.toString();
     }
 
-    default String  ngGenerateTempLocation(DataSetServiceAux aux, String tempDS, String tempCatalog) {
-        StringBuilder sb = new StringBuilder(aux.dl.getRoot());
+    default String  ngGenerateTempLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
+        StringBuilder sb = new StringBuilder(aux.ctx.xdfDataRootSys);
         sb.append(Path.SEPARATOR + aux.ctx.applicationID)
                 .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
                 .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
                 .append(Path.SEPARATOR + aux.ctx.batchID)
                 .append(Path.SEPARATOR + aux.ctx.componentName);
 
-        DataSetServiceAux.logger.debug(String.format("Generated temp location: %s", sb.toString()));
+        DataSetHelper.logger.debug(String.format("Generated temp location: %s", sb.toString()));
         return sb.toString();
     }
 
-    default Map<String,Map<String, Object>> buildPathForOutputs(DataSetServiceAux dsaux){
-        return dsaux.buildDataSetMap(DSMapKey.parameter);
+    default Map<String,Map<String, Object>> ngBuildPathForOutputs(DataSetHelper dsaux){
+        return dsaux.ngBuildDataSetMap(DSMapKey.parameter);
     }
 
-    default Map<String, Map<String, Object>> buildPathForOutputDataSets(DataSetServiceAux aux){
-        return aux.buildDataSetMap(DSMapKey.dataset);
+    default Map<String, Map<String, Object>> ngBuildPathForOutputDataSets(DataSetHelper aux){
+        return aux.ngBuildDataSetMap(DSMapKey.dataset);
     }
 
-    class DataSetServiceAux {
-        private static final Logger logger = Logger.getLogger(WithDataSetService.class);
-        Context ctx;
+    class DataSetHelper {
+        private static final Logger logger = Logger.getLogger(WithDataSet.class);
+        InternalContext ctx;
         DLDataSetService dl;
 
-
-        public DataSetServiceAux(Context c, DLDataSetService md){
+        public DataSetHelper(InternalContext c, DLDataSetService dl){
             ctx = c;
-            dl = md;
+            this.dl = dl;
         }
 
-        public Map<String, Map<String, Object>> buildDataSetMap( DSMapKey ktype)
+
+        private Map<String, Map<String, Object>> ngBuildDataSetMap( DSMapKey ktype)
         {
             Map<String, Map<String, Object>> resMap = new HashMap();
             for( Output output: this.ctx.componentConfiguration.getOutputs()){
@@ -332,10 +321,9 @@ public interface WithDataSetService {
                 String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
                 String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
                 String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
-                //
-                String sampling = DLDataSetOperations.SIMPLE_SAMPLING;
 
-                StringBuilder sb = new StringBuilder(dl.getRoot());
+
+                StringBuilder sb = new StringBuilder(ctx.xdfDataRootSys);
                 sb.append(Path.SEPARATOR + this.ctx.applicationID)
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
@@ -354,9 +342,8 @@ public interface WithDataSetService {
                 res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
                 res_output.put(DataSetProperties.Mode.name(), mode);
 
-                //TODO::Fix BDA Meta
-                res_output.put("sample", sampling);
-
+                //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
+                res_output.put("sample", DLDataSetOperations.SIMPLE_SAMPLING);
 
                 //TODO:: Do we really need it??
                 List<String> kl = new ArrayList<>();
@@ -378,6 +365,7 @@ public interface WithDataSetService {
                 }
                 res_output.put(DataSetProperties.Exists.name(), exists);
 
+                DataSetHelper.logger.debug("Output DS result Map = " + res_output);
                 switch (ktype) {
                     case parameter:
                         if (output.getName() != null)
@@ -389,7 +377,6 @@ public interface WithDataSetService {
             }
             return resMap;
         }
-
 
         private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system) throws Exception {
             if (!HFileOperations.exists(location)) {
@@ -433,7 +420,7 @@ public interface WithDataSetService {
 
 
                 } else {
-                    DataSetServiceAux.logger.warn("Empty input dataset: " + dataset);
+                    DataSetHelper.logger.warn("Empty input dataset: " + dataset);
                 }
                 res.put(DataSetProperties.Empty.name(), dsEmpty);
                 res.put(DataSetProperties.Exists.name(), true);

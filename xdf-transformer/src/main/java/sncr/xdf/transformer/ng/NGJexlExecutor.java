@@ -1,12 +1,10 @@
-package sncr.xdf.transformer;
+package sncr.xdf.transformer.ng;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
@@ -14,38 +12,30 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.transformer.SchemaAlignTransform;
+import sncr.xdf.transformer.Transform;
 import sncr.xdf.transformer.system.StructAccumulator;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
-import static sncr.xdf.transformer.TransformerComponent.RECORD_COUNTER;
-import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_ERRMSG;
-import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
+import static sncr.xdf.transformer.TransformerComponent.*;
 
 
 /**
  * Created by srya0001 on 12/21/2017.
  */
-public class JexlExecutor extends Executor{
+public class NGJexlExecutor extends NGExecutor {
 
-    private static final Logger logger = Logger.getLogger(JexlExecutor.class);
+    private static final Logger logger = Logger.getLogger(NGJexlExecutor.class);
     private StructAccumulator structAccumulator;
 
-
-
-    public JexlExecutor(SparkSession ctx,
-                        String script,
-                        String tLoc,
-                        int thr,
-                        Map<String, Map<String, Object>> inputs,
-                        Map<String, Map<String, Object>> outputs
-                        )  {
-        super(ctx,script,null,tLoc,thr,inputs,outputs);
+    public NGJexlExecutor(AbstractComponent parent, String script, int threshold, String tLoc)  {
+        super(parent, script, threshold, tLoc, null);
         this.structAccumulator = new StructAccumulator();
-        ctx.sparkContext().register(structAccumulator, "Struct");
+        session_ctx.sparkContext().register(structAccumulator, "Struct");
     }
-
-
 
 
 
@@ -70,7 +60,7 @@ public class JexlExecutor extends Executor{
 
     public void execute(Map<String, Dataset> dsMap) throws Exception {
 
-        Dataset ds = dsMap.get(inDataSet);
+        Dataset ds = dsMap.get(inDataSetName);
         logger.debug("Initialize structAccumulator: " );
         schema = ds.schema();
         String[] fNames = ds.schema().fieldNames();

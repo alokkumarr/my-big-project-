@@ -44,7 +44,7 @@ public class SqlScriptParser
      * collected here and are not included in the tables - names anymore.
      */
     private List<String> otherItemNames;
-    public SQLScriptDescriptor.StatementType stType = SQLScriptDescriptor.StatementType.UNKNOWN;
+    public StatementType stType = StatementType.UNKNOWN;
 
     /**
      * Main entry for this Tool class. A list of found tables is returned.
@@ -112,7 +112,7 @@ public class SqlScriptParser
         if (plainSelect.getOracleHierarchical() != null) {
             plainSelect.getOracleHierarchical().accept(this);
         }
-        stType = (stType == SQLScriptDescriptor.StatementType.UNKNOWN )?SQLScriptDescriptor.StatementType.SELECT:stType;
+        stType = (stType == StatementType.UNKNOWN )?StatementType.SELECT:stType;
     }
      
     public void visit(Table tableName) {
@@ -417,7 +417,7 @@ public class SqlScriptParser
     }
 
     public void visit(Drop drop) {
-        stType = SQLScriptDescriptor.StatementType.DROP_TABLE;
+        stType = StatementType.DROP_TABLE;
         String tn = drop.getName().getFullyQualifiedName();
         tables.add(new TableDescriptor(tn, statementIndex, true));
     }
@@ -442,7 +442,7 @@ public class SqlScriptParser
             isTemp = true;
         }
         tables.add(new TableDescriptor(tn, isTemp, statementIndex, true));
-        stType = SQLScriptDescriptor.StatementType.CREATE;
+        stType = StatementType.CREATE;
 
         // Process sub-select
         if (create.getSelect() != null) {

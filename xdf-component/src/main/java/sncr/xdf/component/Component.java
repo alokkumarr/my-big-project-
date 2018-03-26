@@ -21,6 +21,7 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.services.TransformationService;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,7 @@ public abstract class Component {
     protected TransformationService transformationMD;
 
     protected String componentName = "unnamed";
-    protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
+    protected ArrayList<MoveDataDescriptor> resultDataDesc;
     protected Map<String, Map<String, Object>> inputDataSets = null;
     protected Map<String, Map<String, Object>> outputDataSets = null;
 
@@ -98,6 +99,7 @@ public abstract class Component {
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
                     logger.info("Extracting meta data");
+                    dsaux = new WithDataSetService.DataSetServiceAux(ctx, md );
                     inputDataSets = mddl.discoverInputDataSetsWithMetadata(dsaux);
                     inputs = mddl.discoverDataParametersWithMetaData(dsaux);
 
@@ -120,6 +122,8 @@ public abstract class Component {
 
                 if (ctx.componentConfiguration.getOutputs() != null &&
                         ctx.componentConfiguration.getOutputs().size() > 0) {
+                    if (dsaux == null)
+                        dsaux = new WithDataSetService.DataSetServiceAux(ctx, md );
                     outputDataSets = mddl.buildPathForOutputDataSets(dsaux);
                     outputs = mddl.buildPathForOutputs(dsaux);
                 }
@@ -295,7 +299,7 @@ public abstract class Component {
         try {
             md = new DLDataSetService(xdfDataRootSys);
             transformationMD = new TransformationService(xdfDataRootSys);
-            dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
+//            dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
             als = new AuditLogService(md.getRoot());
         }
         catch(Exception e){

@@ -48,6 +48,8 @@ public class DLDataSetOperations {
     public final static PathFilter CSV_FILTER = file ->
             ( (file.getName().endsWith(".csv") || file.getName().endsWith(".dat") || file.getName().endsWith(".txt") )&& (!file.getName().startsWith(".")));
 
+    public static final String SIMPLE_SAMPLING = "simple";
+
 
     private static PARTITION_STRUCTURE checkLevel(FileSystem fileSystem, String glob, List<String> kl) {
         PARTITION_STRUCTURE partitionStructure = PARTITION_STRUCTURE.HIVE;

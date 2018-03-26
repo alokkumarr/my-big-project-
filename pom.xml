@@ -288,6 +288,10 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
     <repository>
+      <id>Restlet</id>
+      <url>http://maven.restlet.org/</url>
+    </repository>
+    <repository>
       <id>eaio.com</id>
       <url>http://eaio.com/maven2</url>
     </repository>

@@ -1,13 +1,17 @@
-package sncr.xdf.sql;
+package sncr.xdf.sql.ng;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.component.*;
-import sncr.xdf.exceptions.XDFException;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Sql;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.component.*;
+import sncr.xdf.context.NGContext;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.*;
+import sncr.xdf.sql.SQLDescriptor;
+import sncr.xdf.sql.SQLMoveDataDescriptor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.io.FileNotFoundException;
@@ -18,33 +22,24 @@ import java.util.Map;
 /**
  * Created by asor0002 on 9/11/2017.
  */
-public class SQLComponent extends Component implements WithMovableResult, WithSparkContext, WithDataSetService {
+public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
-    private static final Logger logger = Logger.getLogger(SQLComponent.class);
-    private Map<String, SQLDescriptor> resultDataSets;
-    JobExecutor executor;
-
+    private static final Logger logger = Logger.getLogger(NGSQLComponent.class);
+    // Set name
     {
         componentName = "sql";
     }
 
-    public static void main(String[] args){
-        SQLComponent component = new SQLComponent();
-        try {
-            // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
-                System.exit(r);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
+    NGJobExecutor executor;
+
+    public NGSQLComponent(NGContext ngctx, ComponentServices[] cs) {
+        super(ngctx, cs);
     }
 
-    protected int Execute(){
+    public NGSQLComponent() {  super(); }
+
+    protected int execute(){
         try {
-            executor = new JobExecutor(ctx, inputDataSets, outputDataSets);
             String script;
             if (ctx.componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline")) {
                 logger.debug("Script is inline encoded");
@@ -60,8 +55,8 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
                 }
             }
             logger.trace("Script to execute:\n" +  script);
-            executor.analyze(script);
-            String tempDir = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
+            executor = new NGJobExecutor(this, script);
+            String tempDir = ngGenerateTempLocation(new DataSetHelper(ctx, services.md),  null, null);
             executor.start(tempDir);
         } catch (Exception e) {
             error = "SQL Executor runtime exception: " + e.getMessage();
@@ -71,12 +66,12 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
         return 0;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return SQLComponent.analyzeAndValidate(config);
+        return NGSQLComponent.analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
@@ -98,9 +93,8 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
 
     @Override
     protected String mkConfString() {
-        String s = "SQL Component parameters: \n" +
+        return "SQL Component parameters: \n" +
                 ((ctx.componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline"))?" encoded script ":getScriptFullPath());
-        return s;
     }
 
 
@@ -112,7 +106,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
 
 
     @Override
-    protected int Move(){
+    protected int move(){
 
         if (executor.getResultDataSets() == null ||
             executor.getResultDataSets().size() == 0 )
@@ -121,25 +115,44 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
             return 0;
         }
 
-        resultDataSets = executor.getResultDataSets();
-        outputDataSets.forEach(
+        Map<String, SQLDescriptor> resultDataDesc = executor.getResultDataSets();
+        ngctx.outputDataSets.forEach(
             (on, obDesc) ->
             {
                 List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
                 String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
 
                 MoveDataDescriptor desc = new SQLMoveDataDescriptor(
-                        resultDataSets.get(on),         // SQLDescriptor
-                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
-                resultDataDesc.add(desc);
+                        resultDataDesc.get(on),        // SQLDescriptor
+                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),
+                        kl);
+                ctx.resultDataDesc.add(desc);
 
-                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
+                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s\n",
                         obDesc.get(DataSetProperties.Name.name()),
                         obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
 
             }
         );
-        return super.Move();
+        return super.move();
+    }
+
+
+    public static void main(String[] args){
+        NGSQLComponent component = new NGSQLComponent();
+        try {
+            int rc = component.initWithCMDParameters(args);
+            if (rc == 0) {
+                rc = component.run();
+            } else {
+                logger.error(String.format("RC:%d from initWithCMDParameters()", rc));
+            }
+            System.exit(rc);
+
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 
 }

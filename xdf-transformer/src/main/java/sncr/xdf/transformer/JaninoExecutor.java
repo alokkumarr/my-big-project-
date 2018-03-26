@@ -15,6 +15,7 @@ import org.apache.spark.util.LongAccumulator;
 import org.codehaus.commons.compiler.CompilerFactoryFactory;
 import org.codehaus.commons.compiler.IScriptEvaluator;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.io.IOException;
 import java.util.HashMap;

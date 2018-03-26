@@ -1,33 +1,35 @@
-package sncr.xdf.sql;
+package sncr.xdf.sql.ng;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.writers.DLBatchWriter;
-import sncr.xdf.context.Context;
+import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.sql.SQLDescriptor;
+import sncr.xdf.sql.TableDescriptor;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 
-public class SQLExecutor implements Serializable {
+public class NGSQLExecutor implements Serializable {
 
     private Map<String, Dataset<Row>> jobDataFrames;
-    private static final Logger logger = Logger.getLogger(SQLExecutor.class);
+    private static final Logger logger = Logger.getLogger(NGSQLExecutor.class);
     private SQLDescriptor descriptor;
-    private Context ctx;
+    private AbstractComponent parent;
 
-    public SQLExecutor(Context ctx,
-                       SQLDescriptor descriptor,
-                       Map<String, Dataset<Row>> availableDataframes
-                       )
+
+    public NGSQLExecutor(AbstractComponent parent,
+                         SQLDescriptor descriptor,
+                         Map<String, Dataset<Row>> availableDataframes)
     {
-        this.ctx = ctx;
+        this.parent = parent;
         this.descriptor = descriptor;
         jobDataFrames = availableDataframes;
     }
@@ -37,7 +39,7 @@ public class SQLExecutor implements Serializable {
         return descriptor.SQL;
     }
 
-    public Long run(SQLScriptDescriptor scriptDescriptor) throws Exception {
+    public Long run(NGSQLScriptDescriptor scriptDescriptor) throws Exception {
         jobDataFrames.forEach((t, df) -> logger.trace("Registered DF so far: " + t ));
         Map<String, TableDescriptor> allTables = scriptDescriptor.getScriptWideTableMap();
 
@@ -94,34 +96,8 @@ public class SQLExecutor implements Serializable {
 
                     logger.debug("Final location to be loaded: " + loc_desc._1()  + " for table: " + tn);
                     Dataset<Row> df = null;
-                    boolean loaded = false;
-
-                    switch ( tb.format )
-                    {
-                        case "parquet" :
-                            try{
-                                df = ctx.sparkSession.read().load(loc_desc._1());
-                                loaded = true;
-                            }
-                            catch(Throwable t){
-                                throw new Exception( "Could not load data from location as parquet: " + loc_desc._1() + ", cancel processing.");
-                            }
-                            break;
-
-                        case "json" :
-                            try{
-                                df = ctx.sparkSession.read().json(loc_desc._1());
-                                loaded = true;
-                            }
-                            catch(Throwable t){
-                                throw new Exception( "Could not load data from location as JSON: " + loc_desc._1() + ", cancel processing.");
-                            }
-                            break;
-                        default:
-                            throw new XDFException( XDFException.ErrorCodes.UnsupportedDataFormat);
-                    }
-
-                    if (!loaded || df == null){
+                    df = parent.getReader().readDataset(tn, tb.format, loc_desc._1());
+                    if (df == null){
                         throw new Exception( "Could not load data neither in parquet nor in JSON, cancel processing");
                     }
                     jobDataFrames.put(tn, df);
@@ -130,8 +106,12 @@ public class SQLExecutor implements Serializable {
 
                 long lt = System.currentTimeMillis();
                 descriptor.loadTime = (int)((lt-st)/1000);
-                Dataset<Row> sqlResult = ctx.sparkSession.sql(descriptor.SQL);
+
+                Dataset<Row> sqlResult = parent.getNgctx().sparkSession.sql(descriptor.SQL);
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
+
+                WithDLBatchWriter pres = (WithDLBatchWriter) parent;
+                pres.registerDataset(parent.getNgctx(), finalResult, descriptor.targetTableName);
 
                 jobDataFrames.put(descriptor.targetTableName, finalResult);
                 finalResult.createOrReplaceTempView(descriptor.targetTableName);
@@ -142,26 +122,19 @@ public class SQLExecutor implements Serializable {
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
 
-                DLBatchWriter xdfWriter = new DLBatchWriter(descriptor.tableDescriptor.format, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
-                xdfWriter.writeToTempLoc( finalResult, descriptor.targetTransactionalLocation);
-
-                descriptor.schema = xdfWriter.extractSchema(finalResult);
+                pres.commitDataSetFromDSMap(parent.getNgctx(), finalResult, descriptor.targetTableName, descriptor.targetTransactionalLocation, "reaplce");
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);
                 logger.debug(String.format("Elapsed time:  %d , Load time: %d, Execution time: %d, Write time: %d %n%n", (wt-st)/1000, (lt-st)/1000, (exet -lt)/1000, (wt-exet)/1000));
                 return 0L;
             case DROP_TABLE:
-//                logger.error("NOT SUPPORTED ANY MORE, quitting " + descriptor.SQL);
                 HFileOperations.deleteEnt(descriptor.tableDescriptor.getLocation());
                 logger.error("Removed data set: " + descriptor.SQL);
-
                 return 0L;
             default:
         }
         return 0L;
     }
-
-
 
 }

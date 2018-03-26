@@ -1,4 +1,4 @@
-package sncr.xdf.sql;
+package sncr.xdf.sql.ng;
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -6,10 +6,12 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.context.Context;
 import sncr.bda.conf.Parameter;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.context.Context;
+import sncr.xdf.context.InternalContext;
+import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.sql.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,15 +20,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static sncr.xdf.sql.StatementType.SELECT;
-
 /**
  * Created by srya0001 on 5/11/2017.
  */
-public class SQLScriptDescriptor {
+public class NGSQLScriptDescriptor {
 
     private final String transactionalLocation;
-    private final Context ctx;
+    private final InternalContext ctx;
     private String script;
 
     public String getScript() { return script; }
@@ -34,7 +34,7 @@ public class SQLScriptDescriptor {
     private Map<String, String> parameterValues;
     private final static String patterns[] = { "(\\$\\{\\w+\\})|(\\$\\w+)" };
 
-    private static final Logger logger = Logger.getLogger(SQLScriptDescriptor.class);
+    private static final Logger logger = Logger.getLogger(NGSQLScriptDescriptor.class);
 
     private Statements stmts;
     private List<SQLDescriptor> statementDescriptors = new ArrayList<>();
@@ -51,10 +51,10 @@ public class SQLScriptDescriptor {
         return statementDescriptors;
     }
 
-    public SQLScriptDescriptor(Context ctx,
-                               String tempDir,
-                               Map<String, Map<String, Object>>  inputDOs,
-                               Map<String, Map<String, Object>> outputDOs){
+    public NGSQLScriptDescriptor(InternalContext ctx,
+                                 String tempDir,
+                                 Map<String, Map<String, Object>>  inputDOs,
+                                 Map<String, Map<String, Object>> outputDOs){
         this.ctx = ctx;
         this.transactionalLocation = tempDir;
         inputDataObjects = inputDOs;
@@ -72,7 +72,7 @@ public class SQLScriptDescriptor {
     // - /root/project/system/ctx/<>.jparm files by Batch ID
     private Map<String,String> extractSQLParameters(List<Parameter> parameters) {
         Map<String, String> sqlParams = new HashMap<>();
-        for (sncr.bda.conf.Parameter param : parameters) {
+        for (Parameter param : parameters) {
             logger.debug("Process parameter: " + param.getName() + " value: " + param.getValue());
             if ((param.getValue() == null || param.getValue().isEmpty())) {
                 logger.error("Cannot set parameter: " + param.getName() + " value is Empty or null, skip it");
@@ -226,7 +226,7 @@ public class SQLScriptDescriptor {
                 sqlDesc.index = i;
                 sqlDesc.targetTableName = targetTable.tableName;
                 sqlDesc.transactionalLocation = transactionalLocation;
-                sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR + sqlDesc.targetTableName;
+                sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR;
                 sqlDesc.targetTableMode = targetTable.mode;
                 sqlDesc.targetTableFormat = targetTable.format;
 
@@ -334,6 +334,7 @@ public class SQLScriptDescriptor {
     public Statements getParsedStatements() {
         return stmts;
     }
+
 
 
 

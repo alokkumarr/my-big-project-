@@ -44,7 +44,7 @@ VARS_FILES+=( $BDA_VARS_FILE )
 
 echo Activation vars: "${VARS_FILES[@]}"
 
-# Run mk_conf to create bin/xdf_info
+# run mk_conf to create bin/xdf_info
 $MK_CONF >$APPL_INFO \
     $CMD_DIR/templates/xdf_info.template \
     ${VARS_FILES[@]} || {
