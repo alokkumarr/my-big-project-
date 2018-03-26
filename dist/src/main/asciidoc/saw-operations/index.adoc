@@ -375,7 +375,6 @@ Recommended key size is 256 bits.
 
 After generating the key, add it to the SAW environment configuration ({{saw-config}}) in the {{saw_security_sso_secret}} parameter and redeploy.
 
-
 == FTP server configuration
 
 SAW supports exporting of pivots and reports to ftp/sftp servers. By default an empty configuration is installed at default location i.e. `/opt/bda/saw-export-service/conf/ftp-details.json` file.
