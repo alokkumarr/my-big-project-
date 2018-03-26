@@ -191,14 +191,14 @@ public class ExportServiceImpl implements ExportService{
                   FtpCustomer obj = jsonMapper.readValue(new File(ftpDetailsFile), FtpCustomer.class);
                   for (FTPDetails alias:obj.getFtpList()) {
                     if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
-                      serviceUtils.uploadToFtp(alias.getHost(),
-                              alias.getPort(),
-                              alias.getUsername(),
-                              alias.getPassword(),
-                              zipFileName,
-                              alias.getLocation(),
-                              "report_" + exportBean.getReportName() + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType")+".zip",
-                              alias.getType());
+                        serviceUtils.uploadToFtp(alias.getHost(),
+                            alias.getPort(),
+                            alias.getUsername(),
+                            alias.getPassword(),
+                            zipFileName,
+                            alias.getLocation(),
+                            "report_" + cfile.getName().substring(0, cfile.getName().lastIndexOf(".")) + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType") + ".zip",
+                            alias.getType());
                       logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                     }
                   }
@@ -284,7 +284,7 @@ public class ExportServiceImpl implements ExportService{
 
           DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
           LocalDateTime now = LocalDateTime.now();
-          if (ftp != null && ftp != "") {
+          if (ftp != null && !ftp.equals("")) {
 
             try {
               // compress the file
@@ -314,14 +314,14 @@ public class ExportServiceImpl implements ExportService{
                     logger.debug("Alias: " + aliastemp.equals(alias.getAlias()));
                     if (alias.getCustomerName().equals(jobGroup) && aliastemp.equals(alias.getAlias())) {
                       logger.debug("Inside If");
-                      serviceUtils.uploadToFtp(alias.getHost(),
-                              alias.getPort(),
-                              alias.getUsername(),
-                              alias.getPassword(),
-                              zipFileName,
-                              alias.getLocation(),
-                              "pivot_" + exportBean.getFileName() + dtf.format(now).toString() + "xlsx" +".zip",
-                              alias.getType());
+                        serviceUtils.uploadToFtp(alias.getHost(),
+                            alias.getPort(),
+                            alias.getUsername(),
+                            alias.getPassword(),
+                            zipFileName,
+                            alias.getLocation(),
+                            "pivot_" + cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1) + dtf.format(now).toString() + "xlsx" + ".zip",
+                            alias.getType());
                       logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                     }
                   }

@@ -37,6 +37,8 @@ public class FTPUploader {
     public void uploadFile(String localFileFullName, String fileName, String hostDir)
             throws Exception {
         try (InputStream input = new FileInputStream(new File(localFileFullName))) {
+            logger.debug("HostDir: " + hostDir);
+            logger.debug("FileName: " + fileName);
             this.ftp.storeFile(hostDir + fileName, input);
         } catch (Exception e) {
             logger.error("Error while uploading to FTP: "+ e.getMessage());
