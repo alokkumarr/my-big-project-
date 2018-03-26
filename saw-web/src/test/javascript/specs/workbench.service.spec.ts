@@ -221,8 +221,7 @@ describe('Workbench Service', () => {
   }));
 
   it('should get the parsed preview data', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
-    const mockParsedPreviewData = [
-      {
+    const mockParsedPreviewData = [{
       '_id': 'workbench::Sample',
       'system': {
         'user': 'A_user',
@@ -241,8 +240,7 @@ describe('Workbench Service', () => {
         'batchId': 'batch-1521128206603'
       },
       'transformations': []
-    },
-    {
+    },{
       '_id': 'workbench::test',
       'system': {
         'user': 'A_user',
@@ -252,50 +250,46 @@ describe('Workbench Service', () => {
         'name': 'test',
         'catalog': 'data',
         'numberOfFiles': 1
-      },
-      'asOfNow': {
+      },'asOfNow': {
         'status': 'INIT',
         'started': '20180315-155243',
         'finished': '',
         'aleId': 'workbench::1521129164782',
         'batchId': 'batch-1521129162354'
-      },
-      'transformations': []
-    }
-  ];
-  WorkbenchService.getParsedPreviewData(`${this.wbAPI}/${userProject}/raw/directory/inspect`).subscribe((res: any) => {
-    expect(res[0]._id).to.be('workbench::Sample');
-    expect(res[0].system.user).to.be('A_user');
-    expect(res[0].system.project).to.be('workbench');
-    expect(res[0].system.dstype).to.be('base');
-    expect(res[0].system.format).to.be('parquet');
-    expect(res[0].system.name).to.be('Sample');
-    expect(res[0].system.catalog).to.be('data');
-    expect(res[0].system.numberOfFiles).to.be('1');
+      },'transformations': []
+    }];
+    
+    WorkbenchService.getParsedPreviewData(`${this.wbAPI}/${userProject}/raw/directory/inspect`).subscribe((res: any) => {
+      expect(res[0]._id).to.be('workbench::Sample');
+      expect(res[0].system.user).to.be('A_user');
+      expect(res[0].system.project).to.be('workbench');
+      expect(res[0].system.dstype).to.be('base');
+      expect(res[0].system.format).to.be('parquet');
+      expect(res[0].system.name).to.be('Sample');
+      expect(res[0].system.catalog).to.be('data');
+      expect(res[0].system.numberOfFiles).to.be('1');
 
-    expect(res[0].asOfNow.status).to.be('INIT');
-    expect(res[0].asOfNow.started).to.be('20180315-153647');
-    expect(res[0].asOfNow.finished).to.be('');
-    expect(res[0].asOfNow.aleId).to.be('workbench::1521128208233');
-    expect(res[0].asOfNow.batchId).to.be('batch-1521128206603');
+      expect(res[0].asOfNow.status).to.be('INIT');
+      expect(res[0].asOfNow.started).to.be('20180315-153647');
+      expect(res[0].asOfNow.finished).to.be('');
+      expect(res[0].asOfNow.aleId).to.be('workbench::1521128208233');
+      expect(res[0].asOfNow.batchId).to.be('batch-1521128206603');
 
+      expect(res[1]._id).to.be('workbench::test');
+      expect(res[1].system.user).to.be('A_user');
+      expect(res[1].system.project).to.be('workbench');
+      expect(res[1].system.dstype).to.be('base');
+      expect(res[1].system.format).to.be('parquet');
+      expect(res[1].system.name).to.be('Sample');
+      expect(res[1].system.catalog).to.be('data');
+      expect(res[1].system.numberOfFiles).to.be('1');
 
-    expect(res[1]._id).to.be('workbench::test');
-    expect(res[1].system.user).to.be('A_user');
-    expect(res[1].system.project).to.be('workbench');
-    expect(res[1].system.dstype).to.be('base');
-    expect(res[1].system.format).to.be('parquet');
-    expect(res[1].system.name).to.be('Sample');
-    expect(res[1].system.catalog).to.be('data');
-    expect(res[1].system.numberOfFiles).to.be('1');
-
-    expect(res[1].asOfNow.status).to.be('INIT');
-    expect(res[1].asOfNow.started).to.be('20180315-155243');
-    expect(res[1].asOfNow.finished).to.be('');
-    expect(res[1].asOfNow.aleId).to.be('workbench::1521129164782');
-    expect(res[1].asOfNow.batchId).to.be('batch-1521129162354');
-
-  });
+      expect(res[1].asOfNow.status).to.be('INIT');
+      expect(res[1].asOfNow.started).to.be('20180315-155243');
+      expect(res[1].asOfNow.finished).to.be('');
+      expect(res[1].asOfNow.aleId).to.be('workbench::1521129164782');
+      expect(res[1].asOfNow.batchId).to.be('batch-1521129162354');
+    });
 
     // const request = httpMock.expectOne(`${WorkbenchService.wbAPI}`);
     // expect(request.request.method).to.be('GET');
