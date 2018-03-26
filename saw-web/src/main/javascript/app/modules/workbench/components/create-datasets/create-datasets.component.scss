@@ -32,10 +32,6 @@ create-datasets {
     background-color: #F5F9FC;
   }
 
-  .mat-horizontal-stepper-header-container {
-    background-color: white;
-  }
-
   .stepperBtn {
     margin-top: 3px;
     font-size: 20px;
@@ -136,5 +132,21 @@ create-datasets {
 
   .top-margin {
     margin-top: 3px;
+  }
+
+  .back-btn {
+    outline: 0;
+    cursor: pointer;
+    position: relative;
+    box-sizing: content-box;
+    display: flex;
+    height: 74px;
+    align-items: center;
+    background-color: #F5F9FC;
+    border-bottom: 2px inset #F5F9FC;
+
+    .mat-icon {
+      font-size: 24px;
+    }
   }
 }

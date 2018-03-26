@@ -9,6 +9,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as merge from 'lodash/merge';
 import * as omit from 'lodash/omit';
 import * as set from 'lodash/set';
+import { UIRouter } from '@uirouter/angular';
 
 import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs'
 
@@ -42,7 +43,7 @@ export class CreateDatasetsComponent implements OnInit {
   private selectedIndex: number = 0;
 
   constructor(
-    public dialogRef: MatDialogRef<CreateDatasetsComponent>,
+    private router: UIRouter,
     private dialog: MatDialog,
     private workBench: WorkbenchService,
     private formBuilder: FormBuilder,
@@ -130,8 +131,11 @@ export class CreateDatasetsComponent implements OnInit {
     };
     // this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
     this.workBench.triggerParser(payload).subscribe(data => {
-      this.dialogRef.close();
       this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 5000 });
     })
+  }
+
+  backtoLists() {
+    this.router.stateService.go('workbench.datasets');
   }
 }

@@ -23,12 +23,12 @@
             </ng-template>
           </tree-root>
         </div>
-        <div fxFlex="70" fxLayout="column">
+        <div fxFlex="70" fxFill fxLayout="column">
           <mat-form-field floatLabel="never" id="infoForMask">
             <input matInput placeholder="Enter file mask" [(ngModel)]="fileMask" [formControl]="fileMaskControl" required />
             <mat-icon matSuffix fontIcon="icon-info" matTooltip="{{maskHelper}}"></mat-icon>
           </mat-form-field>
-          <div>
+          <div class="gridContainer">
             <dx-data-grid id="gridContainer">
               <div *dxTemplate="let data of 'dobjTemplate'">
                 <div fxLayout="row">

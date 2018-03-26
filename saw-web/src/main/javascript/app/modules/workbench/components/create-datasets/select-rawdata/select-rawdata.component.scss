@@ -6,6 +6,34 @@ select-rawdata {
 
   .select-view {
     height: calc(100% - 43px);
+
+    mat-card {
+      height: 99%;
+
+      .staging-title {
+        font-size: 16px;
+      }
+
+      .sec-btn {
+        color: $primary-blue-b2;
+        line-height: 32px !important;
+        height: 32px !important;
+        padding: 0 3px;
+
+        .mat-button {
+          vertical-align: middle;
+          line-height: 32px !important;
+          height: 32px !important;
+          border-radius: 2px;
+          background-color: white;
+          border: solid 1px #1A89D4;
+        }
+
+        .mat-button .mat-button-wrapper > * {
+          vertical-align: initial !important;
+        }
+      }
+    }
   }
 
   .border-right-style {
@@ -45,7 +73,7 @@ select-rawdata {
 
   #infoForMask {
     padding-left: 9px;
-    padding-right: 18px;
+    padding-right: 9px;
 
     mat-icon {
       color: $primary-blue-b2;
@@ -121,5 +149,9 @@ select-rawdata {
 
   .mat-icon-button {
     height: 36px !important;
+  }
+
+  .gridContainer {
+    height: calc(100% - 45.5px) !important;
   }
 }

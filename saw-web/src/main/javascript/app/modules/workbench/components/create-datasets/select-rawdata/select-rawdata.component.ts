@@ -1,6 +1,6 @@
 declare function require(string): string;
 
-import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy} from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { debounceTime } from 'rxjs/operators';
@@ -159,15 +159,9 @@ export class SelectRawdataComponent implements OnInit {
       },
       height: '100%',
       scrolling: {
-        mode: 'standard'
-      },
-      paging: {
-        pageSize: 12
-      },
-      pager: {
-        showPageSizeSelector: true,
-        allowedPageSizes: [10, 20, 50, 100],
-        showInfo: true
+        showScrollbar: 'always',
+        mode: 'virtual',
+        useNative: false
       },
       filterRow: {
         visible: false,
