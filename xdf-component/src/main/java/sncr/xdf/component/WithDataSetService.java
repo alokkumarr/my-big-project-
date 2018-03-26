@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Created by asor0002 on 9/8/2017.
  * Interface provides
@@ -111,8 +110,8 @@ public interface WithDataSetService {
      * - indicates if it is Exists ???
      */
     default Map<String, Object> discoverDataSetWithInput(DataSetServiceAux aux, Input in) throws Exception {
-        String prj = ((in.getProject() != null && !in.getProject().isEmpty())?
-                Path.SEPARATOR + in.getProject():
+        String prj = ((in.getProject() != null && !in.getProject().isEmpty()) ?
+                Path.SEPARATOR + in.getProject() :
                 Path.SEPARATOR + aux.ctx.applicationID);
 
         StringBuilder sb = new StringBuilder(aux.dl.getRoot());
@@ -122,21 +121,34 @@ public interface WithDataSetService {
 
         sb.append(Path.SEPARATOR + in.getDataSet()).append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
+        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+            sb.append(Path.SEPARATOR + in.getCatalog());
+        sb
+                .append(Path.SEPARATOR + in.getDataSet())
+                .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
+
         DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
-
-        Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
-
-        res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-        res.put(DataSetProperties.Name.name(), in.getDataSet());
-        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
-            res.put(DataSetProperties.Catalog.name(), in.getCatalog());
-        res.put(DataSetProperties.Type.name(), in.getDstype().toString());
-        //TODO:: Get actual format reading data descriptor
-        res.put(DataSetProperties.Format.name(), in.getFormat().name());
-        return res;
+        if (!HFileOperations.exists(sb.toString())) {
+            //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
+            throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, in.getDataSet());
+        } else {
+            DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
 
+            Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
+
+            res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+            res.put(DataSetProperties.Name.name(), in.getDataSet());
+            if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+                res.put(DataSetProperties.Catalog.name(), in.getCatalog());
+            res.put(DataSetProperties.Type.name(), in.getDstype().toString());
+            //TODO:: Get actual format reading data descriptor
+            res.put(DataSetProperties.Format.name(), in.getFormat().name());
+            return res;
+
+
+        }
     }
 
     default Map<String, Object> discoverDataSetWithMetaData(DataSetServiceAux aux, String projectName, String dataset) throws Exception {

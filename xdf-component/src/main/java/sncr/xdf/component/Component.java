@@ -63,14 +63,16 @@ public abstract class Component {
     }
 
     public int Run(){
-
         int ret = initializeDataSets();
         if ( ret == 0) {
             ret = Execute();
+            logger.debug("Execute Return code = " + ret);
             if (ret == 0) {
                 ret = Move();
+                logger.debug("Move Return code = " + ret);
                 if (ret == 0) {
                     ret = Archive();
+                    logger.debug("Archive Return code = " + ret);
                     if (ret == 0) {
                     } else {
                     }
