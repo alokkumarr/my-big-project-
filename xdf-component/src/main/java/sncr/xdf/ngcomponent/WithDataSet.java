@@ -217,22 +217,23 @@ public interface WithDataSet {
         String mode = (String) outDS.get(DataSetProperties.Mode.name());
         boolean exists = (boolean) outDS.get(DataSetProperties.Exists.name());
 
-        Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
-                DLDataSetOperations.getPartitioningInfo(location);
-
-        //Check partitioning structure and match it with metadata/input
-        if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
-                trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
-            throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
-        }
-
-        List<String> system = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
-
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
-            if (system != null) {
+
+            Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
+                    DLDataSetOperations.getPartitioningInfo(location);
+
+            //Check partitioning structure and match it with metadata/input
+            if (trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&
+                    trgDSPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.FLAT) {
+                throw new XDFException(XDFException.ErrorCodes.UnsupportedPartitioning, trgDSPartitioning._4().toString(), dataset);
+            }
+
+            List<String> pk = (List<String>) outDS.get(DataSetProperties.PartitionKeys.name());
+
+            if (pk != null) {
                 if (trgDSPartitioning._4() == DLDataSetOperations.PARTITION_STRUCTURE.HIVE && trgDSPartitioning._2() != null) {
-                    for (int i = 0; i < system.size(); i++)
-                        if (!system.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
+                    for (int i = 0; i < pk.size(); i++)
+                        if (!pk.get(i).equalsIgnoreCase(trgDSPartitioning._2().get(i))) {
                             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Order and/or set of partitioning keys in Metadata and in dataset does not match");
                         }
                 }
@@ -341,7 +342,7 @@ public interface WithDataSet {
                 res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
                 res_output.put(DataSetProperties.Mode.name(), mode);
 
-                //TODO:: Fix BDA Meta
+                //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
                 res_output.put("sample", DLDataSetOperations.SIMPLE_SAMPLING);
 
                 //TODO:: Do we really need it??
@@ -364,6 +365,7 @@ public interface WithDataSet {
                 }
                 res_output.put(DataSetProperties.Exists.name(), exists);
 
+                DataSetHelper.logger.debug("Output DS result Map = " + res_output);
                 switch (ktype) {
                     case parameter:
                         if (output.getName() != null)

@@ -255,8 +255,10 @@ public interface WithDLBatchWriter {
             //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
             //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
             String sampling = (String) outputDS.get("sample");
+            boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
 
-            baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), (sampling != null && !sampling.equalsIgnoreCase("none")));
+
+            baseWrite(dataset,  loc, !(mode.equalsIgnoreCase("append")), doSampling);
 
 
             // Whatever a component uses: outputs or outputDataSets --

@@ -1,5 +1,6 @@
 package sncr.xdf.sql;
 
+import org.apache.hadoop.fs.Path;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class SQLMoveDataDescriptor extends MoveDataDescriptor {
                 keys
               );
         this.dest = destDir;
+        this.source +=  Path.SEPARATOR + descriptor.targetObjectName;
     }
 
 }

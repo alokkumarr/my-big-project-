@@ -123,11 +123,12 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
 
                 MoveDataDescriptor desc = new SQLMoveDataDescriptor(
-                        resultDataDesc.get(on),         // SQLDescriptor
-                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
+                        resultDataDesc.get(on),        // SQLDescriptor
+                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),
+                        kl);
                 ctx.resultDataDesc.add(desc);
 
-                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
+                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s\n",
                         obDesc.get(DataSetProperties.Name.name()),
                         obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
 

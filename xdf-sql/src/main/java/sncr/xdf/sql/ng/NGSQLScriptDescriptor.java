@@ -226,7 +226,7 @@ public class NGSQLScriptDescriptor {
                 sqlDesc.index = i;
                 sqlDesc.targetTableName = targetTable.tableName;
                 sqlDesc.transactionalLocation = transactionalLocation;
-                sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR + sqlDesc.targetTableName;
+                sqlDesc.targetTransactionalLocation = sqlDesc.transactionalLocation + Path.SEPARATOR;
                 sqlDesc.targetTableMode = targetTable.mode;
                 sqlDesc.targetTableFormat = targetTable.format;
 

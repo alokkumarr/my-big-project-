@@ -577,7 +577,8 @@ public abstract class AbstractComponent {
             ret = ((WithDLBatchWriter)this).moveData(ctx, ngctx);
         }
         return ret;
-    };
+    }
+
     protected abstract int archive();
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {

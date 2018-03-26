@@ -174,8 +174,8 @@ public class JaninoTransform implements Function<Row, Row> {
                     newRowVals[schema.length() - 1] = ((result.get(PREDEFINED_SCRIPT_MESSAGE) != null) ? result.get(PREDEFINED_SCRIPT_MESSAGE) : "n/a");
 
                     GenericRowWithSchema newrow = new GenericRowWithSchema(newRowVals, schema);
-                    System.out.println(schema.mkString("[ ", "; ", "]"));
-                    System.out.println((newrow.mkString("[ ", "; ", "]")));
+//                    System.out.println(schema.mkString("[ ", "; ", "]"));
+//                    System.out.println((newrow.mkString("[ ", "; ", "]")));
 
                     return newrow;//new GenericRowWithSchema(newRowVals, schema);
 
@@ -220,8 +220,8 @@ public class JaninoTransform implements Function<Row, Row> {
         newRowVals[schema.length() - 1] = msg;
 
         GenericRowWithSchema rejrow = new GenericRowWithSchema(newRowVals, schema);
-        System.out.println(schema.mkString("< ", "; ", " >"));
-        System.out.println((rejrow.mkString("< ", "; ", " >")));
+//        System.out.println(schema.mkString("< ", "; ", " >"));
+//        System.out.println((rejrow.mkString("< ", "; ", " >")));
         return rejrow;
     }
 
