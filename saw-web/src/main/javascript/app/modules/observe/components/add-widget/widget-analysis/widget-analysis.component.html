@@ -14,7 +14,7 @@
     <mat-icon [fontIcon]="icons[analysis.chartType || analysis.type]"></mat-icon>
     <div>
       <strong [textContent]="analysis.name"></strong>
-      <p [textContent]="analysis.description"></p>
+      <p class="analysis-description" [textContent]="analysis.description"></p>
       <div class="card-base">
         <small class="analysis-metric" [textContent]="analysis.metricName"></small>
 
