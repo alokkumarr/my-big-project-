@@ -26,4 +26,12 @@ class Module extends AbstractModule {
       }
     }
   })
+
+  /* Check if running as regular Transport Service, not executor */
+  val executor = System.getProperty("saw.executor", "none")
+  if (executor.equals("none")) {
+    /* Notify systemd of service startup, as required for socket
+     * activation */
+    Service.waitAndNotify()
+  }
 }
