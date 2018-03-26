@@ -4,12 +4,13 @@
     <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
       <mat-icon fontIcon="icon-close"></mat-icon>
     </button>
-    <observe-chart *ngIf="item.analysis.type === 'chart'"
-      class="analysis-container"
-      [item]="item"
-      (onRefresh)="refreshTile($event)"
-      [analysis]="item.analysis"
-      [enableChartDownload]="enableChartDownload"
-      [updater]="item.updater"></observe-chart>
+    <ng-container *ngIf="item.analysis">
+      <observe-chart *ngIf="item.analysis.type === 'chart'" class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
+        [analysis]="item.analysis" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-chart>
+    </ng-container>
+
+    <ng-container *ngIf="item.kpi">
+      <p [textContent]="item.kpi.name"></p>
+    </ng-container>
   </gridster-item>
 </gridster>

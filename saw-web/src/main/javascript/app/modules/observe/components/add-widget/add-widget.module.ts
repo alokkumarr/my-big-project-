@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../../material.module';
 import { CommonPipesModule } from '../../../../common/pipes/common-pipes.module';
 
@@ -9,6 +9,7 @@ import { WidgetTypeComponent } from './widget-type/widget-type.component';
 import { WidgetCategoryComponent } from './widget-category/widget-category.component';
 import { WidgetMetricComponent } from './widget-metric/widget-metric.component';
 import { WidgetAnalysisComponent } from './widget-analysis/widget-analysis.component';
+import { WidgetKPIComponent } from './widget-kpi/widget-kpi.component';
 import { WidgetHeaderComponent } from './widget-header/widget-header.component';
 
 const components = [
@@ -17,6 +18,7 @@ const components = [
   WidgetCategoryComponent,
   WidgetMetricComponent,
   WidgetAnalysisComponent,
+  WidgetKPIComponent,
   WidgetHeaderComponent
 ];
 
@@ -24,13 +26,12 @@ const components = [
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     CommonPipesModule
   ],
-  exports: [
-    AddWidgetComponent
-  ],
+  exports: [AddWidgetComponent],
   declarations: components,
   providers: []
 })
-export class AddWidgetModule { }
+export class AddWidgetModule {}

@@ -1,0 +1,33 @@
+<form [formGroup]="kpiForm">
+  <mat-form-field>
+    <input matInput placeholder="KPI Name" formControlName="name" />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-select placeholder="Select Date Field" formControlName="dateField">
+      <mat-option *ngFor="let field of metric.dateColumns" [value]="field.columnName">
+        {{ field.displayName }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-select placeholder="Filter" formControlName="filter">
+      <mat-option *ngFor="let filt of dateFilters" [value]="filt.value">
+        {{ filt.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-select placeholder="Aggregation" formControlName="aggregate">
+      <mat-option *ngFor="let ag of aggregations" [value]="ag.value">
+        {{ ag.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" (click)="applyKPI()" [disabled]="kpiForm.invalid">
+    Apply
+  </button>
+</form>

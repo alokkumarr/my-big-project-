@@ -13,7 +13,11 @@ import {
   OnChanges,
   OnDestroy
 } from '@angular/core';
-import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
+import {
+  GridsterConfig,
+  GridsterItem,
+  GridsterComponent
+} from 'angular-gridster2';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -46,7 +50,8 @@ export const DASHBOARD_MODES = {
   selector: 'dashboard-grid',
   template
 })
-export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class DashboardGridComponent
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('gridster') gridster: GridsterComponent;
   @ViewChildren(ObserveChartComponent) charts: QueryList<ObserveChartComponent>;
 
@@ -69,7 +74,8 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
   constructor(
     private analyze: AnalyzeService,
     private filters: GlobalFilterService,
-    private sidenav: SideNavService) { }
+    private sidenav: SideNavService
+  ) {}
 
   ngOnInit() {
     this.subscribeToRequester();
@@ -104,24 +110,30 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
 
   ngOnDestroy() {
     this.requesterSubscription && this.requesterSubscription.unsubscribe();
-    this.sidenavEventSubscription && this.sidenavEventSubscription.unsubscribe();
-    this.globalFiltersSubscription && this.globalFiltersSubscription.unsubscribe();
+    this.sidenavEventSubscription &&
+      this.sidenavEventSubscription.unsubscribe();
+    this.globalFiltersSubscription &&
+      this.globalFiltersSubscription.unsubscribe();
   }
 
   onGridInit() {
     if (this.mode === DASHBOARD_MODES.VIEW) {
-      this.sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(val => {
-        setTimeout(_ => {
-          this.gridster.resize();
-        });
-        setTimeout(_ => {
-          this.refreshAllTiles();
-        }, 500);
-      });
+      this.sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(
+        val => {
+          setTimeout(_ => {
+            this.gridster.resize();
+          });
+          setTimeout(_ => {
+            this.refreshAllTiles();
+          }, 500);
+        }
+      );
 
-      this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(data => {
-        this.onApplyGlobalFilters(data);
-      });
+      this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
+        data => {
+          this.onApplyGlobalFilters(data);
+        }
+      );
     }
   }
 
@@ -137,13 +149,19 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
         this.refreshTile(item);
       }
       this.columns = this.gridster.columns;
-      this.getDashboard.emit({changed: true, dashboard: this.prepareDashboard()});
-    }, 500)
+      this.getDashboard.emit({
+        changed: true,
+        dashboard: this.prepareDashboard()
+      });
+    }, 500);
   }
 
   removeTile(item: GridsterItem) {
     this.dashboard.splice(this.dashboard.indexOf(item), 1);
-    this.getDashboard.emit({changed: true, dashboard: this.prepareDashboard()});
+    this.getDashboard.emit({
+      changed: true,
+      dashboard: this.prepareDashboard()
+    });
   }
 
   getDimensions(item) {
@@ -156,9 +174,9 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
   refreshTile(item) {
     const dimensions = this.getDimensions(item);
     item.updater.next([
-      {path: 'chart.height', data: dimensions.height},
-      {path: 'chart.width', data: dimensions.width}
-    ])
+      { path: 'chart.height', data: dimensions.height },
+      { path: 'chart.width', data: dimensions.width }
+    ]);
   }
 
   refreshAllTiles() {
@@ -166,23 +184,29 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
   }
 
   addGlobalFilters(analysis) {
-    if(this.mode === DASHBOARD_MODES.VIEW) {
+    if (this.mode === DASHBOARD_MODES.VIEW) {
       const columns = flatMap(analysis.artifacts, table => table.columns);
 
       const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(filter(
-        map(filters, flt => ({
-          ...flt,
-          ...{
-            semanticId: analysis.semanticId,
-            metricName: analysis.metricName,
-            esRepository: analysis.esRepository,
-            displayName: this.filters.getDisplayNameFor(columns, flt.columnName, flt.tableName)
-          }
-        })),
-        f => f.isGlobalFilter
-      ));
+      this.filters.addFilter(
+        filter(
+          map(filters, flt => ({
+            ...flt,
+            ...{
+              semanticId: analysis.semanticId,
+              metricName: analysis.metricName,
+              esRepository: analysis.esRepository,
+              displayName: this.filters.getDisplayNameFor(
+                columns,
+                flt.columnName,
+                flt.tableName
+              )
+            }
+          })),
+          f => f.isGlobalFilter
+        )
+      );
     }
   }
 
@@ -210,16 +234,15 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
         }),
 
         tile.origAnalysis.sqlBuilder.filters,
-        (gFilt, filt) => (
+        (gFilt, filt) =>
           gFilt.tableName === filt.tableName &&
           gFilt.columnName === filt.columnName
-        )
       );
 
-      const sqlBuilder = {...tile.origAnalysis.sqlBuilder, ...{filters}};
-      tile.analysis = {...tile.origAnalysis, ...{sqlBuilder}};
+      const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
+      tile.analysis = { ...tile.origAnalysis, ...{ sqlBuilder } };
 
-      this.dashboard.splice(id, 1, {...tile});
+      this.dashboard.splice(id, 1, { ...tile });
     });
   }
 
@@ -235,7 +258,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
         this.addGlobalFilters(data);
         tile.updater = new BehaviorSubject({});
         this.dashboard.push(tile);
-        this.getDashboard.emit({changed: true, dashboard: this.model});
+        this.getDashboard.emit({ changed: true, dashboard: this.model });
         this.refreshTile(tile);
       });
     });
@@ -247,24 +270,33 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
   subscribeToRequester() {
     if (this.requester) {
       this.requesterSubscription = this.requester.subscribe((req: any = {}) => {
-        switch(req.action) {
-
+        /* prettier-ignore */
+        switch (req.action) {
         case 'add':
           this.dashboard.push(req.data);
-          this.getDashboard.emit({changed: true, dashboard: this.prepareDashboard()});
+          this.getDashboard.emit({
+            changed: true,
+            dashboard: this.prepareDashboard()
+          });
           break;
 
         case 'remove':
-          const tiles = filter(this.dashboard, tile => get(tile, 'analysis.id') === get(req, 'data.id'));
+          const tiles = filter(
+            this.dashboard,
+            tile => get(tile, 'analysis.id') === get(req, 'data.id')
+          );
           forEach(tiles, this.removeTile.bind(this));
           break;
 
         case 'get':
-          this.getDashboard.emit({save: true, dashboard: this.prepareDashboard()});
+          this.getDashboard.emit({
+            save: true,
+            dashboard: this.prepareDashboard()
+          });
           break;
 
         default:
-          this.getDashboard.emit({dashboard: this.prepareDashboard()});
+          this.getDashboard.emit({ dashboard: this.prepareDashboard() });
         }
       });
     }
@@ -290,6 +322,6 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
         rows: tile.rows
       })),
       filters: []
-    }
+    };
   }
 }

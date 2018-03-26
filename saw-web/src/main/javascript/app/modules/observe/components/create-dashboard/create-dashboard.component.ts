@@ -1,11 +1,17 @@
 declare const require: any;
 
 import { Component, Inject, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatSidenav } from '@angular/material';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatSidenav
+} from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
+import { WIDGET_ACTIONS } from '../add-widget/widget.model';
 import { ObserveService } from '../../services/observe.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -35,7 +41,8 @@ export class CreateDashboardComponent {
 
   @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
 
-  constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
+  constructor(
+    public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
     private router: UIRouter,
     private menu: MenuService,
@@ -49,7 +56,8 @@ export class CreateDashboardComponent {
   }
 
   checkEmpty(dashboard) {
-    this.fillState = get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
+    this.fillState =
+      get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
   }
 
   onDashboardChange(data) {
@@ -64,14 +72,13 @@ export class CreateDashboardComponent {
   updateWidgetLog(dashboard) {
     const newLog = {};
     forEach(dashboard.tiles, tile => {
-      newLog[tile.id] = {type: tile.type}
+      newLog[tile.id] = { type: tile.type };
     });
 
     this.dashboardService.dashboardWidgets.next(newLog);
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   exitCreator(data) {
     this.dialogRef.close(data);
@@ -82,25 +89,44 @@ export class CreateDashboardComponent {
   }
 
   onAnalysisAction(action, data) {
-    switch(action) {
+    /* prettier-ignore */
+    switch (action) {
     case 'ADD':
       if (!data) return;
-      const item = { cols: 1, rows: 1, analysis: data, updater: new BehaviorSubject({}) };
-      this.requester.next({action: 'add', data: item});
+      const item = {
+        cols: 1,
+        rows: 1,
+        analysis: data,
+        updater: new BehaviorSubject({})
+      };
+      this.requester.next({ action: 'add', data: item });
       break;
     case 'REMOVE':
       if (!data) return;
-      this.requester.next({action: 'remove', data});
-      break
+      this.requester.next({ action: 'remove', data });
+      break;
     }
   }
 
   onKPIAction(action, data) {
-    // TODO
+    /* prettier-ignore */
+    switch(action) {
+    case WIDGET_ACTIONS.ADD:
+      if (!data) return;
+
+      const item = {
+        cols: 1,
+        rows: 1,
+        kpi: data
+      };
+      this.requester.next({action: 'add', data: item});
+      break;
+    }
   }
 
-  onWidgetAction({widget, action, data}) {
-    switch(widget) {
+  onWidgetAction({ widget, action, data }) {
+    /* prettier-ignore */
+    switch (widget) {
     case 'ANALYSIS':
       this.onAnalysisAction(action, data);
       break;
@@ -111,7 +137,7 @@ export class CreateDashboardComponent {
   }
 
   saveDashboard() {
-    this.requester.next({action: 'get'});
+    this.requester.next({ action: 'get' });
   }
 
   openSaveDialog(dashboard: Dashboard) {
@@ -126,12 +152,16 @@ export class CreateDashboardComponent {
       if (result) {
         this.dialogRef.afterClosed().subscribe(() => {
           this.updateSideMenu(result);
-          this.router.stateService.go('observe.dashboard', {
-            dashboard: result.entityId,
-            subCategory: result.categoryId
-          }, {
-            reload: true
-          });
+          this.router.stateService.go(
+            'observe.dashboard',
+            {
+              dashboard: result.entityId,
+              subCategory: result.categoryId
+            },
+            {
+              reload: true
+            }
+          );
         });
         this.dialogRef.close();
       }

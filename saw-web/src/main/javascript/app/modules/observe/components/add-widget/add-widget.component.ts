@@ -13,9 +13,13 @@ import { MatSidenav } from '@angular/material/sidenav';
 
 const template = require('./add-widget.component.html');
 require('./add-widget.component.scss');
-import { WIDGET_ANALYSIS_ACTIONS } from './widget-analysis/widget-analysis.component';
 
-import { widgetTypes as wTypes, Widget, WidgetType } from './widget.model';
+import {
+  widgetTypes as wTypes,
+  Widget,
+  WidgetType,
+  WIDGET_ACTIONS
+} from './widget.model';
 
 @Component({
   selector: 'add-widget',
@@ -54,16 +58,23 @@ export class AddWidgetComponent implements OnInit {
   onSelectMetric({ metric, column }) {
     delete this.model.subCategory;
     this.model.metric = metric;
-    this.model.column = this.model.column;
+    this.model.column = column;
     this.widgetStepper.next();
   }
 
   onAnalysisAction({ action, analysis }) {
     this.onWidgetAction.emit({
       widget: 'ANALYSIS',
-      action:
-        WIDGET_ANALYSIS_ACTIONS.ADD_ANALYSIS === action ? 'ADD' : 'REMOVE',
+      action: WIDGET_ACTIONS.ADD === action ? 'ADD' : 'REMOVE',
       data: analysis
+    });
+  }
+
+  onKPIAction({ action, kpi }) {
+    this.onWidgetAction.emit({
+      widget: 'KPI',
+      action,
+      data: kpi
     });
   }
 }

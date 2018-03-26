@@ -19,11 +19,14 @@
   </mat-step>
 
   <mat-step label="Analysis">
-    <widget-header [stepper]="widgetStepper" *ngIf="model.subCategory" [container]="container" [title]="model.subCategory.name"
+    <widget-header [stepper]="widgetStepper" *ngIf="model.subCategory || model.metric" [container]="container" [title]="model.subCategory ? model.subCategory.name : model.metric.metricName"
       [showBack]="true"></widget-header>
 
     <widget-analysis *ngIf="model.subCategory" [category]="model.subCategory.id" (onAnalysisAction)="onAnalysisAction($event)">
     </widget-analysis>
+
+    <widget-kpi *ngIf="model.metric" [metric]="model.metric" [column]="model.column" (onKPIAction)="onKPIAction($event)">
+    </widget-kpi>
   </mat-step>
 
 </mat-horizontal-stepper>
