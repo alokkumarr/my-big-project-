@@ -1,6 +1,4 @@
 # ignore directories
-
-
 out/
 lib/
 log/
