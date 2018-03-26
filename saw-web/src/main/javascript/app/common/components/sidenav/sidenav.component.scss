@@ -1,13 +1,28 @@
-md-sidenav {
+sidenav .layout-row md-sidenav {
   height: 100%;
   position: fixed;
+  max-width: 100%;
+  width: 100%;
+  background: transparent !important;
 
   .sidebar-header {
     font-weight: 700;
   }
 
+  .menu {
+    width: 20%;
+    height: 100%;
+    float: left;
+    background: #FFF;
+  }
+
+  .backdrop {
+    width: 80%;
+    height: 100%;
+    float: left;
+  }
+
   .secondary-toolbar {
-    height: 75px;
     justify-content: center;
   }
 

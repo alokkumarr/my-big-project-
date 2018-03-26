@@ -2,23 +2,26 @@
   <md-sidenav class="md-sidenav-left"
               md-component-id="$ctrl.id"
               md-whiteframe="4"
-              md-disable-backdrop
               eval-attr-as-expr="mdComponentId">
-    <md-toolbar class="secondary-toolbar" md-sidenav-focus>
-      <div class="md-toolbar-tools">
-        <h3 class="sidebar-header" ng-bind="$ctrl.getMenuHeader()"></h3>
+    <div class="menu">           
+      <md-toolbar class="secondary-toolbar" md-sidenav-focus>
+        <div class="md-toolbar-tools">
+          <h3 class="sidebar-header" ng-bind="$ctrl.getMenuHeader()"></h3>
 
-        <span flex></span>
+          <span flex></span>
 
-        <md-button class="md-icon-button" aria-label="Menu"
-                   ng-click="$ctrl.toggleSidenav()">
-          <md-icon md-font-icon="icon-menu"></md-icon>
-        </md-button>
-      </div>
-    </md-toolbar>
+          <md-button class="md-icon-button" aria-label="Menu"
+                     ng-click="$ctrl.toggleSidenav()">
+            <md-icon md-font-icon="icon-menu"></md-icon>
+          </md-button>
+        </div>
+      </md-toolbar>
 
-    <md-content>
-      <accordion-menu source="$ctrl.menu"></accordion-menu>
-    </md-content>
+      <md-content>
+        <accordion-menu source="$ctrl.menu"></accordion-menu>
+      </md-content>
+    </div>
+    <div class="backdrop" ng-click="$ctrl.toggleSidenav()">
+    </div>
   </md-sidenav>
 </div>
