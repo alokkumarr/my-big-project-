@@ -630,8 +630,18 @@ class Analysis extends BaseController {
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       m_log.trace("queryRuntime inside report block before executeAndWait: {}", queryRuntime);
-      //var query :String =null
-      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+      val query = if (queryRuntime != null) queryRuntime
+        // In case of scheduled execution type if manual query exists take the precedence.
+      else if(executionType ==
+        ExecutionType.scheduled.toString) {
+         (analysisJSON \ "queryManual") match {
+          case JNothing => QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+          case obj: JString => obj.extract[String]
+          case obj => unexpectedElement("string", obj)
+        }
+      }
+      else
+        QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       m_log.trace("query inside report block before executeAndWait : {}", query);
       /* Execute analysis report query through queue for concurrency */
       val executionTypeEnum = executionType match {
