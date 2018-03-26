@@ -100,7 +100,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
 
 
  /**
-   * Returns the type tag that was provided with the analysis execution call, which would be "onetime", "scheduled" or “preview"
+   * Returns the type tag that was provided with the analysis execution call, which would be "onetime", "scheduled", “preview" or "regularExecution"
   */
   def getType : String = execType.toString
 

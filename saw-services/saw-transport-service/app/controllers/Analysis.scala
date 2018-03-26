@@ -215,7 +215,8 @@ class Analysis extends BaseController {
     	      {
 	        /* Build query based on analysis supplied in request body */
                 executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
-	        val runtime = (executionType == "onetime")
+	        val runtime = (executionType == ExecutionType.onetime.toString
+            || executionType == ExecutionType.regularExecution.toString)
                 m_log.debug("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
