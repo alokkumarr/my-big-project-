@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Scheduler Proxy
+Requires=saw-scheduler.service
+After=saw-scheduler.service
+Requires=saw-scheduler-proxy.socket
+After=saw-scheduler-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9601
+PrivateTmp=yes

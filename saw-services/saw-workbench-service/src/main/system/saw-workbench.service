@@ -9,6 +9,3 @@ User=mapr
 Restart=on-failure
 # Allow service to exit on SIGTERM, if socket-activated
 SuccessExitStatus=143
-
-[Install]
-WantedBy=default.target

@@ -36,7 +36,8 @@ import {
   NUMBER_TYPES,
   FLOAT_TYPES,
   DATE_INTERVALS_OBJ,
-  DATE_FORMATS_OBJ
+  DATE_FORMATS_OBJ,
+  DEFAULT_DATE_FORMAT
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
 
@@ -222,7 +223,8 @@ export class PivotGridComponent {
         switch (column.dateInterval) {
         case 'day':
           cloned.groupInterval = 1;
-          momentFormat = DATE_FORMATS_OBJ[cloned.format].momentValue
+          console.log('format', cloned.format);
+          momentFormat = this.getMomentFormat(cloned.format);
           cloned.manualFormat = cloned.format;
           cloned.format = {
             formatter: this.getFormatter(momentFormat)
@@ -290,7 +292,7 @@ export class PivotGridComponent {
     let formatToApply;
     switch (dateInterval) {
     case 'day':
-      formatToApply = DATE_FORMATS_OBJ[format].momentValue;
+      formatToApply = this.getMomentFormat(format);
       return moment.utc(value);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
@@ -304,6 +306,13 @@ export class PivotGridComponent {
     default:
       return value;
     }
+  }
+
+  getMomentFormat(format) {
+    const formatObj = DATE_FORMATS_OBJ[format];
+    return formatObj ?
+      formatObj.momentValue :
+      DEFAULT_DATE_FORMAT.momentValue
   }
 
   artifactColumn2PivotField(): any {

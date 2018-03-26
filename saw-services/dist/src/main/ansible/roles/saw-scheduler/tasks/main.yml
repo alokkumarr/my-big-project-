@@ -9,5 +9,19 @@
     - restart saw-scheduler
 - name: Run SAW scheduler initial database setup
   command: /opt/bda/saw-scheduler-service/db-setup/init
+# Workaround: The service restart handler will run only after all
+# tasks have completed.  This causes the service to remain running
+# using the old port when the new socket activation proxy starts up,
+# resulting in a port already in use error.  So trigger the restart
+# handler already here, to force the service to pick up the new port
+# setting before starting the socket activation proxy.  Can be removed
+# as no longer needed after the next SAW release.
+- meta: flush_handlers
+- name: Enable SAW Scheduler Service
+  systemd: name=saw-scheduler-proxy.socket enabled=true state=started
+# Note: In difference to other socket-activates services, the
+# Scheduler Service is by default also enabled itself to ensure that
+# scheduled tasks are executed even without traffic to activate the
+# service
 - name: Enable SAW Scheduler Service
   systemd: name=saw-scheduler enabled=true

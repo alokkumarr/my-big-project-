@@ -51,6 +51,7 @@
     <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
     <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
     <app.varDir>/var/bda/${app.nameVer}</app.varDir>
+    <npm.install>install --prefer-offline</npm.install>
   </properties>
   <dependencies>
 	<dependency>
@@ -214,7 +215,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>install</arguments>
+              <arguments>${npm.install}</arguments>
             </configuration>
           </execution>
           <execution>
@@ -232,7 +233,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>install node-sass</arguments>
+              <arguments>${npm.install} node-sass</arguments>
             </configuration>
           </execution>
            <execution>
@@ -318,7 +319,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -338,7 +339,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 
@@ -443,7 +444,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -463,7 +464,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 
@@ -552,7 +553,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -572,7 +573,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 
@@ -691,7 +692,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -711,7 +712,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 

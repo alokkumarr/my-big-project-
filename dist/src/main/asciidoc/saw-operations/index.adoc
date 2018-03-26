@@ -95,6 +95,11 @@ To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
 
+NOTE: Downgrading to an older SAW version is not supported.  If
+needed, take a backup of the entire environment before upgrading that
+can be used to restore the environment to a state that is supported by
+older SAW versions.
+
 ==== Upgrading to SAW 2.5
 
 Before upgrading, install and configure Apache Livy from the MapR
@@ -141,9 +146,13 @@ execute the following commands:
 
         $ sudo systemctl list-units saw-\*
 
-Please note that it is normal for the `saw-scheduler` service to be in
-an inactive state most of the time.  It is activated on a set schedule
-by `saw-scheduler.timer`.
+NOTE: Some services use [socket activation] to reduce memory usage and
+shorten deploy times.  These services will be listed as not running
+(inactive dead) until the first connection is made over the network.
+This is normal for socket-activated services and does not indicate a
+problem.
+
+[socket activation]: http://0pointer.de/blog/projects/socket-activation.html
 
 === Starting, stopping and restarting services
 
