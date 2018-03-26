@@ -172,6 +172,7 @@ export class DashboardGridComponent
   }
 
   refreshTile(item) {
+    if (item.kpi) return;
     const dimensions = this.getDimensions(item);
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
@@ -252,6 +253,13 @@ export class DashboardGridComponent
     }
 
     forEach(get(this.model, 'tiles', []), tile => {
+      if (tile.kpi) {
+        this.dashboard.push(tile);
+        this.getDashboard.emit({ changed: true, dashboard: this.model });
+        this.refreshTile(tile);
+        return;
+      }
+
       this.analyze.readAnalysis(tile.id).then(data => {
         tile.analysis = data;
         tile.origAnalysis = data;
@@ -302,6 +310,16 @@ export class DashboardGridComponent
     }
   }
 
+  tileType(tile) {
+    if (tile.analysis) {
+      return 'analysis';
+    } else if (tile.kpi) {
+      return 'kpi';
+    }
+
+    return 'custom';
+  }
+
   prepareDashboard(): Dashboard {
     this.model = this.model;
     return {
@@ -314,12 +332,13 @@ export class DashboardGridComponent
       updatedBy: get(this.model, 'updatedBy', ''),
       updatedAt: get(this.model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
-        type: 'analysis',
+        type: this.tileType(tile),
         id: get(tile, 'analysis.id', ''),
         x: tile.x,
         y: tile.y,
         cols: tile.cols,
-        rows: tile.rows
+        rows: tile.rows,
+        kpi: tile.kpi
       })),
       filters: []
     };
