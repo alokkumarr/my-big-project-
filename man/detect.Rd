@@ -34,10 +34,10 @@ negative anomalies are detected, or 'both' for both 'pos' and 'neg'
 anomalies}
 
 \item{alpha}{numeric statistical threshold for anomlie detection. default is
-.01 or 99% Confidence.}
+.01 or 99 percent Confidence.}
 
 \item{max_anoms}{numeric threshold for percent of data identified as
-anomalies. default is .01 or 1% of the data}
+anomalies. default is .01 or 1 percent of the data}
 
 \item{trend_window}{numeric input for percentage of total data width for
 trend detection. default is 0.75. Large values smooth the trend which may
@@ -52,7 +52,10 @@ dataframe with same number of records as input dataframe. Appends
 \description{
 Anomaly detection function for time series data. Function determines
 statistical anomlies in the dataset based on configurable theshold
-parameters. Function is similiar to Seasonl Hybrid ESD algorithm discussed
+parameters.
+}
+\details{
+Function is similiar to Seasonl Hybrid ESD algorithm discussed
 here \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
 \code{\link[AnomalyDetection]{AnomalyDetectionTs}}
 }

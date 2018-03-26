@@ -2,7 +2,9 @@
 #'
 #' Anomaly detection function for time series data. Function determines
 #' statistical anomlies in the dataset based on configurable theshold
-#' parameters. Function is similiar to Seasonl Hybrid ESD algorithm discussed
+#' parameters.
+#'
+#' Function is similiar to Seasonl Hybrid ESD algorithm discussed
 #' here \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
 #' \code{\link[AnomalyDetection]{AnomalyDetectionTs}}
 #'
@@ -19,9 +21,9 @@
 #'   negative anomalies are detected, or 'both' for both 'pos' and 'neg'
 #'   anomalies
 #' @param alpha numeric statistical threshold for anomlie detection. default is
-#'   .01 or 99% Confidence.
+#'   .01 or 99 percent Confidence.
 #' @param max_anoms numeric threshold for percent of data identified as
-#'   anomalies. default is .01 or 1% of the data
+#'   anomalies. default is .01 or 1 percent of the data
 #' @param trend_window numeric input for percentage of total data width for
 #'   trend detection. default is 0.75. Large values smooth the trend which may
 #'   not be appropriate for non-stationary trends. Small values may overfit the

@@ -34,10 +34,10 @@ negative anomalies are detected, or 'both' for both 'pos' and 'neg'
 anomalies}
 
 \item{alpha}{numeric statistical threshold for anomlie detection. default is
-.01 or 99% Confidence.}
+.01 or 99 percent Confidence.}
 
 \item{max_anoms}{numeric threshold for percent of data identified as
-anomalies. default is .01 or 1% of the data}
+anomalies. default is .01 or 1 percent of the data}
 
 \item{trend_window}{numeric input for percentage of total data width for
 trend detection. default is 0.75. Large values smooth the trend which may
