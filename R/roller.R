@@ -144,8 +144,10 @@ roller.tbl_spark <- function(df,
                              ...) {
 
   stopifnot("tbl_spark" %in% class(df))
-  sc <- sparklyr::spark_dataframe(df) %>%
-    sparklyr::spark_connection(.)
+  sc <- df %>%
+    sparklyr::spark_dataframe() %>%
+    sparklyr::spark_connection()
+
   DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS df"))
   sparklyr::sdf_register(df, "df")
   new_tbl_name <- "df_roll"
@@ -166,11 +168,6 @@ roller.tbl_spark <- function(df,
   measure_vars <- args$measure_vars
   fun <- args$fun
   width <- args$width
-
-
-  sc <- df %>%
-    sparklyr::spark_dataframe() %>%
-    sparklyr::spark_connection()
 
   query <- paste("CREATE TABLE", new_tbl_name, "as SELECT",
                  paste(colnames(df), collapse=", "))
