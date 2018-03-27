@@ -41,7 +41,7 @@ public class SFTPUploader {
             FileSystemOptions opts = new FileSystemOptions();
             SftpFileSystemConfigBuilder sftpBuilder = SftpFileSystemConfigBuilder.getInstance();
             sftpBuilder.setStrictHostKeyChecking(opts, "no");
-            sftpBuilder.setUserDirIsRoot(opts, true);
+            sftpBuilder.setUserDirIsRoot(opts, false);
             // ToDo: Make it configurable
             // 10 minutes
             sftpBuilder.setTimeout(opts, 600000);
