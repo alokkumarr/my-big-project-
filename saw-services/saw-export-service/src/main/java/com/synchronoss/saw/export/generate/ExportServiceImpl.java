@@ -276,7 +276,7 @@ public class ExportServiceImpl implements ExportService{
           Workbook workbook =  iFileExporter.getWorkBook(exportBean, dataObj);
           CreatePivotTable createPivotTable = new CreatePivotTable(analysisMetaData.getAnalyses().get(0));
           createPivotTable.createPivot(workbook,file);
-          if (recipients != null && recipients == "")
+          if (recipients != null && recipients != "")
             MailSender.sendMail(recipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
                     serviceUtils.prepareMailBody(exportBean,mailBody)
                     ,exportBean.getFileName());

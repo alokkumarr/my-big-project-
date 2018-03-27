@@ -48,13 +48,18 @@ public class SFTPUploader {
 
             // Local and remote file location preparation
             FileObject localFile = manager.resolveFile(file.getAbsolutePath());
+            logger.debug(localFile.toString());
             FileObject remoteFile = manager.resolveFile(sftpURL, opts);
+            logger.debug(remoteFile.toString());
 
             logger.debug("Just before uploading it to server");
 
             // Copy the actual file
             remoteFile.copyFrom(localFile, Selectors.SELECT_SELF);
+
         } catch (IOException e) {
+            logger.error("SFTP Error: "+ e.getMessage());
+        } catch (Exception e) {
             logger.error("SFTP Error: "+ e.getMessage());
         }
     }
