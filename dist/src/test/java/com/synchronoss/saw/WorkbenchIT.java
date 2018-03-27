@@ -2,7 +2,6 @@ package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.isA;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,16 +11,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
  * executing components.
  */
 public class WorkbenchIT extends BaseIT {
-    private static String WORKBENCH_PATH = "/services/internal/workbench";
-    private static int DATASET_WAIT_RETRIES = 10;
-    private static int DATASET_WAIT_SLEEP_SECONDS = 5;
+    private static final String WORKBENCH_PATH =
+        "/services/internal/workbench";
+    private static final int DATASET_WAIT_RETRIES = 10;
+    private static final int DATASET_WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     /**
