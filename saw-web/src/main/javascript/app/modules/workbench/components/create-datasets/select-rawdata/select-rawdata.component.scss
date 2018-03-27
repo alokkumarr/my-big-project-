@@ -69,6 +69,7 @@ select-rawdata {
   .headerText {
     margin: 9px !important;
     font-size: 16px !important;
+    font-weight: normal !important;
   }
 
   #infoForMask {
@@ -152,6 +153,12 @@ select-rawdata {
   }
 
   .gridContainer {
-    height: calc(100% - 45.5px) !important;
+    height: calc(100% - 47px) !important;
+  }
+
+  .selected-files {
+    padding-top: 0;
+    max-height: calc(100% - 55px) !important;
+    overflow: scroll;
   }
 }

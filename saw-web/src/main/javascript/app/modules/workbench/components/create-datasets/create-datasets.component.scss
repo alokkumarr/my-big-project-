@@ -23,19 +23,24 @@ create-datasets {
     height: calc(100% - 72px);
   }
 
+  .mat-horizontal-stepper-header-container {
+    background-color: #F5F9FC;
+  }
+
   .mat-horizontal-stepper-content {
     height: 100%;
+    padding: 1px;
   }
 
   .mat-stepper-horizontal {
     height: 100%;
-    background-color: #F5F9FC;
   }
 
   .stepperBtn {
     margin-top: 3px;
+    margin-right: 5px;
     font-size: 20px;
-    width: 145px;
+    width: 136px;
 
     .mat-icon {
       height: auto;
@@ -43,7 +48,7 @@ create-datasets {
   }
 
   .previous {
-    height: 42px;
+    height: 38px;
     border-radius: 2px;
     background-color: white;
     border: solid 1px $primary-blue-b2;
@@ -127,26 +132,10 @@ create-datasets {
   }
 
   .data-details {
-    height: calc(100% - 47px);
+    height: calc(100% - 50px);
   }
 
   .top-margin {
     margin-top: 3px;
-  }
-
-  .back-btn {
-    outline: 0;
-    cursor: pointer;
-    position: relative;
-    box-sizing: content-box;
-    display: flex;
-    height: 74px;
-    align-items: center;
-    background-color: #F5F9FC;
-    border-bottom: 2px inset #F5F9FC;
-
-    .mat-icon {
-      font-size: 24px;
-    }
   }
 }

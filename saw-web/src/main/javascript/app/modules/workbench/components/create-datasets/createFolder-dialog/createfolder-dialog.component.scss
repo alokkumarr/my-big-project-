@@ -1,0 +1,12 @@
+@import "themes/base/colors";
+
+createfolder-dialog {
+  .inpElement {
+    width: 100%;
+  }
+
+  .formatList {
+    border: 1px $primary-red solid;
+    margin-bottom: 9px;
+  }
+}

@@ -1,6 +1,6 @@
 declare function require(string): string;
 
-import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy} from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { debounceTime } from 'rxjs/operators';
@@ -15,7 +15,7 @@ import { DxDataGridComponent } from 'devextreme-angular';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service'
 
-import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component'
+import { CreatefolderDialogComponent } from '../createFolder-dialog/createfolder-dialog.component';
 import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component'
 import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs'
@@ -252,11 +252,13 @@ export class SelectRawdataComponent implements OnInit {
    * @memberof SelectRawdataComponent
    */
   createFolder() {
-    const dateDialogRef = this.dialog.open(DateformatDialogComponent, {
-      hasBackdrop: false,
-      data: {
-        placeholder: 'Enter folder name'
-      }
+    const dateDialogRef = this.dialog.open(CreatefolderDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: true,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '236px',
+      width: '350px'
     });
 
     dateDialogRef

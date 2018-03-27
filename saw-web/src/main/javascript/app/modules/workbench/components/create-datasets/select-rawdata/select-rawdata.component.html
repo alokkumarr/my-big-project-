@@ -2,14 +2,14 @@
   <mat-card class="margin-9" style="padding:0px;" fxFlex="75" fxFlex.gt-md="75" fxFlex.md="75">
     <mat-card-header class="headerGradient">
       <div mat-card-avatar class="staging-image"></div>
-      <mat-card-title class="headerText">Staging Area</mat-card-title>
+      <mat-card-title class="headerText" i18n>Staging Area</mat-card-title>
 
       <span class="toolbar-spacer"></span>
-      <button for="fileUpload" mat-icon-button color="primary" (click)="fileUpload.click()">
+      <button for="fileUpload" i18n matTooltip="Upload File" mat-icon-button color="primary" (click)="fileUpload.click()">
         <mat-icon fontIcon="icon-upload"></mat-icon>
       </button>
       <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept="text/csv, 'text/plain'" />
-      <button mat-icon-button color="primary" (click)="createFolder()">
+      <button mat-icon-button color="primary" matTooltip="New Folder" i18n (click)="createFolder()">
         <mat-icon fontIcon="icon-new-folder"></mat-icon>
       </button>
     </mat-card-header>
@@ -24,8 +24,8 @@
           </tree-root>
         </div>
         <div fxFlex="70" fxFill fxLayout="column">
-          <mat-form-field floatLabel="never" id="infoForMask">
-            <input matInput placeholder="Enter file mask" [(ngModel)]="fileMask" [formControl]="fileMaskControl" required />
+          <mat-form-field id="infoForMask">
+            <input matInput autocomplete="off" i18n placeholder="Enter file mask" [(ngModel)]="fileMask" [formControl]="fileMaskControl" required />
             <mat-icon matSuffix fontIcon="icon-info" matTooltip="{{maskHelper}}"></mat-icon>
           </mat-form-field>
           <div class="gridContainer">
@@ -58,14 +58,15 @@
 
   <mat-card class="margin-9 selectCard" fxFlex="25" fxFlex.gt-md="25" fxFlex.md="25">
     <mat-card-header class="headerGradient">
-      <mat-card-title class="headerText">Selected Files</mat-card-title>
+      <mat-card-title class="headerText" i18n>Selected Files</mat-card-title>
       <span class="toolbar-spacer"></span>
       <button mat-icon-button matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
         <mat-icon fontIcon="icon-clear-all"></mat-icon>
       </button>
     </mat-card-header>
-    <mat-card-content>
-      <mat-list role="list" style="padding-top:0px;">
+    <mat-divider></mat-divider>
+    <mat-card-content class="selected-files">
+      <mat-list role="list" class="selected-files">
         <mat-list-item class="whiteFrame" role="listitem" *ngFor="let file of selFiles; index as i">
           <div class="mat-body-2">{{i + 1}}. &ensp; {{ file.name }}</div>
         </mat-list-item>

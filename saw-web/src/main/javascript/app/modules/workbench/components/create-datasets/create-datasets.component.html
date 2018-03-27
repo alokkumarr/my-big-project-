@@ -1,10 +1,4 @@
 <mat-card fxFlex fxFill fxLayout="row">
-  <div class="back-btn">
-    <button mat-icon-button (click)="backtoLists()">
-      <mat-icon fontIcon="icon-arrow-left"></mat-icon>
-    </button>
-  </div>
-
   <mat-horizontal-stepper linear="true" (selectionChange)="stepChanged($event)">
     <ng-template matStepperIcon="edit">
       <mat-icon fontIcon="icon-checkmark"></mat-icon>
@@ -14,23 +8,30 @@
     </ng-template>
     <mat-step [completed]="selectFullfilled" i18n label="SELECT">
       <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
-      <div>
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
+        </button>
         <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
+        <button mat-raised-button color="primary" matStepperNext class="stepperBtn">
           <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
+        <div></div>
       </div>
     </mat-step>
     <mat-step [completed]="detailsFilled" i18n label="DETAILS">
       <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
-      <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
+        </button>
+        <div fxFlex></div>
+        <button mat-raised-button color="secondary" matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
+        <button mat-raised-button color="primary" matStepperNext class="stepperBtn">
           <span i18n> Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
@@ -38,13 +39,16 @@
     </mat-step>
     <mat-step i18n label="PREVIEW">
       <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
-      <div>
-        <button mat-button mat-raised-button mat-primary matStepperPrevious class="stepperBtn previous Outline">
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
+        </button>
+        <div fxFlex></div>
+        <button mat-raised-button matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
+        <button mat-raised-button color="primary" matStepperNext class="stepperBtn">
           <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
@@ -120,13 +124,16 @@
           </mat-card-content>
         </mat-card>
       </div>
-      <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
+        </button>
+        <div fxFlex></div>
+        <button mat-raised-button color="secondary" matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
+        <button mat-raised-button color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
           <span i18n>ADD</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
