@@ -10,6 +10,8 @@ import * as fpGet from 'lodash/fp/get';
 import APP_CONFIG from '../../../../appConfig';
 
 import { WorkbenchService } from '../../../main/javascript/app/modules/workbench/services/workbench.service';
+import { JwtService } from '../../../../../saw-web/src/main/javascript/login/services/jwt.service';
+import { MenuService } from '../../../../../saw-web/src/main/javascript/app/common/services/menu.service'
 
 
 configureTests();
@@ -27,21 +29,20 @@ describe('Workbench Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [WorkbenchService,
+        {provide: JwtService, useValue: mockService},
+        {provide: MenuService, useValue: mockService},
         {provide: UIRouter, useValue: mockService}]
     }).compileComponents();
-    // WorkbenchService = TestBed.get(WorkbenchService);
-    // jWTService = TestBed.get(JwtService);
-    // menuService = TestBed.get(MenuService);
     httpMock = TestBed.get(HttpClientTestingModule);
   });
 
-  it('should return error if dataset request failed', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should return error if dataset request failed', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     WorkbenchService.getDatasets().subscribe((res: any) => {
       expect(res.failure.error.type).to.equal('ERROR_LOADING_DATASETS');
     });
   }));
 
-  it('should get the datasets', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should get the datasets', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     const mockResponse = {
       data: [
       { id: 0, name: 'DS 1', location: 'location 1', creator: 'creator 1', description: 'Desc 1', size: '10000', last_updated_time: 'updated_time 1', updated_by: 'user 1', status: 'status 1', data_set_type: 'type 1', source_type: 'src 1', file_count: 'count 1', creation_time: 'time 1'},
@@ -57,14 +58,14 @@ describe('Workbench Service', () => {
     // request.flush();
   }));
 
-  it('should return error if staging data request failed', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should return error if staging data request failed', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     WorkbenchService.getStagingData(`${this.wbAPI}/${this.userProject}/raw/directory`).subscribe((res: any) => {
       expect(res.failure.error.type).to.be('ERROR_LOADING_STAGING_DATA');
     });
     // httpMock.verify();
   }));
 
-  it('should get the staging data', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should get the staging data', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     const mockStagingResponse = {
       'delimiter': ',',
       'description':'It is delimited file inspecting to verify & understand the content of file',
@@ -128,14 +129,14 @@ describe('Workbench Service', () => {
     // request.flush();
   }));
 
-  it('should return error if raw preview data request failed', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should return error if raw preview data request failed', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     WorkbenchService.getRawPreviewData(`${this.wbAPI}/${userProject}/raw/directory/preview`).subscribe((res: any) => {
       expect(res.failure.error.type).to.be('ERROR_LOADING_RAW_PREVIEW_DATA');
     });
     // httpMock.verify();
   }));
 
-  it('should get the rawPreview data', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should get the rawPreview data', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     const mockRawPreviewData= {
       'projectId': 'workbench',
       'path': '/old_file.csv',
@@ -191,7 +192,7 @@ describe('Workbench Service', () => {
     // request.flush();
   }));
 
-  it('should get dataSet details', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should get dataSet details', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     let id = 1;
     const dateSetResponse = {data: [{ id: 0, name: 'DS 1', location: 'location 1', creator: 'creator 1', description: 'Desc 1', size: '10000', last_updated_time: 'updated_time 1', updated_by: 'user 1', status: 'status 1', data_set_type: 'type 1', source_type: 'src 1', file_count: 'count 1', creation_time: 'time 1'}]			};
     WorkbenchService.getDatasetDetails(id).subscribe((res : any) => {
@@ -214,13 +215,13 @@ describe('Workbench Service', () => {
     // request.flush();
   }));
 
-  it('should return error if parsed preview data request failed', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should return error if parsed preview data request failed', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     WorkbenchService.getParsedPreviewData(`${this.wbAPI}/${userProject}/raw/directory/inspect`).subscribe((res: any) => {
       expect(res.failure.error.type).to.be('ERROR_LOADING_PARSED_PREVIEW_DATA');
     });
   }));
 
-  it('should get the parsed preview data', inject([WorkbenchService], (WorkbenchService: WorkbenchService) => {
+  it('should get the parsed preview data', inject([WorkbenchService, JwtService, MenuService], (WorkbenchService: WorkbenchService, JwtService: JwtService, MenuService: MenuService) => {
     const mockParsedPreviewData = [{
       '_id': 'workbench::Sample',
       'system': {
