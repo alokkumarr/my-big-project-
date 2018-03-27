@@ -173,7 +173,7 @@ public class ExportServiceImpl implements ExportService{
 
               // compress the file
               File cfile = new File(exportBean.getFileName());
-              String zipFileName = cfile.getName().concat(".zip");
+                String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
               FileOutputStream fos = new FileOutputStream(zipFileName);
               ZipOutputStream zos = new ZipOutputStream(fos);
@@ -197,7 +197,7 @@ public class ExportServiceImpl implements ExportService{
                             alias.getPassword(),
                             zipFileName,
                             alias.getLocation(),
-                            "report_" + cfile.getName().substring(0, cfile.getName().lastIndexOf(".")) + dtf.format(now).toString() + ((LinkedHashMap) dispatchBean).get("fileType") + ".zip",
+                            cfile.getName().substring(0, cfile.getName().lastIndexOf(".")) + dtf.format(now).toString() + "." + ((LinkedHashMap) dispatchBean).get("fileType") + ".zip",
                             alias.getType());
                       logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                     }
@@ -320,7 +320,7 @@ public class ExportServiceImpl implements ExportService{
                             alias.getPassword(),
                             zipFileName,
                             alias.getLocation(),
-                            "pivot_" + cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1) + dtf.format(now).toString() + "xlsx" + ".zip",
+                            cfile.getName().substring(0, cfile.getName().lastIndexOf(".") + 1) + dtf.format(now).toString() + ".xlsx" + ".zip",
                             alias.getType());
                       logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                     }
