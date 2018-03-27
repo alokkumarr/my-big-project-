@@ -1,5 +1,5 @@
 <gridster [options]="options" #gridster class="dashboard-gridster">
-  <gridster-item [item]="item" *ngFor="let item of dashboard">
+  <gridster-item [item]="item" *ngFor="let item of dashboard" [ngClass]="item.kpi ? 'cell-kpi' : 'cell-analysis'">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
       <mat-icon fontIcon="icon-close"></mat-icon>
@@ -10,7 +10,7 @@
     </ng-container>
 
     <ng-container *ngIf="item.kpi">
-      <p [textContent]="item.kpi.name"></p>
+      <observe-kpi [kpi]="item.kpi"></observe-kpi>
     </ng-container>
   </gridster-item>
 </gridster>

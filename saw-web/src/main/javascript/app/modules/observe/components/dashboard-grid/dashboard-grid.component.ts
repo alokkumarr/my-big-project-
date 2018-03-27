@@ -63,7 +63,7 @@ export class DashboardGridComponent
 
   public fillState = 'empty';
   public enableChartDownload: boolean;
-  public columns = 4;
+  public columns = 16;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
   private sidenavEventSubscription: Subscription;

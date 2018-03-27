@@ -46,6 +46,7 @@ export class WidgetKPIComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log(this.metric);
     this.kpiForm.get('columnName').setValue(this.column.columnName);
     this.kpiForm.get('name').setValue(this.column.displayName);
     this.kpiForm

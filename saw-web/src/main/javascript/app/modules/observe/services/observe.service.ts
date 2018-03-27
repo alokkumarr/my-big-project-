@@ -17,13 +17,14 @@ import APP_CONFIG from '../../../../../../../appConfig';
 
 @Injectable()
 export class ObserveService {
-
   private api = fpGet('api.url', APP_CONFIG);
 
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpClient,
     private jwt: JwtService,
     private router: UIRouter,
-    private menu: MenuService) {}
+    private menu: MenuService
+  ) {}
 
   addModelStructure(model) {
     return {
@@ -37,7 +38,8 @@ export class ObserveService {
      Otherwise uses update operation.
   */
   saveDashboard(model: Dashboard) {
-    let method = 'post', endpoint = 'create';
+    let method = 'post',
+      endpoint = 'create';
     if (fpGet('entityId', model)) {
       method = 'put';
       endpoint = `update/${model.entityId}`;
@@ -47,72 +49,134 @@ export class ObserveService {
       model.createdBy = this.jwt.getUserId();
     }
 
-    return this.http[method](`${this.api}/observe/dashboards/${endpoint}` , this.addModelStructure(model)).map(fpGet('contents.observe.0'));
+    return this.http[method](
+      `${this.api}/observe/dashboards/${endpoint}`,
+      this.addModelStructure(model)
+    ).map(fpGet('contents.observe.0'));
+  }
+
+  /**
+   * Executes a kpi
+   *
+   * @param {*} model
+   * @returns {Observable<any>}
+   * @memberof ObserveService
+   */
+  executeKPI(model: any): Observable<any> {
+    // return this.http.get(`${this.api}/observe/kpi/execute`).map(fpGet('contents.observe.0'));
+
+    return Observable.of({
+      type: 'kpi',
+      filter: 'MTD',
+      data: {
+        AVAILABLE_MB: {
+          _sum: {
+            prior: '690',
+            current: '698'
+          },
+          _avg: {
+            prior: '25',
+            current: '30'
+          },
+          _count: {
+            prior: '1',
+            current: '3'
+          },
+          _max: {
+            prior: '520',
+            current: '598'
+          },
+          _min: {
+            prior: '80',
+            current: '80'
+          }
+        }
+      }
+    });
   }
 
   getDashboard(entityId: string): Observable<Dashboard> {
-    return this.http.get(`${this.api}/observe/dashboards/${entityId}`).map(fpGet('contents.observe.0'));
+    return this.http
+      .get(`${this.api}/observe/dashboards/${entityId}`)
+      .map(fpGet('contents.observe.0'));
   }
 
-  getDashboardsForCategory(categoryId, userId = this.jwt.getUserId()): Observable<Array<Dashboard>> {
-    return this.http.get(`${this.api}/observe/dashboards/${categoryId}/${userId}`).map(fpGet('contents.observe'));
+  getDashboardsForCategory(
+    categoryId,
+    userId = this.jwt.getUserId()
+  ): Observable<Array<Dashboard>> {
+    return this.http
+      .get(`${this.api}/observe/dashboards/${categoryId}/${userId}`)
+      .map(fpGet('contents.observe'));
   }
 
   deleteDashboard(dashboard: Dashboard) {
-    return this.http.delete(`${this.api}/observe/dashboards/${dashboard.entityId}`).map(fpGet('contents.observe'));
+    return this.http
+      .delete(`${this.api}/observe/dashboards/${dashboard.entityId}`)
+      .map(fpGet('contents.observe'));
   }
 
   getModelValues(filter) {
     const payload = {
-      globalFilters: [{
-        tableName: filter.tableName,
-        semanticId: filter.semanticId,
-        filters: [{
-          columnName: filter.columnName,
-          type: filter.type,
-          size: 1000,
-          order: 'asc'
-        }],
-        esRepository: filter.esRepository
-      }]
+      globalFilters: [
+        {
+          tableName: filter.tableName,
+          semanticId: filter.semanticId,
+          filters: [
+            {
+              columnName: filter.columnName,
+              type: filter.type,
+              size: 1000,
+              order: 'asc'
+            }
+          ],
+          esRepository: filter.esRepository
+        }
+      ]
     };
 
-    return this.http.post(`${this.api}/filters` , payload).map(fpGet(filter.columnName));
+    return this.http
+      .post(`${this.api}/filters`, payload)
+      .map(fpGet(filter.columnName));
   }
 
   reloadMenu() {
     return Observable.create(observer => {
-      this.menu.getMenu('OBSERVE')
-        .then(data => {
-
-          let count = this.getSubcategoryCount(data);
-          forEach(data, category => {
-            forEach(category.children || [], subCategory => {
-
-              this.getDashboardsForCategory(subCategory.id).subscribe((dashboards: Array<Dashboard>) => {
+      this.menu.getMenu('OBSERVE').then(data => {
+        let count = this.getSubcategoryCount(data);
+        forEach(data, category => {
+          forEach(category.children || [], subCategory => {
+            this.getDashboardsForCategory(subCategory.id).subscribe(
+              (dashboards: Array<Dashboard>) => {
                 dashboards = dashboards || [];
                 subCategory.children = subCategory.children || [];
 
-                subCategory.children = subCategory.children.concat(map(dashboards, dashboard => ({
-                  id: dashboard.entityId,
-                  name: dashboard.name,
-                  url: `#!/observe/${subCategory.id}?dashboard=${dashboard.entityId}`,
-                  data: dashboard
-                })));
+                subCategory.children = subCategory.children.concat(
+                  map(dashboards, dashboard => ({
+                    id: dashboard.entityId,
+                    name: dashboard.name,
+                    url: `#!/observe/${subCategory.id}?dashboard=${
+                      dashboard.entityId
+                    }`,
+                    data: dashboard
+                  }))
+                );
 
-                if(--count <= 0) {
+                if (--count <= 0) {
                   observer.next(data);
                   observer.complete();
                 }
-              }, error => {
-                if(--count <= 0) {
+              },
+              error => {
+                if (--count <= 0) {
                   observer.next(data);
                   observer.complete();
                 }
-              });
-            });
+              }
+            );
           });
         });
+      });
       return observer;
     });
   }
@@ -148,7 +212,6 @@ export class ObserveService {
 
     const categoryWithSubCategory = find(menu, cat => cat.children.length > 0);
 
-
     if (categoryWithDashboard) {
       /* If a dashboard has been found in some category/subcategory, redirect to that */
       const subCategory = find(categoryWithDashboard.children, subCat => {
@@ -159,7 +222,6 @@ export class ObserveService {
         subCategory: subCategory.id,
         dashboard: subCategory.children[0].id
       });
-
     } else if (categoryWithSubCategory) {
       /* Otherwise, redirect to the first empty subcategory available. */
       this.router.stateService.go('observe.dashboard', {

@@ -94,8 +94,8 @@ export class CreateDashboardComponent {
     case 'ADD':
       if (!data) return;
       const item = {
-        cols: 1,
-        rows: 1,
+        cols: 4,
+        rows: 4,
         analysis: data,
         updater: new BehaviorSubject({})
       };
@@ -115,8 +115,8 @@ export class CreateDashboardComponent {
       if (!data) return;
 
       const item = {
-        cols: 1,
-        rows: 1,
+        cols: 4,
+        rows: 2,
         kpi: data
       };
       this.requester.next({action: 'add', data: item});

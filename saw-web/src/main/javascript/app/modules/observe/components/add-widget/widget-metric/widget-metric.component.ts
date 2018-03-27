@@ -28,7 +28,7 @@ export class WidgetMetricComponent implements OnInit {
           {
             columnName: 'AVAILABLE_MB',
             displayName: 'Available MB',
-            type: 'double'
+            type: 'integer'
           }
         ];
 

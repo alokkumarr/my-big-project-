@@ -1,0 +1,13 @@
+<h1 [textContent]="kpi.name"></h1>
+
+<div class="kpi-measure-container">
+  <div class="kpi-measure">
+    <h2>Month to Date</h2>
+    <span class="kpi-main-measure">{{(executionResult | async).current}}</span>
+  </div>
+
+  <div class="kpi-measure">
+    <h2>Change</h2>
+    <span class="kpi-secondary-measure">{{(executionResult | async).change}}%</span>
+  </div>
+</div>

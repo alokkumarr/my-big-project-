@@ -22,6 +22,10 @@ dashboard-grid {
         right: 0;
       }
 
+      &.cell-kpi > button {
+        color: white;
+      }
+
       & > .analysis-container {
         display: block;
         width: 100%;
