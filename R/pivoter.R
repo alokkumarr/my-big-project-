@@ -130,8 +130,7 @@ pivoter.data.frame <- function(df,
   # Iterate through group variables and create pivot formula
   i <- 0
   for (g in group_vars) {
-    pivot_fn <-
-      as.formula(paste(paste(id_vars, collapse = "+"), "~", g))
+    pivot_fn <- as.formula(paste(paste(id_vars, collapse = "+"), "~", g))
 
     # Iterate through measure variables and determine pivot function
     for (m in measure_vars) {
@@ -146,13 +145,12 @@ pivoter.data.frame <- function(df,
           value.var = m,
           fill = fill
         )
-      pvt_measure_vars <-
-        setdiff(colnames(sub_result), group_by_vars)
+      pvt_measure_vars <- setdiff(colnames(sub_result), group_by_vars)
 
       if (!is.null(sep)) {
         for (var in pvt_measure_vars) {
-          sub_result <-
-            dplyr::rename_(sub_result, .dots = setNames(var, paste(g, var, m, sep = sep)))
+          sub_result <- dplyr::rename_(sub_result,
+                                       .dots = setNames(var, paste(g, var, m, sep = sep)))
         }
       }
 

@@ -144,12 +144,9 @@ roller.tbl_spark <- function(df,
                              ...) {
 
   stopifnot("tbl_spark" %in% class(df))
-  sc <- df %>%
-    sparklyr::spark_dataframe() %>%
-    sparklyr::spark_connection()
-
-  DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS df"))
-  sparklyr::sdf_register(df, "df")
+  sdf <-  sparklyr::spark_dataframe(df)
+  sc <- sparklyr::spark_connection(sdf)
+  sdf %>% invoke("createOrReplaceTempView", "df")
   new_tbl_name <- "df_roll"
 
   args <- roller_args(
@@ -169,14 +166,13 @@ roller.tbl_spark <- function(df,
   fun <- args$fun
   width <- args$width
 
-  query <- paste("CREATE TABLE", new_tbl_name, "as SELECT",
+  query <- paste("CREATE OR REPLACE TEMP VIEW", new_tbl_name, "as SELECT",
                  paste(colnames(df), collapse=", "))
   for(var in measure_vars){
     query <- paste0(query, ", ", sql_over_translator(var, fun, group_vars, order_vars, width))
   }
   query <- paste(query, "FROM df")
 
-  DBI::dbSendQuery(sc, paste("DROP TABLE IF EXISTS", new_tbl_name))
   DBI::dbSendQuery(sc, query)
   dplyr::tbl(sc, new_tbl_name)
 }
