@@ -2,6 +2,8 @@ package com.synchronoss.saw.workbench.service;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,7 @@ import sncr.bda.core.file.HFileOperations;
 public class WorkbenchExecutionServiceImpl
     implements WorkbenchExecutionService {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
+    private final ObjectMapper mapper = new ObjectMapper();
   
     @Value("${workbench.project-key}")
     @NotNull
@@ -27,13 +30,14 @@ public class WorkbenchExecutionServiceImpl
     private String livyUri;
 
     @Override
-    public String execute(String name, String component, String config)
+    public ObjectNode execute(String name, String component, String config)
         throws Exception {
         log.info("Workbench is about execute job");
         WorkbenchClient client = new WorkbenchClient();
         createDatasetDirectory(name);
         client.submit(livyUri, root, project, component, config);
-        return "{}";
+        ObjectNode root = mapper.createObjectNode();
+        return root;
     }
 
     private void createDatasetDirectory(String name) throws Exception {
