@@ -43,7 +43,8 @@ public class SFTPUploader {
             sftpBuilder.setStrictHostKeyChecking(opts, "no");
             sftpBuilder.setUserDirIsRoot(opts, true);
             // ToDo: Make it configurable
-            sftpBuilder.setTimeout(opts, 10000);
+            // 10 minutes
+            sftpBuilder.setTimeout(opts, 600000);
 
             // Local and remote file location preparation
             FileObject localFile = manager.resolveFile(file.getAbsolutePath());

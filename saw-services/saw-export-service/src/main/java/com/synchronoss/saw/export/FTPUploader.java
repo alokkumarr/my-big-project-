@@ -22,7 +22,8 @@ public class FTPUploader {
     public FTPUploader(String host, int port, String user, String pwd) throws Exception {
         ftp = new FTPClient();
         int reply;
-        ftp.setControlKeepAliveTimeout(300);
+        // 10 minutes
+        ftp.setControlKeepAliveTimeout(600);
         ftp.connect(host, port);
         reply = ftp.getReplyCode();
         if (!FTPReply.isPositiveCompletion(reply)) {
