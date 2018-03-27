@@ -14,8 +14,8 @@ public class WorkbenchClient {
         "/opt/bda/saw-workbench-service/saw-workbench-spark.jar";
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    public void submit(String livyUri, String root, String project,
-                       String component, String config)
+    public void submitExecute(String livyUri, String root, String project,
+                              String component, String config)
         throws Exception {
         LivyClient client = new LivyClientBuilder().setURI(
             new URI(livyUri)).build();

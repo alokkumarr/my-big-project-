@@ -29,13 +29,18 @@ public class WorkbenchExecutionServiceImpl
     @NotNull
     private String livyUri;
 
+    /**
+     * Execute a transformation component on a dataset to create a new
+     * dataset
+     */
     @Override
-    public ObjectNode execute(String name, String component, String config)
+    public ObjectNode execute(
+        String project, String name, String component, String config)
         throws Exception {
-        log.info("Workbench is about execute job");
+        log.info("Execute dataset transformation");
         WorkbenchClient client = new WorkbenchClient();
         createDatasetDirectory(name);
-        client.submit(livyUri, root, project, component, config);
+        client.submitExecute(livyUri, root, project, component, config);
         ObjectNode root = mapper.createObjectNode();
         return root;
     }

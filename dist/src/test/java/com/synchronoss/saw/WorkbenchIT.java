@@ -16,8 +16,9 @@ import org.slf4j.LoggerFactory;
  * executing components.
  */
 public class WorkbenchIT extends BaseIT {
+    private static final String WORKBENCH_PROJECT = "workbench";
     private static final String WORKBENCH_PATH =
-        "/services/internal/workbench";
+        "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
     private static final int DATASET_WAIT_RETRIES = 10;
     private static final int DATASET_WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
@@ -75,7 +76,8 @@ public class WorkbenchIT extends BaseIT {
                 throw new RuntimeException(
                     "Timed out waiting while waiting for dataset");
             }
-            log.info("Waiting for dataset: id={}, retries={}", id, retries);
+            log.info("Waiting for dataset: id = {}, retries = {}",
+                     id, retries);
             try {
                 Thread.sleep(DATASET_WAIT_SLEEP_SECONDS * 1000);
             } catch (InterruptedException e) {
@@ -97,7 +99,7 @@ public class WorkbenchIT extends BaseIT {
         String datasetPath = "find { it._id == '" + id + "' }";
         String statusPath = datasetPath + ".asOfNow.status";
         Response response = given(authSpec)
-            .when().get(WORKBENCH_PATH + "/projects/workbench/datasets")
+            .when().get(WORKBENCH_PATH + "/datasets")
             .then().assertThat().statusCode(200)
             /* Note: Assertion below commented out until datasets are
              * preregistered */
@@ -122,8 +124,7 @@ public class WorkbenchIT extends BaseIT {
          * test.  To be done: Create a dataset and then make
          * assertions on it when listing available datasets. */
         given(authSpec)
-            .when().get(
-                "/services/internal/workbench/projects/workbench/datasets")
+            .when().get(WORKBENCH_PATH + "/datasets")
             .then().assertThat().statusCode(200)
             .body(containsString(""));
     }
