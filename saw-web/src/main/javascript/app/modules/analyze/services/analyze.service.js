@@ -254,6 +254,8 @@ export class AnalyzeService {
     delete model.isScheduled;
     if (mode === EXECUTION_MODES.PREVIEW) {
       model.executionType = EXECUTION_MODES.PREVIEW;
+    } else if (mode === EXECUTION_MODES.LIVE) {
+      model.executionType = 'regularExecution';
     } else {
       delete model.executionType;
     }
