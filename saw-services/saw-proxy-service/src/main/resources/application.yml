@@ -5,8 +5,7 @@ spring:
     name: saw-storage-proxy-service
 server:
   address: localhost
-  port: 9600
-  context-path: ''
+  port: 9800
   maxHttpHeaderSize: 65536
   compression:
     enabled: true

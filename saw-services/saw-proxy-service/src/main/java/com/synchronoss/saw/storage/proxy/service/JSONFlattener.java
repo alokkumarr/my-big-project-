@@ -11,7 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +29,7 @@ public class JSONFlattener {
     /**
      * The class Logger
      */
-    private static final Logger LOGGER = Logger.getLogger(JSONFlattener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONFlattener.class);
 
     /**
      * Parse the JSON content at the given URI using the default
