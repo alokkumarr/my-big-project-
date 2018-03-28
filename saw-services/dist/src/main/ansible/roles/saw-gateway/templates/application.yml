@@ -90,7 +90,6 @@ api:
         -   location: ${observe.service.host}
             method: DELETE
             path: '[/]observe.*'
-<<<<<<< HEAD
         -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]filters.*'
@@ -100,11 +99,8 @@ api:
         -   location: ${workbench.service.host}
             method: GET
             path: '[/]internal/workbench.*'
-=======
         -   location: ${proxy.service.host}
             method: POST
             path: '[/]proxy.*'
-
->>>>>>> SAW-2046: Integrate storage proxy service with Gateway Service to authorize
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml
