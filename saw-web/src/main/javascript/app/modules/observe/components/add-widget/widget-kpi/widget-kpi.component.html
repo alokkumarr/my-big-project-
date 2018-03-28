@@ -3,9 +3,9 @@
     <input matInput placeholder="KPI Name" formControlName="name" />
   </mat-form-field>
 
-  <mat-form-field>
+  <mat-form-field *ngIf="_metric">
     <mat-select placeholder="Select Date Field" formControlName="dateField">
-      <mat-option *ngFor="let field of metric.dateColumns" [value]="field.columnName">
+      <mat-option *ngFor="let field of _metric.dateColumns" [value]="field.columnName">
         {{ field.displayName }}
       </mat-option>
     </mat-select>

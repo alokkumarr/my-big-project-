@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { MatHorizontalStepper } from '@angular/material/stepper';
 import { MatSidenav } from '@angular/material/sidenav';
+import * as clone from 'lodash/clone';
 
 const template = require('./add-widget.component.html');
 require('./add-widget.component.scss');
@@ -57,8 +58,8 @@ export class AddWidgetComponent implements OnInit {
 
   onSelectMetric({ metric, column }) {
     delete this.model.subCategory;
-    this.model.metric = metric;
-    this.model.column = column;
+    this.model.metric = clone(metric);
+    this.model.column = clone(column);
     this.widgetStepper.next();
   }
 
@@ -71,6 +72,7 @@ export class AddWidgetComponent implements OnInit {
   }
 
   onKPIAction({ action, kpi }) {
+    this.widgetStepper.previous();
     this.onWidgetAction.emit({
       widget: 'KPI',
       action,

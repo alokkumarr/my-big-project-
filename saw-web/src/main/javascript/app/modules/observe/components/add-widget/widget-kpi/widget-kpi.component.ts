@@ -15,8 +15,9 @@ require('./widget-kpi.component.scss');
   template
 })
 export class WidgetKPIComponent implements OnInit {
-  @Input() column: any;
-  @Input() metric: any;
+  _column: any;
+  _metric: any;
+
   @Output() onKPIAction = new EventEmitter();
 
   dateFilters = [{ name: 'Month to Date', value: 'MTD' }];
@@ -26,6 +27,9 @@ export class WidgetKPIComponent implements OnInit {
 
   constructor(private fb: FormBuilder) {
     this.createForm();
+  }
+
+  ngOnInit() {
   }
 
   createForm() {
@@ -38,19 +42,25 @@ export class WidgetKPIComponent implements OnInit {
     });
   }
 
+  @Input() set column (data: any) {
+    if(!data) return;
+    this._column = data;
+    this.kpiForm.get('columnName').setValue(data.columnName);
+    this.kpiForm.get('name').setValue(data.displayName);
+  }
+
+  @Input() set metric (data: any) {
+    if(!data) return;
+    this._metric = data;
+    this.kpiForm
+      .get('dateField')
+      .setValue(data.dateColumns[0].columnName);
+  }
+
   applyKPI() {
     this.onKPIAction.emit({
       action: WIDGET_ACTIONS.ADD,
       kpi: this.kpiForm.value
     });
-  }
-
-  ngOnInit() {
-    console.log(this.metric);
-    this.kpiForm.get('columnName').setValue(this.column.columnName);
-    this.kpiForm.get('name').setValue(this.column.displayName);
-    this.kpiForm
-      .get('dateField')
-      .setValue(this.metric.dateColumns[0].columnName);
   }
 }
