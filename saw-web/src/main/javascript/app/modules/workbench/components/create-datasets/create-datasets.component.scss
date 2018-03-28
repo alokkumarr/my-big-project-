@@ -34,6 +34,8 @@ create-datasets {
 
   .mat-stepper-horizontal {
     height: 100%;
+    width: 100% !important;
+    overflow: hidden;
   }
 
   .stepperBtn {

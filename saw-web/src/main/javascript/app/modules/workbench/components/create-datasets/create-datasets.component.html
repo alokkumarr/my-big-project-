@@ -17,7 +17,6 @@
           <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
-        <div></div>
       </div>
     </mat-step>
     <mat-step [completed]="detailsFilled" i18n label="DETAILS">
@@ -37,7 +36,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step i18n label="PREVIEW">
+    <mat-step [completed]="previewDone" i18n label="PREVIEW">
       <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
       <div fxLayout="row" fxLayoutGap="20px">
         <button mat-raised-button (click)="backtoLists()" class="stepperBtn">

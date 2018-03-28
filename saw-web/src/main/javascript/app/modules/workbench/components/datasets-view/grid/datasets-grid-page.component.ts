@@ -60,7 +60,6 @@ export class DatasetsGridPageComponent implements OnInit {
     const columns = [{
       caption: 'Data Set Name',
       dataField: 'system.name',
-      allowSorting: true,
       alignment: 'left',
       width: '35%',
       cellTemplate: 'nameCellTemplate',
@@ -90,13 +89,12 @@ export class DatasetsGridPageComponent implements OnInit {
     }, {
       dataField: 'asOfNow.finished',
       caption: 'Last Updated',
-      sortOrder: 'desc',
       cellTemplate: 'timecreatedCellTemplate',
       width: '12%',
       dataType: 'date',
       alignment: 'right'
     }, {
-      dataField: 'system.type',
+      dataField: 'system.format',
       caption: 'Source',
       cellTemplate: 'dsTypeTemplate',
       width: '7%',
@@ -117,7 +115,7 @@ export class DatasetsGridPageComponent implements OnInit {
         visible: false
       },
       sorting: {
-        mode: 'none'
+        mode: 'multiple'
       },
       scrolling: {
         showScrollbar: 'always',

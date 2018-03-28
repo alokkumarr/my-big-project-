@@ -133,13 +133,16 @@ export class SelectRawdataComponent implements OnInit {
       dataField: 'name',
       dataType: 'string',
       cellTemplate: 'dobjTemplate',
-      width: '66%'
+      width: '66%',
+      allowSorting: true,
+      sortOrder: 'asc'
     }, {
       dataField: 'size',
       caption: 'Size',
       width: '15%',
       dataType: 'number',
-      cellTemplate: 'sizeTemplate'
+      cellTemplate: 'sizeTemplate',
+      allowSorting: true
     }, {
       dataField: 'name',
       caption: 'Preview',
@@ -162,6 +165,9 @@ export class SelectRawdataComponent implements OnInit {
         showScrollbar: 'always',
         mode: 'virtual',
         useNative: false
+      },
+      sorting: {
+        mode: 'multiple'
       },
       filterRow: {
         visible: false,

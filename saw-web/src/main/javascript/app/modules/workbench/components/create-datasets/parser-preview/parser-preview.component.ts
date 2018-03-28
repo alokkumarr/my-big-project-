@@ -2,7 +2,8 @@ declare function require(string): string;
 
 import * as angular from 'angular';
 import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
@@ -14,6 +15,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
 import * as has from 'lodash/has';
 import * as take from 'lodash/take';
+import * as isUndefined from 'lodash/isUndefined';
 
 import { MatDialog } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -32,7 +34,7 @@ require('./parser-preview.component.scss');
 })
 
 export class ParserPreviewComponent implements OnInit {
-  @Input() previewObj: Subject<any>;
+  @Input() previewObj: BehaviorSubject<any>;
   private gridListInstance: any;
   private previewgridConfig: Array<any>;
   private gridData: Array<any>;
@@ -64,15 +66,17 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   onUpdate(data) {
-    if (data.samplesParsed) {
-      this.parserData = cloneDeep(data);
-      const parsedData = data.samplesParsed;
-      this.fieldInfo = cloneDeep(data.fields);
+    if ( data.length === 2 && !isUndefined(data[0].samplesParsed)) {
+      this.parserData = cloneDeep(data[0]);
+      const parsedData = data[0].samplesParsed;
+      this.fieldInfo = cloneDeep(data[0].fields);
       setTimeout(() => {
         this.dataGrid.instance.beginCustomLoading('Loading...');
         this.reloadDataGrid(parsedData);
       });
-      this.rawPreview(data.info.file);
+    }
+    if (data.length === 2 && !isUndefined(data[1])) {
+      this.rawPreview(data[1]);
     }
   }
 
