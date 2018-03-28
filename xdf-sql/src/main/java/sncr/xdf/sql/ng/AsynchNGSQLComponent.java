@@ -22,6 +22,8 @@ import java.util.Map;
 /**
  * Created by asor0002 on 9/11/2017.
  */
+
+//TODO:: Refactor AsynchNGSQLComponent and NGSQLComponent: eliminate duplicate
 public class AsynchNGSQLComponent extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     private static final Logger logger = Logger.getLogger(AsynchNGSQLComponent.class);

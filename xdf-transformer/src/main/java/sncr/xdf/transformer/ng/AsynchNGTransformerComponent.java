@@ -29,6 +29,8 @@ import java.util.*;
  * The component DOES NOT PERFORM any multi-record conversion, use Spark SQL XDF Component
  * if you need to make such transformation.
  */
+
+//TODO:: Refactor AsynchNGTransformerComponent and NGTransformerComponent: eliminate duplicate
 public class AsynchNGTransformerComponent extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     public static String RECORD_COUNTER = "_record_counter";

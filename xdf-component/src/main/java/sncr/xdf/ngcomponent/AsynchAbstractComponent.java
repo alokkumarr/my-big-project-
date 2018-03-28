@@ -60,18 +60,29 @@ public abstract class AsynchAbstractComponent implements WithContext{
     protected DLBatchReader reader;
 
     /**
-     * If ngctx is null - we assume Spark context should be created internally and no dataframes should be
-     * exported/imported from/to outside
+     * The constructor is to be used when component is running with different services than NGContext has.
+     * ngctx should not be null
      * @param ngctx
      */
     public AsynchAbstractComponent(NGContext ngctx, ComponentServices[] cs){
+        if (ngctx == null)
+            throw new IllegalArgumentException("NGContext must not be null");
+
         this.ngctx = ngctx;
         for (int i = 0; i < cs.length; i++) {
             this.ngctx.serviceStatus.put(cs[i], false);
         }
     }
 
+    /**
+     * The constructor is to be used in component asynchronous execution
+     * NGContext must be initialized, output datasets must be pre-registered.
+     * @param ngctx
+     */
     public AsynchAbstractComponent(NGContext ngctx) {
+        if (ngctx == null)
+            throw new IllegalArgumentException("NGContext must not be null");
+
         this.ngctx = ngctx;
         logger.debug(this.ngctx.toString());
         if (this.ngctx.serviceStatus.isEmpty())
@@ -84,6 +95,10 @@ public abstract class AsynchAbstractComponent implements WithContext{
         return error;
     }
 
+    /**
+     * Main component function, after component initialized this method can be called.
+     * @return
+     */
     public int run() {
 
         if (!verifyComponentServices()) {
@@ -116,6 +131,11 @@ public abstract class AsynchAbstractComponent implements WithContext{
         return ret;
     }
 
+
+    /**
+     * In asynchronous execution this method updates output dataset with next status: IN-PROGRESS
+     * @return
+     */
     private int updateStatus() {
         try
         {
@@ -130,7 +150,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
                     ctx.mdOutputDSMap != null){
                     ctx.mdOutputDSMap.forEach((id, ds) -> {
                         try {
-                            services.md.getDSStore().updateStatus(id, "STARTED", ngctx.startTs, null, aleId, ngctx.batchID);
+                            services.md.getDSStore().updateStatus(id, "IN-PROGRESS", ngctx.startTs, null, aleId, ngctx.batchID);
                         } catch (Exception e) {
                             logger.error("Could not update dataset: " + ExceptionUtils.getFullStackTrace(e));
                             return;
@@ -146,6 +166,10 @@ public abstract class AsynchAbstractComponent implements WithContext{
         return 0;
     }
 
+    /**
+     * Virifies readiness of component to be executed
+     * @return
+     */
     protected boolean verifyComponentServices(){
         for (ComponentServices cs: ngctx.serviceStatus.keySet()) {
             if (!ngctx.serviceStatus.get(cs)) {
@@ -320,6 +344,18 @@ public abstract class AsynchAbstractComponent implements WithContext{
             reader = new DLBatchReader(ctx);
     }
 
+
+    /**
+     * Performs component initialization in case if component was created without NGContext (ngctx == null)
+     * creates NGContext and call subsequent function to complete initialization
+     * @param jsc     - externally initiated JavaSparkContext
+     * @param cfg     - parset and mapped component configuration
+     * @param appId   - project
+     * @param batchId - Batch ID
+     * @param xdfDataRootSys - Datalake root.
+     * @return
+     * @throws Exception
+     */
     public final boolean initComponent(JavaSparkContext jsc, ComponentConfiguration cfg, String appId, String batchId, String xdfDataRootSys) throws Exception {
         if (ngctx == null) {
             ngctx = new NGContext(xdfDataRootSys, cfg, appId, componentName, batchId);
@@ -334,6 +370,14 @@ public abstract class AsynchAbstractComponent implements WithContext{
         return initComponent(jsc);
     }
 
+
+    /**
+     * Initializes component: if jsc is null - creates SparkContext based on Project/Configuration settings
+     * If jsc is not null - uses the context.
+     * @param jsc
+     * @return
+     * @throws Exception
+     */
     public final boolean initComponent(JavaSparkContext jsc) throws Exception {
 
         if (ngctx == null){
@@ -410,6 +454,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
     //dev
     protected abstract int execute();
 
+
     protected int move(){
         int ret = 0;
         if(this instanceof WithDLBatchWriter){
@@ -426,7 +471,11 @@ public abstract class AsynchAbstractComponent implements WithContext{
         return config;
     }
 
-    ///
+    /**
+     * Final stage of processing
+     * @param ret
+     * @return
+     */
     private int Finalize(int ret)  {
         String status =
                 ( ret == 0)? "SUCCESS":
@@ -455,9 +504,13 @@ public abstract class AsynchAbstractComponent implements WithContext{
                         Map<String, Object> outDS = ngctx.outputDataSets.get(dsname);
                         JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
 
-                        logger.trace("Extracted schema: " + schema.toString());
-                        services.md.updateDS(id, ngctx, ds, schema);
-
+                        if (schema != null) {
+                            logger.trace("Extracted schema: " + schema.toString());
+                            services.md.updateDS(id, ngctx, ds, schema);
+                        }
+                        else{
+                            logger.warn("The component was not able to get schema from NG context, assume something went wrong");
+                        }
                     } catch (Exception e) {
                         error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                         logger.error(error);
