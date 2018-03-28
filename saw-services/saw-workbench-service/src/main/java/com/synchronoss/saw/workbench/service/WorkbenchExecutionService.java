@@ -1,6 +1,8 @@
 package com.synchronoss.saw.workbench.service;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public interface WorkbenchExecutionService {
-    String execute(String name, String component, String config)
+    ObjectNode execute(String name, String component, String config)
         throws Exception;
 }

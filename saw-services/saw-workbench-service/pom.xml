@@ -343,11 +343,11 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 		<repository>
 			<id>synchronoss-snapshots</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
 		</repository>
 		
 	</repositories>
