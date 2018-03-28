@@ -1,8 +1,10 @@
 
 import {
   SqlBuilder,
-  SqlBuilderPivot
+  SqlBuilderPivot,
+  Join
 } from '../../models';
+import { JsPlumbCanvasChangeEvent } from '../../../../common/components/js-plumb/types';
 import {
   DesignerMode,
   AnalysisStarter,
@@ -40,7 +42,9 @@ export {
   IToolbarActionData,
   DesignerToolbarAciton,
   IToolbarActionResult,
-  Format
+  Format,
+  Join,
+  JsPlumbCanvasChangeEvent
 };
 
 export type FieldChangeEvent = {
@@ -69,3 +73,7 @@ export interface IDEsignerSettingGroupAdapter {
   onReorder: (artifactColumns: ArtifactColumns) => void;
 }
 
+export type DesignerChangeEvent<TPayload> = {
+  reloadType: 'none' | 'frontend' | 'backend';
+  payload: TPayload;
+}

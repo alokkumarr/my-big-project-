@@ -6,7 +6,8 @@
   </designer-settings-query>
 
   <designer-settings-multi-table *ngIf="!isInQueryMode"
-                                 [artifacts]="artifacts">
+                                 [artifacts]="artifacts"
+                                 [sqlBuilder]="sqlBuilder">
   </designer-settings-multi-table>
 
   <button mat-icon-button

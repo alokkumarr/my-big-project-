@@ -23,7 +23,8 @@ import {
   MatTooltipModule,
   MatInputModule,
   MatToolbarModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatDividerModule
 } from '@angular/material';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
@@ -63,7 +64,8 @@ import '../../../../themes/_angular_next.scss';
     MatDatepickerModule,
     MatMomentDateModule,
     MatToolbarModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatDividerModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -92,7 +94,8 @@ import '../../../../themes/_angular_next.scss';
     MatDatepickerModule,
     MatMomentDateModule,
     MatToolbarModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatDividerModule
   ]
 })
 export class MaterialModule {}

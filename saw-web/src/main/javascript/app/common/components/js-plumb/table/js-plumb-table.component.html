@@ -1,8 +1,10 @@
 <mat-list role="list">
 
-  <div>
-    <span class="table-name">{{artifact.artifactName}}</span>
+  <div class="table-name">
+    <span>{{artifact.artifactName}}</span>
   </div>
+
+  <mat-divider></mat-divider>
 
   <mat-list-item *ngFor="let column of artifact.columns; trackBy: index"
                  role="listitem">
@@ -12,9 +14,13 @@
         {{getColumnLabel(column)}}
       </span>
     </mat-checkbox>
-<!--
-    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by $index"
-                       model="endpoint">
-    </js-plumb-endpoint> -->
+    <div *ngIf="column.joinEligible">
+      <js-plumb-endpoint-u *ngFor="let side of sides; trackBy: index"
+                           [column]="column"
+                           [artifactName]="artifact.artifactName"
+                           [side]="side"
+                           [plumbInstance]="plumbInstance">
+      </js-plumb-endpoint-u>
+    </div>
   </mat-list-item>
 </mat-list>

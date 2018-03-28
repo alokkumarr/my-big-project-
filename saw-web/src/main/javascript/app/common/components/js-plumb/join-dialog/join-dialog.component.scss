@@ -1,0 +1,28 @@
+@import "themes/base/colors";
+
+join-dialog {
+  display: block;
+  padding: 10px;
+
+  .dialog__header {
+    padding: 10px;
+    border-bottom: 1px solid $primary-grey-g2;
+
+    strong {
+      font-size: 20px;
+    }
+  }
+
+  .dialog__content {
+    padding: 10px 0;
+
+    mat-list-item.active {
+      background-color: $selection-highlight-col;
+    }
+  }
+
+  .dialog__actions {
+    padding-top: 10px;
+    border-top: 1px solid $primary-grey-g2;
+  }
+}

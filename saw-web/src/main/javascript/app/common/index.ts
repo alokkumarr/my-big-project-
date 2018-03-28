@@ -27,6 +27,7 @@ import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
@@ -52,8 +53,12 @@ import {ErrorDetailComponent} from './components/error-detail';
 import {DataFormatDialogComponent} from './components/data-format-dialog';
 import {ReportGridComponent} from './components/report-grid';
 import {
+  JsPlumbConnectorComponent,
   JsPlumbCanvasComponent,
-  JsPlumbTableComponent
+  JsPlumbTableComponent,
+  JsPlumbJoinLabelComponent,
+  JoinDialogComponent,
+  JsPlumbEndpointComponent
 } from './components/js-plumb';
 import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
@@ -109,6 +114,7 @@ angular
     BrowserModule,
     FormsModule,
     MaterialModule,
+    FlexLayoutModule,
     DndModule,
     DxPivotGridModule,
     DxDataGridModule
@@ -121,7 +127,11 @@ angular
     E2eDirective,
     DataFormatDialogComponent,
     JsPlumbCanvasComponent,
-    JsPlumbTableComponent
+    JsPlumbEndpointComponent,
+    JsPlumbTableComponent,
+    JsPlumbConnectorComponent,
+    JsPlumbJoinLabelComponent,
+    JoinDialogComponent
   ],
   entryComponents: [
     PivotGridComponent,
@@ -129,7 +139,9 @@ angular
     ErrorDetailComponent,
     DataFormatDialogComponent,
     JsPlumbCanvasComponent,
-    JsPlumbTableComponent
+    JsPlumbTableComponent,
+    JsPlumbJoinLabelComponent,
+    JoinDialogComponent
   ],
   exports: [
     DndModule,
@@ -141,7 +153,11 @@ angular
     ErrorDetailComponent,
     DataFormatDialogComponent,
     JsPlumbCanvasComponent,
+    JsPlumbEndpointComponent,
     JsPlumbTableComponent,
+    JsPlumbConnectorComponent,
+    JsPlumbJoinLabelComponent,
+    JoinDialogComponent,
     E2eDirective
   ],
   providers: [

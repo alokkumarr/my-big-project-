@@ -9,7 +9,7 @@ import {
 import {
   Artifact,
   FieldChangeEvent,
-  Sort
+  SqlBuilder
 } from '../../types';
 import { DesignerStates } from '../../container';
 
@@ -26,7 +26,7 @@ export class MultiTableDesignerLayout {
   @Input() isInQueryMode: boolean;
   @Input() query: boolean;
   @Input() data;
-  @Input() sorts: Sort[];
+  @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;
   public isGridPanelExpanded: boolean = false;
 

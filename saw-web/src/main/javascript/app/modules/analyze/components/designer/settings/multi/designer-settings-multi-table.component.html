@@ -1,2 +1,4 @@
-<js-plumb-canvas-u [artifacts]="artifacts">
+<js-plumb-canvas-u (change)="onChange($event)"
+                   [artifacts]="artifacts"
+                   [joins]="sqlBuilder.joins">
 </js-plumb-canvas-u>

@@ -9,9 +9,13 @@
   width: 265px;
 
   .table-name {
-    background-color: #FFF;
-    font-weight: bold;
-    color: $primary-blue-b2;
+    padding: 0 0 10px 10px;
+
+    span {
+      background-color: #FFF;
+      font-weight: bold;
+      color: $primary-blue-b2;
+    }
   }
 
   mat-checkbox {

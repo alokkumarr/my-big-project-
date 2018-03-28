@@ -111,6 +111,11 @@ export class DesignerContainerComponent {
     this._designerService.createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis) => {
         this.analysis = {...this.analysisStarter, ...newAnalysis};
+        if (!this.analysis.sqlBuilder) {
+          this.analysis.sqlBuilder = {
+            joins: []
+          };
+        }
         unset(this.analysis, 'supports');
         unset(this.analysis, 'categoryId');
       });

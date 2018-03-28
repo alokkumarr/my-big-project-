@@ -4,3 +4,11 @@
                   [artifact]="artifact"
                   [plumbInstance]="_jsPlumbInst">
 </js-plumb-table-u>
+
+<js-plumb-connector-u *ngFor="let join of joins; trackBy: index; let i = index"
+             (change)="onJoinChange($event)"
+             [join]="join"
+             [index]="i"
+             [plumbInstance]="_jsPlumbInst">
+</js-plumb-connector-u>
+

@@ -1,0 +1,72 @@
+<header class="dialog__header">
+  <strong i18n>Join</strong>
+</header>
+<div class="dialog__content">
+  <mat-list fxLayout="column">
+    <mat-list-item fxLayout="row"
+                   (click)="onSelect('inner')"
+                   [ngClass]="isActive('inner')">
+      <span class="jsp-join-dialog_icon icon-inner-join" fxFlex="50px" fxLayout="row" fxLayoutAlign="start top">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </span>
+
+        <div fxLayout="column">
+          <strong i18n>Inner Join</strong>
+          <span class="jsp-join-dialog_desc">
+            Include <strong>only</strong> rows where {{left.columnName}} in the {{left.tableName}} table equals {{right.columnName}} in the {{right.tableName}} table.
+          </span>
+        </div>
+    </mat-list-item>
+    <mat-list-item fxLayout="row"
+                   (click)="onSelect('left')"
+                   [ngClass]="isActive('left')">
+      <span class="jsp-join-dialog_icon icon-left-join" fxFlex="50px" fxLayout="row" fxLayoutAlign="start top">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </span>
+
+        <div fxLayout="column">
+          <strong i18n>Left Join</strong>
+          <span class="jsp-join-dialog_desc">
+            Include <strong>all</strong> rows from {{left.tableName}} and <strong>only</strong> those records from {{right.tableName}} where the joined fields are equal.
+          </span>
+        </div>
+    </mat-list-item>
+    <mat-list-item fxLayout="row"
+                   (click)="onSelect('right')"
+                   [ngClass]="isActive('right')">
+      <span class="jsp-join-dialog_icon icon-right-join" fxFlex="50px" fxLayout="row" fxLayoutAlign="start top">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </span>
+
+        <div fxLayout="column">
+          <strong i18n>Right Join</strong>
+          <span class="jsp-join-dialog_desc">
+            Include <strong>all</strong> rows from {{right.tableName}} and <strong>only</strong> those records from {{left.tableName}} where the joined fields are equal.
+          </span>
+        </div>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div class="dialog__actions"
+     fxLayout="column"
+     fxLayoutAlign="start start">
+
+  <div fxLayout="row"
+       fxLayoutAlign="start center">
+    <button (click)="save()"
+            mat-raised-button color="primary" i18n>
+      Save
+    </button>
+    <button mat-button i18n (click)="cancel()">Cancel</button>
+    <button mat-button i18n (click)="deleteJoin()">
+      <mat-icon fontIcon="icon-trash"></mat-icon>
+      Delete Link
+    </button>
+  </div>
+</div>

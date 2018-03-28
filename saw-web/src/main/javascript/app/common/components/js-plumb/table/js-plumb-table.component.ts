@@ -12,8 +12,10 @@ import {
   Artifact,
   Join,
   JoinCriterion,
-  ArtifactColumnReport
-} from '../../../../models';
+  ArtifactColumnReport,
+  JsPlumbCanvasChangeEvent
+} from '../types';
+import { ArtifactColumn } from '../../../../modules/analyze/types';
 
 const template = require('./js-plumb-table.component.html');
 require('./js-plumb-table.component.scss');
@@ -23,8 +25,11 @@ require('./js-plumb-table.component.scss');
   template
 })
 export class JsPlumbTableComponent {
+  @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
   @Input() artifact: Artifact;
   @Input() plumbInstance: any;
+
+  public sides = ['left', 'right'];
 
   constructor (
     private _elementRef: ElementRef
@@ -35,7 +40,6 @@ export class JsPlumbTableComponent {
   }
 
   ngAfterViewInit() {
-    console.log('viewInit');
     const elem = this._elementRef.nativeElement;
     const artifactPosition = this.artifact.artifactPosition;
     this.plumbInstance.draggable(elem, {
@@ -43,27 +47,24 @@ export class JsPlumbTableComponent {
       drag: event => {
         artifactPosition[0] = event.pos[0];
         artifactPosition[1] = event.pos[1];
+        this.change.emit({subject: 'artifactPosition'});
       }
     });
   }
 
-  ngOnDestroy() {
-  }
-
   updatePosition() {
     const elemStyle = this._elementRef.nativeElement.style;
-    console.log('artifact', this.artifact);
     const [x, y] = this.artifact.artifactPosition;
     elemStyle.left = x !== 0 ? `${x}px` : 0;
     elemStyle.top = y !== 0 ? `${y}px` : 0;
-    console.log(`pos: ${x}, ${y}`);
   }
 
   getColumnLabel(column: ArtifactColumnReport) {
     return column.aliasName || column.displayName;
   }
 
-  onCheckBoxToggle(column, checked) {
+  onCheckBoxToggle(column: ArtifactColumnReport, checked) {
     column.checked = checked;
+    this.change.emit({subject: 'column'});
   }
 }

@@ -1,0 +1,15 @@
+<div class="jsp-join-label" fxLayout="column"
+     (click)="openJoinModal()">
+  <span class="jsp-join-label_icon"
+        [ngClass]="getIcon()"
+        fxLayout="row" fxLayoutAlign="center center">
+    <span class="path1"></span>
+    <span class="path2"></span>
+    <span class="path3"></span>
+  </span>
+
+  <span class="jsp-join-label_text">
+    <span>{{join.type}}</span>
+    <mat-icon fontIcon="icon-expand"></mat-icon>
+  </span>
+</div>
