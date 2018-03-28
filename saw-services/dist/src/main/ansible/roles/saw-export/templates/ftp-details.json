@@ -1,4 +1,1 @@
-{
-  "ftpList": [
-  ]
-}
+{{ftp_json_config|default('{"ftpList": []}')}}

@@ -125,7 +125,7 @@ config file to support, HTTP requests with large headers (more than
        large_client_header_buffers 8 64k;
 
 File upload limit settings: Include the below properties in NGINX server
-config file to support larger files upload (more than 1MB) 
+config file to support larger files upload (more than 1MB)
 
        client_max_body_size 25m;
 
@@ -376,9 +376,27 @@ After generating the key, add it to the SAW environment configuration ({{saw-con
 
 == FTP server configuration
 
-SAW supports exporting of pivots and reports to ftp/sftp servers. By default an empty configuration is installed at default location i.e. `/opt/bda/saw-export-service/conf/ftp-details.json` file.
+SAW supports exporting of pivots and reports to ftp/sftp servers.
+By default an empty configuration is installed in
+`/opt/bda/saw-export-service/conf/ftp-details.json` file on saw nodes.
 
-Example File:
+The contents of this configuration can be changed using `saw-config`.
+An example configuration has been included in config file.
+
+.saw-config
+----
+# FTP JSON config
+# ##########################################
+#
+#
+# DO NOT SPLIT THIS INTO MULTIPLE LINES
+#
+#
+# ##########################################
+# ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
+----
+
+Example contents (in pretty format):
 
 .ftp-details.json
 [source, json]
@@ -419,17 +437,15 @@ Example File:
 }
 ----
 
-In above source, `customerName` is the unique identifier given at the time of onboarding customer. Note that based on this unique identifier, different customers are differentiated. Each FTP/SFTP server is required to have unique entry which gets presented to front end, this is maintained by means of `alias` entry. *Note* that each server entry per customer is required to have a unique alias entry which gets presented in front end.
+In above example, `customerName` is the unique identifier given at
+the time of onboarding customer. Note that based on this unique
+identifier, customers are differentiated. Each FTP/SFTP
+server is required to have unique entry which gets presented to front
+end, this is maintained by means of `alias` entry. *Note* that each
+server entry per customer is required to have a unique alias entry
+which gets presented in front end.
 
 [Note]
 ====
-The default location of ftp-details.json file can be changed from application.yml file for export service.
-
-Keys to be modified for ftp config location:
-[source, yaml]
-----
-ftp:
-  details:
-    file: /opt/bda/saw-export-service/conf/ftp-details.json
-----
+Please make sure to put minified JSON in configuration file.
 ====
