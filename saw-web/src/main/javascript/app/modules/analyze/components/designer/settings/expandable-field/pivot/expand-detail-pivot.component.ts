@@ -8,7 +8,7 @@ import {
 import {
   ArtifactColumnPivot,
   Format,
-  FieldChangeEvent
+  DesignerChangeEvent
 }  from '../../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -32,7 +32,7 @@ const INT_SAMPLE = 1000;
   template
 })
 export class ExpandDetailPivotComponent {
-  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnPivot;
 
@@ -57,19 +57,19 @@ export class ExpandDetailPivotComponent {
 
   onAliasChange(value) {
     this.artifactColumn.aliasName = value;
-    this.change.emit({requiresDataChange: false});
+    this.change.emit({subject: 'aliasName'});
   }
 
   onDateIntervalChange(value) {
     this.artifactColumn.dateInterval = value;
-    this.change.emit({requiresDataChange: true});
+    this.change.emit({subject: 'dateInterval'});
   }
 
   onFormatChange(format: Format) {
     if (format) {
       this.artifactColumn.format = format;
       this.changeSample();
-      this.change.emit({requiresDataChange: false});
+      this.change.emit({subject: 'format'});
     }
   }
 

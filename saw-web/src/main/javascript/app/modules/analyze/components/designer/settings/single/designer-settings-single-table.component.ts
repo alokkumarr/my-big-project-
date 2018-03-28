@@ -18,7 +18,7 @@ import {
   ArtifactColumns,
   ArtifactColumnFilter,
   ArtifactColumnPivot,
-  FieldChangeEvent
+  DesignerChangeEvent
 } from '../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -41,7 +41,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   template
 })
 export class DesignerSettingsSingleTableComponent {
-  @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts') public set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
@@ -80,14 +80,14 @@ export class DesignerSettingsSingleTableComponent {
 
   onFieldsChange() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    this._changeSettingsDebounced({requiresDataChange: true});
+    this._changeSettingsDebounced({subject: 'selectedFields'});
   }
 
-  onFieldPropChange(event: FieldChangeEvent) {
+  onFieldPropChange(event: DesignerChangeEvent) {
     this._changeSettingsDebounced(event);
   }
 
-  _changeSettingsDebounced(event: FieldChangeEvent) {
+  _changeSettingsDebounced(event: DesignerChangeEvent) {
     this.settingsChange.emit(event);
   }
 

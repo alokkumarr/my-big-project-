@@ -8,7 +8,7 @@ import {
 
 import {
   Artifact,
-  FieldChangeEvent,
+  DesignerChangeEvent,
   Sort
 } from '../../types';
 import { DesignerStates } from '../../container';
@@ -21,7 +21,7 @@ require('./single-table-designer-layout.component.scss');
   template
 })
 export class SingleTableDesignerLayout {
-  @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() data;
   @Input() sorts: Sort[];

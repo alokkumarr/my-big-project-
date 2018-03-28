@@ -8,7 +8,7 @@ import {
 
 import {
   Artifact,
-  FieldChangeEvent,
+  DesignerChangeEvent,
   SqlBuilder
 } from '../../types';
 import { DesignerStates } from '../../container';
@@ -21,7 +21,7 @@ require('./multi-table-designer-layout.component.scss');
   template
 })
 export class MultiTableDesignerLayout {
-  @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() isInQueryMode: boolean;
   @Input() query: boolean;

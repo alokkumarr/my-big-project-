@@ -47,10 +47,6 @@ export {
   JsPlumbCanvasChangeEvent
 };
 
-export type FieldChangeEvent = {
-  requiresDataChange: boolean
-}
-
 export type ArtifactColumnFilter = {
   keyword: string,
   types: ('number' | 'date' | 'string')[];
@@ -73,7 +69,13 @@ export interface IDEsignerSettingGroupAdapter {
   onReorder: (artifactColumns: ArtifactColumns) => void;
 }
 
-export type DesignerChangeEvent<TPayload> = {
-  reloadType: 'none' | 'frontend' | 'backend';
-  payload: TPayload;
+export type DesignerChangeEvent = {
+  subject: 'format' |
+    'aggregate'     |
+    'dateInterval'  |
+    'aliasName'     |
+    'sort'          |
+    'filter'        |
+    // adding | removing | changing fields in the field chooser for pivot grid and chart designer
+    'selectedFields';
 }

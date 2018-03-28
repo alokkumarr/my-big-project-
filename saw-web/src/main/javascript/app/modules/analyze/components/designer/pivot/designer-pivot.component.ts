@@ -29,7 +29,7 @@ require('./designer-pivot.component.scss');
 export class DesignerPivotComponent {
   @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
-      this.artifactColumns = artifacts[0].columns;
+      this.artifactColumns = [...artifacts[0].columns];
     }
   };
   @Input() data;

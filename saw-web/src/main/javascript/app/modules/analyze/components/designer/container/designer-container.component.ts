@@ -31,7 +31,7 @@ import {
   Sort,
   Filter,
   IToolbarActionResult,
-  FieldChangeEvent
+  DesignerChangeEvent
 } from '../types'
 import { NUMBER_TYPES } from '../../../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
@@ -116,6 +116,7 @@ export class DesignerContainerComponent {
             joins: []
           };
         }
+        this.artifacts = this.analysis.artifacts;
         unset(this.analysis, 'supports');
         unset(this.analysis, 'categoryId');
       });
@@ -176,17 +177,17 @@ export class DesignerContainerComponent {
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
-            this.onSettingsChange({requiresDataChange: true});
+            this.onSettingsChange({subject: 'sort'});
           }
         });
       break;
     case 'filter':
-      this._analyzeDialogService.openFilterDialog(this.filters, this.analysis.artifacts, this.booleanCriteria)
+      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.filters = result.filters;
             this.booleanCriteria = result.booleanCriteria;
-            this.onSettingsChange({requiresDataChange: true});
+            this.onSettingsChange({subject: 'filter'});
           }
         });
       break;
@@ -214,7 +215,7 @@ export class DesignerContainerComponent {
 
   getSqlBuilder(): SqlBuilder {
     const partialSqlBuilder = this._designerService.getPartialSqlBuilder(
-      this.analysis.artifacts[0].columns,
+      this.artifacts[0].columns,
       this.analysis.type
     )
 
@@ -251,11 +252,22 @@ export class DesignerContainerComponent {
     }
   }
 
-  onSettingsChange(event: FieldChangeEvent) {
-    this.artifacts = [...this.artifacts];
-    this.cleanSorts();
-    if (event.requiresDataChange) {
-      this.requestDataIfPossible()
+  onSettingsChange(event: DesignerChangeEvent) {
+    switch (event.subject) {
+    case 'selectedFields':
+      this.cleanSorts();
+    case 'dateInterval':
+    case 'aggregate':
+    case 'filter':
+    case 'sort':
+      // reload backend data
+      this.requestDataIfPossible();
+      break;
+    case 'format':
+    case 'aliasName':
+      // reload frontEnd
+      this.artifacts = [...this.artifacts];
+      break;
     }
   }
 

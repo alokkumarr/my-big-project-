@@ -8,7 +8,7 @@ import {
 import {
   ArtifactColumn,
   AnalysisType,
-  FieldChangeEvent
+  DesignerChangeEvent
 }  from '../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -23,7 +23,7 @@ require('./expandable-field.component.scss');
   template
 })
 export class ExpandableFieldComponent {
-  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
@@ -39,6 +39,6 @@ export class ExpandableFieldComponent {
 
   onAggregateChange(value) {
     this.artifactColumn.aggregate = value;
-    this.change.emit({requiresDataChange: true});
+    this.change.emit({subject: 'aggregate'});
   }
 }

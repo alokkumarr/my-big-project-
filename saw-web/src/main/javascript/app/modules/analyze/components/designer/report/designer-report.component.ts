@@ -8,7 +8,7 @@ import {
 
 import {
   Artifact,
-  FieldChangeEvent
+  DesignerChangeEvent
 } from '../types';
 import { DesignerStates } from '../container';
 
@@ -20,7 +20,7 @@ require('./designer-report.component.scss');
   template
 })
 export class DesignerReportComponent {
-  @Output() public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() data;
   @Input() designerState: DesignerStates;
