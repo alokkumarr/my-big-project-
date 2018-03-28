@@ -1,7 +1,6 @@
 package sncr.bda.context;
 
 import org.apache.log4j.Logger;
-import sncr.bda.conf.ComponentConfiguration;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -20,18 +19,12 @@ import java.text.SimpleDateFormat;
  */
 public class ContextMetadata {
 
-    private static final Logger logger = Logger.getLogger(ContextMetadata.class);
-
     static final String DATE_FMT = "yyyyMMdd-HHmmss";
     static final SimpleDateFormat format = new SimpleDateFormat(DATE_FMT);
     public String finishedTs;
-    static final String defaultFsScheme = "hdfs";
     public final String applicationID;
     public final String user = "A_user";
     public final String transformationName = "A_transformation";
-
-
-    public ComponentConfiguration componentConfiguration;
     public String batchID;
     public String startTs;
     public String componentName;
@@ -39,6 +32,7 @@ public class ContextMetadata {
     public String status;
     public String ale_id;
 
+    public void setStartTs()
     {
         this.startTs = new SimpleDateFormat("yyyyMMdd-HHmmss")
                 .format(new Timestamp(new java.util.Date().getTime()));
@@ -46,15 +40,11 @@ public class ContextMetadata {
 
     public ContextMetadata(String componentName,
                             String batchId,
-                            String appId,
-                            ComponentConfiguration compConf) throws Exception {
+                            String appId){
 
         this.componentName = componentName;
         this.batchID = batchId;
         this.applicationID = appId;
-        this.componentConfiguration = compConf;
-//TODO:: Add project
-//        this.componentConfiguration.set
     }
     public void setFinishTS() {
         finishedTs = format.format(new Timestamp(new java.util.Date().getTime()));

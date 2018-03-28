@@ -50,13 +50,19 @@ public class AuditLogService {
         ale.add(DataSetProperties.Status.toString(), new JsonPrimitive(status));
         ale.add(DataSetProperties.BatchID.toString(), new JsonPrimitive(ctx.batchID));
 
-        ale.add(DataSetProperties.StartTS.toString(), new JsonPrimitive(ctx.startTs));
 
-        ale.add(DataSetProperties.FinishTS.toString(), new JsonPrimitive((ctx.finishedTs == null)?"":ctx.finishedTs));
+        ale.add(DataSetProperties.StartTS.toString(),
+            new JsonPrimitive((ctx.startTs == null)?"":ctx.startTs));
 
-        ale.add(DataSetProperties.ComponentProducer.toString(), new JsonPrimitive(ctx.componentName));
-        ale.add(DataSetProperties.Transformations.toString(), new JsonPrimitive(ctx.transformationName));
-        ale.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
+        ale.add(DataSetProperties.FinishTS.toString(),
+            new JsonPrimitive((ctx.finishedTs == null)?"":ctx.finishedTs));
+
+        ale.add(DataSetProperties.ComponentProducer.toString(),
+            new JsonPrimitive(ctx.componentName));
+        ale.add(DataSetProperties.Transformations.toString(),
+            new JsonPrimitive(ctx.transformationName));
+        ale.add(DataSetProperties.Project.toString(),
+            new JsonPrimitive(ctx.applicationID));
 
         if (input != null) {
             JsonArray ale_ids_ja = new JsonArray();
