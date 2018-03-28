@@ -6,6 +6,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.JaninoTransform;
 
 import java.util.Map;
@@ -23,7 +24,7 @@ public class NGJaninoExecutor extends NGExecutor{
     private final String[] odi;
 
 
-    public NGJaninoExecutor(AbstractComponent parent, String script, int threshold, String tLoc, StructType st, String[]  odi)  {
+    public NGJaninoExecutor(WithContext parent, String script, int threshold, String tLoc, StructType st, String[]  odi)  {
         super(parent, script, threshold, tLoc, st);
         this.odi = odi;
     }

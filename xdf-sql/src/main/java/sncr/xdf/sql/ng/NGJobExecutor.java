@@ -1,14 +1,17 @@
 package sncr.xdf.sql.ng;
 
 import net.sf.jsqlparser.statement.Statement;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.sql.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -23,7 +26,7 @@ public class NGJobExecutor {
 
     private static final Logger logger = Logger.getLogger(NGJobExecutor.class);
 
-    private AbstractComponent parent;
+    private WithContext parent;
     private String script;
 
     private Map<String, Dataset<Row>> availableDataframes;
@@ -36,11 +39,30 @@ public class NGJobExecutor {
         result = new HashMap();
     }
 
+    private String getScriptFullPath() {
+        String sqlScript = this.parent.getNgctx().componentConfiguration.getSql().getScriptLocation() + Path.SEPARATOR + this.parent.getNgctx().componentConfiguration.getSql().getScript();
+        logger.debug(String.format("Get script %s in location: ", sqlScript));
+        return sqlScript;
+    }
 
-    public NGJobExecutor(AbstractComponent parent, String script) throws XDFException
+    public NGJobExecutor(WithContext parent) throws XDFException
     {
         this.parent = parent;
-        this.script = script;
+        if (this.parent.getNgctx().componentConfiguration.getSql().getScriptLocation().equalsIgnoreCase("inline")) {
+            logger.debug("Script is inline encoded");
+            script = new String (Base64.getDecoder().decode(this.parent.getNgctx().componentConfiguration.getSql().getScript()));
+        }
+        else {
+            String pathToSQLScript = getScriptFullPath();
+            logger.debug("Path to script: " + pathToSQLScript);
+            try {
+                script = HFileOperations.readFile(pathToSQLScript);
+            } catch (FileNotFoundException e) {
+                throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Part to SQL script is not correct: " + pathToSQLScript);
+            }
+        }
+        logger.trace("Script to execute:\n" +  script);
+
     }
 
 
@@ -50,7 +72,7 @@ public class NGJobExecutor {
         try {
 
             logger.debug(String.format("Temp dir: %s %n", tempDir ));
-            NGSQLScriptDescriptor scriptDescriptor = new NGSQLScriptDescriptor(parent.getICtx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
+            NGSQLScriptDescriptor scriptDescriptor = new NGSQLScriptDescriptor(parent.getNgctx(), tempDir, parent.getNgctx().inputDataSets, parent.getNgctx().outputDataSets);
             logger.debug("Step 0: Remove comments: " + script);
             script = NGSQLScriptDescriptor.removeComments(script);
             scriptDescriptor.preProcessSQLScript(script);

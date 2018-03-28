@@ -92,7 +92,7 @@ public abstract class Component {
 
     protected int initializeDataSets() {
         try {
-            transformationID = transformationMD.readOrCreateTransformation(ctx);
+            transformationID = transformationMD.readOrCreateTransformation(ctx, ctx.componentConfiguration);
             if (this instanceof WithDataSetService) {
                 final boolean[] failed = {false};
                 WithDataSetService mddl = (WithDataSetService) this;

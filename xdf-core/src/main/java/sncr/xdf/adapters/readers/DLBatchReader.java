@@ -3,17 +3,15 @@ package sncr.xdf.adapters.readers;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Dataset;
-import scala.Tuple2;
-import sncr.xdf.context.NGContext;
+import sncr.xdf.context.InternalContext;
 import sncr.xdf.exceptions.XDFException;
 
 public class DLBatchReader {
     private static final Logger logger = Logger.getLogger(DLBatchReader.class);
-    private final NGContext ngctx;
+    private final InternalContext inctx;
 
-    public DLBatchReader(NGContext ngctx){ this.ngctx = ngctx;}
+    public DLBatchReader(InternalContext inctx){ this.inctx = inctx;}
 
 
     public Dataset readDataset(String name, String format, String loc_desc) throws Exception {
@@ -22,7 +20,7 @@ public class DLBatchReader {
         {
             case "parquet" :
                 try{
-                    ds = ngctx.sparkSession.read().load(loc_desc);
+                    ds = inctx.sparkSession.read().load(loc_desc);
                 }
                 catch(Throwable t){
                     throw new Exception( "Could not load data from location as parquet: " + loc_desc + ", cancel processing.");
@@ -30,7 +28,7 @@ public class DLBatchReader {
                 break;
             case "json" :
                 try{
-                    ds = ngctx.sparkSession.read().json(loc_desc);
+                    ds = inctx.sparkSession.read().json(loc_desc);
                 }
                 catch(Throwable t){
                     throw new Exception( "Could not load data from location as JSON: " + loc_desc + ", cancel processing.");
@@ -39,7 +37,7 @@ public class DLBatchReader {
             default:
                 throw new XDFException( XDFException.ErrorCodes.UnsupportedDataFormat);
         }
-        ngctx.registerDataset(name, ds);
+        inctx.registerDataset(name, ds);
         return ds;
     }
 
@@ -50,8 +48,8 @@ public class DLBatchReader {
         JavaRDD<String> rdd = null;
 
         if (headerSize > 0)
-            rdd = new JavaSparkContext(ngctx.sparkSession.sparkContext())
-                    .textFile(location, ngctx.defaultPartNumber)
+            rdd = new JavaSparkContext(inctx.sparkSession.sparkContext())
+                    .textFile(location, inctx.defaultPartNumber)
                     // Add line numbers
                     .zipWithIndex()
                     // Filter out header based on line number
@@ -59,8 +57,8 @@ public class DLBatchReader {
                     // Get rid of file numbers
                     .keys();
         else
-            rdd = new JavaSparkContext(ngctx.sparkSession.sparkContext())
-                    .textFile(location, ngctx.defaultPartNumber);
+            rdd = new JavaSparkContext(inctx.sparkSession.sparkContext())
+                    .textFile(location, inctx.defaultPartNumber);
 
         return rdd;
     }

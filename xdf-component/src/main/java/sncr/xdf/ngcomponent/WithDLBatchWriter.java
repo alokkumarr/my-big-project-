@@ -2,9 +2,7 @@ package sncr.xdf.ngcomponent;
 
 import com.google.gson.JsonElement;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.Options;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import scala.Tuple3;
@@ -25,10 +23,6 @@ import java.util.*;
  * Created by srya0001 on 9/11/2017.
  */
 public interface WithDLBatchWriter {
-
-    default void registerDataset(NGContext ngctx, Dataset dataset, String dataSetName){
-        ngctx.registerDataset(dataSetName, dataset);
-    }
 
 
     default int commitDataSetFromOutputMap(NGContext ngctx, Dataset dataset, String dataSetName, String location, String mode){
@@ -150,6 +144,9 @@ public interface WithDLBatchWriter {
 
     class WithDLBatchWriterHelper extends DLBatchWriter {
         private static final Logger logger = Logger.getLogger(WithDLBatchWriter.class);
+        private FileSystem fs = HFileOperations.getFileSystem();
+        private FileContext fc = HFileOperations.getFileContext();
+
 
         public WithDLBatchWriterHelper(NGContext ngctx) {
             super(ngctx);
@@ -198,7 +195,7 @@ public interface WithDLBatchWriter {
                     // Try to copy file by file to get better control on potential copy issues
                     // If file already exists in destination it will not be replaced with new one
                     // Appropriate exception will be generated listing all already existent files
-                    String loc = dest + Path.SEPARATOR + moveDataDesc.objectName + "." + ctx.batchID + "." + ctx.startTs + "." + String.format("%05d", ctx.globalFileCount++) + ext;
+                    String loc = dest + Path.SEPARATOR + moveDataDesc.objectName + "." + ngctx.batchID + "." + ngctx.startTs + "." + String.format("%05d", ctx.globalFileCount++) + ext;
                     Path newName = new Path(loc);
                     HFileOperations.fc.rename(s.getPath(), newName);
                     numberOfFilesSuccessfullyCopied++;
@@ -254,7 +251,7 @@ public interface WithDLBatchWriter {
 
             //TODO:: By default - create sample for each produced dataset and mark a dataset as sampled with a sampling model
             //TODO:: Fix DataSetProperties (BDA Meta), add sampling model: sample
-            String sampling = (String) outputDS.get("sample");
+            String sampling = (String) outputDS.get(DataSetProperties.Sample.name());
             boolean doSampling = (sampling != null && !sampling.equalsIgnoreCase("none"));
 
 
@@ -300,7 +297,7 @@ public interface WithDLBatchWriter {
 
 
             //get list of files to be processed
-            FileStatus[] files = ngctx.fs.listStatus(new Path(source));
+            FileStatus[] files = fs.listStatus(new Path(source));
 
             WithDLBatchWriterHelper.logger.debug("Prepare the list of the files, number of files: " + files.length);
             for (int i = 0; i < files.length; i++) {
@@ -310,7 +307,7 @@ public interface WithDLBatchWriter {
 
                     String destFileName =   dest + Path.SEPARATOR +
                                             objectName + "." +
-                                            ctx.batchID + "." + ctx.startTs + "." +
+                                            ngctx.batchID + "." + ngctx.startTs + "." +
                                             String.format("%05d", ctx.globalFileCount ) +
                                             "." + format;
 
@@ -319,14 +316,14 @@ public interface WithDLBatchWriter {
                     Options.Rename opt = (mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
-                    ngctx.fc.rename(src, dst, opt);
+                    fc.rename(src, dst, opt);
                 }
                 ctx.globalFileCount++;
             }
             logger.debug("Remove TMP directory if it Exists: " + source);
             Path tmpDIR = new Path(source);
-            if (ngctx.fs.exists(tmpDIR))
-                ngctx.fs.delete(tmpDIR, true);
+            if (fs.exists(tmpDIR))
+                fs.delete(tmpDIR, true);
             logger.debug("Data Objects were successfully moved from " + source + " into " + dest);
 
         }
@@ -334,16 +331,16 @@ public interface WithDLBatchWriter {
         public int createOrCleanUpDestDir(String dest, String objectName) {
             Path objOutputPath = new Path(dest);
             try {
-                if (ngctx.fs.exists(objOutputPath)) {
+                if (fs.exists(objOutputPath)) {
 
-                    FileStatus[] list = ngctx.fs.listStatus(objOutputPath);
+                    FileStatus[] list = fs.listStatus(objOutputPath);
                     for (int i = 0; i < list.length; i++) {
-                        ngctx.fs.delete(list[i].getPath(), true);
+                        fs.delete(list[i].getPath(), true);
                     }
 
                 } else {
                     logger.warn("Output directory: " + objOutputPath + " for data object/data sample: " + objectName + " does not Exists -- create it");
-                    ngctx.fs.mkdirs(objOutputPath);
+                    fs.mkdirs(objOutputPath);
                 }
             } catch (IOException e) {
                 logger.warn("IO exception in attempt to create/clean up: destination directory", e);

@@ -8,6 +8,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.TransformWithSchema;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class NGJexlExecutorWithSchema extends NGExecutor{
 
     private static final Logger logger = Logger.getLogger(NGJexlExecutorWithSchema.class);
 
-    public NGJexlExecutorWithSchema(AbstractComponent parent, String script, int threshold, String tLoc, StructType st)  {
+    public NGJexlExecutorWithSchema(WithContext parent, String script, int threshold, String tLoc, StructType st)  {
         super(parent, script, threshold, tLoc, st);
     }
 

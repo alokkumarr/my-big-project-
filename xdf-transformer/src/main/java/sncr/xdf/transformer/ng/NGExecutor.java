@@ -11,6 +11,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
+import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.transformer.RequiredNamedParameters;
@@ -37,14 +38,14 @@ public abstract class NGExecutor {
     protected Dataset<Row> outputResult;
     protected Dataset<Row> rejectedRecords;
 
-    protected AbstractComponent parent;
+    protected WithContext parent;
 
     private static final Logger logger = Logger.getLogger(NGExecutor.class);
 
 
-    public NGExecutor(AbstractComponent parent, String script, int threshold, String tLoc, StructType st){
+    public NGExecutor(WithContext parent, String script, int threshold, String tLoc, StructType st){
         this.script = script;
-        session_ctx = parent.getNgctx().sparkSession;
+        session_ctx = parent.getICtx().sparkSession;
         this.threshold = threshold;
         refDataSets = new HashSet<>();
         for( String inpK: parent.getNgctx().inputs.keySet()){

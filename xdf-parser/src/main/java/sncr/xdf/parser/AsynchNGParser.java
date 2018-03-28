@@ -11,11 +11,15 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.*;
 import org.apache.spark.util.LongAccumulator;
+import sncr.bda.CliHandler;
+import sncr.bda.ConfigLoader;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.component.*;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.component.Component;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.core.file.DLDataSetOperations;
@@ -23,16 +27,17 @@ import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
-import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NGParser extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
-    private static final Logger logger = Logger.getLogger(NGParser.class);
+//TODO:: Refactor AsynchNGParser and NGParser: eliminate duplicate
+public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
+
+    private static final Logger logger = Logger.getLogger(AsynchNGParser.class);
 
     private String lineSeparator;
     private char delimiter;
@@ -55,30 +60,15 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
     private List<String> pkeys;
 
-    public NGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
-
-    public NGParser() {
-        super();
-        serviceStatus.remove(ComponentServices.InputDSMetadata);
-    }
+    public AsynchNGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
     {
         componentName = "parser";
     }
 
-    public static void main(String[] args){
-        NGParser component = new NGParser();
-        try {
-            // Spark based component
-            if (component.initWithCMDParameters(args) == 0) {
-                int r = component.run();
-                System.exit(r);
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
+    public AsynchNGParser(NGContext ngctx) {  super(ngctx); }
+
+    public AsynchNGParser() {  super(); }
 
 
     protected int execute(){
@@ -153,12 +143,12 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return NGParser.analyzeAndValidate(config);
+        return AsynchNGParser.analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 
-        ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(config);
+        ComponentConfiguration compConf = AsynchAbstractComponent.analyzeAndValidate(config);
         sncr.bda.conf.Parser parserProps = compConf.getParser();
         if (parserProps == null) {
             throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
@@ -290,4 +280,61 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
 
         }
     }
+
+
+    public static void main(String[] args) {
+
+      NGContextServices ngCtxSvc;
+      CliHandler cli = new CliHandler();
+      try {
+        HFileOperations.init();
+
+        Map<String, Object> parameters = cli.parse(args);
+        String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+        String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
+        if (configAsStr == null || configAsStr.isEmpty()) {
+          throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+        }
+
+        String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+        if (appId == null || appId.isEmpty()) {
+          throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+        }
+
+        String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+        if (batchId == null || batchId.isEmpty()) {
+          throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+        }
+
+        String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+        if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+          throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+        }
+
+        ComponentServices pcs[] = {
+            ComponentServices.OutputDSMetadata,
+            ComponentServices.Project,
+            ComponentServices.TransformationMetadata,
+            ComponentServices.Spark,
+        };
+        ComponentConfiguration cfg = AsynchNGParser.analyzeAndValidate(configAsStr);
+        ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
+        ngCtxSvc.initContext();
+        ngCtxSvc.registerOutputDataSet();
+        logger.debug("Output datasets:");
+        ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+            logger.debug(id)
+        );
+        logger.debug(ngCtxSvc.getNgctx().toString());
+        AsynchNGParser component = new AsynchNGParser(ngCtxSvc.getNgctx());
+        if (!component.initComponent(null))
+            System.exit(-1);
+        int rc = component.run();
+        System.exit(rc);
+      } catch (Exception e) {
+        e.printStackTrace();
+        System.exit(-1);
+      }
+    }
+
 }

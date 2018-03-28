@@ -10,6 +10,7 @@ import sncr.bda.conf.Parameter;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.context.Context;
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.sql.*;
 
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 public class NGSQLScriptDescriptor {
 
     private final String transactionalLocation;
-    private final InternalContext ctx;
+    private final NGContext ctx;
     private String script;
 
     public String getScript() { return script; }
@@ -51,7 +52,7 @@ public class NGSQLScriptDescriptor {
         return statementDescriptors;
     }
 
-    public NGSQLScriptDescriptor(InternalContext ctx,
+    public NGSQLScriptDescriptor(NGContext ctx,
                                  String tempDir,
                                  Map<String, Map<String, Object>>  inputDOs,
                                  Map<String, Map<String, Object>> outputDOs){
