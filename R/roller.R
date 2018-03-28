@@ -242,8 +242,7 @@ validate_roller_args <- function(x) {
   if (!all(x$fun %in% funs)) {
     stop(
       "Supplied function not supported.\nPlease use one of following: ",
-      paste(funs, collapse = ", "),
-      .call = FALSE
+      paste(funs, collapse = ", ")
     )
   }
   if (is.null(x$measure_vars)) {

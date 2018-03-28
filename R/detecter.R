@@ -83,6 +83,10 @@ detect.data.frame <- function(df,
     stop("trend_window has to be greater than zero and less than 1. Recommend 0.5 or 0.75")
   }
 
+  if (frequency < 1 | is.null(frequency)) {
+    stop("frequency must be positive. see https://robjhyndman.com/hyndsight/seasonal-periods/ for guidance")
+  }
+
 
   col_names <- colnames(df)
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
@@ -162,6 +166,9 @@ detect.grouped_df <- function(df,
     stop("trend_window has to be greater than zero and less than 1. Recommend 0.5 or 0.75")
   }
 
+  if (frequency < 1 | is.null(frequency)) {
+    stop("frequency must be positive. see https://robjhyndman.com/hyndsight/seasonal-periods/ for guidance")
+  }
 
 
   two_tail <- ifelse(direction == "both", TRUE, FALSE)

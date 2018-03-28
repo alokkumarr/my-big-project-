@@ -1,9 +1,4 @@
 
-
-
-
-
-
 #'DataFrame Mutater Function
 #'
 #'Appends additional calculated columns to a dataframe. Allows for grouping and
