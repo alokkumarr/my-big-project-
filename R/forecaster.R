@@ -133,7 +133,7 @@ forecastr.data.frame <- function(df,
 #'
 #' @examples
 #' library(forecast)
-#' auto_fourier(USAccDeaths, frequency = 12)
+#' auto_fourier(austres, frequency = 4)
 auto_fourier <- function(y, xreg = NULL, frequency = NULL, ic = "aicc", ...){
 
   stopifnot(ic %in% c('aic', 'aicc', 'loglik', 'bic'))
@@ -187,8 +187,8 @@ auto_fourier <- function(y, xreg = NULL, frequency = NULL, ic = "aicc", ...){
 #'
 #' @examples
 #' library(forecast)
-#' fit <- auto_fourier(USAccDeaths, 12)
-#' auto_fourier_f(fit$model, frequency=12, h=12)
+#' fit <- auto_fourier(austres, frequency = 4)
+#' forecast(fit, h=12, frequency=12)
 forecast.auto_fourier <- function(object, h = 10, xreg = NULL, frequency, level = c(80, 95), ...){
 
   stopifnot("Arima" %in% class(object))

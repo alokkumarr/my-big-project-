@@ -146,7 +146,7 @@ roller.tbl_spark <- function(df,
   stopifnot("tbl_spark" %in% class(df))
   sdf <-  sparklyr::spark_dataframe(df)
   sc <- sparklyr::spark_connection(sdf)
-  sdf %>% invoke("createOrReplaceTempView", "df")
+  sdf %>% sparklyr::invoke("createOrReplaceTempView", "df")
   new_tbl_name <- "df_roll"
 
   args <- roller_args(
