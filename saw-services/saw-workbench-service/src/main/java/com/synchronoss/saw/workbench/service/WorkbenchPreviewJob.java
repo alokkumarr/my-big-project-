@@ -1,0 +1,73 @@
+package com.synchronoss.saw.workbench.service;
+
+import java.util.Iterator;
+
+import com.cloudera.livy.Job;
+import com.cloudera.livy.JobContext;
+import com.mapr.db.MapRDB;
+import com.mapr.db.Table;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.ojai.DocumentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class WorkbenchPreviewJob implements Job<Integer> {
+    private static final long serialVersionUID = 1L;
+    private final String id;
+    private final String location;
+    private final int limit;
+
+    public WorkbenchPreviewJob(String id, String location, int limit) {
+        this.id = id;
+        this.location = location;
+        this.limit = limit;
+    }
+
+    private static final String PREVIEWS_TABLE = "/previews";
+
+    @Override
+    public Integer call(JobContext jobContext) throws Exception {
+        Logger log = LoggerFactory.getLogger(getClass().getName());
+        log.debug("Start preview job");
+        SparkSession session = jobContext.sparkSession();
+        Dataset<Row> dataset = session.read().load(location);
+        StructField[] fields = dataset.schema().fields();
+        Iterator<Row> rows = dataset.limit(limit).toLocalIterator();
+        Table table = MapRDB.getTable(PREVIEWS_TABLE);
+        DocumentBuilder document = MapRDB.newDocumentBuilder();
+        document.addNewMap();
+        document.put("_id", id);
+        document.putNewArray("rows");
+        rows.forEachRemaining((Row row) -> {
+            document.addNewArray();
+            for (int i = 0; i < row.size(); i++) {
+                DataType dataType = fields[i].dataType();
+                if (dataType.equals(DataTypes.StringType)) {
+                    document.add(row.getString(i));
+                } else if (dataType.equals(DataTypes.IntegerType)) {
+                    document.add(row.getInt(i));
+                } else if (dataType.equals(DataTypes.LongType)) {
+                    document.add(row.getLong(i));
+                } else if (dataType.equals(DataTypes.FloatType)) {
+                    document.add(row.getFloat(i));
+                } else if (dataType.equals(DataTypes.DoubleType)) {
+                    document.add(row.getDouble(i));
+                } else {
+                    log.warn("Unhandled Spark data type: {}", dataType);
+                    document.add(row.get(i).toString());
+                }
+            }
+            document.endArray();
+        });
+        document.endArray();
+        document.endMap();
+        table.insertOrReplace(document.getDocument());
+        table.flush();
+        return 0;
+    }
+}
