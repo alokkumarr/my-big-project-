@@ -32,4 +32,10 @@ analysis:
 
 published:
   path: /tmp
-       
+
+
+ftp:
+  details:
+    file: /opt/bda/saw-export-service/conf/ftp-details.json
+
+
