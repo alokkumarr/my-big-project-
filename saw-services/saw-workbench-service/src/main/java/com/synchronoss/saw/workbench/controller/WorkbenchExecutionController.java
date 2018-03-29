@@ -37,11 +37,11 @@ public class WorkbenchExecutionController {
 
     @Autowired
     private WorkbenchExecutionService workbenchExecutionService;
-  
+
     @RequestMapping(value = "datasets", method = RequestMethod.POST,
                     produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public String create(@RequestBody ObjectNode body)
+    public ObjectNode create(@RequestBody ObjectNode body)
         throws JsonProcessingException, Exception {
         log.debug("Create dataset");
         /* Extract input parameters */

@@ -10,13 +10,27 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableDispatchBean.class)
 @JsonDeserialize(as = ImmutableDispatchBean.class)
- interface DispatchBean {
-     String emailList();
-     String fileType();
-     String name();
-     @Nullable
-     String description();
-     String metricName();
-     String userFullName();
-     String publishedTime();
+interface DispatchBean {
+    @Nullable
+    String emailList();
+
+    @Nullable
+    String fileType();
+
+    @Nullable
+    String ftp();
+
+    String name();
+
+    @Nullable
+    String description();
+
+    String metricName();
+
+    String userFullName();
+
+    String publishedTime();
+
+    String jobGroup();
+
 }
