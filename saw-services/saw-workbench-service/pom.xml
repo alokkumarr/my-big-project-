@@ -307,6 +307,10 @@
 									<directory>true</directory>
 								</entry>
 								<entry>
+									<name>/opt/bda/saw-workbench-service/conf</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
 									<name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
 									<file>target/saw-workbench-service-${revision}-exec.jar</file>
 								</entry>
@@ -325,10 +329,6 @@
 								<entry>
 									<name>/usr/lib/systemd/system/saw-workbench-proxy.socket</name>
 									<file>src/main/system/saw-workbench-proxy.socket</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-workbench-service/conf/logback.xml</name>
-									<file>src/main/resources/logback.xml</file>
 								</entry>
 							</entries>
 							<signature>

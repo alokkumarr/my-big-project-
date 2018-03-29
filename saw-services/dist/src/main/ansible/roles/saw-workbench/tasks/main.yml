@@ -7,5 +7,9 @@
   template: src=application.yml dest=/opt/bda/saw-workbench-service/conf
   notify:
     - restart saw-workbench
+- name: Install SAW Workbench Service log configuration file
+  template: src=logback.xml dest=/opt/bda/saw-workbench-service/conf
+  notify:
+    - restart saw-workbench
 - name: Enable SAW Workbench Service
   systemd: name=saw-workbench-proxy.socket enabled=true state=started
