@@ -1,10 +1,11 @@
 declare function require(string): string;
 
-import { Component, Input, OnInit, Inject } from '@angular/core';
+import { Component, Input, OnInit, Inject, OnDestroy } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { TimerObservable } from 'rxjs/observable/TimerObservable';
 import * as map from 'lodash/map';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
@@ -23,7 +24,7 @@ require('./datasets-page.component.scss');
   providers: [DatePipe]
 })
 
-export class DatasetsComponent implements OnInit {
+export class DatasetsComponent implements OnInit, OnDestroy {
   private availableSets: Array<any> = [];
   private viewState: string = 'card';
   private states = {
@@ -33,6 +34,8 @@ export class DatasetsComponent implements OnInit {
   private updater = new BehaviorSubject([]);
   private dataView: string = 'sets';
   private contentHeight: number;
+  private poll = true;
+  private interval = 10000;
 
   constructor(
     private router: UIRouter,
@@ -45,11 +48,25 @@ export class DatasetsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.getPageData();
+
+   /**
+    * Calls list datasets api onInit and every 10 seconds or whatever set interval
+    * 
+    * @memberof DatasetsComponent
+    */
+    TimerObservable.create(0, this.interval)
+      .takeWhile(() => this.poll)
+      .subscribe(() => {
+        this.headerProgress.show();
+        this.getPageData();
+      });
+  }
+
+  ngOnDestroy() {
+    this.poll = false;
   }
 
   getPageData(): void {
-    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.loadSets(this.availableSets);
@@ -57,7 +74,6 @@ export class DatasetsComponent implements OnInit {
   }
 
   loadSets(data): void {
-    this.headerProgress.show();
     if (this.viewState === 'list') {
       setTimeout(() => {
         this.updater.next(data);
@@ -68,7 +84,7 @@ export class DatasetsComponent implements OnInit {
       });
     }
     setTimeout(() => {
-      this.contentHeight = window.innerHeight-165;
+      this.contentHeight = window.innerHeight - 165;
     });
   }
 
@@ -105,10 +121,10 @@ export class DatasetsComponent implements OnInit {
   }
 
   onDataViewChange() {
-    
+
   }
 
   onResize(event) {
-    this.contentHeight = event.target.innerHeight-165;
+    this.contentHeight = event.target.innerHeight - 165;
   }
 }

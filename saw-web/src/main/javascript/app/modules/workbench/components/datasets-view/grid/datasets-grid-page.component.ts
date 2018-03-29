@@ -138,6 +138,8 @@ export class DatasetsGridPageComponent implements OnInit {
   reloadDataGrid(data) {
     this.dataGrid.instance.option('dataSource', data);
     this.dataGrid.instance.refresh();
-    this.headerProgress.hide();
+    setTimeout(() => {
+      this.headerProgress.hide();
+    }, 1000);
   }
 }

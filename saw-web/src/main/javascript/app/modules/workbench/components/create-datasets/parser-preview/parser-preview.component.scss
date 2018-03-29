@@ -56,4 +56,18 @@ parser-preview {
   .content-hgt {
     height: 99% !important;
   }
+
+  .alert {
+    padding: 16px;
+    margin: 24px 0;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .is-important {
+    border-left: 10px solid $primary-red;
+    background-color: #E5524C08;
+  }
 }

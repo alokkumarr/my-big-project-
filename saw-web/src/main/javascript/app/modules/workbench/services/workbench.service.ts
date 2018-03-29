@@ -58,7 +58,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-        catchError(this.handleError('data', [])));
+      catchError((e: any) => { return Observable.of(e); }));
   }
 
   /** File mask search */
@@ -74,8 +74,8 @@ export class WorkbenchService {
       wildcardSearch = this.startsWith;
     } else {
       wildcardSearch = this.exactMatch;
-    } 
-    
+    }
+
     const filemasksearch = mask.replace('*', '');
     for (let fileCounter = 0; fileCounter < temmpFiles.length; fileCounter++) {
       if (wildcardSearch(temmpFiles[fileCounter].name, filemasksearch)) {

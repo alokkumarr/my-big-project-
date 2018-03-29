@@ -59,7 +59,7 @@ export class CreateDatasetsComponent implements OnInit {
     this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
-      nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(18)]),
+      nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(25)]),
       descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(99)])
     });
   }

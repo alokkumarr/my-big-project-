@@ -43,6 +43,8 @@ export class ParserPreviewComponent implements OnInit {
   private fieldInfo = [];
   private parserData: any;
   private rawFile: any;
+  private inspectError: boolean = false;
+  private errMsg: string = '';
 
   constructor(
     private dxDataGrid: dxDataGridService,
@@ -74,6 +76,9 @@ export class ParserPreviewComponent implements OnInit {
         this.dataGrid.instance.beginCustomLoading('Loading...');
         this.reloadDataGrid(parsedData);
       });
+    } else if (data.length != 0 && !isUndefined(data[0].error)) {
+      this.inspectError = true;
+      this.errMsg = data[0].error.message;
     }
     if (data.length === 2 && !isUndefined(data[1])) {
       this.rawPreview(data[1]);

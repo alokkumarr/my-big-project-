@@ -2,7 +2,7 @@
   <mat-card-content fxFill class="content-hgt">
     <mat-tab-group fxFill dynamicHeight="false" style="background-color: white;">
       <mat-tab fxFill label="PARSED_VIEW">
-        <dx-data-grid id="gridContainer">
+        <dx-data-grid *ngIf="!inspectError" id="gridContainer">
           <div *dxTemplate="let data of 'headerTemplate'">
             <div fxLayout="column" class="fNameInp">
               <mat-form-field>
@@ -25,6 +25,12 @@
             </div>
           </div>
         </dx-data-grid>
+        <div *ngIf="inspectError" fxLayout="row" fxLayoutAlign="space-around center">
+          <div fxFlex="75" class="alert is-important">
+            <h4>Please validate entered details!</h4>
+            <p>{{errMsg}}</p>
+          </div>
+        </div>
       </mat-tab>
       <mat-tab fxFill label="RAW_PREVIEW">
         <div class="raw-content">

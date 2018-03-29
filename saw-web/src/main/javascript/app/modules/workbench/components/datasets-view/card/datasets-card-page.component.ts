@@ -10,8 +10,6 @@ import { Observable } from 'rxjs/Observable';
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { SqlExecutorComponent } from '../../sql-executor/sql-executor.component';
 
-import { DATASETS } from '../../../sample-data';
-
 const template = require('./datasets-card-page.component.html');
 require('./datasets-card-page.component.scss');
 
@@ -48,7 +46,9 @@ export class DatasetsCardPageComponent implements OnInit {
     if (this.dataSets.length > 0) {
       
     }
-    this.headerProgress.hide();
+    setTimeout(() => {
+      this.headerProgress.hide();
+    }, 1000);
   }
 
   openSQLEditor(): void {
