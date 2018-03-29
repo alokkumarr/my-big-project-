@@ -48,7 +48,6 @@ public class SAWDelimitedInspector {
       writer.write(str);
       writer.close();
     } catch (Exception e) {
-      e.printStackTrace();
       logger.error("Exception during inspecting a file", e);
     }
     System.out.println("Total memory : " + Runtime.getRuntime().totalMemory());
