@@ -40,7 +40,8 @@ public class WorkbenchExecutionServiceImpl
         log.info("Execute dataset transformation");
         WorkbenchClient client = new WorkbenchClient();
         createDatasetDirectory(name);
-        client.submitExecute(livyUri, root, project, component, config);
+        client.submit(livyUri, new WorkbenchExecuteJob(
+                          root, project, component, config));
         ObjectNode root = mapper.createObjectNode();
         return root;
     }
