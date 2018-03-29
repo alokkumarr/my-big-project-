@@ -157,7 +157,7 @@ export class WorkbenchService {
   }
 
   triggerParser(payload) {
-    const endpoint = `${this.api}/internal/workbench/datasets`;
+    const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
