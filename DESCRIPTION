@@ -1,9 +1,20 @@
 Package: a2modeler
-Title: What the Package Does (one line, title case)
+Title: Synchronoss Advanced Analytics Statistical Modeling R Package
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
+Description: Statistical model building and predicting framework for forecasting, regression, classification and clustering use cases
 Depends: R (>= 3.4.2)
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
+Imports:
+    dplyr,
+    sparklyr (>= 0.7.0),
+    magrittr,
+    reshape2,
+    tidyr,
+    rlang,
+    zoo,
+    checkmate (>= 1.8.2),
+Suggests: 
+    testthat
