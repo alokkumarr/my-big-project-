@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { UIRouter } from '@uirouter/angular';
 
 import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/of';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
