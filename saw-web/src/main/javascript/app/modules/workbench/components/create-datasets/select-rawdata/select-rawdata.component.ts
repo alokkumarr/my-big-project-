@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';

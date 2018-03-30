@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import * as angular from 'angular';
 import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';

@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
