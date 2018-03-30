@@ -1,9 +1,16 @@
-package com.synchronoss.saw.storage.proxy.model;
 
-import com.fasterxml.jackson.annotation.*;
+package com.synchronoss.saw.storage.proxy.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -22,23 +29,23 @@ public class DataField {
     @JsonProperty("aggregate")
     private DataField.Aggregate aggregate;
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("columnName")
     private String columnName;
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("name")
     private String name;
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("type")
     private DataField.Type type;
@@ -46,9 +53,9 @@ public class DataField {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("aggregate")
     public DataField.Aggregate getAggregate() {
@@ -56,9 +63,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("aggregate")
     public void setAggregate(DataField.Aggregate aggregate) {
@@ -66,9 +73,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("columnName")
     public String getColumnName() {
@@ -76,9 +83,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
@@ -86,9 +93,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("name")
     public String getName() {
@@ -96,9 +103,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("name")
     public void setName(String name) {
@@ -106,9 +113,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("type")
     public DataField.Type getType() {
@@ -116,9 +123,9 @@ public class DataField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("type")
     public void setType(DataField.Type type) {
@@ -143,7 +150,7 @@ public class DataField {
         MAX("max"),
         COUNT("count");
         private final String value;
-        private final static Map<String, Aggregate> CONSTANTS = new HashMap<String, Aggregate>();
+        private final static Map<String, DataField.Aggregate> CONSTANTS = new HashMap<String, DataField.Aggregate>();
 
         static {
             for (DataField.Aggregate c: values()) {
@@ -183,11 +190,11 @@ public class DataField {
         TIMESTAMP("timestamp"),
         LONG("long"),
         DOUBLE("double"),
-        INT("integer"),
+        INTEGER("integer"),
         STRING("string"),
         FLOAT("float");
         private final String value;
-        private final static Map<String, Type> CONSTANTS = new HashMap<String, Type>();
+        private final static Map<String, DataField.Type> CONSTANTS = new HashMap<String, DataField.Type>();
 
         static {
             for (DataField.Type c: values()) {

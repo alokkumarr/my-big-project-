@@ -15,10 +15,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "columnName",
-    "groupInterval",
+    "order",
     "type"
 })
-public class ColumnField {
+public class Sort {
 
     /**
      * 
@@ -27,15 +27,20 @@ public class ColumnField {
      */
     @JsonProperty("columnName")
     private String columnName;
-    @JsonProperty("groupInterval")
-    private ColumnField.GroupInterval groupInterval;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("order")
+    private Sort.Order order;
     /**
      * 
      * (Required)
      * 
      */
     @JsonProperty("type")
-    private ColumnField.Type type;
+    private Sort.Type type;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -59,14 +64,24 @@ public class ColumnField {
         this.columnName = columnName;
     }
 
-    @JsonProperty("groupInterval")
-    public ColumnField.GroupInterval getGroupInterval() {
-        return groupInterval;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("order")
+    public Sort.Order getOrder() {
+        return order;
     }
 
-    @JsonProperty("groupInterval")
-    public void setGroupInterval(ColumnField.GroupInterval groupInterval) {
-        this.groupInterval = groupInterval;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("order")
+    public void setOrder(Sort.Order order) {
+        this.order = order;
     }
 
     /**
@@ -75,7 +90,7 @@ public class ColumnField {
      * 
      */
     @JsonProperty("type")
-    public ColumnField.Type getType() {
+    public Sort.Type getType() {
         return type;
     }
 
@@ -85,7 +100,7 @@ public class ColumnField {
      * 
      */
     @JsonProperty("type")
-    public void setType(ColumnField.Type type) {
+    public void setType(Sort.Type type) {
         this.type = type;
     }
 
@@ -99,24 +114,20 @@ public class ColumnField {
         this.additionalProperties.put(name, value);
     }
 
-    public enum GroupInterval {
+    public enum Order {
 
-        YEAR("year"),
-        MONTH("month"),
-        DAY("day"),
-        QUARTER("quarter"),
-        HOUR("hour"),
-        WEEK("week");
+        DESC("desc"),
+        ASC("asc");
         private final String value;
-        private final static Map<String, ColumnField.GroupInterval> CONSTANTS = new HashMap<String, ColumnField.GroupInterval>();
+        private final static Map<String, Sort.Order> CONSTANTS = new HashMap<String, Sort.Order>();
 
         static {
-            for (ColumnField.GroupInterval c: values()) {
+            for (Sort.Order c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
 
-        private GroupInterval(String value) {
+        private Order(String value) {
             this.value = value;
         }
 
@@ -131,8 +142,8 @@ public class ColumnField {
         }
 
         @JsonCreator
-        public static ColumnField.GroupInterval fromValue(String value) {
-            ColumnField.GroupInterval constant = CONSTANTS.get(value);
+        public static Sort.Order fromValue(String value) {
+            Sort.Order constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
@@ -152,10 +163,10 @@ public class ColumnField {
         STRING("string"),
         FLOAT("float");
         private final String value;
-        private final static Map<String, ColumnField.Type> CONSTANTS = new HashMap<String, ColumnField.Type>();
+        private final static Map<String, Sort.Type> CONSTANTS = new HashMap<String, Sort.Type>();
 
         static {
-            for (ColumnField.Type c: values()) {
+            for (Sort.Type c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -175,8 +186,8 @@ public class ColumnField {
         }
 
         @JsonCreator
-        public static ColumnField.Type fromValue(String value) {
-            ColumnField.Type constant = CONSTANTS.get(value);
+        public static Sort.Type fromValue(String value) {
+            Sort.Type constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

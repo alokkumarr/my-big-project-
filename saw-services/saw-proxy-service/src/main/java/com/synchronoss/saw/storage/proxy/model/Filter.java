@@ -15,77 +15,73 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "columnName",
-    "groupInterval",
+    "isRuntimeFilter",
+    "model",
+    "tableName",
     "type"
 })
-public class ColumnField {
+public class Filter {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("columnName")
     private String columnName;
-    @JsonProperty("groupInterval")
-    private ColumnField.GroupInterval groupInterval;
-    /**
-     * 
-     * (Required)
-     * 
-     */
+    @JsonProperty("isRuntimeFilter")
+    private Filter.IsRuntimeFilter isRuntimeFilter;
+    @JsonProperty("model")
+    private Model model;
+    @JsonProperty("tableName")
+    private String tableName;
     @JsonProperty("type")
-    private ColumnField.Type type;
+    private Filter.Type type;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("columnName")
     public String getColumnName() {
         return columnName;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 
-    @JsonProperty("groupInterval")
-    public ColumnField.GroupInterval getGroupInterval() {
-        return groupInterval;
+    @JsonProperty("isRuntimeFilter")
+    public Filter.IsRuntimeFilter getIsRuntimeFilter() {
+        return isRuntimeFilter;
     }
 
-    @JsonProperty("groupInterval")
-    public void setGroupInterval(ColumnField.GroupInterval groupInterval) {
-        this.groupInterval = groupInterval;
+    @JsonProperty("isRuntimeFilter")
+    public void setIsRuntimeFilter(Filter.IsRuntimeFilter isRuntimeFilter) {
+        this.isRuntimeFilter = isRuntimeFilter;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
+    @JsonProperty("model")
+    public Model getModel() {
+        return model;
+    }
+
+    @JsonProperty("model")
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
+    @JsonProperty("tableName")
+    public String getTableName() {
+        return tableName;
+    }
+
+    @JsonProperty("tableName")
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
     @JsonProperty("type")
-    public ColumnField.Type getType() {
+    public Filter.Type getType() {
         return type;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("type")
-    public void setType(ColumnField.Type type) {
+    public void setType(Filter.Type type) {
         this.type = type;
     }
 
@@ -99,42 +95,33 @@ public class ColumnField {
         this.additionalProperties.put(name, value);
     }
 
-    public enum GroupInterval {
+    public enum IsRuntimeFilter {
 
-        YEAR("year"),
-        MONTH("month"),
-        DAY("day"),
-        QUARTER("quarter"),
-        HOUR("hour"),
-        WEEK("week");
-        private final String value;
-        private final static Map<String, ColumnField.GroupInterval> CONSTANTS = new HashMap<String, ColumnField.GroupInterval>();
+        FALSE(false),
+        TRUE(true);
+        private final boolean value;
+        private final static Map<Boolean, Filter.IsRuntimeFilter> CONSTANTS = new HashMap<Boolean, Filter.IsRuntimeFilter>();
 
         static {
-            for (ColumnField.GroupInterval c: values()) {
+            for (Filter.IsRuntimeFilter c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
 
-        private GroupInterval(String value) {
+        private IsRuntimeFilter(boolean value) {
             this.value = value;
         }
 
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
         @JsonValue
-        public String value() {
+        public boolean value() {
             return this.value;
         }
 
         @JsonCreator
-        public static ColumnField.GroupInterval fromValue(String value) {
-            ColumnField.GroupInterval constant = CONSTANTS.get(value);
+        public static Filter.IsRuntimeFilter fromValue(boolean value) {
+            Filter.IsRuntimeFilter constant = CONSTANTS.get(value);
             if (constant == null) {
-                throw new IllegalArgumentException(value);
+                throw new IllegalArgumentException((value +""));
             } else {
                 return constant;
             }
@@ -144,18 +131,18 @@ public class ColumnField {
 
     public enum Type {
 
+        LONG("long"),
+        STRING("string"),
+        INTEGER("integer"),
+        DOUBLE("double"),
         DATE("date"),
         TIMESTAMP("timestamp"),
-        LONG("long"),
-        DOUBLE("double"),
-        INTEGER("integer"),
-        STRING("string"),
         FLOAT("float");
         private final String value;
-        private final static Map<String, ColumnField.Type> CONSTANTS = new HashMap<String, ColumnField.Type>();
+        private final static Map<String, Filter.Type> CONSTANTS = new HashMap<String, Filter.Type>();
 
         static {
-            for (ColumnField.Type c: values()) {
+            for (Filter.Type c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -175,8 +162,8 @@ public class ColumnField {
         }
 
         @JsonCreator
-        public static ColumnField.Type fromValue(String value) {
-            ColumnField.Type constant = CONSTANTS.get(value);
+        public static Filter.Type fromValue(String value) {
+            Filter.Type constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

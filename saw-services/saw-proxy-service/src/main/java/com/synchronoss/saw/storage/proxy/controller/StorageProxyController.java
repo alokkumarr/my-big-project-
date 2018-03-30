@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -33,9 +31,7 @@ import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Storage;
-import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyRequestBody;
-import com.synchronoss.saw.storage.proxy.model.StorageProxyResponse;
 import com.synchronoss.saw.storage.proxy.service.StorageProxyService;
 
 /**
@@ -85,39 +81,39 @@ public class StorageProxyController {
   @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
   @RequestMapping(value = "/proxy/storage/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public CompletableFuture<StorageProxyResponse> retrieveStorageDataAsync(@RequestBody StorageProxyRequestBody requestBody) {
+  public CompletableFuture<StorageProxy> retrieveStorageDataAsync(@RequestBody StorageProxy requestBody) {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-    CompletableFuture<StorageProxyResponse> responseObjectFuture = null;
+    CompletableFuture<StorageProxy> responseObjectFuture = null;
    try {
      ObjectMapper objectMapper = new ObjectMapper();
      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-     StorageProxyNode proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
-     logger.trace("Storage Proxy async request object : {} ", objectMapper.writeValueAsString(proxyNode));
+     //StorageProxyNode proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
+     logger.trace("Storage Proxy async request object : {} ", objectMapper.writeValueAsString(requestBody));
      responseObjectFuture= CompletableFuture.
          supplyAsync(() -> {
-          StorageProxyResponse proxyResponseData = null; 
+          StorageProxy proxyResponseData = null; 
             try {
-              proxyResponseData = proxyService.execute(proxyNode);
+              proxyResponseData = proxyService.execute(requestBody);
             } catch (IOException e) {
               logger.error("While retrieving data there is an exception.", e);
-              proxyResponseData= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+              proxyResponseData= StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
             } catch (ProcessingException e) {
               logger.error("Exception generated while validating incoming json against schema.", e);
-              proxyResponseData= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+              proxyResponseData= StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
             }catch (Exception e) {
               logger.error("Exception generated while processing incoming json.", e);
-              proxyResponseData= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+              proxyResponseData= StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
             }
         return proxyResponseData;
          })
          .handle((res, ex) -> {
            if(ex != null) {
                logger.error("While retrieving data there is an exception.", ex);
-               res.setMessage(ex.getCause().toString());
+               res.setStatusMessage(ex.getCause().toString());
                return res;
            }
            return res;
@@ -143,20 +139,20 @@ public class StorageProxyController {
   
   @RequestMapping(value = "/proxy/storage/", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public StorageProxyResponse retrieveStorageDataSync(@RequestBody StorageProxyRequestBody requestBody) throws JsonProcessingException {
+  public StorageProxy retrieveStorageDataSync(@RequestBody StorageProxy requestBody) throws JsonProcessingException {
     logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
-    StorageProxyResponse responseObjectFuture = null;
-    StorageProxyNode proxyNode = null;
+    StorageProxy responseObjectFuture = null;
+    StorageProxy proxyNode = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     try {
-     proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
-     logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(proxyNode));
-     responseObjectFuture= proxyService.execute(proxyNode);
+     //proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
+     logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(requestBody));
+     responseObjectFuture= proxyService.execute(requestBody);
     } catch (IOException e){
       logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -165,10 +161,10 @@ public class StorageProxyController {
       throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
     } catch (ProcessingException e){
       logger.error("Exception generated while validating incoming json against schema.", e);
-      responseObjectFuture= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+      responseObjectFuture= StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
     }catch (Exception e) {
       logger.error("Exception generated while processing incoming json.", e);
-      responseObjectFuture= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+      responseObjectFuture= StorageProxyUtils.prepareResponse(requestBody, e.getCause().toString());
     }
    logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
    return responseObjectFuture;

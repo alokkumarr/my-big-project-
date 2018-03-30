@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -26,10 +24,8 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
-import com.synchronoss.saw.storage.proxy.model.Content;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
-import com.synchronoss.saw.storage.proxy.model.StorageProxyResponse;
 
 @Component
 public class StorageProxyUtils {
@@ -68,7 +64,7 @@ public class StorageProxyUtils {
     return new ClassPathResource(filename);
   }
 
-  public static Boolean jsonSchemaValidate(StorageProxyNode proxy, String path)
+  public static Boolean jsonSchemaValidate(StorageProxy proxy, String path)
       throws IOException, ProcessingException {
     // Validating JSON against schema
     Boolean result = true;
@@ -77,7 +73,7 @@ public class StorageProxyUtils {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     JsonValidator validator = factory.getValidator();
-    final JsonNode data = JsonLoader.fromString(objectMapper.writeValueAsString(proxy.getProxy()));
+    final JsonNode data = JsonLoader.fromString(objectMapper.writeValueAsString(proxy));
     final JsonNode schema = JsonLoader.fromFile(new File(path));
     ProcessingReport report = validator.validate(schema, data);
     if (report.isSuccess() == false) {
@@ -100,13 +96,9 @@ public class StorageProxyUtils {
     return proxyTreeNode; 
   }
   
-  public static StorageProxyResponse prepareResponse(List<StorageProxy> node, String message){
-    StorageProxyResponse createresponse = new StorageProxyResponse();
-    createresponse.setMessage(message);
-    Content content = new Content();
-    content.setProxy(node);
-    createresponse.setContents(content);
-    return createresponse;
+  public static StorageProxy prepareResponse(StorageProxy node, String message){
+    node.setStatusMessage(message);
+    return node;
   }
   
   

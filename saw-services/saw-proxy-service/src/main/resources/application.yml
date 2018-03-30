@@ -19,8 +19,8 @@ schema:
    file: /Users/Shared/WORK/saw/saw-services/saw-proxy-service/src/main/resources/schema/proxy-scehma.json 
 elastic-search:
            cluster-name: SNCR-VELBDA-elasticsearch 
-           transport-hosts: elasticsearch01.bda.poc.velocity-va.sncrcorp.net
-           transport-ports: 9200   
+           transport-hosts: elasticsearch01.bda.poc.velocity-va.sncrcorp.net,elasticsearch02.bda.poc.velocity-va.sncrcorp.net,elasticsearch03.bda.poc.velocity-va.sncrcorp.net
+           transport-ports: 9200,9200,9200   
 elastic-xpack :
           cluster-active: true
           clsuter-username: elastic

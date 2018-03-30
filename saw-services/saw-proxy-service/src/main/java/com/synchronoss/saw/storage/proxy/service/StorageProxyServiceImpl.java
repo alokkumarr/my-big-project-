@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -23,8 +21,6 @@ import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
-import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
-import com.synchronoss.saw.storage.proxy.model.StorageProxyResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
@@ -45,64 +41,61 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   private StorageConnectorService storageConnectorService;
 
   @Override
-  public StorageProxyResponse execute(StorageProxyNode proxy) throws Exception {
-    logger.debug("Executing data storage proxy for {}", proxy.getProxy().size()); 
+  public StorageProxy execute(StorageProxy proxy) throws Exception {
     logger.trace("Validating Schema is started"); 
     Boolean validate = StorageProxyUtils.jsonSchemaValidate(proxy, schemaFile);
     logger.trace("Validating Schema is finished"); 
-    StorageProxyResponse response =null;
+    StorageProxy response =null;
     if (validate)
     {
-      for (StorageProxy storageProxy: proxy.getProxy())
-       {
-        String storageType = storageProxy.getStorage().value();
+      String storageType = proxy.getStorage().value();
         switch (storageType){
           case "ES" :  
-            String action = storageProxy.getAction().value();         
+            String action = proxy.getAction().value();         
             if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) 
                 || action.equals(Action.SNCRPIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value())){
                         
                         
                           if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value())){
-                                Preconditions.checkArgument(!(storageProxy.getResultFormat().value().equals(ResultFormat.TABULAR.value())), "The result format for above operations cannot be in tabular format");
-                                storageProxy.setResultFormat(ResultFormat.JSON);
+                                Preconditions.checkArgument(!(proxy.getResultFormat().value().equals(ResultFormat.TABULAR.value())), "The result format for above operations cannot be in tabular format");
+                                proxy.setResultFormat(ResultFormat.JSON);
                                 switch (action) {
                                   case "create" : 
-                                    CreateAndDeleteESResponse createResponse =(CreateAndDeleteESResponse) storageConnectorService.createDocument(storageProxy.getQuery(), storageProxy);
-                                                storageProxy.setStatusMessage("created with an id :" + createResponse.getId());
+                                    CreateAndDeleteESResponse createResponse =(CreateAndDeleteESResponse) storageConnectorService.createDocument(proxy.getQuery(), proxy);
+                                                proxy.setStatusMessage("created with an id :" + createResponse.getId());
                                                 List<Object> indexData = new ArrayList<>();
                                                 indexData.add(createResponse);
-                                                storageProxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
-                                                storageProxy.setData(indexData);
+                                                proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                                proxy.setData(indexData);
                                                 break;
                                   case "count" : 
-                                                CountESResponse countResponse =(CountESResponse) storageConnectorService.countDocument(storageProxy.getQuery(), storageProxy);
-                                                storageProxy.setStatusMessage("Total number of documents are :" + countResponse.getCount());
+                                                CountESResponse countResponse =(CountESResponse) storageConnectorService.countDocument(proxy.getQuery(), proxy);
+                                                proxy.setStatusMessage("Total number of documents are :" + countResponse.getCount());
                                                 List<Object> countData = new ArrayList<>();
                                                 countData.add(countResponse);
-                                                storageProxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
-                                                storageProxy.setData(countData);
+                                                proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                                proxy.setData(countData);
                                                 break;
                                   case "delete" : 
-                                                CreateAndDeleteESResponse deleteResponse =(CreateAndDeleteESResponse) storageConnectorService.deleteDocumentById(storageProxy.getEntityId(), storageProxy);
-                                                storageProxy.setStatusMessage("deleted with an id :" + deleteResponse.getId());
+                                                CreateAndDeleteESResponse deleteResponse =(CreateAndDeleteESResponse) storageConnectorService.deleteDocumentById(proxy.getEntityId(), proxy);
+                                                proxy.setStatusMessage("deleted with an id :" + deleteResponse.getId());
                                                 List<Object> deleteData = new ArrayList<>();
                                                 deleteData.add(deleteResponse);
-                                                storageProxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
-                                                storageProxy.setData(deleteData);
+                                                proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                                proxy.setData(deleteData);
                                                 break;
                                 } 
                           }// Action only to support JSON format
                           else {
                             switch (action){
                               case "sncrpivot" : 
-                                               if (storageProxy.getSqlBuilder()!=null){
-                                                 Preconditions.checkArgument(storageProxy.getQuery()!=null, "Query cannot be null.");  
-                                                 String query = storageProxy.getQuery();
+                                               if (proxy.getSqlBuilder()!=null){
+                                                 Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");  
+                                                 String query = proxy.getQuery();
                                                  int size =0;
-                                                   storageProxy.setPageSize(0);
-                                                   storageProxy.setPageNum(0);
-                                                   if(storageProxy.getQuery().contains("size") && !query.contains("from")){
+                                                   proxy.setPageSize(0);
+                                                   proxy.setPageNum(0);
+                                                   if(proxy.getQuery().contains("size") && !query.contains("from")){
                                                      Pattern p = Pattern.compile(QUERY_REG_EX, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
                                                      Matcher m = p.matcher(query);
                                                      if (m.find())
@@ -118,50 +111,50 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                                          }
                                                      } // parsing of size & from
                                                    if (size ==0){ 
-                                                   SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
-                                                   if (storageProxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
+                                                   SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
+                                                   if (proxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
                                                        logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
                                                            ObjectMapper mapperObj = new ObjectMapper();
                                                            String jsonString = mapperObj.writeValueAsString(sncrPivotResponse.getAggregations());
                                                            JsonNode objectNode = mapperObj.readTree("{ \"data\":"+jsonString + "}");
-                                                           PivotSNCRFlattener pivotSNCRFlattener = new PivotSNCRFlattener(storageProxy.getSqlBuilder());
+                                                           PivotSNCRFlattener pivotSNCRFlattener = new PivotSNCRFlattener(proxy.getSqlBuilder());
                                                            List<Object> flatData= pivotSNCRFlattener.parseData(objectNode);
-                                                           storageProxy.setData(flatData);
-                                                           storageProxy.setStatusMessage("Data has been retrieved & has been flattened.");
+                                                           proxy.setData(flatData);
+                                                           proxy.setStatusMessage("Data has been retrieved & has been flattened.");
                                                         logger.debug("Data from Aggregation converted into Flat Data " +flatData);
                                                    }else{
                                                      logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
                                                        ObjectMapper mapperObj = new ObjectMapper();
                                                        String jsonString = mapperObj.writeValueAsString(sncrPivotResponse.getAggregations());
                                                        JsonNode objectNode = mapperObj.readTree("{ \"data\":"+jsonString + "}");
-                                                       PivotSNCRFlattener pivotSNCRFlattener = new PivotSNCRFlattener(storageProxy.getSqlBuilder());
+                                                       PivotSNCRFlattener pivotSNCRFlattener = new PivotSNCRFlattener(proxy.getSqlBuilder());
                                                        List<Map<String, Object>> flatData= pivotSNCRFlattener.parseDataMap(objectNode);
                                                        List<Object> data = new ArrayList<>();
                                                        List<Object> tabularData = StorageProxyUtils.getTabularFormat(flatData, StorageProxyUtils.COMMA); 
                                                        for (Object obj : tabularData){
                                                          data.add(obj);
                                                        }
-                                                       storageProxy.setData(data);
-                                                       storageProxy.setStatusMessage("Data has been retrieved & has been flattened.");
+                                                       proxy.setData(data);
+                                                       proxy.setStatusMessage("Data has been retrieved & has been flattened.");
                                                      logger.debug("Data from Aggregation into JSON Format " +sncrPivotResponse.getAggregations()); 
                                                        }
                                                    }
                                                   else {
-                                                    storageProxy.setStatusMessage("size cannot be greater or less than zero.");
+                                                    proxy.setStatusMessage("size cannot be greater or less than zero.");
                                                   }
                                                   }
                                                   else {
-                                                    storageProxy.setStatusMessage("Please provide size with value 'size=0' & it shall not conti 'from' parameter in query.");
-                                                    storageProxy.setPageSize(0);
-                                                    storageProxy.setPageNum(0);
+                                                    proxy.setStatusMessage("Please provide size with value 'size=0' & it shall not conti 'from' parameter in query.");
+                                                    proxy.setPageSize(0);
+                                                    proxy.setPageNum(0);
                                                   }
                                                 } else {
-                                                  storageProxy.setStatusMessage("To process the action type of sncrpivot, sqlBuilder is mandatory");
+                                                  proxy.setStatusMessage("To process the action type of sncrpivot, sqlBuilder is mandatory");
                                                 }
                                                break;
                               case "search" : 
-                                              Preconditions.checkArgument(storageProxy.getQuery()!=null, "Query cannot be null.");
-                                              String query = storageProxy.getQuery();
+                                              Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");
+                                              String query = proxy.getQuery();
                                               if(query.contains("size") && query.contains("from")){
                                                 Pattern p = Pattern.compile(QUERY_REG_EX, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
                                                 Matcher m = p.matcher(query);
@@ -171,26 +164,26 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                                     String fromSize_1_Num=m.group(2);
                                                     String fromSize_2_Num=m.group(4);
                                                     if (fromSize_1.equals("size")){
-                                                      storageProxy.setPageSize(Integer.parseInt(fromSize_1_Num));
-                                                      storageProxy.setPageNum(Integer.parseInt(fromSize_2_Num)); 
+                                                      proxy.setPageSize(Integer.parseInt(fromSize_1_Num));
+                                                      proxy.setPageNum(Integer.parseInt(fromSize_2_Num)); 
                                                       }
                                                     else{
-                                                      storageProxy.setPageSize(Integer.parseInt(fromSize_2_Num));
-                                                      storageProxy.setPageNum(Integer.parseInt(fromSize_1_Num)); 
+                                                      proxy.setPageSize(Integer.parseInt(fromSize_2_Num));
+                                                      proxy.setPageNum(Integer.parseInt(fromSize_1_Num)); 
                                                     }
                                                 } // parsing of size & from
-                                              if(storageProxy.getPageSize()<= 50000){ 
-                                              SearchESResponse<?> searchResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
+                                              if(proxy.getPageSize()<= 50000){ 
+                                              SearchESResponse<?> searchResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
                                               long actualCount = searchResponse.getHits()!=null? searchResponse.getHits().getTotal() : 0;
                                               if (actualCount >0){
-                                              storageProxy.setStatusMessage("Number of documents found for provided query :" + actualCount);
+                                              proxy.setStatusMessage("Number of documents found for provided query :" + actualCount);
                                               List<Hit<?>> hits = searchResponse.getHits().getHits();
                                               List<Object> data = new ArrayList<>();
-                                              if (storageProxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
+                                              if (proxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
                                                  for (Hit<?> hit : hits){
                                                  data.add(hit.getSource());
                                                 }
-                                                storageProxy.setData(data);
+                                                proxy.setData(data);
                                               } // this block only for JSON format
                                               else{
                                                 List<Map<String,Object>> dataHits = new ArrayList<>();
@@ -202,20 +195,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                                  data.add(obj);
                                                }   
                                               } // this block only for Tabular format
-                                              storageProxy.setData(data);
+                                              proxy.setData(data);
                                               }
                                               else {
-                                                storageProxy.setStatusMessage("There are no documents available with the provided");
+                                                proxy.setStatusMessage("There are no documents available with the provided");
                                               }
                                               } // end of check for the size 50000
                                               else {
-                                                storageProxy.setStatusMessage("The size cannot be greater than 50000");
+                                                proxy.setStatusMessage("The size cannot be greater than 50000");
                                               }
                                               }
                                               else{
-                                                storageProxy.setStatusMessage("Please provide size & from parameter in query.");
-                                                storageProxy.setPageSize(0);
-                                                storageProxy.setPageNum(0);
+                                                proxy.setStatusMessage("Please provide size & from parameter in query.");
+                                                proxy.setPageSize(0);
+                                                proxy.setPageNum(0);
                                               }
                                               break;
                                           }
@@ -224,11 +217,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                           }
             } // end of action operation  if block
             else {
-              storageProxy.setStatusMessage("This "+action+" is not yet supported by StorageType :" + storageType);
+              proxy.setStatusMessage("This "+action+" is not yet supported by StorageType :" + storageType);
             }
               break;
               
-          case "DL" :  storageProxy.setStatusMessage("Not supported. This feature is yet to be implemented");break;
+          case "DL" :  proxy.setStatusMessage("Not supported. This feature is yet to be implemented");break;
               // Below are the steps for future implementation to support other storage implementation
               // a)
               // TODO: Storage Type : DL
@@ -237,7 +230,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               // TODO: Execute Query or perform create, delete, update operation & Prepare response based on the specification (either JSON or Tabular)  
               // TODO: Convert data either into tabular or JSON
           
-          case  "RDMS": storageProxy.setStatusMessage("Not supported. This feature is yet to be implemented");break;
+          case  "RDMS": proxy.setStatusMessage("Not supported. This feature is yet to be implemented");break;
               // TODO: Storage Type : RDBMS (MYSQL/Oracle)
               // b)
               // TODO: Validate PL/SQL Query (executing API & prepare the response with for validation using grammar file)
@@ -247,11 +240,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               // TODO: Convert data either into tabular or JSON
           
         } // end of switch statement
-        } // end of for loop
-    response = StorageProxyUtils.prepareResponse(proxy.getProxy(), "data is retrieved");
+    response = StorageProxyUtils.prepareResponse(proxy, "data is retrieved");
     } // end of schema validation if block
     else {
-      response = StorageProxyUtils.prepareResponse(proxy.getProxy(), "provided JSON input is not valid.");
+      response = StorageProxyUtils.prepareResponse(proxy, "provided JSON input is not valid.");
     }
     return response;
   }

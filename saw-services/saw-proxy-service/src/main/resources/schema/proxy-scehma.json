@@ -1,13 +1,7 @@
 {
-   "definitions":{
-
-   },
+   "definitions":{},
    "$schema":"http://json-schema.org/draft-04/schema#",
    "id":"http://synchronoss.com/proxy.json",
-   "type":"array",
-   "items":{
-      "id":"http://synchronoss.com/proxy.json/items",
-      "type":"object",
       "properties":{
          "storage":{
             "id":"http://synchronoss.com/proxy.json/items/properties/storage",
@@ -108,6 +102,13 @@
             "title":"It holds the user requested time",
             "description":"An explanation about the purpose of this instance."
          },
+         "responseTime":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/responseTime",
+            "type":"string",
+            "title":"It holds the user requested time",
+            "description":"An explanation about the purpose of this instance."
+         },
+
          "productCode":{
             "id":"http://synchronoss.com/proxy.json/items/properties/productCode",
             "type":"string",
@@ -452,5 +453,5 @@
          "moduleName",
          "resultFormat"
       ]
-   }
+   
 }

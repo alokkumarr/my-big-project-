@@ -1,10 +1,17 @@
-package com.synchronoss.saw.storage.proxy.model;
 
-import com.fasterxml.jackson.annotation.*;
+package com.synchronoss.saw.storage.proxy.model;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -29,16 +36,21 @@ public class SqlBuilder {
     @JsonProperty("booleanCriteria")
     private SqlBuilder.BooleanCriteria booleanCriteria;
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("filters")
-    private List<Object> filters = null;
+    private List<Filter> filters = null;
     @JsonProperty("rowFields")
     private List<RowField> rowFields = null;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("sorts")
-    private List<Object> sorts = null;
+    private List<Sort> sorts = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -53,9 +65,9 @@ public class SqlBuilder {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("dataFields")
     public List<DataField> getDataFields() {
@@ -63,9 +75,9 @@ public class SqlBuilder {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("dataFields")
     public void setDataFields(List<DataField> dataFields) {
@@ -83,22 +95,22 @@ public class SqlBuilder {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("filters")
-    public List<Object> getFilters() {
+    public List<Filter> getFilters() {
         return filters;
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("filters")
-    public void setFilters(List<Object> filters) {
+    public void setFilters(List<Filter> filters) {
         this.filters = filters;
     }
 
@@ -112,13 +124,23 @@ public class SqlBuilder {
         this.rowFields = rowFields;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("sorts")
-    public List<Object> getSorts() {
+    public List<Sort> getSorts() {
         return sorts;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("sorts")
-    public void setSorts(List<Object> sorts) {
+    public void setSorts(List<Sort> sorts) {
         this.sorts = sorts;
     }
 
@@ -137,7 +159,7 @@ public class SqlBuilder {
         OR("OR"),
         AND("AND");
         private final String value;
-        private final static Map<String, BooleanCriteria> CONSTANTS = new HashMap<String, BooleanCriteria>();
+        private final static Map<String, SqlBuilder.BooleanCriteria> CONSTANTS = new HashMap<String, SqlBuilder.BooleanCriteria>();
 
         static {
             for (SqlBuilder.BooleanCriteria c: values()) {

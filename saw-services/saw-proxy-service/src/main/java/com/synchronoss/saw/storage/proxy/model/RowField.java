@@ -1,13 +1,21 @@
-package com.synchronoss.saw.storage.proxy.model;
 
-import com.fasterxml.jackson.annotation.*;
+package com.synchronoss.saw.storage.proxy.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "columnName",
+    "groupInterval",
     "type"
 })
 public class RowField {
@@ -19,13 +27,12 @@ public class RowField {
      */
     @JsonProperty("columnName")
     private String columnName;
-    
     @JsonProperty("groupInterval")
     private RowField.GroupInterval groupInterval;
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("type")
     private RowField.Type type;
@@ -33,9 +40,9 @@ public class RowField {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("columnName")
     public String getColumnName() {
@@ -43,33 +50,13 @@ public class RowField {
     }
 
     /**
-     *
+     * 
      * (Required)
-     *
+     * 
      */
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
         this.columnName = columnName;
-    }
-
-    /**
-     *
-     * (Required)
-     *
-     */
-    @JsonProperty("type")
-    public RowField.Type getType() {
-        return type;
-    }
-
-    /**
-     *
-     * (Required)
-     *
-     */
-    @JsonProperty("type")
-    public void setType(RowField.Type type) {
-        this.type = type;
     }
 
     @JsonProperty("groupInterval")
@@ -80,6 +67,26 @@ public class RowField {
     @JsonProperty("groupInterval")
     public void setGroupInterval(RowField.GroupInterval groupInterval) {
         this.groupInterval = groupInterval;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("type")
+    public RowField.Type getType() {
+        return type;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("type")
+    public void setType(RowField.Type type) {
+        this.type = type;
     }
 
     @JsonAnyGetter
@@ -101,7 +108,7 @@ public class RowField {
         HOUR("hour"),
         WEEK("week");
         private final String value;
-        private final static Map<String, GroupInterval> CONSTANTS = new HashMap<String, GroupInterval>();
+        private final static Map<String, RowField.GroupInterval> CONSTANTS = new HashMap<String, RowField.GroupInterval>();
 
         static {
             for (RowField.GroupInterval c: values()) {
@@ -125,7 +132,7 @@ public class RowField {
 
         @JsonCreator
         public static RowField.GroupInterval fromValue(String value) {
-        	RowField.GroupInterval constant = CONSTANTS.get(value);
+            RowField.GroupInterval constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
@@ -134,17 +141,18 @@ public class RowField {
         }
 
     }
+
     public enum Type {
 
         DATE("date"),
         TIMESTAMP("timestamp"),
         LONG("long"),
         DOUBLE("double"),
-        INT("integer"),
+        INTEGER("integer"),
         STRING("string"),
         FLOAT("float");
         private final String value;
-        private final static Map<String, Type> CONSTANTS = new HashMap<String, Type>();
+        private final static Map<String, RowField.Type> CONSTANTS = new HashMap<String, RowField.Type>();
 
         static {
             for (RowField.Type c: values()) {

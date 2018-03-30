@@ -30,6 +30,7 @@ public class StorageProxy {
      * The Storage Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("storage")
@@ -39,50 +40,62 @@ public class StorageProxy {
      * The Storage Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("action")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private StorageProxy.Action action = StorageProxy.Action.fromValue("search");
-    @JsonProperty("query")
-    private String query;
-    
-    @JsonProperty("statusMessage")
-    private String statusMessage;
-
     /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("query")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String query;
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
     @JsonProperty("entityId")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String entityId;
     /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
     @JsonProperty("pageNum")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private Integer pageNum = 0;
+    private float pageNum;
     /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
     @JsonProperty("pageSize")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private Integer pageSize= 25;
-
-    
+    private int pageSize;
+    /**
+     * It holds the statusMessage
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("statusMessage")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String statusMessage;
     /**
      * It holds the user requested by
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("requestBy")
@@ -128,25 +141,26 @@ public class StorageProxy {
      * It holds the user requested time
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("requestedTime")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String requestedTime;
-
+    /**
+     * It holds the user requested time
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
     @JsonProperty("responseTime")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String responseTime;
-    
-    @JsonProperty("dataColumnHeader")
-    @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private Object dataColumnHeader;
-
-    
     /**
      * The Productcode Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("productCode")
@@ -156,6 +170,7 @@ public class StorageProxy {
      * The Modulename Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("moduleName")
@@ -167,6 +182,7 @@ public class StorageProxy {
      * The Resultformat Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("resultFormat")
@@ -174,17 +190,16 @@ public class StorageProxy {
     private StorageProxy.ResultFormat resultFormat = StorageProxy.ResultFormat.fromValue("json");
     @JsonProperty("data")
     private List<Object> data = null;
+    @JsonProperty("sqlBuilder")
+    private SqlBuilder sqlBuilder;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("sqlBuilder")
-    private SqlBuilder sqlBuilder;
-
-    
     /**
      * The Storage Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("storage")
@@ -196,6 +211,7 @@ public class StorageProxy {
      * The Storage Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("storage")
@@ -207,6 +223,7 @@ public class StorageProxy {
      * The Storage Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("action")
@@ -218,6 +235,7 @@ public class StorageProxy {
      * The Storage Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("action")
@@ -225,20 +243,121 @@ public class StorageProxy {
         this.action = action;
     }
 
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
     @JsonProperty("query")
     public String getQuery() {
         return query;
     }
 
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
     @JsonProperty("query")
     public void setQuery(String query) {
         this.query = query;
     }
 
     /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("entityId")
+    public String getEntityId() {
+        return entityId;
+    }
+
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("entityId")
+    public void setEntityId(String entityId) {
+        this.entityId = entityId;
+    }
+
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("pageNum")
+    public float getPageNum() {
+        return pageNum;
+    }
+
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("pageNum")
+    public void setPageNum(float pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("pageSize")
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("pageSize")
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    /**
+     * It holds the statusMessage
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("statusMessage")
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    /**
+     * It holds the statusMessage
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("statusMessage")
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
+
+    /**
      * It holds the user requested by
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("requestBy")
@@ -250,6 +369,7 @@ public class StorageProxy {
      * It holds the user requested by
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("requestBy")
@@ -349,6 +469,7 @@ public class StorageProxy {
      * It holds the user requested time
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("requestedTime")
@@ -360,6 +481,7 @@ public class StorageProxy {
      * It holds the user requested time
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("requestedTime")
@@ -368,9 +490,32 @@ public class StorageProxy {
     }
 
     /**
+     * It holds the user requested time
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("responseTime")
+    public String getResponseTime() {
+        return responseTime;
+    }
+
+    /**
+     * It holds the user requested time
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("responseTime")
+    public void setResponseTime(String responseTime) {
+        this.responseTime = responseTime;
+    }
+
+    /**
      * The Productcode Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("productCode")
@@ -382,6 +527,7 @@ public class StorageProxy {
      * The Productcode Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("productCode")
@@ -393,25 +539,19 @@ public class StorageProxy {
      * The Modulename Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("moduleName")
     public String getModuleName() {
         return moduleName;
     }
-    @JsonProperty("statusMessage")
-    public String getStatusMessage() {
-      return statusMessage;
-    }
-    @JsonProperty("statusMessage")
-    public void setStatusMessage(String statusMessage) {
-      this.statusMessage = statusMessage;
-    }
 
     /**
      * The Modulename Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("moduleName")
@@ -433,6 +573,7 @@ public class StorageProxy {
      * The Resultformat Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("resultFormat")
@@ -444,6 +585,7 @@ public class StorageProxy {
      * The Resultformat Schema
      * <p>
      * An explanation about the purpose of this instance.
+     * (Required)
      * 
      */
     @JsonProperty("resultFormat")
@@ -461,6 +603,16 @@ public class StorageProxy {
         this.data = data;
     }
 
+    @JsonProperty("sqlBuilder")
+    public SqlBuilder getSqlBuilder() {
+        return sqlBuilder;
+    }
+
+    @JsonProperty("sqlBuilder")
+    public void setSqlBuilder(SqlBuilder sqlBuilder) {
+        this.sqlBuilder = sqlBuilder;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -470,110 +622,17 @@ public class StorageProxy {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
-    
-    /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
-    @JsonProperty("entityId")
-    public String getEntityId() {
-    return entityId;
-    }
-
-    /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
-    @JsonProperty("entityId")
-    public void setEntityId(String entityId) {
-    this.entityId = entityId;
-    }
-
-    /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
-    @JsonProperty("pageNum")
-    public Integer getPageNum() {
-    return pageNum;
-    }
-
-    /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
-    @JsonProperty("pageNum")
-    public void setPageNum(Integer pageNum) {
-    this.pageNum = pageNum;
-    }
-
-    /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
-    @JsonProperty("pageSize")
-    public Integer getPageSize() {
-    return pageSize;
-    }
-
-    /**
-    * It holds the query
-    * <p>
-    * An explanation about the purpose of this instance.
-    * 
-    */
-    @JsonProperty("pageSize")
-    public void setPageSize(Integer pageSize) {
-    this.pageSize = pageSize;
-    }
-    
-    @JsonProperty("sqlBuilder")
-    public SqlBuilder getSqlBuilder() {
-      return sqlBuilder;
-    }
-    @JsonProperty("sqlBuilder")
-    public void setSqlBuilder(SqlBuilder sqlBuilder) {
-      this.sqlBuilder = sqlBuilder;
-    }
-    @JsonProperty("responseTime")
-    public String getResponseTime() {
-      return responseTime;
-    }
-    @JsonProperty("responseTime")
-    public void setResponseTime(String responseTime) {
-      this.responseTime = responseTime;
-    }
-
-    @JsonProperty("dataColumnHeader")
-    public Object getDataColumnHeader() {
-      return dataColumnHeader;
-    }
-    @JsonProperty("dataColumnHeader")
-    public void setDataColumnHeader(Object dataColumnHeader) {
-      this.dataColumnHeader = dataColumnHeader;
-    }
-
-
-
 
     public enum Action {
 
         SEARCH("search"),
-        AGGREGATE("aggregate"),
+        VALIDATE("validate"),
+        COUNT("count"),
         CREATE("create"),
         DELETE("delete"),
-        SNCRPIVOT("sncrpivot"),
-        COUNT("count");
+        UPDATE("update"),
+        AGGREGATE("aggregate"),
+        SNCRPIVOT("sncrpivot");
         private final String value;
         private final static Map<String, StorageProxy.Action> CONSTANTS = new HashMap<String, StorageProxy.Action>();
 

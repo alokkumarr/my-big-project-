@@ -12,9 +12,6 @@
     <logger name="org.springframework" level="info">
     </logger>
 
-    <logger name="com.synchronoss.saw" level='info'>
+    <logger name="com.synchronoss.saw" level='trace'>
     </logger>
-    <logger name="springfox.documentation" level='info'>
-    </logger>
-    
 </configuration>
