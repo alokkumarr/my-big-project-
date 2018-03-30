@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 
-import { DATASETS, SQLEXEC_SAMPLE, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
+import { SQLEXEC_SAMPLE, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
 
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
@@ -34,7 +34,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.get(endpoint)
       .pipe(
-        catchError(this.handleError('data', DATASETS)));
+        catchError(this.handleError('data', [])));
   }
 
   /** GET Staging area tree list */
@@ -58,7 +58,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-        catchError(this.handleError('data', [])));
+      catchError((e: any) => { return Observable.of(e); }));
   }
 
   /** File mask search */
@@ -70,13 +70,12 @@ export class WorkbenchService {
     let wildcardSearch: any;
     if (this.startsWith(mask, '*')) {
       wildcardSearch = this.endsWith;
-    }
-    if (this.endsWith(mask, '*')) {
+    } else if (this.endsWith(mask, '*')) {
       wildcardSearch = this.startsWith;
-    }
-    if (!mask.includes('*')) {
+    } else {
       wildcardSearch = this.exactMatch;
     }
+
     const filemasksearch = mask.replace('*', '');
     for (let fileCounter = 0; fileCounter < temmpFiles.length; fileCounter++) {
       if (wildcardSearch(temmpFiles[fileCounter].name, filemasksearch)) {

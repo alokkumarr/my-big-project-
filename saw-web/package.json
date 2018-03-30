@@ -48,7 +48,7 @@
     "angular-messages": "1.6.2",
     "angular-mocks": "1.6.2",
     "angular-sanitize": "1.6.2",
-    "angular-split": "^1.0.0-rc.3",
+    "angular-split": "1.0.0-rc.3",
     "angular-toastr": "2.1.1",
     "angular-translate": "2.13.1",
     "angular-tree-component": "7.0.1",

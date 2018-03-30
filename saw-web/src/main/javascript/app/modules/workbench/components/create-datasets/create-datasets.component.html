@@ -1,55 +1,54 @@
-<div mat-dialog-title fxLayout="row" style="margin-bottom:0px;">
-  <button mat-icon-button mat-dialog-close>
-    <mat-icon fontIcon="icon-arrow-left"></mat-icon>
-  </button>
-  <div class="mat-title">Add Data Set</div>
-  <span fxFlex></span>
-  <button mat-icon-button mat-dialog-close class="xBtn">
-    <mat-icon fontIcon="icon-close"></mat-icon>
-  </button>
-</div>
-<mat-dialog-content>
-  <mat-horizontal-stepper fxFill linear="true" (selectionChange)="stepChanged($event)">
+<mat-card fxFlex fxFill fxLayout="row">
+  <mat-horizontal-stepper linear="true" (selectionChange)="stepChanged($event)">
     <ng-template matStepperIcon="edit">
       <mat-icon fontIcon="icon-checkmark"></mat-icon>
     </ng-template>
     <ng-template matStepperIcon="done">
       <mat-icon fontIcon="icon-checkmark"></mat-icon>
     </ng-template>
-    <mat-step [completed]="selectFullfilled" label="SELECT">
+    <mat-step [completed]="selectFullfilled" i18n label="SELECT">
       <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
-      <div>
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
+        </button>
         <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
-          <span>Next</span>
+        <button mat-raised-button color="primary" matStepperNext class="stepperBtn">
+          <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
-    <mat-step [completed]="detailsFilled" label="DETAILS">
+    <mat-step [completed]="detailsFilled" i18n label="DETAILS">
       <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
-      <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
-          <mat-icon fontIcon="icon-back"></mat-icon>
-          <span>Previous</span>
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
-          <span>Next</span>
+        <button mat-raised-button color="secondary" matStepperPrevious class="stepperBtn previous Outline">
+          <mat-icon fontIcon="icon-back"></mat-icon>
+          <span i18n>Previous</span>
+        </button>
+        <button mat-raised-button color="primary" matStepperNext class="stepperBtn">
+          <span i18n> Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
-    <mat-step label="PREVIEW">
+    <mat-step [completed]="previewDone" i18n label="PREVIEW">
       <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
-      <div>
-        <button mat-button mat-raised-button mat-primary matStepperPrevious class="stepperBtn previous Outline">
-          <mat-icon fontIcon="icon-back"></mat-icon>
-          <span>Previous</span>
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
-          <span>Next</span>
+        <button mat-raised-button matStepperPrevious class="stepperBtn previous Outline">
+          <mat-icon fontIcon="icon-back"></mat-icon>
+          <span i18n>Previous</span>
+        </button>
+        <button mat-raised-button color="primary" matStepperNext class="stepperBtn">
+          <span i18n>Next</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
@@ -57,10 +56,10 @@
     <mat-step label="ADD_DATASET" [stepControl]="nameFormGroup">
       <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
         <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
-          <span class="list-header">Selected Files</span>
+          <span class="list-header" i18n>Selected Files</span>
           <mat-list>
             <mat-list-item class="list-items" *ngFor="let file of selectedFiles; index as i" (click)="previewDialog(file)">
-              <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
+              <p mat-line i18n>{{i + 1}}. &ensp; {{ file.name }}</p>
               <div class="icon-div">
                 <mat-icon mat-list-icon class="preview-icon" fontIcon="icon-show"></mat-icon>
               </div>
@@ -70,7 +69,7 @@
         </div>
         <mat-card fxFlex class="top-margin">
           <mat-card-header class="headerGradient">
-            <mat-card-title class="headerText">NAME_DATASET</mat-card-title>
+            <mat-card-title class="headerText" i18n>NAME_DATASET</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <div class="form-div">
@@ -78,9 +77,9 @@
                 <section class="input-section">
                   <mat-form-field class="margin20">
                     <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" maxlength="18" required />
-                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')">
+                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')" i18n>
                       Dataset Name is
-                      <strong>required</strong>
+                      <strong i18n>required</strong>
                     </mat-error>
                   </mat-form-field>
                   <!-- <div class="margin20">
@@ -97,9 +96,9 @@
                 <section class="input-section">
                   <mat-form-field class="margin20">
                     <input matInput placeholder="Description" name="description" formControlName="descControl" maxlength="50" required />
-                    <mat-error *ngIf="nameFormGroup.controls.descControl.hasError('required')">
+                    <mat-error *ngIf="nameFormGroup.controls.descControl.hasError('required')" i18n>
                       Dataset description is
-                      <strong>required</strong>
+                      <strong i18n>required</strong>
                     </mat-error>
                   </mat-form-field>
                 </section>
@@ -124,17 +123,20 @@
           </mat-card-content>
         </mat-card>
       </div>
-      <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
-          <mat-icon fontIcon="icon-back"></mat-icon>
-          <span>Previous</span>
+      <div fxLayout="row" fxLayoutGap="20px">
+        <button mat-raised-button (click)="backtoLists()" class="stepperBtn">
+          <span i18n>Cancel</span>
         </button>
         <div fxFlex></div>
-        <button mat-button mat-raised-button mat-primary color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
-          <span>ADD</span>
+        <button mat-raised-button color="secondary" matStepperPrevious class="stepperBtn previous Outline">
+          <mat-icon fontIcon="icon-back"></mat-icon>
+          <span i18n>Previous</span>
+        </button>
+        <button mat-raised-button color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
+          <span i18n>ADD</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
   </mat-horizontal-stepper>
-</mat-dialog-content>
+</mat-card>
