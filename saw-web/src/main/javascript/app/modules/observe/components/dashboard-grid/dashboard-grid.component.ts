@@ -32,6 +32,7 @@ import * as forEach from 'lodash/forEach';
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { GlobalFilterService } from '../../services/global-filter.service';
+import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
@@ -74,6 +75,7 @@ export class DashboardGridComponent
   constructor(
     private analyze: AnalyzeService,
     private filters: GlobalFilterService,
+    private dashboardService: DashboardService,
     private sidenav: SideNavService
   ) {}
 
@@ -162,6 +164,12 @@ export class DashboardGridComponent
       changed: true,
       dashboard: this.prepareDashboard()
     });
+  }
+
+  editTile(item: GridsterItem) {
+    if (!item.kpi) return;
+
+    this.dashboardService.onEditItem.next(item);
   }
 
   getDimensions(item) {

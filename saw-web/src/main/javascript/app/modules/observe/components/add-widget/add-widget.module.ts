@@ -30,7 +30,7 @@ const components = [
     MaterialModule,
     CommonPipesModule
   ],
-  exports: [AddWidgetComponent],
+  exports: [AddWidgetComponent, WidgetKPIComponent, WidgetHeaderComponent],
   declarations: components,
   providers: []
 })

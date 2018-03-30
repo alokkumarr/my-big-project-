@@ -1,6 +1,6 @@
 declare const require: any;
 
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, ViewChild, OnDestroy } from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -17,8 +17,10 @@ import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import { animations } from './create-dashboard.animations';
 
+import { Subscription } from 'rxjs/Subscription';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
@@ -33,11 +35,15 @@ const MARGIN_BETWEEN_TILES = 10;
   template,
   animations
 })
-export class CreateDashboardComponent {
+export class CreateDashboardComponent implements OnDestroy {
   public fillState = 'empty';
   public dashboard: Dashboard;
   public requester = new BehaviorSubject({});
   public mode = 'create';
+  public sidebarWidget: string;
+  public editItem: any;
+
+  editSubscription: Subscription;
 
   @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
 
@@ -53,6 +59,23 @@ export class CreateDashboardComponent {
     this.dashboard = get(this.dialogData, 'dashboard');
     this.mode = get(this.dialogData, 'mode');
     this.checkEmpty(this.dashboard);
+
+    this.subscribeToEdits();
+  }
+
+  ngOnDestroy() {
+    this.editSubscription && this.editSubscription.unsubscribe();
+  }
+
+  subscribeToEdits() {
+    this.editSubscription = this.dashboardService.onEditItem.subscribe(data => {
+      if (isEmpty(data)) return;
+
+      this.sidebarWidget = 'edit';
+      this.editItem = data;
+
+      this.widgetSidenav.open();
+    });
   }
 
   checkEmpty(dashboard) {
@@ -85,6 +108,7 @@ export class CreateDashboardComponent {
   }
 
   chooseAnalysis() {
+    this.sidebarWidget = 'add';
     this.widgetSidenav.open();
   }
 

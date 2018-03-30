@@ -15,6 +15,7 @@ require('./widget-kpi.component.scss');
   template
 })
 export class WidgetKPIComponent implements OnInit {
+  _kpi: any;
   _column: any;
   _metric: any;
 
@@ -29,11 +30,11 @@ export class WidgetKPIComponent implements OnInit {
     this.createForm();
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   createForm() {
     this.kpiForm = this.fb.group({
+      semanticId: ['', Validators.required],
       columnName: ['', Validators.required],
       name: ['', Validators.required],
       dateField: ['', Validators.required],
@@ -42,24 +43,44 @@ export class WidgetKPIComponent implements OnInit {
     });
   }
 
-  @Input() set column (data: any) {
-    if(!data) return;
+  @Input()
+  set column(data: any) {
+    if (!data) return;
     this._column = data;
-    this.kpiForm.get('columnName').setValue(data.columnName);
-    this.kpiForm.get('name').setValue(data.displayName);
+    this.kpiForm
+      .get('columnName')
+      .setValue(this._kpi ? this._kpi.columnName : data.columnName);
+    this.kpiForm
+      .get('name')
+      .setValue(this._kpi ? this._kpi.name : data.displayName);
   }
 
-  @Input() set metric (data: any) {
-    if(!data) return;
+  @Input()
+  set metric(data: any) {
+    if (!data) return;
     this._metric = data;
     this.kpiForm
+      .get('semanticId')
+      .setValue(this._kpi ? this._kpi.semanticId : data.id);
+    this.kpiForm
       .get('dateField')
-      .setValue(data.dateColumns[0].columnName);
+      .setValue(
+        this._kpi ? this._kpi.dateField : data.dateColumns[0].columnName
+      );
+  }
+
+  @Input()
+  set kpi(data: any) {
+    if (!data) return;
+    this._kpi = data;
+    this.kpiForm.get('columnName').setValue(data.columnName);
+    this.kpiForm.get('name').setValue(data.name);
+    this.kpiForm.get('semanticId').setValue(data.semanticId);
+    this.kpiForm.get('dateField').setValue(data.dateField);
   }
 
   applyKPI() {
     this.onKPIAction.emit({
-      action: WIDGET_ACTIONS.ADD,
       kpi: this.kpiForm.value
     });
   }

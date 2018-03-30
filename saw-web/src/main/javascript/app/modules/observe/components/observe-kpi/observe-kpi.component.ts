@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as get from 'lodash/get';
+import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
 import { Observable } from 'rxjs/Observable';
 
@@ -13,19 +14,24 @@ require('./observe-kpi.component.scss');
   template
 })
 export class ObserveKPIComponent implements OnInit {
-  @Input() kpi: any;
+  _kpi: any;
   executionResult: Observable<any>;
   constructor(private observe: ObserveService) {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  @Input()
+  set kpi(data) {
+    if (isEmpty(data)) return;
+    this._kpi = data;
     this.executeKPI();
   }
 
   executeKPI() {
     this.executionResult = this.observe
-      .executeKPI(this.kpi)
+      .executeKPI(this._kpi)
       .map(res => {
-        return get(res, `data.${this.kpi.columnName}._${this.kpi.aggregate}`);
+        return get(res, `data.${this._kpi.columnName}._${this._kpi.aggregate}`);
       })
       .map(({ current, prior }) => {
         const currentParsed = parseFloat(current);

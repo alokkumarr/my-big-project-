@@ -1,9 +1,14 @@
 <gridster [options]="options" #gridster class="dashboard-gridster">
   <gridster-item [item]="item" *ngFor="let item of dashboard" [ngClass]="item.kpi ? 'cell-kpi' : 'cell-analysis'">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
-    <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
-      <mat-icon fontIcon="icon-close"></mat-icon>
-    </button>
+    <div class="tile-actions">
+      <button mat-icon-button (click)="editTile(item)" *ngIf="!isViewMode() && item.kpi">
+        <mat-icon fontIcon="icon-edit-solid"></mat-icon>
+      </button>
+      <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+    </div>
     <ng-container *ngIf="item.analysis">
       <observe-chart *ngIf="item.analysis.type === 'chart'" class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
         [analysis]="item.analysis" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-chart>

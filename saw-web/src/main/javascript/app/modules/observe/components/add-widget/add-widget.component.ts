@@ -71,11 +71,11 @@ export class AddWidgetComponent implements OnInit {
     });
   }
 
-  onKPIAction({ action, kpi }) {
+  onKPIAction({ kpi }) {
     this.widgetStepper.previous();
     this.onWidgetAction.emit({
       widget: 'KPI',
-      action,
+      action: WIDGET_ACTIONS.ADD,
       data: kpi
     });
   }
