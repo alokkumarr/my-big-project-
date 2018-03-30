@@ -23,6 +23,7 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
+		<es.version>5.4.0</es.version>
 	</properties>
 
 	<dependencies>
@@ -114,17 +115,16 @@
 			<version>19.0</version>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>rest</artifactId>
-			<version>5.4.0</version>
+			<version>${es.version}</version>
 		</dependency>
-		
 		<dependency>
-		    <groupId>org.apache.lucene</groupId>
-		    <artifactId>lucene-test-framework</artifactId>
-		    <version>6.4.0</version>
-		    <scope>test</scope>
+			<groupId>org.elasticsearch</groupId>
+			<artifactId>elasticsearch</artifactId>
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
@@ -135,10 +135,9 @@
 		</dependency>
 		
 		<dependency>
-		    <groupId>org.elasticsearch.test</groupId>
-		    <artifactId>framework</artifactId>
-		    <version>5.4.0</version>
-		    <scope>test</scope>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>transport</artifactId>
+			<scope>test</scope>
 		</dependency>
 		
 		<dependency>

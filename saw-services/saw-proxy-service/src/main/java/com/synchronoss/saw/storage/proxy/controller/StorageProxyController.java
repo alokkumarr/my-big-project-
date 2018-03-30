@@ -79,7 +79,7 @@ public class StorageProxyController {
    * @return
    */
   @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
-  @RequestMapping(value = "/proxy/storage/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "/internal/proxy/storage/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public CompletableFuture<StorageProxy> retrieveStorageDataAsync(@RequestBody StorageProxy requestBody) {
     logger.debug("Request Body:{}", requestBody);
@@ -137,7 +137,7 @@ public class StorageProxyController {
    * @throws JsonProcessingException 
    */
   
-  @RequestMapping(value = "/proxy/storage/", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "/internal/proxy/storage/", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public StorageProxy retrieveStorageDataSync(@RequestBody StorageProxy requestBody) throws JsonProcessingException {
     logger.debug("Request Body:{}", requestBody);
@@ -145,7 +145,6 @@ public class StorageProxyController {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
     StorageProxy responseObjectFuture = null;
-    StorageProxy proxyNode = null;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
