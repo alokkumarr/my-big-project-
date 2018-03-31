@@ -21,7 +21,7 @@ require('./single-table-designer-layout.component.scss');
   template
 })
 export class SingleTableDesignerLayout {
-  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() data;
   @Input() sorts: Sort[];

@@ -90,13 +90,14 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     switch (analysis.type) {
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
-      openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+      // openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+      AnalyzeDialogService.openEditAnalysisDialog(analysis, mode);
       break;
     case AnalyseTypes.Chart:
       openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       break;
     case AnalyseTypes.Pivot:
-      AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode);
+      AnalyzeDialogService.openEditAnalysisDialog(analysis, mode);
       break;
     default:
     }

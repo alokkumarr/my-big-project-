@@ -8,7 +8,7 @@
 
 <div *ngIf="analysis" [ngSwitch]="layoutConfiguration" class="designer__main">
   <single-table-designer-layout *ngSwitchCase="'single'"
-                                (settingsChange)="onSettingsChange($event)"
+                                (change)="onSettingsChange($event)"
                                 [artifacts]="artifacts"
                                 [data]="data"
                                 [sorts]="sorts"
@@ -16,11 +16,11 @@
   </single-table-designer-layout>
 
   <multi-table-designer-layout *ngSwitchCase="'multi'"
-                               (settingsChange)="onSettingsChange($event)"
+                               (change)="onSettingsChange($event)"
                                [isInQueryMode]="analysis.edit"
                                [artifacts]="artifacts"
-                               [query]="analysis.queryManual"
                                [data]="data"
+                               [sorts]="sorts"
                                [sqlBuilder]="analysis.sqlBuilder"
                                [designerState]="designerState">
   </multi-table-designer-layout>

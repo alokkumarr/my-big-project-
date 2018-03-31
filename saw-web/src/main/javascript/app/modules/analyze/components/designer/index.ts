@@ -6,6 +6,7 @@ import {
   DesignerPivotComponent,
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
+import { DesignerReportComponent } from './report';
 import {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
@@ -38,6 +39,7 @@ export {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
+  DesignerReportComponent,
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
   DesignerSettingsQueryComponent,

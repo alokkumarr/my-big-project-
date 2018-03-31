@@ -31,7 +31,7 @@ export class AnalyzeDialogService {
     return this.openAnalysisDialog(data);
   }
 
-  openEditAdnalysisDialog(analysis: Analysis, mode: DesignerMode = 'edit') {
+  openEditAnalysisDialog(analysis: Analysis, mode: DesignerMode = 'edit') {
     const data: AnalysisDialogData = {
       analysis,
       designerMode: mode

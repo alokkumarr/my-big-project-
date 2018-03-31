@@ -7,10 +7,16 @@ import {
   ViewChild
 } from '@angular/core';
 import { DxDataGridComponent } from 'devextreme-angular';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFilter from 'lodash/fp/filter';
+import * as reduce from 'lodash/reduce';
 import {
   ArtifactColumnReport,
-  Artifact
-} from '../../../models';
+  Artifact,
+  Sort
+} from './types';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
@@ -26,7 +32,12 @@ const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
 
 const template = require('./report-grid.component.html');
 
-type ReportGridColumn = {
+type ReportGridSort = {
+  order: 'asc' | 'desc';
+  index: number;
+}
+
+type ReportGridField = {
   caption: string;
   dataField: string;
   dataType: string,
@@ -35,7 +46,9 @@ type ReportGridColumn = {
   allowSorting: boolean,
   alignment: string,
   width: string,
-  format: string | object
+  format?: string | object,
+  sortOrder?: 'asc' | 'desc',
+  sortIndex?: number;
 }
 
 @Component({
@@ -44,9 +57,21 @@ type ReportGridColumn = {
 })
 
 export class ReportGridComponent {
-  public columns: ReportGridColumn[];
+  public columns: ReportGridField[];
   public data;
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @Input() query: string;
+  @Input('sorts') set setSorts(sorts: Sort[]) {
+    console.log('sorts', sorts);
+    this.sorts = reduce(sorts, (acc, sort, index) => {
+      const reportGirdSort: ReportGridSort = {
+        order: sort.order,
+        index
+      }
+      acc[sort.columnName] = reportGirdSort;
+      return acc;
+    }, {});
+  };
   @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
     this.columns = this.artifacts2Columns(artifacts);
   };
@@ -55,10 +80,29 @@ export class ReportGridComponent {
     // for query mode
     this.columns = this.queryColumns2Columns(queryColumns);
   }
-  @Input() query: string;
   @Input('data') set setData(data: any[]) {
     this.data = data;
   };
+
+  public sorts: {};
+
+  // grid settings
+  public columnAutoWidth = true;
+  public columnMinWidth = 150;
+  public columnResizingMode = 'widget';
+  public allowColumnReordering = true;
+  public allowColumnResizing = true;
+  public showColumnHeaders = true;
+  public showColumnLines = false;
+  public showRowLines = false;
+  public showBorders = false;
+  public rowAlternationEnabled = true;
+  public hoverStateEnabled = true;
+  public wordWrapEnabled = true;
+  public scrolling = {mode: 'scrolling'};
+  public sorting = {mode: 'multiple'};
+  public gridHeight = '100%';
+  public gridWidth = '100%';
 
   onContextMenuPreparing(event) {
     const { target, column } = event;
@@ -100,11 +144,42 @@ export class ReportGridComponent {
 
   }
 
-  artifacts2Columns(artifacts: Artifact[]): ReportGridColumn[] {
+  artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
+    return fpPipe(
+      fpFlatMap((artifact: Artifact) => {
+        return artifact.columns;
+      }),
+      fpFilter('checked'),
+      fpMap((column: ArtifactColumnReport) => {
+        const field: ReportGridField = {
+          caption: column.aliasName || column.displayName,
+          dataField: column.columnName,
+          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
+          type: column.type,
+          visibleIndex: column.visibleIndex,
+          allowSorting: false,
+          alignment: 'left',
+          width: 'auto',
+          ...this.getSortingPart(column)
+        }
+
+        return field;
+      })
+    )(artifacts);
+  }
+
+  queryColumns2Columns(queryColumns): ReportGridField[]  {
     return [];
   }
 
-  queryColumns2Columns(queryColumns): ReportGridColumn[]  {
-    return [];
+  getSortingPart(column: ArtifactColumnReport) {
+    const sort = this.sorts[column.columnName];
+    if (sort) {
+      return {
+        sortIndex: sort.index,
+        sortOrder: sort.order
+      }
+    }
+    return {};
   }
 }

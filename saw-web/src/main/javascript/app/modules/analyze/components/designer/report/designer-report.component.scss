@@ -1,0 +1,23 @@
+@import "themes/base/colors";
+
+designer-report {
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+
+  .non-ideal-state__container {
+    margin-top: 50px;
+  }
+
+  .non-ideal-state__message {
+    color: $primary-grey-g3;
+    font-size: 26px;
+  }
+
+  .non-ideal-state__icon {
+    color: $primary-grey-g2;
+    margin-top: 50px;
+    display: table;
+    font-size: 200px;
+    width: auto;
+  }
+}

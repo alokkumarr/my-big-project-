@@ -29,7 +29,7 @@ require('./js-plumb-canvas.component.scss');
 export class JsPlumbCanvasComponent {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
-  @Input() joins: Join[]= [];
+  @Input() joins: Join[] = [];
   private _jsPlumbInst: any;
 
   constructor (
@@ -154,10 +154,7 @@ export class JsPlumbCanvasComponent {
         targetCriterion
       ]
     }
-    this.joins = [
-      ...this.joins,
-      join
-    ];
+    this.joins.push(join);
     this.onChange({subject: 'joins'});
   }
 
@@ -172,7 +169,6 @@ export class JsPlumbCanvasComponent {
     if (index !== -1) {
       this.joins.splice(index, 1);
     }
-    this.joins = [...this.joins];
     this.onChange({subject: 'joins'});
   }
 }

@@ -23,7 +23,7 @@ require('./designer-settings-multi-table.component.scss');
   template
 })
 export class DesignerSettingsMultiTableComponent {
-  @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
+  @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts') set setArtifacts(artifacts: Artifact[]) {
     this.artifacts = this.setDefaultArtifactPosition(artifacts);
   }
@@ -32,21 +32,13 @@ export class DesignerSettingsMultiTableComponent {
   public artifacts: Artifact[];
 
   onChange(event: JsPlumbCanvasChangeEvent) {
-    console.log('change: ', event.subject);
-    switch (event.subject) {
-    case 'joins':
-      break;
-    case 'artifactPosition':
-      break;
-    case 'column':
-      break;
-    }
+    this.change.emit(event);
   }
 
   setDefaultArtifactPosition(artifacts: Artifact[]) {
     // set the x, y coordiantes of the artifacts (tables in jsplumb)
     const defaultXPosition = 20;
-    const defaultSpacing = 300;
+    const defaultSpacing = 400;
     let xPosition = defaultXPosition;
     forEach(artifacts, (artifact: Artifact) => {
       if (isEmpty(artifact.artifactPosition)) {

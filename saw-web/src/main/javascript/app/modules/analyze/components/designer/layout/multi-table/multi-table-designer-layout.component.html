@@ -6,6 +6,7 @@
   </designer-settings-query>
 
   <designer-settings-multi-table *ngIf="!isInQueryMode"
+                                 (change)="change.emit($event)"
                                  [artifacts]="artifacts"
                                  [sqlBuilder]="sqlBuilder">
   </designer-settings-multi-table>
@@ -21,8 +22,10 @@
 </div>
 <div *ngIf="isGridPanelExpanded"
      class="designer__data-grid">
-  <report-grid-upgraded [artifacts]="artifacts"
-                        [query]="query"
-                        [data]="data">
-  </report-grid-upgraded>
+  <designer-report (change)="change.emit($event)"
+                   [artifacts]="artifacts"
+                   [data]="data"
+                   [sorts]="sorts"
+                   [designerState]="designerState">
+  </designer-report>
 </div>

@@ -17,6 +17,7 @@ export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart | Artifac
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
+  ArtifactColumnReport,
   Sort,
   Format,
   Filter,
@@ -48,7 +49,7 @@ export type AnalysisDialogData = {
   analysis?: Analysis
 };
 
-export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'save';
+export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'save' | 'refresh';
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;

@@ -35,7 +35,9 @@ export class JsPlumbEndpointComponent {
   ) {}
 
   ngOnInit() {
-    this.addEndpoint(this.column, this.side, this.artifactName);
+    setTimeout(() => {
+      this.addEndpoint(this.column, this.side, this.artifactName);
+    });
   }
 
   ngOnDestroy() {

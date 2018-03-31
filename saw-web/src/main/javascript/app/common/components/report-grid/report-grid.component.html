@@ -1,7 +1,23 @@
-<dx-data-grid
+<dx-data-grid class="report-dx-grid"
     id="report-grid"
     #dataGrid
     (onContextMenuPreparing)="onContextMenuPreparing($event)"
+    [columnAutoWidth]="columnAutoWidth"
+    [columnMinWidth]="columnMinWidth"
+    [columnResizingMode]="columnResizingMode"
+    [allowColumnReordering]="allowColumnReordering"
+    [allowColumnResizing]="allowColumnResizing"
+    [showColumnHeaders]="showColumnHeaders"
+    [showColumnLines]="showColumnLines"
+    [showRowLines]="showRowLines"
+    [showBorders]="showBorders"
+    [rowAlternationEnabled]="rowAlternationEnabled"
+    [hoverStateEnabled]="hoverStateEnabled"
+    [wordWrapEnabled]="wordWrapEnabled"
+    [scrolling]="scrolling"
+    [sorting]="sorting"
+    [height]="gridHeight"
+    [width]="gridWidth"
     [dataSource]="data"
     [columns]="columns">
 </dx-data-grid>

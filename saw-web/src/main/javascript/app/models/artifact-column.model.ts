@@ -32,4 +32,5 @@ export interface ArtifactColumnReport extends ArtifactColumn {
   hide?:          boolean;
   tableName?:     string;
   joinEligible?:  boolean;
+  visibleIndex?:  number;
 }

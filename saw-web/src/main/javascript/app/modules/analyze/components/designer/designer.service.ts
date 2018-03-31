@@ -26,7 +26,10 @@ import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
   ArtifactColumns,
-  ArtifactColumnPivot
+  ArtifactColumnPivot,
+  SqlBuilder,
+  SqlBuilderPivot,
+  SqlBuilderReport
 } from './types';
 import {
   NUMBER_TYPES,
@@ -218,7 +221,7 @@ export class DesignerService {
     adapter.onReorder(adapter.artifactColumns);
   }
 
-  getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {
+  getPartialPivotSqlBuilder(artifactColumns: ArtifactColumns): Partial<SqlBuilderPivot> {
     const pivotFields = fpPipe(
       fpFilter((artifactColumn: ArtifactColumnPivot) => artifactColumn.checked && artifactColumn.area),
       fpSortBy('areaIndex'),
@@ -238,21 +241,13 @@ export class DesignerService {
         })
       )
     )(artifactColumns);
-
-    switch (type) {
-    case 'pivot':
-      return {
-        rowFields: pivotFields.row || [],
-        columnFields: pivotFields.column || [],
-        // the data field must be non-empty
-        dataFields: pivotFields.data
-      };
-    case 'chart':
-    case 'report':
-      return {};
-    }
+    return {
+      rowFields: pivotFields.row || [],
+      columnFields: pivotFields.column || [],
+      // the data field must be non-empty
+      dataFields: pivotFields.data
+    };
   }
-
 
   parseData(data, sqlBuilder) {
     const nodeFieldMap = this.getNodeFieldMap(sqlBuilder);

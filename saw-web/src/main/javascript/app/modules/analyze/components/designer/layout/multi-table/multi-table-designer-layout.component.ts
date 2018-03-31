@@ -9,7 +9,8 @@ import {
 import {
   Artifact,
   DesignerChangeEvent,
-  SqlBuilder
+  SqlBuilder,
+  Sort
 } from '../../types';
 import { DesignerStates } from '../../container';
 
@@ -21,13 +22,19 @@ require('./multi-table-designer-layout.component.scss');
   template
 })
 export class MultiTableDesignerLayout {
-  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
+  @Input() sorts: Sort[];
   @Input() isInQueryMode: boolean;
-  @Input() query: boolean;
-  @Input() data;
   @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;
+  @Input('data') set setData(data) {
+    if (data) {
+      this.data = data;
+      this.isGridPanelExpanded = true;
+    }
+  };
+  public data;
   public isGridPanelExpanded: boolean = false;
 
   toggleGridPanel() {

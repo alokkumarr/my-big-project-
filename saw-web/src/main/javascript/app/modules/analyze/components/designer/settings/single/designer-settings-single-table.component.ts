@@ -41,7 +41,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   template
 })
 export class DesignerSettingsSingleTableComponent {
-  @Output() public settingsChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts') public set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
       this.artifactColumns = artifacts[0].columns;
@@ -88,7 +88,7 @@ export class DesignerSettingsSingleTableComponent {
   }
 
   _changeSettingsDebounced(event: DesignerChangeEvent) {
-    this.settingsChange.emit(event);
+    this.change.emit(event);
   }
 
   getUnselectedArtifactColumns() {

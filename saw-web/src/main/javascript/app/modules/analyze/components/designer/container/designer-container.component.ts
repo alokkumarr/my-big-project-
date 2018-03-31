@@ -24,6 +24,7 @@ import {
   Analysis,
   AnalysisType,
   SqlBuilder,
+  SqlBuilderReport,
   SqlBuilderPivot,
   ArtifactColumns,
   Artifact,
@@ -156,16 +157,27 @@ export class DesignerContainerComponent {
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this._designerService.getDataForAnalysis(this.analysis)
-      .then((data: any) => {
-        if (this.isDataEmpty(data.data, this.analysis.type, this.analysis.sqlBuilder)) {
+      .then((response) => {
+        if (this.isDataEmpty(response.data, this.analysis.type, this.analysis.sqlBuilder)) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
-          this.data = this._designerService.parseData(data.data, this.analysis.sqlBuilder);
+          this.data = this.parseData(response.data, this.analysis);
         }
       }, err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
       });
+  }
+
+  parseData(data, analysis: Analysis) {
+    switch (analysis.type) {
+    case 'pivot':
+      return this._designerService.parseData(data, analysis.sqlBuilder);
+    case 'report':
+      return data;
+    case 'chart':
+      break;
+    }
   }
 
   onToolbarAction(action: DesignerToolbarAciton) {
@@ -207,17 +219,29 @@ export class DesignerContainerComponent {
       .afterClosed().subscribe((result: IToolbarActionResult) => {
         if (result) {
           this.onSave.emit(result.isSaveSuccessful);
+          this.isInDraftMode = false;
         }
       });
+      break;
+    case 'refresh':
+      this.requestDataIfPossible();
       break;
     }
   }
 
   getSqlBuilder(): SqlBuilder {
-    const partialSqlBuilder = this._designerService.getPartialSqlBuilder(
-      this.artifacts[0].columns,
-      this.analysis.type
-    )
+    let partialSqlBuilder;
+
+    switch (this.analysis.type) {
+    case 'pivot':
+      partialSqlBuilder = this._designerService.getPartialPivotSqlBuilder(this.artifacts[0].columns);
+      break;
+    case 'report':
+      partialSqlBuilder = {
+        joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
+      }
+      break;
+    }
 
     return {
       booleanCriteria: this.booleanCriteria,
@@ -253,18 +277,49 @@ export class DesignerContainerComponent {
   }
 
   onSettingsChange(event: DesignerChangeEvent) {
+    switch (this.analysis.type) {
+    case 'report':
+      this.handleReportChangeEvents(event);
+    case 'pivot':
+    case 'chart':
+      this.handleOtherChangeEvents(event);
+    }
+    this.isInDraftMode = true;
+  }
+
+  handleReportChangeEvents(event: DesignerChangeEvent) {
+    switch (event.subject) {
+    case 'column':
+      this.cleanSorts();
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      break;
+    case 'filter':
+    case 'joins':
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      break;
+    case 'format':
+    case 'aliasName':
+    case 'sort':
+      this.artifacts = [...this.artifacts];
+      break;
+    case 'artifactPosition':
+    }
+  }
+
+  handleOtherChangeEvents(event: DesignerChangeEvent) {
     switch (event.subject) {
     case 'selectedFields':
       this.cleanSorts();
+      this.requestDataIfPossible();
+      break;
     case 'dateInterval':
     case 'aggregate':
     case 'filter':
-    case 'sort':
-      // reload backend data
       this.requestDataIfPossible();
       break;
     case 'format':
     case 'aliasName':
+    case 'sort':
       // reload frontEnd
       this.artifacts = [...this.artifacts];
       break;
@@ -279,7 +334,7 @@ export class DesignerContainerComponent {
       return isNumber(length) ? length > 0 : false;
     case 'chart':
     case 'report':
-      return false;
+      return true;
     }
 
   }
