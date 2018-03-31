@@ -37,7 +37,6 @@ export class JsPlumbCanvasComponent {
   ) {
     this.onConnection = this.onConnection.bind(this);
     this.onConnectionDetached = this.onConnectionDetached.bind(this);
-    this.onConnectionMoved = this.onConnectionMoved.bind(this);
   }
 
   ngOnInit() {
@@ -98,15 +97,6 @@ export class JsPlumbCanvasComponent {
   onConnectionDetached(info) {
     const connectionPayload = <ConnectionPayload>info.connection.getParameter('connectionPayload');
     this.removeJoin(connectionPayload.join);
-    // TODO emit event
-    // this.onChange({
-    //   name: EVENTS.JOIN_CHANGED,
-    //   params: {}
-    // });
-  }
-
-  onConnectionMoved() {
-
   }
 
   onJoinChange(event: JoinChangeEvent) {
