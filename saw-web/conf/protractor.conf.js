@@ -77,7 +77,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
   capabilities: {
-    browserName: webpackHelper.distRun() ? 'firefox' : 'chrome', //debug purposes
+    browserName: 'chrome',
     chromeOptions: {
       args: [
         'disable-extensions',
