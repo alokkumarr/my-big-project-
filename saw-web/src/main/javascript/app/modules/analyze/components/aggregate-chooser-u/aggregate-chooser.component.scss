@@ -1,0 +1,18 @@
+aggregate-chooser {
+  .aggregate-chooser__btn {
+    width: auto;
+    color: $primary-grey-g3;
+
+    & > .mat-button-wrapper {
+      width: auto;
+
+      & > .mat-icon {
+        width: auto;
+
+        &::before {
+          width: auto;
+        }
+      }
+    }
+  }
+}

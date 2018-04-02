@@ -15,10 +15,6 @@
       <span class="jsp-table-column-name" ng-bind="::field.getDisplayName()"></span>
     </md-checkbox>
 
-    <!-- <aggregate-chooser flex="20" artifact-column="attr"
-      on-select="$ctrl.onSelectAggregateType(aggregateType, field)">
-    </aggregate-chooser> -->
-
     <md-menu ng-if="field.checked && $ctrl.checkType(field) && field.reportType === 'esReport'">
       <md-button aria-label="TOOLTIP_AGGREGATE_TYPE"
                  class="md-icon-button"

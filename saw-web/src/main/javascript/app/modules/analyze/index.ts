@@ -96,6 +96,7 @@ import {
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
+import { AggregateChooserComponent as AggregateChooserComponentUpgraded } from './components/aggregate-chooser-u';
 import {
   analyzeServiceProvider
 } from './services/ajs-analyze-providers';
@@ -176,6 +177,7 @@ angular.module(AnalyzeModule, [
     ReactiveFormsModule
   ],
   declarations: [
+    AggregateChooserComponentUpgraded,
     AnalyzeReportQueryComponent,
     DesignerDialogComponent,
     DesignerContainerComponent,
@@ -206,6 +208,7 @@ angular.module(AnalyzeModule, [
     MultiTableDesignerLayout
   ],
   entryComponents: [
+    AggregateChooserComponentUpgraded,
     AnalyzeReportQueryComponent,
     DesignerDialogComponent,
     DesignerContainerComponent,

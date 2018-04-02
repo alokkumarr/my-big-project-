@@ -14,6 +14,16 @@
         {{getColumnLabel(column)}}
       </span>
     </mat-checkbox>
+
+    <aggregate-chooser-u (change)="onAggregateChange(column, $event)"
+                         [aggregate]="column.aggregate">
+    </aggregate-chooser-u>
+
+    <button mat-icon-button
+            (click)="clearAggregate(column)">
+      <mat-icon fontIcon="icon-close"></mat-icon>
+    </button>
+
     <div *ngIf="column.joinEligible">
       <js-plumb-endpoint-u *ngFor="let side of sides; trackBy: index"
                            [column]="column"

@@ -15,7 +15,7 @@
   </div>
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
-    <div *ngIf="artifactColumn.aggregate">
+    <!-- <div *ngIf="artifactColumn.aggregate">
       <button mat-icon-button
               [matMenuTriggerFor]="aggregatemenu"
               class="expandable-field__option-button">
@@ -29,7 +29,12 @@
           <span style="margin-left: 20px;">{{aggregateType.label}}</span>
         </button>
       </mat-menu>
-    </div>
+    </div> -->
+
+    <aggregate-chooser-u *ngIf="artifactColumn.aggregate"
+                         (change)="onAggregateChange($event)"
+                         [aggregate]="artifactColumn.aggregate">
+    </aggregate-chooser-u>
 
     <button mat-icon-button
             class="expandable-field__remove-btn"

@@ -7,6 +7,7 @@ import {
   ElementRef
 } from '@angular/core';
 import * as find from 'lodash/find';
+import * as unset from 'lodash/unset';
 
 import {
   Artifact,
@@ -66,5 +67,15 @@ export class JsPlumbTableComponent {
   onCheckBoxToggle(column: ArtifactColumnReport, checked) {
     column.checked = checked;
     this.change.emit({subject: 'column'});
+  }
+
+  onAggregateChange(column, aggregate) {
+    column.aggregate = aggregate;
+    this.change.emit({subject: 'aggregate'});
+  }
+
+  clearAggregate(column) {
+    unset(column, 'aggregate');
+    this.change.emit({subject: 'aggregate'});
   }
 }
