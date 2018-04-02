@@ -6,16 +6,25 @@ sql-executor {
   .executor-container {
     height: 99%;
     max-height: 100%;
-    border: 3px #F5F9FC solid;
+    padding: 3px;
+  }
+
+  .title-elem {
+    height: 36px;
+  }
+
+  .ds-name {
+    font-size: 16px;
+  }
+
+  .bck-btn {
+    min-width: 50px;
+    height: 32px;
   }
 
   .action-title {
     color: $primary-blue-b2;
-  }
-
-  .title-elem {
-    margin: 0;
-    padding-left: 20px;
+    font-size: 16px;
   }
 
   .gridContainer {
@@ -24,16 +33,16 @@ sql-executor {
   }
 
   .exec-body {
-    height: calc(100% - 41px);
-    max-height: calc(100% - 41px);
+    height: calc(100% - 45px);
+    max-height: calc(100% - 45px);
   }
 
   .script-pane {
-    overflow: scroll;
+    overflow: auto;
   }
 
   .preview-pane {
-    overflow: scroll;
+    overflow: auto;
   }
 
   .exec-btn-icon {
@@ -58,9 +67,6 @@ sql-executor {
 
   .btn-icon {
     color: $primary-blue-b2;
-    line-height: 32px !important;
-    height: 32px !important;
-    padding-top: 1px;
 
     .mat-button {
       vertical-align: middle;
@@ -74,5 +80,9 @@ sql-executor {
     .mat-button .mat-button-wrapper > * {
       vertical-align: initial;
     }
+  }
+
+  .create-btn > .mat-raised-button {
+    line-height: 32px !important;
   }
 }

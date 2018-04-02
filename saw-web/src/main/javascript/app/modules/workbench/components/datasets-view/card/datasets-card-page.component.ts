@@ -1,6 +1,7 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { UIRouter } from '@uirouter/angular';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -24,6 +25,7 @@ export class DatasetsCardPageComponent implements OnInit {
   private dataSets: Array<any> = [];
 
   constructor(
+    private router: UIRouter,
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService
   ) {  }
@@ -46,16 +48,6 @@ export class DatasetsCardPageComponent implements OnInit {
     }
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 1000);
-  }
-
-  openSQLEditor(): void {
-    this.dialog.open(SqlExecutorComponent, {
-      panelClass: 'full-screen-dialog',
-      autoFocus: false,
-      data: {
-        id: ''
-      }
-    });
+    }, 3000);
   }
 }

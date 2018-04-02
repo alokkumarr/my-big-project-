@@ -7,7 +7,7 @@
             <mat-icon fontIcon="icon-exchange"></mat-icon>
             <span>Data Sets</span>
           </mat-button-toggle>
-          <mat-button-toggle  disabled i18n value="pods">
+          <mat-button-toggle disabled i18n value="pods">
             <mat-icon fontIcon="icon-portal-libraries"></mat-icon>
             <span>Data Pods</span>
           </mat-button-toggle>
@@ -16,7 +16,7 @@
       <div fxFlex="20" fxLayout="row" class="view-mode">
         <mat-button-toggle-group [(ngModel)]="viewState" [value]="viewState" (change)="onViewChange()" #viewMode="matButtonToggleGroup">
           <mat-button-toggle matTooltip="List view" value="list">
-            <mat-icon fontIcon="icon-navicon"></mat-icon>
+            <mat-icon fontIcon="icon-navicon" style="font-size: 21px;"></mat-icon>
           </mat-button-toggle>
           <mat-button-toggle matTooltip="Card view" value="card">
             <mat-icon fontIcon="icon-tile-view-solid"></mat-icon>
@@ -25,15 +25,15 @@
       </div>
       <span fxFlex></span>
       <div class="action-buttons">
-        <button mat-icon-button color="primary" matTooltip="Refresh" (click)="getPageData()">
-          <mat-icon fontIcon="icon-Refresh" class="exec-btn-icon"></mat-icon>
+        <button mat-button color="primary" (click)="getPageData()">
+          <span>Refresh</span>
         </button>
         <!-- <button mat-icon-button color="primary" matTooltip="Create Datapod" style="font-size:24px;" (click)="null">
           <mat-icon fontIcon="icon-portal-libraries" class="exec-btn-icon"></mat-icon>
         </button> -->
         <button mat-raised-button color="primary" i18n (click)="addDataSet()">
-            <span>+ Dataset</span>
-          </button>
+          <span>+ Dataset</span>
+        </button>
         <!-- <button color="primary" mat-icon-button [matMenuTriggerFor]="dataSet" #dataSetMenuTrigger="matMenuTrigger">
           <mat-icon fontIcon="icon-exchange"></mat-icon>
         </button>

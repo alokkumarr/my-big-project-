@@ -33,7 +33,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   private dataView: string = 'sets'; // tslint:disable-line
   private contentHeight: number; // tslint:disable-line
   private poll = true;
-  private interval = 10000;
+  private interval = 20000;
 
   constructor(
     private router: UIRouter,
@@ -54,7 +54,6 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     TimerObservable.create(0, this.interval)
       .takeWhile(() => this.poll)
       .subscribe(() => {
-        this.headerProgress.show();
         this.getPageData();
       });
   }
@@ -64,6 +63,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   }
 
   getPageData(): void {
+    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.loadSets(this.availableSets);
