@@ -29,7 +29,8 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
     public static final String delimiter = "::";
 
     protected String metaRoot;
-    protected final Table table;
+
+    protected Table table;
 
     //TODO:: Replace altRoot with configuration reading
     protected MetadataStore(String tableName, String altRoot) throws Exception {
@@ -37,6 +38,7 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
         logger.debug("Open table: " + fullTableName);
+
         boolean exists = MapRDB.tableExists(fullTableName);
         table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
         table.setOption(Table.TableOption.BUFFERWRITE, false);
