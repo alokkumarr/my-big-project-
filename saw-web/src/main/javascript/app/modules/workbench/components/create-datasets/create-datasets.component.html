@@ -81,6 +81,11 @@
                       Dataset Name is
                       <strong i18n>required</strong>
                     </mat-error>
+                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('pattern')" i18n>
+                      <strong> Only alphabets, numbers, _, - are allowed
+                      </strong>
+                    </mat-error>
+                    <mat-hint> Only alphabets, numbers, _ , - are allowed </mat-hint>
                   </mat-form-field>
                   <!-- <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">

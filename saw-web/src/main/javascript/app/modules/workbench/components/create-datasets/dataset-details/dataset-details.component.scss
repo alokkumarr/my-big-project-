@@ -59,11 +59,15 @@ dataset-details {
   }
 
   .form-div {
-    padding: 1% 9% 0;
+    padding: 3px 9% 0;
+    height: calc(100% - 59px);
+    overflow: auto;
   }
 
   .list-margin1 {
     margin-top: 1%;
+    height: 100%;
+    overflow: auto;
   }
 
   .list-header {

@@ -1,8 +1,9 @@
 
-import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit } from '@angular/core';
+import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { UIRouter } from '@uirouter/angular';
 
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
 import * as get from 'lodash/get';
@@ -19,28 +20,23 @@ require('./sql-executor.component.scss');
   selector: 'sql-executor',
   template
 })
-export class SqlExecutorComponent implements OnInit {
+export class SqlExecutorComponent implements OnInit, OnDestroy {
   private artifacts: any;
   private gridConfig: Array<any>;
-  private showProgress: boolean = false;
   private gridData = new BehaviorSubject([]);
-  private datasetID: string = '';
+  private dsMetadata: any;
   private datasetDetails: Array<any>;
   private appliedActions: Array<any> = SQL_AQCTIONS;
-  private scriptHeight: number = 40;
-  private previewHeight: number = 60;
+  private scriptHeight: number = 75;
+  private previewHeight: number = 25;
+  private query: string = '';
 
   constructor(
-    public dialogRef: MatDialogRef<SqlExecutorComponent>,
+    private router: UIRouter,
     public dialog: MatDialog,
     private workBench: WorkbenchService,
-    private notify: ToastService,
-    @Inject(MAT_DIALOG_DATA) private data: any
-  ) {
-    if (get(data, 'id')) {
-      this.datasetID = data.id;
-    }
-  }
+    private notify: ToastService
+  ) {}
 
   @ViewChild('sqlscript') private scriptComponent: SqlScriptComponent;
 
@@ -48,10 +44,13 @@ export class SqlExecutorComponent implements OnInit {
     this.getPageData();
   }
 
+  ngOnDestroy() {
+    this.workBench.removeDataFromLS('dsMetadata');
+  }
+
   getPageData(): void {
-    this.showProgress = true;
-    this.workBench.getDatasetDetails(this.datasetID).subscribe(data => {
-      this.showProgress = false;
+    this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
+    this.workBench.getDatasetDetails('this.datasetID').subscribe(data => {
       this.artifacts = data.artifacts;
     });
   }
@@ -62,6 +61,10 @@ export class SqlExecutorComponent implements OnInit {
 
   sendDataToPreview(data) {
     this.gridData.next(data);
+  }
+
+  getQuery(data) {
+    this.query = data;
   }
 
   openSaveDialog() {
@@ -76,7 +79,8 @@ export class SqlExecutorComponent implements OnInit {
       .subscribe(data => {
         if (data !== false) {
           this.datasetDetails = data;
-          this.triggerSQL();
+          this.scriptComponent.onCreateEmitter();
+          this.triggerSQL(data);
         }
       });
   }
@@ -86,22 +90,26 @@ export class SqlExecutorComponent implements OnInit {
     this.scriptHeight = fullScreenPreview ? 0 : 40;
   }
 
-  triggerSQL() {
+  triggerSQL(data) {
     const payload = {
-      'name': 'test_sql',
-      'input': 'test_parser',
+      'name': data.name,
+      'input': this.dsMetadata.system.name,
       'component': 'sql',
       'configuration': {
-        'script': 'CREATE TABLE test_sql AS SELECT 1'
+        'script': this.query
       }
     }
     this.workBench.triggerParser(payload).subscribe(data => {
-      //this.dialogRef.close();
-
-    })
+      this.notify.info('SQL_Executor_triggered_successfully', 'Creating Dataset', { hideDelay: 9000 });
+    });
+    this.router.stateService.go('workbench.datasets');
   }
 
   previewAction(action) {
     this.scriptComponent.viewAction(action);
+  }
+
+  backToDS() {
+    this.router.stateService.go('workbench.datasets');
   }
 }

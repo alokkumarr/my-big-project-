@@ -57,9 +57,11 @@ export class ParserPreviewComponent implements OnInit {
 
   ngOnInit() {
     this.previewgridConfig = this.getPreviewGridConfig();
-    this.updaterSubscribtion = this.previewObj.subscribe(data => {
-      this.onUpdate(data)
-    });
+    setTimeout(() => {
+      this.updaterSubscribtion = this.previewObj.subscribe(data => {
+        this.onUpdate(data)
+      });
+    }, 100);
   }
 
   ngOnDestroy() {
@@ -67,7 +69,7 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   onUpdate(data) {
-    if ( data.length === 2 && !isUndefined(data[0].samplesParsed)) {
+    if (data.length === 2 && !isUndefined(data[0].samplesParsed)) {
       this.parserData = cloneDeep(data[0]);
       const parsedData = data[0].samplesParsed;
       this.fieldInfo = cloneDeep(data[0].fields);
@@ -78,6 +80,11 @@ export class ParserPreviewComponent implements OnInit {
     } else if (data.length != 0 && !isUndefined(data[0].error)) {
       this.inspectError = true;
       this.errMsg = data[0].error.message;
+    } else if (data.length === 0) {
+      setTimeout(() => {
+        this.dataGrid.instance.beginCustomLoading('Loading...');
+        this.reloadDataGrid([]);
+      });
     }
     if (data.length === 2 && !isUndefined(data[1])) {
       this.rawPreview(data[1]);
@@ -209,7 +216,7 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   toAdd() {
-    const fieldsObj = map(this.fieldInfo,  obj => {
+    const fieldsObj = map(this.fieldInfo, obj => {
       if (obj.format) {
         obj.format = obj.format[0];  // Parser component expects format to be a string.
       }

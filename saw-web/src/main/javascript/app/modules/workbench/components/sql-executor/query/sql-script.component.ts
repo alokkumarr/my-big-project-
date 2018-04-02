@@ -31,6 +31,7 @@ require('./sql-script.component.scss');
 export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @Input() model: any;
   @Output() onExecute = new EventEmitter<any>();
+  @Output() onCreate = new EventEmitter<any>();
 
   @ViewChild('editor') editor: AceEditorComponent;
 
@@ -139,6 +140,15 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   queryUpdated(query) {
   }
 
+  onCreateEmitter() {
+    this.onCreate.emit(this.query);
+  }
+
+  /**
+   * Executes the queryy against the datset and emits the result to preview component.
+   * 
+   * @memberof SqlScriptComponent
+   */
   executeQuery() {
     this.workBench.executeSqlQuery(this.query).subscribe(data => {
       this.onExecute.emit(data);

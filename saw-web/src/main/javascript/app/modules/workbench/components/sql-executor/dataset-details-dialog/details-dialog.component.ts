@@ -16,6 +16,7 @@ require('./details-dialog.component.scss');
 
 export class DetailsDialogComponent {
   form: FormGroup;
+  private folNamePattern = '[A-Za-z0-9-_/]+';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -24,7 +25,7 @@ export class DetailsDialogComponent {
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      nameControl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(18)]],
+      nameControl: ['', [Validators.required, Validators.pattern(this.folNamePattern), Validators.minLength(3), Validators.maxLength(18)]],
       descControl: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]]
     })
   }

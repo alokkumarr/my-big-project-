@@ -58,7 +58,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-      catchError((e: any) => { return Observable.of(e); }));
+        catchError((e: any) => { return Observable.of(e); }));
   }
 
   /** File mask search */
@@ -159,6 +159,25 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
+  }
+  /**
+   * Following 3 functions
+   * To store, retrive and remove data from localstorage
+   * 
+   * @param {any} metadata 
+   * @memberof WorkbenchService
+   */
+  setDataToLS(key, value) {
+    localStorage.setItem('dsMetadata', JSON.stringify(value));
+  }
+
+  getDataFromLS(key) {
+    const dsMetada = JSON.parse(localStorage.getItem(key));
+    return dsMetada;
+  }
+
+  removeDataFromLS(key) {
+    localStorage.removeItem(key);
   }
 
   /**

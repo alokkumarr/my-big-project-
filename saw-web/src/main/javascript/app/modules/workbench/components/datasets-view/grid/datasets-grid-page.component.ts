@@ -99,7 +99,7 @@ export class DatasetsGridPageComponent implements OnInit {
       width: '7%',
       alignment: 'center'
     }, {
-      dataField: 'sets._id',
+      dataField: '_id',
       caption: 'Actions',
       cellTemplate: 'actionsCellTemplate',
       width: '5%'
@@ -139,6 +139,6 @@ export class DatasetsGridPageComponent implements OnInit {
     this.dataGrid.instance.refresh();
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 1000);
+    }, 3000);
   }
 }

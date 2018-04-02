@@ -42,6 +42,7 @@ export class CreateDatasetsComponent implements OnInit {
   private parserConf: any;
   public nameFormGroup: FormGroup;
   private selectedIndex: number = 0;
+  private folNamePattern = '[A-Za-z0-9-_/]+';
 
   constructor(
     private router: UIRouter,
@@ -58,7 +59,7 @@ export class CreateDatasetsComponent implements OnInit {
     this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
-      nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(25)]),
+      nameControl: new FormControl('', [Validators.required, Validators.pattern(this.folNamePattern), Validators.minLength(3), Validators.maxLength(25)]),
       descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(99)])
     });
   }
@@ -137,7 +138,7 @@ export class CreateDatasetsComponent implements OnInit {
     };
     // this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
     this.workBench.triggerParser(payload).subscribe(data => {
-      this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 5000 });
+      this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 9000 });
     });
     this.router.stateService.go('workbench.datasets');
   }

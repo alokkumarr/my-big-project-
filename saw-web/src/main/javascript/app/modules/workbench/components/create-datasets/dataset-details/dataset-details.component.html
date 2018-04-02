@@ -15,8 +15,7 @@
     <mat-card-header class="headerGradient">
       <mat-card-title class="headerText">Details</mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-      <div class="form-div">
+    <mat-card-content class="form-div">
         <form #datasetDetails novalidate [formGroup]="detailsFormGroup" autocomplete="off">
           <section class="input-section">
             <mat-form-field class="margin20">
@@ -108,7 +107,6 @@
             <span>{{previewConfig.sampleSize}}</span>
           </section> -->
         </form>
-      </div>
     </mat-card-content>
   </mat-card>
 </div>
