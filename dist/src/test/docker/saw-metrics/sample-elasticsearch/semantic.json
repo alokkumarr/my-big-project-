@@ -96,6 +96,7 @@
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
+                "kpiEligible": true,
                 "filterEligible": true
               },
               {
@@ -106,6 +107,7 @@
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
+                "kpiEligible": true,
                 "filterEligible": true
               },
               {
@@ -116,6 +118,7 @@
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
+                "kpiEligible": true,
                 "filterEligible": true
               },
               {
@@ -126,6 +129,7 @@
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
+                "kpiEligible": true,
                 "filterEligible": true
               },
               {
@@ -136,7 +140,9 @@
                 "aliasName": "",
                 "table": "sales",
                 "joinEligible": false,
+                "kpiEligible": true,
                 "filterEligible": true
+
               }
             ]
           }

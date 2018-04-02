@@ -23,6 +23,7 @@ import com.squareup.okhttp.Response;
 
 
 import com.synchronoss.querybuilder.ReportAggregationBuilder;
+import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
 import com.synchronoss.querybuilder.model.report.DataField;
 import com.synchronoss.querybuilder.model.report.SqlBuilder;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
@@ -214,5 +215,42 @@ public class SAWElasticTransportService {
        result.put("esRepository",globalFilter.getEsRepository());
         Gson gson = new Gson();
         return gson.toJson(result);
+    }
+
+    public static String executeReturnDataAsString(KPIExecutionObject executionObject)
+        throws IOException, NullPointerException{
+
+        String url = System.getProperty("url");
+        OkHttpClient client = new OkHttpClient();
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        ESProxy esProxy = new ESProxy();
+        esProxy.setStorageType("ES");
+        esProxy.setIndexName(executionObject.getEsRepository().getIndexName());
+        esProxy.setObjectType(executionObject.getEsRepository().getType());
+        esProxy.setVerb("_search");
+        esProxy.setQuery(executionObject.getCurrentSearchSourceBuilder().toString());
+        esProxy.setModuleName("observe");
+        esProxy.setDsk("dsk");
+        esProxy.setUsername("system");
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
+        Request req = new Request.Builder().post(body).url(url).build();
+        logger.trace("Elasticsearch request: {}", req);
+        Response response = null;
+        response = client.newCall(req).execute();
+        logger.trace("Elasticsearch response: {}", response);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        String responseString = response.body().string();
+        logger.trace("responseStringdfd" + responseString);
+        JsonNode esResponse = objectMapper.readTree(responseString);
+        if (esResponse.get("data") == null) {
+            throw new NullPointerException("Data is not available based on provided query criteria");
+        }
+        JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+        return finalResponse.get("aggregations").toString();
+       // return buildGlobalFilterData(finalResponse.get("aggregations"),executionObject.getGlobalFilter());
     }
 }

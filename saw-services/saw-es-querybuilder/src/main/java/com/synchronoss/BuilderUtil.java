@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilters;
+import com.synchronoss.querybuilder.model.kpi.KPIBuilder;
 import org.threeten.extra.YearQuarter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -100,6 +101,17 @@ public class BuilderUtil
         GlobalFilters globalFilters =
                 objectMapper.treeToValue(objectNode, GlobalFilters.class);
        return globalFilters;
+    }
+
+    public static KPIBuilder getNodeTreeKPIBuilder(String jsonString)
+        throws JsonProcessingException, IOException, ProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        JsonNode objectNode = objectMapper.readTree(jsonString);
+        KPIBuilder kpiBuilder =
+            objectMapper.treeToValue(objectNode, KPIBuilder.class);
+        return kpiBuilder;
     }
 
     public static com.synchronoss.querybuilder.model.report.SqlBuilder getNodeTreeReport(String jsonString, String node)

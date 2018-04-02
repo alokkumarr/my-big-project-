@@ -41,6 +41,7 @@ class Analysis extends BaseController {
     * List analyses.  At the moment only used by scheduler to list
     * analyses that are scheduled.
     */
+  @Deprecated
   def list(view: String): Result = {
     handle((json, ticket) => {
       if (view == "schedule") {
@@ -51,6 +52,7 @@ class Analysis extends BaseController {
     })
   }
 
+  @Deprecated
   private def listSchedules: JObject = {
     val analysisNode = new AnalysisNode
     val search = Map[String, Any]("isScheduled" -> "true")

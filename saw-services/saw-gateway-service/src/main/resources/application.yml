@@ -96,6 +96,9 @@ api:
         -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]filters.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]kpi.*'
         -   location: ${workbench.service.host}
             method: POST
             path: '[/]internal/workbench.*'
