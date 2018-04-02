@@ -1,0 +1,27 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-ngdev/skesloadertest-esloader.json",
+  "xdf-root" : "hdfs:///data/bda",
+  "category" : "DataSet",
+  "id" : "skesloadertest::ESDATASET",
+
+  "source" : {
+    "userData" : {
+      "createdBy" : "Sunil Kumar B M",
+      "description" : "Input dataset for esloader",
+      "category" : "test",
+      "subCategory" : "ES Loader"
+    },
+    "system" : {
+      "physicalLocation":"hdfs:///data/bda/skesloadertest/dl/fs/dinp/ESDATASET01/data",
+      "name" : "ESDATASET",
+      "type" : "fs",
+      "project" : "skesloadertest",
+      "catalog" : "dinp",
+      "format"  : "json",
+      "mode"    : "replace",
+      "numberOfFiles" : 1
+    },
+    "transformations" : [ ]
+  }
+}
