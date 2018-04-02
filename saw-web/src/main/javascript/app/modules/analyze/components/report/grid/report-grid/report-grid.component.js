@@ -166,21 +166,18 @@ export const ReportGridComponent = {
         return null;
       }
       return map(columns, column => {
-        console.log(column);
         const isNumberType = NUMBER_TYPES.includes(column.type);
 
         if (isNumberType && !column.format && column.aggregate === 'percentage') {
           column.format = {};
           column.format.percentage = true;
           column.format.precision = DEFAULT_PRECISION;
-          console.log(column.format);
         }
 
         if (column.type === 'timestamp') {
           column.type = 'date';
         }
         if (FLOAT_TYPES.includes(column.type)) {
-          console.log("inside float");
           if (!column.format) {
             column.format = {};
           }
@@ -188,7 +185,6 @@ export const ReportGridComponent = {
             column.format.precision = DEFAULT_PRECISION;
           }
         }
-        console.log(column.format);
         const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
@@ -197,8 +193,6 @@ export const ReportGridComponent = {
           visibleIndex: column.visibleIndex,
           format: isNumberType ? {formatter: getFormatter(column.format)} : column.format
         };
-
-        console.log(field);
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
