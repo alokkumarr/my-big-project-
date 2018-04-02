@@ -47,9 +47,23 @@
               </md-chip-template>
             </md-chips> 
           </md-input-container>
-          <span ng-if="$ctrl.emailValidateFlag" class="errorTextMsg" translate="EMAIL_ERROR_MSG"></span>
         </div>
-
+        <div ng-if="$ctrl.model.type !== 'chart'" class="form-container" layout="column">
+          <!-- <md-checkbox ng-checked="$ctrl.hasDispatch"
+                        ng-click="$ctrl.hasDispatch = !$ctrl.hasDispatch">
+            <span translate="SET_DISPATCH_LABEL"></span>
+          </md-checkbox> -->
+          <label translate="SET_DISPATCH_LABEL"></label>
+          <div class="publish-form">
+            <md-select multiple style="width:275px;" ng-model="$ctrl.ftp" placeholder="Select FTP Location">
+              <md-option ng-value="location" ng-repeat="location in $ctrl.locations">{{ location }}</md-option>
+            </md-select>
+            <span class="clear" ng-click="$ctrl.ftp = [];">Clear</span>
+          </div>
+        </div>
+        <span ng-if="$ctrl.emailValidateFlag" class="errorTextMsg" translate="EMAIL_ERROR_MSG"></span>
+        <span ng-if="$ctrl.errorFlagMsg" class="errorTextMsg" translate="PUBLISH_ERROR_MSG"></span>
+        <span ng-if="$ctrl.cronValidateField" class="errorTextMsg" translate="SCHEDULE_ERROR_MSG"></span>
       </div>
 
     </div>

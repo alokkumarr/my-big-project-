@@ -1,0 +1,77 @@
+<div class="executor-container">
+  <div mat-dialog-title class="title-elem" fxLayout="row" fxLayoutAlign="center center">
+    <div class="action-title">
+      <mat-icon fontIcon="icon-query-mode" style="vertical-align:middle;"></mat-icon>
+      <span>SQL_EXECUTOR </span>
+    </div>
+    <div class="btn-padding" fxFlex fxLayout="row" fxLayoutGap="10px">
+      <span class="subheading-1">Datasets: </span>
+      <mat-chip-list>
+        <mat-chip selected="true" *ngFor="let artifact of artifacts">{{artifact.artifactName}}</mat-chip>
+      </mat-chip-list>
+    </div>
+    <div fxLayout="row" fxLayoutGap="20px" fxFlexAlign="end center">
+      <div class="btn-icon">
+        <button mat-button matTooltip="Execute Query" (click)="runScript()">
+          <mat-icon fontIcon="icon-play-circle"></mat-icon>
+          <span>Run</span>
+        </button>
+      </div>
+      <div class="btn-icon">
+        <button mat-button matTooltip="Add to list" (click)="addScript()">
+          <mat-icon fontIcon="icon-clipboard"></mat-icon>
+          <span>Add</span>
+        </button>
+      </div>
+      <div class="btn-icon">
+        <button mat-button matTooltip="New Query" (click)="newScript()">
+          <mat-icon fontIcon="icon-soup-solid"></mat-icon>
+          <span>New</span>
+        </button>
+      </div>
+      <div class="btn-icon">
+        <button mat-button matTooltip="Save" (click)="openSaveDialog()">
+          <mat-icon fontIcon="icon-save"></mat-icon>
+          <span>Save</span>
+        </button>
+      </div>
+      <button mat-icon-button mat-dialog-close class="xBtn">
+        <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
+      </button>
+    </div>
+  </div>
+  <mat-progress-bar *ngIf="showProgress" mode="query" style="height:2px;"></mat-progress-bar>
+  <mat-divider></mat-divider>
+  <div mat-dialog-content class="exec-body">
+    <split direction="vertical">
+      <split-area class="script-pane" [size]="scriptHeight">
+        <split direction="horizontal">
+          <split-area size="75">
+            <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)">
+            </sql-script>
+          </split-area>
+          <split-area size="25">
+            <mat-list>
+              <div fxLayout="row" fxLayoutAlign="start start">
+                <h3 mat-subheader fxFlex fxLayout="row" fxLayoutAlign="start start">
+                  <mat-icon fontIcon="icon-clipboard"></mat-icon>
+                  <span>ACTIONS_LIST</span>
+                </h3>
+              </div>
+              <mat-list-item class="list-items" *ngFor="let action of appliedActions; index as i; last as isLast" (click)="previewAction(action.statement)">
+                <p mat-line>{{i + 1}}. &ensp; {{ action.statement }}</p>
+                <div class="icon-div" *ngIf="isLast">
+                  <mat-icon mat-list-icon style="color: #E5524C;" fontIcon="icon-delete"></mat-icon>
+                </div>
+                <mat-divider></mat-divider>
+              </mat-list-item>
+            </mat-list>
+          </split-area>
+        </split>
+      </split-area>
+      <split-area class="preview-pane" [size]="previewHeight">
+        <sqlpreview-grid-page [updater]="gridData" (onToggleScreenMode)="toggleViewMode($event)"></sqlpreview-grid-page>
+      </split-area>
+    </split>
+  </div>
+</div>

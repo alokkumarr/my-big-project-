@@ -2,8 +2,10 @@ package com.synchronoss.saw.gateway.utils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Enumeration;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.client.methods.RequestBuilder;
@@ -14,7 +16,7 @@ public class HeadersRequestTransformer extends ProxyRequestTransformer {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
   @Override
-  public RequestBuilder transform(HttpServletRequest request) throws URISyntaxException, IOException {
+  public RequestBuilder transform(HttpServletRequest request) throws URISyntaxException, IOException, UnsupportedCharsetException, ServletException {
     RequestBuilder requestBuilder = predecessor.transform(request);
     Enumeration<String> headerNames = request.getHeaderNames();
     while (headerNames.hasMoreElements()) {

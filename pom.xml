@@ -7,14 +7,10 @@
   <version>${revision}</version>
   <packaging>pom</packaging>
   <name>saw</name>
-  <modules>
-    <module>saw-dist</module>
-    <module>saw-security</module>
-    <module>saw-services</module>
-    <module>saw-web</module>
-  </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Disable Docker Machine configuration by default -->
+    <docker.skip.machine>true</docker.skip.machine>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -27,14 +23,73 @@
     </dependencies>
   </dependencyManagement>
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M1</version>
+        <configuration>
+          <skip>true</skip>
+          <rules>
+          </rules>
+        </configuration>
+      </plugin>
+      <!-- Workaround: When activating "docker-start" profile, the
+           "docker:build" goal will be invoked on the top-level
+           project too, so ensure the plug-in exists with an empty
+           configuration to let the build proceed.  -->
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.24.0</version>
+        <!-- Mark as not inherited to avoid propagating skip setting -->
+        <inherited>false</inherited>
+        <configuration>
+          <!-- Skip execution of the Docker Maven plug-in for the
+               parent project -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.0.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>8.8</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <phase>test</phase>
+              <configuration>
+                <!-- Consider using approach described in
+                     https://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html
+                     -->
+                <configLocation>${project.parent.basedir}/src/main/resources/checkstyle.xml</configLocation>
+                <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                <violationSeverity>warning</violationSeverity>
+                <!-- Exclude files that were added before Checkstyle was enabled.  Gradually
+                     make also these files conform to checkstyle rules and remove the exclusions -->
+                <excludes>**/AnalyzeIT.java</excludes>
+              </configuration>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>3.1.0</version>
         </plugin>
-        <plugin> 
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.20.1</version>
@@ -45,10 +100,31 @@
   <repositories>
     <repository>
       <id>synchronoss</id>
-      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
+  <repository>
+    <id>synchronoss-snapshots</id>
+    <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+  </repository>
   </repositories>
   <profiles>
+    <!-- Define modules in a default profile, instead of at the top
+         level, to allow limiting modules built in different profiles.
+         This allows for example an invocation to build and start a
+         SAW development environment to be limited to the "dist"
+         module. -->
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>saw-security</module>
+        <module>saw-services</module>
+        <module>saw-web</module>
+        <module>dist</module>
+      </modules>
+    </profile>
     <!-- Profile that uses the preset container name "saw" and binds
          to preset ports.  This is for developers who are manually
          interacting with the SAW containers and only running a single
@@ -58,32 +134,24 @@
          running in parallel, as can happen for example in continuous
          integration.  -->
     <profile>
-      <id>docker-saw</id>
-      <properties>
-        <saw.docker.ip>localhost</saw.docker.ip>
-        <saw.docker.port>80</saw.docker.port>
-        <saw.docker.naming>alias</saw.docker.naming>
-        <saw.mapr.port>18443</saw.mapr.port>
-        <saw.spark.master.port>18080</saw.spark.master.port>
-        <saw.spark.worker.port>18081</saw.spark.worker.port>
-        <saw.kibana.port>15601</saw.kibana.port>
-        <saw.journal.port>19531</saw.journal.port>
-        <!-- Show Docker image build output by default to keep users
-             up to date on the progress, as it can take considerable
-             time for the first run and after Dockerfile modifications
-             -->
-        <docker.verbose>true</docker.verbose>
-      </properties>
-    </profile>
-    <!-- Additional profile for Docker Machine setups, to be used
-         together with the Docker profile -->
-    <profile>
-      <id>docker-saw-machine</id>
-      <properties>
-        <!-- Bind to all interfaces so that environment can be
-             accessed remotely -->
-        <saw.docker.ip>0.0.0.0</saw.docker.ip>
-      </properties>
+      <id>docker-start</id>
+      <activation>
+        <property>
+          <!-- Note: Should perhaps have been named "docker-fixed" (in
+               reference to the fixed ports, as opposed to the default
+               randomized ports) or just "docker") -->
+          <name>docker-start</name>
+        </property>
+      </activation>
+      <modules>
+        <module>dist</module>
+      </modules>
+      <build>
+        <defaultGoal>
+          enforcer:enforce properties:read-project-properties
+          docker:stop docker:build docker:start
+        </defaultGoal>
+      </build>
     </profile>
   </profiles>
 </project>

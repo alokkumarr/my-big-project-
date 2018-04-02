@@ -1,0 +1,106 @@
+@import "themes/base/colors";
+
+widget-analysis {
+  .choose-analysis {
+    color: $primary-grey-g5;
+    padding: 16px 10px;
+    display: flex;
+    margin: 5px 0;
+    background: white;
+
+    .analysis-description {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      word-wrap: break-word;
+      overflow: hidden;
+      transition: height 2s;
+    }
+
+    &:hover {
+      .analysis-description {
+        white-space: unset;
+        text-overflow: unset;
+        overflow: visible;
+      }
+    }
+
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 20%;
+
+      &::before {
+        color: $primary-grey-g2;
+      }
+    }
+
+    & > div {
+      flex-grow: 1;
+      width: 80%;
+      display: flex;
+      flex-direction: column;
+
+      & > * {
+        margin: 5px 0;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .card-base {
+        display: flex;
+        align-items: center;
+
+        small.analysis-metric {
+          color: $primary-grey-g3;
+          flex-grow: 1;
+          padding-right: 5px;
+        }
+      }
+    }
+  }
+
+  .search-analysis {
+    font-size: 18px;
+    margin-top: 10px;
+    width: 100%;
+
+    .mat-form-field-prefix {
+      mat-icon {
+        font-size: 14px;
+        width: 1.4em;
+      }
+    }
+  }
+
+  .mat-mini-fab.widget-action-button {
+    align-self: flex-end;
+    box-shadow: none;
+
+    /*
+      &.widget-action-remove {
+        border: 1px solid #E53935;
+        background: white;
+
+        mat-icon {
+          &::before {
+            color: #E53935;
+          }
+        }
+      }
+    */
+
+    mat-icon {
+      font-size: 12px;
+      vertical-align: baseline;
+      line-height: 24px;
+      font-weight: bold;
+      width: 12px;
+
+      &::before {
+        color: white;
+      }
+    }
+  }
+}

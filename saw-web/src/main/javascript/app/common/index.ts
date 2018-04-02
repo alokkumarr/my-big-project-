@@ -60,6 +60,7 @@ import {
   JoinDialogComponent,
   JsPlumbEndpointComponent
 } from './components/js-plumb';
+import {DateFormatDialogComponent} from './components/date-format-dialog';
 import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
@@ -131,7 +132,8 @@ angular
     JsPlumbTableComponent,
     JsPlumbConnectorComponent,
     JsPlumbJoinLabelComponent,
-    JoinDialogComponent
+    JoinDialogComponent,
+    DateFormatDialogComponent
   ],
   entryComponents: [
     PivotGridComponent,
@@ -141,7 +143,8 @@ angular
     JsPlumbCanvasComponent,
     JsPlumbTableComponent,
     JsPlumbJoinLabelComponent,
-    JoinDialogComponent
+    JoinDialogComponent,
+    DateFormatDialogComponent
   ],
   exports: [
     DndModule,
@@ -158,6 +161,7 @@ angular
     JsPlumbConnectorComponent,
     JsPlumbJoinLabelComponent,
     JoinDialogComponent,
+    DateFormatDialogComponent,
     E2eDirective
   ],
   providers: [

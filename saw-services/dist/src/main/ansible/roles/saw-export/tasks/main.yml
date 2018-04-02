@@ -7,5 +7,17 @@
   template: src=application.yml dest=/opt/bda/saw-export-service/conf
   notify:
     - restart saw-export
+- name: Install SAW export Service ftp details file
+  template: src=ftp-details.json dest=/opt/bda/saw-export-service/conf
+  notify:
+    - restart saw-export
+# Workaround: The service restart handler will run only after all
+# tasks have completed.  This causes the service to remain running
+# using the old port when the new socket activation proxy starts up,
+# resulting in a port already in use error.  So trigger the restart
+# handler already here, to force the service to pick up the new port
+# setting before starting the socket activation proxy.  Can be removed
+# as no longer needed after the next SAW release.
+- meta: flush_handlers
 - name: Enable SAW Export Service
-  systemd: name=saw-export enabled=true
+  systemd: name=saw-export-proxy.socket enabled=true state=started

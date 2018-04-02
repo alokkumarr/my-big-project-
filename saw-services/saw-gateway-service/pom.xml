@@ -109,7 +109,6 @@
 			<version>2.7.1</version>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -208,7 +207,7 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 	</repositories>
 </project>

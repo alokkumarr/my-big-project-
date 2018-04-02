@@ -9,7 +9,13 @@ import {
   FLOAT_TYPES,
   DATE_TYPES,
   CHART_COLORS,
-  BACKEND_TIMEZONE
+  BACKEND_TIMEZONE,
+  DATE_FORMATS,
+  DATE_FORMATS_OBJ,
+  DEFAULT_DATE_FORMAT,
+  AGGREGATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ
 } from '../../common/consts.js';
 
 export {
@@ -17,7 +23,13 @@ export {
   FLOAT_TYPES,
   DATE_TYPES,
   CHART_COLORS,
-  BACKEND_TIMEZONE
+  BACKEND_TIMEZONE,
+  DATE_FORMATS,
+  DATE_FORMATS_OBJ,
+  DEFAULT_DATE_FORMAT,
+  AGGREGATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ
 };
 
 export const Events = {
@@ -84,35 +96,6 @@ export const PRIVILEGES = {
   DELETE: 'DELETE',
   ALL: 'ALL'
 };
-
-export const AGGREGATE_TYPES = [{
-  label: 'Total',
-  value: 'sum',
-  icon: 'icon-Sum'
-}, {
-  label: 'Average',
-  value: 'avg',
-  icon: 'icon-AVG'
-}, {
-  label: 'Mininum',
-  value: 'min',
-  icon: 'icon-MIN'
-}, {
-  label: 'Maximum',
-  value: 'max',
-  icon: 'icon-MAX'
-}, {
-  label: 'Count',
-  value: 'count',
-  icon: 'icon-Count'
-}];
-
-export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
-
-export const AGGREGATE_TYPES_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(AGGREGATE_TYPES);
 
 export const COMBO_TYPES = [{
   label: 'line',
@@ -271,15 +254,16 @@ export const DATE_INTERVALS = [{
 }, {
   label: 'Quarter',
   value: 'quarter',
-  format: 'YYYY-Q'
+  format: 'yyyy-QQQ',
+  momentFormat: 'YYYY-Q'
 }, {
   label: 'Month',
   value: 'month',
-  format: 'YYYY-MM'
+  format: 'yyyy-MM',
+  momentFormat: 'YYYY-MM'
 }, {
   label: 'Date',
-  value: 'day',
-  format: 'YYYY-MM-DD'
+  value: 'day'
 }];
 
 export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];

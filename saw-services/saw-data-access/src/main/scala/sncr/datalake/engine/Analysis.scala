@@ -6,13 +6,16 @@ import java.util.UUID
 import java.util.concurrent.{ExecutorService, Executors, Future}
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
-import files.HFileOperations;
+import files.HFileOperations
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.DLConfiguration
 import sncr.datalake.TimeLogger._
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
 import sncr.metadata.engine.ProcessingResult
+import sncr.saw.common.config.SAWServiceConfig
+
+import scala.reflect.io.File
 
 /**
   * Created by srya0001 on 6/8/2017.
@@ -58,7 +61,9 @@ class Analysis(val analysisId : String) {
   }
 
   private def executionCompleted(resultId: String): Boolean = {
-    val path = "/main/saw-transport-executor-result-" + resultId
+    val mainPath = if (SAWServiceConfig.executorConfig.hasPath("path"))
+      SAWServiceConfig.executorConfig.getString("path") else "/main"
+    val path = mainPath+File.separator+"saw-transport-executor-result-" + resultId
     try {
       HFileOperations.readFile(path)
     } catch {

@@ -1,0 +1,14 @@
+<dx-data-grid id="gridContainer">
+  <div *dxTemplate="let data of 'toggleViewTemplate'">
+    <div *ngIf="!fullScreen">
+      <button mat-icon-button matTooltip="Full screen mode" (click)="togglePreview(true)">
+        <mat-icon fontIcon="icon-full-screen" class="screen-icon"></mat-icon>
+      </button>
+    </div>
+    <div *ngIf="fullScreen">
+      <button mat-icon-button matTooltip="Exit full screen mode" (click)="togglePreview(false)">
+        <mat-icon fontIcon="icon-fullscreen-exit" class="screen-icon" style="font-size: 28px;"></mat-icon>
+      </button>
+    </div>
+  </div>
+</dx-data-grid>

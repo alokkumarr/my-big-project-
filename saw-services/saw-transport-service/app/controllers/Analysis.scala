@@ -215,7 +215,8 @@ class Analysis extends BaseController {
     	      {
 	        /* Build query based on analysis supplied in request body */
                 executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
-	        val runtime = (executionType == "onetime")
+	        val runtime = (executionType == ExecutionType.onetime.toString
+            || executionType == ExecutionType.regularExecution.toString)
                 m_log.debug("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
@@ -629,14 +630,25 @@ class Analysis extends BaseController {
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       m_log.trace("queryRuntime inside report block before executeAndWait: {}", queryRuntime);
-      //var query :String =null
-      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+      val query = if (queryRuntime != null) queryRuntime
+        // In case of scheduled execution type if manual query exists take the precedence.
+      else if(executionType ==
+        ExecutionType.scheduled.toString) {
+         (analysisJSON \ "queryManual") match {
+          case JNothing => QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+          case obj: JString => obj.extract[String]
+          case obj => unexpectedElement("string", obj)
+        }
+      }
+      else
+        QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       m_log.trace("query inside report block before executeAndWait : {}", query);
       /* Execute analysis report query through queue for concurrency */
       val executionTypeEnum = executionType match {
         case "preview" => ExecutionType.preview
         case "onetime" => ExecutionType.onetime
         case "scheduled" => ExecutionType.scheduled
+        case "regularExecution" => ExecutionType.regularExecution
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       val execution = analysis.executeAndWaitQueue(
@@ -645,6 +657,7 @@ class Analysis extends BaseController {
             case ExecutionType.preview => executorFastQueue
             case ExecutionType.onetime => executorFastQueue
             case ExecutionType.scheduled => executorRegularQueue
+            case ExecutionType.regularExecution => executorRegularQueue
             case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
           executorQueue.send(executionTypeEnum, analysisId, resultId, query)

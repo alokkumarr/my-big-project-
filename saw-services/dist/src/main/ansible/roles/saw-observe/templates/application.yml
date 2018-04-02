@@ -5,14 +5,14 @@ spring:
     name: saw-observe-service
 server:
   address: localhost
-  port: 9500
+  port: 9501
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 metastore:
-    base:  hdfs:///main
-    
+    base: "{{ saw_observe_metastore | default('hdfs:///main/') }}"
+
 logging:
   config: /opt/bda/saw-observe-service/conf/logback.xml

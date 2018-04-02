@@ -1,2 +1,3 @@
 - name: restart saw-export
-  systemd: name=saw-export state=restarted daemon_reload=true
+  # Stop service, to trigger restart by socket activation
+  systemd: name=saw-export state=stopped daemon_reload=true

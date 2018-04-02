@@ -4,6 +4,8 @@ import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
 import * as moment from 'moment';
+import * as fpMap from 'lodash/fp/map';
+import * as fpPipe from 'lodash/fp/pipe';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
@@ -26,6 +28,7 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
+      this.cronValidateField = false;
       this._JwtService = JwtService;
       this.resp = this._JwtService.getTokenObj();
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
@@ -60,6 +63,8 @@ export const AnalyzePublishDialogComponent = {
       this.endCriterion = this.endCriteria.never.keyword;
       this.loadCronLayout = false;
       this._$rootScope = $rootScope;
+      this.ftp = [];
+      this.locations = [];
     }
 
     $onInit() {
@@ -72,8 +77,20 @@ export const AnalyzePublishDialogComponent = {
         });
     }
 
+    getFTPLocations() {
+      const request = {
+        jobGroup: this.resp.ticket.custCode
+      };
+      this._AnalyzeService.getlistFTP(request).then(response => {
+        this.locations = response.data.ftp;
+      });
+    }
+
     fetchCronDetails() {
       this.$dialog.showLoader();
+      if (this.model.type !== 'chart') {
+        this.getFTPLocations();
+      }
       this.requestCron = {
         jobName: this.model.id,
         categoryId: this.model.categoryId,
@@ -90,8 +107,11 @@ export const AnalyzePublishDialogComponent = {
             activeTab: response.data.data.jobDetails.activeTab,
             activeRadio: response.data.data.jobDetails.activeRadio
           };
-          if (response.data.data.jobDetails.cronExpression) {
+          if (response.data.data.jobDetails.analysisID) {
             this.scheduleState = 'exist';
+          }
+          if (this.model.type !== 'chart') {
+            this.ftp = response.data.data.jobDetails.ftp;
           }
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
@@ -134,11 +154,8 @@ export const AnalyzePublishDialogComponent = {
           jobName: this.model.id,
           scheduleState: this.scheduleState
         };
-      } else {
-        if (!this.validateEmails(this.emails)) {
-          this.emailValidateFlag = true;
-          return;
-        }
+        this.triggerSchedule();
+      } else if (this.validateForm()) {
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -148,6 +165,7 @@ export const AnalyzePublishDialogComponent = {
           cronExpression: this.crondetails.cronexp,
           description: this.description,
           emailList: this.emails,
+          ftp: this.ftp,
           fileType: 'csv',
           jobName: this.model.id,
           metricName: this.model.metricName,
@@ -157,24 +175,65 @@ export const AnalyzePublishDialogComponent = {
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
+        this.triggerSchedule();
       }
+    }
+
+    triggerSchedule() {
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
     }
 
-    validateEmails(emails) {
-      if (isEmpty(emails)) {
+    validateForm() {
+      this.errorFlagMsg = false;
+      this.emailValidateFlag = false;
+      this.cronValidateField = false;
+      let validationCheck = true;
+
+      const validateFields = {
+        emails: this.validateEmails(this.emails),
+        schedule: this.validateSchedule(),
+        publish: this.validatePublishSelection()
+      };
+      fpPipe(
+        fpMap(check => {
+          if (check === false) {
+            validationCheck = false;
+          }
+        })
+      )(validateFields);
+      return validationCheck;
+    }
+
+    validatePublishSelection() {
+      if (isEmpty(this.emails) && isEmpty(this.ftp) && this.model.type !== 'chart') {
+        this.errorFlagMsg = true;
         return false;
       }
+      return true;
+    }
+
+    validateSchedule() {
+      if (isEmpty(this.crondetails.cronexp)) {
+        this.cronValidateField = true;
+        return false;
+      }
+    }
+
+    validateEmails(emails) {
       const emailsList = emails;
       let emailsAreValid = true;
+      if (isEmpty(emailsList) && this.model.type === 'chart') {
+        emailsAreValid = false;
+        this.emailValidateFlag = true;
+      }
       forEach(emailsList, email => {
         const isEmailvalid = this.regexOfEmail.test(email.toLowerCase());
         if (!isEmailvalid) {
           emailsAreValid = false;
           // cancel forEach
-          return false;
+          this.emailValidateFlag = true;
         }
       });
       return emailsAreValid;
