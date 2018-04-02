@@ -44,25 +44,26 @@ public class WorkbenchPreviewJob implements Job<Integer> {
         document.put("_id", id);
         document.putNewArray("rows");
         rows.forEachRemaining((Row row) -> {
-            document.addNewArray();
+            document.addNewMap();
             for (int i = 0; i < row.size(); i++) {
+                String name = fields[i].name();
                 DataType dataType = fields[i].dataType();
                 if (dataType.equals(DataTypes.StringType)) {
-                    document.add(row.getString(i));
+                    document.put(name, row.getString(i));
                 } else if (dataType.equals(DataTypes.IntegerType)) {
-                    document.add(row.getInt(i));
+                    document.put(name, row.getInt(i));
                 } else if (dataType.equals(DataTypes.LongType)) {
-                    document.add(row.getLong(i));
+                    document.put(name, row.getLong(i));
                 } else if (dataType.equals(DataTypes.FloatType)) {
-                    document.add(row.getFloat(i));
+                    document.put(name, row.getFloat(i));
                 } else if (dataType.equals(DataTypes.DoubleType)) {
-                    document.add(row.getDouble(i));
+                    document.put(name, row.getDouble(i));
                 } else {
                     log.warn("Unhandled Spark data type: {}", dataType);
-                    document.add(row.get(i).toString());
+                    document.put(name, row.get(i).toString());
                 }
             }
-            document.endArray();
+            document.endMap();
         });
         document.endArray();
         document.endMap();

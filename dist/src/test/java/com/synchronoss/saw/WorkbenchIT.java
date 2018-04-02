@@ -149,7 +149,7 @@ public class WorkbenchIT extends BaseIT {
             .when().get(WORKBENCH_PATH + "/previews/" + previewId)
             .then().assertThat().statusCode(200)
             .body("rows", hasSize(3))
-            .body("rows[0][0]", equalTo("foo"));
+            .body("rows[0].field1", equalTo("foo"));
     }
 
     /**
