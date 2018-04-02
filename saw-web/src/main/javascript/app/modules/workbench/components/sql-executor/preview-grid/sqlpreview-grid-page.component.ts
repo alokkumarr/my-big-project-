@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import { Component, Input, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Subject } from 'rxjs/Subject';

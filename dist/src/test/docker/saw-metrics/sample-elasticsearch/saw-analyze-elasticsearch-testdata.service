@@ -1,6 +1,5 @@
 [Unit]
 Description=SAW Analyze Elasticsearch test data loader
-Requires=saw-transport.service
 After=saw-transport.service
 
 [Service]

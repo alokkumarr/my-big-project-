@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
+import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -67,6 +68,19 @@ public class SAWElasticSearchQueryExecutor {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     return SAWElasticTransportService.executeReturnDataAsString(executionObjectList);
   }
+
+    /**
+     *
+     * @param executionObjectList
+     * @return
+     * @throws JsonProcessingException
+     * @throws IOException
+     */
+    public static String executeReturnDataAsString(KPIExecutionObject kpiExecutionObject) throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        return SAWElasticTransportService.executeReturnDataAsString(kpiExecutionObject);
+    }
   /**
    * 
    * @param searchSourceBuilder

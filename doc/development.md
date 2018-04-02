@@ -82,10 +82,13 @@ starting points to investigate installed SAW services and packages:
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
-To stop the SAW containers, simply send an interrupt to the Maven
-process used to start the containers.  In case containers have been
-left behind and prevent running new SAW containers, existing
-containers can be removed by executing the following command:
+The SAW containers can be stopped using the following command:
+
+        $ docker stop saw saw-mapr
+
+In case containers have been left behind and prevent running new SAW
+containers, existing containers can be removed by executing the
+following command:
 
         $ docker rm -f saw saw-mapr
 
@@ -99,7 +102,7 @@ package and starting a new container, it can take minutes to complete.
 To iterate faster on specific system tests against an existing local
 deployment, run the following command:
 
-        mvn -pl dist test-compile failsafe:integration-test
+        mvn test-compile failsafe:integration-test -Pdocker-start
 
 The above command will immediately start executing system tests
 against an existing local SAW deployment.  Therefore it is possible to

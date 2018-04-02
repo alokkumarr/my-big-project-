@@ -8,7 +8,7 @@ dir=$(dirname $0)
 
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
-datalake_raw=/data/bda/raw
+datalake_raw=/main/raw
 
 wait_maprfs() {
     # The MapR container might still be starting up, so wait until MapR-FS

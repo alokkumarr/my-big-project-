@@ -14,7 +14,7 @@ write_files:
       #!/bin/bash
       aws_url=http://169.254.169.254/latest/meta-data/public-hostname
       public_hostname=$(curl -sS $aws_url)
-      echo "SAW start page: http://$public_hostname/"
+      echo "http://$public_hostname/"
 runcmd:
   # To limit costs, shut down after certain period (typical working
   # session).  Only stops the instance, does not terminate it.  Leaves

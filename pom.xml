@@ -55,6 +55,37 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.0.0</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>8.8</version>
+            </dependency>
+          </dependencies>
+          <executions>
+            <execution>
+              <phase>test</phase>
+              <configuration>
+                <!-- Consider using approach described in
+                     https://maven.apache.org/plugins/maven-checkstyle-plugin/examples/multi-module-config.html
+                     -->
+                <configLocation>${project.parent.basedir}/src/main/resources/checkstyle.xml</configLocation>
+                <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                <violationSeverity>warning</violationSeverity>
+                <!-- Exclude files that were added before Checkstyle was enabled.  Gradually
+                     make also these files conform to checkstyle rules and remove the exclusions -->
+                <excludes>**/AnalyzeIT.java</excludes>
+              </configuration>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>3.1.0</version>
         </plugin>
@@ -69,11 +100,11 @@
   <repositories>
     <repository>
       <id>synchronoss</id>
-      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   <repository>
     <id>synchronoss-snapshots</id>
-    <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+    <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
   </repository>
   </repositories>
   <profiles>
@@ -106,6 +137,9 @@
       <id>docker-start</id>
       <activation>
         <property>
+          <!-- Note: Should perhaps have been named "docker-fixed" (in
+               reference to the fixed ports, as opposed to the default
+               randomized ports) or just "docker") -->
           <name>docker-start</name>
         </property>
       </activation>

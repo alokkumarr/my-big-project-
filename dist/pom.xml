@@ -89,7 +89,7 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>3.0.3</version>
+      <version>3.0.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -103,6 +103,11 @@
       <artifactId>jackson-databind</artifactId>
       <version>2.9.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
     </dependency>
   </dependencies>
   <build>
@@ -118,6 +123,10 @@
           <showWarnings>true</showWarnings>
           <compilerArgument>-Xlint:all</compilerArgument>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -432,7 +441,7 @@
   <repositories>
     <repository>
       <id>synchronoss</id>
-      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
   <profiles>

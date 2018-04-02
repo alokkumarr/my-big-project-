@@ -37,38 +37,8 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
  * Integration test that lists metrics, creates an analysis, saves it,
  * executes it and lists the execution results.
  */
-public class ServicesExecuteIT {
-    private RequestSpecification spec;
-
-    private ObjectMapper mapper;
-    private String token;
-
-    @BeforeClass
-    public static void setUpClass() {
-        String port = System.getProperty("saw.docker.port");
-        if (port == null) {
-            throw new RuntimeException("Property saw.docker.port unset");
-        }
-        RestAssured.baseURI = "http://localhost:" + port;
-        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-    }
-
-    @Rule
-    public final JUnitRestDocumentation restDocumentation =
-        new JUnitRestDocumentation();
-
-    @Before
-    public void setUp() throws JsonProcessingException {
-        this.spec = new RequestSpecBuilder()
-            .addFilter(documentationConfiguration(restDocumentation)).build();
-        mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        /* Token is required for all the test cases.
-         Initialize the token before test case run.  */
-        token = authenticate();
-    }
-
-    @Test
+public class AnalyzeIT extends BaseIT {
+    @Test(timeout=300000)
     public void testExecuteAnalysis() throws JsonProcessingException {
         String metricId = listMetrics(token);
         ObjectNode analysis = createAnalysis(token, metricId);
@@ -100,34 +70,6 @@ public class ServicesExecuteIT {
         assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
     }
 
-    private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
-    private static final String TEST_PASSWORD = "Sawsyncnewuser1!";
-
-    private String authenticate() throws JsonProcessingException {
-        ObjectNode node = mapper.createObjectNode();
-        node.put("masterLoginId", TEST_USERNAME);
-        node.put("password", TEST_PASSWORD);
-        String json = mapper.writeValueAsString(node);
-        Response response = given(spec)
-            .accept("application/json")
-            .header("Content-Type", "application/json")
-            .body(json)
-            .filter(document(
-                        "authenticate",
-                        preprocessRequest(
-                            preprocessReplace(TEST_USERNAME, "user@example.com"),
-                            preprocessReplace(TEST_PASSWORD, "password123"))))
-            .when().post("/security/doAuthenticate")
-            .then().assertThat().statusCode(200)
-            .body("aToken", startsWith(""))
-            .extract().response();
-        return response.path("aToken");
-    }
-
-    private OperationPreprocessor preprocessReplace(String from, String to) {
-        return replacePattern(Pattern.compile(Pattern.quote(from)), to);
-    }
-
     private String listMetrics(String token) throws JsonProcessingException {
         ObjectNode node = mapper.createObjectNode();
         ObjectNode contents = node.putObject("contents");
@@ -148,9 +90,27 @@ public class ServicesExecuteIT {
             .body(json)
             .when().post("/services/md")
             .then().assertThat().statusCode(200)
-            .body(path, instanceOf(String.class))
             .extract().response();
-        return response.path(path);
+        try {
+            String metricId = response.path(path);
+            if (metricId == null) {
+                return retryListMetrics(token);
+            }
+            return metricId;
+        } catch (IllegalArgumentException e) {
+            return retryListMetrics(token);
+        }
+    }
+
+    private String retryListMetrics(String token)
+        throws JsonProcessingException {
+        /* Path was not found, so wait and retry.  The sample metrics
+         * are loaded asynchronously, so wait until the loading
+         * finishes before proceeding.  */
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {}
+        return listMetrics(token);
     }
 
     private ObjectNode createAnalysis(String token, String metricId)
@@ -336,8 +296,13 @@ public class ServicesExecuteIT {
         return objectNode;
     }
 
-    @Test
-    public void globalFilterTest()  throws JsonProcessingException {
+    @Test(timeout=300000)
+    public void testGlobalFilter()  throws JsonProcessingException {
+        /* Use list metrics method, which waits for sample metrics to
+         * be loaded before returning, to ensure sample metrics are
+         * available before creating filters */
+        listMetrics(token);
+        /* Proceed to creating filters */
         ObjectNode node = globalFilters();
         String json = mapper.writeValueAsString(node);
         String field = "string.keyword";

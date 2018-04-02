@@ -10,12 +10,15 @@ import org.springframework.util.concurrent.ListenableFuture;
 import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.export.model.DataResponse;
 
+import java.util.List;
+
 public interface ExportService {
 
   public DataResponse dataToBeExportedSync(String executionId, HttpServletRequest request, String analysisId) throws JSONValidationSAWException;
   public ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(String executionId, HttpServletRequest request, String analysisId)throws JSONValidationSAWException;
   public void reportToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)throws JSONValidationSAWException;
   public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId)throws JSONValidationSAWException;
+  public List<String> listFtpsForCustomer(RequestEntity request);
 
   AnalysisMetaData getAnalysisMetadata(String analysisId);
 }
