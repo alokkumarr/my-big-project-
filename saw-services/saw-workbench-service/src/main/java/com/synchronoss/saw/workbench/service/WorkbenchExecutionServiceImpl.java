@@ -43,10 +43,17 @@ public class WorkbenchExecutionServiceImpl
     @NotNull
     private Integer previewLimit;
 
+    /**
+     * Cached Workbench Livy client to be kept around for next
+     * operation to reduce startup time.
+     */
+    private WorkbenchClient cachedClient;
+
     private static final String PREVIEWS_TABLE = "/previews";
 
     @PostConstruct
     private void init() throws Exception {
+        /* Initialize the previews MapR-DB table */
         String path = PREVIEWS_TABLE;
         try (Admin admin = MapRDB.newAdmin()) {
             if (!admin.tableExists(path)) {
@@ -59,6 +66,37 @@ public class WorkbenchExecutionServiceImpl
                 admin.createTable(table).close();
             }
         }
+        /* Cache a Workbench Livy client to reduce startup time for
+         * first operation */
+        cacheWorkbenchClient();
+    }
+
+    /**
+     * Get Workbench Livy client to be used for Livy jobs
+     */
+    private WorkbenchClient getWorkbenchClient() throws Exception {
+        /* Synchronize access to the cached client to ensure that the
+         * current client is handed out only to a single caller and
+         * that a new client is put into place before the next
+         * caller */
+        synchronized (cachedClient) {
+            try {
+                if (cachedClient == null) {
+                    log.debug("Create Workbench Livy client on demand");
+                    cacheWorkbenchClient();
+                }
+                return cachedClient;
+            } finally {
+                /* Create a new Workbench Livy client for the next
+                 * operation */
+                cacheWorkbenchClient();
+            }
+        }
+    }
+
+    private void cacheWorkbenchClient() throws Exception {
+        log.debug("Caching Workbench Livy client");
+        cachedClient = new WorkbenchClient(livyUri);
     }
 
     /**
@@ -70,9 +108,9 @@ public class WorkbenchExecutionServiceImpl
         String project, String name, String component, String config)
         throws Exception {
         log.info("Execute dataset transformation");
-        WorkbenchClient client = new WorkbenchClient();
+        WorkbenchClient client = getWorkbenchClient();
         createDatasetDirectory(name);
-        client.submit(livyUri, new WorkbenchExecuteJob(
+        client.submit(new WorkbenchExecuteJob(
                           root, project, component, config));
         ObjectNode root = mapper.createObjectNode();
         return root;
@@ -107,10 +145,9 @@ public class WorkbenchExecutionServiceImpl
         String location = dataset.path("system")
             .path("physicalLocation").asText();
         /* Submit job to Livy for reading out preview data */
-        WorkbenchClient client = new WorkbenchClient();
+        WorkbenchClient client = getWorkbenchClient();
         String id = UUID.randomUUID().toString();
-        client.submit(
-            livyUri, new WorkbenchPreviewJob(id, location, previewLimit));
+        client.submit(new WorkbenchPreviewJob(id, location, previewLimit));
         /* Return generated preview ID to client to be used for
          * retrieving preview data */
         ObjectNode root = mapper.createObjectNode();
