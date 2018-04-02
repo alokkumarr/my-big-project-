@@ -21,9 +21,19 @@ export function getFormatter(format: Format) {
   }
   return fpPipe(
     number => applyPrecisionIfNeeded(format, number),
+    number => applyPercentageSymbolIfNeeded(format, number),
     numberString => applyCommasIfNeeded(format, numberString),
     numberString => applyCurrencyIfNeeded(format, numberString)
   )
+}
+
+export function applyPercentageSymbolIfNeeded(format, number) {
+  if (format.percentage) {
+    const percentageValue = `${number}%`;
+    return percentageValue.toString();
+  } else {
+    return number.toString();  
+  }
 }
 
 export function applyPrecisionIfNeeded(format, number) {

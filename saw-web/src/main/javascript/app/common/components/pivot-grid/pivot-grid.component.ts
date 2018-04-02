@@ -322,9 +322,10 @@ export class PivotGridComponent {
 
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
+          const percent = (cloned.aggregate == 'percentage' ? true : false);
           cloned.format = {
             formatter: getFormatter(artifactColumn.format || (
-              FLOAT_TYPES.includes(cloned.type) ? {precision: DEFAULT_PRECISION} : {precision: 0}
+              FLOAT_TYPES.includes(cloned.type) ? {precision: DEFAULT_PRECISION, percentage: percent} : {precision: 0, percentage: percent}
             ))
           };
           /* We're aggregating values in backend. Aggregating it again using
