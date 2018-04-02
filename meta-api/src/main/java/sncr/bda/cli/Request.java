@@ -379,8 +379,6 @@ public class Request {
 
 
     private boolean analyzeAndValidateCRUD(JsonObject item){
-
-        //TODO: Changes required here
         if ((action == Actions.create ||
              action == Actions.delete ||
              action == Actions.update ||

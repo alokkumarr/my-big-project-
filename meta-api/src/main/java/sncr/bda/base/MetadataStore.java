@@ -30,7 +30,6 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
 
     protected String metaRoot;
 
-    //TODO: Uncomment the below line
     protected Table table;
 
     //TODO:: Replace altRoot with configuration reading
@@ -40,10 +39,9 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
         logger.debug("Open table: " + fullTableName);
 
-        //TODO: uncomment the below lines
-//        boolean exists = MapRDB.tableExists(fullTableName);
-//        table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
-//        table.setOption(Table.TableOption.BUFFERWRITE, false);
+        boolean exists = MapRDB.tableExists(fullTableName);
+        table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
+        table.setOption(Table.TableOption.BUFFERWRITE, false);
     }
 
 
