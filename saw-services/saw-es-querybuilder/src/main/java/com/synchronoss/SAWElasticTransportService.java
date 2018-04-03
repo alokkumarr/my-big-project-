@@ -1,10 +1,7 @@
 package com.synchronoss;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,6 +9,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.google.gson.Gson;
 import com.squareup.okhttp.MediaType;
@@ -20,14 +18,13 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-
-
 import com.synchronoss.querybuilder.ReportAggregationBuilder;
 import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
 import com.synchronoss.querybuilder.model.report.DataField;
 import com.synchronoss.querybuilder.model.report.SqlBuilder;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,9 +214,27 @@ public class SAWElasticTransportService {
         return gson.toJson(result);
     }
 
-    public static String executeReturnDataAsString(KPIExecutionObject executionObject)
-        throws IOException, NullPointerException{
+     public static String executeReturnDataAsString(KPIExecutionObject executionObject) throws IOException {
+         ObjectMapper mapper = new ObjectMapper();
+         ObjectNode data = mapper.createObjectNode();
+         KPIResultParser kpiResultParser = new KPIResultParser(executionObject.getDataFields());
+         Map< String , Object> current = kpiResultParser.jsonNodeParser(
+             executeReturnDataAsString(executionObject,
+                 executionObject.getCurrentSearchSourceBuilder()));
+         Map< String , Object> prior = kpiResultParser.jsonNodeParser(
+             executeReturnDataAsString(executionObject,
+                 executionObject.getPriorSearchSourceBuilder()));
+         Gson gson = new Gson();
+         data.putPOJO("current",gson.toJson(current));
+         data.putPOJO("prior", gson.toJson(prior));
+         ObjectNode result = mapper.createObjectNode();
+         result.putPOJO("data",data);
+         return result.toString();
+     }
 
+    private static JsonNode executeReturnDataAsString(KPIExecutionObject executionObject
+        ,SearchSourceBuilder searchSourceBuilder)
+        throws IOException, NullPointerException{
         String url = System.getProperty("url");
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -228,7 +243,7 @@ public class SAWElasticTransportService {
         esProxy.setIndexName(executionObject.getEsRepository().getIndexName());
         esProxy.setObjectType(executionObject.getEsRepository().getType());
         esProxy.setVerb("_search");
-        esProxy.setQuery(executionObject.getCurrentSearchSourceBuilder().toString());
+        esProxy.setQuery(searchSourceBuilder.toString());
         esProxy.setModuleName("observe");
         esProxy.setDsk("dsk");
         esProxy.setUsername("system");
@@ -250,7 +265,6 @@ public class SAWElasticTransportService {
             throw new NullPointerException("Data is not available based on provided query criteria");
         }
         JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
-        return finalResponse.get("aggregations").toString();
-       // return buildGlobalFilterData(finalResponse.get("aggregations"),executionObject.getGlobalFilter());
+        return finalResponse.get("aggregations");
     }
 }

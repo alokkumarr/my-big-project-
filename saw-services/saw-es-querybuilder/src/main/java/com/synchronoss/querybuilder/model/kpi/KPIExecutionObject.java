@@ -2,6 +2,8 @@ package com.synchronoss.querybuilder.model.kpi;
 
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import java.util.List;
+
 public class KPIExecutionObject {
 
     /**
@@ -18,6 +20,8 @@ public class KPIExecutionObject {
      *
      */
     private SearchSourceBuilder currentSearchSourceBuilder;
+
+    private List<DataField> dataFields;
 
     /**
      * Gets esRepository
@@ -65,5 +69,21 @@ public class KPIExecutionObject {
      */
     public void setCurrentSearchSourceBuilder(SearchSourceBuilder currentSearchSourceBuilder) {
         this.currentSearchSourceBuilder = currentSearchSourceBuilder;
+    }
+
+    /**
+     * Gets dataFields
+     *
+     * @return value of dataFields
+     */
+    public List<DataField> getDataFields() {
+        return dataFields;
+    }
+
+    /**
+     * Sets dataFields
+     */
+    public void setDataFields(List<DataField> dataFields) {
+        this.dataFields = dataFields;
     }
 }
