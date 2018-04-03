@@ -11,6 +11,7 @@ import {
 import { MatHorizontalStepper } from '@angular/material/stepper';
 import { MatSidenav } from '@angular/material/sidenav';
 import * as clone from 'lodash/clone';
+import { ObserveService } from '../../services/observe.service';
 
 const template = require('./add-widget.component.html');
 require('./add-widget.component.scss');
@@ -40,7 +41,7 @@ export class AddWidgetComponent implements OnInit {
   @Output() onWidgetAction = new EventEmitter();
   @ViewChild('widgetStepper') widgetStepper: MatHorizontalStepper;
 
-  constructor() {}
+  constructor(private observe: ObserveService) {}
 
   ngOnInit() {}
 
@@ -72,11 +73,14 @@ export class AddWidgetComponent implements OnInit {
   }
 
   onKPIAction({ kpi }) {
-    this.widgetStepper.previous();
-    this.onWidgetAction.emit({
-      widget: 'KPI',
-      action: WIDGET_ACTIONS.ADD,
-      data: kpi
+    this.observe.createKPI({ semanticId: kpi.semanticId }).subscribe(data => {
+      this.widgetStepper.previous();
+      kpi.id = data.id;
+      this.onWidgetAction.emit({
+        widget: 'KPI',
+        action: WIDGET_ACTIONS.ADD,
+        data: kpi
+      });
     });
   }
 }

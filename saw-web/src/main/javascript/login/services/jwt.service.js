@@ -84,9 +84,20 @@ export class JwtService {
     return this.parseJWT(this.get());
   }
 
+  get customerCode() {
+    const token = this.getTokenObj();
+    if (!token) {
+      return '';
+    }
+
+    return get(token, 'ticket.custCode', 'ATT');
+  }
+
   isValid(token) {
-    return get(token, 'ticket.valid', false) &&
-      get(token, 'ticket.validUpto', 0) >= Date.now();
+    return (
+      get(token, 'ticket.valid', false) &&
+      get(token, 'ticket.validUpto', 0) >= Date.now()
+    );
   }
 
   /* Bootstraps request structure with necessary auth data */
@@ -94,10 +105,12 @@ export class JwtService {
     const token = this.getTokenObj();
     return {
       contents: {
-        keys: [{
-          customerCode: get(token, 'ticket.custCode', 'ATT')
-          // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
-        }]
+        keys: [
+          {
+            customerCode: get(token, 'ticket.custCode', 'ATT')
+            // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
+          }
+        ]
       }
     };
   }
@@ -125,7 +138,11 @@ export class JwtService {
   }
 
   _isSet(code, bitIndex) {
-    const fullCode = padStart((code >>> 0).toString(2), PRIVILEGE_CODE_LENGTH, '0');
+    const fullCode = padStart(
+      (code >>> 0).toString(2),
+      PRIVILEGE_CODE_LENGTH,
+      '0'
+    );
     /* If index of 'All' privileges is set, it is considered same as if the
        requested privilege bit is set */
     return fullCode[bitIndex] === '1' || fullCode[PRIVILEGE_INDEX.ALL] === '1';
@@ -145,57 +162,67 @@ export class JwtService {
     opts.module = opts.module || 'ANALYZE';
 
     const token = this.getTokenObj();
-    const module = find(
-      get(token, 'ticket.products.[0].productModules'),
-      module => module.productModName === opts.module
-    ) || [];
+    const module =
+      find(
+        get(token, 'ticket.products.[0].productModules'),
+        module => module.productModName === opts.module
+      ) || [];
 
     const code = this.getCode(opts, module);
 
     switch (name) {
-    case 'ACCESS':
-      return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
-    case 'CREATE':
-      return this._isSet(code, PRIVILEGE_INDEX.CREATE);
-    case 'EXECUTE':
-      return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
-    case 'PUBLISH':
-      return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
-    case 'FORK':
-      return this._isSet(code, PRIVILEGE_INDEX.FORK);
-    case 'EDIT':
-      return this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
-        (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
-    case 'EXPORT':
-      return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
-    case 'DELETE':
-      return this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
-        (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
-    default:
-      return false;
+      case 'ACCESS':
+        return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
+      case 'CREATE':
+        return this._isSet(code, PRIVILEGE_INDEX.CREATE);
+      case 'EXECUTE':
+        return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
+      case 'PUBLISH':
+        return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+      case 'FORK':
+        return this._isSet(code, PRIVILEGE_INDEX.FORK);
+      case 'EDIT':
+        return (
+          this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
+          (this.isOwner(token, opts.creatorId) || this.isAdmin(token))
+        );
+      case 'EXPORT':
+        return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
+      case 'DELETE':
+        return (
+          this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
+          (this.isOwner(token, opts.creatorId) || this.isAdmin(token))
+        );
+      default:
+        return false;
     }
     /* eslint-enable */
   }
 
   getCode(opts, module) {
-
     if (opts.subCategoryId) {
       const subCategories = flatMap(
         module.prodModFeature,
-        feature => feature.productModuleSubFeatures);
-      const subCategory = find(
-        subCategories,
-        subFeature => subFeature.prodModFeatureID.toString() === opts.subCategoryId.toString()
-      ) || {};
+        feature => feature.productModuleSubFeatures
+      );
+      const subCategory =
+        find(
+          subCategories,
+          subFeature =>
+            subFeature.prodModFeatureID.toString() ===
+            opts.subCategoryId.toString()
+        ) || {};
 
       return subCategory.privilegeCode || 0;
     }
 
     if (opts.categoryId) {
-      const category = find(
-        module.prodModFeature,
-        feature => feature.prodModFeatureID.toString() === opts.categoryId.toString()
-      ) || {};
+      const category =
+        find(
+          module.prodModFeature,
+          feature =>
+            feature.prodModFeatureID.toString() === opts.categoryId.toString()
+        ) || {};
 
       return category.privilegeCode || 0;
     }

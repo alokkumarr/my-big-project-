@@ -56,6 +56,20 @@ export class ObserveService {
     ).map(fpGet('contents.observe.0'));
   }
 
+  createKPI({ semanticId }): Observable<any> {
+    return this.http.post(`${this.api}/kpi`, {
+      keys: [
+        {
+          customerCode: this.jwt.customerCode,
+          module: 'observe',
+          semanticId,
+          analysisType: 'kpi'
+        }
+      ],
+      action: 'create'
+    });
+  }
+
   /**
    * Executes a kpi
    *

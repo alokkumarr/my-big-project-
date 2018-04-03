@@ -1,6 +1,7 @@
+<mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
 <mat-accordion [multi]="true" [displayMode]="flat">
 
-  <mat-expansion-panel *ngFor="let metric of metrics | async">
+  <mat-expansion-panel *ngFor="let metric of metrics" (opened)="onLoadMetricArtifacts(metric.id)">
     <mat-expansion-panel-header>
       {{metric.metricName}}
     </mat-expansion-panel-header>
@@ -8,5 +9,9 @@
     <button mat-button class="choose-metric" *ngFor="let column of metric.kpiColumns" (click)="onSelectMetricColumn(column, metric)">
       {{column.displayName || column.columnName}}
     </button>
+
+    <h4 class="metric-ineligible-message" *ngIf="metric.kpiEligible === false">
+      This metric is not eligible for KPIs.
+    </h4>
   </mat-expansion-panel>
 </mat-accordion>

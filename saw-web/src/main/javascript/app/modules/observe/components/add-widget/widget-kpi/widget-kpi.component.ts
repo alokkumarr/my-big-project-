@@ -34,6 +34,7 @@ export class WidgetKPIComponent implements OnInit {
 
   createForm() {
     this.kpiForm = this.fb.group({
+      id: [''],
       semanticId: ['', Validators.required],
       columnName: ['', Validators.required],
       name: ['', Validators.required],
@@ -73,6 +74,7 @@ export class WidgetKPIComponent implements OnInit {
   set kpi(data: any) {
     if (!data) return;
     this._kpi = data;
+    this.kpiForm.get('id').setValue(data.id);
     this.kpiForm.get('columnName').setValue(data.columnName);
     this.kpiForm.get('name').setValue(data.name);
     this.kpiForm.get('semanticId').setValue(data.semanticId);
