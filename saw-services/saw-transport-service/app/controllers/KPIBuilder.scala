@@ -1,14 +1,11 @@
 package controllers
 
-import java.time.Instant
-import java.util.UUID
-
 import com.synchronoss.querybuilder.{KPIDataQueryBuilder, SAWElasticSearchQueryExecutor}
 import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject
 import model.ClientException
+import org.json4s.{JArray, JNothing}
 import org.json4s.JsonAST.{JObject, JString, JValue}
 import org.json4s.native.JsonMethods.{compact, parse, render}
-import org.json4s.JsonDSL._
 import play.mvc.Result
 import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
@@ -30,28 +27,17 @@ class KPIBuilder extends BaseController {
     val action = (json \ "action").extract[String].toLowerCase;
 
     action match {
-        case "create" => {
+        case "fetch" => {
           val semanticId = extractKey(json,"semanticId")
-          val instanceJson: JObject = ("semanticId", semanticId) ~
-            ("createdTimestamp", Instant.now().toEpochMilli()) ~
-            ("userId", userId.asInstanceOf[Number].longValue) ~
-            ("userFullName", userFullName)
           val semanticNodeJson = readSemanticNode(semanticId)
-          val kpiId = UUID.randomUUID.toString
-         // val kPIEligible =
-          val mergeJson =
-            semanticNodeJson.merge(instanceJson)
-          val responseJson = json merge mergeJson
+          val responseJson = json merge semanticNodeJson
           responseJson
         }
         case "execute" => {
           val jsonString: String = compact(render(json));
-        val executionObject : KPIExecutionObject = new KPIDataQueryBuilder(jsonString).buildQuery();
-           val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject)
+          val executionObject : KPIExecutionObject = new KPIDataQueryBuilder(jsonString).buildQuery();
+          val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject)
           val responseJson = parse(data)
-         //  val kPIEligibleFields =
-       //   val mergeJson =
-      //      semanticNodeJson.merge(instanceJson)
           responseJson
         }
       }
@@ -65,10 +51,31 @@ class KPIBuilder extends BaseController {
       }
     }
 
-  private def fetchSemanticwithKPIfields(semanticNodeJson : JObject): Unit =
+  private def checkSemanticwithKPIfieldsPresent(semanticNodeJson : JObject) =
   {
-    print(semanticNodeJson)
+    val artifacts = semanticNodeJson \ "artifacts" match {
+      case artifacts: JArray => artifacts.arr
+      case JNothing => List()
+      case obj: JValue => unexpectedElement(obj, "array", "artifacts")
+    }
+   checkKpiEligibleColumns(artifacts)
   }
+
+  private def checkKpiEligibleColumns(artifacts: List[JValue]) = {
+    if(artifacts.size>1)
+      throw ClientException("Multiple artifacts is not supported for the KPI Builder")
+    val columnElements = artifacts.flatMap((artifact: JValue) => {
+      val columns = extractArray(artifact, "columns")
+      if (columns.size < 1)
+        throw new ClientException("No column present in artifact ")
+      columns.filter(kpiEligible(_))
+    })
+
+    if (columnElements.isEmpty)
+      throw ClientException("No kpiEligible column present in artifacts")
+    columnElements
+  }
+
   private def extractKey(json: JValue, property: String) = {
     try {
       val JString(value) = (json \ "keys")(0) \ property
@@ -77,6 +84,23 @@ class KPIBuilder extends BaseController {
       case e: Exception =>
         throw new ClientException("ID not found in keys property")
     }
+  }
+  private def kpiEligible(column: JValue) = {
+    (column \ "kpiEligible").extractOrElse[Boolean](false) == true
+  }
+
+  def extractArray(json: JValue, name: String): List[JValue] = {
+    json \ name match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json, "array", name)
+    }
+  }
+  def unexpectedElement(json: JValue, expected: String, location: String): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new ClientException(
+      "Unexpected element: %s, expected %s, at %s".format(
+        name, expected, location))
   }
 }
 
