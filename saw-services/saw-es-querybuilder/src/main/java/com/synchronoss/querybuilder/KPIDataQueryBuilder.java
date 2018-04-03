@@ -44,70 +44,79 @@ public class KPIDataQueryBuilder {
      */
     public KPIExecutionObject buildQuery() throws IOException, ProcessingException {
 
-        int size = 0;
         KPIBuilder kpiBuilder = BuilderUtil.getNodeTreeKPIBuilder(getJsonString());
-
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            searchSourceBuilder.size(size);
-
             if (kpiBuilder.getKpi().getFilters() == null) {
                 throw new NullPointerException(
                     "Please add filter[] block.It can be empty but these blocks are important.");
             }
+        KPIExecutionObject kpiExecutionObject = new KPIExecutionObject();
+        kpiExecutionObject.setCurrentSearchSourceBuilder(buildKPIQuery(kpiBuilder,true));
+        kpiExecutionObject.setPriorSearchSourceBuilder(buildKPIQuery(kpiBuilder,false));
+        kpiExecutionObject.setEsRepository(kpiBuilder.getKpi().getEsRepository());
+        kpiExecutionObject.setDataFields(kpiBuilder.getKpi().getDataFields());
+        return kpiExecutionObject;
+    }
 
-            List<com.synchronoss.querybuilder.model.kpi.Filter> filters = kpiBuilder.getKpi().getFilters();
+    /**
+     *
+     * @param kpiBuilder
+     * @param current
+     * @return
+     */
+    private SearchSourceBuilder buildKPIQuery(KPIBuilder kpiBuilder, boolean current)
+    {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.size(0);
+        List<com.synchronoss.querybuilder.model.kpi.Filter> filters = kpiBuilder.getKpi().getFilters();
         List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-            final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+        final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         for (com.synchronoss.querybuilder.model.kpi.Filter item : filters)
         {
-                if (item.getType().value().equals(Filter.Type.DATE.value()) || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
-                    if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
-                    {
-                        DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
-                        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-                        if(item.getType().value().equals(Filter.Type.DATE.value())) {
-                            rangeQueryBuilder.format(DATE_FORMAT);
-                        }
-                        rangeQueryBuilder.lte(dynamicConvertor.getLte());
-                        rangeQueryBuilder.gte(dynamicConvertor.getGte());
-                        builder.add(rangeQueryBuilder);
+            if (item.getType().value().equals(Filter.Type.DATE.value()) || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
+                if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
+                {  DynamicConvertor dynamicConvertor = null;
+                    if(current)
+                     dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+                    else
+                        dynamicConvertor = BuilderUtil.dynamicDecipherForPrior(item.getModel().getPreset().value());
+                    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                    if(item.getType().value().equals(Filter.Type.DATE.value())) {
+                        rangeQueryBuilder.format(DATE_FORMAT);
                     }
-                    else {
-                        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-                        if(item.getType().value().equals(Filter.Type.DATE.value())) {
-                            rangeQueryBuilder.format(DATE_FORMAT);
-                        }
-                        rangeQueryBuilder.lte(item.getModel().getLte());
-                        rangeQueryBuilder.gte(item.getModel().getGte());
-                        builder.add(rangeQueryBuilder);
+                    rangeQueryBuilder.lte(dynamicConvertor.getLte());
+                    rangeQueryBuilder.gte(dynamicConvertor.getGte());
+                    builder.add(rangeQueryBuilder);
+                }
+                else {
+                    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                    if(item.getType().value().equals(Filter.Type.DATE.value())) {
+                        rangeQueryBuilder.format(DATE_FORMAT);
                     }
+                    rangeQueryBuilder.lte(item.getModel().getLte());
+                    rangeQueryBuilder.gte(item.getModel().getGte());
+                    builder.add(rangeQueryBuilder);
                 }
-                // make the query based on the filter given
-                if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                    builder = QueryBuilderUtil.stringFilterKPI(item, builder);
-                }
-                if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
-                    .getType().value().toLowerCase().equals(Filter.Type.INT.value().toLowerCase()))
-                    || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
-                    || item.getType().value().toLowerCase().equals(Filter.Type.LONG.value().toLowerCase())) {
-                    builder = QueryBuilderUtil.numericFilterKPI(item, builder);
-                }
+            }
+            // make the query based on the filter given
+            if (item.getType().value().equals(Filter.Type.STRING.value())) {
+                builder = QueryBuilderUtil.stringFilterKPI(item, builder);
+            }
+            if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
+                .getType().value().toLowerCase().equals(Filter.Type.INT.value().toLowerCase()))
+                || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
+                || item.getType().value().toLowerCase().equals(Filter.Type.LONG.value().toLowerCase())) {
+                builder = QueryBuilderUtil.numericFilterKPI(item, builder);
+            }
         }
-            builder.forEach(item -> {
-                boolQueryBuilder.must(item);
-            });
+        builder.forEach(item -> {
+            boolQueryBuilder.must(item);
+        });
         searchSourceBuilder.query(boolQueryBuilder);
         List<DataField> dataFields = kpiBuilder.getKpi().getDataFields();
-        AggregationBuilder aggregationBuilder = null;
         for(DataField dataField : dataFields) {
             searchSourceBuilder = QueryBuilderUtil.aggregationBuilderDataFieldKPI(
                 dataField, searchSourceBuilder);
         }
-        // set the size zero for aggregation query .
-        searchSourceBuilder.size(0);
-        KPIExecutionObject kpiExecutionObject = new KPIExecutionObject();
-        kpiExecutionObject.setCurrentSearchSourceBuilder(searchSourceBuilder);
-        kpiExecutionObject.setEsRepository(kpiBuilder.getKpi().getEsRepository());
-        return kpiExecutionObject;
+     return searchSourceBuilder;
     }
 }
