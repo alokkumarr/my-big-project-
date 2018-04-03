@@ -97,6 +97,9 @@ export const JSPlumbTable = {
     }
 
     clearAggegate(field) {
+      if (field.format.percentage) {
+        delete field.format.percentage;
+      }
       delete field.aggregate;
       delete field.meta.aggregate;
     }

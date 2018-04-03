@@ -167,7 +167,6 @@ export const ReportGridComponent = {
       }
       return map(columns, column => {
         const isNumberType = NUMBER_TYPES.includes(column.type);
-
         if (isNumberType && !column.format && column.aggregate === 'percentage') {
           column.format = {};
           column.format.percentage = true;
