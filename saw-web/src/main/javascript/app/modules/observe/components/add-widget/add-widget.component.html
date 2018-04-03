@@ -25,7 +25,7 @@
     <widget-analysis *ngIf="model.subCategory" [category]="model.subCategory.id" (onAnalysisAction)="onAnalysisAction($event)">
     </widget-analysis>
 
-    <widget-kpi *ngIf="model.metric" [metric]="model.metric" [column]="model.column" (onKPIAction)="onKPIAction($event)">
+    <widget-kpi *ngIf="model.metric" [metric]="model.metric" [kpi]="model.kpi" (onKPIAction)="onKPIAction($event)">
     </widget-kpi>
   </mat-step>
 

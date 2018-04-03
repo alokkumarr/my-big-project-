@@ -77,36 +77,20 @@ export class ObserveService {
    * @returns {Observable<any>}
    * @memberof ObserveService
    */
-  executeKPI(model: any): Observable<any> {
+  executeKPI(kpi: any): Observable<any> {
     // return this.http.get(`${this.api}/observe/kpi/execute`).map(fpGet('contents.observe.0'));
 
-    return Observable.of({
-      type: 'kpi',
-      filter: 'MTD',
-      data: {
-        AVAILABLE_MB: {
-          _sum: {
-            prior: '690',
-            current: '698'
-          },
-          _avg: {
-            prior: '25',
-            current: '30'
-          },
-          _count: {
-            prior: '1',
-            current: '3'
-          },
-          _max: {
-            prior: '520',
-            current: '598'
-          },
-          _min: {
-            prior: '80',
-            current: '80'
-          }
+    return this.http.post(`${this.api}/kpi`, {
+      keys: [
+        {
+          customerCode: this.jwt.customerCode,
+          module: 'observe',
+          semanticId: kpi.semanticId,
+          analysisType: 'kpi'
         }
-      }
+      ],
+      action: 'execute',
+      kpi
     });
   }
 

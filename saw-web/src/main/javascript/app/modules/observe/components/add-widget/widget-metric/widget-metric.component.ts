@@ -21,7 +21,7 @@ import { ObserveService } from '../../../services/observe.service';
 export class WidgetMetricComponent implements OnInit {
   @Output() onSelect = new EventEmitter();
 
-  metrics: Array<any>;
+  metrics: Array<any> = [];
   showProgress = false;
 
   constructor(
@@ -59,6 +59,9 @@ export class WidgetMetricComponent implements OnInit {
   }
 
   applyArtifactsToMetric(metric, metricData) {
+    metric.kpiId = metricData.id;
+    metric.artifacts = metricData.artifacts;
+    metric.esRepository = metricData.esRepository;
     metric.kpiColumns = flatMap(metricData.artifacts, table => {
       return filter(
         table.columns,
@@ -80,7 +83,22 @@ export class WidgetMetricComponent implements OnInit {
   onSelectMetricColumn(column, metric) {
     this.onSelect.emit({
       column,
-      metric
+      metric,
+      kpi: {
+        id: metric.kpiId,
+        name: column.displayName,
+        tableName: column.table || column.tableName,
+        semanticId: metric.id,
+        dataFields: [
+          {
+            columnName: column.columnName,
+            name: column.columnName,
+            aggregate: []
+          }
+        ],
+        filters: [],
+        esRepository: metric.esRepository
+      }
     });
   }
 }

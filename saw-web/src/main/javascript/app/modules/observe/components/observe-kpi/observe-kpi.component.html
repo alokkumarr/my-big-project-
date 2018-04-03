@@ -2,12 +2,12 @@
 
 <div class="kpi-measure-container">
   <div class="kpi-measure">
-    <h2>Month to Date</h2>
-    <span class="kpi-main-measure">{{(executionResult | async).current}}</span>
+    <h2>Year to Date</h2>
+    <span class="kpi-main-measure">{{executionResult.current}}</span>
   </div>
 
   <div class="kpi-measure">
     <h2>Change</h2>
-    <span class="kpi-secondary-measure">{{(executionResult | async).change}}%</span>
+    <span class="kpi-secondary-measure">{{executionResult.change}}%</span>
   </div>
 </div>

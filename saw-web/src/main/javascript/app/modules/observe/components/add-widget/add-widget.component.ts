@@ -33,7 +33,7 @@ export class AddWidgetComponent implements OnInit {
     type?: WidgetType;
     subCategory?: any;
     metric?: any;
-    column?: any;
+    kpi?: any;
   } = {};
   widgets = Widget;
 
@@ -53,14 +53,14 @@ export class AddWidgetComponent implements OnInit {
   onSelectCategory(data) {
     this.model.subCategory = data;
     delete this.model.metric;
-    delete this.model.column;
+    delete this.model.kpi;
     this.widgetStepper.next();
   }
 
-  onSelectMetric({ metric, column }) {
+  onSelectMetric({ metric, kpi }) {
     delete this.model.subCategory;
     this.model.metric = clone(metric);
-    this.model.column = clone(column);
+    this.model.kpi = clone(kpi);
     this.widgetStepper.next();
   }
 
@@ -73,14 +73,11 @@ export class AddWidgetComponent implements OnInit {
   }
 
   onKPIAction({ kpi }) {
-    this.observe.createKPI({ semanticId: kpi.semanticId }).subscribe(data => {
-      this.widgetStepper.previous();
-      kpi.id = data.id;
-      this.onWidgetAction.emit({
-        widget: 'KPI',
-        action: WIDGET_ACTIONS.ADD,
-        data: kpi
-      });
+    this.widgetStepper.previous();
+    this.onWidgetAction.emit({
+      widget: 'KPI',
+      action: WIDGET_ACTIONS.ADD,
+      data: kpi
     });
   }
 }

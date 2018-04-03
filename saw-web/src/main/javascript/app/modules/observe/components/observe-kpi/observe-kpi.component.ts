@@ -15,7 +15,7 @@ require('./observe-kpi.component.scss');
 })
 export class ObserveKPIComponent implements OnInit {
   _kpi: any;
-  executionResult: Observable<any>;
+  executionResult: { current?: number; prior?: number; change?: number } = {};
   constructor(private observe: ObserveService) {}
 
   ngOnInit() {}
@@ -28,17 +28,26 @@ export class ObserveKPIComponent implements OnInit {
   }
 
   executeKPI() {
-    this.executionResult = this.observe
+    const dataFieldName = get(this._kpi, 'dataFields.0.name');
+    const primaryAggregate = get(this._kpi, 'dataFields.0.aggregate.0');
+    this.observe
       .executeKPI(this._kpi)
       .map(res => {
-        return get(res, `data.${this._kpi.columnName}._${this._kpi.aggregate}`);
+        return {
+          current: get(
+            res,
+            `data.current.${dataFieldName}._${primaryAggregate}`
+          ),
+          prior: get(res, `data.prior.${dataFieldName}._${primaryAggregate}`)
+        };
       })
-      .map(({ current, prior }) => {
+      .subscribe(({ current, prior }) => {
         const currentParsed = parseFloat(current);
         const priorParsed = parseFloat(prior);
-        const change = round((currentParsed - priorParsed) / currentParsed, 2);
+        const change =
+          round((currentParsed - priorParsed) * 100 / priorParsed, 2) || 0;
 
-        return {
+        this.executionResult = {
           current: round(currentParsed, 2),
           prior: priorParsed,
           change

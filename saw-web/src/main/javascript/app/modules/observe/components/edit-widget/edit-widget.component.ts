@@ -5,8 +5,11 @@ import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
+import * as flatMap from 'lodash/flatMap';
 
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import { ObserveService } from '../../services/observe.service';
+import { DATE_TYPES } from '../../../../common/consts';
+
 const template = require('./edit-widget.component.html');
 require('./edit-widget.component.scss');
 
@@ -21,7 +24,7 @@ export class EditWidgetComponent implements OnInit {
   @Input() container: MatSidenav;
   @Output() onWidgetAction = new EventEmitter();
 
-  constructor(private analyze: AnalyzeService) {}
+  constructor(private observe: ObserveService) {}
 
   ngOnInit() {}
 
@@ -46,27 +49,26 @@ export class EditWidgetComponent implements OnInit {
   }
 
   prepareKPI(model) {
-    Observable.fromPromise(this.analyze.getSemanticLayerData())
-      .map((data: Array<any>) => {
-        return find(data, metric => metric.id === model.kpi.semanticId);
-      })
+    this.observe
+      .createKPI({ semanticId: model.kpi.semanticId })
       .map(metric => {
         if (!metric) return;
-        metric.kpiColumns = [
-          {
-            columnName: 'AVAILABLE_MB',
-            displayName: 'Available MB',
-            type: 'integer'
-          }
-        ];
+        metric.kpiColumns = flatMap(metric.artifacts, table => {
+          return filter(
+            table.columns,
+            col => col.kpiEligible && !DATE_TYPES.includes(col.type)
+          );
+        });
 
-        metric.dateColumns = [
-          {
-            columnName: 'TRANSFER_DATE',
-            displayName: 'Transfer Date',
-            type: 'date'
-          }
-        ];
+        metric.dateColumns = flatMap(metric.artifacts, table => {
+          return filter(
+            table.columns,
+            col => col.kpiEligible && DATE_TYPES.includes(col.type)
+          );
+        });
+
+        metric.kpiEligible =
+          metric.kpiColumns.length > 0 && metric.dateColumns.length > 0;
 
         return metric;
       })
@@ -75,11 +77,7 @@ export class EditWidgetComponent implements OnInit {
 
         this.editItem = {
           kpi: clone(model.kpi),
-          column: find(
-            metric.kpiColumns,
-            col => col.columnName === model.kpi.columnName
-          ),
-          metric: metric
+          metric
         };
       });
   }

@@ -3,7 +3,7 @@
   <mat-step label="Analysis">
     <widget-header [stepper]="widgetStepper" [container]="container" title="Edit" [showBack]="false"></widget-header>
 
-    <widget-kpi *ngIf="editItem && editItem.kpi" [metric]="editItem.metric" [column]="editItem.column" [kpi]="editItem.kpi" (onKPIAction)="onKPIAction($event)">
+    <widget-kpi *ngIf="editItem && editItem.kpi" [metric]="editItem.metric" [kpi]="editItem.kpi" (onKPIAction)="onKPIAction($event)">
     </widget-kpi>
   </mat-step>
 

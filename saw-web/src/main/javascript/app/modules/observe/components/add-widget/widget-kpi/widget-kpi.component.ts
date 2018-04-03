@@ -5,6 +5,11 @@ import {
   FormBuilder,
   Validators
 } from '@angular/forms';
+
+import * as get from 'lodash/get';
+import * as assign from 'lodash/assign';
+import * as find from 'lodash/find';
+
 import { WIDGET_ACTIONS } from '../widget.model';
 
 const template = require('./widget-kpi.component.html');
@@ -16,12 +21,11 @@ require('./widget-kpi.component.scss');
 })
 export class WidgetKPIComponent implements OnInit {
   _kpi: any;
-  _column: any;
   _metric: any;
 
   @Output() onKPIAction = new EventEmitter();
 
-  dateFilters = [{ name: 'Month to Date', value: 'MTD' }];
+  dateFilters = [{ name: 'Year to Date', value: 'YTD' }];
   aggregations = [{ name: 'Sum', value: 'sum' }];
 
   kpiForm: FormGroup;
@@ -34,9 +38,6 @@ export class WidgetKPIComponent implements OnInit {
 
   createForm() {
     this.kpiForm = this.fb.group({
-      id: [''],
-      semanticId: ['', Validators.required],
-      columnName: ['', Validators.required],
       name: ['', Validators.required],
       dateField: ['', Validators.required],
       filter: [this.dateFilters[0].value, Validators.required],
@@ -45,45 +46,63 @@ export class WidgetKPIComponent implements OnInit {
   }
 
   @Input()
-  set column(data: any) {
-    if (!data) return;
-    this._column = data;
-    this.kpiForm
-      .get('columnName')
-      .setValue(this._kpi ? this._kpi.columnName : data.columnName);
-    this.kpiForm
-      .get('name')
-      .setValue(this._kpi ? this._kpi.name : data.displayName);
-  }
-
-  @Input()
   set metric(data: any) {
     if (!data) return;
     this._metric = data;
-    this.kpiForm
-      .get('semanticId')
-      .setValue(this._kpi ? this._kpi.semanticId : data.id);
+    const kpiDateField = get(this._kpi, 'filters.0.columnName');
+
     this.kpiForm
       .get('dateField')
-      .setValue(
-        this._kpi ? this._kpi.dateField : data.dateColumns[0].columnName
-      );
+      .setValue(kpiDateField || data.dateColumns[0].columnName);
   }
 
   @Input()
   set kpi(data: any) {
     if (!data) return;
+
     this._kpi = data;
-    this.kpiForm.get('id').setValue(data.id);
-    this.kpiForm.get('columnName').setValue(data.columnName);
-    this.kpiForm.get('name').setValue(data.name);
-    this.kpiForm.get('semanticId').setValue(data.semanticId);
-    this.kpiForm.get('dateField').setValue(data.dateField);
+
+    data.name && this.kpiForm.get('name').setValue(data.name);
+
+    const dateField = get(data, 'filters.0.columnName');
+    dateField && this.kpiForm.get('dateField').setValue(dateField);
+
+    const filt = get(data, 'filters.0.model.preset');
+    this.kpiForm.get('filter').setValue(filt || this.dateFilters[0].value);
+
+    const primaryAggregate = get(data, 'dataFields.0.aggregate.0');
+    this.kpiForm
+      .get('aggregate')
+      .setValue(primaryAggregate || this.aggregations[0].value);
   }
 
   applyKPI() {
+    const dataField = get(this._kpi, 'dataFields.0');
+    const dateField = find(
+      this._metric.dateColumns,
+      col => col.columnName === this.kpiForm.get('dateField').value
+    );
+
     this.onKPIAction.emit({
-      kpi: this.kpiForm.value
+      kpi: assign(this._kpi, {
+        name: this.kpiForm.get('name').value,
+        dataFields: [
+          {
+            columnName: dataField.columnName,
+            name: dataField.name,
+            aggregate: [this.kpiForm.get('aggregate').value]
+          }
+        ],
+        filters: [
+          {
+            type: dateField.type,
+            columnName: dateField.columnName,
+            model: {
+              preset: this.kpiForm.get('filter').value
+            }
+          }
+        ]
+      })
     });
   }
 }
