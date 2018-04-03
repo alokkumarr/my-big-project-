@@ -4,8 +4,6 @@ import java.util.Iterator;
 
 import com.cloudera.livy.Job;
 import com.cloudera.livy.JobContext;
-import com.mapr.db.MapRDB;
-import com.mapr.db.Table;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -38,10 +36,8 @@ public class WorkbenchPreviewJob implements Job<Integer> {
         Dataset<Row> dataset = session.read().load(location);
         StructField[] fields = dataset.schema().fields();
         Iterator<Row> rows = dataset.limit(limit).toLocalIterator();
-        Table table = MapRDB.getTable(PREVIEWS_TABLE);
-        DocumentBuilder document = MapRDB.newDocumentBuilder();
-        document.addNewMap();
-        document.put("_id", id);
+        PreviewBuilder preview = new PreviewBuilder(id, "success");
+        DocumentBuilder document = preview.getDocumentBuilder();
         document.putNewArray("rows");
         rows.forEachRemaining((Row row) -> {
             document.addNewMap();
@@ -66,9 +62,7 @@ public class WorkbenchPreviewJob implements Job<Integer> {
             document.endMap();
         });
         document.endArray();
-        document.endMap();
-        table.insertOrReplace(document.getDocument());
-        table.flush();
+        preview.insert();
         return 0;
     }
 }

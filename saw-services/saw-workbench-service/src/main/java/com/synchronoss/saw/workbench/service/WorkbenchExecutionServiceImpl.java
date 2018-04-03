@@ -49,12 +49,10 @@ public class WorkbenchExecutionServiceImpl
      */
     private WorkbenchClient cachedClient;
 
-    private static final String PREVIEWS_TABLE = "/previews";
-
     @PostConstruct
     private void init() throws Exception {
         /* Initialize the previews MapR-DB table */
-        String path = PREVIEWS_TABLE;
+        String path = PreviewBuilder.PREVIEWS_TABLE;
         try (Admin admin = MapRDB.newAdmin()) {
             if (!admin.tableExists(path)) {
                 log.info("Creating previews table: {}", path);
@@ -148,6 +146,8 @@ public class WorkbenchExecutionServiceImpl
         WorkbenchClient client = getWorkbenchClient();
         String id = UUID.randomUUID().toString();
         client.submit(new WorkbenchPreviewJob(id, location, previewLimit));
+        PreviewBuilder preview = new PreviewBuilder(id, "queued");
+        preview.insert();
         /* Return generated preview ID to client to be used for
          * retrieving preview data */
         ObjectNode root = mapper.createObjectNode();
@@ -159,7 +159,7 @@ public class WorkbenchExecutionServiceImpl
     public ObjectNode getPreview(String previewId) throws Exception {
         log.info("Get dataset transformation preview");
         /* Locate the preview data in MapR-DB */
-        Table table = MapRDB.getTable(PREVIEWS_TABLE);
+        Table table = MapRDB.getTable(PreviewBuilder.PREVIEWS_TABLE);
         Document doc = table.findById(previewId);
         /* Return the preview data */
         if (doc == null) {

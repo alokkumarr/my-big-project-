@@ -159,13 +159,14 @@ public class WorkbenchIT extends BaseIT {
     private void waitForPreview(String id, int retries)
         throws JsonProcessingException {
         Response response = given(authSpec)
-            .when().get(WORKBENCH_PATH + "/previews/" + id);
-        int statusCode = response.statusCode();
-        if (statusCode == 200) {
+            .when().get(WORKBENCH_PATH + "/previews/" + id)
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        String status = response.path("status");
+        if (status.equals("success")) {
             return;
-        } else if (statusCode != 404) {
-            throw new RuntimeException(
-                "Unhandled status code: " + statusCode);
+        } else if (!status.equals("queued")) {
+            throw new RuntimeException("Unknown preview status: " + status);
         }
         /* Preview not found yet, so wait more */
         if (retries == 0) {
