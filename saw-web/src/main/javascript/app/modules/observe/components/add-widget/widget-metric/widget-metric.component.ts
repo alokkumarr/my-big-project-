@@ -6,6 +6,7 @@ import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 
+import { guid } from '../../../../../common/utils/guid';
 import { DATE_TYPES } from '../../../../../common/consts';
 
 const template = require('./widget-metric.component.html');
@@ -47,7 +48,7 @@ export class WidgetMetricComponent implements OnInit {
     if (!metric || metric.kpiColumns) return;
 
     this.showProgress = true;
-    this.observe.createKPI({ semanticId }).subscribe(
+    this.observe.getArtifacts({ semanticId }).subscribe(
       data => {
         this.applyArtifactsToMetric(metric, data);
         this.showProgress = false;
@@ -59,7 +60,6 @@ export class WidgetMetricComponent implements OnInit {
   }
 
   applyArtifactsToMetric(metric, metricData) {
-    metric.kpiId = metricData.id;
     metric.artifacts = metricData.artifacts;
     metric.esRepository = metricData.esRepository;
     metric.kpiColumns = flatMap(metricData.artifacts, table => {
@@ -85,7 +85,7 @@ export class WidgetMetricComponent implements OnInit {
       column,
       metric,
       kpi: {
-        id: metric.kpiId,
+        id: guid(),
         name: column.displayName,
         tableName: column.table || column.tableName,
         semanticId: metric.id,

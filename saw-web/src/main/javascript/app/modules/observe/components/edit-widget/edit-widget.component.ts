@@ -50,7 +50,7 @@ export class EditWidgetComponent implements OnInit {
 
   prepareKPI(model) {
     this.observe
-      .createKPI({ semanticId: model.kpi.semanticId })
+      .getArtifacts({ semanticId: model.kpi.semanticId })
       .map(metric => {
         if (!metric) return;
         metric.kpiColumns = flatMap(metric.artifacts, table => {

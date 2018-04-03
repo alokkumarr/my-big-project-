@@ -56,7 +56,7 @@ export class ObserveService {
     ).map(fpGet('contents.observe.0'));
   }
 
-  createKPI({ semanticId }): Observable<any> {
+  getArtifacts({ semanticId }): Observable<any> {
     return this.http.post(`${this.api}/kpi`, {
       keys: [
         {
@@ -66,7 +66,7 @@ export class ObserveService {
           analysisType: 'kpi'
         }
       ],
-      action: 'create'
+      action: 'fetch'
     });
   }
 
