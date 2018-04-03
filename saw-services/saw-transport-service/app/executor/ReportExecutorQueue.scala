@@ -132,6 +132,7 @@ class ReportExecutorQueue(val executorType: String) {
         case "preview" => ExecutionType.preview
         case "onetime" => ExecutionType.onetime
         case "scheduled" => ExecutionType.scheduled
+        case "regularExecution" => ExecutionType.regularExecution
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       /* Save execution as a function to be invoked only after MapR streams

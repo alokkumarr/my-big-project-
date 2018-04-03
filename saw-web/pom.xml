@@ -51,6 +51,7 @@
     <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
     <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
     <app.varDir>/var/bda/${app.nameVer}</app.varDir>
+    <npm.install>install --prefer-offline</npm.install>
   </properties>
   <dependencies>
 	<dependency>
@@ -214,27 +215,10 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>install</arguments>
+              <arguments>${npm.install}</arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>npm-uninstall-node-sass</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>uninstall node-sass</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-install-node-sass</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>install node-sass</arguments>
-            </configuration>
-          </execution>
+
            <execution>
             <id>npm-run-build</id>
             <goals>
@@ -318,27 +302,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -443,27 +407,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -552,27 +496,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 
@@ -691,27 +615,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>install node-sass</arguments>
+                  <arguments>${npm.install}</arguments>
                 </configuration>
               </execution>
 

@@ -78,6 +78,16 @@ saw_workbench_project_root=maprfs:///data/bda
 saw_workbench_preview_limit=10000
 saw_workbench_livy_uri=http://localhost:8998/
 
+# FTP JSON config
+# ##########################################
+#
+#
+# DO NOT SPLIT THIS INTO MULTIPLE LINES
+#
+#
+# ##########################################
+# ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
+
 [saw-security]
 localhost
 

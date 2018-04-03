@@ -1,4 +1,3 @@
-declare const require: any;
 declare const ace: any;
 
 import {

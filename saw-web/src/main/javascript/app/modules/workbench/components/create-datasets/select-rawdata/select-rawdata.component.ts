@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import { Component, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
@@ -7,13 +6,14 @@ import * as trim from 'lodash/trim';
 import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
+import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service'
 
-import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component'
+import { CreatefolderDialogComponent } from '../createFolder-dialog/createfolder-dialog.component';
 import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component'
 import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs'
@@ -41,6 +41,7 @@ export class SelectRawdataComponent implements OnInit {
   private nodeID = '';
 
   constructor(
+    private headerProgress: HeaderProgressService,
     public dialog: MatDialog,
     private dxDataGrid: dxDataGridService,
     private workBench: WorkbenchService,
@@ -75,9 +76,11 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   getPageData() {
+    this.headerProgress.show();
     this.workBench.getStagingData('/').subscribe(data => {
       const filteredDataFiles = filter(data.data, ['isDirectory', false]);
       this.reloadDataGrid(filteredDataFiles);
+      this.headerProgress.hide();
     });
   }
 
@@ -111,10 +114,12 @@ export class SelectRawdataComponent implements OnInit {
     const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
     this.currentPath = path;
     this.nodeID = node.id;
+    this.headerProgress.show();
     this.workBench.getStagingData(path).subscribe(data => {
       const filteredDataFiles = filter(data.data, ['isDirectory', false])
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
+      this.headerProgress.hide();
     });
   }
 
@@ -131,17 +136,20 @@ export class SelectRawdataComponent implements OnInit {
       dataField: 'name',
       dataType: 'string',
       cellTemplate: 'dobjTemplate',
-      width: '66%'
+      width: '66%',
+      allowSorting: true,
+      sortOrder: 'asc'
     }, {
       dataField: 'size',
       caption: 'Size',
       width: '15%',
       dataType: 'number',
-      cellTemplate: 'sizeTemplate'
+      cellTemplate: 'sizeTemplate',
+      allowSorting: true
     }, {
       dataField: 'name',
       caption: 'Preview',
-      alignment: 'center',
+      alignment: 'right',
       width: '14%',
       allowFiltering: false,
       cellTemplate: 'actionsTemplate'
@@ -157,22 +165,19 @@ export class SelectRawdataComponent implements OnInit {
       },
       height: '100%',
       scrolling: {
-        mode: 'standard'
+        showScrollbar: 'always',
+        mode: 'virtual',
+        useNative: false
       },
-      paging: {
-        pageSize: 12
-      },
-      pager: {
-        showPageSizeSelector: true,
-        allowedPageSizes: [10, 20, 50, 100],
-        showInfo: true
+      sorting: {
+        mode: 'multiple'
       },
       filterRow: {
-        visible: false,
+        visible: true,
         applyFilter: 'auto'
       },
       headerFilter: {
-        visible: false
+        visible: true
       },
       showRowLines: false,
       showBorders: false,
@@ -240,10 +245,12 @@ export class SelectRawdataComponent implements OnInit {
     const validType = this.workBench.validateFileTypes(filesToUpload);
     if (validSize && validType) {
       const path = this.currentPath;
+      this.headerProgress.show();
       this.workBench.uploadFile(filesToUpload, path).subscribe(data => {
         const filteredDataFiles = filter(data.data, ['isDirectory', false])
         this.reloadDataGrid(filteredDataFiles);
         this.clearSelected();
+        this.headerProgress.hide();
       });
     } else {
       this.notify.warn('Only ".csv" or ".txt" extension files are supported', 'Unsupported file type');
@@ -256,11 +263,13 @@ export class SelectRawdataComponent implements OnInit {
    * @memberof SelectRawdataComponent
    */
   createFolder() {
-    const dateDialogRef = this.dialog.open(DateformatDialogComponent, {
-      hasBackdrop: false,
-      data: {
-        placeholder: 'Enter folder name'
-      }
+    const dateDialogRef = this.dialog.open(CreatefolderDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: true,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '236px',
+      width: '350px'
     });
 
     dateDialogRef
@@ -268,6 +277,7 @@ export class SelectRawdataComponent implements OnInit {
       .subscribe(name => {
         if (trim(name) !== '' && name != 'null') {
           const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
+          this.headerProgress.show();
           this.workBench.createFolder(path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
             const currChilds = get(currentNode.data, 'children', []);
@@ -286,6 +296,7 @@ export class SelectRawdataComponent implements OnInit {
             }
             this.tree.treeModel.update();
             currentNode.expand();
+            this.headerProgress.hide();
           });
         }
       });

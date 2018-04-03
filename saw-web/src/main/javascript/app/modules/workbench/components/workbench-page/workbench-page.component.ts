@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import { Component } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';

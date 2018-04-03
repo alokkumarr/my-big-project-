@@ -1,4 +1,3 @@
-declare function require(string): string;
 
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
@@ -23,7 +22,7 @@ export class DatasetsCardPageComponent implements OnInit {
   @Input() updater: BehaviorSubject<any>;
   private updaterSubscribtion: any;
   private dataSets: Array<any> = [];
-    
+
   constructor(
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService
@@ -32,7 +31,7 @@ export class DatasetsCardPageComponent implements OnInit {
   ngOnInit() {
     this.headerProgress.show();
     this.updaterSubscribtion = this.updater.subscribe(data => {
-      this.onUpdate(data)        
+      this.onUpdate(data)
     });
   }
 
@@ -43,9 +42,11 @@ export class DatasetsCardPageComponent implements OnInit {
   onUpdate(data) {
     this.dataSets = data;
     if (this.dataSets.length > 0) {
-      
+
     }
-    this.headerProgress.hide();
+    setTimeout(() => {
+      this.headerProgress.hide();
+    }, 1000);
   }
 
   openSQLEditor(): void {

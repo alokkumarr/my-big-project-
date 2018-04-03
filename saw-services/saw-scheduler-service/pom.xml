@@ -113,6 +113,11 @@
             <artifactId>antlr4-runtime</artifactId>
             <version>4.5</version>
         </dependency>
+		<dependency>
+			<groupId>info.faljse</groupId>
+			<artifactId>SDNotify</artifactId>
+			<version>1.1</version>
+		</dependency>
     </dependencies>
 
 	<build>
@@ -183,6 +188,14 @@
 									<file>src/main/system/saw-scheduler.service</file>
 								</entry>
 								<entry>
+									<name>/usr/lib/systemd/system/saw-scheduler-proxy.service</name>
+									<file>src/main/system/saw-scheduler-proxy.service</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-scheduler-proxy.socket</name>
+									<file>src/main/system/saw-scheduler-proxy.socket</file>
+								</entry>
+								<entry>
 									<name>/opt/bda/saw-scheduler-service/conf/logback.xml</name>
 									<file>src/main/resources/logback.xml</file>
 								</entry>
@@ -208,7 +221,7 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 	</repositories>
 </project>

@@ -14,6 +14,7 @@ export const LayoutHeaderComponent = {
       this._UserService = UserService;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this.UserDetails = this._JwtService.getTokenObj();
 
       const token = this._JwtService.getTokenObj();
       const product = get(token, 'ticket.products.[0]');

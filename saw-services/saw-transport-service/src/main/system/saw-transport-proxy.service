@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Transport Proxy
+Requires=saw-transport.service
+After=saw-transport.service
+Requires=saw-transport-proxy.socket
+After=saw-transport-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9201
+PrivateTmp=yes

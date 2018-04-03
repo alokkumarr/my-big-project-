@@ -12,15 +12,15 @@ import sncr.xdf.context.Context;
 import sncr.xdf.parser.Parser;
 import sncr.xdf.sql.SQLComponent;
 
-public class WorkbenchJob implements Job<Integer> {
+public class WorkbenchExecuteJob implements Job<Integer> {
     private static final long serialVersionUID = 1L;
     private final String root;
     private final String project;
     private final String component;
     private final String config;
 
-    public WorkbenchJob(String root, String project, String component,
-                        String config) {
+    public WorkbenchExecuteJob(
+        String root, String project, String component, String config) {
         this.root = root;
         this.project = project;
         this.component = component;
@@ -30,7 +30,7 @@ public class WorkbenchJob implements Job<Integer> {
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
-        log.debug("Start Workbench job");
+        log.debug("Start execute job");
         String batch = "batch-" + Instant.now().toEpochMilli();
         Component xdfComponent;
         if (component.equals("parser")) {
@@ -59,7 +59,7 @@ public class WorkbenchJob implements Job<Integer> {
             throw new IllegalArgumentException(
                 "Unknown component: " + component);
         }
-        log.debug("Finished Workbench job");
+        log.debug("Finished execute job");
         return Component.startComponent(
             xdfComponent, root, config, project, batch);
     }
