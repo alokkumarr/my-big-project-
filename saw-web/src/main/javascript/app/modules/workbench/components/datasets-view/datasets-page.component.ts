@@ -83,7 +83,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
       });
     }
     setTimeout(() => {
-      this.contentHeight = window.innerHeight - 165;
+      this.contentHeight = window.innerHeight - 170;
     });
   }
 

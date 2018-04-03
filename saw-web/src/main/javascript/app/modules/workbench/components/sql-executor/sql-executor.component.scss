@@ -7,6 +7,7 @@ sql-executor {
     height: 99%;
     max-height: 100%;
     padding: 3px;
+    background-color: #F5F9FC;
   }
 
   .title-elem {
@@ -15,6 +16,7 @@ sql-executor {
 
   .ds-name {
     font-size: 16px;
+    padding-left: 5%;
   }
 
   .bck-btn {
@@ -24,7 +26,11 @@ sql-executor {
 
   .action-title {
     color: $primary-blue-b2;
-    font-size: 16px;
+    font-size: 18px;
+
+    mat-icon {
+      vertical-align: middle;
+    }
   }
 
   .gridContainer {
@@ -47,11 +53,6 @@ sql-executor {
 
   .exec-btn-icon {
     font-size: 24px;
-  }
-
-  .btn-padding {
-    padding-left: 25px;
-    padding-right: 25px;
   }
 
   .list-items {
