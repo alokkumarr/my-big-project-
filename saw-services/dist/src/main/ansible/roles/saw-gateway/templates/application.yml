@@ -9,6 +9,9 @@ spring:
       max-file-size: 25MB
   main:
     banner-mode: 'off'
+logging:
+  level:
+    com.synchronoss.saw.gateway: INFO
 server:
   address: localhost
   port: 9100
@@ -98,5 +101,3 @@ api:
         -   location: ${workbench.service.host}
             method: GET
             path: '[/]internal/workbench.*'
-logging:
-  config: /opt/bda/saw-gateway-service/conf/logback.xml

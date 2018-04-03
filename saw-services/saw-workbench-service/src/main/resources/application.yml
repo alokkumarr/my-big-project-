@@ -7,6 +7,9 @@ spring:
     multipart:
       max-request-size: 25MB
       max-file-size: 25MB
+logging:
+  level:
+    com.synchronoss.saw.workbench: INFO
 server:
   address: localhost
   port: 9701
