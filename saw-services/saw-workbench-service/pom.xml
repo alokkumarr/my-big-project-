@@ -25,6 +25,9 @@
 		<json-core>1.2.5</json-core>
 		<metadata.api>1.0.3</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+
+    <revision>2</revision>
+    <revision.nodash>2</revision.nodash>
 	</properties>
 
 	<dependencies>
@@ -172,7 +175,7 @@
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>xdf</artifactId>
-			<version>1.0.3</version>
+			<version>1.0.3_dev</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -197,7 +200,12 @@
 			<artifactId>livy-client-http</artifactId>
 			<version>0.3.0</version>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>com.synchronoss.saw</groupId>
+      <artifactId>saw-inspect-data-api</artifactId>
+      <version>2</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -343,11 +351,11 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 		<repository>
 			<id>synchronoss-snapshots</id>
-			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
+			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
 		</repository>
 		
 	</repositories>

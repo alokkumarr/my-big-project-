@@ -27,6 +27,10 @@ init_datalake() {
 load_data() {
     echo "Loading sample CSV data"
     $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
+
+    echo "Loading sample CSV data"
+    $sudo_mapr $hadoop_put $dir/RevenueVehicleMaintPerf2.csv $datalake_raw
+
 }
 
 wait_maprfs

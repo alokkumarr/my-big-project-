@@ -1,7 +1,6 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.containsString;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -15,13 +14,82 @@ import org.slf4j.LoggerFactory;
  * Workbench Service integration tests.  Tests parsing, viewing and
  * executing components.
  */
-public class WorkbenchIT extends BaseIT {
+public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     private static final String WORKBENCH_PROJECT = "workbench";
     private static final String WORKBENCH_PATH =
         "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
     private static final int DATASET_WAIT_RETRIES = 20;
     private static final int DATASET_WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
+
+    /*
+        Parser configuration file.
+     */
+    private String parserConf =
+        "{\n"
+        + "  \"parser\": {\n"
+        + "    \"fields\": [\n"
+        + "  { \"name\": \"State\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"Name\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"NTDID\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"LegacyNTDID\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"OrgType\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"ReporterType\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"UrbanizedArea\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"UZAPopulation\", \"type\": \"integer\"},\n"
+        + "  { \"name\": \"UZASize\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"WholeAgencyVOMSSize\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"Mode\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"TOS\", \"type\": \"string\"},\n"
+        + "  { \"name\": \"VOMS\", \"type\": \"integer\"},\n"
+        + "  { \"name\": \"MajorMechanicalFailure\", \"type\": \"integer\"},\n"
+        + "  { \"name\": \"OtherMechanicalFailure\", \"type\": \"integer\"},\n"
+        + "  { \"name\": \"TotalRevenueSystemMechanical\","
+        +    "\"type\": \"integer\"},\n"
+        + "  { \"name\": \"C4\", \"type\": \"string\"}\n"
+        + "  ],\n"
+        + "    \"file\" : "
+        + "\"hdfs:///main/raw/RevenueVehicleMaintPerf2.csv\",\n"
+        + "    \"lineSeparator\": \"\\n\",\n"
+        + "    \"delimiter\": \",\",\n"
+        + "    \"quoteChar\": \"\\\"\",\n"
+        + "    \"quoteEscape\": \"\\\\\",\n"
+        + "    \"headerSize\": 4\n"
+        + "  },\n"
+        + "  \"outputs\" : [\n"
+        + "    { \n"
+        + "      \"dataSet\" : \"WBAPARSER01\",\n"
+        + "      \"mode\" : \"replace\",\n"
+        + "      \"format\" : \"paquet\",\n"
+        + "      \"catalog\" : \"dout\"\n"
+        + "     }\n"
+        + "  ],\n"
+        + "  \"parameters\" : [\n"
+        + "\n"
+        + "  ]\n"
+        + "}";
+
+
+    /**
+     * Parse a CSV file into dataset with given name using Workbench
+     * Services.
+     */
+    private String parseDataset2() throws JsonProcessingException {
+        Response response = given(authSpec)
+            .body(parserConf)
+            .when()
+            .post(WORKBENCH_PATH + "/datasets")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .extract()
+            .response();
+        String resp = response.getBody().asString();
+        assert (resp != null);
+        return resp;
+    }
+
+
 
     /**
      * Parse a CSV file into dataset with given name using Workbench
@@ -54,6 +122,7 @@ public class WorkbenchIT extends BaseIT {
             .body(json)
             .when().post(WORKBENCH_PATH + "/datasets")
             .then().assertThat().statusCode(200);
+
     }
 
     /**
@@ -63,6 +132,8 @@ public class WorkbenchIT extends BaseIT {
         throws JsonProcessingException {
         waitForDatasetRetry(id, DATASET_WAIT_RETRIES);
     }
+
+
 
     /**
      * Wait until dataset becomes visible in Workbench Services, using
@@ -119,13 +190,9 @@ public class WorkbenchIT extends BaseIT {
     }
 
     @Test
-    public void testListDatasets() {
-        /* Note: Placeholder for Workbench list datasets integration
-         * test.  To be done: Create a dataset and then make
-         * assertions on it when listing available datasets. */
-        given(authSpec)
-            .when().get(WORKBENCH_PATH + "/datasets")
-            .then().assertThat().statusCode(200)
-            .body(containsString(""));
+    public void testListPreregDatasets() throws JsonProcessingException {
+    // id = parseDataset("test_list")
+        String id = parseDataset2();
+        log.info("ID: " + id);
     }
 }

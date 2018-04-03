@@ -1,9 +1,12 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +14,12 @@ import org.springframework.stereotype.Service;
 
 import sncr.bda.core.file.HFileOperations;
 
+
+
 @Service
 public class WorkbenchExecutionServiceImpl
     implements WorkbenchExecutionService {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
-    private final ObjectMapper mapper = new ObjectMapper();
   
     @Value("${workbench.project-key}")
     @NotNull
@@ -37,13 +41,27 @@ public class WorkbenchExecutionServiceImpl
     public ObjectNode execute(
         String project, String name, String component, String config)
         throws Exception {
+
         log.info("Execute dataset transformation");
         WorkbenchClient client = new WorkbenchClient();
-        createDatasetDirectory(name);
-        client.submit(livyUri, new WorkbenchExecuteJob(
-                          root, project, component, config));
-        ObjectNode root = mapper.createObjectNode();
-        return root;
+        XDFContextProvider ngCtx =
+            new XDFContextProvider(root, project, component, config);
+        /* createDatasetDirectory(name); */
+        WorkbenchExecuteJob  workbenchExecuteJob =
+            new WorkbenchExecuteJob(ngCtx.getNGContext());
+        List<String> ids = ngCtx.getDataSetIDs();
+
+//        ArrayNode nodes = mapper.createArrayNode();
+//        ids.forEach(id -> nodes.add(id));
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode responseRoot = mapper.createObjectNode();
+        responseRoot.put("id", ids.get(0));
+
+        client.submit(livyUri, workbenchExecuteJob);
+
+        return responseRoot;
+        //createDatasetDirectory(name);
     }
 
     private void createDatasetDirectory(String name) throws Exception {
