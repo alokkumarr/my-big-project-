@@ -11,7 +11,8 @@
     </button>
 
     <h4 class="metric-ineligible-message" *ngIf="metric.kpiEligible === false">
-      This metric is not eligible for KPIs.
+      This Dataset either is not configured with any KPI eligible metrics or it does not contain at least one eligible Date type
+      field.
     </h4>
   </mat-expansion-panel>
 </mat-accordion>
