@@ -4,6 +4,7 @@
 \alias{resample}
 \alias{resample.numeric}
 \alias{resample.data.frame}
+\alias{resample.tbl_spark}
 \title{Random Sample function}
 \usage{
 resample(x, ...)
@@ -11,6 +12,8 @@ resample(x, ...)
 \method{resample}{numeric}(x, number, amount, seed = NULL)
 
 \method{resample}{data.frame}(df, number, amount, seed = NULL)
+
+\method{resample}{tbl_spark}(df, amount, seed = NULL)
 }
 \arguments{
 \item{number}{number of resamples to create}

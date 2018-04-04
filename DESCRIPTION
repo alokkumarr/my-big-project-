@@ -1,10 +1,10 @@
 Package: a2modeler
-Title: Synchronoss Advanced Analytics Statistical Modeling R Package
+Title: Synchronoss Advanced Analytics Statistical Modeling R Package.
 Version: 0.0.0.9000
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
-Description: Statistical model building and predicting framework for forecasting, regression, classification and clustering use cases
+Description: Statistical model building and predicting framework for forecasting, regression, classification and clustering use cases.
 Depends: R (>= 3.4.2)
-License: What license is it under?
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:

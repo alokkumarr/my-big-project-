@@ -64,7 +64,7 @@ valid_samples <- function(x){
     stop("Indicies names length doesn't match training indicies")
   }
 
-  if(is.null(x$test_holdout_prct) & (! is.null(test_index))){
+  if(is.null(x$test_holdout_prct) & (! is.null(x$test_index))){
     stop("Test holdout index created when none configured")
   }
 
@@ -343,7 +343,7 @@ add_holdout_samples <- function(x, ...){
 #' @param x  numeric vector
 #' @rdname add_holdout_samples
 #' @export
-add_holdout_samples.numeric <- function(x, splits){
+add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits){
 
   checkmate::assert_numeric(splits, lower = 0, upper = 1, min.len = 2, max.len = 3)
   if(sum(splits) != 1){
@@ -541,7 +541,7 @@ add_resample_samples.numeric <- function(x, number, amount, test_holdout_prct = 
 
   samples(
     validation_method = "resample",
-    validation_args = list(split = splits[1]),
+    validation_args = list(number = number, amount = amount, seed = seed),
     test_holdout_prct = test_holdout_prct,
     test_holdout_method = "resample",
     downsample_prct = NULL,
