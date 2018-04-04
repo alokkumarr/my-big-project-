@@ -31,6 +31,10 @@ export function hourToCron(hour, hourType, minutes) {
   return minuteHourUTC;
 }
 
+export function generateHourlyCron(hours, minutes) {
+  return `0 ${minutes} 0/${hours} 1/1 * ? *`;
+}
+
 export function generateDailyCron(cronDaily, dateSelects) {
   if (cronDaily.dailyType === 'everyDay') {
     const CronExp = `0 ${this.hourToCron(dateSelects.hour, dateSelects.hourType, dateSelects.minute)} 1/${cronDaily.days} * ? *`;	

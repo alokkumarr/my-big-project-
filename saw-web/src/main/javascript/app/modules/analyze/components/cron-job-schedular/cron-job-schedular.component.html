@@ -1,8 +1,22 @@
 <div class="tab">
+  <button class="tablinks" (click)="openSchedule(event, 'hourly')" [ngClass]="{'active': scheduleType === 'hourly'}">Hourly</button>
   <button class="tablinks" (click)="openSchedule(event, 'daily')" [ngClass]="{'active': scheduleType === 'daily'}">Daily</button>
   <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')" [ngClass]="{'active': scheduleType === 'weeklybasis'}">Weekly</button>
   <button class="tablinks" (click)="openSchedule(event, 'monthly')" [ngClass]="{'active': scheduleType === 'monthly'}">Monthly</button>
   <button class="tablinks" (click)="openSchedule(event, 'yearly')" [ngClass]="{'active': scheduleType === 'yearly'}">Yearly</button>
+</div>
+
+<div *ngIf="scheduleType === 'hourly'" [ngClass]="{'active': scheduleType === 'hourly'}" class="tabcontent">
+  Every <mat-select [(ngModel)]="hourly.hours" (selectionChange)="regenerateCron('')">
+      <mat-option *ngFor="let hour of hours" [value]="hour">
+        {{hour}}
+    </mat-option>
+  </mat-select> hour(s) on minute 
+  <mat-select [(ngModel)]="hourly.minutes" (selectionChange)="regenerateCron('')">
+      <mat-option *ngFor="let minute of minutes" [value]="minute">
+        {{minute}}
+    </mat-option>
+  </mat-select>
 </div>
 
 <div *ngIf="scheduleType === 'daily'" [ngClass]="{'scheduleType': selectedItem === 'daily'}" class="tabcontent">
