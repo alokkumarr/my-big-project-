@@ -1,2 +1,3 @@
 - name: restart saw-observe
-  systemd: name=saw-observe state=restarted daemon_reload=true
+  # Stop service, to trigger restart by socket activation
+  systemd: name=saw-observe state=stopped daemon_reload=true

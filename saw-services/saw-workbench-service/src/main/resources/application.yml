@@ -1,0 +1,35 @@
+info:
+  component: Synchronoss Workbench Service
+spring:
+  application:
+    name: saw-workbench-service
+  http:
+    multipart:
+      max-request-size: 25MB
+      max-file-size: 25MB
+logging:
+  level:
+    com.synchronoss.saw.workbench: INFO
+server:
+  address: localhost
+  port: 9701
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
+
+workbench:
+        project-key: "workbench"
+        project-path: "/Desktop" 
+        project-root: "/Users/spau0004"
+        preview-limit: 10000
+        livy-uri: http://localhost:8998
+
+metastore:
+    base:  hdfs:///main/        

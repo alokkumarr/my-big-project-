@@ -1,0 +1,61 @@
+@import "themes/base/colors";
+
+datasets-page {
+  width: 100%;
+
+  .action-buttons {
+    .mat-icon-button {
+      font-size: 22px;
+      line-height: 32px !important;
+      height: 34px !important;
+    }
+
+    .mat-raised-button {
+      line-height: 32px !important;
+      vertical-align: middle;
+    }
+  }
+
+  .toolbar-white {
+    background-color: #FFF;
+    height: 45px !important;
+    min-height: 45px !important;
+  }
+
+  .md-subhead {
+    color: #0096D5;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .mat-button-toggle-checked {
+    background-color: $primary-blue-b2;
+    color: white;
+  }
+
+  .mat-button-toggle-label-content {
+    padding: 0 7px;
+    line-height: 32px;
+  }
+
+  .view-mode {
+    .mat-button-toggle-group {
+      box-shadow: none;
+    }
+
+    .mat-button-toggle-checked {
+      background-color: white;
+      color: $primary-blue-b2;
+    }
+  }
+
+  .page-content {
+    background-color: #F5F9FC;
+    overflow: auto;
+
+    .grid-view {
+      padding: 3px;
+    }
+  }
+}
+

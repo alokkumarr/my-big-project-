@@ -1,0 +1,164 @@
+@import "themes/base/colors";
+@import '~angular-tree-component/dist/angular-tree-component.css';
+
+select-rawdata {
+  width: 100%;
+
+  .select-view {
+    height: calc(100% - 43px);
+
+    mat-card {
+      height: 99%;
+
+      .staging-title {
+        font-size: 16px;
+      }
+
+      .sec-btn {
+        color: $primary-blue-b2;
+        line-height: 32px !important;
+        height: 32px !important;
+        padding: 0 3px;
+
+        .mat-button {
+          vertical-align: middle;
+          line-height: 32px !important;
+          height: 32px !important;
+          border-radius: 2px;
+          background-color: white;
+          border: solid 1px #1A89D4;
+        }
+
+        .mat-button .mat-button-wrapper > * {
+          vertical-align: initial !important;
+        }
+      }
+    }
+  }
+
+  .border-right-style {
+    border-right-style: inset;
+    background-color: white;
+  }
+
+  .yellow-icon {
+    color: rgb(238, 203, 0);
+  }
+
+  .tree-icon {
+    color: rgb(238, 203, 0);
+    font-size: 20px;
+  }
+
+  .toolbar-spacer {
+    flex: 1 1 auto;
+  }
+
+  .staging-image {
+    background-image: url('../../../../../../../../../assets/img/staging-img.png');
+    background-size: cover;
+    height: 38px;
+    width: 38px;
+  }
+
+  .margin-9 {
+    margin: 3px 3px 0 0;
+    padding-bottom: 0;
+  }
+
+  .headerText {
+    margin: 9px !important;
+    font-size: 16px !important;
+    font-weight: normal !important;
+  }
+
+  #infoForMask {
+    padding-left: 9px;
+    padding-right: 9px;
+
+    mat-icon {
+      color: $primary-blue-b2;
+      font-size: 19px;
+    }
+
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    .mat-form-field-underline {
+      bottom: 0.25em;
+    }
+  }
+
+  .borderPrimary {
+    border-top-color: $primary-blue-b2;
+    border-top-width: 1.6px;
+  }
+
+  .selectCard {
+    padding: 0;
+    background-color: #F5F9FC;
+  }
+
+  .whiteFrame {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    background-color: white;
+  }
+
+  .headerGradient {
+    padding: 8px 15px;
+    background-color: white;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+
+  .results {
+    width: 100%;
+    height: 150px;
+    color: rgb(189, 189, 189);
+    text-align: center;
+
+    span {
+      font-size: 28px;
+      word-break: break-word;
+    }
+  }
+
+  .file-icon {
+    color: $primary-green;
+    font-size: 18px;
+  }
+
+  .tree {
+    padding: 25px 0 0 9px;
+    border-right-style: inset;
+  }
+
+  .preview-icon {
+    font-size: 18px;
+    cursor: pointer;
+    color: $primary-blue-b2;
+  }
+
+  .xBtn {
+    color: $primary-red;
+  }
+
+  .staging-content {
+    height: calc(100% - 55px);
+  }
+
+  .mat-icon-button {
+    height: 36px !important;
+  }
+
+  .gridContainer {
+    height: calc(100% - 47px) !important;
+  }
+
+  .selected-files {
+    padding-top: 0;
+    max-height: calc(100% - 55px) !important;
+    overflow: scroll;
+  }
+}

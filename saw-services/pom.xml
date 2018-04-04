@@ -64,11 +64,12 @@
 		<scala.compat.version>2.11</scala.compat.version>
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
+		<metadata.api>1.0.4</metadata.api>
 	</properties>
   <repositories>
    <repository>
     <id>synchronoss</id>
-      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
   <dependencies>
@@ -144,6 +145,9 @@
 		<module>saw-es-querybuilder</module>
 		<module>saw-gateway-service</module>
 		<module>saw-export-service</module>
+		<module>saw-workbench-service</module>
+		<module>saw-date-extract-api</module>
+		<module>saw-inspect-data-api</module>
 		<module>saw-observe-service</module>
 		<module>saw-scheduler-service</module>
 		<module>saw-json-store-api</module>

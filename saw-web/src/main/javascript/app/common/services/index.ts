@@ -18,11 +18,11 @@ export const CommonServiceModule = 'CommonModule.Service';
 const moduleDependencies = ['toastr'];
 
 angular.module(CommonServiceModule, moduleDependencies)
-  .factory('dxDataGridService', dxDataGridService)
-  .factory('LocalSearchService', LocalSearchService)
   .factory('fileService', fileService)
   .factory('ErrorDetailDialogService', downgradeInjectable(ErrorDetailDialogService) as Function)
   .factory('ErrorDetailService', downgradeInjectable(ErrorDetailService) as Function)
+  .service('dxDataGridService', dxDataGridService)
+  .service('LocalSearchService', LocalSearchService)
   .service('toastMessage', ToastService)
   .service('HeaderProgress', HeaderProgressService)
   .service('SidenavService', SideNavService)

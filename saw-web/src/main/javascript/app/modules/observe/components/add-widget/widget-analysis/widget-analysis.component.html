@@ -1,0 +1,40 @@
+<mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
+
+<mat-form-field class="search-analysis">
+  <span matPrefix>
+    <mat-icon fontIcon="icon-search"></mat-icon>
+  </span>
+  <input matInput placeholder="Search" [(ngModel)]="searchTerm" />
+</mat-form-field>
+
+<div [hidden]="showProgress">
+  <div class="choose-analysis"
+    *ngFor="let analysis of analyses | filter:'name':searchTerm">
+
+    <mat-icon [fontIcon]="icons[analysis.chartType || analysis.type]"></mat-icon>
+    <div>
+      <strong [textContent]="analysis.name"></strong>
+      <p class="analysis-description" [textContent]="analysis.description"></p>
+      <div class="card-base">
+        <small class="analysis-metric" [textContent]="analysis.metricName"></small>
+
+        <button mat-mini-fab
+          color="primary"
+          class="widget-action-button"
+          *ngIf="!widgetLog[analysis.id] else removeButton"
+          (click)="addAnalysis(analysis)">
+          <mat-icon fontIcon="icon-plus"></mat-icon>
+        </button>
+
+        <ng-template #removeButton>
+          <button mat-mini-fab
+            color="warn"
+            class="widget-action-button widget-action-remove"
+            (click)="removeAnalysis(analysis)">
+            <mat-icon fontIcon="icon-close"></mat-icon>
+          </button>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

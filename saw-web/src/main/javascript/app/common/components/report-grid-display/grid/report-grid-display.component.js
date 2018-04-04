@@ -1,9 +1,9 @@
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
-import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as keys from 'lodash/keys';
+import * as split from 'lodash/split';
 import * as filter from 'lodash/filter';
 import * as fpGet from 'lodash/fp/get';
 import * as reduce from 'lodash/reduce';
@@ -16,7 +16,6 @@ import * as template from './report-grid-display.component.html';
 import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../consts.js';
 import {getFormatter, DEFAULT_PRECISION} from '../../../utils/numberFormatter';
 
-const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
 
 export const ReportGridDisplayComponent = {
@@ -41,11 +40,9 @@ export const ReportGridDisplayComponent = {
     $onInit() {
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
-        customizeColumns: columns => {
-          forEach(columns, col => {
-            col.alignment = 'left';
-            col.width = COLUMN_WIDTH;
-          });
+        columnChooser: {
+          enabled: true,
+          mode: 'select'
         },
         remoteOperations: {
           paging: true
@@ -78,9 +75,14 @@ export const ReportGridDisplayComponent = {
           'loadPanel.position.of': `$ctrl.pageSize > ${DEFAULT_PAGE_SIZE} ? window : "${gridSelector}"`
         },
         onInitialized: this.onGridInitialized.bind(this),
-        height: 'auto',
-        width: 'auto'
+        onContentReady: this.onContentReady.bind(this)
       });
+    }
+
+    $onDestroy() {
+      if (this._gridInstance) {
+        this._gridInstance.hideColumnChooser();
+      }
     }
 
     _createCustomStore() {
@@ -88,9 +90,6 @@ export const ReportGridDisplayComponent = {
         load: options => {
           return this.source({options})
             .then(({data, count}) => {
-              this._$timeout(() => {
-                this.updateColumns(this.columns, data);
-              });
               return {data, totalCount: count};
             });
         }
@@ -100,6 +99,10 @@ export const ReportGridDisplayComponent = {
 
     updateColumns(columns, data) {
       if (this._gridInstance) {
+        if (!columns) {
+          this._gridInstance.option('columns', null);
+          return;
+        }
         const cols = this._getDxColumns(columns, data);
         this._gridInstance.option('columns', cols);
         // this._gridInstance.refresh();
@@ -169,6 +172,12 @@ export const ReportGridDisplayComponent = {
       }
     }
 
+    getDataField(column) {
+      const dataField = column.columnName || column.name;
+      // trim the .keyword suffix from the column name if it is there
+      return split(dataField, '.')[0];
+    }
+
     _getDxColumns(columns = [], data = []) {
       let allColumns = [];
       if (isEmpty(data) || this.showChecked) {
@@ -186,17 +195,15 @@ export const ReportGridDisplayComponent = {
         const isNumberType = NUMBER_TYPES.includes(column.type);
 
         const field = {
-          alignment: 'left',
           caption: column.aliasName || column.alias || column.displayName || column.name,
+          dataField: this.getDataField(column),
           format: isNumberType ? {
             formatter: getFormatter(column.format || (
               FLOAT_TYPES.includes(column.type) ? {precision: DEFAULT_PRECISION} : {precision: 0}
             ))
           } : column.format,
-          dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
-          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
-          width: COLUMN_WIDTH
+          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
@@ -208,11 +215,40 @@ export const ReportGridDisplayComponent = {
     }
 
     $onChanges() {
-      this.updateColumns(this.columns, this.data);
+      this._$timeout(() => {
+        this.updateColumns(this.columns, this.data);
+      });
     }
 
     onGridInitialized(e) {
       this._gridInstance = e.component;
+    }
+
+    onContentReady(e) {
+      // close the columnCHoser, when the user clicks outside of it
+      const columnChooserView = e.component.getView('columnChooserView');
+      if (!columnChooserView._popupContainer) {
+        columnChooserView._initializePopupContainer();
+        columnChooserView.render();
+        const onBodyClick = e => {
+          const content = columnChooserView._popupContainer._$content[0];
+          const target = e.target;
+          const clickOutside = !content.contains(target);
+          if (clickOutside) {
+            this._$timeout(() => {
+              this._gridInstance.hideColumnChooser();
+            });
+          }
+        };
+        columnChooserView._popupContainer.on('showing', () => {
+          /* eslint-disable */
+          document.body.addEventListener('click', onBodyClick);
+        });
+        columnChooserView._popupContainer.on('hiding', () => {
+          document.body.removeEventListener('click', onBodyClick);
+          /* eslint-enable */
+        });
+      }
     }
   }
 };

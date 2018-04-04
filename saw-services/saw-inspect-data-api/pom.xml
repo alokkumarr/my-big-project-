@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.synchronoss.saw</groupId>
+	<artifactId>saw-inspect-data-api</artifactId>
+	<version>${revision}</version>
+	<packaging>jar</packaging>
+	<description></description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<metadata.api>1.0.4</metadata.api>
+	</properties>
+
+	<dependencies>
+	<dependency>
+		<groupId>com.univocity</groupId>
+		<artifactId>univocity-parsers</artifactId>
+		<version>2.5.9</version>
+	</dependency>
+		<dependency>
+			<groupId>com.mapr.db</groupId>
+			<artifactId>maprdb</artifactId>
+			<version>${mapr.db.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>meta-api</artifactId>
+			<version>${metadata.api}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-date-extract-api</artifactId>
+			<version>${revision}</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>synchronoss</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+		<repository>
+			<id>synchronoss-snapshots</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+		</repository>
+	</repositories>
+</project>

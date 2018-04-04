@@ -5,7 +5,6 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpGet from 'lodash/fp/get';
 import * as first from 'lodash/first';
 import * as map from 'lodash/map';
-import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
 import * as reduce from 'lodash/reduce';
@@ -520,8 +519,9 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
           this.gridDataTotalCount = count;
-          const columnNames = keys(fpGet('[0]', data));
-          this.columns = this.getColumns(columnNames);
+          // const columnNames = keys(fpGet('[0]', data));
+          // this.columns = this.getColumns(columnNames);
+          this.columns = null;
           this.applyDataToGrid(this.columns, [], [], this.gridData);
           this.endProgress();
           this.toggleDetailsPanel(true);
@@ -541,7 +541,10 @@ export const AnalyzeReportComponent = {
      * @returns
      */
     checkColumnName(columns) {
-
+      // there is no .keyword in query mode
+      if (this.model.edit) {
+        return columns;
+      }
       forEach(columns, field => {
         field.name = this.getColumnName(field.name);
         field.meta.name = this.getColumnName(field.meta.name);
@@ -678,7 +681,9 @@ export const AnalyzeReportComponent = {
     }
 
     hasSelectedColumns() {
-      return this.columns.length > 0;
+      return this.columns ?
+        this.columns.length > 0 :
+        true;
     }
 
     isSortDisabled() {

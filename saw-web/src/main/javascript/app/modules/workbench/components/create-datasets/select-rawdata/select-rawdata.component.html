@@ -1,0 +1,83 @@
+<div class="select-view" fxLayout="row" fxLayoutGap="9px">
+  <mat-card class="margin-9" style="padding:0px;" fxFlex="75" fxFlex.gt-md="75" fxFlex.md="75">
+    <mat-card-header class="headerGradient">
+      <div mat-card-avatar class="staging-image"></div>
+      <mat-card-title class="headerText" i18n>Staging Area</mat-card-title>
+
+      <span class="toolbar-spacer"></span>
+      <button for="fileUpload" i18n matTooltip="Upload File" mat-icon-button color="primary" (click)="fileUpload.click()">
+        <mat-icon fontIcon="icon-upload"></mat-icon>
+      </button>
+      <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept="text/csv, 'text/plain'" />
+      <button mat-icon-button color="primary" matTooltip="New Folder" i18n (click)="createFolder()">
+        <mat-icon fontIcon="icon-new-folder"></mat-icon>
+      </button>
+    </mat-card-header>
+    <mat-card-content class="staging-content">
+      <div fxLayout="row" [style.height.%]="100">
+        <div class="tree" fxFlex="30">
+          <tree-root #tree [nodes]="treeNodes" [options]="treeOptions">
+            <ng-template #treeNodeTemplate let-node let-index="index">
+              <mat-icon (click)="openFolder(node)" class="tree-icon" fontIcon="icon-folder-solid"></mat-icon>
+              <span (click)="openFolder(node)" style="vertical-align: top;">{{ node.data.name }}</span>
+            </ng-template>
+          </tree-root>
+        </div>
+        <div fxFlex="70" fxFill fxLayout="column">
+          <mat-form-field id="infoForMask">
+            <input matInput autocomplete="off" i18n placeholder="Enter file mask" [(ngModel)]="fileMask" [formControl]="fileMaskControl" required />
+            <mat-icon matSuffix fontIcon="icon-info" matTooltip="{{maskHelper}}"></mat-icon>
+          </mat-form-field>
+          <div class="gridContainer">
+            <dx-data-grid id="gridContainer">
+              <div *dxTemplate="let data of 'dobjTemplate'">
+                <div fxLayout="row">
+                  <mat-icon class="file-icon" fontIcon="icon-file-solid"></mat-icon>
+                  <div>{{data.value}}</div>
+                </div>
+              </div>
+              <div *dxTemplate="let data of 'sizeTemplate'">
+                <span [innerHTML]="data.value"></span>
+              </div>
+              <div *dxTemplate="let data of 'dateTemplate'">
+                <span [innerHTML]="data.value | date : 'short'"></span>
+              </div>
+              <div *dxTemplate="let data of 'actionsTemplate'">
+                <div fxLayout="row" fxLayoutAlign="center center">
+                  <span class="preview-icon" matTooltip="Preview File" (click)="previewDialog(data.value)">
+                    <mat-icon fontIcon="icon-show"></mat-icon>
+                  </span>
+                </div>
+              </div>
+            </dx-data-grid>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="margin-9 selectCard" fxFlex="25" fxFlex.gt-md="25" fxFlex.md="25">
+    <mat-card-header class="headerGradient">
+      <mat-card-title class="headerText" i18n>Selected Files</mat-card-title>
+      <span class="toolbar-spacer"></span>
+      <button mat-icon-button matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
+        <mat-icon fontIcon="icon-clear-all"></mat-icon>
+      </button>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content class="selected-files">
+      <mat-list role="list" class="selected-files">
+        <mat-list-item class="whiteFrame" role="listitem" *ngFor="let file of selFiles; index as i">
+          <div class="mat-body-2">{{i + 1}}. &ensp; {{ file.name }}</div>
+        </mat-list-item>
+      </mat-list>
+      <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!fileMask && !selFiles.length">
+        <span>Use Mask to select files</span>
+      </div>
+      <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="fileMask && !selFiles.length">
+        <span>NO MATCHING RESULTS</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+</div>

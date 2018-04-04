@@ -15,7 +15,6 @@ import {
   MatDatepickerModule,
   MatProgressBarModule,
   MatChipsModule,
-  // NoConflictStyleCompatibilityMode,
   MatIconRegistry,
   MatListModule,
   MatCheckboxModule,
@@ -23,8 +22,12 @@ import {
   MatTooltipModule,
   MatInputModule,
   MatToolbarModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatSliderModule,
+  MatTabsModule,
+  MatDividerModule
 } from '@angular/material';
+import {MatStepperModule} from '@angular/material/stepper';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
@@ -36,63 +39,64 @@ require('nouislider/distribute/nouislider.min.css');
 import '../../../../themes/_angular_next.scss';
 @NgModule({
   imports: [
-    // NoConflictStyleCompatibilityMode,
     BrowserAnimationsModule,
     MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
-    MatSidenavModule,
     MatRadioModule,
     MatSelectModule,
+    MatIconModule,
+    MatDialogModule,
     MatAutocompleteModule,
-    MatExpansionModule,
-    MatMomentDateModule,
-    MatDatepickerModule,
     MatFormFieldModule,
+    MatSidenavModule,
+    MatDatepickerModule,
     MatProgressBarModule,
     MatChipsModule,
-    NouisliderModule,
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatSlideToggleModule,
     MatExpansionModule,
     MatButtonToggleModule,
-    MatInputModule,
     MatCardModule,
-    MatDatepickerModule,
+    MatStepperModule,
+    MatSliderModule,
+    MatTabsModule,
+    MatDividerModule,
     MatMomentDateModule,
-    MatToolbarModule,
-    MatSlideToggleModule
+    NouisliderModule
   ],
   providers: [MatIconRegistry],
   exports: [
     MatButtonModule,
+    MatRadioModule,
+    MatSelectModule,
     MatIconModule,
     MatDialogModule,
-    MatRadioModule,
-    MatSidenavModule,
-    MatExpansionModule,
-    MatSelectModule,
     MatAutocompleteModule,
-    MatMomentDateModule,
-    MatDatepickerModule,
     MatFormFieldModule,
+    MatSidenavModule,
+    MatDatepickerModule,
     MatProgressBarModule,
     MatChipsModule,
-    NouisliderModule,
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatSlideToggleModule,
     MatExpansionModule,
     MatButtonToggleModule,
-    MatInputModule,
     MatCardModule,
-    MatDatepickerModule,
+    MatStepperModule,
+    MatSliderModule,
+    MatTabsModule,
+    MatDividerModule,
     MatMomentDateModule,
-    MatToolbarModule,
-    MatSlideToggleModule
+    NouisliderModule
   ]
 })
-export class MaterialModule {}
+export class MaterialModule { }

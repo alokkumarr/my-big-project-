@@ -1,0 +1,40 @@
+@import "themes/base/colors";
+
+datasets-grid-page {
+  width: 100%;
+  overflow: hidden;
+
+  .src-img {
+    height: 20px;
+    width: 46px;
+    margin-right: 5%;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .btn-card2 {
+    background-color: #636363 !important;
+    color: #FFF !important;
+    padding: 2px 15px;
+  }
+
+  .branded-column-name {
+    color: $primary-blue-b2;
+    font-weight: 600;
+  }
+
+  .parquet {
+    background-image: url('../../../../../../../../../assets/img/maprE.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .es {
+    background-image: url('../../../../../../../../../assets/svg/elastic.svg');
+  }
+
+  .grid-container {
+    overflow: hidden;
+    display: block;
+  }
+}

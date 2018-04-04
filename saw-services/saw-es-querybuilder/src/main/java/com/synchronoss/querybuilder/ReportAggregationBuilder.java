@@ -3,6 +3,7 @@ package com.synchronoss.querybuilder;
 import com.synchronoss.querybuilder.model.report.DataField;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.List;
 public class ReportAggregationBuilder {
 
     private final static String GROUP_BY_FIELD = "group_by_field";
-    private final static String DATA_FIELDS = "data_fields";
     private Integer querySize;
 
     public ReportAggregationBuilder(Integer querySize) {
@@ -69,17 +69,17 @@ public class ReportAggregationBuilder {
        return aggregateFields;
    }
 
-   public AggregationBuilder reportAggregationBuilder(List<DataField> dataFields, List<DataField> aggregateFields)
+   public void reportAggregationBuilder(List<DataField> dataFields, List<DataField> aggregateFields,
+                                                      SearchSourceBuilder searchSourceBuilder)
     {
         // if only aggregation fields are there.
-        AggregationBuilder aggregationBuilder = AggregationBuilders.global(DATA_FIELDS);;
+
         if (aggregateFields.size() == dataFields.size()) {
         for (DataField dataField1 : aggregateFields) {
-            aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
+            searchSourceBuilder.aggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
                     dataField1));
         }
     }
-    return aggregationBuilder;
     }
 }
 

@@ -19,11 +19,14 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   private _filter;
   private step = 1;
   private defaults: {min, max} = {min: 1, max: 100};
+  private filterCache: {operator?, start?, end?};
   private value: Array<number>;
   private config = {
     tooltips: true
   };
   private clearFiltersListener: Subscription;
+  private applyFiltersListener: Subscription;
+  private closeFiltersListener: Subscription;
 
   constructor(
     private observe: ObserveService,
@@ -33,11 +36,24 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
       this.loadDefaults();
+      this.cacheFilters();
+    });
+
+    this.applyFiltersListener = this.filters.onApplyFilter.subscribe(() => {
+      this.cacheFilters();
+    });
+
+    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(state => {
+      if (!state) {
+        this.loadDefaults(true); // load cached filter data since last apply
+      }
     });
   }
 
   ngOnDestroy() {
     this.clearFiltersListener.unsubscribe();
+    this.applyFiltersListener.unsubscribe();
+    this.closeFiltersListener.unsubscribe();
   }
 
   @Input() set filter(data) {
@@ -47,11 +63,11 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
     this.value = [this.defaults.min, this.defaults.max];
   }
 
-  loadDefaults() {
-    this.value = [this.defaults.min, this.defaults.max];
-    this.onSliderChange(this.value);
-  }
-
+  /**
+   * Loads minimum and maximum values for this number field from backend.
+   *
+   * @memberof GlobalNumberFilterComponent
+   */
   loadMinMax() {
     this.observe.getModelValues(this._filter).subscribe(data => {
       this.defaults.min = parseFloat(get(data, `_min`, this.defaults.min));
@@ -63,10 +79,54 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       */
       setTimeout(() => {
         this.loadDefaults();
+        this.cacheFilters();
       }, 10);
     });
   }
 
+  /**
+   * Caches filter in-memory. Cache is used to revert to last
+   * applied / default values.
+   *
+   * @memberof GlobalNumberFilterComponent
+   */
+  cacheFilters() {
+    this.filterCache = {
+      operator: 'BTW',
+      start: this.value[0],
+      end: this.value[1]
+    };
+  }
+
+  /**
+   * Resets the slider start and end to default state or
+   * last cached state as needed.
+   *
+   * @param {boolean} [fromCache=false]
+   * @returns
+   * @memberof GlobalNumberFilterComponent
+   */
+  loadDefaults(fromCache = false) {
+    if ((fromCache && !this.filterCache)) {
+      return;
+    }
+
+    const loadData = fromCache ? this.filterCache : {
+      start: this.defaults.min,
+      end: this.defaults.max
+    };
+
+    this.value = [loadData.start, loadData.end];
+    this.onSliderChange(this.value);
+  }
+
+  /**
+   * Gets the filter model together and communicates the
+   * updated filter to the parent.
+   *
+   * @param {any} data
+   * @memberof GlobalNumberFilterComponent
+   */
   onSliderChange(data) {
     this.value = data;
     const payload = {

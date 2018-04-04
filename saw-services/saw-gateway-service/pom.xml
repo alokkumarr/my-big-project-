@@ -109,7 +109,6 @@
 			<version>2.7.1</version>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -180,20 +179,16 @@
 									<directory>true</directory>
 								</entry>
 								<entry>
+									<name>/opt/bda/saw-gateway-service/conf</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
 									<name>/opt/bda/saw-gateway-service/saw-gateway.jar</name>
 									<file>target/saw-gateway-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
 									<name>/usr/lib/systemd/system/saw-gateway.service</name>
 									<file>src/main/system/saw-gateway.service</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-gateway-service/conf/logback.xml</name>
-									<file>src/main/resources/logback.xml</file>
-								</entry>
-								<entry>
-									<name>/opt/bda/saw-gateway-service/conf/application.yml</name>
-									<file>src/main/resources/application.yml</file>
 								</entry>
 							</entries>
 							<signature>
@@ -208,7 +203,7 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 	</repositories>
 </project>

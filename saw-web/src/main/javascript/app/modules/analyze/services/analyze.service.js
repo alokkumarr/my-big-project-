@@ -204,6 +204,10 @@ export class AnalyzeService {
     return deferred.promise;
   }
 
+  getlistFTP(custCode) {
+    return this._$http.post(`${this.url}/exports/listFTP`, custCode);
+  }
+
   deleteAnalysis(model) {
     if (!this._JwtService.hasPrivilege('DELETE', {
       subCategoryId: model.categoryId,
@@ -262,6 +266,8 @@ export class AnalyzeService {
     delete model.isScheduled;
     if (mode === EXECUTION_MODES.PREVIEW) {
       model.executionType = EXECUTION_MODES.PREVIEW;
+    } else if (mode === EXECUTION_MODES.LIVE) {
+      model.executionType = 'regularExecution';
     } else {
       delete model.executionType;
     }

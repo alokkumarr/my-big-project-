@@ -41,7 +41,7 @@ export function runConfig($q, $rootScope, $state, $location, $window, JwtService
       );
 
       /* See if the state we're going to is in the list of supported modules */
-      const allowed = some(modules, moduleName => startsWith(toState, moduleName) || startsWith(toState, 'observe'));
+      const allowed = some(modules, moduleName => startsWith(toState, moduleName) || startsWith(toState, 'workbench'));
 
       if (!allowed) {
         $log.error(new Error(`Privilege to access ${toState} not present.`));

@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Load sample CSV file (for Workbench)
+#
+set -eu
+
+dir=$(dirname $0)
+
+sudo_mapr="sudo -u mapr"
+hadoop_put="hadoop fs -put -f"
+datalake_raw=/main/raw
+
+wait_maprfs() {
+    # The MapR container might still be starting up, so wait until MapR-FS
+    # has been verified being available
+    echo "Waiting for MapR-FS to become available"
+    while ! hadoop fs -ls / > /dev/null 2>&1; do
+        sleep 5
+        echo "Retrying accessing MapR-FS"
+    done
+}
+
+init_datalake() {
+    $sudo_mapr hadoop fs -mkdir -p $datalake_raw
+}
+
+load_data() {
+    echo "Loading sample CSV data"
+    $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
+}
+
+wait_maprfs
+init_datalake
+load_data

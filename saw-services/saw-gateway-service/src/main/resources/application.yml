@@ -3,55 +3,77 @@ info:
 spring:
   application:
     name: saw-gateway-service
+  http:
+    multipart:
+      max-request-size: 25MB
+      max-file-size: 25MB
+  main:
+    banner-mode: 'off'
+logging:
+  level:
+    com.synchronoss.saw.gateway: INFO
 server:
   address: localhost
-  port: 9100 
+  port: 9100
   context-path: ''
   maxHttpHeaderSize: 65536
   compression:
-    enabled: true  
-    mime-types: text/html,text/css,application/javascript,application/json      
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9300
+internal-analysis:
+    service:
+        host: http://localhost:9200
 metadata:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9200
 semantic:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9200
 security:
     service:
-        host: http://localhost:9000/saw-security
+        host: http://localhost:9000
 export:
     service:
-        host: http://localhost:9400       
-
+        host: http://localhost:9400
 observe:
     service:
         host: http://localhost:9500
 scheduler:
     service:
         host: http://localhost:9600
+workbench:
+    service:
+        host: http://localhost:9700
 
 api:
-    gateway:
+  gateway:
         endpoints:
         -   location: ${metadata.service.host}
             method: POST
             path: '[/]md*'
-        -   location: ${analysis.service.host}
+        -   location: ${internal-analysis.service.host}
             method: GET
-            path: '[/]analysis*'
-        -   location: ${analysis.service.host}
+            path: '[/]analysis.*'
+        -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
-            path: '[/]semantic*'          
+            path: '[/]semantic*'
+        -   location: ${analysis.service.host}
+            method: GET
+            path: '/api/analyses.*'
         -   location: ${export.service.host}
-            method : GET
+            method: GET
+            path: '[/]export.*'
+        -   location: ${export.service.host}
+            method : POST
             path : '[/]export.*'
         -   location: ${scheduler.service.host}
             method : GET
@@ -64,18 +86,22 @@ api:
             path : '[/]scheduler.*'
         -   location: ${observe.service.host}
             method: POST
-            path: '[/]observe.*'       
+            path: '[/]observe.*'
         -   location: ${observe.service.host}
             method: GET
-            path: '[/]observe.*'       
+            path: '[/]observe.*'
         -   location: ${observe.service.host}
             method: PUT
-            path: '[/]observe.*'       
+            path: '[/]observe.*'
         -   location: ${observe.service.host}
             method: DELETE
             path: '[/]observe.*'
         -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]filters.*'
-        
-        
+        -   location: ${workbench.service.host}
+            method: POST
+            path: '[/]internal/workbench.*'
+        -   location: ${workbench.service.host}
+            method: GET
+            path: '[/]internal/workbench.*'

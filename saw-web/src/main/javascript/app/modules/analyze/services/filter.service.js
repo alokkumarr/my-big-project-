@@ -89,7 +89,6 @@ export class FilterService {
         isRuntimeFilter: frontendFilter.isRuntimeFilter,
         isGlobalFilter: frontendFilter.isGlobalFilter
       };
-
       if (!(frontendFilter.isRuntimeFilter || frontendFilter.isGlobalFilter) || frontendFilter.model) {
         result.model = frontendFilter.model;
       }

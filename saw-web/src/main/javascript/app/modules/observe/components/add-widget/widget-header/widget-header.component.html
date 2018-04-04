@@ -1,0 +1,12 @@
+<button mat-icon-button
+  *ngIf="showBack"
+  (click)="back()">
+  <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+</button>
+
+<strong [textContent]="title"></strong>
+
+<button mat-icon-button
+  (click)="close()">
+  <mat-icon fontIcon="icon-close"></mat-icon>
+</button>

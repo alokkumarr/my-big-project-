@@ -71,7 +71,7 @@ public class GatewayServiceControllerTest {
 		requestHeaders.set("host", "localhost");
 		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/api/md").headers(requestHeaders)
 				.contentType(MediaType.APPLICATION_JSON);
-		mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isForbidden())
+		mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isUnauthorized())
 				.andDo(MockMvcResultHandlers.print());
 	}
 
