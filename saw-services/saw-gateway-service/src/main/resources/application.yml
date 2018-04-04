@@ -9,6 +9,9 @@ spring:
       max-file-size: 25MB
   main:
     banner-mode: 'off'
+logging:
+  level:
+    com.synchronoss.saw.gateway: INFO
 server:
   address: localhost
   port: 9100
