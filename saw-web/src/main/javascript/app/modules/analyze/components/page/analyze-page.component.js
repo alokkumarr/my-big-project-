@@ -25,9 +25,8 @@ export const AnalyzePageComponent = {
 
       this.MenuService.getMenu('ANALYZE')
         .then(data => {
-          leftSideNav.update(data, 'ANALYZE');
-           
-          // leftSideNav.openSidenavManually();
+          leftSideNav.update(data, 'ANALYZE'); 
+          // leftSideNav.openSidenavManually(); 
           this._AnalyzeService.updateMenu(data);
           this.goToDefaultChildStateIfNeeded(data);
         });
