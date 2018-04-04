@@ -35,7 +35,6 @@ export const SidenavComponent = {
     $postLink() {
       if (this.id) {
         this._sidenavInst = this.$mdSidenav(this.id);
-        this.toggleSidenav();
       }
     }
 
