@@ -5,6 +5,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
@@ -22,10 +23,10 @@ public class NGSQLExecutor implements Serializable {
     private Map<String, Dataset<Row>> jobDataFrames;
     private static final Logger logger = Logger.getLogger(NGSQLExecutor.class);
     private SQLDescriptor descriptor;
-    private AbstractComponent parent;
+    private WithContext parent;
 
 
-    public NGSQLExecutor(AbstractComponent parent,
+    public NGSQLExecutor(WithContext parent,
                          SQLDescriptor descriptor,
                          Map<String, Dataset<Row>> availableDataframes)
     {
@@ -107,11 +108,10 @@ public class NGSQLExecutor implements Serializable {
                 long lt = System.currentTimeMillis();
                 descriptor.loadTime = (int)((lt-st)/1000);
 
-                Dataset<Row> sqlResult = parent.getNgctx().sparkSession.sql(descriptor.SQL);
+                Dataset<Row> sqlResult = parent.getICtx().sparkSession.sql(descriptor.SQL);
                 Dataset<Row> finalResult = sqlResult.coalesce(descriptor.tableDescriptor.numberOfFiles);
 
                 WithDLBatchWriter pres = (WithDLBatchWriter) parent;
-                pres.registerDataset(parent.getNgctx(), finalResult, descriptor.targetTableName);
 
                 jobDataFrames.put(descriptor.targetTableName, finalResult);
                 finalResult.createOrReplaceTempView(descriptor.targetTableName);

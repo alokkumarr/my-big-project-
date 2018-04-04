@@ -6,8 +6,12 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.context.ContextMetadata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,27 +27,20 @@ import java.util.Map;
  * The context should be used as execution scope of all components
  *
  */
-public class NGContext {
+public class NGContext extends ContextMetadata {
 
-    private static final Logger logger = Logger.getLogger(NGContext.class);
+    public ComponentConfiguration componentConfiguration;
 
-    //Hadoop FS handlers
-    public FileContext fc;
-    public FileSystem fs;
+    public final String xdfDataRootSys;
+    public List<String> registeredOutputDSIds = new ArrayList<>();
 
-
-    //Spark session and config
-    public SparkSession sparkSession = null;
-    public int sampleSize = 10000;
-    private Map<String, Dataset<Row>> datasetRegistry = new HashMap<>();
-
-
-    public NGContext(SparkSession ss){
-        sparkSession = ss;
+    public NGContext(String xdfRoot,  ComponentConfiguration componentConfiguration, String applicationID, String componentName, String batchID){
+        super(componentName, batchID, applicationID);
+        xdfDataRootSys = xdfRoot;
+        this.componentConfiguration  = componentConfiguration;
+        this.componentName = componentName;
     }
 
-    public NGContext(){
-    }
 
     public Map<String, Map<String, Object>> inputDataSets = new HashMap<>();
     public Map<String, Map<String, Object>> outputDataSets = new HashMap<>();
@@ -51,20 +48,61 @@ public class NGContext {
     public Map<String, Map<String, Object>> inputs = new HashMap<>();
     public Map<String, Map<String, Object>> outputs = new HashMap<>();
 
-    public int defaultPartNumber = 1;
+    @Override
+    public String toString(){
 
-    public void registerDataset(String name, Dataset<Row> dobj) {
-        datasetRegistry.put(name, dobj);
+        StringBuilder s = new StringBuilder();
+        s.append("Configuration parameters: \n");
+        s.append("User: ").append(user).append("\n");
+        s.append("Application ").append(applicationID);
+        s.append("Component Name ").append(componentName);
+        s.append("Batch ID").append(batchID).append("\n");
+        s.append("Transformation: ").append(transformationName).append("\n");
+
+        componentConfiguration.getParameters().forEach(p ->
+        {
+            if (p != null) s.append("Name: ").append(p.getName()).append(" Value: ").append(p.getValue()).append("\n");
+        });
+        s.append("Input: \n");
+        componentConfiguration.getInputs().forEach(p ->
+        {
+            if (p != null) s
+                    .append(" Object: ").append(p.getDataSet())
+                    .append(" Name: ").append(p.getName())
+                    .append(" Format: ").append(p.getFormat())
+                    .append(" File mask: ").append(p.getFileMask())
+                    .append(" Project: ").append(p.getProject())
+                    .append("\n");
+        });
+        s.append("Output: \n");
+        componentConfiguration.getOutputs().forEach(p ->
+        {
+            if (p != null) s
+                    .append(" Object: ").append(p.getDataSet())
+                    .append(" Name: ").append(p.getName())
+                    .append(" Format: ").append(p.getFormat())
+                    .append(" Mode: ").append(p.getMode())
+                    .append("\n");
+        });
+
+        s.append("Services:");
+        serviceStatus.forEach( (k, v) -> s.append(k.name()).append(" => ").append(v).append("\n"));
+
+        s.append("Pre-registered DS: ");
+        registeredOutputDSIds.forEach( id -> s.append(id).append(", "));
+        s.append("\n");
+
+        s.append("Input DS maps: ");
+        s.append(inputDataSets.toString());
+        s.append("\n");
+
+        s.append("Output DS maps: ");
+        s.append(outputDataSets.toString());
+        s.append("\n");
+
+        return s.toString();
     }
 
-    public void registerInputDataset(Dataset<Row> dobj) {
-        datasetRegistry.put("input", dobj);
-    }
-
-    public void registerOutputDataset(Dataset<Row> dobj) {
-        datasetRegistry.put("output", dobj);
-    }
-
-    ;
+    public Map<ComponentServices, Boolean> serviceStatus = new HashMap<>();
 
 }

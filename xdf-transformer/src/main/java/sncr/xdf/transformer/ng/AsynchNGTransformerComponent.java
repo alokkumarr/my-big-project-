@@ -4,11 +4,15 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.types.*;
+import sncr.bda.CliHandler;
+import sncr.bda.ConfigLoader;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
-import sncr.xdf.component.*;
+import sncr.xdf.context.ComponentServices;
+import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.transformer.RequiredNamedParameters;
@@ -25,31 +29,25 @@ import java.util.*;
  * The component DOES NOT PERFORM any multi-record conversion, use Spark SQL XDF Component
  * if you need to make such transformation.
  */
-public class NGTransformerComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
+
+//TODO:: Refactor AsynchNGTransformerComponent and NGTransformerComponent: eliminate duplicate
+public class AsynchNGTransformerComponent extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
     public static String RECORD_COUNTER = "_record_counter";
     public static String TRANSFORMATION_RESULT = "_tr_result";
     public static String TRANSFORMATION_ERRMSG = "_tr_errmsg";
 
-    private static final Logger logger = Logger.getLogger(NGTransformerComponent.class);
+    private static final Logger logger = Logger.getLogger(AsynchNGTransformerComponent.class);
     private String tempLocation;
 
     {
         componentName = "transformer";
     }
+    public AsynchNGTransformerComponent(NGContext ngctx) {  super(ngctx); }
 
-    public static void main(String[] args){
-        NGTransformerComponent component = new NGTransformerComponent();
-        try {
-           if (component.initWithCMDParameters(args) == 0) {
-                int r = component.run();
-                System.exit(r);
-           }
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
+    public AsynchNGTransformerComponent() {  super(); }
+
+    public AsynchNGTransformerComponent(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
 
     private String getScriptFullPath() {
@@ -238,12 +236,12 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return NGTransformerComponent.analyzeAndValidate(config);
+        return AsynchNGTransformerComponent.analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
 
-        ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(cfgAsStr);
+        ComponentConfiguration compConf = AsynchAbstractComponent.analyzeAndValidate(cfgAsStr);
         Transformer transformerCfg = compConf.getTransformer();
         if (transformerCfg == null)
             throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "transformer");
@@ -278,6 +276,67 @@ public class NGTransformerComponent extends AbstractComponent implements WithDLB
         return compConf;
     }
 
+
+
+    public static void main(String[] args) {
+
+        NGContextServices ngCtxSvc;
+        CliHandler cli = new CliHandler();
+        try {
+            HFileOperations.init();
+
+            Map<String, Object> parameters = cli.parse(args);
+            String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+            String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
+
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
+
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
+
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            ComponentServices[] scs =
+                {
+                    ComponentServices.InputDSMetadata,
+                    ComponentServices.OutputDSMetadata,
+                    ComponentServices.Project,
+                    ComponentServices.TransformationMetadata,
+                    ComponentServices.Spark
+                };
+            ComponentConfiguration cfg = AsynchNGTransformerComponent.analyzeAndValidate(configAsStr);
+            ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
+                "transformer", batchId);
+
+            ngCtxSvc.initContext();
+            ngCtxSvc.registerOutputDataSet();
+
+            logger.debug("Output datasets:");
+
+            ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.debug(id)
+            );
+            AsynchNGTransformerComponent component = new AsynchNGTransformerComponent(ngCtxSvc.getNgctx());
+          if (!component.initComponent(null))
+            System.exit(-1);
+          int rc = component.run();
+          System.exit(rc);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
 
 }
 

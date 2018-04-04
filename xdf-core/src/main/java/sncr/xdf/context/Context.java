@@ -36,15 +36,14 @@ public class Context extends ContextMetadata {
     public SparkSession sparkSession = null;
     public SparkConf sparkConf;
     public int globalFileCount = 0  ;
-
+    public ComponentConfiguration componentConfiguration;
 
     public Context(String componentName,
                    String batchId,
                    String appId,
                    ComponentConfiguration compConf) throws Exception {
-        super(componentName, batchId, appId, compConf);
-
-
+        super(componentName, batchId, appId);
+        componentConfiguration = compConf;
     }
 
     @Override

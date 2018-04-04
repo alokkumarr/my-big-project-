@@ -13,8 +13,10 @@ import sncr.bda.conf.Output;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.DLDataSetService;
+import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.context.InternalContext;
+import sncr.xdf.context.NGContext;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
@@ -175,9 +177,8 @@ public interface WithDataSet {
 
                 DataSetHelper.logger.debug("Dataset location = " + location);
 
-                //TODO:: Fix BDA Meta
-                String sampling = system.has("sample") ?
-                        system.get("sample").getAsString() : DLDataSetOperations.SIMPLE_SAMPLING;
+                String sampling = system.has(DataSetProperties.Sample.name()) ?
+                        system.get(DataSetProperties.Sample.name()).getAsString() : DLDataSetOperations.SIMPLE_SAMPLING;
 
 
                 Map<String, Object> res = aux.discoverAndValidateInputDS(dataset, location, system);
@@ -191,8 +192,7 @@ public interface WithDataSet {
                 res.put(DataSetProperties.Type.name(), dataSource);
                 res.put(DataSetProperties.Format.name(), format);
 
-                //TODO:: Fix BDA Meta
-                res.put("sample", sampling);
+                res.put(DataSetProperties.Sample.name(), sampling);
                 DataSetHelper.logger.debug("Result Map = " + res);
 
                 return res;
@@ -215,8 +215,14 @@ public interface WithDataSet {
         String dataset = (String) outDS.get(DataSetProperties.Name.name());
 
         String mode = (String) outDS.get(DataSetProperties.Mode.name());
-        boolean exists = (boolean) outDS.get(DataSetProperties.Exists.name());
 
+        boolean exists = false;
+        try {
+            exists = HFileOperations.exists(location);
+        } catch (Exception e) {
+            DataSetHelper.logger.warn("Could not check output data object: " + dataset);
+        }
+        outDS.put(DataSetProperties.Exists.name(), exists);
         if (exists && mode.toLowerCase().equals(DLDataSetOperations.MODE_APPEND)) {
 
             Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> trgDSPartitioning =
@@ -248,12 +254,10 @@ public interface WithDataSet {
         return true;
     }
 
+/*
     default Map<String, Object> createDatasetMap(String physicalLocation, String datasetName, String catalog,
                                                  boolean doEmpty, String dstype, Input.Format format) {
         Map<String, Object> res = new HashMap();
-
-//TODO:: Should not be in Metadata
-//        res.put(DataSetProperties.PhysicalLocation.name(), physicalLocation);
 
         res.put(DataSetProperties.Name.name(), datasetName);
         if (catalog != null && !catalog.isEmpty())
@@ -268,32 +272,24 @@ public interface WithDataSet {
         res.put(DataSetProperties.Empty.name(), doEmpty);
         return res;
     }
+*/
 
-
-    default String  generateTempLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
-        StringBuilder sb = new StringBuilder(aux.dl.getRoot());
-        sb.append(Path.SEPARATOR + aux.ctx.applicationID)
-                .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
-                .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
-                .append(Path.SEPARATOR + aux.ctx.batchID)
-                .append(Path.SEPARATOR + aux.ctx.componentName);
-
-        DataSetHelper.logger.debug(String.format("Generated temp location: %s", sb.toString()));
-        return sb.toString();
-    }
-
-    default String  ngGenerateTempLocation(DataSetHelper aux, String tempDS, String tempCatalog) {
+    default String  generateTempLocation(DataSetHelper aux, String batchID, String componentName, String tempDS, String tempCatalog) {
         StringBuilder sb = new StringBuilder(aux.ctx.xdfDataRootSys);
         sb.append(Path.SEPARATOR + aux.ctx.applicationID)
                 .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
                 .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
-                .append(Path.SEPARATOR + aux.ctx.batchID)
-                .append(Path.SEPARATOR + aux.ctx.componentName);
+                .append(Path.SEPARATOR + batchID)
+                .append(Path.SEPARATOR + componentName);
 
         DataSetHelper.logger.debug(String.format("Generated temp location: %s", sb.toString()));
         return sb.toString();
     }
 
+
+//TODO:: Move to separate interface/class: WithOutputDataSet
+
+// WithOutputDataSet -- start
     default Map<String,Map<String, Object>> ngBuildPathForOutputs(DataSetHelper dsaux){
         return dsaux.ngBuildDataSetMap(DSMapKey.parameter);
     }
@@ -301,17 +297,17 @@ public interface WithDataSet {
     default Map<String, Map<String, Object>> ngBuildPathForOutputDataSets(DataSetHelper aux){
         return aux.ngBuildDataSetMap(DSMapKey.dataset);
     }
+// WithOutputDataSet -- end
 
     class DataSetHelper {
         private static final Logger logger = Logger.getLogger(WithDataSet.class);
-        InternalContext ctx;
+        NGContext ctx;
         DLDataSetService dl;
 
-        public DataSetHelper(InternalContext c, DLDataSetService dl){
+        public DataSetHelper(NGContext c, DLDataSetService dl){
             ctx = c;
             this.dl = dl;
         }
-
 
         private Map<String, Map<String, Object>> ngBuildDataSetMap( DSMapKey ktype)
         {
@@ -343,27 +339,16 @@ public interface WithDataSet {
                 res_output.put(DataSetProperties.Mode.name(), mode);
 
                 //TODO:: For now hardcode sampling to SIMPLE model ( 0.1 % of all record )
-                res_output.put("sample", DLDataSetOperations.SIMPLE_SAMPLING);
+                res_output.put(DataSetProperties.Sample.name(), DLDataSetOperations.SIMPLE_SAMPLING);
+
 
                 //TODO:: Do we really need it??
-                List<String> kl = new ArrayList<>();
-                kl.addAll(output.getPartitionKeys());
+                List<String> kl = new ArrayList<>(output.getPartitionKeys());
 
                 String m = "Configured keys: [" + kl.size()+ "]";
                 for (String s : kl) m += s + " ";
                 logger.trace( m);
-
-
                 res_output.put(DataSetProperties.PartitionKeys.name(), kl);
-
-
-                boolean exists = false;
-                try {
-                    exists = HFileOperations.exists(sb.toString());
-                } catch (Exception e) {
-                    logger.warn("Could not check output data object: " + output.getDataSet());
-                }
-                res_output.put(DataSetProperties.Exists.name(), exists);
 
                 DataSetHelper.logger.debug("Output DS result Map = " + res_output);
                 switch (ktype) {
@@ -377,6 +362,8 @@ public interface WithDataSet {
             }
             return resMap;
         }
+
+
 
         private Map<String, Object> discoverAndValidateInputDS(String dataset, String location, JsonObject system) throws Exception {
             if (!HFileOperations.exists(location)) {

@@ -153,10 +153,10 @@ public class DLBatchWriter {
     }
 
     protected boolean isPathDir( Path p ) throws IOException {
-        return  ngctx.fs.exists(p) &&
-                ngctx.fs.isDirectory(p) &&
-                ngctx.fs.listStatus(p) != null &&
-                ngctx.fs.listStatus(p).length > 0;
+        return  HFileOperations.fs.exists(p) &&
+                HFileOperations.fs.isDirectory(p) &&
+                HFileOperations.fs.listStatus(p) != null &&
+                HFileOperations.fs.listStatus(p).length > 0;
     }
 
     //TODO:: Fix BDA Meta

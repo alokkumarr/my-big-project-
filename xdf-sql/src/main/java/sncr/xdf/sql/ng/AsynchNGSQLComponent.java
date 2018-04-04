@@ -1,31 +1,32 @@
 package sncr.xdf.sql.ng;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.bda.CliHandler;
+import sncr.bda.ConfigLoader;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Sql;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.component.*;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.SQLMoveDataDescriptor;
-import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
-import java.io.FileNotFoundException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by asor0002 on 9/11/2017.
  */
-public class NGSQLComponent extends AbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
-    private static final Logger logger = Logger.getLogger(NGSQLComponent.class);
+//TODO:: Refactor AsynchNGSQLComponent and NGSQLComponent: eliminate duplicate
+public class AsynchNGSQLComponent extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
+
+    private static final Logger logger = Logger.getLogger(AsynchNGSQLComponent.class);
     // Set name
     {
         componentName = "sql";
@@ -33,7 +34,11 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
 
     NGJobExecutor executor;
 
-    public NGSQLComponent() {  super(); }
+    public AsynchNGSQLComponent(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
+
+    public AsynchNGSQLComponent(NGContext ngctx) {  super(ngctx); }
+
+    public AsynchNGSQLComponent() {  super(); }
 
     protected int execute(){
         try {
@@ -57,12 +62,12 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return NGSQLComponent.analyzeAndValidate(config);
+        return analyzeAndValidate(config);
     }
 
     public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
 
-        ComponentConfiguration compConf = AbstractComponent.analyzeAndValidate(cfgAsStr);
+        ComponentConfiguration compConf = AsynchAbstractComponent.analyzeAndValidate(cfgAsStr);
 
         Sql sparkSQLProps = compConf.getSql();
         if (sparkSQLProps == null) {
@@ -109,19 +114,61 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
         return super.move();
     }
 
+    public static void main(String[] args) {
 
-    public static void main(String[] args){
-        NGSQLComponent component = new NGSQLComponent();
+        NGContextServices ngCtxSvc;
+        CliHandler cli = new CliHandler();
         try {
-            int rc = component.initWithCMDParameters(args);
-            if (rc == 0) {
-                rc = component.run();
-            } else {
-                logger.error(String.format("RC:%d from initWithCMDParameters()", rc));
-            }
-            System.exit(rc);
+            HFileOperations.init();
 
-        } catch (Exception e){
+            Map<String, Object> parameters = cli.parse(args);
+            String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
+            String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
+            if (configAsStr == null || configAsStr.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
+
+            String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
+            if (appId == null || appId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
+
+            String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
+            if (batchId == null || batchId.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
+
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if (xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            ComponentServices[] scs =
+            {
+                ComponentServices.InputDSMetadata,
+                ComponentServices.OutputDSMetadata,
+                ComponentServices.Project,
+                ComponentServices.TransformationMetadata,
+                ComponentServices.Spark
+            };
+            ComponentConfiguration cfg = AsynchNGSQLComponent.analyzeAndValidate(configAsStr);
+            ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
+                "sql", batchId);
+
+            ngCtxSvc.initContext();
+            ngCtxSvc.registerOutputDataSet();
+
+            logger.debug("Output datasets:");
+
+            ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
+                logger.debug(id)
+            );
+            AsynchNGSQLComponent component = new AsynchNGSQLComponent(ngCtxSvc.getNgctx());
+          if (!component.initComponent(null))
+            System.exit(-1);
+          int rc = component.run();
+          System.exit(rc);
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }

@@ -5,6 +5,7 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.catalyst.plans.logical.With;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
@@ -12,6 +13,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 import sncr.xdf.ngcomponent.AbstractComponent;
+import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.transformer.SchemaAlignTransform;
 import sncr.xdf.transformer.Transform;
 import sncr.xdf.transformer.system.StructAccumulator;
@@ -31,7 +33,7 @@ public class NGJexlExecutor extends NGExecutor {
     private static final Logger logger = Logger.getLogger(NGJexlExecutor.class);
     private StructAccumulator structAccumulator;
 
-    public NGJexlExecutor(AbstractComponent parent, String script, int threshold, String tLoc)  {
+    public NGJexlExecutor(WithContext parent, String script, int threshold, String tLoc)  {
         super(parent, script, threshold, tLoc, null);
         this.structAccumulator = new StructAccumulator();
         session_ctx.sparkContext().register(structAccumulator, "Struct");
