@@ -1,7 +1,7 @@
 <div class="grid-container">
   <dx-data-grid id="gridContainer">
     <div *dxTemplate="let data of 'nameCellTemplate'">
-      <span class="clickable" [innerHTML]="data.value"></span>
+      <a (click)="viewDetails(data.data)" [innerHTML]="data.value"></a>
     </div>
     <div *dxTemplate="let data of 'dsTypeTemplate'">
       <div class="src-img {{data.value}}"></div>

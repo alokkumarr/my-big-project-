@@ -58,7 +58,9 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-        catchError((e: any) => { return Observable.of(e); }));
+        catchError((e: any) => {
+          return Observable.of(e);
+        }));
   }
 
   /** File mask search */
@@ -141,7 +143,7 @@ export class WorkbenchService {
         catchError(this.handleError('data', [])));
   }
   /**
-   * Service to fetch meta data of all datasets
+   * Service to fetch meta data of a dataset
    * 
    * @param {string} projectName 
    * @param {any} id 
@@ -193,6 +195,25 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', SQLEXEC_SAMPLE)));
   }
 
+  navigateToDetails(metadata) {
+    this.setDataToLS('dsMetadata', metadata);
+    this.router.stateService.go('workbench.datasetDetails');
+  }
+
+  triggerDatasetPreview(name: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews`;
+    return this.http.post(endpoint, { name })
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  getDatasetPreviewData(id): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews/${id}`;
+    return this.http.get(endpoint)
+      .pipe(
+        catchError((e: any) => {
+          return Observable.of(e);
+        }));
+  }
 
   /**
    * Handle Http operation that failed.

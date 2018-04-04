@@ -73,7 +73,7 @@
           </mat-card-header>
           <mat-card-content>
             <div class="form-div">
-              <form novalidate [formGroup]="nameFormGroup">
+              <form [formGroup]="nameFormGroup">
                 <section class="input-section">
                   <mat-form-field class="margin20">
                     <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" maxlength="18" required />
@@ -137,7 +137,7 @@
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <button mat-raised-button color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!nameFormGroup.valid" (click)="triggerParser()" class="stepperBtn">
           <span i18n>ADD</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>

@@ -3,7 +3,7 @@
     <mat-card class="datasets-card" >
       <mat-card-header>
           <div mat-card-avatar class="src-img {{sets.system.format}}"></div>
-        <div class="dataset-name" fxFlex [innerHTML]="sets.system.name"></div>
+        <a class="dataset-name" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name"></a>
         <dataset-actions [dsMetadata]="sets"></dataset-actions>
       </mat-card-header>
       <mat-divider></mat-divider>

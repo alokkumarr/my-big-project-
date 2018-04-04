@@ -8,6 +8,7 @@ import { DxDataGridComponent } from 'devextreme-angular';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
+import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datasets-grid-page.component.html');
 require('./datasets-grid-page.component.scss');
@@ -28,7 +29,8 @@ export class DatasetsGridPageComponent implements OnInit {
 
   constructor(
     private dxDataGrid: dxDataGridService,
-    private headerProgress: HeaderProgressService
+    private headerProgress: HeaderProgressService,
+    private workbench: WorkbenchService
   ) { }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
@@ -121,13 +123,14 @@ export class DatasetsGridPageComponent implements OnInit {
         mode: 'virtual',
         useNative: false
       },
+      filterRow: {
+        visible: true,
+        applyFilter: 'auto'
+      },
       showRowLines: false,
       showBorders: false,
-      rowAlternationEnabled: false,
-      showColumnLines: false,
-      selection: {
-        mode: 'single'
-      },
+      rowAlternationEnabled: true,
+      showColumnLines: true,
       hoverStateEnabled: true,
       onSelectionChanged: selectedItems => {
       }
@@ -140,5 +143,9 @@ export class DatasetsGridPageComponent implements OnInit {
     setTimeout(() => {
       this.headerProgress.hide();
     }, 3000);
+  }
+
+  viewDetails(metadata) {
+    this.workbench.navigateToDetails(metadata);
   }
 }

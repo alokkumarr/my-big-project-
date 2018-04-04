@@ -128,7 +128,7 @@ export class ParserPreviewComponent implements OnInit {
       },
       showRowLines: false,
       showBorders: false,
-      rowAlternationEnabled: false,
+      rowAlternationEnabled: true,
       showColumnLines: true,
       selection: {
         mode: 'none'
