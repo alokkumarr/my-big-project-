@@ -2,25 +2,25 @@
 % Please edit documentation in R/sampling.R
 \name{holdout}
 \alias{holdout}
-\alias{holdout.data.frame}
 \alias{holdout.numeric}
+\alias{holdout.data.frame}
 \alias{holdout.tbl_spark}
 \title{Holdout Sampling function}
 \usage{
 holdout(x, ...)
 
-\method{holdout}{data.frame}(df, split)
-
 \method{holdout}{numeric}(x, split)
+
+\method{holdout}{data.frame}(df, split)
 
 \method{holdout}{tbl_spark}(df, split)
 }
 \arguments{
 \item{x}{numeric vector}
 
-\item{df}{data.frame}
-
 \item{split}{numeric input for percentage of rows in head index}
+
+\item{df}{data.frame}
 
 \item{df}{spark dataframe}
 }
