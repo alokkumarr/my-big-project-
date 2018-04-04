@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>meta</artifactId>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.7</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
@@ -211,5 +211,5 @@
 			<id>sncr-libs-releases</id>
 			<url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
 		</site>
-	</distributionManagement>	
+	</distributionManagement>
 </project>

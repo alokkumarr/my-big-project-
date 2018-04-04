@@ -34,7 +34,9 @@ public enum DataSetProperties {
         System("system"),
         Schema("schema"),
         Sample("sample"),
-        PartitionKeys("partitionsKeys");
+        PartitionKeys("partitionsKeys"),
+        CreatedTime("createdTime"),
+        ModifiedTime("modifiedTime");
 
     private final String intName;
 

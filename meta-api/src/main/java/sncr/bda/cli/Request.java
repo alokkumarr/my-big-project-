@@ -3,10 +3,12 @@ package sncr.bda.cli;
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
 import sncr.bda.metastore.TransformationStore;
@@ -68,7 +70,6 @@ public class Request {
     {
         jsonParser = new JsonParser();
         request = jsonParser.parse(jStr);
-//            System.out.print("Parsed JSON: \n\n" + je.toString() + "\n");
     }
 
 
@@ -406,6 +407,14 @@ public class Request {
                 return false;
             }
             src = src0.getAsJsonObject();
+
+            DateTime currentTime = new DateTime();
+
+            if (action == Actions.create) {
+                src.addProperty(DataSetProperties.CreatedTime.toString(), (currentTime.getMillis() / 1000));
+            }
+
+            src.addProperty(DataSetProperties.ModifiedTime.toString(), (currentTime.getMillis() / 1000));
 
         }
         return true;
