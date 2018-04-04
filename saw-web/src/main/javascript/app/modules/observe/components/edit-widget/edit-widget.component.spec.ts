@@ -12,9 +12,9 @@ import {
 import { MaterialModule } from '../../../../material.module';
 import { EditWidgetComponent } from './edit-widget.component';
 import { AddWidgetModule } from '../add-widget/add-widget.module';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import { ObserveService } from '../../services/observe.service';
 
-const AnalyzeServiceStub: Partial<AnalyzeService> = {};
+const ObserveServiceStub: Partial<ObserveService> = {};
 
 configureTests();
 
@@ -24,7 +24,7 @@ describe('Edit Widget', () => {
     TestBed.configureTestingModule({
       imports: [MaterialModule, AddWidgetModule],
       declarations: [EditWidgetComponent],
-      providers: [{ provide: AnalyzeService, useValue: AnalyzeServiceStub }]
+      providers: [{ provide: ObserveService, useValue: ObserveServiceStub }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditWidgetComponent);
