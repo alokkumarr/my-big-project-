@@ -82,6 +82,7 @@ export class DashboardGridComponent
   ngOnInit() {
     this.subscribeToRequester();
 
+    this.columns = this.getMinColumns();
     this.options = {
       gridType: 'scrollVertical',
       minCols: this.columns,
@@ -116,6 +117,13 @@ export class DashboardGridComponent
       this.sidenavEventSubscription.unsubscribe();
     this.globalFiltersSubscription &&
       this.globalFiltersSubscription.unsubscribe();
+  }
+
+  getMinColumns() {
+    if (this.mode === DASHBOARD_MODES.CREATE) return 8;
+
+    const savedMinCols = get(this.model, 'options.0.minCols');
+    return savedMinCols ? savedMinCols : 4;
   }
 
   onGridInit() {
@@ -348,7 +356,13 @@ export class DashboardGridComponent
         rows: tile.rows,
         kpi: tile.kpi
       })),
-      filters: []
+      filters: [],
+      options: [
+        {
+          minCols:
+            get(this.model, 'options.0.minCols') || get(this.options, 'minCols')
+        }
+      ]
     };
   }
 }
