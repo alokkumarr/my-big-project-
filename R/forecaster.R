@@ -104,7 +104,6 @@ forecastr.data.frame <- function(df,
 
   }
 
-
 }
 
 

@@ -7,15 +7,18 @@
 \alias{resample.tbl_spark}
 \title{Random Sample function}
 \usage{
-resample(x, ...)
+resample(x, number, amount, seed)
 
 \method{resample}{numeric}(x, number, amount, seed = NULL)
 
-\method{resample}{data.frame}(df, number, amount, seed = NULL)
+\method{resample}{data.frame}(x, number, amount, seed = NULL)
 
-\method{resample}{tbl_spark}(df, amount, seed = NULL)
+\method{resample}{tbl_spark}(x, amount, seed = NULL)
 }
 \arguments{
+\item{x}{numeric vector, dataframe, spark dataframe, or modeler object to
+create holdout samples from}
+
 \item{number}{number of resamples to create}
 
 \item{amount}{percent of data to randomly sample}

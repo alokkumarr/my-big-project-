@@ -6,7 +6,7 @@
 \alias{get_test_samples.modeler}
 \title{Get Test Sample}
 \usage{
-get_test_samples(obj, ...)
+get_test_samples(obj)
 
 \method{get_test_samples}{samples}(obj)
 

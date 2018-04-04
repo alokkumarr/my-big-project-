@@ -4,7 +4,8 @@
 \alias{new_modeler}
 \title{New Modeler Object Constructer function}
 \usage{
-new_modeler(df, target, type, name, id, version, desc, scientist, ...)
+new_modeler(df, target, type, name, id, version, desc, scientist, dir, samples,
+  models, ...)
 }
 \description{
 New Modeler Object Constructer function

@@ -7,22 +7,19 @@
 \alias{holdout.tbl_spark}
 \title{Holdout Sampling function}
 \usage{
-holdout(x, ...)
+holdout(x, split)
 
 \method{holdout}{numeric}(x, split)
 
-\method{holdout}{data.frame}(df, split)
+\method{holdout}{data.frame}(x, split)
 
-\method{holdout}{tbl_spark}(df, split)
+\method{holdout}{tbl_spark}(x, split)
 }
 \arguments{
-\item{x}{numeric vector}
+\item{x}{numeric vector, dataframe, spark dataframe, or modeler object to
+create samples from}
 
 \item{split}{numeric input for percentage of rows in head index}
-
-\item{df}{data.frame}
-
-\item{df}{spark dataframe}
 }
 \description{
 Function creates two row indicies from a dataset based on split parameter.

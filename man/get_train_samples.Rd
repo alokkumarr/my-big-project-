@@ -6,7 +6,7 @@
 \alias{get_train_samples.modeler}
 \title{Get Training Samples}
 \usage{
-get_train_samples(obj, ...)
+get_train_samples(obj)
 
 \method{get_train_samples}{samples}(obj)
 

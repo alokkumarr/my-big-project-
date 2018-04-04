@@ -5,7 +5,7 @@
 \title{Modeler Helper Function}
 \usage{
 modeler(df, target, type, name = NULL, id = NULL, version = NULL,
-  desc = NULL, scientist = NULL, ...)
+  desc = NULL, scientist = NULL, dir = NULL, ...)
 }
 \description{
 Modeler Helper Function

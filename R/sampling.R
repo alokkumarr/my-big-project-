@@ -115,7 +115,7 @@ samples <- function(validation_method,
 #' mtcars %>%
 #' add_holdout_samples(., splits = c(.8, .2)) %>%
 #' get_train_samples(.)
-get_train_samples <- function(obj, ...){
+get_train_samples <- function(obj){
   UseMethod("get_train_samples", obj)
 }
 
@@ -148,7 +148,7 @@ get_train_samples.modeler <- function(obj){
 #' mtcars %>%
 #' add_holdout_samples(., splits = c(.8, .2)) %>%
 #' get_validation_samples(.)
-get_validation_samples <- function(obj, ...){
+get_validation_samples <- function(obj){
   UseMethod("get_validation_samples", obj)
 }
 
@@ -181,7 +181,7 @@ get_validation_samples.modeler <- function(obj){
 #' mtcars %>%
 #' add_holdout_samples(., splits = c(.6, .2, .2)) %>%
 #' get_test_samples(.)
-get_test_samples <- function(obj, ...){
+get_test_samples <- function(obj){
   UseMethod("get_test_samples", obj)
 }
 
@@ -207,8 +207,7 @@ get_test_samples.modeler <- function(obj){
 #' Each pair used in model evaluation step where a model is fit to the train
 #' index and evaluated on the predictions made on the validation index
 #'
-#' @param obj
-#' @param ...
+#' @param obj modeler object
 #'
 #' @return list with train and validation indicies pairs
 #' @export
@@ -219,7 +218,7 @@ get_test_samples.modeler <- function(obj){
 #' mtcars %>%
 #' add_holdout_samples(., splits = c(.6, .2, .2)) %>%
 #' get_indicies(.)
-get_indicies <- function(obj, ...){
+get_indicies <- function(obj){
   UseMethod("get_indicies", obj)
 }
 
@@ -251,20 +250,20 @@ get_indicies.modeler <- function(obj){
 
 #' Add Default Samples function
 #'
-#' Function creates a no-frills sampling object. Object has a single train index
+#' Function creates a no-frills sampling object. Creates a single train index
 #' only. No validation or test indicies created.
 #'
-#' Function used when modeler object create for place holder for modeler object.
-#' Default sampling can be used for simple out of the box models
+#' Function used when modeler object created as a place holder for modeler
+#' object. Default sampling can be used for simple out of the box models.
 #'
-#'
+#' @param x numeric vector, data.frame, spark dataframe or modeler object to
+#'   create samples from
 #' @export
-add_default_samples <- function(x, ...){
+add_default_samples <- function(x){
   UseMethod("add_default_samples", x)
 }
 
 
-#' @param x  numeric vector
 #' @rdname add_default_samples
 #' @export
 add_default_samples.numeric <- function(x){
@@ -282,32 +281,29 @@ add_default_samples.numeric <- function(x){
 }
 
 
-#' @param df R data.frame
 #' @rdname add_default_samples
 #' @export
-add_default_samples.data.frame <- function(df){
-  x <- 1:nrow(df)
-  add_default_samples(x)
+add_default_samples.data.frame <- function(x){
+  z <- 1:nrow(x)
+  add_default_samples(z)
 }
 
 
-#' @param df Spark Dataframe
 #' @rdname add_default_samples
 #' @export
-add_default_samples.tbl_spark <- function(df){
-  x <- 1:sparklyr::sdf_nrow(df)
-  add_default_samples(x)
+add_default_samples.tbl_spark <- function(x){
+  z <- 1:sparklyr::sdf_nrow(x)
+  add_default_samples(z)
 }
 
 
-#' @param obj modeler object
 #' @rdname add_default_samples
 #' @export
-add_default_samples.modeler <- function(obj){
+add_default_samples.modeler <- function(x){
 
-  default <- add_default_samples(obj$data)
-  obj$samples <- default
-  obj
+  default <- add_default_samples(x$data)
+  x$samples <- default
+  x
 }
 
 
@@ -323,24 +319,26 @@ add_default_samples.modeler <- function(obj){
 #' primarily in forecasting applications but can be used for other modeling
 #' applications
 #'
-#' Modeler method returns updated modeler object with new samples object
-#' appendeed. Data.frame method returns samples object
 #'
+#' @param x numeric vector, data.frame, spark dataframe, or modeler object to
+#'   create holdout samples from
 #' @param splits numeric vector of holdout splits. Values need to sum to 1. Each
 #'   value represents the amount of data partitioned. Order matters - the splits
 #'   correspond to train/validation/test*. Test value optional.
 #'
 #' @export
+#' @return Returns updated modeler object if modeler object provided otherwise
+#' returns samples object
+#'
 #' @examples
 #'
 #' # Data.frame example
 #' add_holdout_samples(mtcars, splits = c(.8, .2))
-add_holdout_samples <- function(x, ...){
-  UseMethod("add_holdout_samples", x)
+add_holdout_samples <- function(x, splits) {
+  UseMethod("add_holdout_samples")
 }
 
 
-#' @param x  numeric vector
 #' @rdname add_holdout_samples
 #' @export
 add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits){
@@ -378,33 +376,29 @@ add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits
 }
 
 
-#' @param df  R data.frame
 #' @rdname add_holdout_samples
 #' @export
-add_holdout_samples.data.frame <- function(df, splits){
-  x <- 1:nrow(df)
-  add_holdout_samples(x, splits)
+add_holdout_samples.data.frame <- function(x, splits){
+  z <- 1:nrow(x)
+  add_holdout_samples(z, splits)
 }
 
 
-#' @param df  Spark Dataframe
 #' @rdname add_holdout_samples
 #' @export
-add_holdout_samples.tbl_spark <- function(df, splits){
-  x <- 1:sparklyr::sdf_nrow(df)
-  add_holdout_samples(x, splits)
+add_holdout_samples.tbl_spark <- function(x, splits){
+  z <- 1:sparklyr::sdf_nrow(x)
+  add_holdout_samples(z, splits)
 }
 
 
-
-#' @param obj modeler object
 #' @rdname add_holdout_samples
 #' @export
-add_holdout_samples.modeler <- function(obj, splits){
+add_holdout_samples.modeler <- function(x, splits){
 
-  holdout_samples <- add_holdout_samples(obj$data, splits)
-  obj$samples <- holdout_samples
-  obj
+  holdout_samples <- add_holdout_samples(x$data, splits)
+  x$samples <- holdout_samples
+  x
 }
 
 
@@ -414,15 +408,15 @@ add_holdout_samples.modeler <- function(obj, splits){
 #' Function creates two row indicies from a dataset based on split parameter.
 #' Indicies used to create data samples
 #'
+#' @param x numeric vector, dataframe, spark dataframe, or modeler object to
+#'   create samples from
 #' @param split numeric input for percentage of rows in head index
 #' @export
-holdout <- function(x, ...) {
-  UseMethod("holdout", x)
+holdout <- function(x, split) {
+  UseMethod("holdout")
 }
 
 
-#' @inheritParams holdout
-#' @param x numeric vector
 #' @rdname holdout
 #' @export
 holdout.numeric <- function(x, split){
@@ -436,23 +430,19 @@ holdout.numeric <- function(x, split){
 }
 
 
-#' @inheritParams holdout
-#' @param df data.frame
 #' @rdname holdout
 #' @export
-holdout.data.frame <- function(df, split){
-  x <- 1:nrow(df)
-  holdout(x, split)
+holdout.data.frame <- function(x, split){
+  z <- 1:nrow(x)
+  holdout(z, split)
 }
 
 
-#' @inheritParams holdout
-#' @param df spark dataframe
 #' @rdname holdout
 #' @export
-holdout.tbl_spark <- function(df, split){
-  x <- 1:sparklyr::sdf_nrow(df)
-  holdout(x, split)
+holdout.tbl_spark <- function(x, split){
+  z <- 1:sparklyr::sdf_nrow(x)
+  holdout(z, split)
 }
 
 
@@ -466,16 +456,17 @@ holdout.tbl_spark <- function(df, split){
 #' Function creates a random sample index from a dataset. Index can be used to
 #' create data samples
 #'
+#' @param x numeric vector, dataframe, spark dataframe, or modeler object to
+#'   create holdout samples from
 #' @param number number of resamples to create
 #' @param amount percent of data to randomly sample
 #' @param seed optional input for setting random seed
 #' @export
-resample <- function(x, ...) {
-  UseMethod("resample", x)
+resample <- function(x, number, amount, seed) {
+  UseMethod("resample")
 }
 
 
-#' @inheritParams resample
 #' @rdname resample
 #' @export
 resample.numeric <- function(x, number, amount, seed = NULL){
@@ -493,31 +484,53 @@ resample.numeric <- function(x, number, amount, seed = NULL){
 }
 
 
-#' @inheritParams resample
 #' @rdname resample
 #' @export
-resample.data.frame <- function(df, number, amount, seed = NULL){
-  x <- 1:nrow(df)
-  resample(x, number, amount, seed)
+resample.data.frame <- function(x, number, amount, seed = NULL){
+  z <- 1:nrow(x)
+  resample(z, number, amount, seed)
 }
 
 
-#' @inheritParams resample
 #' @rdname resample
 #' @export
-resample.tbl_spark <- function(df, amount, seed = NULL){
+resample.tbl_spark <- function(x, amount, seed = NULL){
 
-  x <- 1:sparklyr::sdf_nrow(df)
-  resample(x, number, amount, seed)
+  z <- 1:sparklyr::sdf_nrow(x)
+  resample(z, number, amount, seed)
 }
 
 
-add_resample_samples <- function(x, ...){
-  UseMethod("add_resample_samples", x)
+
+#' Add Random Resamples function
+#'
+#' Function creates a new samples object with random resamples based on
+#' configuration. Each index is random sample of the dataset
+#'
+#' The function creates train and validation pairs using all of the dataset rows
+#'
+#'
+#' @param x numeric vector, dataframe, spark dataframe, or modeler object to
+#'   create samples from
+#' @param number number of random resamples
+#' @param amount amount of data used for train sample. 1-amount used for
+#'   validation sample.
+#' @param test_holdout_prct amount of data to holdout out for test sample
+#' @param seed random seed generator
+#'
+#' @return either an updated modeler object if provided otherwise a samples
+#'   object with resamples
+#' @export
+#'
+#' @examples
+#'
+#' # Data.frame example
+#' add_resample_samples(mtcars, number = 5, amount = .5)
+add_resample_samples <- function(x, number, amount, test_holdout_prct, seed){
+  UseMethod("add_resample_samples")
 }
 
 
-#' @param x  numeric vector
 #' @rdname add_resample_samples
 #' @export
 add_resample_samples.numeric <- function(x, number, amount, test_holdout_prct = NULL, seed = NULL){
@@ -553,33 +566,30 @@ add_resample_samples.numeric <- function(x, number, amount, test_holdout_prct = 
 }
 
 
-#' @param df  R data.frame
 #' @rdname add_resample_samples
 #' @export
-add_resample_samples.data.frame <- function(df, number, amount, test_holdout_prct = NULL, seed = NULL){
-  x <- 1:nrow(df)
-  add_resample_samples(x, number, amount, test_holdout_prct, seed)
+add_resample_samples.data.frame <- function(x, number, amount, test_holdout_prct = NULL, seed = NULL){
+  z <- 1:nrow(x)
+  add_resample_samples(z, number, amount, test_holdout_prct, seed)
 }
 
 
-#' @param df  Spark Dataframe
 #' @rdname add_resample_samples
 #' @export
-add_resample_samples.tbl_spark <- function(df, number, amount, test_holdout_prct = NULL, seed = NULL){
-  x <- 1:sparklyr::sdf_nrow(df)
-  add_resample_samples(x, number, amount, test_holdout_prct, seed)
+add_resample_samples.tbl_spark <- function(x, number, amount, test_holdout_prct = NULL, seed = NULL){
+  z <- 1:sparklyr::sdf_nrow(x)
+  add_resample_samples(z, number, amount, test_holdout_prct, seed)
 }
 
 
 
-#' @param obj modeler object
 #' @rdname add_resample_samples
 #' @export
-add_resample_samples.modeler <- function(obj, number, amount, test_holdout_prct = NULL, seed = NULL){
+add_resample_samples.modeler <- function(x, number, amount, test_holdout_prct = NULL, seed = NULL){
 
-  resample_samples <- add_resample_samples(obj$data, number, amount, test_holdout_prct, seed)
-  obj$samples <- resample_samples
-  obj
+  resample_samples <- add_resample_samples(x$data, number, amount, test_holdout_prct, seed)
+  x$samples <- resample_samples
+  x
 }
 
 

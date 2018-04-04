@@ -6,14 +6,14 @@
 \alias{get_indicies.modeler}
 \title{Get Sample Indicies}
 \usage{
-get_indicies(obj, ...)
+get_indicies(obj)
 
 \method{get_indicies}{samples}(obj)
 
 \method{get_indicies}{modeler}(obj)
 }
 \arguments{
-\item{...}{}
+\item{obj}{modeler object}
 }
 \value{
 list with train and validation indicies pairs

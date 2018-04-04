@@ -8,30 +8,25 @@
 \alias{add_default_samples.modeler}
 \title{Add Default Samples function}
 \usage{
-add_default_samples(x, ...)
+add_default_samples(x)
 
 \method{add_default_samples}{numeric}(x)
 
-\method{add_default_samples}{data.frame}(df)
+\method{add_default_samples}{data.frame}(x)
 
-\method{add_default_samples}{tbl_spark}(df)
+\method{add_default_samples}{tbl_spark}(x)
 
-\method{add_default_samples}{modeler}(obj)
+\method{add_default_samples}{modeler}(x)
 }
 \arguments{
-\item{x}{numeric vector}
-
-\item{df}{R data.frame}
-
-\item{obj}{modeler object}
-
-\item{df}{Spark Dataframe}
+\item{x}{numeric vector, data.frame, spark dataframe or modeler object to
+create samples from}
 }
 \description{
-Function creates a no-frills sampling object. Object has a single train index
+Function creates a no-frills sampling object. Creates a single train index
 only. No validation or test indicies created.
 }
 \details{
-Function used when modeler object create for place holder for modeler object.
-Default sampling can be used for simple out of the box models
+Function used when modeler object created as a place holder for modeler
+object. Default sampling can be used for simple out of the box models.
 }

@@ -8,28 +8,27 @@
 \alias{add_holdout_samples.modeler}
 \title{Add Holdout Samples function}
 \usage{
-add_holdout_samples(x, ...)
+add_holdout_samples(x, splits)
 
 \method{add_holdout_samples}{integer}(x, splits)
 
-\method{add_holdout_samples}{data.frame}(df, splits)
+\method{add_holdout_samples}{data.frame}(x, splits)
 
-\method{add_holdout_samples}{tbl_spark}(df, splits)
+\method{add_holdout_samples}{tbl_spark}(x, splits)
 
-\method{add_holdout_samples}{modeler}(obj, splits)
+\method{add_holdout_samples}{modeler}(x, splits)
 }
 \arguments{
-\item{x}{numeric vector}
+\item{x}{numeric vector, data.frame, spark dataframe, or modeler object to
+create holdout samples from}
 
 \item{splits}{numeric vector of holdout splits. Values need to sum to 1. Each
 value represents the amount of data partitioned. Order matters - the splits
 correspond to train/validation/test*. Test value optional.}
-
-\item{df}{R data.frame}
-
-\item{obj}{modeler object}
-
-\item{df}{Spark Dataframe}
+}
+\value{
+Returns updated modeler object if modeler object provided otherwise
+returns samples object
 }
 \description{
 Function creates a new samples object with holdout samples based on
@@ -39,9 +38,6 @@ configuration
 Holdout samples take sequential row indicies. Holdout samples are used
 primarily in forecasting applications but can be used for other modeling
 applications
-
-Modeler method returns updated modeler object with new samples object
-appendeed. Data.frame method returns samples object
 }
 \examples{
 

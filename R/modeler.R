@@ -1,5 +1,9 @@
 
 
+# Modeler Class Functions -------------------------------------------------
+
+
+
 #' New Modeler Object Constructer function
 new_modeler <- function(df,
                         target,
@@ -9,24 +13,22 @@ new_modeler <- function(df,
                         version,
                         desc,
                         scientist,
+                        dir,
+                        samples,
+                        models,
                         ...){
 
 
   checkmate::assert_character(target)
   checkmate::assert_character(type)
-  checkmate::assert_character(name, null.ok = TRUE)
-  checkmate::assert_character(id, null.ok = TRUE)
-  checkmate::assert_character(version, null.ok = TRUE)
-  checkmate::assert_character(desc, null.ok = TRUE)
-  checkmate::assert_character(scientist, null.ok = TRUE)
-
-
-  if(is.null(name)) name <- paste(target, type, sep = "-")
-  if(is.null(id)) id <- sparklyr::random_string("id")
-  if(is.null(version)) version <- "1.0"
-  if(is.null(desc)) desc <- ""
-  if(is.null(scientist)) scientist <- Sys.info()["user"]
-  default_samples <- add_default_samples(df)
+  checkmate::assert_character(name)
+  checkmate::assert_character(id)
+  checkmate::assert_character(version)
+  checkmate::assert_character(desc)
+  checkmate::assert_character(scientist)
+  checkmate::test_path_for_output(dir)
+  checkmate::assert_class(samples, "samples")
+  checkmate::assert_list(models)
 
   structure(
     list(
@@ -39,7 +41,9 @@ new_modeler <- function(df,
       created_on = Sys.time(),
       data = df,
       target = target,
-      samples = default_samples,
+      dir = dir,
+      samples = samples,
+      models,
       ...
     ),
     class = "modeler")
@@ -74,22 +78,46 @@ modeler <- function(df,
                     version = NULL,
                     desc = NULL,
                     scientist = NULL,
+                    dir = NULL,
                     ...){
+
+  if(is.null(name)) name <- paste(target, type, sep = "-")
+  if(is.null(id)) id <- sparklyr::random_string("id")
+  if(is.null(version)) version <- "1.0"
+  if(is.null(desc)) desc <- ""
+  if(is.null(scientist)) scientist <- Sys.info()["user"]
+  if(is.null(dir)) dir <- "./"
+  default_samples <- add_default_samples(df)
+  empty_models <- list()
 
   valid_modeler(
     new_modeler(
-      df,
-      target,
-      type,
-      name,
-      id,
-      version,
-      desc,
-      scientist,
+      df = df,
+      target = target,
+      type = type,
+      name = name,
+      id = id,
+      version = version,
+      desc = desc,
+      scientist = scientist,
+      dir = dir,
+      samples = default_samples,
+      models = empty_models,
       ...)
   )
 }
 
+
+
+
+# Modeler Class Generics --------------------------------------------------
+
+
+
+#' Train Model Generic
+train_models <- function(obj, model, ...) {
+  UseMethod("train_models")
+}
 
 
 #' @export
