@@ -502,8 +502,8 @@ resample.data.frame <- function(df, number, amount, seed = NULL){
 }
 
 
-#' @inheritParams rsample
-#' @rdname rsample
+#' @inheritParams resample
+#' @rdname resample
 #' @export
 resample.tbl_spark <- function(df, amount, seed = NULL){
 
