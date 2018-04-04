@@ -1,6 +1,8 @@
 package sncr.bda.context;
 
 import org.apache.log4j.Logger;
+
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -17,7 +19,7 @@ import java.text.SimpleDateFormat;
  * The context should be used as execution scope of all components
  *
  */
-public class ContextMetadata {
+public class ContextMetadata implements Serializable {
 
     static final String DATE_FMT = "yyyyMMdd-HHmmss";
     static final SimpleDateFormat format = new SimpleDateFormat(DATE_FMT);
