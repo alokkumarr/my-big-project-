@@ -64,5 +64,12 @@ saw_workbench_metadata=hdfs:///main/
 # ##########################################
 # ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
 
+#
+# Email and FTP export size definition
+# default value for email is 50000 and ftp is 100000
+#
+# saw_email_export_size=50000
+# saw_ftp_export_size=100000
+
 [saw-security]
 localhost ansible_connection=local

@@ -29,6 +29,9 @@ server:
 analysis:
     service:
         host: http://localhost:9200/analysis
+    emailExportSize: "{{ saw_email_username | default('50000') }}"
+    ftpExportSize: "{{ saw_ftp_export_size | default('100000') }}"
+
 
 logging:
   config: /opt/bda/saw-export-service/conf/logback.xml
