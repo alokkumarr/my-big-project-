@@ -1,7 +1,7 @@
 <div class="dataSets-view" fxLayout="column" (window:resize)="onResize($event)">
   <mat-toolbar class="toolbar-white">
     <mat-toolbar-row>
-      <div fxFlex="48" fxLayout="row">
+      <div fxFlex="47" fxLayout="row">
         <mat-button-toggle-group [(ngModel)]="dataView" [value]="dataView" #viewType="matButtonToggleGroup">
           <mat-button-toggle i18n value="sets">
             <mat-icon fontIcon="icon-exchange"></mat-icon>
@@ -16,18 +16,19 @@
       <div fxFlex="20" fxLayout="row" class="view-mode">
         <mat-button-toggle-group [(ngModel)]="viewState" [value]="viewState" (change)="onViewChange()" #viewMode="matButtonToggleGroup">
           <mat-button-toggle matTooltip="List view" value="list">
-            <mat-icon fontIcon="icon-navicon" style="font-size: 21px;"></mat-icon>
+            <mat-icon fontIcon="icon-list-view" style="font-size: 24px;"></mat-icon>
           </mat-button-toggle>
           <mat-button-toggle matTooltip="Card view" value="card">
-            <mat-icon fontIcon="icon-tile-view-solid"></mat-icon>
+            <mat-icon fontIcon="icon-tile-view-solid" style="font-size: 21px;"></mat-icon>
           </mat-button-toggle>
         </mat-button-toggle-group>
       </div>
       <span fxFlex></span>
       <div class="action-buttons">
-        <button mat-button color="primary" (click)="getPageData()">
+          <mat-button-toggle checked="false" (click)="togglePoll()">Auto Refresh</mat-button-toggle>
+        <!-- <button mat-button color="primary" (click)="getPageData()">
           <span>Refresh</span>
-        </button>
+        </button> -->
         <!-- <button mat-icon-button color="primary" matTooltip="Create Datapod" style="font-size:24px;" (click)="null">
           <mat-icon fontIcon="icon-portal-libraries" class="exec-btn-icon"></mat-icon>
         </button> -->

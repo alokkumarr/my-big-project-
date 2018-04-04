@@ -1,0 +1,31 @@
+<div class="details-container">
+  <div class="details-title" fxLayout="row" fxLayoutAlign="center center">
+    <button mat-button class="bck-btn">
+      <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
+    </button>
+    <div class="ds-name" fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <span>Selected Dataset: </span>
+      <mat-chip-list>
+        <mat-chip>{{dsMetadata.system.name}}</mat-chip>
+      </mat-chip-list>
+    </div>
+  </div>
+  <div class="details-body">
+    <mat-tab-group dynamicHeight="false">
+      <mat-tab label="Details">
+        <div fxLayout="row" fxFill fxFlex fxLayoutGap="10px">
+          <mat-card class="details-card" fxFlex="60">Simple card</mat-card>
+          <mat-card class="details-card details-grid" fxFlex="40">
+            <dx-data-grid fxFlex [dataSource]="dsMetadata.schema" [rowAlternationEnabled]="true" [showBorders]="false" [columns]="['Name', 'Type']">
+            </dx-data-grid>
+          </mat-card>
+          
+        </div>
+      </mat-tab>
+      <mat-tab label="Data">
+        <h1>Some more tab content</h1>
+        <p>...</p>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

@@ -18,6 +18,29 @@ workbench-page {
   .margin-btm-9 {
     margin-bottom: 9px !important;
   }
+
+  .dx-datagrid .dx-row > td {
+    padding: 3px !important;
+  }
+
+  .dx-datagrid {
+    line-height: normal !important;
+  }
+
+  .mat-tab-label-active {
+    color: $primary-blue-b2;
+  }
+
+  .mat-tab-body-wrapper {
+    height: 100%;
+    padding-bottom: 3px;
+  }
+
+  .mat-tab-label,
+  .mat-tab-link {
+    font-size: 17px;
+    font-weight: 600;
+  }
 }
 
 .full-screen-dialog {
