@@ -33,12 +33,14 @@ describe('Edit Widget', () => {
       el = fixture.nativeElement;
 
       fixture.detectChanges();
+      tick();
     })
   );
 
   it(
     'should exist',
     fakeAsync(() => {
+      tick();
       expect(typeof fixture.componentInstance.prepareKPI).to.equal('function');
     })
   );
@@ -46,6 +48,7 @@ describe('Edit Widget', () => {
   it(
     'should not show kpi widget without input',
     fakeAsync(() => {
+      tick();
       expect(fixture.componentInstance.editItem).to.be.undefined;
 
       expect(el.querySelector('widget-kpi')).to.be.null;
