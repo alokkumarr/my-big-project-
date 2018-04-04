@@ -26,9 +26,9 @@ public class TransformationService {
     }
 
 
-    public String readOrCreateTransformation(ContextMetadata ctx) throws Exception {
+    public String readOrCreateTransformation(ContextMetadata ctx, ComponentConfiguration componentConfiguration) throws Exception {
 
-        ComponentConfiguration componentConfiguration = ctx.componentConfiguration;
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(SerializationFeature.INDENT_OUTPUT, true)
                 .configure(ALLOW_COMMENTS, true)
@@ -40,7 +40,7 @@ public class TransformationService {
         os.flush();
         String strCompConf = os.toString();
         int hc  = strCompConf.hashCode();
-        String id = generateId(ctx.applicationID,ctx.componentName, hc);
+        String id = generateId(ctx.applicationID, ctx.componentName, hc);
         JsonElement transformation  = ts.read(id);
         if (transformation != null){
             logger.debug("Transformation with such configuration found and read from metastore");

@@ -139,11 +139,8 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
     {
         JsonObject src = new JsonObject();
         src.add("status", new JsonPrimitive(status));
-        src.add("started", new JsonPrimitive(startTS));
-        if ( finishedTS != null)
-            src.add("finished", new JsonPrimitive(finishedTS));
-        else
-            src.add("finished", new JsonPrimitive( "" ) );
+        src.add("started", new JsonPrimitive((startTS == null)? "" : startTS ));
+        src.add("finished", new JsonPrimitive((finishedTS == null)? "" : finishedTS ));
         src.add("aleId", new JsonPrimitive(aleId));
         src.add("batchId", new JsonPrimitive(batchSessionId));
         return src;
