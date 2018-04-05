@@ -853,7 +853,6 @@ export class ChartService {
 
     let tooltipObj = {
       useHTML: true,
-      valueSuffix: '%',
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
       pointFormat: `${xIsNumber ? xAxisString : ''}
         ${yAxisString}
@@ -866,7 +865,6 @@ export class ChartService {
     if (type.substring(0, 2) === 'ts') {
       tooltipObj = {
         enabled: true,
-        valueSuffix: '%',
         useHTML: true,
         valueDecimals: 3,
         split: true,
