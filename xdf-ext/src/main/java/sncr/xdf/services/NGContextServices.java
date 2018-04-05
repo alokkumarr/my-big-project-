@@ -1,20 +1,19 @@
-package sncr.xdf.ngcomponent;
+package sncr.xdf.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.conf.*;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
-
-import java.util.HashMap;
-import java.util.Map;
+import sncr.xdf.context.RequiredNamedParameters;
+import sncr.xdf.exceptions.XDFException;
 
 
 /**
@@ -208,11 +207,11 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     }
 
 
-    protected ComponentConfiguration validateConfig(String config) throws Exception {
+    protected ComponentConfiguration validateConfig(String config){
         return NGContextServices.analyzeAndValidate(config);
     }
 
-    public static ComponentConfiguration analyzeAndValidate(String cfg) throws Exception
+    public static ComponentConfiguration analyzeAndValidate(String cfg)
     {
         ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
         return config;
@@ -222,6 +221,45 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
     public String toString(){
         String strCtx = "Execution context: " + ngctx.toString();
         return strCtx;
+    }
+
+    public static ComponentConfiguration analyzeAndValidateTransformerConf(String configAsStr) {
+
+
+            ComponentConfiguration compConf = new Gson().fromJson(configAsStr, ComponentConfiguration.class);
+            Transformer transformerCfg = compConf.getTransformer();
+            if (transformerCfg == null)
+                throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "transformer");
+
+            if (transformerCfg.getScript() == null || transformerCfg.getScript().isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script name.");
+            }
+            if (transformerCfg.getScriptLocation() == null || transformerCfg.getScriptLocation().isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script location.");
+            }
+
+            boolean valid = false;
+            for( Input inpK: compConf.getInputs()){
+                if (inpK.getName() != null && inpK.getName().equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
+                    valid = true; break;
+                }
+            }
+
+            if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
+
+            valid = false;
+            boolean rvalid = false;
+            for( Output outK: compConf.getOutputs()) {
+                if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())) {
+                    valid = true;
+                } else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
+                    rvalid = true;
+                }
+            }
+            if (!valid || !rvalid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejecteds' does not exist .");
+
+            return compConf;
+
     }
 
     /**
@@ -237,5 +275,40 @@ public class NGContextServices implements WithDataSet, WithProjectScope{
         public TransformationService transformationMD;
     }
 
+    public static ComponentConfiguration analyzeAndValidateParserConf(String config){
+
+        ComponentConfiguration compConf = new Gson().fromJson(config, ComponentConfiguration.class);
+
+        sncr.bda.conf.Parser parserProps = compConf.getParser();
+        if (parserProps == null) {
+            throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
+        }
+
+        if(parserProps.getFile() == null || parserProps.getFile().length() == 0){
+            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+        }
+
+        if(parserProps.getFields() == null || parserProps.getFields().size() == 0){
+            throw new XDFException(XDFException.ErrorCodes.InvalidConfFile);
+        }
+        return compConf;
+    }
+
+    public static ComponentConfiguration analyzeAndValidateSqlConf(String cfgAsStr){
+
+        ComponentConfiguration compConf = new Gson().fromJson(cfgAsStr, ComponentConfiguration.class);
+
+        Sql sparkSQLProps = compConf.getSql();
+        if (sparkSQLProps == null) {
+            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "sql");
+        }
+        if (sparkSQLProps.getScript() == null || sparkSQLProps.getScript().isEmpty()) {
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL does not have SQL script name.");
+        }
+        if (sparkSQLProps.getScriptLocation() == null || sparkSQLProps.getScriptLocation().isEmpty()) {
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
+        }
+        return compConf;
+    }
 
 }

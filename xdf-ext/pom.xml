@@ -10,14 +10,7 @@
 		<version>1.0.3_dev</version>
   </parent>
 
-  <artifactId>xdf-core</artifactId>
+  <artifactId>xdf-ext</artifactId>
 
-  <dependencies>
-  <dependency>
-      <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-ext</artifactId>
-      <version>${project.version}</version>
-  </dependency>
-  </dependencies>
 
 </project>

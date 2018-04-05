@@ -15,15 +15,16 @@ import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.component.*;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
 
 import java.io.IOException;
 import java.util.ArrayList;

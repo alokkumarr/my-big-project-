@@ -1,4 +1,4 @@
-package sncr.xdf.ngcomponent;
+package sncr.xdf.services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,11 +13,9 @@ import sncr.bda.conf.Output;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.DLDataSetService;
-import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.DSMapKey;
-import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
 import java.util.ArrayList;

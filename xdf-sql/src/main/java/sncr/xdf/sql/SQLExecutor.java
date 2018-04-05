@@ -7,7 +7,7 @@ import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.context.Context;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
 import java.io.Serializable;

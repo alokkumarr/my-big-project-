@@ -13,6 +13,9 @@ import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
+import sncr.xdf.services.NGContextServices;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.SQLMoveDataDescriptor;
 
@@ -65,22 +68,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
         return analyzeAndValidate(config);
     }
 
-    public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
 
-        ComponentConfiguration compConf = AsynchAbstractComponent.analyzeAndValidate(cfgAsStr);
-
-        Sql sparkSQLProps = compConf.getSql();
-        if (sparkSQLProps == null) {
-            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "sql");
-        }
-        if (sparkSQLProps.getScript() == null || sparkSQLProps.getScript().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL does not have SQL script name.");
-        }
-        if (sparkSQLProps.getScriptLocation() == null || sparkSQLProps.getScriptLocation().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
-        }
-        return compConf;
-    }
 
     @Override
     protected int move(){
@@ -151,7 +139,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
-            ComponentConfiguration cfg = AsynchNGSQLComponent.analyzeAndValidate(configAsStr);
+            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateSqlConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
                 "sql", batchId);
 

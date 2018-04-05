@@ -22,6 +22,8 @@ import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
 
 import java.util.ArrayList;
 import java.util.HashMap;

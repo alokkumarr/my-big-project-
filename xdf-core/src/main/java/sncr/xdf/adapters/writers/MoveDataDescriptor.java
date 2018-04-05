@@ -1,6 +1,6 @@
 package sncr.xdf.adapters.writers;
 
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 
 import java.util.List;
 

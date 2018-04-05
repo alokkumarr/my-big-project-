@@ -18,5 +18,10 @@
       <artifactId>xdf-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+      <dependency>
+          <groupId>com.synchronoss.bda</groupId>
+          <artifactId>xdf-ext</artifactId>
+          <version>${project.version}</version>
+      </dependency>
   </dependencies>
 </project>

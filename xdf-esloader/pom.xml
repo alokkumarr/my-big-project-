@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>com.synchronoss.bda</groupId>
-            <artifactId>xdf-component</artifactId>
+            <artifactId>xdf-ext</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

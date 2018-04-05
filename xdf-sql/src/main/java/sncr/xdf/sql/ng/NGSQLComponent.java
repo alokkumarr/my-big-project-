@@ -1,22 +1,17 @@
 package sncr.xdf.sql.ng;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Sql;
-import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
-import sncr.xdf.component.*;
-import sncr.xdf.context.ComponentServices;
-import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.SQLMoveDataDescriptor;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
-import java.io.FileNotFoundException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 

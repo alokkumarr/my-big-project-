@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.context.Context;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.io.IOException;

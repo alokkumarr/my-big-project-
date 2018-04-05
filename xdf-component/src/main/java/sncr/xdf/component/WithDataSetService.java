@@ -15,7 +15,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.services.DLDataSetService;
 import sncr.xdf.context.Context;
 import sncr.xdf.context.DSMapKey;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
 import java.util.ArrayList;

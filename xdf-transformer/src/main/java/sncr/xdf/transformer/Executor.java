@@ -15,6 +15,7 @@ import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.DLBatchWriter;
+import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.*;
