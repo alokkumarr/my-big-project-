@@ -12,7 +12,10 @@ import { i18nConfig } from './i18n';
 
 import { MaterialModule } from '../../material.module';
 
-import { jwtServiceProvider, userServiceProvider } from '../../../login/services/ajs-login-providers';
+import {
+  jwtServiceProvider,
+  userServiceProvider
+} from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
   chartServiceProvider,
@@ -37,7 +40,9 @@ import { ChartComponent } from '../../common/components/charts/chart.component';
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
+import { EditWidgetModule } from './components/edit-widget/edit-widget.module';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
 import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
@@ -60,9 +65,8 @@ import { CommonModule } from '../../common';
 
 export const ObserveModule = 'ObserveModule';
 
-angular.module(ObserveModule, [
-  CommonModule
-])
+angular
+  .module(ObserveModule, [CommonModule])
   .config(routesConfig)
   .config(i18nConfig);
 
@@ -76,6 +80,7 @@ const components = [
   GlobalStringFilterComponent,
   CreateDashboardComponent,
   ObserveChartComponent,
+  ObserveKPIComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent,
   ChartComponent
@@ -90,14 +95,23 @@ const components = [
     GridsterModule,
     HttpClientModule,
     UIRouterUpgradeModule,
-    AddWidgetModule
+    AddWidgetModule,
+    EditWidgetModule
   ],
   declarations: components,
   entryComponents: components,
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: RefreshTokenInterceptor, multi: true },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HandleErrorInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RefreshTokenInterceptor,
+      multi: true
+    },
     GlobalFilterService,
     DashboardService,
     ObserveService,
