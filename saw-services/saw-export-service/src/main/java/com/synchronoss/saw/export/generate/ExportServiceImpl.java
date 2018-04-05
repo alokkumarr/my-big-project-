@@ -54,7 +54,7 @@ public class ExportServiceImpl implements ExportService{
   
   @Value("${analysis.service.host}")
   private String apiExportOtherProperties;
-  
+
   @Value("${analysis.uiExportSize}")
   private String apiExportSize;
 
