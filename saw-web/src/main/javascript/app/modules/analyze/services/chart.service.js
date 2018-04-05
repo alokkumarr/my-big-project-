@@ -846,7 +846,7 @@ export class ChartService {
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
       <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
-      <td>{point.y:,.2f} {point.series.userOptions.aggregateSymbol}</td>
+      <td>{point.y:,.2f}{point.series.userOptions.aggregateSymbol}</td>
     </tr>`;
     const zAxisString = fields.z ?
       `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
