@@ -1,4 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -6,9 +13,13 @@ import {
   Validators
 } from '@angular/forms';
 
+import { Subscription } from 'rxjs/Subscription';
+
 import * as get from 'lodash/get';
 import * as assign from 'lodash/assign';
 import * as find from 'lodash/find';
+
+import * as moment from 'moment';
 
 import { WIDGET_ACTIONS } from '../widget.model';
 import {
@@ -24,16 +35,18 @@ require('./widget-kpi.component.scss');
   selector: 'widget-kpi',
   template
 })
-export class WidgetKPIComponent implements OnInit {
+export class WidgetKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
   _metric: any;
 
   @Output() onKPIAction = new EventEmitter();
 
   dateFilters = DATE_PRESETS;
+  showDateFields = false;
   aggregations = [{ name: 'Sum', value: 'sum' }];
 
   kpiForm: FormGroup;
+  datePresetSubscription: Subscription;
 
   constructor(private fb: FormBuilder) {
     this.createForm();
@@ -41,13 +54,26 @@ export class WidgetKPIComponent implements OnInit {
 
   ngOnInit() {}
 
+  ngOnDestroy() {
+    this.datePresetSubscription.unsubscribe();
+  }
+
   createForm() {
     this.kpiForm = this.fb.group({
       name: ['', Validators.required],
       dateField: ['', Validators.required],
+      gte: [moment()],
+      lte: [moment()],
       filter: [this.dateFilters[0].value, Validators.required],
       aggregate: [this.aggregations[0].value, Validators.required]
     });
+
+    /* Only show date inputs if custom filter is selected */
+    this.datePresetSubscription = this.kpiForm
+      .get('filter')
+      .valueChanges.subscribe(data => {
+        this.showDateFields = data === CUSTOM_DATE_PRESET_VALUE;
+      });
   }
 
   @Input()

@@ -19,6 +19,20 @@
     </mat-select>
   </mat-form-field>
 
+  <mat-form-field *ngIf="showDateFields">
+    <input matInput formControlName="gte" [max]="kpiForm.get('lte').value" [matDatepicker]="frompicker" (click)="frompicker.open()"
+      placeholder="From" />
+    <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
+    <mat-datepicker #frompicker disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="showDateFields">
+    <input matInput formControlName="lte" [min]="kpiForm.get('gte').value" [matDatepicker]="topicker" (click)="topicker.open()"
+      placeholder="To" />
+    <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
+    <mat-datepicker #topicker disabled="false"></mat-datepicker>
+  </mat-form-field>
+
   <mat-form-field>
     <mat-select placeholder="Aggregation" formControlName="aggregate">
       <mat-option *ngFor="let ag of aggregations" [value]="ag.value">
