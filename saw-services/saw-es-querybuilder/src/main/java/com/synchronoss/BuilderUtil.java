@@ -273,10 +273,11 @@ public class BuilderUtil
                 break;
             }
             case "MTD": {
-                LocalDateTime lastMonth = now.minusMonths(1);
-                LocalDateTime firstDayOfMonth = lastMonth.with(TemporalAdjusters.firstDayOfMonth());
-                dynamicConvertor.setLte(lastMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-                dynamicConvertor.setGte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
+                int calculatedDayDifference = now.getDayOfMonth()- firstDayOfMonth.getDayOfMonth();
+                LocalDateTime priorDayOfMonth = firstDayOfMonth.minusDays(calculatedDayDifference);
+                dynamicConvertor.setLte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(priorDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LTM": {
