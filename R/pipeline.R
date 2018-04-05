@@ -44,8 +44,8 @@ pipeline <- function(expr = identity,
   a1 <- Sys.time()
   valid_pipeline(
     new_pipeline(expr,
-                 desc,
                  output = NULL,
+                 desc,
                  created_on = a1,
                  last_updated = a1,
                  runtime = NULL)

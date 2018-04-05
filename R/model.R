@@ -5,9 +5,11 @@
 
 
 #' Model Class Constructer
-new_model <- function(pipeline,
+new_model <- function(pipe,
+                      target,
                       method,
                       method_args,
+                      class,
                       desc,
                       path,
                       id,
@@ -16,9 +18,11 @@ new_model <- function(pipeline,
                       last_updated,
                       fit,
                       performance) {
-  checkmate::assert_class(pipeline, "pipeline")
+  checkmate::assert_class(pipe, "pipeline")
+  checkmate::assert_character(target)
   checkmate::assert_list(method_args)
-  checkmate::assert_function(method, args = names(method_args))
+  checkmate::assert_function(match.fun(method), args = names(method_args))
+  checkmate::assert_choice(class, choices = c("forecast_model", "spark.ml", "h2o"))
   checkmate::assert_character(desc)
   checkmate::assert_path_for_output(path, overwrite = FALSE)
   checkmate::assert_character(id)
@@ -32,9 +36,11 @@ new_model <- function(pipeline,
 
   structure(
     list(
-      pipeline = pipeline,
+      pipe = pipe,
+      target = target,
       method = method,
       method_args = method_args,
+      class = class,
       desc = desc,
       path = path,
       id = id,
@@ -44,7 +50,7 @@ new_model <- function(pipeline,
       fit = fit,
       performance = performance
     ),
-    class = "model"
+    class = c("model")
   )
 }
 
@@ -70,7 +76,7 @@ valid_model <- function(x) {
 #' Requires a pipeline object input, and a valid model method. Any method
 #' package dependencies need to be loaded prior to model call
 #'
-#' @param pipeline pipeline object. default is empty pipeline which applies no
+#' @param pipe pipeline object. default is empty pipeline which applies no
 #'   data transformations
 #' @param method string input of model method
 #' @param ... additional arguments to pass to model method
@@ -78,9 +84,11 @@ valid_model <- function(x) {
 #' @param path optional file path to save model
 #'
 #' @export
-model <- function(pipeline = pipeline(),
+model <- function(pipe,
+                  target,
                   method,
                   ...,
+                  class,
                   desc = NULL,
                   path = NULL) {
   id <- sparklyr::random_string("model")
@@ -91,14 +99,16 @@ model <- function(pipeline = pipeline(),
 
   valid_model(
     new_model(
-      pipeline = pipeline,
+      pipe = pipe,
+      target = target,
       method = method,
       method_args = list(...),
+      class = class,
       desc = desc,
       path = path,
       id = id,
       status = "created",
-      created_at = Sys.time(),
+      created_on = Sys.time(),
       last_updated = Sys.time(),
       fit = NULL,
       performance = NULL
@@ -122,16 +132,26 @@ model <- function(pipeline = pipeline(),
 #' @export
 #' @return modeler object with model added
 add_model <-function(obj,
-                     pipeline = pipeline(),
+                     pipe = NULL,
                      method,
                      ...,
+                     class,
                      desc = NULL,
                      path = NULL) {
   checkmate::assert_class(obj, "modeler")
 
-  m <- model(pipeline, method, method, ..., desc, path)
+  if(is.null(pipe))
+    pipe <- pipeline()
+
+  m <- model(pipe = pipe,
+             target = obj$target,
+             method = method,
+             ...,
+             class = class,
+             desc = desc,
+             path = path)
   m$status <- "added"
-  obj$models[[model$id]] <- m
+  obj$models[[m$id]] <- m
   obj
 }
 
@@ -150,6 +170,7 @@ append_model <- function(obj, model) {
   checkmate::assert_class(obj, "modeler")
   checkmate::assert_class(model, "model")
 
+  model$target <- obj$target
   model$status <- "added"
   model$last_updated <- Sys.time()
   obj$models[[model$id]] <- model

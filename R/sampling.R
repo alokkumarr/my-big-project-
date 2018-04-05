@@ -273,7 +273,7 @@ add_default_samples.numeric <- function(x){
     test_holdout_prct = NULL,
     test_holdout_method = "none",
     downsample_prct = NULL,
-    train_indicies = list(train = x),
+    train_indicies = list(default = x),
     validation_indicies = NULL,
     indicies_names = "train",
     test_index = NULL
@@ -592,5 +592,14 @@ add_resample_samples.modeler <- function(x, number, amount, test_holdout_prct = 
   x
 }
 
+
+
+#' @rdname add_resample_samples
+#' @export
+add_resample_samples.forecaster <- function(x, number, amount, test_holdout_prct = NULL, seed = NULL){
+
+  stop("Resamples not appropriate for forecasting use cases.",
+       "\n  Use either default, holdout or time_slices samples. ")
+}
 
 
