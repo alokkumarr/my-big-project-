@@ -177,6 +177,11 @@ public class BuilderUtil
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
     LocalDateTime now = LocalDateTime.now();
     switch (dynamic) {
+        case "Yesterday" :
+        LocalDateTime yesterday = now.minusDays(1);
+        dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+        dynamicConvertor.setGte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+        break;
       case "YTD": {
         LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
         dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
@@ -265,6 +270,13 @@ public class BuilderUtil
         DynamicConvertor dynamicConvertor = new DynamicConvertor();
         LocalDateTime now = LocalDateTime.now();
         switch (dynamic) {
+            case "Yesterday" :
+                LocalDateTime yesterday = now.minusDays(1);
+                LocalDateTime dayBeforeYesterday = now.minusDays(2);
+                dynamicConvertor.setLte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+
             case "YTD": {
                 LocalDateTime lastYear = now.minusYears(1);
                 LocalDateTime firstDay = lastYear.with(TemporalAdjusters.firstDayOfYear());
@@ -273,10 +285,11 @@ public class BuilderUtil
                 break;
             }
             case "MTD": {
-                LocalDateTime lastMonth = now.minusMonths(1);
-                LocalDateTime firstDayOfMonth = lastMonth.with(TemporalAdjusters.firstDayOfMonth());
-                dynamicConvertor.setLte(lastMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-                dynamicConvertor.setGte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
+                int calculatedDayDifference = now.getDayOfMonth()- firstDayOfMonth.getDayOfMonth();
+                LocalDateTime priorDayOfMonth = firstDayOfMonth.minusDays(calculatedDayDifference);
+                dynamicConvertor.setLte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(priorDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LTM": {
