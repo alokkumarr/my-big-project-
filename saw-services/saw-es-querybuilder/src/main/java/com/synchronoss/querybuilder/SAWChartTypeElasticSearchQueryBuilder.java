@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.synchronoss.SAWElasticTransportService;
-import com.synchronoss.querybuilder.model.chart.DataField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -23,9 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
+import com.synchronoss.SAWElasticTransportService;
+import com.synchronoss.querybuilder.model.chart.DataField;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
 import com.synchronoss.querybuilder.model.chart.Model;
-import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 /**
@@ -36,6 +34,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
 
   String jsonString;
   String dataSecurityString;
+  Integer timeOut = 3;
 
   SearchSourceBuilder searchSourceBuilder;
 
@@ -43,15 +42,17 @@ class SAWChartTypeElasticSearchQueryBuilder {
     private final static String VALUE = "value";
     private final static String SUM ="_sum";
 
-  public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut) {
     super();
     this.jsonString = jsonString;
+    this.timeOut = timeOut;
   }
   
-  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey) {
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut) {
 	    super();
 	    this.dataSecurityString = dataSecurityKey;
 	    this.jsonString = jsonString;
+	    this.timeOut=timeOut;
   }
 
   public String getDataSecurityString() {
@@ -214,7 +215,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields,preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                    "system","analyse");
+                    "system","analyse", timeOut);
             // Set total sum for dataFields will be used for percentage calculation.
             objectMapper = new ObjectMapper();
             JsonNode objectNode = objectMapper.readTree(result);
