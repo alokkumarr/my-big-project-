@@ -421,6 +421,7 @@ export class ChartService {
   }
 
   getSerie({alias, displayName, comboType, aggregate, chartType}, index, fields, type) {
+    let aggregateType = '';
     const comboGroups = fpPipe(
       fpMap('comboType'),
       fpUniq,
@@ -430,8 +431,12 @@ export class ChartService {
 
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
+    if (aggregate === 'percentage') {
+      aggregateType = '%';
+    }
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
+      aggregateSymbol: aggregateType,
       type: splinifiedChartType,
       yAxis: (chartType === 'tsPane' || type === 'tsPane') ? index : comboGroups[comboType],
       zIndex,
@@ -834,11 +839,10 @@ export class ChartService {
       <th>${fields.x.alias || get(opts, 'labels.x', '') || fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
     </tr>`;
-
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
       <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
-      <td>{point.y:,.2f} ${'{series.name}'.includes('Total') ? '%' : ''}</td>
+      <td>{point.y:,.2f} {point.series.userOptions.aggregateSymbol}</td>
     </tr>`;
     const zAxisString = fields.z ?
       `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
@@ -849,6 +853,7 @@ export class ChartService {
 
     let tooltipObj = {
       useHTML: true,
+      valueSuffix: '%',
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
       pointFormat: `${xIsNumber ? xAxisString : ''}
         ${yAxisString}
@@ -861,6 +866,7 @@ export class ChartService {
     if (type.substring(0, 2) === 'ts') {
       tooltipObj = {
         enabled: true,
+        valueSuffix: '%',
         useHTML: true,
         valueDecimals: 3,
         split: true,
@@ -884,6 +890,7 @@ export class ChartService {
       path: 'legend.enabled',
       data: Boolean(!yIsSingle || fields.g)
     });
+
     return changes;
   }
 
