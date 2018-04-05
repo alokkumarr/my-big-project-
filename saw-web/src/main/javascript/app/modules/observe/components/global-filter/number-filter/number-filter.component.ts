@@ -17,11 +17,11 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
 
   private _filter;
-  private step = 1;
+  private step = 1; // tslint:disable-line
   private defaults: {min, max} = {min: 1, max: 100};
   private filterCache: {operator?, start?, end?};
   private value: Array<number>;
-  private config = {
+  private config = { // tslint:disable-line
     tooltips: true
   };
   private clearFiltersListener: Subscription;

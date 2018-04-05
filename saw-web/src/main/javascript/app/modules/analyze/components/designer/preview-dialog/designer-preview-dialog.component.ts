@@ -1,7 +1,6 @@
 declare const require: any;
 import {
   Component,
-  Input,
   Inject
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';

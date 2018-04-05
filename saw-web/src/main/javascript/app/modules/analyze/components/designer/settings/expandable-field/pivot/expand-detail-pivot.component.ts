@@ -12,11 +12,9 @@ import {
   DesignerChangeEvent
 }  from '../../../types';
 import {
-  TYPE_ICONS_OBJ,
   AGGREGATE_TYPES,
   DATE_INTERVALS,
   DATE_TYPES,
-  NUMBER_TYPES,
   FLOAT_TYPES,
   DATE_FORMATS_OBJ,
   DEFAULT_DATE_FORMAT
