@@ -71,3 +71,7 @@ export const DATE_PRESETS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(DATE_PRESETS);
+
+export const DATE_FORMAT = {
+  YYYY_MM_DD: 'YYYY-MM-DD'
+};

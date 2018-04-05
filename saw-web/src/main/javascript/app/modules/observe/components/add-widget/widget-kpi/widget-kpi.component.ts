@@ -21,8 +21,10 @@ import * as find from 'lodash/find';
 
 import * as moment from 'moment';
 
+import { requireIf } from '../../../validators/required-if.validator';
 import { WIDGET_ACTIONS } from '../widget.model';
 import {
+  DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS_OBJ,
   DATE_PRESETS
@@ -58,12 +60,23 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this.datePresetSubscription.unsubscribe();
   }
 
+  /**
+   * Initialises form and adds listeners to individual form fields as required
+   *
+   * @memberof WidgetKPIComponent
+   */
   createForm() {
     this.kpiForm = this.fb.group({
       name: ['', Validators.required],
       dateField: ['', Validators.required],
-      gte: [moment()],
-      lte: [moment()],
+      gte: [
+        moment(),
+        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
+      ],
+      lte: [
+        moment(),
+        [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
+      ],
       filter: [this.dateFilters[0].value, Validators.required],
       aggregate: [this.aggregations[0].value, Validators.required]
     });
@@ -72,10 +85,18 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this.datePresetSubscription = this.kpiForm
       .get('filter')
       .valueChanges.subscribe(data => {
+        this.kpiForm.get('lte').updateValueAndValidity();
+        this.kpiForm.get('gte').updateValueAndValidity();
         this.showDateFields = data === CUSTOM_DATE_PRESET_VALUE;
       });
   }
 
+  /**
+   * Metric is required to set default date field (if not present)
+   * and to populate date field selector in form.
+   *
+   * @memberof WidgetKPIComponent
+   */
   @Input()
   set metric(data: any) {
     if (!data) return;
@@ -87,6 +108,11 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       .setValue(kpiDateField || data.dateColumns[0].columnName);
   }
 
+  /**
+   * Updates the form with the data present in kpi structure
+   *
+   * @memberof WidgetKPIComponent
+   */
   @Input()
   set kpi(data: any) {
     if (!data) return;
@@ -101,12 +127,47 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     const filt = get(data, 'filters.0.model.preset');
     this.kpiForm.get('filter').setValue(filt || this.dateFilters[0].value);
 
+    const lte = get(data, 'filters.0.model.lte');
+    lte &&
+      this.kpiForm.get('lte').setValue(moment(lte, DATE_FORMAT.YYYY_MM_DD));
+
+    const gte = get(data, 'filters.0.model.gte');
+    gte &&
+      this.kpiForm.get('gte').setValue(moment(gte, DATE_FORMAT.YYYY_MM_DD));
+
     const primaryAggregate = get(data, 'dataFields.0.aggregate.0');
     this.kpiForm
       .get('aggregate')
       .setValue(primaryAggregate || this.aggregations[0].value);
   }
 
+  /**
+   * Returns the model for date filter. If custom preset has been chosen,
+   * includes the custom date range in result as well.
+   *
+   * @returns
+   * @memberof WidgetKPIComponent
+   */
+  prepareDateFilterModel() {
+    const model = {
+      preset: this.kpiForm.get('filter').value
+    };
+
+    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) return model;
+
+    return {
+      ...model,
+      lte: this.kpiForm.get('lte').value.format(DATE_FORMAT.YYYY_MM_DD),
+      gte: this.kpiForm.get('gte').value.format(DATE_FORMAT.YYYY_MM_DD)
+    };
+  }
+
+  /**
+   * Converts the form values to backend-valid structure and notifies parent.
+   * Represensts the save/update operation.
+   *
+   * @memberof WidgetKPIComponent
+   */
   applyKPI() {
     const dataField = get(this._kpi, 'dataFields.0');
     const dateField = find(
@@ -128,9 +189,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
           {
             type: dateField.type,
             columnName: dateField.columnName,
-            model: {
-              preset: this.kpiForm.get('filter').value
-            }
+            model: this.prepareDateFilterModel()
           }
         ]
       })
