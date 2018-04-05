@@ -486,9 +486,9 @@ export class ChartService {
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
     let comboType = fields.y[0].comboType;
-    let aggregateSymbol = '';
+    let aggrsymbol = '';
     if (fields.y[0].aggregate === 'percentage') {
-      aggregateSymbol = '%';
+      aggrsymbol = '%';
     }
     if (angular.isDefined(comboType)) {
       if (comboType === 'tsspline' || comboType === 'tsPane') {
@@ -500,7 +500,7 @@ export class ChartService {
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
       fpGroupBy('g'),
       fpToPairs,
-      fpMap(([name, data]) => ({name, data, type: comboType, aggregateSymbol: aggregateSymbol}))
+      fpMap(([name, data]) => ({name, data, type: comboType, aggregateSymbol: aggrsymbol}))
     )(parsedData);
   }
 
