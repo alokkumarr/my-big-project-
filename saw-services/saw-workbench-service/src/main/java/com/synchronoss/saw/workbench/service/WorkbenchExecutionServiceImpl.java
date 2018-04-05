@@ -151,7 +151,9 @@ public class WorkbenchExecutionServiceImpl
         /* Submit job to Livy for reading out preview data */
         WorkbenchClient client = getWorkbenchClient();
         String id = UUID.randomUUID().toString();
-        client.submit(new WorkbenchPreviewJob(id, location, previewLimit));
+        client.submit(
+            new WorkbenchPreviewJob(id, location, previewLimit),
+            () -> handlePreviewFailure(id));
         PreviewBuilder preview = new PreviewBuilder(id, "queued");
         preview.insert();
         /* Return generated preview ID to client to be used for
@@ -159,6 +161,12 @@ public class WorkbenchExecutionServiceImpl
         ObjectNode root = mapper.createObjectNode();
         root.put("id", id);
         return root;
+    }
+
+    private void handlePreviewFailure(String previewId) {
+        log.error("Creating preview failed");
+        PreviewBuilder preview = new PreviewBuilder(previewId, "failed");
+        preview.insert();
     }
 
     private String getDatasetLocation(String project, String name) {
