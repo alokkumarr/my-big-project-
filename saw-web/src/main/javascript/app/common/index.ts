@@ -60,7 +60,9 @@ import {
   JoinDialogComponent,
   JsPlumbEndpointComponent
 } from './components/js-plumb';
+import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
 import {DateFormatDialogComponent} from './components/date-format-dialog';
+import { AggregateChooserComponent } from './components/aggregate-chooser';
 import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
@@ -133,7 +135,9 @@ angular
     JsPlumbConnectorComponent,
     JsPlumbJoinLabelComponent,
     JoinDialogComponent,
-    DateFormatDialogComponent
+    DateFormatDialogComponent,
+    AliasRenameDialogComponent,
+    AggregateChooserComponent
   ],
   entryComponents: [
     PivotGridComponent,
@@ -144,7 +148,9 @@ angular
     JsPlumbTableComponent,
     JsPlumbJoinLabelComponent,
     JoinDialogComponent,
-    DateFormatDialogComponent
+    DateFormatDialogComponent,
+    AliasRenameDialogComponent,
+    AggregateChooserComponent
   ],
   exports: [
     DndModule,
@@ -162,6 +168,8 @@ angular
     JsPlumbJoinLabelComponent,
     JoinDialogComponent,
     DateFormatDialogComponent,
+    AliasRenameDialogComponent,
+    AggregateChooserComponent,
     E2eDirective
   ],
   providers: [

@@ -26,7 +26,25 @@
   }
 
   mat-list > mat-list-item.mat-list-item {
-    height: 32px;
+    height: auto;
+    padding-bottom: 5px;
+    padding-top: 5px;
+
+    .jsp-table__column {
+      width: 100%;
+
+      .jsp-table__column-name {
+        padding-left: 10px;
+        font-size: 14px;
+        line-height: 16px;
+        word-wrap: break-word;
+        width: 90%;
+      }
+
+      .jsp-table__column-actions {
+        height: 22px;
+      }
+    }
   }
 
   .jsp-endpoint-TopCenter,
@@ -46,13 +64,6 @@
     position: absolute;
     top: 50%;
     right: 0;
-  }
-
-  .jsp-table-column-name {
-    font-size: 14px;
-    line-height: 16px;
-    word-wrap: break-word;
-    width: 90%;
   }
 
   .icon-close {

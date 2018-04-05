@@ -3,14 +3,15 @@ import {
   SqlBuilder,
   SqlBuilderPivot,
   SqlBuilderReport,
-  Join
+  SqlBuilderEsReport,
+  Join,
+  AnalysisType
 } from '../../models';
 import { JsPlumbCanvasChangeEvent } from '../../../../common/components/js-plumb/types';
 import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
-  AnalysisType,
   Sort,
   Filter,
   FilterModel,
@@ -37,6 +38,7 @@ export {
   SqlBuilder,
   SqlBuilderPivot,
   SqlBuilderReport,
+  SqlBuilderEsReport,
   Sort,
   Filter,
   FilterModel,
@@ -84,5 +86,7 @@ export type DesignerChangeEvent = {
     'selectedFields'   |
     'joins'            |
     'artifactPosition' |
-    'column';
+    'column'           |
+    'visibleIndex';
+  column?: ArtifactColumnReport;
 }

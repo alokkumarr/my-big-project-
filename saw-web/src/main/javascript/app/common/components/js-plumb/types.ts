@@ -27,4 +27,5 @@ export type ConnectionPayload = {
 
 export type JsPlumbCanvasChangeEvent = {
   subject: 'joins' | 'artifactPosition' | 'column' | 'aggregate';
+  column?: ArtifactColumnReport;
 }

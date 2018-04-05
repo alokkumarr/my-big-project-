@@ -28,4 +28,7 @@ export class DesignerReportComponent {
   @Input() designerState: DesignerStates;
   public DesignerStates = DesignerStates;
 
+  onReportGridChange(event) {
+    this.change.emit(event);
+  }
 }

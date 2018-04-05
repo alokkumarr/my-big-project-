@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
+import * as sortBy from 'lodash/sortBy';
 
 import {
   Artifact,
@@ -53,6 +54,10 @@ export class JsPlumbTableComponent {
     });
   }
 
+  getArtifactColumns() {
+    return sortBy(this.artifact.columns, ({displayName, aliasName}: ArtifactColumn) => aliasName || displayName);
+  }
+
   updatePosition() {
     const elemStyle = this._elementRef.nativeElement.style;
     const [x, y] = this.artifact.artifactPosition;
@@ -66,7 +71,10 @@ export class JsPlumbTableComponent {
 
   onCheckBoxToggle(column: ArtifactColumnReport, checked) {
     column.checked = checked;
-    this.change.emit({subject: 'column'});
+    this.change.emit({
+      subject: 'column',
+      column
+    });
   }
 
   onAggregateChange(column, aggregate) {

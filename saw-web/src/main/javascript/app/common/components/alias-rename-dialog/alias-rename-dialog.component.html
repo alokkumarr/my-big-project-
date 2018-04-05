@@ -1,0 +1,22 @@
+<header class="dialog__header">
+  <strong i18n>Format</strong>
+</header>
+<div class="dialog__content"
+     fxLayout="column">
+  <mat-form-field>
+    <input matInput
+           (input)="onAliasChange($event.target.value)"
+           [value]="alias"
+           placeholder="Alias"/>
+  </mat-form-field>
+</div>
+<div class="dialog__actions">
+  <div fxLayout="row"
+       fxLayoutAlign="start center">
+    <button (click)="rename()"
+            mat-raised-button color="primary" i18n>
+      Rename
+    </button>
+    <button mat-button i18n (click)="close()">Cancel</button>
+  </div>
+</div>

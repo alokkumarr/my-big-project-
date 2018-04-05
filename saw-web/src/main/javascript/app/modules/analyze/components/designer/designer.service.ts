@@ -29,7 +29,7 @@ import {
   ArtifactColumnPivot,
   SqlBuilder,
   SqlBuilderPivot,
-  SqlBuilderReport
+  SqlBuilderEsReport
 } from './types';
 import {
   NUMBER_TYPES,
@@ -247,6 +247,12 @@ export class DesignerService {
       // the data field must be non-empty
       dataFields: pivotFields.data
     };
+  }
+
+  getPartialEsReportSqlBuilder(artifactColumns: ArtifactColumns): Partial<SqlBuilderEsReport> {
+    return {
+      dataFields: filter(artifactColumns, 'checked')
+    }
   }
 
   parseData(data, sqlBuilder) {

@@ -6,23 +6,35 @@
 
   <mat-divider></mat-divider>
 
-  <mat-list-item *ngFor="let column of artifact.columns; trackBy: index"
+  <mat-list-item *ngFor="let column of getArtifactColumns(); trackBy: index"
                  role="listitem">
-    <mat-checkbox [checked]="column.checked"
-                  (change)="onCheckBoxToggle(column, $event.checked)">
-      <span class="jsp-table-column-name">
+    <div fxLayout="row"
+         fxLayoutAlign="space-between center"
+         class="jsp-table__column">
+
+      <mat-checkbox [checked]="column.checked"
+                    (change)="onCheckBoxToggle(column, $event.checked)">
+      </mat-checkbox>
+      <div class="jsp-table__column-name">
         {{getColumnLabel(column)}}
-      </span>
-    </mat-checkbox>
+      </div>
 
-    <aggregate-chooser-u (change)="onAggregateChange(column, $event)"
-                         [aggregate]="column.aggregate">
-    </aggregate-chooser-u>
+      <div *ngIf="column.checked"
+           class="jsp-table__column-actions"
+           fxLayout="row"
+           fxLayoutAlign="space-between center">
+        <aggregate-chooser-u (change)="onAggregateChange(column, $event)"
+                            [aggregate]="column.aggregate"
+                            [type]="column.type">
+        </aggregate-chooser-u>
 
-    <button mat-icon-button
-            (click)="clearAggregate(column)">
-      <mat-icon fontIcon="icon-close"></mat-icon>
-    </button>
+        <button *ngIf="column.aggregate"
+                mat-icon-button
+                (click)="clearAggregate(column)">
+          <mat-icon fontIcon="icon-close"></mat-icon>
+        </button>
+      </div>
+    </div>
 
     <div *ngIf="column.joinEligible">
       <js-plumb-endpoint-u *ngFor="let side of sides; trackBy: index"

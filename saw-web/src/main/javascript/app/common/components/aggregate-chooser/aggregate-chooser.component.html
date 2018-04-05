@@ -5,7 +5,7 @@
 </button>
 <mat-menu #aggregatemenu="matMenu">
   <button mat-menu-item
-          *ngFor="let aggregateType of AGGREGATE_TYPES; trackBy: index"
+          *ngFor="let aggregateType of aggregates; trackBy: index"
           (click)="onAggregateChange(aggregateType.value)">
     <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
     <span style="margin-left: 20px;">{{aggregateType.label}}</span>

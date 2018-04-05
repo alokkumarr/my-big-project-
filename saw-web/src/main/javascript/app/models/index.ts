@@ -29,5 +29,7 @@ export { Sort } from './sort.model';
 export {
   SqlBuilder,
   SqlBuilderPivot,
-  SqlBuilderReport
+  SqlBuilderReport,
+  SqlBuilderEsReport
 } from './sql-builder.model';
+export { AnalysisType } from './analysis-type.model';

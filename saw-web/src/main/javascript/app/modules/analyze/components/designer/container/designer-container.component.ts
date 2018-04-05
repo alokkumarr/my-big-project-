@@ -99,6 +99,7 @@ export class DesignerContainerComponent {
   getLayoutConfiguration(analysis: Analysis | AnalysisStarter) {
     switch (analysis.type) {
     case 'report':
+    case 'esReport':
       return 'multi';
     case 'pivot':
     case 'chart':
@@ -174,6 +175,7 @@ export class DesignerContainerComponent {
     case 'pivot':
       return this._designerService.parseData(data, analysis.sqlBuilder);
     case 'report':
+    case 'esReport':
       return data;
     case 'chart':
       break;
@@ -236,10 +238,13 @@ export class DesignerContainerComponent {
     case 'pivot':
       partialSqlBuilder = this._designerService.getPartialPivotSqlBuilder(this.artifacts[0].columns);
       break;
+    case 'esReport':
+      partialSqlBuilder = this._designerService.getPartialEsReportSqlBuilder(this.artifacts[0].columns);
+      break;
     case 'report':
       partialSqlBuilder = {
         joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
-      }
+      };
       break;
     }
 
@@ -272,6 +277,7 @@ export class DesignerContainerComponent {
     case 'chart':
       // TODO verify if the object returned is empty
     case 'report':
+    case 'esReport':
       return isEmpty(data);
     }
   }
@@ -279,31 +285,44 @@ export class DesignerContainerComponent {
   onSettingsChange(event: DesignerChangeEvent) {
     switch (this.analysis.type) {
     case 'report':
+    case 'esReport':
       this.handleReportChangeEvents(event);
+      break;
     case 'pivot':
     case 'chart':
       this.handleOtherChangeEvents(event);
+      break;
     }
     this.isInDraftMode = true;
   }
 
   handleReportChangeEvents(event: DesignerChangeEvent) {
     switch (event.subject) {
+    // backend data refresh needed
     case 'column':
       this.cleanSorts();
+      this.resetColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
+    case 'aggregate':
     case 'filter':
     case 'joins':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
+    // only front end data refresh needed
     case 'format':
     case 'aliasName':
     case 'sort':
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
+    case 'visibleIndex':
     }
+  }
+
+  resetColumnPropsToDefaultIfNeeded(column) {
+    column.visible = true;
+    unset(column, 'aggregate');
   }
 
   handleOtherChangeEvents(event: DesignerChangeEvent) {
@@ -334,6 +353,7 @@ export class DesignerContainerComponent {
       return isNumber(length) ? length > 0 : false;
     case 'chart':
     case 'report':
+    case 'esReport':
       return true;
     }
 

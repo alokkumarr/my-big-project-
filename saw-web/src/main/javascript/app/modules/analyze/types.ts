@@ -8,7 +8,8 @@ import {
   ArtifactColumnReport,
   Sort,
   Filter,
-  FilterModel
+  FilterModel,
+  AnalysisType
 } from './models';
 
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
@@ -22,12 +23,12 @@ export {
   Format,
   Filter,
   FilterModel,
-  Artifact
+  Artifact,
+  AnalysisType
 };
 
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
-export type AnalysisType = 'report' | 'chart' | 'pivot';
 export type ChartType = 'line' | 'column' | 'bar' | 'area' | 'pie' | 'scatter' | 'bubble';
 
 export type Analysis = AnalysisChart | AnalysisReport;

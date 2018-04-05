@@ -37,9 +37,11 @@
   </div>
 
   <report-grid-upgraded *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
+                        (change)="onReportGridChange($event)"
                         [artifacts]="artifacts"
                         [query]="query"
                         [sorts]="sorts"
-                        [data]="data">
+                        [data]="data"
+                        [isEditable]="true">
   </report-grid-upgraded>
 </div>

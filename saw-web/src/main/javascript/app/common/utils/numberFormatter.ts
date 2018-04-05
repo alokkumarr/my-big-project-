@@ -15,7 +15,7 @@ export function formatNumber(number, format: Format) {
   return getFormatter(format)(number);
 }
 
-export function getFormatter(format: Format) {
+export function getFormatter(format: Format | string) {
   if (!format) {
     return {};
   }

@@ -16,7 +16,7 @@
           (click)="toggleGridPanel()">
     <mat-icon fontIcon="icon-expand"
               class="grid-panel-toggle__icon"
-              [ngClass]="{'expanded': isGridPanelExpanded}">
+              [ngClass]="{'expanded': !isGridPanelExpanded}">
     </mat-icon>
   </button>
 </div>
