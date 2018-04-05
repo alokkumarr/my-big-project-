@@ -70,7 +70,6 @@ export class ReportGridComponent {
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Input() query: string;
   @Input('sorts') set setSorts(sorts: Sort[]) {
-    console.log('sorts', sorts);
     this.sorts = reduce(sorts, (acc, sort, index) => {
       const reportGirdSort: ReportGridSort = {
         order: sort.order,
@@ -83,7 +82,6 @@ export class ReportGridComponent {
   @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
     this.artifacts = artifacts;
     this.columns = this.artifacts2Columns(artifacts);
-    console.log('columns: ', this.columns);
   };
   @Input('queryColumns') set setQueryColumns(queryColumns) {
     // TODO merge with SAW - 2002 for queryColumns
@@ -130,7 +128,6 @@ export class ReportGridComponent {
         isVisibleIndexChanged = true;
       }
       if (isVisibleIndexChanged) {
-        console.log('changed visibleIndex');
         this.change.emit({subject: 'visibleIndex'});
       }
     });
