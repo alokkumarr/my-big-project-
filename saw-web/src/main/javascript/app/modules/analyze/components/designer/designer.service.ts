@@ -5,7 +5,6 @@ import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
-import * as filter from 'lodash/filter';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
@@ -19,7 +18,6 @@ import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../../services/analyze.service'
 import {
   AnalysisType,
-  ChartType,
   Analysis
 } from '../../types';
 import {
@@ -34,7 +32,6 @@ import {
   DEFAULT_AGGREGATE_TYPE,
   DEFAULT_DATE_INTERVAL
 } from '../../consts';
-import { MAX_LENGTH_VALIDATOR } from '@angular/forms/src/directives/validators';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
