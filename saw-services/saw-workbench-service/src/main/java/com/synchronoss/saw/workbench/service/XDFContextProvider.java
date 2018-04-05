@@ -1,7 +1,6 @@
 package com.synchronoss.saw.workbench.service;
 
 import java.time.Instant;
-
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -11,13 +10,7 @@ import sncr.bda.conf.ComponentConfiguration;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 
-import sncr.xdf.ngcomponent.NGContextServices;
-
-import sncr.xdf.parser.AsynchNGParser;
-
-import sncr.xdf.sql.ng.AsynchNGSQLComponent;
-
-import sncr.xdf.transformer.ng.AsynchNGTransformerComponent;
+import sncr.xdf.services.NGContextServices;
 
 
 
@@ -42,7 +35,7 @@ public class XDFContextProvider {
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
-            cfg = AsynchNGParser.analyzeAndValidate(config);
+            cfg = NGContextServices.analyzeAndValidateParserConf(config);
             ngCtxSvc = new NGContextServices(
                 pcs, root, cfg, project, component, batch);
             break;
@@ -55,7 +48,7 @@ public class XDFContextProvider {
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
-            cfg = AsynchNGSQLComponent.analyzeAndValidate(config);
+            cfg = NGContextServices.analyzeAndValidateSqlConf(config);
             ngCtxSvc = new NGContextServices(
                 scs, root, cfg, project, component, batch);
             break;
@@ -68,7 +61,7 @@ public class XDFContextProvider {
                 ComponentServices.TransformationMetadata,
                 ComponentServices.Spark
             };
-            cfg = AsynchNGTransformerComponent.analyzeAndValidate(config);
+            cfg = NGContextServices.analyzeAndValidateTransformerConf(config);
             ngCtxSvc = new NGContextServices(
                 tcs, root, cfg, project, component, batch);
             break;

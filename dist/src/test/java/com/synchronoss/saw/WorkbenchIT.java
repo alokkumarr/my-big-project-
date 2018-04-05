@@ -3,12 +3,15 @@ package com.synchronoss.saw;
 import static io.restassured.RestAssured.given;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.response.Response;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
@@ -22,61 +25,112 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     private static final int DATASET_WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    /*
-        Parser configuration file.
-     */
-    private String parserConf =
-        "{\n"
-        + "  \"parser\": {\n"
-        + "    \"fields\": [\n"
-        + "  { \"name\": \"State\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"Name\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"NTDID\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"LegacyNTDID\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"OrgType\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"ReporterType\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"UrbanizedArea\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"UZAPopulation\", \"type\": \"integer\"},\n"
-        + "  { \"name\": \"UZASize\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"WholeAgencyVOMSSize\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"Mode\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"TOS\", \"type\": \"string\"},\n"
-        + "  { \"name\": \"VOMS\", \"type\": \"integer\"},\n"
-        + "  { \"name\": \"MajorMechanicalFailure\", \"type\": \"integer\"},\n"
-        + "  { \"name\": \"OtherMechanicalFailure\", \"type\": \"integer\"},\n"
-        + "  { \"name\": \"TotalRevenueSystemMechanical\","
-        +    "\"type\": \"integer\"},\n"
-        + "  { \"name\": \"C4\", \"type\": \"string\"}\n"
-        + "  ],\n"
-        + "    \"file\" : "
-        + "\"hdfs:///main/raw/RevenueVehicleMaintPerf2.csv\",\n"
-        + "    \"lineSeparator\": \"\\n\",\n"
-        + "    \"delimiter\": \",\",\n"
-        + "    \"quoteChar\": \"\\\"\",\n"
-        + "    \"quoteEscape\": \"\\\\\",\n"
-        + "    \"headerSize\": 4\n"
-        + "  },\n"
-        + "  \"outputs\" : [\n"
-        + "    { \n"
-        + "      \"dataSet\" : \"WBAPARSER01\",\n"
-        + "      \"mode\" : \"replace\",\n"
-        + "      \"format\" : \"paquet\",\n"
-        + "      \"catalog\" : \"dout\"\n"
-        + "     }\n"
-        + "  ],\n"
-        + "  \"parameters\" : [\n"
-        + "\n"
-        + "  ]\n"
-        + "}";
-
 
     /**
      * Parse a CSV file into dataset with given name using Workbench
      * Services.
      */
-    private String parseDataset2() throws JsonProcessingException {
+    private String parseDataset2() throws IOException {
+
+        ObjectNode root = mapper.createObjectNode();
+        root.put("name", "WBAPARSER01");
+        root.put("component", "parser");
+        ObjectNode config = root.putObject("configuration");
+        ArrayNode fields = config.putArray("fields");
+
+        ObjectNode field1 = fields.addObject();
+        field1.put("name", "State");
+        field1.put("type", "string");
+
+        ObjectNode field2 = fields.addObject();
+        field2.put("name", "Name");
+        field2.put("type", "string");
+
+        ObjectNode field3 = fields.addObject();
+        field3.put("name", "NTDID");
+        field3.put("type", "string");
+
+        ObjectNode field4 = fields.addObject();
+        field4.put("name", "LegacyNTDID");
+        field4.put("type", "string");
+
+        ObjectNode field5 = fields.addObject();
+        field5.put("name", "OrgType");
+        field5.put("type", "string");
+
+        ObjectNode field6 = fields.addObject();
+        field6.put("name", "ReporterType");
+        field6.put("type", "string");
+
+        ObjectNode field7 = fields.addObject();
+        field7.put("name", "UrbanizedArea");
+        field7.put("type", "string");
+
+        ObjectNode field8 = fields.addObject();
+        field8.put("name", "UZAPopulation");
+        field8.put("type", "string");
+
+        ObjectNode field9 = fields.addObject();
+        field9.put("name", "UZASize");
+        field9.put("type", "string");
+
+        ObjectNode field10 = fields.addObject();
+        field10.put("name", "WholeAgencyVOMSSize");
+        field10.put("type", "string");
+
+        ObjectNode field11 = fields.addObject();
+        field11.put("name", "Mode");
+        field11.put("type", "string");
+
+        ObjectNode field12 = fields.addObject();
+        field12.put("name", "TOS");
+        field12.put("type", "string");
+
+        ObjectNode field13 = fields.addObject();
+        field13.put("name", "VOMS");
+        field13.put("type", "integer");
+
+        ObjectNode field14 = fields.addObject();
+        field14.put("name", "MajorMechanicalFailure");
+        field14.put("type", "integer");
+
+        ObjectNode field15 = fields.addObject();
+        field15.put("name", "OtherMechanicalFailure");
+        field15.put("type", "integer");
+
+        ObjectNode field16 = fields.addObject();
+        field16.put("name", "TotalRevenueSystemMechanical");
+        field16.put("type", "integer");
+
+        ObjectNode field17 = fields.addObject();
+        field17.put("name", "C4");
+        field17.put("type", "string");
+
+        config.put("file", "RevenueVehicleMaintPerf2.csv");
+        config.put("lineSeparator", "\n");
+        config.put("delimiter", ",");
+        config.put("quoteChar", "\"");
+        config.put("quoteEscape", "\\");
+        config.put("headerSize", "4");
+
+        ObjectNode outputs = config.putObject("output");
+        outputs.put("dataSet", "WBAPARSER01");
+        outputs.put("mode", "replace");
+        outputs.put("format", "parquet");
+        outputs.put("catalog", "data");
+        outputs.put("dataSet", "WBAPARSER01");
+
+        ArrayNode parameters = config.putArray("parameters");
+        ObjectNode p1 = parameters.addObject();
+        p1.put("name", "spark.master");
+        p1.put("value", "local[*]");
+
+        String json = mapper.writeValueAsString(root);
+
+        log.info("request: " + json);
+
         Response response = given(authSpec)
-            .body(parserConf)
+            .body(json)
             .when()
             .post(WORKBENCH_PATH + "/datasets")
             .then()
@@ -86,7 +140,13 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
             .response();
         String resp = response.getBody().asString();
         assert (resp != null);
-        return resp;
+        log.info("Response: " + resp);
+
+        JsonNode node = mapper.reader().readTree(resp);
+
+        assert( node != null );
+        String id = node.get("id").asText();
+        return id;
     }
 
 
@@ -190,9 +250,10 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     }
 
     @Test
-    public void testListPreregDatasets() throws JsonProcessingException {
+    public void testListPreregDatasets() throws IOException {
     // id = parseDataset("test_list")
         String id = parseDataset2();
+        assert ( id.equalsIgnoreCase("workbench::WBAPARSER01") );
         log.info("ID: " + id);
     }
 }
