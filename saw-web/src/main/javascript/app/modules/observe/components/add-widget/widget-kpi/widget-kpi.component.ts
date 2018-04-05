@@ -11,6 +11,11 @@ import * as assign from 'lodash/assign';
 import * as find from 'lodash/find';
 
 import { WIDGET_ACTIONS } from '../widget.model';
+import {
+  CUSTOM_DATE_PRESET_VALUE,
+  DATE_PRESETS_OBJ,
+  DATE_PRESETS
+} from '../../../consts';
 
 const template = require('./widget-kpi.component.html');
 require('./widget-kpi.component.scss');
@@ -25,7 +30,7 @@ export class WidgetKPIComponent implements OnInit {
 
   @Output() onKPIAction = new EventEmitter();
 
-  dateFilters = [{ name: 'Month to Date', value: 'MTD' }];
+  dateFilters = DATE_PRESETS;
   aggregations = [{ name: 'Sum', value: 'sum' }];
 
   kpiForm: FormGroup;
@@ -84,7 +89,7 @@ export class WidgetKPIComponent implements OnInit {
     );
 
     this.onKPIAction.emit({
-      kpi: assign(this._kpi, {
+      kpi: assign({}, this._kpi, {
         name: this.kpiForm.get('name').value,
         dataFields: [
           {
