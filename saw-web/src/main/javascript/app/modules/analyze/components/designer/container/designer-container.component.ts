@@ -11,11 +11,7 @@ import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
 import * as forEach from 'lodash/forEach';
-import * as map from 'lodash/map';
 import * as find from 'lodash/find';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpReduce from 'lodash/fp/reduce';
-import * as fpFilter from 'lodash/fp/filter';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -31,7 +27,6 @@ import {
   Filter,
   IToolbarActionResult
 } from '../types'
-import { NUMBER_TYPES } from '../../../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
 import { FieldChangeEvent } from '../settings/single';
 

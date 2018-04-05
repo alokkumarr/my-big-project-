@@ -8,12 +8,14 @@
     "object-literal-sort-keys": false,
     "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
     "max-params": ["error", 20],
-    "no-unused-variable": true,
     "no-warning-comments": [0],
-    "capitalized-comments": [0]
+    "capitalized-comments": [0],
+    "no-console": [true],
+    "no-unused-variable": [true]
   },
   "jsRules": {
     "ter-indent": [true, 2],
+    "no-console": [true],
     "quotemark": [true, "single"],
     "object-literal-sort-keys": false,
     "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],

@@ -7,8 +7,6 @@ import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
-import * as indexOf from 'lodash/indexOf';
-import * as forEach from 'lodash/forEach';
 import * as replace from 'lodash/replace';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
@@ -36,9 +34,7 @@ export class ParserPreviewComponent implements OnInit {
   @Input() previewObj: BehaviorSubject<any>;
   private gridListInstance: any;
   private previewgridConfig: Array<any>;
-  private gridData: Array<any>;
   private updaterSubscribtion: any;
-  private toAddSubscribtion: any;
   private fieldInfo = [];
   private parserData: any;
   private rawFile: any;

@@ -13,12 +13,12 @@ const template = require('./rawpreview-dialog.component.html');
 })
 
 export class RawpreviewDialogComponent implements OnInit {
-  private title = '';
-  private message = 'No Data';
-  
+  private title = ''; // tslint:disable-line
+  private message = 'No Data'; // tslint:disable-line
+
   constructor(
     private dialogRef: MatDialogRef<RawpreviewDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private params: any
+    @Inject(MAT_DIALOG_DATA) private params: any // tslint:disable-line
   ) {
     if (get(params, 'rawData')) {
       this.message = take(params.rawData, 50);

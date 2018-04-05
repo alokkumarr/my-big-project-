@@ -9,16 +9,11 @@ import {
 } from '@angular/core';
 
 import {
-  IDroppableOptions,
   ISortableDropEvent,
   SortableCallback
 } from './types';
-import {
-  arrayMove
-} from './utils';
 import { dndClasses } from './consts';
 import {DragnDropService} from './dnd.service';
-import { concat } from 'rxjs/observable/concat';
 
 @Directive({
   selector: '[dndSortableContainer]'

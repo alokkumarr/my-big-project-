@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -19,16 +22,11 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-
-
-
 import com.synchronoss.querybuilder.ReportAggregationBuilder;
-import com.synchronoss.querybuilder.model.report.DataField;
-import com.synchronoss.querybuilder.model.report.SqlBuilder;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.synchronoss.querybuilder.model.report.DataField;
+import com.synchronoss.querybuilder.model.report.SqlBuilder;
 
 
 public class SAWElasticTransportService {
@@ -37,15 +35,17 @@ public class SAWElasticTransportService {
 
   private static String HITS= "hits";
   private static String _SOURCE ="_source";
-
+  private Integer timeOut = 3;
 
   private static String execute(String query, String jsonString, String dsk, String username,
-    String moduleName,boolean isReport) throws JsonProcessingException, IOException, NullPointerException{
+    String moduleName,boolean isReport, Integer timeOut) throws JsonProcessingException, IOException, NullPointerException{
     String url = System.getProperty("url");
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
     String indexName = repository.get("indexName").asText();
     String type = repository.get("type").textValue();
     OkHttpClient client = new OkHttpClient();
+    client.setConnectTimeout(timeOut, TimeUnit.MINUTES);
+    client.setReadTimeout(timeOut, TimeUnit.MINUTES); 
     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     ESProxy esProxy = new ESProxy();
     esProxy.setStorageType("ES");
@@ -103,11 +103,11 @@ public class SAWElasticTransportService {
    * @throws NullPointerException
    */
   public static String executeReturnAsString(String query, String jsonString, String dsk,
-      String userName, String moduleName) throws JsonProcessingException, IOException, NullPointerException
+      String userName, String moduleName, Integer timeOut) throws JsonProcessingException, IOException, NullPointerException
   {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    String response = execute(query, jsonString, dsk, userName, moduleName,false);
+    String response = execute(query, jsonString, dsk, userName, moduleName,false,timeOut);
     String arr = response;
     return arr;
   }
@@ -124,11 +124,11 @@ public class SAWElasticTransportService {
    * @throws NullPointerException
    */
   public static String executeReturnDataAsString(String query, String jsonString, String dsk,
-                                             String userName, String moduleName) throws IOException, NullPointerException
+                                             String userName, String moduleName, Integer timeOut) throws IOException, NullPointerException
   {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    String response = execute(query, jsonString, dsk, userName, moduleName,true);
+    String response = execute(query, jsonString, dsk, userName, moduleName,true, timeOut);
     String arr = response;
     return arr;
   }
@@ -171,11 +171,13 @@ public class SAWElasticTransportService {
       }
       return node.toString();
   }
-    public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObject)
+    public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObject, Integer timeOut)
     throws IOException, NullPointerException{
 
         String url = System.getProperty("url");
         OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(timeOut, TimeUnit.MINUTES);
+        client.setReadTimeout(timeOut, TimeUnit.MINUTES);
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         ESProxy esProxy = new ESProxy();
         esProxy.setStorageType("ES");
@@ -214,5 +216,8 @@ public class SAWElasticTransportService {
        result.put("esRepository",globalFilter.getEsRepository());
         Gson gson = new Gson();
         return gson.toJson(result);
+    }
+    public Integer getTimeOut() {
+      return timeOut;
     }
 }

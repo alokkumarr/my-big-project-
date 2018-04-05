@@ -23,7 +23,7 @@ public class WorkbenchIT extends BaseIT {
     private static final String WORKBENCH_PROJECT = "workbench";
     private static final String WORKBENCH_PATH =
         "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
-    private static final int WAIT_RETRIES = 20;
+    private static final int WAIT_RETRIES = 30;
     private static final int WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 

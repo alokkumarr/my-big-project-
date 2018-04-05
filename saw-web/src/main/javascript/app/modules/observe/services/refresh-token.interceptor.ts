@@ -1,5 +1,5 @@
-import { Injectable, Injector } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/observable/throw'
 import 'rxjs/add/operator/catch';
@@ -11,7 +11,7 @@ import { UserService } from '../../../../login/services/user.service';
 
 @Injectable()
 export class RefreshTokenInterceptor implements HttpInterceptor {
-  constructor(private jwt: JwtService, private user: UserService, private injector: Injector) { }
+  constructor(private jwt: JwtService, private user: UserService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 

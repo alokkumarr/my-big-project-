@@ -1,11 +1,11 @@
 
-import { Component, Inject, ViewChild, OnInit } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
-import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Subject } from 'rxjs/Subject';
+import { MatDialog } from '@angular/material';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import * as cloneDeep from 'lodash/cloneDeep';
+
+import { Component, ViewChild, OnInit } from '@angular/core';
+import { UIRouter } from '@uirouter/angular';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as merge from 'lodash/merge';
 import * as omit from 'lodash/omit';
 import * as set from 'lodash/set';
@@ -19,7 +19,6 @@ import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
-import { Parser } from '@angular/compiler/src/ml_parser/parser';
 
 const template = require('./create-datasets.component.html');
 require('./create-datasets.component.scss');
@@ -37,9 +36,8 @@ export class CreateDatasetsComponent implements OnInit {
   private csvConfig: any;
   private parsedPreview = new BehaviorSubject([]);
   private previewData: any;
-  private toAdd: Subject<any> = new Subject();
   private fieldsConf: any;
-  private parserConf: any;
+  private parserConf: any; // tslint:disable-line
   public nameFormGroup: FormGroup;
   private selectedIndex: number = 0;
 
@@ -47,7 +45,6 @@ export class CreateDatasetsComponent implements OnInit {
     private router: UIRouter,
     private dialog: MatDialog,
     private workBench: WorkbenchService,
-    private formBuilder: FormBuilder,
     private notify: ToastService
   ) { }
 
@@ -109,7 +106,7 @@ export class CreateDatasetsComponent implements OnInit {
   previewDialog(fileDetails): void {
     const path = `${fileDetails.path}/${fileDetails.name}`;
     this.workBench.getRawPreviewData(path).subscribe(data => {
-      const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+      this.dialog.open(RawpreviewDialogComponent, {
         minHeight: 500,
         minWidth: 600,
         data: {

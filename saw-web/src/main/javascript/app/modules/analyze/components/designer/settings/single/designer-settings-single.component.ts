@@ -7,7 +7,6 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as debounce from 'lodash/debounce';
-import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 
 import { DesignerService } from '../../designer.service';
@@ -15,8 +14,7 @@ import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
   ArtifactColumns,
-  ArtifactColumnFilter,
-  ArtifactColumnPivot
+  ArtifactColumnFilter
 } from '../../types';
 import {
   TYPE_ICONS_OBJ,
