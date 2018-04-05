@@ -29,7 +29,8 @@ server:
 analysis:
     service:
         host: http://localhost:9200/analysis
-    emailExportSize: "{{ saw_email_username | default('50000') }}"
+    uiExportSize: "{{ uiExportSize | default('10000') }}"
+    emailExportSize: "{{ saw_email_export_size | default('50000') }}"
     ftpExportSize: "{{ saw_ftp_export_size | default('100000') }}"
 
 

@@ -56,7 +56,7 @@ public class ExportServiceImpl implements ExportService{
   private String apiExportOtherProperties;
 
   // preview size
-  @Value("${analysis.size}")
+  @Value("${analysis.uiExportSize}")
   private String apiExportSize;
 
   // email export size

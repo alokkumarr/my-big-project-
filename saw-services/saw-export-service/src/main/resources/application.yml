@@ -28,7 +28,7 @@ server:
 analysis:
     service:
         host: http://localhost:9200/analysis
-    size: 10000
+    uiExportSize: 10000
     emailExportSize: 50000
     ftpExportSize: 100000
 
