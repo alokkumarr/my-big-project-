@@ -177,6 +177,11 @@ public class BuilderUtil
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
     LocalDateTime now = LocalDateTime.now();
     switch (dynamic) {
+        case "Yesterday" :
+        LocalDateTime yesterday = now.minusDays(1);
+        dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+        dynamicConvertor.setGte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+        break;
       case "YTD": {
         LocalDateTime firstDay = now.with(TemporalAdjusters.firstDayOfYear());
         dynamicConvertor.setLte(now.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
@@ -265,6 +270,13 @@ public class BuilderUtil
         DynamicConvertor dynamicConvertor = new DynamicConvertor();
         LocalDateTime now = LocalDateTime.now();
         switch (dynamic) {
+            case "Yesterday" :
+                LocalDateTime yesterday = now.minusDays(1);
+                LocalDateTime dayBeforeYesterday = now.minusDays(2);
+                dynamicConvertor.setLte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+
             case "YTD": {
                 LocalDateTime lastYear = now.minusYears(1);
                 LocalDateTime firstDay = lastYear.with(TemporalAdjusters.firstDayOfYear());

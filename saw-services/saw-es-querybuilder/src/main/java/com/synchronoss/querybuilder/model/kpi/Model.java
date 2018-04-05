@@ -183,7 +183,7 @@ public class Model {
     }
 
     public enum Preset {
-
+        Yesterday("Yesterday"),
         YTD("YTD"),
         MTD("MTD"),
         LTM("LTM"),
