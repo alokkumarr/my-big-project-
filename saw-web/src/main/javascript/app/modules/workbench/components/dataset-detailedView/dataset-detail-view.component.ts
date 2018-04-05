@@ -24,6 +24,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   private poll: boolean;
   private interval = 5000;
   private previewData: Array<any>;
+  private previewStatus: string = 'queued';
 
   constructor(
     private router: UIRouter,
@@ -34,7 +35,6 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
     this.triggerPreview();
-
   }
 
   ngOnDestroy() {
@@ -50,6 +50,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
 
   triggerPreview() {
     this.workBench.triggerDatasetPreview(this.dsMetadata.system.name).subscribe((data) => {
+      this.previewStatus = 'queued'
       if (!isUndefined(data.id)) {
         this.startPolling(data.id);
       }
@@ -58,8 +59,11 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
 
   getPreview(id) {
     this.workBench.getDatasetPreviewData(id).subscribe((data) => {
-      if (isUndefined(data.status)) {
+      this.previewStatus = data.status;
+      if (this.previewStatus === 'success') {
         this.previewData = data.rows;
+        this.stopPolling();
+      } else if (this.previewStatus === 'failed') {
         this.stopPolling();
       }
     });

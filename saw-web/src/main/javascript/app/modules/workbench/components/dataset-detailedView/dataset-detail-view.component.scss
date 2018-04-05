@@ -14,7 +14,7 @@ dataset-detail-view {
     height: 100%;
   }
 
-  .details-title {
+  .details-header {
     color: rgba(0, 0, 0, 0.54);
     background: rgba(0, 0, 0, 0.03);
     padding: 8px 0;
@@ -44,9 +44,49 @@ dataset-detail-view {
 
   .details-card {
     margin: 3px;
+
+    .details-title {
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      color: #555;
+    }
+
+    .details-content {
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 1.43;
+    }
+
+    .mat-divider {
+      position: relative;
+      padding-bottom: 5px;
+    }
+
+    .prop-name {
+      color: #727272;
+      width: 136px;
+      line-height: 1.43;
+    }
+
+    .prop-value {
+      color: #555;
+    }
   }
 
   .details-grid {
     padding: 3px;
+  }
+
+  .loading {
+    width: 100%;
+    height: 150px;
+    color: rgb(189, 189, 189);
+    text-align: center;
+
+    span {
+      font-size: 28px;
+      word-break: break-word;
+    }
   }
 }

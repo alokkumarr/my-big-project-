@@ -20,11 +20,15 @@ workbench-page {
   }
 
   .dx-datagrid .dx-row > td {
-    padding: 3px !important;
+    padding: 3px;
   }
 
   .dx-datagrid {
     line-height: normal !important;
+  }
+
+  .dx-header-row > td {
+    padding: 7px !important;
   }
 
   .mat-tab-label-active {
