@@ -25,7 +25,7 @@ export class WidgetKPIComponent implements OnInit {
 
   @Output() onKPIAction = new EventEmitter();
 
-  dateFilters = [{ name: 'Year to Date', value: 'YTD' }];
+  dateFilters = [{ name: 'Month to Date', value: 'MTD' }];
   aggregations = [{ name: 'Sum', value: 'sum' }];
 
   kpiForm: FormGroup;
