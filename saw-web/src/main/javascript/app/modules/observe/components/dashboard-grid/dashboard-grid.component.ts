@@ -238,6 +238,9 @@ export class DashboardGridComponent
    */
   onApplyGlobalFilters(filterGroup) {
     this.dashboard.forEach((tile, id) => {
+      // Only applies to analysis type tiles
+      if (tile.type !== 'analysis') return;
+
       const gFilters = filterGroup[tile.analysis.semanticId] || [];
 
       const filters = unionWith(
