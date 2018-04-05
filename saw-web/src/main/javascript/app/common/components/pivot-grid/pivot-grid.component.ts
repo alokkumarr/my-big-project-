@@ -223,7 +223,6 @@ export class PivotGridComponent {
         switch (column.dateInterval) {
         case 'day':
           cloned.groupInterval = 1;
-          console.log('format', cloned.format);
           momentFormat = this.getMomentFormat(cloned.format);
           cloned.manualFormat = cloned.format;
           cloned.format = {
