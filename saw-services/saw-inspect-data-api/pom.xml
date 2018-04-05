@@ -15,7 +15,7 @@
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
-		<metadata.api>1.0.4</metadata.api>
+		<metadata.api>1.0.5</metadata.api>
 	</properties>
 
 	<dependencies>

@@ -9,7 +9,6 @@ import { HeaderProgressService } from '../../../../../common/services/header-pro
 import { SqlExecutorComponent } from '../../sql-executor/sql-executor.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-
 const template = require('./datasets-card-page.component.html');
 require('./datasets-card-page.component.scss');
 
