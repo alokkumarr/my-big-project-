@@ -1,13 +1,12 @@
 
-import { Component, Input, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { SqlExecutorComponent } from '../../sql-executor/sql-executor.component';
+
 
 const template = require('./datasets-card-page.component.html');
 require('./datasets-card-page.component.scss');
@@ -23,7 +22,7 @@ export class DatasetsCardPageComponent implements OnInit {
   @Input() updater: BehaviorSubject<any>;
   private updaterSubscribtion: any;
   private dataSets: Array<any> = [];
-    
+
   constructor(
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService
@@ -32,7 +31,7 @@ export class DatasetsCardPageComponent implements OnInit {
   ngOnInit() {
     this.headerProgress.show();
     this.updaterSubscribtion = this.updater.subscribe(data => {
-      this.onUpdate(data)        
+      this.onUpdate(data)
     });
   }
 
@@ -43,7 +42,7 @@ export class DatasetsCardPageComponent implements OnInit {
   onUpdate(data) {
     this.dataSets = data;
     if (this.dataSets.length > 0) {
-      
+
     }
     setTimeout(() => {
       this.headerProgress.hide();

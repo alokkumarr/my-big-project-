@@ -36,7 +36,6 @@ export class ChartComponent {
   private highcharts: any = Highcharts;
   private highstocks: any = Highstock;
   private chart: any = null;
-  private stockChart: any = null;
   private config: any = {};
   private stockConfig: any = {};
   private subscription: any;
@@ -56,12 +55,19 @@ export class ChartComponent {
     } else {
       this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
     }
+  }
+
+  ngOnInit() {
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
       this.subscription = this.updater.subscribe({
         next: this.onOptionsChartUpdate.bind(this)
       });
     }
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   /**

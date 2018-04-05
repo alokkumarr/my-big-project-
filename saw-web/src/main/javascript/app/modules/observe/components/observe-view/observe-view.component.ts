@@ -1,6 +1,6 @@
 declare const require: any;
 
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { MatDialog, MatSidenav } from '@angular/material';
 import { Transition } from '@uirouter/angular';
@@ -24,7 +24,6 @@ export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
   private subCategoryId: string;
   private dashboard: Dashboard;
-  private sidenavOpened = false;
   private privileges = {
     create: false,
     delete: false,

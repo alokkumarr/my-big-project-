@@ -1,13 +1,11 @@
 declare const require: any;
 import {
   Component,
-  Input,
   Inject
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as currencyCodes from 'currency-codes/data.js';
 import * as getCurrencySymbol from 'currency-symbol-map/currency-symbol-map.js';
-import * as isNumber from 'lodash/isNumber';
 import * as has from 'lodash/has';
 import * as trim from 'lodash/trim';
 import * as isFinite from 'lodash/isFinite';
