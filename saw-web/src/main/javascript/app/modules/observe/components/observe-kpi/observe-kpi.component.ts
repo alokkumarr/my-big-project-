@@ -4,6 +4,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
 import { Observable } from 'rxjs/Observable';
 
+import { DATE_PRESETS_OBJ } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 
 const template = require('./observe-kpi.component.html');
@@ -15,6 +16,7 @@ require('./observe-kpi.component.scss');
 })
 export class ObserveKPIComponent implements OnInit {
   _kpi: any;
+  datePresetObj = DATE_PRESETS_OBJ;
   executionResult: { current?: number; prior?: number; change?: number } = {};
   constructor(private observe: ObserveService) {}
 
@@ -25,6 +27,13 @@ export class ObserveKPIComponent implements OnInit {
     if (isEmpty(data)) return;
     this._kpi = data;
     this.executeKPI();
+  }
+
+  get filterLabel() {
+    if (!this._kpi) return '';
+
+    const preset = get(this._kpi, 'filters.0.model.preset');
+    return get(this.datePresetObj, `${preset}.label`);
   }
 
   executeKPI() {
