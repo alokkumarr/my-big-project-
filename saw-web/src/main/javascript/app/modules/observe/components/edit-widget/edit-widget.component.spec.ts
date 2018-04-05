@@ -20,52 +20,42 @@ configureTests();
 
 describe('Edit Widget', () => {
   let fixture: ComponentFixture<EditWidgetComponent>, el: HTMLElement;
-  beforeEach(
-    fakeAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [MaterialModule, AddWidgetModule],
-        declarations: [EditWidgetComponent],
-        providers: [{ provide: ObserveService, useValue: ObserveServiceStub }]
-      }).compileComponents();
-
-      fixture = TestBed.createComponent(EditWidgetComponent);
-
-      el = fixture.nativeElement;
-
-      fixture.detectChanges();
-      tick();
+  beforeEach(done => {
+    TestBed.configureTestingModule({
+      imports: [MaterialModule, AddWidgetModule],
+      declarations: [EditWidgetComponent],
+      providers: [{ provide: ObserveService, useValue: ObserveServiceStub }]
     })
-  );
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(EditWidgetComponent);
 
-  it(
-    'should exist',
-    fakeAsync(() => {
-      tick();
-      expect(typeof fixture.componentInstance.prepareKPI).to.equal('function');
-    })
-  );
+        el = fixture.nativeElement;
 
-  it(
-    'should not show kpi widget without input',
-    fakeAsync(() => {
-      tick();
-      expect(fixture.componentInstance.editItem).to.be.undefined;
+        fixture.detectChanges();
+        done();
+      });
+  });
 
-      expect(el.querySelector('widget-kpi')).to.be.null;
-    })
-  );
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.prepareKPI).to.equal('function');
+  });
 
-  it(
-    'should show kpi widget if editItem present',
-    fakeAsync(() => {
-      fixture.componentInstance.editItem = {
-        kpi: {},
-        column: {},
-        metric: { dateColumns: [{}] }
-      };
-      fixture.detectChanges();
-      tick();
+  it('should not show kpi widget without input', () => {
+    expect(fixture.componentInstance.editItem).to.be.undefined;
+    expect(el.querySelector('widget-kpi')).to.be.null;
+  });
+
+  it('should show kpi widget if editItem present', done => {
+    fixture.componentInstance.editItem = {
+      kpi: {},
+      column: {},
+      metric: { dateColumns: [{}] }
+    };
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
       expect(el.querySelector('widget-kpi')).to.not.be.null;
-    })
-  );
+      done();
+    });
+  });
 });
