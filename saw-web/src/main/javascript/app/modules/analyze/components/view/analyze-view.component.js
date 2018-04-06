@@ -74,7 +74,8 @@ export const AnalyzeViewComponent = {
         categoryId: this.$state.params.id,
         groupkey: this.resp.ticket.custCode
       };
-      this._AnalyzeService.getAllCronJobs(this.requestModel).then(response => {
+      this._AnalyzeService.getAllCronJobs(this.requestModel)
+      .then(response => {
         this.loadCards = true;
         if (response.statusCode === 200) {
           if (!isUndefined(response)) {
@@ -83,6 +84,9 @@ export const AnalyzeViewComponent = {
             this.cronSavedJobs = '';
           }
         }
+      })
+      .catch(err => {
+        this.loadCards = true;
       });
     }
 

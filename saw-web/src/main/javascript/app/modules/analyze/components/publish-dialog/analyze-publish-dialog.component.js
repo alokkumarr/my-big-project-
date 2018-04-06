@@ -120,6 +120,11 @@ export const AnalyzePublishDialogComponent = {
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
         }
+      })
+      .catch(err => {
+        this._$rootScope.showProgress = false;
+        this.loadCronLayout = true;
+        this.$dialog.hideLoader();
       });
     }
 
