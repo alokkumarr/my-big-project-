@@ -83,8 +83,7 @@ export const AnalyzeViewComponent = {
             this.cronSavedJobs = '';
           }
         }
-      }).catch(err => {
-        console.log(err);
+      }).catch(() => {
         this.loadCards = true;
       });
     }
