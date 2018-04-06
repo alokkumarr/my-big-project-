@@ -436,7 +436,7 @@ export class ChartService {
     }
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
-      aggrSymbol: aggrSymbol,
+      aggrSymbol,
       type: splinifiedChartType,
       yAxis: (chartType === 'tsPane' || type === 'tsPane') ? index : comboGroups[comboType],
       zIndex,
