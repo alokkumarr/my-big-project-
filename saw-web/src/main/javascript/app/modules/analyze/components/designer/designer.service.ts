@@ -7,6 +7,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
 import * as concat from 'lodash/concat';
 import * as flatMap from 'lodash/flatMap';
 import * as take from 'lodash/take';
