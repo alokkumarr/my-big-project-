@@ -11,16 +11,11 @@ import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import { animations } from './create-dashboard.animations';
 
-import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
-import * as map from 'lodash/map';
 import * as get from 'lodash/get';
-import * as findIndex from 'lodash/findIndex';
+import * as forEach from 'lodash/forEach';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
-
-const MARGIN_BETWEEN_TILES = 10;
 
 @Component({
   selector: 'create-dashboard',
@@ -38,7 +33,7 @@ export class CreateDashboardComponent {
   constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
     private router: UIRouter,
-    private menu: MenuService,
+    private menu: MenuService, // tslint:disable-line
     private dashboardService: DashboardService,
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any

@@ -1,20 +1,10 @@
 declare function require(string): string;
 
-import { MatIconRegistry } from '@angular/material';
-import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
-import { Inject, OnInit } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
-
-import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
-import * as map from 'lodash/map';
-
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
-import { Dashboard } from '../../models/dashboard.interface';
 
 
 const template = require('./observe-page.component.html');
@@ -32,16 +22,11 @@ import { Component } from '@angular/core';
 })
 export class ObservePageComponent {
   constructor(
-    private iconRegistry: MatIconRegistry,
     private analyze: AnalyzeService,
     private menu: MenuService,
     private observe: ObserveService,
-    private headerProgress: HeaderProgressService,
-    private router: UIRouter,
-    @Inject('$componentHandler') private $componentHandler
-  ) {
-    // this.iconRegistry.setDefaultFontSetClass('icomoon');
-  }
+    private headerProgress: HeaderProgressService
+  ) {}
 
 
   ngOnInit() {
