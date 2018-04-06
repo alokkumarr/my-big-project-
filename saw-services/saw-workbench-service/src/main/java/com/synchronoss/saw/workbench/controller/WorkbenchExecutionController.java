@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 @RestController
-@RequestMapping("/internal/workbench/")
+@RequestMapping("/internal/workbench/projects/")
 public class WorkbenchExecutionController {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
@@ -38,12 +39,15 @@ public class WorkbenchExecutionController {
     @Autowired
     private WorkbenchExecutionService workbenchExecutionService;
 
-    @RequestMapping(value = "datasets", method = RequestMethod.POST,
-                    produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(
+        value = "{project}/datasets", method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ObjectNode create(@RequestBody ObjectNode body)
+    public ObjectNode create(
+        @PathVariable(name = "project", required = true) String project,
+        @RequestBody ObjectNode body)
         throws JsonProcessingException, Exception {
-        log.debug("Create dataset");
+        log.debug("Create dataset: project = {}", project);
         /* Extract input parameters */
         String name = body.path("name").asText();
         String input = body.path("input").asText();
@@ -84,6 +88,6 @@ public class WorkbenchExecutionController {
         xdfOutput.put("dataSet", name);
         /* Invoke XDF component */
         return workbenchExecutionService.execute(
-            name, component, xdfConfig.toString());
+            project, name, component, xdfConfig.toString());
     }
 }

@@ -7,6 +7,10 @@
   template: src=application.yml dest=/opt/bda/saw-export-service/conf
   notify:
     - restart saw-export
+- name: Install SAW export Service ftp details file
+  template: src=ftp-details.json dest=/opt/bda/saw-export-service/conf
+  notify:
+    - restart saw-export
 # Workaround: The service restart handler will run only after all
 # tasks have completed.  This causes the service to remain running
 # using the old port when the new socket activation proxy starts up,

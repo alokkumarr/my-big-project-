@@ -1,19 +1,18 @@
-declare function require(string): string;
 
 import * as angular from 'angular';
 import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
-import * as indexOf from 'lodash/indexOf';
-import * as forEach from 'lodash/forEach';
 import * as replace from 'lodash/replace';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
 import * as has from 'lodash/has';
 import * as take from 'lodash/take';
+import * as isUndefined from 'lodash/isUndefined';
 
 import { MatDialog } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -32,15 +31,15 @@ require('./parser-preview.component.scss');
 })
 
 export class ParserPreviewComponent implements OnInit {
-  @Input() previewObj: Subject<any>;
+  @Input() previewObj: BehaviorSubject<any>;
   private gridListInstance: any;
   private previewgridConfig: Array<any>;
-  private gridData: Array<any>;
   private updaterSubscribtion: any;
-  private toAddSubscribtion: any;
   private fieldInfo = [];
   private parserData: any;
   private rawFile: any;
+  private inspectError: boolean = false;
+  private errMsg: string = '';
 
   constructor(
     private dxDataGrid: dxDataGridService,
@@ -64,15 +63,20 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   onUpdate(data) {
-    if (data.samplesParsed) {
-      this.parserData = cloneDeep(data);
-      const parsedData = data.samplesParsed;
-      this.fieldInfo = cloneDeep(data.fields);
+    if ( data.length === 2 && !isUndefined(data[0].samplesParsed)) {
+      this.parserData = cloneDeep(data[0]);
+      const parsedData = data[0].samplesParsed;
+      this.fieldInfo = cloneDeep(data[0].fields);
       setTimeout(() => {
         this.dataGrid.instance.beginCustomLoading('Loading...');
         this.reloadDataGrid(parsedData);
       });
-      this.rawPreview(data.info.file);
+    } else if (data.length != 0 && !isUndefined(data[0].error)) {
+      this.inspectError = true;
+      this.errMsg = data[0].error.message;
+    }
+    if (data.length === 2 && !isUndefined(data[1])) {
+      this.rawPreview(data[1]);
     }
   }
 

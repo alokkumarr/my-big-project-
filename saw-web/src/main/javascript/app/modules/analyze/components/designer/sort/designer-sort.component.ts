@@ -6,7 +6,6 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as filter from 'lodash/filter';
-import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
 import * as find from 'lodash/find';
 import * as take from 'lodash/take';

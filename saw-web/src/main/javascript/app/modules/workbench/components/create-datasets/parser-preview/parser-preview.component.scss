@@ -13,6 +13,7 @@ parser-preview {
 
   .mat-tab-body-wrapper {
     height: 100%;
+    padding-bottom: 3px;
   }
 
   .fieldType {
@@ -49,6 +50,24 @@ parser-preview {
 
   .raw-content {
     padding: 20px;
-    background-color: #F5F9FC;
+    font-size: 14px;
+  }
+
+  .content-hgt {
+    height: 99% !important;
+  }
+
+  .alert {
+    padding: 16px;
+    margin: 24px 0;
+    font-size: 14px;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .is-important {
+    border-left: 10px solid $primary-red;
+    background-color: #E5524C08;
   }
 }

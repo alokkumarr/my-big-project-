@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+  <div mat-dialog-title i18n>New Folder</div>
+  <mat-dialog-content style="height:100px;">
+    <mat-form-field class="inpElement">
+      <input matInput formControlName="folderNameControl" autocomplete="off" placeholder="Enter Folder Name" required />
+      <mat-error *ngIf="folderNameControl.errors?.required" i18n>
+        Folder Name is
+        <strong>required</strong>
+      </mat-error>
+      <mat-error *ngIf="folderNameControl.errors?.pattern" i18n>
+        Only alphabets, numbers, _, -  are allowed
+      </mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid" i18n>OK</button>
+    <span fxFlex></span>
+    <button mat-button type="button" style="color: #E5524C;" mat-dialog-close i18n>Cancel</button>
+  </mat-dialog-actions>
+</form>
