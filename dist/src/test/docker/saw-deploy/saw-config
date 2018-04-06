@@ -66,10 +66,11 @@ saw_workbench_metadata=hdfs:///main/
 
 #
 # Email and FTP export size definition
-# default value for email is 50000 and ftp is 100000
+# default value for email is 50000 and ftp is 1000000
 #
+saw_ui_export_size=10000
 saw_email_export_size=50000
-saw_ftp_export_size=100000
+saw_ftp_export_size=1000000
 
 [saw-security]
 localhost ansible_connection=local

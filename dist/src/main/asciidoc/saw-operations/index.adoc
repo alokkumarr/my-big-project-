@@ -378,8 +378,11 @@ After generating the key, add it to the SAW environment configuration ({{saw-con
 
 === email and ftp extract size configuration
 
-SAW supports exporting reports and pivots to email servers. Configurations for email and
-ftp are as given:
+SAW supports *exporting* reports and pivots:
+
+. from UI
+. to email
+. to ftp/sftp servers
 
 In saw-config, we can configure how many number of rows we want to extract for all the
 reports / pivots:
@@ -387,8 +390,9 @@ reports / pivots:
 .saw-config
 [source, yaml]
 ----
+saw_ui_export_size=10000
 saw_email_export_size=50000
-saw_ftp_export_size=100000
+saw_ftp_export_size=1000000
 ----
 
 === FTP server configuration

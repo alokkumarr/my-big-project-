@@ -56,7 +56,7 @@ public class ExportServiceImpl implements ExportService{
   private String apiExportOtherProperties;
 
   @Value("${analysis.uiExportSize}")
-  private String apiExportSize;
+  private String uiExportSize;
 
   // email export size
   @Value("${analysis.emailExportSize}")
@@ -85,8 +85,12 @@ public class ExportServiceImpl implements ExportService{
   public DataResponse dataToBeExportedSync(String executionId, HttpServletRequest request,String analysisId) throws JSONValidationSAWException {
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     RestTemplate restTemplate = new RestTemplate();
-    String sizOfExport = request.getParameter("pageSize");
-    String url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=report";
+    // During report extraction time, this parameter will not be passed.
+    // Hence we should use uiExportSize configuration parameter.
+    String sizOfExport;
+    sizOfExport = ((sizOfExport = request.getParameter("pageSize"))!=null) ? sizOfExport : uiExportSize;
+    String url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+ sizOfExport
+        +"&analysisType=report";
     logger.debug("Transport Service URL: {}", url);
     ResponseEntity<DataResponse> transportResponse = restTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
@@ -105,7 +109,10 @@ public class ExportServiceImpl implements ExportService{
   @Override
   @Async
   public ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(String executionId, HttpServletRequest request, String analysisId) {
-    String sizOfExport = request.getParameter("pageSize");
+    // During report extraction time, this parameter will not be passed.
+    // Hence we should use uiExportSize configuration parameter.
+    String sizOfExport;
+    sizOfExport = ((sizOfExport = request.getParameter("pageSize"))!=null) ? sizOfExport : uiExportSize;
     String url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=report";
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
