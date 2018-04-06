@@ -33,7 +33,8 @@ const MARGIN_BETWEEN_TILES = 10;
 @Component({
   selector: 'create-dashboard',
   template,
-  animations
+  animations,
+  providers: [DashboardService]
 })
 export class CreateDashboardComponent implements OnDestroy {
   public fillState = 'empty';
