@@ -167,8 +167,10 @@ export const ReportGridComponent = {
       }
       return map(columns, column => {
         const isNumberType = NUMBER_TYPES.includes(column.type);
-        if (isNumberType && !column.format && column.aggregate === 'percentage') {
-          column.format = {};
+        if (isNumberType && column.aggregate === 'percentage') {
+          if (!column.format) {
+            column.format = {};  
+          }
           column.format.percentage = true;
           column.format.precision = DEFAULT_PRECISION;
         }

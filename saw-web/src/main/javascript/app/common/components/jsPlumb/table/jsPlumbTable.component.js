@@ -2,6 +2,7 @@ import * as isEmpty from 'lodash/isEmpty';
 
 import * as template from './jsPlumbTable.component.html';
 import style from './jsPlumbTable.component.scss';
+import * as isUndefined from 'lodash/isUndefined';
 import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, AGGREGATE_STRING_TYPES} from '../../../consts';
 
 export const JSPlumbTable = {
@@ -91,6 +92,10 @@ export const JSPlumbTable = {
     }
 
     onSelectAggregateType(aggregateType, field) {
+      console.log(field);
+      if (!isUndefined(field.format) && field.format.percentage) {
+        delete field.format.percentage;
+      }
       this.didAnalysisChange = true;
       field.aggregate = aggregateType.value;
       field.meta.aggregate = aggregateType.value;
