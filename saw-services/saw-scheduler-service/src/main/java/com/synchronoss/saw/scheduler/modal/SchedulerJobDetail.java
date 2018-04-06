@@ -2,11 +2,26 @@ package com.synchronoss.saw.scheduler.modal;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/*** Important Note :
+ *  @Since   SAW2.5.0.
+ *  Section readObject and writeObject has added in this class due to the serialization issue after
+ *  adding new field in this class. Before editing this class Please read below Instruction carefully.
+ *  1) Any new field addition in this class should be inserted in last.
+ *  2) Do not modify the existing order of fields in readObject and writeObject method, add the fields at the end.
+ *  3) If any dataType changes for existing fields, needs to be handled in readObject section using if else condition
+ *  to make this class backward compatible.
+ *  4) Do not change the serialVersionUID while editing this class, changing this value will cause serialization issue.
+ * Note : This class objects are getting stored in Database as blob part scheduled job definition.
+ */
 public class SchedulerJobDetail implements Serializable {
+
+    private static final long serialVersionUID =8510739855197957265l;
 
    private String analysisID;
 
@@ -37,7 +52,7 @@ public class SchedulerJobDetail implements Serializable {
 
    private List<String> emailList;
 
-   private List<String> ftp;
+   private List<String> ftp = new ArrayList<>();
 
    private String fileType ;
 
@@ -287,5 +302,71 @@ public class SchedulerJobDetail implements Serializable {
      */
     public void setFileType(String fileType) {
         this.fileType = fileType;
+    }
+
+
+    /**
+     *
+     * @param out
+     * @throws IOException
+     */
+    private void writeObject(java.io.ObjectOutputStream out)
+        throws IOException {
+        out.writeObject(activeRadio);
+        out.writeObject(activeTab);
+        out.writeObject(analysisID);
+        out.writeObject(analysisName);
+        out.writeObject(categoryID);
+        out.writeObject(cronExpression);
+        out.writeObject(description);
+        out.writeObject(emailList);
+        out.writeObject(fileType);
+        out.writeObject(jobGroup);
+        out.writeObject(jobName);
+        out.writeObject(jobScheduleTime);
+        out.writeObject(metricName);
+        out.writeObject(type);
+        out.writeObject(userFullName);
+        if (ftp!=null)
+        out.writeObject(ftp);
+
+    }
+
+    /**
+     *
+     * @param in
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private void readObject(java.io.ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+
+        activeRadio = (String) in.readObject();
+        activeTab = (String) in.readObject();
+        analysisID = (String) in.readObject();
+        analysisName = (String) in.readObject();
+        categoryID = (String) in.readObject();
+        cronExpression = (String) in.readObject();
+        description = (String) in.readObject();
+        emailList = (List<String>) in.readObject();
+        fileType = (String) in.readObject();
+        Object obj = in.readObject();
+        if(obj instanceof List) {
+            ftp = (List<String>) obj;
+            jobGroup = (String) in.readObject();
+            jobName = (String) in.readObject();
+            jobScheduleTime = (Date) in.readObject();
+            metricName = (String) in.readObject();
+            type = (String) in.readObject();
+            userFullName = (String) in.readObject();
+        }else
+        {
+            jobGroup = (String) obj;
+            jobName = (String) in.readObject();
+            jobScheduleTime = (Date) in.readObject();
+            metricName = (String) in.readObject();
+            type = (String) in.readObject();
+            userFullName = (String) in.readObject();
+        }
     }
 }
