@@ -15,7 +15,7 @@ require('./observe-kpi.component.scss');
 })
 export class ObserveKPIComponent implements OnInit {
   _kpi: any;
-  executionResult: { current?: number; prior?: number; change?: number } = {};
+  executionResult: { current?: number; prior?: number; change?: string } = {};
   constructor(private observe: ObserveService) {}
 
   ngOnInit() {}
@@ -50,7 +50,7 @@ export class ObserveKPIComponent implements OnInit {
         this.executionResult = {
           current: round(currentParsed, 2),
           prior: priorParsed,
-          change
+          change: change >= 0 ? `+${change}` : `${change}`
         };
       });
   }
