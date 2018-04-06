@@ -421,7 +421,7 @@ export class ChartService {
   }
 
   getSerie({alias, displayName, comboType, aggregate, chartType}, index, fields, type) {
-    let aggregateType = '';
+    let aggregateSymbol = '';
     const comboGroups = fpPipe(
       fpMap('comboType'),
       fpUniq,
@@ -432,11 +432,11 @@ export class ChartService {
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
     if (aggregate === 'percentage') {
-      aggregateType = '%';
+      aggregateSymbol = '%';
     }
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
-      aggregateSymbol: aggregateType,
+      aggregateSymbol: aggregateSymbol,
       type: splinifiedChartType,
       yAxis: (chartType === 'tsPane' || type === 'tsPane') ? index : comboGroups[comboType],
       zIndex,
