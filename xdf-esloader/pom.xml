@@ -36,11 +36,11 @@
             <artifactId>org.restlet</artifactId>
             <version>${restlet-version}</version>
         </dependency>
-        <!-- dependency>
+        <dependency>
             <groupId>com.synchronoss.bda</groupId>
             <artifactId>dataset-utils</artifactId>
             <version>${project.version}</version>
-        </dependency -->
+        </dependency>
         <dependency>
             <groupId>com.synchronoss.bda</groupId>
             <artifactId>xdf-component</artifactId>
