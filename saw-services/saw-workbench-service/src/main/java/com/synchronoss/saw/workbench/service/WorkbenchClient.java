@@ -10,16 +10,26 @@ import com.cloudera.livy.LivyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Workbench client for submitting Livy jobs
+ */
 public class WorkbenchClient {
     private static final String WORKBENCH_JAR =
         "/opt/bda/saw-workbench-service/saw-workbench-spark.jar";
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
+    private LivyClient client;
 
-    public void submit(String livyUri, Job job) throws Exception {
-        LivyClient client = new LivyClientBuilder().setURI(
-            new URI(livyUri)).build();
+    public WorkbenchClient(String livyUri) throws Exception {
+        client = new LivyClientBuilder().setURI(new URI(livyUri)).build();
         log.debug("Uploading Workbench JAR");
         client.uploadJar(new File(WORKBENCH_JAR));
+        log.debug("Uploaded Workbench JAR");
+    }
+
+    /**
+     * Submits given Workbench job to Livy
+     */
+    public void submit(Job job) throws Exception {
         log.info("Submitting job");
         JobHandle<Integer> jobHandle = client.submit(job);
         jobHandle.addListener(new WorkbenchJobListener(client));
