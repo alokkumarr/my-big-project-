@@ -421,7 +421,7 @@ export class ChartService {
   }
 
   getSerie({alias, displayName, comboType, aggregate, chartType}, index, fields, type) {
-    let aggregateSymbol = '';
+    let aggrSymbol = '';
     const comboGroups = fpPipe(
       fpMap('comboType'),
       fpUniq,
@@ -432,11 +432,11 @@ export class ChartService {
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
     if (aggregate === 'percentage') {
-      aggregateSymbol = '%';
+      aggrSymbol = '%';
     }
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
-      aggregateSymbol: aggregateSymbol,
+      aggrSymbol: aggrSymbol,
       type: splinifiedChartType,
       yAxis: (chartType === 'tsPane' || type === 'tsPane') ? index : comboGroups[comboType],
       zIndex,
@@ -500,7 +500,7 @@ export class ChartService {
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
       fpGroupBy('g'),
       fpToPairs,
-      fpMap(([name, data]) => ({name, data, type: comboType, aggregateSymbol: aggrsymbol}))
+      fpMap(([name, data]) => ({name, data, type: comboType, aggrSymbol: aggrsymbol}))
     )(parsedData);
   }
 
@@ -846,7 +846,7 @@ export class ChartService {
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
       <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
-      <td>{point.y:,.2f}{point.series.userOptions.aggregateSymbol}</td>
+      <td>{point.y:,.2f}{point.series.userOptions.aggrSymbol}</td>
     </tr>`;
     const zAxisString = fields.z ?
       `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
