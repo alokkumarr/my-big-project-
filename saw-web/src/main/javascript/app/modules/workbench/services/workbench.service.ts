@@ -1,19 +1,20 @@
-import * as fpGet from 'lodash/fp/get';
-import * as forEach from 'lodash/forEach';
-import * as isUndefined from 'lodash/isUndefined';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { UIRouter } from '@uirouter/angular';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 
-import {
-  SQLEXEC_SAMPLE,
-  TREE_VIEW_Data,
-  RAW_SAMPLE,
-  parser_preview,
-  ARTIFACT_SAMPLE
-} from '../sample-data';
+import { DATASETS, SQLEXEC_SAMPLE, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
+
+import * as fpGet from 'lodash/fp/get';
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
+
+// import { JwtService } from '../../../../login/services/jwt.service';
+// import { MenuService } from '../../../common/services/menu.service';
 
 import APP_CONFIG from '../../../../../../../appConfig';
 
@@ -24,14 +25,15 @@ export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
   private wbAPI = `${this.api}/internal/workbench/projects`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private router: UIRouter) { }
 
   /** GET datasets from the server */
   getDatasets(): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.get(endpoint)
       .pipe(
-        catchError(this.handleError('data', [])));
+        catchError(this.handleError('data', DATASETS)));
   }
 
   /** GET Staging area tree list */
@@ -55,7 +57,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-      catchError((e: any) => { return Observable.of(e); }));
+        catchError(this.handleError('data', [])));
   }
 
   /** File mask search */
@@ -67,12 +69,13 @@ export class WorkbenchService {
     let wildcardSearch: any;
     if (this.startsWith(mask, '*')) {
       wildcardSearch = this.endsWith;
-    } else if (this.endsWith(mask, '*')) {
+    }
+    if (this.endsWith(mask, '*')) {
       wildcardSearch = this.startsWith;
-    } else {
+    }
+    if (!mask.includes('*')) {
       wildcardSearch = this.exactMatch;
     }
-
     const filemasksearch = mask.replace('*', '');
     for (let fileCounter = 0; fileCounter < temmpFiles.length; fileCounter++) {
       if (wildcardSearch(temmpFiles[fileCounter].name, filemasksearch)) {
@@ -139,30 +142,30 @@ export class WorkbenchService {
   }
   /**
    * Service to fetch meta data of all datasets
-   *
-   * @param {string} projectName
-   * @param {any} id
-   * @returns {Observable<any>}
+   * 
+   * @param {string} projectName 
+   * @param {any} id 
+   * @returns {Observable<any>} 
    * @memberof WorkbenchService
    */
   getDatasetDetails(id): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/${id}`;
-    return this.http.get(endpoint)
+    return this.http.get(`${this.wbAPI}/${userProject}/${id}`)
       .pipe(
         catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }
 
   triggerParser(payload) {
-    const endpoint = `${this.wbAPI}/${userProject}/datasets`;
+    const endpoint = `${this.api}/internal/workbench/datasets`;
     return this.http.post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
 
   /**
-   * Calls the sql executor component and fetches the output as data for preview grid
-   *
-   * @param {string} query
-   * @returns {Observable<any>}
+   * Calls the sql executor component and fetches the output as data for preview grid 
+   * 
+   * @param {string} query 
+   * @returns {Observable<any>} 
    * @memberof WorkbenchService
    */
   executeSqlQuery(query: string): Observable<any> {
