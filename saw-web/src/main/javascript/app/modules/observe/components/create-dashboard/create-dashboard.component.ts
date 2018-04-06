@@ -1,6 +1,12 @@
 declare const require: any;
 
-import { Component, Inject, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Inject,
+  ViewChild,
+  OnDestroy,
+  AfterContentInit
+} from '@angular/core';
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -33,9 +39,10 @@ const MARGIN_BETWEEN_TILES = 10;
 @Component({
   selector: 'create-dashboard',
   template,
-  animations
+  animations,
+  providers: [DashboardService]
 })
-export class CreateDashboardComponent implements OnDestroy {
+export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   public fillState = 'empty';
   public dashboard: Dashboard;
   public requester = new BehaviorSubject({});
@@ -59,12 +66,14 @@ export class CreateDashboardComponent implements OnDestroy {
     this.dashboard = get(this.dialogData, 'dashboard');
     this.mode = get(this.dialogData, 'mode');
     this.checkEmpty(this.dashboard);
-
-    this.subscribeToEdits();
   }
 
   ngOnDestroy() {
     this.editSubscription && this.editSubscription.unsubscribe();
+  }
+
+  ngAfterContentInit() {
+    this.subscribeToEdits();
   }
 
   subscribeToEdits() {
