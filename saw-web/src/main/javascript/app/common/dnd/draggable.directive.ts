@@ -27,8 +27,9 @@ export class DndDraggableDirective {
       this._data = data;
     }
   }
-
+  // tslint:disable
   @HostBinding(`class.${dndClasses.draggedOldPlace}`) private _isDragged = false;
+  // tslint:enable
 
   private _data: any = null;
 

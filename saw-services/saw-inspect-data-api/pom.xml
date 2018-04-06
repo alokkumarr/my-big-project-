@@ -15,7 +15,7 @@
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
-		<metadata.api>1.0.3</metadata.api>
+		<metadata.api>1.0.4</metadata.api>
 	</properties>
 
 	<dependencies>
@@ -43,11 +43,11 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 		<repository>
 			<id>synchronoss-snapshots</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
 		</repository>
 	</repositories>
 </project>

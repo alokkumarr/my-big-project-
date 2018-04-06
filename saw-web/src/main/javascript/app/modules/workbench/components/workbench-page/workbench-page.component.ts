@@ -1,9 +1,7 @@
-declare function require(string): string;
 
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 
-import { MenuService } from '../../../../common/services/menu.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
 const template = require('./workbench-page.component.html');
@@ -16,10 +14,8 @@ require('./workbench-page.component.scss');
 })
 export class WorkbenchPageComponent {
   constructor(
-    private menu: MenuService,
     private headerProgress: HeaderProgressService,
-    private router: UIRouter,
-    @Inject('$componentHandler') private $componentHandler
+    private router: UIRouter
   ) {  }
 
 
