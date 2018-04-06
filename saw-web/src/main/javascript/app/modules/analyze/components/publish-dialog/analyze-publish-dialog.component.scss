@@ -37,6 +37,9 @@
 
   md-chips.md-triton-theme .md-chips .md-chip-input-container input {
     width: 250px;
+    font-size: 14px;
+    padding: 10px;
+    margin: -2px;
   }
 
   .errorTextMsg {
@@ -54,5 +57,19 @@
     font-size: larger;
     margin-top: 3px;
     margin-right: 2px;
+  }
+
+  .schedule-container .form-container .publish-form {
+    span.clear {
+      position: relative;
+      margin: 10px;
+      top: 10px;
+      color: #0096D5;
+      cursor: pointer;
+    }
+
+    md-select {
+      float: left;
+    }
   }
 }

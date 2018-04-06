@@ -68,6 +68,11 @@ that will subsequently be available in the image build cache.  After
 the command has completed the SAW start page can be accessed
 at [http://localhost/](http://localhost/).
 
+To follow logs in a running SAW container, execute the following
+command:
+
+        $ docker exec saw journalctl -f
+
 To enter a shell inside the main SAW container, execute the following
 command:
 
@@ -78,7 +83,6 @@ starting points to investigate installed SAW services and packages:
 
         $ systemctl status saw-*
         $ systemctl list-units saw-*
-        $ systemctl list-timers saw-*
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 

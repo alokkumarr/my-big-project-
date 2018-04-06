@@ -211,7 +211,8 @@ The Elasticsearch executor supports analyses of types pivot and chart.
 The SAW Export Service enables exporting analysis executions to file
 formats such as Microsoft Excel.  It calls the SAW Execution Service
 to retrieve the execution result, generates the desired output file
-format and finally provides it to the client.
+format and finally provides it to the client over email and/or on
+FTP/SFTP configured locations.
 
 === SAW Scheduler Service
 

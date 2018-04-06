@@ -1,37 +1,44 @@
-<section class="preview-container">
-  <mat-tab-group dynamicHeight="false" fxFlex style="background-color: white;">
-    <mat-tab fxFlex label="PARSED_VIEW">
-      <dx-data-grid id="gridContainer">
-        <div *dxTemplate="let data of 'headerTemplate'">
-          <div fxLayout="column" class="fNameInp">
-            <mat-form-field>
-              <input matInput [(ngModel)]="fieldInfo[data.columnIndex].name" class="fieldName" type="text" required />
-            </mat-form-field>
-            <div fxLayout="row" class="fTypeGroup">
-              <div fxFlex>
-                <select (change)="checkDate($event)" id="{{ data.columnIndex }}" class="fieldType" [(ngModel)]="fieldInfo[data.columnIndex].type">
-                  <option value="string">STRING</option>
-                  <option value="long">LONG</option>
-                  <option value="date">DATE</option>
-                  <option value="boolean">BOOLEAN</option>
-                  <option value="double">DOUBLE</option>
-                </select>
-                <mat-icon fontIcon="icon-edit-solid" class="formatEditIcon" id="edit_{{ data.columnIndex }}" (click)="openDateFormatDialog($event)"
-                  [style.visibility]="fieldInfo[data.columnIndex].type === 'date' ? 'visible' : 'hidden'"></mat-icon>
+<mat-card class="preview-container">
+  <mat-card-content fxFill class="content-hgt">
+    <mat-tab-group fxFill dynamicHeight="false" style="background-color: white;">
+      <mat-tab fxFill label="PARSED_VIEW">
+        <dx-data-grid *ngIf="!inspectError" id="gridContainer">
+          <div *dxTemplate="let data of 'headerTemplate'">
+            <div fxLayout="column" class="fNameInp">
+              <mat-form-field>
+                <input matInput [(ngModel)]="fieldInfo[data.columnIndex].name" class="fieldName" type="text" required />
+              </mat-form-field>
+              <div fxLayout="row" class="fTypeGroup">
+                <div fxFlex>
+                  <select (change)="checkDate($event)" id="{{ data.columnIndex }}" class="fieldType" [(ngModel)]="fieldInfo[data.columnIndex].type">
+                    <option value="string">STRING</option>
+                    <option value="long">LONG</option>
+                    <option value="date">DATE</option>
+                    <option value="boolean">BOOLEAN</option>
+                    <option value="double">DOUBLE</option>
+                  </select>
+                  <mat-icon fontIcon="icon-edit-solid" class="formatEditIcon" id="edit_{{ data.columnIndex }}" (click)="openDateFormatDialog($event)"
+                    [style.visibility]="fieldInfo[data.columnIndex].type === 'date' ? 'visible' : 'hidden'"></mat-icon>
+                </div>
+                <mat-icon fontIcon="icon-info-solid" class="errorInfoIcon" *ngIf="fieldInfo[data.columnIndex].format?.length > 1"></mat-icon>
               </div>
-              <mat-icon fontIcon="icon-info-solid" class="errorInfoIcon" *ngIf="fieldInfo[data.columnIndex].format?.length > 1"></mat-icon>
             </div>
           </div>
+        </dx-data-grid>
+        <div *ngIf="inspectError" fxLayout="row" fxLayoutAlign="space-around center">
+          <div fxFlex="75" class="alert is-important">
+            <h4>Please validate entered details!</h4>
+            <p>{{errMsg}}</p>
+          </div>
         </div>
-      </dx-data-grid>
-    </mat-tab>
-    <mat-tab label="RAW_PREVIEW">
-      <div class="raw-content">
-        <div *ngFor="let line of rawFile">
-          <span [textContent]="line"></span>
+      </mat-tab>
+      <mat-tab fxFill label="RAW_PREVIEW">
+        <div class="raw-content">
+          <div *ngFor="let line of rawFile">
+            <span [textContent]="line"></span>
+          </div>
         </div>
-        <!-- <span fxFlex [textContent]="rawFile" ></span> -->
-      </div>
-    </mat-tab>
-  </mat-tab-group>
-</section>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

@@ -1,13 +1,13 @@
-declare function require(string): string;
 
-import { Component, Input, OnInit, Inject } from '@angular/core';
+import { Component, Input, OnInit, Inject, OnDestroy } from '@angular/core';
+import { UIRouter } from '@uirouter/angular';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { TimerObservable } from 'rxjs/observable/TimerObservable';
 import * as map from 'lodash/map';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
-import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { CreateDatasetsComponent } from '../create-datasets/create-datasets.component';
@@ -22,7 +22,7 @@ require('./datasets-page.component.scss');
   providers: [DatePipe]
 })
 
-export class DatasetsComponent implements OnInit {
+export class DatasetsComponent implements OnInit, OnDestroy {
   private availableSets: Array<any> = [];
   private viewState: string = 'card';
   private states = {
@@ -30,24 +30,40 @@ export class DatasetsComponent implements OnInit {
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
-  private dataView: string = 'sets';
-  private contentHeight: number;
+  private dataView: string = 'sets'; // tslint:disable-line
+  private contentHeight: number; // tslint:disable-line
+  private poll = true;
+  private interval = 10000;
 
   constructor(
+    private router: UIRouter,
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
-    private dataGrid: dxDataGridService,
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private datePipe: DatePipe
   ) { }
 
   ngOnInit() {
-    this.getPageData();
+
+   /**
+    * Calls list datasets api onInit and every 10 seconds or whatever set interval
+    *
+    * @memberof DatasetsComponent
+    */
+    TimerObservable.create(0, this.interval)
+      .takeWhile(() => this.poll)
+      .subscribe(() => {
+        this.headerProgress.show();
+        this.getPageData();
+      });
+  }
+
+  ngOnDestroy() {
+    this.poll = false;
   }
 
   getPageData(): void {
-    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.loadSets(this.availableSets);
@@ -55,7 +71,6 @@ export class DatasetsComponent implements OnInit {
   }
 
   loadSets(data): void {
-    this.headerProgress.show();
     if (this.viewState === 'list') {
       setTimeout(() => {
         this.updater.next(data);
@@ -66,7 +81,7 @@ export class DatasetsComponent implements OnInit {
       });
     }
     setTimeout(() => {
-      this.contentHeight = window.innerHeight-165;
+      this.contentHeight = window.innerHeight - 165;
     });
   }
 
@@ -99,22 +114,14 @@ export class DatasetsComponent implements OnInit {
   }
 
   addDataSet(): void {
-    const detailsDialogRef = this.dialog.open(CreateDatasetsComponent, {
-      panelClass: 'full-screen-dialog',
-      autoFocus: false
-    });
-    detailsDialogRef
-      .afterClosed()
-      .subscribe(() => {
-        this.getPageData();
-      });
+    this.router.stateService.go('workbench.add');
   }
 
   onDataViewChange() {
-    
+
   }
 
   onResize(event) {
-    this.contentHeight = event.target.innerHeight-165;
+    this.contentHeight = event.target.innerHeight - 165;
   }
 }

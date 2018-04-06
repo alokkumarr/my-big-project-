@@ -174,4 +174,24 @@ public class DataExportControllerTest {
 		return analysisMetaData;
 	}
 
+	@Test
+	public void testListAnalysis() {
+		try {
+			stubFor(post(urlEqualTo("/auth/validateToken")).withHeader("Content-Type", WireMock.equalTo("application/json"))
+                    .withRequestBody(WireMock.equalTo(""))
+                    .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody("{'jobGroup': 'TESTJOBGROUP'}")));
+			HttpHeaders requestHeaders = new HttpHeaders();
+			requestHeaders.set("host", "localhost");
+			requestHeaders.set("authorization", "localhost");
+			MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post("/exports/listFTP")
+                    .headers(requestHeaders)
+                    .contentType(MediaType.APPLICATION_JSON);
+			mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().isOk())
+					.andExpect(MockMvcResultMatchers.content().string("{\"ftp\":[]}"))
+					.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+					.andDo(MockMvcResultHandlers.print());
+		} catch (Exception e) {
+			// exception occurred
+		}
+	}
 }

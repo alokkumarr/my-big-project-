@@ -8,16 +8,11 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
-import * as isEmpty from 'lodash/isEmpty';
-import * as forEach from 'lodash/forEach';
-import * as first from 'lodash/first';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 
 import {
-  ArtifactColumns,
-  ArtifactColumn,
   Filter,
   Artifact
 } from '../../types';

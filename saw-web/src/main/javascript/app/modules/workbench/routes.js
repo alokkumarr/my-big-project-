@@ -1,5 +1,6 @@
 import {WorkbenchPageComponent} from './components/workbench-page/workbench-page.component';
 import {DatasetsComponent} from './components/datasets-view/datasets-page.component';
+import {CreateDatasetsComponent} from './components/create-datasets/create-datasets.component';
 
 export function routesConfig($stateProvider) {
   'ngInject';
@@ -13,6 +14,10 @@ export function routesConfig($stateProvider) {
       name: 'workbench.datasets',
       url: '/datasets',
       component: DatasetsComponent
+    }, {
+      name: 'workbench.add',
+      url: '/add',
+      component: CreateDatasetsComponent
     }
   ];
 

@@ -10,7 +10,7 @@ import * as find from 'lodash/find';
 import {
   Analysis
 } from '../types';
-import {Events, PRIVILEGES} from '../../../consts';
+import {PRIVILEGES} from '../../../consts';
 import { DesignerService } from '../designer.service';
 
 const template = require('./designer-save.component.html');

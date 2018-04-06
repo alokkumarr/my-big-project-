@@ -192,6 +192,10 @@ export class AnalyzeService {
     return this._$http.post(`${this.url}/scheduler/jobs`, model);
   }
 
+  getlistFTP(custCode) {
+    return this._$http.post(`${this.url}/exports/listFTP`, custCode);
+  }
+
   deleteAnalysis(model) {
     if (!this._JwtService.hasPrivilege('DELETE', {
       subCategoryId: model.categoryId,
