@@ -66,7 +66,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
      * @param ngctx
      */
     public AsynchAbstractComponent(NGContext ngctx, ComponentServices[] cs){
-        if (ngctx == null)
+            if (ngctx == null)
             throw new IllegalArgumentException("NGContext must not be null");
 
         this.ngctx = ngctx;
