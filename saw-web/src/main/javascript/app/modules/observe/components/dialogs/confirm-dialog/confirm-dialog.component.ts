@@ -11,14 +11,14 @@ const template = require('./confirm-dialog.component.html');
 })
 
 export class ConfirmDialogComponent implements OnInit {
-  private title = '';
-  private message = 'Are you sure you want to proceed';
-  private actionButton = 'Proceed';
-  private actionColor = 'primary';
+  private title = ''; // tslint:disable-line
+  private message = 'Are you sure you want to proceed'; // tslint:disable-line
+  private actionButton = 'Proceed'; // tslint:disable-line
+  private actionColor = 'primary'; // tslint:disable-line
 
   constructor(
     private dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private params: any
+    @Inject(MAT_DIALOG_DATA) private params: any // tslint:disable-line
   ) {
     if (get(params, 'message')) {
       this.message = params.message;

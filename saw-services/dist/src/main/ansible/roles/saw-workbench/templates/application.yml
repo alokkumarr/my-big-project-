@@ -7,6 +7,9 @@ spring:
     multipart:
       max-request-size: 25MB
       max-file-size: 25MB
+logging:
+  level:
+    com.synchronoss.saw.workbench: INFO
 server:
   address: localhost
   port: 9701
@@ -20,8 +23,6 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
-logging:
-  config: /opt/bda/saw-workbench-service/conf/logback.xml
 workbench:
         project-key: "{{ saw_workbench_project_key | default('workbench') }}"
         project-path: "{{ saw_workbench_project_path | default('/raw') }}"

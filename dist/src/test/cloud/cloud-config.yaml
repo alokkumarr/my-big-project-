@@ -1,5 +1,14 @@
 #cloud-config
 bootcmd:
+  # To limit costs, by default shut down after a couple of hours
+  # (typical working session).  Only stop the instance, but do not
+  # terminate it.  This preserves the instance storage which has a
+  # certain cost, but on the other hand saves the container image
+  # cache which makes subsequent deployment cycles faster.  Note:
+  # Schedule the shutdown in "bootcmd", instead of "runcmd", to ensure
+  # it is run on every instance start and not just after initial
+  # provisioning.
+  - shutdown +240
   # Workaround: If epel-release installed in same command, not yet
   # available, so do it as separate command earlier
   - yum -q -y install epel-release
@@ -15,9 +24,3 @@ write_files:
       aws_url=http://169.254.169.254/latest/meta-data/public-hostname
       public_hostname=$(curl -sS $aws_url)
       echo "http://$public_hostname/"
-runcmd:
-  # To limit costs, shut down after certain period (typical working
-  # session).  Only stops the instance, does not terminate it.  Leaves
-  # storage costs, but on the other hand preserves container image
-  # cache.
-  - shutdown +180

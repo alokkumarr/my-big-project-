@@ -1,10 +1,7 @@
-declare function require(string): string;
 
-import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { MatDialog } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
@@ -22,9 +19,7 @@ require('./datasets-grid-page.component.scss');
 export class DatasetsGridPageComponent implements OnInit {
   @Input() searchTerm: string;
   @Input() updater: BehaviorSubject<any>;
-  private gridListInstance: any;
   private gridConfig: Array<any>;
-  private gridData: Array<any>;
   private updaterSubscribtion: any;
 
   constructor(
@@ -60,7 +55,6 @@ export class DatasetsGridPageComponent implements OnInit {
     const columns = [{
       caption: 'Data Set Name',
       dataField: 'system.name',
-      allowSorting: true,
       alignment: 'left',
       width: '35%',
       cellTemplate: 'nameCellTemplate',
@@ -90,13 +84,12 @@ export class DatasetsGridPageComponent implements OnInit {
     }, {
       dataField: 'asOfNow.finished',
       caption: 'Last Updated',
-      sortOrder: 'desc',
       cellTemplate: 'timecreatedCellTemplate',
       width: '12%',
       dataType: 'date',
       alignment: 'right'
     }, {
-      dataField: 'system.type',
+      dataField: 'system.format',
       caption: 'Source',
       cellTemplate: 'dsTypeTemplate',
       width: '7%',
@@ -117,7 +110,7 @@ export class DatasetsGridPageComponent implements OnInit {
         visible: false
       },
       sorting: {
-        mode: 'none'
+        mode: 'multiple'
       },
       scrolling: {
         showScrollbar: 'always',
@@ -140,6 +133,8 @@ export class DatasetsGridPageComponent implements OnInit {
   reloadDataGrid(data) {
     this.dataGrid.instance.option('dataSource', data);
     this.dataGrid.instance.refresh();
-    this.headerProgress.hide();
+    setTimeout(() => {
+      this.headerProgress.hide();
+    }, 1000);
   }
 }
