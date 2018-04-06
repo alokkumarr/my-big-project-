@@ -1,8 +1,12 @@
 <div class="dataSets-cardView" fxLayout="row wrap" >
   <div fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
-    <mat-card class="datasets-card" >
-      <mat-card-header>
-          <div mat-card-avatar class="src-img {{sets.system.format}}"></div>
+    <mat-card class="datasets-card">
+      <mat-card-header class="{{sets.asOfNow.status}}">
+          <div class="status-icon" matTooltip="{{sets.asOfNow.status}}" [ngSwitch]="sets.asOfNow.status">
+            <mat-icon *ngSwitchCase="'FAILED'" fontIcon="icon-danger"></mat-icon>
+            <img *ngSwitchCase="'SUCCESS'" src="../../../../../../../../../assets/svg/happy.svg" height="24" width="24" />
+            <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
+          </div>
         <a class="dataset-name" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name"></a>
         <dataset-actions [dsMetadata]="sets"></dataset-actions>
       </mat-card-header>
