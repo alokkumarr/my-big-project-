@@ -31,13 +31,16 @@ workbench-page {
     padding: 7px !important;
   }
 
+  .dx-freespace-row {
+    height: 0 !important;
+  }
+
   .mat-tab-label-active {
     color: $primary-blue-b2;
   }
 
   .mat-tab-body-wrapper {
     height: 100%;
-    padding-bottom: 3px;
   }
 
   .mat-tab-label,

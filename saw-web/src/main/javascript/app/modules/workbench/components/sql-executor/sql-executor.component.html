@@ -1,15 +1,17 @@
 <div class="executor-container">
   <div class="title-elem" fxLayout="row" fxLayoutAlign="center center">
     <button mat-button class="bck-btn">
-        <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
+      <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
     </button>
     <div class="action-title">
       <mat-icon fontIcon="icon-query-mode"></mat-icon>
       <span>SQL EXECUTOR </span>
     </div>
-    <div class="btn-padding ds-name" fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+    <div class="ds-name" fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
       <span>Selected Dataset: </span>
-      <span>{{dsMetadata.system.name}}</span>
+      <mat-chip-list>
+        <mat-chip>{{dsMetadata.system.name}}</mat-chip>
+      </mat-chip-list>
     </div>
     <div fxLayout="row" fxLayoutGap="20px" fxFlexAlign="end center">
       <!-- <div class="btn-icon">
@@ -38,17 +40,24 @@
       </div>
     </div>
   </div>
-  <mat-divider></mat-divider>
   <div class="exec-body">
     <split direction="vertical">
       <split-area class="script-pane" [size]="scriptHeight">
         <split direction="horizontal">
-          <split-area size="100">
+          <split-area size="75">
             <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)" (onCreate)="getQuery($event)">
             </sql-script>
           </split-area>
-          <!-- <split-area size="25">
-            <mat-list>
+          <split-area size="25" class="fields-pane">
+            <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'99%'" [width]="'100%'"
+              [showBorders]="false">
+              <dxi-column caption="Field Name" dataField="name"></dxi-column>
+              <dxi-column caption="Data Type" dataField="type"></dxi-column>
+              <dxo-scrolling mode="infinite"></dxo-scrolling>
+              <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+              <dxo-header-filter [visible]="true"></dxo-header-filter>
+            </dx-data-grid>
+            <!-- <mat-list>
               <div fxLayout="row" fxLayoutAlign="start start">
                 <h3 mat-subheader fxFlex fxLayout="row" fxLayoutAlign="start start">
                   <mat-icon fontIcon="icon-clipboard"></mat-icon>
@@ -62,8 +71,8 @@
                 </div>
                 <mat-divider></mat-divider>
               </mat-list-item>
-            </mat-list>
-          </split-area> -->
+            </mat-list> -->
+          </split-area>
         </split>
       </split-area>
       <split-area class="preview-pane" [size]="previewHeight">

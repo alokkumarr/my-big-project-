@@ -1,10 +1,11 @@
 
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { UIRouter } from '@uirouter/angular';
 
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../services/workbench.service';
+import { DxDataGridComponent } from 'devextreme-angular';
 
 import * as isUndefined from 'lodash/isUndefined';
 
@@ -23,7 +24,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   private timerSubscription;
   private poll: boolean;
   private interval = 5000;
-  private previewData: Array<any>;
+  private previewData: Array<any> = [];
   private previewStatus: string = 'queued';
 
   constructor(
@@ -32,13 +33,15 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
     private workBench: WorkbenchService
   ) { }
 
+  @ViewChild('dpGrid') dataGrid: DxDataGridComponent;
+
   ngOnInit() {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
     this.triggerPreview();
   }
 
   ngOnDestroy() {
-    if (this.poll) {
+    if (!isUndefined(this.timerSubscription) && !this.timerSubscription.isStopped) {
       this.stopPolling();
     }
     this.workBench.removeDataFromLS('dsMetadata');
@@ -62,6 +65,9 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
       this.previewStatus = data.status;
       if (this.previewStatus === 'success') {
         this.previewData = data.rows;
+        setTimeout(() => {
+          this.dataGrid.instance.refresh();
+        });
         this.stopPolling();
       } else if (this.previewStatus === 'failed') {
         this.stopPolling();
@@ -85,5 +91,11 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   stopPolling() {
     this.timerSubscription.unsubscribe();
     this.poll = false;
+  }
+
+  tabChanged = (event): void => {
+    if (event.index === 1 && this.previewStatus === 'success') {
+      this.dataGrid.instance.refresh();
+    }
   }
 }

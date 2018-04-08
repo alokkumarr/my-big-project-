@@ -24,7 +24,9 @@ export class DatasetActionsComponent implements OnInit {
   ngOnInit() { }
 
   openSQLEditor(): void {
-    this.workBench.setDataToLS('dsMetadata', this.dsMetadata);
-    this.router.stateService.go('workbench.sql');
+    if (this.dsMetadata.asOfNow.status === 'SUCCESS') {
+      this.workBench.setDataToLS('dsMetadata', this.dsMetadata);
+      this.router.stateService.go('workbench.sql');
+    }
   }
 }

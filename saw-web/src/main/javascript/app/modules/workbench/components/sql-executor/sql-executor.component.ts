@@ -21,14 +21,14 @@ require('./sql-executor.component.scss');
   template
 })
 export class SqlExecutorComponent implements OnInit, OnDestroy {
-  private artifacts: any;
+  private artifacts = [];
   private gridConfig: Array<any>;
   private gridData = new BehaviorSubject([]);
   private dsMetadata: any;
   private datasetDetails: Array<any>;
   private appliedActions: Array<any> = SQL_AQCTIONS;
-  private scriptHeight: number = 75;
-  private previewHeight: number = 25;
+  private scriptHeight: number = 98;
+  private previewHeight: number = 2;
   private query: string = '';
 
   constructor(
@@ -50,9 +50,18 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
 
   getPageData(): void {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
-    this.workBench.getDatasetDetails('this.datasetID').subscribe(data => {
-      this.artifacts = data.artifacts;
-    });
+    this.constructArtifactForEditor();
+    // this.workBench.getDatasetDetails('this.datasetID').subscribe(data => {
+    //   this.artifacts = data.artifacts;
+    // });
+  }
+
+  constructArtifactForEditor() {
+    const table = {
+      artifactName: this.dsMetadata.system.name,
+      columns : this.dsMetadata.schema.fields
+    }
+    this.artifacts.push(table);
   }
 
   runScript(): void {

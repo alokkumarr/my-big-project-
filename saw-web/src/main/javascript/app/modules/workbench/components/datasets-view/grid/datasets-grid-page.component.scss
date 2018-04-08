@@ -37,4 +37,16 @@ datasets-grid-page {
     overflow: hidden;
     display: block;
   }
+
+  .FAILED {
+    border-left: 3px solid $primary-red;
+  }
+
+  .SUCCESS {
+    border-left: 3px solid $primary-green;
+  }
+
+  .INIT {
+    border-left: 3px solid $primary-orange;
+  }
 }

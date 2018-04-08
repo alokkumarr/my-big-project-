@@ -2,8 +2,10 @@
 
 dataset-detail-view {
   width: 100%;
-  padding: 0 3px 3px;
+  height: calc(100% - 3px);
   background-color: $background-color;
+  padding: 0 3px 3px;
+  overflow: auto;
 
   mat-tab-group {
     max-width: 100%;
@@ -24,12 +26,21 @@ dataset-detail-view {
     border: 2px solid white;
 
     .mat-icon {
-      font-size: 20px;
+      font-size: 26px;
     }
 
     .mat-chip {
       color: rgba(0, 0, 0, 0.54);
       font-size: 16px;
+    }
+
+    .status-icon {
+      width: 36px;
+
+      .mat-icon {
+        font-size: 24px;
+        vertical-align: middle;
+      }
     }
   }
 
@@ -72,10 +83,34 @@ dataset-detail-view {
     .prop-value {
       color: #555;
     }
+
+    .status_INIT {
+      color: $primary-orange;
+    }
+
+    .status_SUCCESS {
+      color: $primary-green;
+    }
+
+    .status_FAILED {
+      color: $primary-red;
+    }
   }
 
   .details-grid {
     padding: 3px;
+  }
+
+  .data-cont {
+    height: 100%;
+
+    .data-grid {
+      padding: 3px;
+      height: 100%;
+      width: 100%;
+      overflow: auto;
+      max-height: 100%;
+    }
   }
 
   .loading {
@@ -91,8 +126,8 @@ dataset-detail-view {
     }
 
     .load-gif {
-      height: 100%;
-      width: 100%;
+      height: 70%;
+      width: 70%;
       background-image: url('../../../../../../../../assets/img/loading-run.gif');
       background-size: contain;
       background-repeat: no-repeat;

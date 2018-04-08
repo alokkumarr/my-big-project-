@@ -28,7 +28,6 @@ require('./sql-script.component.scss');
   template
 })
 export class SqlScriptComponent implements OnDestroy, AfterViewInit {
-  @Input() model: any;
   @Output() onExecute = new EventEmitter<any>();
   @Output() onCreate = new EventEmitter<any>();
 

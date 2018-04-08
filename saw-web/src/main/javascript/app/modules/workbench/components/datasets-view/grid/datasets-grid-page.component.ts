@@ -91,9 +91,8 @@ export class DatasetsGridPageComponent implements OnInit {
       dataType: 'date',
       alignment: 'right'
     }, {
-      dataField: 'system.format',
-      caption: 'Source',
-      cellTemplate: 'dsTypeTemplate',
+      dataField: 'asOfNow.status',
+      caption: 'Status',
       width: '7%',
       alignment: 'center'
     }, {

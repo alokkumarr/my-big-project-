@@ -8,10 +8,16 @@
       <mat-chip-list>
         <mat-chip>{{dsMetadata.system.name}}</mat-chip>
       </mat-chip-list>
+      <div class="status-icon" matTooltip="{{dsMetadata.asOfNow.status}}" [ngSwitch]="dsMetadata.asOfNow.status">
+        <mat-icon *ngSwitchCase="'FAILED'" style="color: #AB0E27;" fontIcon="icon-warning"></mat-icon>
+        <mat-icon *ngSwitchCase="'SUCCESS'" style="color: #73B421;" fontIcon="icon-exchange"></mat-icon>
+        <!-- <img *ngSwitchCase="'SUCCESS'" src="../../../../../../../../../assets/svg/happy.svg" height="24" width="24" /> -->
+        <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
+      </div>
     </div>
   </div>
   <div class="details-body">
-    <mat-tab-group dynamicHeight="false">
+    <mat-tab-group dynamicHeight="false" (selectedTabChange)="tabChanged($event)">
       <mat-tab label="Summary">
         <div fxLayout="row" fxFill fxFlex fxLayoutGap="10px">
           <mat-card class="details-card" fxLayout="column" fxFlex="60">
@@ -25,6 +31,10 @@
               <div class="details-content" fxLayout="row">
                 <span class="prop-name">Dataset Description :</span>
                 <span class="prop-value">{{dsMetadata.system.description}}</span>
+              </div>
+              <div class="details-content" fxLayout="row">
+                <span class="prop-name">Execution Status :</span>
+                <span class="prop-value status_{{dsMetadata.asOfNow.status}}">{{dsMetadata.asOfNow.status}}</span>
               </div>
               <div class="details-content" fxLayout="row">
                 <span class="prop-name">Format :</span>
@@ -54,23 +64,34 @@
             </div>
           </mat-card>
           <mat-card class="details-card details-grid" fxFlex="40">
-            <dx-data-grid fxFlex [dataSource]="dsMetadata.schema" [rowAlternationEnabled]="true" [showBorders]="false" [columns]="['Field Name', 'Data Type']">
-              <dxo-filter-row [visible]="showFilterRow" [applyFilter]="currentFilter"></dxo-filter-row>
-              <dxo-header-filter [visible]="showHeaderFilter"></dxo-header-filter>
-            </dx-data-grid>
+            <div fxFill>
+              <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'98%'" [width]="'100%'"
+                [showBorders]="false">
+                <dxi-column caption="Field Name" dataField="name"></dxi-column>
+                <dxi-column caption="Data Type" dataField="type"></dxi-column>
+                <dxo-scrolling mode="infinite"></dxo-scrolling>
+                <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                <dxo-header-filter [visible]="true"></dxo-header-filter>
+              </dx-data-grid>
+            </div>
           </mat-card>
-
         </div>
       </mat-tab>
       <mat-tab label="Data Preview">
-        <dx-data-grid *ngIf="previewStatus === 'success'" fxFlex fxFill [dataSource]="previewData" [allowColumnResizing]="true" [columnAutoWidth]="true" [rowAlternationEnabled]="true" [showBorders]="false">
-          <dxo-scrolling mode="infinite"></dxo-scrolling>
-          <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
-          <dxo-header-filter [visible]="true"></dxo-header-filter>
-        </dx-data-grid>
-        <div class="loading" fxLayout="column" fxLayoutAlign="center center" *ngIf="previewStatus === 'queued'">
-          <span class="load-gif">Generating Preview... </span>
-          <div ></div>
+        <div fxLayout="row" class="data-cont" fxFlex fxLayoutAlign="center center">
+          <mat-card class="data-grid" fxFlex="100">
+            <dx-data-grid #dpGrid id="dpGrid" *ngIf="previewStatus === 'success'" fxFlex [dataSource]="previewData" [height]="'100%'" [width]="'100%'" [allowColumnResizing]="true" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
+              [columnAutoWidth]="true" [rowAlternationEnabled]="true" [showBorders]="false">
+              <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+              <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+              <dxo-header-filter [visible]="true"></dxo-header-filter>
+              <dxo-load-panel [enabled]="false">
+              </dxo-load-panel>
+            </dx-data-grid>
+            <div class="loading" fxLayout="column" fxLayoutAlign="center center" *ngIf="previewStatus === 'queued'">
+              <span class="load-gif">Generating Preview... </span>
+            </div>
+          </mat-card>
         </div>
       </mat-tab>
     </mat-tab-group>
