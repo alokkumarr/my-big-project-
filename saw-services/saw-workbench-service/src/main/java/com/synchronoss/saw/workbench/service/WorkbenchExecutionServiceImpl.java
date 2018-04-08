@@ -139,9 +139,15 @@ public class WorkbenchExecutionServiceImpl
         DataSetStore dss = new DataSetStore(metastoreBase);
         String json = dss.readDataSet(project, name);
         log.debug("Dataset metadata: {}", json);
+        if (json == null) {
+            throw new RuntimeException("Dataset not found: " + name);
+        }
         JsonNode dataset = mapper.readTree(json);
-        String location = dataset.path("system")
-            .path("physicalLocation").asText();
+        String status = dataset.path("asOfNow").path("status").asText();
+        if (status == null || !status.equals("SUCCESS")) {
+            throw new RuntimeException("Unhandled dataset status: " + status);
+        }
+        String location = getDatasetLocation(project, name);
         /* Submit job to Livy for reading out preview data */
         WorkbenchClient client = getWorkbenchClient();
         String id = UUID.randomUUID().toString();
@@ -153,6 +159,10 @@ public class WorkbenchExecutionServiceImpl
         ObjectNode root = mapper.createObjectNode();
         root.put("id", id);
         return root;
+    }
+
+    private String getDatasetLocation(String project, String name) {
+        return root + "/" + project + "/dl/fs/data/" + name + "/data";
     }
 
     @Override
