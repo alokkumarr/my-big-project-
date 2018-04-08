@@ -27,8 +27,8 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
   private dsMetadata: any;
   private datasetDetails: Array<any>;
   private appliedActions: Array<any> = SQL_AQCTIONS;
-  private scriptHeight: number = 98;
-  private previewHeight: number = 2;
+  private scriptHeight: number = 100;
+  private previewHeight: number = 0;
   private query: string = '';
 
   constructor(

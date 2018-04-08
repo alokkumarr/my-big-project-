@@ -65,7 +65,7 @@
           </mat-card>
           <mat-card class="details-card details-grid" fxFlex="40">
             <div fxFill>
-              <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'98%'" [width]="'100%'"
+              <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'98%'" [width]="'100%'" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
                 [showBorders]="false">
                 <dxi-column caption="Field Name" dataField="name"></dxi-column>
                 <dxi-column caption="Data Type" dataField="type"></dxi-column>

@@ -56,7 +56,7 @@
 
     <!-- LIST VIEW -->
 
-    <div class="grid-view" *ngSwitchCase="'list'">
+    <div class="grid-view" *ngSwitchCase="'list'" [style.height.px]="contentHeight - 6">
       <datasets-grid-page [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-grid-page>
     </div>
 

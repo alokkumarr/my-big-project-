@@ -1,4 +1,4 @@
-<div class="grid-container">
+<div class="grid-container" fxFill>
   <dx-data-grid id="gridContainer">
     <div *dxTemplate="let data of 'nameCellTemplate'">
       <a (click)="viewDetails(data.data)" [innerHTML]="data.value"></a>
