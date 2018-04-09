@@ -9,6 +9,7 @@ import org.json4s.native.JsonMethods.{compact, parse, render}
 import play.mvc.Result
 import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
+import sncr.saw.common.config.SAWServiceConfig
 
 class KPIBuilder extends BaseController {
 
@@ -35,8 +36,10 @@ class KPIBuilder extends BaseController {
         }
         case "execute" => {
           val jsonString: String = compact(render(json));
+          val timeOut :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("timeout"))
+            new Integer(SAWServiceConfig.es_conf.getInt("timeout")) else new java.lang.Integer(3)
           val executionObject : KPIExecutionObject = new KPIDataQueryBuilder(jsonString).buildQuery();
-          val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject)
+          val data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(executionObject,timeOut)
           val responseJson = parse(data)
           responseJson
         }

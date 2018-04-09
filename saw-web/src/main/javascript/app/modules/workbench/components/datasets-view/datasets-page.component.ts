@@ -8,7 +8,6 @@ import { TimerObservable } from 'rxjs/observable/TimerObservable';
 import * as map from 'lodash/map';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
-import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { CreateDatasetsComponent } from '../create-datasets/create-datasets.component';
@@ -31,8 +30,8 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
-  private dataView: string = 'sets';
-  private contentHeight: number;
+  private dataView: string = 'sets'; // tslint:disable-line
+  private contentHeight: number; // tslint:disable-line
   private poll = true;
   private interval = 10000;
 
@@ -40,7 +39,6 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     private router: UIRouter,
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
-    private dataGrid: dxDataGridService,
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private datePipe: DatePipe
@@ -50,7 +48,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
 
    /**
     * Calls list datasets api onInit and every 10 seconds or whatever set interval
-    * 
+    *
     * @memberof DatasetsComponent
     */
     TimerObservable.create(0, this.interval)

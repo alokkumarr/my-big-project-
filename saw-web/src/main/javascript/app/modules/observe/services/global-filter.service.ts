@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as has from 'lodash/has';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as findIndex from 'lodash/findIndex';

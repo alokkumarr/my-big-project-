@@ -1,22 +1,15 @@
 declare const require: any;
 import {
   Component,
-  Input,
-  Output,
-  EventEmitter
+  Input
 } from '@angular/core';
 import {Subject} from 'rxjs/Subject';
 
 import {
-  ArtifactColumns,
-  ArtifactColumnPivot
+  ArtifactColumns
 } from '../types';
 import { DesignerStates } from '../container';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
-import {
-  DATE_TYPES,
-  DATE_INTERVALS_OBJ
-} from '../../../consts';
 
 const template = require('./designer-pivot.component.html');
 require('./designer-pivot.component.scss');

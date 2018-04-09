@@ -1,5 +1,5 @@
 
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
@@ -16,8 +16,8 @@ require('./dateformat-dialog.component.scss');
 
 export class DateformatDialogComponent {
   form: FormGroup;
-  private placeholder = '';
-  private formatArr = '';
+  private placeholder = ''; // tslint:disable-line
+  private formatArr = ''; // tslint:disable-line
 
   constructor(
     private formBuilder: FormBuilder,

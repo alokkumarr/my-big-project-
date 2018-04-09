@@ -59,7 +59,6 @@ export function applyCommasIfNeeded(format, numberString) {
 
 export function applyCurrencyIfNeeded(format, numberString) {
   const {
-    type,
     currency,
     currencySymbol
   } = format;
