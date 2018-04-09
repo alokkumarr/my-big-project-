@@ -168,6 +168,7 @@ export class ReportGridComponent {
       };
       this.allowColumnReordering = false;
 
+      // paging is used in situations where the grid is not editable
       this.loadPanel = {
         onShowing: this.onLoadPanelShowing,
         position: {
