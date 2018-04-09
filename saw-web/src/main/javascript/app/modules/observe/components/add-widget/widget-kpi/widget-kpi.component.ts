@@ -27,7 +27,8 @@ import {
   DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS_OBJ,
-  DATE_PRESETS
+  DATE_PRESETS,
+  KPI_AGGREGATIONS
 } from '../../../consts';
 
 const template = require('./widget-kpi.component.html');
@@ -45,7 +46,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
   dateFilters = DATE_PRESETS;
   showDateFields = false;
-  aggregations = [{ name: 'Sum', value: 'sum' }];
+  aggregations = KPI_AGGREGATIONS;
 
   kpiForm: FormGroup;
   datePresetSubscription: Subscription;

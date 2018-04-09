@@ -75,3 +75,10 @@ export const DATE_PRESETS_OBJ = fpPipe(
 export const DATE_FORMAT = {
   YYYY_MM_DD: 'YYYY-MM-DD'
 };
+
+export const KPI_AGGREGATIONS = [
+  { name: 'Sum', value: 'sum' },
+  { name: 'Average', value: 'avg' },
+  { name: 'Minimum', value: 'min' },
+  { name: 'Maximum', value: 'max' }
+];
