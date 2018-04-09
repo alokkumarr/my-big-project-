@@ -64,7 +64,7 @@ public class WorkbenchClient {
         public void onJobFailed(
             JobHandle<Integer> job, Throwable cause) {
             client.stop(true);
-            log.info("Workbench job failed");
+            log.error("Workbench job failed", cause);
         }
 
         @Override
