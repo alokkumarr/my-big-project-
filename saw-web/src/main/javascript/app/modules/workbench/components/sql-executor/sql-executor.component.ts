@@ -7,6 +7,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
 import * as get from 'lodash/get';
+import * as endsWith from 'lodash/endsWith';
+
 import { SQL_AQCTIONS } from '../../sample-data';
 
 import { SqlScriptComponent } from './query/sql-script.component';
@@ -36,7 +38,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private workBench: WorkbenchService,
     private notify: ToastService
-  ) {}
+  ) { }
 
   @ViewChild('sqlscript') private scriptComponent: SqlScriptComponent;
 
@@ -59,7 +61,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
   constructArtifactForEditor() {
     const table = {
       artifactName: this.dsMetadata.system.name,
-      columns : this.dsMetadata.schema.fields
+      columns: this.dsMetadata.schema.fields
     }
     this.artifacts.push(table);
   }
@@ -99,13 +101,26 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     this.scriptHeight = fullScreenPreview ? 0 : 40;
   }
 
+
+  /**
+   * Constructs the payload for SQL executor component. 
+   * 
+   * @param {any} data 
+   * @memberof SqlExecutorComponent
+   */
   triggerSQL(data) {
+    /**
+     * Temporary workaround to construct user friendly SQL script. 
+     * Will be handled in BE in upcoming release  
+     */
+    const appendedScript = `CREATE TABLE AS ${data.name} AS ${this.query}`;
+    const script = endsWith(appendedScript, ';') === true ? `${appendedScript}` : `${appendedScript};`
     const payload = {
       'name': data.name,
       'input': this.dsMetadata.system.name,
       'component': 'sql',
       'configuration': {
-        'script': this.query
+        'script': script
       }
     }
     this.workBench.triggerParser(payload).subscribe(data => {

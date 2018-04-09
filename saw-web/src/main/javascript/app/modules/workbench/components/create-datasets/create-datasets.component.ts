@@ -40,7 +40,7 @@ export class CreateDatasetsComponent implements OnInit {
   private parserConf: any; // tslint:disable-line
   public nameFormGroup: FormGroup;
   private selectedIndex: number = 0;
-  private folNamePattern = '[A-Za-z0-9-_/]+';
+  private folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
     private router: UIRouter,

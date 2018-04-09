@@ -16,7 +16,7 @@ require('./createfolder-dialog.component.scss');
 
 export class CreatefolderDialogComponent {
   form: FormGroup;
-  folNamePattern = '[A-Za-z0-9-_]+';
+  folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
     private formBuilder: FormBuilder,

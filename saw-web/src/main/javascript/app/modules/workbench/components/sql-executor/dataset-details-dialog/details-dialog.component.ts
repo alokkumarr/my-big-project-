@@ -15,7 +15,7 @@ require('./details-dialog.component.scss');
 
 export class DetailsDialogComponent {
   form: FormGroup;
-  private folNamePattern = '[A-Za-z0-9-_/]+';
+  private folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
     private formBuilder: FormBuilder,

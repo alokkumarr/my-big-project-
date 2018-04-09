@@ -69,7 +69,7 @@
                 [showBorders]="false">
                 <dxi-column caption="Field Name" dataField="name"></dxi-column>
                 <dxi-column caption="Data Type" dataField="type"></dxi-column>
-                <dxo-scrolling mode="infinite"></dxo-scrolling>
+                <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
                 <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
                 <dxo-header-filter [visible]="true"></dxo-header-filter>
               </dx-data-grid>
