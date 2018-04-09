@@ -4,13 +4,16 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import sncr.bda.core.file.HFileOperations;
+
 
 
 @Service
@@ -30,22 +33,35 @@ public class WorkbenchExecutionServiceImpl
     @NotNull
     private String livyUri;
 
+    /**
+     * Execute a transformation component on a dataset to create a new
+     * dataset
+     */
     @Override
-    public String execute(String name, String component, String config)
+    public ObjectNode execute(
+        String project, String name, String component, String config)
         throws Exception {
-        log.info("Workbench is about execute job");
-        WorkbenchClient client =
-            new WorkbenchClient(component, root, project, config);
+
+        log.info("Execute dataset transformation");
+        WorkbenchClient client = new WorkbenchClient();
+        XDFContextProvider ngCtx =
+            new XDFContextProvider(root, project, component, config);
+        /* createDatasetDirectory(name); */
+        WorkbenchExecuteJob  workbenchExecuteJob =
+            new WorkbenchExecuteJob(ngCtx.getNGContext());
+        List<String> ids = ngCtx.getDataSetIDs();
+
+//        ArrayNode nodes = mapper.createArrayNode();
+//        ids.forEach(id -> nodes.add(id));
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode responseRoot = mapper.createObjectNode();
+        responseRoot.put("id", ids.get(0));
+
+        client.submit(livyUri, workbenchExecuteJob);
+
+        return responseRoot;
         //createDatasetDirectory(name);
-        List<String> ids = client.getDataSetIDs();
-        client.submit(livyUri);
-        StringBuilder s = new StringBuilder();
-        ids.forEach(id -> s.append((s.length() == 0) ? "[\"" : ",\"")
-                            .append(id)
-                            .append("\"")
-        );
-        s.append("]");
-        return s.toString();
     }
 
     private void createDatasetDirectory(String name) throws Exception {

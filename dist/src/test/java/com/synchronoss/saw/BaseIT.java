@@ -29,6 +29,7 @@ public class BaseIT {
         new JUnitRestDocumentation();
 
     protected RequestSpecification spec;
+    protected RequestSpecification authSpec;
     protected ObjectMapper mapper;
     protected String token;
 
@@ -44,11 +45,15 @@ public class BaseIT {
 
     @Before
     public void setUp() throws JsonProcessingException {
-        spec = new RequestSpecBuilder()
-            .addFilter(documentationConfiguration(restDocumentation)).build();
         mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        spec = new RequestSpecBuilder()
+            .addFilter(documentationConfiguration(restDocumentation))
+            .build();
         token = authenticate();
+        authSpec = new RequestSpecBuilder()
+            .addFilter(documentationConfiguration(restDocumentation))
+            .build().header("Authorization", "Bearer " + token);
     }
 
     private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
