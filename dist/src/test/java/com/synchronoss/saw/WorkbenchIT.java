@@ -255,6 +255,14 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     }
 
     @Test
+    public void testListPreregDatasets() throws IOException {
+        // id = parseDataset("test_list")
+        String id = parseDataset2();
+        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
+        log.info("ID: " + id);
+    }
+
+    @Test
     public void testParseDataset() throws JsonProcessingException {
         String name = "test_parse";
         parseDataset(name);
@@ -264,11 +272,5 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         waitForDataset(id);
     }
 
-    @Test
-    public void testListPreregDatasets() throws IOException {
-    // id = parseDataset("test_list")
-        String id = parseDataset2();
-        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
-        log.info("ID: " + id);
-    }
+
 }
