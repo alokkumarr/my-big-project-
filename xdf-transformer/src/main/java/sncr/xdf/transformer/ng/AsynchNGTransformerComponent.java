@@ -15,7 +15,10 @@ import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.NGContext;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
-import sncr.xdf.transformer.RequiredNamedParameters;
+import sncr.xdf.services.NGContextServices;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
+import sncr.xdf.context.RequiredNamedParameters;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -235,49 +238,6 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
         return super.move();
     }
 
-    protected ComponentConfiguration validateConfig(String config) throws Exception {
-        return AsynchNGTransformerComponent.analyzeAndValidate(config);
-    }
-
-    public static ComponentConfiguration analyzeAndValidate(String cfgAsStr) throws Exception {
-
-        ComponentConfiguration compConf = AsynchAbstractComponent.analyzeAndValidate(cfgAsStr);
-        Transformer transformerCfg = compConf.getTransformer();
-        if (transformerCfg == null)
-            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "transformer");
-
-        if (transformerCfg.getScript() == null || transformerCfg.getScript().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script name.");
-        }
-        if (transformerCfg.getScriptLocation() == null || transformerCfg.getScriptLocation().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script location.");
-        }
-
-        boolean valid = false;
-        for( Input inpK: compConf.getInputs()){
-            if (inpK.getName() != null && inpK.getName().equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
-                valid = true; break;
-            }
-        }
-
-        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
-
-        valid = false;
-        boolean rvalid = false;
-        for( Output outK: compConf.getOutputs()) {
-            if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())) {
-                valid = true;
-            } else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
-                rvalid = true;
-            }
-        }
-        if (!valid || !rvalid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejecteds' does not exist .");
-
-        return compConf;
-    }
-
-
-
     public static void main(String[] args) {
 
         NGContextServices ngCtxSvc;
@@ -315,7 +275,7 @@ public class AsynchNGTransformerComponent extends AsynchAbstractComponent implem
                     ComponentServices.TransformationMetadata,
                     ComponentServices.Spark
                 };
-            ComponentConfiguration cfg = AsynchNGTransformerComponent.analyzeAndValidate(configAsStr);
+            ComponentConfiguration cfg = NGContextServices.analyzeAndValidateTransformerConf(configAsStr);
             ngCtxSvc = new NGContextServices(scs, xdfDataRootSys, cfg, appId,
                 "transformer", batchId);
 

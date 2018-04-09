@@ -13,8 +13,7 @@ import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
-import sncr.xdf.ngcomponent.AbstractComponent;
-import sncr.xdf.transformer.RequiredNamedParameters;
+import sncr.xdf.context.RequiredNamedParameters;
 
 import java.util.*;
 

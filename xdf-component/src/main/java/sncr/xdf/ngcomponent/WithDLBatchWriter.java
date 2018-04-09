@@ -11,7 +11,7 @@ import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.context.DSMapKey;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.adapters.writers.*;
 
 

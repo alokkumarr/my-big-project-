@@ -3,9 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>xdf-nextgen</artifactId>
-        <groupId>com.synchronoss.bda</groupId>
-        <version>1.0.3_dev</version>
+     <groupId>com.synchronoss.bda</groupId>
+     <artifactId>xdf-nextgen</artifactId>
+     <version>1.0.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>com.synchronoss.bda</groupId>
-            <artifactId>xdf-component</artifactId>
+            <artifactId>xdf-ext</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

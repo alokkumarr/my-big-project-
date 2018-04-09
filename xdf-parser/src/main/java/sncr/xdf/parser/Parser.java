@@ -21,7 +21,7 @@ import sncr.xdf.adapters.writers.DLBatchWriter;
 import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.parser.spark.ConvertToRow;

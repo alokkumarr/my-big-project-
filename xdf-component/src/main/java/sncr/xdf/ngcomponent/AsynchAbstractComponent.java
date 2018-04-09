@@ -15,10 +15,11 @@ import sncr.bda.services.AuditLogService;
 import sncr.bda.services.DLDataSetService;
 import sncr.bda.services.TransformationService;
 import sncr.xdf.adapters.readers.DLBatchReader;
-import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.context.ComponentServices;
 import sncr.xdf.context.InternalContext;
 import sncr.xdf.context.NGContext;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
      * @param ngctx
      */
     public AsynchAbstractComponent(NGContext ngctx, ComponentServices[] cs){
-        if (ngctx == null)
+            if (ngctx == null)
             throw new IllegalArgumentException("NGContext must not be null");
 
         this.ngctx = ngctx;

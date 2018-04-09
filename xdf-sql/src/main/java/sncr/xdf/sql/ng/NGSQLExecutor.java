@@ -7,9 +7,8 @@ import scala.Tuple4;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.ngcomponent.WithContext;
 import sncr.xdf.ngcomponent.WithDLBatchWriter;
-import sncr.xdf.core.file.DLDataSetOperations;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.ngcomponent.AbstractComponent;
 import sncr.xdf.sql.SQLDescriptor;
 import sncr.xdf.sql.TableDescriptor;
 

@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.synchronoss.bda</groupId>
     <artifactId>xdf-nextgen</artifactId>
-    <version>1.0.3_dev</version>
+    <version>1.0.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>xdf-sql</artifactId>
@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-core</artifactId>
+      <artifactId>xdf-ext</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

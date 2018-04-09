@@ -1,4 +1,4 @@
-package sncr.xdf.core.file;
+package sncr.xdf.file;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;

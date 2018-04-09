@@ -11,6 +11,7 @@ import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.component.*;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.context.RequiredNamedParameters;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
 

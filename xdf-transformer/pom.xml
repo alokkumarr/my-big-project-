@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.synchronoss.bda</groupId>
     <artifactId>xdf-nextgen</artifactId>
-    <version>1.0.3_dev</version>
+    <version>1.0.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>xdf-transformer</artifactId>
@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
-      <artifactId>xdf-core</artifactId>
+      <artifactId>xdf-ext</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -22,11 +22,11 @@
       <artifactId>xdf-component</artifactId>
       <version>${project.version}</version>
     </dependency>
-		<dependency>
-				<groupId>org.codehaus.janino</groupId>
-				<artifactId>janino</artifactId>
-				<version>2.7.5</version>
-		</dependency>		
+    <dependency>
+        <groupId>org.codehaus.janino</groupId>
+        <artifactId>janino</artifactId>
+        <version>2.7.5</version>
+    </dependency>
   </dependencies>
 
 

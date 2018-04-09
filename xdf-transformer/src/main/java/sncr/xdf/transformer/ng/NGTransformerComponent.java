@@ -8,10 +8,11 @@ import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
-import sncr.xdf.component.*;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.ngcomponent.*;
-import sncr.xdf.transformer.RequiredNamedParameters;
+import sncr.xdf.services.WithDataSet;
+import sncr.xdf.services.WithProjectScope;
+import sncr.xdf.context.RequiredNamedParameters;
 
 import java.io.FileNotFoundException;
 import java.util.*;

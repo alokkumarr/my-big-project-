@@ -1,4 +1,4 @@
-package sncr.xdf.ngcomponent;
+package sncr.xdf.services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,6 +46,6 @@ public interface WithProjectScope {
     }
 
     class WithProjectScopeHelper {
-        private static final Logger logger = Logger.getLogger(WithDLBatchWriter.class);
+        private static final Logger logger = Logger.getLogger(WithProjectScope.class);
     }
 }
