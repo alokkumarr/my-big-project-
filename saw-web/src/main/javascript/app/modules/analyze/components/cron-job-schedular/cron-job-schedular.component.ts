@@ -1,6 +1,6 @@
 declare const require: any;
 
-import { Component, Inject, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';

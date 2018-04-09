@@ -33,8 +33,9 @@ export class DndSortableDirective {
       this._data = data;
     }
   }
-
+  // tslint:disable
   @HostBinding(`class.${dndClasses.draggedSortingOldPlace}`) private _isDragged = false;
+  // tslint:enable
 
   private _data: any = null;
   // counter for the enter and leave events of the containers children that bubble up

@@ -41,7 +41,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor') editor: AceEditorComponent;
 
   private _artifacts: Array<any>;
-  private editorOptions = {
+  private editorOptions = { // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
