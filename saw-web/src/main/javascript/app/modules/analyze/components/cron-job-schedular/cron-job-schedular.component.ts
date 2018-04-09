@@ -40,7 +40,9 @@ export class CronJobSchedularComponent {
   	this.specificWeekDayMonth = clone(this.dailyTypeDay);
   	this.specificMonthDayYear = clone(this.dailyTypeDay);
   	this.specificMonthWeekYear = clone(this.dailyTypeDay);
+    this.immediateTime = clone(this.dailyTypeDay);
   	this.model = {};
+    this.immediate = {};
     this.hourly = {};
   	this.daily = {};
   	this.weekly = {};
@@ -108,7 +110,8 @@ export class CronJobSchedularComponent {
       value: 12,
       label:'December'
     }];
-    this.scheduleType = 'daily';
+    this.scheduleType = 'immediate';
+    this.immediate.immediatetype = '';
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
@@ -132,7 +135,10 @@ export class CronJobSchedularComponent {
     this.specificWeekDayMonth = clone(this.dailyTypeDay);
     this.specificMonthDayYear = clone(this.dailyTypeDay);
     this.specificMonthWeekYear = clone(this.dailyTypeDay);
-    this.model = {}
+    this.immediateTime = clone(this.dailyTypeDay);
+    this.model = {};
+    this.hourly = {};
+    this.immediate = {};
     this.daily = {};
     this.weekly = {};
     this.monthly = {};
@@ -148,8 +154,27 @@ export class CronJobSchedularComponent {
     this.regenerateCron(event);
   }
 
+  generateImmediateSchedule(value) {
+    this.scheduleType = 'immediate';
+    this.immediate.immediatetype = 'currenttime';
+    this.regenerateCron('');
+  }
+
   regenerateCron(dateSelects) {
+    console.log(this.scheduleType);
     switch (this.scheduleType) {
+    case 'immediate':
+      console.log("oinisde immediate");
+      console.log(this.immediate);
+      console.log(this.immediate.immediatetype);
+      if (this.immediate.immediatetype === 'currenttime') {
+        console.log('current');
+      }
+      if (this.immediate.immediatetype === 'specfied') {
+        console.log(this.immediateTime);
+        console.log(this.immediateDate);
+      }
+      return;
     case 'hourly':
       //Generating Cron expression for selections made in hourly tab
       this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);

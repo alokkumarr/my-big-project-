@@ -1,9 +1,25 @@
 <div class="tab">
+  <button class="tablinks" (click)="openSchedule(event, 'immediate')" [ngClass]="{'active': scheduleType === 'immediate'}">Immediate</button>
   <button class="tablinks" (click)="openSchedule(event, 'hourly')" [ngClass]="{'active': scheduleType === 'hourly'}">Hourly</button>
   <button class="tablinks" (click)="openSchedule(event, 'daily')" [ngClass]="{'active': scheduleType === 'daily'}">Daily</button>
   <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')" [ngClass]="{'active': scheduleType === 'weeklybasis'}">Weekly</button>
   <button class="tablinks" (click)="openSchedule(event, 'monthly')" [ngClass]="{'active': scheduleType === 'monthly'}">Monthly</button>
   <button class="tablinks" (click)="openSchedule(event, 'yearly')" [ngClass]="{'active': scheduleType === 'yearly'}">Yearly</button>
+</div>
+
+<div *ngIf="scheduleType === 'immediate'" [ngClass]="{'scheduleType': selectedItem === 'immediate'}" class="tabcontent">
+  <mat-radio-group [(ngModel)]="immediate.immediatetype">
+    <mat-radio-button value="currenttime" (click)="generateImmediateSchedule(immediate.immediatetype);">Immediate </mat-radio-button>
+    <br/><br/><br/>
+    <mat-radio-button value="specfied" (click)="resetData();">Schedule at Specified time</mat-radio-button><br/><br/>
+    <!-- immediateDate -->
+    <div class=DateTimeSelector [hidden]="immediate.immediatetype !== 'specfied'">
+      <input matInput [matDatepicker]="picker" [(ngModel)]="immediateDate" placeholder="Choose a date" (dateChange)="regenerateCron();">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <cron-date-picker [model]="immediateTime" (onDateChange)="onDateChange($event)"></cron-date-picker>  
+    </div>
+  </mat-radio-group>
 </div>
 
 <div *ngIf="scheduleType === 'hourly'" [ngClass]="{'active': scheduleType === 'hourly'}" class="tabcontent">
