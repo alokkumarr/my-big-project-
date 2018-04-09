@@ -25,19 +25,25 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   private poll: boolean;
   private interval = 5000;
   private previewData: Array<any> = [];
-  private previewStatus: string = 'queued';
+  private previewStatus: string;
 
   constructor(
     private router: UIRouter,
     private dxDataGrid: dxDataGridService,
     private workBench: WorkbenchService
-  ) { }
+  ) { 
+    this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
+  }
 
   @ViewChild('dpGrid') dataGrid: DxDataGridComponent;
 
   ngOnInit() {
-    this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
-    this.triggerPreview();
+    if (this.dsMetadata.asOfNow.status === 'SUCCESS') {
+      this.previewStatus = 'queued';
+      this.triggerPreview();
+    } else {
+      this.previewStatus = 'failed';
+    }
   }
 
   ngOnDestroy() {

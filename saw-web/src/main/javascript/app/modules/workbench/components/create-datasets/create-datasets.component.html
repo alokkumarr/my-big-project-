@@ -56,8 +56,8 @@
     <mat-step label="ADD_DATASET" [stepControl]="nameFormGroup">
       <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
         <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
-          <span class="list-header" i18n>Selected Files</span>
           <mat-list>
+            <h3 class="list-header" mat-subheader>Selected Files</h3>
             <mat-list-item class="list-items" *ngFor="let file of selectedFiles; index as i" (click)="previewDialog(file)">
               <p mat-line i18n>{{i + 1}}. &ensp; {{ file.name }}</p>
               <div class="icon-div">

@@ -77,7 +77,7 @@
           </mat-card>
         </div>
       </mat-tab>
-      <mat-tab label="Data Preview">
+      <mat-tab label="Data Preview" [disabled]="previewStatus === 'failed'">
         <div fxLayout="row" class="data-cont" fxFlex fxLayoutAlign="center center">
           <mat-card class="data-grid" fxFlex="100">
             <dx-data-grid #dpGrid id="dpGrid" *ngIf="previewStatus === 'success'" fxFlex [dataSource]="previewData" [height]="'100%'" [width]="'100%'" [allowColumnResizing]="true" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"

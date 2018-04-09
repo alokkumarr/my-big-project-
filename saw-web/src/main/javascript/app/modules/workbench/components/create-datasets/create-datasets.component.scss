@@ -110,16 +110,11 @@ create-datasets {
     padding: 1% 9% 0;
   }
 
-  .list-margin1 {
-    margin-top: 1%;
-  }
-
   .list-header {
-    padding: 9px;
     background-color: $primary-blue-b2;
-    font-size: 16px;
-    border-radius: 3px 12px 0 0;
-    color: white;
+    font-size: 16px !important;
+    border-radius: 12px 12px 0 0;
+    color: white !important;
   }
 
   .list-items {

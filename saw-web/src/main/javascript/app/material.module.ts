@@ -25,8 +25,7 @@ import {
   MatSlideToggleModule,
   MatSliderModule,
   MatTabsModule,
-  MatDividerModule,
-  MatProgressSpinnerModule
+  MatDividerModule
 } from '@angular/material';
 import {MatStepperModule} from '@angular/material/stepper';
 import {MatExpansionModule} from '@angular/material/expansion';
@@ -67,8 +66,7 @@ import '../../../../themes/_angular_next.scss';
     MatTabsModule,
     MatDividerModule,
     MatMomentDateModule,
-    NouisliderModule,
-    MatProgressSpinnerModule
+    NouisliderModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -98,8 +96,7 @@ import '../../../../themes/_angular_next.scss';
     MatTabsModule,
     MatDividerModule,
     MatMomentDateModule,
-    NouisliderModule,
-    MatProgressSpinnerModule
+    NouisliderModule
   ]
 })
 export class MaterialModule { }
