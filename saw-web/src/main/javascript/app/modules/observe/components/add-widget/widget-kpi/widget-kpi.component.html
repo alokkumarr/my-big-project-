@@ -41,13 +41,12 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field>
-    <mat-select placeholder="Secondary Aggregations" formControlName="secAggregates" multiple>
-      <mat-option *ngFor="let ag of aggregations" [value]="ag.value" [disabled]="kpiForm.get('primAggregate').value === ag.value">
-        {{ ag.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  <div class="secondary-aggregate-form" formGroupName="secAggregates">
+    <h4>Secondary Aggregations</h4>
+    <mat-slide-toggle *ngFor="let ag of aggregations" [formControlName]="ag.value">
+      {{ag.name}}
+    </mat-slide-toggle>
+  </div>
 
   <button mat-raised-button color="primary" (click)="applyKPI()" [disabled]="kpiForm.invalid">
     Apply

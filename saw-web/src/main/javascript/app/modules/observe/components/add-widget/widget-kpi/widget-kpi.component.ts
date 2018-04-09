@@ -16,11 +16,13 @@ import {
 import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
+import * as forEach from 'lodash/forEach';
 import * as assign from 'lodash/assign';
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
 
 import * as moment from 'moment';
-
 import { requireIf } from '../../../validators/required-if.validator';
 import { WIDGET_ACTIONS } from '../widget.model';
 import {
@@ -50,6 +52,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
   kpiForm: FormGroup;
   datePresetSubscription: Subscription;
+  primaryAggregationSubscription: Subscription;
 
   constructor(private fb: FormBuilder) {
     this.createForm();
@@ -58,7 +61,9 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ngOnDestroy() {
-    this.datePresetSubscription.unsubscribe();
+    this.datePresetSubscription && this.datePresetSubscription.unsubscribe();
+    this.primaryAggregationSubscription &&
+      this.primaryAggregationSubscription.unsubscribe();
   }
 
   /**
@@ -67,6 +72,13 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    * @memberof WidgetKPIComponent
    */
   createForm() {
+    const secAggregateControls = {};
+    forEach(this.aggregations, ag => {
+      secAggregateControls[ag.value] = [false];
+    });
+
+    window['mykpi'] = this;
+
     this.kpiForm = this.fb.group({
       name: ['', Validators.required],
       dateField: ['', Validators.required],
@@ -80,7 +92,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       ],
       filter: [this.dateFilters[0].value, Validators.required],
       primAggregate: [this.aggregations[0].value, Validators.required],
-      secAggregates: [[]]
+      secAggregates: this.fb.group(secAggregateControls)
     });
 
     /* Only show date inputs if custom filter is selected */
@@ -91,6 +103,36 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         this.kpiForm.get('gte').updateValueAndValidity();
         this.showDateFields = data === CUSTOM_DATE_PRESET_VALUE;
       });
+
+    /* Update disablity status of secondary aggregations based on
+     * primary aggregation selection */
+    this.primaryAggregationSubscription = this.kpiForm
+      .get('primAggregate')
+      .valueChanges.subscribe(this.updateSecondaryAggregations.bind(this));
+  }
+
+  /**
+   * On every change to primary aggregation, disable that control
+   * in secondary controls and clear its value. Primary aggregation
+   * cannot also be a part of secondary aggregations.
+   *
+   * @param {string} primaryAggregation
+   * @memberof WidgetKPIComponent
+   */
+  updateSecondaryAggregations(primaryAggregation: string) {
+    const secondaryAggregatesForm = this.kpiForm.get(
+      'secAggregates'
+    ) as FormGroup;
+
+    forEach(this.aggregations, ag => {
+      const aggregateControl = secondaryAggregatesForm.get(ag.value);
+      if (ag.value === primaryAggregation) {
+        aggregateControl.setValue(false);
+        aggregateControl.disable();
+      } else {
+        aggregateControl.enable();
+      }
+    });
   }
 
   /**
@@ -145,7 +187,12 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       .get('primAggregate')
       .setValue(primaryAggregate || this.aggregations[0].value);
 
-    this.kpiForm.get('secAggregates').setValue(secondaryAggregates || []);
+    const secAggregateForm = this.kpiForm.get('secAggregates') as FormGroup;
+    forEach(this.aggregations, ag => {
+      secAggregateForm
+        .get(ag.value)
+        .setValue(secondaryAggregates.includes(ag.value));
+    });
   }
 
   /**
@@ -181,6 +228,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       this._metric.dateColumns,
       col => col.columnName === this.kpiForm.get('dateField').value
     );
+    const secondaryAggregates = filter(
+      this.aggregations,
+      ag => this.kpiForm.get('secAggregates').get(ag.value).value
+    );
 
     this.onKPIAction.emit({
       kpi: assign({}, this._kpi, {
@@ -191,7 +242,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
             name: dataField.name,
             aggregate: [
               this.kpiForm.get('primAggregate').value,
-              ...this.kpiForm.get('secAggregates').value
+              ...map(secondaryAggregates, ag => ag.value)
             ]
           }
         ],
