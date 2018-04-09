@@ -59,13 +59,14 @@ export class ObserveKPIComponent implements OnInit {
 
         const secondary = map(secondaryAggregates || [], ag => ({
           name: upperCase(ag),
-          value: get(res, `data.current.${dataFieldName}._${ag}`)
+          value:
+            parseFloat(get(res, `data.current.${dataFieldName}._${ag}`)) || 0
         }));
         return { primary, secondary };
       })
       /* Parse and calculate percentage change for primary aggregations */
       .subscribe(({ primary, secondary }) => {
-        const currentParsed = parseFloat(primary.current);
+        const currentParsed = parseFloat(primary.current) || 0;
         const priorParsed = parseFloat(primary.prior);
         const change =
           round((currentParsed - priorParsed) * 100 / priorParsed, 2) || 0;
