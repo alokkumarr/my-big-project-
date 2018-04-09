@@ -79,7 +79,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         [requireIf('filter', val => val === CUSTOM_DATE_PRESET_VALUE)]
       ],
       filter: [this.dateFilters[0].value, Validators.required],
-      aggregate: [this.aggregations[0].value, Validators.required]
+      primAggregate: [this.aggregations[0].value, Validators.required],
+      secAggregates: [[]]
     });
 
     /* Only show date inputs if custom filter is selected */
@@ -136,10 +137,15 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     gte &&
       this.kpiForm.get('gte').setValue(moment(gte, DATE_FORMAT.YYYY_MM_DD));
 
-    const primaryAggregate = get(data, 'dataFields.0.aggregate.0');
+    const [primaryAggregate, ...secondaryAggregates] = get(
+      data,
+      'dataFields.0.aggregate'
+    );
     this.kpiForm
-      .get('aggregate')
+      .get('primAggregate')
       .setValue(primaryAggregate || this.aggregations[0].value);
+
+    this.kpiForm.get('secAggregates').setValue(secondaryAggregates || []);
   }
 
   /**
@@ -183,7 +189,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
           {
             columnName: dataField.columnName,
             name: dataField.name,
-            aggregate: [this.kpiForm.get('aggregate').value]
+            aggregate: [
+              this.kpiForm.get('primAggregate').value,
+              ...this.kpiForm.get('secAggregates').value
+            ]
           }
         ],
         filters: [
