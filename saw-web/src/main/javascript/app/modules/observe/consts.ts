@@ -80,5 +80,6 @@ export const KPI_AGGREGATIONS = [
   { name: 'Sum', value: 'sum' },
   { name: 'Average', value: 'avg' },
   { name: 'Minimum', value: 'min' },
-  { name: 'Maximum', value: 'max' }
+  { name: 'Maximum', value: 'max' },
+  { name: 'Count', value: 'count' }
 ];
