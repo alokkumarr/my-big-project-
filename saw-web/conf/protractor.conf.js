@@ -133,6 +133,7 @@ exports.config = {
     root: [
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
