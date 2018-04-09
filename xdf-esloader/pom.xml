@@ -41,11 +41,6 @@
             <artifactId>dataset-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.synchronoss.bda</groupId>
-            <artifactId>xdf-component</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
 
