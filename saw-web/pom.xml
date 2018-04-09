@@ -218,24 +218,7 @@
               <arguments>${npm.install}</arguments>
             </configuration>
           </execution>
-          <execution>
-            <id>npm-uninstall-node-sass</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>uninstall node-sass</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm-install-node-sass</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>${npm.install} node-sass</arguments>
-            </configuration>
-          </execution>
+
            <execution>
             <id>npm-run-build</id>
             <goals>
@@ -320,26 +303,6 @@
                 </goals>
                 <configuration>
                   <arguments>${npm.install}</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 
@@ -449,26 +412,6 @@
               </execution>
 
               <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>${npm.install} node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
                 <id>npm-run-build</id>
                 <goals>
                   <goal>npm</goal>
@@ -554,26 +497,6 @@
                 </goals>
                 <configuration>
                   <arguments>${npm.install}</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 
@@ -693,26 +616,6 @@
                 </goals>
                 <configuration>
                   <arguments>${npm.install}</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-uninstall-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>uninstall node-sass</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <id>npm-install-node-sass</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>${npm.install} node-sass</arguments>
                 </configuration>
               </execution>
 

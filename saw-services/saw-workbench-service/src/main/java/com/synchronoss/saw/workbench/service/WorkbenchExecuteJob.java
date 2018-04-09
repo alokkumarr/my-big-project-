@@ -46,18 +46,18 @@ public class WorkbenchExecuteJob implements Job<Integer> {
         log.debug("Start execute job");
         AsynchAbstractComponent aac = null;
         switch (ngctx.componentName) {
-        case "sql":
-            aac = new AsynchNGSQLComponent(ngctx);
-            break;
-        case "parser":
-            aac = new AsynchNGParser(ngctx);
-            break;
-        case "transformer":
-            aac = new AsynchNGTransformerComponent(ngctx);
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown component: "
-                + ngctx.componentName);
+            case "sql":
+                aac = new AsynchNGSQLComponent(ngctx);
+                break;
+            case "parser":
+                aac = new AsynchNGParser(ngctx);
+                break;
+            case "transformer":
+                aac = new AsynchNGTransformerComponent(ngctx);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown component: "
+                    + ngctx.componentName);
         }
         if (!aac.initComponent(jobContext.sc())) {
             log.error("Could not initialize component");

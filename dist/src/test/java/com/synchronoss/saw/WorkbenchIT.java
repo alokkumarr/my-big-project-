@@ -11,10 +11,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.restassured.response.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.restassured.response.Response;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
@@ -186,7 +189,6 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
             .body(json)
             .when().post(WORKBENCH_PATH + "/datasets")
             .then().assertThat().statusCode(200);
-
     }
 
     /**
@@ -196,8 +198,6 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         throws JsonProcessingException {
         waitForDatasetRetry(id, DATASET_WAIT_RETRIES);
     }
-
-
 
     /**
      * Wait until dataset becomes visible in Workbench Services, using
@@ -232,7 +232,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         } else if (status.equals("FAILED")) {
             log.info("XDF failed.");
         } else {
-            log.info("XDF .");
+            log.info("XDF partially succeeded.");
         }
         /* Dataset is in SUCCESS state, so return */
     }
@@ -253,6 +253,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
             .extract().response();
         return response.path(statusPath);
     }
+
 
     @Test
     public void testListPreregDatasets() throws IOException {

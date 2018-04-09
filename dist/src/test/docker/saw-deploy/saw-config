@@ -54,5 +54,15 @@ saw_workbench_preview_limit=100
 saw_workbench_livy_uri=http://saw-mapr:8998/
 saw_workbench_metadata=hdfs:///main/
 
+# FTP JSON config
+# ##########################################
+#
+#
+# DO NOT SPLIT THIS INTO MULTIPLE LINES
+#
+#
+# ##########################################
+# ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
+
 [saw-security]
 localhost ansible_connection=local

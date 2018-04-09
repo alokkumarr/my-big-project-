@@ -90,7 +90,7 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>3.0.3</version>
+      <version>3.0.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -106,6 +106,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+<<<<<<< HEAD
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slf4j.version}</version>
@@ -115,6 +116,11 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.1.8</version>
+=======
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+>>>>>>> 29f2c84bb9376543d2961ca17e7f766a8e6a0875
     </dependency>
   </dependencies>
   <build>
@@ -448,7 +454,7 @@
   <repositories>
     <repository>
       <id>synchronoss</id>
-      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
   <profiles>

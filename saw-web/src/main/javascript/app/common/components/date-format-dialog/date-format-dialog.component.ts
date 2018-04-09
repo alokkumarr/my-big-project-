@@ -1,12 +1,9 @@
 declare const require: any;
 import {
   Component,
-  Input,
   Inject
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import * as moment from 'moment';
-import * as map from 'lodash/map';
 
 import { DATE_FORMATS } from '../../consts';
 

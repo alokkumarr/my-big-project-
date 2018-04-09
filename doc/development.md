@@ -68,6 +68,11 @@ that will subsequently be available in the image build cache.  After
 the command has completed the SAW start page can be accessed
 at [http://localhost/](http://localhost/).
 
+To follow logs in a running SAW container, execute the following
+command:
+
+        $ docker exec saw journalctl -f
+
 To enter a shell inside the main SAW container, execute the following
 command:
 
@@ -78,14 +83,16 @@ starting points to investigate installed SAW services and packages:
 
         $ systemctl status saw-*
         $ systemctl list-units saw-*
-        $ systemctl list-timers saw-*
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
-To stop the SAW containers, simply send an interrupt to the Maven
-process used to start the containers.  In case containers have been
-left behind and prevent running new SAW containers, existing
-containers can be removed by executing the following command:
+The SAW containers can be stopped using the following command:
+
+        $ docker stop saw saw-mapr
+
+In case containers have been left behind and prevent running new SAW
+containers, existing containers can be removed by executing the
+following command:
 
         $ docker rm -f saw saw-mapr
 

@@ -1,5 +1,4 @@
 import * as angular from 'angular';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgModule } from '@angular/core';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -12,7 +11,10 @@ import { i18nConfig } from './i18n';
 
 import { MaterialModule } from '../../material.module';
 
-import { jwtServiceProvider, userServiceProvider } from '../../../login/services/ajs-login-providers';
+import {
+  jwtServiceProvider,
+  userServiceProvider
+} from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
   chartServiceProvider,
@@ -37,7 +39,9 @@ import { ChartComponent } from '../../common/components/charts/chart.component';
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
+import { EditWidgetModule } from './components/edit-widget/edit-widget.module';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
 import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
@@ -50,19 +54,12 @@ import {
 } from './components/global-filter';
 import { GlobalFilterService } from './services/global-filter.service';
 import { DashboardService } from './services/dashboard.service';
-import { FilterSidenavComponent } from './components/filter-sidenav/filter-sidenav.component';
-import { CheckboxFilterComponent } from './components/checkbox-filter/checkbox-filter.component';
-import { PriceRangeFilterComponent } from './components/price-range-filter/price-range-filter.component';
-import { RadioFilterComponent } from './components/radio-filter/radio-filter.component';
-import { TimeRangeFilterComponent } from './components/time-range-filter/time-range-filter.component';
-import { FilterGroupComponent } from './components/filter-group/filter-group.component';
 import { CommonModule } from '../../common';
 
 export const ObserveModule = 'ObserveModule';
 
-angular.module(ObserveModule, [
-  CommonModule
-])
+angular
+  .module(ObserveModule, [CommonModule])
   .config(routesConfig)
   .config(i18nConfig);
 
@@ -76,6 +73,7 @@ const components = [
   GlobalStringFilterComponent,
   CreateDashboardComponent,
   ObserveChartComponent,
+  ObserveKPIComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent,
   ChartComponent
@@ -90,14 +88,23 @@ const components = [
     GridsterModule,
     HttpClientModule,
     UIRouterUpgradeModule,
-    AddWidgetModule
+    AddWidgetModule,
+    EditWidgetModule
   ],
   declarations: components,
   entryComponents: components,
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: RefreshTokenInterceptor, multi: true },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HandleErrorInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RefreshTokenInterceptor,
+      multi: true
+    },
     GlobalFilterService,
     DashboardService,
     ObserveService,

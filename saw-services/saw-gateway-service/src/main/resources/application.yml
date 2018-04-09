@@ -9,6 +9,9 @@ spring:
       max-file-size: 25MB
   main:
     banner-mode: 'off'
+logging:
+  level:
+    com.synchronoss.saw.gateway: INFO
 server:
   address: localhost
   port: 9100
@@ -69,6 +72,9 @@ api:
         -   location: ${export.service.host}
             method: GET
             path: '[/]export.*'
+        -   location: ${export.service.host}
+            method : POST
+            path : '[/]export.*'
         -   location: ${scheduler.service.host}
             method : GET
             path : '[/]scheduler.*'
@@ -93,6 +99,9 @@ api:
         -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]filters.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]kpi.*'
         -   location: ${workbench.service.host}
             method: POST
             path: '[/]internal/workbench.*'

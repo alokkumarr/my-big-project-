@@ -2,22 +2,17 @@ declare const require: any;
 
 import {
   Component,
-  Input,
   Inject
 } from '@angular/core';
 import {
   MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogConfig
+  MAT_DIALOG_DATA
 } from '@angular/material';
 
 import { ErrorDetailService } from '../../services/error-detail.service';
 
 require('./error-detail.component.scss');
 const template = require('./error-detail.component.html');
-
-const ERROR_TITLE_LENGTH = 50;
 
 @Component({
   selector: 'error-detail',

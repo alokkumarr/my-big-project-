@@ -9,17 +9,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import sncr.bda.core.file.HFileOperations;
 
-
-
 @Service
 public class WorkbenchExecutionServiceImpl
     implements WorkbenchExecutionService {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
+    private final ObjectMapper mapper = new ObjectMapper();
   
     @Value("${workbench.project-key}")
     @NotNull
@@ -62,6 +62,7 @@ public class WorkbenchExecutionServiceImpl
 
         return responseRoot;
         //createDatasetDirectory(name);
+
     }
 
     private void createDatasetDirectory(String name) throws Exception {

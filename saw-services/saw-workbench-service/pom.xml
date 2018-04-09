@@ -25,7 +25,6 @@
 		<json-core>1.2.5</json-core>
 		<metadata.api>1.0.9</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
-
     <revision>2</revision>
     <revision.nodash>2</revision.nodash>
 	</properties>
@@ -359,6 +358,10 @@
 									<directory>true</directory>
 								</entry>
 								<entry>
+									<name>/opt/bda/saw-workbench-service/conf</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
 									<name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
 									<file>target/saw-workbench-service-${revision}-exec.jar</file>
 								</entry>
@@ -378,10 +381,6 @@
 									<name>/usr/lib/systemd/system/saw-workbench-proxy.socket</name>
 									<file>src/main/system/saw-workbench-proxy.socket</file>
 								</entry>
-								<entry>
-									<name>/opt/bda/saw-workbench-service/conf/logback.xml</name>
-									<file>src/main/resources/logback.xml</file>
-								</entry>
 							</entries>
 							<signature>
 								<skip>true</skip>
@@ -395,12 +394,12 @@
 	<repositories>
 		<repository>
 			<id>synchronoss</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
 		<repository>
 			<id>synchronoss-snapshots</id>
-			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
 		</repository>
-		
+
 	</repositories>
 </project>

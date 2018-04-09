@@ -41,6 +41,7 @@ class Analysis extends BaseController {
     * List analyses.  At the moment only used by scheduler to list
     * analyses that are scheduled.
     */
+  @Deprecated
   def list(view: String): Result = {
     handle((json, ticket) => {
       if (view == "schedule") {
@@ -51,6 +52,7 @@ class Analysis extends BaseController {
     })
   }
 
+  @Deprecated
   private def listSchedules: JObject = {
     val analysisNode = new AnalysisNode
     val search = Map[String, Any]("isScheduled" -> "true")
@@ -215,7 +217,8 @@ class Analysis extends BaseController {
     	      {
 	        /* Build query based on analysis supplied in request body */
                 executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
-	        val runtime = (executionType == "onetime")
+	        val runtime = (executionType == ExecutionType.onetime.toString
+            || executionType == ExecutionType.regularExecution.toString)
                 m_log.debug("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
@@ -396,17 +399,19 @@ class Analysis extends BaseController {
       throw new Exception("Could not find analysis node with provided analysis ID")
     m_log.trace("json dataset: {}", json);
     m_log.trace("type: {}", typeInfo);
+    val timeOut :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("timeout"))
+      new Integer(SAWServiceConfig.es_conf.getInt("timeout")) else new java.lang.Integer(3)
     if ( typeInfo.equals("pivot") )
     {
       var data : String= null
       if (dataSecurityKeyStr!=null) {
         m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr), json);
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr, timeOut), json, timeOut);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, timeOut), json, timeOut);
 
       }
 
@@ -482,11 +487,11 @@ class Analysis extends BaseController {
       if (dataSecurityKeyStr!=null) {
         m_log.trace("dataSecurityKeyStr dataset inside esReport block: {}", dataSecurityKeyStr)
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
-          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr), json);
+          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr, timeOut), json, timeOut);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
-          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json), json);
+          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json, timeOut), json, timeOut);
       }
 
       val finishedTS = System.currentTimeMillis;
@@ -557,11 +562,11 @@ class Analysis extends BaseController {
       if (dataSecurityKeyStr!=null) {
         m_log.trace("dataSecurityKeyStr dataset inside chart block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr), json);
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr, timeOut), json, timeOut);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, timeOut), json, timeOut);
       }
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
@@ -629,14 +634,25 @@ class Analysis extends BaseController {
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       m_log.trace("queryRuntime inside report block before executeAndWait: {}", queryRuntime);
-      //var query :String =null
-      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+      val query = if (queryRuntime != null) queryRuntime
+        // In case of scheduled execution type if manual query exists take the precedence.
+      else if(executionType ==
+        ExecutionType.scheduled.toString) {
+         (analysisJSON \ "queryManual") match {
+          case JNothing => QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+          case obj: JString => obj.extract[String]
+          case obj => unexpectedElement("string", obj)
+        }
+      }
+      else
+        QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       m_log.trace("query inside report block before executeAndWait : {}", query);
       /* Execute analysis report query through queue for concurrency */
       val executionTypeEnum = executionType match {
         case "preview" => ExecutionType.preview
         case "onetime" => ExecutionType.onetime
         case "scheduled" => ExecutionType.scheduled
+        case "regularExecution" => ExecutionType.regularExecution
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       val execution = analysis.executeAndWaitQueue(
@@ -645,6 +661,7 @@ class Analysis extends BaseController {
             case ExecutionType.preview => executorFastQueue
             case ExecutionType.onetime => executorFastQueue
             case ExecutionType.scheduled => executorRegularQueue
+            case ExecutionType.regularExecution => executorRegularQueue
             case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
           executorQueue.send(executionTypeEnum, analysisId, resultId, query)

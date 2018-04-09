@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
+import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,7 +26,13 @@ import com.synchronoss.SAWElasticTransportService;
  */
 public class SAWElasticSearchQueryExecutor {
   
-
+  Integer timeOut = 3; // in minutes
+  
+  public SAWElasticSearchQueryExecutor(){}
+  public SAWElasticSearchQueryExecutor(Integer timeOut) {
+    super();
+    this.timeOut = timeOut;
+  }
 
   /**
    * 
@@ -35,10 +42,10 @@ public class SAWElasticSearchQueryExecutor {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String executeReturnAsString(SearchSourceBuilder searchSourceBuilder, String jsonString) throws JsonProcessingException, IOException {
+  public static String executeReturnAsString(SearchSourceBuilder searchSourceBuilder, String jsonString, Integer timeOut) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    return SAWElasticTransportService.executeReturnAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze");
+    return SAWElasticTransportService.executeReturnAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze", timeOut);
   }
 
   /**
@@ -49,10 +56,10 @@ public class SAWElasticSearchQueryExecutor {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String executeReturnDataAsString(SearchSourceBuilder searchSourceBuilder, String jsonString) throws JsonProcessingException, IOException {
+  public static String executeReturnDataAsString(SearchSourceBuilder searchSourceBuilder, String jsonString, Integer timeOut) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    return SAWElasticTransportService.executeReturnDataAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze");
+    return SAWElasticTransportService.executeReturnDataAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze",timeOut);
   }
 
   /**
@@ -62,11 +69,24 @@ public class SAWElasticSearchQueryExecutor {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObjectList) throws JsonProcessingException, IOException {
+  public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObjectList, Integer timeOut) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    return SAWElasticTransportService.executeReturnDataAsString(executionObjectList);
+    return SAWElasticTransportService.executeReturnDataAsString(executionObjectList,timeOut);
   }
+
+    /**
+     *
+     * @param kpiExecutionObject
+     * @return
+     * @throws JsonProcessingException
+     * @throws IOException
+     */
+    public static String executeReturnDataAsString(KPIExecutionObject kpiExecutionObject, Integer timeOut) throws JsonProcessingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        return SAWElasticTransportService.executeReturnDataAsString(kpiExecutionObject, timeOut);
+    }
   /**
    * 
    * @param searchSourceBuilder

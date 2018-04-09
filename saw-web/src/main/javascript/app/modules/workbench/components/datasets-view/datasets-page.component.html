@@ -3,11 +3,11 @@
     <mat-toolbar-row>
       <div fxFlex="48" fxLayout="row">
         <mat-button-toggle-group [(ngModel)]="dataView" [value]="dataView" #viewType="matButtonToggleGroup">
-          <mat-button-toggle matTooltip="Data Sets" value="sets">
+          <mat-button-toggle i18n value="sets">
             <mat-icon fontIcon="icon-exchange"></mat-icon>
             <span>Data Sets</span>
           </mat-button-toggle>
-          <mat-button-toggle matTooltip="Data Pods" value="pods">
+          <mat-button-toggle  disabled i18n value="pods">
             <mat-icon fontIcon="icon-portal-libraries"></mat-icon>
             <span>Data Pods</span>
           </mat-button-toggle>
@@ -28,14 +28,17 @@
         <button mat-icon-button color="primary" matTooltip="Refresh" (click)="getPageData()">
           <mat-icon fontIcon="icon-Refresh" class="exec-btn-icon"></mat-icon>
         </button>
-        <button mat-icon-button color="primary" matTooltip="Create Datapod" style="font-size:24px;" (click)="null">
+        <!-- <button mat-icon-button color="primary" matTooltip="Create Datapod" style="font-size:24px;" (click)="null">
           <mat-icon fontIcon="icon-portal-libraries" class="exec-btn-icon"></mat-icon>
-        </button>
-        <button color="primary" mat-icon-button [matMenuTriggerFor]="dataSet" (mouseenter)="dataSetMenuTrigger.openMenu()" #dataSetMenuTrigger="matMenuTrigger">
+        </button> -->
+        <button mat-raised-button color="primary" i18n (click)="addDataSet()">
+            <span>+ Dataset</span>
+          </button>
+        <!-- <button color="primary" mat-icon-button [matMenuTriggerFor]="dataSet" #dataSetMenuTrigger="matMenuTrigger">
           <mat-icon fontIcon="icon-exchange"></mat-icon>
         </button>
         <mat-menu color="primary" #dataSet="matMenu">
-          <span (mouseleave)="dataSetMenuTrigger.closeMenu()">
+          <span>
             <button mat-menu-item (click)="addDataSet()">
               <span>Add</span>
             </button>
@@ -43,7 +46,7 @@
               <span>Create</span>
             </button>
           </span>
-        </mat-menu>
+        </mat-menu> -->
       </div>
     </mat-toolbar-row>
   </mat-toolbar>

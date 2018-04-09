@@ -32,5 +32,5 @@ load_data() {
 }
 
 wait_maprfs
-load_semantic
 load_data
+load_semantic
