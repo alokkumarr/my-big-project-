@@ -1,8 +1,8 @@
 <dx-data-grid class="report-dx-grid"
-    id="report-grid"
     #dataGrid
     (onContextMenuPreparing)="onContextMenuPreparing($event)"
     (onContentReady)="onContentReady($event)"
+    [customizeColumns]="customizeColumns"
     [columnAutoWidth]="columnAutoWidth"
     [columnMinWidth]="columnMinWidth"
     [columnResizingMode]="columnResizingMode"
@@ -20,5 +20,10 @@
     [height]="gridHeight"
     [width]="gridWidth"
     [dataSource]="data"
-    [columns]="columns">
+    [columns]="columns"
+    [columnChooser]="columnChooser"
+    [remoteOperations]="remoteOperations"
+    [loadPanel]="loadPanel"
+    [pager]="pager"
+    [paging]="paging">
 </dx-data-grid>

@@ -4,6 +4,7 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 
 export const INT_TYPES = ['int', 'integer', 'long'];
 export const FLOAT_TYPES = ['double', 'float'];
+export const DEFAULT_PRECISION = 2;
 export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
 

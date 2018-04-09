@@ -51,8 +51,8 @@ export class DesignerService {
     return this._analyzeService.getDataBySettings(analysis);
   }
 
-  getDataForAnalysisPreview(analysis) {
-    return this._analyzeService.previewExecution(analysis);
+  getDataForAnalysisPreview(analysis, options) {
+    return this._analyzeService.previewExecution(analysis, options);
   }
 
   getCategories(privilege) {

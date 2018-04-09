@@ -9,15 +9,13 @@ import * as $ from 'jquery';
 import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
-import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../../consts';
+// import style from './report-grid.component.scss';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES, DEFAULT_PRECISION} from '../../../../consts';
 import {getFormatter} from '../../../../../../common/utils/numberFormatter';
-
-const DEFAULT_PRECISION = 2;
 
 export const ReportGridComponent = {
   template,
-  style: [style],
+  // style: [style],
   bindings: {
     reportGridContainer: '<',
     reportGridNode: '<',

@@ -10,7 +10,7 @@
   <designer-sort *ngSwitchCase="'sort'"
                   (sortsChange)="onSortsChange($event)"
                   [sorts]="data.sorts"
-                  [artifactColumns]="data.artifactColumns">
+                  [artifacts]="data.artifacts">
   </designer-sort>
   <designer-filter-container *ngSwitchCase="'filter'"
                   (filtersChange)="onFiltersChange($event)"

@@ -50,11 +50,11 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSortDialog(sorts: Sort[], artifactColumns: ArtifactColumns) {
+  openSortDialog(sorts: Sort[], artifacts: Artifact[]) {
     const data: IToolbarActionData = {
       action: 'sort',
       sorts,
-      artifactColumns
+      artifacts
     }
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',

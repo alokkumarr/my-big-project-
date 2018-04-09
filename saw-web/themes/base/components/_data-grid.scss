@@ -1,11 +1,13 @@
 @import "themes/base/colors";
 
-div[dx-data-grid] {
+tr.dx-row.dx-header-row[role="row"] {
   td[role="columnheader"] {
     color: black;
     font-weight: 600;
   }
+}
 
+div[dx-data-grid] {
   tr.dx-data-row.dx-state-hover:not(.dx-selection):not(.dx-row-inserted):not(.dx-row-removed):not(.dx-edit-row) > td:not(.dx-focused) {
     background-color: $grid-hover-color;
   }

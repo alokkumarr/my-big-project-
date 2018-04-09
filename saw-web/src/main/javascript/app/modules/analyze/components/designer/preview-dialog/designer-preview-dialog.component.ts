@@ -21,32 +21,38 @@ export class DesignerPreviewDialogComponent {
 
   public previewData = null;
   public artifactColumns: ArtifactColumns;
+  public analysis: Analysis;
+  public dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>;
 
   constructor(
     private _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {analysis: Analysis},
     private _designerService: DesignerService
   ) {
-    const analysis = data.analysis;
-    switch (data.analysis.type) {
+    this.analysis = data.analysis;
+    switch (this.analysis.type) {
     case 'pivot':
-      this.artifactColumns = analysis.artifacts[0].columns;
+      this.artifactColumns = this.analysis.artifacts[0].columns;
       break;
-    default:
+    case 'report':
+    case 'esReport':
+      this.dataLoader = (options = {}) => this._designerService.getDataForAnalysisPreview(this.analysis, options)
+        .then(({data, count}) => ({data: data, totalCount: count}));
       break;
     }
   }
 
   ngOnInit() {
     const analysis = this.data.analysis;
-    this._designerService.getDataForAnalysisPreview(analysis)
-      .then(data => {
-        switch (analysis.type) {
-        case 'pivot':
+    switch (analysis.type) {
+    case 'pivot':
+      this._designerService.getDataForAnalysisPreview(analysis, {})
+        .then(data => {
           this.previewData = this._designerService.parseData(data.data, analysis.sqlBuilder);
-          break;
-        }
-      });
+        });
+      break;
+    }
+
   }
 
   close() {

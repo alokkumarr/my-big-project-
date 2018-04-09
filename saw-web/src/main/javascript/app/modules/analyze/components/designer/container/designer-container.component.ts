@@ -30,6 +30,11 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent
 } from '../types'
+import {
+  FLOAT_TYPES,
+  DEFAULT_PRECISION,
+  DATE_TYPES
+} from '../../../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
 
 const template = require('./designer-container.component.html');
@@ -181,8 +186,7 @@ export class DesignerContainerComponent {
     switch (action) {
     case 'sort':
     // TODO update sorts for multiple artifacts
-      const firstArtifactCols = this.artifacts[0].columns;
-      this._analyzeDialogService.openSortDialog(this.sorts, firstArtifactCols)
+      this._analyzeDialogService.openSortDialog(this.sorts, this.artifacts)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
@@ -296,18 +300,18 @@ export class DesignerContainerComponent {
     // backend data refresh needed
     case 'column':
       this.cleanSorts();
-      this.resetColumnPropsToDefaultIfNeeded(event.column);
+      this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'aggregate':
     case 'filter':
     case 'joins':
+    case 'sort':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     // only front end data refresh needed
     case 'format':
     case 'aliasName':
-    case 'sort':
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
@@ -315,9 +319,20 @@ export class DesignerContainerComponent {
     }
   }
 
-  resetColumnPropsToDefaultIfNeeded(column) {
+  setColumnPropsToDefaultIfNeeded(column) {
     column.visible = true;
     unset(column, 'aggregate');
+    if (FLOAT_TYPES.includes(column.type)) {
+      if (!column.format) {
+        column.format = {};
+      }
+      if (!column.format.precision) {
+        column.format.precision = DEFAULT_PRECISION;
+      }
+    }
+    if (DATE_TYPES.includes(column.type) && !column.format) {
+      column.format = 'yyyy-MM-dd';
+    }
   }
 
   handleOtherChangeEvents(event: DesignerChangeEvent) {
