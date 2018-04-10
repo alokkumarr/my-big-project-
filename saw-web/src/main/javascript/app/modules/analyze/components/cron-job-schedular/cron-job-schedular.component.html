@@ -13,10 +13,10 @@
     <br/><br/><br/>
     <mat-radio-button value="specfied" (click)="resetData();">Schedule at Specified time</mat-radio-button><br/><br/>
     <!-- immediateDate -->
-    <div class=DateTimeSelector [hidden]="immediate.immediatetype !== 'specfied'">
+    <div class="DateTimeSelector" [hidden]="immediate.immediatetype !== 'specfied'">
     <br/>  
     Date Time:
-    <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" [(ngModel)]="immediate.immediateDateTime" (ngModelChange)="regenerateCron('')">
+    <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" [(ngModel)]="immediate.immediateDateTime" (ngModelChange)="regenerateCron('')" />
     <owl-date-time [startAt]="startAt" #dt></owl-date-time>
     </div>
   </mat-radio-group>
