@@ -98,17 +98,21 @@ export const AnalyzePublishDialogComponent = {
       };
       this._$rootScope.showProgress = true;
       this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
-        this._$rootScope.showProgress = false;
-        this.loadCronLayout = true;
-        this.$dialog.hideLoader();
-        if (response.data.data.jobDetails) {
-          this.crondetails = {
-            cronexp: response.data.data.jobDetails.cronExpression,
-            activeTab: response.data.data.jobDetails.activeTab,
-            activeRadio: response.data.data.jobDetails.activeRadio
-          };
-          if (response.data.data.jobDetails.analysisID) {
-            this.scheduleState = 'exist';
+        if (response.statusCode === 200) {
+          this._$rootScope.showProgress = false;
+          this.loadCronLayout = true;
+          this.$dialog.hideLoader();
+          if (response.data.jobDetails) {
+            this.crondetails = {
+              cronexp: response.data.jobDetails.cronExpression,
+              activeTab: response.data.jobDetails.activeTab,
+              activeRadio: response.data.jobDetails.activeRadio
+            };
+            if (response.data.jobDetails.analysisID) {
+              this.scheduleState = 'exist';
+            }
+            this.emails = response.data.jobDetails.emailList;
+            this.hasSchedule = true;
           }
           if (this.model.type !== 'chart') {
             this.ftp = response.data.data.jobDetails.ftp;
@@ -116,6 +120,10 @@ export const AnalyzePublishDialogComponent = {
           this.emails = response.data.data.jobDetails.emailList;
           this.hasSchedule = true;
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
+        this.loadCronLayout = true;
+        this.$dialog.hideLoader();
       });
     }
 
