@@ -171,6 +171,7 @@ export const AnalyzePublishDialogComponent = {
         let cronJobName = this.model.id;
         let jobTime = moment.utc().format();
         if (this.crondetails.activeTab === 'immediate') {
+          this.scheduleState = 'new';
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
         }
         this.model.schedule = {
