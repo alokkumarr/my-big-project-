@@ -173,10 +173,6 @@ export const AnalyzePublishDialogComponent = {
         if (this.crondetails.activeTab === 'immediate') {
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
         }
-        if (this.crondetails.activeRadio === 'specfied' && this.crondetails.activeTab === 'immediate') {
-          jobTime = moment(this.crondetails.cronexp).utc().format();
-          this.crondetails.cronexp = '';
-        }
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,

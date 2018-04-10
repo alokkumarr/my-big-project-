@@ -45,23 +45,9 @@ export const AnalyzeCardComponent = {
 
     applyCronPropertytoCard() {
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === this.model.id) {
-          if (!isEmpty(cron.jobDetails.cronExpression)) {
-            if (cron.jobDetails.activeTab === 'hourly') {
-              // there is no time stamp in hourly cron hence converting to utc and local is not required.
-              this.cronReadbleMsg = cronstrue.toString(cron.jobDetails.cronExpression);
-            } else {
-              const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
-              this.cronReadbleMsg = cronstrue.toString(cronLocal);
-            }
-          } else {
-            // Need to validate if the schedule is executed or not since this is one time execution
-            const date = new Date(cron.jobDetails.jobScheduleTime);
-            const todaysDate = new Date();
-            if (date > todaysDate) {
-              this.cronReadbleMsg = moment.utc(date).local();
-            }
-          }
+        if (cron.jobDetails.analysisID === this.model.id && !isEmpty(cron.jobDetails.cronExpression)) {
+          const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
+          this.cronReadbleMsg = cronstrue.toString(cronLocal);
         }
       });
     }

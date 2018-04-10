@@ -11,8 +11,6 @@ import {
   generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
-require('../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css');
-
 const template = require('./cron-job-schedular.component.html');
 require('./cron-job-schedular.component.scss');
 
@@ -169,13 +167,7 @@ export class CronJobSchedularComponent {
       if (this.immediate.immediatetype === 'currenttime') {
         this.cronChange('', this.scheduleType, this.immediate.immediatetype);
       }
-      if (this.immediate.immediatetype === 'specfied') {
-        if (this.immediate.immediateDateTime < new Date()) {
-          this.immediate.immediateDateTime = '';
-        }
-        this.cronChange(this.immediate.immediateDateTime, this.scheduleType, this.immediate.immediatetype);
-      }
-      return;
+    break;
     case 'hourly':
       //Generating Cron expression for selections made in hourly tab
       this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);
