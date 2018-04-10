@@ -2,7 +2,7 @@ info:
   component: Synchronoss Storage Proxy Service
 spring:
   application:
-    name: saw-proxy-service
+    name: saw-storage-proxy-service
 server:
   address: localhost
   port: 9600

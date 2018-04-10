@@ -47,7 +47,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>saw-proxy-service</artifactId>
+      <artifactId>saw-storage-proxy-service</artifactId>
       <version>${revision}</version>
     </dependency>
   </dependencies>

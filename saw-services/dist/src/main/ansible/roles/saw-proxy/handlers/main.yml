@@ -1,2 +1,0 @@
-- name: restart saw-proxy
-  systemd: name=saw-proxy state=restarted daemon_reload=true

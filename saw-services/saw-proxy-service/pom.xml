@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.synchronoss.saw</groupId>
-	<artifactId>saw-proxy-service</artifactId>
+	<artifactId>saw-storage-proxy-service</artifactId>
 	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description></description>
@@ -216,30 +216,30 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-proxy-service</packageName>
+							<packageName>saw-storage-proxy-service</packageName>
 							<entries>
 								<entry>
-									<name>/opt/bda/saw-proxy-service</name>
+									<name>/opt/bda/saw-storage-proxy-service</name>
 									<directory>true</directory>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-proxy-service/saw-proxy.jar</name>
-									<file>target/saw-proxy-service-${revision}-exec.jar</file>
+									<name>/opt/bda/saw-storage-proxy-service/saw-storage-proxy.jar</name>
+									<file>target/saw-storage-proxy-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
-									<name>/usr/lib/systemd/system/saw-proxy.service</name>
-									<file>src/main/system/saw-proxy.service</file>
+									<name>/usr/lib/systemd/system/saw-storage-proxy.service</name>
+									<file>src/main/system/saw-storage-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-proxy-service/conf/logback.xml</name>
+									<name>/opt/bda/saw-storage-proxy-service/conf/logback.xml</name>
 									<file>src/main/resources/logback.xml</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-proxy-service/conf/proxy-scehma.json</name>
+									<name>/opt/bda/saw-storage-proxy-service/conf/proxy-scehma.json</name>
 									<file>src/main/resources/schema/proxy-scehma.json</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-proxy-service/conf/application.yml</name>
+									<name>/opt/bda/saw-storage-proxy-service/conf/application.yml</name>
 									<file>src/main/resources/application.yml</file>
 									
 								</entry>
