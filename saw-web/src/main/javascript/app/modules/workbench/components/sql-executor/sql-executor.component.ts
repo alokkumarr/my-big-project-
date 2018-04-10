@@ -113,7 +113,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
      * Temporary workaround to construct user friendly SQL script. 
      * Will be handled in BE in upcoming release  
      */
-    const appendedScript = `CREATE TABLE AS ${data.name} AS ${this.query}`;
+    const appendedScript = `CREATE TABLE ${data.name} AS ${this.query}`;
     const script = endsWith(appendedScript, ';') === true ? `${appendedScript}` : `${appendedScript};`
     const payload = {
       'name': data.name,
