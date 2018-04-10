@@ -77,8 +77,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       secAggregateControls[ag.value] = [false];
     });
 
-    window['mykpi'] = this;
-
     this.kpiForm = this.fb.group({
       name: ['', Validators.required],
       dateField: ['', Validators.required],
@@ -181,7 +179,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
     const [primaryAggregate, ...secondaryAggregates] = get(
       data,
-      'dataFields.0.aggregate'
+      'dataFields.0.aggregate',
+      []
     );
     this.kpiForm
       .get('primAggregate')

@@ -43,7 +43,8 @@ export class ObserveKPIComponent implements OnInit {
     const dataFieldName = get(this._kpi, 'dataFields.0.name');
     const [primaryAggregate, ...secondaryAggregates] = get(
       this._kpi,
-      'dataFields.0.aggregate'
+      'dataFields.0.aggregate',
+      []
     );
     this.observe
       .executeKPI(this._kpi)
