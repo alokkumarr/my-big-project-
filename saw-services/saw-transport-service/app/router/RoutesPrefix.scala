@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/pman0003/Codebase/bda/saw-feature/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Thu Feb 15 13:04:46 IST 2018
+// @SOURCE:/Users/pman0003/Codebase/bda/resolveConflict/saw/saw-services/saw-transport-service/conf/routes
+// @DATE:Tue Mar 27 17:30:28 IST 2018
 
 
 package router {

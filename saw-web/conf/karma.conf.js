@@ -1,6 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 
-module.exports = function (config) {
+module.exports = function(config) {
   config.set({
     basePath: webpackHelper.root('src/'),
     logLevel: config.LOG_INFO,
@@ -29,6 +29,7 @@ module.exports = function (config) {
       '../node_modules/zone.js/dist/sync-test.js',
       '../node_modules/zone.js/dist/proxy.js',
       '../node_modules/zone.js/dist/mocha-patch.js',
+      '../src/main/javascript/app/**/*.spec.*',
       'test/javascript/specs/**/*.spec.*'
     ],
     exclude: [],
@@ -44,6 +45,8 @@ module.exports = function (config) {
     ],
     preprocessors: {
       'test/javascript/specs/polyfills.js': ['webpack'],
+      '../src/main/javascript/app/**/*.spec.ts': ['webpack'],
+      '../src/main/javascript/app/**/*.spec.js': ['webpack'],
       'test/javascript/specs/**/*.spec.js': ['webpack'],
       'test/javascript/specs/**/*.spec.ts': ['webpack']
     },
