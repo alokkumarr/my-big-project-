@@ -31,7 +31,7 @@ export function hourToCron(hour, hourType, minutes) {
 }
 
 export function generateHourlyCron(hours, minutes) {
-  return `0 ${hours} 0/${minutes} 1/1 * ? *`;
+  return `0 ${minutes} 0/${hours} 1/1 * ? *`;
 }
 
 export function generateDailyCron(cronDaily, dateSelects) {
