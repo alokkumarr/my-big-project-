@@ -39,16 +39,19 @@ class SAWPivotTypeElasticSearchQueryBuilder {
   private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
     private final static String VALUE = "value";
     private final static String SUM ="_sum";
+    Integer timeOut = 3;
 
-  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString) {
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, Integer timeOut) {
     super();
     this.jsonString = jsonString;
+    this.timeOut = timeOut;
   }
   
-  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey) {
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut) {
 	    super();
 	    this.dataSecurityString = dataSecurityKey;
 	    this.jsonString = jsonString;
+	    this.timeOut = timeOut;
 }
 
   public String getDataSecurityString() {
@@ -212,7 +215,7 @@ public String getJsonString() {
           preSearchSourceBuilder.query(boolQueryBuilder);
           QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
           String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                  "system","analyse");
+                  "system","analyse", timeOut);
           // Set total sum for dataFields will be used for percentage calculation.
           objectMapper = new ObjectMapper();
           JsonNode objectNode = objectMapper.readTree(result);
