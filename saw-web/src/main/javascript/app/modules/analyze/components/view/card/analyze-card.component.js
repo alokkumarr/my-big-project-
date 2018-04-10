@@ -45,9 +45,16 @@ export const AnalyzeCardComponent = {
 
     applyCronPropertytoCard() {
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === this.model.id && !isEmpty(cron.jobDetails.cronExpression)) {
-          const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
-          this.cronReadbleMsg = cronstrue.toString(cronLocal);
+        if (cron.jobDetails.analysisID === this.model.id) {
+          if (!isEmpty(cron.jobDetails.cronExpression)) {
+            if (cron.jobDetails.activeTab === 'hourly') {
+              // there is no time stamp in hourly cron hence converting to utc and local is not required.
+              this.cronReadbleMsg = cronstrue.toString(cron.jobDetails.cronExpression);
+            } else {
+              const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
+              this.cronReadbleMsg = cronstrue.toString(cronLocal);
+            }
+          }
         }
       });
     }
