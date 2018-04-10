@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>xdf-nextgen</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
