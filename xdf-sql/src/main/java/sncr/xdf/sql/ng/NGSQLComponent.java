@@ -89,7 +89,7 @@ public class NGSQLComponent extends AbstractComponent implements WithDLBatchWrit
                 List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
                 String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
 
-                MoveDataDescriptor desc = new SQLMoveDataDescriptor(
+                MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(
                         resultDataDesc.get(on),        // SQLDescriptor
                         (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),
                         kl);

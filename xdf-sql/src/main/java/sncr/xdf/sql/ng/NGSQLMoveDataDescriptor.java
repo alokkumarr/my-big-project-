@@ -1,16 +1,14 @@
-package sncr.xdf.sql;
+package sncr.xdf.sql.ng;
 
 import org.apache.hadoop.fs.Path;
 import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.sql.SQLDescriptor;
 
 import java.util.List;
 
-/**
- * Created by srya0001 on 6/23/2017.
- */
-public class SQLMoveDataDescriptor extends MoveDataDescriptor {
+public class NGSQLMoveDataDescriptor extends MoveDataDescriptor {
 
-    public SQLMoveDataDescriptor(SQLDescriptor descriptor, String destDir, List<String> keys) {
+    public NGSQLMoveDataDescriptor(SQLDescriptor descriptor, String destDir, List<String> keys) {
         super(descriptor.targetTransactionalLocation,
               descriptor.location,
               descriptor.targetObjectName,
@@ -19,7 +17,6 @@ public class SQLMoveDataDescriptor extends MoveDataDescriptor {
                 keys
               );
         this.dest = destDir;
-        this.source +=  Path.SEPARATOR + descriptor.targetObjectName;
     }
 
 }
