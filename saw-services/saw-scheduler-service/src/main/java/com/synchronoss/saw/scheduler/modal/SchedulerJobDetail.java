@@ -52,7 +52,7 @@ public class SchedulerJobDetail implements Serializable {
 
    private List<String> emailList;
 
-   private List<String> ftp = new ArrayList<>();
+   private List<String> ftp;
 
    private String fileType ;
 
@@ -321,14 +321,14 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(description);
         out.writeObject(emailList);
         out.writeObject(fileType);
+        if (ftp!=null || ftp.size()>0)
+        out.writeObject(ftp);
         out.writeObject(jobGroup);
         out.writeObject(jobName);
         out.writeObject(jobScheduleTime);
         out.writeObject(metricName);
         out.writeObject(type);
         out.writeObject(userFullName);
-        if (ftp!=null)
-        out.writeObject(ftp);
 
     }
 
