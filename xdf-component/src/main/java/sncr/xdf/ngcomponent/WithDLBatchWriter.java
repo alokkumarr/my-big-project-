@@ -5,6 +5,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.*;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
+import org.joda.time.DateTime;
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -262,14 +263,31 @@ public interface WithDLBatchWriter {
             // All final data should go to outputDataSets, to make a single source of
             // dataset descriptors.
 
+            DateTime timeStamp = new DateTime();
+            long currentTime = timeStamp.getMillis() / 1000;
+
             if (mapType == DSMapKey.dataset) {
                 outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
                 logger.trace("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
+
+                //Add record count
+                outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
+
+                //Add timestamp fields
+                outputDS.put(DataSetProperties.CreatedTime.name(), currentTime);
+                outputDS.put(DataSetProperties.ModifiedTime.name(), currentTime);
             }
             else{
                 Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
                 outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
                 logger.trace("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
+
+                //Add record count
+                outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
+
+                //Add timestamp fields
+                outputDS2.put(DataSetProperties.CreatedTime.name(), currentTime);
+                outputDS2.put(DataSetProperties.ModifiedTime.name(), currentTime);
             }
 
 
