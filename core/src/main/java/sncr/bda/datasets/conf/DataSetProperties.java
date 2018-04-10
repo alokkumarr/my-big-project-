@@ -33,6 +33,7 @@ public enum DataSetProperties {
         User("user"),
         System("system"),
         Schema("schema"),
+        RecordCount("recordCount"),
         Sample("sample"),
         PartitionKeys("partitionsKeys"),
         CreatedTime("createdTime"),
