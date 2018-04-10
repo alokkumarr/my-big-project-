@@ -38,8 +38,8 @@ public class SAWDelimitedInspector {
   public static void main(String[] args) {
     try {
       String cnf =
-          "{\"inspect\":{\"lineSeparator\":\"\\n\",\"delimiter\":\",\",\"quoteChar\":\"\",\"quoteEscapeChar\":\"\",\"headerSize\":\"1\",\"fieldNamesLine\":\"1\",\"dateFormats\":[],\"rowsToInspect\":100,\"delimiterType\":\"delimited\",\"header\":\"yes\"}}";
-      SAWDelimitedInspector parser = new SAWDelimitedInspector(cnf, "/Users/spau0004/Desktop/yo.csv", true, "Desktop/yo.csv");
+          "{\"inspect\":{\"lineSeparator\":\"\\n\",\"delimiter\":\"|\",\"quoteChar\":\"\",\"quoteEscapeChar\":\"\",\"headerSize\":\"1\",\"fieldNamesLine\":\"1\",\"dateFormats\":[],\"rowsToInspect\":100,\"delimiterType\":\"delimited\",\"header\":\"yes\"}}";
+      SAWDelimitedInspector parser = new SAWDelimitedInspector(cnf, "/Users/spau0004/Desktop/neg.csv", true, "Desktop/neg.csv");
       parser.parseSomeLines();
       String str = parser.toJson();
       System.out.println(str);
@@ -48,6 +48,7 @@ public class SAWDelimitedInspector {
       writer.write(str);
       writer.close();
     } catch (Exception e) {
+      e.printStackTrace();
       logger.error("Exception during inspecting a file", e);
     }
     System.out.println("Total memory : " + Runtime.getRuntime().totalMemory());
@@ -96,7 +97,7 @@ public class SAWDelimitedInspector {
         dateFmt[i] = formats.get(i).getAsString();
       }
       this.rowProcessor = new SAWDelimitedInspectorRowProcessor(this.headerSize,
-          this.fieldNamesLine, dateFmt, sampleSize);
+          this.fieldNamesLine, dateFmt, sampleSize,settings);
       this.settings.setProcessor(this.rowProcessor);
       parser = new CsvParser(this.settings);
       this.rowsToInspect = rowsToInspect;
@@ -191,4 +192,5 @@ public class SAWDelimitedInspector {
     info.addProperty("file", relativePath);
     return gson.toJson(jo);
   }
+  
 }
