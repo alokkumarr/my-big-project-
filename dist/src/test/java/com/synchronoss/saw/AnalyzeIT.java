@@ -406,4 +406,63 @@ public class AnalyzeIT extends BaseIT {
      return objectNode;
     }
 
+    @Test
+    public void kpiExecuteTest() throws JsonProcessingException
+    {
+        ObjectNode node = kpiData();
+        String json = mapper.writeValueAsString(node);
+        Response response = given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(json)
+            .when().post("/services/kpi")
+            .then().assertThat().statusCode(200)
+            .extract().response();
+    }
+
+    /**
+     * prepare data to execute KPI.
+     * @return
+     */
+    private ObjectNode kpiData()
+    {
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("action", "execute");
+        ArrayNode keys = objectNode.putArray("keys");
+        ObjectNode key = keys.addObject();
+        key.put("customerCode", "SYNCHRONOSS");
+        key.put("module", "observe");
+        key.put("semanticId", "dd2335a1-fa77-4db2-b50b-5391ac7117de");
+        key.put("analysisType", "kpi");
+        ObjectNode kpi = mapper.createObjectNode();
+        kpi.put("id","abc-123");
+        kpi.put("name","Integer");
+        kpi.put("tableName","sample");
+        kpi.put("semanticId","dd2335a1-fa77-4db2-b50b-5391ac7117de");
+        ArrayNode dataFields = kpi.putArray("dataFields");
+        ObjectNode fields = mapper.createObjectNode();
+        fields.put("columnName","integer");
+        fields.put("name","integer");
+        ArrayNode aggregate = fields.putArray("aggregate");
+        aggregate.add("sum");
+        aggregate.add("avg");
+        aggregate.add("min");
+        aggregate.add("max");
+        aggregate.add("count");
+        dataFields.add(fields);
+        ArrayNode filters = kpi.putArray("filters");
+        ObjectNode filtersObject = mapper.createObjectNode();
+        filtersObject.put("type","date");
+        filtersObject.put("columnName","date");
+        ObjectNode modal = mapper.createObjectNode();
+        modal.put("preset","LSM");
+        filtersObject.putPOJO("model",modal);
+        filters.add(filtersObject);
+        ObjectNode esRepository = mapper.createObjectNode();
+        esRepository.put("storageType", "ES");
+        esRepository.put("indexName", "sample");
+        esRepository.put("type", "sample");
+        kpi.putPOJO("esRepository",esRepository);
+        objectNode.putPOJO("kpi",kpi);
+        return objectNode;
+    }
 }
