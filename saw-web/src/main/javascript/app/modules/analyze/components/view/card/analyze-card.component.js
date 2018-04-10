@@ -45,9 +45,17 @@ export const AnalyzeCardComponent = {
 
     applyCronPropertytoCard() {
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === this.model.id && !isEmpty(cron.jobDetails.cronExpression)) {
-          const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
-          this.cronReadbleMsg = cronstrue.toString(cronLocal);
+        if (cron.jobDetails.analysisID === this.model.id) {
+          if (!isEmpty(cron.jobDetails.cronExpression)) {
+            const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
+            this.cronReadbleMsg = cronstrue.toString(cronLocal);  
+          } else {
+            const date =  new Date(cron.jobDetails.jobScheduleTime);
+            const todaysDate = new Date();
+            if (date > todaysDate) {
+              this.cronReadbleMsg = moment.utc(date).local();
+            }
+          }
         }
       });
     }

@@ -186,9 +186,17 @@ export const AnalyzeListViewComponent = {
     generateSchedule(rowData) {
       let scheduleHuman = '';
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
-          const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
-          scheduleHuman = cronstrue.toString(localCron);
+        if (cron.jobDetails.analysisID === rowData.id) {
+          if (!isEmpty(cron.jobDetails.cronExpression)) {
+            const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
+            scheduleHuman = cronstrue.toString(localCron);
+          } else {
+            const todaysDate = new Date();
+            const date =  new Date(cron.jobDetails.jobScheduleTime);
+            if (date > todaysDate) {
+              scheduleHuman = moment.utc(date).local();
+            }
+          }
         }
       });
       return scheduleHuman;

@@ -14,10 +14,10 @@
     <mat-radio-button value="specfied" (click)="resetData();">Schedule at Specified time</mat-radio-button><br/><br/>
     <!-- immediateDate -->
     <div class=DateTimeSelector [hidden]="immediate.immediatetype !== 'specfied'">
-      <input matInput [matDatepicker]="picker" [(ngModel)]="immediateDate" placeholder="Choose a date" (dateChange)="regenerateCron();">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-      <cron-date-picker [model]="immediateTime" (onDateChange)="onDateChange($event)"></cron-date-picker>  
+    <br/>  
+    Date Time:
+    <input [owlDateTimeTrigger]="dt" [owlDateTime]="dt" [(ngModel)]="immediate.immediateDateTime" (ngModelChange)="regenerateCron('')">
+    <owl-date-time [startAt]="startAt" #dt></owl-date-time>
     </div>
   </mat-radio-group>
 </div>

@@ -145,6 +145,12 @@ export const AnalyzePublishDialogComponent = {
       this.crondetails = cronexpression;
     }
 
+    alphanumeric_unique() {
+        return Math.random().toString(36).split('').filter( function(value, index, self) { 
+            return self.indexOf(value) === index;
+        }).join('').substr(2,8);
+    }
+
     publish() {
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
@@ -156,6 +162,15 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
+        let cronJobName = this.model.id;
+        let jobTime = moment.utc().format();
+        if (this.crondetails.activeTab === 'immediate') {
+          cronJobName = cronJobName + '-' + this.alphanumeric_unique();
+        }
+        if (this.crondetails.activeRadio === 'specfied' && this.crondetails.activeTab === 'immediate') {
+          jobTime = moment(this.crondetails.cronexp).utc().format();
+          this.crondetails.cronexp = '';
+        }
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -167,11 +182,11 @@ export const AnalyzePublishDialogComponent = {
           emailList: this.emails,
           ftp: this.ftp,
           fileType: 'csv',
-          jobName: this.model.id,
+          jobName: cronJobName,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: moment().format(),
+          jobScheduleTime: jobTime,
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
@@ -215,7 +230,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     validateSchedule() {
-      if (isEmpty(this.crondetails.cronexp)) {
+      if (isEmpty(this.crondetails.cronexp) && this.crondetails.activeTab !== 'immediate') {
         this.cronValidateField = true;
         return false;
       }

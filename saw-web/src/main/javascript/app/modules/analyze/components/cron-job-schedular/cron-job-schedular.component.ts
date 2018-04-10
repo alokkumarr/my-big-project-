@@ -11,6 +11,8 @@ import {
   generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
+require('../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css');
+
 const template = require('./cron-job-schedular.component.html');
 require('./cron-job-schedular.component.scss');
 
@@ -24,6 +26,7 @@ export class CronJobSchedularComponent {
   @Input() public model: any;
   @Input() public crondetails: any;
   @Output() onCronChanged: EventEmitter<any> = new EventEmitter();
+  public startAt = new Date();
   NumberMapping: any = {'=1': '#st', '=2': '#nd', '=3': '#rd', 'other': '#th'};
   DayMapping: any = {'=TUE': 'TUESDAY', '=WED': 'WEDNESDAY', '=THU': 'THURSDAY', '=SAT': 'SATURDAY', 'other': '#DAY'};
 
@@ -161,18 +164,16 @@ export class CronJobSchedularComponent {
   }
 
   regenerateCron(dateSelects) {
-    console.log(this.scheduleType);
     switch (this.scheduleType) {
     case 'immediate':
-      console.log("oinisde immediate");
-      console.log(this.immediate);
-      console.log(this.immediate.immediatetype);
       if (this.immediate.immediatetype === 'currenttime') {
-        console.log('current');
+        this.cronChange('', this.scheduleType, this.immediate.immediatetype);
       }
       if (this.immediate.immediatetype === 'specfied') {
-        console.log(this.immediateTime);
-        console.log(this.immediateDate);
+        if (this.immediate.immediateDateTime < new Date()) {
+          this.immediate.immediateDateTime = '';
+        }
+        this.cronChange(this.immediate.immediateDateTime, this.scheduleType, this.immediate.immediatetype);
       }
       return;
     case 'hourly':
