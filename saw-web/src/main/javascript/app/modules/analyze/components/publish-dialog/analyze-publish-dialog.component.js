@@ -153,10 +153,10 @@ export const AnalyzePublishDialogComponent = {
       this.crondetails = cronexpression;
     }
 
-    alphanumeric_unique() {
-        return Math.random().toString(36).split('').filter( function(value, index, self) { 
-            return self.indexOf(value) === index;
-        }).join('').substr(2,8);
+    alphanumericUnique() {
+      return Math.random().toString(36).split('').filter(function(value, index, self) { 
+        return self.indexOf(value) === index;
+      }).join('').substr(2, 8);
     }
 
     publish() {
@@ -173,7 +173,7 @@ export const AnalyzePublishDialogComponent = {
         let cronJobName = this.model.id;
         let jobTime = moment.utc().format();
         if (this.crondetails.activeTab === 'immediate') {
-          cronJobName = cronJobName + '-' + this.alphanumeric_unique();
+          cronJobName = cronJobName + '-' + this.alphanumericUnique();
         }
         if (this.crondetails.activeRadio === 'specfied' && this.crondetails.activeTab === 'immediate') {
           jobTime = moment(this.crondetails.cronexp).utc().format();
