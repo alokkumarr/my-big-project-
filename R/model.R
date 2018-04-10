@@ -40,7 +40,6 @@ new_model <- function(pipe,
       target = target,
       method = method,
       method_args = method_args,
-      class = class,
       desc = desc,
       path = path,
       id = id,
@@ -50,7 +49,7 @@ new_model <- function(pipe,
       fit = fit,
       performance = performance
     ),
-    class = c("model")
+    class = c(class, "model")
   )
 }
 
@@ -192,6 +191,12 @@ fit <- function(...){
 }
 
 
+#' @export
+evaluate <- function(x, ...) {
+  UseMethod("evaluate", x)
+}
+
+
 #' Predict Model Generic
 #'
 #' Make model predictions
@@ -200,3 +205,7 @@ fit <- function(...){
 predict <- function(...){
   UseMethod("predict")
 }
+
+
+
+

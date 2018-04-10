@@ -6,6 +6,7 @@
 \alias{add_resample_samples.data.frame}
 \alias{add_resample_samples.tbl_spark}
 \alias{add_resample_samples.modeler}
+\alias{add_resample_samples.forecaster}
 \title{Add Random Resamples function}
 \usage{
 add_resample_samples(x, number, amount, test_holdout_prct, seed)
@@ -20,6 +21,9 @@ add_resample_samples(x, number, amount, test_holdout_prct, seed)
   test_holdout_prct = NULL, seed = NULL)
 
 \method{add_resample_samples}{modeler}(x, number, amount,
+  test_holdout_prct = NULL, seed = NULL)
+
+\method{add_resample_samples}{forecaster}(x, number, amount,
   test_holdout_prct = NULL, seed = NULL)
 }
 \arguments{

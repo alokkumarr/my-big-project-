@@ -3,17 +3,12 @@
 \name{predict.forecast_model}
 \alias{predict.forecast_model}
 \alias{predict}
-\title{Predict Forecast method}
+\title{Forecast Prediction Method}
 \usage{
-\method{predict}{forecast_model}(mobj, ...)
+\method{predict}{forecast_model}(obj, periods, data, level, ...)
 
 predict(...)
 }
-\arguments{
-\item{mobj}{forecast model object as a result of fit function}
-}
 \description{
-Method to make forecast predictions using a forecaster model object
-
 Make model predictions
 }

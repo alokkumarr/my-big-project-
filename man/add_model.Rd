@@ -4,13 +4,12 @@
 \alias{add_model}
 \title{Add Model to Modeler Object function}
 \usage{
-add_model(obj, pipeline = pipeline(), method, ..., desc = NULL,
-  path = NULL)
+add_model(obj, pipe = NULL, method, ..., class, desc = NULL, path = NULL)
 }
 \arguments{
 \item{obj}{modeler object}
 
-\item{pipeline}{pipeline object. default is empty pipeline which applies no
+\item{pipe}{pipeline object. default is empty pipeline which applies no
 data transformations}
 
 \item{method}{string input of model method}

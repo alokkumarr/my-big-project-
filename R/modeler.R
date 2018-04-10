@@ -17,6 +17,7 @@ new_modeler <- function(df,
                         samples,
                         models,
                         measure,
+                        evaluate,
                         ...){
 
 
@@ -31,6 +32,7 @@ new_modeler <- function(df,
   checkmate::assert_class(samples, "samples")
   checkmate::assert_list(models)
   checkmate::assert_list(measure)
+  checkmate::assert_data_frame(evaluate)
 
   structure(
     list(
@@ -47,6 +49,7 @@ new_modeler <- function(df,
       samples = samples,
       models = models,
       measure = measure,
+      evaluate = evaluate,
       ...
     ),
     class = "modeler")
@@ -116,6 +119,7 @@ modeler <- function(df,
   default_samples <- add_default_samples(df)
   empty_models <- list()
   measure <- list()
+  evaluate <- data.frame()
 
   valid_modeler(
     new_modeler(
@@ -131,12 +135,24 @@ modeler <- function(df,
       samples = default_samples,
       models = empty_models,
       measure = measure,
+      evaluate = evaluate,
       ...)
   )
 }
 
 
+
+# Modeler Functions -------------------------------------------------------
+
+
+
 #' Get Models Status
+#'
+#' Function to return modeler's model statuses
+#'
+#' @param obj modeler object
+#' @param id one or more model id characters
+#' @export
 get_models_status <- function(obj, id = NULL){
 
   models <- obj$models
@@ -152,21 +168,21 @@ get_models_status <- function(obj, id = NULL){
 #' Function to access all modeler models. Subsettable by either id or status
 #'
 #' @param obj modeler object
-#' @param id vector of id strings
+#' @param id one or more model id characters
 #' @param status model status code. accepts "created", "added", "trained", "evaluated", or "selected"
 #'
 #' @return list of model objects
 #' @export
-get_models <- function(obj, id = NULL, status = NULL) {
+get_models <- function(obj, ids = NULL, status = NULL) {
   checkmate::assert_class(obj, "modeler")
-  checkmate::assert_character(id, null.ok = TRUE)
+  checkmate::assert_character(ids, null.ok = TRUE)
   checkmate::assert_choice(status,
                            choices = c("created", "added", "trained", "evaluated", "selected"),
                            null.ok = TRUE)
 
   models <- obj$models
-  if(! is.null(id))
-    models <- models[[names(models) == id]]
+  if(! is.null(ids))
+    models <- models[names(models) %in% ids]
 
   if(! is.null(status))
     models <- models[sapply(models, function(m) m$status) == status]
@@ -175,37 +191,80 @@ get_models <- function(obj, id = NULL, status = NULL) {
 }
 
 
+#' Get Model Validation Predictions
+#'
+#' @param obj modeler object
+#' @param ids one or more model id characters
+#'
+#' @export
+get_validation_predictions <- function(obj, ids = NULL) {
+  checkmate::assert_class(obj, "modeler")
+  checkmate::assert_character(ids, null.ok = TRUE)
+  models <- get_models(obj, ids = ids)
 
-train_models.modeler <- function(obj, id = NULL){
-  checkmate::assert_character(id, null.ok = TRUE)
+  preds <- data.frame()
+  for (model in models) {
+    checkmate::assert_class(model, "model")
+    checkmate::assert_choice(model$status, c("trained", "evaluated", "selected"))
 
-  status <- get_models_status(obj)
-  if(! is.null(id))
-    status <- status[names(status) == id]
-
-  added_ids <- names(status == "added")
-  for(id in added_ids) {
-    model <- get_models(obj, id = id)
-    model$pipe <- flow(obj$data, model$pipe)
-    indicies <- get_indicies(obj)
-    for(index in indicies) {
-      df_index <- model$pipe$output %>% dplyr::slice(index$train)
-      fm <- fit_model(obj, data = df_index)
+    for (i in seq_along(model$performance)) {
+      smpl_name <- names(model$performance)[i]
+      preds <- preds %>%
+        dplyr::union_all(
+          model$performance[[i]]$validation %>%
+            dplyr::mutate(model = model$id,
+                          sample = smpl_name)
+        )
     }
   }
+
+  preds
 }
 
 
 
-fit_model.model <- function(obj, data, ...) {
-  fit(
-    structure(list(id = obj$id), class = obj$class),
-    method = obj$method,
-    method_args = obj$method_args,
-    target = obj$target,
-    data = data,
-    ...
-  )
+#' Get Model Train Fits
+#'
+#' @param obj modeler object
+#' @param id model id character
+#'
+#' @export
+get_train_fits <- function(obj, id) {
+  checkmate::assert_class(obj, "modeler")
+  checkmate::assert_character(id, null.ok = TRUE)
+  model <- get_models(obj, ids = id)[[1]]
+  checkmate::assert_class(model, "model")
+  checkmate::assert_choice(model$status, c("trained", "evaluated", "selected"))
+
+  preds <- data.frame()
+  for (i in seq_along(model$performance)) {
+    preds <- preds %>%
+      rbind(model$performance[[i]]$train %>%
+              dplyr::mutate(sample = names(model$performance)[i]))
+  }
+
+  preds
+}
+
+
+#' Get Target Data function
+#'
+#' Returns modeler target data. Calls get_target_df generic
+#'
+#' @param obj modeler object
+#' @export
+get_target <- function(obj) {
+  checkmate::assert_class(obj, "modeler")
+  get_target_df(obj$data, obj$target)
+}
+
+
+#' Get Model Evaluation Summary
+#'
+#' Returns data.frame with measure calculated on the validation samples
+get_evalutions <- function(obj) {
+  checkmate::assert_class(obj, "modeler")
+  obj$evaluate
 }
 
 
@@ -219,44 +278,9 @@ train_models <- function(obj, ...) {
 }
 
 
-#' Fit Model Generic
-#' @export
-fit_model <- function(obj, ...) {
-  UseMethod("fit_model")
-}
-
-
-#' @export
-fit <- function(obj, method, method_args, target, data, ...) {
-  UseMethod("fit")
-}
-
-
 #' Evalutate Models Generic
 evaluate_models <- function(obj, ...) {
   UseMethod("evaluate_models")
-}
-
-#' @export
-evaluate <- function(x, ...) {
-  UseMethod("evaluate", x)
-}
-
-
-
-
-#' Fit Args Generic
-#' @export
-fit_args <- function(x, ...) {
-  UseMethod("fit_args", x)
-}
-
-
-
-
-#' @export
-get_predictions <- function(x, ...) {
-  UseMethod("get_predictions", x)
 }
 
 
@@ -271,4 +295,54 @@ get_coefs <- function(x, ...) {
   UseMethod("get_coefs", x)
 }
 
+#' Get Target Dataframe Generic Method
+#'
+#' Function to return modeler target
+get_target_df <- function(obj, target) {
+  UseMethod("get_target_df")
+}
 
+
+
+# Modeler Class Methods ---------------------------------------------------
+
+
+#' Train Models Method for Modeler Class
+train_models.modeler <- function(obj, id = NULL) {
+  checkmate::assert_character(id, null.ok = TRUE)
+
+  status <- get_models_status(obj)
+  if (!is.null(id))
+    status <- status[names(status) == id]
+
+  added_ids <- names(status == "added")
+  for (id in added_ids) {
+    model <- get_models(obj, ids = id)[[1]]
+    model$pipe <- flow(obj$data, model$pipe)
+    indicies <- get_indicies(obj)
+    model$performance <- indicies
+    for (i in seq_along(indicies)) {
+      index <- indicies[[i]]
+      model <- fit(model,
+                   data = model$pipe$output %>% dplyr::slice(index$train))
+      fitted <- fitted(model)
+      predicted <- predict(model,
+                           data = model$pipe$output %>% dplyr::slice(index$train))
+      perf <- list(train = data.frame("index" = index$train,
+                                      fitted = fitted),
+                   validation = data.frame("index" = index$validation,
+                                           predicted = predicted))
+      model$performance[[i]] <- perf
+    }
+  }
+  obj
+}
+
+
+#' Get Target data.frame Method
+#'
+#'@export
+get_target_df.data.frame <- function(df, target) {
+ checkmate::assert_subset(target, colnames(df))
+  df[, target, drop=FALSE]
+}

@@ -4,10 +4,10 @@
 \alias{model}
 \title{Model Class Helper}
 \usage{
-model(pipeline = pipeline(), method, ..., desc = NULL, path = NULL)
+model(pipe, target, method, ..., class, desc = NULL, path = NULL)
 }
 \arguments{
-\item{pipeline}{pipeline object. default is empty pipeline which applies no
+\item{pipe}{pipeline object. default is empty pipeline which applies no
 data transformations}
 
 \item{method}{string input of model method}

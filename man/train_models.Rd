@@ -4,7 +4,7 @@
 \alias{train_models}
 \title{Train Model Generic}
 \usage{
-train_models(obj, model, ...)
+train_models(obj, ...)
 }
 \description{
 Train Model Generic

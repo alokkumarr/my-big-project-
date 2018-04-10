@@ -4,14 +4,19 @@
 \alias{forecaster}
 \title{Forecaster Constructer Function}
 \usage{
-forecaster(df, target, name = NULL, id = NULL, version = NULL,
-  desc = NULL, scientist = NULL, dir = NULL, ...)
+forecaster(df, target, frequency = NULL, prediction_conf_levels = c(80, 95),
+  name = NULL, id = NULL, version = NULL, desc = NULL,
+  scientist = NULL, dir = NULL, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}
 
 \item{target}{target variable for supervised use cases such as forecaster,
 regresser, and classifier}
+
+\item{frequency}{seasonaly frequency of target. Default is NULL - no seasonality}
+
+\item{prediction_conf_levels}{prediction confidence levels. Default is 80 & 95% CIs}
 
 \item{name}{optional name for use case. Default is to append target with type}
 
