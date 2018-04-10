@@ -11,13 +11,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.restassured.response.Response;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.restassured.response.Response;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
@@ -124,7 +121,6 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         outputs.put("mode", "replace");
         outputs.put("format", "parquet");
         outputs.put("catalog", "data");
-        outputs.put("dataSet", "WBAPARSER01");
 
         ArrayNode parameters = config.putArray("parameters");
         ObjectNode p1 = parameters.addObject();
@@ -145,13 +141,11 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
             .extract()
             .response();
         String resp = response.getBody().asString();
+
         assert (resp != null);
         log.info("Response: " + resp);
-
         JsonNode node = mapper.reader().readTree(resp);
-
         assert (node != null);
-
         String id = node.get("id").asText();
         return id;
     }
@@ -162,7 +156,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
      * Parse a CSV file into dataset with given name using Workbench
      * Services.
      */
-    private void parseDataset(String name) throws JsonProcessingException {
+    private void parseDataset(String name) throws IOException {
         ObjectNode root = mapper.createObjectNode();
         root.put("name", name);
         root.put("component", "parser");
@@ -184,11 +178,34 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         config.put("quoteChar", "\"");
         config.put("quoteEscape", "\\");
         config.put("headerSize", "0");
+        ObjectNode outputs = config.putObject("output");
+        outputs.put("dataSet", name);
+        outputs.put("mode", "replace");
+        outputs.put("format", "parquet");
+        outputs.put("catalog", "data");
+
+        ArrayNode parameters = config.putArray("parameters");
+        ObjectNode p1 = parameters.addObject();
+        p1.put("name", "spark.master");
+        p1.put("value", "local[*]");
+
         String json = mapper.writeValueAsString(root);
-        given(authSpec)
+        log.info("request: " + json);
+
+        Response response = given(authSpec)
             .body(json)
             .when().post(WORKBENCH_PATH + "/datasets")
-            .then().assertThat().statusCode(200);
+            .then().assertThat().statusCode(200)
+            .extract()
+            .response();
+        String resp = response.getBody().asString();
+
+        assert (resp != null);
+        log.info("Response: " + resp);
+        JsonNode node = mapper.reader().readTree(resp);
+        assert (node != null);
+
+
     }
 
     /**
@@ -251,6 +268,11 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
              * preregistered */
             //.body(datasetPath, isA(Map.class))
             .extract().response();
+
+        String resp = response.getBody().asString();
+        assert (resp != null);
+        log.info("Dataset Status Response: " + resp);
+
         return response.path(statusPath);
     }
 
@@ -261,10 +283,11 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         String id = parseDataset2();
         assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
         log.info("ID: " + id);
+        waitForDataset(id);
     }
 
     @Test
-    public void testParseDataset() throws JsonProcessingException {
+    public void testParseDataset() throws IOException {
         String name = "test_parse";
         parseDataset(name);
         /* Workaround: Until the dataset creation API provides the

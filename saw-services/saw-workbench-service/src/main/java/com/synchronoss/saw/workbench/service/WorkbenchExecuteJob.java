@@ -43,27 +43,31 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
-        log.debug("Start execute job");
+        log.info("Start execute job");
         AsynchAbstractComponent aac = null;
         switch (ngctx.componentName) {
-            case "sql":
-                aac = new AsynchNGSQLComponent(ngctx);
-                break;
-            case "parser":
-                aac = new AsynchNGParser(ngctx);
-                break;
-            case "transformer":
-                aac = new AsynchNGTransformerComponent(ngctx);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown component: "
-                    + ngctx.componentName);
+        case "sql":
+            aac = new AsynchNGSQLComponent(ngctx);
+            break;
+        case "parser":
+            aac = new AsynchNGParser(ngctx);
+            break;
+        case "transformer":
+            aac = new AsynchNGTransformerComponent(ngctx);
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown component: "
+                + ngctx.componentName);
         }
         if (!aac.initComponent(jobContext.sc())) {
             log.error("Could not initialize component");
             return -1;
         }
-        log.debug("Starting Workbench job");
-        return aac.run();
+        log.info("Starting Workbench job");
+        int rc = aac.run();
+        log.info("Workbench job completed, result: " + rc + " error: "
+            + aac.getError());
+
+        return rc;
     }
 }
