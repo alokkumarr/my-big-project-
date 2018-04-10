@@ -188,9 +188,15 @@ export const AnalyzeListViewComponent = {
       forEach(this.cronJobs, cron => {
         if (cron.jobDetails.analysisID === rowData.id) {
           if (!isEmpty(cron.jobDetails.cronExpression)) {
-            const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
-            scheduleHuman = cronstrue.toString(localCron);
+            if (cron.jobDetails.activeTab === 'hourly') {
+              //there is no time stamp in hourly cron hence converting to utc and local is not required.
+              scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);  
+            } else {
+              const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
+              scheduleHuman = cronstrue.toString(localCron);  
+            }
           } else {
+            // Need to validate if the schedule is executed or not since this is one time execution
             const todaysDate = new Date();
             const date =  new Date(cron.jobDetails.jobScheduleTime);
             if (date > todaysDate) {
