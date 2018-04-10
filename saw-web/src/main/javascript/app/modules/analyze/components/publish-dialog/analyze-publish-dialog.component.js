@@ -169,7 +169,6 @@ export const AnalyzePublishDialogComponent = {
         this.triggerSchedule();
       } else if (this.validateForm()) {
         let cronJobName = this.model.id;
-        let jobTime = moment.utc().format();
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
@@ -189,7 +188,7 @@ export const AnalyzePublishDialogComponent = {
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: jobTime,
+          jobScheduleTime: moment.utc().format(),
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
