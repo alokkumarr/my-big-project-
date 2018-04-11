@@ -9,7 +9,7 @@
 
 <div *ngIf="scheduleType === 'immediate'" [ngClass]="{'scheduleType': selectedItem === 'immediate'}" class="tabcontent">
   <mat-radio-group [(ngModel)]="immediate.immediatetype">
-    <mat-radio-button value="currenttime" (click)="generateImmediateSchedule(immediate.immediatetype);">Immediate </mat-radio-button>
+    <mat-radio-button value="currenttime" (click)="generateImmediateSchedule(immediate.immediatetype);">Schedule Immediately </mat-radio-button>
     <br/><br/><br/>
   </mat-radio-group>
 </div>
