@@ -87,7 +87,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
                 List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
                 String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
 
-                MoveDataDescriptor desc = new SQLMoveDataDescriptor(
+                MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(
                         resultDataDesc.get(on),        // SQLDescriptor
                         (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),
                         kl);
