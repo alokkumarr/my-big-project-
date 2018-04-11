@@ -6,7 +6,6 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as isArray from 'lodash/isArray';
-import * as get from 'lodash/get';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
@@ -15,11 +14,9 @@ import * as clone from 'lodash/clone';
 import * as split from 'lodash/split';
 import * as isPlainObject from 'lodash/isPlainObject';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as fpPick from 'lodash/fp/pick';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
 import * as filter from 'lodash/filter';
-import * as fpForEach from 'lodash/fp/forEach';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
@@ -28,8 +25,7 @@ import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.comp
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import {
   ArtifactColumnPivot,
-  Sort,
-  Format
+  Sort
 } from '../../../modules/analyze/models';
 import {
   DATE_TYPES,
@@ -278,7 +274,6 @@ export class PivotGridComponent {
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      const dataValue = dataPoint[name];
       forEach(columnsToFormat, ({name, dateInterval, manualFormat}) => {
         clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval, manualFormat);
       });

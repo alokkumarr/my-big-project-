@@ -20,9 +20,9 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   private _filter;
   private model: any = {};
   private filterCache: {gte?, lte?, preset?};
-  private presets = DATE_PRESETS;
+  private presets = DATE_PRESETS; // tslint:disable-line
   private defaults: {min, max};
-  private showDateFields: boolean;
+  private showDateFields: boolean; // tslint:disable-line
   private clearFiltersListener: Subscription;
   private applyFiltersListener: Subscription;
   private closeFiltersListener: Subscription;

@@ -6,7 +6,6 @@ import {
   AfterViewInit,
   Input,
   Output,
-  Inject,
   ViewChild,
   EventEmitter
 } from '@angular/core';
@@ -36,9 +35,9 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
 
   private _artifacts: Array<any>;
   private query: string;
-  private readOnlyMode: boolean = false;
+  private readOnlyMode: boolean = false; // tslint:disable-line
 
-  private editorOptions = {
+  private editorOptions = { // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true, // the editor completes the statement when you hit Ctrl + Space
     enableLiveAutocompletion: true, // the editor completes the statement while you are typing
@@ -148,8 +147,8 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   /**
    * Shows the preview of an action from list in editor.
    * shifts the editor in readonly mode.
-   * 
-   * @param {string} action 
+   *
+   * @param {string} action
    * @memberof SqlScriptComponent
    */
   viewAction(action: string) {

@@ -92,9 +92,11 @@ export const JSPlumbTable = {
     }
 
     onSelectAggregateType(aggregateType, field) {
+
       if (!isUndefined(field.format)) {
         delete field.format;
       }
+
       this.didAnalysisChange = true;
       field.aggregate = aggregateType.value;
       field.meta.aggregate = aggregateType.value;
