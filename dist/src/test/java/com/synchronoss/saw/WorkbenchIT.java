@@ -271,8 +271,6 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
 
         String resp = response.getBody().asString();
         assert (resp != null);
-        log.info("Dataset Status Response: " + resp);
-
         return response.path(statusPath);
     }
 
@@ -295,6 +293,8 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         String id = "workbench::" + name;
         waitForDataset(id);
     }
+
+
 
 
 }

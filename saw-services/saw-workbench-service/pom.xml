@@ -174,7 +174,7 @@
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>xdf-ext</artifactId>
-			<version>1.0.5-SNAPSHOT</version>
+			<version>1.0.7</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -185,7 +185,7 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-component</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>1.0.7</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -196,7 +196,7 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-sql</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>1.0.7</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -207,7 +207,7 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-parser</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>1.0.7</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -218,7 +218,7 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-transformer</artifactId>
-      <version>1.0.5-SNAPSHOT</version>
+      <version>1.0.7</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
