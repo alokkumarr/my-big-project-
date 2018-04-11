@@ -201,7 +201,7 @@ class Analysis extends BaseController {
       }
         m_log.debug("search key"+keys);
         json merge contentsAnalyze(searchAnalysisJson(keys))
-}     }
+     }
       case "execute" => {
 
         logWithTime(m_log, "Execute analysis from controller", {
