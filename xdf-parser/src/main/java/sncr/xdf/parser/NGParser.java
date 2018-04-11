@@ -233,7 +233,7 @@ public class NGParser extends AbstractComponent implements WithDLBatchWriter, Wi
             logger.error(error);
             return rc;
         }
-        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+        ctx.resultDataDesc.add(new MoveDataDescriptor(tempDir  + Path.SEPARATOR + outputDataSetName, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
         return 0;
     }
 
