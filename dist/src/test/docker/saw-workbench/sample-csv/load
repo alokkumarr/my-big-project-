@@ -8,7 +8,6 @@ dir=$(dirname $0)
 
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
-hadoop_mkdir="hadoop fs -mkdir -p"
 datalake_raw=/main/raw
 
 wait_maprfs() {
@@ -26,23 +25,10 @@ init_datalake() {
 }
 
 load_data() {
-    echo "Loading sample CSV data 1"
+    echo "Loading sample CSV data"
     $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
-
-    echo "Loading sample CSV data 2"
-    $sudo_mapr $hadoop_put $dir/RevenueVehicleMaintPerf2.csv $datalake_raw
-
 }
-
-create_project_dirs() {
-    echo "Create prohject directory srtructure"
-    $sudo_mapr $hadoop_mkdir /main/workbench/dl/fs/data
-
-}
-
 
 wait_maprfs
 init_datalake
 load_data
-create_project_dirs
-
