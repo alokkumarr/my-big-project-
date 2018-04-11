@@ -53,6 +53,10 @@ public class DLBatchWriter {
         return parser.parse(finalResult.schema().json());
     }
 
+    public long extractrecordCount(Dataset<Row> dataset) {
+        return dataset.count();
+    }
+
 
     /**
      * The default method to write data into datalake,
