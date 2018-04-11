@@ -99,3 +99,23 @@ export const COMBO_TYPES = [{
   value: 'area',
   icon: 'icon-area-chart'
 }];
+
+export const SCHEDULE_TYPES = [{
+  label: 'Immediate',
+  value: 'immediate'
+}, {
+  label: 'Hourly',
+  value: 'hourly'
+}, {
+  label: 'Daily',
+  value: 'daily'
+}, {
+  label: 'Weekly',
+  value: 'weeklybasis'
+}, {
+  label: 'Monthly',
+  value: 'monthly'
+}, {
+  label: 'Yearly',
+  value: 'yearly'
+}];

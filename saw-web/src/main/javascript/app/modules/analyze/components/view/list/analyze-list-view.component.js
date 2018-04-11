@@ -186,15 +186,13 @@ export const AnalyzeListViewComponent = {
     generateSchedule(rowData) {
       let scheduleHuman = '';
       forEach(this.cronJobs, cron => {
-        if (cron.jobDetails.analysisID === rowData.id) {
-          if (!isEmpty(cron.jobDetails.cronExpression)) {
-            if (cron.jobDetails.activeTab === 'hourly') {
-              // there is no time stamp in hourly cron hence converting to utc and local is not required.
-              scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);
-            } else {
-              const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
-              scheduleHuman = cronstrue.toString(localCron);
-            }
+        if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
+          if (cron.jobDetails.activeTab === 'hourly') {
+            // there is no time stamp in hourly cron hence converting to utc and local is not required.
+            scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);
+          } else {
+            const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
+            scheduleHuman = cronstrue.toString(localCron);
           }
         }
       });

@@ -1,13 +1,10 @@
 <div class="tab">
-  <button class="tablinks" (click)="openSchedule(event, 'immediate')" [ngClass]="{'active': scheduleType === 'immediate'}">Immediate</button>
-  <button class="tablinks" (click)="openSchedule(event, 'hourly')" [ngClass]="{'active': scheduleType === 'hourly'}">Hourly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'daily')" [ngClass]="{'active': scheduleType === 'daily'}">Daily</button>
-  <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')" [ngClass]="{'active': scheduleType === 'weeklybasis'}">Weekly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'monthly')" [ngClass]="{'active': scheduleType === 'monthly'}">Monthly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'yearly')" [ngClass]="{'active': scheduleType === 'yearly'}">Yearly</button>
+  <div *ngFor="let schedule of schedules">
+    <button class="tablinks" (click)="openSchedule(event, schedule.value)" [ngClass]="{'active': scheduleType === schedule.value}">{{schedule.label}}</button>  
+  </div>
 </div>
 
-<div *ngIf="scheduleType === 'immediate'" [ngClass]="{'scheduleType': selectedItem === 'immediate'}" class="tabcontent">
+<div *ngIf="scheduleType === 'immediate'" [ngClass]="{'scheduleType': selectedItem === 'immediate'}" class="tabcontent immediate">
   <mat-radio-group [(ngModel)]="immediate.immediatetype">
     <mat-radio-button value="currenttime" (click)="generateImmediateSchedule(immediate.immediatetype);">Schedule Immediately </mat-radio-button>
     <br/><br/><br/>

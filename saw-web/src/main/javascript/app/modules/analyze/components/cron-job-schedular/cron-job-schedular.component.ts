@@ -11,6 +11,8 @@ import {
   generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
+import { SCHEDULE_TYPES } from '../../../../common/consts';
+
 const template = require('./cron-job-schedular.component.html');
 require('./cron-job-schedular.component.scss');
 
@@ -35,6 +37,7 @@ export class CronJobSchedularComponent {
   	  second: '',
   	  hourType: 'AM'
   	};
+    this.schedules = SCHEDULE_TYPES;
   	this.dailyTypeWeek = clone(this.dailyTypeDay);
   	this.weeklybasisDate = clone(this.dailyTypeDay);
   	this.specificDayMonth = clone(this.dailyTypeDay);
@@ -167,14 +170,14 @@ export class CronJobSchedularComponent {
       if (this.immediate.immediatetype === 'currenttime') {
         this.cronChange('', this.scheduleType, this.immediate.immediatetype);
       }
-    break;
+      break;
     case 'hourly':
       //Generating Cron expression for selections made in hourly tab
       this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);
       if (isValid(this.CronExpression)) {
         this.cronChange(this.CronExpression, this.scheduleType, '');
       }
-    break;
+      break;
     case 'daily':
       //Generating Cron expression for selections made in daily tab
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
