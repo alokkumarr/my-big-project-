@@ -817,7 +817,7 @@ export class ChartService {
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
     }
-    
+
     return concat(
       changes,
       this.addTooltipsAndLegend(fields, type, opts)
