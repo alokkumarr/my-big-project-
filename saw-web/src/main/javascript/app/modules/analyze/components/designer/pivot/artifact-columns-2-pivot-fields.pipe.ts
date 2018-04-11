@@ -7,13 +7,10 @@ import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as fpFilter from 'lodash/fp/filter';
 
 import {
-  ArtifactColumns,
-  ArtifactColumn,
-  ArtifactColumnFilter
+  ArtifactColumns
 } from '../types';
 import {
-  NUMBER_TYPES,
-  DATE_TYPES
+  NUMBER_TYPES
 } from '../../../consts';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {

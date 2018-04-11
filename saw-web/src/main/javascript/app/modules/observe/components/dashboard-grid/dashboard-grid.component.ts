@@ -23,7 +23,6 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
-import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
 import * as flatMap from 'lodash/flatMap';

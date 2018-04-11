@@ -14,12 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class KPIDataQueryBuilder {
 
-    private static final String KPI_VALUES= "kpi_values";
     private static final Logger logger = LoggerFactory.getLogger(
         KPIDataQueryBuilder.class);
     private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
@@ -72,9 +72,11 @@ public class KPIDataQueryBuilder {
         final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         for (com.synchronoss.querybuilder.model.kpi.Filter item : filters)
         {
+            DynamicConvertor dynamicConvertor = null;
             if (item.getType().value().equals(Filter.Type.DATE.value()) || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
                 if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
-                {  DynamicConvertor dynamicConvertor = null;
+                {
+                    logger.info("Build KPI value with preset value : "+item.getModel().getPreset().value());
                     if(current)
                      dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
                     else
@@ -88,13 +90,27 @@ public class KPIDataQueryBuilder {
                     builder.add(rangeQueryBuilder);
                 }
                 else {
-                    RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-                    if(item.getType().value().equals(Filter.Type.DATE.value())) {
-                        rangeQueryBuilder.format(DATE_FORMAT);
+                    logger.info("Build KPI value with custom range value : "+item.getModel().getPreset().value());
+                    if (current) {
+                        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                        if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                            rangeQueryBuilder.format(DATE_FORMAT);
+                        }
+                        rangeQueryBuilder.lte(item.getModel().getLte());
+                        rangeQueryBuilder.gte(item.getModel().getGte());
+                        builder.add(rangeQueryBuilder);
                     }
-                    rangeQueryBuilder.lte(item.getModel().getLte());
-                    rangeQueryBuilder.gte(item.getModel().getGte());
-                    builder.add(rangeQueryBuilder);
+                    else
+                    {
+                        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+                        if (item.getType().value().equals(Filter.Type.DATE.value())) {
+                            rangeQueryBuilder.format(DATE_FORMAT);
+                        }
+                         dynamicConvertor  = calculatePriorDateCustomRange(item.getModel());
+                        rangeQueryBuilder.lte(dynamicConvertor.getLte());
+                        rangeQueryBuilder.gte(dynamicConvertor.getGte());
+                        builder.add(rangeQueryBuilder);
+                    }
                 }
             }
             // make the query based on the filter given
@@ -118,5 +134,40 @@ public class KPIDataQueryBuilder {
                 dataField, searchSourceBuilder);
         }
      return searchSourceBuilder;
+    }
+
+    /**
+     * This method is used to calculate the KPI custom range filter for
+     * prior data.
+     * @param model
+     * @return
+     */
+    private DynamicConvertor calculatePriorDateCustomRange(Model model)
+    {
+        final List<String> dateFormats = Arrays.asList("yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
+        Date gte = null;
+        Date lte = null;
+        DynamicConvertor dynamicConvertor = new DynamicConvertor() ;
+        for(String format: dateFormats){
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            try{
+                gte =sdf.parse(model.getGte());
+                lte = sdf.parse(model.getLte());
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+                cal.setTime(gte);
+                long t1 = cal.getTimeInMillis();
+                cal.setTime(lte);
+                long diff = Math.abs(t1- cal.getTimeInMillis());
+                long startTime = cal.getTimeInMillis();
+                dynamicConvertor.setGte(sdf.format(cal.getTime()));
+                cal.setTimeInMillis(startTime-diff);
+                dynamicConvertor.setLte(sdf.format(cal.getTime()));
+                return dynamicConvertor ;
+            } catch (ParseException e) {
+                //intentionally empty
+            }
+        }
+        throw new IllegalArgumentException("Invalid input for date. Given '"+gte+ ", "+lte+"', expecting format yyyy-MM-dd HH:mm:ss or yyyy-MM-dd.");
     }
 }

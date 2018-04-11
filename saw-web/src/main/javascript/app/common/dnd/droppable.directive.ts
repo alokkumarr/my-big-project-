@@ -7,10 +7,7 @@ import {
   HostBinding
 } from '@angular/core';
 
-import {
-  IDroppableOptions,
-  IDragPayload
-} from './types';
+import { IDroppableOptions } from './types';
 import { dndClasses } from './consts';
 import {DragnDropService} from './dnd.service';
 
@@ -29,11 +26,12 @@ export class DndDroppableDirective {
 
   // apply the classes needed for the droppable container to not
   // take dragenter and dragleave events from it's children
+  // tslint:disable
   @HostBinding(`class.${dndClasses.droppableContainer}`) private _droppableContainer = true;
   @HostBinding(`class.${dndClasses.droppableContainerAfter}`) private _droppableContainerAfter = true;
 
   @HostBinding(`class.${dndClasses.dropAreaDragOver}`) private _isDropAllowed = false;
-
+  // tslint:enable
   private _droppableOptions: IDroppableOptions;
 
   constructor(
