@@ -194,6 +194,14 @@ class Analysis extends BaseController {
         else
           json merge contentsAnalyze(searchAnalysisJson(keys))
       }
+      case "export" => {
+        val keys = (json \ "contents" \ "keys")(0) match {
+          case keys: JObject => keys
+          case obj => throw new ClientException("Expected object, got: " + obj)
+      }
+        m_log.debug("search key"+keys);
+        json merge contentsAnalyze(searchAnalysisJson(keys))
+}     }
       case "execute" => {
 
         logWithTime(m_log, "Execute analysis from controller", {
