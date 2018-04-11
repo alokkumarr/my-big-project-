@@ -18,6 +18,7 @@ new_modeler <- function(df,
                         models,
                         measure,
                         evaluate,
+                        final_model,
                         ...){
 
 
@@ -33,6 +34,7 @@ new_modeler <- function(df,
   checkmate::assert_list(models)
   checkmate::assert_list(measure)
   checkmate::assert_data_frame(evaluate)
+  checkmate::assert_class(final_model, "model", null.ok = TRUE)
 
   structure(
     list(
@@ -50,6 +52,7 @@ new_modeler <- function(df,
       models = models,
       measure = measure,
       evaluate = evaluate,
+      final_model = final_model,
       ...
     ),
     class = "modeler")
@@ -120,6 +123,7 @@ modeler <- function(df,
   empty_models <- list()
   measure <- list()
   evaluate <- data.frame()
+  final_model <- NULL
 
   valid_modeler(
     new_modeler(
@@ -136,6 +140,7 @@ modeler <- function(df,
       models = empty_models,
       measure = measure,
       evaluate = evaluate,
+      final_model = final_model,
       ...)
   )
 }
@@ -191,62 +196,6 @@ get_models <- function(obj, ids = NULL, status = NULL) {
 }
 
 
-#' Get Model Validation Predictions
-#'
-#' @param obj modeler object
-#' @param ids one or more model id characters
-#'
-#' @export
-get_validation_predictions <- function(obj, ids = NULL) {
-  checkmate::assert_class(obj, "modeler")
-  checkmate::assert_character(ids, null.ok = TRUE)
-  models <- get_models(obj, ids = ids)
-
-  preds <- data.frame()
-  for (model in models) {
-    checkmate::assert_class(model, "model")
-    checkmate::assert_choice(model$status, c("trained", "evaluated", "selected"))
-
-    for (i in seq_along(model$performance)) {
-      smpl_name <- names(model$performance)[i]
-      preds <- preds %>%
-        dplyr::union_all(
-          model$performance[[i]]$validation %>%
-            dplyr::mutate(model = model$id,
-                          sample = smpl_name)
-        )
-    }
-  }
-
-  preds
-}
-
-
-
-#' Get Model Train Fits
-#'
-#' @param obj modeler object
-#' @param id model id character
-#'
-#' @export
-get_train_fits <- function(obj, id) {
-  checkmate::assert_class(obj, "modeler")
-  checkmate::assert_character(id, null.ok = TRUE)
-  model <- get_models(obj, ids = id)[[1]]
-  checkmate::assert_class(model, "model")
-  checkmate::assert_choice(model$status, c("trained", "evaluated", "selected"))
-
-  preds <- data.frame()
-  for (i in seq_along(model$performance)) {
-    preds <- preds %>%
-      rbind(model$performance[[i]]$train %>%
-              dplyr::mutate(sample = names(model$performance)[i]))
-  }
-
-  preds
-}
-
-
 #' Get Target Data function
 #'
 #' Returns modeler target data. Calls get_target_df generic
@@ -264,12 +213,17 @@ get_target <- function(obj) {
 #' Returns data.frame with measure calculated on the validation samples
 get_evalutions <- function(obj) {
   checkmate::assert_class(obj, "modeler")
-  obj$evaluate
+  suppressWarnings(
+    bind_rows(lapply(obj$models, function(m) data.frame(method = as.character(m$method))),
+              .id = "model") %>%
+      inner_join(obj$evaluate, by = "model")
+  )
 }
 
 
-# Modeler Class Generics --------------------------------------------------
 
+
+# Modeler Class Generics --------------------------------------------------
 
 
 #' Train Model Generic
@@ -283,17 +237,22 @@ evaluate_models <- function(obj, ...) {
   UseMethod("evaluate_models")
 }
 
-
+#' Set Final Model Generic
+#'
+#' Function to select the final model. See method argument for options
+#'
+#' @param obj forecaster object
+#' @param method selection method. Choices are 'manual' which requires a valid
+#'   id or 'best' method which selects the best model based on the measure
+#' @param id optional model id input required for manual method
+#' @param reevaluate logical option to re-evaluate the final model. Requires a
+#'   test holdout sample
+#' @param refit logical option to re-fit final model on entire training dataset
 #' @export
-get_fit <- function(x, ...) {
-  UseMethod("get_fit", x)
+set_final_model <- function(obj, method, id, reevaluate, refit) {
+  UseMethod("set_final_model")
 }
 
-
-#' @export
-get_coefs <- function(x, ...) {
-  UseMethod("get_coefs", x)
-}
 
 #' Get Target Dataframe Generic Method
 #'
@@ -303,40 +262,16 @@ get_target_df <- function(obj, target) {
 }
 
 
+#' Tidy Model Performance Generic
+#'
+#' Function to extract model performance on all samples. Converts output to
+#' data.frame
+tidy_performance <- function(obj) {
+  UseMethod("tidy_performance")
+}
+
 
 # Modeler Class Methods ---------------------------------------------------
-
-
-#' Train Models Method for Modeler Class
-train_models.modeler <- function(obj, id = NULL) {
-  checkmate::assert_character(id, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(id))
-    status <- status[names(status) == id]
-
-  added_ids <- names(status == "added")
-  for (id in added_ids) {
-    model <- get_models(obj, ids = id)[[1]]
-    model$pipe <- flow(obj$data, model$pipe)
-    indicies <- get_indicies(obj)
-    model$performance <- indicies
-    for (i in seq_along(indicies)) {
-      index <- indicies[[i]]
-      model <- fit(model,
-                   data = model$pipe$output %>% dplyr::slice(index$train))
-      fitted <- fitted(model)
-      predicted <- predict(model,
-                           data = model$pipe$output %>% dplyr::slice(index$train))
-      perf <- list(train = data.frame("index" = index$train,
-                                      fitted = fitted),
-                   validation = data.frame("index" = index$validation,
-                                           predicted = predicted))
-      model$performance[[i]] <- perf
-    }
-  }
-  obj
-}
 
 
 #' Get Target data.frame Method
@@ -345,4 +280,14 @@ train_models.modeler <- function(obj, id = NULL) {
 get_target_df.data.frame <- function(df, target) {
  checkmate::assert_subset(target, colnames(df))
   df[, target, drop=FALSE]
+}
+
+
+# Tidy Performance Method
+#' @export
+tidy_performance.modeler <- function(obj) {
+
+  status <- get_models_status(obj)
+  ids <- names(status == "trained")
+  dplyr::bind_rows(lapply(obj$models, tidy_performance))
 }

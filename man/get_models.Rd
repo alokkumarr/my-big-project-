@@ -4,14 +4,14 @@
 \alias{get_models}
 \title{Get All Modeler Models}
 \usage{
-get_models(obj, id = NULL, status = NULL)
+get_models(obj, ids = NULL, status = NULL)
 }
 \arguments{
 \item{obj}{modeler object}
 
-\item{id}{vector of id strings}
-
 \item{status}{model status code. accepts "created", "added", "trained", "evaluated", or "selected"}
+
+\item{id}{one or more model id characters}
 }
 \value{
 list of model objects

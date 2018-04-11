@@ -6,6 +6,11 @@
 \usage{
 get_models_status(obj, id = NULL)
 }
+\arguments{
+\item{obj}{modeler object}
+
+\item{id}{one or more model id characters}
+}
 \description{
-Get Models Status
+Function to return modeler's model statuses
 }

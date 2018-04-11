@@ -5,7 +5,7 @@
 \alias{predict}
 \title{Forecast Prediction Method}
 \usage{
-\method{predict}{forecast_model}(obj, periods, data, level, ...)
+\method{predict}{forecast_model}(obj, periods, data, level)
 
 predict(...)
 }

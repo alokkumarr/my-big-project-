@@ -207,5 +207,13 @@ predict <- function(...){
 }
 
 
+#' @export
+get_fit <- function(x, ...) {
+  UseMethod("get_fit", x)
+}
 
 
+#' @export
+get_coefs <- function(x, ...) {
+  UseMethod("get_coefs", x)
+}

@@ -4,7 +4,7 @@
 \alias{get_forecasts.forecast}
 \title{Get Forecasts from forecast object}
 \usage{
-get_forecasts.forecast(fobj)
+\method{get_forecasts}{forecast}(fobj)
 }
 \arguments{
 \item{fobj}{forecast object}
