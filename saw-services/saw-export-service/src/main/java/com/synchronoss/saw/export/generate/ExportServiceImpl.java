@@ -1,5 +1,7 @@
 package com.synchronoss.saw.export.generate;
 
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -157,8 +159,23 @@ public class ExportServiceImpl implements ExportService{
           // create a directory with unique name in published location to avoid file conflict for dispatch.
           File file = new File(exportBean.getFileName());
           file.getParentFile().mkdir();
-          iFileExporter.generateFile(exportBean ,entity.getBody().getData());
+//          iFileExporter.generateFile(exportBean ,entity.getBody().getData());
 
+          // instead of generating file with above method, let's generate with java streams
+          FileOutputStream fos = new FileOutputStream(file);
+          OutputStreamWriter osw = new OutputStreamWriter(fos);
+          entity.getBody().getData().stream().forEach(
+              line -> {
+                if( line instanceof LinkedHashMap ) {
+                  //write header information
+                  Object[] obj = ((LinkedHashMap) line).keySet().toArray();
+                  exportBean.setColumnHeader(Arrays.copyOf(obj, obj.length, String[].class));
+                }
+                else {
+                  // write normal file
+                }
+              }
+          );
           if (recipients != null && recipients != "")
             MailSender.sendMail(recipients, exportBean.getReportName() + " | " +
                     exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
