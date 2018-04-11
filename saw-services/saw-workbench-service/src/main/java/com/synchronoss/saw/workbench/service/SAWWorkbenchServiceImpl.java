@@ -10,6 +10,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import com.google.gson.JsonElement;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -333,6 +334,19 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
     logger.trace("response structure {}", objectMapper.writeValueAsString(dataSetsJSON));
     return dataSetsJSON;
+  }
+
+  public DataSet getDataSet(String projectId, String dataSet) throws Exception {
+    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSet);
+
+    String dataSetId = projectId + "::" + dataSet;
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+
+    JsonElement dataset = mdtStore.read(dataSetId);
+
+    return objectMapper.readValue(dataset.toString(), DataSet.class);
   }
   
 

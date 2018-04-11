@@ -181,8 +181,8 @@ export class SelectRawdataComponent implements OnInit {
       },
       showRowLines: false,
       showBorders: false,
-      rowAlternationEnabled: false,
-      showColumnLines: false,
+      rowAlternationEnabled: true,
+      showColumnLines: true,
       selection: {
         mode: 'single'
       },

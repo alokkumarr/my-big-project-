@@ -121,7 +121,7 @@ export const AnalyzeChartSettingsComponent = {
       forEach(axisOptions, attr => {
         if (selectedAttr === attr) {
           attr.checked = marker;
-          if (marker === 'x' && DATE_TYPES.includes(selectedAttr.type)) {
+          if (['x', 'g'].includes(marker) && DATE_TYPES.includes(selectedAttr.type)) {
             attr.dateFormat = DEFAULT_DATE_FORMAT.value;
           }
           if (['y', 'z'].includes(marker) && NUMBER_TYPES.includes(selectedAttr.type)) {

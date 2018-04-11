@@ -3,7 +3,7 @@ import {
   ElementRef,
   Input,
   ViewChild
- } from '@angular/core';
+} from '@angular/core';
 
 import * as Highcharts from 'highcharts/highcharts';
 import * as Highstock from 'highcharts/highstock';    // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
@@ -14,7 +14,7 @@ import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
-import {globalChartOptions, chartOptions, stockChartOptions} from './default-chart-options';
+import { globalChartOptions, chartOptions, stockChartOptions } from './default-chart-options';
 import * as isUndefined from 'lodash/isUndefined';
 
 export const UPDATE_PATHS = {
@@ -46,8 +46,8 @@ export class ChartComponent {
   }
 
   ngAfterViewInit() {
-    this.config = defaultsDeep(this.options, chartOptions);
-    this.stockConfig = defaultsDeep(this.options, stockChartOptions);
+    this.config = defaultsDeep(this.config, this.options, chartOptions);
+    this.stockConfig = defaultsDeep(this.stockConfig, this.options, stockChartOptions);
     this.enableExport && this.enableExporting(this.config);
     this.enableExport && this.enableExporting(this.stockConfig);
     if (this.isStockChart) {
