@@ -403,7 +403,9 @@ describe('Privileges tests: privileges.test.js', () => {
 
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
+      homePage.mainMenuExpandBtn.click();
       commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
+      homePage.mainMenuCollapseBtn.click();
     };
   });
 });
