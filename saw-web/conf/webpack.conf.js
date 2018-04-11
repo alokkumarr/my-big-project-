@@ -126,7 +126,7 @@ module.exports = function (env) {
           loader: 'file-loader?name=fonts/[name].[ext]&publicPath=../'
         },
         {
-          test: /\.(png|jpg|svg)$/,
+          test: /\.(png|jpg|svg|gif)$/,
           loader: 'file-loader?name=img/[name].[ext]&publicPath=../'
         }
       ]

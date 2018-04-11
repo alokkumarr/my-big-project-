@@ -159,6 +159,6 @@ select-rawdata {
   .selected-files {
     padding-top: 0;
     max-height: calc(100% - 55px) !important;
-    overflow: scroll;
+    overflow: auto;
   }
 }
