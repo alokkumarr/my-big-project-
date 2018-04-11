@@ -232,7 +232,7 @@ export class ChartService {
         value: 'data',
         name: 'Show Data Value'
       }];
-      config.customTooltip = false;
+      config.customTooltip = true;
       config.legend = false;
       return config;
 
@@ -653,6 +653,7 @@ export class ChartService {
         seriesData.name = yLabel;
         seriesData.dataLabels = seriesData.dataLabels || {};
         seriesData.dataLabels.enabled = labelOptions.enabled;
+
         /* eslint-disable */
         seriesData.dataLabels.formatter = function () {
           if (this.percentage <= 5) {
@@ -816,7 +817,7 @@ export class ChartService {
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
     }
-
+    
     return concat(
       changes,
       this.addTooltipsAndLegend(fields, type, opts)

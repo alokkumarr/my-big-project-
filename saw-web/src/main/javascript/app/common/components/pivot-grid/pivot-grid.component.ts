@@ -322,6 +322,10 @@ export class PivotGridComponent {
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
           const percent = (cloned.aggregate == 'percentage' ? true : false);
+          
+          if (!isUndefined(artifactColumn.format)) {
+            artifactColumn.format.percentage = percent;
+          }
           cloned.format = {
             formatter: getFormatter(artifactColumn.format || (
               FLOAT_TYPES.includes(cloned.type) ? {precision: DEFAULT_PRECISION, percentage: percent} : {precision: 0, percentage: percent}

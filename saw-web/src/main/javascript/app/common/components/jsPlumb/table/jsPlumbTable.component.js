@@ -92,9 +92,8 @@ export const JSPlumbTable = {
     }
 
     onSelectAggregateType(aggregateType, field) {
-      console.log(field);
-      if (!isUndefined(field.format) && field.format.percentage) {
-        delete field.format.percentage;
+      if (!isUndefined(field.format)) {
+        delete field.format;
       }
       this.didAnalysisChange = true;
       field.aggregate = aggregateType.value;

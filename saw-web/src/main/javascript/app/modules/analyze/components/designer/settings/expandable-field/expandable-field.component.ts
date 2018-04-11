@@ -38,6 +38,7 @@ export class ExpandableFieldComponent {
   }
 
   onAggregateChange(value) {
+    delete this.artifactColumn.format;
     this.artifactColumn.aggregate = value;
     this.change.emit({requiresDataChange: true});
   }
