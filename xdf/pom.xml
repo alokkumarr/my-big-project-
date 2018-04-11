@@ -4,7 +4,7 @@
   <parent>
 		<groupId>com.synchronoss.bda</groupId>
 		<artifactId>xdf-nextgen</artifactId>
-		<version>1.0.6</version>
+		<version>1.0.7</version>
   </parent>
 
   <!-- use app.name from parent pom -->
@@ -159,6 +159,8 @@
                   <includes>
                     <include>app_env</include>
                     <include>execute-component.sh</include>
+                    <include>execute-ng-component.sh</include>
+                    <include>test-ng-component.sh</include>
                     <include>mk_conf.sh</include>
                     <include>mk_csv.sh</include>
                     <include>xdf_activate.sh</include>
