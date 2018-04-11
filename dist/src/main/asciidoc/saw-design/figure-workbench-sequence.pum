@@ -6,11 +6,11 @@ Client -> "SAW Security Service": Authentication request
 == Execution ==
 
 Client -> "SAW Gateway Service": Execution request
-"SAW Gateway Service" -> "SAW Execution Service": Execution request
+"SAW Gateway Service" -> "SAW Workbench Service": Execution request
 
-"SAW Execution Service" -> "Apache Spark": Execute Spark SQL
+"SAW Workbench Service" -> "Apache Spark": Execute Spark SQL
 "Apache Spark" -> "MapR-FS": Write results
 "MapR-FS" --> "SAW Execution Service": Read results
 
-"SAW Execution Service" --> "SAW Gateway Service": Execution response
+"SAW Workbench Service" --> "SAW Gateway Service": Execution response
 "SAW Gateway Service" --> Client: Execution response
