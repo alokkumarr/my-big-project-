@@ -19,4 +19,5 @@ public interface SAWWorkbenchService {
   public Inspect inspectFromProjectDirectoybyId(Inspect inspect)throws Exception;
   public Project readSubDirectoriesByProjectId(Project project) throws Exception;
   public List<DataSet> listOfDataSet(Project project) throws Exception;
+  public DataSet getDataSet(String projectId, String datasetId) throws Exception;
 }

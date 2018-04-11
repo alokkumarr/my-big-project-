@@ -61,7 +61,8 @@ export const SidenavComponent = {
       return {
         analyze: 'Analyses',
         observe: 'Dashboards',
-        admin: 'Manage'
+        admin: 'Manage',
+        workbench: 'WORKBENCH'
       }[this._moduleName.toLowerCase()] || '';
     }
 

@@ -2,7 +2,13 @@ package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+
 import java.io.IOException;
+
+import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,8 +30,8 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     private static final String WORKBENCH_PROJECT = "workbench";
     private static final String WORKBENCH_PATH =
         "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
-    private static final int DATASET_WAIT_RETRIES = 20;
-    private static final int DATASET_WAIT_SLEEP_SECONDS = 5;
+    private static final int WAIT_RETRIES = 30;
+    private static final int WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
 
@@ -209,18 +215,10 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     }
 
     /**
-     * Wait until dataset becomes visible in Workbench Services.
-     */
-    private void waitForDataset(String id)
-        throws JsonProcessingException {
-        waitForDatasetRetry(id, DATASET_WAIT_RETRIES);
-    }
-
-    /**
      * Wait until dataset becomes visible in Workbench Services, using
      * the given number of retries before timing out.
      */
-    private void waitForDatasetRetry(String id, int retries)
+    private void waitForDataset(String id, int retries)
         throws JsonProcessingException {
         String status = getDatasetStatus(id);
         if (status == null
@@ -231,14 +229,14 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
                 throw new RuntimeException(
                     "Timed out waiting while waiting for dataset");
             }
-            log.info("Waiting for dataset: id = {}, retries = {}",
-                     id, retries);
+            log.debug("Waiting for dataset: id = {}, retries = {}",
+                      id, retries);
             try {
-                Thread.sleep(DATASET_WAIT_SLEEP_SECONDS * 1000);
+                Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
             } catch (InterruptedException e) {
                 log.debug("Interrupted");
             }
-            waitForDatasetRetry(id, retries - 1);
+            waitForDataset(id, retries - 1);
         } else if (!status.equals("SUCCESS")
                     && !status.equals("FAILED")
                     && !status.equals("PARTIAL")) {
@@ -281,7 +279,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         String id = parseDataset2();
         assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
         log.info("ID: " + id);
-        waitForDataset(id);
+        waitForDataset(id, WAIT_RETRIES);
     }
 
     @Test
@@ -291,10 +289,88 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         /* Workaround: Until the dataset creation API provides the
          * dataset ID, construct it manually here. */
         String id = "workbench::" + name;
-        waitForDataset(id);
+        waitForDataset(id, WAIT_RETRIES);
     }
 
 
 
+
+    @Test
+    public void testListDatasets() {
+        /* Note: Placeholder for Workbench list datasets integration
+         * test.  To be done: Create a dataset and then make
+         * assertions on it when listing available datasets. */
+        given(authSpec)
+            .when().get(WORKBENCH_PATH + "/datasets")
+            .then().assertThat().statusCode(200)
+            .body(containsString(""));
+    }
+
+    @Test
+    public void testPreviewDataset() throws IOException {
+        String name = "test-preview-" + testId();
+        /* Create dataset to be used for testing viewing dataset */
+        parseDataset(name);
+        /* Workaround: Until the dataset creation API provides the
+         * dataset ID, construct it manually here. */
+        String id = "workbench::" + name;
+        waitForDataset(id, WAIT_RETRIES);
+        /* View dataset */
+        ObjectNode root = mapper.createObjectNode();
+        root.put("name", name);
+        Response response = given(authSpec)
+            .body(root)
+            .when().post(WORKBENCH_PATH + "/previews")
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        String previewId = response.path("id");
+        /* Wait for preview to become available */
+        waitForPreview(previewId, WAIT_RETRIES);
+        /* Assert preview rows exist */
+        given(authSpec)
+            .when().get(WORKBENCH_PATH + "/previews/" + previewId)
+            .then().assertThat().statusCode(200)
+            .body("rows", hasSize(3))
+            .body("rows[0].field1", equalTo("foo"));
+    }
+
+    /**
+     * Wait until preview becomes visible in Workbench Services, using
+     * the given number of retries before timing out.
+     */
+    private void waitForPreview(String id, int retries)
+        throws JsonProcessingException {
+        Response response = given(authSpec)
+            .when().get(WORKBENCH_PATH + "/previews/" + id)
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        String status = response.path("status");
+        if (status.equals("success")) {
+            return;
+        } else if (!status.equals("queued")) {
+            throw new RuntimeException("Unknown preview status: " + status);
+        }
+        /* Preview not found yet, so wait more */
+        if (retries == 0) {
+            throw new RuntimeException(
+                "Timed out waiting while waiting for preview");
+        }
+        log.debug("Waiting for preview: id = {}, retries = {}",
+                 id, retries);
+        try {
+            Thread.sleep(WAIT_SLEEP_SECONDS * 1000);
+        } catch (InterruptedException e) {
+            log.debug("Interrupted");
+        }
+        waitForPreview(id, retries - 1);
+    }
+
+    /**
+     * Generate ID suitable for use as suffix in dataset names to
+     * ensure each test gets a unique dataset name
+     */
+    private String testId() {
+        return UUID.randomUUID().toString();
+    }
 
 }

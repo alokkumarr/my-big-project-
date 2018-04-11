@@ -56,8 +56,8 @@
     <mat-step label="ADD_DATASET" [stepControl]="nameFormGroup">
       <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
         <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
-          <span class="list-header" i18n>Selected Files</span>
           <mat-list>
+            <h3 class="list-header" mat-subheader>Selected Files</h3>
             <mat-list-item class="list-items" *ngFor="let file of selectedFiles; index as i" (click)="previewDialog(file)">
               <p mat-line i18n>{{i + 1}}. &ensp; {{ file.name }}</p>
               <div class="icon-div">
@@ -73,7 +73,7 @@
           </mat-card-header>
           <mat-card-content>
             <div class="form-div">
-              <form novalidate [formGroup]="nameFormGroup">
+              <form [formGroup]="nameFormGroup">
                 <section class="input-section">
                   <mat-form-field class="margin20">
                     <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" maxlength="18" required />
@@ -81,6 +81,11 @@
                       Dataset Name is
                       <strong i18n>required</strong>
                     </mat-error>
+                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('pattern')" i18n>
+                      <strong> Only alphabets, numbers are allowed
+                      </strong>
+                    </mat-error>
+                    <mat-hint> Only alphabets, numbers are allowed </mat-hint>
                   </mat-form-field>
                   <!-- <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">
@@ -132,7 +137,7 @@
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span i18n>Previous</span>
         </button>
-        <button mat-raised-button color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
+        <button mat-raised-button color="primary" matStepperNext [disabled]="!nameFormGroup.valid" (click)="triggerParser()" class="stepperBtn">
           <span i18n>ADD</span>
           <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>

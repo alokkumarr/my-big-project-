@@ -14,7 +14,6 @@ import sncr.xdf.sql.ng.AsynchNGSQLComponent;
 import sncr.xdf.transformer.ng.AsynchNGTransformerComponent;
 
 
-
 public class WorkbenchExecuteJob implements Job<Integer> {
     private static final long serialVersionUID = 1L;
     private final String root;
