@@ -41,6 +41,7 @@ const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
 export enum DesignerStates {
+  WAITING_FOR_COLUMNS,
   NO_SELECTION,
   SELECTION_WAITING_FOR_DATA,
   SELECTION_WITH_NO_DATA,
@@ -67,6 +68,7 @@ export class DesignerContainerComponent {
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
+  public isInQueryMode = false;
 
   constructor(
     private _designerService: DesignerService,
@@ -74,10 +76,12 @@ export class DesignerContainerComponent {
   ) {}
 
   ngOnInit() {
+    this.designerState = DesignerStates.WAITING_FOR_COLUMNS;
     switch (this.designerMode) {
     case 'new':
-      this.designerState = DesignerStates.NO_SELECTION;
-      this.initNewAnalysis();
+      this.initNewAnalysis().then(() => {
+        this.designerState = DesignerStates.NO_SELECTION;
+      });
       break;
     case 'edit':
       this.initExistingAnalysis();
@@ -110,7 +114,7 @@ export class DesignerContainerComponent {
 
   initNewAnalysis() {
     const {type, semanticId} = this.analysisStarter;
-    this._designerService.createAnalysis(semanticId, type)
+    return this._designerService.createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis) => {
         this.analysis = {...this.analysisStarter, ...newAnalysis};
         if (!this.analysis.sqlBuilder) {
@@ -119,6 +123,7 @@ export class DesignerContainerComponent {
           };
         }
         this.artifacts = this.analysis.artifacts;
+        this.analysis.edit = this.analysis.edit || false;
         unset(this.analysis, 'supports');
         unset(this.analysis, 'categoryId');
       });
@@ -129,6 +134,7 @@ export class DesignerContainerComponent {
     this.filters = this.analysis.sqlBuilder.filters;
     this.sorts = this.analysis.sqlBuilder.sorts;
     this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
+    this.isInQueryMode = this.analysis.edit;
   }
 
   forkAnalysis() {
@@ -227,7 +233,14 @@ export class DesignerContainerComponent {
     case 'refresh':
       this.requestDataIfPossible();
       break;
+    case 'modeToggle':
+      this.toggleDesignerQueryModes();
+      break;
     }
+  }
+
+  toggleDesignerQueryModes() {
+    this.isInQueryMode = !this.isInQueryMode;
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -307,7 +320,12 @@ export class DesignerContainerComponent {
     case 'filter':
     case 'joins':
     case 'sort':
+    case 'changeQuery':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      break;
+    case 'submitQuery':
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.requestDataIfPossible();
       break;
     // only front end data refresh needed
     case 'format':

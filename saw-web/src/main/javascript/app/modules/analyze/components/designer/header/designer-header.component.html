@@ -21,33 +21,53 @@
     </div>
   </div>
 
-  <div  fxLayout="row"
-        fxLayoutAlign="space-between center">
-    <button mat-button [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
+  <div fxLayout="row"
+       fxLayoutAlign="space-between center">
+    <mat-button-toggle-group *ngIf="analysis && analysis.type === 'report'"
+                             (change)="requestAction.emit('modeToggle')"
+                             [value]="isInQueryMode"
+                             [disabled]="analysis.edit">
+      <mat-button-toggle [value]="false">
+        <mat-icon fontIcon="icon-designer-mode"></mat-icon>
+        <ng-container i18n>Designer</ng-container>
+      </mat-button-toggle>
+      <mat-button-toggle [value]="true">
+        <mat-icon fontIcon="icon-query-mode"></mat-icon>
+        <ng-container i18n>Query</ng-container>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <button mat-button
+            [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
             (click)="requestAction.emit('refresh')">
       <ng-container i18n>Refresh Data</ng-container>
     </button>
+
     <button mat-button
             (click)="requestAction.emit('description')">
       <mat-icon fontIcon="icon-description"></mat-icon>
       <ng-container i18n>Description</ng-container>
     </button>
+
     <button mat-button
             (click)="requestAction.emit('preview')"
             [disabled]="designerState !== DesignerStates.SELECTION_WITH_DATA">
       <mat-icon fontIcon="icon-full-screen"></mat-icon>
       <ng-container i18n>Preview</ng-container>
     </button>
+
     <button mat-button
             (click)="requestAction.emit('sort')">
       <mat-icon fontIcon="icon-sort"></mat-icon>
       <ng-container i18n>Sort</ng-container>
     </button>
+
     <button mat-button
             (click)="requestAction.emit('filter')">
       <mat-icon fontIcon="icon-filter"></mat-icon>
       <ng-container i18n>Filter</ng-container>
     </button>
+
     <button mat-raised-button
             e2e="designer-save-btn"
             color="primary"
@@ -56,5 +76,6 @@
     </button>
   </div>
 </div>
-<mat-progress-bar *ngIf="designerState === DesignerStates.SELECTION_WAITING_FOR_DATA" mode="indeterminate"></mat-progress-bar>
+<mat-progress-bar *ngIf="designerState === DesignerStates.SELECTION_WAITING_FOR_DATA || designerState === DesignerStates.WAITING_FOR_COLUMNS"
+                  mode="indeterminate"></mat-progress-bar>
 

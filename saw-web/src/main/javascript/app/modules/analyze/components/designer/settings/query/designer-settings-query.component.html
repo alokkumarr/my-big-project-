@@ -1,1 +1,11 @@
-<div>designer settings QUERY</div>
+<analyze-report-query [query]="analysis.queryManual || analysis.query"
+                      [artifacts]="artifacts"
+                      (change)="onQueryChange($event)"
+                      style="padding: 20px; display: block;"
+></analyze-report-query>
+
+<div class="query-actions">
+  <button mat-raised-button color="primary" (click)="submitQuery()">
+    Submit
+  </button>
+</div>

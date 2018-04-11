@@ -51,6 +51,7 @@ import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
 import {ErrorDetailComponent} from './components/error-detail';
 import {DataFormatDialogComponent} from './components/data-format-dialog';
+import {ConfirmDialogComponent} from './components/confirm-dialog';
 import {ReportGridComponent} from './components/report-grid';
 import {
   JsPlumbConnectorComponent,
@@ -129,6 +130,7 @@ angular
     ErrorDetailComponent,
     E2eDirective,
     DataFormatDialogComponent,
+    ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbEndpointComponent,
     JsPlumbTableComponent,
@@ -144,6 +146,7 @@ angular
     ReportGridComponent,
     ErrorDetailComponent,
     DataFormatDialogComponent,
+    ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbTableComponent,
     JsPlumbJoinLabelComponent,
@@ -161,6 +164,7 @@ angular
     ClickToCopyDirective,
     ErrorDetailComponent,
     DataFormatDialogComponent,
+    ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbEndpointComponent,
     JsPlumbTableComponent,

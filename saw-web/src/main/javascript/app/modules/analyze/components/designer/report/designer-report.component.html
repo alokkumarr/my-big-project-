@@ -10,17 +10,14 @@
     <mat-icon class="non-ideal-state__icon" fontIcon="icon-report"></mat-icon>
   </div>
 
-  <div *ngSwitchCase="DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA"
+  <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
        fxLayout="column"
        fxLayoutAlign="space-between center"
        class="non-ideal-state__container">
-      <span class="non-ideal-state__message" i18n>
-        Click Refresh data to get new data
-      </span>
-      <mat-icon class="non-ideal-state__icon" fontIcon="icon-report"></mat-icon>
+    <mat-icon class="non-ideal-state__icon" fontIcon="icon-report"></mat-icon>
   </div>
 
-  <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
+  <div *ngSwitchCase="DesignerStates.WAITING_FOR_COLUMNS"
        fxLayout="column"
        fxLayoutAlign="space-between center"
        class="non-ideal-state__container">
@@ -36,12 +33,31 @@
     </span>
   </div>
 
-  <report-grid-upgraded *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
-                        (change)="onReportGridChange($event)"
-                        [artifacts]="artifacts"
-                        [query]="query"
-                        [sorts]="sorts"
-                        [data]="data"
-                        [isEditable]="true">
-  </report-grid-upgraded>
+  <div *ngSwitchDefault style="height: 100%; width: 100%;">
+    <div *ngIf="data; else elseBlock" style="height: 100%; width: 100%;">
+      <div style="height: calc(100% - 30px); width: 100%;">
+        <report-grid-upgraded (change)="onReportGridChange($event)"
+                              [artifacts]="artifacts"
+                              [query]="query"
+                              [sorts]="sorts"
+                              [data]="data"
+                              [isEditable]="true">
+        </report-grid-upgraded>
+      </div>
+      <div class="data-count-limit">
+        Showing {{data.length}} out of 100000 rows. Click on 'Preview' to see more.
+      </div>
+    </div>
+
+    <ng-template #elseBlock>
+      <div fxLayout="column"
+          fxLayoutAlign="space-between center"
+          class="non-ideal-state__container">
+        <span i18n class="non-ideal-state__message">
+          Click refresh data
+        </span>
+        <mat-icon class="non-ideal-state__icon" fontIcon="icon-report"></mat-icon>
+      </div>
+    </ng-template>
+  </div>
 </div>

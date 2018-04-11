@@ -16,8 +16,17 @@ multi-table-designer-layout {
       position: absolute;
       bottom: 0;
 
-      mat-icon.grid-panel-toggle__icon.expanded {
-        transform: rotate(180deg);
+      mat-icon.grid-panel-toggle__icon {
+        height: 15px;
+        margin-bottom: 5px;
+      }
+
+      &.expanded {
+        bottom: 10px;
+
+        mat-icon.grid-panel-toggle__icon {
+          transform: rotate(180deg);
+        }
       }
     }
   }

@@ -7,7 +7,6 @@ import {
   AfterViewInit,
   Input,
   Output,
-  Inject,
   ViewChild,
   EventEmitter
 } from '@angular/core';
@@ -24,19 +23,13 @@ import { AceEditorComponent } from 'ng2-ace-editor';
 const template = require('./analyze-report-query.component.html');
 require('./analyze-report-query.component.scss');
 
-const WARN_DIALOG = {
-  title: 'Are you sure you want to proceed?',
-  content: 'If you save changes to sql query, you will not be able to go back to designer view for this analysis.'
-};
-
 @Component({
   selector: 'analyze-report-query',
   template
 })
 export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
-  @Input() model: any;
-  @Output() onSave = new EventEmitter<any>();
-  @Output() onQueryChange = new EventEmitter<any>();
+  @Input() query: string;
+  @Output() change = new EventEmitter<string>();
 
   @ViewChild('editor') editor: AceEditorComponent;
 
@@ -51,10 +44,6 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   };
   private langTools = ace.acequire('ace/ext/language_tools');
   private completions = [];
-
-  constructor(
-    @Inject('$mdDialog') private _$mdDialog: any
-  ) { }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -138,36 +127,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
     this.langTools.addCompleter(artifactsCompleter);
   }
 
-  warnUser() {
-    const confirm = this._$mdDialog.confirm()
-      .title(WARN_DIALOG.title)
-      .textContent(WARN_DIALOG.content)
-      .multiple(true)
-      .ok('Save')
-      .cancel('Cancel');
-
-    return this._$mdDialog.show(confirm);
-  }
-
   queryUpdated(query) {
-    this.model.queryManual = this.model.query;
-    this.onQueryChange.emit();
-  }
-
-  doSubmit() {
-    this.model.edit = true;
-    this.onSave.emit(this.model);
-  }
-
-  submitQuery() {
-    if (!this.model.edit) {
-      this.warnUser().then(() => {
-        this.doSubmit();
-      }, () => {
-        // do nothing if user hits cancel
-      });
-    } else {
-      this.doSubmit();
-    }
+    this.change.emit(query);
   }
 }

@@ -19,11 +19,11 @@ require('./designer-header.component.scss');
   template
 })
 export class DesignerHeaderComponent {
-  @Output() public onBack: EventEmitter<any> = new EventEmitter();
+  @Output() public onBack: EventEmitter<null> = new EventEmitter();
   @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
-  // TODO replace any with Analysis model currently analyze model -> rename to analysis
   @Input() public analysis: Analysis;
   @Input() public isInDraftMode: boolean;
+  @Input() public isInQueryMode: boolean;
   @Input() public designerState: DesignerStates;
 
   public DesignerStates = DesignerStates;

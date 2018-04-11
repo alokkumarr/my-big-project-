@@ -85,6 +85,9 @@ export class ReportGridComponent {
     }, {});
   };
   @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
+    if (!artifacts) {
+      return;
+    }
     this.artifacts = artifacts;
     this.columns = this.artifacts2Columns(artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
@@ -122,11 +125,11 @@ export class ReportGridComponent {
   public rowAlternationEnabled = true;
   public hoverStateEnabled = true;
   public wordWrapEnabled = true;
-  public scrolling = {mode: 'scrolling'};
+  public scrolling = {mode: 'Virtual'};
   public sorting = {mode: 'multiple'};
   public columnChooser;
-  public gridHeight = 'auto';
-  public gridWidth = 'auto';
+  public gridHeight = '100%';
+  public gridWidth = '100%';
   public remoteOperations;
   public paging;
   public pager = {
@@ -135,6 +138,7 @@ export class ReportGridComponent {
     showPageSizeSelector: true
   };
   public loadPanel;
+  public summary = {calculateCustomSummary: () => `Showing 10 out of 10000 rows. Click on 'Preview' to see more.`};
 
   constructor(
     private _dialog: MatDialog,

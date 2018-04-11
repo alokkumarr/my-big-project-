@@ -32,13 +32,12 @@ export class AggregateChooserComponent {
   public aggregates;
 
   ngOnInit() {
-    if (this.type) {
-      this.aggregates = filter(AGGREGATE_TYPES, type => {
-        return type.value === 'count' &&
-          NUMBER_TYPES.includes(this.type);
-      });
-    } else {
+    if (NUMBER_TYPES.includes(this.type)) {
       this.aggregates = AGGREGATE_TYPES;
+    } else {
+      this.aggregates = filter(AGGREGATE_TYPES, type => {
+        return type.value === 'count';
+      });
     }
   }
 

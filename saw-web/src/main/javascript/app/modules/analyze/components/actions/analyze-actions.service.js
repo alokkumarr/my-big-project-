@@ -2,9 +2,9 @@ import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
 import * as deepClone from 'lodash/cloneDeep';
 
-import {AnalyseTypes} from '../../consts';
+import {AnalyseTypes, Events} from '../../consts';
 
-export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector) {
+export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector, $eventEmitter) {
   'ngInject';
 
   return {
@@ -88,16 +88,18 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     };
 
     switch (analysis.type) {
-    case AnalyseTypes.ESReport:
-    case AnalyseTypes.Report:
-      // openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
-      AnalyzeDialogService.openEditAnalysisDialog(analysis, mode);
-      break;
     case AnalyseTypes.Chart:
       openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       break;
+    case AnalyseTypes.ESReport:
+    case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
-      AnalyzeDialogService.openEditAnalysisDialog(analysis, mode);
+      AnalyzeDialogService.openEditAnalysisDialog(analysis, mode)
+        .afterClosed().subscribe(successfullySaved => {
+          if (successfullySaved) {
+            $eventEmitter.emit(Events.AnalysesRefresh);
+          }
+        });
       break;
     default:
     }

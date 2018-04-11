@@ -2,8 +2,11 @@
      [ngClass]="{'expanded': !isGridPanelExpanded}">
 
   <designer-settings-query *ngIf="isInQueryMode"
-                           [artifacts]="artifacts">
-  </designer-settings-query>
+                        [analysis]="analysis"
+                        [artifacts]="artifacts"
+                        (change)="onQueryChange()"
+                        (save)="onSaveQuery($event)"
+  ></designer-settings-query>
 
   <designer-settings-multi-table *ngIf="!isInQueryMode"
                                  (change)="change.emit($event)"
@@ -11,12 +14,12 @@
                                  [sqlBuilder]="sqlBuilder">
   </designer-settings-multi-table>
 
-  <button mat-icon-button
+  <button mat-mini-fab
+          [ngClass]="{'expanded': !isGridPanelExpanded}"
           class="grid-panel-toggle__btn"
           (click)="toggleGridPanel()">
     <mat-icon fontIcon="icon-expand"
-              class="grid-panel-toggle__icon"
-              [ngClass]="{'expanded': !isGridPanelExpanded}">
+              class="grid-panel-toggle__icon">
     </mat-icon>
   </button>
 </div>

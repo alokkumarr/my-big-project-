@@ -10,7 +10,8 @@ import {
   Artifact,
   DesignerChangeEvent,
   SqlBuilder,
-  Sort
+  Sort,
+  Analysis
 } from '../../types';
 import { DesignerStates } from '../../container';
 
@@ -24,6 +25,7 @@ require('./multi-table-designer-layout.component.scss');
 export class MultiTableDesignerLayout {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
+  @Input() analysis: Analysis;
   @Input() sorts: Sort[];
   @Input() isInQueryMode: boolean;
   @Input() sqlBuilder: SqlBuilder;
@@ -39,5 +41,13 @@ export class MultiTableDesignerLayout {
 
   toggleGridPanel() {
     this.isGridPanelExpanded = !this.isGridPanelExpanded;
+  }
+
+  onQueryChange() {
+    this.change.emit({subject: 'changeQuery'});
+  }
+
+  onSaveQuery(evt) {
+    this.change.emit({subject: 'submitQuery'});
   }
 }

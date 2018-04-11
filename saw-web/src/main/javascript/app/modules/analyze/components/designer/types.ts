@@ -12,6 +12,7 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
+  AnalysisReport,
   Sort,
   Filter,
   FilterModel,
@@ -32,6 +33,7 @@ export {
   ArtifactColumnChart,
   ArtifactColumnReport,
   Analysis,
+  AnalysisReport,
   DesignerMode,
   AnalysisStarter,
   AnalysisType,
@@ -87,6 +89,8 @@ export type DesignerChangeEvent = {
     'joins'            |
     'artifactPosition' |
     'column'           |
-    'visibleIndex';
+    'visibleIndex'     |
+    'submitQuery'      |
+    'changeQuery';
   column?: ArtifactColumnReport;
 }

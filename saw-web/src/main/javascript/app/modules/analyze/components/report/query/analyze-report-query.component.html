@@ -1,12 +1,7 @@
 <ace-editor #editor
-  [(text)]="model.query"
+  [text]="query"
   (textChanged)="queryUpdated($event)"
   [options]="editorOptions"
   theme="eclipse"
   mode="sql">
 </ace-editor>
-<div class="query-actions">
-  <button mat-raised-button color="primary" (click)="submitQuery()">
-    Submit
-  </button>
-</div>

@@ -24,7 +24,8 @@ export {
   Filter,
   FilterModel,
   Artifact,
-  AnalysisType
+  AnalysisType,
+  AnalysisReport
 };
 
 
@@ -50,7 +51,7 @@ export type AnalysisDialogData = {
   analysis?: Analysis
 };
 
-export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'save' | 'refresh';
+export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'save' | 'refresh' | 'modeToggle';
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;

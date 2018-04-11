@@ -2,6 +2,7 @@
                  [analysis]="analysis"
                  [isInDraftMode]="isInDraftMode"
                  [designerState]="designerState"
+                 [isInQueryMode]="isInQueryMode"
                  (onBack)="onBack.emit()"
                  (requestAction)="onToolbarAction($event)">
 </designer-header>
@@ -17,8 +18,9 @@
 
   <multi-table-designer-layout *ngSwitchCase="'multi'"
                                (change)="onSettingsChange($event)"
-                               [isInQueryMode]="analysis.edit"
-                               [artifacts]="artifacts"
+                               [isInQueryMode]="isInQueryMode"
+                               [analysis]="analysis"
+                               [artifacts]="analysis.edit ? null : artifacts"
                                [data]="data"
                                [sorts]="sorts"
                                [sqlBuilder]="analysis.sqlBuilder"
