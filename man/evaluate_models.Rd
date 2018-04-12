@@ -3,12 +3,19 @@
 \name{evaluate_models.forecaster}
 \alias{evaluate_models.forecaster}
 \alias{evaluate_models}
-\title{Evalutate Models Generic}
+\title{Evalutate Models Generic Function}
 \usage{
 \method{evaluate_models}{forecaster}(obj)
 
 evaluate_models(obj, ...)
 }
+\value{
+updated modeler object
+}
 \description{
-Evalutate Models Generic
+Evaluate the accuracy of all trained models.
+}
+\details{
+Function applies the measure function associated with modeler object to all
+model sample predictions.
 }

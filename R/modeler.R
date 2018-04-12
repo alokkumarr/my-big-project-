@@ -211,6 +211,8 @@ get_target <- function(obj) {
 #' Get Model Evaluation Summary
 #'
 #' Returns data.frame with measure calculated on the validation samples
+#' @param obj modeler object
+#' @export
 get_evalutions <- function(obj) {
   checkmate::assert_class(obj, "modeler")
   suppressWarnings(
@@ -220,22 +222,61 @@ get_evalutions <- function(obj) {
   )
 }
 
+#' Get the Best Performing Model
+#'
+#' Function to select the best performing model based on modeler measure
+#'
+#' @param obj modeler object
+#' @export
+#' @return returns best model
+get_best_model <- function(obj) {
 
+  evals <- get_evalutions(obj)
+  smpl <- ifelse("validation" %in% evals$sample, "validation", "train")
+  id <- evals %>%
+    dplyr::filter_at("sample", dplyr::any_vars(. == smpl)) %>%
+    dplyr::group_by(model) %>%
+    dplyr::summarise_at(obj$measure$method, mean) %>%
+    dplyr::arrange_at(obj$measure$method,
+                      .funs = ifelse(obj$measure$minimize, identity, desc)) %>%
+    head(1) %>%
+    .$model
+  get_models(obj, ids = id)[[1]]
+}
 
 
 # Modeler Class Generics --------------------------------------------------
 
 
-#' Train Model Generic
+#' Train Model Generic Function
+#'
+#' Train all models added to a modeler object
+#'
+#' Function looks for all untrained models added to a modeler project. Function
+#' fits model based on modeler samples, model method and model method args.
+#' Function saves model fit, all fitted predictions to the training sample and
+#' any validation predictions
+#'
+#' @export
+#' @return updated modeler object
 train_models <- function(obj, ...) {
   UseMethod("train_models")
 }
 
 
-#' Evalutate Models Generic
+#' Evalutate Models Generic Function
+#'
+#' Evaluate the accuracy of all trained models.
+#'
+#' Function applies the measure function associated with modeler object to all
+#' model sample predictions.
+#'
+#' @export
+#' @return updated modeler object
 evaluate_models <- function(obj, ...) {
   UseMethod("evaluate_models")
 }
+
 
 #' Set Final Model Generic
 #'
@@ -269,6 +310,8 @@ get_target_df <- function(obj, target) {
 tidy_performance <- function(obj) {
   UseMethod("tidy_performance")
 }
+
+
 
 
 # Modeler Class Methods ---------------------------------------------------

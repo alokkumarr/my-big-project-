@@ -51,25 +51,36 @@ fitted.forecast_model <- function(obj) {
 }
 
 
+
 #' Forecast Prediction Method
 #' @rdname predict
-predict.forecast_model <- function(obj, periods, data, level) {
+predict.forecast_model <- function(obj, periods, data = NULL, level = c(80, 95)) {
+    method_args <- obj$method_args
+    target <- obj$target
+    y <- as.numeric(data[[target]])
 
-  method_args <- obj$method_args
-  target <- obj$target
-  y <- as.numeric(data[[target]])
-  if(ncol(data) > 1){
-    xreg <- data[, -target, drop=FALSE]
-  }else{
-    xreg <- NULL
+    if (!is.null(data)) {
+      if (ncol(data) > 1) {
+        xreg <- data[,-target, drop = FALSE]
+      } else{
+        xreg <- NULL
+      }
+    } else{
+      xreg <- NULL
+    }
+
+    f <- do.call("forecast",
+                 modifyList(
+                   method_args,
+                   list(
+                     object = obj$fit,
+                     xreg = xreg,
+                     h = periods,
+                     level = level
+                   )
+                 ))
+    get_forecasts(f)
   }
-
-  f <- do.call("forecast",
-               modifyList(method_args,
-                          list(object = obj$fit, xreg = xreg, h = periods,
-                               level = level)))
-  get_forecasts(f)
-}
 
 
 

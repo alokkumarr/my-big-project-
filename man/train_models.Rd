@@ -3,12 +3,21 @@
 \name{train_models.forecaster}
 \alias{train_models.forecaster}
 \alias{train_models}
-\title{Train Model Generic}
+\title{Train Model Generic Function}
 \usage{
 \method{train_models}{forecaster}(obj, ids = NULL)
 
 train_models(obj, ...)
 }
+\value{
+updated modeler object
+}
 \description{
-Train Model Generic
+Train all models added to a modeler object
+}
+\details{
+Function looks for all untrained models added to a modeler project. Function
+fits model based on modeler samples, model method and model method args.
+Function saves model fit, all fitted predictions to the training sample and
+any validation predictions
 }

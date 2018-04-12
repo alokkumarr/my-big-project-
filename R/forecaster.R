@@ -129,19 +129,12 @@ set_final_model.forecaster <- function(obj,
     stop("final model not selected: id not provided for manual method")
 
   if (method == "best") {
-    evals <- get_evalutions(obj)
-    smpl <- ifelse("validation" %in% evals$sample, "validation", "train")
-    id <- evals %>%
-      dplyr::filter_at("sample", dplyr::any_vars(. == smpl)) %>%
-      dplyr::group_by(model) %>%
-      dplyr::summarise_at(obj$measure$method, mean) %>%
-      dplyr::arrange_at(obj$measure$method,
-                        .funs = ifelse(obj$measure$minimize, identity, desc)) %>%
-      head(1) %>%
-      .$model
+    model <- get_best_model(obj)
+    id <- model$id
+  }else{
+    model <- get_models(obj, ids = id)[[1]]
   }
 
-  model <- get_models(obj, ids = id)[[1]]
   model$status <- "selected"
   obj$models[[id]] <- model
 
@@ -194,4 +187,19 @@ set_final_model.forecaster <- function(obj,
   }
 
   obj
+}
+
+
+
+#' Forecaster Prediction Method
+#'
+#' Method makes predictions for Forecaster's final model
+#' @rdname predict
+predict.forecaster <- function(obj, periods, data = NULL, level = c(80, 95)) {
+
+  if(is.null(obj$final_model)){
+    stop("Final model not set")
+  }
+
+  predict(obj$final_model, periods, data, level)
 }
