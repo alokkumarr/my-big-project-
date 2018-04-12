@@ -49,7 +49,6 @@ describe('Edit Widget', () => {
   it('should show kpi widget if editItem present', done => {
     fixture.componentInstance.editItem = {
       kpi: {},
-      column: {},
       metric: { dateColumns: [{}] }
     };
     fixture.detectChanges();
