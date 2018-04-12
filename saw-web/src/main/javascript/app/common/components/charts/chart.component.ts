@@ -1,12 +1,7 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  ViewChild
-} from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 
 import * as Highcharts from 'highcharts/highcharts';
-import * as Highstock from 'highcharts/highstock';    // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
+import * as Highstock from 'highcharts/highstock'; // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
@@ -14,7 +9,11 @@ import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
-import { globalChartOptions, chartOptions, stockChartOptions } from './default-chart-options';
+import {
+  globalChartOptions,
+  chartOptions,
+  stockChartOptions
+} from './default-chart-options';
 import * as isUndefined from 'lodash/isUndefined';
 
 export const UPDATE_PATHS = {
@@ -47,13 +46,23 @@ export class ChartComponent {
 
   ngAfterViewInit() {
     this.config = defaultsDeep(this.config, this.options, chartOptions);
-    this.stockConfig = defaultsDeep(this.stockConfig, this.options, stockChartOptions);
+    this.stockConfig = defaultsDeep(
+      this.stockConfig,
+      this.options,
+      stockChartOptions
+    );
     this.enableExport && this.enableExporting(this.config);
     this.enableExport && this.enableExporting(this.stockConfig);
     if (this.isStockChart) {
-      this.chart = this.highstocks.stockChart(this.container.nativeElement, this.stockConfig);
+      this.chart = this.highstocks.stockChart(
+        this.container.nativeElement,
+        this.stockConfig
+      );
     } else {
-      this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+      this.chart = this.highcharts.chart(
+        this.container.nativeElement,
+        this.config
+      );
     }
   }
 
@@ -113,13 +122,15 @@ export class ChartComponent {
       set(config, 'exporting.sourceWidth', this.chart.chartWidth);
       set(config, 'exporting.sourceHeight', this.chart.chartHeight);
 
-      this.chart.update({
-        exporting: {
-          sourceHeight: this.chart.chartHeight,
-          sourceWidth: this.chart.chartWidth
-        }
-      }, false);
-
+      this.chart.update(
+        {
+          exporting: {
+            sourceHeight: this.chart.chartHeight,
+            sourceWidth: this.chart.chartWidth
+          }
+        },
+        false
+      );
     }, 100);
   }
 
@@ -128,40 +139,58 @@ export class ChartComponent {
       if (updates.export) {
         this.onExport();
       }
+      return;
+    }
+
+    forEach(updates, updateObj => {
+      set(this.config, updateObj.path, updateObj.data);
+    });
+
+    // Not using chart.update due to a bug with navigation
+    // update and bar styles.
+    if (this.isStockChart) {
+      set(
+        this.config,
+        'xAxis.0.title.text',
+        get(this.config, 'xAxis.title.text')
+      ); // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
+      set(
+        this.config,
+        'xAxis.0.categories',
+        get(this.config, 'xAxis.categories')
+      );
+
+      // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
+      // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
+      this.clonedConfig = clone(this.config);
+      this.addExportConfig(this.config);
+      this.chart = this.highstocks.stockChart(
+        this.container.nativeElement,
+        this.config
+      );
+      this.config = clone(this.clonedConfig);
+      this.addExportSize(this.config);
+      this.clonedConfig = {};
     } else {
-      forEach(updates, updateObj => {
-        set(this.config, updateObj.path, updateObj.data);
-      });
+      this.addExportConfig(this.config);
+      this.chart = this.highcharts.chart(
+        this.container.nativeElement,
+        this.config
+      );
+      this.addExportSize(this.config);
+    }
 
-      // Not using chart.update due to a bug with navigation
-      // update and bar styles.
-      if (this.isStockChart) {
-        set(this.config, 'xAxis.0.title.text', get(this.config, 'xAxis.title.text')); // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
-        set(this.config, 'xAxis.0.categories', get(this.config, 'xAxis.categories'));
+    // This is causing more problems than it solves. Updating the defaultsDeep
+    // call in ngAfterViewInit callback. Hopefully this isn't needed anymore.
+    // if (!isUndefined(this.config.xAxis)) {
+    //   this.config.xAxis.categories = [];
+    // }
 
-        // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
-        // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
-        this.clonedConfig = clone(this.config);
-        this.addExportConfig(this.config);
-        this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
-        this.config = clone(this.clonedConfig);
-        this.addExportSize(this.config);
-        this.clonedConfig = {};
-      } else {
-        this.addExportConfig(this.config);
-        this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
-        this.addExportSize(this.config);
-      }
-      if (!isUndefined(this.config.xAxis)) {
-        this.config.xAxis.categories = [];
-      }
-
-      const pieNegatives = this.pieHasNegatives();
-      if (pieNegatives.all) {
-        // do nothing
-      } else if (pieNegatives.some) {
-        // do nothing
-      }
+    const pieNegatives = this.pieHasNegatives();
+    if (pieNegatives.all) {
+      // do nothing
+    } else if (pieNegatives.some) {
+      // do nothing
     }
   }
 
