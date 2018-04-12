@@ -15,11 +15,14 @@ export const AnalyzeReportDetailComponent = {
     constructor(FilterService) {
       'ngInject';
       this._FilterService = FilterService;
-      this._isEmpty = isEmpty;
       this.filters = [];
     }
 
     $onInit() {
+      this.initAnalysis();
+    }
+
+    initAnalysis() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
       // no culomns if the in query mode
       this.columns = this.analysis.edit ? null : this._getColumns(this.analysis);
@@ -34,6 +37,14 @@ export const AnalyzeReportDetailComponent = {
 
     loadData(options) {
       return this.source({options});
+    }
+
+    $onChanges(data) {
+      if (isEmpty(get(data, 'analysis.previousValue'))) {
+        return;
+      }
+
+      this.initAnalysis();
     }
     // TODO runtime filters in SAW-634
 
