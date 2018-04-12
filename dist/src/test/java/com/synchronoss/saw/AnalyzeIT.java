@@ -400,6 +400,9 @@ public class AnalyzeIT extends BaseIT {
         ArrayNode email = objectNode.putArray("emailList");
         email.add("abc@synchronoss.com");
         email.add("xyz@synchronoss.com");
+        ArrayNode ftp = objectNode.putArray("ftp");
+        ftp.add("ftp");
+        ftp.add("sftp");
         objectNode.put("jobScheduleTime","2018-03-01T16:24:28+05:30");
         objectNode.put("categoryID","4");
         objectNode.put("jobGroup","SYNCHRONOSS");

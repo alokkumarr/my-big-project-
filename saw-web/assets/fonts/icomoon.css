@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('icomoon.ttf?pb6xro') format('truetype'),
-    url('icomoon.woff?pb6xro') format('woff'),
-    url('icomoon.svg?pb6xro#icomoon') format('svg');
+    url('icomoon.ttf?t1wamy') format('truetype'),
+    url('icomoon.woff?t1wamy') format('woff'),
+    url('icomoon.svg?t1wamy#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -23,12 +23,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-clipboard-solid:before {
-  content: "\e984";
-}
-.icon-clipboard:before {
-  content: "\e985";
-}
 .icon-Candlestick-icon-white:before {
   content: "\e98b";
   color: #fff;
@@ -297,6 +291,12 @@
 }
 .icon-uniE955:before {
   content: "\e9e3";
+}
+.icon-clipboard-solid:before {
+  content: "\e984";
+}
+.icon-clipboard:before {
+  content: "\e985";
 }
 .icon-fullscreen:before {
   content: "\e983";
@@ -568,7 +568,7 @@
 .icon-users:before {
   content: "\e947";
 }
-.icon-warning:before {
+.icon-warning2:before {
   content: "\e948";
 }
 .icon-workspace-solid:before {
@@ -708,4 +708,74 @@
 }
 .icon-x:before {
   content: "\e907";
+}
+.icon-warning:before {
+  content: "\e9e9";
+}
+.icon-danger:before {
+  content: "\e9ea";
+  color: #ab0e27;
+}
+.icon-happy2 .path1:before {
+  content: "\e9eb";
+  color: rgb(255, 215, 102);
+}
+.icon-happy2 .path2:before {
+  content: "\e9ec";
+  margin-left: -1em;
+  color: rgb(75, 104, 127);
+}
+.icon-happy2 .path3:before {
+  content: "\e9ed";
+  margin-left: -1em;
+  color: rgb(234, 104, 94);
+}
+.icon-happy2 .path4:before {
+  content: "\e9ee";
+  margin-left: -1em;
+  color: none;
+}
+.icon-happy2 .path5:before {
+  content: "\e9ef";
+  margin-left: -1em;
+  color: rgb(255, 255, 255);
+}
+.icon-happy2 .path6:before {
+  content: "\e9f0";
+  margin-left: -1em;
+  color: rgb(255, 255, 255);
+}
+.icon-happy2 .path7:before {
+  content: "\e9f1";
+  margin-left: -1em;
+  color: none;
+}
+.icon-happy2 .path8:before {
+  content: "\e9f2";
+  margin-left: -1em;
+  color: none;
+}
+.icon-happy2 .path9:before {
+  content: "\e9f3";
+  margin-left: -1em;
+  color: none;
+}
+.icon-wip:before {
+  content: "\ea1d";
+  color: #f07601;
+}
+.icon-vhappy:before {
+  content: "\e9e4";
+}
+.icon-very-sad:before {
+  content: "\e9e5";
+}
+.icon-happy:before {
+  content: "\e9e6";
+}
+.icon-neutral:before {
+  content: "\e9e7";
+}
+.icon-sad:before {
+  content: "\e9e8";
 }

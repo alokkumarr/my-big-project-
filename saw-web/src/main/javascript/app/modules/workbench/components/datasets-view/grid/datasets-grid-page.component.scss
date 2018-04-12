@@ -2,6 +2,7 @@
 
 datasets-grid-page {
   width: 100%;
+  height: 100%;
   overflow: hidden;
 
   .src-img {
@@ -36,5 +37,17 @@ datasets-grid-page {
   .grid-container {
     overflow: hidden;
     display: block;
+  }
+
+  .FAILED {
+    border-left: 3px solid $primary-red;
+  }
+
+  .SUCCESS {
+    border-left: 3px solid $primary-green;
+  }
+
+  .INIT {
+    border-left: 3px solid $primary-orange;
   }
 }

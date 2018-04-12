@@ -4,7 +4,7 @@ import { UIRouter } from '@uirouter/angular';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { TimerObservable } from 'rxjs/observable/TimerObservable';
+import { Observable } from 'rxjs/Observable';
 import * as map from 'lodash/map';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
@@ -30,10 +30,12 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
-  private dataView: string = 'sets'; // tslint:disable-line
-  private contentHeight: number; // tslint:disable-line
-  private poll = true;
-  private interval = 10000;
+  private dataView: string = 'sets';
+  private contentHeight: number;
+  private timer;
+  private timerSubscription;
+  private poll: boolean = true;
+  private interval = 20000;
 
   constructor(
     private router: UIRouter,
@@ -45,25 +47,35 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-
-   /**
-    * Calls list datasets api onInit and every 10 seconds or whatever set interval
-    *
-    * @memberof DatasetsComponent
-    */
-    TimerObservable.create(0, this.interval)
-      .takeWhile(() => this.poll)
-      .subscribe(() => {
-        this.headerProgress.show();
-        this.getPageData();
-      });
+    this.startPolling();
   }
 
   ngOnDestroy() {
+    if (this.poll) {
+      this.stopPolling();
+    }
+  }
+
+  startPolling() {
+    /**
+        * Calls list datasets api onInit and every 10 seconds or whatever set interval
+        * 
+        * @memberof DatasetsComponent
+        */
+    this.timer = Observable.timer(0, this.interval);
+    this.timerSubscription = this.timer.subscribe(() => {
+      this.getPageData();
+    });
+    this.poll = true;
+  }
+
+  stopPolling() {
+    this.timerSubscription.unsubscribe();
     this.poll = false;
   }
 
   getPageData(): void {
+    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.loadSets(this.availableSets);
@@ -81,7 +93,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
       });
     }
     setTimeout(() => {
-      this.contentHeight = window.innerHeight - 165;
+      this.contentHeight = window.innerHeight - 170;
     });
   }
 
@@ -123,5 +135,9 @@ export class DatasetsComponent implements OnInit, OnDestroy {
 
   onResize(event) {
     this.contentHeight = event.target.innerHeight - 165;
+  }
+
+  togglePoll() {
+    this.poll === true ? this.stopPolling() : this.startPolling();
   }
 }
