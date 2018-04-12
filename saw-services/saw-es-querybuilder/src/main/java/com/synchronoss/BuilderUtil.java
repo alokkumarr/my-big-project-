@@ -336,8 +336,8 @@ public class BuilderUtil
                 LocalDateTime last6Week = now.minusWeeks(6);
                 LocalDateTime priorlast6Week = last6Week.minusWeeks(6);
                 LocalDateTime startOfWeek =
-                    last6Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-                LocalDateTime endOfWeek = priorlast6Week.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
+                    priorlast6Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+                LocalDateTime endOfWeek = last6Week.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
                 dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
