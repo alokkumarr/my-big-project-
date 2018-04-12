@@ -2,6 +2,7 @@ package com.synchronoss.saw.export.generate;
 
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -167,9 +168,27 @@ public class ExportServiceImpl implements ExportService{
           entity.getBody().getData().stream().forEach(
               line -> {
                 if( line instanceof LinkedHashMap ) {
+                  String[] header = null;
                   //write header information
-                  Object[] obj = ((LinkedHashMap) line).keySet().toArray();
-                  exportBean.setColumnHeader(Arrays.copyOf(obj, obj.length, String[].class));
+                  if (exportBean.getColumnHeader()==null || exportBean.getColumnHeader().length==0) {
+                    Object[] obj = ((LinkedHashMap) line).keySet().toArray();
+                    header = Arrays.copyOf(obj, obj.length, String[].class);
+                    exportBean.setColumnHeader(header);
+                    StringBuffer csvHeader = new StringBuffer();
+                    IntStream.range(0, header.length).forEach(i -> {
+                      csvHeader.append("\"");
+                      csvHeader.append(header[i]);
+                      csvHeader.append("\"");
+                      if (i < header.length - 1) {
+                        csvHeader.append(",");
+                      }
+                    });
+                    osw.write(csvHeader.toString());
+                  }
+                  for (String val : header) {
+
+                  }
+
                 }
                 else {
                   // write normal file
