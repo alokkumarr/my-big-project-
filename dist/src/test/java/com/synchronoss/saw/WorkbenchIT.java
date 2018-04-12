@@ -135,7 +135,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
 
         String json = mapper.writeValueAsString(root);
 
-        log.info("request: " + json);
+        log.debug("request: " + json);
 
         Response response = given(authSpec)
             .body(json)
@@ -149,7 +149,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         String resp = response.getBody().asString();
 
         assert (resp != null);
-        log.info("Response: " + resp);
+        log.debug("Response: " + resp);
         JsonNode node = mapper.reader().readTree(resp);
         assert (node != null);
         String id = node.get("id").asText();
@@ -196,7 +196,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         p1.put("value", "local[*]");
 
         String json = mapper.writeValueAsString(root);
-        log.info("request: " + json);
+        log.debug("request: " + json);
 
         Response response = given(authSpec)
             .body(json)
@@ -207,7 +207,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         String resp = response.getBody().asString();
 
         assert (resp != null);
-        log.info("Response: " + resp);
+        log.debug("Response: " + resp);
         JsonNode node = mapper.reader().readTree(resp);
         assert (node != null);
 
@@ -278,7 +278,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         // id = parseDataset("test_list")
         String id = parseDataset2();
         assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
-        log.info("ID: " + id);
+        log.debug("ID: " + id);
         waitForDataset(id, WAIT_RETRIES);
     }
 
