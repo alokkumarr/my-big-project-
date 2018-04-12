@@ -11,7 +11,7 @@ export const DATE_PRESETS = [
     label: 'This Week'
   },
   {
-    value: 'YESTERDAY',
+    value: 'Yesterday',
     keyword: 'YESTERDAY',
     label: 'Yesterday'
   },
