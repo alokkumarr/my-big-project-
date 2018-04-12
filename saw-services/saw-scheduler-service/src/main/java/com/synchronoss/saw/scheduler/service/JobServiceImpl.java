@@ -322,7 +322,8 @@ public class JobServiceImpl implements JobService{
 						String jobName = jobKey.getName();
 						JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 						SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
-						if (job.getCategoryID().equalsIgnoreCase(categoryID)) {
+						if (job.getCategoryID().equalsIgnoreCase(categoryID)  &&
+                            !(job.getCronExpression() == null || job.getCronExpression().trim().equals(""))) {
 							//get job's trigger
 							List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
 							Date scheduleTime = triggers.get(0).getStartTime();

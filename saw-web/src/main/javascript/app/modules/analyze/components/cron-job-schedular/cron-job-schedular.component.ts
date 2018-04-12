@@ -245,8 +245,16 @@ export class CronJobSchedularComponent {
     switch (this.scheduleType) {
     case 'hourly':
       //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
-      this.hourly.hours = parseInt(parseCronValue[7]);
-      this.hourly.minutes = parseInt(parseCronValue[1]);
+      if (isNaN(parseInt(parseCronValue[7]))) {
+        this.hourly.hours = 1; 
+      } else {
+        this.hourly.hours = parseInt(parseCronValue[7]);  
+      }
+      if (isNaN(parseInt(parseCronValue[1]))) {
+        this.hourly.minutes = 0;  
+      } else {
+        this.hourly.minutes = parseInt(parseCronValue[1]);  
+      }
       break;
     case 'daily':
       //Loading/displying values for Cron expression for daily tab selection in UI Templete.
