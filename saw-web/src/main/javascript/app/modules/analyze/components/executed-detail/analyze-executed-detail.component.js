@@ -250,25 +250,35 @@ export const AnalyzeExecutedDetailComponent = {
 
     loadExecutionData(options = {}) {
       if (this._executionId) {
+        this._$rootScope.showProgress = true;
         options.analysisType = this.analysis.type;
 
         return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
           .then(({data, count}) => {
+            this._$rootScope.showProgress = false;
             this.requester.next({data});
             return {data, count};
+          }, err => {
+            this._$rootScope.showProgress = false;
+            throw err;
           });
       }
       return this._$q.reject(new Error('No execution id selected'));
     }
 
     loadAnalysisById(analysisId) {
+      this._$rootScope.showProgress = true;
       return this._AnalyzeService.readAnalysis(analysisId)
         .then(analysis => {
           this.analysis = analysis;
+          this._$rootScope.showProgress = false;
           this.setPrivileges();
           if (!this.analysis.schedule) {
             this.isPublished = false;
           }
+        }, err => {
+          this._$rootScope.showProgress = false;
+          throw err;
         });
     }
 
@@ -282,10 +292,15 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     loadExecutedAnalyses(analysisId) {
+      this._$rootScope.showProgress = true;
       this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
         .then(analyses => {
           this.analyses = analyses;
+          this._$rootScope.showProgress = false;
           this.loadLastPublishedAnalysis();
+        }, err => {
+          this._$rootScope.showProgress = false;
+          throw err;
         });
     }
 
