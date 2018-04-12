@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/pman0003/Codebase/bda/saw-feature/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Thu Feb 15 13:04:46 IST 2018
+// @SOURCE:/Users/pman0003/Codebase/bda/resolveConflict/saw/saw-services/saw-transport-service/conf/routes
+// @DATE:Tue Mar 27 17:30:28 IST 2018
 
 package controllers;
 
@@ -11,6 +11,7 @@ public class routes {
   
   public static final controllers.ReverseAnalysis Analysis = new controllers.ReverseAnalysis(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseGlobalFilter GlobalFilter = new controllers.ReverseGlobalFilter(RoutesPrefix.byNamePrefix());
+  public static final controllers.ReverseKPIBuilder KPIBuilder = new controllers.ReverseKPIBuilder(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseSemantic Semantic = new controllers.ReverseSemantic(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseMD MD = new controllers.ReverseMD(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseMCT MCT = new controllers.ReverseMCT(RoutesPrefix.byNamePrefix());
@@ -22,6 +23,7 @@ public class routes {
     
     public static final controllers.javascript.ReverseAnalysis Analysis = new controllers.javascript.ReverseAnalysis(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseGlobalFilter GlobalFilter = new controllers.javascript.ReverseGlobalFilter(RoutesPrefix.byNamePrefix());
+    public static final controllers.javascript.ReverseKPIBuilder KPIBuilder = new controllers.javascript.ReverseKPIBuilder(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseSemantic Semantic = new controllers.javascript.ReverseSemantic(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseMD MD = new controllers.javascript.ReverseMD(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseMCT MCT = new controllers.javascript.ReverseMCT(RoutesPrefix.byNamePrefix());

@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Storage Proxy
+
+[Service]
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-storage-proxy-service/saw-storage-proxy.jar --spring.config.location=/opt/bda/saw-storage-proxy-service/conf/application.yml"
+SyslogIdentifier=saw-storage-proxy
+User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

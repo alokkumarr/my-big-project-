@@ -9,6 +9,8 @@ POST    /		controllers.TS.handleRequest
 
 POST    /md		controllers.MD.handleRequest
 
+POST    /kpi	controllers.KPIBuilder.process
+
 # Analysis Service
 
 GET     /analysis                         controllers.Analysis.list(view: String)

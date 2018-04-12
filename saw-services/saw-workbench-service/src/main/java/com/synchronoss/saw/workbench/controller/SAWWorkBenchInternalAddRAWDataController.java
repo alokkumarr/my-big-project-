@@ -10,7 +10,9 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.ServletException;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.QueryParam;
 
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
+import sncr.bda.metastore.DataSetStore;
 
 /**
  * @author spau0004
@@ -290,6 +293,33 @@ public class SAWWorkBenchInternalAddRAWDataController {
       throw new CreateEntitySAWException("Exception occured while uploading files in the raw data directory");
     } 
    return responseObjectFuture;
+  }
+
+    /**
+     *
+     * Retrieve the properties of a given dataset id
+     * @param projectId
+     * @param datasetId
+     * @return
+     */
+  @RequestMapping(value = "{projectId}/datasets/{datasetId}",
+                  method = RequestMethod.GET,
+                  produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public DataSet getDataset(
+          @PathVariable(name="projectId", required = true) String projectId,
+          @PathVariable(name="datasetId", required = true) String datasetId) {
+      logger.debug("Get the properties of a dataset {} under project {}", datasetId, projectId);
+
+      DataSet dataset = null;
+
+      try {
+          dataset = sawWorkbenchService.getDataSet(projectId, datasetId);
+      } catch(Exception ex) {
+          logger.error("Error occurred while retriving the dataset properties");
+      }
+
+      return dataset;
   }
 }
   

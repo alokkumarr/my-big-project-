@@ -1,10 +1,7 @@
-<div class="grid-container">
+<div class="grid-container" fxFill>
   <dx-data-grid id="gridContainer">
     <div *dxTemplate="let data of 'nameCellTemplate'">
-      <span class="clickable" [innerHTML]="data.value"></span>
-    </div>
-    <div *dxTemplate="let data of 'dsTypeTemplate'">
-      <div class="src-img {{data.value}}"></div>
+      <a (click)="viewDetails(data.data)" [innerHTML]="data.value"></a>
     </div>
     <div *dxTemplate="let data of 'creatorCellTemplate'">
       <span class="clickable" [innerHTML]="data.value"></span>
@@ -13,7 +10,7 @@
       <span class="clickable" [innerHTML]="data.value"></span>
     </div>
     <div *dxTemplate="let data of 'actionsCellTemplate'">
-      <dataset-actions [id]="data.value"></dataset-actions>
+      <dataset-actions [dsMetadata]="data.data"></dataset-actions>
     </div>
   </dx-data-grid>
 </div>
