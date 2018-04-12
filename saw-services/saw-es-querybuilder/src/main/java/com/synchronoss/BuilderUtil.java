@@ -364,17 +364,4 @@ public class BuilderUtil
         return dynamicConvertor;
     }
 
-    public static void main (String args[])
-    {
-        DynamicConvertor dynamicConvertor = dynamicDecipherForPrior("LSW");
-        DynamicConvertor dynamicConvertor1 = dynamicDecipher("LSW");
-        System.out.println(dynamicConvertor.getGte());
-        System.out.println(dynamicConvertor.getLte());
-
-        System.out.println(dynamicConvertor1.getGte());
-        System.out.println(dynamicConvertor1.getLte());
-
-
-    }
-
  }

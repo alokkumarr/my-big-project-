@@ -155,9 +155,9 @@ public class KPIDataQueryBuilder {
                 lte = sdf.parse(model.getLte());
                 Calendar cal = Calendar.getInstance();
                 cal.setTimeZone(TimeZone.getTimeZone("UTC"));
-                cal.setTime(gte);
-                long t1 = cal.getTimeInMillis();
                 cal.setTime(lte);
+                long t1 = cal.getTimeInMillis();
+                cal.setTime(gte);
                 long diff = Math.abs(t1- cal.getTimeInMillis());
                 long startTime = cal.getTimeInMillis();
                 dynamicConvertor.setGte(sdf.format(cal.getTime()));
