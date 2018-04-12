@@ -845,7 +845,7 @@ export class ChartService {
       <td>{${xStringValue}}</td>
     </tr>`;
     const yIsSingle = fields.y.length === 1;
-    const yAxisString = `<tr>
+    let yAxisString = `<tr>
       <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
       <td>{point.y:,.2f}{point.series.userOptions.aggrSymbol}</td>
     </tr>`;
