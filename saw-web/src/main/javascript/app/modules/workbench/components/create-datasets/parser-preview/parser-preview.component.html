@@ -1,7 +1,7 @@
 <mat-card class="preview-container">
   <mat-card-content fxFill class="content-hgt">
     <mat-tab-group fxFill dynamicHeight="false" style="background-color: white;">
-      <mat-tab fxFill label="PARSED_VIEW">
+      <mat-tab e2e="parsed-data-preview" fxFill label="PARSED_VIEW">
         <dx-data-grid *ngIf="!inspectError" id="gridContainer">
           <div *dxTemplate="let data of 'headerTemplate'">
             <div fxLayout="column" class="fNameInp">
@@ -32,7 +32,7 @@
           </div>
         </div>
       </mat-tab>
-      <mat-tab fxFill label="RAW_PREVIEW">
+      <mat-tab e2e="raw-data-preview" fxFill label="RAW_PREVIEW">
         <div class="raw-content">
           <div *ngFor="let line of rawFile">
             <span [textContent]="line"></span>

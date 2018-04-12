@@ -44,7 +44,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
     
     Using(UserLists, function (data, description) {
         const fieldSeparatorStr = ",";
-          it('should display card view by default by ' + description, function () {
+         /* it('should display card view by default by ' + description, function () {
             expect(browser.getCurrentUrl()).toContain('/login');
             LoginPage.userLogin(data.user, users.anyUser.password);
             WorkbenchPage.validateCardViewMode();
@@ -84,21 +84,59 @@ describe('Workbench Tests : workbench.test.js',  () => {
             expect(browser.getCurrentUrl()).toContain('/login');
             LoginPage.userLogin(data.user, users.anyUser.password);
             commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.podsView);
-          });
+          }); */
 
-          it('should add new dataset ' + description, function () {
+          /* it('should add new dataset ' + description, function () {
             expect(browser.getCurrentUrl()).toContain('/login');
             LoginPage.userLogin(data.user, users.anyUser.password);
             commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.addDataSetBtn);
-            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.fileElements.fileName);
-            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.nextStepperBtn);
+           // commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.createNewFolderElem);
+           // browser.sleep(300);
+           // expect(WorkbenchPage.newDialogue.dialogue.isDisplayed()).toBeTruthy();
+           // const folderName = 'Test_Folder';
+           // const DialogueInput = WorkbenchPage.newDialogue.getInputOfDialogue('workbench');
+           // DialogueInput.clear().sendKeys(folderName);             
+           // const SubmitBtn = WorkbenchPage.newDialogue.submitFolderNameElem('workbench')
+           // commonFunctions.waitFor.elementToBeClickableAndClick(SubmitBtn);
+            // browser.sleep(500);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.fileUploadElem);
+            const fileToUpload = '../demo_file.txt';
+            const elem = WorkbenchPage.workbenchElems.fileUploadElem
+            const absolutePath = path.resolve(__dirname, fileToUpload);
+            // console.log('Absolut Path : ', absolutePath);
+            WorkbenchPage.uploadFile(absolutePath, elem);
+
+            browser.sleep(500);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.firstWindowStepperFwd);
             const fieldSeparator = WorkbenchPage.workbenchElems.fieldSeparatorElement;
             fieldSeparator.clear().sendKeys(fieldSeparatorStr);
-            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.nextStepperBtn);
-            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.nextStepperBtn);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.secondWindowStepperFwd);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.rawPreviewData);
+            browser.sleep(500);
+            
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.thirdWindowStepperFwd);
+
+            const dataSetName = WorkbenchPage.workbenchElems.dataSetName;
+            const datasetNameTxt = 'DS_1'
+            dataSetName.clear().sendKeys(datasetNameTxt);
+
+            const dataSetDesc = WorkbenchPage.workbenchElems.dataSetDescription;
+            dataSetName.clear().sendKeys('Description for ' + datasetNameTxt);
+
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.fourthWindowStepperAdd);
+        });
+        */
+        it('should preview a file from data grid', function() {
+            expect(browser.getCurrentUrl()).toContain('/login');
+            LoginPage.userLogin(data.user, users.anyUser.password);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.addDataSetBtn);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.fileElements.previewFile);
+            browser.sleep(1000);
+            commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.fileElements.closeRawPreviewFile); 
         });
         
-        it('should execute sql  ' + description, function () {
+
+       /* it('should execute sql  ' + description, function () {
             expect(browser.getCurrentUrl()).toContain('/login');
             LoginPage.userLogin(data.user, users.anyUser.password);
             commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.dataSetAction);            
@@ -113,6 +151,6 @@ describe('Workbench Tests : workbench.test.js',  () => {
             const elem = WorkbenchPage.workbenchElems.fileUploadElem
             const absolutePath = path.resolve(__dirname, fileToUpload);
             WorkbenchPage.uploadFile(absolutePath, elem);
-        });
+        }); */
     });
 });
