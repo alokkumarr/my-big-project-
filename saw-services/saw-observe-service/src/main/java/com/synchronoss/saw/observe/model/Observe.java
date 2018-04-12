@@ -1,8 +1,11 @@
 package com.synchronoss.saw.observe.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -38,7 +41,9 @@ public class Observe implements Serializable {
   @JsonProperty("filters")
   private List<Object> filters = null;
 
-  
+  @JsonIgnore
+  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
   @JsonProperty("_id")
   public String get_id() {
     return _id;
@@ -152,5 +157,14 @@ public class Observe implements Serializable {
     this.filters = filters;
   }
 
+  @JsonAnyGetter
+  public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+  @JsonAnySetter
+  public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
 
 }
