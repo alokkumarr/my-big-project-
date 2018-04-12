@@ -2,9 +2,12 @@ import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
 import * as deepClone from 'lodash/cloneDeep';
 
-import {AnalyseTypes} from '../../consts';
+import {AnalyseTypes, Events} from '../../consts';
 
-export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector) {
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/toPromise';
+
+export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector) {
   'ngInject';
 
   return {
@@ -31,7 +34,15 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   }
 
   function edit(analysis) {
-    return openEditModal(clone(analysis), 'edit');
+    return openEditModal(clone(analysis), 'edit').then(status => {
+      if (!status) {
+        return status;
+      }
+
+      $eventEmitter.emit(Events.AnalysesRefresh);
+
+      return status;
+    });
   }
 
   function publish(analysis) {
@@ -89,13 +100,11 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
       return openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
-      break;
     case AnalyseTypes.Chart:
       return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
-      break;
     case AnalyseTypes.Pivot:
-      AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode);
-      break;
+      return AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode)
+        .afterClosed().first().toPromise();
     default:
     }
   }

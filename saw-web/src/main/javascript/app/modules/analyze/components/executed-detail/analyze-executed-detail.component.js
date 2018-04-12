@@ -25,7 +25,7 @@ export const AnalyzeExecutedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
+    constructor($injector, $eventEmitter, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
       $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
@@ -36,6 +36,7 @@ export const AnalyzeExecutedDetailComponent = {
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
       this._$rootScope = $rootScope;
+      this._$eventEmitter = $eventEmitter;
       this._$scope = $scope;
       this._$q = $q;
       this._FilterService = FilterService;
@@ -59,7 +60,7 @@ export const AnalyzeExecutedDetailComponent = {
       const analysisId = this._$state.params.analysisId;
       const analysis = this._$state.params.analysis;
 
-      this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
+      this._destroyHandler = this._$eventEmitter.on(Events.AnalysesRefresh, () => {
         this.loadAnalysisById(analysisId).then(() => {
           this._executionId = null;
           this.loadExecutedAnalyses(analysisId);
