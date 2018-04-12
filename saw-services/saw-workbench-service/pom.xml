@@ -243,11 +243,6 @@
 			<artifactId>livy-client-http</artifactId>
 			<version>0.3.0</version>
 		</dependency>
-    <dependency>
-      <groupId>com.synchronoss.saw</groupId>
-      <artifactId>saw-inspect-data-api</artifactId>
-      <version>2</version>
-    </dependency>
   </dependencies>
 	<build>
 		<plugins>
