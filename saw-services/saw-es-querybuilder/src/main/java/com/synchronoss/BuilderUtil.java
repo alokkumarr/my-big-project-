@@ -232,10 +232,10 @@ public class BuilderUtil
         DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
         LocalDateTime lastWeek = now.minusWeeks(6);
         LocalDateTime startOfWeek =
-            lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+            now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
         LocalDateTime endOfWeek = lastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-        dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-        dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+        dynamicConvertor.setLte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+        dynamicConvertor.setGte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
       }
       case "TW": {
@@ -364,6 +364,17 @@ public class BuilderUtil
         return dynamicConvertor;
     }
 
+    public static void main (String args[])
+    {
+        DynamicConvertor dynamicConvertor = dynamicDecipherForPrior("LSW");
+        DynamicConvertor dynamicConvertor1 = dynamicDecipher("LSW");
+        System.out.println(dynamicConvertor.getGte());
+        System.out.println(dynamicConvertor.getLte());
 
+        System.out.println(dynamicConvertor1.getGte());
+        System.out.println(dynamicConvertor1.getLte());
+
+
+    }
 
  }
