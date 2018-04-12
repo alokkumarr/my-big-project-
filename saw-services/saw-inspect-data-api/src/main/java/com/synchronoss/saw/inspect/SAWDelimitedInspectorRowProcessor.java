@@ -87,11 +87,14 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
       
             if(rowCounter < headerSize) {
                   if(rowCounter == (fieldDefRowNumber - 1)) {
-                      processFieldNames(row);
-                  }
+                      processFieldNames(row);}
                   String currentLine = context.currentParsedContent();
-                  headerLines.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
-              } 
+              try {
+                headerLines.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+              } catch (StringIndexOutOfBoundsException ex) {
+                headerLines.add(currentLine.substring(0, currentLine.length()));      
+              }
+             } 
             else {
               if (headerSize>0){
                 maxNumberOfFields = fieldNames.size();
@@ -108,13 +111,21 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
               }
               if(numberOfRowsParsed > 0 && devSampleCnt < DEV_SAMPLE_SIZE){
                 String currentLine = context.currentParsedContent();
-                deviatedSamples.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+                try {
+                  deviatedSamples.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+                } catch (StringIndexOutOfBoundsException ex) {
+                  deviatedSamples.add(currentLine.substring(0, currentLine.length()));
+                }
                 deviatedParsedSamples.add(row);
                 devSampleCnt++;
             } else{
               if(sampleCnt < SAMPLE_SIZE){
                 String currentLine = context.currentParsedContent();
-                samples.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+                try {
+                  samples.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+                }catch (StringIndexOutOfBoundsException ex) {
+                  samples.add(currentLine.substring(0, currentLine.length()));  
+                }
                 parsedSamples.add(row);
                 sampleCnt++;
                 }

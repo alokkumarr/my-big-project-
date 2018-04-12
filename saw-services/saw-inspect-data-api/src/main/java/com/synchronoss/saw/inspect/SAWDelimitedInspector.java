@@ -38,8 +38,8 @@ public class SAWDelimitedInspector {
   public static void main(String[] args) {
     try {
       String cnf =
-          "{\"inspect\":{\"lineSeparator\":\"\\n\",\"delimiter\":\"|\",\"quoteChar\":\"\",\"quoteEscapeChar\":\"\",\"headerSize\":\"1\",\"fieldNamesLine\":\"1\",\"dateFormats\":[],\"rowsToInspect\":100,\"delimiterType\":\"delimited\",\"header\":\"yes\"}}";
-      SAWDelimitedInspector parser = new SAWDelimitedInspector(cnf, "/Users/spau0004/Desktop/neg.csv", true, "Desktop/neg.csv");
+          "{\"inspect\":{\"lineSeparator\":\"\\n\",\"delimiter\":\",\",\"quoteChar\":\"\",\"quoteEscapeChar\":\"\",\"headerSize\":3,\"fieldNamesLine\":\"3\",\"dateFormats\":[],\"rowsToInspect\":100,\"delimiterType\":\"delimited\",\"header\":\"yes\"}}";
+      SAWDelimitedInspector parser = new SAWDelimitedInspector(cnf, "/Users/spau0004/Desktop/multi.csv", true, "Desktop/multi.csv");
       parser.parseSomeLines();
       String str = parser.toJson();
       System.out.println(str);
