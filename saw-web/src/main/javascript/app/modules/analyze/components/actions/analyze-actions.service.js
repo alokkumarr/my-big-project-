@@ -27,11 +27,11 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   function fork(analysis) {
     const model = clone(analysis);
     model.name += ' Copy';
-    openEditModal(model, 'fork');
+    return openEditModal(model, 'fork');
   }
 
   function edit(analysis) {
-    openEditModal(clone(analysis), 'edit');
+    return openEditModal(clone(analysis), 'edit');
   }
 
   function publish(analysis) {
@@ -77,23 +77,21 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   function openEditModal(analysis, mode) {
     /* Delayed injection of service to battle issues with downgradeModule */
     const AnalyzeDialogService = $injector.get('AnalyzeDialogService');
-    const openModal = template => {
-      showDialog({
-        template,
-        controller: scope => {
-          scope.model = deepClone(analysis);
-        },
-        multiple: true
-      });
-    };
+    const openModal = template => showDialog({
+      template,
+      controller: scope => {
+        scope.model = deepClone(analysis);
+      },
+      multiple: true
+    });
 
     switch (analysis.type) {
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
-      openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+      return openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
       break;
     case AnalyseTypes.Chart:
-      openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+      return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       break;
     case AnalyseTypes.Pivot:
       AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode);
