@@ -855,7 +855,12 @@ export class ChartService {
     const groupString = fields.g ?
       `<tr><th>Group:</th><td>{point.g}</td></tr>` :
       '';
-
+    if (type === 'pie' && fields.y[0].aggregate === 'percentage') {
+      yAxisString = `<tr>
+        <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
+        <td>{point.y:,.2f}%</td>
+      </tr>`;
+    }
     let tooltipObj = {
       useHTML: true,
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
