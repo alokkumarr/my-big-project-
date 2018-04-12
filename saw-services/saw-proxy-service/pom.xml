@@ -126,30 +126,30 @@
 			<artifactId>elasticsearch</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>pl.allegro.tech</groupId>
 			<artifactId>embedded-elasticsearch</artifactId>
 			<version>2.4.2</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>transport</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 		    <groupId>com.jayway.jsonpath</groupId>
 		    <artifactId>json-path</artifactId>
 		</dependency>
-		
+
 		<dependency>
 		    <groupId>com.jayway.jsonpath</groupId>
 		    <artifactId>json-path-assert</artifactId>
 		</dependency>
-	
+
 		<!-- APACHE COMMONS LANG -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -231,17 +231,13 @@
 									<file>src/main/system/saw-storage-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-storage-proxy-service/conf/logback.xml</name>
-									<file>src/main/resources/logback.xml</file>
-								</entry>
-								<entry>
 									<name>/opt/bda/saw-storage-proxy-service/conf/proxy-scehma.json</name>
 									<file>src/main/resources/schema/proxy-scehma.json</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service/conf/application.yml</name>
 									<file>src/main/resources/application.yml</file>
-									
+
 								</entry>
 							</entries>
 							<signature>
