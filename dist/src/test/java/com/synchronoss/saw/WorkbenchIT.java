@@ -114,6 +114,54 @@ public class WorkbenchIT extends BaseIT {
     }
 
     @Test
+    public void testSQLDataset() throws JsonProcessingException {
+        String name = "test-sql-" + testId();
+        /* Use only characters suitable for a SQL table name */
+        name = name.replace("-", "_");
+        /* Execute SQL */
+        executeSQLDataset(name);
+        /* Workaround: Until the dataset creation API provides the
+         * dataset ID, construct it manually here. */
+        String id = "workbench::" + name;
+        waitForDataset(id, WAIT_RETRIES);
+    }
+
+    /**
+     * Execute SQL on a dataset with given name using Workbench
+     * Services.
+     */
+    private void executeSQLDataset(String name)
+        throws JsonProcessingException {
+        String inputName = "test-parse-" + testId();
+        /* Use only characters suitable for a SQL table name */
+        inputName = inputName.replace("-", "_");
+        /* Create dataset to be used for testing viewing dataset */
+        parseDataset(inputName);
+        /* Workaround: Until the dataset creation API provides the
+         * dataset ID, construct it manually here. */
+        String inputId = "workbench::" + inputName;
+        waitForDataset(inputId, WAIT_RETRIES);
+        /* Execute SQL on dataset */
+        ObjectNode root = mapper.createObjectNode();
+        root.put("name", name);
+        root.put("input", inputName);
+        root.put("component", "sql");
+        ObjectNode config = root.putObject("configuration");
+        String sql = "CREATE TABLE " + name + " AS SELECT * FROM "
+            + inputName;
+        config.put("script", sql);
+        given(authSpec)
+            .body(root)
+            .when().post(WORKBENCH_PATH + "/datasets")
+            .then().assertThat().statusCode(200);
+        /* Wait for dataset */
+        String outputId = "workbench::" + name;
+        waitForDataset(outputId, WAIT_RETRIES);
+        /* View dataset results */
+        viewDataset(name);
+    }
+
+    @Test
     public void testListDatasets() {
         /* Note: Placeholder for Workbench list datasets integration
          * test.  To be done: Create a dataset and then make
@@ -134,6 +182,10 @@ public class WorkbenchIT extends BaseIT {
         String id = "workbench::" + name;
         waitForDataset(id, WAIT_RETRIES);
         /* View dataset */
+        viewDataset(name);
+    }
+
+    private void viewDataset(String name) throws JsonProcessingException {
         ObjectNode root = mapper.createObjectNode();
         root.put("name", name);
         Response response = given(authSpec)
