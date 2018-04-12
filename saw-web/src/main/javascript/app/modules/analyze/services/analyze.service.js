@@ -185,11 +185,23 @@ export class AnalyzeService {
   }
 
   getCronDetails(requestBody) {
-    return this._$http.post(`${this.url}/scheduler/fetchJob`, requestBody);
+    const deferred = this._$q.defer();
+    this._$http.post(`${this.url}/scheduler/fetchJob`, requestBody).then(({data}) => {
+      deferred.resolve(data);
+    }, err => {
+      deferred.reject(err);
+    });
+    return deferred.promise;
   }
 
   getAllCronJobs(model) {
-    return this._$http.post(`${this.url}/scheduler/jobs`, model);
+    const deferred = this._$q.defer();
+    this._$http.post(`${this.url}/scheduler/jobs`, model).then(({data}) => {
+      deferred.resolve(data);
+    }, err => {
+      deferred.reject(err);
+    });
+    return deferred.promise;
   }
 
   getlistFTP(custCode) {

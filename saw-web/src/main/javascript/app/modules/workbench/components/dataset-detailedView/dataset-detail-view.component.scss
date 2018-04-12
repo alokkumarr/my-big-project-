@@ -1,0 +1,137 @@
+@import "themes/base/colors";
+
+dataset-detail-view {
+  width: 100%;
+  height: calc(100% - 3px);
+  background-color: $background-color;
+  padding: 0 3px 3px;
+  overflow: auto;
+
+  mat-tab-group {
+    max-width: 100%;
+    height: 100%;
+  }
+
+  .details-container {
+    height: 100%;
+  }
+
+  .details-header {
+    color: rgba(0, 0, 0, 0.54);
+    background: rgba(0, 0, 0, 0.03);
+    padding: 8px 0;
+    height: 50px;
+    font-size: 18px;
+    font-weight: 500;
+    border: 2px solid white;
+
+    .mat-icon {
+      font-size: 26px;
+    }
+
+    .mat-chip {
+      color: rgba(0, 0, 0, 0.54);
+      font-size: 16px;
+    }
+
+    .status-icon {
+      width: 36px;
+
+      .mat-icon {
+        font-size: 24px;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .details-body {
+    background-color: #FFF;
+    height: calc(100% - 50px);
+  }
+
+  .mat-tab-body {
+    background-color: $background-color;
+  }
+
+  .details-card {
+    margin: 3px;
+
+    .details-title {
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      color: #555;
+    }
+
+    .details-content {
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 1.43;
+    }
+
+    .mat-divider {
+      position: relative;
+      padding-bottom: 5px;
+    }
+
+    .prop-name {
+      color: #727272;
+      width: 136px;
+      line-height: 1.43;
+    }
+
+    .prop-value {
+      color: #555;
+    }
+
+    .status_INIT {
+      color: $primary-orange;
+    }
+
+    .status_SUCCESS {
+      color: $primary-green;
+    }
+
+    .status_FAILED {
+      color: $primary-red;
+    }
+  }
+
+  .details-grid {
+    padding: 3px;
+  }
+
+  .data-cont {
+    height: 100%;
+
+    .data-grid {
+      padding: 3px;
+      height: 100%;
+      width: 100%;
+      overflow: auto;
+      max-height: 100%;
+    }
+  }
+
+  .loading {
+    width: 100%;
+    height: 100%;
+    color: rgb(189, 189, 189);
+    text-align: center;
+    background-color: #FFF;
+
+    span {
+      font-size: 28px;
+      word-break: break-word;
+    }
+
+    .load-gif {
+      height: 70%;
+      width: 70%;
+      background-image: url('../../../../../../../../assets/svg/loading-ripple.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+  }
+}

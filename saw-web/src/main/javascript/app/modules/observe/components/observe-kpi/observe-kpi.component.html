@@ -1,0 +1,10 @@
+<h1 [textContent]="_kpi.name"></h1>
+
+<h2>Month to Date</h2>
+
+<div class="kpi-measure-container">
+  <div class="kpi-measure">
+    <span class="kpi-main-measure">{{executionResult.current}}</span>
+    <span class="kpi-secondary-measure">({{executionResult.change}}%)</span>
+  </div>
+</div>

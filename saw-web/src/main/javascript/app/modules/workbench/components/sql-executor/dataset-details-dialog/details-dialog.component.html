@@ -7,6 +7,11 @@
               Dataset Name is
               <strong>required</strong>
             </mat-error>
+            <mat-error *ngIf="form.controls.nameControl.hasError('pattern')" i18n>
+              <strong> Only alphabets, numbers are allowed
+              </strong>
+            </mat-error>
+            <mat-hint> Only alphabets, numbers are allowed </mat-hint>
           </mat-form-field>
         </section>
         <section class="input-section">
@@ -20,7 +25,7 @@
         </section>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-button type="submit" [disabled]="!form.valid">OK</button>
+    <button mat-raised-button type="submit" color="primary" [disabled]="!form.valid">OK</button>
     <button mat-button type="button" style="color: #E5524C;" (click)="onClose()">Cancel</button>
   </mat-dialog-actions>
 </form>

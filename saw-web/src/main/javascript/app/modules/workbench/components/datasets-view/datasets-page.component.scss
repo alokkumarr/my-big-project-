@@ -33,9 +33,22 @@ datasets-page {
     color: white;
   }
 
+  .mat-button-toggle {
+    font-size: 16px;
+    height: 34px;
+  }
+
   .mat-button-toggle-label-content {
     padding: 0 7px;
-    line-height: 32px;
+    line-height: 32px !important;
+
+    .mat-icon {
+      width: auto;
+    }
+  }
+
+  .mat-button-toggle-label-content > * {
+    vertical-align: bottom;
   }
 
   .view-mode {

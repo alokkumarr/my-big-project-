@@ -28,6 +28,7 @@ import com.synchronoss.saw.workbench.controller.SAWWorkBenchInternalAddRAWDataCo
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchServiceImpl;
+import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 
 @RunWith(SpringRunner.class)
@@ -48,6 +49,10 @@ public class SAWWorkBenchInternalAddRAWDataControllerTest {
   private String requestPreviewJSON = "{\"path\":\"test.csv\"}";
   private String requestInspectJSON = "{\"file\":\"test.csv\",\"lineSeparator\":\"\\n\",\"delimiter\":\",\",\"quoteChar\":\"'\",\"quoteEscapeChar\":\"\\\\\",\"headerSize\":1,\"fieldNamesLine\":1,\"dateFormats\":[],\"rowsToInspect\":5,\"delimiterType\":\"delimited\"}";
   
+  /* Workaround: Mock the executor service bean too, to avoid
+   * initialization that requires MapR-DB connection */
+  @MockBean
+  private WorkbenchExecutionService workbenchExecutionService;
   
   @Test
   public void previewRAWData() throws Exception {
