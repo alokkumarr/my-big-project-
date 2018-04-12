@@ -333,19 +333,20 @@ public class BuilderUtil
                 break;
             }
             case "LSW": {
-                LocalDateTime priorlast6Week = now.minusWeeks(12);
+                LocalDateTime last6Week = now.minusWeeks(6);
+                LocalDateTime priorlast6Week = last6Week.minusWeeks(6);
                 LocalDateTime startOfWeek =
-                    priorlast6Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+                    last6Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
                 LocalDateTime endOfWeek = priorlast6Week.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
                 dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "TW": {
-                LocalDateTime lastWeek = now;
+                LocalDateTime lastWeek = now.minusWeeks(1);
                 LocalDateTime startOfWeek =
                     lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-                dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(lastWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
