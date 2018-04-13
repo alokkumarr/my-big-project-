@@ -139,3 +139,29 @@ test_that("Multiple Model with Manual set final model method test case", {
   expect_equal(f5$final_model$id,names(get_models(f5))[2])
   expect_data_frame(get_evalutions(f5), nrow=4)
 })
+
+
+
+test_that("Covariate test case", {
+
+  dat2 <- data.frame(y = dat1$y, x = rnorm(n))
+
+  f6 <- forecaster(df = dat2,
+                   target = "y",
+                   name = "test") %>%
+    add_model(pipe = pipeline(),
+              method = "auto.arima",
+              class = "forecast_model") %>%
+    train_models(.) %>%
+    evaluate_models(.) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  f6_preds <- predict(f6, 10, data = data.frame(x=rnorm(10)))
+
+  expect_class(f6, "forecaster")
+  expect_class(f6$final_model, "forecast_model")
+  expect_equal(f6$models[[names(get_models(f6))]]$fit, f6$final_model$fit)
+  expect_data_frame(get_evalutions(f6), nrow=1)
+})
+
+

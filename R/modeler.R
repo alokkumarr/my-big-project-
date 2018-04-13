@@ -182,7 +182,7 @@ get_models <- function(obj, ids = NULL, status = NULL) {
   checkmate::assert_class(obj, "modeler")
   checkmate::assert_character(ids, null.ok = TRUE)
   checkmate::assert_choice(status,
-                           choices = c("created", "added", "trained", "evaluated", "selected"),
+                           choices = c("created", "added", "trained", "evaluated", "selected", "final"),
                            null.ok = TRUE)
 
   models <- obj$models

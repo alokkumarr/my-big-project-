@@ -4,7 +4,7 @@
 \alias{new_pipeline}
 \title{Pipeline Class Constructer}
 \usage{
-new_pipeline(expr, output, desc, created_on, last_updated, runtime)
+new_pipeline(expr, output, desc, created_on, runtime)
 }
 \description{
 Pipeline Class Constructer

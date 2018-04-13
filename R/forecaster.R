@@ -56,7 +56,7 @@ train_models.forecaster <- function(obj, ids = NULL) {
   for (id in ids) {
     model <- get_models(obj, id = id)[[1]]
     checkmate::assert_class(model, "forecast_model")
-    model$pipe <- flow(obj$data, model$pipe)
+    model$pipe <- execute(obj$data, model$pipe)
     indicies <- get_indicies(obj)
     model$performance <- indicies
     for (i in seq_along(indicies)) {
@@ -171,7 +171,6 @@ set_final_model.forecaster <- function(obj,
       obj$evaluate <- rbind(obj$evaluate, eval)
     }
   }
-
 
   if (refit) {
     final_model <- fit(model,

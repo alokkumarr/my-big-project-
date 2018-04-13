@@ -6,6 +6,9 @@
 \usage{
 get_evalutions(obj)
 }
+\arguments{
+\item{obj}{modeler object}
+}
 \description{
 Returns data.frame with measure calculated on the validation samples
 }

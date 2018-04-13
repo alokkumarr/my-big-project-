@@ -28,7 +28,7 @@ fit.forecast_model <- function(obj, data, ...){
 
   y <- as.numeric(data[[target]])
   if(ncol(data) > 1){
-    xreg <- data[, -target, drop=FALSE]
+    xreg <- data[, colnames(data) != target, drop=FALSE]
   }else{
     xreg <- NULL
   }
@@ -54,33 +54,38 @@ fitted.forecast_model <- function(obj) {
 
 #' Forecast Prediction Method
 #' @rdname predict
-predict.forecast_model <- function(obj, periods, data = NULL, level = c(80, 95)) {
-    method_args <- obj$method_args
-    target <- obj$target
-    y <- as.numeric(data[[target]])
+predict.forecast_model <- function(obj,
+                                   periods,
+                                   data = NULL,
+                                   level = c(80, 95)) {
+  method_args <- obj$method_args
+  target <- obj$target
 
-    if (!is.null(data)) {
-      if (ncol(data) > 1) {
-        xreg <- data[,-target, drop = FALSE]
-      } else{
-        xreg <- NULL
-      }
-    } else{
+  if (!is.null(data)) {
+    obj$pipe <- execute(data, obj$pipe)
+    data <- obj$pipe$output
+    x_vars <- setdiff(colnames(data), target)
+    if (length(x_vars) > 0) {
+      xreg <- data[, x_vars, drop = FALSE]
+    } else {
       xreg <- NULL
     }
-
-    f <- do.call("forecast",
-                 modifyList(
-                   method_args,
-                   list(
-                     object = obj$fit,
-                     xreg = xreg,
-                     h = periods,
-                     level = level
-                   )
-                 ))
-    get_forecasts(f)
+  } else{
+    xreg <- NULL
   }
+
+  f <- do.call("forecast",
+               modifyList(
+                 method_args,
+                 list(
+                   object = obj$fit,
+                   xreg = xreg,
+                   h = periods,
+                   level = level
+                 )
+               ))
+  get_forecasts(f)
+}
 
 
 
@@ -202,4 +207,20 @@ tidy_performance.forecast_model <- function(mobj) {
 }
 
 
+evaluate.forecast_model <- function(mobj) {
 
+  eval <- tidy_performance(mobj) %>%
+    dplyr::inner_join(get_target(obj) %>%
+                        dplyr::mutate(index = row_number()),
+                      by = "index") %>%
+    dplyr::group_by(model, sample, indicie) %>%
+    dplyr::do(data.frame(
+      match.fun(obj$measure$method)(.,
+                                    actual = obj$target,
+                                    predicted = "predicted")
+    )) %>%
+    dplyr::ungroup() %>%
+    setNames(c("model", "sample", "indicie", obj$measure$method))
+
+  obj$evaluate <- eval
+}

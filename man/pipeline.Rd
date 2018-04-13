@@ -7,5 +7,6 @@
 pipeline(expr = identity, desc = NULL)
 }
 \description{
-Creates a pipeline object. The expression is set by default as the identity function. This returns the
+Creates a pipeline object. The expression is set by default as the identity
+function. This returns the
 }

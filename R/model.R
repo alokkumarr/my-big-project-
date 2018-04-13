@@ -15,7 +15,6 @@ new_model <- function(pipe,
                       id,
                       status,
                       created_on,
-                      last_updated,
                       fit,
                       performance) {
   checkmate::assert_class(pipe, "pipeline")
@@ -27,9 +26,8 @@ new_model <- function(pipe,
   checkmate::assert_path_for_output(path, overwrite = FALSE)
   checkmate::assert_character(id)
   checkmate::assert_choice(status,
-                           c("created", "added", "trained", "evaluated", "selected"))
+                           c("created", "added", "trained", "evaluated", "selected", "final"))
   checkmate::assert_posixct(created_on)
-  checkmate::assert_posixct(last_updated)
   checkmate::assert_list(fit, null.ok = TRUE)
   checkmate::assert_list(performance, null.ok = TRUE)
 
@@ -44,7 +42,6 @@ new_model <- function(pipe,
       path = path,
       id = id,
       created_on = created_on,
-      last_updated = last_updated,
       status = status,
       fit = fit,
       performance = performance
@@ -108,7 +105,6 @@ model <- function(pipe,
       id = id,
       status = "created",
       created_on = Sys.time(),
-      last_updated = Sys.time(),
       fit = NULL,
       performance = NULL
     )
@@ -197,15 +193,6 @@ evaluate <- function(x, ...) {
 }
 
 
-#' Predict Model Generic
-#'
-#' Make model predictions
-#'
-#' @export
-predict <- function(...){
-  UseMethod("predict")
-}
-
 
 #' @export
 get_fit <- function(x, ...) {
@@ -216,4 +203,16 @@ get_fit <- function(x, ...) {
 #' @export
 get_coefs <- function(x, ...) {
   UseMethod("get_coefs", x)
+}
+
+
+
+# Class Methods -----------------------------------------------------------
+
+get_target.model <- function(obj) {
+
+  obj$pipe$output %>%
+    select_at(obj$target) %>%
+    mutate(index = 1:n())
+
 }
