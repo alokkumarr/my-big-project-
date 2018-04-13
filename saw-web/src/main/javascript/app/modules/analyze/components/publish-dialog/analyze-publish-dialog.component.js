@@ -115,9 +115,9 @@ export const AnalyzePublishDialogComponent = {
             this.hasSchedule = true;
           }
           if (this.model.type !== 'chart') {
-            this.ftp = response.data.data.jobDetails.ftp;
+            this.ftp = response.data.jobDetails.ftp;
           }
-          this.emails = response.data.data.jobDetails.emailList;
+          this.emails = response.data.jobDetails.emailList;
           this.hasSchedule = true;
         }
       }).catch(() => {

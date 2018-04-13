@@ -8,7 +8,7 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 
 import {
-  generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
+  getLocalMinute, generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
 } from '../../../../common/utils/cronFormatter';
 
 import { SCHEDULE_TYPES } from '../../../../common/consts';
@@ -221,6 +221,8 @@ export class CronJobSchedularComponent {
     this.onCronChanged.emit(this.crondetails);
   }
 
+  
+
   loadData() {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
@@ -253,7 +255,8 @@ export class CronJobSchedularComponent {
       if (isNaN(parseInt(parseCronValue[1]))) {
         this.hourly.minutes = 0;  
       } else {
-        this.hourly.minutes = parseInt(parseCronValue[1]);  
+        const fetchLocalMinute = getLocalMinute(parseInt(parseCronValue[1]));
+        this.hourly.minutes = fetchLocalMinute;  
       }
       break;
     case 'daily':

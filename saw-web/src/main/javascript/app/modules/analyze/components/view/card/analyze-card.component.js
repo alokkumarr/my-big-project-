@@ -5,6 +5,7 @@ import cronstrue from 'cronstrue';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isEmpty from 'lodash/isEmpty';
+import { getLocalMinute } from '../../../../../common/utils/cronFormatter';
 
 let self;
 export const AnalyzeCardComponent = {
@@ -49,7 +50,8 @@ export const AnalyzeCardComponent = {
           if (!isEmpty(cron.jobDetails.cronExpression)) {
             if (cron.jobDetails.activeTab === 'hourly') {
               // there is no time stamp in hourly cron hence converting to utc and local is not required.
-              this.cronReadbleMsg = cronstrue.toString(cron.jobDetails.cronExpression);
+              const localMinuteCron = this.extractMinute(cron.jobDetails.cronExpression);
+              this.cronReadbleMsg = cronstrue.toString(localMinuteCron);
             } else {
               const cronLocal = this.convertToLocal(cron.jobDetails.cronExpression);
               this.cronReadbleMsg = cronstrue.toString(cronLocal);
@@ -59,12 +61,21 @@ export const AnalyzeCardComponent = {
       });
     }
 
+    extractMinute(CronUTC) {
+      const splitArray = CronUTC.split(' ');
+      const date = new Date();
+      date.setUTCHours(moment().format('HH'), splitArray[1]);
+      const UtcTime = moment.utc(date).local().format('mm').split(' ');
+      splitArray[1] = UtcTime[0];
+      return splitArray.join(' ');
+    }
+
     convertToLocal(CronUTC) {
       const splitArray = CronUTC.split(' ');
       const date = new Date();
       date.setUTCHours(splitArray[2], splitArray[1]);
       const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
-      splitArray[1] = UtcTime[0];
+      splitArray[1] = getLocalMinute(UtcTime[0]);
       splitArray[2] = UtcTime[1];
       return splitArray.join(' ');
     }

@@ -189,7 +189,9 @@ export const AnalyzeListViewComponent = {
         if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
           if (cron.jobDetails.activeTab === 'hourly') {
             // there is no time stamp in hourly cron hence converting to utc and local is not required.
-            scheduleHuman = cronstrue.toString(cron.jobDetails.cronExpression);
+            const localMinuteCron = this.extractMinute(cron.jobDetails.cronExpression);
+            scheduleHuman = cronstrue.toString(localMinuteCron);
+
           } else {
             const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
             scheduleHuman = cronstrue.toString(localCron);
@@ -197,6 +199,15 @@ export const AnalyzeListViewComponent = {
         }
       });
       return scheduleHuman;
+    }
+
+    extractMinute(CronUTC) {
+      const splitArray = CronUTC.split(' ');
+      const date = new Date();
+      date.setUTCHours(moment().format('HH'), splitArray[1]);
+      const UtcTime = moment.utc(date).local().format('mm').split(' ');
+      splitArray[1] = UtcTime[0];
+      return splitArray.join(' ');
     }
 
     convertToLocal(CronUTC) {

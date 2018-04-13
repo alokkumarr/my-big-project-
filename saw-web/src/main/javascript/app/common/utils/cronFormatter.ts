@@ -24,6 +24,13 @@ export function convertToLocal(cronUTC) {
 
 }
 
+export function getLocalMinute(minute) {
+  const date = new Date();
+  date.setUTCHours(moment().format('HH'), minute);
+  const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
+  return parseInt(UtcTime[0]);
+}
+
 export function hourToCron(hour, hourType, minutes) {
   const hourValue = hourType === 'AM' ? (parseInt(hour) === 12 ? 0 : parseInt(hour)) : (parseInt(hour) === 12 ? 12 : parseInt(hour) + 12));
   const minuteHourUTC = this.convertToUtc(hourValue, minutes);
@@ -31,7 +38,9 @@ export function hourToCron(hour, hourType, minutes) {
 }
 
 export function generateHourlyCron(hours, minutes) {
-  return `0 ${minutes} 0/${hours} 1/1 * ? *`;
+  const fetchUTCMinute = this.convertToUtc(moment().format('HH'), minutes);
+  const UTCMinute = fetchUTCMinute.split(' ');
+  return `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
 }
 
 export function generateDailyCron(cronDaily, dateSelects) {
