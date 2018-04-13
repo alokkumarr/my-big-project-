@@ -160,9 +160,9 @@ public class KPIDataQueryBuilder {
                 cal.setTime(gte);
                 long diff = Math.abs(t1- cal.getTimeInMillis());
                 long startTime = cal.getTimeInMillis();
-                dynamicConvertor.setGte(sdf.format(cal.getTime()));
-                cal.setTimeInMillis(startTime-diff);
                 dynamicConvertor.setLte(sdf.format(cal.getTime()));
+                cal.setTimeInMillis(startTime-diff);
+                dynamicConvertor.setGte(sdf.format(cal.getTime()));
                 return dynamicConvertor ;
             } catch (ParseException e) {
                 //intentionally empty

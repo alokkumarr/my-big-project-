@@ -179,7 +179,7 @@ public class BuilderUtil
     switch (dynamic) {
         case "Yesterday" :
         LocalDateTime yesterday = now.minusDays(1);
-        dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+        dynamicConvertor.setLte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
         dynamicConvertor.setGte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
       case "YTD": {
@@ -231,11 +231,8 @@ public class BuilderUtil
       case "LSW": {
         DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
         LocalDateTime lastWeek = now.minusWeeks(6);
-        LocalDateTime startOfWeek =
-            now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-        LocalDateTime endOfWeek = lastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-        dynamicConvertor.setLte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-        dynamicConvertor.setGte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+          dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+          dynamicConvertor.setGte(lastWeek.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
       }
       case "TW": {
@@ -243,8 +240,8 @@ public class BuilderUtil
         LocalDateTime lastWeek = now;
         LocalDateTime startOfWeek =
             lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-        dynamicConvertor.setLte(now.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-        dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+          dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+          dynamicConvertor.setGte(startOfWeek.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
       }
       case "LTW": {
@@ -273,8 +270,8 @@ public class BuilderUtil
         switch (dynamic) {
             case "Yesterday" :
                 LocalDateTime yesterday = now.minusDays(1);
-                LocalDateTime dayBeforeYesterday = now.minusDays(2);
-                dynamicConvertor.setLte(yesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                LocalDateTime dayBeforeYesterday = yesterday.minusDays(1);
+                dynamicConvertor.setLte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(dayBeforeYesterday.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
 
@@ -282,7 +279,7 @@ public class BuilderUtil
                 LocalDateTime firstDayOfYear = now.with(TemporalAdjusters.firstDayOfYear());
                 int calculatedDayDifference  = now.getDayOfYear()-firstDayOfYear.getDayOfYear();
                 LocalDateTime priorDayOfYear = firstDayOfYear.minusDays(calculatedDayDifference);
-                dynamicConvertor.setLte(firstDayOfYear.format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(firstDayOfYear.minusDays(1).with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(priorDayOfYear.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -311,14 +308,14 @@ public class BuilderUtil
             case "LM": {
                 LocalDateTime priorLastMonth = now.minusMonths(1);
                 LocalDateTime lastMonth = priorLastMonth.minusMonths(1);
-                dynamicConvertor.setLte(priorLastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LQ": {
                 YearQuarter lastQuarter = YearQuarter.now().minusQuarters(1);
-                YearQuarter priorQuarter = YearQuarter.now().minusQuarters(2);
-                dynamicConvertor.setLte(lastQuarter.minusQuarters(1).atEndOfQuarter().toString()+ SPACE + DATE_FORMAT_LTE);
+                YearQuarter priorQuarter = lastQuarter.now().minusQuarters(1);
+                dynamicConvertor.setLte(priorQuarter.minusQuarters(1).atEndOfQuarter().toString()+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(priorQuarter.minusQuarters(1).atDay(1).toString()+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -335,11 +332,8 @@ public class BuilderUtil
             case "LSW": {
                 LocalDateTime last6Week = now.minusWeeks(6);
                 LocalDateTime priorlast6Week = last6Week.minusWeeks(6);
-                LocalDateTime startOfWeek =
-                    priorlast6Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-                LocalDateTime endOfWeek = last6Week.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-                dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-                dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                dynamicConvertor.setLte(last6Week.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(priorlast6Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "TW": {
@@ -352,7 +346,7 @@ public class BuilderUtil
             }
             case "LTW": {
                 LocalDateTime last2Week = now.minusWeeks(2);
-                LocalDateTime priorLast2Week = last2Week.minusWeeks(4);
+                LocalDateTime priorLast2Week = last2Week.minusWeeks(2);
                 dynamicConvertor.setLte(last2Week.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(priorLast2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
