@@ -5,7 +5,6 @@ import cronstrue from 'cronstrue';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isEmpty from 'lodash/isEmpty';
-import { getLocalMinute } from '../../../../../common/utils/cronFormatter';
 
 let self;
 export const AnalyzeCardComponent = {
@@ -75,7 +74,7 @@ export const AnalyzeCardComponent = {
       const date = new Date();
       date.setUTCHours(splitArray[2], splitArray[1]);
       const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
-      splitArray[1] = getLocalMinute(UtcTime[0]);
+      splitArray[1] = UtcTime[0];
       splitArray[2] = UtcTime[1];
       return splitArray.join(' ');
     }
