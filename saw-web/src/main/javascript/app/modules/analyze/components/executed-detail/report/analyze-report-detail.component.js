@@ -9,7 +9,8 @@ export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
     analysis: '<',
-    source: '&'
+    source: '&',
+    requester: '<'
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {
@@ -20,6 +21,23 @@ export const AnalyzeReportDetailComponent = {
 
     $onInit() {
       this.initAnalysis();
+      if (this.requester) {
+        this.requesterSubscription = this.requester.subscribe(this.onRequest.bind(this));
+      }
+    }
+
+    $onDestroy() {
+      if (this.requesterSubscription) {
+        this.requesterSubscription.unsubscribe();
+      }
+    }
+
+    onRequest(data) {
+      if (!data) {
+        return;
+      }
+
+      this.gridData = [{refresh: true}];
     }
 
     initAnalysis() {

@@ -60,6 +60,7 @@ export const AnalyzeExecutedDetailComponent = {
       const analysisId = this._$state.params.analysisId;
       const analysis = this._$state.params.analysis;
 
+      this.reportSource = this.loadExecutionData(false);
       this._destroyHandler = this._$eventEmitter.on(Events.AnalysesRefresh, () => {
         this.loadAnalysisById(analysisId).then(() => {
           this._executionId = null;
@@ -248,22 +249,26 @@ export const AnalyzeExecutedDetailComponent = {
       return replace(csv, firstRow, displayNames);
     }
 
-    loadExecutionData(options = {}) {
-      if (this._executionId) {
-        this._$rootScope.showProgress = true;
-        options.analysisType = this.analysis.type;
+    loadExecutionData(updateRequester = false) {
+      return (options = {}) => {
+        if (this._executionId) {
+          this._$rootScope.showProgress = true;
+          options.analysisType = this.analysis.type;
 
-        return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
-          .then(({data, count}) => {
-            this._$rootScope.showProgress = false;
-            this.requester.next({data});
-            return {data, count};
-          }, err => {
-            this._$rootScope.showProgress = false;
-            throw err;
-          });
-      }
-      return this._$q.reject(new Error('No execution id selected'));
+          return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
+            .then(({data, count}) => {
+              this._$rootScope.showProgress = false;
+              if (updateRequester) {
+                this.requester.next({data});
+              }
+              return {data, count};
+            }, err => {
+              this._$rootScope.showProgress = false;
+              throw err;
+            });
+        }
+        return this._$q.reject(new Error('No execution id selected'));
+      };
     }
 
     loadAnalysisById(analysisId) {
@@ -287,7 +292,7 @@ export const AnalyzeExecutedDetailComponent = {
     loadLastPublishedAnalysis() {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
-        this.loadExecutionData();
+        this.loadExecutionData(true)();
       }
     }
 
