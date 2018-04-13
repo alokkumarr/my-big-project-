@@ -2,6 +2,7 @@ package com.synchronoss.saw.export.generate;
 
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 
@@ -178,58 +179,13 @@ public class ExportServiceImpl implements ExportService{
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
               file.getParentFile().mkdir();
-//              iFileExporter.generateFile(exportBean, entity.getBody().getData());
+
               FileOutputStream fos = new FileOutputStream(file);
               OutputStreamWriter osw = new OutputStreamWriter(fos);
-              entity.getBody().getData().stream().forEach(
-                  line -> {
-                    try {
-                      if( line instanceof LinkedHashMap ) {
-                        String[] header = null;
-                        //write header information
-                        if (exportBean.getColumnHeader()==null || exportBean.getColumnHeader().length==0) {
-                          Object[] obj = ((LinkedHashMap) line).keySet().toArray();
-                          header = Arrays.copyOf(obj, obj.length, String[].class);
-                          exportBean.setColumnHeader(header);
-                          StringBuffer csvHeader = new StringBuffer();
-                          int bound = header.length;
-                          for (int i = 0; i < bound; i++) {
-                            csvHeader.append("\"");
-                            csvHeader.append(header[i]);
-                            csvHeader.append("\"");
-                            if (i < header.length - 1) {
-                              csvHeader.append(",");
-                            }
-                          }
-                          osw.write(csvHeader.toString());
-                          osw.write("\n");
-                        }
-                        StringBuffer rowbuffer = new StringBuffer();
-                        for (String val : header) {
-                          if (val instanceof String) {
-                            String value = String.valueOf(((LinkedHashMap) line).get(val));
-                            if (rowbuffer.length() > 0)
-                              rowbuffer.append(",");
-                            if (value != null && !(value.equals("") || ("null".equalsIgnoreCase(value)))) {
-                              rowbuffer.append("\"");
-                              rowbuffer.append(value);
-                              rowbuffer.append("\"");
-                            } else {
-                              rowbuffer.append("\"");
-                              rowbuffer.append("\"");
-                            }
-                          }
-                        }
-                        osw.write(rowbuffer.toString());
-                        osw.write("\n");
-                      }
-                    } catch (Exception e) {
-                      // nothing
-                      logger.error(e.getMessage());
-                    }
-                  }
-              );
+              streamReportToFile(entity, exportBean, osw);
+
               osw.close();
+              fos.close();
 
               MailSender.sendMail(finalRecipients, exportBean.getReportName() + " | " +
                       exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
@@ -263,12 +219,12 @@ public class ExportServiceImpl implements ExportService{
           @Override
           public void onSuccess(ResponseEntity<DataResponse> entity) {
             logger.debug("[Success] Response :" + entity.getStatusCode());
-            IFileExporter iFileExporter = new CSVReportDataExporter();
+//            IFileExporter iFileExporter = new CSVReportDataExporter();
             ExportBean exportBean = new ExportBean();
             String dir = UUID.randomUUID().toString();
-            MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
             exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-                dispatchBean).get("name")) + "." + ((LinkedHashMap) dispatchBean).get("fileType"));
+                dispatchBean).get("name")) + "."
+                +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".csv"));
             exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
             exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
             exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
@@ -277,11 +233,17 @@ public class ExportServiceImpl implements ExportService{
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
               file.getParentFile().mkdir();
-              iFileExporter.generateFile(exportBean ,entity.getBody().getData());
+
+              FileOutputStream fos = new FileOutputStream(file);
+              OutputStreamWriter osw = new OutputStreamWriter(fos);
+              streamReportToFile(entity, exportBean, osw);
+
+              osw.close();
+              fos.close();
 
               DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss");
               LocalDateTime now = LocalDateTime.now();
-              // compress the file
+
               File cfile = new File(exportBean.getFileName());
               String zipFileName = cfile.getAbsolutePath().concat(".zip");
 
@@ -289,8 +251,8 @@ public class ExportServiceImpl implements ExportService{
 
                 try {
 
-                  FileOutputStream fos = new FileOutputStream(zipFileName);
-                  ZipOutputStream zos = new ZipOutputStream(fos);
+                  FileOutputStream fos_zip = new FileOutputStream(zipFileName);
+                  ZipOutputStream zos = new ZipOutputStream(fos_zip);
 
                   zos.putNextEntry(new ZipEntry(cfile.getName()));
 
@@ -320,6 +282,10 @@ public class ExportServiceImpl implements ExportService{
                       logger.error(e.getMessage());
                     }
                   }
+
+                  zos.close();
+                  fos_zip.close();
+
                 } catch (Exception e) {
                   logger.error("ftp error: "+e.getMessage());
                 }
@@ -340,6 +306,40 @@ public class ExportServiceImpl implements ExportService{
         });
       }
     }
+  }
+
+  private void streamReportToFile(ResponseEntity<DataResponse> entity, ExportBean exportBean,
+      OutputStreamWriter osw) {
+    entity.getBody().getData().stream().forEach(
+        line -> {
+          try {
+            if( line instanceof LinkedHashMap) {
+              String[] header = null;
+              if (exportBean.getColumnHeader()==null || exportBean.getColumnHeader().length==0) {
+                Object[] obj = ((LinkedHashMap) line).keySet().toArray();
+                header = Arrays.copyOf(obj, obj.length, String[].class);
+                exportBean.setColumnHeader(header);
+                osw.write(Arrays.stream(header).map(i -> "\""+ i + "\"")
+                    .collect(Collectors.joining(",")));
+                osw.write("\n");
+                osw.write(
+                    Arrays.stream(exportBean.getColumnHeader())
+                        .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
+                        .collect(Collectors.joining(",")));
+                osw.write("\n");
+              } else {
+                osw.write(
+                    Arrays.stream(exportBean.getColumnHeader())
+                        .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
+                        .collect(Collectors.joining(",")));
+                osw.write("\n");
+              }
+            }
+          } catch (Exception e) {
+            logger.error("ERROR_PROCESSING_STREAM: "+e.getMessage());
+          }
+        }
+    );
   }
 
   @Override
