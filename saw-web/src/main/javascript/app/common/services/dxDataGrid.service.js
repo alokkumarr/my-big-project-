@@ -32,7 +32,6 @@ export class dxDataGridService {
       },
       customizeColumns: columns => {
         forEach(columns, col => {
-          col.allowSorting = false;
           col.alignment = 'left';
         });
       },

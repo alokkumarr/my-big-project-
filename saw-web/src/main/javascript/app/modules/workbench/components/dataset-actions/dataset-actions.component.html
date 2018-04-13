@@ -2,7 +2,7 @@
     <mat-icon fontIcon="icon-action-solid"></mat-icon>
   </button>
   <mat-menu #datasetmenu="matMenu">
-    <button mat-menu-item (click)="openSQLEditor()">
+    <button mat-menu-item [disabled]="dsMetadata.asOfNow.status !== 'SUCCESS'" (click)="openSQLEditor()">
       <mat-icon style="margin-right: 0px !important; vertical-align: baseline;" fontIcon="icon-query-mode"></mat-icon>
       <span>Execute SQL</span>
     </button>

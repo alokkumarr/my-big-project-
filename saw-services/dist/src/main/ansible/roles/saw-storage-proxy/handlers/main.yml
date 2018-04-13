@@ -1,0 +1,2 @@
+- name: restart saw-storage-proxy
+  systemd: name=saw-storage-proxy state=restarted daemon_reload=true

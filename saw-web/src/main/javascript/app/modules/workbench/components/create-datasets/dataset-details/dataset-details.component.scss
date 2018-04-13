@@ -59,19 +59,21 @@ dataset-details {
   }
 
   .form-div {
-    padding: 1% 9% 0;
+    padding: 3px 9% 0;
+    height: calc(100% - 59px);
+    overflow: auto;
   }
 
   .list-margin1 {
-    margin-top: 1%;
+    height: 100%;
+    overflow: auto;
   }
 
   .list-header {
-    padding: 9px;
-    background-color: #1A89D4;
-    font-size: 16px;
-    border-radius: 3px 12px 0 0;
-    color: white;
+    background-color: $primary-blue-b2;
+    font-size: 16px !important;
+    border-radius: 12px 12px 0 0;
+    color: white !important;
   }
 
   .list-items {

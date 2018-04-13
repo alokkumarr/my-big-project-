@@ -48,18 +48,16 @@ datasets-card-page {
       }
     }
 
-    .src-img {
-      background-size: contain;
-      background-repeat: no-repeat;
+    .status-icon {
       width: 30px;
 
-      &.parquet {
-        background-image: url('../../../../../../../../../assets/img/maprE.png');
+      .mat-icon {
+        font-size: 21px;
       }
+    }
 
-      &.es {
-        background-image: url('../../../../../../../../../assets/svg/elastic.svg');
-      }
+    .mat-card-header-text {
+      margin: 0 3px;
     }
 
     mat-card-content {
@@ -82,5 +80,17 @@ datasets-card-page {
       -webkit-line-clamp: 2;  /* number of lines to show */
       -webkit-box-orient: vertical;
     }
+  }
+
+  .FAILED {
+    border-left: 3px solid $primary-red;
+  }
+
+  .SUCCESS {
+    border-left: 3px solid $primary-green;
+  }
+
+  .INIT {
+    border-left: 3px solid $primary-orange;
   }
 }
