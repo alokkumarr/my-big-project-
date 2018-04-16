@@ -6,7 +6,7 @@
 \alias{get_validation_samples.modeler}
 \title{Get Validation Samples}
 \usage{
-get_validation_samples(obj, ...)
+get_validation_samples(obj)
 
 \method{get_validation_samples}{samples}(obj)
 
