@@ -9,17 +9,38 @@ export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
     analysis: '<',
-    source: '&'
+    source: '&',
+    requester: '<'
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {
       'ngInject';
       this._FilterService = FilterService;
-      this._isEmpty = isEmpty;
       this.filters = [];
     }
 
     $onInit() {
+      this.initAnalysis();
+      if (this.requester) {
+        this.requesterSubscription = this.requester.subscribe(this.onRequest.bind(this));
+      }
+    }
+
+    $onDestroy() {
+      if (this.requesterSubscription) {
+        this.requesterSubscription.unsubscribe();
+      }
+    }
+
+    onRequest(data) {
+      if (!data) {
+        return;
+      }
+
+      this.gridData = [{refresh: true}];
+    }
+
+    initAnalysis() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
       // no culomns if the in query mode
       this.columns = this.analysis.edit ? null : this._getColumns(this.analysis);
@@ -34,6 +55,14 @@ export const AnalyzeReportDetailComponent = {
 
     loadData(options) {
       return this.source({options});
+    }
+
+    $onChanges(data) {
+      if (isEmpty(get(data, 'analysis.previousValue'))) {
+        return;
+      }
+
+      this.initAnalysis();
     }
     // TODO runtime filters in SAW-634
 
