@@ -186,9 +186,17 @@ fit <- function(...){
   UseMethod("fit")
 }
 
-
+#' Evaluate Model Generic
+#'
+#' Function to evaluate the predictive performance of a model
+#'
+#' @param mobj model object
+#' @param target_df dataframe with target and index variables
+#' @param measure measure object
+#'
+#' @return returns evaluted model object
 #' @export
-evaluate <- function(x, ...) {
+evaluate <- function(mobj, target_df, measure) {
   UseMethod("evaluate", x)
 }
 

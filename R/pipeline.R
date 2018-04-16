@@ -8,7 +8,6 @@ new_pipeline <- function(expr,
   checkmate::assert_function(expr)
   checkmate::assert_character(desc)
   checkmate::assert_posixct(created_on)
-  checkmate::assert_posixct(last_updated)
 
   structure(
     list(

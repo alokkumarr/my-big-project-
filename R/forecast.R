@@ -158,69 +158,42 @@ get_coefs.forecast_model <- function(mobj){
 }
 
 
-
 #' Tidy Forecast Model Performance Object
 #
 #' @param mobj forecast model object as a result of fit function
 #' @rdname get_performance
 #' @export
 tidy_performance.forecast_model <- function(mobj) {
-  checkmate::assert_choice(mobj$status, c("trained", "evaluated", "selected"))
+  checkmate::assert_choice(mobj$status, c("trained", "evaluated", "selected", "final"))
 
-  perf <- data.frame()
-
-  for (i in seq_along(mobj$performance)) {
-    indicie <- names(mobj$performance)[i]
-
-    train <- mobj$performance[[i]]$train %>%
-      setNames(c("index", "predicted")) %>%
-      dplyr::mutate(sample = "train")
-
-    if (!is.null(mobj$performance[[i]]$validation)) {
-      validation <- mobj$performance[[i]]$validation %>%
-        dplyr::select(index, mean) %>%
-        setNames(c("index", "predicted")) %>%
-        dplyr::mutate(sample = "validation")
-
-    } else {
-      validation <- NULL
-    }
-
-    if (!is.null(mobj$performance[[i]]$test)) {
-      test <- mobj$performance[[i]]$test %>%
-        dplyr::select(index, mean) %>%
-        setNames(c("index", "predicted")) %>%
-        dplyr::mutate(sample = "test")
-
-    } else {
-      test <- NULL
-    }
-
-    smpl_perf <- rbind(train, validation , test)
-    perf <- rbind(perf,
-                  smpl_perf %>%
-                    dplyr::mutate(model = mobj$id,
-                                  indicie = indicie))
-  }
-
-  perf
+  lapply(mobj$performance, function(z) {
+    lapply(z, function(x) {
+      x %>%
+        select(1:2) %>%
+        setNames(c("index", "predicted"))
+    }) %>%
+      bind_rows(.id = "sample")
+  }) %>%
+    bind_rows(.id = "indicie") %>%
+    dplyr::mutate(model = mobj$id)
 }
 
 
-evaluate.forecast_model <- function(mobj) {
 
-  eval <- tidy_performance(mobj) %>%
-    dplyr::inner_join(get_target(obj) %>%
-                        dplyr::mutate(index = row_number()),
-                      by = "index") %>%
+#' @rdname evaluate
+#' @export
+evaluate.forecast_model <- function(mobj, target_df, measure) {
+
+   mobj$evaluate <- tidy_performance(mobj) %>%
+    dplyr::inner_join(target_df, by = "index") %>%
     dplyr::group_by(model, sample, indicie) %>%
     dplyr::do(data.frame(
-      match.fun(obj$measure$method)(.,
-                                    actual = obj$target,
-                                    predicted = "predicted")
+      match.fun(measure$method)(.,
+                                actual = mobj$target,
+                                predicted = "predicted")
     )) %>%
     dplyr::ungroup() %>%
-    setNames(c("model", "sample", "indicie", obj$measure$method))
+    setNames(c("model", "sample", "indicie", measure$method))
 
-  obj$evaluate <- eval
+   mobj
 }
