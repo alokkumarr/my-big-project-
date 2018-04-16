@@ -8,7 +8,6 @@ import com.synchronoss.querybuilder.model.kpi.*;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,8 +157,9 @@ public class KPIDataQueryBuilder {
                 cal.setTime(lte);
                 long t1 = cal.getTimeInMillis();
                 cal.setTime(gte);
-                long diff = Math.abs(t1- cal.getTimeInMillis());
+                long diff = Math.abs(t1- (cal.getTimeInMillis()-1000));
                 long startTime = cal.getTimeInMillis();
+                cal.setTimeInMillis(cal.getTimeInMillis()-1000);
                 dynamicConvertor.setLte(sdf.format(cal.getTime()));
                 cal.setTimeInMillis(startTime-diff);
                 dynamicConvertor.setGte(sdf.format(cal.getTime()));
