@@ -281,14 +281,15 @@ public class BuilderUtil
                 int calculatedDayDifference  = now.getDayOfYear()-firstDayOfYear.getDayOfYear();
                 LocalDateTime priorDayOfYear = firstDayOfYear.minusDays(calculatedDayDifference);
                 dynamicConvertor.setLte(firstDayOfYear.minusDays(1).with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
-                dynamicConvertor.setGte(priorDayOfYear.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                dynamicConvertor.setGte(priorDayOfYear.minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "MTD": {
                 LocalDateTime firstDayOfMonth = now.with(TemporalAdjusters.firstDayOfMonth());
                 int calculatedDayDifference = now.getDayOfMonth()- firstDayOfMonth.getDayOfMonth();
-                LocalDateTime priorDayOfMonth = firstDayOfMonth.minusDays(calculatedDayDifference);
-                dynamicConvertor.setLte(firstDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                LocalDateTime lastMonth = firstDayOfMonth.minusDays(1);
+                LocalDateTime priorDayOfMonth = lastMonth.minusDays(calculatedDayDifference);
+                dynamicConvertor.setLte(lastMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(priorDayOfMonth.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
