@@ -1,7 +1,7 @@
 /*******************************************************************************
  Create Workbench module and "My Workflow" as default sub category
 ********************************************************************************/
--- INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) VALUES ('WORKBENCH','WRK000001','Workbench Module',1,NOW(),'admin');
+INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) VALUES ('WORKBENCH','WRK000001','Workbench Module',1,NOW(),'admin');
 -- Correcting module (spelling mistake)
 UPDATE MODULES SET MODULE_DESC='Analyze Module' WHERE MODULE_CODE= 'ANLYS00001';
 -- Binding Product & Module
