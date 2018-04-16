@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilters;
 import com.synchronoss.querybuilder.model.kpi.KPIBuilder;
+import java.time.temporal.ChronoUnit;
 import org.threeten.extra.YearQuarter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -337,10 +338,11 @@ public class BuilderUtil
             }
             case "TW": {
                 LocalDateTime startOfWeek =
-                    now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1))).minusDays(1);
-                int calculatedDayDifference = now.getDayOfMonth()- startOfWeek.getDayOfMonth();
-                LocalDateTime lastWeek = startOfWeek.minusDays(calculatedDayDifference);
-                dynamicConvertor.setLte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                    now.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
+                Long calculatedDayDifference = ChronoUnit.DAYS.between(startOfWeek,now);
+                LocalDateTime week = startOfWeek.minusHours(24);
+                LocalDateTime lastWeek = week.minusDays(calculatedDayDifference);
+                dynamicConvertor.setLte(week.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(lastWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
