@@ -3,5 +3,23 @@ widget-kpi {
     display: flex;
     flex-direction: column;
     padding-top: 15px;
+
+    .secondary-aggregate-form {
+      display: flex;
+      flex-direction: column;
+
+      mat-slide-toggle {
+        padding: 5px 0;
+
+        & > label {
+          flex-direction: row-reverse;
+          justify-content: space-between;
+        }
+
+        &:last-child {
+          padding-bottom: 20px;
+        }
+      }
+    }
   }
 }

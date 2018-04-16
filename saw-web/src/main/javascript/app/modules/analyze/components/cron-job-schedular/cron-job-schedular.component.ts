@@ -8,8 +8,10 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 
 import {
-  generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
+  getLocalMinute, generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
 } from '../../../../common/utils/cronFormatter';
+
+import { SCHEDULE_TYPES } from '../../../../common/consts';
 
 const template = require('./cron-job-schedular.component.html');
 require('./cron-job-schedular.component.scss');
@@ -24,6 +26,7 @@ export class CronJobSchedularComponent {
   @Input() public model: any;
   @Input() public crondetails: any;
   @Output() onCronChanged: EventEmitter<any> = new EventEmitter();
+  public startAt = new Date();
   NumberMapping: any = {'=1': '#st', '=2': '#nd', '=3': '#rd', 'other': '#th'};
   DayMapping: any = {'=TUE': 'TUESDAY', '=WED': 'WEDNESDAY', '=THU': 'THURSDAY', '=SAT': 'SATURDAY', 'other': '#DAY'};
 
@@ -34,17 +37,24 @@ export class CronJobSchedularComponent {
   	  second: '',
   	  hourType: 'AM'
   	};
+    this.schedules = SCHEDULE_TYPES;
   	this.dailyTypeWeek = clone(this.dailyTypeDay);
   	this.weeklybasisDate = clone(this.dailyTypeDay);
   	this.specificDayMonth = clone(this.dailyTypeDay);
   	this.specificWeekDayMonth = clone(this.dailyTypeDay);
   	this.specificMonthDayYear = clone(this.dailyTypeDay);
   	this.specificMonthWeekYear = clone(this.dailyTypeDay);
-  	this.model = {}
+    this.immediateTime = clone(this.dailyTypeDay);
+  	this.model = {};
+    this.immediate = {};
+    this.hourly = {};
   	this.daily = {};
   	this.weekly = {};
   	this.monthly = {};
   	this.yearly = {};
+
+    this.hours = this.range(1,23);
+    this.minutes = this.range(0,59);
     this.days = this.range(1, 31);
     this.months = this.range(1,12);
     this.weeks = [{
@@ -104,7 +114,8 @@ export class CronJobSchedularComponent {
       value: 12,
       label:'December'
     }];
-    this.scheduleType = 'daily';
+    this.scheduleType = 'immediate';
+    this.immediate.immediatetype = '';
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
@@ -128,7 +139,10 @@ export class CronJobSchedularComponent {
     this.specificWeekDayMonth = clone(this.dailyTypeDay);
     this.specificMonthDayYear = clone(this.dailyTypeDay);
     this.specificMonthWeekYear = clone(this.dailyTypeDay);
-    this.model = {}
+    this.immediateTime = clone(this.dailyTypeDay);
+    this.model = {};
+    this.hourly = {};
+    this.immediate = {};
     this.daily = {};
     this.weekly = {};
     this.monthly = {};
@@ -144,8 +158,26 @@ export class CronJobSchedularComponent {
     this.regenerateCron(event);
   }
 
+  generateImmediateSchedule(value) {
+    this.scheduleType = 'immediate';
+    this.immediate.immediatetype = 'currenttime';
+    this.regenerateCron('');
+  }
+
   regenerateCron(dateSelects) {
     switch (this.scheduleType) {
+    case 'immediate':
+      if (this.immediate.immediatetype === 'currenttime') {
+        this.cronChange('', this.scheduleType, this.immediate.immediatetype);
+      }
+      break;
+    case 'hourly':
+      //Generating Cron expression for selections made in hourly tab
+      this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);
+      if (isValid(this.CronExpression)) {
+        this.cronChange(this.CronExpression, this.scheduleType, '');
+      }
+      break;
     case 'daily':
       //Generating Cron expression for selections made in daily tab
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
@@ -189,23 +221,44 @@ export class CronJobSchedularComponent {
     this.onCronChanged.emit(this.crondetails);
   }
 
+  
+
   loadData() {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
-    const localCronExpression = convertToLocal(this.crondetails.cronexp);
-    let parseCronValue = cronstrue.toString(localCronExpression).split(' ');
-    let fetchTime = parseCronValue[1].split(':');
-    let meridium = parseCronValue[2].split(',');
-    let modelDate = {
-      hour: parseInt(fetchTime[0]),
-      minute: fetchTime[1],
-      hourType: meridium[0]
-    };
+    if (this.scheduleType === 'hourly') {
+      let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+    } else {
+      const localCronExpression = convertToLocal(this.crondetails.cronexp);
+      let parseCronValue = cronstrue.toString(localCronExpression).split(' ');
+      let fetchTime = parseCronValue[1].split(':');
+      let meridium = parseCronValue[2].split(',');
+      let modelDate = {
+        hour: parseInt(fetchTime[0]),
+        minute: fetchTime[1],
+        hourType: meridium[0]
+      };  
+    }
+    
 
     switch (this.scheduleType) {
+    case 'hourly':
+      //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
+      if (isNaN(parseInt(parseCronValue[7]))) {
+        this.hourly.hours = 1; 
+      } else {
+        this.hourly.hours = parseInt(parseCronValue[7]);  
+      }
+      if (isNaN(parseInt(parseCronValue[1]))) {
+        this.hourly.minutes = 0;  
+      } else {
+        const fetchLocalMinute = getLocalMinute(parseInt(parseCronValue[1]));
+        this.hourly.minutes = fetchLocalMinute;  
+      }
+      break;
     case 'daily':
       //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       this.daily.dailyType = this.crondetails.activeRadio;
