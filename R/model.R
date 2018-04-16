@@ -186,6 +186,21 @@ fit <- function(...){
   UseMethod("fit")
 }
 
+
+#' Train Model Generic
+#'
+#' Train single model to indicies provided
+#'
+#' Fits Model and makes predictions for any validation or test indicies
+#' provided. Adds fitted values and predictions to model's performance values
+#'
+#' @return updated model object
+#' @export
+train <- function(...) {
+  UseMethod("train")
+}
+
+
 #' Evaluate Model Generic
 #'
 #' Function to evaluate the predictive performance of a model
@@ -197,9 +212,8 @@ fit <- function(...){
 #' @return returns evaluted model object
 #' @export
 evaluate <- function(mobj, target_df, measure) {
-  UseMethod("evaluate", x)
+  UseMethod("evaluate")
 }
-
 
 
 #' @export
@@ -211,6 +225,12 @@ get_fit <- function(x, ...) {
 #' @export
 get_coefs <- function(x, ...) {
   UseMethod("get_coefs", x)
+}
+
+
+#' @export
+get_forecasts <- function(x, ...) {
+  UseMethod("get_forecasts", x)
 }
 
 

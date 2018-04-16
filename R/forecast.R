@@ -102,13 +102,6 @@ print.forecast_model <- function(mobj){
 
 
 
-#' @export
-get_forecasts <- function(x, ...) {
-  UseMethod("get_forecasts", x)
-}
-
-
-
 #' Get Forecasts from forecast object
 #'
 #' @param fobj forecast object
@@ -196,4 +189,41 @@ evaluate.forecast_model <- function(mobj, target_df, measure) {
     setNames(c("model", "sample", "indicie", measure$method))
 
    mobj
+}
+
+
+
+#' @rdname train
+#' @export
+train.forecast_model <- function(mobj, indicies, level) {
+  checkmate::assert_list(indicies)
+  mobj$performance <- indicies
+  for (i in seq_along(indicies)) {
+    index <- indicies[[i]]
+    checkmate::assert_subset(names(index), c("train", "validation", "test"))
+
+    # Fit model to training sample
+    mobj <- fit(mobj,
+                data = mobj$pipe$output %>% dplyr::slice(index$train))
+    fitted <- fitted(mobj)
+    train <- data.frame("index" = index$train, "fitted" = fitted)
+    perf <- list("train" = train)
+
+    # Add predictions for validation, test or both
+    samples <- names(index)[! sapply(index, is.null)]
+    for(smpl in setdiff(samples, "train")){
+      predicted <- predict(mobj,
+                           data = mobj$pipe$output %>% dplyr::slice(index[[smpl]]),
+                           periods = length(index[[smpl]]),
+                           level = level)
+      smpl_list <- list(data.frame("index" = index[[smpl]], predicted))
+      names(smpl_list) <- smpl
+      perf <- c(perf, smpl_list)
+    }
+
+    mobj$performance[[i]] <- perf
+    mobj$status <- "trained"
+  }
+
+  mobj
 }

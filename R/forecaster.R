@@ -52,61 +52,38 @@ train_models.forecaster <- function(obj, ids = NULL) {
   if (!is.null(ids))
     status <- status[names(status) %in% id]
   ids <- names(status == "added")
+  indicies <- get_indicies(obj)
 
   for (id in ids) {
     model <- get_models(obj, id = id)[[1]]
     checkmate::assert_class(model, "forecast_model")
     model$pipe <- execute(obj$data, model$pipe)
-    indicies <- get_indicies(obj)
-    model$performance <- indicies
-    for (i in seq_along(indicies)) {
-      index <- indicies[[i]]
-      model <- fit(model,
-                   data = model$pipe$output %>% dplyr::slice(index$train))
-      fitted <- fitted(model)
-      train <- data.frame("index" = index$train, "fitted" = fitted)
-
-      if(! is.null(index$validation)){
-        predicted <- predict(model,
-                             data = model$pipe$output %>% dplyr::slice(index$validation),
-                             periods = length(index$validation),
-                             level = obj$conf_levels)
-        validation = data.frame("index" = index$validation, predicted)
-        perf <- list("train" = train, "validation" = validation)
-      }else{
-        perf <- list("train" = train)
-      }
-      model$performance[[i]] <- perf
-      model$status <- "trained"
-    }
+    model <- train(model, indicies, level = obj$conf_levels)
     obj$models[[id]] <- model
   }
   obj
 }
 
 
+
 #' @rdname evaluate_models
 #' @export
-evaluate_models.forecaster <- function(obj) {
+evaluate_models.forecaster <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
 
   status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% id]
   ids <- names(status == "trained")
+  target_df <- get_target(obj) %>% dplyr::mutate(index = row_number())
 
-  eval <- tidy_performance(obj) %>%
-    dplyr::inner_join(get_target(obj) %>%
-                        dplyr::mutate(index = row_number()),
-                      by = "index") %>%
-    dplyr::group_by(model, sample, indicie) %>%
-    dplyr::do(data.frame(
-      match.fun(obj$measure$method)(.,
-                                    actual = obj$target,
-                                    predicted = "predicted")
-    )) %>%
-    dplyr::ungroup() %>%
-    setNames(c("model", "sample", "indicie", obj$measure$method))
-
-  obj$evaluate <- eval
-
+  for (id in ids) {
+    model <- get_models(obj, id = id)[[1]]
+    checkmate::assert_class(model, "forecast_model")
+    model <- evaluate(model, target_df, obj$measure)
+    obj$models[[id]] <- model
+    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
+  }
   obj
 }
 
@@ -142,44 +119,19 @@ set_final_model.forecaster <- function(obj,
     if (is.null(obj$samples$test_holdout_prct)) {
       warning("Missing Test Holdout Sample. Final Model not re-evaluated.")
     } else{
-      val_index <- setdiff(1:nrow(obj$data), obj$samples$test_index)
-      remodel <- fit(model,
-                     data = model$pipe$output %>% dplyr::slice(val_index))
-      fitted <- fitted(remodel)
-      train <- data.frame("index" = val_index, "fitted" = fitted)
-      predicted <- predict(
-        model,
-        data = model$pipe$output %>% dplyr::slice(obj$samples$test_index),
-        periods = length(obj$samples$test_index),
-        level = obj$conf_levels)
-      test <- data.frame("index" = obj$samples$test_index, predicted)
-      perf <- list("test_holdout" = list("train" = train, "test" = test))
-      remodel$performance <- perf
-
-      eval <- tidy_performance(remodel) %>%
-        dplyr::inner_join(get_target(obj) %>%
-                            dplyr::mutate(index = row_number()),
-                          by = "index") %>%
-        dplyr::group_by(model, sample, indicie) %>%
-        dplyr::do(data.frame(
-          match.fun(obj$measure$method)(.,
-                                        actual = obj$target,
-                                        predicted = "predicted")
-        )) %>%
-        dplyr::ungroup() %>%
-        setNames(c("model", "sample", "indicie", obj$measure$method))
-      obj$evaluate <- rbind(obj$evaluate, eval)
+      val_indicie <- list("test_holdout" =
+                            list("train" = setdiff(1:nrow(obj$data), obj$samples$test_index),
+                                 "test"  = obj$samples$test_index))
+      remodel <- train(model, val_indicie, obj$conf_levels)
+      target_df <- get_target(obj) %>% dplyr::mutate(index = row_number())
+      remodel <- evaluate(remodel, target_df, obj$measure)
+      obj$evaluate <- rbind(obj$evaluate, remodel$evaluate)
     }
   }
 
   if (refit) {
-    final_model <- fit(model,
-                       data = model$pipe$output)
-    fitted <- fitted(final_model)
-    train <- data.frame("index" = 1:nrow(obj$data), "fitted" = fitted)
-    final_model$status <- "final"
-    perf <- list("train" = train)
-    final_model$performance <- perf
+    refit_indicie <- list("train" = list("train" = 1:nrow(obj$data)))
+    final_model <- train(model, refit_indicie, level = obj$conf_level)
     obj$final_model <- final_model
   }else{
     obj$final_model <- model
