@@ -3,12 +3,10 @@ package com.synchronoss.saw.export.generate;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.synchronoss.saw.export.ServiceUtils;
 import com.synchronoss.saw.export.distribution.MailSenderUtil;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
@@ -182,7 +180,7 @@ public class ExportServiceImpl implements ExportService{
 
               FileOutputStream fos = new FileOutputStream(file);
               OutputStreamWriter osw = new OutputStreamWriter(fos);
-              streamReportToFile(entity, exportBean, osw);
+              streamToCSVReport(entity, exportBean, osw);
 
               osw.close();
               fos.close();
@@ -236,7 +234,8 @@ public class ExportServiceImpl implements ExportService{
 
               FileOutputStream fos = new FileOutputStream(file);
               OutputStreamWriter osw = new OutputStreamWriter(fos);
-              streamReportToFile(entity, exportBean, osw);
+
+              streamToCSVReport(entity, exportBean, osw);
 
               osw.close();
               fos.close();
@@ -308,7 +307,7 @@ public class ExportServiceImpl implements ExportService{
     }
   }
 
-  private void streamReportToFile(ResponseEntity<DataResponse> entity, ExportBean exportBean,
+  private void streamToCSVReport(ResponseEntity<DataResponse> entity, ExportBean exportBean,
       OutputStreamWriter osw) {
     entity.getBody().getData().stream().forEach(
         line -> {
@@ -328,6 +327,8 @@ public class ExportServiceImpl implements ExportService{
                         .collect(Collectors.joining(",")));
                 osw.write("\n");
               } else {
+                // ideally we shouldn't be using collectors but it's a single row so it
+                // won't hamper memory consumption
                 osw.write(
                     Arrays.stream(exportBean.getColumnHeader())
                         .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
