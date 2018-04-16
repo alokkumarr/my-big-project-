@@ -129,11 +129,15 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
     const lte = get(data, 'filters.0.model.lte');
     lte &&
-      this.kpiForm.get('lte').setValue(moment(lte, DATE_FORMAT.YYYY_MM_DD));
+      this.kpiForm
+        .get('lte')
+        .setValue(moment(lte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
 
     const gte = get(data, 'filters.0.model.gte');
     gte &&
-      this.kpiForm.get('gte').setValue(moment(gte, DATE_FORMAT.YYYY_MM_DD));
+      this.kpiForm
+        .get('gte')
+        .setValue(moment(gte, DATE_FORMAT.YYYY_MM_DD_HH_mm_ss));
 
     const primaryAggregate = get(data, 'dataFields.0.aggregate.0');
     this.kpiForm
@@ -155,10 +159,16 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
     if (model.preset !== CUSTOM_DATE_PRESET_VALUE) return model;
 
+    // Adding static time signatures until we allow users to choose time
+    // for `to` and `from` fields.
     return {
       ...model,
-      lte: this.kpiForm.get('lte').value.format(DATE_FORMAT.YYYY_MM_DD),
-      gte: this.kpiForm.get('gte').value.format(DATE_FORMAT.YYYY_MM_DD)
+      lte:
+        this.kpiForm.get('lte').value.format(DATE_FORMAT.YYYY_MM_DD) +
+        ' 23:59:59',
+      gte:
+        this.kpiForm.get('gte').value.format(DATE_FORMAT.YYYY_MM_DD) +
+        ' 00:00:00'
     };
   }
 
