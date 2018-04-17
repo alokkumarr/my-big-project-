@@ -1,8 +1,10 @@
 cron-job-schedular {
-  .dateDetails {
-    border: 1px solid #CCC;
-    border-bottom: none;
-    border-top: none;
+  border: 1px solid #CCC;
+
+  .dateDetails .clear {
+    color: #0096D5;
+    cursor: pointer;
+    font-size: 14px;
   }
 
   mat-tab-group mat-tab-header div div div .mat-tab-label {
@@ -50,8 +52,6 @@ cron-job-schedular {
   /* Style the tab content */
   .tabcontent {
     padding: 6px 12px;
-    border: 1px solid #CCC;
-    border-top: none;
   }
 
   .checkbox {

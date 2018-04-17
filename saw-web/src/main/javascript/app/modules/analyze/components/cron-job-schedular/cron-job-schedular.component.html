@@ -3,25 +3,6 @@
     <mat-tab label="{{schedule.label}}"></mat-tab>
   </div>
 </mat-tab-group>
-<div class="dateDetails" *ngIf="scheduleType !== 'immediate'">
-  <mat-form-field>
-    <input matInput [matDatepicker]="fromDatePicker" [(ngModel)]="startDate" placeholder="Start date">
-    <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #fromDatePicker></mat-datepicker>
-  </mat-form-field>
-
-  <mat-radio-group [(ngModel)]="EndDateType" class="to-date">
-    <mat-radio-button class="infiniteSchedule" value="infiniteSchedule">No End Date</mat-radio-button>
-    <mat-radio-button class="end-date" value="endDate">End Date</mat-radio-button>
-    <div [hidden]="EndDateType === 'infiniteSchedule'">
-      <mat-form-field>
-        <input matInput [matDatepicker]="toDatePicker" [min]="startDate" [(ngModel)]="endDate" placeholder="End date">
-        <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
-        <mat-datepicker #toDatePicker></mat-datepicker> 
-      </mat-form-field>
-    </div>
-  </mat-radio-group>
-</div>
 
 <div *ngIf="scheduleType === 'immediate'" [ngClass]="{'scheduleType': selectedItem === 'immediate'}" class="tabcontent immediate">
   <mat-radio-group [(ngModel)]="immediate.immediatetype">
@@ -135,4 +116,19 @@
     </mat-select>at <br/>
     <cron-date-picker [model]="specificMonthWeekYear" (onDateChange)="onDateChange($event)" [hidden]="yearly.yearlyType !== 'yearlyDay'"></cron-date-picker>
   </mat-radio-group>
+</div>
+
+<div class="dateDetails" *ngIf="scheduleType !== 'immediate'">
+  <mat-form-field>
+    <input matInput [matDatepicker]="fromDatePicker" [(ngModel)]="startDate" placeholder="Start date">
+    <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #fromDatePicker></mat-datepicker>
+  </mat-form-field>
+  <span class="clear" (click)="startDate = '';">Clear</span><br/>
+  <mat-form-field>
+    <input matInput [matDatepicker]="toDatePicker" [min]="startDate" [(ngModel)]="endDate" placeholder="End date">
+    <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
+    <mat-datepicker #toDatePicker></mat-datepicker> 
+  </mat-form-field>
+  <span class="clear" (click)="endDate = '';">Clear</span><br/>
 </div>

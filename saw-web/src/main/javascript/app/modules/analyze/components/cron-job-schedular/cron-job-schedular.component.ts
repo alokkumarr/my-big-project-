@@ -2,6 +2,7 @@ declare const require: any;
 
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { MatTabChangeEvent } from '@angular/material';
+import {FormControl} from '@angular/forms';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
@@ -120,8 +121,7 @@ export class CronJobSchedularComponent {
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
-
-    this.EndDateType = 'infiniteSchedule';
+    this.startDate = new Date();
   }
 
   private range(start: number, end: number): number[] {
@@ -220,13 +220,15 @@ export class CronJobSchedularComponent {
   }
 
   cronChange(CronExpression, activeTab, activeRadio) {
-    console.log(this.startDate);
-    console.log(this.endDate);
+    console.log(new Date(this.startDate));
+    console.log(new Date(this.endDate));
     return;
     this.crondetails = {
       cronexp: CronExpression,
       activeTab: activeTab,
-      activeRadio: activeRadio
+      activeRadio: activeRadio,
+      startDate: new Date(this.startDate),
+      endDate: new Date(this.endDate)
     }
     this.onCronChanged.emit(this.crondetails);
   }
