@@ -6,7 +6,7 @@ const path = require('path');
  * server), as opposed to a local saw-web front-end development
  * server */
 function distRun() {
-  return false; //process.env.PWD.endsWith('/dist');
+  return process.env.PWD.endsWith('/dist');
 }
 
 module.exports = {
@@ -27,6 +27,6 @@ module.exports = {
       var port = browser.params.saw.docker.port;
       return 'http://localhost:' + port + '/web/';
     }
-    return 'http://localhost:3001/';
+    return 'http://localhost:3000/';
   }
 };
