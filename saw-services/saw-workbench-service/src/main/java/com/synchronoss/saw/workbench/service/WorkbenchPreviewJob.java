@@ -19,20 +19,22 @@ public class WorkbenchPreviewJob implements Job<Integer> {
     private final String id;
     private final String location;
     private final int limit;
+    private final String previewsTablePath;
 
-    public WorkbenchPreviewJob(String id, String location, int limit) {
+    public WorkbenchPreviewJob(
+        String id, String location, int limit, String previewsTablePath) {
         this.id = id;
         this.location = location;
         this.limit = limit;
+        this.previewsTablePath = previewsTablePath;
     }
-
-    private static final String PREVIEWS_TABLE = "/previews";
 
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
         log.info("Starting preview job");
-        PreviewBuilder preview = new PreviewBuilder(id, "success");
+        PreviewBuilder preview = new PreviewBuilder(
+            previewsTablePath, id, "success");
         DocumentBuilder document = preview.getDocumentBuilder();
         document.putNewArray("rows");
         SparkSession session = jobContext.sparkSession();

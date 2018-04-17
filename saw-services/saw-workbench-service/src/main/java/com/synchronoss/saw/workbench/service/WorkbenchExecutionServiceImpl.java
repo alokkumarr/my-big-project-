@@ -43,6 +43,10 @@ public class WorkbenchExecutionServiceImpl
     @NotNull
     private Integer previewLimit;
 
+    @Value("${workbench.project-root}/previews")
+    @NotNull
+    private String previewsTablePath;
+
     /**
      * Cached Workbench Livy client to be kept around for next
      * operation to reduce startup time.
@@ -52,12 +56,11 @@ public class WorkbenchExecutionServiceImpl
     @PostConstruct
     private void init() throws Exception {
         /* Initialize the previews MapR-DB table */
-        String path = PreviewBuilder.PREVIEWS_TABLE;
         try (Admin admin = MapRDB.newAdmin()) {
-            if (!admin.tableExists(path)) {
-                log.info("Creating previews table: {}", path);
+            if (!admin.tableExists(previewsTablePath)) {
+                log.info("Creating previews table: {}", previewsTablePath);
                 TableDescriptor table =
-                    MapRDB.newTableDescriptor(path);
+                    MapRDB.newTableDescriptor(previewsTablePath);
                 FamilyDescriptor family =
                     MapRDB.newDefaultFamilyDescriptor().setTTL(3600);
                 table.addFamily(family);
@@ -152,9 +155,11 @@ public class WorkbenchExecutionServiceImpl
         WorkbenchClient client = getWorkbenchClient();
         String id = UUID.randomUUID().toString();
         client.submit(
-            new WorkbenchPreviewJob(id, location, previewLimit),
+            new WorkbenchPreviewJob(
+                id, location, previewLimit, previewsTablePath),
             () -> handlePreviewFailure(id));
-        PreviewBuilder preview = new PreviewBuilder(id, "queued");
+        PreviewBuilder preview = new PreviewBuilder(
+            previewsTablePath, id, "queued");
         preview.insert();
         /* Return generated preview ID to client to be used for
          * retrieving preview data */
@@ -165,7 +170,8 @@ public class WorkbenchExecutionServiceImpl
 
     private void handlePreviewFailure(String previewId) {
         log.error("Creating preview failed");
-        PreviewBuilder preview = new PreviewBuilder(previewId, "failed");
+        PreviewBuilder preview = new PreviewBuilder(
+            previewsTablePath, previewId, "failed");
         preview.insert();
     }
 
@@ -177,7 +183,7 @@ public class WorkbenchExecutionServiceImpl
     public ObjectNode getPreview(String previewId) throws Exception {
         log.debug("Getting dataset transformation preview");
         /* Locate the preview data in MapR-DB */
-        Table table = MapRDB.getTable(PreviewBuilder.PREVIEWS_TABLE);
+        Table table = MapRDB.getTable(previewsTablePath);
         Document doc = table.findById(previewId);
         /* Return the preview data */
         if (doc == null) {
