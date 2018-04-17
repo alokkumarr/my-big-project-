@@ -1,6 +1,7 @@
 declare const require: any;
 
 import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { MatTabChangeEvent } from '@angular/material';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
@@ -119,6 +120,8 @@ export class CronJobSchedularComponent {
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
+
+    this.EndDateType = 'infiniteSchedule';
   }
 
   private range(start: number, end: number): number[] {
@@ -149,9 +152,13 @@ export class CronJobSchedularComponent {
     this.yearly = {};
   }
 
-  openSchedule(event, scheduleType) {
+  openSchedule(scheduleType) {
     this.resetData();
-  	this.scheduleType = scheduleType;
+    if (scheduleType.tab.textLabel.toLowerCase() === 'weekly') {
+      this.scheduleType = 'weeklybasis'
+    } else {
+      this.scheduleType = scheduleType.tab.textLabel.toLowerCase();
+    }
   }
 
   onDateChange(event) {
@@ -213,6 +220,9 @@ export class CronJobSchedularComponent {
   }
 
   cronChange(CronExpression, activeTab, activeRadio) {
+    console.log(this.startDate);
+    console.log(this.endDate);
+    return;
     this.crondetails = {
       cronexp: CronExpression,
       activeTab: activeTab,
@@ -246,6 +256,7 @@ export class CronJobSchedularComponent {
 
     switch (this.scheduleType) {
     case 'hourly':
+      this.selectedTab = 1;
       //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
       if (isNaN(parseInt(parseCronValue[7]))) {
         this.hourly.hours = 1; 
@@ -260,6 +271,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'daily':
+      this.selectedTab = 2;
       //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       this.daily.dailyType = this.crondetails.activeRadio;
       if (this.daily.dailyType === 'everyDay') {
@@ -275,6 +287,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'weeklybasis':
+      this.selectedTab = 3;
       //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       let getWeekDays = this.crondetails.cronexp.split(' ');
       forEach(getWeekDays[5].split(','), day => {
@@ -284,6 +297,7 @@ export class CronJobSchedularComponent {
       this.weeklybasisDate = clone(modelDate); //Loading time values for weekly tab
       break;
     case 'monthly':
+      this.selectedTab = 4;
       //Loading/displying values for Cron expression for monthly tab selection in UI Templete.
       this.monthly.monthlyType = this.crondetails.activeRadio;
       if (this.monthly.monthlyType === 'monthlyDay') {
@@ -310,6 +324,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'yearly':
+      this.selectedTab = 5;
       //Loading/displying values for Cron expression for yearly tab selection in UI Templete.
       this.yearly.yearlyType = this.crondetails.activeRadio;
       if (this.yearly.yearlyType === 'yearlyMonth') {
