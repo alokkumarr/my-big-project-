@@ -30,7 +30,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
-        log.debug("Start execute job");
+        log.info("Starting execute job");
         String batch = "batch-" + Instant.now().toEpochMilli();
         Component xdfComponent;
         if (component.equals("parser")) {
@@ -65,7 +65,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
             throw new RuntimeException(
                 "XDF returned non-zero status: " + status);
         }
-        log.debug("Finished execute job");
+        log.info("Finished execute job");
         return null;
     }
 }

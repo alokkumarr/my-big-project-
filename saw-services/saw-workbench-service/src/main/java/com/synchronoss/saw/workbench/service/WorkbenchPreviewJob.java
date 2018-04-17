@@ -31,7 +31,7 @@ public class WorkbenchPreviewJob implements Job<Integer> {
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
-        log.debug("Start preview job");
+        log.info("Starting preview job");
         PreviewBuilder preview = new PreviewBuilder(id, "success");
         DocumentBuilder document = preview.getDocumentBuilder();
         document.putNewArray("rows");
@@ -69,6 +69,7 @@ public class WorkbenchPreviewJob implements Job<Integer> {
         }
         document.endArray();
         preview.insert();
+        log.info("Finished preview job");
         return 0;
     }
 

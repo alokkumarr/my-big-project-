@@ -105,7 +105,7 @@ public class WorkbenchExecutionServiceImpl
     public ObjectNode execute(
         String project, String name, String component, String config)
         throws Exception {
-        log.info("Execute dataset transformation");
+        log.info("Executing dataset transformation");
         WorkbenchClient client = getWorkbenchClient();
         createDatasetDirectory(name);
         client.submit(new WorkbenchExecuteJob(
@@ -134,7 +134,7 @@ public class WorkbenchExecutionServiceImpl
      */
     @Override
     public ObjectNode preview(String project, String name) throws Exception {
-        log.info("Create dataset transformation preview");
+        log.info("Creating dataset transformation preview");
         /* Get physical location of dataset */
         DataSetStore dss = new DataSetStore(metastoreBase);
         String json = dss.readDataSet(project, name);
@@ -175,7 +175,7 @@ public class WorkbenchExecutionServiceImpl
 
     @Override
     public ObjectNode getPreview(String previewId) throws Exception {
-        log.info("Get dataset transformation preview");
+        log.debug("Getting dataset transformation preview");
         /* Locate the preview data in MapR-DB */
         Table table = MapRDB.getTable(PreviewBuilder.PREVIEWS_TABLE);
         Document doc = table.findById(previewId);
