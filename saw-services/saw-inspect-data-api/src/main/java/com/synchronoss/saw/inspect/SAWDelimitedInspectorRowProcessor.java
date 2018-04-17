@@ -123,7 +123,8 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
 
     private void processFieldNames(Object[] names){
         for(Object o : names){
-            fieldNames.add(o.toString());
+            if(o!=null) {
+            fieldNames.add(o.toString());}
         }
     }
 

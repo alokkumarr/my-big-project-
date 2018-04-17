@@ -35,17 +35,17 @@ public class SAWElasticSearchQueryBuilder {
    * @throws AssertionError
    * @throws ProcessingException 
    */
-  public String getQuery(EntityType type, String jsonString) throws IllegalArgumentException, ProcessingException {
+  public String getQuery(EntityType type, String jsonString, Integer timeOut) throws IllegalArgumentException, ProcessingException {
     String query = null;
     try {
       //assert (type.find(type) == null);
       //assert (jsonString == null || jsonString.equals(""));
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).buildDataQuery(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut).buildDataQuery(size);
       } else {
         query =
-                type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
-                        .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString).buildQuery();
+                type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString, timeOut)
+                        .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, timeOut).buildQuery();
         }
       }catch(IllegalStateException | IOException | NullPointerException exception){
         throw new IllegalArgumentException(exception.getMessage());
@@ -63,16 +63,16 @@ public class SAWElasticSearchQueryBuilder {
    * @return query
    * @throws AssertionError
    */
-  public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString)
+  public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString, Integer timeOut)
       throws IllegalArgumentException {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut).getSearchSourceBuilder(size);
       } else {
       query =
-          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
-              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString)
+          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString, timeOut)
+              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, timeOut)
               .getSearchSourceBuilder();
     }} catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());
@@ -89,16 +89,16 @@ public class SAWElasticSearchQueryBuilder {
    * @return query
    * @throws AssertionError
    */
-  public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString, String dataSecurityKey)
+  public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString, String dataSecurityKey, Integer timeOut)
       throws IllegalArgumentException {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder(size);
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString, timeOut).getSearchSourceBuilder(size);
       } else {
       query =
-          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey)
-              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, dataSecurityKey)
+          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey, timeOut)
+              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, dataSecurityKey, timeOut)
               .getSearchSourceBuilder();
     }} catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());

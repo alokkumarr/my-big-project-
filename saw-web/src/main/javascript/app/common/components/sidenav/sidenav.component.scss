@@ -1,12 +1,19 @@
-md-sidenav {
-  height: 100%;
+sidenav {
+  z-index: 80;
+
+  .layout-row md-backdrop {
+    background-color: transparent !important;
+  }
+}
+
+sidenav .layout-row md-sidenav {
+  position: fixed;
 
   .sidebar-header {
     font-weight: 700;
   }
 
   .secondary-toolbar {
-    height: 75px;
     justify-content: center;
   }
 

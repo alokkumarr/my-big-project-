@@ -92,7 +92,7 @@ public class ChartQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
   
@@ -111,7 +111,7 @@ public class ChartQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
 
@@ -130,7 +130,7 @@ public class ChartQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
   
@@ -150,7 +150,7 @@ public class ChartQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,dataSecurityKey).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,dataSecurityKey,3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
   

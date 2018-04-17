@@ -1,0 +1,86 @@
+{
+  "$id": "http://synchronoss.com/indexResponse.json",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "_shards": {
+      "id": "/properties/_shards",
+      "type": "object",
+      "properties": {
+        "total": {
+          "$id": "/properties/_shards/properties/total",
+          "type": "integer",
+          "title": "The Total Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        },
+        "failed": {
+          "id": "/properties/_shards/properties/failed",
+          "type": "integer",
+          "title": "The Failed Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        },
+        "successful": {
+          "id": "/properties/_shards/properties/successful",
+          "type": "integer",
+          "title": "The Successful Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        }
+      }
+    },
+    "_index": {
+      "id": "/properties/_index",
+      "type": "string",
+      "title": "The _index Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": ""
+    },
+    "_type": {
+      "id": "/properties/_type",
+      "type": "string",
+      "title": "The _type Schema",
+      "description": "An explanation about the purpose of this instance."
+      
+    },
+    "_id": {
+      "id": "/properties/_id",
+      "type": "string",
+      "title": "The _id Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": ""
+    },
+    "_version": {
+      "id": "/properties/_version",
+      "type": "integer",
+      "title": "The _version Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": 0
+    },
+    "_seq_no": {
+      "$id": "/properties/_seq_no",
+      "type": "integer",
+      "title": "The _seq_no Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": 0
+    },
+    "_primary_term": {
+      "id": "/properties/_primary_term",
+      "type": "integer",
+      "title": "The _primary_term Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": 0
+      
+    },
+    "result": {
+      "id": "/properties/result",
+      "type": "string",
+      "title": "The Result Schema",
+      "description": "An explanation about the purpose of this instance."
+      
+      
+    }
+  }
+}

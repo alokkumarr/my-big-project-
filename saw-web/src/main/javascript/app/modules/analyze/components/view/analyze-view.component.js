@@ -76,11 +76,15 @@ export const AnalyzeViewComponent = {
       };
       this._AnalyzeService.getAllCronJobs(this.requestModel).then(response => {
         this.loadCards = true;
-        if (!isUndefined(response.data.data[0])) {
-          this.cronSavedJobs = response.data.data;
-        } else {
-          this.cronSavedJobs = '';
+        if (response.statusCode === 200) {
+          if (!isUndefined(response)) {
+            this.cronSavedJobs = response.data;
+          } else {
+            this.cronSavedJobs = '';
+          }
         }
+      }).catch(() => {
+        this.loadCards = true;
       });
     }
 

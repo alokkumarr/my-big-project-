@@ -77,7 +77,9 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       }
 
       login.loginAs(data.user);
+      homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategory(categoryName, subCategoryName, defaultCategory);
+      homePage.mainMenuCollapseBtn.click();
 
       // Create analysis
       homePage.createAnalysis(metricName, data.chartType);

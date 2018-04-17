@@ -2,16 +2,13 @@
   <md-sidenav class="md-sidenav-left"
               md-component-id="$ctrl.id"
               md-whiteframe="4"
-              md-is-locked-open="$ctrl.isOpen()"
-              md-disable-backdrop
-              eval-attr-as-expr="mdComponentId">
+              eval-attr-as-expr="mdComponentId"> 
     <md-toolbar class="secondary-toolbar" md-sidenav-focus>
       <div class="md-toolbar-tools">
         <h3 class="sidebar-header" ng-bind="$ctrl.getMenuHeader()"></h3>
-
         <span flex></span>
-
         <md-button class="md-icon-button" aria-label="Menu"
+                   e2e="main-menu-collapse-btn"
                    ng-click="$ctrl.toggleSidenav()">
           <md-icon md-font-icon="icon-menu"></md-icon>
         </md-button>

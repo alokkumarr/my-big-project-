@@ -92,7 +92,7 @@ public class PivotQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString, 3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
 
@@ -111,7 +111,7 @@ public class PivotQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString, 3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
   
@@ -130,7 +130,7 @@ public class PivotQueryBuilderTest {
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
     SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,dataSecurityKey).query()).execute().actionGet();
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString,dataSecurityKey, 3).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
 

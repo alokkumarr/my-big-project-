@@ -1,20 +1,20 @@
+import * as fpGet from 'lodash/fp/get';
+import * as forEach from 'lodash/forEach';
+import * as isUndefined from 'lodash/isUndefined';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { UIRouter } from '@uirouter/angular';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
+import { UIRouter } from '@uirouter/angular';
 
-import { DATASETS, SQLEXEC_SAMPLE, TREE_VIEW_Data, RAW_SAMPLE, parser_preview, ARTIFACT_SAMPLE } from '../sample-data';
-
-import * as fpGet from 'lodash/fp/get';
-import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
-import * as map from 'lodash/map';
-import * as isUndefined from 'lodash/isUndefined';
-
-// import { JwtService } from '../../../../login/services/jwt.service';
-// import { MenuService } from '../../../common/services/menu.service';
+import {
+  SQLEXEC_SAMPLE,
+  TREE_VIEW_Data,
+  RAW_SAMPLE,
+  parser_preview,
+  ARTIFACT_SAMPLE
+} from '../sample-data';
 
 import APP_CONFIG from '../../../../../../../appConfig';
 
@@ -25,7 +25,8 @@ export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
   private wbAPI = `${this.api}/internal/workbench/projects`;
 
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpClient,
     private router: UIRouter) { }
 
   /** GET datasets from the server */
@@ -33,7 +34,7 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.get(endpoint)
       .pipe(
-        catchError(this.handleError('data', DATASETS)));
+        catchError(this.handleError('data', [])));
   }
 
   /** GET Staging area tree list */
@@ -57,7 +58,9 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-        catchError(this.handleError('data', [])));
+        catchError((e: any) => {
+          return Observable.of(e);
+        }));
   }
 
   /** File mask search */
@@ -69,13 +72,12 @@ export class WorkbenchService {
     let wildcardSearch: any;
     if (this.startsWith(mask, '*')) {
       wildcardSearch = this.endsWith;
-    }
-    if (this.endsWith(mask, '*')) {
+    } else if (this.endsWith(mask, '*')) {
       wildcardSearch = this.startsWith;
-    }
-    if (!mask.includes('*')) {
+    } else {
       wildcardSearch = this.exactMatch;
     }
+
     const filemasksearch = mask.replace('*', '');
     for (let fileCounter = 0; fileCounter < temmpFiles.length; fileCounter++) {
       if (wildcardSearch(temmpFiles[fileCounter].name, filemasksearch)) {
@@ -141,7 +143,7 @@ export class WorkbenchService {
         catchError(this.handleError('data', [])));
   }
   /**
-   * Service to fetch meta data of all datasets
+   * Service to fetch meta data of a dataset
    * 
    * @param {string} projectName 
    * @param {any} id 
@@ -150,22 +152,41 @@ export class WorkbenchService {
    */
   getDatasetDetails(id): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/${id}`;
-    return this.http.get(`${this.wbAPI}/${userProject}/${id}`)
+    return this.http.get(endpoint)
       .pipe(
         catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }
 
   triggerParser(payload) {
-    const endpoint = `${this.api}/internal/workbench/datasets`;
+    const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
+  /**
+   * Following 3 functions
+   * To store, retrive and remove data from localstorage
+   * 
+   * @param {any} metadata 
+   * @memberof WorkbenchService
+   */
+  setDataToLS(key, value) {
+    localStorage.setItem('dsMetadata', JSON.stringify(value));
+  }
+
+  getDataFromLS(key) {
+    const dsMetada = JSON.parse(localStorage.getItem(key));
+    return dsMetada;
+  }
+
+  removeDataFromLS(key) {
+    localStorage.removeItem(key);
+  }
 
   /**
-   * Calls the sql executor component and fetches the output as data for preview grid 
-   * 
-   * @param {string} query 
-   * @returns {Observable<any>} 
+   * Calls the sql executor component and fetches the output as data for preview grid
+   *
+   * @param {string} query
+   * @returns {Observable<any>}
    * @memberof WorkbenchService
    */
   executeSqlQuery(query: string): Observable<any> {
@@ -174,6 +195,25 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', SQLEXEC_SAMPLE)));
   }
 
+  navigateToDetails(metadata) {
+    this.setDataToLS('dsMetadata', metadata);
+    this.router.stateService.go('workbench.datasetDetails');
+  }
+
+  triggerDatasetPreview(name: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews`;
+    return this.http.post(endpoint, { name })
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  getDatasetPreviewData(id): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews/${id}`;
+    return this.http.get(endpoint)
+      .pipe(
+        catchError((e: any) => {
+          return Observable.of(e);
+        }));
+  }
 
   /**
    * Handle Http operation that failed.

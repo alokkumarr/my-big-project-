@@ -29,6 +29,10 @@ server:
 analysis:
     service:
         host: http://localhost:9200/analysis
+    uiExportSize: "{{ saw_ui_export_size | default('10000') }}"
+    emailExportSize: "{{ saw_email_export_size | default('50000') }}"
+    ftpExportSize: "{{ saw_ftp_export_size | default('1000000') }}"
+
 
 logging:
   config: /opt/bda/saw-export-service/conf/logback.xml

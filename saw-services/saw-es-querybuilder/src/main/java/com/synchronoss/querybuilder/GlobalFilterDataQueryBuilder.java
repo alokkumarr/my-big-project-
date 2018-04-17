@@ -1,14 +1,10 @@
 package com.synchronoss.querybuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.synchronoss.BuilderUtil;
-import com.synchronoss.querybuilder.model.globalfilter.Filter;
-import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
-import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
-import com.synchronoss.querybuilder.model.globalfilter.GlobalFilters;
-import org.elasticsearch.index.query.BoolQueryBuilder;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -17,13 +13,13 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.synchronoss.BuilderUtil;
+import com.synchronoss.querybuilder.model.globalfilter.Filter;
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilters;
 
 public class GlobalFilterDataQueryBuilder {
 

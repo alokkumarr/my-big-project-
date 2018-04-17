@@ -41,7 +41,19 @@ public class DataSet {
     
     @JsonProperty("asOfNow")
     private Object asOfNow = null;
+
+    @JsonProperty("schema")
+    private Object schema = null;
+
+    @JsonProperty("recordCount")
+    private long recordCount;
     
+    @JsonProperty("createdTime")
+    private long createdTime;
+
+    @JsonProperty("modifiedTime")
+    private long modifiedTime;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -102,6 +114,47 @@ public class DataSet {
     public void setAsInput(List<Object> asInput) {
       this.asInput = asInput;
     }
+
+    @JsonProperty("schema")
+    public Object getSchema() {
+        return this.schema;
+    }
+
+    @JsonProperty("schema")
+    public void setSchema(Object schema) {
+        this.schema = schema;
+    }
+
+    @JsonProperty("recordCount")
+    public long getRecordCount() {
+        return this.recordCount;
+    }
+
+    @JsonProperty("recordCount")
+    public void setRecordCount(long recordCount) {
+        this.recordCount = recordCount;
+    }
+
+    @JsonProperty("createdTime")
+    public long getCreatedTime() {
+        return this.createdTime;
+    }
+
+    @JsonProperty("createdTime")
+    public void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    @JsonProperty("modifiedTime")
+    public long getModifiedTime() {
+        return this.modifiedTime;
+    }
+
+    @JsonProperty("modifiedTime")
+    public void setModifiedTime(long modifiedTime) {
+        this.modifiedTime = modifiedTime;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;

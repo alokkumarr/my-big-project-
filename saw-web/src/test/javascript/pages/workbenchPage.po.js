@@ -17,6 +17,13 @@ module.exports = {
         previewFile: element(by.css('span.preview-icon[e2e="preview-file"]')),
         closeRawPreviewFile: element(by.css('rawpreview-dialog button[e2e="close-raw-preview-dialog-button"]')),
       },
+      detailedDataSet: {
+          cardViewDataSetElem: element(by.css('mat-card.datasets-card mat-card-header[e2e="data-set-card"]')),
+          listViewDataSetElem: element(by.css('div.grid-container a[e2e="data-set-grid-view-mode"]')),
+
+          dataSetSummaryPreview: element(by.css('div.data-summary-view[e2e="data-set-summary-preview"]')),
+          dataSetDetailPreview: element(by.css('div.data-cont[e2e="data-set-detial-preview"]')),
+      },
       dataSetActionElement: {
           dataSetAction: element(by.css('dataset-actions')),
           menuAction: element(by.css('button.mat-menu-item[role="menuitem"]')),
@@ -43,13 +50,13 @@ module.exports = {
           submitFolderNameElem: name =>  element(by.css(`button[e2e="submit-folder-name-${name}"]`))
       },
     workbenchElems : {
-        view: element(by.css('div.view-mode mat-button-toggle-group')),
-        data: element(by.css('div.data-mode mat-button-toggle-group')),
+        view: element(by.css('div[e2e="view-mode-group"] mat-button-toggle-group')),
+        data: element(by.css('div[e2e="data-mode-group"] mat-button-toggle-group')),
         refreshBtn: element(by.css('div.action-buttons button.mat-icon-button[ng-reflect-message="Refresh"]')),
-        listView: element(by.css('div.view-mode mat-button-toggle-group mat-button-toggle[value="list"]')),
-        cardView: element(by.css('div.view-mode mat-button-toggle-group mat-button-toggle[value="card"]')),
-        setsView: element(by.css('div.data-mode mat-button-toggle-group mat-button-toggle[value="sets"]')),
-        podsView: element(by.css('div.data-mode mat-button-toggle-group mat-button-toggle[value="pods"]')),
+        listView: element(by.css('div.view-mode mat-button-toggle[e2e="list-view"]')),
+        cardView: element(by.css('div.view-mode mat-button-toggle[e2e="card-view"]')),
+        setsView: element(by.css('div.data-mode mat-button-toggle[e2e="data-sets-view"]')),
+        podsView: element(by.css('div.data-mode mat-button-toggle[e2e="data-pods-view"]')),
         addDataSetBtn: element(by.css('button[e2e="add-new-data-sets"]')),
         nextStepperBtn: element(by.css('button.stepperBtn[matsteppernext]')),
         prevStepperBtn: element(by.css('button.stepperBtn[matstepperprevious]')),

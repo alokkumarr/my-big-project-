@@ -1,26 +1,41 @@
+export enum Widget {
+  ANALYSIS,
+  KPI,
+  CUSTOM
+}
+
 export interface WidgetType {
   name: string;
-  id: string;
+  id: Widget;
   description: string;
   disabled?: boolean;
   icon: string;
-};
+}
 
-export const widgetTypes: Array<WidgetType> = [{
-  name: 'Existing Analysis',
-  id: 'ANALYSIS_WIDGET',
-  description: 'Add a chart to your dashboard',
-  icon: 'analysis-widget'
-}, {
-  name: 'Snapshot KPI',
-  id: 'KPI_WIDGET',
-  description: 'Capture a metric at any point in time',
-  disabled: true,
-  icon: 'kpi-widget'
-} /*, {
+export const widgetTypes: Array<WidgetType> = [
+  {
+    name: 'Existing Analysis',
+    id: Widget.ANALYSIS,
+    description: 'Add a chart to your dashboard',
+    icon: 'analysis-widget'
+  },
+  {
+    name: 'Snapshot KPI',
+    id: Widget.KPI,
+    description: 'Capture a metric at any point in time',
+    disabled: false,
+    icon: 'kpi-widget'
+  } /*, {
   name: 'Custom Widget',
-  id: 'CUSTOM_WIDGET',
+  id: Widget.CUSTOM,
   description: 'Embed a URL or add custom scripts',
   disabled: true,
   icon: 'custom-widget'
-} */ ];
+} */
+];
+
+export enum WIDGET_ACTIONS {
+  ADD,
+  EDIT,
+  REMOVE
+}

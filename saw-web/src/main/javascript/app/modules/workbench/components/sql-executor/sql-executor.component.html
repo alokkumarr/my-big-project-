@@ -1,17 +1,20 @@
 <div class="executor-container">
-  <div mat-dialog-title class="title-elem" fxLayout="row" fxLayoutAlign="center center">
+  <div class="title-elem" fxLayout="row" fxLayoutAlign="center center">
+    <button mat-button class="bck-btn">
+      <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
+    </button>
     <div class="action-title">
-      <mat-icon fontIcon="icon-query-mode" style="vertical-align:middle;"></mat-icon>
-      <span>SQL_EXECUTOR </span>
+      <mat-icon fontIcon="icon-query-mode"></mat-icon>
+      <span>SQL EXECUTOR </span>
     </div>
-    <div class="btn-padding" fxFlex fxLayout="row" fxLayoutGap="10px">
-      <span class="subheading-1">Datasets: </span>
+    <div class="ds-name" fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+      <span>Selected Dataset: </span>
       <mat-chip-list>
-        <mat-chip selected="true" *ngFor="let artifact of artifacts">{{artifact.artifactName}}</mat-chip>
+        <mat-chip>{{dsMetadata.system.name}}</mat-chip>
       </mat-chip-list>
     </div>
     <div fxLayout="row" fxLayoutGap="20px" fxFlexAlign="end center">
-      <div class="btn-icon">
+      <!-- <div class="btn-icon">
         <button mat-button matTooltip="Execute Query" (click)="runScript()">
           <mat-icon fontIcon="icon-play-circle"></mat-icon>
           <span>Run</span>
@@ -28,30 +31,37 @@
           <mat-icon fontIcon="icon-soup-solid"></mat-icon>
           <span>New</span>
         </button>
-      </div>
-      <div class="btn-icon">
-        <button mat-button matTooltip="Save" (click)="openSaveDialog()">
-          <mat-icon fontIcon="icon-save"></mat-icon>
-          <span>Save</span>
+      </div> -->
+      <div class="create-btn">
+        <button mat-raised-button color="primary" i18n (click)="openSaveDialog()">
+          <!-- <mat-icon fontIcon="icon-save"></mat-icon> -->
+          <span>Create</span>
         </button>
       </div>
-      <button mat-icon-button mat-dialog-close class="xBtn">
-        <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
-      </button>
     </div>
   </div>
-  <mat-progress-bar *ngIf="showProgress" mode="query" style="height:2px;"></mat-progress-bar>
-  <mat-divider></mat-divider>
-  <div mat-dialog-content class="exec-body">
+  <div class="exec-body">
     <split direction="vertical">
       <split-area class="script-pane" [size]="scriptHeight">
         <split direction="horizontal">
           <split-area size="75">
-            <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)">
+            <sql-script #sqlscript [artifacts]="artifacts" (onExecute)="sendDataToPreview($event)" (onCreate)="getQuery($event)">
             </sql-script>
           </split-area>
-          <split-area size="25">
-            <mat-list>
+          <split-area size="25" class="fields-pane">
+            <mat-card class="details-grid" fxFlex>
+              <div fxFill>
+                <dx-data-grid fxFlex [dataSource]="dsMetadata?.schema?.fields" [rowAlternationEnabled]="true" [height]="'99%'" [width]="'100%'"
+                  [showBorders]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">
+                  <dxi-column caption="Field Name" dataField="name"></dxi-column>
+                  <dxi-column caption="Data Type" dataField="type"></dxi-column>
+                  <dxo-scrolling mode="infinite"></dxo-scrolling>
+                  <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                  <dxo-header-filter [visible]="true"></dxo-header-filter>
+                </dx-data-grid>
+              </div>
+            </mat-card>
+            <!-- <mat-list>
               <div fxLayout="row" fxLayoutAlign="start start">
                 <h3 mat-subheader fxFlex fxLayout="row" fxLayoutAlign="start start">
                   <mat-icon fontIcon="icon-clipboard"></mat-icon>
@@ -65,12 +75,12 @@
                 </div>
                 <mat-divider></mat-divider>
               </mat-list-item>
-            </mat-list>
+            </mat-list> -->
           </split-area>
         </split>
       </split-area>
       <split-area class="preview-pane" [size]="previewHeight">
-        <sqlpreview-grid-page [updater]="gridData" (onToggleScreenMode)="toggleViewMode($event)"></sqlpreview-grid-page>
+        <!-- <sqlpreview-grid-page [updater]="gridData" (onToggleScreenMode)="toggleViewMode($event)"></sqlpreview-grid-page> -->
       </split-area>
     </split>
   </div>

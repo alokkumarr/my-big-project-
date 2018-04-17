@@ -50,6 +50,9 @@ scheduler:
 workbench:
     service:
         host: http://localhost:9700
+proxy:
+    service:
+        host: http://localhost:9800
 
 api:
   gateway:
@@ -99,9 +102,15 @@ api:
         -   location: ${internal-analysis.service.host}
             method: POST
             path: '[/]filters.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]kpi.*'
         -   location: ${workbench.service.host}
             method: POST
             path: '[/]internal/workbench.*'
         -   location: ${workbench.service.host}
             method: GET
             path: '[/]internal/workbench.*'
+        -   location: ${proxy.service.host}
+            method: POST
+            path: '[/]proxy.*'

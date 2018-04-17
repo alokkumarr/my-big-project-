@@ -1,0 +1,51 @@
+{
+  "$id": "http://synchronoss.com/countResponse.json",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "count": {
+      "id": "/properties/count",
+      "type": "integer",
+      "title": "The Count Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": 0
+      
+    },
+    "_shards": {
+      "$id": "/properties/_shards",
+      "type": "object",
+      "properties": {
+        "total": {
+          "id": "/properties/_shards/properties/total",
+          "type": "integer",
+          "title": "The Total Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+          
+        },
+        "successful": {
+          "id": "/properties/_shards/properties/successful",
+          "type": "integer",
+          "title": "The Successful Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        },
+        "skipped": {
+          "id": "/properties/_shards/properties/skipped",
+          "type": "integer",
+          "title": "The Skipped Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        },
+        "failed": {
+          "id": "/properties/_shards/properties/failed",
+          "type": "integer",
+          "title": "The Failed Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        }
+      }
+    }
+  }
+}
