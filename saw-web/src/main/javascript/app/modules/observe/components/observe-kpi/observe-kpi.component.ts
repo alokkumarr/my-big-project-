@@ -18,6 +18,7 @@ require('./observe-kpi.component.scss');
 })
 export class ObserveKPIComponent implements OnInit {
   _kpi: any;
+  multiplier: number;
   datePresetObj = DATE_PRESETS_OBJ;
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   secondaryResult: Array<{ name: string; value: string | number }> = [];
@@ -30,6 +31,13 @@ export class ObserveKPIComponent implements OnInit {
     if (isEmpty(data)) return;
     this._kpi = data;
     this.executeKPI();
+  }
+
+  @Input()
+  set dimensions(data) {
+    if (data && data.height > 0) {
+      this.multiplier = data.height / 100;
+    }
   }
 
   get filterLabel() {

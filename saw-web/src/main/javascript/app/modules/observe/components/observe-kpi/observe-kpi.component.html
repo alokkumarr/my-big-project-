@@ -1,16 +1,16 @@
 <div [ngClass]="{'has-secondary-measure': secondaryResult.length > 0}">
-  <h1 [textContent]="_kpi.name"></h1>
+  <h1 [textContent]="_kpi.name" [ngStyle]="{'font-size.px': 12 * multiplier}"></h1>
 
-  <h2>{{filterLabel}}</h2>
+  <h2 [ngStyle]="{'font-size.px': 10 * multiplier}">{{filterLabel}}</h2>
 
   <div class="kpi-primary-measure-container">
     <div class="kpi-measure">
-      <span class="kpi-main-measure">{{primaryResult.current}}</span>
-      <span class="kpi-change">({{primaryResult.change}}%)</span>
+      <span class="kpi-main-measure" [ngStyle]="{'font-size.px': 26 * multiplier}">{{primaryResult.current}}</span>
+      <span class="kpi-change" [ngStyle]="{'font-size.px': 10 * multiplier}">({{primaryResult.change}}%)</span>
     </div>
   </div>
 
-  <div class="kpi-secondary-measure-container">
+  <div class="kpi-secondary-measure-container" [ngStyle]="{'font-size.px': 7 * multiplier}">
     <span *ngFor="let measure of secondaryResult">
       {{measure.name}}: {{measure.value}}
     </span>
