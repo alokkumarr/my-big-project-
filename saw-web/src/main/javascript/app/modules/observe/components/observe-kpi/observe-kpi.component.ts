@@ -68,8 +68,10 @@ export class ObserveKPIComponent implements OnInit {
 
         const secondary = map(secondaryAggregates || [], ag => ({
           name: upperCase(ag),
-          value:
-            parseFloat(get(res, `data.current.${dataFieldName}._${ag}`)) || 0
+          value: round(
+            parseFloat(get(res, `data.current.${dataFieldName}._${ag}`)) || 0,
+            2
+          )
         }));
         return { primary, secondary };
       })

@@ -28,6 +28,7 @@ observe-kpi > div {
       align-items: center;
       justify-content: center;
       flex-grow: 1;
+      flex-wrap: wrap;
 
       span {
         &.kpi-main-measure {
