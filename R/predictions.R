@@ -1,0 +1,40 @@
+
+
+#' Predictions Class Constructor
+new_predictions <- function(predictions,
+                            model,
+                            type,
+                            id,
+                            desc) {
+  checkmate::assert_subset(class(predictions), c("data.frame", "tbl_spark"))
+  checkmate::assert_class(model, "model")
+  checkmate::assert_character(id)
+  checkmate::assert_character(desc)
+  checkmate::assert_choice(type,
+                           c("forecaster", "segmenter", "regresser", "classifier"))
+
+  structure(
+    list(
+      predictions = predictions,
+      model = model,
+      type = type,
+      id = id,
+      desc = desc,
+      created_on = Sys.time()
+    ),
+    class = "predictions"
+  )
+}
+
+
+
+print.predictions <- function(obj) {
+  cat("---------------------------- \n")
+  cat(obj$type, "predictions \n")
+  cat("---------------------------- \n\n")
+  cat("model id    :", obj$model$id, "\n")
+  cat("model method:", obj$model$method, "\n")
+  cat("created on  :", as.character(obj$created_on), "\n")
+  cat("predictions :", "\n")
+  print(head(obj$predictions))
+}

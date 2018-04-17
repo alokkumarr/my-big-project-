@@ -70,7 +70,7 @@ valid_modeler <- function(x){
          "\n* classifier")
   }
 
-  if(! class(x$data) %in% c("data.frame", "tbl_spark")){
+  if(! any(class(x$data) %in% c("data.frame", "tbl_spark"))){
     stop("df input class not supported. modeler supports only data.frame and tbl_spark objects")
   }
 
@@ -333,4 +333,34 @@ tidy_performance.modeler <- function(obj) {
   status <- get_models_status(obj)
   ids <- names(status == "trained")
   dplyr::bind_rows(lapply(obj$models, tidy_performance))
+}
+
+
+#' @export
+print.modeler <- summary.modeler <- function(obj) {
+  cat("---------------------------- \n")
+  cat(obj$name, obj$type, "\n")
+  cat("---------------------------- \n\n")
+  cat("id:         ", obj$id, "\n")
+  cat("version:    ", obj$version, "\n")
+  cat("created on: ", as.character(obj$created_on), "\n")
+  cat("created by: ", obj$scientist, "\n")
+  cat("description:", obj$desc, "\n\n")
+  cat("data ----------------------------", "\n\n")
+  cat("target:", obj$target, "\n")
+  cat("sample records:", "\n")
+  print(head(obj$data))
+  cat("\nsampling ----------------------------", "\n\n")
+  cat("validation:", obj$samples$validation_method, "\n")
+  cat("test holdout prct:",
+      ifelse(is.null(obj$samples$test_holdout_prct), 0, obj$samples$test_holdout_prct),
+      "\n")
+  cat("\nmeasure ----------------------------", "\n\n")
+  cat("measure name:", obj$measure$name, "\n")
+  cat("\nevaluation ----------------------------", "\n\n")
+  print(get_evalutions(obj))
+  cat("\nfinal model ----------------------------", "\n")
+  cat("method:", obj$final_model$method, "\n")
+  cat("method args:", unlist(obj$final_model$method_args), "\n")
+  cat("desc:", obj$final_model$desc)
 }

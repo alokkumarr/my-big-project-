@@ -142,15 +142,27 @@ set_final_model.forecaster <- function(obj,
 
 
 
+
 #' Forecaster Prediction Method
 #'
 #' Method makes predictions for Forecaster's final model
 #' @rdname predict
-predict.forecaster <- function(obj, periods, data = NULL, level = c(80, 95)) {
-
-  if(is.null(obj$final_model)){
+predict.forecaster <- function(obj,
+                               periods,
+                               data = NULL,
+                               level = c(80, 95),
+                               desc = "") {
+  final_model <- obj$final_model
+  if (is.null(final_model)) {
     stop("Final model not set")
   }
+  final_model$pipe <- execute(data, final_model$pipe)
 
-  predict(obj$final_model, periods, data, level)
+  new_predictions(
+    predictions = predict(final_model, periods, data = final_model$pipe$output, level),
+    model = final_model,
+    type = "forecaster",
+    id = sparklyr::random_string(prefix = "pred"),
+    desc = desc
+  )
 }

@@ -35,7 +35,6 @@ fit.forecast_model <- function(obj, data, ...){
 
   args <- modifyList(method_args, list(y = y, xreg = xreg))
   m <- do.call(method, args)
-  #obj$fit <- structure(m, class = c("forecast_fit", class(m)))
   obj$fit <- m
   obj$last_updated <- Sys.time()
   obj$status <- "trained"
@@ -52,6 +51,7 @@ fitted.forecast_model <- function(obj) {
 
 
 
+
 #' Forecast Prediction Method
 #' @rdname predict
 predict.forecast_model <- function(obj,
@@ -62,8 +62,10 @@ predict.forecast_model <- function(obj,
   target <- obj$target
 
   if (!is.null(data)) {
-    obj$pipe <- execute(data, obj$pipe)
-    data <- obj$pipe$output
+    if (nrow(data) != periods) {
+      warning("number of data rows doesn't match forecast periods")
+    }
+
     x_vars <- setdiff(colnames(data), target)
     if (length(x_vars) > 0) {
       xreg <- data[, x_vars, drop = FALSE]
