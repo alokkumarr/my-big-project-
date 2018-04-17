@@ -222,6 +222,7 @@ export class DesignerContainerComponent {
         });
       break;
     case 'save':
+      this.updateAnalysis();
       this._analyzeDialogService.openSaveDialog(this.analysis)
       .afterClosed().subscribe((result: IToolbarActionResult) => {
         if (result) {

@@ -9,7 +9,8 @@ import {
 import {
   Artifact,
   DesignerChangeEvent,
-  Sort
+  Sort,
+  Filter
 } from '../types';
 import { DesignerStates } from '../container';
 
@@ -25,10 +26,21 @@ export class DesignerReportComponent {
   @Input() artifacts: Artifact[];
   @Input() data;
   @Input() sorts: Sort[];
+  @Input() filters: Filter[];
   @Input() designerState: DesignerStates;
   public DesignerStates = DesignerStates;
 
   onReportGridChange(event) {
     this.change.emit(event);
+  }
+
+  onRemoveFilter(index) {
+    this.filters.splice(index, 1);
+    this.change.emit({subject: 'filter'});
+  }
+
+  onRemoveFilterAll() {
+    this.filters.splice(0, this.filters.length);
+    this.change.emit({subject: 'filter'});
   }
 }

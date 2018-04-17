@@ -9,7 +9,7 @@
          fxLayoutAlign="start"
          *ngIf="analysis">
       <div class="header__name">
-        <strong class="e2e-pivot-title">
+        <strong class="e2e-designer-title">
           {{analysis.name}}
         </strong>
         <label i18n *ngIf="isInDraftMode">Draft</label>
@@ -38,18 +38,21 @@
     </mat-button-toggle-group>
 
     <button mat-button
+            e2e="refresh-data-btn"
             [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
             (click)="requestAction.emit('refresh')">
       <ng-container i18n>Refresh Data</ng-container>
     </button>
 
     <button mat-button
+            e2e="open-description-modal"
             (click)="requestAction.emit('description')">
       <mat-icon fontIcon="icon-description"></mat-icon>
       <ng-container i18n>Description</ng-container>
     </button>
 
     <button mat-button
+            e2e="open-preview-modal"
             (click)="requestAction.emit('preview')"
             [disabled]="designerState !== DesignerStates.SELECTION_WITH_DATA">
       <mat-icon fontIcon="icon-full-screen"></mat-icon>
@@ -57,12 +60,14 @@
     </button>
 
     <button mat-button
+            e2e="open-sort-modal"
             (click)="requestAction.emit('sort')">
       <mat-icon fontIcon="icon-sort"></mat-icon>
       <ng-container i18n>Sort</ng-container>
     </button>
 
     <button mat-button
+            e2e="open-filter-modal"
             (click)="requestAction.emit('filter')">
       <mat-icon fontIcon="icon-filter"></mat-icon>
       <ng-container i18n>Filter</ng-container>

@@ -35,6 +35,11 @@
 
   <div *ngSwitchDefault style="height: 100%; width: 100%;">
     <div *ngIf="data; else elseBlock" style="height: 100%; width: 100%;">
+      <filter-chips-u *ngIf="filters.length > 0"
+                      (remove)="onRemoveFilter($event)"
+                      (removeAll)="onRemoveFilterAll()"
+                      [filters]="filters">
+      </filter-chips-u>
       <div style="height: calc(100% - 30px); width: 100%;">
         <report-grid-upgraded (change)="onReportGridChange($event)"
                               [artifacts]="artifacts"

@@ -11,7 +11,7 @@
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
                 e2e="js-plumb-field-{{field.getIdentifier()}}"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
-    <md-checkbox style="width:300px" ng-model="field.checked">
+    <md-checkbox style="width: 300px;" ng-model="field.checked">
       <span class="jsp-table-column-name" ng-bind="::field.getDisplayName()"></span>
     </md-checkbox>
 

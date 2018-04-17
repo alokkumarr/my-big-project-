@@ -6,9 +6,10 @@
 
   <mat-divider></mat-divider>
 
-  <mat-list-item *ngFor="let column of getArtifactColumns(); trackBy: index"
+  <mat-list-item *ngFor="let column of columns; trackBy: index"
                  role="listitem">
     <div fxLayout="row"
+         [attr.e2e]="getIdentifier(column)"
          fxLayoutAlign="space-between center"
          class="jsp-table__column">
 

@@ -39,6 +39,11 @@ export class JsPlumbJoinLabelComponent {
     return `icon-${this.join.type}-join`;
   }
 
+  getIdentifier() {
+    const [source, target] = this.join.criteria;
+    return `${source.tableName}:${source.columnName}-${this.join.type}-${target.tableName}:${target.columnName}`;
+  }
+
   openJoinModal() {
     const data = {join: this.join};
     this._dialog.open(JoinDialogComponent, {

@@ -12,7 +12,7 @@
                   e2e="filter-select">
         <mat-option *ngFor="let artifactColumn of artifactColumns"
                     [value]="artifactColumn.columnName"
-                    [e2e]="'filter-select-option-' + (artifactColumn.displayName)">
+                    [attr.e2e]="'filter-select-option-' + (artifactColumn.displayName)">
           {{ artifactColumn.displayName }}
         </mat-option>
       </mat-select>

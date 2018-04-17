@@ -33,6 +33,7 @@
 
     <aggregate-chooser-u *ngIf="artifactColumn.aggregate"
                          (change)="onAggregateChange($event)"
+                         [type]="artifactColumn.type"
                          [aggregate]="artifactColumn.aggregate">
     </aggregate-chooser-u>
 

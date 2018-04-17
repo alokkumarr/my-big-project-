@@ -17,7 +17,6 @@ import {
   ArtifactColumnReport,
   JsPlumbCanvasChangeEvent
 } from '../types';
-import { ArtifactColumn } from '../../../../modules/analyze/types';
 
 const template = require('./js-plumb-table.component.html');
 require('./js-plumb-table.component.scss');
@@ -28,8 +27,16 @@ require('./js-plumb-table.component.scss');
 })
 export class JsPlumbTableComponent {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
-  @Input() artifact: Artifact;
   @Input() plumbInstance: any;
+  @Input('artifact') set setArtifact(artifact: Artifact) {
+    this.artifact = artifact;
+    this.columns = sortBy(artifact.columns, (column: ArtifactColumnReport) => {
+      return this.getColumnLabel(column);
+    });
+  };
+
+  public columns: ArtifactColumnReport[];
+  public artifact: Artifact;
 
   public sides = ['left', 'right'];
 
@@ -54,10 +61,6 @@ export class JsPlumbTableComponent {
     });
   }
 
-  getArtifactColumns() {
-    return sortBy(this.artifact.columns, ({displayName, aliasName}: ArtifactColumn) => aliasName || displayName);
-  }
-
   updatePosition() {
     const elemStyle = this._elementRef.nativeElement.style;
     const [x, y] = this.artifact.artifactPosition;
@@ -75,6 +78,10 @@ export class JsPlumbTableComponent {
       subject: 'column',
       column
     });
+  }
+
+  getIdentifier(column) {
+    return `js-plumb-field-${this.artifact.artifactName}:${this.getColumnLabel(column)}`;
   }
 
   onAggregateChange(column, aggregate) {

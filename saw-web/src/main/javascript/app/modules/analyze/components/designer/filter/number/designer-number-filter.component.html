@@ -11,7 +11,7 @@
                 [value]="filterModel.operator">
       <mat-option *ngFor="let operator of OPERATORS"
                   [value]="operator.value"
-                  [e2e]="'filter-number-option-' + operator.label">
+                  [attr.e2e]="'filter-number-option-' + operator.label">
         {{ operator.label }}
       </mat-option>
     </mat-select>

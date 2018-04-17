@@ -127,7 +127,7 @@ const doSelectPivotGroupInterval = (name, groupInterval) => {
 };
 
 const getReportField = (tableName, fieldName) => element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
-const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('md-checkbox'));
+const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('mat-checkbox'));
 //const getReportFieldCheckbox = (tableName, fieldName) =>
 // element(by.xpath(`//md-checkbox/div/span[text()='${fieldName}']/ancestor::*[contains(@e2e, '${tableName}')]`));
 const getReportFieldEndPoint = (tableName, fieldName, side) => {
@@ -190,7 +190,6 @@ module.exports = {
       refreshBtn
     },
     pivot: {
-      title: element(by.css('span[e2e="designer-type-pivot"]')),
       getPivotFieldCheckbox,
       doSelectPivotArea,
       doSelectPivotAggregate,
@@ -199,7 +198,6 @@ module.exports = {
       refreshBtn
     },
     report: {
-      title: element(by.css('span[e2e="designer-type-report"]')),
       expandBtn: element(by.css('button[e2e="report-expand-btn"]')),
       getReportFieldCheckbox,
       getReportFieldEndPoint,
@@ -207,7 +205,7 @@ module.exports = {
       filterBtn: filtersBtn,
       refreshBtn
     },
-    saveBtn: element(by.css('button[e2e="open-save-modal"]'))
+    saveBtn: element(by.css('button[e2e="designer-save-btn"]'))
   },
   filtersDialog: {
     getFilterAutocomplete,
@@ -268,7 +266,7 @@ module.exports = {
     reportDescriptionField: element(by.model('$ctrl.model.description')),
     reportDescription: element(by.model('$ctrl.dataHolder.description')),
     saveReportDetails: element(by.css('[ng-click="$ctrl.save()"]')),
-    reportTitle: element(by.css('.e2e-report-title')),
+    reportTitle: element(by.css('.e2e-designer-title')),
     reportDescriptionBtn: element(by.partialButtonText('Description')),
     filterItemInternet: element(by.css('[aria-label="INTERNET"]')),
     filterItemComplete: element(by.css('[aria-label="Complete"]')),

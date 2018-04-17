@@ -11,7 +11,8 @@ import {
   DesignerChangeEvent,
   SqlBuilder,
   Sort,
-  Analysis
+  Analysis,
+  Filter
 } from '../../types';
 import { DesignerStates } from '../../container';
 
@@ -27,6 +28,7 @@ export class MultiTableDesignerLayout {
   @Input() artifacts: Artifact[];
   @Input() analysis: Analysis;
   @Input() sorts: Sort[];
+  @Input() filters: Filter[];
   @Input() isInQueryMode: boolean;
   @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;

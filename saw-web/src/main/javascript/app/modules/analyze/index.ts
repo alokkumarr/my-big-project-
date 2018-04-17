@@ -96,6 +96,7 @@ import {
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
+import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
 import {
   analyzeServiceProvider
 } from './services/ajs-analyze-providers';
@@ -155,6 +156,7 @@ angular.module(AnalyzeModule, [
   .component('numberFilter', NumberFilterComponent)
   .component('dateFilter', DateFilterComponent)
   .component('filterChips', FilterChipsComponent)
+  .directive('filterChipsU', downgradeComponent({component: FilterChipsUpgraded}) as angular.IDirectiveFactory)
   .component('analyzeFilterRow', AnalyzeFilterRowComponent)
   .component('analyzeFilterModal', AnalyzeFilterModalComponent)
   .component('analyzeDescriptionDialog', AnalyzeDescriptionDialogComponent)
@@ -203,7 +205,8 @@ angular.module(AnalyzeModule, [
     CronJobSchedularComponent,
     CronDatePickerComponent,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout
+    MultiTableDesignerLayout,
+    FilterChipsUpgraded
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -232,7 +235,8 @@ angular.module(AnalyzeModule, [
     CronJobSchedularComponent,
     CronDatePickerComponent,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout
+    MultiTableDesignerLayout,
+    FilterChipsUpgraded
   ],
   providers: [
     $mdDialogProvider,

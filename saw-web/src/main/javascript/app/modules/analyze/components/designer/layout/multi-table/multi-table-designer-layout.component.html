@@ -15,6 +15,7 @@
   </designer-settings-multi-table>
 
   <button mat-mini-fab
+          e2e="report-expand-btn"
           [ngClass]="{'expanded': !isGridPanelExpanded}"
           class="grid-panel-toggle__btn"
           (click)="toggleGridPanel()">
@@ -29,6 +30,7 @@
                    [artifacts]="artifacts"
                    [data]="data"
                    [sorts]="sorts"
+                   [filters]="filters"
                    [designerState]="designerState">
   </designer-report>
 </div>
