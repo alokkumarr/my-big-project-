@@ -18,10 +18,17 @@ require('./observe-kpi.component.scss');
 })
 export class ObserveKPIComponent implements OnInit {
   _kpi: any;
-  multiplier: number;
+
+  /* Used to dynamically adjust font-size based on tile height */
+  fontMultipliers = {
+    primary: 1,
+    secondary: 1
+  };
+
   datePresetObj = DATE_PRESETS_OBJ;
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   secondaryResult: Array<{ name: string; value: string | number }> = [];
+
   constructor(private observe: ObserveService) {}
 
   ngOnInit() {}
@@ -36,7 +43,8 @@ export class ObserveKPIComponent implements OnInit {
   @Input()
   set dimensions(data) {
     if (data && data.height > 0) {
-      this.multiplier = data.height / 100;
+      this.fontMultipliers.primary = data.height / 100;
+      this.fontMultipliers.secondary = Math.min(2, data.height / 100);
     }
   }
 
