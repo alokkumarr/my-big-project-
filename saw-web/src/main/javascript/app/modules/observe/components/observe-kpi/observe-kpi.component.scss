@@ -17,7 +17,7 @@ observe-kpi > div {
 
   h2 {
     margin: 0;
-    font-weight: normal;
+    font-weight: bold;
   }
 
   .kpi-primary-measure-container {
@@ -31,14 +31,14 @@ observe-kpi > div {
       flex-wrap: wrap;
 
       span {
+        font-weight: bold;
+
         &.kpi-main-measure {
-          font-weight: bold;
           margin: 0;
         }
 
         &.kpi-change {
           margin: 0 0 0 10px;
-          font-weight: normal;
         }
       }
     }
@@ -48,7 +48,7 @@ observe-kpi > div {
     display: none;
     background: white;
     flex-grow: 1;
-    color: gray;
+    color: black;
     align-items: center;
     flex-wrap: wrap;
 
