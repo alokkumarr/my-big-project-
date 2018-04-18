@@ -6,7 +6,8 @@ import * as startsWith from 'lodash/startsWith';
 
 export const SAW_MODULES = {
   OBSERVE: {name: 'OBSERVE', codePrefix: 'OBSR'},
-  ANALYZE: {name: 'ANALYZE', codePrefix: 'ANLYS'}
+  ANALYZE: {name: 'ANALYZE', codePrefix: 'ANLYS'},
+  WORKBENCH: {name: 'WORKBENCH', codePrefix: 'WRK'}
 };
 
 export class MenuService {

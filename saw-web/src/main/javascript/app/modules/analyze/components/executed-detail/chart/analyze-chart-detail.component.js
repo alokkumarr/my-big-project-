@@ -29,9 +29,16 @@ export const AnalyzeChartDetailComponent = {
     }
 
     $onInit() {
-      this.settings = this._ChartService.fillSettings(this.analysis.artifacts, this.analysis);
+      this.initAnalysis();
       this.subscription = this.requester.subscribe(options => this.request(options));
 
+      this._$timeout(() => {
+        this.updateChart();
+      });
+    }
+
+    initAnalysis() {
+      this.settings = this._ChartService.fillSettings(this.analysis.artifacts, this.analysis);
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.analysis.artifacts[0].columns);
       this.sorts = this.analysis.sqlBuilder.sorts ?
         this._SortService.mapBackend2FrontendSort(this.analysis.sqlBuilder.sorts, this.sortFields) : [];
@@ -50,14 +57,18 @@ export const AnalyzeChartDetailComponent = {
       };
       this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {chart: this.chart, legend: this.legend});
       this.isStockChart = this.analysis.isStockChart;
-
-      this._$timeout(() => {
-        this.updateChart();
-      });
     }
 
     $onDestroy() {
       this.subscription.unsubscribe();
+    }
+
+    $onChanges(data) {
+      if (isEmpty(get(data, 'analysis.previousValue'))) {
+        return;
+      }
+
+      this.initAnalysis();
     }
 
     updateChart() {

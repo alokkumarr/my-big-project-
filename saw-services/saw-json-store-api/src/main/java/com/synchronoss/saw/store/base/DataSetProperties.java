@@ -31,7 +31,12 @@ public enum DataSetProperties {
     Project ( "project"),
     BatchID ("batchID"),
     User("user"),
-    System("system");
+    System("system"),
+
+    Schema("schema"),
+    RecordCount("recordCount"),
+    CreatedTime("createdTime"),
+    ModifiedTime("modifiedTime");
 
     private final String intName;
 

@@ -1,39 +1,64 @@
 declare const require: any;
 
-import { Component, Inject, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatSidenav } from '@angular/material';
+import {
+  Component,
+  Inject,
+  ViewChild,
+  OnDestroy,
+  AfterContentInit
+} from '@angular/core';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatSidenav
+} from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
+import { WIDGET_ACTIONS } from '../add-widget/widget.model';
 import { ObserveService } from '../../services/observe.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import { animations } from './create-dashboard.animations';
 
-import * as get from 'lodash/get';
+import { Subscription } from 'rxjs/Subscription';
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
+import * as map from 'lodash/map';
+import * as get from 'lodash/get';
+import * as findIndex from 'lodash/findIndex';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
 
+const MARGIN_BETWEEN_TILES = 10;
+
 @Component({
   selector: 'create-dashboard',
   template,
-  animations
+  animations,
+  providers: [DashboardService]
 })
-export class CreateDashboardComponent {
+export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   public fillState = 'empty';
   public dashboard: Dashboard;
   public requester = new BehaviorSubject({});
   public mode = 'create';
+  public sidebarWidget: string;
+  public editItem: any;
+
+  editSubscription: Subscription;
 
   @ViewChild('widgetChoice') widgetSidenav: MatSidenav;
 
-  constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
+  constructor(
+    public dialogRef: MatDialogRef<CreateDashboardComponent>,
     private dialog: MatDialog,
     private router: UIRouter,
-    private menu: MenuService, // tslint:disable-line
+    private menu: MenuService,
     private dashboardService: DashboardService,
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
@@ -43,8 +68,28 @@ export class CreateDashboardComponent {
     this.checkEmpty(this.dashboard);
   }
 
+  ngOnDestroy() {
+    this.editSubscription && this.editSubscription.unsubscribe();
+  }
+
+  ngAfterContentInit() {
+    this.subscribeToEdits();
+  }
+
+  subscribeToEdits() {
+    this.editSubscription = this.dashboardService.onEditItem.subscribe(data => {
+      if (isEmpty(data)) return;
+
+      this.sidebarWidget = 'edit';
+      this.editItem = data;
+
+      this.widgetSidenav.open();
+    });
+  }
+
   checkEmpty(dashboard) {
-    this.fillState = get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
+    this.fillState =
+      get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
   }
 
   onDashboardChange(data) {
@@ -59,43 +104,62 @@ export class CreateDashboardComponent {
   updateWidgetLog(dashboard) {
     const newLog = {};
     forEach(dashboard.tiles, tile => {
-      newLog[tile.id] = {type: tile.type}
+      newLog[tile.id] = { type: tile.type };
     });
 
     this.dashboardService.dashboardWidgets.next(newLog);
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   exitCreator(data) {
     this.dialogRef.close(data);
   }
 
   chooseAnalysis() {
+    this.sidebarWidget = 'add';
     this.widgetSidenav.open();
   }
 
   onAnalysisAction(action, data) {
-    switch(action) {
+    /* prettier-ignore */
+    switch (action) {
     case 'ADD':
       if (!data) return;
-      const item = { cols: 1, rows: 1, analysis: data, updater: new BehaviorSubject({}) };
-      this.requester.next({action: 'add', data: item});
+      const item = {
+        cols: 2,
+        rows: 2,
+        analysis: data,
+        updater: new BehaviorSubject({})
+      };
+      this.requester.next({ action: 'add', data: item });
       break;
     case 'REMOVE':
       if (!data) return;
-      this.requester.next({action: 'remove', data});
-      break
+      this.requester.next({ action: 'remove', data });
+      break;
     }
   }
 
   onKPIAction(action, data) {
-    // TODO
+    /* prettier-ignore */
+    switch(action) {
+    case WIDGET_ACTIONS.ADD:
+      if (!data) return;
+
+      const item = {
+        cols: 2,
+        rows: 1,
+        kpi: data
+      };
+      this.requester.next({action: 'add', data: item});
+      break;
+    }
   }
 
-  onWidgetAction({widget, action, data}) {
-    switch(widget) {
+  onWidgetAction({ widget, action, data }) {
+    /* prettier-ignore */
+    switch (widget) {
     case 'ANALYSIS':
       this.onAnalysisAction(action, data);
       break;
@@ -106,7 +170,7 @@ export class CreateDashboardComponent {
   }
 
   saveDashboard() {
-    this.requester.next({action: 'get'});
+    this.requester.next({ action: 'get' });
   }
 
   openSaveDialog(dashboard: Dashboard) {
@@ -121,12 +185,16 @@ export class CreateDashboardComponent {
       if (result) {
         this.dialogRef.afterClosed().subscribe(() => {
           this.updateSideMenu(result);
-          this.router.stateService.go('observe.dashboard', {
-            dashboard: result.entityId,
-            subCategory: result.categoryId
-          }, {
-            reload: true
-          });
+          this.router.stateService.go(
+            'observe.dashboard',
+            {
+              dashboard: result.entityId,
+              subCategory: result.categoryId
+            },
+            {
+              reload: true
+            }
+          );
         });
         this.dialogRef.close();
       }

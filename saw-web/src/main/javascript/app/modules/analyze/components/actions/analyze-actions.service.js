@@ -4,7 +4,14 @@ import * as deepClone from 'lodash/cloneDeep';
 
 import {AnalyseTypes, Events} from '../../consts';
 
+<<<<<<< HEAD
 export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector, $eventEmitter) {
+=======
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/toPromise';
+
+export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector) {
+>>>>>>> master
   'ngInject';
 
   return {
@@ -27,11 +34,19 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   function fork(analysis) {
     const model = clone(analysis);
     model.name += ' Copy';
-    openEditModal(model, 'fork');
+    return openEditModal(model, 'fork');
   }
 
   function edit(analysis) {
-    openEditModal(clone(analysis), 'edit');
+    return openEditModal(clone(analysis), 'edit').then(status => {
+      if (!status) {
+        return status;
+      }
+
+      $eventEmitter.emit(Events.AnalysesRefresh);
+
+      return status;
+    });
   }
 
   function publish(analysis) {
@@ -77,31 +92,22 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   function openEditModal(analysis, mode) {
     /* Delayed injection of service to battle issues with downgradeModule */
     const AnalyzeDialogService = $injector.get('AnalyzeDialogService');
-    const openModal = template => {
-      showDialog({
-        template,
-        controller: scope => {
-          scope.model = deepClone(analysis);
-        },
-        multiple: true
-      });
-    };
+    const openModal = template => showDialog({
+      template,
+      controller: scope => {
+        scope.model = deepClone(analysis);
+      },
+      multiple: true
+    });
 
     switch (analysis.type) {
     case AnalyseTypes.Chart:
-      openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
-      break;
+      return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
-      AnalyzeDialogService.openEditAnalysisDialog(analysis, mode)
-        .afterClosed().subscribe(successfullySaved => {
-          if (successfullySaved) {
-            $eventEmitter.emit(Events.AnalysesRefresh);
-          }
-        });
-      break;
-    default:
+      return AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode)
+        .afterClosed().first().toPromise();
     }
   }
 

@@ -1,24 +1,25 @@
 package com.synchronoss.saw.store.cli;
 
-import static com.synchronoss.saw.store.cli.Request.MetaCategory.AuditLog;
-import static com.synchronoss.saw.store.cli.Request.MetaCategory.valueOf;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mapr.db.MapRDB;
+import com.synchronoss.saw.store.base.DataSetProperties;
+import com.synchronoss.saw.store.metastore.PortalDataSetStore;
+import org.ojai.Document;
+import org.ojai.joda.DateTime;
+import org.ojai.store.QueryCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.ojai.Document;
-import org.ojai.store.QueryCondition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.mapr.db.MapRDB;
-import com.synchronoss.saw.store.metastore.PortalDataSetStore;
+import static com.synchronoss.saw.store.cli.Request.MetaCategory.AuditLog;
+import static com.synchronoss.saw.store.cli.Request.MetaCategory.valueOf;
 
 /**
  * The class handles basic requests to Metadata Store
@@ -452,6 +453,14 @@ public class Request {
               return false; 
           }
             src = src0.getAsJsonObject();
+
+            DateTime currentTime = new DateTime();
+
+            if (action == Actions.create) {
+                src.addProperty(DataSetProperties.CreatedTime.toString(), (currentTime.getMillis() / 1000));
+            }
+
+            src.addProperty(DataSetProperties.ModifiedTime.toString(), (currentTime.getMillis() / 1000));
         }
         return true;
     }

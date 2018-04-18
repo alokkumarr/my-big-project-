@@ -86,7 +86,7 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
         }
 
 
-      val response: HttpResponse = future.get(timeout, TimeUnit.SECONDS)
+      val response: HttpResponse = future.get(timeout, TimeUnit.MINUTES)
       val respHandler = new BasicResponseHandler
       val msg = s"Response: ${response.getStatusLine.getStatusCode} - ${response.getStatusLine.getReasonPhrase}"
 

@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
@@ -11,11 +18,8 @@ require('./widget-analysis.component.scss');
 
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
+import { WIDGET_ACTIONS } from '../widget.model';
 
-export enum WIDGET_ANALYSIS_ACTIONS {
-  ADD_ANALYSIS,
-  REMOVE_ANALYSIS
-}
 const ALLOWED_ANALYSIS_TYPES = ['chart'];
 
 @Component({
@@ -39,9 +43,11 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.dashboardWidgetSubscription = this.dashboard.dashboardWidgets.subscribe(data => {
-      this.widgetLog = { ...data };
-    });
+    this.dashboardWidgetSubscription = this.dashboard.dashboardWidgets.subscribe(
+      data => {
+        this.widgetLog = { ...data };
+      }
+    );
   }
 
   ngOnDestroy() {
@@ -49,34 +55,45 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   }
 
   loadIcons() {
-    const chartTypes = find(ANALYSIS_METHODS, method => method.label === 'CHARTS');
+    const chartTypes = find(
+      ANALYSIS_METHODS,
+      method => method.label === 'CHARTS'
+    );
     forEach(chartTypes.children, chart => {
       this.icons[chart.type.split(':')[1]] = chart.icon.font;
     });
   }
 
-  @Input() set category(id: number | string) {
+  @Input()
+  set category(id: number | string) {
     this.searchTerm = '';
     this.showProgress = true;
-    this.analyze.getAnalysesFor(id.toString()).then(result => {
-      this.analyses = filter(result, analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type));
-      this.showProgress = false;
-    }, () => {
-      this.showProgress = false;
-    });
+    this.analyze.getAnalysesFor(id.toString()).then(
+      result => {
+        this.analyses = filter(
+          result,
+          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
+        );
+        this.showProgress = false;
+      },
+      () => {
+        this.showProgress = false;
+      }
+    );
   }
 
   sendAnalysisAction(action, analysis) {
     this.onAnalysisAction.emit({
-      action, analysis
+      action,
+      analysis
     });
   }
 
-  addAnalysis (analysis) {
-    this.sendAnalysisAction(WIDGET_ANALYSIS_ACTIONS.ADD_ANALYSIS, analysis);
+  addAnalysis(analysis) {
+    this.sendAnalysisAction(WIDGET_ACTIONS.ADD, analysis);
   }
 
-  removeAnalysis (analysis) {
-    this.sendAnalysisAction(WIDGET_ANALYSIS_ACTIONS.REMOVE_ANALYSIS, analysis);
+  removeAnalysis(analysis) {
+    this.sendAnalysisAction(WIDGET_ACTIONS.REMOVE, analysis);
   }
 }

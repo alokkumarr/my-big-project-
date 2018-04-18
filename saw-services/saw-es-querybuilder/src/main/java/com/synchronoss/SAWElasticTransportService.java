@@ -5,13 +5,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.google.gson.Gson;
 import com.squareup.okhttp.MediaType;
@@ -20,15 +25,13 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-
-
 import com.synchronoss.querybuilder.ReportAggregationBuilder;
+import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
 import com.synchronoss.querybuilder.model.report.DataField;
 import com.synchronoss.querybuilder.model.report.SqlBuilder;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 
 public class SAWElasticTransportService {
@@ -37,15 +40,17 @@ public class SAWElasticTransportService {
 
   private static String HITS= "hits";
   private static String _SOURCE ="_source";
-
+  private Integer timeOut = 3;
 
   private static String execute(String query, String jsonString, String dsk, String username,
-    String moduleName,boolean isReport) throws JsonProcessingException, IOException, NullPointerException{
+    String moduleName,boolean isReport, Integer timeOut) throws JsonProcessingException, IOException, NullPointerException{
     String url = System.getProperty("url");
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
     String indexName = repository.get("indexName").asText();
     String type = repository.get("type").textValue();
     OkHttpClient client = new OkHttpClient();
+    client.setConnectTimeout(timeOut, TimeUnit.MINUTES);
+    client.setReadTimeout(timeOut, TimeUnit.MINUTES);
     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     ESProxy esProxy = new ESProxy();
     esProxy.setStorageType("ES");
@@ -103,11 +108,11 @@ public class SAWElasticTransportService {
    * @throws NullPointerException
    */
   public static String executeReturnAsString(String query, String jsonString, String dsk,
-      String userName, String moduleName) throws JsonProcessingException, IOException, NullPointerException
+      String userName, String moduleName, Integer timeOut) throws JsonProcessingException, IOException, NullPointerException
   {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    String response = execute(query, jsonString, dsk, userName, moduleName,false);
+    String response = execute(query, jsonString, dsk, userName, moduleName,false,timeOut);
     String arr = response;
     return arr;
   }
@@ -124,11 +129,11 @@ public class SAWElasticTransportService {
    * @throws NullPointerException
    */
   public static String executeReturnDataAsString(String query, String jsonString, String dsk,
-                                             String userName, String moduleName) throws IOException, NullPointerException
+                                             String userName, String moduleName, Integer timeOut) throws IOException, NullPointerException
   {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    String response = execute(query, jsonString, dsk, userName, moduleName,true);
+    String response = execute(query, jsonString, dsk, userName, moduleName,true, timeOut);
     String arr = response;
     return arr;
   }
@@ -171,11 +176,13 @@ public class SAWElasticTransportService {
       }
       return node.toString();
   }
-    public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObject)
+    public static String executeReturnDataAsString(GlobalFilterExecutionObject executionObject, Integer timeOut)
     throws IOException, NullPointerException{
 
         String url = System.getProperty("url");
         OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(timeOut, TimeUnit.MINUTES);
+        client.setReadTimeout(timeOut, TimeUnit.MINUTES);
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
         ESProxy esProxy = new ESProxy();
         esProxy.setStorageType("ES");
@@ -214,5 +221,64 @@ public class SAWElasticTransportService {
        result.put("esRepository",globalFilter.getEsRepository());
         Gson gson = new Gson();
         return gson.toJson(result);
+    }
+
+     public static String executeReturnDataAsString(KPIExecutionObject executionObject, Integer timeOut) throws IOException {
+         ObjectMapper mapper = new ObjectMapper();
+         ObjectNode data = mapper.createObjectNode();
+         KPIResultParser kpiResultParser = new KPIResultParser(executionObject.getDataFields());
+         Map< String , Object> current = kpiResultParser.jsonNodeParser(
+             executeReturnDataAsString(executionObject,
+                 executionObject.getCurrentSearchSourceBuilder(),timeOut));
+         Map< String , Object> prior = kpiResultParser.jsonNodeParser(
+             executeReturnDataAsString(executionObject,
+                 executionObject.getPriorSearchSourceBuilder(),timeOut));
+         Gson gson = new Gson();
+         data.putPOJO("current",gson.toJson(current));
+         data.putPOJO("prior", gson.toJson(prior));
+         ObjectNode result = mapper.createObjectNode();
+         result.putPOJO("data",data);
+         return result.toString();
+     }
+
+    private static JsonNode executeReturnDataAsString(KPIExecutionObject executionObject
+        , SearchSourceBuilder searchSourceBuilder, Integer timeOut)
+        throws IOException, NullPointerException{
+        String url = System.getProperty("url");
+        OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(timeOut, TimeUnit.MINUTES);
+        client.setReadTimeout(timeOut, TimeUnit.MINUTES);
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        ESProxy esProxy = new ESProxy();
+        esProxy.setStorageType("ES");
+        esProxy.setIndexName(executionObject.getEsRepository().getIndexName());
+        esProxy.setObjectType(executionObject.getEsRepository().getType());
+        esProxy.setVerb("_search");
+        esProxy.setQuery(searchSourceBuilder.toString());
+        esProxy.setModuleName("observe");
+        esProxy.setDsk("dsk");
+        esProxy.setUsername("system");
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
+        Request req = new Request.Builder().post(body).url(url).build();
+        logger.trace("Elasticsearch request: {}", req);
+        Response response = null;
+        response = client.newCall(req).execute();
+        logger.trace("Elasticsearch response: {}", response);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        String responseString = response.body().string();
+        logger.trace("responseStringdfd" + responseString);
+        JsonNode esResponse = objectMapper.readTree(responseString);
+        if (esResponse.get("data") == null) {
+            throw new NullPointerException("Data is not available based on provided query criteria");
+        }
+        JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+        return finalResponse.get("aggregations");
+    }
+    public Integer getTimeOut() {
+      return timeOut;
     }
 }

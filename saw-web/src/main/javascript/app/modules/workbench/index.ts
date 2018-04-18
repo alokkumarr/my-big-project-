@@ -41,6 +41,7 @@ import { SqlExecutorComponent } from './components/sql-executor/sql-executor.com
 import { SqlScriptComponent } from './components/sql-executor/query/sql-script.component';
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
+import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
 
 import { CommonModule } from '../../common';
 
@@ -68,7 +69,8 @@ const components = [
   SqlScriptComponent,
   SqlpreviewGridPageComponent,
   DetailsDialogComponent,
-  CreatefolderDialogComponent
+  CreatefolderDialogComponent,
+  DatasetDetailViewComponent
 ];
 
 @NgModule({

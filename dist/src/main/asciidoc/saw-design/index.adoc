@@ -131,13 +131,33 @@ The SAW Workbench Service enables executing Workbench related operation.  It tak
 project definition to execute as input, translates it into a Datalake operation and records
 the operation's activity in MaprDB and finally provides the results back to the client.
 
-.Figure: Executing an analysis using the SAW Execution Service
+.Figure: Executing an analysis using the SAW Workbench Service
 plantuml::saw-design/figure-workbench-sequence.pum[format=svg]
 
 The SAW Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
 semantic metadata configuration REST APU & data wrangling related REST API.
 
+=== SAW Proxy Service
+
+The SAW Proxy Service will act as proxy for our storage. The intention of this services
+to provide common storage proxy service behind our gateway for our polyglot persistence layer (ES, DL, RDMS & MapRDB).
+The purpose is to bring back all of transformation which is being done currently in UI to the backend service and UI just
+needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
+
+.Figure: Executing an data query using the SAW Proxy Service
+plantuml::saw-design/figure-proxy-sequence.pum[format=svg]
+
+The request body shall provide the query, storage type & other details. The below are salient feature for the service which are as follows:
+1. It will return either in JSON or Tabular Format.
+   ES returns in JSON format in terms of search, it should be converted into Tabular format if in
+   the request body tabular format is requested.
+2. Input JSON Schema Validation.
+3. support create, search, update & delete operations.
+4. It should support to flatten our in house build pivot format.
+5. Search results will provided in paginated format either in JSON or Tabular format.
+6. Implicit ES Query validation.
+7. Every incoming request to this story proxy service will be validated in gateway service layer.
 
 ==== Apache Spark
 

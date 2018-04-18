@@ -98,24 +98,32 @@ export const AnalyzePublishDialogComponent = {
       };
       this._$rootScope.showProgress = true;
       this._AnalyzeService.getCronDetails(this.requestCron).then(response => {
+        if (response.statusCode === 200) {
+          this._$rootScope.showProgress = false;
+          this.loadCronLayout = true;
+          this.$dialog.hideLoader();
+          if (response.data.jobDetails) {
+            this.crondetails = {
+              cronexp: response.data.jobDetails.cronExpression,
+              activeTab: response.data.jobDetails.activeTab,
+              activeRadio: response.data.jobDetails.activeRadio
+            };
+            if (response.data.jobDetails.analysisID) {
+              this.scheduleState = 'exist';
+            }
+            this.emails = response.data.jobDetails.emailList;
+            this.hasSchedule = true;
+          }
+          if (this.model.type !== 'chart') {
+            this.ftp = response.data.jobDetails.ftp;
+          }
+          this.emails = response.data.jobDetails.emailList;
+          this.hasSchedule = true;
+        }
+      }).catch(() => {
         this._$rootScope.showProgress = false;
         this.loadCronLayout = true;
         this.$dialog.hideLoader();
-        if (response.data.data.jobDetails) {
-          this.crondetails = {
-            cronexp: response.data.data.jobDetails.cronExpression,
-            activeTab: response.data.data.jobDetails.activeTab,
-            activeRadio: response.data.data.jobDetails.activeRadio
-          };
-          if (response.data.data.jobDetails.analysisID) {
-            this.scheduleState = 'exist';
-          }
-          if (this.model.type !== 'chart') {
-            this.ftp = response.data.data.jobDetails.ftp;
-          }
-          this.emails = response.data.data.jobDetails.emailList;
-          this.hasSchedule = true;
-        }
       });
     }
 
@@ -145,6 +153,10 @@ export const AnalyzePublishDialogComponent = {
       this.crondetails = cronexpression;
     }
 
+    alphanumericUnique() {
+      return Math.random().toString(36).substring(7);
+    }
+
     publish() {
       if (this.hasSchedule === false) {
         this.scheduleState = 'delete';
@@ -156,6 +168,11 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
+        let cronJobName = this.model.id;
+        if (this.crondetails.activeTab === 'immediate') {
+          this.scheduleState = 'new';
+          cronJobName = cronJobName + '-' + this.alphanumericUnique();
+        }
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -167,11 +184,11 @@ export const AnalyzePublishDialogComponent = {
           emailList: this.emails,
           ftp: this.ftp,
           fileType: 'csv',
-          jobName: this.model.id,
+          jobName: cronJobName,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: moment().format(),
+          jobScheduleTime: moment.utc().format(),
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
@@ -215,7 +232,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     validateSchedule() {
-      if (isEmpty(this.crondetails.cronexp)) {
+      if (isEmpty(this.crondetails.cronexp) && this.crondetails.activeTab !== 'immediate') {
         this.cronValidateField = true;
         return false;
       }

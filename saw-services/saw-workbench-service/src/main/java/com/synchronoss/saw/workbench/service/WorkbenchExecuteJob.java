@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import sncr.xdf.component.Component;
 import sncr.xdf.context.Context;
 import sncr.xdf.parser.Parser;
-import sncr.xdf.sql.SQLComponent;
+import sncr.xdf.sql.TempSQLComponent;
 
 public class WorkbenchExecuteJob implements Job<Integer> {
     private static final long serialVersionUID = 1L;
@@ -45,7 +45,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
                 }
             };
         } else if (component.equals("sql")) {
-            xdfComponent = new SQLComponent() {
+            xdfComponent = new TempSQLComponent() {
                 @Override
                 public void initSpark(Context ctx) {
                     try {

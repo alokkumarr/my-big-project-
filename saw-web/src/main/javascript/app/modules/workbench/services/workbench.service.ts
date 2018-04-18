@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
+import { UIRouter } from '@uirouter/angular';
 
 import {
   SQLEXEC_SAMPLE,
@@ -24,7 +25,9 @@ export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
   private wbAPI = `${this.api}/internal/workbench/projects`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private router: UIRouter) { }
 
   /** GET datasets from the server */
   getDatasets(): Observable<any> {
@@ -55,7 +58,9 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-      catchError((e: any) => { return Observable.of(e); }));
+        catchError((e: any) => {
+          return Observable.of(e);
+        }));
   }
 
   /** File mask search */
@@ -138,11 +143,11 @@ export class WorkbenchService {
         catchError(this.handleError('data', [])));
   }
   /**
-   * Service to fetch meta data of all datasets
-   *
-   * @param {string} projectName
-   * @param {any} id
-   * @returns {Observable<any>}
+   * Service to fetch meta data of a dataset
+   * 
+   * @param {string} projectName 
+   * @param {any} id 
+   * @returns {Observable<any>} 
    * @memberof WorkbenchService
    */
   getDatasetDetails(id): Observable<any> {
@@ -156,6 +161,25 @@ export class WorkbenchService {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
     return this.http.post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
+  }
+  /**
+   * Following 3 functions
+   * To store, retrive and remove data from localstorage
+   * 
+   * @param {any} metadata 
+   * @memberof WorkbenchService
+   */
+  setDataToLS(key, value) {
+    localStorage.setItem('dsMetadata', JSON.stringify(value));
+  }
+
+  getDataFromLS(key) {
+    const dsMetada = JSON.parse(localStorage.getItem(key));
+    return dsMetada;
+  }
+
+  removeDataFromLS(key) {
+    localStorage.removeItem(key);
   }
 
   /**
@@ -171,6 +195,25 @@ export class WorkbenchService {
       .pipe(catchError(this.handleError('data', SQLEXEC_SAMPLE)));
   }
 
+  navigateToDetails(metadata) {
+    this.setDataToLS('dsMetadata', metadata);
+    this.router.stateService.go('workbench.datasetDetails');
+  }
+
+  triggerDatasetPreview(name: string): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews`;
+    return this.http.post(endpoint, { name })
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  getDatasetPreviewData(id): Observable<any> {
+    const endpoint = `${this.wbAPI}/${userProject}/previews/${id}`;
+    return this.http.get(endpoint)
+      .pipe(
+        catchError((e: any) => {
+          return Observable.of(e);
+        }));
+  }
 
   /**
    * Handle Http operation that failed.

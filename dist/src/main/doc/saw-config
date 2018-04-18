@@ -88,6 +88,17 @@ saw_workbench_livy_uri=http://localhost:8998/
 # ##########################################
 # ftp_json_config='{"ftpList":[{"customerName":"CUSTUNIQUEID","alias":"ftpsrv1","host":"srv1","port":21,"username":"usr1","password":"pwd1","location":"/path/to/dir/","type":"ftp"}]}'
 
+
+#
+# Email and FTP export size definition
+# default value for email is 50000 and ftp is 1000000
+#
+saw_ui_export_size = 10000
+saw_email_export_size=50000
+saw_ftp_export_size=1000000
+
+
+
 [saw-security]
 localhost
 

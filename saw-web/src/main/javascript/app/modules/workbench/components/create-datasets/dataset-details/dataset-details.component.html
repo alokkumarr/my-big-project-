@@ -1,7 +1,7 @@
 <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
   <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
-    <span class="list-header">Selected Files</span>
     <mat-list>
+      <h3 class="list-header" mat-subheader>Selected Files</h3>
       <mat-list-item class="list-items" *ngFor="let file of selFiles; index as i" (click)="previewDialog(file)">
         <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
         <div class="icon-div">
@@ -15,100 +15,98 @@
     <mat-card-header class="headerGradient">
       <mat-card-title class="headerText">Details</mat-card-title>
     </mat-card-header>
-    <mat-card-content>
-      <div class="form-div">
-        <form #datasetDetails novalidate [formGroup]="detailsFormGroup" autocomplete="off">
-          <section class="input-section">
-            <mat-form-field class="margin20">
-              <mat-select placeholder="Data format type?" [(value)]="previewConfig.delimiterType">
-                <mat-option value="delimited">Delimited</mat-option>
-                <mat-option value="parquet" disabled>Parquet</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field class="margin20">
-              <mat-select placeholder="Header row present?" [(value)]="previewConfig.header">
-                <mat-option value="yes">Yes</mat-option>
-                <mat-option value="no">No</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </section>
-          <section class="input-section">
-            <mat-form-field class="margin20">
-              <input matInput placeholder="Field Seperator" name="fieldSeperator" formControlName="fieldSeperatorControl" required />
-              <mat-error *ngIf="detailsFormGroup.controls.fieldSeperatorControl.hasError('required')">
-                Field Seperator is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field class="margin20">
-              <input matInput type="number" placeholder="Header Size" name="hederSize" formControlName="hederSizeControl" required />
-              <mat-error *ngIf="detailsFormGroup.controls.hederSizeControl.hasError('required')">
-                Header Size is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </section>
-          <section class="input-section">
-            <mat-form-field class="margin20">
-              <input matInput placeholder="Field names Line" name="fieldNamesLine" formControlName="fieldNamesLineControl" />
-              <mat-error *ngIf="detailsFormGroup.controls.fieldNamesLineControl.hasError('required')">
-                Field names Line is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field class="margin20">
-              <mat-select placeholder="Line Seperator" [(value)]="lineSeperator">
-                <mat-option value="lineFeed">Line Feed (\n)</mat-option>
-                <mat-option value="carriageReturn">Carriage Return (\r)</mat-option>
-                <mat-option value="eol">End of Line (\r\n)</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </section>
-          <section class="input-section">
-            <mat-form-field class="margin20">
-              <input matInput placeholder="Quote Character" name="quoteChar" formControlName="quoteCharControl" />
-              <mat-error *ngIf="detailsFormGroup.controls.quoteCharControl.hasError('required')">
-                Quote Character is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field class="margin20">
-              <input matInput placeholder="Escape Character" name="escapeChar" formControlName="escapeCharControl" />
-              <mat-error *ngIf="detailsFormGroup.controls.escapeCharControl.hasError('required')">
-                Quote Character is
-                <strong>required</strong>
-              </mat-error>
-            </mat-form-field>
-          </section>
-          <section class="input-section">
-            <mat-form-field class="margin20">
-              <mat-chip-list #chipList>
-                <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" removable="true" (remove)="removeFormat(format)">
-                  {{format}}
-                  <mat-icon fontIcon="icon-remove" matChipRemove></mat-icon>
-                </mat-chip>
-                <input placeholder="Date Formats" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" matChipInputAddOnBlur="true"
-                  (matChipInputTokenEnd)="addFormat($event)" />
-              </mat-chip-list>
-            </mat-form-field>
-          </section>
-          <mat-divider></mat-divider>
-          <section class="input-section">
-            <span fxFlex="20">Sample Size</span>
-            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="1000" min="50" step="50" thumb-label="true"
-              tick-interval="500" [(ngModel)]="previewConfig.rowsToInspect" [ngModelOptions]="{standalone: true}">
-            </mat-slider>
-            <span>{{previewConfig.rowsToInspect}}</span>
-          </section>
-          <!-- <section class="input-section">
+    <mat-card-content class="form-div">
+      <form #datasetDetails novalidate [formGroup]="detailsFormGroup" autocomplete="off">
+        <section class="input-section">
+          <mat-form-field class="margin20">
+            <mat-select placeholder="Data format type?" [(value)]="previewConfig.delimiterType">
+              <mat-option value="delimited">Delimited</mat-option>
+              <mat-option value="parquet" disabled>Parquet</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field class="margin20">
+            <mat-select placeholder="Header row present?" [(value)]="previewConfig.header">
+              <mat-option value="yes">Yes</mat-option>
+              <mat-option value="no">No</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </section>
+        <section class="input-section">
+          <mat-form-field class="margin20">
+            <input matInput placeholder="Field Seperator" name="fieldSeperator" formControlName="fieldSeperatorControl" required />
+            <mat-error *ngIf="detailsFormGroup.controls.fieldSeperatorControl.hasError('required')">
+              Field Seperator is
+              <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="margin20">
+            <input matInput type="number" placeholder="Header Size" name="hederSize" formControlName="hederSizeControl" required />
+            <mat-error *ngIf="detailsFormGroup.controls.hederSizeControl.hasError('required')">
+              Header Size is
+              <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </section>
+        <section class="input-section">
+          <mat-form-field class="margin20">
+            <input matInput placeholder="Field names Line" name="fieldNamesLine" formControlName="fieldNamesLineControl" />
+            <mat-error *ngIf="detailsFormGroup.controls.fieldNamesLineControl.hasError('required')">
+              Field names Line is
+              <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="margin20">
+            <mat-select placeholder="Line Seperator" [(value)]="lineSeperator">
+              <mat-option value="lineFeed">Line Feed (\n)</mat-option>
+              <mat-option value="carriageReturn">Carriage Return (\r)</mat-option>
+              <mat-option value="eol">End of Line (\r\n)</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </section>
+        <section class="input-section">
+          <mat-form-field class="margin20">
+            <input matInput placeholder="Quote Character" name="quoteChar" formControlName="quoteCharControl" />
+            <mat-error *ngIf="detailsFormGroup.controls.quoteCharControl.hasError('required')">
+              Quote Character is
+              <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="margin20">
+            <input matInput placeholder="Escape Character" name="escapeChar" formControlName="escapeCharControl" />
+            <mat-error *ngIf="detailsFormGroup.controls.escapeCharControl.hasError('required')">
+              Quote Character is
+              <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+        </section>
+        <section class="input-section">
+          <mat-form-field class="margin20">
+            <mat-chip-list #chipList>
+              <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" removable="true" (remove)="removeFormat(format)">
+                {{format}}
+                <mat-icon fontIcon="icon-remove" matChipRemove></mat-icon>
+              </mat-chip>
+              <input placeholder="Date Formats" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" matChipInputAddOnBlur="true"
+                (matChipInputTokenEnd)="addFormat($event)" />
+            </mat-chip-list>
+          </mat-form-field>
+        </section>
+        <mat-divider></mat-divider>
+        <section class="input-section">
+          <span fxFlex="20">Sample Size</span>
+          <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="1000" min="50" step="50" thumb-label="true"
+            tick-interval="500" [(ngModel)]="previewConfig.rowsToInspect" [ngModelOptions]="{standalone: true}">
+          </mat-slider>
+          <span>{{previewConfig.rowsToInspect}}</span>
+        </section>
+        <!-- <section class="input-section">
             <span fxFlex="20">Sample Size</span>
             <mat-slider fxFlex placeholder="Sample Size" name="sampleSize" class="margin20" max="200" min="10" step="10" thumb-label="true"
               tick-interval="auto" [(ngModel)]="previewConfig.sampleSize" [ngModelOptions]="{standalone: true}">
             </mat-slider>
             <span>{{previewConfig.sampleSize}}</span>
           </section> -->
-        </form>
-      </div>
+      </form>
     </mat-card-content>
   </mat-card>
 </div>

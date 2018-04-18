@@ -1,4 +1,4 @@
-@import "themes/base/colors";
+@import 'themes/base/colors';
 
 add-widget {
   background-color: whitesmoke;
@@ -14,7 +14,8 @@ add-widget {
     }
   }
 
-  widget-category {
+  widget-category,
+  widget-metric {
     mat-expansion-panel.mat-expansion-panel {
       background-color: transparent;
       border-bottom: 1px solid $primary-grey-g1;
@@ -25,12 +26,13 @@ add-widget {
         border-bottom: 1px solid $primary-grey-g1;
       }
 
-      &:not([class*=mat-elevation-z]) {
+      &:not([class*='mat-elevation-z']) {
         box-shadow: none;
       }
     }
 
-    button.choose-category {
+    button.choose-category,
+    button.choose-metric {
       width: 100%;
       text-align: left;
     }

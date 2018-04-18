@@ -25,7 +25,7 @@ export const AnalyzeExecutedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
+    constructor($injector, $eventEmitter, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
       $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
@@ -36,6 +36,7 @@ export const AnalyzeExecutedDetailComponent = {
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
       this._$rootScope = $rootScope;
+      this._$eventEmitter = $eventEmitter;
       this._$scope = $scope;
       this._$q = $q;
       this._FilterService = FilterService;
@@ -59,7 +60,8 @@ export const AnalyzeExecutedDetailComponent = {
       const analysisId = this._$state.params.analysisId;
       const analysis = this._$state.params.analysis;
 
-      this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
+      this.reportSource = this.loadExecutionData(false);
+      this._destroyHandler = this._$eventEmitter.on(Events.AnalysesRefresh, () => {
         this.loadAnalysisById(analysisId).then(() => {
           this._executionId = null;
           this.loadExecutedAnalyses(analysisId);
@@ -247,27 +249,41 @@ export const AnalyzeExecutedDetailComponent = {
       return replace(csv, firstRow, displayNames);
     }
 
-    loadExecutionData(options = {}) {
-      if (this._executionId) {
-        options.analysisType = this.analysis.type;
+    loadExecutionData(updateRequester = false) {
+      return (options = {}) => {
+        if (this._executionId) {
+          this._$rootScope.showProgress = true;
+          options.analysisType = this.analysis.type;
 
-        return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
-          .then(({data, count}) => {
-            this.requester.next({data});
-            return {data, count};
-          });
-      }
-      return this._$q.reject(new Error('No execution id selected'));
+          return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
+            .then(({data, count}) => {
+              this._$rootScope.showProgress = false;
+              if (updateRequester) {
+                this.requester.next({data});
+              }
+              return {data, count};
+            }, err => {
+              this._$rootScope.showProgress = false;
+              throw err;
+            });
+        }
+        return this._$q.reject(new Error('No execution id selected'));
+      };
     }
 
     loadAnalysisById(analysisId) {
+      this._$rootScope.showProgress = true;
       return this._AnalyzeService.readAnalysis(analysisId)
         .then(analysis => {
           this.analysis = analysis;
+          this._$rootScope.showProgress = false;
           this.setPrivileges();
           if (!this.analysis.schedule) {
             this.isPublished = false;
           }
+        }, err => {
+          this._$rootScope.showProgress = false;
+          throw err;
         });
     }
 
@@ -276,15 +292,20 @@ export const AnalyzeExecutedDetailComponent = {
     loadLastPublishedAnalysis() {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
-        this.loadExecutionData();
+        this.loadExecutionData(true)();
       }
     }
 
     loadExecutedAnalyses(analysisId) {
+      this._$rootScope.showProgress = true;
       this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
         .then(analyses => {
           this.analyses = analyses;
+          this._$rootScope.showProgress = false;
           this.loadLastPublishedAnalysis();
+        }, err => {
+          this._$rootScope.showProgress = false;
+          throw err;
         });
     }
 

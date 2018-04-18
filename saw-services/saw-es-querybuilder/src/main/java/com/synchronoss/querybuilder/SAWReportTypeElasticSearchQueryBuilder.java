@@ -26,17 +26,20 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     private final static String SUM ="_sum";
     String jsonString;
     String dataSecurityString;
+    Integer timeOut = 3;
     SearchSourceBuilder searchSourceBuilder;
 
-    public SAWReportTypeElasticSearchQueryBuilder(String jsonString) {
+    public SAWReportTypeElasticSearchQueryBuilder(String jsonString,  Integer timeOut) {
         super();
         this.jsonString = jsonString;
+        this.timeOut = timeOut;
     }
 
-    public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey) {
+    public SAWReportTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey,Integer timeOut) {
         super();
         this.dataSecurityString = dataSecurityKey;
         this.jsonString = jsonString;
+        this.timeOut = timeOut;
     }
 
     public String getDataSecurityString() {
@@ -182,7 +185,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         List<DataField> dataFields =
                 sqlBuilderNode.getDataFields();
         ReportAggregationBuilder reportAggregationBuilder = new ReportAggregationBuilder(size);
-        List<DataField> aggregationFields = reportAggregationBuilder.getAggregationField(dataFields);
+        List<DataField> aggregationFields = ReportAggregationBuilder.getAggregationField(dataFields);
         AggregationBuilder finalAggregationBuilder =null;
 
         boolean isPercentage = dataFields.stream().anyMatch(dataField ->
@@ -195,7 +198,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
-                    "system","analyse");
+                    "system","analyse",timeOut);
             // Set total sum for dataFields will be used for percentage calculation.
             objectMapper = new ObjectMapper();
             JsonNode objectNode = objectMapper.readTree(result);

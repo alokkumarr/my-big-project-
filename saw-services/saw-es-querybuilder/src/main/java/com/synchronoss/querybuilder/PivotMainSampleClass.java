@@ -295,7 +295,7 @@ public class PivotMainSampleClass {
     System.out.println(searchSourceBuilder.toString());
     String response =
         SAWElasticTransportService.executeReturnAsString(searchSourceBuilder.toString(),
-            objectNode.toString(), "some", "xssds", "login");
+            objectNode.toString(), "some", "xssds", "login",3);
     System.out.println(response);
 
   }

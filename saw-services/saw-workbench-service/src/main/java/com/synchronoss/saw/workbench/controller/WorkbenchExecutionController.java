@@ -90,4 +90,45 @@ public class WorkbenchExecutionController {
         return workbenchExecutionService.execute(
             project, name, component, xdfConfig.toString());
     }
+
+    @RequestMapping(
+        value = "{project}/previews", method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ObjectNode preview(
+        @PathVariable(name = "project", required = true) String project,
+        @RequestBody ObjectNode body)
+        throws JsonProcessingException, Exception {
+        log.debug("Create dataset preview: project = {}", project);
+        /* Extract dataset name which is to be previewed */
+        String name = body.path("name").asText();
+        /* Start asynchronous preview creation */
+        return workbenchExecutionService.preview(project, name);
+    }
+
+    @RequestMapping(
+        value = "{project}/previews/{previewId}",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ObjectNode preview(
+        @PathVariable(name = "project", required = true) String project,
+        @PathVariable(name = "previewId", required = true) String previewId)
+        throws JsonProcessingException, Exception {
+        log.debug("Get dataset preview: project = {}", project);
+        /* Get previously created preview */
+        ObjectNode body = workbenchExecutionService.getPreview(previewId);
+        /* If preview was not found, response to indicate that preview
+         * has not been created yet */
+        if (body == null) {
+            throw new NotFoundException();
+        }
+        /* Otherwise return the preview contents */
+        return body;
+    }
+
+    @ResponseStatus(
+        value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
+    private static class NotFoundException extends RuntimeException {
+    }
 }

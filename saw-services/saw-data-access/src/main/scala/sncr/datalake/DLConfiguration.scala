@@ -53,7 +53,7 @@ object DLConfiguration {
     * Row limit is configured/hardcoded value
     */
 
-  val rowLimit = if (cfg.hasPath ("sql-executor.inline-data-store-limit-rows") ) cfg.getInt ("sql-executor.inline-data-store-limit-rows") else 100
+  val rowLimit = if (cfg.hasPath("sql-executor.inline-data-store-limit-rows")) cfg.getInt("sql-executor.inline-data-store-limit-rows") else 100
   val jarLocation = cfg.getString ("sql-executor.jar-location")
   val commonLocation = cfg.getString ("sql-executor.output-location")
   val semanticLayerTempLocation = cfg.getString ("sql-executor.semantic-layer-tmp-location")

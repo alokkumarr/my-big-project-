@@ -26,6 +26,10 @@ import com.synchronoss.querybuilder.model.pivot.ColumnField;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import static com.synchronoss.AggregationConstants.*;
+import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.AVG;
+import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.SUM;
+
 
 public class QueryBuilderUtil {
 	
@@ -146,6 +150,40 @@ public class QueryBuilderUtil {
 
 		return aggregationBuilder;
 	}
+
+    public static SearchSourceBuilder aggregationBuilderDataFieldKPI(com.synchronoss.querybuilder.model.kpi.DataField data,
+                                                                    SearchSourceBuilder searchSourceBuilder
+    )
+    {
+        for(com.synchronoss.querybuilder.model.kpi.DataField.Aggregate aggregate : data.getAggregate()) {
+
+            AggregationBuilder aggregationBuilder = null;
+            switch (aggregate) {
+                case SUM:
+                    aggregationBuilder = AggregationBuilders.sum(data.getName()+_SUM).field(data.getColumnName());
+                    break;
+                case AVG:
+                    aggregationBuilder = AggregationBuilders.avg(data.getName()+_AVG).field(data.getColumnName());
+                    break;
+                case MIN:
+                    aggregationBuilder = AggregationBuilders.min(data.getName()+_MIN).field(data.getColumnName());
+                    break;
+                case MAX:
+                    aggregationBuilder = AggregationBuilders.max(data.getName()+_MAX).field(data.getColumnName());
+                    break;
+                case COUNT:
+                    aggregationBuilder = AggregationBuilders.count(data.getName()+_COUNT).field(data.getColumnName());
+                    break;
+                case PERCENTAGE:
+                    Script script = new Script("_value*100/" + data.getAdditionalProperties().get(data.getColumnName()
+                        + "_sum"));
+                    aggregationBuilder = AggregationBuilders.sum(data.getName()+_PERCENTAGE).field(data.getColumnName()).script(script);
+                    break;
+            }
+            searchSourceBuilder.aggregation(aggregationBuilder);
+        }
+        return searchSourceBuilder;
+    }
 
     public static AggregationBuilder aggregationBuilderDataFieldChart(com.synchronoss.querybuilder.model.chart.DataField data)
 
@@ -397,6 +435,50 @@ public class QueryBuilderUtil {
 		return builder;
 	}
 
+    public static List<QueryBuilder> numericFilterKPI (com.synchronoss.querybuilder.model.kpi.Filter item, List<QueryBuilder> builder)
+    {
+
+        if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getValue());
+            rangeQueryBuilder.gte(item.getModel().getOtherValue());
+            builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.GT.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.gt(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.GTE.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.gte(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.LT.value())) {
+
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lt(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.LTE.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+            TermQueryBuilder termQueryBuilder =
+                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+            builder.add(termQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+                .getValue()));
+            builder.add(boolQueryBuilderIn);
+        }
+        return builder;
+    }
+
 	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
 	{
 		if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
@@ -483,6 +565,56 @@ public class QueryBuilderUtil {
 
 		return builder;
 	}
+
+
+    /**
+     * string filter for the KPI builder.
+     * @param item
+     * @param builder
+     * @return
+     */
+    public static List<QueryBuilder> stringFilterKPI(com.synchronoss.querybuilder.model.kpi.Filter item, List<QueryBuilder> builder)
+    {
+        if(item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+            TermsQueryBuilder termsQueryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            builder.add(termsQueryBuilder);
+        }
+
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+            item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+            QueryBuilder qeuryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+            boolQueryBuilder.mustNot(qeuryBuilder);
+            builder.add(boolQueryBuilder);
+        }
+
+        // prefix query builder - not analyzed
+        if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+            PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+                (String) item.getModel().getModelValues().get(0));
+            builder.add(pqb);
+        }
+
+        // using wildcard as there's no suffix query type provided by
+        // elasticsearch
+        if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+            WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+                "*"+item.getModel().getModelValues().get(0));
+            builder.add(wqb);
+        }
+
+        // same for contains clause - not analyzed query
+        if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+            WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+                "*" + item.getModel().getModelValues().get(0)+"*");
+            builder.add(wqb);
+        }
+
+        return builder;
+    }
 
     /**
      *
