@@ -151,6 +151,51 @@ add_model <-function(obj,
 }
 
 
+#' Add Multiple Models to Modeler Object function
+#'
+#' Function to add model to modeler object. More than one model can be added to
+#' a modeler object.
+#'
+#' Function creates a new model object from inputs and then appends to modeler
+#' models list
+#'
+#' @param obj modeler object
+#' @param pipe pipeline object
+#' @param models list with models method and list of arguments in each element
+#' @param class modeler object class
+#'
+#' @export
+#' @return modeler object with models added
+add_models <- function(obj,
+                       pipe = NULL,
+                       models,
+                       class) {
+  checkmate::assert_class(obj, "modeler")
+  checkmate::assert_class(models, "list")
+
+  if(is.null(pipe))
+    pipe <- pipeline()
+
+  for(i in 1:length(models)) {
+
+    model_args <- modifyList(
+      list(pipe = pipe,
+               target = obj$target,
+               method = models[[i]]$method,
+               class = class,
+               desc = NULL,
+               path = NULL),
+      models[[i]]$method_args)
+    m <- do.call("model", model_args)
+    m$status <- "added"
+    obj$models[[m$id]] <- m
+    obj
+  }
+
+  obj
+}
+
+
 #' Append Model to Modeler Object function
 #'
 #' Function to append a valid model to a modeler object.

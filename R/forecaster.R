@@ -15,7 +15,7 @@
 #' @family use cases
 #' @aliases forecaster
 #' @export
-forecaster <- function(df,
+new_forecaster <- function(df,
                        target,
                        index_var,
                        unit = NULL,
@@ -187,4 +187,176 @@ predict.forecaster <- function(obj,
     id = sparklyr::random_string(prefix = "pred"),
     desc = desc
   )
+}
+
+
+
+# Auto Forecaster ---------------------------------------------------------
+
+
+#' Auto Forecaster Function
+#'
+#' Creates automated forecasts for univariate time series.
+#'
+#' Convience wrapper to create complete forecaster pipeline
+#'
+#' @param df dataframe
+#' @param target numeric variable to model and forecast
+#' @param index_var index variable
+#' @param periods number of periods to forecast
+#' @param unit unit of index variable default is null
+#' @param models nested list of models. each model list should have a method and
+#'   list of arguments
+#' @param splits holdout splits ratios default is 80-20 train to validation
+#' @param conf_levels forecast confidence levels. default is 80 and 90 percent
+#'
+#' @return predictions object
+#' @export
+#'
+#' @examples
+auto_forecaster <- function(df,
+                            target,
+                            index_var,
+                            periods,
+                            unit = NULL,
+                            pipe = NULL,
+                            models = list(method = "auto.arima",
+                                          method_args = list()),
+                            splits = c(.8, .2),
+                            conf_levels = c(80, 95)) {
+
+  df_names <- colnames(df)
+  checkmate::assert_data_frame(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_subset(target, df_names)
+  checkmate::assert_number(periods, lower = 0)
+  checkmate::assert_class(pipe, "pipeline", null.ok = TRUE)
+  checkmate::assert_list(models)
+  checkmate::assert_numeric(splits, lower=0, upper=1, min.len = 2, max.len = 3)
+  checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
+                            min.len = 1, max.len = 2)
+
+  new_forecaster(df,
+                 target = target,
+                 index_var = index_var,
+                 unit = unit,
+                 name = "auto-forecaster") %>%
+    add_models(pipe = if(is.null(pipe)) pipeline() else pipe,
+               models = models,
+               class = "forecast_model") %>%
+    train_models(.) %>%
+    evaluate_models(.) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
+    predict(periods = periods, level = conf_levels)
+}
+
+
+
+#' @inheritParams auto_forecasts
+#' @param group_vars optional column name of grouping variables. splits data and
+#'   applies auto_forecaster to each group
+#' @param measure_vars colname names of variables to forecast
+#' @export
+forecaster <- function(...){
+  UseMethod("forecaster")
+}
+
+
+
+#' @export
+#' @rdname forecaster
+forecaster.data.frame <- function(df,
+                                  index_var,
+                                  group_vars = NULL,
+                                  measure_vars,
+                                  periods,
+                                  unit = NULL,
+                                  pipe = NULL,
+                                  models = list(method = "auto.arima",
+                                                method_args = list()),
+                                  splits = c(.8, .2),
+                                  conf_levels = c(80, 95)) {
+
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_subset(group_vars, df_names)
+  checkmate::assert_subset(measure_vars, df_names)
+  checkmate::assert_number(periods, lower = 0)
+  checkmate::assert_list(models)
+  checkmate::assert_numeric(splits, lower=0, upper=1, min.len = 2, max.len = 3)
+  checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
+                            min.len = 1, max.len = 2)
+
+  if(is.null(pipe))
+    pipe <- pipeline(expr = function(x) x[, "y", drop=FALSE])
+
+
+  df %>%
+    dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
+    a2munge::melter(.,
+                    id_vars = c(index_var, group_vars),
+                    measure_vars,
+                    variable_name = "measure",
+                    value_name = "y") %>%
+    dplyr::group_by_at(c(group_vars, "measure")) %>%
+    dplyr::do(
+      auto_forecaster(.,
+                      target = "y",
+                      index_var = index_var,
+                      periods  = periods,
+                      unit = NULL,
+                      pipe = pipe,
+                      models = models,
+                      splits = splits,
+                      conf_levels = conf_levels) %>%
+        .$predictions
+    ) %>%
+    dplyr::ungroup()
+}
+
+
+
+#' @export
+#' @rdname forecaster
+forecaster.tbl_spark <- function(df,
+                                      index_var,
+                                      group_vars = NULL,
+                                      measure_vars,
+                                      periods,
+                                      unit = NULL,
+                                      models = list(method = "auto.arima",
+                                                    method_args = list()),
+                                      splits = c(.8, .2),
+                                      conf_levels = c(80, 95)) {
+
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_subset(group_vars, df_names)
+  checkmate::assert_subset(measure_vars, df_names)
+  checkmate::assert_number(periods, lower = 0)
+  checkmate::assert_list(models)
+  checkmate::assert_numeric(splits, lower=0, upper=1, min.len = 2, max.len = 3)
+  checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
+                            min.len = 1, max.len = 2)
+
+
+  df %>%
+    dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
+    a2munge::melter(.,
+                    id_vars = c(index_var, group_vars),
+                    measure_vars,
+                    variable_name = "measure",
+                    value_name = "y") %>%
+    sparklyr::spark_apply(.,
+                          function(e, l) {
+
+                            fun(e[, c(l$index_var, l$target)])
+                          },
+                          group_by = c(group_vars, "measure"),
+                          names = c(),
+                          context = {
+                            l = list(
+
+                            )
+                          })
 }

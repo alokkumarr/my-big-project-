@@ -21,7 +21,7 @@ dat1 <- data.frame(index = 1:n,
 
 test_that("No holdout sampling test case", {
 
-  f1 <- forecaster(df = dat1,
+  f1 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -46,7 +46,7 @@ test_that("No holdout sampling test case", {
 
 test_that("Validation only holdout sampling test case", {
 
-  f2 <- forecaster(df = dat1,
+  f2 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -71,7 +71,7 @@ test_that("Validation only holdout sampling test case", {
 
 test_that("Multiple Model test case", {
 
-  f3 <- forecaster(df = dat1,
+  f3 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -103,7 +103,7 @@ test_that("Multiple Model test case", {
 
 test_that("Multiple Model with Test Holdout test case", {
 
-  f4 <- forecaster(df = dat1,
+  f4 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -135,7 +135,7 @@ test_that("Multiple Model with Test Holdout test case", {
 
 test_that("Multiple Model with Manual set final model method test case", {
 
-  f5 <- forecaster(df = dat1,
+  f5 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -168,7 +168,7 @@ test_that("Covariate test case", {
 
   dat2 <- data.frame(dat1, x = rnorm(n))
 
-  f6 <- forecaster(df = dat2,
+  f6 <- new_forecaster(df = dat2,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -193,7 +193,7 @@ test_that("Covariate test case", {
 
 test_that("Prediction index test case", {
 
-  f7 <- forecaster(df = dat1,
+  f7 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -207,7 +207,7 @@ test_that("Prediction index test case", {
 
   dat3 <- dat1 %>% mutate(index = seq(Sys.Date()-days(n-1), Sys.Date(), by="day"))
 
-  f8 <- forecaster(df = dat3,
+  f8 <- new_forecaster(df = dat3,
                    target = "y",
                    index_var = "index",
                    unit = "days",
@@ -237,7 +237,7 @@ test_that("Pipeline transformation test case", {
     x %>% mutate(y = BoxCox(y, bcl))
   })
 
-  f9 <- forecaster(df = dat1,
+  f9 <- new_forecaster(df = dat1,
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
@@ -257,7 +257,7 @@ test_that("Pipeline transformation test case", {
 
 test_that("Time Slice Sampling test case", {
 
-  f10 <- forecaster(df = dat1,
+  f10 <- new_forecaster(df = dat1,
                     target = "y",
                     index_var = "index",
                     name = "test") %>%
@@ -271,3 +271,59 @@ test_that("Time Slice Sampling test case", {
 
   expect_data_frame(get_evalutions(f10), nrow=20)
 })
+
+
+
+
+test_that("Add Models test case", {
+
+  f11 <- new_forecaster(df = dat1,
+                    target = "y",
+                    index_var = "index",
+                    name = "test") %>%
+    add_holdout_samples(., splits = c(.8, .2)) %>%
+    add_models(.,
+               pipe = pipeline(),
+               models = list(
+                 list(method = "auto.arima", method_args = list()),
+                 list(method = "ets", method_args = list())),
+               class = "forecast_model") %>%
+    train_models(.) %>%
+    evaluate_models(.) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  expect_equal(length(f11$models), 2)
+  expect_data_frame(get_evalutions(f11), nrow=4)
+})
+
+
+
+test_that("Auto Forecaster data.frame test case", {
+
+  af1 <- auto_forecaster(dat1,
+                         target = "y",
+                         index_var = "index",
+                         periods = 10,
+                         unit = NULL,
+                         models = list(
+                           list(method = "auto.arima", method_args = list()),
+                           list(method = "ets", method_args = list())))
+  expect_data_frame(af1$predictions, nrow=10)
+
+  dat3 <- rbind(dat1 %>% mutate(group = "A"),
+                dat1 %>% mutate(group = "B"))
+
+  af2 <- forecaster(dat3,
+                    index_var = "index",
+                    group_vars = "group",
+                    measure_vars = c("y"),
+                    periods = 10,
+                    unit = NULL,
+                    pipe = NULL,
+                    models = list(
+                      list(method = "auto.arima", method_args = list()),
+                      list(method = "ets", method_args = list())))
+  expect_data_frame(af2, nrow=20)
+})
+
+
