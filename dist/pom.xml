@@ -197,6 +197,8 @@
               <amazonec2-access-key>${env.SAW_AWS_ACCESS_KEY_ID}</amazonec2-access-key>
               <amazonec2-secret-key>${env.SAW_AWS_SECRET_ACCESS_KEY}</amazonec2-secret-key>
               <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
+              <!-- Use spot instance for cost savings and removing EBS volume upon termination -->
+              <amazonec2-request-spot-instance/>
               <amazonec2-root-size>32</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
