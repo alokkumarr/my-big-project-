@@ -104,6 +104,7 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
     case AnalyseTypes.Pivot:
       return AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode)
         .afterClosed().first().toPromise();
+    default:
     }
   }
 
