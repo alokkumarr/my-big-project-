@@ -4,14 +4,10 @@ import * as deepClone from 'lodash/cloneDeep';
 
 import {AnalyseTypes, Events} from '../../consts';
 
-<<<<<<< HEAD
-export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector, $eventEmitter) {
-=======
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/toPromise';
 
 export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, AnalyzeService, toastMessage, FilterService, $log, $injector) {
->>>>>>> master
   'ngInject';
 
   return {
