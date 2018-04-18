@@ -228,7 +228,7 @@ module.exports = {
     getStringFilterInput,
     getNumberFilterInput,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
-    getAppliedFilter
+    getAppliedFilter: getAppliedFilterUpgraded
   },
   filtersDialogUpgraded : {
     getFilterAutocomplete: getFilterAutocompleteUpgraded,
