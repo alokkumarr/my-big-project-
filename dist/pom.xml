@@ -154,18 +154,19 @@
         </executions>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-failsafe-plugin</artifactId>
-	<executions>
-	  <execution>
-	    <goals>
-	      <goal>integration-test</goal>
-	      <goal>verify</goal>
-	    </goals>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-failsafe-plugin</artifactId>
+	      <executions>
+	        <execution>
+	          <goals>
+	            <goal>integration-test</goal>
+	            <goal>verify</goal>
+	          </goals>
           </execution>
         </executions>
         <configuration>
           <systemPropertyVariables>
+            <saw.docker.host>${docker.host.address}</saw.docker.host>
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
           </systemPropertyVariables>
         </configuration>
@@ -373,7 +374,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --params.saw.docker.port=${saw.docker.port}</arguments>
+              <arguments>run protractor -- --params.saw.docker.host=${docker.host.address} --params.saw.docker.port=${saw.docker.port}</arguments>
             </configuration>
           </execution>
         </executions>
@@ -483,7 +484,7 @@
       </activation>
       <properties>
         <!-- Limit access to local machine only by default -->
-        <saw.docker.ip>localhost</saw.docker.ip>
+        <saw.docker.ip>127.0.0.1</saw.docker.ip>
       </properties>
     </profile>
     <!-- Cloud Docker profile -->
