@@ -80,25 +80,39 @@ const getChartSettingsCheckBox = name => {
 };
 
 const filtersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
+const filtersBtnUpgraded = element(by.css('button[e2e="open-filter-modal"]'));
 
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
 
 const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
+const geFilterRowUpgraded = index => element.all(by.css('designer-filter-row')).get(index);
 
 const getFilterAutocomplete = index => getFilterRow(index)
   .element(by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input'));
+
+const getFilterAutocompleteUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="filter-autocomplete-input"]'));
 
 // If filter value type is String
 const getStringFilterInput = index => getFilterRow(index)
   .element(by.css('string-filter'))
   .element(by.css('input[aria-label="Chips input."]'));
 
+const getStringFilterInputUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="designer-filter-string-input"]'));
+
 // If filter value type is Number
 const getNumberFilterInput = index => getFilterRow(index)
   .element(by.xpath("//input[@ng-model='$ctrl.tempModel.value']"));
 
+const getNumberFilterInputUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="designer-number-filter-input"]'));
+
 const getAppliedFilter = name => element(by.css('filter-chips'))
   .element(by.cssContainingText('md-chip-template > span', name));
+
+const getAppliedFilterUpgraded = name => element(by.css('filter-chips-u'))
+  .element(by.cssContainingText('mat-chip', name));
 
 const getPivotField = name => element(by.css(`md-list-item[e2e="pivot-field-${name}"]`));
 
@@ -176,6 +190,7 @@ module.exports = {
   },
   designerDialog: {
     saveDialog: element(by.css('analyze-save-dialog')),
+    saveDialogUpgraded: element(by.css('designer-save')),
     chart: {
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
@@ -194,7 +209,7 @@ module.exports = {
       doSelectPivotArea,
       doSelectPivotAggregate,
       doSelectPivotGroupInterval,
-      filterBtn: filtersBtn,
+      filterBtn: filtersBtnUpgraded,
       refreshBtn
     },
     report: {
@@ -202,7 +217,8 @@ module.exports = {
       getReportFieldCheckbox,
       getReportFieldEndPoint,
       getJoinlabel,
-      filterBtn: filtersBtn,
+      filterBtn: filtersBtnUpgraded,
+      gridExpandBtn: element(by.css('button[e2e="report-expand-btn"]')),
       refreshBtn
     },
     saveBtn: element(by.css('button[e2e="designer-save-btn"]'))
@@ -213,6 +229,13 @@ module.exports = {
     getNumberFilterInput,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
     getAppliedFilter
+  },
+  filtersDialogUpgraded : {
+    getFilterAutocomplete: getFilterAutocompleteUpgraded,
+    getStringFilterInput: getStringFilterInputUpgraded,
+    getNumberFilterInput: getNumberFilterInputUpgraded,
+    applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
+    getAppliedFilter: getAppliedFilterUpgraded
   },
   detail: {
     getAnalysisChartType
@@ -232,6 +255,13 @@ module.exports = {
     firstCardTitle,
     getCardTypeByName: getCardTypeByName,
     getAnalysisMenuButton: getAnalysisMenuButton
+  },
+  saveDialogUpgraded: {
+    selectedCategory: element(by.css('[e2e="save-dialog-selected-category"]')),
+    nameInput: element(by.css('input[e2e="save-dialog-name"]')),
+    descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
+    saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
+    cancelBtn: element(by.css('button[e2e="designer-dialog-cancel"]'))
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),

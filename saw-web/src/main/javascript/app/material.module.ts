@@ -32,6 +32,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
+import {ReactiveFormsModule} from '@angular/forms';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 require('nouislider/distribute/nouislider.min.css');
@@ -40,6 +41,7 @@ import '../../../../themes/_angular_next.scss';
 @NgModule({
   imports: [
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     MatButtonModule,
     MatRadioModule,
     MatSelectModule,

@@ -48,7 +48,9 @@ export class DesignerNumberFilterComponent {
 
   init() {
     if (!this.filterModel) {
-      this.filterModel = {};
+      this.filterModel = {
+        operator: 'EQ'
+      };
     }
   }
 
