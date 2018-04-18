@@ -175,21 +175,24 @@ export class CronJobSchedularComponent {
     switch (this.scheduleType) {
     case 'immediate':
       if (this.immediate.immediatetype === 'currenttime') {
-        this.cronChange('', this.scheduleType, this.immediate.immediatetype);
+        this.activeRadio = this.immediate.immediatetype;
+        this.cronChange();
       }
       break;
     case 'hourly':
       //Generating Cron expression for selections made in hourly tab
       this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, '');
+        this.activeRadio = '';
+        this.cronChange();
       }
       break;
     case 'daily':
       //Generating Cron expression for selections made in daily tab
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, this.daily.dailyType);
+        this.activeRadio = this.daily.dailyType;
+        this.cronChange();
       }
       break;
     case 'weeklybasis':
@@ -199,41 +202,39 @@ export class CronJobSchedularComponent {
           .join(',');
       this.CronExpression = generateWeeklyCron(days, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, '');
+        this.activeRadio = '';
+        this.cronChange();
       }
       break;
     case 'monthly':
       //Generating Cron expression for selections made in monthly tab
       this.CronExpression = generateMonthlyCron(this.monthly, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, this.monthly.monthlyType);
+        this.activeRadio = this.monthly.monthlyType;
+        this.cronChange();
       }
       break;
     case 'yearly':
       //Generating Cron expression for selections made in yearly tab
       this.CronExpression = generateYearlyCron(this.yearly, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, this.yearly.yearlyType);
+        this.activeRadio = this.yearly.yearlyType;
+        this.cronChange();
       }
       break;
     }
   }
 
-  cronChange(CronExpression, activeTab, activeRadio) {
-    console.log(new Date(this.startDate));
-    console.log(new Date(this.endDate));
-    return;
+  cronChange() {
     this.crondetails = {
-      cronexp: CronExpression,
-      activeTab: activeTab,
-      activeRadio: activeRadio,
-      startDate: new Date(this.startDate),
-      endDate: new Date(this.endDate)
+      cronexp: this.CronExpression,
+      activeTab: this.scheduleType,
+      activeRadio: this.activeRadio,
+      startDate: (new Date(this.startDate) == 'Invalid Date' ? '' : new Date(this.startDate)),
+      endDate: (new Date(this.endDate) == 'Invalid Date' ? '' : new Date(this.endDate))
     }
     this.onCronChanged.emit(this.crondetails);
   }
-
-  
 
   loadData() {
     this.onCronChanged.emit(this.crondetails);

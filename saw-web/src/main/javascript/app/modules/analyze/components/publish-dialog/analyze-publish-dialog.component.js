@@ -150,6 +150,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     onCronChanged(cronexpression) {
+      console.log(cronexpression);
       this.crondetails = cronexpression;
     }
 
@@ -185,6 +186,8 @@ export const AnalyzePublishDialogComponent = {
           ftp: this.ftp,
           fileType: 'csv',
           jobName: cronJobName,
+          startDate: this.crondetails.startDate,
+          endDate: this.crondetails.endDate,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
@@ -192,6 +195,7 @@ export const AnalyzePublishDialogComponent = {
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
+        console.log(this.model.schedule);
         this.triggerSchedule();
       }
     }
