@@ -39,6 +39,7 @@ fit.forecast_model <- function(obj, data, ...) {
 
 #' Forecast Model Fitted Method
 #' @rdname fitted
+#' @export
 fitted.forecast_model <- function(obj) {
   as.numeric(fitted(obj$fit))
 }
@@ -46,6 +47,7 @@ fitted.forecast_model <- function(obj) {
 
 #' Forecast Prediction Method
 #' @rdname predict
+#' @export
 predict.forecast_model <- function(obj,
                                    periods,
                                    data = NULL,
@@ -79,13 +81,14 @@ predict.forecast_model <- function(obj,
 }
 
 
-
+#' @export
 #' @rdname summary
 summary.forecast_model <- function(mobj){
   mobj$fit
 }
 
 
+#' @export
 #' @rdname print
 print.forecast_model <- function(mobj){
   mobj$fit

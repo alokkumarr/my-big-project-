@@ -61,3 +61,29 @@ test_that("resampling functions work as expected", {
   expect_equal(length(get_train_samples(s2x)[[1]]), n*amt*thp)
   expect_equal(length(get_validation_samples(s2x)[[1]]), n*amt*thp)
 })
+
+
+
+
+test_that("time_slices functions work as expected", {
+  n <- 10
+  x <- 1:n
+  df <- data.frame(x = x)
+  width <- 5
+  horizon <- 1
+  skip <- 0
+
+  s1x <- add_time_slice_samples(x, width, horizon, skip)
+  s1df <- add_time_slice_samples(df, width, horizon, skip)
+
+  s2x <- add_time_slice_samples(x, width, horizon, skip)
+  s2df <- add_time_slice_samples(x, width, horizon, skip)
+
+  expect_equal(s1x, s1df)
+  expect_equal(s2x, s2df)
+  expect_equal(length(get_train_samples(s1x)), n-width)
+  expect_equal(length(get_train_samples(s1x)[[1]]), width)
+  expect_equal(length(get_validation_samples(s1x)[[1]]), horizon)
+  expect_equal(length(get_train_samples(s1x)[[1]]), length(get_train_samples(s1x)[[2]]))
+  expect_null(get_test_samples(s1x))
+})

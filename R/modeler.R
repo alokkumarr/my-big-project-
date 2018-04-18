@@ -367,5 +367,5 @@ print.modeler <- summary.modeler <- function(obj) {
   cat("\nfinal model ----------------------------", "\n")
   cat("method:", obj$final_model$method, "\n")
   cat("method args:", unlist(obj$final_model$method_args), "\n")
-  cat("desc:", obj$final_model$desc)
+  cat("desc:", obj$final_model$desc, "\n")
 }

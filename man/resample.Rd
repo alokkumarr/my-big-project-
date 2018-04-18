@@ -17,7 +17,7 @@ resample(x, number, amount, seed)
 }
 \arguments{
 \item{x}{numeric vector, dataframe, spark dataframe, or modeler object to
-create holdout samples from}
+create samples from}
 
 \item{number}{number of resamples to create}
 

@@ -254,3 +254,20 @@ test_that("Pipeline transformation test case", {
 })
 
 
+
+test_that("Time Slice Sampling test case", {
+
+  f10 <- forecaster(df = dat1,
+                    target = "y",
+                    index_var = "index",
+                    name = "test") %>%
+    add_time_slice_samples(., width = 190, horizon = 1, skip = 0) %>%
+    add_model(pipe = pipeline(),
+              method = "auto.arima",
+              class = "forecast_model") %>%
+    train_models(.) %>%
+    evaluate_models(.) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  expect_data_frame(get_evalutions(f10), nrow=20)
+})

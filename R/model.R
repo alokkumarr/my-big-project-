@@ -234,6 +234,11 @@ get_forecasts <- function(x, ...) {
 }
 
 
+#' @export
+tidy_performance <- function(obj) {
+  UseMethod("tidy_performance")
+}
+
 
 # Class Methods -----------------------------------------------------------
 

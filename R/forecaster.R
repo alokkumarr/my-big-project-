@@ -164,6 +164,7 @@ set_final_model.forecaster <- function(obj,
 #'
 #' Method makes predictions for Forecaster's final model
 #' @rdname predict
+#' @export
 predict.forecaster <- function(obj,
                                periods,
                                data = NULL,
