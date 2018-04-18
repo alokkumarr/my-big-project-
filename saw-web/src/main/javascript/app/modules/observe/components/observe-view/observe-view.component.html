@@ -10,7 +10,7 @@
     <div class="page-header-toolbar">
       <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
       <div class="page-header-actions">
-        <kpi-filter></kpi-filter>
+        <kpi-filter *ngIf="hasKPIs"></kpi-filter>
 
         <button mat-button
         color="warn"

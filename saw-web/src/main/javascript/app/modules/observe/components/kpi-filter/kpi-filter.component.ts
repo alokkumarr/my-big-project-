@@ -71,6 +71,12 @@ export class KPIFilter implements OnDestroy {
     });
   }
 
+  /**
+   * getFilterModel - Returns the filter model. If no custom preset selected,
+   * also includes dates in the result.
+   *
+   * @returns {undefined}
+   */
   getFilterModel() {
     const model = {
       preset: this.kpiFilterForm.get('preset').value
