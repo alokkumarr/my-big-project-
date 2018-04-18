@@ -38,6 +38,12 @@ observe-page {
 
     .page-header-actions {
       align-self: center;
+      display: flex;
+      align-items: center;
+
+      button {
+        height: 36px;
+      }
     }
   }
 
