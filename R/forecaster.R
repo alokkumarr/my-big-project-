@@ -4,13 +4,21 @@
 #' Creates a forecaster object which inherits from modeler class
 #'
 #' @inheritParams modeler
-#' @param frequency seasonaly frequency of target. Default is NULL - no seasonality
-#' @param prediction_conf_levels prediction confidence levels. Default is 80 & 95% CIs
+#' @param index_var column name of index variable. index variable should be
+#'   either sequential numeric, date or datetime.
+#' @param units index variable unit for date or datetime variables. ex - days
+#'   for date index variable.
+#' @param frequency seasonaly frequency of target. Default is NULL - no
+#'   seasonality
+#' @param prediction_conf_levels prediction confidence levels. Default is 80 &
+#'   95% CIs
 #' @family use cases
 #' @aliases forecaster
 #' @export
 forecaster <- function(df,
                        target,
+                       index_var,
+                       unit = NULL,
                        frequency = NULL,
                        prediction_conf_levels = c(80, 95),
                        name = NULL,
@@ -21,6 +29,12 @@ forecaster <- function(df,
                        dir = NULL,
                        ...){
 
+  checkmate::assert_choice(index_var, colnames(df))
+  checkmate::assert_numeric(frequency, lower = 1, null.ok = TRUE)
+  checkmate::assert_numeric(prediction_conf_levels, lower = 50, upper = 100,
+                            min.len = 1, max.len = 2)
+  checkmate::assert_character(unit, null.ok = TRUE)
+
   mobj <- modeler(df,
                   target,
                   type = "forecaster",
@@ -30,6 +44,8 @@ forecaster <- function(df,
                   desc,
                   scientist,
                   dir)
+  mobj$index_var <- index_var
+  mobj$index <- index(df[[index_var]], unit = unit)
   mobj$frequency <- frequency
   mobj$conf_levels <- prediction_conf_levels
   fobj <- structure(mobj, class = c("forecaster", class(mobj)))
@@ -58,6 +74,7 @@ train_models.forecaster <- function(obj, ids = NULL) {
     model <- get_models(obj, id = id)[[1]]
     checkmate::assert_class(model, "forecast_model")
     model$pipe <- execute(obj$data, model$pipe)
+    model$index_var <- obj$index_var
     model <- train(model, indicies, level = obj$conf_levels)
     obj$models[[id]] <- model
   }
@@ -157,9 +174,13 @@ predict.forecaster <- function(obj,
     stop("Final model not set")
   }
   final_model$pipe <- execute(data, final_model$pipe)
+  preds <- predict(final_model, periods, data = final_model$pipe$output, level)
+  index_out <- extend(obj$index, length_out = periods)
+  preds <- data.frame(index_out, preds)
+  colnames(preds)[1] <- obj$index_var
 
   new_predictions(
-    predictions = predict(final_model, periods, data = final_model$pipe$output, level),
+    predictions = preds,
     model = final_model,
     type = "forecaster",
     id = sparklyr::random_string(prefix = "pred"),

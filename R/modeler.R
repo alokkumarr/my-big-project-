@@ -215,12 +215,17 @@ get_target <- function(obj) {
 #' @export
 get_evalutions <- function(obj) {
   checkmate::assert_class(obj, "modeler")
-  suppressWarnings(
-    bind_rows(lapply(obj$models, function(m) data.frame(method = as.character(m$method))),
-              .id = "model") %>%
-      inner_join(obj$evaluate, by = "model")
-  )
+  mdls <- suppressWarnings(bind_rows(lapply(obj$models, function(m)
+    data.frame(method = as.character(m$method))),
+    .id = "model"))
+
+  if (is.null(obj$evaluate)) {
+    mdls
+  } else {
+    inner_join(mdls, obj$evaluate, by = "model")
+  }
 }
+
 
 #' Get the Best Performing Model
 #'

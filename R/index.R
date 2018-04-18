@@ -12,14 +12,14 @@ new_index <- function(unit, periods, start, end) {
 
 
 #' @export
-index <- function(x, units, periods) {
+index <- function(x, units) {
   UseMethod("index")
 }
 
 
 #' @rdname
 #' @export
-index.numeric <- index.integer <- function(x) {
+index.numeric <- index.integer <- function(x, unit = NULL) {
   unit <- mean(diff(x))
   if ((unit %% 1) != 0) {
     stop("index not regular")
@@ -38,9 +38,9 @@ index.numeric <- index.integer <- function(x) {
 
 #' @rdname index
 #' @export
-index.Date <- function(x, unit = "days", periods = NULL) {
+index.Date <- function(x, unit = "days") {
   checkmate::assert_choice(unit, c("days", "weeks", "months", "years"))
-  checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
+  #checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
   if ((periods %% 1) != 0) {
     stop("index not regular")
@@ -60,7 +60,7 @@ index.Date <- function(x, unit = "days", periods = NULL) {
 
 #' @rdname index
 #' @export
-index.POSIXct <- index.POSIXt <- function(x, unit = "hours", periods = NULL) {
+index.POSIXct <- index.POSIXt <- function(x, unit = "hours") {
   checkmate::assert_choice(unit, c("seconds", "minutes", "hours", "days"))
   checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
@@ -103,7 +103,6 @@ extend.index <- function(obj, length_out) {
 
 #' @rdname extend
 #' @export
-#' @importFrom lubridate seconds, minutes, hours, days, weeks, months, years
 extend.time_index <- function(obj, length_out) {
   obj$end + match.fun(obj$unit)(seq(
     from = 1,

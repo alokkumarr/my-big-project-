@@ -4,9 +4,9 @@
 \alias{forecaster}
 \title{Forecaster Constructer Function}
 \usage{
-forecaster(df, target, frequency = NULL, prediction_conf_levels = c(80, 95),
-  name = NULL, id = NULL, version = NULL, desc = NULL,
-  scientist = NULL, dir = NULL, ...)
+forecaster(df, target, index_var, unit = NULL, frequency = NULL,
+  prediction_conf_levels = c(80, 95), name = NULL, id = NULL,
+  version = NULL, desc = NULL, scientist = NULL, dir = NULL, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}
@@ -14,9 +14,14 @@ forecaster(df, target, frequency = NULL, prediction_conf_levels = c(80, 95),
 \item{target}{target variable for supervised use cases such as forecaster,
 regresser, and classifier}
 
-\item{frequency}{seasonaly frequency of target. Default is NULL - no seasonality}
+\item{index_var}{column name of index variable. index variable should be
+either sequential numeric, date or datetime.}
 
-\item{prediction_conf_levels}{prediction confidence levels. Default is 80 & 95% CIs}
+\item{frequency}{seasonaly frequency of target. Default is NULL - no
+seasonality}
+
+\item{prediction_conf_levels}{prediction confidence levels. Default is 80 &
+95% CIs}
 
 \item{name}{optional name for use case. Default is to append target with type}
 
@@ -32,6 +37,9 @@ system user}
 \item{dir}{optional directory path for saving reports, data and models}
 
 \item{...}{any addtional parameters}
+
+\item{units}{index variable unit for date or datetime variables. ex - days
+for date index variable.}
 }
 \description{
 Creates a forecaster object which inherits from modeler class

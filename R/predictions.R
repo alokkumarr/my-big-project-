@@ -32,9 +32,9 @@ print.predictions <- function(obj) {
   cat("---------------------------- \n")
   cat(obj$type, "predictions \n")
   cat("---------------------------- \n\n")
-  cat("model id    :", obj$model$id, "\n")
-  cat("model method:", obj$model$method, "\n")
-  cat("created on  :", as.character(obj$created_on), "\n")
-  cat("predictions :", "\n")
+  cat("model id           :", obj$model$id, "\n")
+  cat("model method       :", obj$model$method, "\n")
+  cat("created on         :", as.character(obj$created_on), "\n")
+  cat("sample predictions :", "\n")
   print(head(obj$predictions))
 }

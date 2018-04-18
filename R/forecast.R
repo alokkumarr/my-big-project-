@@ -14,33 +14,27 @@ forecast_methods <- c(
 )
 
 
-
 #' @rdname fit
 #' @export
-fit.forecast_model <- function(obj, data, ...){
-
-  method <- obj$method
-  method_args <- obj$method_args
-  target <- obj$target
-
+fit.forecast_model <- function(obj, data, ...) {
   checkmate::assert_data_frame(data)
-  checkmate::assert_choice(method, forecast_methods)
+  checkmate::assert_choice(obj$method, forecast_methods)
 
-  y <- as.numeric(data[[target]])
-  if(ncol(data) > 1){
-    xreg <- data[, colnames(data) != target, drop=FALSE]
-  }else{
+  y <- as.numeric(data[[obj$target]])
+  x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
+  if (length(x_vars) > 0) {
+    xreg <- data[, x_vars, drop = FALSE]
+  } else{
     xreg <- NULL
   }
 
-  args <- modifyList(method_args, list(y = y, xreg = xreg))
-  m <- do.call(method, args)
+  args <- modifyList(obj$method_args, list(y = y, xreg = xreg))
+  m <- do.call(obj$method, args)
   obj$fit <- m
   obj$last_updated <- Sys.time()
   obj$status <- "trained"
   obj
 }
-
 
 
 #' Forecast Model Fitted Method
@@ -50,23 +44,18 @@ fitted.forecast_model <- function(obj) {
 }
 
 
-
-
 #' Forecast Prediction Method
 #' @rdname predict
 predict.forecast_model <- function(obj,
                                    periods,
                                    data = NULL,
                                    level = c(80, 95)) {
-  method_args <- obj$method_args
-  target <- obj$target
-
   if (!is.null(data)) {
     if (nrow(data) != periods) {
       warning("number of data rows doesn't match forecast periods")
     }
 
-    x_vars <- setdiff(colnames(data), target)
+    x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
     if (length(x_vars) > 0) {
       xreg <- data[, x_vars, drop = FALSE]
     } else {
@@ -78,7 +67,7 @@ predict.forecast_model <- function(obj,
 
   f <- do.call("forecast",
                modifyList(
-                 method_args,
+                 obj$method_args,
                  list(
                    object = obj$fit,
                    xreg = xreg,
@@ -202,11 +191,12 @@ train.forecast_model <- function(mobj, indicies, level) {
   mobj$performance <- indicies
   for (i in seq_along(indicies)) {
     index <- indicies[[i]]
+    train_index <- index$train
     checkmate::assert_subset(names(index), c("train", "validation", "test"))
 
     # Fit model to training sample
     mobj <- fit(mobj,
-                data = mobj$pipe$output %>% dplyr::slice(index$train))
+                data = mobj$pipe$output %>% dplyr::slice(train_index))
     fitted <- fitted(mobj)
     train <- data.frame("index" = index$train, "fitted" = fitted)
     perf <- list("train" = train)
@@ -214,11 +204,12 @@ train.forecast_model <- function(mobj, indicies, level) {
     # Add predictions for validation, test or both
     samples <- names(index)[! sapply(index, is.null)]
     for(smpl in setdiff(samples, "train")){
+      smpl_index <- index[[smpl]]
       predicted <- predict(mobj,
-                           data = mobj$pipe$output %>% dplyr::slice(index[[smpl]]),
-                           periods = length(index[[smpl]]),
+                           data = mobj$pipe$output %>% dplyr::slice(smpl_index),
+                           periods = length(smpl_index),
                            level = level)
-      smpl_list <- list(data.frame("index" = index[[smpl]], predicted))
+      smpl_list <- list(data.frame("index" = smpl_index, predicted))
       names(smpl_list) <- smpl
       perf <- c(perf, smpl_list)
     }
