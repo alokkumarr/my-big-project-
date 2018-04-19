@@ -83,6 +83,10 @@ detect.data.frame <- function(df,
     stop("trend_window has to be greater than zero and less than 1. Recommend 0.5 or 0.75")
   }
 
+  if (frequency < 1 | is.null(frequency)) {
+    stop("frequency must be positive. see https://robjhyndman.com/hyndsight/seasonal-periods/ for guidance")
+  }
+
 
   col_names <- colnames(df)
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
@@ -162,6 +166,9 @@ detect.grouped_df <- function(df,
     stop("trend_window has to be greater than zero and less than 1. Recommend 0.5 or 0.75")
   }
 
+  if (frequency < 1 | is.null(frequency)) {
+    stop("frequency must be positive. see https://robjhyndman.com/hyndsight/seasonal-periods/ for guidance")
+  }
 
 
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
@@ -194,6 +201,7 @@ detect.grouped_df <- function(df,
     dplyr::arrange_at(index_var) %>%
     dplyr::select_at(c(index_var, measure_var, 'seasonal', 'trend', 'resid', 'anomaly'))
 }
+
 
 #' Anomaly Dectection Wrapper Function
 #'
@@ -234,21 +242,21 @@ detecter.data.frame <- function(df,
 
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
-    melter(.,
-           id_vars = c(index_var, group_vars),
-           measure_vars,
-           variable_name = "measure",
-           value_name = "value") %>%
+    a2munge::melter(.,
+                    id_vars = c(index_var, group_vars),
+                    measure_vars,
+                    variable_name = "measure",
+                    value_name = "value") %>%
     dplyr::group_by_at(c(group_vars, "measure")) %>%
     do(
-      detect(.,
-             index_var = index_var,
-             measure_var = "value",
-             frequency = frequency,
-             alpha = alpha,
-             direction = direction,
-             max_anoms = max_anoms,
-             trend_window = trend_window)
+      a2munge::detect(.,
+                      index_var = index_var,
+                      measure_var = "value",
+                      frequency = frequency,
+                      alpha = alpha,
+                      direction = direction,
+                      max_anoms = max_anoms,
+                      trend_window = trend_window)
     ) %>%
     dplyr::ungroup()
 }

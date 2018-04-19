@@ -1,7 +1,7 @@
 Package: a2munge
 Title: Synchronoss Advanced Analytics Data Munging R Package
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: Data munging functionality to support Synchronoss Advanced Analytics applications. Includes functions for data ingestion, data preperation, data transformation and data enrichment. The package supports both base R and Spark DataFrame objects. 
 Depends: R (>= 3.4.0)
 License: file LICENSE
@@ -15,5 +15,7 @@ Imports:
     tidyr,
     rlang,
     zoo,
-Suggests: testthat
+    checkmate (>= 1.8.2),
+Suggests: 
+    testthat
 RoxygenNote: 6.0.1.9000
