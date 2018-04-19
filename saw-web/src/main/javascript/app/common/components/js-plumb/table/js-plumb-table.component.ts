@@ -28,6 +28,7 @@ require('./js-plumb-table.component.scss');
 export class JsPlumbTableComponent {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
   @Input() plumbInstance: any;
+  @Input() useAggregate: boolean;
   @Input('artifact') set setArtifact(artifact: Artifact) {
     this.artifact = artifact;
     this.columns = sortBy(artifact.columns, (column: ArtifactColumnReport) => {

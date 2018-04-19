@@ -24,7 +24,8 @@
            class="jsp-table__column-actions"
            fxLayout="row"
            fxLayoutAlign="space-between center">
-        <aggregate-chooser-u (change)="onAggregateChange(column, $event)"
+        <aggregate-chooser-u *ngIf="useAggregate"
+                            (change)="onAggregateChange(column, $event)"
                             [aggregate]="column.aggregate"
                             [type]="column.type">
         </aggregate-chooser-u>

@@ -28,6 +28,7 @@ require('./js-plumb-canvas.component.scss');
 })
 export class JsPlumbCanvasComponent {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
+  @Input() useAggregate: boolean;
   @Input() artifacts: Artifact[];
   @Input() joins: Join[] = [];
   private _jsPlumbInst: any;

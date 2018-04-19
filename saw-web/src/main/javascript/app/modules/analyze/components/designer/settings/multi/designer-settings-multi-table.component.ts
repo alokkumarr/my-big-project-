@@ -24,6 +24,7 @@ require('./designer-settings-multi-table.component.scss');
 })
 export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Input() useAggregate: boolean;
   @Input('artifacts') set setArtifacts(artifacts: Artifact[]) {
     this.artifacts = this.setDefaultArtifactPosition(artifacts);
   }

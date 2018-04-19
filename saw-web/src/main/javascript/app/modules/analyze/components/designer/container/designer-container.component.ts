@@ -246,25 +246,29 @@ export class DesignerContainerComponent {
 
   getSqlBuilder(): SqlBuilder {
     let partialSqlBuilder;
+    let sortProp: 'sorts' | 'orderByColumns';
 
     switch (this.analysis.type) {
     case 'pivot':
       partialSqlBuilder = this._designerService.getPartialPivotSqlBuilder(this.artifacts[0].columns);
+      sortProp = 'sorts';
       break;
     case 'esReport':
       partialSqlBuilder = this._designerService.getPartialEsReportSqlBuilder(this.artifacts[0].columns);
+      sortProp = 'sorts';
       break;
     case 'report':
       partialSqlBuilder = {
         joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
       };
+      sortProp = 'orderByColumns';
       break;
     }
 
     return {
       booleanCriteria: this.booleanCriteria,
       filters: this.filters,
-      sorts: this.sorts,
+      [sortProp]: this.sorts,
       ...partialSqlBuilder
     }
   }

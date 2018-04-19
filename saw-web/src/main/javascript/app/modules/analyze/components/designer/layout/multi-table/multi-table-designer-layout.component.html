@@ -7,10 +7,10 @@
                         (change)="onQueryChange()"
                         (save)="onSaveQuery($event)"
   ></designer-settings-query>
-
   <designer-settings-multi-table *ngIf="!isInQueryMode"
                                  (change)="change.emit($event)"
                                  [artifacts]="artifacts"
+                                 [useAggregate]="analysis.type === 'esReport'"
                                  [sqlBuilder]="sqlBuilder">
   </designer-settings-multi-table>
 
