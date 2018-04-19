@@ -8,6 +8,7 @@ library(a2modeler)
 library(forecast)
 library(dplyr)
 library(lubridate)
+library(sparklyr)
 
 context("forecaster class unit tests")
 
@@ -326,4 +327,55 @@ test_that("Auto Forecaster data.frame test case", {
   expect_data_frame(af2, nrow=20)
 })
 
+
+
+
+
+test_that("Spark Forecaster test case", {
+
+
+  dat3 <- rbind(dat1 %>% mutate(group = "A"),
+                dat1 %>% mutate(group = "B"))
+
+  # Create Spark Connection and read in some data
+  sc <- spark_connect(master = "local")
+
+  # Load data into Spark
+  dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
+
+  r_f1 <- forecaster(dat3,
+                    index_var = "index",
+                    group_vars = "group",
+                    measure_vars = c("y"),
+                    periods = 10,
+                    unit = NULL,
+                    pipe = NULL,
+                    models = list(
+                      list(method = "auto.arima", method_args = list()),
+                      list(method = "ets", method_args = list())))
+
+  spk_f1 <- forecaster(dat3_tbl,
+                    index_var = "index",
+                    group_vars = "group",
+                    measure_vars = c("y"),
+                    periods = 10,
+                    unit = NULL,
+                    pipe = NULL,
+                    models = list(
+                      list(method = "auto.arima", method_args = list()),
+                      list(method = "ets", method_args = list())))
+
+  expect_equal(
+    spk_f1 %>%
+      arrange(group, measure, index) %>%
+      select_if(is.numeric) %>%
+      collect() %>%
+      round(5) ,
+    r_f1 %>%
+      arrange(group, measure, index) %>%
+      select_if(is.numeric) %>%
+      round(5)
+  )
+
+})
 

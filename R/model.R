@@ -180,11 +180,11 @@ add_models <- function(obj,
 
     model_args <- modifyList(
       list(pipe = pipe,
-               target = obj$target,
-               method = models[[i]]$method,
-               class = class,
-               desc = NULL,
-               path = NULL),
+           target = obj$target,
+           method = models[[i]]$method,
+           class = class,
+           desc = NULL,
+           path = NULL),
       models[[i]]$method_args)
     m <- do.call("model", model_args)
     m$status <- "added"

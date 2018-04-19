@@ -165,3 +165,50 @@ rmse.tbl_spark <- function(x, predicted, actual){
     dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
     dplyr::collect()
 }
+
+
+
+
+
+
+#' @export MAPE
+#' @rdname measures
+MAPE <- measure(id = "MAPE",
+                method = "mape",
+                method_args = list("x", "predicted", "actual"),
+                minimize = TRUE,
+                best = 0,
+                worst = Inf,
+                properties = c("modeler", "regresser", "forecaster"),
+                name = "Mean Absolute Percentage Error",
+                note = "The MAPE is defined as abs(actual - predicted) / actual")
+
+
+
+#' Generic mape function
+#' @export
+mape <- function(...){
+  UseMethod("mape")
+}
+
+
+#' @export
+#' @rdname mape
+mape.data.frame <- function(x, predicted, actual){
+  checkmate::assert_choice(predicted, colnames(x))
+  checkmate::assert_choice(actual, colnames(x))
+  c("mape" = mean(abs((actual - predicted) / acutal)))
+}
+
+
+#' @importFrom magrittr %>%
+#' @export
+#' @rdname mape
+mape.tbl_spark <- function(x, predicted, actual){
+  checkmate::assert_choice(predicted, colnames(x))
+  checkmate::assert_choice(actual, colnames(x))
+  x %>%
+    dplyr::summarise_at(actual, funs(mape = mean(abs((. - !!rlang::sym(predicted))/ .)))) %>%
+    dplyr::collect()
+}
+

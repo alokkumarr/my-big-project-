@@ -16,18 +16,18 @@
 #' @aliases forecaster
 #' @export
 new_forecaster <- function(df,
-                       target,
-                       index_var,
-                       unit = NULL,
-                       frequency = NULL,
-                       prediction_conf_levels = c(80, 95),
-                       name = NULL,
-                       id = NULL,
-                       version = NULL,
-                       desc = NULL,
-                       scientist = NULL,
-                       dir = NULL,
-                       ...){
+                           target,
+                           index_var,
+                           unit = NULL,
+                           frequency = NULL,
+                           prediction_conf_levels = c(80, 95),
+                           name = NULL,
+                           id = NULL,
+                           version = NULL,
+                           desc = NULL,
+                           scientist = NULL,
+                           dir = NULL,
+                           ...){
 
   checkmate::assert_choice(index_var, colnames(df))
   checkmate::assert_numeric(frequency, lower = 1, null.ok = TRUE)
@@ -241,12 +241,13 @@ auto_forecaster <- function(df,
                  index_var = index_var,
                  unit = unit,
                  name = "auto-forecaster") %>%
+    add_holdout_samples(., splits = splits) %>%
     add_models(pipe = if(is.null(pipe)) pipeline() else pipe,
                models = models,
                class = "forecast_model") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE) %>%
     predict(periods = periods, level = conf_levels)
 }
 
@@ -272,8 +273,8 @@ forecaster.data.frame <- function(df,
                                   periods,
                                   unit = NULL,
                                   pipe = NULL,
-                                  models = list(method = "auto.arima",
-                                                method_args = list()),
+                                  models = list(list(method = "auto.arima",
+                                                method_args = list())),
                                   splits = c(.8, .2),
                                   conf_levels = c(80, 95)) {
 
@@ -290,7 +291,10 @@ forecaster.data.frame <- function(df,
   if(is.null(pipe))
     pipe <- pipeline(expr = function(x) x[, "y", drop=FALSE])
 
-
+  conf_levels_names <- do.call("c",
+                               lapply(conf_levels,
+                                      function(x)
+                                        paste(c("lower", "upper"), x, sep = "")))
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
     a2munge::melter(.,
@@ -311,52 +315,100 @@ forecaster.data.frame <- function(df,
                       conf_levels = conf_levels) %>%
         .$predictions
     ) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::select_at(c(index_var, group_vars, "measure", "mean", conf_levels_names))
 }
-
 
 
 #' @export
 #' @rdname forecaster
 forecaster.tbl_spark <- function(df,
-                                      index_var,
-                                      group_vars = NULL,
-                                      measure_vars,
-                                      periods,
-                                      unit = NULL,
-                                      models = list(method = "auto.arima",
-                                                    method_args = list()),
-                                      splits = c(.8, .2),
-                                      conf_levels = c(80, 95)) {
-
+                                 index_var,
+                                 group_vars = NULL,
+                                 measure_vars,
+                                 periods,
+                                 unit = NULL,
+                                 pipe = NULL,
+                                 models = list(list(method = "auto.arima",
+                                               method_args = list())),
+                                 splits = c(.8, .2),
+                                 conf_levels = c(80, 95)) {
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_subset(group_vars, df_names)
   checkmate::assert_subset(measure_vars, df_names)
   checkmate::assert_number(periods, lower = 0)
   checkmate::assert_list(models)
-  checkmate::assert_numeric(splits, lower=0, upper=1, min.len = 2, max.len = 3)
-  checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
-                            min.len = 1, max.len = 2)
+  checkmate::assert_numeric(
+    splits,
+    lower = 0,
+    upper = 1,
+    min.len = 2,
+    max.len = 3
+  )
+  checkmate::assert_numeric(
+    conf_levels,
+    lower = 50,
+    upper = 100,
+    min.len = 1,
+    max.len = 2
+  )
 
+  conf_levels_names <- do.call("c",
+                               lapply(conf_levels,
+                                      function(x)
+                                        paste(c("lower", "upper"), x, sep = "")))
+  spk_names <- c(index_var, "mean", conf_levels_names)
 
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
-    a2munge::melter(.,
-                    id_vars = c(index_var, group_vars),
-                    measure_vars,
-                    variable_name = "measure",
-                    value_name = "y") %>%
+    a2munge::melter(
+      .,
+      id_vars = c(index_var, group_vars),
+      measure_vars,
+      variable_name = "measure",
+      value_name = "y"
+    ) %>%
     sparklyr::spark_apply(.,
                           function(e, l) {
+                            library(forecast)
+                            library(a2modeler)
+                            library(dplyr)
+                            library(checkmate)
+                            library(lubridate)
 
-                            fun(e[, c(l$index_var, l$target)])
+                            f1 <- new_forecaster(e[, c(l$target, l$index_var)],
+                                                 target = l$target,
+                                                 index_var = l$index_var,
+                                                 unit = l$unit,
+                                                 name = "auto-forecaster") %>%
+                              add_holdout_samples(., splits = l$splits) %>%
+                              add_models(.,
+                                         pipe = l$pipe,
+                                         models = l$models,
+                                         class = "forecast_model") %>%
+                              train_models(.) %>%
+                              evaluate_models(.) %>%
+                              set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+
+                            p1 <- predict(f1, periods = l$periods, level = l$conf_levels)
+                            p1$predictions
+
                           },
                           group_by = c(group_vars, "measure"),
-                          names = c(),
+                          names = spk_names,
+                          packages = TRUE,
                           context = {
                             l = list(
-
+                              target = "y",
+                              index_var = index_var,
+                              periods = periods,
+                              unit = unit,
+                              pipe = pipe,
+                              models = models,
+                              splits = splits,
+                              conf_levels = conf_levels
                             )
-                          })
+                          }) %>%
+    dplyr::select_at(c(index_var, group_vars, "measure", "mean", conf_levels_names))
 }
