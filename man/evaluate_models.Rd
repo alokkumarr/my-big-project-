@@ -5,7 +5,7 @@
 \alias{evaluate_models}
 \title{Evalutate Models Generic Function}
 \usage{
-\method{evaluate_models}{forecaster}(obj)
+\method{evaluate_models}{forecaster}(obj, ids = NULL)
 
 evaluate_models(obj, ...)
 }

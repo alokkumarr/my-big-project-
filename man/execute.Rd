@@ -3,12 +3,15 @@
 \name{execute}
 \alias{execute}
 \alias{execute.tbl_spark}
+\alias{execute.NULL}
 \alias{execute.modeler}
 \title{Pipeline Execute function}
 \usage{
 execute(x, pipe)
 
 \method{execute}{tbl_spark}(x, pipe)
+
+\method{execute}{NULL}(x, pipe)
 
 \method{execute}{modeler}(x, pipe)
 }

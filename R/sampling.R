@@ -13,7 +13,7 @@ new_samples <-  function(validation_method,
                          indicies_names,
                          test_index) {
   checkmate::assert_character(validation_method, len = 1)
-  checkmate::assert_list(validation_args, unique = TRUE)
+  checkmate::assert_list(validation_args)
   checkmate::assert_number(test_holdout_prct, lower = 0, upper = 1, null.ok = TRUE)
   checkmate::assert_character(test_holdout_method, len = 1, null.ok = TRUE)
   checkmate::assert_number(downsample_prct, lower = 0, upper = 1, null.ok = TRUE)
@@ -446,8 +446,6 @@ holdout.tbl_spark <- function(x, split){
 }
 
 
-
-
 # random_samples ----------------------------------------------------------
 
 
@@ -457,7 +455,7 @@ holdout.tbl_spark <- function(x, split){
 #' create data samples
 #'
 #' @param x numeric vector, dataframe, spark dataframe, or modeler object to
-#'   create holdout samples from
+#'   create samples from
 #' @param number number of resamples to create
 #' @param amount percent of data to randomly sample
 #' @param seed optional input for setting random seed
@@ -495,7 +493,6 @@ resample.data.frame <- function(x, number, amount, seed = NULL){
 #' @rdname resample
 #' @export
 resample.tbl_spark <- function(x, amount, seed = NULL){
-
   z <- 1:sparklyr::sdf_nrow(x)
   resample(z, number, amount, seed)
 }
@@ -593,7 +590,6 @@ add_resample_samples.modeler <- function(x, number, amount, test_holdout_prct = 
 }
 
 
-
 #' @rdname add_resample_samples
 #' @export
 add_resample_samples.forecaster <- function(x, number, amount, test_holdout_prct = NULL, seed = NULL){
@@ -602,4 +598,183 @@ add_resample_samples.forecaster <- function(x, number, amount, test_holdout_prct
        "\n  Use either default, holdout or time_slices samples. ")
 }
 
+
+
+# time_slice_samples ------------------------------------------------------
+
+
+#' Time Slice Sample function
+#'
+#'
+#' @param x numeric vector, dataframe, spark dataframe, or modeler object to
+#'   create samples from
+#' @param width number of training sample periods
+#' @param horizon number of test sample periods
+#' @param skip number of samples skipped. used to thin sample pairs
+#' @param fixed_width logical option to keep all training widths the same.
+#'   default is TRUE
+#' @export
+#' @note similiar in design to caret's createTimeSlices function
+#'   \url{https://github.com/topepo/caret/blob/master/pkg/caret/R/createDataPartition.R}
+#'
+time_slice <- function(x, width, horizon, skip, fixed_width) {
+  UseMethod("time_slice")
+}
+
+
+
+#' @rdname time_slice
+#' @export
+time_slice.integer <-
+  time_slice.numeric <-  function(x,
+                                  width,
+                                  horizon,
+                                  skip = 0,
+                                  fixed_width = TRUE) {
+    n <- length(x)
+    checkmate::assert_numeric(x, any.missing = FALSE)
+    checkmate::assert_number(width, lower = 1, upper = n - 1)
+    checkmate::assert_number(horizon, lower = 1, upper = n - width)
+    checkmate::assert_number(skip, lower = 0, upper = n - 1)
+    checkmate::assert_flag(fixed_width)
+
+    stops <- seq(width, (n - horizon), by = skip + 1)
+
+    if (fixed_width) {
+      starts <- stops - width + 1
+    } else {
+      starts <- rep(1, length(stops)) # all start at 1
+    }
+
+    train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
+    validation <-
+      mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
+    labels <- paste("slice", gsub(" ", "0", format(starts)), sep = "")
+    names(train) <- labels
+    names(validation) <- labels
+
+    out <- list(train = train, validation = validation)
+
+    out
+  }
+
+
+#' @rdname time_slice
+#' @export
+time_slice.data.frame <- function(x, width, horizon, skip = 0, fixed_width = TRUE){
+  z <- 1:nrow(x)
+  time_slice(z, width, horizon, skip, fixed_width)
+}
+
+
+#' @rdname time_slice
+#' @export
+time_slice.tbl_spark <- function(x, width, horizon, skip = 0, fixed_width = TRUE){
+  z <- 1:sparklyr::sdf_nrow(x)
+  time_slice(z, width, horizon, skip, fixed_width)
+}
+
+
+
+#' Add Time Slice function
+#'
+#' Function creates a new samples object with time slice resamples based on
+#' configuration. Each index is time slice sample of the dataset
+#'
+#' The function creates train and validation pairs
+#'
+#' @inheritParams time_slice
+#'
+#' @return either an updated modeler object if provided otherwise a samples
+#'   object with resamples
+#' @export
+#'
+#' @examples
+#'
+#' # Data.frame example
+#' add_time_slice_samples(mtcars, number = 5, amount = .5)
+add_time_slice_samples <- function(x, width, horizon, skip = 0, fixed_width = TRUE){
+  UseMethod("add_time_slice_samples")
+}
+
+
+#' @rdname add_time_slice_samples
+#' @export
+add_time_slice_samples.numeric <- function(x, width, horizon, skip = 0, fixed_width = TRUE){
+
+  ts1 <- time_slice(x, width, horizon, skip, fixed_width)
+
+  train_indicies <- ts1$train
+  val_indicies <- ts1$validation
+
+  samples(
+    validation_method = "time_slice",
+    validation_args = list(width = width, horizon = horizon,
+                           skip = skip, fixed_width = fixed_width),
+    test_holdout_prct = 0,
+    test_holdout_method = "none",
+    downsample_prct = NULL,
+    train_indicies = train_indicies,
+    validation_indicies = val_indicies,
+    indicies_names = names(train_indicies),
+    test_index = NULL
+  )
+}
+
+
+
+#' @rdname add_time_slice_samples
+#' @export
+add_time_slice_samples.data.frame <- function(x,
+                                              width,
+                                              horizon,
+                                              skip = 0,
+                                              fixed_width = TRUE) {
+  z <- 1:nrow(x)
+  add_time_slice_samples(
+    z,
+    width = width,
+    horizon = horizon,
+    skip = skip,
+    fixed_width = fixed_width
+  )
+}
+
+
+#' @rdname add_time_slice_samples
+#' @export
+add_time_slice_samples.tbl_spark <- function(x,
+                                             width,
+                                             horizon,
+                                             skip = 0,
+                                             fixed_width = TRUE) {
+  z <- 1:sparklyr::sdf_nrow(x)
+  add_time_slice_samples(
+    z,
+    width = width,
+    horizon = horizon,
+    skip = skip,
+    fixed_width = fixed_width
+  )
+}
+
+
+#' @rdname add_time_slice_samples
+#' @export
+add_time_slice_samples.forecaster <- function(x,
+                                              width,
+                                              horizon,
+                                              skip = 0,
+                                              fixed_width = TRUE) {
+  time_slice_samples <-
+    add_time_slice_samples(
+      x$data,
+      width = width,
+      horizon = horizon,
+      skip = skip,
+      fixed_width = fixed_width
+    )
+  x$samples <- time_slice_samples
+  x
+}
 

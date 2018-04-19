@@ -15,6 +15,7 @@ Imports:
     tidyr,
     rlang,
     zoo,
+    lubridate,
     checkmate (>= 1.8.2),
 Suggests: 
     testthat

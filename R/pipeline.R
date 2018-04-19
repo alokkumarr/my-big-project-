@@ -93,6 +93,19 @@ execute.tbl_spark <- execute.data.frame <- function(x, pipe){
 
 #' @rdname execute
 #' @export
+execute.NULL <- function(x, pipe){
+  checkmate::assert_class(pipe, "pipeline")
+  a1 <- Sys.time()
+  pipe$output <- NULL
+  a2 <- Sys.time()
+  pipe$runtime <- as.numeric(a2 - a1)
+  pipe
+}
+
+
+
+#' @rdname execute
+#' @export
 execute.modeler <- function(x, pipe){
   execute(x$data, pipe)
 }

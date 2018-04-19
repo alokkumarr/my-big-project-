@@ -8,7 +8,8 @@
 \method{predict}{forecast_model}(obj, periods, data = NULL, level = c(80,
   95))
 
-\method{predict}{forecaster}(obj, periods, data = NULL, level = c(80, 95))
+\method{predict}{forecaster}(obj, periods, data = NULL, level = c(80, 95),
+  desc = "")
 }
 \description{
 Method makes predictions for Forecaster's final model

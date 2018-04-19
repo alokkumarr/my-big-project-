@@ -1,41 +1,71 @@
 
 
+#
+# # Forecast methods currently supported
+# forecast_methods <- c(
+#   "Arima" = "Arima",
+#   "Fractionally Differenced Arima"= "arfima",
+#   "Auto Arima" = "auto.arima",
+#   "Auto Fourier" = "auto_fourier",
+#   "ETS with boxcox, ARIMA errors, Trend and Seasonal" = "bats",
+#   "Exponentially Smoothing State Space"  = "ets",
+#   "Neural Network Time Series" = "nnetar",
+#   "BATS with Trigonometric Seasonal" = "tbats"
+# )
 
 # Forecast methods currently supported
-forecast_methods <- c(
-  "Arima" = "Arima",
-  "Fractionally Differenced Arima"= "arfima",
-  "Auto Arima" = "auto.arima",
-  "Auto Fourier" = "auto_fourier",
-  "ETS with boxcox, ARIMA errors, Trend and Seasonal" = "bats",
-  "Exponentially Smoothing State Space"  = "ets",
-  "Neural Network Time Series" = "nnetar",
-  "BATS with Trigonometric Seasonal" = "tbats"
+forecast_methods <- data.frame(
+  method =  c(
+    "Arima",
+    "arfima",
+    "auto.arima",
+    "auto_fourier",
+    "bats",
+    "ets",
+    "nnetar",
+    "tbats"
+  ),
+  name = c(
+    "Arima",
+    "Fractionally Differenced Arima",
+    "Auto Arima",
+    "Auto Fourier",
+    "ETS with boxcox, ARIMA errors, Trend and Seasonal",
+    "Exponentially Smoothing State Space",
+    "Neural Network Time Series",
+    "BATS with Trigonometric Seasonal"
+  ),
+  package = c(
+    "forecast",
+    "forecast",
+    "forecast",
+    "a2modeler",
+    "forecast",
+    "forecast",
+    "forecast",
+    "forecast"
+  )
 )
-
 
 
 #' @rdname fit
 #' @export
-fit.forecast_model <- function(obj, data, ...){
-
-  method <- obj$method
-  method_args <- obj$method_args
-  target <- obj$target
-
+fit.forecast_model <- function(obj, data, ...) {
   checkmate::assert_data_frame(data)
-  checkmate::assert_choice(method, forecast_methods)
+  checkmate::assert_choice(obj$method, as.character(forecast_methods$method))
 
-  y <- as.numeric(data[[target]])
-  if(ncol(data) > 1){
-    xreg <- data[, colnames(data) != target, drop=FALSE]
-  }else{
+  y <- as.numeric(data[[obj$target]])
+  x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
+  if (length(x_vars) > 0) {
+    xreg <- data[, x_vars, drop = FALSE]
+  } else{
     xreg <- NULL
   }
 
-  args <- modifyList(method_args, list(y = y, xreg = xreg))
-  m <- do.call(method, args)
-  #obj$fit <- structure(m, class = c("forecast_fit", class(m)))
+  args <- modifyList(obj$method_args, list(y = y, xreg = xreg))
+  pkg <- as.character(filter(forecast_methods, method == obj$method)$package)
+  fun <- get(obj$method, asNamespace(pkg))
+  m <- do.call(fun, args)
   obj$fit <- m
   obj$last_updated <- Sys.time()
   obj$status <- "trained"
@@ -43,28 +73,27 @@ fit.forecast_model <- function(obj, data, ...){
 }
 
 
-
 #' Forecast Model Fitted Method
 #' @rdname fitted
+#' @export
 fitted.forecast_model <- function(obj) {
   as.numeric(fitted(obj$fit))
 }
 
 
-
 #' Forecast Prediction Method
 #' @rdname predict
+#' @export
 predict.forecast_model <- function(obj,
                                    periods,
                                    data = NULL,
                                    level = c(80, 95)) {
-  method_args <- obj$method_args
-  target <- obj$target
-
   if (!is.null(data)) {
-    obj$pipe <- execute(data, obj$pipe)
-    data <- obj$pipe$output
-    x_vars <- setdiff(colnames(data), target)
+    if (nrow(data) != periods) {
+      warning("number of data rows doesn't match forecast periods")
+    }
+
+    x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
     if (length(x_vars) > 0) {
       xreg <- data[, x_vars, drop = FALSE]
     } else {
@@ -74,9 +103,10 @@ predict.forecast_model <- function(obj,
     xreg <- NULL
   }
 
-  f <- do.call("forecast",
+  fun <- get("forecast", asNamespace("forecast"))
+  f <- do.call(fun,
                modifyList(
-                 method_args,
+                 obj$method_args,
                  list(
                    object = obj$fit,
                    xreg = xreg,
@@ -88,23 +118,17 @@ predict.forecast_model <- function(obj,
 }
 
 
-
+#' @export
 #' @rdname summary
 summary.forecast_model <- function(mobj){
   mobj$fit
 }
 
 
+#' @export
 #' @rdname print
 print.forecast_model <- function(mobj){
   mobj$fit
-}
-
-
-
-#' @export
-get_forecasts <- function(x, ...) {
-  UseMethod("get_forecasts", x)
 }
 
 
@@ -196,4 +220,43 @@ evaluate.forecast_model <- function(mobj, target_df, measure) {
     setNames(c("model", "sample", "indicie", measure$method))
 
    mobj
+}
+
+
+
+#' @rdname train
+#' @export
+train.forecast_model <- function(mobj, indicies, level) {
+  checkmate::assert_list(indicies)
+  mobj$performance <- indicies
+  for (i in seq_along(indicies)) {
+    index <- indicies[[i]]
+    train_index <- index$train
+    checkmate::assert_subset(names(index), c("train", "validation", "test"))
+
+    # Fit model to training sample
+    mobj <- fit(mobj,
+                data = mobj$pipe$output %>% dplyr::slice(train_index))
+    fitted <- fitted(mobj)
+    train <- data.frame("index" = index$train, "fitted" = fitted)
+    perf <- list("train" = train)
+
+    # Add predictions for validation, test or both
+    samples <- names(index)[! sapply(index, is.null)]
+    for(smpl in setdiff(samples, "train")){
+      smpl_index <- index[[smpl]]
+      predicted <- predict(mobj,
+                           data = mobj$pipe$output %>% dplyr::slice(smpl_index),
+                           periods = length(smpl_index),
+                           level = level)
+      smpl_list <- list(data.frame("index" = smpl_index, predicted))
+      names(smpl_list) <- smpl
+      perf <- c(perf, smpl_list)
+    }
+
+    mobj$performance[[i]] <- perf
+    mobj$status <- "trained"
+  }
+
+  mobj
 }
