@@ -102,7 +102,7 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
-      return AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode)
+      return AnalyzeDialogService.openEditAnalysisDialog(analysis, mode)
         .afterClosed().first().toPromise();
     default:
     }

@@ -7,7 +7,7 @@ module.exports = {
   aggregateFunctionMenuItem: aggregateFunction => element(by.xpath(`//button[@role="menuitem"]/mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   filterWindow: {
     numberInput: element(by.xpath("(//input[@type='number'])[2]")),
-    columnDropDown: element(by.xpath('//span[text()="Column"]')),
+    columnDropDown: element(by.css('input[e2e="filter-autocomplete-input"]')),
     columnNameDropDownItem: columnName => element(by.xpath(`(//mat-option/span[contains(text(),"${columnName}")])[1]`)),
     date: {
       presetDropDown: element(by.xpath('//span[contains(text(),"Custom")]')),
@@ -19,8 +19,8 @@ module.exports = {
       input: element(by.xpath(`//*[@e2e="filter-string-input"]`))
     },
     number: {
-      operator: element(by.xpath('//span[text()="Operator"]')),
-      operatorDropDownItem: operator => element(by.xpath(`(//span[contains(text(),"${operator}")])[1]`)),
+      operator: element(by.css('mat-select[e2e="filter-number-operator-select"]')),
+      operatorDropDownItem: operator => element(by.css(`mat-option[e2e="filter-number-operator-option-${operator}"]`)),
       input: element(by.xpath('//input[@type="number"]'))
     }
   },
