@@ -28,6 +28,6 @@ the forecast function
 }
 \examples{
 library(forecast)
-fit <- auto_fourier(USAccDeaths, 12)
-auto_fourier_f(fit$model, frequency=12, h=12)
+fit <- auto_fourier(austres, frequency = 4)
+forecast(fit, h=12, frequency=12)
 }

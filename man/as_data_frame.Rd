@@ -4,7 +4,10 @@
 \alias{as_data_frame.forecast}
 \title{Convert Forecast object to data.frame}
 \usage{
-as_data_frame.forecast(object)
+as_data_frame.forecast(fobj)
+}
+\arguments{
+\item{fobj}{forecast object}
 }
 \description{
 Convert Forecast object to data.frame

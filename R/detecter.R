@@ -202,6 +202,7 @@ detect.grouped_df <- function(df,
     dplyr::select_at(c(index_var, measure_var, 'seasonal', 'trend', 'resid', 'anomaly'))
 }
 
+
 #' Anomaly Dectection Wrapper Function
 #'
 #' Detecter is a wrapper function for the detect function. Detecter takes a
@@ -241,21 +242,21 @@ detecter.data.frame <- function(df,
 
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
-    melter(.,
-           id_vars = c(index_var, group_vars),
-           measure_vars,
-           variable_name = "measure",
-           value_name = "value") %>%
+    a2munge::melter(.,
+                    id_vars = c(index_var, group_vars),
+                    measure_vars,
+                    variable_name = "measure",
+                    value_name = "value") %>%
     dplyr::group_by_at(c(group_vars, "measure")) %>%
     do(
-      detect(.,
-             index_var = index_var,
-             measure_var = "value",
-             frequency = frequency,
-             alpha = alpha,
-             direction = direction,
-             max_anoms = max_anoms,
-             trend_window = trend_window)
+      a2munge::detect(.,
+                      index_var = index_var,
+                      measure_var = "value",
+                      frequency = frequency,
+                      alpha = alpha,
+                      direction = direction,
+                      max_anoms = max_anoms,
+                      trend_window = trend_window)
     ) %>%
     dplyr::ungroup()
 }

@@ -36,5 +36,5 @@ The case of no harmonic regressors is also considered
 }
 \examples{
 library(forecast)
-auto_fourier(USAccDeaths, frequency = 12)
+auto_fourier(austres, frequency = 4)
 }
