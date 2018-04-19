@@ -18,7 +18,7 @@
             [value]="tempModel.gte"
             [max]="tempModel.lte"
             placeholder="From"
-            [formControl]="date"/>
+            [formControl]="lteFC"/>
       <mat-datepicker-toggle matSuffix [for]="gte"></mat-datepicker-toggle>
       <mat-datepicker #gte
                       [startAt]="tempModel.gte"
@@ -32,7 +32,7 @@
             [value]="tempModel.lte"
             [min]="tempModel.gte"
             placeholder="To"
-            [formControl]="date"/>
+            [formControl]="gteFC"/>
       <mat-datepicker-toggle matSuffix [for]="lte"></mat-datepicker-toggle>
       <mat-datepicker #lte
                       [startAt]="tempModel.lte"

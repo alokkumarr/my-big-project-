@@ -1,5 +1,3 @@
-declare const require: any;
-
 import {
   Component,
   Input,
@@ -11,6 +9,7 @@ import {
 } from '../../types';
 
 const template = require('./designer-number-filter.component.html');
+require('./designer-number-filter.component.scss');
 
 export const OPERATORS = [{
   value: 'GT',

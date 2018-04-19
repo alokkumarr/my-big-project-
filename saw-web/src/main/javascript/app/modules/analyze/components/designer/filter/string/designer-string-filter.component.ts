@@ -19,25 +19,25 @@ const SEMICOLON = 186;
 
 export const OPERATORS = [{
   value: 'EQ',
-  label: 'EQUALS'
+  label: 'Equals'
 }, {
   value: 'NEQ',
-  label: 'NOT_EQUAL'
+  label: 'Not equal'
 }, {
   value: 'ISIN',
-  label: 'IS_IN'
+  label: 'Is in'
 }, {
   value: 'ISNOTIN',
-  label: 'IS_NOT_IN'
+  label: 'Is not in'
 }, {
   value: 'CONTAINS',
-  label: 'CONTAINS'
+  label: 'Contains'
 }, {
   value: 'SW',
-  label: 'STARTS_WITH'
+  label: 'Starts with'
 }, {
   value: 'EW',
-  label: 'ENDS_WITH'
+  label: 'Ends with'
 }];
 
 @Component({
