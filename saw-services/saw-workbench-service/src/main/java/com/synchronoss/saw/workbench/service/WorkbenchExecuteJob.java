@@ -42,31 +42,42 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
-        log.info("Start execute job");
-        AsynchAbstractComponent aac = null;
-        switch (ngctx.componentName) {
-        case "sql":
-            aac = new AsynchNGSQLComponent(ngctx);
-            break;
-        case "parser":
-            aac = new AsynchNGParser(ngctx);
-            break;
-        case "transformer":
-            aac = new AsynchNGTransformerComponent(ngctx);
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown component: "
-                + ngctx.componentName);
+        log.info("Starting execute job");
+        String batch = "batch-" + Instant.now().toEpochMilli();
+        Component xdfComponent;
+        if (component.equals("parser")) {
+            xdfComponent = new Parser() {
+                @Override
+                public void initSpark(Context ctx) {
+                    try {
+                        ctx.sparkSession = jobContext.sparkSession();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+        } else if (component.equals("sql")) {
+            xdfComponent = new TempSQLComponent() {
+                @Override
+                public void initSpark(Context ctx) {
+                    try {
+                        ctx.sparkSession = jobContext.sparkSession();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            };
+        } else {
+            throw new IllegalArgumentException(
+                "Unknown component: " + component);
         }
-        if (!aac.initComponent(jobContext.sc())) {
-            log.error("Could not initialize component");
-            return -1;
+        int status = Component.startComponent(
+            xdfComponent, root, config, project, batch);
+        if (status != 0) {
+            throw new RuntimeException(
+                "XDF returned non-zero status: " + status);
         }
-        log.info("Starting Workbench job");
-        int rc = aac.run();
-        log.info("Workbench job completed, result: " + rc + " error: "
-            + aac.getError());
-
-        return rc;
+        log.info("Finished execute job");
+        return null;
     }
 }

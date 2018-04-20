@@ -9,9 +9,6 @@
   <name>saw</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Disable Docker Machine configuration by default -->
-    <docker.skip.machine>true</docker.skip.machine>
-
   </properties>
   <dependencyManagement>
     <dependencies>
