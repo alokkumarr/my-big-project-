@@ -325,13 +325,14 @@ export class DesignerContainerComponent {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'aggregate':
-    case 'filter':
+    case 'filterRemove':
     case 'joins':
-    case 'sort':
     case 'changeQuery':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'submitQuery':
+    case 'filter':
+    case 'sort':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.requestDataIfPossible();
       break;

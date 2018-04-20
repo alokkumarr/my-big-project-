@@ -84,6 +84,7 @@ export type DesignerChangeEvent = {
     'aliasName'        |
     'sort'             |
     'filter'           |
+    'filterRemove'     |
     // adding | removing | changing fields in the field chooser for pivot grid and chart designer
     'selectedFields'   |
     'joins'            |

@@ -37,11 +37,11 @@ export class DesignerReportComponent {
 
   onRemoveFilter(index) {
     this.filters.splice(index, 1);
-    this.change.emit({subject: 'filter'});
+    this.change.emit({subject: 'filterRemove'});
   }
 
   onRemoveFilterAll() {
     this.filters.splice(0, this.filters.length);
-    this.change.emit({subject: 'filter'});
+    this.change.emit({subject: 'filterRemove'});
   }
 }
