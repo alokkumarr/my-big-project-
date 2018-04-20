@@ -53,8 +53,7 @@
 
     <button mat-button
             e2e="open-preview-modal"
-            (click)="requestAction.emit('preview')"
-            [disabled]="designerState !== DesignerStates.SELECTION_WITH_DATA">
+            (click)="requestAction.emit('preview')">
       <mat-icon fontIcon="icon-full-screen"></mat-icon>
       <ng-container i18n>Preview</ng-container>
     </button>
