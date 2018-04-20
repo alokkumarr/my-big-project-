@@ -2,6 +2,7 @@
   <div class="filter__table-name">
     {{artifact.artifactName}}
   </div>
+  <mat-divider></mat-divider>
   <div class="filter__list">
     <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: index"
                          (removeRequest)="removeFilter(i, artifact.artifactName)"

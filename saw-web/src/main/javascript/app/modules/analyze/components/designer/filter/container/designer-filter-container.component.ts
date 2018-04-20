@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
+import * as forEach from 'lodash/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -31,10 +32,12 @@ export class DesignerFilterContainerComponent {
 
   ngOnInit() {
     this.groupedFilters = groupBy(this.filters, 'tableName');
-    const firstArtifactName = this.artifacts[0].artifactName;
-    if (!this.groupedFilters[firstArtifactName]) {
-      this.addFilter(firstArtifactName, true);
-    }
+    forEach(this.artifacts, artifact => {
+      const name = artifact.artifactName;
+      if (!this.groupedFilters[name]) {
+        this.addFilter(name, true);
+      }
+    });
   }
 
   onFilterChange() {

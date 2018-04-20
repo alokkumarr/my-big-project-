@@ -4,7 +4,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-
+import * as isEmpty from 'lodash/isEmpty';
 import {
   Artifact,
   DesignerChangeEvent,
@@ -33,7 +33,7 @@ export class MultiTableDesignerLayout {
   @Input() designerState: DesignerStates;
   @Input() dataCount: number;
   @Input('data') set setData(data) {
-    if (data) {
+    if (!isEmpty(data)) {
       this.data = data;
       this.isGridPanelExpanded = true;
     }
