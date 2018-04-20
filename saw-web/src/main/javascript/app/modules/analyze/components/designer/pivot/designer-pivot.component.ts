@@ -1,4 +1,3 @@
-declare const require: any;
 import {
   Component,
   Input

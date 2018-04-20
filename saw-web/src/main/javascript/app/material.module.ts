@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NouisliderModule } from 'ng2-nouislider';

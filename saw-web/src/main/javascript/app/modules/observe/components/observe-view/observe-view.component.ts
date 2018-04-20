@@ -1,11 +1,8 @@
-declare const require: any;
-
 import { Component, OnInit, ViewChild } from '@angular/core';
-
 import { MatDialog, MatSidenav } from '@angular/material';
 import { Transition } from '@uirouter/angular';
-import { Dashboard } from '../../models/dashboard.interface';
 
+import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { GlobalFilterService } from '../../services/global-filter.service';

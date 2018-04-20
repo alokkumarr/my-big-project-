@@ -1,4 +1,3 @@
-declare const require: any;
 import {
   Component,
   Input,
@@ -318,7 +317,7 @@ export class PivotGridComponent {
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
           const percent = (cloned.aggregate == 'percentage' ? true : false);
-          
+
           if (!isUndefined(artifactColumn.format)) {
             artifactColumn.format.percentage = percent;
           }

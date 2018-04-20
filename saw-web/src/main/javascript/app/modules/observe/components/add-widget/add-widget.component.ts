@@ -1,5 +1,3 @@
-declare const require: any;
-
 import {
   Component,
   OnInit,
