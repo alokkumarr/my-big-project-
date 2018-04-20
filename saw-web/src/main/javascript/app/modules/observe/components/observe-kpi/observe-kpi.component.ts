@@ -1,9 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as get from 'lodash/get';
+import * as map from 'lodash/map';
+import * as upperCase from 'lodash/upperCase';
 import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
 import { Observable } from 'rxjs/Observable';
 
+import { DATE_PRESETS_OBJ } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 
 const template = require('./observe-kpi.component.html');
@@ -15,7 +18,17 @@ require('./observe-kpi.component.scss');
 })
 export class ObserveKPIComponent implements OnInit {
   _kpi: any;
-  executionResult: { current?: number; prior?: number; change?: string } = {};
+
+  /* Used to dynamically adjust font-size based on tile height */
+  fontMultipliers = {
+    primary: 1,
+    secondary: 1
+  };
+
+  datePresetObj = DATE_PRESETS_OBJ;
+  primaryResult: { current?: number; prior?: number; change?: string } = {};
+  secondaryResult: Array<{ name: string; value: string | number }> = [];
+
   constructor(private observe: ObserveService) {}
 
   ngOnInit() {}
@@ -27,31 +40,63 @@ export class ObserveKPIComponent implements OnInit {
     this.executeKPI();
   }
 
+  @Input()
+  set dimensions(data) {
+    if (data && data.height > 0) {
+      this.fontMultipliers.primary = data.height / 100;
+      this.fontMultipliers.secondary = Math.min(2, data.height / 100);
+    }
+  }
+
+  get filterLabel() {
+    if (!this._kpi) return '';
+
+    const preset = get(this._kpi, 'filters.0.model.preset');
+    return get(this.datePresetObj, `${preset}.label`);
+  }
+
   executeKPI() {
     const dataFieldName = get(this._kpi, 'dataFields.0.name');
-    const primaryAggregate = get(this._kpi, 'dataFields.0.aggregate.0');
+    const [primaryAggregate, ...secondaryAggregates] = get(
+      this._kpi,
+      'dataFields.0.aggregate',
+      []
+    );
     this.observe
       .executeKPI(this._kpi)
+      /* Parse kpi execution results into primary and secondary aggregation results */
       .map(res => {
-        return {
+        const primary = {
           current: get(
             res,
             `data.current.${dataFieldName}._${primaryAggregate}`
           ),
           prior: get(res, `data.prior.${dataFieldName}._${primaryAggregate}`)
         };
+
+        const secondary = map(secondaryAggregates || [], ag => ({
+          name: upperCase(ag),
+          value: round(
+            parseFloat(get(res, `data.current.${dataFieldName}._${ag}`)) || 0,
+            2
+          )
+        }));
+        return { primary, secondary };
       })
-      .subscribe(({ current, prior }) => {
-        const currentParsed = parseFloat(current);
-        const priorParsed = parseFloat(prior);
+      /* Parse and calculate percentage change for primary aggregations */
+      .subscribe(({ primary, secondary }) => {
+        const currentParsed = parseFloat(primary.current) || 0;
+        const priorParsed = parseFloat(primary.prior);
         const change =
           round((currentParsed - priorParsed) * 100 / priorParsed, 2) || 0;
 
-        this.executionResult = {
+        this.primaryResult = {
           current: round(currentParsed, 2),
           prior: priorParsed,
           change: change >= 0 ? `+${change}` : `${change}`
         };
+
+        this.secondaryResult = secondary;
       });
   }
 }

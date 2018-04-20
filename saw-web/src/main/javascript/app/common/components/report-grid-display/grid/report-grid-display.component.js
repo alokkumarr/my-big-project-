@@ -105,7 +105,6 @@ export const ReportGridDisplayComponent = {
         }
         const cols = this._getDxColumns(columns, data);
         this._gridInstance.option('columns', cols);
-        // this._gridInstance.refresh();
       }
     }
 
@@ -214,10 +213,18 @@ export const ReportGridDisplayComponent = {
       });
     }
 
-    $onChanges() {
+    $onChanges(changes) {
       this._$timeout(() => {
         this.updateColumns(this.columns, this.data);
       });
+
+      if (!changes.data) {
+        return;
+      }
+
+      if (fpGet('0.refresh', this.data) && this._gridInstance) {
+        this._gridInstance.refresh();
+      }
     }
 
     onGridInitialized(e) {
