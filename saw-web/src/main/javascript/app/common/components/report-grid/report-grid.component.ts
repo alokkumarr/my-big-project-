@@ -100,6 +100,11 @@ export class ReportGridComponent {
     this.columns = this.queryColumns2Columns(queryColumns);
   }
   @Input('data') set setData(data: any[]) {
+    if (data || data.length < 7) {
+      this.gridHeight = 'auto';
+    } else {
+      this.gridHeight = '100%';
+    }
     this.data = data;
   };
   @Input('dataLoader') dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>;
@@ -127,8 +132,8 @@ export class ReportGridComponent {
   public scrolling = {mode: 'Virtual'};
   public sorting = {mode: 'multiple'};
   public columnChooser;
-  public gridHeight = '100%';
   public gridWidth = '100%';
+  public gridHeight: '100%' | 'auto' = '100%';
   public remoteOperations;
   public paging;
   public pager = {
