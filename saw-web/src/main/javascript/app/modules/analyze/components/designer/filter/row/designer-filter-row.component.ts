@@ -48,7 +48,7 @@ export class DesignerFilterRowComponent {
     this.filteredColumns = this.formControl.valueChanges
       .pipe(
         startWith<string | ArtifactColumn>(''),
-        map(value => typeof value === 'string' ? value : value.aliasName || value.displayName),
+        map(value => typeof value === 'string' ? value : value.displayName),
         map(name => name ? this.nameFilter(name) : this.artifactColumns.slice())
       );
   }
@@ -64,7 +64,7 @@ export class DesignerFilterRowComponent {
 
   nameFilter(name: string): ArtifactColumn[] {
     return this.artifactColumns.filter(option => {
-      const optionName = option.aliasName || option.displayName;
+      const optionName = option.displayName;
       return optionName.toLowerCase().indexOf(name.toLowerCase()) > -1;
     });
   }
@@ -95,6 +95,6 @@ export class DesignerFilterRowComponent {
   }
 
   displayWith(artifactColumn) {
-    return artifactColumn ? artifactColumn.aliasName || artifactColumn.displayName : '';
+    return artifactColumn ? artifactColumn.displayName : '';
   }
 }

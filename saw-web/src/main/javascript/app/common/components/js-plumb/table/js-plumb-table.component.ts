@@ -30,9 +30,7 @@ export class JsPlumbTableComponent {
   @Input() useAggregate: boolean;
   @Input('artifact') set setArtifact(artifact: Artifact) {
     this.artifact = artifact;
-    this.columns = sortBy(artifact.columns, (column: ArtifactColumnReport) => {
-      return this.getColumnLabel(column);
-    });
+    this.columns = sortBy(artifact.columns, 'displayName');
   };
 
   public columns: ArtifactColumnReport[];
@@ -68,10 +66,6 @@ export class JsPlumbTableComponent {
     elemStyle.top = y !== 0 ? `${y}px` : 0;
   }
 
-  getColumnLabel(column: ArtifactColumnReport) {
-    return column.aliasName || column.displayName;
-  }
-
   onCheckBoxToggle(column: ArtifactColumnReport, checked) {
     column.checked = checked;
     this.change.emit({
@@ -81,7 +75,7 @@ export class JsPlumbTableComponent {
   }
 
   getIdentifier(column) {
-    return `js-plumb-field-${this.artifact.artifactName}:${this.getColumnLabel(column)}`;
+    return `js-plumb-field-${this.artifact.artifactName}:${column.displayName}`;
   }
 
   onAggregateChange(column, aggregate) {

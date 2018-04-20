@@ -28,7 +28,7 @@ export class FilterChipsComponent {
     }
     this.nameMap = reduce(artifacts, (acc, artifact: Artifact) => {
       acc[artifact.artifactName] = reduce(artifact.columns, (acc, col: ArtifactColumn) => {
-        acc[col.columnName] = col.aliasName || col.displayName;
+        acc[col.columnName] = col.displayName;
         return acc;
       }, {});
       return acc;

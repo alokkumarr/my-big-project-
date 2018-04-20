@@ -17,7 +17,7 @@
                     (change)="onCheckBoxToggle(column, $event.checked)">
       </mat-checkbox>
       <div class="jsp-table__column-name">
-        {{getColumnLabel(column)}}
+        {{column.displayName}}
       </div>
 
       <div *ngIf="column.checked"
