@@ -13,13 +13,11 @@ observe-kpi > div {
 
   h1 {
     margin: 10px 0 0;
-    font-size: 1.8vh;
   }
 
   h2 {
     margin: 0;
-    font-size: 1.3vh;
-    font-weight: normal;
+    font-weight: bold;
   }
 
   .kpi-primary-measure-container {
@@ -30,19 +28,17 @@ observe-kpi > div {
       align-items: center;
       justify-content: center;
       flex-grow: 1;
+      flex-wrap: wrap;
 
       span {
-        font-size: 1.3vh;
+        font-weight: bold;
 
         &.kpi-main-measure {
-          font-size: 3vh;
-          font-weight: bold;
           margin: 0;
         }
 
         &.kpi-change {
           margin: 0 0 0 10px;
-          font-weight: normal;
         }
       }
     }
@@ -52,22 +48,21 @@ observe-kpi > div {
     display: none;
     background: white;
     flex-grow: 1;
-    color: gray;
+    color: black;
     align-items: center;
     flex-wrap: wrap;
 
     span {
       min-width: 50%;
       margin: 0;
-      font-size: 1vh;
     }
   }
 
-  &.has-secondary-measure {
-    & > * {
-      flex-grow: 1;
-    }
+  & > * {
+    flex-grow: 1;
+  }
 
+  &.has-secondary-measure {
     .kpi-secondary-measure-container {
       display: flex;
     }

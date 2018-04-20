@@ -15,7 +15,7 @@
     </ng-container>
 
     <ng-container *ngIf="item.kpi">
-      <observe-kpi [kpi]="item.kpi"></observe-kpi>
+      <observe-kpi [kpi]="item.kpi" [dimensions]="item.dimensions"></observe-kpi>
     </ng-container>
   </gridster-item>
 </gridster>

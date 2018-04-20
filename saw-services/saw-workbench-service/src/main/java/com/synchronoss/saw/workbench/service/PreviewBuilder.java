@@ -9,8 +9,6 @@ import org.ojai.DocumentBuilder;
  * for storing a Workbench preview.
  */ 
 public class PreviewBuilder {
-    public static final String PREVIEWS_TABLE = "/previews";
-
     private Table table;
     private DocumentBuilder document;
 
@@ -18,8 +16,8 @@ public class PreviewBuilder {
      * Create new preview builder with the given preview ID and
      * preview status.
      */
-    public PreviewBuilder(String id, String status) {
-        table = MapRDB.getTable(PREVIEWS_TABLE);
+    public PreviewBuilder(String tablePath, String id, String status) {
+        table = MapRDB.getTable(tablePath);
         document = MapRDB.newDocumentBuilder();
         document.addNewMap();
         document.put("_id", id);

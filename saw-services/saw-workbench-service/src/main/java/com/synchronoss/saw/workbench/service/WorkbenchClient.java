@@ -30,17 +30,34 @@ public class WorkbenchClient {
      * Submits given Workbench job to Livy
      */
     public void submit(Job job) throws Exception {
+        submit(job, null);
+    }
+
+    /**
+     * Submits given Workbench job to Livy with given failure handler
+     */
+    public void submit(Job job, FailureHandler failure) throws Exception {
         log.info("Submitting job");
         JobHandle<Integer> jobHandle = client.submit(job);
-        jobHandle.addListener(new WorkbenchJobListener(client));
+        jobHandle.addListener(new WorkbenchJobListener(client, failure));
         log.info("Submitted job");
+    }
+
+    /**
+     * Handles failure to execute Workbench job, for example marking
+     * the related entity (dataset or preview) as failed
+     */
+    interface FailureHandler {
+        void apply();
     }
 
     private class WorkbenchJobListener implements JobHandle.Listener<Integer> {
         private LivyClient client;
+        private FailureHandler failure;
 
-        WorkbenchJobListener(LivyClient client) {
+        WorkbenchJobListener(LivyClient client, FailureHandler failure) {
             this.client = client;
+            this.failure = failure;
         }
 
         @Override
@@ -65,12 +82,20 @@ public class WorkbenchClient {
             JobHandle<Integer> job, Throwable cause) {
             client.stop(true);
             log.error("Workbench job failed", cause);
+            /* If failure handler was set, invoke it */
+            if (failure != null) {
+                failure.apply();
+            }
         }
 
         @Override
         public void onJobCancelled(JobHandle<Integer> job) {
             client.stop(true);
             log.info("Workbench job cancelled");
+            /* If failure handler was set, invoke it */
+            if (failure != null) {
+                failure.apply();
+            }
         }
     }
 }
