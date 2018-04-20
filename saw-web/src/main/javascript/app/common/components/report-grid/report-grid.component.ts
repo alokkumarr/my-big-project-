@@ -286,7 +286,7 @@ export class ReportGridComponent {
 
     this.getNewDataThroughDialog(
       component,
-      {format: payload.format},
+      {format: payload.format, type},
       format => {
         changeColumnProp('format', format);
         this.change.emit({subject: 'format'});
