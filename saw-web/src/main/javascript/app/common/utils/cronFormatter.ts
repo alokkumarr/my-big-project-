@@ -40,7 +40,11 @@ export function hourToCron(hour, hourType, minutes) {
 export function generateHourlyCron(hours, minutes) {
   const fetchUTCMinute = this.convertToUtc(moment().format('HH'), minutes);
   const UTCMinute = fetchUTCMinute.split(' ');
-  return `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
+  if (parseInt(hours) === 0) {
+    return `0 0/${minutes} * 1/1 * ? *`;
+  } else {
+    return `0 ${UTCMinute[0]} 0/${hours} 1/1 * ? *`;
+  }
 }
 
 export function generateDailyCron(cronDaily, dateSelects) {

@@ -53,7 +53,7 @@ export class CronJobSchedularComponent {
   	this.monthly = {};
   	this.yearly = {};
 
-    this.hours = this.range(1,23);
+    this.hours = this.range(0,23);
     this.minutes = this.range(0,59);
     this.days = this.range(1, 31);
     this.months = this.range(1,12);
@@ -221,8 +221,6 @@ export class CronJobSchedularComponent {
     this.onCronChanged.emit(this.crondetails);
   }
 
-  
-
   loadData() {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
@@ -242,21 +240,18 @@ export class CronJobSchedularComponent {
         hourType: meridium[0]
       };  
     }
-    
 
     switch (this.scheduleType) {
     case 'hourly':
-      //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
-      if (isNaN(parseInt(parseCronValue[7]))) {
-        this.hourly.hours = 1; 
+      const fetchLocalMinute;
+      if (this.crondetails.cronexp.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
+        this.hourly.hours = 0;
+        fetchLocalMinute = parseCronValue[1].split('/');
+        this.hourly.minutes = (isNaN(parseInt(fetchLocalMinute[0])) ? 1 : parseInt(fetchLocalMinute[0]));
       } else {
-        this.hourly.hours = parseInt(parseCronValue[7]);  
-      }
-      if (isNaN(parseInt(parseCronValue[1]))) {
-        this.hourly.minutes = 0;  
-      } else {
-        const fetchLocalMinute = getLocalMinute(parseInt(parseCronValue[1]));
-        this.hourly.minutes = fetchLocalMinute;  
+        //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
+        this.hourly.hours = (isNaN(parseInt(parseCronValue[7])) ? 1 : parseInt(parseCronValue[7]));
+        this.hourly.minutes = (isNaN(parseInt(parseCronValue[1])) ? 0 : getLocalMinute(parseInt(parseCronValue[1])));
       }
       break;
     case 'daily':
