@@ -40,7 +40,7 @@
   </div>
 
   <div *ngSwitchDefault style="height: calc(100% -42); width: 100%;">
-    <div *ngIf="data; else elseBlock" style="height: 100%; width: 100%;">
+    <div *ngIf="!isEmpty(data); else elseBlock" style="height: 100%; width: 100%;">
       <div style="height: calc(100% - 30px); width: 100%;">
         <report-grid-upgraded (change)="onReportGridChange($event)"
                               [artifacts]="artifacts"
@@ -51,7 +51,7 @@
         </report-grid-upgraded>
       </div>
       <div class="data-count-limit">
-        Showing {{data.length}} out of 100000 rows. Click on 'Preview' to see more.
+        Showing {{data.length}} out of {{dataCount}} rows. Click on 'Preview' to see more.
       </div>
     </div>
 

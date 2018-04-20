@@ -63,7 +63,8 @@ export class DesignerContainerComponent {
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
   public artifacts: Artifact[] = [];
-  public data: any = null;
+  public data: any = [];
+  public dataCount: number;
   public sorts: Sort[] = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
@@ -167,12 +168,15 @@ export class DesignerContainerComponent {
       .then((response) => {
         if (this.isDataEmpty(response.data, this.analysis.type, this.analysis.sqlBuilder)) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
+          this.data = [];
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
+          this.dataCount = response.count;
           this.data = this.parseData(response.data, this.analysis);
         }
       }, err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
+        this.data = [];
       });
   }
 

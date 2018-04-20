@@ -5,7 +5,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-
+import * as isEmpty from 'lodash/isEmpty';
 import {
   Artifact,
   DesignerChangeEvent,
@@ -25,10 +25,12 @@ export class DesignerReportComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() data;
+  @Input() dataCount: number;
   @Input() sorts: Sort[];
   @Input() filters: Filter[];
   @Input() designerState: DesignerStates;
   public DesignerStates = DesignerStates;
+  isEmpty = isEmpty;
 
   onReportGridChange(event) {
     this.change.emit(event);
