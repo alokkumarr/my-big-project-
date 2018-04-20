@@ -260,8 +260,8 @@ export class ReportGridComponent {
     }
   }
 
-  hideColumn({payload}: ReportGridField) {
-    payload.visible = false;
+  hideColumn({changeColumnProp}: ReportGridField) {
+    changeColumnProp('visible', false);
     this.change.emit({subject: 'visibility'});
   }
 

@@ -339,6 +339,7 @@ export class DesignerContainerComponent {
     // only front end data refresh needed
     case 'format':
     case 'aliasName':
+    case 'visibility':
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':

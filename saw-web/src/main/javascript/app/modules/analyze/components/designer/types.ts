@@ -90,6 +90,7 @@ export type DesignerChangeEvent = {
     'artifactPosition' |
     'column'           |
     'visibleIndex'     |
+    'visibility'       |
     'submitQuery'      |
     'changeQuery';
   column?: ArtifactColumnReport;
