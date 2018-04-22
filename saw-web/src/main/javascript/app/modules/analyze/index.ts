@@ -31,6 +31,7 @@ import {AggregateChooserComponent} from './components/aggregate-chooser/aggregat
 import {AnalyzeActionsService} from './components/actions/analyze-actions.service';
 import {AnalyzeActionsMenuComponent} from './components/actions/analyze-actions-menu.component';
 import {AnalyzeViewComponent} from './components/view/analyze-view.component';
+import {AnalyzeViewComponent as AnalyzeViewUpgraded} from './components/view-u/analyze-view.component';
 import {AnalyzeCardsViewComponent} from './components/view/card/analyze-cards-view.component';
 import {AnalyzeCardComponent} from './components/view/card/analyze-card.component';
 import {AnalyzeListViewComponent} from './components/view/list/analyze-list-view.component';
@@ -131,6 +132,10 @@ angular.module(AnalyzeModule, [
   .component('reportFormatDialog', ReportFormatDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
+  .directive(
+    'analyzeViewU',
+    downgradeComponent({component: AnalyzeViewUpgraded}) as angular.IDirectiveFactory
+  )
   .component('analyzeCardsView', AnalyzeCardsViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeListView', AnalyzeListViewComponent)
@@ -211,7 +216,8 @@ angular.module(AnalyzeModule, [
     CronDatePickerComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
-    FilterChipsUpgraded
+    FilterChipsUpgraded,
+    AnalyzeViewUpgraded
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -241,7 +247,8 @@ angular.module(AnalyzeModule, [
     CronDatePickerComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
-    FilterChipsUpgraded
+    FilterChipsUpgraded,
+    AnalyzeViewUpgraded
   ],
   providers: [
     $mdDialogProvider,

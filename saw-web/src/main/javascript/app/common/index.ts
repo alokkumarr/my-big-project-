@@ -39,6 +39,7 @@ import {
   DxDataGridModule,
   DxDataGridComponent
 } from 'devextreme-angular';
+import {downgradeComponent} from '@angular/upgrade/static';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
 
@@ -77,6 +78,7 @@ import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import {
   toastProvider, componentHandlerProvider
 } from './services/ajs-common-providers';
+import {SearchBoxComponent} from './components/search-box';
 
 import AppConfig from '../../../../../appConfig';
 
@@ -112,6 +114,7 @@ angular
   .factory('$componentHandler', () => {
     return new ComponentHandler();
   })
+  .directive('searchBox', downgradeComponent({component: SearchBoxComponent}))
   .factory('AuthService', AuthServiceFactory)
   .service('UserService', UserService)
   .service('JwtService', JwtService);
@@ -147,7 +150,8 @@ angular
     JoinDialogComponent,
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
-    AggregateChooserComponent
+    AggregateChooserComponent,
+    SearchBoxComponent
   ],
   entryComponents: [
     PivotGridComponent,
@@ -165,7 +169,8 @@ angular
     JoinDialogComponent,
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
-    AggregateChooserComponent
+    AggregateChooserComponent,
+    SearchBoxComponent
   ],
   exports: [
     DndModule,
@@ -190,7 +195,8 @@ angular
     AccordionMenuLinkComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
-    E2eDirective
+    E2eDirective,
+    SearchBoxComponent
   ],
   providers: [
     ErrorDetailService,
