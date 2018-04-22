@@ -1,3 +1,4 @@
+import * as isUndefined from 'lodash/isUndefined';
 import * as template from './users-view.component.html';
 import style from './users-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
@@ -191,6 +192,9 @@ export const UsersViewComponent = {
     }
 
     applySearchFilter() {
+      if (!isUndefined(value)) {
+        this.states.searchTerm = value;
+      }
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
 

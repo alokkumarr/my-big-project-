@@ -7,8 +7,8 @@
               e2e="category-title"
               ng-bind="$ctrl.category.name"></span>&nbsp;
         <search-box placeholder="Search Analyses"
-                    ng-model="$ctrl.states.searchTerm"
-                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
+                    [value]="$ctrl.states.searchTerm"
+                    (change)="$ctrl.applySearchFilter($event)" [delay]="1000"></search-box>
       </div>
 
       <div layout="row" layout-align="start center">

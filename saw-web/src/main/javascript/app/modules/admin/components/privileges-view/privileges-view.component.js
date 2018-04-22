@@ -1,3 +1,4 @@
+import * as isUndefined from 'lodash/isUndefined';
 import * as template from './privileges-view.component.html';
 import style from './privileges-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
@@ -157,7 +158,10 @@ export const PrivilegesViewComponent = {
       return false;
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
+      if (!isUndefined(value)) {
+        this.states.searchTerm = value;
+      }
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
 

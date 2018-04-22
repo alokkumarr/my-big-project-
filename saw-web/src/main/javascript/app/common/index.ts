@@ -31,6 +31,7 @@ import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
@@ -55,6 +56,7 @@ import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import {
   toastProvider
 } from './services/ajs-common-providers';
+import {SearchBoxComponent} from './components/search-box';
 
 import AppConfig from '../../../../../appConfig';
 
@@ -90,6 +92,7 @@ angular
   .factory('$componentHandler', () => {
     return new ComponentHandler();
   })
+  .directive('searchBox', downgradeComponent({component: SearchBoxComponent}))
   .factory('AuthService', AuthServiceFactory)
   .service('UserService', UserService)
   .service('JwtService', JwtService);
@@ -109,13 +112,15 @@ angular
     ErrorDetailComponent,
     E2eDirective,
     DataFormatDialogComponent,
-    DateFormatDialogComponent
+    DateFormatDialogComponent,
+    SearchBoxComponent
   ],
   entryComponents: [
     PivotGridComponent,
     ErrorDetailComponent,
     DataFormatDialogComponent,
-    DateFormatDialogComponent
+    DateFormatDialogComponent,
+    SearchBoxComponent
   ],
   exports: [
     DndModule,
@@ -125,7 +130,8 @@ angular
     ErrorDetailComponent,
     DataFormatDialogComponent,
     DateFormatDialogComponent,
-    E2eDirective
+    E2eDirective,
+    SearchBoxComponent
   ],
   providers: [
     ErrorDetailService,

@@ -21,18 +21,15 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService,
-      toastMessage, $rootScope, localStorageService, FilterService, LocalSearchService) {
+    constructor($injector, AnalyzeService, $state, JwtService,
+      toastMessage, $rootScope, localStorageService, LocalSearchService) {
       'ngInject';
       super($injector);
 
-      this._$compile = $compile;
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
-      this._$mdDialog = $mdDialog;
       this._localStorageService = localStorageService;
       this._LocalSearchService = LocalSearchService;
-      this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
       this._JwtService = JwtService;
@@ -48,7 +45,8 @@ export const AnalyzeViewComponent = {
         reportView: [this.LIST_VIEW, this.CARD_VIEW].indexOf(savedView) >= 0 ?
           savedView : this.LIST_VIEW,
         analysisType: 'all',
-        searchTerm: ''
+        searchTerm: '',
+        searchTermValue: ''
       };
       this.updater = new Subject();
       this.canUserCreate = false;
@@ -129,7 +127,8 @@ export const AnalyzeViewComponent = {
       });
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
+      this.states.searchTerm = value;
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
       this._LocalSearchService.doSearch(searchCriteria, this._analysisCache, SEARCH_CONFIG).then(data => {
