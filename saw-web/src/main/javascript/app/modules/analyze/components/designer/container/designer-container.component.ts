@@ -130,10 +130,11 @@ export class DesignerContainerComponent {
   }
 
   initExistingAnalysis() {
+    const sqlBuilder = this.analysis.sqlBuilder;
     this.artifacts = this.analysis.artifacts;
-    this.filters = this.analysis.sqlBuilder.filters;
-    this.sorts = this.analysis.sqlBuilder.sorts;
-    this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
+    this.filters = sqlBuilder.filters;
+    this.sorts = sqlBuilder.sorts || sqlBuilder.orderByColumns;
+    this.booleanCriteria = sqlBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;
   }
 

@@ -27,13 +27,13 @@
     </div>
   </div>
   <div class="sort-divider"></div>
-  <div [ngSwitch]="sorts.length > 0"
+  <div [ngSwitch]="isEmpty(sorts)"
        class="sorted-fields-container">
     <strong i18n
             class="sort-fields-title">
       Sorted fields
     </strong>
-    <div *ngSwitchCase="false"
+    <div *ngSwitchCase="true"
           fxLayout="column"
           fxLayoutAlign="start center">
       <span class="non-ideal-state__message" i18n>
@@ -41,7 +41,7 @@
         </span>
         <mat-icon class="non-ideal-state__icon" fontIcon="icon-sort"></mat-icon>
     </div>
-    <div *ngSwitchCase="true"
+    <div *ngSwitchCase="false"
          class="sorted-fields"
          dndSortableContainer
          [dndContainer]="sorts"

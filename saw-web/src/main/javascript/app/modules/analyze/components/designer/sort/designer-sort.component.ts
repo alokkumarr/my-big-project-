@@ -14,6 +14,7 @@ import * as reduce from 'lodash/reduce';
 import * as find from 'lodash/find';
 import * as take from 'lodash/take';
 import * as has from 'lodash/has';
+import * as isEmpty from 'lodash/isEmpty';
 import * as takeRight from 'lodash/takeRight';
 import {
   ArtifactColumns,
@@ -40,6 +41,7 @@ export class DesignerSortComponent {
   public availableFields: ArtifactColumns = [];
   public nameMap: Object = {};
   public TYPE_MAP = TYPE_MAP;
+  public isEmpty = isEmpty;
 
   public removeFromAvailableFields = (artifactColumn: ArtifactColumn) => {
     this.availableFields = filter(this.availableFields,
@@ -80,6 +82,7 @@ export class DesignerSortComponent {
       fpFilter('checked')
     )(this.artifacts);
     this.availableFields = this.getAvailableFields(this.checkedFields, this.sorts);
+    console.log('availableFields', this.availableFields);
     this.nameMap = reduce(this.checkedFields, (accumulator, field) => {
       accumulator[field.columnName] = field.displayName;
       return accumulator;
