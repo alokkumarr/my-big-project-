@@ -43,7 +43,7 @@ export class DesignerFilterRowComponent {
   }
 
   ngOnInit() {
-    const target = find(this.artifactColumns, ({columnName}) => this.filter.columnName);
+    const target = find(this.artifactColumns, ({columnName}) => columnName === this.filter.columnName);
     this.formControl.setValue(target);
     this.filteredColumns = this.formControl.valueChanges
       .pipe(
