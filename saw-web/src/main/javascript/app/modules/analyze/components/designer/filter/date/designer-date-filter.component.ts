@@ -85,8 +85,8 @@ export class DesignerDateFilterComponent {
 
   getFormattedModel({lte, gte, preset}) {
     return {
-      lte: lte.format(DATE_FORMAT),
-      gte: gte.format(DATE_FORMAT),
+      lte: lte ? lte.format(DATE_FORMAT) : null,
+      gte: gte ? gte.format(DATE_FORMAT) : null,
       preset
     }
   }
