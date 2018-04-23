@@ -5,7 +5,8 @@ import {
 } from '../../../models';
 
 export type ReportGridChangeEvent = {
-  subject: 'format' | 'aliasName' | 'visibility' | 'visibleIndex';
+  subject: 'format' | 'aliasName' | 'removeColumn' | 'visibleIndex';
+  column?: ArtifactColumnReport;
 }
 
 export {

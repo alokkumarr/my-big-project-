@@ -247,10 +247,10 @@ export class ReportGridComponent {
         this.renameColumn(column);
       }
     }, {
-      text: `Hide ${column.caption}`,
+      text: `Remove ${column.caption}`,
       icon: 'grid-menu-item icon-eye-disabled',
       onItemClick: () => {
-        this.hideColumn(column);
+        this.removeColumn(column);
       }
     }];
     if (NUMBER_TYPES.includes(column.type) || DATE_TYPES.includes(column.type)) {
@@ -264,9 +264,12 @@ export class ReportGridComponent {
     }
   }
 
-  hideColumn({changeColumnProp}: ReportGridField) {
-    changeColumnProp('visible', false);
-    this.change.emit({subject: 'visibility'});
+  removeColumn({changeColumnProp, payload}: ReportGridField) {
+    changeColumnProp('checked', false);
+    this.change.emit({
+      subject: 'removeColumn',
+      column: payload
+    });
   }
 
   renameColumn({payload, changeColumnProp}: ReportGridField) {

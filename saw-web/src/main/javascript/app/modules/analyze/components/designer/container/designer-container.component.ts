@@ -324,6 +324,12 @@ export class DesignerContainerComponent {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
+    case 'removeColumn':
+      this.cleanSorts();
+      this.setColumnPropsToDefaultIfNeeded(event.column);
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.artifacts = [...this.artifacts];
+      break;
     case 'aggregate':
     case 'filterRemove':
     case 'joins':
@@ -339,7 +345,7 @@ export class DesignerContainerComponent {
     // only front end data refresh needed
     case 'format':
     case 'aliasName':
-    case 'visibility':
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
       break;
     case 'artifactPosition':
