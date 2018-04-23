@@ -3,6 +3,7 @@ import {downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
 import {NgModule} from '@angular/core';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { LocalStorageModule } from 'angular-2-local-storage';
 
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
@@ -168,6 +169,10 @@ angular.module(AnalyzeModule, [
 @NgModule({
   imports: [
     CommonModuleAngular4,
+    LocalStorageModule.withConfig({
+      prefix: 'symmetra',
+      storageType: 'localStorage'
+    }),
     CommonModuleTs,
     MaterialModule,
     FlexLayoutModule,

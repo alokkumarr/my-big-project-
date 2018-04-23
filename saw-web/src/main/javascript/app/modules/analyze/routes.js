@@ -1,3 +1,5 @@
+import {AnalyzeViewComponent} from './components/view-u';
+
 export function routesConfig($stateProvider) {
   'ngInject';
 
@@ -9,7 +11,7 @@ export function routesConfig($stateProvider) {
     }, {
       name: 'analyze.view',
       url: '/:id',
-      component: 'analyzeView'
+      component: AnalyzeViewComponent
     }, {
       name: 'analyze.executedDetail',
       url: '/analysis/:analysisId/executed?executionId',
