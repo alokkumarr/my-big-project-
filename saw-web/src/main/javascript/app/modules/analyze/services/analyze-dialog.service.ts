@@ -59,6 +59,7 @@ export class AnalyzeDialogService {
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data
     } as MatDialogConfig);
   }
