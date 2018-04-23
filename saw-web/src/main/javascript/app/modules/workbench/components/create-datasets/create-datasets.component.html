@@ -6,7 +6,7 @@
     <ng-template matStepperIcon="done">
       <mat-icon fontIcon="icon-checkmark"></mat-icon>
     </ng-template>
-    <mat-step e2e="first-window" [completed]="selectFullfilled" i18n label="SELECT">
+    <mat-step e2e="create-dataset-first-window" [completed]="selectFullfilled" i18n label="SELECT">
       <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
       <div fxLayout="row" fxLayoutGap="20px">
         <button e2e="first-window-stepperCancel" mat-raised-button (click)="backtoLists()" class="stepperBtn">
@@ -19,7 +19,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step e2e="second-window" [completed]="detailsFilled" i18n label="DETAILS">
+    <mat-step e2e="create-dataset-second-window" [completed]="detailsFilled" i18n label="DETAILS">
       <dataset-details #detailsComponent [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
       <div fxLayout="row" fxLayoutGap="20px">
         <button e2e="second-window-stepperCancel" mat-raised-button (click)="backtoLists()" class="stepperBtn">
@@ -36,7 +36,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step e2e="third-window" [completed]="previewDone" i18n label="PREVIEW">
+    <mat-step e2e="create-dataset-third-window" [completed]="previewDone" i18n label="PREVIEW">
       <parser-preview *ngIf="selectedIndex === 2 || selectedIndex === 3" [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
       <div fxLayout="row" fxLayoutGap="20px">
         <button e2e="third-window-stepperCancel" mat-raised-button (click)="backtoLists()" class="stepperBtn">
@@ -53,7 +53,7 @@
         </button>
       </div>
     </mat-step>
-    <mat-step e2e="fourth-window" label="ADD_DATASET" [stepControl]="nameFormGroup">
+    <mat-step e2e="create-dataset-fourth-window" label="ADD_DATASET" [stepControl]="nameFormGroup">
       <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
         <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
           <mat-list>

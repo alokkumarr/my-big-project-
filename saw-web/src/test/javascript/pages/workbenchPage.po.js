@@ -18,7 +18,7 @@ module.exports = {
         closeRawPreviewFile: element(by.css('rawpreview-dialog button[e2e="close-raw-preview-dialog-button"]')),
       },
       detailedDataSet: {
-          cardViewDataSetElem: element(by.css('mat-card.datasets-card mat-card-header[e2e="data-set-card"]')),
+          cardViewDataSetElem: element(by.css('a[e2e="data-set-card"]')),
           listViewDataSetElem: element(by.css('div.grid-container a[e2e="data-set-grid-view-mode"]')),
 
           dataSetSummaryPreview: element(by.css('div.data-summary-view[e2e="data-set-summary-preview"]')),
@@ -27,20 +27,20 @@ module.exports = {
       dataSetActionElement: {
           dataSetAction: element(by.css('dataset-actions')),
           menuAction: element(by.css('button.mat-menu-item[role="menuitem"]')),
-          firstWindowStepperFwd: element(by.css('mat-step[e2e="first-window"] button[e2e="first-window-stepperFwd"]')),
-          firstWindowStepperCancel: element(by.css('mat-step[e2e="first-window"] button[e2e="first-window-stepperCancel"]')),
+          firstWindowStepperFwd: element(by.css('mat-step[e2e="create-dataset-first-window"] button[e2e="first-window-stepperFwd"]')),
+          firstWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-first-window"] button[e2e="first-window-stepperCancel"]')),
           
-          secondWindowStepperCancel: element(by.css('mat-step[e2e="second-window"] button[e2e="second-window-stepperCancel"]')),
-          secondWindowStepperFwd: element(by.css('mat-step[e2e="second-window"] button[e2e="second-window-stepperFwd"]')),
-          secondWindowStepperPrev: element(by.css('mat-step[e2e="second-window"] button[e2e="second-window-stepperPrev"]')),
+          secondWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-second-window"] button[e2e="second-window-stepperCancel"]')),
+          secondWindowStepperFwd: element(by.css('mat-step[e2e="create-dataset-second-window"] button[e2e="second-window-stepperFwd"]')),
+          secondWindowStepperPrev: element(by.css('mat-step[e2e="create-dataset-second-window"] button[e2e="second-window-stepperPrev"]')),
           
-          thirdWindowStepperCancel: element(by.css('mat-step[e2e="third-window"] button[e2e="third-window-stepperCancel"]')),
-          thirdWindowStepperFwd: element(by.css('mat-step[e2e="third-window"] button[e2e="third-window-stepperFwd"]')),
-          thirdWindowStepperPrev: element(by.css('mat-step[e2e="third-window"] button[e2e="third-window-stepperPrev"]')),
+          thirdWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-third-window"] button[e2e="third-window-stepperCancel"]')),
+          thirdWindowStepperFwd: element(by.css('mat-step[e2e="create-dataset-third-window"] button[e2e="third-window-stepperFwd"]')),
+          thirdWindowStepperPrev: element(by.css('mat-step[e2e="create-dataset-third-window"] button[e2e="third-window-stepperPrev"]')),
 
-          fourthWindowStepperCancel: element(by.css('mat-step[e2e="fourth-window"] button[e2e="fourth-window-stepperCancel"]')),
-          fourthWindowStepperAdd: element(by.css('mat-step[e2e="fourth-window"] button[e2e="fourth-window-stepperAdd"]')),
-          fourthWindowStepperPrev: element(by.css('mat-step[e2e="fourth-window"] button[e2e="fourth-window-stepperPrev"]')),
+          fourthWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-fourth-window"] button[e2e="fourth-window-stepperCancel"]')),
+          fourthWindowStepperAdd: element(by.css('mat-step[e2e="create-dataset-fourth-window"] button[e2e="fourth-window-stepperAdd"]')),
+          fourthWindowStepperPrev: element(by.css('mat-step[e2e="create-dataset-fourth-window"] button[e2e="fourth-window-stepperPrev"]')),
 
           rawPreviewData: element(by.css('mat-tab[e2e="raw-data-preview"]')),
       },
