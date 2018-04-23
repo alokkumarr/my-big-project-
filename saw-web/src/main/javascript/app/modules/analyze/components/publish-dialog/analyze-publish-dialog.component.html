@@ -38,7 +38,8 @@
               placeholder="Enter email-id and separate by ';'"
               secondary-placeholder="Emails separate by ';'"
               md-separator-keys="$ctrl.separatorKeys"
-              md-enable-chip-edit="false">
+              md-enable-chip-edit="false"
+              md-add-on-blur="true">
               <md-chip-template >
                 <div ng-if="!$ctrl.validateThisEmail($chip)" class="errorMsg">?</div>
                 <span>
