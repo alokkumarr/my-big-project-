@@ -6,6 +6,7 @@ const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');
+const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
 
@@ -129,8 +130,10 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
       //Verify if created appeared in list
-      commonFunctions.waitFor.elementToBePresent(createdAnalysis)
-        .then(() => expect(createdAnalysis.isPresent()).toBe(true));
+      commonFunctions.waitFor.elementToBeClickableAndClick(createdAnalysis);
+      commonFunctions.waitFor.elementToBeClickableAndClick(savedAlaysisPage.backButton);
+      /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
+        .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
 
       //Verify chart type on home page
       analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
