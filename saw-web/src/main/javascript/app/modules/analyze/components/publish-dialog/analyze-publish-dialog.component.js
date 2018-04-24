@@ -169,9 +169,11 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
-        this.crondetails.endDate.setHours(23);
-        this.crondetails.endDate.setMinutes(59);
-        this.crondetails.endDate.setSeconds(59);
+        if (!isEmpty(this.crondetails.endDate)) {
+          this.crondetails.endDate.setHours(23);
+          this.crondetails.endDate.setMinutes(59);
+          this.crondetails.endDate.setSeconds(59);
+        }
         let cronJobName = this.model.id;
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';

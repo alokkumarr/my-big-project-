@@ -237,8 +237,10 @@ export class CronJobSchedularComponent {
   }
 
   loadData() {
+    this.CronExpression = this.crondetails.cronexp;
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
+    this.activeRadio = this.crondetails.activeRadio;
     this.startDate = new Date(this.crondetails.startDate);
     this.endDate = new Date(this.crondetails.endDate);
     if (isEmpty(this.crondetails.cronexp)) {
@@ -261,6 +263,7 @@ export class CronJobSchedularComponent {
     switch (this.scheduleType) {
     case 'hourly':
       const fetchLocalMinute;
+      this.selectedTab = 1;
       if (this.crondetails.cronexp.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
         this.hourly.hours = 0;
         fetchLocalMinute = parseCronValue[1].split('/');

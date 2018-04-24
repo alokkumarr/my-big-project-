@@ -120,7 +120,7 @@
 
 <div class="dateDetails" *ngIf="scheduleType !== 'immediate'">
   <mat-form-field>
-    <input matInput [matDatepicker]="fromDatePicker" [max]="endDate" [ngModel]="startDate" [value]="startDate" (dateChange)="cronChange();" placeholder="Start date">
+    <input matInput [matDatepicker]="fromDatePicker" [max]="endDate" [(ngModel)]="startDate" [value]="startDate" (dateChange)="cronChange();" placeholder="Start date">
     <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
     <mat-datepicker #fromDatePicker></mat-datepicker>
   </mat-form-field>
