@@ -2,6 +2,7 @@ import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isFinite from 'lodash/isFinite';
 import * as keys from 'lodash/keys';
 import * as split from 'lodash/split';
 import * as filter from 'lodash/filter';
@@ -14,9 +15,10 @@ import DataSource from 'devextreme/data/data_source';
 import * as template from './report-grid-display.component.html';
 
 import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../consts.js';
-import {getFormatter, DEFAULT_PRECISION} from '../../../utils/numberFormatter';
+import {getFormatter} from '../../../utils/numberFormatter';
 
 const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PRECISION = 2;
 
 export const ReportGridDisplayComponent = {
   template,
@@ -177,6 +179,25 @@ export const ReportGridDisplayComponent = {
       return split(dataField, '.')[0];
     }
 
+    /**
+     * addAggregateConditionalFormat
+     * Adds conditional formatting if applicable based on the
+     * aggregate selected for the column.
+     *
+     * @param column
+     * @returns {undefined}
+     */
+    addAggregateConditionalFormat(column) {
+      const isNumberType = NUMBER_TYPES.includes(column.type);
+      if (isNumberType && ['percentage', 'avg'].includes(column.aggregate)) {
+        if (!column.format) {
+          column.format = {};
+        }
+        column.format[column.aggregate] = true;
+        column.format.precision = isFinite(column.format.precision) ? column.format.precision : DEFAULT_PRECISION;
+      }
+    }
+
     _getDxColumns(columns = [], data = []) {
       let allColumns = [];
       if (isEmpty(data) || this.showChecked) {
@@ -192,6 +213,8 @@ export const ReportGridDisplayComponent = {
           column.type = 'date';
         }
         const isNumberType = NUMBER_TYPES.includes(column.type);
+
+        this.addAggregateConditionalFormat(column);
 
         const field = {
           caption: column.aliasName || column.alias || column.displayName || column.name,
