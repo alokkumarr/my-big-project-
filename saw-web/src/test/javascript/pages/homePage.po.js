@@ -35,7 +35,7 @@ module.exports = {
  */
 const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) => {
   //Collapse default category
-  module.exports.expandedCategory(defaultCategory).click();
+  commonFunctions.waitFor.elementToBeClickableAndClick(module.exports.expandedCategory(defaultCategory));
 
   //Navigate to Category/Sub-category
   const collapsedCategory = module.exports.collapsedCategory(categoryName);

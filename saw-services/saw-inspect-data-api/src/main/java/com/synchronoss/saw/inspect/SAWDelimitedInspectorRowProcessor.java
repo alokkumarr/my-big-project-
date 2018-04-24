@@ -15,6 +15,7 @@ import com.synchronoss.saw.extract.DateTemporalExtractor;
 import com.synchronoss.saw.store.base.TemporalDateStructure;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.processor.ObjectRowProcessor;
+import com.univocity.parsers.csv.CsvParserSettings;
 
 public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
 
@@ -45,12 +46,13 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
     private List<String> deviatedSamples;
     private List<Object[]> deviatedParsedSamples;
     private int devSampleCnt;
+    private CsvParserSettings settings;
 
 
     String[] dateFmt;
     private DateFormat fmt;
 
-    public SAWDelimitedInspectorRowProcessor(long headerSize, long fieldDefRowNumber, String[] dateFmt, long sampleSize){
+    public SAWDelimitedInspectorRowProcessor(long headerSize, long fieldDefRowNumber, String[] dateFmt, long sampleSize, CsvParserSettings settings){
         this.rowCounter = 0;
         this.numberOfRowsParsed = 0;
         this.maxNumberOfFields = 0;
@@ -70,6 +72,7 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         this.deviatedParsedSamples = new ArrayList<>(DEV_SAMPLE_SIZE);
         this.sampleCnt = 0;
         this.devSampleCnt = 0;
+        this.settings = settings;
         if(dateFmt!=null && dateFmt.length > 0) {
             this.dateFmt = dateFmt;
             this.fmt = new SimpleDateFormat(dateFmt[0]);
@@ -81,13 +84,17 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
 
     @Override
     public void rowProcessed(Object[] row, ParsingContext context) {
+      
             if(rowCounter < headerSize) {
                   if(rowCounter == (fieldDefRowNumber - 1)) {
-                      processFieldNames(row);
-                  }
+                      processFieldNames(row);}
                   String currentLine = context.currentParsedContent();
-                  headerLines.add(currentLine.substring(0, currentLine.indexOf(new String(context.lineSeparator()))));
-              } 
+              try {
+                headerLines.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+              } catch (StringIndexOutOfBoundsException ex) {
+                headerLines.add(currentLine.substring(0, currentLine.length()));      
+              }
+             } 
             else {
               if (headerSize>0){
                 maxNumberOfFields = fieldNames.size();
@@ -104,13 +111,21 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
               }
               if(numberOfRowsParsed > 0 && devSampleCnt < DEV_SAMPLE_SIZE){
                 String currentLine = context.currentParsedContent();
-                deviatedSamples.add(currentLine.substring(0, currentLine.indexOf(new String(context.lineSeparator()))));
+                try {
+                  deviatedSamples.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+                } catch (StringIndexOutOfBoundsException ex) {
+                  deviatedSamples.add(currentLine.substring(0, currentLine.length()));
+                }
                 deviatedParsedSamples.add(row);
                 devSampleCnt++;
             } else{
               if(sampleCnt < SAMPLE_SIZE){
                 String currentLine = context.currentParsedContent();
-                samples.add(currentLine.substring(0, currentLine.indexOf(new String(context.lineSeparator()))));
+                try {
+                  samples.add(currentLine.substring(0, currentLine.indexOf(settings.getFormat().getDelimiter())));
+                }catch (StringIndexOutOfBoundsException ex) {
+                  samples.add(currentLine.substring(0, currentLine.length()));  
+                }
                 parsedSamples.add(row);
                 sampleCnt++;
                 }
@@ -358,4 +373,3 @@ public class SAWDelimitedInspectorRowProcessor extends ObjectRowProcessor {
         }
     }
 }
-

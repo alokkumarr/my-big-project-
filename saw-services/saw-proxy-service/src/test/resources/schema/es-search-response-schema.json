@@ -1,0 +1,81 @@
+{
+  "id": "http://synchronoss.com/esResponse.json",
+  "type": "object",
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "took": {
+      "id": "/properties/took",
+      "type": "integer",
+      "title": "The Took Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": 0
+      
+    },
+    "timed_out": {
+      "id": "/properties/timed_out",
+      "type": "boolean",
+      "title": "The Timed_out Schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": false
+      
+    },
+    "_shards": {
+      "id": "/properties/_shards",
+      "type": "object",
+      "properties": {
+        "total": {
+          "id": "/properties/_shards/properties/total",
+          "type": "integer",
+          "title": "The Total Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        },
+        "successful": {
+          "id": "/properties/_shards/properties/successful",
+          "type": "integer",
+          "title": "The Successful Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+          
+        },
+        "failed": {
+          "id": "/properties/_shards/properties/failed",
+          "type": "integer",
+          "title": "The Failed Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        }
+      }
+    },
+    "hits": {
+      "id": "/properties/hits",
+      "type": "object",
+      "properties": {
+        "total": {
+          "id": "/properties/hits/properties/total",
+          "type": "integer",
+          "title": "The Total Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+          
+        },
+        "max_score": {
+          "id": "/properties/hits/properties/max_score",
+          "type": "number",
+          "title": "The Max_score Schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0
+        },
+        "hits": {
+          "id": "/properties/hits/properties/hits",
+          "type": "array"
+        }
+      }
+    },
+    "aggregations": {
+      "id": "/properties/aggregations",
+      "type": "object"
+    }
+  }
+}

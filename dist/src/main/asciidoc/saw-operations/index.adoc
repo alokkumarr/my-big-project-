@@ -466,7 +466,4 @@ end, this is maintained by means of `alias` entry. *Note* that each
 server entry per customer is required to have a unique alias entry
 which gets presented in front end.
 
-[Note]
-====
-Please make sure to put minified JSON in configuration file.
-====
+NOTE: Please make sure to put minified JSON in configuration file.

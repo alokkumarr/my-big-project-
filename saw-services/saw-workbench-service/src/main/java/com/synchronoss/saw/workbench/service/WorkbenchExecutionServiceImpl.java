@@ -29,7 +29,7 @@ public class WorkbenchExecutionServiceImpl
     implements WorkbenchExecutionService {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
     private final ObjectMapper mapper = new ObjectMapper();
-  
+
     @Value("${workbench.project-key}")
     @NotNull
     private String project;
@@ -37,7 +37,7 @@ public class WorkbenchExecutionServiceImpl
     @Value("${workbench.project-root}")
     @NotNull
     private String root;
-  
+
     @Value("${workbench.livy-uri}")
     @NotNull
     private String livyUri;
@@ -45,6 +45,10 @@ public class WorkbenchExecutionServiceImpl
     @Value("${workbench.preview-limit}")
     @NotNull
     private Integer previewLimit;
+
+    @Value("${workbench.project-root}/previews")
+    @NotNull
+    private String previewsTablePath;
 
     /**
      * Cached Workbench Livy client to be kept around for next
@@ -55,12 +59,11 @@ public class WorkbenchExecutionServiceImpl
     @PostConstruct
     private void init() throws Exception {
         /* Initialize the previews MapR-DB table */
-        String path = PreviewBuilder.PREVIEWS_TABLE;
         try (Admin admin = MapRDB.newAdmin()) {
-            if (!admin.tableExists(path)) {
-                log.info("Creating previews table: {}", path);
+            if (!admin.tableExists(previewsTablePath)) {
+                log.info("Creating previews table: {}", previewsTablePath);
                 TableDescriptor table =
-                    MapRDB.newTableDescriptor(path);
+                    MapRDB.newTableDescriptor(previewsTablePath);
                 FamilyDescriptor family =
                     MapRDB.newDefaultFamilyDescriptor().setTTL(3600);
                 table.addFamily(family);
@@ -143,13 +146,13 @@ public class WorkbenchExecutionServiceImpl
     /**
      * Preview the output of a executing a transformation component on
      * a dataset
-     * 
+     *
      * Also used for simply viewing the contents of an existing
      * dataset.
      */
     @Override
     public ObjectNode preview(String project, String name) throws Exception {
-        log.info("Create dataset transformation preview");
+        log.info("Creating dataset transformation preview");
         /* Get physical location of dataset */
         DataSetStore dss = new DataSetStore(metastoreBase);
         String json = dss.readDataSet(project, name);
@@ -166,8 +169,12 @@ public class WorkbenchExecutionServiceImpl
         /* Submit job to Livy for reading out preview data */
         WorkbenchClient client = getWorkbenchClient();
         String id = UUID.randomUUID().toString();
-        client.submit(new WorkbenchPreviewJob(id, location, previewLimit));
-        PreviewBuilder preview = new PreviewBuilder(id, "queued");
+        client.submit(
+            new WorkbenchPreviewJob(
+                id, location, previewLimit, previewsTablePath),
+            () -> handlePreviewFailure(id));
+        PreviewBuilder preview = new PreviewBuilder(
+            previewsTablePath, id, "queued");
         preview.insert();
         /* Return generated preview ID to client to be used for
          * retrieving preview data */
@@ -176,15 +183,22 @@ public class WorkbenchExecutionServiceImpl
         return root;
     }
 
+    private void handlePreviewFailure(String previewId) {
+        log.error("Creating preview failed");
+        PreviewBuilder preview = new PreviewBuilder(
+            previewsTablePath, previewId, "failed");
+        preview.insert();
+    }
+
     private String getDatasetLocation(String project, String name) {
         return root + "/" + project + "/dl/fs/data/" + name + "/data";
     }
 
     @Override
     public ObjectNode getPreview(String previewId) throws Exception {
-        log.info("Get dataset transformation preview");
+        log.debug("Getting dataset transformation preview");
         /* Locate the preview data in MapR-DB */
-        Table table = MapRDB.getTable(PreviewBuilder.PREVIEWS_TABLE);
+        Table table = MapRDB.getTable(previewsTablePath);
         Document doc = table.findById(previewId);
         /* Return the preview data */
         if (doc == null) {

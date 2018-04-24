@@ -232,7 +232,7 @@ export class ChartService {
         value: 'data',
         name: 'Show Data Value'
       }];
-      config.customTooltip = false;
+      config.customTooltip = true;
       config.legend = false;
       return config;
 
@@ -421,6 +421,7 @@ export class ChartService {
   }
 
   getSerie({alias, displayName, comboType, aggregate, chartType}, index, fields, type) {
+    let aggrSymbol = '';
     const comboGroups = fpPipe(
       fpMap('comboType'),
       fpUniq,
@@ -430,8 +431,12 @@ export class ChartService {
 
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
+    if (aggregate === 'percentage') {
+      aggrSymbol = '%';
+    }
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
+      aggrSymbol,
       type: splinifiedChartType,
       yAxis: (chartType === 'tsPane' || type === 'tsPane') ? index : comboGroups[comboType],
       zIndex,
@@ -481,6 +486,10 @@ export class ChartService {
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
     let comboType = fields.y[0].comboType;
+    let aggrsymbol = '';
+    if (fields.y[0].aggregate === 'percentage') {
+      aggrsymbol = '%';
+    }
     if (angular.isDefined(comboType)) {
       if (comboType === 'tsspline' || comboType === 'tsPane') {
         comboType = comboType === 'tsPane' ? 'spline' : comboType.slice(2);
@@ -491,7 +500,7 @@ export class ChartService {
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
       fpGroupBy('g'),
       fpToPairs,
-      fpMap(([name, data]) => ({name, data, type: comboType}))
+      fpMap(([name, data]) => ({name, data, type: comboType, aggrSymbol: aggrsymbol}))
     )(parsedData);
   }
 
@@ -644,6 +653,7 @@ export class ChartService {
         seriesData.name = yLabel;
         seriesData.dataLabels = seriesData.dataLabels || {};
         seriesData.dataLabels.enabled = labelOptions.enabled;
+
         /* eslint-disable */
         seriesData.dataLabels.formatter = function () {
           if (this.percentage <= 5) {
@@ -834,11 +844,10 @@ export class ChartService {
       <th>${fields.x.alias || get(opts, 'labels.x', '') || fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
     </tr>`;
-
     const yIsSingle = fields.y.length === 1;
-    const yAxisString = `<tr>
+    let yAxisString = `<tr>
       <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
-      <td>{point.y:,.2f}</td>
+      <td>{point.y:,.2f}{point.series.userOptions.aggrSymbol}</td>
     </tr>`;
     const zAxisString = fields.z ?
       `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
@@ -846,7 +855,12 @@ export class ChartService {
     const groupString = fields.g ?
       `<tr><th>Group:</th><td>{point.g}</td></tr>` :
       '';
-
+    if (type === 'pie' && fields.y[0].aggregate === 'percentage') {
+      yAxisString = `<tr>
+        <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
+        <td>{point.y:,.2f}%</td>
+      </tr>`;
+    }
     let tooltipObj = {
       useHTML: true,
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
@@ -884,6 +898,7 @@ export class ChartService {
       path: 'legend.enabled',
       data: Boolean(!yIsSingle || fields.g)
     });
+
     return changes;
   }
 

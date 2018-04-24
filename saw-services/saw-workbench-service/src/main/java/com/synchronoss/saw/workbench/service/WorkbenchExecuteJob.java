@@ -42,6 +42,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     @Override
     public Integer call(JobContext jobContext) throws Exception {
         Logger log = LoggerFactory.getLogger(getClass().getName());
+
         log.info("Start execute job");
         AsynchAbstractComponent aac = null;
         switch (ngctx.componentName) {
@@ -66,7 +67,15 @@ public class WorkbenchExecuteJob implements Job<Integer> {
         int rc = aac.run();
         log.info("Workbench job completed, result: " + rc + " error: "
             + aac.getError());
+        int status = Component.startComponent(
+            xdfComponent, root, config, project, batch);
+        if (status != 0) {
+            throw new RuntimeException(
+                "XDF returned non-zero status: " + status);
+        }
+        log.info("Finished execute job");
+        return null;
 
-        return rc;
+
     }
 }

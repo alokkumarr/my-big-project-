@@ -45,6 +45,11 @@
       <artifactId>saw-observe-service</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>saw-storage-proxy-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
