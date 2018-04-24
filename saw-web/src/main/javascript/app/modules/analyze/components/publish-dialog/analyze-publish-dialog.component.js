@@ -185,6 +185,8 @@ export const AnalyzePublishDialogComponent = {
           ftp: this.ftp,
           fileType: 'csv',
           jobName: cronJobName,
+          startDate: this.crondetails.startDate,
+          endDate: this.crondetails.endDate,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
