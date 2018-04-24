@@ -3,7 +3,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as template from './jsPlumbTable.component.html';
 import style from './jsPlumbTable.component.scss';
 import * as isUndefined from 'lodash/isUndefined';
-import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, AGGREGATE_STRING_TYPES} from '../../../consts';
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, AGGREGATE_STRING_TYPES, INT_TYPES} from '../../../consts';
 
 export const JSPlumbTable = {
   template,
@@ -95,6 +95,9 @@ export const JSPlumbTable = {
       if (!isUndefined(field.format) && (field.format.percentage || field.format.avg)) {
         delete field.format.percentage;
         delete field.format.avg;
+      } else if (INT_TYPES.includes(field.type)) {
+        field.format = field.format || {};
+        delete field.format.precision;
       }
 
       this.didAnalysisChange = true;
@@ -106,6 +109,9 @@ export const JSPlumbTable = {
       if (field.format.percentage || field.format.avg) {
         delete field.format.percentage;
         delete field.format.avg;
+      } else if (INT_TYPES.includes(field.type)) {
+        field.format = field.format || {};
+        delete field.format.precision;
       }
       delete field.aggregate;
       delete field.meta.aggregate;

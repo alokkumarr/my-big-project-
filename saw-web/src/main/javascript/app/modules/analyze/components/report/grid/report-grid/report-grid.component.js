@@ -11,7 +11,7 @@ import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES, INT_TYPES} from '../../../../consts';
 import {getFormatter} from '../../../../../../common/utils/numberFormatter';
 
 const DEFAULT_PRECISION = 2;
@@ -178,6 +178,9 @@ export const ReportGridComponent = {
         }
         column.format[column.aggregate] = true;
         column.format.precision = isFinite(column.format.precision) ? column.format.precision : DEFAULT_PRECISION;
+      } else if (INT_TYPES.includes(column.type)) {
+        column.format = column.format || {};
+        delete column.format.precision;
       }
     }
 
