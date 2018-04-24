@@ -92,8 +92,9 @@ export const JSPlumbTable = {
     }
 
     onSelectAggregateType(aggregateType, field) {
-      if (!isUndefined(field.format) && field.format.percentage) {
+      if (!isUndefined(field.format) && (field.format.percentage || field.format.avg)) {
         delete field.format.percentage;
+        delete field.format.avg;
       }
 
       this.didAnalysisChange = true;
@@ -102,8 +103,9 @@ export const JSPlumbTable = {
     }
 
     clearAggegate(field) {
-      if (field.format.percentage) {
+      if (field.format.percentage || field.format.avg) {
         delete field.format.percentage;
+        delete field.format.avg;
       }
       delete field.aggregate;
       delete field.meta.aggregate;
