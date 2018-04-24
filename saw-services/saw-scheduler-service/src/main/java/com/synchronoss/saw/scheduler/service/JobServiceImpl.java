@@ -324,7 +324,8 @@ public class JobServiceImpl implements JobService{
 						JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 						SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
 						if (job.getCategoryID().equalsIgnoreCase(categoryID)  &&
-                            !(job.getCronExpression() == null || job.getCronExpression().trim().equals(""))) {
+                            !(job.getCronExpression() == null || job.getCronExpression().trim().equals(""))
+                            && isActiveSchedule(job.getJobScheduleTime(),job.getEndDate())) {
 							//get job's trigger
 							List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
 							Date scheduleTime = triggers.get(0).getStartTime();
@@ -495,5 +496,27 @@ public class JobServiceImpl implements JobService{
 		}
 		return false;
 	}
+
+    /**
+     *
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    private static boolean isActiveSchedule(Date startDate, Date endDate)
+    {
+        Date date = new Date();
+        if (endDate!=null) {
+            if (startDate.compareTo(date) <= 0 && endDate.compareTo(date) >= 0)
+                return true;
+            else
+                return false;
+        }
+        else {
+            // In case their are no end date the then schedule will be always
+            //active.
+            return true;
+        }
+    }
 }
 
