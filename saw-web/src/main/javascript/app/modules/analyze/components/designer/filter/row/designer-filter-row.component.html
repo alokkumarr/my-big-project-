@@ -19,7 +19,7 @@
                         (optionSelected)="onArtifactColumnSelected($event.option.value.columnName)">
         <mat-option *ngFor="let artifactColumn of filteredColumns | async"
                     [value]="artifactColumn">
-          {{ artifactColumn.aliasName || artifactColumn.displayName }}
+          {{ artifactColumn.displayName }}
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
