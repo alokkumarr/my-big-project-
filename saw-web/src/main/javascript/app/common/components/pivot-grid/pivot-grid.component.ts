@@ -1,13 +1,9 @@
 declare const require: any;
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
+import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
@@ -20,13 +16,10 @@ import * as filter from 'lodash/filter';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
-import {Subject} from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-import {
-  ArtifactColumnPivot,
-  Sort
-} from '../../../modules/analyze/models';
+import { ArtifactColumnPivot, Sort } from '../../../modules/analyze/models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
@@ -61,39 +54,42 @@ export interface IPivotGridUpdate {
 export class PivotGridComponent {
   @Input() updater: Subject<IPivotGridUpdate>;
   @Input() mode: string | 'designer';
-  @Input('sorts') set setSorts(sorts: Sort[]) {
+  @Input('sorts')
+  set setSorts(sorts: Sort[]) {
     if (sorts) {
       this.delayIfNeeded(() => {
         this.updateSorts(sorts, null);
       });
       this._sorts = sorts;
     }
-  };
-  @Input('artifactColumns') set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
+  }
+  @Input('artifactColumns')
+  set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
     this.artifactColumns = fpPipe(
       fpFilter('checked'),
       this.preProcessArtifactColumns(),
       this.artifactColumn2PivotField()
     )(artifactColumns);
     this.setPivotData();
-  };
-  @Input('data') set setData(data: any[]) {
+  }
+  @Input('data')
+  set setData(data: any[]) {
     this.data = this.preProcessData(data);
     this.setPivotData();
-  };
+  }
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public fields: any[];
   public data: any[];
   public _sorts: Array<Sort> = [];
   public artifactColumns: ArtifactColumnPivot[];
-  public pivotGridOptions : any;
+  public pivotGridOptions: any;
   rowHeaderLayout = 'tree';
-  allowSortingBySummary = false
+  allowSortingBySummary = false;
   showBorders = true;
   allowSorting = false;
   allowFiltering = false;
   allowExpandAll = true;
-  fieldChooser = {enabled: false};
+  fieldChooser = { enabled: false };
   // field-panel
   visible = true;
   showColumnFields = true;
@@ -111,7 +107,9 @@ export class PivotGridComponent {
       // if it's not repainted it appears smaller
       this._gridInstance.repaint();
       if (this.updater) {
-        this._subscription = this.updater.subscribe(updates => this.update(updates));
+        this._subscription = this.updater.subscribe(updates =>
+          this.update(updates)
+        );
       }
     }, 500);
   }
@@ -128,10 +126,10 @@ export class PivotGridComponent {
 
   onPivotContentReady() {
     const fields = this._gridInstance.getDataSource().fields();
-    this.onContentReady.emit({fields});
+    this.onContentReady.emit({ fields });
   }
 
-  onExported(e){
+  onExported(e) {
     e.component.getDataSource().state(this._preExportState);
     this._preExportState = null;
   }
@@ -161,7 +159,7 @@ export class PivotGridComponent {
     const dataSource = this._gridInstance.getDataSource();
     const fields = dataSource.fields();
     this._preExportState = dataSource.state();
-    forEach(fields, ({dataField}) => dataSource.expandAll(dataField));
+    forEach(fields, ({ dataField }) => dataSource.expandAll(dataField));
     this._gridInstance.exportToExcel();
   }
 
@@ -191,9 +189,10 @@ export class PivotGridComponent {
     forEach(sorts, (sort: Sort) => {
       // remove the suffix from the sort fields name, that is added by elastic search
       // there is a bug that breaks pivotgrid when the name conains a .
-      const dataField = sort.type === 'string' ?
-        sort.columnName.split('.')[0] :
-        sort.columnName;
+      const dataField =
+        sort.type === 'string'
+          ? sort.columnName.split('.')[0]
+          : sort.columnName;
       dataSource.field(dataField, {
         sortOrder: sort.order
       });
@@ -216,6 +215,7 @@ export class PivotGridComponent {
       if (DATE_TYPES.includes(column.type)) {
         let momentFormat;
         const cloned = clone(column);
+        /* prettier-ignore */
         switch (column.dateInterval) {
         case 'day':
           cloned.groupInterval = 1;
@@ -267,15 +267,21 @@ export class PivotGridComponent {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-    const columnsToFormat = filter(this.artifactColumns, ({type}) => DATE_TYPES.includes(type));
+    const columnsToFormat = filter(this.artifactColumns, ({ type }) =>
+      DATE_TYPES.includes(type)
+    );
     if (isEmpty(columnsToFormat)) {
       return data;
     }
 
     const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
-      forEach(columnsToFormat, ({name, dateInterval, manualFormat}) => {
-        clonedDataPoint[name] = this.getFormattedDataValue(clonedDataPoint[name], dateInterval, manualFormat);
+      forEach(columnsToFormat, ({ name, dateInterval, manualFormat }) => {
+        clonedDataPoint[name] = this.getFormattedDataValue(
+          clonedDataPoint[name],
+          dateInterval,
+          manualFormat
+        );
       });
       return clonedDataPoint;
     });
@@ -284,17 +290,18 @@ export class PivotGridComponent {
 
   getFormattedDataValue(value, dateInterval, format) {
     let formatToApply;
+    /* prettier-ignore */
     switch (dateInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
       return moment.utc(value);
     case 'quarter':
-      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
       const formattedValue = moment.utc(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
     case 'month':
-      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat
+      formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
       return moment.utc(value).format(formatToApply);
     case 'year':
     default:
@@ -304,27 +311,35 @@ export class PivotGridComponent {
 
   getMomentFormat(format) {
     const formatObj = DATE_FORMATS_OBJ[format];
-    return formatObj ?
-      formatObj.momentValue :
-      DEFAULT_DATE_FORMAT.momentValue
+    return formatObj ? formatObj.momentValue : DEFAULT_DATE_FORMAT.momentValue;
   }
 
   artifactColumn2PivotField(): any {
     return fpPipe(
-      fpMap((artifactColumn) => {
+      fpMap(artifactColumn => {
         const cloned = clone(artifactColumn);
 
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
-          const percent = (cloned.aggregate == 'percentage' ? true : false);
-          
+          const percent = cloned.aggregate == 'percentage' ? true : false;
+
           if (!isUndefined(artifactColumn.format)) {
             artifactColumn.format.percentage = percent;
           }
+
+          const conditionalPrecision =
+            ['percentage', 'avg'].includes(artifactColumn.aggregate) &&
+            !isFinite(get(artifactColumn, 'format.precision'))
+              ? DEFAULT_PRECISION
+              : 0;
+
           cloned.format = {
-            formatter: getFormatter(artifactColumn.format || (
-              FLOAT_TYPES.includes(cloned.type) ? {precision: DEFAULT_PRECISION, percentage: percent} : {precision: 0, percentage: percent}
-            ))
+            formatter: getFormatter(
+              artifactColumn.format ||
+                (FLOAT_TYPES.includes(cloned.type)
+                  ? { precision: DEFAULT_PRECISION, percentage: percent }
+                  : { precision: conditionalPrecision, percentage: percent })
+            )
           };
           /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
@@ -351,10 +366,12 @@ export class PivotGridComponent {
 
         return cloned;
       }),
-      fpMap(fpMapKeys(key => {
-        const newKey = ARTIFACT_COLUMN_2_PIVOT_FIELD[key];
-        return newKey || key;
-      }))
+      fpMap(
+        fpMapKeys(key => {
+          const newKey = ARTIFACT_COLUMN_2_PIVOT_FIELD[key];
+          return newKey || key;
+        })
+      )
     );
   }
 }
