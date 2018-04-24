@@ -35,7 +35,7 @@ export class AnalyzeViewComponent implements OnInit {
   public analysisId : string;
   public canUserCreate: boolean;
   public states = {
-    reportView: this.CARD_VIEW,
+    viewMode: this.CARD_VIEW,
     analysisType: 'all',
     searchTerm: '',
     searchTermValue: ''
@@ -61,7 +61,7 @@ export class AnalyzeViewComponent implements OnInit {
     this.analysisId = this._transition.params().id;
     const savedView = <string>this._localStorage.get(VIEW_KEY);
     console.log('savedView', savedView);
-    this.states.reportView = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
+    this.states.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
     savedView : this.LIST_VIEW;
 
     this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
@@ -74,7 +74,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   onViewChange(view) {
-    this.states.reportView = view;
+    this.states.viewMode = view;
   }
 
   onAnalysisTypeChange(type) {

@@ -35,6 +35,7 @@ import {AnalyzeViewComponent} from './components/view/analyze-view.component';
 import {AnalyzeViewComponent as AnalyzeViewUpgraded} from './components/view-u/analyze-view.component';
 import {AnalyzeCardsViewComponent} from './components/view/card/analyze-cards-view.component';
 import {AnalyzeCardComponent} from './components/view/card/analyze-card.component';
+import {AnalyzeListViewComponent as AnalyzeListViewUpgraded} from './components/view-u/list-view';
 import {AnalyzeListViewComponent} from './components/view/list/analyze-list-view.component';
 import {AnalyzeExecutedListComponent} from './components/executed-list/analyze-executed-list.component';
 import {AnalyzeReportDetailComponent} from './components/executed-detail/report/analyze-report-detail.component';
@@ -137,6 +138,10 @@ angular.module(AnalyzeModule, [
     'analyzeViewU',
     downgradeComponent({component: AnalyzeViewUpgraded}) as angular.IDirectiveFactory
   )
+  .directive(
+    'analyzeViewU',
+    downgradeComponent({component: AnalyzeListViewUpgraded}) as angular.IDirectiveFactory
+  )
   .component('analyzeCardsView', AnalyzeCardsViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeListView', AnalyzeListViewComponent)
@@ -222,7 +227,8 @@ angular.module(AnalyzeModule, [
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
     FilterChipsUpgraded,
-    AnalyzeViewUpgraded
+    AnalyzeViewUpgraded,
+    AnalyzeListViewUpgraded
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -253,7 +259,8 @@ angular.module(AnalyzeModule, [
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
     FilterChipsUpgraded,
-    AnalyzeViewUpgraded
+    AnalyzeViewUpgraded,
+    AnalyzeListViewUpgraded
   ],
   providers: [
     $mdDialogProvider,
