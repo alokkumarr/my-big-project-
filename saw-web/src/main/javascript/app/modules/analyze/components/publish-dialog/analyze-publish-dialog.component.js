@@ -150,7 +150,6 @@ export const AnalyzePublishDialogComponent = {
     }
 
     onCronChanged(cronexpression) {
-      console.log(cronexpression);
       this.crondetails = cronexpression;
     }
 
@@ -195,7 +194,6 @@ export const AnalyzePublishDialogComponent = {
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
-        console.log(this.model.schedule);
         this.triggerSchedule();
       }
     }
