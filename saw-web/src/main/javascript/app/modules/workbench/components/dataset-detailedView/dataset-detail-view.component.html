@@ -19,7 +19,7 @@
   <div class="details-body">
     <mat-tab-group dynamicHeight="false" (selectedTabChange)="tabChanged($event)">
       <mat-tab label="Summary">
-        <div fxLayout="row" fxFill fxFlex fxLayoutGap="10px">
+        <div class="data-summary-view" e2e="data-set-summary-preview" fxLayout="row" fxFill fxFlex fxLayoutGap="10px">
           <mat-card class="details-card" fxLayout="column" fxFlex="60">
             <div class="ds-details">
               <span class="details-title mat-subheading-2">Dataset Details</span>
@@ -77,8 +77,8 @@
           </mat-card>
         </div>
       </mat-tab>
-      <mat-tab label="Data Preview" [disabled]="previewStatus === 'failed'">
-        <div fxLayout="row" class="data-cont" fxFlex fxLayoutAlign="center center">
+      <mat-tab  label="Data Preview" [disabled]="previewStatus === 'failed'">
+        <div e2e="data-set-detial-preview" fxLayout="row" class="data-cont" fxFlex fxLayoutAlign="center center">
           <mat-card class="data-grid" fxFlex="100">
             <dx-data-grid #dpGrid id="dpGrid" *ngIf="previewStatus === 'success'" fxFlex [dataSource]="previewData" [height]="'100%'" [width]="'100%'" [allowColumnResizing]="true" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
               [columnAutoWidth]="true" [rowAlternationEnabled]="true" [showBorders]="false">

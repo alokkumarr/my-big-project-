@@ -5,11 +5,11 @@
       <mat-card-title class="headerText" i18n>Staging Area</mat-card-title>
 
       <span class="toolbar-spacer"></span>
-      <button for="fileUpload" i18n matTooltip="Upload File" mat-icon-button color="primary" (click)="fileUpload.click()">
+      <button for="fileUpload" i18n matTooltip="Upload File" e2e="upload-selected-file" mat-icon-button color="primary" (click)="fileUpload.click()">
         <mat-icon fontIcon="icon-upload"></mat-icon>
       </button>
-      <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept="text/csv, 'text/plain'" />
-      <button mat-icon-button color="primary" matTooltip="New Folder" i18n (click)="createFolder()">
+      <input fxHide e2e="uploaded-file" type="file" #fileUpload (change)="fileInput($event)" multiple accept="text/csv, 'text/plain'" />
+      <button mat-icon-button color="primary" matTooltip="New Folder" e2e="create-new-folder" i18n (click)="createFolder()">
         <mat-icon fontIcon="icon-new-folder"></mat-icon>
       </button>
     </mat-card-header>
@@ -28,7 +28,7 @@
             <input matInput autocomplete="off" i18n placeholder="Enter file mask" [(ngModel)]="fileMask" [formControl]="fileMaskControl" required />
             <mat-icon matSuffix fontIcon="icon-info" matTooltip="{{maskHelper}}"></mat-icon>
           </mat-form-field>
-          <div class="gridContainer">
+          <div class="gridContainer" e2e="grid-container">
             <dx-data-grid id="gridContainer">
               <div *dxTemplate="let data of 'dobjTemplate'">
                 <div fxLayout="row">
@@ -44,7 +44,7 @@
               </div>
               <div *dxTemplate="let data of 'actionsTemplate'">
                 <div fxLayout="row" fxLayoutAlign="center center">
-                  <span class="preview-icon" matTooltip="Preview File" (click)="previewDialog(data.value)">
+                  <span e2e="preview-file" class="preview-icon" matTooltip="Preview File" (click)="previewDialog(data.value)">
                     <mat-icon fontIcon="icon-show"></mat-icon>
                   </span>
                 </div>
