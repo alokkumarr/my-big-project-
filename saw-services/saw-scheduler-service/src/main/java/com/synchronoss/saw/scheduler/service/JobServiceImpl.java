@@ -77,7 +77,7 @@ public class JobServiceImpl implements JobService{
 		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
 
         logger.debug("creating trigger for key :"+jobKey + " at date :"+job.getJobScheduleTime());
-		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -137,6 +137,7 @@ public class JobServiceImpl implements JobService{
         logger.debug("Parameters received for updating cron job : jobKey :"+jobKey + ", date: "+schedulerJobDetail.getJobScheduleTime());
 		try {
 			Trigger newTrigger = JobUtil.createCronTrigger(jobName, schedulerJobDetail.getJobScheduleTime(),
+					schedulerJobDetail.getEndDate(),
 					schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);

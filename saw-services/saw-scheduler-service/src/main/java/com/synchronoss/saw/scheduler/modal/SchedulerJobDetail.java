@@ -56,6 +56,9 @@ public class SchedulerJobDetail implements Serializable {
 
    private String fileType ;
 
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
+   private Date endDate;
+
     /**
      * Gets analysisID
      *
@@ -304,6 +307,21 @@ public class SchedulerJobDetail implements Serializable {
         this.fileType = fileType;
     }
 
+    /**
+     * Gets endDate
+     *
+     * @return value of endDate
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * Sets endDate
+     */
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
     /**
      *
@@ -329,6 +347,8 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(metricName);
         out.writeObject(type);
         out.writeObject(userFullName);
+        if(endDate!=null)
+            out.writeObject(endDate);
 
     }
 
@@ -367,6 +387,11 @@ public class SchedulerJobDetail implements Serializable {
             metricName = (String) in.readObject();
             type = (String) in.readObject();
             userFullName = (String) in.readObject();
+        }
+        if(in.available()!=-1) {
+            Object endDt = in.readObject();
+            if (endDt instanceof Date)
+            endDate = (Date) endDt;
         }
     }
 }
