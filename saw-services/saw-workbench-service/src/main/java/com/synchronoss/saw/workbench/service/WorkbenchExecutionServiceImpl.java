@@ -1,7 +1,5 @@
 package com.synchronoss.saw.workbench.service;
 
-import java.util.List;
-
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -17,7 +15,6 @@ import com.mapr.db.TableDescriptor;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -115,21 +112,11 @@ public class WorkbenchExecutionServiceImpl
         log.info("Execute dataset transformation");
 
         WorkbenchClient client = getWorkbenchClient();
-        XDFContextProvider ngCtx =
-            new XDFContextProvider(root, project, component, config);
-//        createDatasetDirectory(name);
-
-        WorkbenchExecuteJob  workbenchExecuteJob =
-            new WorkbenchExecuteJob(ngCtx.getNGContext());
-        List<String> ids = ngCtx.getDataSetIDs();
-
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseRoot = mapper.createObjectNode();
-        responseRoot.put("id", ids.get(0));
-
-        client.submit(workbenchExecuteJob);
-
-        return responseRoot;
+        createDatasetDirectory(name);
+        client.submit(new WorkbenchExecuteJob(
+                          root, project, component, config));
+        ObjectNode root = mapper.createObjectNode();
+        return root;
     }
 
     private void createDatasetDirectory(String name) throws Exception {

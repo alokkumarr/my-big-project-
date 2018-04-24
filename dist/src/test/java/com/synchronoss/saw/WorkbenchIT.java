@@ -1,32 +1,25 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import java.io.IOException;
-
 import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.restassured.response.Response;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Workbench Service integration tests.  Tests parsing, viewing and
  * executing components.
  */
-public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
+public class WorkbenchIT extends BaseIT {
     private static final String WORKBENCH_PROJECT = "workbench";
     private static final String WORKBENCH_PATH =
         "/services/internal/workbench/projects/" + WORKBENCH_PROJECT;
@@ -34,135 +27,11 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     private static final int WAIT_SLEEP_SECONDS = 5;
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-
     /**
      * Parse a CSV file into dataset with given name using Workbench
      * Services.
      */
-    private String parseDataset2() throws IOException {
-
-        ObjectNode root = mapper.createObjectNode();
-        root.put("name", "WBAPARSER01");
-        root.put("component", "parser");
-        ObjectNode config = root.putObject("configuration");
-        ArrayNode fields = config.putArray("fields");
-
-        ObjectNode field1 = fields.addObject();
-        field1.put("name", "State");
-        field1.put("type", "string");
-
-        ObjectNode field2 = fields.addObject();
-        field2.put("name", "Name");
-        field2.put("type", "string");
-
-        ObjectNode field3 = fields.addObject();
-        field3.put("name", "NTDID");
-        field3.put("type", "string");
-
-        ObjectNode field4 = fields.addObject();
-        field4.put("name", "LegacyNTDID");
-        field4.put("type", "string");
-
-        ObjectNode field5 = fields.addObject();
-        field5.put("name", "OrgType");
-        field5.put("type", "string");
-
-        ObjectNode field6 = fields.addObject();
-        field6.put("name", "ReporterType");
-        field6.put("type", "string");
-
-        ObjectNode field7 = fields.addObject();
-        field7.put("name", "UrbanizedArea");
-        field7.put("type", "string");
-
-        ObjectNode field8 = fields.addObject();
-        field8.put("name", "UZAPopulation");
-        field8.put("type", "string");
-
-        ObjectNode field9 = fields.addObject();
-        field9.put("name", "UZASize");
-        field9.put("type", "string");
-
-        ObjectNode field10 = fields.addObject();
-        field10.put("name", "WholeAgencyVOMSSize");
-        field10.put("type", "string");
-
-        ObjectNode field11 = fields.addObject();
-        field11.put("name", "Mode");
-        field11.put("type", "string");
-
-        ObjectNode field12 = fields.addObject();
-        field12.put("name", "TOS");
-        field12.put("type", "string");
-
-        ObjectNode field13 = fields.addObject();
-        field13.put("name", "VOMS");
-        field13.put("type", "integer");
-
-        ObjectNode field14 = fields.addObject();
-        field14.put("name", "MajorMechanicalFailure");
-        field14.put("type", "integer");
-
-        ObjectNode field15 = fields.addObject();
-        field15.put("name", "OtherMechanicalFailure");
-        field15.put("type", "integer");
-
-        ObjectNode field16 = fields.addObject();
-        field16.put("name", "TotalRevenueSystemMechanical");
-        field16.put("type", "integer");
-
-        ObjectNode field17 = fields.addObject();
-        field17.put("name", "C4");
-        field17.put("type", "string");
-
-        config.put("file", "RevenueVehicleMaintPerf2.csv");
-        config.put("lineSeparator", "\n");
-        config.put("delimiter", ",");
-        config.put("quoteChar", "\"");
-        config.put("quoteEscape", "\\");
-        config.put("headerSize", "4");
-
-        ObjectNode outputs = config.putObject("output");
-        outputs.put("dataSet", "WBAPARSER01");
-        outputs.put("mode", "replace");
-        outputs.put("format", "parquet");
-        outputs.put("catalog", "data");
-
-        ArrayNode parameters = config.putArray("parameters");
-        ObjectNode p1 = parameters.addObject();
-        p1.put("name", "spark.master");
-        p1.put("value", "local[*]");
-
-        String json = mapper.writeValueAsString(root);
-
-        log.debug("request: " + json);
-
-        Response response = given(authSpec)
-            .body(json)
-            .when()
-            .post(WORKBENCH_PATH + "/datasets")
-            .then()
-            .assertThat()
-            .statusCode(200)
-            .extract()
-            .response();
-        String resp = response.getBody().asString();
-
-        assert (resp != null);
-        log.debug("Response: " + resp);
-        JsonNode node = mapper.reader().readTree(resp);
-        assert (node != null);
-        String id = node.get("id").asText();
-        return id;
-    }
-
-
-
-    /**
-     * Parse a CSV file into dataset with given name using Workbench
-     * Services.
-     */
-    private void parseDataset(String name) throws IOException {
+    private void parseDataset(String name) throws JsonProcessingException {
         ObjectNode root = mapper.createObjectNode();
         root.put("name", name);
         root.put("component", "parser");
@@ -184,34 +53,10 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
         config.put("quoteChar", "\"");
         config.put("quoteEscape", "\\");
         config.put("headerSize", "0");
-        ObjectNode outputs = config.putObject("output");
-        outputs.put("dataSet", name);
-        outputs.put("mode", "replace");
-        outputs.put("format", "parquet");
-        outputs.put("catalog", "data");
-
-        ArrayNode parameters = config.putArray("parameters");
-        ObjectNode p1 = parameters.addObject();
-        p1.put("name", "spark.master");
-        p1.put("value", "local[*]");
-
-        String json = mapper.writeValueAsString(root);
-        log.debug("request: " + json);
-
-        Response response = given(authSpec)
-            .body(json)
+        given(authSpec)
+            .body(root)
             .when().post(WORKBENCH_PATH + "/datasets")
-            .then().assertThat().statusCode(200)
-            .extract()
-            .response();
-        String resp = response.getBody().asString();
-
-        assert (resp != null);
-        log.debug("Response: " + resp);
-        JsonNode node = mapper.reader().readTree(resp);
-        assert (node != null);
-
-
+            .then().assertThat().statusCode(200);
     }
 
     /**
@@ -221,10 +66,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     private void waitForDataset(String id, int retries)
         throws JsonProcessingException {
         String status = getDatasetStatus(id);
-        if (status == null
-            || status.equals("INIT")
-            || status.equals("IN-PROGRESS")
-            || status.equals("STARTED")) {
+        if (status == null || status.equals("INIT")) {
             if (retries == 0) {
                 throw new RuntimeException(
                     "Timed out waiting while waiting for dataset");
@@ -237,17 +79,9 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
                 log.debug("Interrupted");
             }
             waitForDataset(id, retries - 1);
-        } else if (!status.equals("SUCCESS")
-                    && !status.equals("FAILED")
-                    && !status.equals("PARTIAL")) {
+        } else if (!status.equals("SUCCESS")) {
             throw new RuntimeException(
                 "Unknown dataset status: " + status);
-        } else if (status.equals("SUCCESS")) {
-            log.info("XDF successfully completed.");
-        } else if (status.equals("FAILED")) {
-            log.info("XDF failed.");
-        } else {
-            log.info("XDF partially succeeded.");
         }
         /* Dataset is in SUCCESS state, so return */
     }
@@ -266,34 +100,18 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
              * preregistered */
             //.body(datasetPath, isA(Map.class))
             .extract().response();
-
-        String resp = response.getBody().asString();
-        assert (resp != null);
         return response.path(statusPath);
     }
 
-
     @Test
-    public void testListPreregDatasets() throws IOException {
-        // id = parseDataset("test_list")
-        String id = parseDataset2();
-        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
-        log.debug("ID: " + id);
-        waitForDataset(id, WAIT_RETRIES);
-    }
-
-    @Test
-    public void testParseDataset() throws IOException {
-        String name = "test_parse";
+    public void testParseDataset() throws JsonProcessingException {
+        String name = "test-parse-" + testId();
         parseDataset(name);
         /* Workaround: Until the dataset creation API provides the
          * dataset ID, construct it manually here. */
         String id = "workbench::" + name;
         waitForDataset(id, WAIT_RETRIES);
     }
-
-
-
 
     @Test
     public void testSQLDataset() throws JsonProcessingException {
@@ -355,7 +173,7 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     }
 
     @Test
-    public void testPreviewDataset() throws IOException {
+    public void testPreviewDataset() throws JsonProcessingException {
         String name = "test-preview-" + testId();
         /* Create dataset to be used for testing viewing dataset */
         parseDataset(name);
@@ -424,5 +242,4 @@ public class WorkbenchIT extends com.synchronoss.saw.BaseIT {
     private String testId() {
         return UUID.randomUUID().toString();
     }
-
 }

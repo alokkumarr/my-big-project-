@@ -1,18 +1,16 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.time.Instant;
+
 import com.cloudera.livy.Job;
 import com.cloudera.livy.JobContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import sncr.xdf.context.NGContext;
-
-import sncr.xdf.ngcomponent.AsynchAbstractComponent;
-import sncr.xdf.parser.AsynchNGParser;
-import sncr.xdf.sql.ng.AsynchNGSQLComponent;
-import sncr.xdf.transformer.ng.AsynchNGTransformerComponent;
-
+import sncr.xdf.component.Component;
+import sncr.xdf.context.Context;
+import sncr.xdf.parser.Parser;
+import sncr.xdf.sql.TempSQLComponent;
 
 public class WorkbenchExecuteJob implements Job<Integer> {
     private static final long serialVersionUID = 1L;
@@ -20,7 +18,6 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     private final String project;
     private final String component;
     private final String config;
-    private final NGContext ngctx;
 
     public WorkbenchExecuteJob(
         String root, String project, String component, String config) {
@@ -28,15 +25,6 @@ public class WorkbenchExecuteJob implements Job<Integer> {
         this.project = project;
         this.component = component;
         this.config = config;
-        ngctx = null;
-    }
-
-    public WorkbenchExecuteJob(NGContext ngctx) {
-        this.root      = null;
-        this.project   = null;
-        this.component = null;
-        this.config    = null;
-        this.ngctx     = ngctx;
     }
 
     @Override
@@ -75,7 +63,5 @@ public class WorkbenchExecuteJob implements Job<Integer> {
         }
         log.info("Finished execute job");
         return null;
-
-
     }
 }
