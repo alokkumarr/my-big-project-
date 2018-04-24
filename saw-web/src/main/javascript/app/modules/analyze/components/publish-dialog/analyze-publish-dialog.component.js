@@ -3,7 +3,6 @@ import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
-import * as moment from 'moment';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 
