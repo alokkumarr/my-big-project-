@@ -121,7 +121,7 @@ export class CronJobSchedularComponent {
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
-    this.startDate = new Date();
+    //this.startDate = new Date();
   }
 
   private range(start: number, end: number): number[] {
@@ -239,6 +239,8 @@ export class CronJobSchedularComponent {
   loadData() {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
+    this.startDate = new Date(this.crondetails.startDate);
+    this.endDate = new Date(this.crondetails.endDate);
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
