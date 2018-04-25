@@ -13,13 +13,15 @@ import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
+import * as get from 'lodash/get';
+import * as filter from 'lodash/filter';
+
 const template = require('./observe-view.component.html');
 
 @Component({
   selector: 'observe-view',
   template
 })
-
 export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
   private subCategoryId: string;
@@ -30,6 +32,7 @@ export class ObserveViewComponent implements OnInit {
     edit: false
   };
   @ViewChild('filterSidenav') sidenav: MatSidenav;
+  hasKPIs: boolean = false;
 
   constructor(
     public dialog: MatDialog,
@@ -72,17 +75,23 @@ export class ObserveViewComponent implements OnInit {
 
   deleteDashboard(): void {
     this.headerProgress.show();
-    this.observe.deleteDashboard(this.dashboard).subscribe(() => {
-      this.observe.reloadMenu().subscribe(menu => {
+    this.observe.deleteDashboard(this.dashboard).subscribe(
+      () => {
+        this.observe.reloadMenu().subscribe(
+          menu => {
+            this.headerProgress.hide();
+            this.observe.updateSidebar(menu);
+            this.observe.redirectToFirstDash(menu, true);
+          },
+          () => {
+            this.headerProgress.hide();
+          }
+        );
+      },
+      () => {
         this.headerProgress.hide();
-        this.observe.updateSidebar(menu);
-        this.observe.redirectToFirstDash(menu, true);
-      }, () => {
-        this.headerProgress.hide();
-      });
-    }, () => {
-      this.headerProgress.hide();
-    });
+      }
+    );
   }
 
   editDashboard(): void {
@@ -129,14 +138,28 @@ export class ObserveViewComponent implements OnInit {
 
   loadDashboard(): void {
     this.headerProgress.show();
-    this.observe.getDashboard(this.dashboardId).subscribe(data => {
-      this.dashboard = data;
-      this.loadPrivileges();
-      this.headerProgress.hide();
-    }, _ => {
-      this.headerProgress.hide();
-    })
+    this.observe.getDashboard(this.dashboardId).subscribe(
+      data => {
+        this.dashboard = data;
+        this.loadPrivileges();
+        this.checkForKPIs();
+        this.headerProgress.hide();
+      },
+      _ => {
+        this.headerProgress.hide();
+      }
+    );
+  }
 
+  /**
+   * checkForKPIs - Checks if dashboard has any KPI tiles
+   *
+   * @returns {void}
+   */
+  checkForKPIs(): void {
+    const tiles = get(this.dashboard, 'tiles', []);
+    const kpis = filter(tiles, t => t.type === 'kpi');
+    this.hasKPIs = kpis && kpis.length > 0;
   }
 
   filterSidenavStateChange(data) {
