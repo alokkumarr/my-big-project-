@@ -38,6 +38,6 @@ export class ExpandableFieldComponent {
 
   onAggregateChange(value) {
     this.artifactColumn.aggregate = value;
-    this.change.emit({subject: 'aggregate'});
+    this.change.emit({subject: 'aggregate', column: this.artifactColumn});
   }
 }

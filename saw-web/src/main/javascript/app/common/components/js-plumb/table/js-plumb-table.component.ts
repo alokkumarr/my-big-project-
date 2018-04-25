@@ -80,7 +80,7 @@ export class JsPlumbTableComponent {
 
   onAggregateChange(column, aggregate) {
     column.aggregate = aggregate;
-    this.change.emit({subject: 'aggregate'});
+    this.change.emit({subject: 'aggregate', column});
   }
 
   clearAggregate(column) {

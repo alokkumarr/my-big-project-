@@ -20,23 +20,23 @@ export function getFormatter(format: Format | string) {
     return {};
   }
   return fpPipe(
-    number => applyPrecisionIfNeeded(format, number),
-    number => applyPercentageSymbolIfNeeded(format, number),
-    numberString => applyCommasIfNeeded(format, numberString),
-    numberString => applyCurrencyIfNeeded(format, numberString)
+    number => applyPrecisionIfNeeded(<Format>format, number),
+    number => applyPercentageSymbolIfNeeded(<Format>format, number),
+    numberString => applyCommasIfNeeded(<Format>format, numberString),
+    numberString => applyCurrencyIfNeeded(<Format>format, numberString)
   )
 }
 
-export function applyPercentageSymbolIfNeeded(format, number) {
+export function applyPercentageSymbolIfNeeded(format: Format, number) {
   if (format.percentage) {
     const percentageValue = `${number}%`;
     return percentageValue.toString();
   } else {
-    return number.toString();  
+    return number.toString();
   }
 }
 
-export function applyPrecisionIfNeeded(format, number) {
+export function applyPrecisionIfNeeded(format: Format, number) {
   const precision = format.precision;
   if (isFinite(precision)) {
     return Number(number).toFixed(precision);
@@ -44,7 +44,7 @@ export function applyPrecisionIfNeeded(format, number) {
   return number.toString();
 }
 
-export function applyCommasIfNeeded(format, numberString) {
+export function applyCommasIfNeeded(format: Format, numberString) {
   if (format.comma) {
     return fpPipe(
 
@@ -67,7 +67,7 @@ export function applyCommasIfNeeded(format, numberString) {
   return numberString;
 }
 
-export function applyCurrencyIfNeeded(format, numberString) {
+export function applyCurrencyIfNeeded(format: Format, numberString) {
   const {
     currency,
     currencySymbol

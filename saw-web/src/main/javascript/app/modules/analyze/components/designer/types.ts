@@ -94,5 +94,5 @@ export type DesignerChangeEvent = {
     'visibleIndex'     |
     'submitQuery'      |
     'changeQuery';
-  column?: ArtifactColumnReport;
+  column?: ArtifactColumn;
 }

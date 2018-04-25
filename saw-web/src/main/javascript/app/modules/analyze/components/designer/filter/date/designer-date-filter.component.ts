@@ -68,7 +68,7 @@ export class DesignerDateFilterComponent {
   }
 
   onPresetChange(change) {
-    this.filterModel.preset = change.value;
+    this.tempModel.preset = change.value;
     if (change.value !== CUSTOM_DATE_PRESET_VALUE) {
       this.tempModel.gte = null;
       this.tempModel.lte = null;
