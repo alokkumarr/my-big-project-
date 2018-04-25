@@ -122,13 +122,13 @@
   <mat-form-field>
     <input matInput [matDatepicker]="fromDatePicker" [max]="endDate" [(ngModel)]="startDate" [value]="startDate" (dateChange)="cronChange();" placeholder="Start date">
     <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #fromDatePicker></mat-datepicker>
+    <mat-datepicker #fromDatePicker ng-model-options="{ timezone: 'utc' }"></mat-datepicker>
   </mat-form-field>
   <span class="clear" (click)="startDate = '';cronChange();">Clear</span><br/>
   <mat-form-field>
     <input matInput [matDatepicker]="toDatePicker" [min]="startDate" [(ngModel)]="endDate" [value]="endDate" (dateChange)="cronChange();" placeholder="End date">
     <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #toDatePicker></mat-datepicker> 
+    <mat-datepicker #toDatePicker ng-model-options="{ timezone: 'utc' }"></mat-datepicker> 
   </mat-form-field>
   <span class="clear" (click)="endDate = '';cronChange();">Clear</span><br/>
 </div>

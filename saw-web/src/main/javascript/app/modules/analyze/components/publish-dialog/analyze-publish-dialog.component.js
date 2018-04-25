@@ -5,6 +5,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
+import * as moment from 'moment';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
@@ -169,7 +170,7 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
-        if (!isEmpty(this.crondetails.endDate)) {
+        if (moment(this.crondetails.endDate).isValid()) {
           this.crondetails.endDate.setHours(23);
           this.crondetails.endDate.setMinutes(59);
           this.crondetails.endDate.setSeconds(59);
