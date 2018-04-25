@@ -34,7 +34,7 @@ import * as toString from 'lodash/toString';
 import * as replace from 'lodash/replace';
 import * as isUndefined from 'lodash/isUndefined';
 
-import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
+import {NUMBER_TYPES, FLOAT_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -420,7 +420,7 @@ export class ChartService {
     }
   }
 
-  getSerie({alias, displayName, comboType, aggregate, chartType}, index, fields, type) {
+  getSerie({alias, type, displayName, comboType, aggregate, chartType}, index, fields, chartTypeOverride) {
     let aggrSymbol = '';
     const comboGroups = fpPipe(
       fpMap('comboType'),
@@ -437,8 +437,10 @@ export class ChartService {
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       aggrSymbol,
+      aggregate,
       type: splinifiedChartType,
-      yAxis: (chartType === 'tsPane' || type === 'tsPane') ? index : comboGroups[comboType],
+      dataType: type,
+      yAxis: (chartType === 'tsPane' || chartTypeOverride === 'tsPane') ? index : comboGroups[comboType],
       zIndex,
       data: []
     };
@@ -500,7 +502,14 @@ export class ChartService {
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
       fpGroupBy('g'),
       fpToPairs,
-      fpMap(([name, data]) => ({name, data, type: comboType, aggrSymbol: aggrsymbol}))
+      fpMap(([name, data]) => ({
+        name,
+        data,
+        type: comboType,
+        aggrSymbol: aggrsymbol,
+        aggregate: fields.y[0].aggregate,
+        dataType: fields.y[0].type
+      }))
     )(parsedData);
   }
 
@@ -833,34 +842,81 @@ export class ChartService {
 
     const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
     const xIsString = fields.x.type === 'string';
-    // x can be either a string, a number or a date
-    // string -> use the value from categories
-    // number -> restrict the number to 2 decimals
-    // date -> just show the date
-    const xStringValue = xIsString ?
-      'point.key' : xIsNumber ?
-        'point.x:,.2f' : 'point.x';
-    const xAxisString = `<tr>
-      <th>${fields.x.alias || get(opts, 'labels.x', '') || fields.x.displayName}:</th>
-      <td>{${xStringValue}}</td>
-    </tr>`;
     const yIsSingle = fields.y.length === 1;
-    let yAxisString = `<tr>
-      <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
-      <td>{point.y:,.2f}{point.series.userOptions.aggrSymbol}</td>
-    </tr>`;
-    const zAxisString = fields.z ?
-      `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
-      '';
-    const groupString = fields.g ?
-      `<tr><th>Group:</th><td>{point.g}</td></tr>` :
-      '';
-    if (type === 'pie' && fields.y[0].aggregate === 'percentage') {
-      yAxisString = `<tr>
-        <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
-        <td>{point.y:,.2f}%</td>
+
+    /**
+     * If the data type is float OR aggregate is percentage or average, we
+     * show two decimal places. Else, no decimal places.
+     *
+     * @returns {undefined}
+     */
+    const getPrecision = (aggregate, type) => {
+      return ['percentage', 'avg'].includes(aggregate) || FLOAT_TYPES.includes(type) ? 2 : 0;
+    };
+
+    /**
+     * If point is provided as paramter, this function returns the formatted tooltip.
+     * If point is not provided, it replaces the point values with appropriate format strings.
+     *
+     * Point is supposed to be provided when we're dynamically using pointFormatter in our
+     * tooltip.
+     *
+     * @returns {string}
+     */
+    const tooltipFormatter = point => { // eslint-disable-line
+      const options = point ? point.series.userOptions : {};
+      //
+      // x can be either a string, a number or a date
+      // string -> use the value from categories
+      // number -> restrict the number to 2 decimals
+      // date -> just show the date
+      const xStringValue = point ?
+        (
+          xIsString ?
+            point.key : xIsNumber ?
+              round(point.x, 2) : point.x
+        ) :
+        (
+          xIsString ?
+            'point.key' : xIsNumber ?
+              'point.x:,.2f' : 'point.x'
+        );
+
+      const xAxisString = `<tr>
+        <th>${fields.x.alias || get(opts, 'labels.x', '') || fields.x.displayName}:</th>
+        <td>{${xStringValue}}</td>
       </tr>`;
-    }
+
+      let yAxisString = `<tr>
+        <th>${fields.y.alias || get(opts, 'labels.y', '') || (point ? point.series.name : '{series.name}')}:</th>
+        <td>${point ? round(point.y, getPrecision(options.aggregate, options.dataType)) : '{point.y:,.2f}'}${point ? point.series.userOptions.aggrSymbol : '{point.series.userOptions.aggrSymbol}'}</td>
+      </tr>`;
+
+      const zAxisString = fields.z ?
+        `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>${point ? round(point.z, 2) : '{point.z:,.2f}'}</td></tr>` :
+        '';
+
+      const groupString = fields.g ?
+        `<tr><th>Group:</th><td>${point ? point.g : '{point.g}'}</td></tr>` :
+        '';
+
+      if (type === 'pie' && fields.y[0].aggregate === 'percentage') {
+        yAxisString = `<tr>
+          <th>${fields.y.alias || get(opts, 'labels.y', '') || (point ? point.series.name : '{series.name}')}:</th>
+          <td>${point ? round(point.y, getPrecision(options.aggregate, options.dataType)) : '{point.y:,.2f}'}</td>
+        </tr>`;
+      }
+
+      return {
+        xAxisString,
+        yAxisString,
+        zAxisString,
+        groupString
+      };
+    };
+
+    const {xAxisString, yAxisString, zAxisString, groupString} = tooltipFormatter();
+
     let tooltipObj = {
       useHTML: true,
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
@@ -868,6 +924,13 @@ export class ChartService {
         ${yAxisString}
         ${zAxisString}
         ${groupString}`,
+      pointFormatter: function () { // eslint-disable-line
+        const {xAxisString, yAxisString, zAxisString, groupString} = tooltipFormatter(this);
+        return `${xIsNumber ? xAxisString : ''}
+          ${yAxisString}
+          ${zAxisString}
+          ${groupString}`;
+      },
       footerFormat: '</table>',
       followPointer: true
     };
