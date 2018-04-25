@@ -230,8 +230,8 @@ export class CronJobSchedularComponent {
       cronexp: this.CronExpression,
       activeTab: this.scheduleType,
       activeRadio: this.activeRadio,
-      startDate: (new Date(this.startDate) == 'Invalid Date' ? '' : new Date(this.startDate)),
-      endDate: (new Date(this.endDate) == 'Invalid Date' ? '' : new Date(this.endDate))
+      startDate: (new Date(this.startDate) === 'Invalid Date' ? '' : new Date(this.startDate)),
+      endDate: (new Date(this.endDate) === 'Invalid Date' ? '' : new Date(this.endDate))
     }
     this.onCronChanged.emit(this.crondetails);
   }
