@@ -39,6 +39,7 @@
 
     <button mat-button
             e2e="refresh-data-btn"
+            [disabled]="isInQueryMode"
             [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
             (click)="requestAction.emit('refresh')">
       <ng-container i18n>Refresh Data</ng-container>

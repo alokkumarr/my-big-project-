@@ -19,7 +19,7 @@
   </pivot-grid>
 
   <report-grid-upgraded *ngIf="analysis.type === 'report' || analysis.type === 'esReport'"
-                        [artifacts]="analysis.artifacts"
+                        [artifacts]="analysis.edit ? null : artifacts"
                         [query]="analysis.queryManual"
                         [sorts]="analysis.sqlBuilder.sorts"
                         [dataLoader]="dataLoader"
