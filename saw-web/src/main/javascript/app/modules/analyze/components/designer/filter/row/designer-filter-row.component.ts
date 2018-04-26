@@ -58,7 +58,7 @@ export class DesignerFilterRowComponent {
     unset(this.filter, 'columnName');
     unset(this.filter, 'type');
     unset(this.filter, 'model');
-    unset(this.filter, 'isRuntimeFilter');
+    this.filter.isRuntimeFilter = false;
     this.filterChange.emit();
   }
 
