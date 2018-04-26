@@ -27,7 +27,7 @@
                              (change)="requestAction.emit('modeToggle')"
                              [value]="isInQueryMode"
                              [disabled]="analysis.edit">
-      <mat-button-toggle [value]="false">
+      <mat-button-toggle [value]="false" [disabled]="analysis.edit">
         <mat-icon fontIcon="icon-designer-mode"></mat-icon>
         <ng-container i18n>Designer</ng-container>
       </mat-button-toggle>
