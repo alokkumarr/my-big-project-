@@ -52,8 +52,13 @@ export class DesignerSettingsQueryComponent {
   }
 
   doSubmit() {
-    this.analysis.edit = true;
-    this.analysis.query = this.analysis.queryManual;
+    const analysis = this.analysis;
+    analysis.edit = true;
+    if (analysis.queryManual && !analysis.query) {
+      analysis.query = analysis.queryManual;
+    } else {
+      analysis.queryManual = analysis.query;
+    }
     this.save.emit();
   }
 

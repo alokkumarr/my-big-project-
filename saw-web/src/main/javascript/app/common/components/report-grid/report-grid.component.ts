@@ -208,6 +208,9 @@ export class ReportGridComponent {
 
   /** Update the visible indices when the column order changes */
   updateVisibleIndices(component) {
+    if (!this.columns) {
+      return;
+    }
     const cols = component.getVisibleColumns();
     let isVisibleIndexChanged = false;
     forEach(cols, (col: ReportGridField) => {
