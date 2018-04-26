@@ -239,7 +239,7 @@ export class ReportGridComponent {
     if (target !== 'header') {
       return;
     }
-    if (!this.isEditable) {
+    if (!this.isEditable || !this.columns) {
       event.items = [];
       return;
     }
