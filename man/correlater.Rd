@@ -6,7 +6,7 @@
 \alias{correlater.tbl_spark}
 \title{DataFrame Correlater function}
 \usage{
-correlater(df, ...)
+correlater(df, target_var, transform, output_col_names, remove_diag, collect)
 
 \method{correlater}{data.frame}(df, target_var = NULL, transform = NULL,
   output_col_names = c("var1", "var2", "cor"), remove_diag = FALSE)

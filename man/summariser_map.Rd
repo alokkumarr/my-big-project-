@@ -6,7 +6,7 @@
 \alias{summariser_map.tbl_spark}
 \title{DataFrame Summariser Map function}
 \usage{
-summariser_map(df, ...)
+summariser_map(df, id_vars, map, sep, fill)
 
 \method{summariser_map}{data.frame}(df, id_vars, map = list(), sep = "_",
   fill = NULL)
@@ -21,10 +21,9 @@ summariser_map(df, ...)
 as the left hand side of pivot. used as the by in the join step. can be zero
 or more columns.}
 
-\item{map}{nested list of summariser function arguments. use summariser_args
-helper function to create arguments to summariser function. Can handle more
-than one set of summariser_args. Can also process additional parameters to
-the aggregation function - similiar to the ... argument in summariser}
+\item{map}{nested list of summariser function arguments. Can handle more than
+one list of summariser arguments. Can also process additional parameters to the
+aggregation function - similiar to the ... argument in summariser}
 
 \item{sep}{argument passed to pivoter function. see pivoter function for
 details}
@@ -67,11 +66,11 @@ for(id in id_vars){
 summariser_map(dat,
                id_vars = "id",
                map = list(
-                 summariser_args(
+                 list(
                       group_vars = c("cat1"),
                       measure_vars = c("metric1", "metric2"),
                       fun = c("sum")),
-                     summariser_args(group_vars = c("cat2"),
+                     list(group_vars = c("cat2"),
                           measure_vars = c("metric2"),
                           fun = c("mean"))
                    ))

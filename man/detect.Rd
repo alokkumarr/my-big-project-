@@ -6,7 +6,8 @@
 \alias{detect.grouped_df}
 \title{Dataframe Anomaly Detection function}
 \usage{
-detect(df, ...)
+detect(df, index_var, measure_var, frequency, direction, alpha, max_anoms,
+  trend_window)
 
 \method{detect}{data.frame}(df, index_var = NULL, measure_var = NULL,
   frequency, direction = "pos", alpha = 0.01, max_anoms = 0.01,

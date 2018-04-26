@@ -2,11 +2,14 @@
 % Please edit documentation in R/roller.R
 \name{roller_args}
 \alias{roller_args}
-\title{Roller Argument Helper Function}
+\title{Roller Arguments Constructor function}
 \usage{
-roller_args(order_vars, group_vars, measure_vars, fun, width, by, partial, ...)
+roller_args(col_names, order_vars, group_vars, measure_vars, fun, width, by,
+  partial, ...)
 }
 \arguments{
+\item{col_names}{column names of dataframe}
+
 \item{order_vars}{optional vector of column names to arrange data by. can be
 one or more columns. default is NULL. order matters - arranges left to
 right. supports decreasing ordering - see examples.}
@@ -33,9 +36,9 @@ enabled for roller.data.frame. Default is TRUE.}
 
 \item{...}{additional arguments to pass to the transformation function}
 }
-\description{
-Creates a valid object of roller_args class
+\value{
+roller_args object
 }
-\details{
-Function should be used in roller internals
+\description{
+Creates new object of class roller_args
 }

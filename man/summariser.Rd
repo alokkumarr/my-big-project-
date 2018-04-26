@@ -6,7 +6,7 @@
 \alias{summariser.tbl_spark}
 \title{DataFrame Summariser function}
 \usage{
-summariser(df, ...)
+summariser(df, group_vars, measure_vars, fun, ...)
 
 \method{summariser}{data.frame}(df, group_vars, measure_vars = NULL,
   fun = c("sum"), ...)
@@ -17,8 +17,6 @@ summariser(df, ...)
 \arguments{
 \item{df}{DataFrame}
 
-\item{...}{additional parameters passed to aggregate function}
-
 \item{group_vars}{vector of column names. used in the group by aggregration.
 can be zero or more columns. set to NULL for no grouping}
 
@@ -28,6 +26,8 @@ or more columns. Default is NULL which will calculate counts only}
 \item{fun}{vector of function names. can be one or more columns. default is
 sum. Current functions supported: n_distinct, min, max, sum, mean, variance,
 sd, kurtosis, skewness, and percentile}
+
+\item{...}{additional parameters passed to aggregate function}
 }
 \value{
 returns DataFrame with one row for each unique combination of grouping

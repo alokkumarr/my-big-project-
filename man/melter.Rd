@@ -6,7 +6,7 @@
 \alias{melter.tbl_spark}
 \title{DataFrame Melter function}
 \usage{
-melter(df, ...)
+melter(df, id_vars, measure_vars, variable_name, value_name, type)
 
 \method{melter}{data.frame}(df, id_vars = NULL, measure_vars,
   variable_name = "variable", value_name = "value")

@@ -52,8 +52,8 @@
 #'                 fun = "cumsum")
 #' dat %>% mutater(measure_vars = "metric1",
 #'                 fun = funs(add2 = .+2))
-mutater <- function(df, ...) {
-  UseMethod("mutater", df)
+mutater <- function(df, order_vars, group_vars, measure_vars, fun, ...) {
+  UseMethod("mutater")
 }
 
 
@@ -67,6 +67,10 @@ mutater.data.frame <- function(df,
                                measure_vars,
                                fun,
                                ...) {
+  checkmate::assert_subset(order_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, colnames(df))
+
   if (!is.null(group_vars)) {
     df <- df %>% dplyr::group_by_at(group_vars)
   }
@@ -114,6 +118,11 @@ mutater.tbl_spark <- function(df,
                               measure_vars,
                               fun,
                               ...) {
+
+  checkmate::assert_subset(order_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, colnames(df))
+
   if (!is.null(group_vars)) {
     df <- df %>% dplyr::group_by_at(group_vars)
   }

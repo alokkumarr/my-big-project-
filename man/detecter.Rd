@@ -6,7 +6,8 @@
 \alias{detecter.tbl_spark}
 \title{Anomaly Dectection Wrapper Function}
 \usage{
-detecter(df, ...)
+detecter(df, index_var, group_vars, measure_vars, frequency, direction, alpha,
+  max_anoms, trend_window)
 
 \method{detecter}{data.frame}(df, index_var, group_vars = NULL, measure_vars,
   frequency, direction = "pos", alpha = 0.01, max_anoms = 0.01,

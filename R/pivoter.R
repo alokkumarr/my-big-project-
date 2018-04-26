@@ -76,8 +76,7 @@ pivoter.tbl_spark <- function(df,
   # Iterate through group variables and create pivot formula
   i <- 0
   for (g in group_vars) {
-    pivot_fn <-
-      as.formula(paste(paste(id_vars, collapse = "+"), "~", g))
+    pivot_fn <- as.formula(paste(paste(id_vars, collapse = "+"), "~", g))
 
     # Iterate through measure variables and determine pivot function
     for (m in measure_vars) {
@@ -89,11 +88,9 @@ pivoter.tbl_spark <- function(df,
       } else{
         fill_var <- fill
       }
-      sub_result <-
-        sparklyr::sdf_pivot(df, formula = pivot_fn, fun.aggregate = pivot_agg) %>%
+      sub_result <- sparklyr::sdf_pivot(df, formula = pivot_fn, fun.aggregate = pivot_agg) %>%
         sparklyr::na.replace(fill_var)
-      pvt_measure_vars <-
-        setdiff(colnames(sub_result), group_by_vars)
+      pvt_measure_vars <- setdiff(colnames(sub_result), group_by_vars)
 
       if (!is.null(sep)) {
         for (var in pvt_measure_vars) {

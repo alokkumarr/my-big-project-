@@ -6,7 +6,7 @@
 \alias{lagger.tbl_spark}
 \title{DataFrame Lagger function}
 \usage{
-lagger(df, ...)
+lagger(df, order_vars, group_vars, measure_vars, lags)
 
 \method{lagger}{data.frame}(df, order_vars, group_vars = NULL, measure_vars,
   lags = 1L)

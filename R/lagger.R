@@ -45,8 +45,8 @@
 #'          group_vars = "id",
 #'          measure_vars = c("metric1"),
 #'          lags = c(1, 3, 5))
-lagger <- function(df, ...) {
-  UseMethod("lagger", df)
+lagger <- function(df, order_vars, group_vars, measure_vars, lags) {
+  UseMethod("lagger")
 }
 
 

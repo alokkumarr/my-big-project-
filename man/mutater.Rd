@@ -6,7 +6,7 @@
 \alias{mutater.tbl_spark}
 \title{DataFrame Mutater Function}
 \usage{
-mutater(df, ...)
+mutater(df, order_vars, group_vars, measure_vars, fun, ...)
 
 \method{mutater}{data.frame}(df, order_vars = NULL, group_vars = NULL,
   measure_vars, fun, ...)
@@ -16,8 +16,6 @@ mutater(df, ...)
 }
 \arguments{
 \item{df}{DataFrame}
-
-\item{...}{additional arguments to pass to the transformation function}
 
 \item{order_vars}{optional vector of column names to arrange data by. can be
 one or more columns. default is NULL. order matters - arranges left to
@@ -32,6 +30,8 @@ to. can be one or more columns}
 \item{fun}{transformation function. accepts either fun name string or a
 expression wrapped in funs() call. see examples for example of using custom
 function with funs()}
+
+\item{...}{additional arguments to pass to the transformation function}
 }
 \value{
 DataFrame with additional calculated columns appended

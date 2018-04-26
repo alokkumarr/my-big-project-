@@ -41,12 +41,12 @@ dat_tbl <- copy_to(sc, dat, overwrite = TRUE)
 r_map <- summariser_map(dat,
                         id_vars = 'id',
                         map = list(
-                          summariser_args(
+                          list(
                             group_vars = c("cat1"),
                             measure_vars = c("metric1", "metric2"),
                             fun = c("sum")
                           ),
-                          summariser_args(
+                          list(
                             group_vars = c("cat2"),
                             measure_vars = c("metric2"),
                             fun = c("mean")
@@ -56,12 +56,12 @@ r_map <- summariser_map(dat,
 spk_map <- summariser_map(dat_tbl,
                           id_vars = "id",
                           map = list(
-                            summariser_args(
+                            list(
                               group_vars = c("cat1"),
                               measure_vars = c("metric1", "metric2"),
                               fun = c("sum")
                             ),
-                            summariser_args(
+                            list(
                               group_vars = c("cat2"),
                               measure_vars = c("metric2"),
                               fun = c("mean")

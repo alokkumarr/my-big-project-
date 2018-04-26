@@ -26,7 +26,7 @@
 #'corr(mtcars)
 #'corr(mtcars, "mpg")
 #'corr(mtcars, "mpg", "id_var")
-corr <- function(df, ...) {
+corr <- function(df, target_var, target_var_name) {
   UseMethod("corr", df)
 }
 
@@ -113,8 +113,8 @@ corr.tbl_spark <- function(df,
 #'
 #'@return Dataframe with pairwise correlation values in narrow, long format
 #'@export
-correlater <- function(df, ...) {
-  UseMethod("correlater", df)
+correlater <- function(df, target_var, transform, output_col_names, remove_diag, collect) {
+  UseMethod("correlater")
 }
 
 
@@ -127,21 +127,25 @@ correlater.data.frame <- function(df,
                                   transform = NULL,
                                   output_col_names = c("var1", "var2", "cor"),
                                   remove_diag = FALSE) {
+
+  variables <- colnames(df)
+  checkmate::assert_choice(target_var, variables, null.ok = TRUE)
+  checkmate::assert_choice(transform,
+                           c("standardize", "standardizer", "normalize", "normalizer"),
+                           null.ok = TRUE)
+  checkmate::assert_character(output_col_names, min.len = 3, max.len = 3)
+  checkmate::assert_flag(remove_diag)
+
   # Select only numeric columns
   df <- df %>%
     dplyr::select_if(is.numeric)
 
-  variables <- colnames(df)
-  stopifnot(target_var %in% c(variables) | is.null(target_var))
 
-  if (!is.null(transform)) {
-    if (!transform %in% c("standardize", "standardizer", "normalize", "normalizer")) {
-      stop(
-        "transform input not a recognized function. currently only supporting 'standardize' transformation via stardardizer function or 'normalize' via normalizer."
-      )
-    } else if (transform %in% c("standardize", "standardizer")) {
+  if(! is.null(transform)) {
+    if (transform %in% c("standardize", "standardizer")) {
       df <- standardizer(df, measure_vars = variables)
-    } else if (transform %in% c("normalize", "normalizer")) {
+    }
+    if (transform %in% c("normalize", "normalizer")) {
       df <- normalizer(df, measure_vars = variables)
     }
   }
@@ -187,16 +191,21 @@ correlater.tbl_spark <- function(df,
     dplyr::select_if(is.numeric)
 
   variables <- colnames(df)
-  stopifnot(target_var %in% c(variables) | is.null(target_var))
+  checkmate::assert_choice(target_var, variables, null.ok = TRUE)
+  checkmate::assert_choice(transform,
+                           c("standardize", "standardizer", "normalize", "normalizer"),
+                           null.ok = TRUE)
+  checkmate::assert_character(output_col_names, min.len = 3, max.len = 3)
+  checkmate::assert_flag(remove_diag)
+  checkmate::assert_flag(collect)
 
-  if (!is.null(transform)) {
-    if (!transform %in% c("standardize", "standardizer", "normalize", "normalizer")) {
-      message(
-        "transform input not a recognized function. currently only supporting 'standardize' transformation via stardardizer function or 'normalize' via normalizer. no transform applied on data"
-      )
-    } else if (transform %in% c("standardize", "standardizer")) {
+
+
+  if(! is.null(transform)) {
+    if (transform %in% c("standardize", "standardizer")) {
       df <- standardizer(df, measure_vars = variables)
-    } else if (transform %in% c("normalize", "normalizer")) {
+    }
+    if (transform %in% c("normalize", "normalizer")) {
       df <- normalizer(df, measure_vars = variables)
     }
   }

@@ -50,8 +50,8 @@
 #'       value_name = "value")
 #'
 #'@export
-melter <- function(df, ...) {
-  UseMethod("melter", df)
+melter <- function(df,id_vars, measure_vars, variable_name, value_name, type) {
+  UseMethod("melter")
 }
 
 
@@ -63,6 +63,13 @@ melter.data.frame <- function(df,
                               measure_vars,
                               variable_name = "variable",
                               value_name = "value") {
+
+  variables <- colnames(df)
+  checkmate::assert_subset(id_vars, variables, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, variables)
+  checkmate::assert_character(variable_name, min.len = 1, max.len = 1)
+  checkmate::assert_character(value_name, min.len = 1, max.len = 1)
+
   reshape2::melt(
     df,
     id.vars = id_vars,
@@ -83,6 +90,12 @@ melter.tbl_spark <- function(df,
                              variable_name = "variable",
                              value_name = "value",
                              type = "DOUBLE") {
+  variables <- colnames(df)
+  checkmate::assert_subset(id_vars, variables, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, variables)
+  checkmate::assert_character(variable_name, min.len = 1, max.len = 1)
+  checkmate::assert_character(value_name, min.len = 1, max.len = 1)
+
   # Helper Function
   str_fun <- function(s) {
     paste(paste0("'", s, "'"),

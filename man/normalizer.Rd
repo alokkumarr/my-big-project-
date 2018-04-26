@@ -6,7 +6,7 @@
 \alias{normalizer.tbl_spark}
 \title{DataFrame Normalizer Data Transform Function}
 \usage{
-normalizer(df, ...)
+normalizer(df, group_vars, measure_vars)
 
 \method{normalizer}{data.frame}(df, group_vars = NULL, measure_vars)
 

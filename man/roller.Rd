@@ -6,7 +6,7 @@
 \alias{roller.tbl_spark}
 \title{DataFrame Roller Function}
 \usage{
-roller(df, ...)
+roller(df, order_vars, group_vars, measure_vars, fun, width, by, partial, ...)
 
 \method{roller}{data.frame}(df, order_vars, group_vars = NULL, measure_vars,
   fun, width, by = 1, partial = TRUE, ...)
@@ -16,8 +16,6 @@ roller(df, ...)
 }
 \arguments{
 \item{df}{DataFrame}
-
-\item{...}{additional arguments to pass to the transformation function}
 
 \item{order_vars}{optional vector of column names to arrange data by. can be
 one or more columns. default is NULL. order matters - arranges left to
@@ -42,6 +40,8 @@ enabled for roller.data.frame method. Default is 1.}
 
 \item{partial}{logical argument if partial windows should be calculated. Only
 enabled for roller.data.frame. Default is TRUE.}
+
+\item{...}{additional arguments to pass to the transformation function}
 }
 \value{
 DataFrame with additional calculated columns appended

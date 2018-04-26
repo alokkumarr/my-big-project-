@@ -33,7 +33,14 @@
 #'   additional fields for seasonality, trend, residual, and anomaly. Anomalies
 #'   are coded with a binary flag of 1
 #' @export
-detect <- function(df, ...) {
+detect <- function(df,
+                   index_var,
+                   measure_var,
+                   frequency,
+                   direction,
+                   alpha,
+                   max_anoms,
+                   trend_window) {
   UseMethod("detect", df)
 }
 
@@ -213,8 +220,16 @@ detect.grouped_df <- function(df,
 #'   function to. default is NULL - no grouping
 #' @inheritParams detect
 #' @export
-detecter <- function(df, ...) {
-  UseMethod("detecter", df)
+detecter <- function(df,
+                     index_var,
+                     group_vars,
+                     measure_vars,
+                     frequency,
+                     direction,
+                     alpha,
+                     max_anoms,
+                     trend_window) {
+  UseMethod("detecter")
 }
 
 

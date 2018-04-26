@@ -25,8 +25,8 @@
 #'           measure_vars = c("Sepal.Length", "Sepal.Width"),
 #'           fun = c("sum", "mean"))
 #'@export
-summariser <- function(df, ...) {
-  UseMethod("summariser", df)
+summariser <- function(df, group_vars, measure_vars, fun, ...) {
+  UseMethod("summariser")
 }
 
 
@@ -40,16 +40,34 @@ summariser.data.frame <- function(df,
                                   measure_vars = NULL,
                                   fun = c("sum"),
                                   ...) {
-  # Arguments
-  args <- summariser_args(group_vars, measure_vars, fun, ...)
-  group_vars <- args$group_vars
-  measure_vars <- args$measure_vars
-  fun <- args$fun
+  checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(
+    fun,
+    c(
+      "n_distinct",
+      "min",
+      "max",
+      "sum",
+      "mean",
+      "variance",
+      "sd",
+      "kurtosis",
+      "skewness",
+      "percentile"
+    )
+  )
+  if (is.null(group_vars) & is.null(measure_vars)) {
+    stop(
+      "Both group_vars and measure_vars are NULL.\nNeed to supply one valid column name to one or the other\n",
+      .call = FALSE
+    )
+  }
 
 
   # Check for measure variables provided
   if (is.null(measure_vars)) {
-    message("No measure vars provided. Providing counts of records only.")
+    message("No measure vars provided. Providing counts of records only.\nfun input set to n_distinct")
     fun <- "n_distinct"
     measure_vars <- "rn"
     df <- df %>%
@@ -94,15 +112,34 @@ summariser.tbl_spark <- function(df,
                                  measure_vars = NULL,
                                  fun = c("sum"),
                                  ...) {
-  # Arguments
-  args <- summariser_args(group_vars, measure_vars, fun, ...)
-  group_vars <- args$group_vars
-  measure_vars <- args$measure_vars
-  fun <- args$fun
+
+  checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_subset(
+    fun,
+    c(
+      "n_distinct",
+      "min",
+      "max",
+      "sum",
+      "mean",
+      "variance",
+      "sd",
+      "kurtosis",
+      "skewness",
+      "percentile"
+    )
+  )
+  if (is.null(group_vars) & is.null(measure_vars)) {
+    stop(
+      "Both group_vars and measure_vars are NULL.\nNeed to supply one valid column name to one or the other\n",
+      .call = FALSE
+    )
+  }
 
   # Check for measure variables provided
   if (is.null(measure_vars)) {
-    message("No measure vars provided. Providing counts of records only.")
+    message("No measure vars provided. Providing counts of records only.\nfun input set to n_distinct")
     fun <- "n_distinct"
     measure_vars <- "rn"
     df <- df %>%
@@ -126,8 +163,7 @@ summariser.tbl_spark <- function(df,
 
   # Rename measure variables
   if (length(measure_vars) < 2 | length(fun) < 2) {
-    agg <-
-      agg %>% dplyr::select_(.dots = stats::setNames(colnames(agg), c(
+    agg <- agg %>% dplyr::select_(.dots = stats::setNames(colnames(agg), c(
         group_vars, paste(measure_vars, fun, sep =
                             "_")
       )))
@@ -142,8 +178,7 @@ summariser.tbl_spark <- function(df,
 #' Function to create object of summarise_args S3 class
 #'
 #' @inheritParams summariser
-new_summariser_args <-
-  function(group_vars, measure_vars, fun, ...) {
+new_summariser_args <- function(group_vars, measure_vars, fun, ...) {
     stopifnot(is.character(group_vars) | is.null(group_vars))
     stopifnot(is.character(measure_vars) | is.null(measure_vars))
     stopifnot(is.character(fun))

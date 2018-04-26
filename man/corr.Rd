@@ -6,7 +6,7 @@
 \alias{corr.tbl_spark}
 \title{DataFrame Correlation Function}
 \usage{
-corr(df, ...)
+corr(df, target_var, target_var_name)
 
 \method{corr}{data.frame}(df, target_var = NULL,
   target_var_name = "target_variable")

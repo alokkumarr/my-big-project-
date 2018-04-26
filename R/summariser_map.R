@@ -13,10 +13,9 @@
 #'@param id_vars vector of column names. used in the group by aggregration. used
 #'  as the left hand side of pivot. used as the by in the join step. can be zero
 #'  or more columns.
-#'@param map nested list of summariser function arguments. use summariser_args
-#'  helper function to create arguments to summariser function. Can handle more
-#'  than one set of summariser_args. Can also process additional parameters to
-#'  the aggregation function - similiar to the ... argument in summariser
+#'@param map nested list of summariser function arguments. Can handle more than
+#'  one list of summariser arguments. Can also process additional parameters to the
+#'  aggregation function - similiar to the ... argument in summariser
 #'@param sep argument passed to pivoter function. see pivoter function for
 #'  details
 #'@param fill optional argument passed to pivoter function. see pivoter function
@@ -51,17 +50,17 @@
 #' summariser_map(dat,
 #'                id_vars = "id",
 #'                map = list(
-#'                  summariser_args(
+#'                  list(
 #'                       group_vars = c("cat1"),
 #'                       measure_vars = c("metric1", "metric2"),
 #'                       fun = c("sum")),
-#'                      summariser_args(group_vars = c("cat2"),
+#'                      list(group_vars = c("cat2"),
 #'                           measure_vars = c("metric2"),
 #'                           fun = c("mean"))
 #'                    ))
 #'@export
-summariser_map <- function(df, ...) {
-  UseMethod("summariser_map", df)
+summariser_map <- function(df, id_vars, map, sep, fill) {
+  UseMethod("summariser_map")
 }
 
 
@@ -73,6 +72,11 @@ summariser_map.data.frame <- function(df,
                                       map = list(),
                                       sep = "_",
                                       fill = NULL) {
+  checkmate::assert_subset(id_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_list(map)
+  checkmate::assert_character(sep)
+  checkmate::assert_numeric(fill, null.ok = TRUE)
+
   for (i in seq_along(map)) {
     agg <- do.call("summariser",
                    modifyList(map[[i]],
@@ -117,6 +121,11 @@ summariser_map.tbl_spark <- function(df,
                                      map = list(),
                                      sep = "_",
                                      fill = NULL) {
+  checkmate::assert_subset(id_vars, colnames(df), empty.ok = TRUE)
+  checkmate::assert_list(map)
+  checkmate::assert_character(sep)
+  checkmate::assert_numeric(fill, null.ok = TRUE)
+
   for (i in seq_along(map)) {
     agg <- do.call("summariser",
                    modifyList(

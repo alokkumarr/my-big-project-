@@ -52,8 +52,16 @@
 #' measure_vars = c("metric1"),
 #' fun = "mean",
 #' width=5)
-roller <- function(df, ...) {
-  UseMethod("roller", df)
+roller <- function(df,
+                   order_vars,
+                   group_vars,
+                   measure_vars,
+                   fun,
+                   width,
+                   by,
+                   partial,
+                   ...) {
+  UseMethod("roller")
 }
 
 
@@ -73,7 +81,8 @@ roller.data.frame <- function(df,
                               by = 1,
                               partial = TRUE,
                               ...) {
-  args <- roller_args(order_vars,
+  args <- roller_args(col_names = colnames(df),
+                      order_vars,
                       group_vars,
                       measure_vars,
                       fun,
@@ -150,6 +159,7 @@ roller.tbl_spark <- function(df,
   new_tbl_name <- "df_roll"
 
   args <- roller_args(
+    col_names = colnames(df),
     order_vars = order_vars,
     group_vars = group_vars,
     measure_vars = measure_vars,
@@ -183,25 +193,46 @@ roller.tbl_spark <- function(df,
 #'
 #' Creates new object of class roller_args
 #'
+#' @param col_names column names of dataframe
 #' @inheritParams roller
 #'
 #' @return roller_args object
 #' @export
-new_roller_args <- function(order_vars,
-                            group_vars,
-                            measure_vars,
-                            fun,
-                            width,
-                            by,
-                            partial,
-                            ...) {
-  stopifnot(is.character(order_vars) | is.null(order_vars))
-  stopifnot(is.character(group_vars) | is.null(group_vars))
-  stopifnot(is.character(measure_vars) | is.null(measure_vars))
-  stopifnot(is.character(fun))
-  stopifnot(is.numeric(by))
-  stopifnot(is.numeric(width))
-  stopifnot(is.logical(partial))
+roller_args <- function(col_names,
+                        order_vars,
+                        group_vars,
+                        measure_vars,
+                        fun,
+                        width,
+                        by,
+                        partial,
+                        ...) {
+
+  checkmate::assert_subset(order_vars, col_names, empty.ok = TRUE)
+  checkmate::assert_subset(group_vars, col_names, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, col_names)
+  checkmate::assert_subset(fun, c(
+    "n_distinct",
+    "min",
+    "max",
+    "sum",
+    "mean",
+    "var",
+    "variance",
+    "sd",
+    "stddev",
+    "kurtosis",
+    "skewness"
+  ))
+  checkmate::assert_number(by, lower = 1)
+  checkmate::assert_number(width, lower = 1)
+  checkmate::assert_flag(partial)
+
+  if (is.null(order_vars)) {
+    message(
+      "Order var not specified. Rolling function applied on the dataframe in its current order"
+    )
+  }
 
   structure(
     list(
@@ -220,81 +251,6 @@ new_roller_args <- function(order_vars,
 
 
 
-#' Roller Arguments Validation Function
-#'
-#' Checks for valid inputs to roller_args class
-#'
-#' @param x obj of class roller_args
-validate_roller_args <- function(x) {
-  funs <- c(
-    "n_distinct",
-    "min",
-    "max",
-    "sum",
-    "mean",
-    "var",
-    "variance",
-    "sd",
-    "stddev",
-    "kurtosis",
-    "skewness"
-  )
-  if (!all(x$fun %in% funs)) {
-    stop(
-      "Supplied function not supported.\nPlease use one of following: ",
-      paste(funs, collapse = ", ")
-    )
-  }
-  if (is.null(x$measure_vars)) {
-    stop(
-      "Measure_vars not specified.\nNeed to supply one valid column name to apply function to\n",
-      .call = FALSE
-    )
-  }
-  if (is.null(x$order_vars)) {
-    message(
-      "Order var not specified. Rolling function applied on the dataframe in its current order"
-    )
-  }
-  if (x$by < 1) {
-    stop("by input should be >= 1", .call = FALSE)
-  }
-  if (x$width < 1) {
-    stop("width should be >= 1", .call = FALSE)
-  }
-
-  x
-}
-
-
-
-#' Roller Argument Helper Function
-#'
-#' Creates a valid object of roller_args class
-#'
-#' Function should be used in roller internals
-#' @inheritParams roller
-#'
-#' @export
-#' @importFrom magrittr %>%
-roller_args <- function(order_vars,
-                        group_vars,
-                        measure_vars,
-                        fun,
-                        width,
-                        by,
-                        partial,
-                        ...) {
-  new_roller_args(order_vars,
-                  group_vars,
-                  measure_vars,
-                  fun,
-                  width,
-                  by,
-                  partial,
-                  ...) %>%
-    validate_roller_args()
-}
 
 
 

@@ -6,7 +6,7 @@
 \alias{standardizer.tbl_spark}
 \title{DataFrame Standarizer Data Transform Function}
 \usage{
-standardizer(df, ...)
+standardizer(df, group_vars, measure_vars)
 
 \method{standardizer}{data.frame}(df, group_vars = NULL, measure_vars)
 

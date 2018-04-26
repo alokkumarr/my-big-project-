@@ -1,4 +1,5 @@
 
+
 #'DataFrame Standarizer Data Transform Function
 #'
 #'Data transformation function to standarize one or more variables. The
@@ -22,8 +23,8 @@
 #'library(dplyr)
 #'standardizer(mtcars, measure_vars = c("mpg", "hp"))
 #'standardizer(mtcars, group_vars = "am", measure_vars = c("mpg", "hp"))
-standardizer <- function(df, ...) {
-  UseMethod("standardizer", df)
+standardizer <- function(df, group_vars, measure_vars) {
+  UseMethod("standardizer")
 }
 
 
@@ -34,7 +35,10 @@ standardizer <- function(df, ...) {
 standardizer.data.frame <- function(df,
                                     group_vars = NULL,
                                     measure_vars) {
-  stopifnot(all(measure_vars %in% colnames(df)))
+  variables <- colnames(df)
+  checkmate::assert_subset(group_vars, variables, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, variables)
+
   if (!is.null(group_vars)) {
     df <- df %>%
       dplyr::group_by_at(group_vars)
@@ -56,9 +60,11 @@ standardizer.data.frame <- function(df,
 #' @export
 standardizer.tbl_spark <- function(df,
                                    group_vars = NULL,
-                                   measure_vars){
+                                   measure_vars) {
+  variables <- colnames(df)
+  checkmate::assert_subset(group_vars, variables, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, variables)
 
-  stopifnot(all(measure_vars %in% colnames(df)))
   if (!is.null(group_vars)) {
     df <- df %>%
       dplyr::group_by_at(group_vars)
@@ -73,9 +79,6 @@ standardizer.tbl_spark <- function(df,
     results
   }
 }
-
-
-
 
 
 
@@ -98,8 +101,8 @@ standardizer.tbl_spark <- function(df,
 #'library(dplyr)
 #'normalizer(mtcars, measure_vars = c("mpg", "hp"))
 #'normalizer(mtcars, group_vars = "am", measure_vars = c("mpg", "hp"))
-normalizer <- function(df, ...) {
-  UseMethod("normalizer", df)
+normalizer <- function(df, group_vars, measure_vars) {
+  UseMethod("normalizer")
 }
 
 
@@ -108,16 +111,18 @@ normalizer <- function(df, ...) {
 #' @rdname normalizer
 #' @export
 normalizer.data.frame <- function(df,
-                                    group_vars = NULL,
-                                    measure_vars) {
-  stopifnot(all(measure_vars %in% colnames(df)))
+                                  group_vars = NULL,
+                                  measure_vars) {
+  variables <- colnames(df)
+  checkmate::assert_subset(group_vars, variables, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, variables)
   if (!is.null(group_vars)) {
     df <- df %>%
       dplyr::group_by_at(group_vars)
   }
 
   results <- df %>%
-    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.))/max(.)))
+    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.)) / max(.)))
 
   if (!is.null(group_vars)) {
     results %>% dplyr::ungroup()
@@ -131,17 +136,18 @@ normalizer.data.frame <- function(df,
 #' @rdname normalizer
 #' @export
 normalizer.tbl_spark <- function(df,
-                                   group_vars = NULL,
-                                   measure_vars){
-
-  stopifnot(all(measure_vars %in% colnames(df)))
+                                 group_vars = NULL,
+                                 measure_vars) {
+  variables <- colnames(df)
+  checkmate::assert_subset(group_vars, variables, empty.ok = TRUE)
+  checkmate::assert_subset(measure_vars, variables)
   if (!is.null(group_vars)) {
     df <- df %>%
       dplyr::group_by_at(group_vars)
   }
 
   results <- df %>%
-    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.))/max(.)))
+    dplyr::mutate_at(measure_vars, dplyr::funs((. - min(.)) / max(.)))
 
   if (!is.null(group_vars)) {
     results %>% dplyr::ungroup()
@@ -149,4 +155,3 @@ normalizer.tbl_spark <- function(df,
     results
   }
 }
-
