@@ -590,14 +590,22 @@ export class ChartService {
       }
     }
 
+    const {aggregate, aggrSymbol, dataType} = get(series, '0');
+
     const chartSeries = [{
       data: innerData,
+      aggrSymbol,
+      dataType,
+      aggregate,
       dataLabels: {
         color: '#ffffff',
         distance: -30
       },
       size: '60%'
     }, {
+      aggrSymbol,
+      dataType,
+      aggregate,
       data: outerData,
       size: '100%',
       innerSize: '60%',
@@ -887,9 +895,9 @@ export class ChartService {
         <td>{${xStringValue}}</td>
       </tr>`;
 
-      let yAxisString = `<tr>
+      const yAxisString = `<tr>
         <th>${fields.y.alias || get(opts, 'labels.y', '') || (point ? point.series.name : '{series.name}')}:</th>
-        <td>${point ? round(point.y, getPrecision(options.aggregate, options.dataType)) : '{point.y:,.2f}'}${point ? point.series.userOptions.aggrSymbol : '{point.series.userOptions.aggrSymbol}'}</td>
+        <td>${point ? round(point.y, getPrecision(options.aggregate, options.dataType)).toLocaleString() : '{point.y:,.2f}'}${point ? point.series.userOptions.aggrSymbol : '{point.series.userOptions.aggrSymbol}'}</td>
       </tr>`;
 
       const zAxisString = fields.z ?
@@ -897,15 +905,8 @@ export class ChartService {
         '';
 
       const groupString = fields.g ?
-        `<tr><th>Group:</th><td>${point ? point.g : '{point.g}'}</td></tr>` :
+        `<tr><th>Group:</th><td>${point ? (point.g || point.name) : '{point.g}'}</td></tr>` :
         '';
-
-      if (type === 'pie' && fields.y[0].aggregate === 'percentage') {
-        yAxisString = `<tr>
-          <th>${fields.y.alias || get(opts, 'labels.y', '') || (point ? point.series.name : '{series.name}')}:</th>
-          <td>${point ? round(point.y, getPrecision(options.aggregate, options.dataType)) : '{point.y:,.2f}'}</td>
-        </tr>`;
-      }
 
       return {
         xAxisString,
