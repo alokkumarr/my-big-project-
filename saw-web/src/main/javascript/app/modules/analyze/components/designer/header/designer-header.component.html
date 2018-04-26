@@ -61,6 +61,7 @@
 
     <button mat-button
             e2e="open-sort-modal"
+            [disabled]="isInQueryMode"
             (click)="requestAction.emit('sort')">
       <mat-icon fontIcon="icon-sort"></mat-icon>
       <ng-container i18n>Sort</ng-container>
@@ -68,6 +69,7 @@
 
     <button mat-button
             e2e="open-filter-modal"
+            [disabled]="isInQueryMode"
             (click)="requestAction.emit('filter')">
       <mat-icon fontIcon="icon-filter"></mat-icon>
       <ng-container i18n>Filter</ng-container>
