@@ -21,12 +21,4 @@ export class ConfirmDialogComponent {
     private _dialogRef: MatDialogRef<ConfirmDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
   ) {}
-
-  onNegativeAction() {
-    this._dialogRef.close();
-  }
-
-  onPositiveAction() {
-    this._dialogRef.close(true);
-  }
 }

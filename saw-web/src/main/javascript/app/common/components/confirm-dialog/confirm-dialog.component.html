@@ -8,11 +8,12 @@
 
 <div mat-dialog-actions>
   <button mat-button i18n
-          (click)="onNegativeAction()">
+          mat-dialog-close>
     {{data.negativeActionLabel}}
   </button>
   <button mat-button i18n color="primary"
-          (click)="onPositiveAction()">
+          [mat-dialog-close]="true"
+          cdkFocusInitial>
     {{data.positiveActionLabel}}
   </button>
 </div>
