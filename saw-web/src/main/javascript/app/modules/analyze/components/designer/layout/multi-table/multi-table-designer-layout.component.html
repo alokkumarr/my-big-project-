@@ -27,7 +27,7 @@
 <div *ngIf="isGridPanelExpanded"
      class="designer__data-grid">
   <designer-report (change)="change.emit($event)"
-                   [artifacts]="artifacts"
+                   [artifacts]="analysis.edit ? null : artifacts"
                    [data]="data"
                    [dataCount]="dataCount"
                    [sorts]="sorts"
