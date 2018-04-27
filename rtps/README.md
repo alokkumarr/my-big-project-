@@ -1,1 +1,1 @@
-# Smart Care Real Time Event Processing Spark Applications
+# Synchronoss Real Time Data Ingestion and Analytics
