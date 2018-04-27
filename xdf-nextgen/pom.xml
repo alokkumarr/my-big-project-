@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>xdf-nextgen</artifactId>
-  <version>1.0.8</version>
+  <version>${revision}</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
@@ -251,12 +251,12 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>core</artifactId>
-      <version>1.0.10</version>
+      <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>meta-api</artifactId>
-      <version>1.0.10</version>
+      <version>${revision}</version>
     </dependency>
 <!-- BDA Internal dependencies END -->		
 
