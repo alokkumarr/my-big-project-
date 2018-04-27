@@ -523,14 +523,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
                 <version>2.1.5</version>
-                <executions>
-                    <execution>
-                        <id>rtis-rpm</id>
-                        <goals>
-                            <goal>rpm</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <license>Synchronoss proprietary product</license>
                     <distribution>Real Time Ingestion Service</distribution>
@@ -683,4 +675,36 @@ getent passwd rtis-user &gt;/dev/null || {
             </plugin>
         </plugins>
     </build>
+  <!-- Workaround: This project uses the rpm-maven-plugin, which
+       requires RPM tools to be installed.  It should be migrated to
+       using the Java RPM builder.  Until then, put building RPMs
+       behind a profile actived only for continuous integration buils.
+       -->
+  <profiles>
+    <profile>
+      <id>legacy-rpmbuild</id>
+      <activation>
+        <property>
+          <name>legacy-rpmbuild</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>rpm-maven-plugin</artifactId>
+            <version>2.1.5</version>
+            <executions>
+              <execution>
+                <id>rtis-rpm</id>
+                <goals>
+                  <goal>rpm</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
