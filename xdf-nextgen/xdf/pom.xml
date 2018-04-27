@@ -1,0 +1,305 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+		<groupId>com.synchronoss.bda</groupId>
+		<artifactId>xdf-nextgen</artifactId>
+		<version>1.0.8</version>
+  </parent>
+
+  <!-- use app.name from parent pom -->
+  <!--artifactId>${app.name}</artifactId-->
+  <artifactId>xdf</artifactId>
+
+  <packaging>jar</packaging>
+  <!--name>xdf</name-->
+  <properties>
+
+  </properties>
+
+  <dependencies>
+  <dependency>
+    <groupId>com.synchronoss.bda</groupId>
+    <artifactId>xdf-core</artifactId>
+    <version>${project.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>com.synchronoss.bda</groupId>
+    <artifactId>xdf-parser</artifactId>
+    <version>${project.version}</version>
+  </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-data-profiler</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-transformer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-preview</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-sql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+
+   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <filters>
+                <filter>
+                  <artifact>org.codehaus.janino:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>full</shadedClassifierName>
+              <artifactSet>
+                <includes>
+                  <include>*:*</include>
+                </includes>
+              </artifactSet>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                <!--  <resource>reference.conf</resource> -->
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- RPM plugin -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>rpm-maven-plugin</artifactId>
+        <version>2.1.5</version>
+        <executions>
+          <execution>
+            <id>xdf-rpm-build</id>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <license>Synchronoss proprietary code</license>
+          <distribution>XDF-${rpm.version}</distribution>
+          <needarch>false</needarch>
+          <targetOS>i386-linux</targetOS>
+          <group>SNCR/BDA</group>
+          <packager>BDA</packager>
+
+          <name>${rpm.name}</name>
+          <!-- version>${rpm.version}</version -->
+          <!--
+            Only applicable to a Mapping if filemode,
+            username, AND groupname are NOT populated.
+          -->
+          <defaultUsername>${app.user}</defaultUsername>
+          <defaultGroupname>${app.group}</defaultGroupname>
+          <defaultDirmode>755</defaultDirmode>
+          <defaultFilemode>444</defaultFilemode>
+          <!-- -->
+          <defineStatements>
+            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+          </defineStatements>
+          <mappings>
+            <!-- dirs -->
+            <mapping>
+              <directory>${app.optDir}</directory>
+            </mapping>
+            <mapping>
+              <directory>${app.optDir}/bin</directory>
+            </mapping>
+            <mapping>
+              <directory>${app.optDir}/conf</directory>
+            </mapping>
+            <mapping>
+              <directory>${app.optDir}/lib</directory>
+            </mapping>
+            <mapping>
+              <directory>${app.optDir}/test</directory>
+            </mapping>
+            <mapping>
+              <directory>${app.varDir}/log</directory>
+            </mapping>
+
+            <!-- bin files -->
+            <mapping>
+              <directory>${app.optDir}/bin</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources>
+                <source>
+                  <location>./bin</location>
+                  <includes>
+                    <include>app_env</include>
+                    <include>execute-component.sh</include>
+                    <include>execute-ng-component.sh</include>
+                    <include>test-ng-component.sh</include>
+                    <include>mk_conf.sh</include>
+                    <include>mk_csv.sh</include>
+                    <include>xdf_activate.sh</include>
+                    <include>xdf-mdcli.sh</include>
+                    <include>create-metadata.sh</include>
+                  </includes>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- bin/templates files with filter -->
+            <mapping>
+              <directory>${app.optDir}/bin/templates</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>0644</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources>
+                <source>
+                  <location>./bin/templates/xdf_info.template</location>
+                  <filter>true</filter>
+                </source>
+                <source>
+                  <location>./bin/templates/xdf-nextgen.vars.changeme</location>
+                  <destination>${app.name}.vars.changeme</destination>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- conf files -->
+            <mapping>
+              <directory>${app.optDir}/conf</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>644</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources>
+                <source>
+                  <location>./conf</location>
+                  <includes>
+                    <include>log4j.*</include>
+                    <include>logback.xml</include>
+                  </includes>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- lib files -->
+            <mapping>
+              <directory>${app.optDir}/lib</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>444</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources><source>
+                  <location>./target/xdf-${project.version}-full.jar</location>
+              </source></sources>
+            </mapping>
+
+            <!-- test files -->
+            <mapping>
+              <directory>${app.optDir}/test</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources><source>
+                <location>./test</location>
+                <includes><include>*.sh</include></includes>
+              </source></sources>
+            </mapping>
+            <!-- same dir, different perms -->
+            <mapping>
+              <directory>${app.optDir}/test</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>444</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources><source>
+                <location>./test</location>
+                <excludes><exclude>*.sh</exclude></excludes>
+              </source></sources>
+            </mapping>
+
+          </mappings>
+          <!-- Installation scripts -->
+          <!--preinstallScriptlet>
+            <script>
+echo PreInstall done: ${app.nameVer}
+            </script>
+          </preinstallScriptlet-->
+          <postinstallScriptlet>
+            <script>
+echo PostInstall started: ${app.nameVer}
+(
+  cd ${app.optParDir} # /dfs/opt/bda
+  rm -f ${app.name}-current
+  ln -s ${app.name}/${app.nameVer} ${app.name}-current
+)
+echo Soft link created:
+ls -l ${app.optParDir}/${app.name}-current
+#
+tf=( ${app.optDir}/test/* )
+if [[ $tf ]]; then
+  echo Test directory contains ${#tf[*]} files
+fi
+#
+act_cmd='su ${app.user} -c ${app.optDir}/bin/xdf_activate.sh'
+if [[ -f /etc/bda/${app.name}.vars ]] ; then
+  echo '# Activate ${app.nameVer}'
+  $act_cmd || {
+    echo '#NB# Activation completed with error'
+    echo '#    Fix the problem and execute manual activation:'
+    echo &quot;$ $act_cmd&quot;
+  }
+else
+  mkdir -p /etc/bda
+  cp ${app.optDir}/bin/templates/${app.name}.vars.changeme /etc/bda
+  echo '#NB# Activation skipped - no vars file provided'
+  echo '#    Create vars file: /etc/bda/${app.name}.vars'
+  echo '#    from /etc/bda/${app.name}.vars.changeme'
+  echo '#    and execute manual activation:'
+  echo &quot;$ $act_cmd&quot;
+fi
+echo PostInstall done: ${app.nameVer}
+            </script>
+          </postinstallScriptlet>
+          <preremoveScriptlet>
+            <script>
+echo PreRemove started: ${app.nameVer}
+echo Remove soft link
+rm -f ${app.optParDir}/${app.name}-current
+echo PreRemove done: ${app.nameVer}
+            </script>
+          </preremoveScriptlet>
+        </configuration>
+      </plugin>
+      <!-- RPM plugin : end -->
+    </plugins>
+  </build>
+
+</project>

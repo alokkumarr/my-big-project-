@@ -1,0 +1,28 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-ngdev/transformer_ref_test1.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "xda-ux-sr-comp-dev::TRREF02",
+	
+	"source" : {
+    	"userData" : {
+					"createdBy" : "S.Ryabov",
+					"description" : "Reference dataset to test transformer (ref 2)",
+					"category" : "test", 
+					"subCategory" : "Transformer"
+			},
+			"system" : { 
+			  "physicalLocation":"hdfs:///data/bda/xda-ux-sr-comp-dev/dl/fs/dinp/TRREF02/data",
+				"name" : "TRREF02", 
+				"type" : "fs", 
+				"project" : "xda-ux-sr-comp-dev",				
+				"catalog" : "dinp", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 1 
+				
+			}, 
+			"transformations" : [ ]
+	}
+}
