@@ -23,8 +23,8 @@ provided in the environment:
   Ecosystem Pack on the MapR cluster
 
 . Install and configure Apache Livy from the MapR Ecosystem Pack on
-  the MapR cluster, and set `livy.file.upload.max.size = 500000000` in
-  `livy.conf`
+  the MapR cluster, and set `livy.file.upload.max.size = 500000000`
+  and `livy.spark.master` in `livy.conf`
 
 . Provision a MapR user in the MapR cluster (with user ID 500)
 
