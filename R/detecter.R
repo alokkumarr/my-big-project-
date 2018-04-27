@@ -263,7 +263,7 @@ detecter.data.frame <- function(df,
                     variable_name = "measure",
                     value_name = "value") %>%
     dplyr::group_by_at(c(group_vars, "measure")) %>%
-    do(
+    dplyr::do(
       a2munge::detect(.,
                       index_var = index_var,
                       measure_var = "value",
@@ -302,7 +302,7 @@ detecter.tbl_spark <- function(df,
 
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
-    melter(
+    a2munge::melter(
       .,
       id_vars = c(index_var, group_vars),
       measure_vars,
