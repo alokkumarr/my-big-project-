@@ -80,3 +80,15 @@ test_that("json feature works as expected", {
   expect_file_exists("~/writer-tests/mtcars.json")
   file.remove("~/writer-tests/mtcars.json")
 })
+
+
+test_that("data.frame method works as expected", {
+  writer(mtcars, path = "~/writer-tests/mtcars.csv")
+  expect_file_exists("~/writer-tests/mtcars.csv")
+  writer(mtcars, path = "~/writer-tests/mtcars.csv", mode = "append")
+  expect_file_exists("~/writer-tests/mtcars.csv")
+  expect_equal(length(dir("~/writer-tests")), 1)
+  expect_equal(nrow(read.csv("~/writer-tests/mtcars.csv")), nrow(mtcars) * 2)
+  file.remove("~/writer-tests/mtcars.csv")
+})
+

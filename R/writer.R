@@ -54,7 +54,6 @@ writer.tbl_spark <- function(df,
   file_tmp_folder <- paste(base_dir, temp_folder_name, sep = "/")
   overwrite <- ifelse(!is.null(mode), ifelse(mode == "overwrite", T, F), F)
   append <- ifelse(!is.null(mode), ifelse(mode == "append", T, F), F)
-  ts <- as.numeric(Sys.time())
 
   checkmate::assert_directory(root_dir, access = "w")
   checkmate::assert_choice(type, c("csv", "parquet", "json", "jdbc", "source", "table", "text"))
@@ -130,3 +129,28 @@ writer.tbl_spark <- function(df,
 }
 
 
+
+
+
+#' @export
+#' @rdname writer
+writer.data.frame <- function(df,
+                              path,
+                              mode = NULL,
+                              ...) {
+  checkmate::assert_character(path)
+  checkmate::assert_choice(mode, c('error', 'append', 'overwrite', 'ignore'), null.ok = TRUE)
+
+  type <- tools::file_ext(path)
+  name <- gsub(paste0(".", type), "", basename(path))
+  base_dir <- dirname(path)
+  append <- ifelse(!is.null(mode), ifelse(mode == "append", T, F), F)
+  col_names <- ifelse(append, FALSE, TRUE)
+
+  checkmate::assert_directory(base_dir, access = "w")
+  checkmate::assert_choice(type, c("csv", "txt"))
+
+  suppressWarnings(
+    write.table(df, file = path, append = append, col.names = col_names, ...)
+  )
+}
