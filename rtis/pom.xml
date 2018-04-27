@@ -17,14 +17,14 @@
           default value here,
           can be specified outside with -Dprod.release=RRR
         -->
-        <prod.release>0_g0000_wip</prod.release>
+        <prod.release>0</prod.release>
         <!-- use prod.release property -->
         <project.release>${prod.release}</project.release>
         <idVer>${artifactId}.${version}</idVer>
 
         <!-- RPM properties -->
         <rpm.name>bda-${prod.name}</rpm.name>
-        <rpm.version>${project.version}</rpm.version>
+        <rpm.version>${revision.nodash}</rpm.version>
         <rpm.release>${project.release}</rpm.release>
 
         <!-- Application -->
