@@ -59,7 +59,7 @@ export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
-  @Output() public onBack: EventEmitter<any> = new EventEmitter();
+  @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<boolean> = new EventEmitter();
   public isInDraftMode: boolean = false;
   public designerState: DesignerStates;

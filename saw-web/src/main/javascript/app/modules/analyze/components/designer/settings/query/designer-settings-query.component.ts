@@ -64,7 +64,7 @@ export class DesignerSettingsQueryComponent {
 
   submitQuery() {
     if (!this.analysis.edit) {
-      this.warnUser().afterClosed().subscribe((result) => {
+      this.warnUser().afterClosed().subscribe(result => {
         if (result) {
           this.doSubmit();
         }

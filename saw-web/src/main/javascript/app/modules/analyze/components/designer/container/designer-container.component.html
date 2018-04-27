@@ -3,7 +3,7 @@
                  [isInDraftMode]="isInDraftMode"
                  [designerState]="designerState"
                  [isInQueryMode]="isInQueryMode"
-                 (onBack)="onBack.emit()"
+                 (onBack)="onBack.emit(isInDraftMode)"
                  (requestAction)="onToolbarAction($event)">
 </designer-header>
 
