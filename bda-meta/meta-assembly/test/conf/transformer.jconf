@@ -1,0 +1,60 @@
+{
+"inputs" :
+[
+				{
+					"name"    : "TRTEST01",
+					"dataSet" : "TRTEST01",
+					"catalog" : "dinp",
+					"format"  : "parquet"
+				}
+],
+"outputs" :
+[
+	{
+		"name"    : "TRTEST01DATA",
+		"dataSet" : "TRTEST01_RES",
+		"catalog" : "dout",
+		"format"  : "parquet",
+		"mode"    : "replace",
+		"numberOfFiles" : 1,
+		"metadata" : {
+				"createdBy" : "S.Ryabov",
+				"description" : "Transformer component test case: transformed records",
+				"category" : "cat1",
+				"category" : "subcat1"
+		}
+	},
+	{
+		"name"    : "TRTEST01REJ",
+		"dataSet" : "TRTEST01_REJECTED",
+		"catalog" : "dout",
+		"format"  : "json",
+		"mode"    : "replace",
+		"numberOfFiles" : 1,
+		"metadata" : {
+			"createdBy" : "S.Ryabov",
+			"description" : "Transformer component test case: rejected records",
+			"category" : "cat1",
+			"category" : "subcat1"
+		}
+	}
+],
+"parameters" :
+[
+		{"name": "spark.master", "value": "yarn"},
+		{"name": "spark.yarn.queue","value":"xdf"},
+		{"name": "spark.driver.memory","value":"1g"},
+		{"name": "spark.executor.memory","value":"6g"},
+		{"name": "spark.executor.cores","value":"1"},
+		{"name": "spark.executor.instances","value":"1"},
+		{"name": "spark.yarn.tags", "value":"XDA-NGSR"}
+],
+"transformer" : {
+		"scriptLocation" : "file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/scripts",
+		"script" : "transformer.jexl",
+		"inputDataSet" :  "TRTEST01",
+		"outputDataSet" :  "TRTEST01_RES", 
+		"rejectedDataSet" :  "TRTEST01_REJECTED",
+		"scriptEngine" :  "jexl"
+}
+}
