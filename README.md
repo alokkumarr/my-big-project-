@@ -1,8 +1,8 @@
 # Introduction
 
-This is the SAW bundle source code repository.  It provides
-documentation and tools common to all SAW modules, which include SAW
-Security, SAW Servies and SAW Web.
+This is the Synchronoss Insights Platform (SIP) source code
+repository.  It provides source code, documentation and tools to build
+and deploy the SIP platform.  This includes SAW, XDF, RTIS and RTPS.
 
 # Development
 
