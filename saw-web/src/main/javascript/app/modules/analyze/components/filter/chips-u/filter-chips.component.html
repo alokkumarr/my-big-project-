@@ -1,6 +1,6 @@
 <div fxLayout="row" fxLayoutAlign="start center" *ngIf="filters.length > 0">
   <div fxLayout="column">
-    <span class="filter-counter" i18n>{filters.length, plural, =1 {1 Filter} other {# Filters} } Applied</span>
+    <span class="filter-counter" i18n>{filters.length, plural, =1 {1 Filter} other {{{filters.length}} Filters} } Applied</span>
     <button mat-button
             *ngIf="!readonly"
             (click)="onRemoveAll()"
