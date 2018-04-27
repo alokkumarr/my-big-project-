@@ -83,13 +83,18 @@ pivoter.tbl_spark <- function(df,
       i <- i + 1
       pivot_agg <- list(fun)
       names(pivot_agg) <- m
+      fill_var <- suppressWarnings(match.fun(fun)(c()))
+
+      sub_result <- sparklyr::sdf_pivot(df, formula = pivot_fn, fun.aggregate = pivot_agg)
+
       if (is.null(fill)) {
-        fill_var <- suppressWarnings(match.fun(fun)(c()))
-      } else{
-        fill_var <- fill
+        if (!is.na(fill_var)) {
+          sub_result <- sub_result %>% sparklyr::na.replace(fill_var)
+        }
+      } else {
+        sub_result <- sub_result %>% sparklyr::na.replace(fill)
       }
-      sub_result <- sparklyr::sdf_pivot(df, formula = pivot_fn, fun.aggregate = pivot_agg) %>%
-        sparklyr::na.replace(fill_var)
+
       pvt_measure_vars <- setdiff(colnames(sub_result), group_by_vars)
 
       if (!is.null(sep)) {
