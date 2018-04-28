@@ -7,7 +7,7 @@
     <version>${revision}</version>
   </parent>
   <!-- use app.name from parent pom -->
-  <artifactId>${app.name}</artifactId>
+  <artifactId>rtps</artifactId>
   <!-- repositories in parent -->
   <dependencies>
     <dependency>
