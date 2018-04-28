@@ -20,7 +20,7 @@
         <prod.release>0</prod.release>
         <!-- use prod.release property -->
         <project.release>${prod.release}</project.release>
-        <idVer>${artifactId}.${version}</idVer>
+        <idVer>${project.artifactId}.${project.version}</idVer>
 
         <!-- RPM properties -->
         <rpm.name>bda-${prod.name}</rpm.name>
