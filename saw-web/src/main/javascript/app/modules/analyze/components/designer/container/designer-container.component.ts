@@ -230,13 +230,16 @@ export class DesignerContainerComponent {
       break;
     case 'save':
       this.updateAnalysis();
-      this._analyzeDialogService.openSaveDialog(this.analysis)
-      .afterClosed().subscribe((result: IToolbarActionResult) => {
-        if (result) {
-          this.onSave.emit(result.isSaveSuccessful);
-          this.isInDraftMode = false;
-        }
-      });
+      if (!this.analysis.edit) {
+        this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
+          if (result) {
+            this.analysis.edit = true;
+            this.openSaveDialog();
+          }
+        });
+      } else {
+        this.openSaveDialog();
+      }
       break;
     case 'refresh':
       this.requestDataIfPossible();
@@ -245,6 +248,16 @@ export class DesignerContainerComponent {
       this.toggleDesignerQueryModes();
       break;
     }
+  }
+
+  openSaveDialog() {
+    this._analyzeDialogService.openSaveDialog(this.analysis)
+    .afterClosed().subscribe((result: IToolbarActionResult) => {
+      if (result) {
+        this.onSave.emit(result.isSaveSuccessful);
+        this.isInDraftMode = false;
+      }
+    });
   }
 
   toggleDesignerQueryModes() {

@@ -18,8 +18,15 @@ import { ToolbarActionDialogComponent } from '../components/designer/toolbar-act
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
+import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
+import { ConfirmDialogData } from '../../../common/types';
 
-
+const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
+  title: 'Are you sure you want to proceed?',
+  content: 'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
+  positiveActionLabel: 'Save',
+  negativeActionLabel: 'Cancel'
+};
 @Injectable()
 export class AnalyzeDialogService {
   constructor(public dialog: MatDialog) {}
@@ -131,6 +138,14 @@ export class AnalyzeDialogService {
       width: 'auto',
       height: 'auto',
       data
+    } as MatDialogConfig);
+  }
+
+  openQueryConfirmationDialog() {
+    return this.dialog.open(ConfirmDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: CONFIRM_DIALOG_DATA
     } as MatDialogConfig);
   }
 }
