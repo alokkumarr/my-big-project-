@@ -171,9 +171,8 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
-        const endDate = ((!isUndefined(this.crondetails.endDate) && moment(this.crondetails.endDate).isValid()) ? moment.utc(this.crondetails.endDate).endOf('day').add(1, 'days') : '');
-        const startDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
-        
+        const eDate = ((!isUndefined(this.crondetails.endDate) && moment(this.crondetails.endDate).isValid()) ? moment.utc(this.crondetails.endDate).endOf('day').add(1, 'days') : '');
+        const sDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
         let cronJobName = this.model.id;
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
@@ -191,11 +190,11 @@ export const AnalyzePublishDialogComponent = {
           ftp: this.ftp,
           fileType: 'csv',
           jobName: cronJobName,
-          endDate: endDate,
+          endDate: eDate,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: startDate,
+          jobScheduleTime: sDate,
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };

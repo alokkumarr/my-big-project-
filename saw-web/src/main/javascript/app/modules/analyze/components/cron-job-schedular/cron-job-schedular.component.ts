@@ -244,7 +244,6 @@ export class CronJobSchedularComponent {
     this.activeRadio = this.crondetails.activeRadio;
     this.startDate = new Date(this.crondetails.startDate);
     this.endDate = new Date(this.crondetails.endDate);
-    console.log(moment(this.endDate).subtract(1, 'days'));
     this.endDate = moment(this.endDate).subtract(1, 'days');
     if (isEmpty(this.crondetails.cronexp)) {
       return;
