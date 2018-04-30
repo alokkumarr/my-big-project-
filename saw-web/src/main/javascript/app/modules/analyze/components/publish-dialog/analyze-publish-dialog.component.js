@@ -6,6 +6,7 @@ import * as first from 'lodash/first';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
@@ -170,11 +171,9 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
-        if (moment(this.crondetails.endDate).isValid()) {
-          this.crondetails.endDate.setHours(23);
-          this.crondetails.endDate.setMinutes(59);
-          this.crondetails.endDate.setSeconds(59);
-        }
+        const endDate = ((!isUndefined(this.crondetails.endDate) && moment(this.crondetails.endDate).isValid()) ? moment.utc(this.crondetails.endDate).endOf('day').add(1, 'days') : '');
+        const startDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
+        
         let cronJobName = this.model.id;
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
@@ -192,11 +191,11 @@ export const AnalyzePublishDialogComponent = {
           ftp: this.ftp,
           fileType: 'csv',
           jobName: cronJobName,
-          endDate: this.crondetails.endDate,
+          endDate: endDate,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: this.crondetails.startDate,
+          jobScheduleTime: startDate,
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };

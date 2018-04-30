@@ -8,6 +8,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as moment from 'moment';
 
 import {
   getLocalMinute, generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
@@ -243,6 +244,8 @@ export class CronJobSchedularComponent {
     this.activeRadio = this.crondetails.activeRadio;
     this.startDate = new Date(this.crondetails.startDate);
     this.endDate = new Date(this.crondetails.endDate);
+    console.log(moment(this.endDate).subtract(1, 'days'));
+    this.endDate = moment(this.endDate).subtract(1, 'days');
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
