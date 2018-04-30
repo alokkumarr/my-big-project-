@@ -1,4 +1,4 @@
-= SAW Design Guide
+= SIP Design Guide
 Version {project-version}
 :toc:
 :nofooter:
@@ -7,7 +7,7 @@ Version {project-version}
 
 == Introduction
 
-This document describes the high-level design of the SAW application,
+This document describes the high-level design of the SIP platform,
 including its architecture and modules.
 
 == Overview
