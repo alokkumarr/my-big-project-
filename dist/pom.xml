@@ -13,7 +13,24 @@
   <name>saw-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <docker.naming>none</docker.naming>
+    <!-- Enable Docker Machine configuration by default -->
+    <saw.docker.skip.machine>false</saw.docker.skip.machine>
+    <!-- Default AWS region for Docker Machine -->
+    <saw.aws.region>us</saw.aws.region>
+    <!-- Configure timestamp format suitable for use in Docker Machine
+         hostnames -->
+    <maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
+    <!-- SAW Docker environment ports -->
+    <saw.docker.port>80</saw.docker.port>
+    <saw.mapr.web.port>18443</saw.mapr.web.port>
+    <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
+    <saw.yarn.resource.port>18088</saw.yarn.resource.port>
+    <saw.yarn.node.port>18042</saw.yarn.node.port>
+    <saw.spark.master.port>18080</saw.spark.master.port>
+    <saw.spark.worker.port>18081</saw.spark.worker.port>
+    <saw.livy.port>18998</saw.livy.port>
+    <saw.kibana.port>15601</saw.kibana.port>
+    <saw.journal.port>19531</saw.journal.port>
   </properties>
   <dependencies>
     <dependency>
@@ -113,6 +130,24 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0.0</version>
+        <configuration>
+          <files>
+            <file>${project.basedir}/src/test/cloud/cloud-region-${saw.aws.region}.properties</file>
+          </files>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.6.1</version>
@@ -154,18 +189,19 @@
         </executions>
       </plugin>
       <plugin>
-	<groupId>org.apache.maven.plugins</groupId>
-	<artifactId>maven-failsafe-plugin</artifactId>
-	<executions>
-	  <execution>
-	    <goals>
-	      <goal>integration-test</goal>
-	      <goal>verify</goal>
-	    </goals>
+	      <groupId>org.apache.maven.plugins</groupId>
+	      <artifactId>maven-failsafe-plugin</artifactId>
+	      <executions>
+	        <execution>
+	          <goals>
+	            <goal>integration-test</goal>
+	            <goal>verify</goal>
+	          </goals>
           </execution>
         </executions>
         <configuration>
           <systemPropertyVariables>
+            <saw.docker.host>${saw.docker.ip}</saw.docker.host>
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
           </systemPropertyVariables>
         </configuration>
@@ -173,7 +209,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.24.0</version>
+        <version>0.25.2</version>
         <configuration>
           <!-- Automatically create required Docker networks -->
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
@@ -185,10 +221,10 @@
           <startParallel>true</startParallel>
           <!-- Ignore the Docker Machine configuration by default, and
                only enable it from the cloud profile when needed -->
-          <skipMachine>${docker.skip.machine}</skipMachine>
+          <skipMachine>${saw.docker.skip.machine}</skipMachine>
           <!-- Configure Docker Machine -->
           <machine>
-            <name>user-${env.SAW_AWS_USERNAME}</name>
+            <name>user-${maven.build.timestamp}</name>
             <autoCreate>true</autoCreate>
             <createOptions>
               <driver>amazonec2</driver>
@@ -196,6 +232,8 @@
               <amazonec2-access-key>${env.SAW_AWS_ACCESS_KEY_ID}</amazonec2-access-key>
               <amazonec2-secret-key>${env.SAW_AWS_SECRET_ACCESS_KEY}</amazonec2-secret-key>
               <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
+              <!-- Use spot instance for cost savings and removing EBS volume upon termination -->
+              <amazonec2-request-spot-instance/>
               <amazonec2-root-size>32</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
@@ -241,7 +279,7 @@
                 </assembly>
               </build>
               <run>
-                <namingStrategy>${saw.docker.naming}</namingStrategy>
+                <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
                 </network>
@@ -285,7 +323,7 @@
                 <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
               </build>
               <run>
-                <namingStrategy>${saw.docker.naming}</namingStrategy>
+                <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
                   <alias>saw-mapr</alias>
@@ -373,16 +411,16 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --params.saw.docker.port=${saw.docker.port}</arguments>
+              <arguments>run protractor -- --params.saw.docker.host=${docker.host.address} --params.saw.docker.port=${saw.docker.port}</arguments>
             </configuration>
           </execution>
         </executions>
       </plugin>
       <plugin>
-	<groupId>org.asciidoctor</groupId>
-	<artifactId>asciidoctor-maven-plugin</artifactId>
-	<version>1.5.6</version>
-	<dependencies>
+	      <groupId>org.asciidoctor</groupId>
+	      <artifactId>asciidoctor-maven-plugin</artifactId>
+	      <version>1.5.6</version>
+	      <dependencies>
           <dependency>
             <groupId>org.asciidoctor</groupId>
             <artifactId>asciidoctorj-diagram</artifactId>
@@ -454,17 +492,6 @@
         </property>
       </activation>
       <properties>
-        <saw.docker.port>80</saw.docker.port>
-        <saw.docker.naming>alias</saw.docker.naming>
-        <saw.mapr.web.port>18443</saw.mapr.web.port>
-        <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
-        <saw.yarn.resource.port>18088</saw.yarn.resource.port>
-        <saw.yarn.node.port>18042</saw.yarn.node.port>
-        <saw.spark.master.port>18080</saw.spark.master.port>
-        <saw.spark.worker.port>18081</saw.spark.worker.port>
-        <saw.livy.port>18998</saw.livy.port>
-        <saw.kibana.port>15601</saw.kibana.port>
-        <saw.journal.port>19531</saw.journal.port>
         <!-- Show Docker image build output by default to keep users
              up to date on the progress, as it can take considerable
              time for the first run and after Dockerfile modifications
@@ -482,8 +509,11 @@
         </property>
       </activation>
       <properties>
-        <!-- Limit access to local machine only by default -->
-        <saw.docker.ip>localhost</saw.docker.ip>
+        <!-- Disable Docker Machine configuration when using local -->
+        <saw.docker.skip.machine>true</saw.docker.skip.machine>
+        <!-- Limit access to local machine only when no remote access
+             needed -->
+        <saw.docker.ip>127.0.0.1</saw.docker.ip>
       </properties>
     </profile>
     <!-- Cloud Docker profile -->
@@ -496,11 +526,7 @@
         </property>
       </activation>
       <properties>
-        <!-- Enable Docker Machine configuration when using cloud -->
-        <docker.skip.machine>false</docker.skip.machine>
-        <!-- Bind to all interfaces so that environment can be
-             accessed remotely -->
-        <saw.docker.ip>0.0.0.0</saw.docker.ip>
+        <saw.aws.region>${env.SAW_AWS_REGION}</saw.aws.region>
       </properties>
       <build>
         <plugins>
@@ -527,34 +553,8 @@
                   <property>env.SAW_AWS_SECRET_ACCESS_KEY</property>
                   <message>The environment variable SAW_AWS_SECRET_ACCESS_KEY must be set</message>
                 </requireProperty>
-                <requireProperty>
-                  <property>env.SAW_AWS_USERNAME</property>
-                  <message>The environment variable SAW_AWS_USERNAME must be set</message>
-                  <regex>\w{4}\d{4}(-.*)?</regex>
-                  <regexMessage>
-                    Username must be in the form "abcd0001" with an optional suffix</regexMessage>
-                </requireProperty>
               </rules>
               <fail>true</fail>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <version>1.0.0</version>
-            <configuration>
-              <files>
-                <file>${project.basedir}/src/test/cloud/cloud-region-${env.SAW_AWS_REGION}.properties</file>
-              </files>
-              <!-- Workaround: The properties plug-in is invoked for
-                   the parent project too, for which the path above
-                   cannot be found.  As a workaround configure the
-                   plug-in to be quiet to work around that error.  The
-                   Maven profile should perhaps somehow be moved into
-                   the submodule instead, so that dist-related
-                   plug-ins are not invoked at the top-level
-              -->
-              <quiet>true</quiet>
             </configuration>
           </plugin>
         </plugins>

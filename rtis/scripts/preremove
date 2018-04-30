@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+source /etc/bda/rtis.env || exit 
+
+echo "Remove link on current version of RealTime Ingestion Server"
+
+rm -f /opt/bda/rtis/conf/application.conf /opt/bda/rtis/conf/rtis.env
+rm -f ${BDA_HOME}/rtis
+rm -f /etc/bda/rtis.env
+
+echo "RealTime Ingestion Server pre-remove step has been completed"

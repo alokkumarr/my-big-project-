@@ -187,8 +187,11 @@ export class DashboardGridComponent
   }
 
   refreshTile(item) {
-    if (item.kpi) return;
     const dimensions = this.getDimensions(item);
+    if (item.kpi) {
+      item.dimensions = dimensions;
+      return;
+    }
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
@@ -274,7 +277,9 @@ export class DashboardGridComponent
       if (tile.kpi) {
         this.dashboard.push(tile);
         this.getDashboard.emit({ changed: true, dashboard: this.model });
-        this.refreshTile(tile);
+        setTimeout(() => {
+          this.refreshTile(tile);
+        }, 100);
         return;
       }
 

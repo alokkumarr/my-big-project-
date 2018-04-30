@@ -1,7 +1,7 @@
 <div class="grid-container" fxFill>
   <dx-data-grid id="gridContainer">
     <div *dxTemplate="let data of 'nameCellTemplate'">
-      <a (click)="viewDetails(data.data)" [innerHTML]="data.value"></a>
+      <a (click)="viewDetails(data.data)" [innerHTML]="data.value" e2e="data-set-grid-view-mode"></a>
     </div>
     <div *dxTemplate="let data of 'creatorCellTemplate'">
       <span class="clickable" [innerHTML]="data.value"></span>

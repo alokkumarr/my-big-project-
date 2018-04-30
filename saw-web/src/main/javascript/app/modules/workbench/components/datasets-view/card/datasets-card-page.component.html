@@ -8,7 +8,7 @@
           <!-- <img *ngSwitchCase="'SUCCESS'" src="../../../../../../../../../assets/svg/happy.svg" height="24" width="24" /> -->
           <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
         </div>
-        <a class="dataset-name" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name"></a>
+        <a class="dataset-name" e2e="data-set-card" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name"></a>
         <dataset-actions [dsMetadata]="sets"></dataset-actions>
       </mat-card-header>
       <mat-divider></mat-divider>
