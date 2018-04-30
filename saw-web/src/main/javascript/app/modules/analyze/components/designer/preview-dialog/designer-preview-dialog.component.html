@@ -10,16 +10,15 @@
   </div>
 </header>
 
-<div class="preview-container" [ngSwitch]="analysis.type">
+<div class="preview-container">
   <pivot-grid *ngIf="previewData && analysis.type === 'pivot'"
               [artifactColumns]="artifactColumns"
               [sorts]="data.analysis.sqlBuilder.sorts"
               [data]="previewData"
               mode="preview">
   </pivot-grid>
-
   <report-grid-upgraded *ngIf="analysis.type === 'report' || analysis.type === 'esReport'"
-                        [artifacts]="analysis.edit ? null : artifacts"
+                        [artifacts]="analysis.edit ? null : analysis.artifacts"
                         [query]="analysis.queryManual"
                         [sorts]="analysis.sqlBuilder.sorts"
                         [dataLoader]="dataLoader"
