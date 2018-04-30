@@ -46,6 +46,7 @@ class AnalysisExecutions extends BaseController {
   def getExecutionData(analysisId: String, executionId: String, page: Int, pageSize: Int, analysisType: String): Result = {
     handle(process = (json, ticket) =>
     {
+      // changed from Int to Long because stream returns long.
       var totalRows : Long =0
       var pagingData: JValue = null
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
@@ -119,7 +120,7 @@ class AnalysisExecutions extends BaseController {
   }
   def execute(analysisId: String): Result = {
     handle((json, ticket) => {
-      analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
+        analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
     })
   }
 }

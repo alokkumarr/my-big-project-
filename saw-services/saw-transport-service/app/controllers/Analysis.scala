@@ -685,7 +685,9 @@ class Analysis extends BaseController {
         }
         else {
           /* Load execution results from data lake (instead of from Spark driver) */
+          /* rowLimit in loadExecution is no more used hence limiting it at the code level */
           execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
+            .limit(DLConfiguration.rowLimit)
             .iterator.asScala
             .foreach(line => {
               val resultsRow = new java.util.HashMap[String, (String, Object)]
