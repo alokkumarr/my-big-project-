@@ -1,4 +1,5 @@
 import * as isEmpty from 'lodash/isEmpty';
+import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as flatMap from 'lodash/flatMap';
@@ -48,9 +49,22 @@ export const AnalyzeReportDetailComponent = {
     }
 
     _getColumns(analysis) {
-      return flatMap(analysis.artifacts, table => {
+      const columns = flatMap(analysis.artifacts, table => {
         return table.columns;
       });
+
+      /* Add aggregate to columns. Helps in calculating conditional
+       * formatting based on aggregates */
+      forEach(get(analysis, 'sqlBuilder.dataFields') || [], aggregates => {
+        forEach(columns, column => {
+          if (aggregates.columnName === column.columnName) {
+            column.aggregate = aggregates.aggregate;
+          }
+          column.reportType = analysis.type;
+        });
+
+      });
+      return columns;
     }
 
     loadData(options) {

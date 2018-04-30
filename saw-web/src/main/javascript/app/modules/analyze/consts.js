@@ -7,6 +7,7 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 import {
   NUMBER_TYPES,
   FLOAT_TYPES,
+  INT_TYPES,
   DATE_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
@@ -21,6 +22,7 @@ import {
 export {
   NUMBER_TYPES,
   FLOAT_TYPES,
+  INT_TYPES,
   DATE_TYPES,
   CHART_COLORS,
   BACKEND_TIMEZONE,
