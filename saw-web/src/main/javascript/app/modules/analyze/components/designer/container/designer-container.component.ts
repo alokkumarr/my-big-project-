@@ -230,7 +230,7 @@ export class DesignerContainerComponent {
       break;
     case 'save':
       this.updateAnalysis();
-      if (!this.analysis.edit) {
+      if (this.isInQueryMode && !this.analysis.edit) {
         this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
           if (result) {
             this.analysis.edit = true;
