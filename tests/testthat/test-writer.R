@@ -17,78 +17,86 @@ sc <- spark_connect(master = "local")
 # Load data into Spark
 mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
 
+# Temp Directory
+tmp <- paste0(tempdir(), "/writer-tests")
 
 test_that("parquet file type with default value", {
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet")
-  expect_file_exists("~/writer-tests/mtcars.parquet")
-  file.remove("~/writer-tests/mtcars.parquet")
+  .path <- paste0(tmp, "/mtcars.parquet")
+  writer(mtcars_tbl, path = .path)
+  expect_file_exists(.path)
+  file.remove(.path)
 })
 
 
 test_that("overwrite feature works as expected", {
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet")
-  expect_file_exists("~/writer-tests/mtcars.parquet")
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet", mode = "overwrite")
-  expect_file_exists("~/writer-tests/mtcars.parquet")
-  expect_equal(length(dir("~/writer-tests")), 1)
-  file.remove("~/writer-tests/mtcars.parquet")
+  .path <- paste0(tmp, "/mtcars.parquet")
+  writer(mtcars_tbl, path = .path)
+  expect_file_exists(.path)
+  writer(mtcars_tbl, path = .path, mode = "overwrite")
+  expect_file_exists(.path)
+  expect_equal(length(dir(tmp)), 1)
+  file.remove(.path)
 })
 
 
 
 test_that("append feature works as expected", {
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet")
-  expect_file_exists("~/writer-tests/mtcars.parquet")
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet", mode = "append")
-  expect_file_exists("~/writer-tests/mtcars-1.parquet")
-  expect_equal(length(dir("~/writer-tests")), 2)
-  file.remove("~/writer-tests/mtcars.parquet")
-  file.remove("~/writer-tests/mtcars-1.parquet")
+  .path <- paste0(tmp, "/mtcars.parquet")
+  writer(mtcars_tbl, path = .path)
+  expect_file_exists(.path)
+  writer(mtcars_tbl, path = .path, mode = "append")
+  expect_file_exists(paste0(tmp, "/mtcars-1.parquet"))
+  expect_equal(length(dir(tmp)), 2)
+  file.remove(.path)
+  file.remove(paste0(tmp, "/mtcars-1.parquet"))
 })
 
 
 
 test_that("partition_by feature works as expected", {
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet", partition_by = "am")
-  expect_directory_exists("~/writer-tests/am=1.0")
-  expect_directory_exists("~/writer-tests/am=0.0")
-  expect_file_exists("~/writer-tests/am=0.0/mtcars-am=0.0.parquet")
-  expect_file_exists("~/writer-tests/am=1.0/mtcars-am=1.0.parquet")
+  .path <- paste0(tmp, "/mtcars.parquet")
+  writer(mtcars_tbl, path = .path, partition_by = "am")
+  expect_directory_exists(paste0(tmp, "/am=1.0"))
+  expect_directory_exists(paste0(tmp, "/am=0.0"))
+  expect_file_exists(paste0(tmp, "/am=0.0/mtcars-am=0.0.parquet"))
+  expect_file_exists(paste0(tmp, "/am=1.0/mtcars-am=1.0.parquet"))
 
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.parquet",
-         partition_by = "am", mode = "append")
+  writer(mtcars_tbl, path = .path, partition_by = "am", mode = "append")
 
-  expect_equal(length(dir("~/writer-tests/am=0.0")), 2)
-  expect_equal(length(dir("~/writer-tests/am=1.0")), 2)
-  expect_file_exists("~/writer-tests/am=0.0/mtcars-am=0.0-1.parquet")
-  expect_file_exists("~/writer-tests/am=1.0/mtcars-am=1.0-1.parquet")
+  expect_equal(length(dir(paste0(tmp,"/am=0.0"))), 2)
+  expect_equal(length(dir(paste0(tmp, "/am=1.0"))), 2)
+  expect_file_exists(paste0(tmp, "/am=0.0/mtcars-am=0.0-1.parquet"))
+  expect_file_exists(paste0(tmp, "/am=1.0/mtcars-am=1.0-1.parquet"))
 
-  unlink("~/writer-tests/am=1.0", recursive = TRUE)
-  unlink("~/writer-tests/am=0.0", recursive = TRUE)
+  unlink(paste0(tmp, "/am=1.0"), recursive = TRUE)
+  unlink(paste0(tmp, "/am=0.0"), recursive = TRUE)
 })
 
 
 test_that("csv feature works as expected", {
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.csv")
-  expect_file_exists("~/writer-tests/mtcars.csv")
-  file.remove("~/writer-tests/mtcars.csv")
+  .path <- paste0(tmp, "/mtcars.csv")
+  writer(mtcars_tbl, path = .path)
+  expect_file_exists(.path)
+  file.remove(.path)
 })
 
 
 test_that("json feature works as expected", {
-  writer(mtcars_tbl, path = "~/writer-tests/mtcars.json")
-  expect_file_exists("~/writer-tests/mtcars.json")
-  file.remove("~/writer-tests/mtcars.json")
+  .path <- paste0(tmp, "/mtcars.json")
+  writer(mtcars_tbl, path = .path)
+  expect_file_exists(.path)
+  file.remove(.path)
 })
 
 
 test_that("data.frame method works as expected", {
-  writer(mtcars, path = "~/writer-tests/mtcars.csv")
-  expect_file_exists("~/writer-tests/mtcars.csv")
-  writer(mtcars, path = "~/writer-tests/mtcars.csv", mode = "append")
-  expect_file_exists("~/writer-tests/mtcars.csv")
-  expect_equal(length(dir("~/writer-tests")), 1)
-  expect_equal(nrow(read.csv("~/writer-tests/mtcars.csv")), nrow(mtcars) * 2)
-  file.remove("~/writer-tests/mtcars.csv")
+  .path <- paste0(tmp, "/mtcars.csv")
+  writer(mtcars_tbl, path = .path)
+  expect_file_exists(.path)
+  writer(mtcars, path = .path, mode = "append")
+  expect_file_exists(.path)
+  expect_equal(length(dir(tmp)), 1)
+  expect_equal(nrow(read.csv(.path)), nrow(mtcars) * 2)
+  file.remove(.path)
 })
 
