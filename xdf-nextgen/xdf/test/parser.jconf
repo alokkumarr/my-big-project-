@@ -1,0 +1,29 @@
+{
+  "parser": {
+    "fields": [
+      { "name": "F00", "type": "string"},
+      { "name": "F01", "type": "long"},
+      { "name": "F02", "type": "double"},
+      { "name": "F03", "type": "date"},
+      { "name": "F04", "type": "string"},
+      { "name": "F05", "type": "long"},
+      { "name": "F06", "type": "double"},
+      { "name": "F07", "type": "date"},
+      { "name": "F08", "type": "string"},
+      { "name": "F09", "type": "long"}
+    ],
+    "file" : "hdfs:///tmp/test/headless/*.1.csv",
+    "lineSeparator": "\n",
+    "delimiter": ",",
+    "quoteChar": "\"",
+    "quoteEscape": "\\",
+    "headerSize": 0,
+    "fieldNameLine": 0
+  },
+  "outputs" : [
+    { "dataSet" : "parsedDataSet"}
+  ],
+  "parameters" : [
+    {"name" : "spark.master", "value" : "yarn"}
+  ]
+}

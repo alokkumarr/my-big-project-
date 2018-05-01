@@ -1,0 +1,32 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/req1r.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::test1::meta",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "S.Ryabov",
+					"description" : "Metadata test case",
+					"tags" : [ "XDF", "UX", "Metadata" ]
+					
+			},
+			
+			"dataLake" : { 
+			
+				"name" : "tc220", 
+				"type" : "fs", 
+				"catalog" : "dout", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 2 
+				
+			}, 
+	   
+			"transformations" : []
+	}
+	
+}

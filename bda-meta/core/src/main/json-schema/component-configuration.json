@@ -1,0 +1,379 @@
+{
+  "$schema" : "http://json-schema.org/draft-04/schema#",
+  "description" : "Defines the configuration XDF-UX component",
+  "id" : "component",
+  "type": "object",
+  "numberOfFiles": {
+    "description": "Number of files for all output objects",
+    "type": "integer",
+    "default" : 1
+  },
+  "format": {
+    "description": "Data format",
+    "type": "object",
+    "default": "parquet",
+    "enum": [
+      "parquet",
+      "json",
+      "csv",
+      "maprdb",
+      "es"
+    ]
+  },
+  "dstype" :{
+    "type": "string",
+    "description": "Type of data source",
+    "default": "base",
+    "enum": [
+      "base",
+      "partition"
+    ]
+  },
+  "keys" : {
+    "type": "array",
+    "description": "Partitioning keys",
+    "minItems": 0,
+    "uniqueItems": true,
+    "items": {
+      "type": "string"
+      }
+  },
+  "InputDataSet" : {
+    "type" : "object",
+    "required": [
+      "dataSet"
+    ],
+    "properties" : {
+      "name": {
+        "description": "Parameter name",
+        "type": "string"
+      },
+      "dataSet": {
+        "description": "Data object name",
+        "type": "string"
+      },
+      "fileMask": {
+        "type": "string"
+      },
+      "format": {
+        "$ref": "#/format"
+      },
+      "dstype": {
+        "$ref" : "#/dstype"
+      },
+      "catalog": {
+        "type": "string",
+        "description": "Catalog in data source",
+        "default": "data"
+      },
+      "project": {
+        "type": "string",
+        "description": "Project of input object"
+      },
+      "parent": {
+        "type": "string"
+      }
+    }
+  },
+  "OutputDataSet" : {
+    "type": "object",
+    "required": [
+      "dataSet",
+      "dstype",
+      "mode"
+    ],
+    "properties": {
+      "name": {
+        "description": "Parameter name",
+        "type": "string"
+      },
+      "dataSet": {
+        "description": "Data object name",
+        "type": "string"
+      },
+      "format": {
+        "$ref": "#/format"
+      },
+      "mode": {
+        "type": "object",
+        "description": "mode of the partition",
+        "default": "replace",
+        "enum": [
+          "replace",
+          "append"
+        ]
+      },
+      "numberOfFiles": {
+        "$ref": "#/numberOfFiles"
+      },
+      "dstype": {
+        "$ref" : "#/dstype"
+      },
+      "partitionKeys": {
+        "$ref" : "#/keys"
+      },
+      "catalog": {
+        "type": "string",
+        "description": "Location in selected container",
+        "default": "data"
+      },
+      "parent": {
+        "type": "string"
+      },
+      "userdata": {}
+    }
+  },
+  "properties" : {
+    "inputs" : {
+      "description" : "List of named input data objects",
+      "type" : "array",
+      "items" : {
+        "$ref": "#/InputDataSet"
+      }
+    },
+    "outputs" : {
+      "description" : "List of named output data objects",
+      "type" : "array",
+      "items" : {
+        "$ref": "#/OutputDataSet"
+      }
+    },
+    "project" : {
+      "description": "Project/Application name (ID)",
+      "type": "string"
+    },
+    "parameters" : {
+      "description" : "System parameters specific for component execution",
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "value" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "parser": {
+      "description": "Parser specific properties",
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "format": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "lineSeparator": {
+          "type": "string"
+        },
+        "delimiter": {
+          "type": "string"
+        },
+        "quoteChar": {
+          "type": "string"
+        },
+        "quoteEscape": {
+          "type": "string"
+        },
+        "headerSize": {
+          "type": "integer"
+        },
+        "numberOfFiles": {
+          "$ref": "#/numberOfFiles"
+        }
+      }
+    },
+
+    "sql" : {
+      "description": "SQL script executor specific properties",
+      "properties": {
+        "script" : {
+          "description" : "SQL script sile name name",
+          "type" : "string"
+        },
+        "scriptLocation" : {
+          "description" : "Location containing SQL script, special value: 'inline' means scripts field itself is base64 encoded SQL script",
+          "type" : "string"
+        }
+      }
+    },
+    "transformer" : {
+      "description": "Transformer specific properties",
+      "properties": {
+        "script" : {
+          "description" : "script sile name name",
+          "type" : "string"
+        },
+        "scriptLocation" : {
+          "description" : "Location containing Jexl/Janino script, special value: 'inline' means scripts field itself is base64 encoded Java (Janino-compatible) script or Jexl script",
+          "type" : "string"
+        },
+        "scriptPreamble" : {
+          "description" : "Standard beginning of script. The preamble pre-populate output record with input values if there is match between fields",
+          "type" : "string"
+        },
+        "scriptEngine": {
+          "type": "object",
+          "description": "Script engine: Jexl/Janino",
+          "default": "janino",
+          "enum": [
+            "jexl",
+            "janino"
+          ]
+        },
+        "additionalImports": {
+          "type": "array",
+          "description": "List of additional import statements for Janino script.s",
+          "minItems": 0,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "threshold": {
+          "type": "integer",
+          "description": "If # of failed records exceeds this threshold, processing will be cancelled",
+          "default": 0
+        },
+        "outputSchema" : {
+          "type": "array",
+          "description": "List of output fields: field name, field type.",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+     },
+    "es-loader" : {
+      "description": "ES Loader specific properties",
+      "properties": {
+        "destinationIndexName": {
+          "description": "Index to which the data has to be loaded",
+          "type": "string"
+        },
+        "indexMappingfile": {
+          "description": "Name of the file with index mapping (definition), optional",
+          "type": "string",
+          "required": false
+        },
+        "documentIDField": {
+          "description": "",
+          "type": "string",
+          "required": false
+        },
+        "filterString": {
+          "description": "Used to filter data from the given dataset using conditional statements (E.g.: col1='STR1' AND length > 10)",
+          "type": "string",
+          "required": false
+        },
+        "aliases": {
+          "description": "List of aliases and corresponding loading modes",
+          "type": "array",
+          "items" : {
+            "description" : "Object contains alias name and loading mode",
+            "type" : "object",
+            "properties" : {
+              "aliasName" : {
+                "description" : "Name of alias",
+                "type" : "string"
+              },
+              "mode" : {
+                "default" : "append",
+                "description" : "Mode of output",
+                "enum" : [ "replace", "append" ]
+              }
+            },
+            "required" : [ "aliasName", "mode" ]
+          }
+        },
+        "esNodes": {
+          "description": "Comma separated list of host names or IP addresses",
+          "type": "string"
+        },
+        "esClusterName": {
+          "description": "Name of the ElasticSearch cluster. By default, the cluster name will be elasticsearch",
+          "type": "string"
+        },
+        "esPort": {
+          "description": "Connecting port for ElasticSearch server",
+          "type": "integer"
+        },
+        "esMappingId": {
+          "description": "Key column in the dataset to which the record in ES will be matched",
+          "type": "string"
+        },
+        "esUser": {
+          "description": "User name for ElasticSearch",
+          "type": "string"
+        },
+        "esPass": {
+          "description": "Password for the username mentioned for the ElasticSearch",
+          "type": "string"
+        }
+      }
+    },
+    "es-reader" : {
+      "description": "ES Reader specific properties",
+      "properties": {}
+    },
+    "db-loader" : {
+      "description": "DB Loader specific properties",
+      "properties": {}
+    },
+    "analyzer" : {
+      "description": "Data profiler/analyzer configuration properties",
+      "properties": {
+        "esId" : {
+          "description" : "Id of elastic search document containing analyzer metadata",
+          "type" : "string"
+        },
+        "fieldSeparator" : {
+          "description" : "Field separator",
+          "type" : "string"
+        },
+        "header" : {
+          "description" : "Indicates if source data contains header",
+          "type" : "boolean"
+        },
+        "timestampMasks" : {
+          "description" : "Array of timestamp masks used to define fields as timestamps/dates",
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "zero" : {
+      "description": "Zero specific properties",
+      "properties": {}
+    }
+  }
+}

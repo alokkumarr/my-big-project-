@@ -1,0 +1,8 @@
+{
+  "action" : "delete",
+  "output" : "hdfs:///var/bda/xdf-ngdev/project.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "Project",
+	"id" : "P1"
+}
+

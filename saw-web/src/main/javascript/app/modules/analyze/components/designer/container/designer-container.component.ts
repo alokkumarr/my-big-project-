@@ -348,9 +348,6 @@ export class DesignerContainerComponent {
       this.artifacts = [...this.artifacts];
       break;
     case 'aggregate':
-      if (event.column) {
-        this.setPresetsForAggregatesIfNeeded(event.column);
-      }
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
@@ -385,21 +382,6 @@ export class DesignerContainerComponent {
     }
     if (DATE_TYPES.includes(column.type) && !column.format) {
       column.format = 'yyyy-MM-dd';
-    }
-  }
-
-  setPresetsForAggregatesIfNeeded(column: ArtifactColumn) {
-    if (NUMBER_TYPES.includes(column.type)) {
-      if (['avg', 'percentage'].includes(column.aggregate)) {
-        if (!column.format) {
-          column.format = {};
-        }
-        const format = column.format as Format;
-        format.precision = format.precision || DEFAULT_PRECISION;
-        if (column.aggregate === 'percentage') {
-          format.percentage = true;
-        }
-      }
     }
   }
 

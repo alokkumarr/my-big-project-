@@ -32,9 +32,11 @@ import {
   DATE_TYPES,
   NUMBER_TYPES,
   FLOAT_TYPES,
+  INT_TYPES,
   DATE_INTERVALS_OBJ
 } from '../../../modules/analyze/consts';
 import { componentFactoryName } from '@angular/compiler';
+import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 const template = require('./report-grid.component.html');
 require('./report-grid.component.scss');
@@ -322,7 +324,8 @@ export class ReportGridComponent {
       fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
         const isNumberType = NUMBER_TYPES.includes(column.type);
-        const format = isNumberType ? {formatter: getFormatter(column.format)} : column.format;
+        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, column.type, column.aggregate);
+        const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),
@@ -340,6 +343,20 @@ export class ReportGridComponent {
         return field;
       })
     )(artifacts);
+  }
+
+  preprocessFormatIfNeeded(format, type, aggregate) {
+    const isPercentage = aggregate === 'percentage';
+    const isAVG = aggregate === 'avg';
+    if ((!isPercentage && !isAVG) ||
+      !NUMBER_TYPES.includes(type)) {
+      return format;
+    }
+    return {
+      ...format,
+      precision: DEFAULT_PRECISION,
+      percentage: isPercentage
+    };
   }
 
   getDataField(column: ArtifactColumnReport) {
