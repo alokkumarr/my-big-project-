@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>xdf-nextgen</artifactId>
-  <version>1.0.8</version>
+  <version>${revision}</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
@@ -18,7 +18,7 @@
       Default value here,
       desired value can be specified outside with -Dprod.release=RRR
     -->
-    <prod.release>0_g0000_wip</prod.release>
+    <prod.release>0</prod.release>
     <!-- use prod.release property -->
     <project.release>${prod.release}</project.release>
     <!-- Versions  -->
@@ -58,7 +58,7 @@
     <!-- XDF package -->
     <!-- RPM properties -->
     <rpm.name>bda-${prod.name}</rpm.name>
-    <rpm.version>${project.version}</rpm.version>
+    <rpm.version>${revision.nodash}</rpm.version>
     <rpm.release>${project.release}</rpm.release>
     <!-- XDF application -->
     <app.name>${prod.name}</app.name>
@@ -251,12 +251,12 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>core</artifactId>
-      <version>1.0.10</version>
+      <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>meta-api</artifactId>
-      <version>1.0.10</version>
+      <version>${revision}</version>
     </dependency>
 <!-- BDA Internal dependencies END -->		
 
