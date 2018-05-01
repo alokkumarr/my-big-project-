@@ -172,11 +172,12 @@ export const AnalyzePublishDialogComponent = {
         this.triggerSchedule();
       } else if (this.validateForm()) {
         const eDate = ((!isUndefined(this.crondetails.endDate) && moment(this.crondetails.endDate).isValid()) ? moment.utc(this.crondetails.endDate).endOf('day').add(1, 'days') : '');
-        const sDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
+        let sDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
         let cronJobName = this.model.id;
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
+          sDate = moment.utc().format();
         }
         this.model.schedule = {
           scheduleState: this.scheduleState,
