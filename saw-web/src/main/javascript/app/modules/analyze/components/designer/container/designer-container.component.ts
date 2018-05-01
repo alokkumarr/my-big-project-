@@ -79,6 +79,7 @@ export class DesignerContainerComponent {
   ) {}
 
   ngOnInit() {
+    const isReport = ['report', 'esReport'].includes(get(this.analysis, 'type') || get(this.analysisStarter, 'type'));
     this.designerState = DesignerStates.WAITING_FOR_COLUMNS;
     switch (this.designerMode) {
     case 'new':
@@ -88,12 +89,18 @@ export class DesignerContainerComponent {
       break;
     case 'edit':
       this.initExistingAnalysis();
-      this.requestDataIfPossible();
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      if (!isReport) {
+        this.requestDataIfPossible();
+      }
       break;
     case 'fork':
       this.forkAnalysis().then(() => {
         this.initExistingAnalysis();
-        this.requestDataIfPossible();
+        this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+        if (!isReport) {
+          this.requestDataIfPossible();
+        }
       });
     default:
       break;
