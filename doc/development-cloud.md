@@ -26,18 +26,20 @@ cloud:
         $ mvn package
         $ mvn -Ddocker-start=cloud
 
-6. Get the SAW start page URL by running the following command:
+6. Get the remote Docker Machine host IP address by running the
+   following command:
 
-        $ docker-machine ssh user-$SAW_AWS_USERNAME saw-url
+        $ docker-machine ip user-$SAW_AWS_USERNAME
 
-7. Navigate to the SAW start page URL in your browser
+7. Navigate to the SAW start page in your browser using the IP address
+   retrieved in the previous step (`http://<ip>/`)
 
-Note: The first run will take longer to complete, up to 20 minutes.
-Subsequent runs using the same remote machine will be faster and take
-only a couple of minutes.  Also please note that remote machines are
-automatically shut down after a couple of hours, to reduce costs.
-Contents of the machine are preserved and it can be started up again
-if needed.
+Note: The first run will take longer to complete.  Subsequent runs
+using the same remote machine will be faster and take only a couple of
+minutes.  Also please note that remote machines are automatically shut
+down after a couple of hours, to reduce costs.  Contents of the
+machine are preserved and it can be started up again if needed with
+the command `docker-machine start user-$SAW_AWS_USERNAME`.
 
 [Docker Machine]: https://github.com/docker/machine/releases/
 

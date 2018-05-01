@@ -224,7 +224,7 @@
           <skipMachine>${saw.docker.skip.machine}</skipMachine>
           <!-- Configure Docker Machine -->
           <machine>
-            <name>user-${maven.build.timestamp}</name>
+            <name>user-${env.SAW_AWS_USERNAME}</name>
             <autoCreate>true</autoCreate>
             <createOptions>
               <driver>amazonec2</driver>
@@ -232,8 +232,6 @@
               <amazonec2-access-key>${env.SAW_AWS_ACCESS_KEY_ID}</amazonec2-access-key>
               <amazonec2-secret-key>${env.SAW_AWS_SECRET_ACCESS_KEY}</amazonec2-secret-key>
               <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
-              <!-- Use spot instance for cost savings and removing EBS volume upon termination -->
-              <amazonec2-request-spot-instance/>
               <amazonec2-root-size>32</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
@@ -551,6 +549,13 @@
                 <requireProperty>
                   <property>env.SAW_AWS_SECRET_ACCESS_KEY</property>
                   <message>The environment variable SAW_AWS_SECRET_ACCESS_KEY must be set</message>
+                </requireProperty>
+                <requireProperty>
+                  <property>env.SAW_AWS_USERNAME</property>
+                  <message>The environment variable SIP_AWS_USERNAME must be set</message>
+                  <regex>\w{4}\d{4}(-.*)?</regex>
+                  <regexMessage>
+                    Username must be in the form "abcd0001" with an optional suffix</regexMessage>
                 </requireProperty>
               </rules>
               <fail>true</fail>
