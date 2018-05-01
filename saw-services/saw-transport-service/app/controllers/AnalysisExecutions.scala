@@ -30,24 +30,23 @@ class AnalysisExecutions extends BaseController {
         }
         val id = Bytes.toString(result.getRowKey)
         ("id", id) ~
-        ("finished", (content \ "execution_finish_ts").extractOpt[Long]) ~
-        ("status", (content \ "exec-msg").extractOpt[String])
+          ("finished", (content \ "execution_finish_ts").extractOpt[Long]) ~
+          ("status", (content \ "exec-msg").extractOpt[String])
       })
       /* Note: Keep "results" property for API backwards compatibility */
-      ("executions", executions) ~ ("results", executions) : JValue
+      ("executions", executions) ~ ("results", executions): JValue
     })
   }
 
   // input type is string because of string stream
-  def isJObject(abc: Any) :Boolean = {
-    return parse(abc+"").getClass.getName().equals("org.json4s.JObject")
-}
+  def isJObject(abc: Any): Boolean = {
+    return parse(abc + "").getClass.getName().equals("org.json4s.JObject")
+  }
 
   def getExecutionData(analysisId: String, executionId: String, page: Int, pageSize: Int, analysisType: String): Result = {
-    handle(process = (json, ticket) =>
-    {
+    handle(process = (json, ticket) => {
       // changed from Int to Long because stream returns long.
-      var totalRows : Long =0
+      var totalRows: Long = 0
       var pagingData: JValue = null
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       val execution = analysis.getExecution(executionId)
@@ -118,9 +117,10 @@ class AnalysisExecutions extends BaseController {
       } // end of chart & pivot
     })
   }
+
   def execute(analysisId: String): Result = {
     handle((json, ticket) => {
-        analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
+      analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
     })
   }
 }
