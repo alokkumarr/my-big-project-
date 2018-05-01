@@ -311,6 +311,7 @@ detecter.tbl_spark <- function(df,
     ) %>%
     sparklyr::spark_apply(.,
                           function(e, l) {
+                            library(a2munge)
                             index_var <- l$i_var
                             measure_var <- l$m_var
                             freq <- l$freq
@@ -340,7 +341,7 @@ detecter.tbl_spark <- function(df,
                               a = alpha,
                               anoms = max_anoms,
                               trend_win = trend_window,
-                              fun = match.fun("detect.data.frame")
+                              fun = match.fun("detect")
                             )
                           }) %>%
     select_at(c(index_var, group_vars, "measure", "value", "seasonal", "trend", "resid", "anomaly"))
