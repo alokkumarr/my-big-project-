@@ -7,6 +7,8 @@
 </designer-header>
 
 <designer-settings-single class="designer__data-settings"
+                   [analysisType]="analysisStarter.type"
+                   [analysisSubtype]="analysisStarter.chartType"
                    (settingsChange)="onSettingsChange($event)"
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </designer-settings-single>

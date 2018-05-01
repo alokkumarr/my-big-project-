@@ -1,10 +1,5 @@
 declare const require: any;
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
@@ -26,8 +21,8 @@ import {
   Sort,
   Filter,
   IToolbarActionResult
-} from '../types'
-import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
+} from '../types';
+import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { FieldChangeEvent } from '../settings/single';
 
 const template = require('./designer-container.component.html');
@@ -66,6 +61,7 @@ export class DesignerContainerComponent {
   ) {}
 
   ngOnInit() {
+    /* prettier-ignore */
     switch (this.designerMode) {
     case 'new':
       this.designerState = DesignerStates.NO_SELECTION;
@@ -86,10 +82,11 @@ export class DesignerContainerComponent {
   }
 
   initNewAnalysis() {
-    const {type, semanticId} = this.analysisStarter;
-    this._designerService.createAnalysis(semanticId, type)
+    const { type, semanticId } = this.analysisStarter;
+    this._designerService
+      .createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis) => {
-        this.analysis = {...this.analysisStarter, ...newAnalysis};
+        this.analysis = { ...this.analysisStarter, ...newAnalysis };
         unset(this.analysis, 'supports');
         unset(this.analysis, 'categoryId');
       });
@@ -103,17 +100,21 @@ export class DesignerContainerComponent {
   }
 
   forkAnalysis() {
-    const {type, semanticId} = this.analysis;
-    return this._designerService.createAnalysis(semanticId, type)
+    const { type, semanticId } = this.analysis;
+    return this._designerService
+      .createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis) => {
-        this.analysis = {...this.analysis, ...{
-          id: newAnalysis.id,
-          metric: newAnalysis.metric,
-          createdTimestamp: newAnalysis.createdTimestamp,
-          userId: newAnalysis.userId,
-          userFullName: newAnalysis.userFullName,
-          metricName: newAnalysis.metricName
-        }};
+        this.analysis = {
+          ...this.analysis,
+          ...{
+            id: newAnalysis.id,
+            metric: newAnalysis.metric,
+            createdTimestamp: newAnalysis.createdTimestamp,
+            userId: newAnalysis.userId,
+            userFullName: newAnalysis.userFullName,
+            metricName: newAnalysis.metricName
+          }
+        };
       });
   }
 
@@ -128,37 +129,57 @@ export class DesignerContainerComponent {
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-    this._designerService.getDataForAnalysis(this.analysis)
-      .then((data: any) => {
-        if (this.isDataEmpty(data.data, this.analysis.type, this.analysis.sqlBuilder)) {
+    this._designerService.getDataForAnalysis(this.analysis).then(
+      (data: any) => {
+        if (
+          this.isDataEmpty(
+            data.data,
+            this.analysis.type,
+            this.analysis.sqlBuilder
+          )
+        ) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
-          this.data = this._designerService.parseData(data.data, this.analysis.sqlBuilder);
+          this.data = this._designerService.parseData(
+            data.data,
+            this.analysis.sqlBuilder
+          );
         }
-      }, err => {
+      },
+      err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-      });
+      }
+    );
   }
 
   onToolbarAction(action: DesignerToolbarAciton) {
+    /* prettier-ignore */
     switch (action) {
     case 'sort':
-      this._analyzeDialogService.openSortDialog(this.sorts, this.firstArtifactColumns)
-        .afterClosed().subscribe((result: IToolbarActionResult) => {
+      this._analyzeDialogService
+        .openSortDialog(this.sorts, this.firstArtifactColumns)
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
-            this.onSettingsChange({requiresDataChange: true});
+            this.onSettingsChange({ requiresDataChange: true });
           }
         });
       break;
     case 'filter':
-      this._analyzeDialogService.openFilterDialog(this.filters, this.analysis.artifacts, this.booleanCriteria)
-        .afterClosed().subscribe((result: IToolbarActionResult) => {
+      this._analyzeDialogService
+        .openFilterDialog(
+          this.filters,
+          this.analysis.artifacts,
+          this.booleanCriteria
+        )
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.filters = result.filters;
             this.booleanCriteria = result.booleanCriteria;
-            this.onSettingsChange({requiresDataChange: true});
+            this.onSettingsChange({ requiresDataChange: true });
           }
         });
       break;
@@ -166,20 +187,24 @@ export class DesignerContainerComponent {
       this._analyzeDialogService.openPreviewDialog(this.analysis);
       break;
     case 'description':
-      this._analyzeDialogService.openDescriptionDialog(this.analysis.description)
-        .afterClosed().subscribe((result: IToolbarActionResult) => {
+      this._analyzeDialogService
+        .openDescriptionDialog(this.analysis.description)
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.analysis.description = result.description;
           }
         });
       break;
     case 'save':
-      this._analyzeDialogService.openSaveDialog(this.analysis)
-      .afterClosed().subscribe((result: IToolbarActionResult) => {
-        if (result) {
-          this.onSave.emit(result.isSaveSuccessful);
-        }
-      });
+      this._analyzeDialogService
+        .openSaveDialog(this.analysis)
+        .afterClosed()
+        .subscribe((result: IToolbarActionResult) => {
+          if (result) {
+            this.onSave.emit(result.isSaveSuccessful);
+          }
+        });
       break;
     }
   }
@@ -188,36 +213,40 @@ export class DesignerContainerComponent {
     const partialSqlBuilder = this._designerService.getPartialSqlBuilder(
       this.analysis.artifacts[0].columns,
       this.analysis.type
-    )
+    );
 
     return {
       booleanCriteria: this.booleanCriteria,
       filters: this.filters,
       sorts: this.sorts,
       ...partialSqlBuilder
-    }
+    };
   }
 
   isDataEmpty(data, type: AnalysisType, sqlBuilder: SqlBuilder) {
+    /* prettier-ignore */
     switch (type) {
     case 'pivot':
       let isDataEmpty = false;
       if (data.row_level_1) {
-        isDataEmpty = isEmpty(get(data ,'row_level_1.buckets'));
+        isDataEmpty = isEmpty(get(data, 'row_level_1.buckets'));
       } else if (data.column_level_1) {
-        isDataEmpty = isEmpty(get(data ,'column_level_1.buckets'));
+        isDataEmpty = isEmpty(get(data, 'column_level_1.buckets'));
       } else {
         // when no row or column fields are selected
-        forEach((<SqlBuilderPivot>sqlBuilder).dataFields, ({columnName}) => {
-          isDataEmpty = isEmpty(get(data , columnName));
-          if (isDataEmpty) {
-            return false;
+        forEach(
+          (<SqlBuilderPivot>sqlBuilder).dataFields,
+          ({ columnName }) => {
+            isDataEmpty = isEmpty(get(data, columnName));
+            if (isDataEmpty) {
+              return false;
+            }
           }
-        });
+        );
       }
       return isDataEmpty;
     case 'chart':
-      // TODO verify if the object returned is empty
+    // TODO verify if the object returned is empty
     case 'report':
       return isEmpty(data);
     }
@@ -227,7 +256,7 @@ export class DesignerContainerComponent {
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();
     if (event.requiresDataChange) {
-      this.requestDataIfPossible()
+      this.requestDataIfPossible();
     } else {
       this.data = [...this.data];
     }
@@ -235,15 +264,18 @@ export class DesignerContainerComponent {
 
   canRequestData() {
     // there has to be at least 1 data field, to make a request
+    /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
       const length = get(this.analysis, 'sqlBuilder.dataFields.length');
       return isNumber(length) ? length > 0 : false;
     case 'chart':
+      const dataLength = get(this.analysis, 'sqlBuilder.dataFields.length', 0);
+      const nonDataLength = get(this.analysis, 'sqlBuilder.nodeFields.length', 0);
+      return dataLength && nonDataLength;
     case 'report':
       return false;
     }
-
   }
 
   getFirstArtifactColumns() {
@@ -260,7 +292,9 @@ export class DesignerContainerComponent {
   cleanSorts() {
     const checkedFields = filter(this.firstArtifactColumns, 'checked');
     this.sorts = filter(this.sorts, sort => {
-      return Boolean(find(checkedFields, ({columnName}) => columnName === sort.columnName));
+      return Boolean(
+        find(checkedFields, ({ columnName }) => columnName === sort.columnName)
+      );
     });
   }
 }

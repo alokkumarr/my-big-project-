@@ -15,16 +15,14 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import { Injectable } from '@angular/core';
-import { AnalyzeService } from '../../services/analyze.service'
-import {
-  AnalysisType,
-  Analysis
-} from '../../types';
+import { AnalyzeService } from '../../services/analyze.service';
+import { AnalysisType, Analysis } from '../../types';
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
   ArtifactColumns,
-  ArtifactColumnPivot
+  ArtifactColumnPivot,
+  ArtifactColumnChart
 } from './types';
 import {
   NUMBER_TYPES,
@@ -37,7 +35,7 @@ const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
 @Injectable()
 export class DesignerService {
-  constructor(private _analyzeService: AnalyzeService) { }
+  constructor(private _analyzeService: AnalyzeService) {}
 
   createAnalysis(semanticId: string, type: AnalysisType): Promise<Analysis> {
     return this._analyzeService.createAnalysis(semanticId, type);
@@ -59,83 +57,89 @@ export class DesignerService {
     return this._analyzeService.saveReport(analysis);
   }
 
-  public getPivotGroupAdapters(artifactColumns): IDEsignerSettingGroupAdapter[] {
-
+  public getPivotGroupAdapters(
+    artifactColumns
+  ): IDEsignerSettingGroupAdapter[] {
     const pivotReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
       artifactColumn.area = null;
       artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
-    }
+    };
 
     const onReorder = (artifactColumns: ArtifactColumns) => {
       forEach(artifactColumns, (column, index) => {
         column.areaIndex = index;
       });
-    }
+    };
 
-    const areLessThenMaxFields = (artifactColumns: ArtifactColumns): boolean => {
+    const areLessThenMaxFields = (
+      artifactColumns: ArtifactColumns
+    ): boolean => {
       return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
     };
 
-    const canAcceptNumberType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
-      ({type}: ArtifactColumnPivot) => (
-        areLessThenMaxFields(groupAdapter.artifactColumns) &&
-        NUMBER_TYPES.includes(type)
-      )
-    );
+    const canAcceptNumberType = (
+      groupAdapter: IDEsignerSettingGroupAdapter
+    ) => ({ type }: ArtifactColumnPivot) =>
+      areLessThenMaxFields(groupAdapter.artifactColumns) &&
+      NUMBER_TYPES.includes(type);
 
-    const canAcceptAnyType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
-      () => areLessThenMaxFields(groupAdapter.artifactColumns)
-    );
+    const canAcceptAnyType = (
+      groupAdapter: IDEsignerSettingGroupAdapter
+    ) => () => areLessThenMaxFields(groupAdapter.artifactColumns);
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-    }
+    };
 
     const applyNonDatafieldDefaults = artifactColumn => {
       artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
-    }
+    };
 
-    const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> =  [{
-      title: 'Data',
-      type: 'pivot',
-      marker: 'data',
-      artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptNumberType,
-      transform(artifactColumn: ArtifactColumnPivot) {
-        artifactColumn.area = 'data';
-        artifactColumn.checked = true;
-        applyDataFieldDefaults(artifactColumn);
+    const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
+      {
+        title: 'Data',
+        type: 'pivot',
+        marker: 'data',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptNumberType,
+        transform(artifactColumn: ArtifactColumnPivot) {
+          artifactColumn.area = 'data';
+          artifactColumn.checked = true;
+          applyDataFieldDefaults(artifactColumn);
+        },
+        reverseTransform: pivotReverseTransform,
+        onReorder
       },
-      reverseTransform: pivotReverseTransform,
-      onReorder
-    }, {
-      title: 'Row',
-      type: 'pivot',
-      marker: 'row',
-      artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptAnyType,
-      transform(artifactColumn: ArtifactColumnPivot) {
-        artifactColumn.area = 'row';
-        artifactColumn.checked = true;
-        applyNonDatafieldDefaults(artifactColumn);
+      {
+        title: 'Row',
+        type: 'pivot',
+        marker: 'row',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptAnyType,
+        transform(artifactColumn: ArtifactColumnPivot) {
+          artifactColumn.area = 'row';
+          artifactColumn.checked = true;
+          applyNonDatafieldDefaults(artifactColumn);
+        },
+        reverseTransform: pivotReverseTransform,
+        onReorder
       },
-      reverseTransform: pivotReverseTransform,
-      onReorder
-    }, {
-      title: 'Column',
-      type: 'pivot',
-      marker: 'column',
-      artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptAnyType,
-      transform(artifactColumn: ArtifactColumnPivot) {
-        artifactColumn.area = 'column';
-        artifactColumn.checked = true;
-        applyNonDatafieldDefaults(artifactColumn);
-      },
-      reverseTransform: pivotReverseTransform,
-      onReorder
-    }];
+      {
+        title: 'Column',
+        type: 'pivot',
+        marker: 'column',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptAnyType,
+        transform(artifactColumn: ArtifactColumnPivot) {
+          artifactColumn.area = 'column';
+          artifactColumn.checked = true;
+          applyNonDatafieldDefaults(artifactColumn);
+        },
+        reverseTransform: pivotReverseTransform,
+        onReorder
+      }
+    ];
 
     this._distributeArtifactColumnsIntoGroups(
       artifactColumns,
@@ -146,30 +150,128 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
-  // getChartGroupAdapters(chartType: ChartType) {
+  getChartGroupAdapters(
+    artifactColumns,
+    chartType
+  ): IDEsignerSettingGroupAdapter[] {
+    const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
+      artifactColumn.area = null;
+      artifactColumn.checked = false;
+    };
 
-  // }
+    const onReorder = (artifactColumns: ArtifactColumns) => {
+      forEach(artifactColumns, (column, index) => {
+        column.areaIndex = index;
+      });
+    };
+
+    const canAcceptNumberType = (
+      groupAdapter: IDEsignerSettingGroupAdapter
+    ) => ({ type }: ArtifactColumnPivot) => NUMBER_TYPES.includes(type);
+
+    const canAcceptAnyType = (
+      groupAdapter: IDEsignerSettingGroupAdapter
+    ) => () => true;
+
+    const applyDataFieldDefaults = artifactColumn => {
+      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    };
+
+    const applyNonDatafieldDefaults = artifactColumn => {
+      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+    };
+
+    const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
+      {
+        title: 'Metric',
+        type: 'chart',
+        marker: 'y',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptNumberType,
+        transform(artifactColumn: ArtifactColumnChart) {
+          artifactColumn.area = 'y';
+          artifactColumn.checked = true;
+          applyDataFieldDefaults(artifactColumn);
+        },
+        reverseTransform: chartReverseTransform,
+        onReorder
+      },
+      {
+        title: 'Dimension',
+        type: 'chart',
+        marker: 'x',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptAnyType,
+        transform(artifactColumn: ArtifactColumnChart) {
+          artifactColumn.area = 'x';
+          artifactColumn.checked = true;
+          applyNonDatafieldDefaults(artifactColumn);
+        },
+        reverseTransform: chartReverseTransform,
+        onReorder
+      },
+      {
+        title: 'Group',
+        type: 'chart',
+        marker: 'g',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptAnyType,
+        transform(artifactColumn: ArtifactColumnChart) {
+          artifactColumn.area = 'g';
+          artifactColumn.checked = true;
+          applyNonDatafieldDefaults(artifactColumn);
+        },
+        reverseTransform: chartReverseTransform,
+        onReorder
+      }
+    ];
+
+    if (chartType === 'bubble') {
+      chartGroupAdapters.push({
+        title: 'Size',
+        type: 'chart',
+        marker: 'z',
+        artifactColumns: [],
+        canAcceptArtifactColumn: canAcceptNumberType,
+        transform(artifactColumn: ArtifactColumnChart) {
+          artifactColumn.area = 'z';
+          artifactColumn.checked = true;
+          applyNonDatafieldDefaults(artifactColumn);
+        },
+        reverseTransform: chartReverseTransform,
+        onReorder
+      });
+    }
+
+    this._distributeArtifactColumnsIntoGroups(
+      artifactColumns,
+      chartGroupAdapters,
+      'chart'
+    );
+
+    return chartGroupAdapters;
+  }
 
   private _distributeArtifactColumnsIntoGroups(
     artifactColumns: ArtifactColumns,
-    pivotGroupAdapters: IDEsignerSettingGroupAdapter[],
+    groupAdapters: IDEsignerSettingGroupAdapter[],
     analysisType: 'chart' | 'pivot'
   ) {
     const groupByProps = {
-      chart: 'checked',
+      chart: 'area',
       pivot: 'area'
     };
     fpPipe(
       fpFilter('checked'),
       fpGroupBy(groupByProps[analysisType]),
       groupedColumns => {
-        forEach(pivotGroupAdapters, adapter => {
+        forEach(groupAdapters, adapter => {
           adapter.artifactColumns = groupedColumns[adapter.marker] || [];
         });
       }
     )(artifactColumns);
 
-    return pivotGroupAdapters;
+    return groupAdapters;
   }
 
   addArtifactColumnIntoAGroup(
@@ -198,11 +300,7 @@ export class DesignerService {
 
     const firstN = take(array, index);
     const lastN = takeRight(array, array.length - index);
-    adapter.artifactColumns = [
-      ...firstN,
-      artifactColumn,
-      ...lastN
-    ];
+    adapter.artifactColumns = [...firstN, artifactColumn, ...lastN];
     adapter.onReorder(adapter.artifactColumns);
   }
 
@@ -211,31 +309,65 @@ export class DesignerService {
     adapter: IDEsignerSettingGroupAdapter
   ) {
     adapter.reverseTransform(artifactColumn);
-    remove(adapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
+    remove(
+      adapter.artifactColumns,
+      ({ columnName }) => artifactColumn.columnName === columnName
+    );
     adapter.onReorder(adapter.artifactColumns);
   }
 
   getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {
+    console.log(artifactColumns, type);
     const pivotFields = fpPipe(
-      fpFilter((artifactColumn: ArtifactColumnPivot) => artifactColumn.checked && artifactColumn.area),
+      fpFilter(
+        (artifactColumn: ArtifactColumnPivot) =>
+          artifactColumn.checked && artifactColumn.area
+      ),
       fpSortBy('areaIndex'),
       fpGroupBy('area'),
       fpMapValues(
         fpMap((artifactColumn: ArtifactColumnPivot) => {
-          const isDataArea = artifactColumn.area === 'data'
+          const isDataArea = artifactColumn.area === 'data';
           const isDateType = DATE_TYPES.includes(artifactColumn.type);
           return {
-            type:         artifactColumn.type,
-            columnName:   artifactColumn.columnName,
-            aggregate:    isDataArea ? artifactColumn.aggregate : null,
+            type: artifactColumn.type,
+            columnName: artifactColumn.columnName,
+            aggregate: isDataArea ? artifactColumn.aggregate : null,
             // the name propertie is needed for the elastic search
-            name:         isDataArea ? artifactColumn.columnName : null,
+            name: isDataArea ? artifactColumn.columnName : null,
             dateInterval: isDateType ? artifactColumn.dateInterval : null
           };
         })
       )
     )(artifactColumns);
 
+    const chartFields = fpPipe(
+      fpFilter(
+        (artifactColumn: ArtifactColumnChart) =>
+          artifactColumn.checked && artifactColumn.area
+      ),
+      fpGroupBy('area'),
+      fpMapValues(
+        fpMap((artifactColumn: ArtifactColumnChart) => {
+          const isDataArea = ['y', 'z'].includes(artifactColumn.area);
+          const isDateType = DATE_TYPES.includes(artifactColumn.type);
+          return {
+            ...(isDataArea ? { aggregate: artifactColumn.aggregate } : {}),
+            checked: artifactColumn.area,
+            columnName: artifactColumn.columnName,
+            comboType: artifactColumn.comboType,
+            displayName: artifactColumn.displayName,
+            table: artifactColumn.table,
+            name: artifactColumn.columnName,
+            type: artifactColumn.type,
+            // the name propertie is needed for the elastic search
+            ...(isDateType ? { dateInterval: artifactColumn.dateInterval } : {})
+          };
+        })
+      )
+    )(artifactColumns);
+
+    /* prettier-ignore */
     switch (type) {
     case 'pivot':
       return {
@@ -245,11 +377,14 @@ export class DesignerService {
         dataFields: pivotFields.data
       };
     case 'chart':
+      return {
+        dataFields: [...(chartFields.y || []), ...(chartFields.z || [])],
+        nodeFields: [...(chartFields.x || []), ...(chartFields.g || [])]
+      }
     case 'report':
       return {};
     }
   }
-
 
   parseData(data, sqlBuilder) {
     const nodeFieldMap = this.getNodeFieldMap(sqlBuilder);
@@ -257,7 +392,7 @@ export class DesignerService {
     return this.parseNode(data, {}, nodeFieldMap, 0);
   }
 
-     /** Map the tree level to the columnName of the field
+  /** Map the tree level to the columnName of the field
    * Example:
    * row_field_1: 0 -> SOURCE_OS
    * row_field_2: 1 -> SOURCE_MANUFACTURER
@@ -278,7 +413,9 @@ export class DesignerService {
 
     const nodeName = this.getChildNodeName(node);
     if (nodeName && node[nodeName]) {
-      const data = flatMap(node[nodeName].buckets, bucket => this.parseNode(bucket, dataObj, nodeFieldMap, level + 1));
+      const data = flatMap(node[nodeName].buckets, bucket =>
+        this.parseNode(bucket, dataObj, nodeFieldMap, level + 1)
+      );
       return data;
     }
     const datum = this.parseLeaf(node, dataObj);
