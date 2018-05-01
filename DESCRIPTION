@@ -3,7 +3,7 @@ Title: Synchronoss Advanced Analytics Statistical Modeling R Package
 Version: 0.0.0.9000
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: Statistical model building and predicting framework for forecasting, regression, classification and clustering use cases.
-Depends: R (>= 3.4.2)
+Depends: R (>= 3.4.1)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -15,8 +15,8 @@ Imports:
     tidyr,
     rlang,
     zoo,
-    lubridate,
     checkmate (>= 1.8.2),
 Suggests: 
-    testthat
+     lubridate,
+     testthat
 RoxygenNote: 6.0.1.9000

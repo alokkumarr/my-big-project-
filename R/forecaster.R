@@ -66,12 +66,12 @@ train_models.forecaster <- function(obj, ids = NULL) {
 
   status <- get_models_status(obj)
   if (!is.null(ids))
-    status <- status[names(status) %in% id]
+    status <- status[names(status) %in% ids]
   ids <- names(status == "added")
   indicies <- get_indicies(obj)
 
   for (id in ids) {
-    model <- get_models(obj, id = id)[[1]]
+    model <- get_models(obj, ids = id)[[1]]
     checkmate::assert_class(model, "forecast_model")
     model$pipe <- execute(obj$data, model$pipe)
     model$index_var <- obj$index_var
@@ -90,7 +90,7 @@ evaluate_models.forecaster <- function(obj, ids = NULL) {
 
   status <- get_models_status(obj)
   if (!is.null(ids))
-    status <- status[names(status) %in% id]
+    status <- status[names(status) %in% ids]
   ids <- names(status == "trained")
   target_df <- get_target(obj) %>% dplyr::mutate(index = row_number())
 
@@ -205,6 +205,7 @@ predict.forecaster <- function(obj,
 #' @param index_var index variable
 #' @param periods number of periods to forecast
 #' @param unit unit of index variable default is null
+#' @param pipe pipeline object
 #' @param models nested list of models. each model list should have a method and
 #'   list of arguments
 #' @param splits holdout splits ratios default is 80-20 train to validation
@@ -220,8 +221,10 @@ auto_forecaster <- function(df,
                             periods,
                             unit = NULL,
                             pipe = NULL,
-                            models = list(method = "auto.arima",
-                                          method_args = list()),
+                            models = list(list(method = "auto.arima",
+                                               method_args = list()),
+                                          list(method = "ets",
+                                               method_args = list())),
                             splits = c(.8, .2),
                             conf_levels = c(80, 95)) {
 
@@ -274,7 +277,9 @@ forecaster.data.frame <- function(df,
                                   unit = NULL,
                                   pipe = NULL,
                                   models = list(list(method = "auto.arima",
-                                                method_args = list())),
+                                                     method_args = list()),
+                                                list(method = "ets",
+                                                     method_args = list())),
                                   splits = c(.8, .2),
                                   conf_levels = c(80, 95)) {
 
@@ -330,7 +335,9 @@ forecaster.tbl_spark <- function(df,
                                  unit = NULL,
                                  pipe = NULL,
                                  models = list(list(method = "auto.arima",
-                                               method_args = list())),
+                                                    method_args = list()),
+                                               list(method = "ets",
+                                                    method_args = list())),
                                  splits = c(.8, .2),
                                  conf_levels = c(80, 95)) {
   df_names <- colnames(df)

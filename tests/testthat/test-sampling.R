@@ -79,11 +79,16 @@ test_that("time_slices functions work as expected", {
   s2x <- add_time_slice_samples(x, width, horizon, skip)
   s2df <- add_time_slice_samples(x, width, horizon, skip)
 
+  s3x <- add_time_slice_samples(x, width, horizon, skip, fixed_width=FALSE)
+  s3df <- add_time_slice_samples(x, width, horizon, skip, fixed_width=FALSE)
+
   expect_equal(s1x, s1df)
   expect_equal(s2x, s2df)
+  expect_equal(s3x, s3df)
   expect_equal(length(get_train_samples(s1x)), n-width)
   expect_equal(length(get_train_samples(s1x)[[1]]), width)
   expect_equal(length(get_validation_samples(s1x)[[1]]), horizon)
   expect_equal(length(get_train_samples(s1x)[[1]]), length(get_train_samples(s1x)[[2]]))
   expect_null(get_test_samples(s1x))
+  expect_true(all(unlist(lapply(s3x$train_indicies, function(x) x[1])) == 1))
 })

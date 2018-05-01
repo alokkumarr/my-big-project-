@@ -15,7 +15,7 @@ get_test_samples(obj)
 \arguments{
 \item{obj}{object with valid samples object}
 
-\item{...}{}
+\item{...}{additional parameters. currently not used}
 }
 \value{
 test index

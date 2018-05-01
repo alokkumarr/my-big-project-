@@ -14,6 +14,8 @@ data transformations}
 
 \item{...}{additional arguments to pass to model method}
 
+\item{class}{string of model class. ex - forecaster_model for a forecast model}
+
 \item{desc}{optional model description}
 
 \item{path}{optional file path to save model}

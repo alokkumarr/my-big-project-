@@ -12,7 +12,7 @@ new_index <- function(unit, periods, start, end) {
 
 
 #' @export
-index <- function(x, units) {
+index <- function(x, unit) {
   UseMethod("index")
 }
 

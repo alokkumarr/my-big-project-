@@ -197,7 +197,7 @@ mape <- function(...){
 mape.data.frame <- function(x, predicted, actual){
   checkmate::assert_choice(predicted, colnames(x))
   checkmate::assert_choice(actual, colnames(x))
-  c("mape" = mean(abs((actual - predicted) / acutal)))
+  c("mape" = mean(abs((actual - predicted) / actual)))
 }
 
 

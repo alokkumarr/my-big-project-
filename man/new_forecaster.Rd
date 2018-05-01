@@ -48,4 +48,3 @@ Creates a forecaster object which inherits from modeler class
 \seealso{
 Other use cases: \code{\link{modeler}}
 }
-\concept{use cases}

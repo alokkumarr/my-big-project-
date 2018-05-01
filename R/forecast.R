@@ -63,7 +63,7 @@ fit.forecast_model <- function(obj, data, ...) {
   }
 
   args <- modifyList(obj$method_args, list(y = y, xreg = xreg))
-  pkg <- as.character(filter(forecast_methods, method == obj$method)$package)
+  pkg <- as.character(dplyr::filter(forecast_methods, method == obj$method)$package)
   fun <- get(obj$method, asNamespace(pkg))
   m <- do.call(fun, args)
   obj$fit <- m
@@ -193,12 +193,12 @@ tidy_performance.forecast_model <- function(mobj) {
   lapply(mobj$performance, function(z) {
     lapply(z, function(x) {
       x %>%
-        select(1:2) %>%
+        dplyr::select(1:2) %>%
         setNames(c("index", "predicted"))
     }) %>%
-      bind_rows(.id = "sample")
+      dplyr::bind_rows(.id = "sample")
   }) %>%
-    bind_rows(.id = "indicie") %>%
+    dplyr::bind_rows(.id = "indicie") %>%
     dplyr::mutate(model = mobj$id)
 }
 

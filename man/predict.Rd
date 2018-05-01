@@ -12,5 +12,7 @@
   desc = "")
 }
 \description{
+Forecast Prediction Method
+
 Method makes predictions for Forecaster's final model
 }

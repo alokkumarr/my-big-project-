@@ -10,7 +10,7 @@
 #'
 #'
 #' @inheritParams forecast::auto.arima
-#' @param x Optional a vector or matrix of extrenal regressors. Must have same
+#' @param xreg Optional a vector or matrix of external regressors. Must have same
 #'   number of rows as y
 #' @param frequency numeric input for seasonal frequency of y - univarite time
 #'   series. Default is NULL for no seasonality
@@ -47,8 +47,7 @@ auto_fourier <- function(y,
     if (k == 0) {
       m <- try(forecast::auto.arima(y, ic = ic))
     } else{
-      x_reg <-
-        cbind(xreg, forecast::fourier(ts(y, frequency = frequency), K = k))
+      x_reg <- cbind(xreg, forecast::fourier(ts(y, frequency = frequency), K = k))
       m <- try(forecast::auto.arima(y, xreg = x_reg, ic = ic, ...))
     }
     if (class(m)[1] == "try-error") {

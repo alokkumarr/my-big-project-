@@ -5,8 +5,9 @@
 \title{Auto Forecaster Function}
 \usage{
 auto_forecaster(df, target, index_var, periods, unit = NULL, pipe = NULL,
-  models = list(method = "auto.arima", method_args = list()),
-  splits = c(0.8, 0.2), conf_levels = c(80, 95))
+  models = list(list(method = "auto.arima", method_args = list()), list(method
+  = "ets", method_args = list())), splits = c(0.8, 0.2), conf_levels = c(80,
+  95))
 }
 \arguments{
 \item{df}{dataframe}
@@ -18,6 +19,8 @@ auto_forecaster(df, target, index_var, periods, unit = NULL, pipe = NULL,
 \item{periods}{number of periods to forecast}
 
 \item{unit}{unit of index variable default is null}
+
+\item{pipe}{pipeline object}
 
 \item{models}{nested list of models. each model list should have a method and
 list of arguments}

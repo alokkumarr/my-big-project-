@@ -102,6 +102,8 @@ valid_modeler <- function(x){
 #' @export
 #' @family use cases
 #' @aliases modeler
+#' @importFrom stats coef filter fitted predict setNames ts
+#' @importFrom utils head modifyList
 modeler <- function(df,
                     target,
                     type,
@@ -219,8 +221,8 @@ get_evalutions <- function(obj) {
     data.frame(method = as.character(m$method))),
     .id = "model"))
 
-  if (is.null(obj$evaluate)) {
-    mdls
+  if (nrow(obj$evaluate) == 0) {
+    obj$evaluate
   } else {
     inner_join(mdls, obj$evaluate, by = "model")
   }
@@ -362,6 +364,8 @@ print.modeler <- summary.modeler <- function(obj) {
       "\n")
   cat("\nmeasure ----------------------------", "\n\n")
   cat("measure name:", obj$measure$name, "\n")
+  cat("\nmodels ----------------------------", "\n\n")
+  print(get_models_status(f1))
   cat("\nevaluation ----------------------------", "\n\n")
   print(get_evalutions(obj))
   cat("\nfinal model ----------------------------", "\n")

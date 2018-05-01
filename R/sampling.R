@@ -104,7 +104,7 @@ samples <- function(validation_method,
 #' Function to extract training sample indicies from samples object
 #'
 #' @param obj object with valid samples object
-#' @param ...
+#' @param ... additional parameters. currently not used
 #'
 #' @return list of train indicies
 #' @export
@@ -116,7 +116,7 @@ samples <- function(validation_method,
 #' add_holdout_samples(., splits = c(.8, .2)) %>%
 #' get_train_samples(.)
 get_train_samples <- function(obj){
-  UseMethod("get_train_samples", obj)
+  UseMethod("get_train_samples")
 }
 
 #' @rdname get_train_samples
@@ -137,7 +137,7 @@ get_train_samples.modeler <- function(obj){
 #' Function to extract validation sample indicies from samples object
 #'
 #' @param obj object with valid samples object
-#' @param ...
+#' @param ... additional parameters. currently not used
 #'
 #' @return list of validation indicies
 #' @export
@@ -149,7 +149,7 @@ get_train_samples.modeler <- function(obj){
 #' add_holdout_samples(., splits = c(.8, .2)) %>%
 #' get_validation_samples(.)
 get_validation_samples <- function(obj){
-  UseMethod("get_validation_samples", obj)
+  UseMethod("get_validation_samples")
 }
 
 #' @rdname get_validation_samples
@@ -170,7 +170,7 @@ get_validation_samples.modeler <- function(obj){
 #' Function to extract test sample index from samples object
 #'
 #' @param obj object with valid samples object
-#' @param ...
+#' @param ... additional parameters. currently not used
 #'
 #' @return test index
 #' @export
@@ -649,7 +649,7 @@ time_slice.integer <-
     train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
     validation <-
       mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
-    labels <- paste("slice", gsub(" ", "0", format(starts)), sep = "")
+    labels <- paste("slice", gsub(" ", "0", format(stops)), sep = "")
     names(train) <- labels
     names(validation) <- labels
 

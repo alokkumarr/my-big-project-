@@ -78,6 +78,7 @@ valid_model <- function(x) {
 #' @param ... additional arguments to pass to model method
 #' @param desc optional model description
 #' @param path optional file path to save model
+#' @param class string of model class. ex - forecaster_model for a forecast model
 #'
 #' @export
 model <- function(pipe,
@@ -260,25 +261,30 @@ evaluate <- function(mobj, target_df, measure) {
   UseMethod("evaluate")
 }
 
-
+#' Return a Model Fit
+#'
 #' @export
 get_fit <- function(x, ...) {
   UseMethod("get_fit", x)
 }
 
-
+#' Return the Model Coefficients
+#'
 #' @export
 get_coefs <- function(x, ...) {
   UseMethod("get_coefs", x)
 }
 
-
+#' Get Model Forecasts
+#'
 #' @export
 get_forecasts <- function(x, ...) {
   UseMethod("get_forecasts", x)
 }
 
 
+#' Return Tidy Dataset of Model Performance
+#'
 #' @export
 tidy_performance <- function(obj) {
   UseMethod("tidy_performance")
@@ -287,6 +293,8 @@ tidy_performance <- function(obj) {
 
 # Class Methods -----------------------------------------------------------
 
+#' @export
+#' @rdname get_target
 get_target.model <- function(obj) {
 
   obj$pipe$output %>%

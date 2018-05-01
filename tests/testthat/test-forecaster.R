@@ -93,8 +93,8 @@ test_that("Multiple Model test case", {
   expect_class(f3$final_model, "forecast_model")
   expect_equal(f3$final_model$id,
                get_evalutions(f3) %>%
-                 filter(sample == "validation") %>%
-                 top_n(1, -rmse) %>%
+                 dplyr::filter(sample == "validation") %>%
+                 dplyr::top_n(1, -rmse) %>%
                  .$model)
   expect_data_frame(get_evalutions(f3), nrow=4)
   expect_data_frame(f3_preds$predictions, nrow=10)
@@ -125,8 +125,8 @@ test_that("Multiple Model with Test Holdout test case", {
   expect_class(f4$final_model, "forecast_model")
   expect_equal(f4$final_model$id,
                get_evalutions(f4) %>%
-                 filter(sample == "validation") %>%
-                 top_n(1, -rmse) %>%
+                 dplyr::filter(sample == "validation") %>%
+                 dplyr::top_n(1, -rmse) %>%
                  .$model)
   expect_data_frame(get_evalutions(f4), nrow=6)
   expect_data_frame(f4_preds$predictions, nrow=10)

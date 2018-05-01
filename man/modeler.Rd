@@ -42,4 +42,3 @@ like forecaster, regresser, segmenter, etc... inherit form
 \seealso{
 Other use cases: \code{\link{new_forecaster}}
 }
-\concept{use cases}

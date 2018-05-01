@@ -196,14 +196,14 @@ flush <- function(pipe) {
 #' @export
 flush_pipes <- function(obj, ids = NULL) {
   checkmate::check_class(obj, "modeler")
-  check_character(id, null.ok = TRUE)
+  check_character(ids, null.ok = TRUE)
 
-  if(is.null(id)) {
+  if(is.null(ids)) {
     ids <- get_models(obj)
   }
 
   for(id in ids) {
-    model <- get_models(obj, id = id)[[1]]
+    model <- get_models(obj, ids = id)[[1]]
     model$pipe <- flush(model$pipe)
     obj$models[[id]] <- model
   }

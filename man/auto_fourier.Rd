@@ -9,8 +9,8 @@ auto_fourier(y, xreg = NULL, frequency = NULL, ic = "aicc", ...)
 \arguments{
 \item{y}{a univariate time series}
 
-\item{xreg}{Optionally, a vector or matrix of external regressors, which
-must have the same number of rows as \code{y}.}
+\item{xreg}{Optional a vector or matrix of external regressors. Must have same
+number of rows as y}
 
 \item{frequency}{numeric input for seasonal frequency of y - univarite time
 series. Default is NULL for no seasonality}
@@ -19,9 +19,6 @@ series. Default is NULL for no seasonality}
 'loglik', or 'bic'. Default is 'aicc'}
 
 \item{...}{Additional arguments to be passed to \code{\link[stats]{arima}}.}
-
-\item{x}{Optional a vector or matrix of extrenal regressors. Must have same
-number of rows as y}
 }
 \value{
 returns a list with best ARIMA model according AIC including harmonic
