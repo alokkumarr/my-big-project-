@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW semantic Proxy
+Requires=saw-semantic.service
+After=saw-semantic.service
+Requires=saw-semantic-proxy.socket
+After=saw-semantic-proxy.socket
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 127.0.0.1:9901
+PrivateTmp=yes
