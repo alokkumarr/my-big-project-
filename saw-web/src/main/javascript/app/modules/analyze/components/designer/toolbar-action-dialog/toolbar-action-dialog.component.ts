@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as filter from 'lodash/filter';
 import {
   IToolbarActionData,
   IToolbarActionResult
@@ -67,7 +68,7 @@ export class ToolbarActionDialogComponent {
       result.sorts = this.data.sorts;
       break;
     case 'filter':
-      result.filters = this.data.filters;
+      result.filters = filter(this.data.filters, 'columnName');
       result.booleanCriteria = this.data.booleanCriteria;
       break;
     case 'description':
