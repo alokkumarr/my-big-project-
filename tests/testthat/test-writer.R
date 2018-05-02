@@ -20,6 +20,7 @@ mtcars_tbl <- copy_to(sc, mtcars, overwrite = TRUE)
 # Temp Directory
 tmp <- paste0(tempdir(), "/writer-tests")
 
+
 test_that("parquet file type with default value", {
   .path <- paste0(tmp, "/mtcars.parquet")
   writer(mtcars_tbl, path = .path)
