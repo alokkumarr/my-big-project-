@@ -240,7 +240,7 @@ export class DesignerContainerComponent {
       if (this.isInQueryMode && !this.analysis.edit) {
         this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
           if (result) {
-            this.analysis.edit = true;
+            this.changeToQueryModePermanently();
             this.openSaveDialog();
           }
         });
@@ -361,6 +361,10 @@ export class DesignerContainerComponent {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'submitQuery':
+      this.changeToQueryModePermanently();
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.requestDataIfPossible();
+      break;
     case 'filter':
     case 'sort':
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -375,6 +379,12 @@ export class DesignerContainerComponent {
     case 'artifactPosition':
     case 'visibleIndex':
     }
+  }
+
+  changeToQueryModePermanently() {
+    this.analysis.edit = true;
+    this.filters = [];
+    this.sorts = [];
   }
 
   setColumnPropsToDefaultIfNeeded(column) {

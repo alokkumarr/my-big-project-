@@ -36,7 +36,6 @@ export class DesignerSettingsQueryComponent {
 
   doSubmit() {
     const analysis = this.analysis;
-    analysis.edit = true;
     if (analysis.queryManual) {
       analysis.query = analysis.queryManual;
     } else {
