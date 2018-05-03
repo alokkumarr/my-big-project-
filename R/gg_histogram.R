@@ -96,8 +96,7 @@ gg_histogram <- function(df,
                          ...) {
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)
-  x_variable <- enquo(x_variable)
-  #checkmate::assert_subset(rlang::quo_text(x_variable), df_names)
+  checkmate::assert_subset(x_variable, df_names)
   
   if (!is_color(fill)[[1]])
     checkmate::assert_choice(fill, df_names)
@@ -127,7 +126,7 @@ gg_histogram <- function(df,
     df_names,
     fill = fill,
     color = color,
-    aes_params = list(x = rlang::quo_text(x_variable)),
+    aes_params = list(x = x_variable),
     geom_params = list(...)
   )
   
