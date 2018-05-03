@@ -86,10 +86,16 @@ export class DesignerContainerComponent {
       this.initNewAnalysis().then(() => {
         this.designerState = DesignerStates.NO_SELECTION;
       });
+      this.layoutConfiguration = this.getLayoutConfiguration(
+        this.analysisStarter
+      );
       break;
     case 'edit':
       this.initExistingAnalysis();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.layoutConfiguration = this.getLayoutConfiguration(
+        this.analysis
+      );
       if (!isReport) {
         this.requestDataIfPossible();
       }
@@ -98,6 +104,9 @@ export class DesignerContainerComponent {
       this.forkAnalysis().then(() => {
         this.initExistingAnalysis();
         this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+        this.layoutConfiguration = this.getLayoutConfiguration(
+          this.analysis
+        );
         if (!isReport) {
           this.requestDataIfPossible();
         }
@@ -105,9 +114,6 @@ export class DesignerContainerComponent {
     default:
       break;
     }
-    this.layoutConfiguration = this.getLayoutConfiguration(
-      this.analysisStarter || this.analysis
-    );
   }
 
   getLayoutConfiguration(analysis: Analysis | AnalysisStarter) {
@@ -150,9 +156,11 @@ export class DesignerContainerComponent {
 
   forkAnalysis() {
     const {type, semanticId} = this.analysis;
+    const analysis = this.analysis;
+    this.analysis = null;
     return this._designerService.createAnalysis(semanticId, type)
       .then((newAnalysis: Analysis) => {
-        this.analysis = {...this.analysis, ...{
+        this.analysis = {...analysis, ...{
           id: newAnalysis.id,
           metric: newAnalysis.metric,
           createdTimestamp: newAnalysis.createdTimestamp,
