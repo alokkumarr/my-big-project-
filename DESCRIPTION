@@ -1,0 +1,20 @@
+Package: a2charter
+Title: Synchronoss Advanced Analytics Data Charting R Package
+Version: 0.0.0.9000
+Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
+Description: Helper functions for creating high quality data visualizations using ggplot2 and highcharter
+Depends: R (>= 3.4.1)
+License: file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    dplyr,
+    magrittr,
+    tidyr,
+    rlang,
+    checkmate (>= 1.8.2),
+    ggplot2,
+    highcharter,
+Suggests: 
+    testthat
+RoxygenNote: 6.0.1.9000
