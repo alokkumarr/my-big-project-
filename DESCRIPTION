@@ -16,5 +16,7 @@ Imports:
     ggplot2,
     highcharter,
 Suggests: 
-    testthat
+    testthat,
+    pals,
+    scales
 RoxygenNote: 6.0.1.9000

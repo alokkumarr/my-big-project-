@@ -1,4 +1,5 @@
 
+
 # ggplot components -------------------------------------------------------
 
 # Description - Set of helper functions that be reused across sncr_* charts
@@ -24,26 +25,25 @@
 #' ggplot(mtcars, aes(x=mpg)) +
 #' geom_histogram() +
 #' gg_facet("~am")
-gg_facet <- function(facet_formula = NULL, ...){
+gg_facet <- function(facet_formula = NULL, ...) {
+  checkmate::assert_string(facet_formula, null.ok = TRUE)
   
   # Default is to return null facet
-  if(is.null(facet_formula)){
-    
-    facet <- facet_null()
-  }else{
-    
+  if (is.null(facet_formula)) {
+    facet <- ggplot2::facet_null()
+  } else{
     # Check to see if facet_formula can be converted to formula
-    if(! class(as.formula(facet_formula)) =="formula"){
+    if (!class(as.formula(facet_formula)) == "formula") {
       stop("facet_formula not a formula\nPlease try in this format: lhs~rhs or ~rhs")
     }
     
     # Check for left-hand side of formula to determin facet_grid or wrap
     lhs <- strsplit(facet_formula, "~")[[1]][1]
     
-    if(lhs == ""){
-      facet <- match.fun('facet_wrap')
-    }else{
-      facet <- match.fun('facet_grid')
+    if (lhs == "") {
+      facet <- get("facet_wrap", asNamespace("ggplot2"))
+    } else{
+      facet <- get("facet_grid", asNamespace("ggplot2"))
     }
     
     #facet(eval(parse(text = facet_formula)), ...)
@@ -70,20 +70,27 @@ gg_facet <- function(facet_formula = NULL, ...){
 #' ggplot(mtcars, aes(x=mpg)) +
 #' geom_histogram() +
 #' gg_coord("flip")
-gg_coord <- function(coord = NULL, ...){
-  
-  # Default is the identity transform
-  if(is.null(coord)){
-    
-    geom_blank()
-  }else{
-    
-    coord <- try(match.fun(paste("coord", coord, sep="_")), silent = T)
-    if(class(coord) == "try-error"){
-      stop("coord not valid ggplot2 coord_* function\nplease see: http://ggplot2.tidyverse.org/reference/#section-coordinate-systems")
-    }else{
-      coord(...)
-    }
+gg_coord <- function(coord = NULL, ...) {
+  checkmate::assert_choice(
+    coord,
+    choices = c(
+      "trans",
+      "polar",
+      "map",
+      "quickmap",
+      "flip",
+      "fixed",
+      "cartesian"
+    ),
+    null.ok = TRUE
+  )
+  if (is.null(coord)) {
+    # Default is the identity transform
+    ggplot2::geom_blank()
+  } else{
+    coord_name <- paste("coord", coord, sep = "_")
+    coord <- get(coord_name, asNamespace("ggplot2"))
+    coord(...)
   }
 }
 
@@ -105,13 +112,13 @@ gg_coord <- function(coord = NULL, ...){
 #' @return returns either a geom_label or geom_blank object
 #' @export
 #'
-gg_label <- function(label = NULL, y = NULL, ...){
-  
-  if(is.null(label)){
-    geom_blank()
-  }else{
-    
-    geom_label(aes_string(label=label, y=y), ...)
+gg_label <- function(label = NULL, y = NULL, ...) {
+  checkmate::assert_string(label, null.ok = TRUE)
+  checkmate::assert_string(y, null.ok = TRUE)
+  if (is.null(label)) {
+    ggplot2::geom_blank()
+  } else{
+    ggplot2::geom_label(ggplot2::aes_string(label = label, y = y), ...)
   }
 }
 
@@ -158,7 +165,6 @@ gg_label <- function(label = NULL, y = NULL, ...){
 #' @export
 #'
 get_geom_params <- function(names,
-                            #constraint_params = list(),
                             fill = NULL,
                             color = NULL,
                             linetype = NULL,
@@ -167,18 +173,26 @@ get_geom_params <- function(names,
                             group = NULL,
                             shape = NULL,
                             aes_params = list(),
-                            geom_params = list()){
+                            geom_params = list()) {
   
+  checkmate::assert_character(names, unique = TRUE, null.ok = TRUE)
   
+  constraint_params <-
+    list(
+      fill = fill,
+      color = color,
+      linetype = linetype,
+      size = size,
+      alpha = alpha,
+      group = group,
+      shape = shape
+    )
+  constraint_params <-
+    constraint_params[-which(sapply(constraint_params, is.null))]
   
-  constraint_params <- list(fill = fill, color = color, linetype = linetype,
-                            size = size, alpha = alpha, group = group,
-                            shape = shape)
-  constraint_params <- constraint_params[-which(sapply(constraint_params, is.null))]
-  
-  for(i in seq_along(constraint_params)){
-    
-    if(!is.null(constraint_params[[i]]) && constraint_params[[i]] %in% names){
+  for (i in seq_along(constraint_params)) {
+    if (!is.null(constraint_params[[i]]) &&
+        constraint_params[[i]] %in% names) {
       aes_params <- modifyList(aes_params, constraint_params[i])
     } else{
       geom_params <- modifyList(geom_params, constraint_params[i])
@@ -194,19 +208,35 @@ get_geom_params <- function(names,
 #' Wrapper function to labs function in ggplot2. Needed to handle parameter
 #' inputs to the title values with default \code{link{waiver}}
 #'
-#' @param title chart title. expects a string. default is empty string.
-#' @param subtitle chart subtitle. expects a string. default is empty string.
-#' @param x_axis_title x-axis title. expects a string. default is empty string.
-#' @param y_axis_title y-axis title. expects a string. default is empty string.
-#' @param caption chart caption. expects a string. default is empty string.
-#' 
+#' @param title chart title. expects a string
+#' @param subtitle chart subtitle. expects a string
+#' @param x_axis_title x-axis title. expects a string
+#' @param y_axis_title y-axis title. expects a string
+#' @param caption chart caption. expects a string
+#'
 #' @return ggplot2 label object
 #' @export
-gg_titles <- function(title, subtitle, x_axis_title, y_axis_title, caption){
+gg_titles <- function(title,
+                      subtitle ,
+                      x_axis_title,
+                      y_axis_title,
+                      caption) {
+  
+  checkmate::assert_string(title, null.ok = TRUE)
+  checkmate::assert_string(subtitle, null.ok = TRUE)
+  checkmate::assert_string(x_axis_title, null.ok = TRUE)
+  checkmate::assert_string(y_axis_title, null.ok = TRUE)
+  checkmate::assert_string(caption, null.ok = TRUE)
   
   # Create list with waiver() default values
-  title_list <- list(empty = "", title = title, subtitle = subtitle,
-                     x = x_axis_title, y = y_axis_title, caption = caption)
+  title_list <- list(
+    empty = "",
+    title = title,
+    subtitle = subtitle,
+    x = x_axis_title,
+    y = y_axis_title,
+    caption = caption
+  )
   
   do.call("labs", Filter(Negate(is.null), title_list))
 }
@@ -225,18 +255,27 @@ gg_titles <- function(title, subtitle, x_axis_title, y_axis_title, caption){
 #' @return list with sort params arguments and updated x axis title
 #' @export
 #'
-gg_sort <- function(sort, x_variable, y_variable, x_axis_title){
+gg_sort <- function(sort,
+                    x_variable,
+                    y_variable,
+                    x_axis_title) {
+  checkmate::assert_flag(sort)
   
-  if(sort){
-    if(is.null(y_variable)){
+  if (sort) {
+    if (is.null(y_variable)) {
       sort_params <- paste0("forcats::fct_infreq(", x_variable, ")")
-    }else{
-      sort_params <- paste0("forcats::fct_reorder(f=", x_variable, ", x=", y_variable, ")")
+    } else{
+      sort_params <-
+        paste0("forcats::fct_reorder(f=",
+               x_variable,
+               ", x=",
+               y_variable,
+               ")")
     }
-    if(is.null(x_axis_title)){
+    if (is.null(x_axis_title)) {
       x_axis_title <- x_variable
     }
-  }else{
+  } else{
     sort_params <- x_variable
   }
   
@@ -256,12 +295,12 @@ gg_sort <- function(sort, x_variable, y_variable, x_axis_title){
 #' @return ggplot geom_point layer object
 #' @export
 #'
-gg_point <- function(points=F, ...){
-  
-  if( points){
-    geom_point(...)
-  }else{
-    geom_blank()
+gg_point <- function(points = F, ...) {
+  checkmate::assert_flag(points)
+  if (points) {
+    ggplot2::geom_point(...)
+  } else{
+    ggplot2::geom_blank()
   }
 }
 
@@ -277,13 +316,14 @@ gg_point <- function(points=F, ...){
 #' @return either a
 #' @export
 #'
-gg_line <- function(line = TRUE, fun = "mean", geom = "line", ...){
-  
-  if(line){
-    stat_summary(fun.y=match.fun(fun), geom=geom, ...)
-  }else{
-    geom_blank()
+gg_line <- function(line = TRUE,
+                    fun = "mean",
+                    geom = "line",
+                    ...) {
+  checkmate::assert_flag(line)
+  if (line) {
+    ggplot2::stat_summary(fun.y = match.fun(fun), geom = geom, ...)
+  } else{
+    ggplot2::geom_blank()
   }
 }
-
-

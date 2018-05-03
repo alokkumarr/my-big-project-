@@ -7,15 +7,15 @@
 gg_titles(title, subtitle, x_axis_title, y_axis_title, caption)
 }
 \arguments{
-\item{title}{chart title. expects a string. default is empty string.}
+\item{title}{chart title. expects a string}
 
-\item{subtitle}{chart subtitle. expects a string. default is empty string.}
+\item{subtitle}{chart subtitle. expects a string}
 
-\item{x_axis_title}{x-axis title. expects a string. default is empty string.}
+\item{x_axis_title}{x-axis title. expects a string}
 
-\item{y_axis_title}{y-axis title. expects a string. default is empty string.}
+\item{y_axis_title}{y-axis title. expects a string}
 
-\item{caption}{chart caption. expects a string. default is empty string.}
+\item{caption}{chart caption. expects a string}
 }
 \value{
 ggplot2 label object
