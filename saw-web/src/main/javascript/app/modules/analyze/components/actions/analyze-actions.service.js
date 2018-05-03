@@ -30,7 +30,15 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function fork(analysis) {
     const model = clone(analysis);
     model.name += ' Copy';
-    return openEditModal(model, 'fork');
+    return openEditModal(model, 'fork').then(status => {
+      if (!status) {
+        return status;
+      }
+
+      $eventEmitter.emit(Events.AnalysesRefresh);
+
+      return status;
+    });
   }
 
   function edit(analysis) {
