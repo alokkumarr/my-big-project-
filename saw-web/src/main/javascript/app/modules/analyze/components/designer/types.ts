@@ -1,4 +1,4 @@
-import { SqlBuilder, SqlBuilderPivot } from '../../models';
+import { SqlBuilder, SqlBuilderPivot, SqlBuilderChart } from '../../models';
 import {
   DesignerMode,
   AnalysisStarter,
@@ -27,6 +27,7 @@ export {
   AnalysisType,
   SqlBuilder,
   SqlBuilderPivot,
+  SqlBuilderChart,
   Sort,
   Filter,
   FilterModel,

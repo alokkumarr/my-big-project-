@@ -236,7 +236,7 @@ export class DesignerService {
         transform(artifactColumn: ArtifactColumnChart) {
           artifactColumn.area = 'z';
           artifactColumn.checked = true;
-          applyNonDatafieldDefaults(artifactColumn);
+          applyDataFieldDefaults(artifactColumn);
         },
         reverseTransform: chartReverseTransform,
         onReorder
@@ -358,6 +358,7 @@ export class DesignerService {
             comboType: artifactColumn.comboType,
             displayName: artifactColumn.displayName,
             table: artifactColumn.table,
+            tableName: artifactColumn.table,
             name: artifactColumn.columnName,
             type: artifactColumn.type,
             // the name propertie is needed for the elastic search

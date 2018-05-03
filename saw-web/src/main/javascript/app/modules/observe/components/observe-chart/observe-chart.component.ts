@@ -28,7 +28,8 @@ const template = require('./observe-chart.component.html');
 
 @Component({
   selector: 'observe-chart',
-  template
+  template,
+  providers: [ChartService]
 })
 export class ObserveChartComponent {
   @Input() analysis: any;

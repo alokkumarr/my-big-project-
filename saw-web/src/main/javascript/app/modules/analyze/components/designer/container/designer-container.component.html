@@ -13,9 +13,18 @@
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </designer-settings-single>
 
-<designer-pivot class="designer__main"
-                [data]="data"
-                [sorts]="sorts"
-                [artifactColumns]="firstArtifactColumns"
-                [designerState]="designerState">
-</designer-pivot>
+<ng-container [ngSwitch]="analysisStarter.type">
+  <designer-pivot class="designer__main"
+                  *ngSwitchCase="'pivot'"
+                  [data]="data"
+                  [sorts]="sorts"
+                  [artifactColumns]="firstArtifactColumns"
+                  [designerState]="designerState">
+  </designer-pivot>
+  <designer-chart class="designer__main"
+                  *ngSwitchCase="'chart'"
+                  [chartType]="analysisStarter.chartType"
+                  [data]="data"
+                  [sqlBuilder]="analysis && analysis.sqlBuilder">
+  </designer-chart>
+</ng-container>

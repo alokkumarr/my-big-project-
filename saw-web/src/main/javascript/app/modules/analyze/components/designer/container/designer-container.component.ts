@@ -16,6 +16,7 @@ import {
   AnalysisType,
   SqlBuilder,
   SqlBuilderPivot,
+  SqlBuilderChart,
   ArtifactColumns,
   DesignerToolbarAciton,
   Sort,
@@ -23,6 +24,7 @@ import {
   IToolbarActionResult
 } from '../types';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
+import { ChartService } from '../../../services/chart.service';
 import { FieldChangeEvent } from '../settings/single';
 
 const template = require('./designer-container.component.html');
@@ -57,7 +59,8 @@ export class DesignerContainerComponent {
 
   constructor(
     private _designerService: DesignerService,
-    private _analyzeDialogService: AnalyzeDialogService
+    private _analyzeDialogService: AnalyzeDialogService,
+    private _chartService: ChartService
   ) {}
 
   ngOnInit() {
@@ -141,16 +144,34 @@ export class DesignerContainerComponent {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
-          this.data = this._designerService.parseData(
-            data.data,
-            this.analysis.sqlBuilder
-          );
+          this.parseData(data.data, this.analysis.sqlBuilder);
         }
       },
       err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
       }
     );
+  }
+
+  parseData(data, sqlBuilder: SqlBuilder) {
+    /* prettier-ignore */
+    switch(this.analysis.type) {
+    case 'pivot':
+      this.data = this._designerService.parseData(
+        data.data,
+        this.analysis.sqlBuilder
+      );
+      break;
+    case 'chart':
+      this.data = this._chartService.parseData(
+        data,
+        sqlBuilder
+      );
+      break;
+    case 'report':
+    default:
+      this.data = data;
+    }
   }
 
   onToolbarAction(action: DesignerToolbarAciton) {
@@ -246,6 +267,8 @@ export class DesignerContainerComponent {
       }
       return isDataEmpty;
     case 'chart':
+      const parsedData = this._chartService.parseData(data, sqlBuilder);
+      return isEmpty(parsedData);
     // TODO verify if the object returned is empty
     case 'report':
       return isEmpty(data);
