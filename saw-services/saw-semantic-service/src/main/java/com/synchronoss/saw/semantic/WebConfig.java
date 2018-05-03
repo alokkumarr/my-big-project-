@@ -1,4 +1,4 @@
-package com.synchronoss.saw.workbench;
+package com.synchronoss.saw.semantic;
 
 import java.io.IOException;
 import java.util.Iterator;

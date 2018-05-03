@@ -1,0 +1,74 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://www.synchronoss.com",
+  "type": "object",
+  "properties": {
+    "customerCode": {
+      "id": "/properties/customerCode",
+      "type": "string",
+      "title": "The Customercode Schema "
+    },
+    "projectCode": {
+      "id": "/properties/projectCode",
+      "type": "string",
+      "title": "The Projectcode Schema "
+    },
+    "dataSetId": {
+      "id": "/properties/dataSetId",
+      "type": "array"
+    },
+    "username": {
+      "id": "/properties/username",
+      "type": "string",
+      "title": "The Username Schema "
+    },
+    "dataSecurityKey": {
+      "id": "/properties/dataSecurityKey",
+      "type": "string",
+      "title": "The Datasecuritykey Schema "
+    },
+    "module": {
+      "id": "/properties/module",
+      "type": "string",
+      "title": "The Module Schema ",
+      "default": "ANALYZE",
+      "enum": ["ANALYZE", "OBSERVE", "ALERT", "WORKBENCH"]
+    },
+    "metricName": {
+      "id": "/properties/metricName",
+      "type": "string",
+      "title": "The Metricname Schema "
+    },
+    "supports": {
+      "id": "/properties/supports",
+      "type": "array"
+    },
+    "artifacts": {
+      "id": "/properties/artifacts",
+      "type": "array"
+    },
+    "esRepository": {
+      "id": "/properties/esRepository",
+      "type": "object",
+      "title": "The Esrepository Schema "
+    },
+    "repository": {
+      "id": "/properties/repository",
+      "type": "object",
+      "title": "The Repository Schema "
+    }
+  },
+  "required": [
+    "customerCode",
+    "projectCode",
+    "dataSetId",
+    "username",
+    "module",
+    "metricName",
+    "supports",
+    "artifacts",
+    "esRepository",
+    "repository"
+  ]
+}

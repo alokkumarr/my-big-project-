@@ -1,4 +1,4 @@
-package com.synchronoss.saw.workbench;
+package com.synchronoss.saw.semantic;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

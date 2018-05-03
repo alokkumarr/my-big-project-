@@ -10,6 +10,7 @@ spring:
 logging:
   level:
     com.synchronoss.saw.workbench: INFO
+    sncr.bda: INFO
 server:
   address: localhost
   port: 9901

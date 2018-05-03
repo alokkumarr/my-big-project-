@@ -1,4 +1,4 @@
-package com.synchronoss.saw.workbench;
+package com.synchronoss.saw.semantic;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
-public class SAWWorkBenchUtils {
+public class SAWSemanticUtils {
   public final String SCHEMA_FILENAME = "payload-schema.json";
   public final static String COMMA = ",";
 

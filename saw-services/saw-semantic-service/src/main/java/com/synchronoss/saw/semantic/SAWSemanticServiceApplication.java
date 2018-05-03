@@ -1,4 +1,4 @@
-package com.synchronoss.saw.workbench;
+package com.synchronoss.saw.semantic;
 
 import info.faljse.SDNotify.SDNotify;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
@@ -15,11 +15,11 @@ import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @ComponentScan("com.synchronoss")
-public class SAWWorkBenchServiceApplication {
-  private static final Logger LOG = LoggerFactory.getLogger(SAWWorkBenchServiceApplication.class);
+public class SAWSemanticServiceApplication {
+  private static final Logger LOG = LoggerFactory.getLogger(SAWSemanticServiceApplication.class);
   public static void main(String[] args) {
     ConfigurableApplicationContext ctx =
-        SpringApplication.run(SAWWorkBenchServiceApplication.class, args);
+        SpringApplication.run(SAWSemanticServiceApplication.class, args);
     LOG.info(ctx.getApplicationName() + " has started.");
 
   }

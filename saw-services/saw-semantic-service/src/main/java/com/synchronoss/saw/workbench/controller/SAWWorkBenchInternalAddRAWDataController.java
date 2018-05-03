@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import com.synchronoss.saw.workbench.AsyncConfiguration;
+import com.synchronoss.saw.semantic.AsyncConfiguration;
 import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;

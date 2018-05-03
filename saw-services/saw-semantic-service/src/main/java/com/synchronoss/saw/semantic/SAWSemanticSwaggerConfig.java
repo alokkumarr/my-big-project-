@@ -1,4 +1,4 @@
-package com.synchronoss.saw.workbench;
+package com.synchronoss.saw.semantic;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +11,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-public class SAWWorkBenchSwaggerConfig {                                    
+public class SAWSemanticSwaggerConfig {                                    
     @Bean
     public Docket api() { 
         return new Docket(DocumentationType.SWAGGER_2)  
           .select()                                  
-          .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.workbench.controller"))              
+          .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.semantic.controller"))              
           .paths(PathSelectors.any())                          
           .build();         
     }
