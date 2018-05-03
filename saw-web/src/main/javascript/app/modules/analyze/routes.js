@@ -1,4 +1,4 @@
-import {AnalyzeViewComponent} from './components/view-u';
+import {AnalyzeViewComponent} from './view';
 
 export function routesConfig($stateProvider) {
   'ngInject';

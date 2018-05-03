@@ -10,7 +10,7 @@
     </div>
 
     <div fxLayout="row" fxLayoutAlign="start center" fxFlex="40">
-      <mat-radio-group [value]="states.reportView" change="onViewChange($event.value)" class="switch-view">
+      <mat-radio-group [value]="states.viewMode" (change)="onViewChange($event.value)" class="switch-view">
         <mat-radio-button [value]="LIST_VIEW">
           <mat-icon fontIcon="icon-Table-view" i18n-matTooltip matTooltip="List view"></mat-icon>
         </mat-radio-button>
@@ -35,4 +35,18 @@
       </button>
     </div>
   </mat-toolbar>
+  <div [ngSwitch]="states.viewMode">
+    <analyze-list-view-u *ngSwitchCase="LIST_VIEW"
+                         [analyses]="analyses"
+                         [analysisType]="analysisType"
+                         [searchTerm]="states.searchTermValue"
+                         [cronJobs]="cronJobs">
+    </analyze-list-view-u>
+    <analyze-card-view-u *ngSwitchCase="CARD_VIEW"
+                         [analyses]="analyses"
+                         [analysisType]="analysisType"
+                         [searchTerm]="states.searchTermValue"
+                         [cronJobs]="cronJobs">
+    </analyze-card-view-u>
+  </div>
 </div>
