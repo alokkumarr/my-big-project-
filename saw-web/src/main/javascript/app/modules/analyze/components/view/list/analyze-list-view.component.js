@@ -132,6 +132,7 @@ export const AnalyzeListViewComponent = {
         cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
+        dataField: 'scheduled',
         calculateCellValue: rowData => {
           return this.generateSchedule(rowData);
         },

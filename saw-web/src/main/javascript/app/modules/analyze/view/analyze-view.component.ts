@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Transition } from '@uirouter/angular';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
-import { JwtService } from '../../../../../login/services/jwt.service';
-import { AnalyzeService } from '../../services/analyze.service';
-import { ToastService } from '../../../../common/services/toastMessage.service';
-import { LocalSearchService } from '../../../../common/services/local-search.service';
-import { Analysis } from '../../types';
+import { HeaderProgressService } from '../../../common/services/header-progress.service';
+import { JwtService } from '../../../../login/services/jwt.service';
+import { AnalyzeService } from '../services/analyze.service';
+import { ToastService } from '../../../common/services/toastMessage.service';
+import { LocalSearchService } from '../../../common/services/local-search.service';
+import { Analysis } from '../types';
 
 const template = require('./analyze-view.component.html');
 require('./analyze-view.component.scss');

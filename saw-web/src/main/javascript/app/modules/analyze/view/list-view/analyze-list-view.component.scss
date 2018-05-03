@@ -1,0 +1,16 @@
+@import "themes/base/colors";
+
+analyze-list-view-u {
+  .branded-column-name {
+    color: $primary-blue-b2;
+    font-weight: bolder;
+  }
+
+  .list-action-button {
+    display: inline-flex;
+    min-width: 24px;
+    min-height: 24px;
+    line-height: 24px;
+    height: 24px;
+  }
+}

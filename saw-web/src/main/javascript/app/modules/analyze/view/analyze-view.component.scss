@@ -18,11 +18,17 @@ analyze-view-u {
   }
 
   .switch-view {
+    margin-right: 20px;
     display: inline-flex;
 
     mat-radio-button {
       margin: 0;
       padding-right: 3px;
+
+      mat-icon {
+        font-size: 14px;
+        color: $primary-grey-g4;
+      }
 
       &.mat-radio-checked {
         mat-icon {

@@ -4,8 +4,7 @@ import {
   Input,
   Output
 } from '@angular/core';
-import { Analysis } from '../../../types';
-import { CronJobSchedularComponent } from '../../cron-job-schedular';
+import { Analysis } from '../../types';
 
 const template = require('./analyze-card.component.html');
 

@@ -30,7 +30,10 @@ import { FormsModule } from '@angular/forms';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
+import { UIRouterModule } from '@uirouter/angular';
+import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { BrowserModule } from '@angular/platform-browser';
+import {FlexLayoutModule} from '@angular/flex-layout';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
@@ -40,6 +43,7 @@ import { ChartService } from './components/charts/chart.service';
 import {CommonServiceModule} from './services';
 import {CommonComponentModule} from './components';
 import {CommonFilterModule} from './filters';
+import { CommonPipesModule } from './pipes/common-pipes.module';
 import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
@@ -100,11 +104,15 @@ angular
 @NgModule({
   imports: [
     CommonModuleAngular4,
+    UIRouterModule,
     BrowserModule,
+    DxDataGridModule,
+    DxTemplateModule,
     FormsModule,
     MaterialModule,
     DndModule,
-    DxPivotGridModule
+    DxPivotGridModule,
+    CommonPipesModule
   ],
   declarations: [
     PivotGridComponent,
@@ -124,6 +132,19 @@ angular
   ],
   exports: [
     DndModule,
+    FlexLayoutModule,
+    CommonModuleAngular4,
+    UIRouterModule,
+    BrowserModule,
+    DxDataGridModule,
+    DxTemplateModule,
+    FormsModule,
+    MaterialModule,
+    CommonPipesModule,
+    UIRouterModule,
+    DxDataGridModule,
+    DxTemplateModule,
+    CommonPipesModule,
     PivotGridComponent,
     DxPivotGridComponent,
     ClickToCopyDirective,
