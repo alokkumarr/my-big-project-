@@ -4,7 +4,22 @@
 \alias{gg_sort}
 \title{GGPlot Sort Component}
 \usage{
-gg_sort(sort, x_variable, y_variable, x_axis_title)
+gg_sort(sort, x_variable, y_variable, x_axis_title, desc = TRUE)
+}
+\arguments{
+\item{sort}{logical option to sort boxplots by y_variable. Default is FALSE}
+
+\item{x_variable}{x-variable to chart. expects a string. default is NULL. not
+a required input}
+
+\item{y_variable}{continuous y-variable to chart. expects a string. default
+is NULL. either a y-variable is required or boxplot values (ymin, lower,
+middle, upper, ymax)}
+
+\item{x_axis_title}{x-axis title. expects a string}
+
+\item{desc}{logical option to sort boxplots in descending order. Default is
+TRUE. Note sort has to be TRUE for desc option to apply}
 }
 \value{
 list with sort params arguments and updated x axis title

@@ -248,28 +248,32 @@ gg_titles <- function(title,
 #' Wrapper function to sort x_variable by either count or median of y-variable
 #' if provided
 #'
-#' @inheritParams sncr_bar
+#' @inheritParams gg_boxplot
 #' @seealso \code{\link[forcats]{fct_infreq}}
 #' @seealso \code{\link[forcats]{fct_reorder}}
 #'
 #' @return list with sort params arguments and updated x axis title
 #' @export
-#'
+#' @importFrom forcats fct_infreq 
+#' @importFrom forcats fct_reorder
 gg_sort <- function(sort,
                     x_variable,
                     y_variable,
-                    x_axis_title) {
+                    x_axis_title,
+                    desc = TRUE) {
   checkmate::assert_flag(sort)
   
   if (sort) {
     if (is.null(y_variable)) {
-      sort_params <- paste0("forcats::fct_infreq(", x_variable, ")")
+      sort_params <- paste0("fct_infreq(", x_variable, ")")
     } else{
       sort_params <-
-        paste0("forcats::fct_reorder(f=",
+        paste0("fct_reorder(.f=",
                x_variable,
-               ", x=",
+               ", .x=",
                y_variable,
+               ", .desc=",
+               desc,
                ")")
     }
     if (is.null(x_axis_title)) {

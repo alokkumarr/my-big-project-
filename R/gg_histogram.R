@@ -78,8 +78,9 @@
 #'
 gg_histogram <- function(df,
                          x_variable,
-                         fill = "grey25",
+                         fill = sncr_pal()(1),
                          color = "black",
+                         alpha = .50,
                          facet_formula = NULL,
                          facet_labeller = "both",
                          facet_args = list(),

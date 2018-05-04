@@ -16,9 +16,6 @@ sncr_colors <- c(
 )
 
 
-
-
-
 #' Function to extract Synchronoss colors as hex codes
 #'
 #' @param ... Character names of sncr_colors 
