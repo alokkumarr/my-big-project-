@@ -11,7 +11,8 @@ import {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
-  ExpandDetailPivotComponent
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
@@ -38,6 +39,7 @@ export {
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
+  ExpandDetailChartComponent,
   ToolbarActionDialogComponent,
   DesignerSortComponent,
   DesignerDescriptionComponent,

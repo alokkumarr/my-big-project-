@@ -354,6 +354,7 @@ export class DesignerService {
           const isDateType = DATE_TYPES.includes(artifactColumn.type);
           return {
             ...(isDataArea ? { aggregate: artifactColumn.aggregate } : {}),
+            alias: artifactColumn.aliasName,
             checked: artifactColumn.area,
             columnName: artifactColumn.columnName,
             comboType: artifactColumn.comboType,

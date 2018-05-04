@@ -281,6 +281,7 @@ export class DesignerContainerComponent {
     if (event.requiresDataChange) {
       this.requestDataIfPossible();
     } else {
+      this.updateAnalysis();
       this.data = [...this.data];
     }
   }

@@ -2,11 +2,13 @@ import { DesignerSettingsSingleComponent } from './single';
 import { DesignerSettingsGroupComponent } from './group';
 import {
   ExpandableFieldComponent,
-  ExpandDetailPivotComponent
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent
 } from './expandable-field';
 export {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
-  ExpandDetailPivotComponent
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent
 };
