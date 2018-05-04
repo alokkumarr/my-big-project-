@@ -15,6 +15,22 @@
   </div>
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
+    <div *ngIf="artifactColumn.comboType">
+      <button mat-icon-button
+              [matMenuTriggerFor]="comboTypeSelect"
+              class="expandable-field__option-button">
+        <mat-icon [fontIcon]="COMBO_TYPES_OBJ[artifactColumn.comboType].icon"></mat-icon>
+      </button>
+      <mat-menu #comboTypeSelect="matMenu">
+        <button mat-menu-item
+                *ngFor="let comboType of COMBO_TYPES; trackBy: index"
+                (click)="onComboTypeChange(comboType.value)">
+          <mat-icon [fontIcon]="comboType.icon"></mat-icon>
+          <span style="margin-left: 20px;">{{comboType.label}}</span>
+        </button>
+      </mat-menu>
+    </div>
+
     <div *ngIf="artifactColumn.aggregate">
       <button mat-icon-button
               [matMenuTriggerFor]="aggregatemenu"

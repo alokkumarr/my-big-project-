@@ -175,7 +175,9 @@ export class DesignerService {
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-      artifactColumn.comboType = 'column';
+      if (['column', 'bar', 'line', 'area', 'combo'].includes(chartType)) {
+        artifactColumn.comboType = 'column';
+      }
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {

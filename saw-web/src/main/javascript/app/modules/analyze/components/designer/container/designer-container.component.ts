@@ -282,7 +282,7 @@ export class DesignerContainerComponent {
       this.requestDataIfPossible();
     } else {
       this.updateAnalysis();
-      this.data = [...this.data];
+      this.data = this.data ? [...this.data] : [];
     }
   }
 

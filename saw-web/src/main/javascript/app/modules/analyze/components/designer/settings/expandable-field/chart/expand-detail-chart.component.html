@@ -1,11 +1,10 @@
 <div fxLayout="column">
-  <mat-form-field>
+  <mat-form-field fxFlex>
       <input matInput type="text"
              placeholder="Alias"
              (input)="onAliasChange($event.target.value)"
              [value]="artifactColumn.aliasName || ''"/>
   </mat-form-field>
-
   <div *ngIf="hasDateInterval"
        fxLayout="column">
     <mat-form-field >
@@ -35,23 +34,6 @@
         <mat-icon fontIcon="icon-filter"></mat-icon>
       </button>
     </div>
-  </div>
-
-  <div *ngIf="isDataField"
-       fxLayout="row"
-       fxLayoutAlign="start center">
-    <mat-form-field (click)="openDataFormatDialog()">
-      <input matInput
-             type="text"
-             placeholder="Format"
-             disabled
-             style="cursor: pointer;"
-             [value]="numberSample"/>
-    </mat-form-field>
-    <button mat-icon-button
-            (click)="openDataFormatDialog()">
-      <mat-icon fontIcon="icon-filter"></mat-icon>
-    </button>
   </div>
 </div>
 
