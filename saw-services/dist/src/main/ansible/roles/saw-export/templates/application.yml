@@ -43,3 +43,6 @@ published:
 ftp:
   details:
     file: /opt/bda/saw-export-service/conf/ftp-details.json
+
+
+exportChunkSize: "{{ export_chunk_size | default('10000') }}"

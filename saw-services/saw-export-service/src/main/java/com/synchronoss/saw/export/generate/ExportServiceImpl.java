@@ -79,6 +79,9 @@ public class ExportServiceImpl implements ExportService{
   @Value("${ftp.details.file}")
   private String ftpDetailsFile;
 
+  @Value("${exportChunkSize}")
+  private String exportChunkSize;
+
   @Autowired
   private ApplicationContext appContext;
 
@@ -226,7 +229,7 @@ public class ExportServiceImpl implements ExportService{
         exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
         exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
 
-        long limitPerPage = 10000;
+        long limitPerPage = Long.parseLong(exportChunkSize);
         long page = 0; // just to keep hold of last not processed data in for loop
 
         // number of pages to process

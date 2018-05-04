@@ -72,5 +72,8 @@ saw_ui_export_size=10000
 saw_email_export_size=50000
 saw_ftp_export_size=1000000
 
+## Chunk size for processing exports
+export_chunk_size=10000
+
 [saw-security]
 localhost ansible_connection=local
