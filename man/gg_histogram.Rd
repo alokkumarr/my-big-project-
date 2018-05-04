@@ -4,11 +4,12 @@
 \alias{gg_histogram}
 \title{GGplot2 Histogram Chart}
 \usage{
-gg_histogram(df, x_variable, fill = "grey25", color = "black",
-  facet_formula = NULL, facet_labeller = "both", facet_args = list(),
-  coord = NULL, coord_args = list(), title = NULL, subtitle = NULL,
-  x_axis_title = NULL, y_axis_title = NULL, caption = NULL,
-  legend_args = list(), theme = "sncr", palette = "a2", ...)
+gg_histogram(df, x_variable, fill = sncr_pal()(1), color = "black",
+  alpha = 0.5, facet_formula = NULL, facet_labeller = "both",
+  facet_args = list(), coord = NULL, coord_args = list(), title = NULL,
+  subtitle = NULL, x_axis_title = NULL, y_axis_title = NULL,
+  caption = NULL, legend_args = list(), theme = "sncr", palette = "a2",
+  ...)
 }
 \arguments{
 \item{fill}{either a variable name to apply a group by operation and create

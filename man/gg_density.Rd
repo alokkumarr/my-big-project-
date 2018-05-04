@@ -5,7 +5,7 @@
 \title{GGplot2 Density Chart}
 \usage{
 gg_density(df, x_variable, fill = sncr_pal()(1), color = "black",
-  alpha = 0.6, facet_formula = NULL, facet_labeller = "both",
+  alpha = 0.5, facet_formula = NULL, facet_labeller = "both",
   facet_args = list(), coord = NULL, coord_args = list(), title = NULL,
   subtitle = NULL, x_axis_title = NULL, y_axis_title = NULL,
   caption = NULL, legend_args = list(), theme = "sncr", palette = "a2",

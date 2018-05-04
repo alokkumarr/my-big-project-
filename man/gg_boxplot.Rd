@@ -6,7 +6,7 @@
 \usage{
 gg_boxplot(df, x_variable = NULL, y_variable = NULL, ymin = NULL,
   lower = NULL, middle = NULL, upper = NULL, ymax = NULL,
-  fill = sncr_pal()(1), color = "black", alpha = 0.6,
+  fill = sncr_pal()(1), color = "black", alpha = 0.5,
   position = "dodge", sort = FALSE, desc = TRUE, facet_formula = NULL,
   facet_labeller = "both", facet_args = list(), coord = NULL,
   coord_args = list(), title = NULL, subtitle = NULL,
