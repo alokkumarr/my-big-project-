@@ -18,7 +18,7 @@
       </mat-select>
     </mat-form-field>
 
-    <div *ngIf="!filter.isRuntimeFilter" style="margin-left: 10px;">
+    <div *ngIf="!filter.isRuntimeFilter && !filter.isGlobalFilter" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">

@@ -158,8 +158,8 @@ export class DesignerContainerComponent {
     switch(this.analysis.type) {
     case 'pivot':
       this.data = this._designerService.parseData(
-        data.data,
-        this.analysis.sqlBuilder
+        data,
+        sqlBuilder
       );
       break;
     case 'chart':

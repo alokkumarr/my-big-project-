@@ -7,13 +7,13 @@
 </designer-header>
 
 <designer-settings-single class="designer__data-settings"
-                   [analysisType]="analysisStarter.type"
-                   [analysisSubtype]="analysisStarter.chartType"
+                   [analysisType]="(analysisStarter || analysis).type"
+                   [analysisSubtype]="(analysisStarter || analysis).chartType"
                    (settingsChange)="onSettingsChange($event)"
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </designer-settings-single>
 
-<ng-container [ngSwitch]="analysisStarter.type">
+<ng-container [ngSwitch]="(analysisStarter || analysis).type">
   <designer-pivot class="designer__main"
                   *ngSwitchCase="'pivot'"
                   [data]="data"
@@ -23,7 +23,7 @@
   </designer-pivot>
   <designer-chart class="designer__main"
                   *ngSwitchCase="'chart'"
-                  [chartType]="analysisStarter.chartType"
+                  [chartType]="(analysisStarter || analysis).chartType"
                   [data]="data"
                   [sqlBuilder]="analysis && analysis.sqlBuilder">
   </designer-chart>

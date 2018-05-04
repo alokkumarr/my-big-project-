@@ -1,21 +1,13 @@
 declare const require: any;
 
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 
-import {
-  Filter,
-  Artifact
-} from '../../types';
+import { Filter, Artifact } from '../../types';
 
 const template = require('./designer-filter-container.component.html');
 require('./designer-filter-container.component.scss');
@@ -49,8 +41,9 @@ export class DesignerFilterContainerComponent {
       tableName,
       columnName: null,
       isRuntimeFilter: false,
+      isGlobalFilter: false,
       model: null
-    }
+    };
     if (!this.groupedFilters[tableName]) {
       this.groupedFilters[tableName] = [];
     }
@@ -64,16 +57,17 @@ export class DesignerFilterContainerComponent {
   }
 
   removeFilter(targetIndex, tableName) {
-    this.groupedFilters[tableName] = filter(this.groupedFilters[tableName],
-      (_, index) => targetIndex !== index);
+    this.groupedFilters[tableName] = filter(
+      this.groupedFilters[tableName],
+      (_, index) => targetIndex !== index
+    );
     this.onFiltersChange();
   }
 
   onFiltersChange() {
-    this.filters = fpPipe(
-      fpToPairs,
-      fpFlatMap(([_, filters]) => filters)
-    )(this.groupedFilters);
+    this.filters = fpPipe(fpToPairs, fpFlatMap(([_, filters]) => filters))(
+      this.groupedFilters
+    );
 
     this.filtersChange.emit(this.filters);
   }
@@ -81,5 +75,4 @@ export class DesignerFilterContainerComponent {
   artifactTrackByFn(_, artifact: Artifact) {
     return artifact.artifactName;
   }
-
 }
