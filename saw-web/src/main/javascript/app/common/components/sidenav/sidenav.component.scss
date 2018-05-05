@@ -1,64 +1,9 @@
-sidenav {
-  z-index: 80;
-
-  .layout-row md-backdrop {
-    background-color: transparent !important;
-  }
+.sidenav-container {
+  position: fixed !important;
+  width: 15%;
+  margin-top: 73px;
 }
 
-sidenav .layout-row md-sidenav {
-  position: fixed;
-
-  .sidebar-header {
-    font-weight: 700;
-  }
-
-  .secondary-toolbar {
-    justify-content: center;
-  }
-
-  md-content {
-    padding: 0 !important;
-  }
-
-  accordion-menu {
-    .sidenav-menu {
-      margin: 0;
-    }
-
-    .parent-list-item {
-      border-bottom: 1px solid #E3E3E3;
-      border-top: none;
-
-      &:first-child {
-        border-top: 1px solid #E3E3E3;
-      }
-    }
-
-    .menu-toggle-list {
-      li {
-        &:first-child {
-          border-top: 1px solid #E3E3E3;
-        }
-      }
-    }
-
-    .menu-toggle-list {
-      .layout-row {
-        padding-left: 15px;
-      }
-    }
-  }
-
-  accordion-menu-link {
-    .md-button-toggle {
-      .md-toggle-icon:not(.toggled) {
-        transform: rotate(-0deg);
-      }
-
-      .md-toggle-icon.toggled {
-        transform: rotate(-180deg);
-      }
-    }
-  }
+sidenav {
+  z-index: 80;
 }

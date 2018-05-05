@@ -25,7 +25,8 @@ import 'devextreme/ui/data_grid';
 import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import { FormsModule } from '@angular/forms';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
@@ -43,6 +44,7 @@ import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {SidenavComponent} from './components/sidenav/sidenav.component';
 import {ErrorDetailComponent} from './components/error-detail';
 import {DataFormatDialogComponent} from './components/data-format-dialog';
 import {DateFormatDialogComponent} from './components/date-format-dialog';
@@ -53,7 +55,7 @@ import {ErrorDetailService} from './services/error-detail.service';
 import {ErrorDetailDialogService} from './services/error-detail-dialog.service';
 import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import {
-  toastProvider
+  toastProvider, componentHandlerProvider
 } from './services/ajs-common-providers';
 
 import AppConfig from '../../../../../appConfig';
@@ -109,13 +111,15 @@ angular
     ErrorDetailComponent,
     E2eDirective,
     DataFormatDialogComponent,
-    DateFormatDialogComponent
+    DateFormatDialogComponent,
+    SidenavComponent
   ],
   entryComponents: [
     PivotGridComponent,
     ErrorDetailComponent,
     DataFormatDialogComponent,
-    DateFormatDialogComponent
+    DateFormatDialogComponent,
+    SidenavComponent
   ],
   exports: [
     DndModule,
@@ -125,13 +129,16 @@ angular
     ErrorDetailComponent,
     DataFormatDialogComponent,
     DateFormatDialogComponent,
-    E2eDirective
+    E2eDirective,
+    SidenavComponent
   ],
   providers: [
     ErrorDetailService,
     ErrorDetailDialogService,
     toastProvider,
-    ChartService
-  ]
+    ChartService,
+    componentHandlerProvider
+  ],
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
 export class CommonModuleTs {}

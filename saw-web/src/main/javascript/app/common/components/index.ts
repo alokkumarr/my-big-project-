@@ -19,7 +19,8 @@ import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
-import {SidenavComponent, SidenavBtnComponent} from './sidenav';
+import {SidenavBtnComponent} from './sidenav';
+import {SidenavComponent} from './sidenav/sidenav.component';
 import {PivotGridComponent} from './pivot-grid/pivot-grid.component';
 import {BinaryOptionComponent} from './binary-option/binary-option.component';
 import {ReportGridDisplayComponent} from './report-grid-display/grid/report-grid-display.component';
@@ -47,9 +48,11 @@ angular
   .component('panel', PanelComponent)
   .component('rangeSlider', RangeSliderComponent)
   .component('searchBox', SearchBoxComponent)
-  .component('sidenav', SidenavComponent)
+  //.component('sidenav', SidenavComponent)
+  .directive('sidenav', downgradeComponent({component: SidenavComponent}))
   .directive('pivotGrid', downgradeComponent({component: PivotGridComponent}))
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
   .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
   .component('sidenavBtn', SidenavBtnComponent);
+
