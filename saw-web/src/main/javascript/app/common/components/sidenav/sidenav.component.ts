@@ -18,8 +18,6 @@ export class SidenavComponent {
   @Input() id: any;
 
   constructor(@Inject('$componentHandler') private chp: ComponentHandler, private menuservice: MenuService) { }
-
-  @Input() unregister = this.unregister = this.chp.register(this.id, this);
   
   ngOnInit() {
   	this.unregister = this.chp.register(this.id, this);
