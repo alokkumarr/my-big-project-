@@ -2,12 +2,46 @@
   color: #0096D5;
 }
 
-accordion-menu-link {
-  & > div {
-    padding-left: 10px;
-  }
+.menu-panel-content a {
+  display: block;
+  padding: 0 24px;
+  line-height: 40px;
+  max-height: 60px;
+  font-weight: 400;
+  color: #333;
+}
 
-  &.accordion-root > div {
-    padding-left: 0;
-  }
+.activeButton {
+  color: #0096D5 !important;
+}
+
+.menu-panel-header {
+  border-top: 1px solid #EEE;
+}
+
+.mat-expansion-panel {
+  box-shadow: none !important;
+}
+
+.mat-expansion-panel-header {
+  padding: 0 !important;
+  width: 92%;
+}
+
+mat-panel-title {
+  border-radius: 0;
+  color: #5C6670;
+  cursor: pointer;
+  display: block;
+  align-items: inherit;
+  line-height: 54px;
+  max-height: 54px;
+  margin: 0;
+  overflow: hidden;
+  padding: 0 24px;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+  width: 100%;
+  font-weight: 600;
 }

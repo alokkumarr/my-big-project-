@@ -27,6 +27,8 @@ import 'devextreme/integration/angular';
 
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
+import { Router } from '@angular/router';
+
 import { FormsModule } from '@angular/forms';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
@@ -44,6 +46,8 @@ import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {AccordionMenuLinkComponent} from './components/accordionMenu/accordionMenuLink.component';
+import {AccordionMenuComponent} from './components/accordionMenu/accordionMenu.component';
 import {SidenavComponent} from './components/sidenav/sidenav.component';
 import {ErrorDetailComponent} from './components/error-detail';
 import {DataFormatDialogComponent} from './components/data-format-dialog';
@@ -112,14 +116,18 @@ angular
     E2eDirective,
     DataFormatDialogComponent,
     DateFormatDialogComponent,
-    SidenavComponent
+    SidenavComponent,
+    AccordionMenuComponent,
+    AccordionMenuLinkComponent
   ],
   entryComponents: [
     PivotGridComponent,
     ErrorDetailComponent,
     DataFormatDialogComponent,
     DateFormatDialogComponent,
-    SidenavComponent
+    SidenavComponent,
+    AccordionMenuComponent,
+    AccordionMenuLinkComponent
   ],
   exports: [
     DndModule,
@@ -130,7 +138,9 @@ angular
     DataFormatDialogComponent,
     DateFormatDialogComponent,
     E2eDirective,
-    SidenavComponent
+    SidenavComponent,
+    AccordionMenuComponent,
+    AccordionMenuLinkComponent
   ],
   providers: [
     ErrorDetailService,

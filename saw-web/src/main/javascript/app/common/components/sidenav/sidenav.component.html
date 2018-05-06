@@ -26,12 +26,7 @@
   <mat-sidenav-container>
     <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container">
       <h3 class="sidebar-header"><span>{{getMenuHeader()}}</span></h3>
-      <mat-list role="list">
-        <mat-list-item role="listitem">Item 1</mat-list-item>
-        <mat-list-item role="listitem">Item 2</mat-list-item>
-        <mat-list-item role="listitem">Item 3</mat-list-item>
-      </mat-list>
-      <accordion-menu source="getMenuDetails();"></accordion-menu>
+      <accordion-menu [source]=""></accordion-menu>
     </mat-sidenav>
     <br/>
   </mat-sidenav-container>

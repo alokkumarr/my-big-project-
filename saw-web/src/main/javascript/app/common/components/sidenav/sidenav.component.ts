@@ -1,9 +1,7 @@
-import {UpgradeComponent} from '@angular/upgrade/static';
 import { Component, Input, Inject, Injectable } from '@angular/core';
 import * as get from 'lodash/get';
 import { ComponentHandler } from './../../utils/componentHandler';
 import { MenuService } from './../../services/menu.service';
-import {AccordionMenu} from '../accordionMenu';
 
 const template = require('./sidenav.component.html');
 require('./sidenav.component.scss');
@@ -17,12 +15,16 @@ require('./sidenav.component.scss');
 export class SidenavComponent { 
 
   @Input() menu: any;
+  @Input() id: any;
 
   constructor(@Inject('$componentHandler') private chp: ComponentHandler, private menuservice: MenuService) { }
+
+  @Input() unregister = this.unregister = this.chp.register(this.id, this);
   
   ngOnInit() {
-    this._moduleName = 'ANALYZE';
-    this.unregister = this.chp.register('left-side-nav', this);
+  	//this.unregister = this.chp.register(this.id, this);
+    this._moduleName = '';
+    //this.getMenuDetails();
   }
 
   getMenuHeader() {
@@ -40,10 +42,16 @@ export class SidenavComponent {
   }
 
   getMenuDetails() {
-    this.menuservice.getMenu('ANALYZE').then(data => {
-  	  this.menu = data;
+    this.menuservice.getMenu('OBSERVE').then(data => {
+      //console.log(data);
+      console.log(JSON.stringify(data));
     });
-    return this.menu;
   }
+
+  // this.getMenuDetails = _.memoize(function() {
+  //   this.menuservice.getMenu('ANALYZE').then(data => {
+  //     return data;
+  //   });
+  // });
 }
 

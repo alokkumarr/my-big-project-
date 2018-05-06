@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 import {downgradeComponent} from '@angular/upgrade/static';
 
-import {AccordionMenu, AccordionMenuLink} from './accordionMenu';
+import {AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
 import {
   JSPlumbCanvas,
@@ -20,6 +20,8 @@ import {mdButtonGroupComponent} from './md-button-group/md-button-group.componen
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
 import {SidenavBtnComponent} from './sidenav';
+import {AccordionMenuComponent} from './accordionMenu/accordionMenu.component'
+import {AccordionMenuLinkComponent} from './accordionMenu/accordionMenuLink.component'
 import {SidenavComponent} from './sidenav/sidenav.component';
 import {PivotGridComponent} from './pivot-grid/pivot-grid.component';
 import {BinaryOptionComponent} from './binary-option/binary-option.component';
@@ -31,8 +33,10 @@ export const CommonComponentModule = 'CommonModule.Component';
 
 angular
   .module(CommonComponentModule, [ChartsModule])
-  .component('accordionMenu', AccordionMenu)
-  .component('accordionMenuLink', AccordionMenuLink)
+  //.component('accordionMenu', AccordionMenu)
+  .directive('accordionMenu', downgradeComponent({component: AccordionMenuComponent}))
+  .directive('accordionMenuLink', downgradeComponent({component: AccordionMenuLinkComponent}))
+  //.component('accordionMenuLink', AccordionMenuLink)
   .component('badge', BadgeComponent)
   .component('binaryOption', BinaryOptionComponent)
   .component('choiceGroup', ChoiceGroupComponent)

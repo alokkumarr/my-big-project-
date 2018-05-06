@@ -1,6 +1,3 @@
-<ul class="sidenav-menu">
-  <li class="parent-list-item"
-      ng-repeat="item in $ctrl.source">
-    <accordion-menu-link metadata="item" class="accordion-root"></accordion-menu-link>
-  </li>
-</ul>
+<div *ngFor="let item of source">
+  <accordion-menu-link [metadata]="item" class="accordion-root"></accordion-menu-link>
+</div>
