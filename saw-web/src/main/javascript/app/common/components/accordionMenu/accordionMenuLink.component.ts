@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/platform-browser';
 import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./accordionMenuLink.component.html');
@@ -14,7 +15,7 @@ export class AccordionMenuLinkComponent {
   location: Location;
   @Input() public metadata: any;
 
-  constructor() {}
+  constructor(@Inject(DOCUMENT) private document: any) {}
   
   ngOnInit() {
     this.expanded = false;
@@ -23,7 +24,7 @@ export class AccordionMenuLinkComponent {
   }
 
   checkActiveMenu(linkUrl) {
-    this.url = '#!' + '/analyze/4';
+    this.url = location.hash;
     if (this.url === linkUrl) {
       return true;
     }
@@ -31,7 +32,7 @@ export class AccordionMenuLinkComponent {
   }
 
   expandLoadedPanel() {
-    const url = '/analyze/4';
+    const url = location.hash.split('#!')[1];
 
     if (/^\/observe/.test(url)) {
       /* If observe module, open all levels by default */

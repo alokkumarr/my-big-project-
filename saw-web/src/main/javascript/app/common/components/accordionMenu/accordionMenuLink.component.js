@@ -17,10 +17,6 @@ export const AccordionMenuLink = {
       this._$location = $location;
     }
 
-    $postLink() {
-      this.isOpen = Boolean(this.metadata.active);
-    }
-
     /* Check if the current item's url matches the browser url */
     checkActiveMenu(linkUrl) {
       this.url = '#!' + this._$location.url();
@@ -32,6 +28,7 @@ export const AccordionMenuLink = {
 
     /* Check if the collapser contains an item that is currently open. */
     checkAndCollapse() {
+      console.log(window.location.href);
       const url = this._$location.url();
 
       if (/^\/observe/.test(url)) {

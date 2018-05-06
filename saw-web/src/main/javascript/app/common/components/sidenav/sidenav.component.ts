@@ -22,9 +22,8 @@ export class SidenavComponent {
   @Input() unregister = this.unregister = this.chp.register(this.id, this);
   
   ngOnInit() {
-  	//this.unregister = this.chp.register(this.id, this);
+  	this.unregister = this.chp.register(this.id, this);
     this._moduleName = '';
-    //this.getMenuDetails();
   }
 
   getMenuHeader() {
@@ -40,18 +39,5 @@ export class SidenavComponent {
     this._moduleName = moduleName;
     this.menu = data;
   }
-
-  getMenuDetails() {
-    this.menuservice.getMenu('OBSERVE').then(data => {
-      //console.log(data);
-      console.log(JSON.stringify(data));
-    });
-  }
-
-  // this.getMenuDetails = _.memoize(function() {
-  //   this.menuservice.getMenu('ANALYZE').then(data => {
-  //     return data;
-  //   });
-  // });
 }
 
