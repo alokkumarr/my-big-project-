@@ -78,8 +78,21 @@ test_that("Basic Boxplot Unit Tests", {
   
   p2 <-  gg_boxplot(dat, y_variable = "mpg", outlier.color = "red")
   expect_equal(p2$plot_env$params_list$geom_params$outlier.color, "red")
-})
+  
+  y <- rnorm(100)
+  df <- data.frame(
+   x = 1,
+   y0 = min(y),
+   y25 = quantile(y, 0.25),
+   y50 = median(y),
+   y75 = quantile(y, 0.75),
+   y100 = max(y))
 
+  p3 <- gg_boxplot(df, ymin = "y0", lower = "y25", middle = "y50", upper = "y75", ymax = "y100", fill="darkorange")
+  expect_class(p3$layers[[1]], "ggproto")
+  expect_class(p3$layers[[1]]$geom, "GeomBoxplot")
+  expect_subset(c("ymin", "lower", "middle", "upper", "ymax"), as.character(names(p3$mapping)))
+})
 
 
 

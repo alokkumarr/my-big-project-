@@ -65,7 +65,7 @@
 #' gg_histogram(d, "mpg")
 #' gg_histogram(d, "mpg", fill="steelblue", color="grey25")
 #' gg_histogram(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message")
-#' gg_histogram(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme=theme_minimal())
+#' gg_histogram(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme="minimal")
 #'
 #' # A few charts with additional features
 #' gg_histogram(d, "mpg", fill="am", color="am")

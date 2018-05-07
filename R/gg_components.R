@@ -265,16 +265,19 @@ gg_sort <- function(sort,
   
   if (sort) {
     if (is.null(y_variable)) {
-      sort_params <- paste0("fct_infreq(", x_variable, ")")
+      if(desc) {
+        sort_params <- paste0("fct_infreq(", x_variable, ")")
+      }else{
+        sort_params <- paste0("fct_inorder(", x_variable, ")")
+      }
     } else{
-      sort_params <-
-        paste0("fct_reorder(.f=",
-               x_variable,
-               ", .x=",
-               y_variable,
-               ", .desc=",
-               desc,
-               ")")
+      sort_params <- paste0("fct_reorder(.f=",
+                            x_variable,
+                            ", .x=",
+                            y_variable,
+                            ", .desc=",
+                            desc,
+                            ")")
     }
     if (is.null(x_axis_title)) {
       x_axis_title <- x_variable
