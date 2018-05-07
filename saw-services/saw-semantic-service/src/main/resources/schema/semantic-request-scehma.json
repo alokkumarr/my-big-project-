@@ -9,8 +9,19 @@
       "type": "string",
       "title": "The Customercode Schema "
     },
+    "_id": {
+      "id": "/properties/entityId",
+      "type": "string",
+      "title": "The entityId Schema "
+    },
+    
     "projectCode": {
       "id": "/properties/projectCode",
+      "type": "string",
+      "title": "The Projectcode Schema "
+    },
+    "statusMessage": {
+      "id": "/properties/statusMessage",
       "type": "string",
       "title": "The Projectcode Schema "
     },
@@ -22,6 +33,26 @@
       "id": "/properties/username",
       "type": "string",
       "title": "The Username Schema "
+    },
+    "createdBy": {
+      "id": "/properties/createdBy",
+      "type": "string",
+      "title": "The createdBy Schema "
+    },
+    "updatedBy": {
+      "id": "/properties/updatedBy",
+      "type": "string",
+      "title": "The updatedBy Schema "
+    },
+    "createdAt": {
+      "id": "/properties/createdAt",
+      "type": "string",
+      "title": "The createdAt Schema "
+    },
+    "updatedAt": {
+      "id": "/properties/updatedAt",
+      "type": "string",
+      "title": "The updatedAt Schema "
     },
     "dataSecurityKey": {
       "id": "/properties/dataSecurityKey",

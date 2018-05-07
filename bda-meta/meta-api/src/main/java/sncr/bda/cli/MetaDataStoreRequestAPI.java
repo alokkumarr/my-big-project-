@@ -1,24 +1,33 @@
 package sncr.bda.cli;
 
-import com.google.gson.*;
-import com.mapr.db.MapRDB;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.mapr.db.MapRDB;
 import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.DataSetStore;
-import sncr.bda.metastore.ProjectStore;
+import sncr.bda.metastore.SemanticDataSetStore;
 import sncr.bda.metastore.TransformationStore;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Map;
-
-import static sncr.bda.cli.MetaDataStoreRequestAPI.MetaCategory.*;
+import sncr.bda.metastore.exception.MetaStoreEntityException;
+import sncr.bda.metastore.exception.MetaStoreSearchNotFoundException;
+import sncr.bda.store.generic.schema.Action;
+import sncr.bda.store.generic.schema.Category;
+import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 
 /**
  * The class handles basic requests to Metadata Store
@@ -44,19 +53,18 @@ import static sncr.bda.cli.MetaDataStoreRequestAPI.MetaCategory.*;
  *      }
  *    ]
  * }
- * Created by srya0001 on 11/4/2017.
  */
 public class MetaDataStoreRequestAPI {
 
     private static final Logger logger = Logger.getLogger(MetaDataStoreRequestAPI.class);
 
     protected JsonElement request;
-    private Actions action;
+    private Action action;
     private String id;
     private String response;
     private String rFile;
     private JsonObject src;
-    private MetaCategory category;
+    private Category category;
     private String xdfRoot;
     private JsonElement result;
     private OutputStream os;
@@ -64,18 +72,64 @@ public class MetaDataStoreRequestAPI {
     private QueryCondition maprDBCondition;
     private JsonArray filter;
     private JsonParser jsonParser;
+    private JsonArray searchResultJsonArray;
 
-
-    public MetaDataStoreRequestAPI(String jStr)
-    {
-        jsonParser = new JsonParser();
-        request = jsonParser.parse(jStr);
+    public MetaDataStoreRequestAPI(String jStr) {
+      jsonParser = new JsonParser();
+      request = jsonParser.parse(jStr);
     }
-
-
-    public void process(){
+    public MetaDataStoreRequestAPI(List<MetaDataStoreStructure> metaDataStoreStructure) throws JsonSyntaxException, JsonProcessingException {
+      ObjectMapper mapper = new ObjectMapper();
+      jsonParser = new JsonParser();
+      request = jsonParser.parse(mapper.writeValueAsString(metaDataStoreStructure));
+    }
+  
+    public String getId() {
+      return id;
+    }
+  
+    public void setId(String id) {
+      this.id = id;
+    }
+  
+    public JsonObject getSrc() {
+      return src;
+    }
+  
+    public void setSrc(JsonObject src) {
+      this.src = src;
+    }
+  
+    public String getXdfRoot() {
+      return xdfRoot;
+    }
+  
+    public String getResponse() {
+      return response;
+    }
+  
+    public void setResponse(String response) {
+      this.response = response;
+    }
+  
+    public void setXdfRoot(String xdfRoot) {
+      this.xdfRoot = xdfRoot;
+    }
+  
+    public JsonElement getResult() {
+      return result;
+    }
+  
+    public void setResult(JsonElement result) {
+      this.result = result;
+    }
+  
+    public JsonArray getSearchResultJsonArray() {
+      return searchResultJsonArray;
+    }
+  
+    public void process() throws MetaStoreEntityException{
         try {
-
             if (request.isJsonArray()) {
             JsonArray ja = request.getAsJsonArray();
             ja.forEach( arrayElem -> {
@@ -84,76 +138,56 @@ public class MetaDataStoreRequestAPI {
                     try {
                         processItem(jo);
                     } catch (Exception e) {
-                        generateResponse("item-processing", e);
+                       logger.error("Error while processing the item: {}" , e);
                     }
                 }else{
-                    logger.error("Cannot handle provided JSON item: " + arrayElem);
+                    logger.error("Cannot handle provided JSON items: " + arrayElem);
                 }
-            });
-            }
+            });}
             else if (request.isJsonObject()){
                 JsonObject jo = request.getAsJsonObject();
                 processItem(jo);
             }else{
                 logger.error("Cannot handle provided JSON");
+                throw new MetaStoreEntityException("Cannot handle provided JSON : " + request.toString());
             }
         } catch (Exception e) {
-            generateResponse("process", e);
+          logger.error("Cannot handle provided JSON : {}", e);
+          throw new MetaStoreEntityException("Cannot handle provided JSON : {}", e);
         }
     }
 
-    private void processItem(JsonObject item){
-
-        if (analyzeAndValidate(item)){
+        private void processItem(JsonObject item) {
+          if (analyzeAndValidate(item)) {
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
-
             try {
-                os = HFileOperations.writeToFile(rFile);
+              os = HFileOperations.writeToFile(rFile);
             } catch (FileNotFoundException e1) {
-                logger.error("Could not write response to file: " + rFile, e1);
-                return;
+              logger.error("Could not write response to file: " + rFile, e1);
+              return;
             }
-
             try {
-                switch (action) {
-                    case create:
-                    case delete:
-                    case update:
-                    case read:
-                        doAction(item);
-                        break;
-                    case search:
-                        doSearch();
-                        break;
-                    default:
-                        logger.warn("Action is not supported");
-                }
+              doAction(item);
+            } catch (Exception e) {
+              logger.error("Could not process requested item: ", e);
             }
-            catch(Exception e){
-                logger.error("Could not process requested item: ", e);
-
-            }
-
             if (os != null) {
-                try {
-                    os.flush();
-                    os.close();
-                } catch (IOException e) {
-                    logger.error("Exception in request destructor: ", e);
-                }
+              try {
+                os.flush();
+                os.close();
+              } catch (IOException e) {
+                logger.error("Exception in request destructor: ", e);
+                throw new MetaStoreEntityException("Exception in request destructor: ", e);
+              }
             }
-
-        }
-        else{
+          } else {
             logger.error("Could not process current item, skip it");
+          }
         }
-    }
 
 
     private void doSearch() throws Exception {
-
         maprDBCondition =  MapRDB.newCondition();
-
         boolean toBeClosed = false;
         if (filter.size() > 1) {
             if (query.has("conjunction"))
@@ -165,7 +199,6 @@ public class MetaDataStoreRequestAPI {
                 maprDBCondition.and();
             toBeClosed = true;
         }
-
         filter.forEach(c -> {
             if ( c.isJsonObject() ){
                 JsonObject cjo = c.getAsJsonObject();
@@ -183,45 +216,47 @@ public class MetaDataStoreRequestAPI {
                 }
             }
             else{
-                logger.warn("Incorrect query");
-            }
-        });
+                logger.warn("Incorrect query");}});
         if (toBeClosed) maprDBCondition.close();
         maprDBCondition.build();
-
         Map<String, Document> searchResult = null;
         switch ( category ){
-            case DataSet:
-                DataSetStore dss = new DataSetStore(xdfRoot);
-                searchResult = dss.search(maprDBCondition);
-                break;
-            case DataPod:
-                logger.warn("Not implemented yet");
-                break;
-            case DataSegment:
-                logger.warn("Not implemented yet");
-                break;
-            case Transformation:
-                TransformationStore tr = new TransformationStore(xdfRoot);
-                searchResult = tr.search(maprDBCondition);
-                break;
-            default:
-                logger.error("Not supported category");
-                return;
+            case DATA_SET:
+                          DataSetStore dss = new DataSetStore(xdfRoot);
+                          searchResult = dss.search(maprDBCondition);
+                          break;
+            case TRANSFORMATION:
+                           TransformationStore tr = new TransformationStore(xdfRoot);
+                           searchResult = tr.search(maprDBCondition);
+                           break;
+            case SEMANTIC :
+                          SemanticDataSetStore sds = new SemanticDataSetStore(xdfRoot);
+                          searchResult = sds.search(maprDBCondition);
+                          break;
+            case PROJECT :
+                          ProjectAdmin pls = new ProjectAdmin(xdfRoot);
+                          searchResult = pls.search(maprDBCondition);
+                          break;
+            case DATA_POD: 
+                          logger.warn("Not implemented yet");
+                          break;
+            case DATA_SEGMENT: 
+                         logger.warn("Not implemented yet");
+                          break;
+            default: logger.error("Not supported category");
+                     break;
         }
-        writeSearchResult(searchResult);
+         writeSearchResult(searchResult);
+        
     }
 
     private void writeSearchResult(Map<String, Document> searchResult) {
-
         if (searchResult == null || searchResult.isEmpty()) {
             logger.info("No data found");
-            return;
+            throw new MetaStoreSearchNotFoundException("No data found");
         }
-        JsonObject response = new JsonObject();
-        response.addProperty("scope", "search");
-        JsonArray respJA = new JsonArray();
-        response.add("result", respJA);
+        searchResultJsonArray = new JsonArray();
+        logger.debug(" Map<String, Document> searchResult :" + searchResult);
         final int[] c = {0};
         searchResult.forEach( (id, doc) ->
             {
@@ -229,15 +264,11 @@ public class MetaDataStoreRequestAPI {
                 JsonObject docDesc = new JsonObject();
                 docDesc.addProperty("id", id);
                 docDesc.add(String.valueOf(c[0]), jsonParser.parse(doc.asJsonString()));
-                respJA.add(docDesc);
+                logger.debug("searchResultJsonArray: " + jsonParser.parse(doc.asJsonString()));
+                searchResultJsonArray.add(docDesc);
             }
         );
-        try {
-            os.write(response.toString().getBytes());
-        } catch (IOException e) {
-            logger.error("Could not write data to response file: ", e);
-        }
-
+        logger.debug("Search Result from writeSearchResult " + searchResultJsonArray.toString());
     }
 
     private QueryCondition.Op getOperation(String cond) {
@@ -272,157 +303,125 @@ public class MetaDataStoreRequestAPI {
         return null;
     }
 
-
+    
     private void doAction(JsonObject item) throws Exception {
-        switch ( category ){
-            case DataSet:
-                DataSetStore dss = new DataSetStore(xdfRoot);
-                switch (action){
-                    case create: dss.create(id, src); break;
-                    case delete: dss.delete(id); break;
-                    case update: dss.update(id, src); break;
-                    case read: result = dss.read(id); break;
-                    default:
-                        logger.warn("Action is not supported");
-                }
-                break;
-            case DataPod:
-                logger.warn("Not implemented yet");
-                break;
-            case DataSegment:
-                logger.warn("Not implemented yet");
-                break;
-            case Project:
-                ProjectAdmin ps = new ProjectAdmin(xdfRoot);
-                switch (action){
-                    case create:
-                            ps.createProject(id, src);
+        switch (category){
+          
+            case DATA_SET:
+                          DataSetStore dss = new DataSetStore(xdfRoot);
+                          switch (action){
+                              case CREATE: dss.create(id, src); break;
+                              case DELETE: dss.delete(id); break;
+                              case UPDATE: dss.update(id, src); break;
+                              case READ  : result = dss.read(id); break;
+                              case SEARCH : doSearch();  break;
+                              default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
+                          }
+                          break; 
+            case PROJECT:
+                          ProjectAdmin ps = new ProjectAdmin(xdfRoot);
+                          switch (action){
+                              case CREATE: ps.createProject(id, src); break;
+                              case DELETE: ps.deleteProject(id); break;
+                              case UPDATE: ps.updateProject(id, src); break;
+                              case READ: result = ps.readProjectData(id); break;
+                              case SEARCH : doSearch(); break;
+                              default: logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
+                          }
+                          break;
+                          
+            case TRANSFORMATION:
+                          TransformationStore ts = new TransformationStore(xdfRoot);
+                          switch (action){
+                              case CREATE: ts.create(id, item); break;
+                              case DELETE: ts.delete(id); break;
+                              case UPDATE: ts.update(id, item); break;
+                              case READ: result = ts.read(id); break;
+                              case SEARCH : doSearch(); break;
+                              default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
+                          }
+                          break;
+                          
+            case SEMANTIC:
+                        SemanticDataSetStore sds = new SemanticDataSetStore(xdfRoot);
+                        switch (action){
+                            case CREATE: sds.create(id, item); break;
+                            case DELETE: sds.delete(id); break;
+                            case UPDATE: sds.update(id, item); break;
+                            case READ: result = sds.read(id); break;
+                            case SEARCH : doSearch(); break;
+                            default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
+                        }
                         break;
-                    case delete: ps.deleteProject(id); break;
-                    case update: ps.updateProject(id, src); break;
-                    case read: result = ps.readProjectData(id); break;
-                    default:
-                        logger.warn("Action is not supported");
-                }
-                break;
-            case Transformation:
-                TransformationStore ts = new TransformationStore(xdfRoot);
-                switch (action){
-                    case create: ts.create(id, item); break;
-                    case delete: ts.delete(id); break;
-                    case update: ts.update(id, item); break;
-                    case read: result = ts.read(id); break;
-                    default:
-                        logger.warn("Action is not supported");
-                }
-                break;
-            default:
-                logger.error("Not supported category");
-                return;
+           
+            case DATA_POD: logger.warn("Not implemented yet"); break;
+            
+            case DATA_SEGMENT: logger.warn("Not implemented yet");break;
+            
+            default: logger.error("Not supported category"); break;
         }
-        generateResponse("action", null);
     }
 
-    private void generateResponse(String scope, Exception e) {
-        try{
-            JsonObject response = new JsonObject();
-            response.addProperty("scope", scope);
-            if (e == null){
-                response.add("result", new JsonPrimitive("success"));
-                if ( result != null )
-                    response.add("metadata", result);
-
-            }else{
-                response.add("result", new JsonPrimitive(e.getMessage()));
-            }
-            logger.debug("Response: \n" + response.toString());
-            os.write(response.toString().getBytes());
-        } catch (IOException e2) {
-            logger.error("IOException at attempt to write result: " + rFile, e2);
-            return;
-        }
-
-    }
-
-    private boolean analyzeAndValidate(JsonObject item) {
-
+      private boolean analyzeAndValidate(JsonObject item) {
         try {
-            if (!(item.has("action") && item.has("output") && item.has("category"))){
-                logger.error("Action, output and category keys are mandatory");
-                return false;
-            }
-
-            rFile = item.get("output").getAsString();
-            String a = item.get("action").getAsString();
-            if (item.has("xdf-root"))
-                xdfRoot = item.get("xdf-root").getAsString();
-
-            String cat = item.get("category").getAsString();
-            category = valueOf(cat);
-
-            action = Actions.valueOf(a);
-
-            if (action == Actions.create ||
-                action == Actions.delete ||
-                action == Actions.update ||
-                action == Actions.read)
-                return analyzeAndValidateCRUD(item);
-            else{
-                return analyzeAndValidateSearch(item);
-            }
-        }
-        catch ( Exception e){
-            logger.error("Exception at request validation/analysis phase: ", e);
+          if (!(item.has("action") && item.has("output") && item.has("category"))) {
+            logger.error("Action, output and category keys are mandatory");
             return false;
+          }
+          rFile = item.get("output").getAsString();
+          String a = item.get("action").getAsString();
+          if (item.has("xdf-root"))
+            xdfRoot = item.get("xdf-root").getAsString();
+          String cat = item.get("category").getAsString();
+          category = Category.valueOf(cat);
+          action = Action.valueOf(a);
+          if (action == Action.CREATE || action == Action.DELETE || action == Action.UPDATE
+              || action == Action.READ)
+            return analyzeAndValidateCRUD(item);
+          else {
+            return analyzeAndValidateSearch(item);
+          }
+        } catch (Exception e) {
+          logger.error("Exception at request validation/analysis phase: ", e);
+          return false;
         }
-    }
+      }
 
-
-    private boolean analyzeAndValidateCRUD(JsonObject item){
-        if ((action == Actions.create ||
-             action == Actions.delete ||
-             action == Actions.update ||
-             action == Actions.read) &&
-             !item.has("id")){
-            logger.error("Requested action requires ID");
+      private boolean analyzeAndValidateCRUD(JsonObject item) {
+        if ((action == Action.CREATE || action == Action.DELETE || action == Action.UPDATE
+            || action == Action.READ) && !item.has("id")) {
+          logger.error("Requested action requires ID");
+          return false;
+        }
+        if (item.has("id"))
+          id = item.get("id").getAsString();
+    
+        if (category == Category.AUDIT_LOG) {
+          logger.error("Create/Update/Delete are not supported for AuditLog");
+          return false;
+        }
+        if ((action == Action.CREATE || action == Action.UPDATE) && !item.has("source")) {
+          logger.error("Create/Update action require 'source' body");
+          return false;
+        }
+        if (action == Action.CREATE || action == Action.UPDATE) {
+          JsonElement src0 = item.get("source");
+          if (!src0.isJsonObject()) {
+            logger.error("'source' must be valid JSON object");
             return false;
-        }
-        if (item.has("id")) id = item.get("id").getAsString();
-
-        if (category == AuditLog)
-        {
-            logger.error("Create/Update/Delete are not supported for AuditLog");
-            return false;
-        }
-
-        if ((action == Actions.create || action == Actions.update ) &&  !item.has("source")){
-            logger.error("Create/Update action require 'source' body");
-            return false;
-        }
-
-        if (action == Actions.create || action == Actions.update) {
-            JsonElement src0 = item.get("source");
-            if (!src0.isJsonObject()) {
-                logger.error("'source' must be valid JSON object");
-                return false;
-            }
-            src = src0.getAsJsonObject();
-
-            DateTime currentTime = new DateTime();
-
-            if (action == Actions.create) {
-                src.addProperty(DataSetProperties.CreatedTime.toString(), (currentTime.getMillis() / 1000));
-            }
-
-            src.addProperty(DataSetProperties.ModifiedTime.toString(), (currentTime.getMillis() / 1000));
-
+          }
+          src = src0.getAsJsonObject();
+          DateTime currentTime = new DateTime();
+          if (action == Action.CREATE) {
+            src.addProperty(DataSetProperties.CreatedTime.toString(), (currentTime.getMillis() / 1000));
+          }
+          src.addProperty(DataSetProperties.ModifiedTime.toString(), (currentTime.getMillis() / 1000));
         }
         return true;
-    }
-
+      }
 
     private boolean analyzeAndValidateSearch(JsonObject item) {
-        if (action == Actions.search && !item.has("query")) {
+        if (action == Action.SEARCH && !item.has("query")) {
             logger.error("Provided action requires query");
             return false;
         } else {
@@ -443,23 +442,4 @@ public class MetaDataStoreRequestAPI {
         }
         return true;
     }
-
-
-    enum Actions{
-        read,
-        create,
-        update,
-        delete,
-        search;
-    }
-
-    enum MetaCategory{
-        Project,
-        Transformation,
-        DataSet,
-        AuditLog,
-        DataPod,
-        DataSegment;
-    }
-
 }

@@ -34,7 +34,7 @@ public class Action {
      * 
      */
     @JsonProperty("content")
-    private Content content;
+    private Object content;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -67,7 +67,7 @@ public class Action {
      * 
      */
     @JsonProperty("content")
-    public Content getContent() {
+    public Object getContent() {
         return content;
     }
 
@@ -78,7 +78,7 @@ public class Action {
      * 
      */
     @JsonProperty("content")
-    public void setContent(Content content) {
+    public void setContent(Object content) {
         this.content = content;
     }
 

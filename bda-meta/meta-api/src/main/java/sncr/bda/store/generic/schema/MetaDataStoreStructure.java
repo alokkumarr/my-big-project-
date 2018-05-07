@@ -4,13 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -32,7 +30,7 @@ public class MetaDataStoreStructure {
 */
 @JsonProperty("category")
 @JsonPropertyDescription("An explanation about the purpose of this instance.")
-private MetaDataStoreStructure.Category category;
+private Category category;
 /**
 * The Action Schema.
 * <p>
@@ -41,7 +39,7 @@ private MetaDataStoreStructure.Category category;
 */
 @JsonProperty("action")
 @JsonPropertyDescription("An explanation about the purpose of this instance.")
-private MetaDataStoreStructure.Action action;
+private Action action;
 /**
 * The Output Schema.
 * <p>
@@ -85,7 +83,7 @@ private Map<String, Object> additionalProperties = new HashMap<String, Object>()
 * 
 */
 @JsonProperty("category")
-public MetaDataStoreStructure.Category getCategory() {
+public Category getCategory() {
 return category;
 }
 
@@ -96,7 +94,7 @@ return category;
 * 
 */
 @JsonProperty("category")
-public void setCategory(MetaDataStoreStructure.Category category) {
+public void setCategory(Category category) {
 this.category = category;
 }
 
@@ -107,7 +105,7 @@ this.category = category;
 * 
 */
 @JsonProperty("action")
-public MetaDataStoreStructure.Action getAction() {
+public Action getAction() {
 return action;
 }
 
@@ -118,7 +116,7 @@ return action;
 * 
 */
 @JsonProperty("action")
-public void setAction(MetaDataStoreStructure.Action action) {
+public void setAction(Action action) {
 this.action = action;
 }
 
@@ -218,88 +216,6 @@ public void setAdditionalProperty(String name, Object value) {
 this.additionalProperties.put(name, value);
 }
 
-public enum Action {
 
-CREATE("create"),
-DELETE("delete"),
-READ("read"),
-UPDATE("update"),
-SEARCH("search");
-private final String value;
-private final static Map<String, MetaDataStoreStructure.Action> CONSTANTS = new HashMap<String, MetaDataStoreStructure.Action>();
-
-static {
-for (MetaDataStoreStructure.Action c: values()) {
-CONSTANTS.put(c.value, c);
-}
-}
-
-private Action(String value) {
-this.value = value;
-}
-
-@Override
-public String toString() {
-return this.value;
-}
-
-@JsonValue
-public String value() {
-return this.value;
-}
-
-@JsonCreator
-public static MetaDataStoreStructure.Action fromValue(String value) {
-MetaDataStoreStructure.Action constant = CONSTANTS.get(value);
-if (constant == null) {
-throw new IllegalArgumentException(value);
-} else {
-return constant;
-}
-}
-
-}
-
-public enum Category {
-
-DATA_SET("DataSet"),
-TRANSFORMATION("Transformation"),
-DATA_POD("DataPod"),
-DATA_SEGMENT("DataSegment"),
-USER_INTERFACE("PortalDataSet");
-private final String value;
-private final static Map<String, MetaDataStoreStructure.Category> CONSTANTS = new HashMap<String, MetaDataStoreStructure.Category>();
-
-static {
-for (MetaDataStoreStructure.Category c: values()) {
-CONSTANTS.put(c.value, c);
-}
-}
-
-private Category(String value) {
-this.value = value;
-}
-
-@Override
-public String toString() {
-return this.value;
-}
-
-@JsonValue
-public String value() {
-return this.value;
-}
-
-@JsonCreator
-public static MetaDataStoreStructure.Category fromValue(String value) {
-MetaDataStoreStructure.Category constant = CONSTANTS.get(value);
-if (constant == null) {
-throw new IllegalArgumentException(value);
-} else {
-return constant;
-}
-}
-
-}
 
 }

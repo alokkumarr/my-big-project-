@@ -11,20 +11,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.saw.semantic.model.NodeCategory;
+import sncr.bda.store.generic.schema.Action;
+import sncr.bda.store.generic.schema.Category;
+import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 
 @Component
 public class SAWSemanticUtils {
-  public final String SCHEMA_FILENAME = "payload-schema.json";
   public final static String COMMA = ",";
 
   public ObjectMapper getMapper() {
@@ -66,6 +68,23 @@ public class SAWSemanticUtils {
     }
     return headers;
 }
+  
+  public static List<MetaDataStoreStructure> node2JsonString(NodeCategory node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if (node != null) {
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id != null) {
+      metaDataStoreStructure.setId(Id);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return listOfMetadata;
+  }
+  
   
   private static String getSeperatedColumns(Set<String> headers, Map<String, Object> map, String separator) {
     List<Object> items = new ArrayList<Object>();
