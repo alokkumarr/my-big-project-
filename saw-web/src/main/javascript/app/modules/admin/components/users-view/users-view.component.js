@@ -13,6 +13,7 @@ const SEARCH_CONFIG = [
   {keyword: 'STATUS', fieldName: 'activeStatusInd'}
 ];
 
+let self;
 export const UsersViewComponent = {
   template,
   styles: [style],
@@ -65,7 +66,6 @@ export const UsersViewComponent = {
         const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
         leftSideNav.update(AdminMenuData, 'ADMIN');
       });
-      leftSideNav.openSidenavManually();
     }
     openNewUserModal() {
       this._$rootScope.showProgress = true;

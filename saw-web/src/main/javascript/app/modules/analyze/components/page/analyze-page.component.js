@@ -6,6 +6,7 @@ import * as template from './analyze-page.component.html';
 import style from './analyze-page.component.scss';
 import {LAST_ANALYSES_CATEGORY_ID} from '../../consts';
 
+let self;
 export const AnalyzePageComponent = {
   template,
   styles: [style],

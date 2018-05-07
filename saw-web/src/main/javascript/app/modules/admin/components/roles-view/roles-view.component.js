@@ -11,6 +11,7 @@ const SEARCH_CONFIG = [
   {keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc'}
 ];
 
+let self;
 export const RolesViewComponent = {
   template,
   styles: [style],
@@ -52,6 +53,7 @@ export const RolesViewComponent = {
         this._$rootScope.showProgress = false;
       });
       this.roleTypes = [];
+      this._$timeout = $timeout;
       self = this;
     }
     $onInit() {

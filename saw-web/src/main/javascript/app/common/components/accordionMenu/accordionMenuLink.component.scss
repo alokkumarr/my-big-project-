@@ -28,6 +28,17 @@
   width: 92%;
 }
 
+.no-children {
+  cursor: pointer;
+  line-height: 54px;
+  overflow: hidden;
+  padding: 0 24px;
+
+  a {
+    color: #333;
+  }
+}
+
 mat-panel-title {
   border-radius: 0;
   color: #5C6670;

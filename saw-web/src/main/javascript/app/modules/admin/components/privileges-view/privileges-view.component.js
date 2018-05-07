@@ -13,6 +13,7 @@ const SEARCH_CONFIG = [
   {keyword: 'SUB CATEGORY', fieldName: 'subCategoryName'}
 ];
 
+let self;
 export const PrivilegesViewComponent = {
   template,
   styles: [style],
@@ -59,6 +60,7 @@ export const PrivilegesViewComponent = {
         this._$rootScope.showProgress = false;
       });
       this.roleTypes = [];
+      this._$timeout = $timeout;
       self = this;
     }
     $onInit() {

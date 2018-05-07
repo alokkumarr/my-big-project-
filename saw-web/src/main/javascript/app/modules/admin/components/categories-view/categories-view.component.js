@@ -13,6 +13,7 @@ const SEARCH_CONFIG = [
   {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
 ];
 
+let self;
 export const CategoriesViewComponent = {
   template,
   styles: [style],
@@ -53,6 +54,7 @@ export const CategoriesViewComponent = {
       }).catch(() => {
         this._$rootScope.showProgress = false;
       });
+      this._$timeout = $timeout;
       self = this;
     }
     $onInit() {

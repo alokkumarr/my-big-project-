@@ -1,6 +1,6 @@
 <div layout="row">
-  <mat-icon style="font-size: 24px;position:fixed;margin: -43px 0px 1px 10px;" fontIcon="icon-menu" (click)="sidenav.toggle()"></mat-icon>
-  <mat-sidenav-container>
+  <mat-icon fontIcon="icon-menu" (click)="sidenav.toggle()"></mat-icon>
+  <mat-sidenav-container class="md-whiteframe-4dp">
     <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container">
       <h3 class="sidebar-header"><span>{{getMenuHeader()}}</span></h3>
       <accordion-menu [source]="menu"></accordion-menu>

@@ -17,7 +17,8 @@ layout-header header {
       }
 
       div mat-icon {
-        margin-left: 15px;
+        margin-top: 7px;
+        font-size: 16px;
       }
     }
 
@@ -55,3 +56,7 @@ header .company-logo {
   width: 145px;
 }
 
+.mat-icon-help {
+  color: #5C6670;
+  font-size: 20px;
+}
