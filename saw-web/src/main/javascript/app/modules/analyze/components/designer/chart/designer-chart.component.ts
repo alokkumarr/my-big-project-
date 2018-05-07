@@ -23,6 +23,7 @@ export class DesignerChartComponent implements OnInit {
   chartHgt = {
     height: 500
   };
+  isStockChart: boolean;
 
   @Input() chartType: string;
 
@@ -60,6 +61,7 @@ export class DesignerChartComponent implements OnInit {
   constructor(private _chartService: ChartService) {}
 
   ngOnInit() {
+    this.isStockChart = this.chartType.substring(0, 2) === 'ts';
     this.chartOptions = this._chartService.getChartConfigFor(this.chartType, {
       chart: this.chartHgt,
       legend: this._chartService.initLegend({ chartType: this.chartType })
