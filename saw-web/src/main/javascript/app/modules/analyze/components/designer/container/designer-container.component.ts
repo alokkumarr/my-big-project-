@@ -7,6 +7,8 @@ import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
+import * as orderBy from 'lodash/orderBy';
+import * as map from 'lodash/map';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -99,7 +101,24 @@ export class DesignerContainerComponent {
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.filters = this.analysis.sqlBuilder.filters;
     this.sorts = this.analysis.sqlBuilder.sorts;
+    this.addDefaultSorts();
     this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
+  }
+
+  addDefaultSorts() {
+    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+
+    const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
+
+    if (isEmpty(this.sorts)) {
+      forEach(sqlBuilder.nodeFields || [], node => {
+        this.sorts.push({
+          order: 'asc',
+          columnName: node.columnName,
+          type: node.type
+        });
+      });
+    }
   }
 
   forkAnalysis() {
@@ -163,10 +182,21 @@ export class DesignerContainerComponent {
       );
       break;
     case 'chart':
-      this.data = this._chartService.parseData(
+      let chartData = this._chartService.parseData(
         data,
         sqlBuilder
       );
+
+      /* Order chart data manually. Backend doesn't sort chart data. */
+      if (!isEmpty(this.sorts)) {
+        chartData = orderBy(
+          chartData,
+          map(this.sorts, 'columnName'),
+          map(this.sorts, 'order')
+        );
+      }
+
+      this.data = chartData;
       break;
     case 'report':
     default:
@@ -236,12 +266,14 @@ export class DesignerContainerComponent {
       this.analysis.type
     );
 
-    return {
+    const sqlBuilder = {
       booleanCriteria: this.booleanCriteria,
       filters: this.filters,
       sorts: this.sorts,
       ...partialSqlBuilder
     };
+
+    return sqlBuilder;
   }
 
   isDataEmpty(data, type: AnalysisType, sqlBuilder: SqlBuilder) {
@@ -278,6 +310,7 @@ export class DesignerContainerComponent {
   onSettingsChange(event: FieldChangeEvent) {
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();
+    this.addDefaultSorts();
     if (event.requiresDataChange) {
       this.requestDataIfPossible();
     } else {
