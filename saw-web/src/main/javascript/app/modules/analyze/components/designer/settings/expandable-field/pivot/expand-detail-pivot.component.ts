@@ -1,24 +1,17 @@
 declare const require: any;
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
-import {
-  ArtifactColumnPivot,
-  Format
-}  from '../../../types';
+import { ArtifactColumnPivot, Format } from '../../../types';
 import {
   AGGREGATE_TYPES,
   DATE_INTERVALS,
   DATE_TYPES,
   FLOAT_TYPES,
+  DATE_FORMATS,
   DATE_FORMATS_OBJ,
   DEFAULT_DATE_FORMAT
 } from '../../../../../consts';
-import { AnalyzeDialogService } from '../../../../../services/analyze-dialog.service'
+import { AnalyzeDialogService } from '../../../../../services/analyze-dialog.service';
 import {
   formatNumber,
   isFormatted
@@ -48,9 +41,7 @@ export class ExpandDetailPivotComponent {
   public dateSample: string;
   public isFloat: boolean;
 
-  constructor(
-    private _analyzeDialogService: AnalyzeDialogService
-  ) {}
+  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     const type = this.artifactColumn.type;
@@ -62,7 +53,7 @@ export class ExpandDetailPivotComponent {
 
   onAliasChange(value) {
     this.artifactColumn.aliasName = value;
-    this.change.emit({requiresDataChange: false});
+    this.change.emit({ requiresDataChange: false });
   }
 
   onDateIntervalChange(value) {
@@ -70,25 +61,32 @@ export class ExpandDetailPivotComponent {
     if (this.artifactColumn.dateInterval !== 'day') {
       this.artifactColumn.format = DEFAULT_DATE_FORMAT.value;
     }
-    this.change.emit({requiresDataChange: true});
+    this.change.emit({ requiresDataChange: true });
   }
 
   onFormatChange(format: Format | string) {
     if (format) {
       this.artifactColumn.format = format;
       this.changeSample();
-      this.change.emit({requiresDataChange: false});
+      this.change.emit({ requiresDataChange: false });
     }
   }
 
   openDataFormatDialog() {
-    this._analyzeDialogService.openDataFormatDialog(<Format>this.artifactColumn.format, this.artifactColumn.type)
-      .afterClosed().subscribe(format => this.onFormatChange(format));
+    this._analyzeDialogService
+      .openDataFormatDialog(
+        <Format>this.artifactColumn.format,
+        this.artifactColumn.type
+      )
+      .afterClosed()
+      .subscribe(format => this.onFormatChange(format));
   }
 
   openDateFormatDialog() {
-    this._analyzeDialogService.openDateFormatDialog(<string>this.artifactColumn.format)
-      .afterClosed().subscribe(format => this.onFormatChange(format));
+    this._analyzeDialogService
+      .openDateFormatDialog(<string>this.artifactColumn.format, DATE_FORMATS)
+      .afterClosed()
+      .subscribe(format => this.onFormatChange(format));
   }
 
   changeSample() {
@@ -100,10 +98,10 @@ export class ExpandDetailPivotComponent {
   }
 
   changeNumberSample() {
-    const format = this.artifactColumn.format
+    const format = this.artifactColumn.format;
     const sampleNr = this.isFloat ? FLOAT_SAMPLE : INT_SAMPLE;
 
-    if ( format && isFormatted(<Format>format)) {
+    if (format && isFormatted(<Format>format)) {
       this.numberSample = formatNumber(sampleNr, <Format>format);
     } else {
       this.numberSample = null;
@@ -111,7 +109,7 @@ export class ExpandDetailPivotComponent {
   }
 
   changeDateSample() {
-    const format = <string>this.artifactColumn.format
+    const format = <string>this.artifactColumn.format;
     if (format) {
       this.dateSample = moment.utc().format(format);
     }

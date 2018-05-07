@@ -47,6 +47,30 @@ export const DATE_FORMATS_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(DATE_FORMATS);
 
+export const CHART_DATE_FORMATS = [{
+  value: 'MMMM d YYYY, h:mm:ss a',
+  label: 'September 1st 2017, 1:28:31 pm'
+}, {
+  value: 'MMM d YYYY',
+  label: ' Sep 1st 2017'
+}, {
+  value: 'MMM YYYY',
+  label: 'September 2017'
+}, {
+  value: 'MM YYYY',
+  label: '09 2017'
+}, {
+  value: 'YYYY',
+  label: '2017'
+}];
+
+export const CHART_DEFAULT_DATE_FORMAT = CHART_DATE_FORMATS[1];
+
+export const CHART_DATE_FORMATS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(CHART_DATE_FORMATS);
+
 export const AGGREGATE_TYPES = [{
   label: 'Total',
   value: 'sum',

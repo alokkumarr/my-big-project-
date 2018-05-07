@@ -28,7 +28,8 @@ import {
   NUMBER_TYPES,
   DATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
-  DEFAULT_DATE_INTERVAL
+  DEFAULT_DATE_INTERVAL,
+  CHART_DEFAULT_DATE_FORMAT
 } from '../../consts';
 
 const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
@@ -181,7 +182,9 @@ export class DesignerService {
     };
 
     const applyNonDatafieldDefaults = artifactColumn => {
-      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+      if (DATE_TYPES.includes(artifactColumn.type)) {
+        artifactColumn.dateFormat = CHART_DEFAULT_DATE_FORMAT.value;
+      }
     };
 
     const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
@@ -366,7 +369,11 @@ export class DesignerService {
             name: artifactColumn.columnName,
             type: artifactColumn.type,
             // the name propertie is needed for the elastic search
-            ...(isDateType ? { dateInterval: artifactColumn.dateInterval } : {})
+            /* prettier-ignore */
+            ...(isDateType ? {
+              dateFormat:
+                artifactColumn.dateFormat || CHART_DEFAULT_DATE_FORMAT.value
+            } : {})
           };
         })
       )

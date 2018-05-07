@@ -5,7 +5,9 @@ import { ArtifactColumnChart, Format } from '../../../types';
 import {
   DATE_INTERVALS,
   DATE_TYPES,
-  DEFAULT_DATE_FORMAT
+  DEFAULT_DATE_FORMAT,
+  CHART_DATE_FORMATS,
+  CHART_DATE_FORMATS_OBJ
 } from '../../../../../consts';
 import { AnalyzeDialogService } from '../../../../../services/analyze-dialog.service';
 import {
@@ -29,6 +31,7 @@ export class ExpandDetailChartComponent {
   @Input() public artifactColumn: ArtifactColumnChart;
 
   public DATE_INTERVALS = DATE_INTERVALS;
+  public DATE_FORMATS_OBJ = CHART_DATE_FORMATS_OBJ;
   public isDataField: boolean = false;
   public hasDateInterval: boolean = false;
   public numberSample: string;
@@ -49,25 +52,21 @@ export class ExpandDetailChartComponent {
     this.change.emit({ requiresDataChange: false });
   }
 
-  onDateIntervalChange(value) {
-    this.artifactColumn.dateInterval = value;
-    if (this.artifactColumn.dateInterval !== 'day') {
-      this.artifactColumn.format = DEFAULT_DATE_FORMAT.value;
-    }
-    this.change.emit({ requiresDataChange: true });
-  }
-
   onFormatChange(format: Format | string) {
     if (format) {
       this.artifactColumn.format = format;
+      this.artifactColumn.dateFormat = format as string;
       this.changeSample();
-      this.change.emit({ requiresDataChange: false });
+      this.change.emit({ requiresDataChange: true });
     }
   }
 
   openDateFormatDialog() {
     this._analyzeDialogService
-      .openDateFormatDialog(<string>this.artifactColumn.format)
+      .openDateFormatDialog(
+        <string>this.artifactColumn.dateFormat,
+        CHART_DATE_FORMATS
+      )
       .afterClosed()
       .subscribe(format => this.onFormatChange(format));
   }

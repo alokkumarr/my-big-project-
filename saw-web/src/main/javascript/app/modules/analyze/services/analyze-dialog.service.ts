@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import {
   AnalysisDialogData,
@@ -18,7 +18,6 @@ import { ToolbarActionDialogComponent } from '../components/designer/toolbar-act
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
-
 
 @Injectable()
 export class AnalyzeDialogService {
@@ -55,7 +54,7 @@ export class AnalyzeDialogService {
       action: 'sort',
       sorts,
       artifactColumns
-    }
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -69,7 +68,7 @@ export class AnalyzeDialogService {
       filters,
       artifacts,
       booleanCriteria
-    }
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -80,7 +79,7 @@ export class AnalyzeDialogService {
   openPreviewDialog(analysis: Analysis) {
     const data = {
       analysis
-    }
+    };
     return this.dialog.open(DesignerPreviewDialogComponent, {
       width: '100vw',
       maxWidth: '100vw',
@@ -93,7 +92,7 @@ export class AnalyzeDialogService {
     const data: IToolbarActionData = {
       action: 'description',
       description
-    }
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: '500px',
       height: 'auto',
@@ -109,22 +108,22 @@ export class AnalyzeDialogService {
         format,
         type
       }
-    } as MatDialogConfig)
+    } as MatDialogConfig);
   }
 
-  openDateFormatDialog(format: string) {
+  openDateFormatDialog(format: string, availableFormats) {
     return this.dialog.open(DateFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
-      data: { format }
-    } as MatDialogConfig)
+      data: { format, availableFormats }
+    } as MatDialogConfig);
   }
 
   openSaveDialog(analysis: Analysis) {
     const data: IToolbarActionData = {
       action: 'save',
       analysis
-    }
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',

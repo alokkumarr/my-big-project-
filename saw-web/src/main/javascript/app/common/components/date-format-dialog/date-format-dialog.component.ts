@@ -1,8 +1,5 @@
 declare const require: any;
-import {
-  Component,
-  Inject
-} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { DATE_FORMATS } from '../../consts';
@@ -15,16 +12,17 @@ require('./date-format-dialog.component.scss');
   template
 })
 export class DateFormatDialogComponent {
-
   public dateFormats;
 
   constructor(
     private _dialogRef: MatDialogRef<DateFormatDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      format: string
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      format: string;
+      availableFormats?: Array<any>;
     }
   ) {
-    this.dateFormats = DATE_FORMATS;
+    this.dateFormats = this.data.availableFormats || DATE_FORMATS;
   }
 
   close() {
