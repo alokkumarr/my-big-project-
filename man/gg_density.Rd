@@ -12,6 +12,8 @@ gg_density(df, x_variable, fill = sncr_pal()(1), color = "black",
   ...)
 }
 \arguments{
+\item{x_variable}{variable name to chart. expects a string}
+
 \item{fill}{either a variable name to apply a group by operation and create
 subgroups of histograms or color name or hex value to fill the histogram
 with color. expects a string. default is 'grey25'}
@@ -61,13 +63,12 @@ control the legend formatting
 empty list}
 
 \item{theme}{argument to change the chart theme. expects a ggplot_theme
-function. default is theme_grey(). check out
+name. default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a vector of either color names or hex
-values. default is the Set1 Brewer Palette}
+color is set to a variable. expects a palette name. default is "a2" for a2 palette}
 
 \item{...}{}
 
@@ -131,9 +132,9 @@ gg_density(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", c
 # A few charts with additional features
 gg_density(d, "mpg", fill="am", color="am")
 gg_density(d, "mpg", fill="am", color="am", adjust=1/2)
-gg_density(d, "mpg", fill="am", color="am", adjust=1/2, palette = pals::viridis(2))
+gg_density(d, "mpg", fill="am", color="am", adjust=1/2, palette = "virdis")
 gg_density(d, "mpg", fill="am", facet_formula = "~am", adjust=1/2,alpha=0.1)
-gg_density(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2,alpha=0.1)
+gg_density(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2, alpha=0.1)
 gg_density(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), adjust=1/2,alpha=0.1)
 gg_density(d, "mpg", fill="am", color="am", coord="flip", adjust=1/2)
 

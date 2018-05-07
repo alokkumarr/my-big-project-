@@ -83,13 +83,12 @@ control the legend formatting
 empty list}
 
 \item{theme}{argument to change the chart theme. expects a ggplot_theme
-function. default is theme_grey(). check out
+name. default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a vector of either color names or hex
-values. default is the Set1 Brewer Palette}
+color is set to a variable. expects a palette name. default is "a2" for a2 palette}
 
 \item{...}{}
 

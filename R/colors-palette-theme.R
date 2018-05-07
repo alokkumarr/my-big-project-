@@ -46,7 +46,7 @@ sncr_palettes <- list(
   
   `coolwarm` = pals::coolwarm(5),
   
-  `virdis` = pals::viridis(3)
+  `viridis` = pals::viridis(3)
 ) 
 
 

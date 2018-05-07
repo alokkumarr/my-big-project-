@@ -37,13 +37,12 @@
 #' # A few charts with additional features
 #' gg_density(d, "mpg", fill="am", color="am")
 #' gg_density(d, "mpg", fill="am", color="am", adjust=1/2)
-#' gg_density(d, "mpg", fill="am", color="am", adjust=1/2, palette = pals::viridis(2))
+#' gg_density(d, "mpg", fill="am", color="am", adjust=1/2, palette = "virdis")
 #' gg_density(d, "mpg", fill="am", facet_formula = "~am", adjust=1/2,alpha=0.1)
-#' gg_density(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2,alpha=0.1)
+#' gg_density(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2, alpha=0.1)
 #' gg_density(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), adjust=1/2,alpha=0.1)
 #' gg_density(d, "mpg", fill="am", color="am", coord="flip", adjust=1/2)
 #'
-
 gg_density <- function(df,
                        x_variable,
                        fill = sncr_pal()(1),

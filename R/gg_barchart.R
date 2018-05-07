@@ -38,7 +38,9 @@
 #' @return returns a ggplot2 object of a formatted bar chart
 #' @export
 #' @importFrom scales percent
-#' @importFrom ggplot2 label_both 
+#' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 position_identity position_jitter position_dodge position_stack position_fill
+#' @importFrom ggplot2 label_both label_value label_context label_parsed label_wrap_gen
 #'
 #' @examples
 #' # Create a data set
@@ -60,31 +62,31 @@
 #' d1 <- mtcars %>% group_by(am = factor(am)) %>% summarise(count = n())
 #' gg_barchart(d1, x_variable="am", y_variable="count")
 gg_barchart <- function(df,
-                   x_variable,
-                   y_variable = NULL,
-                   weight = NULL,
-                   fill = sncr_pal()(1),
-                   color = "black",
-                   position = "dodge",
-                   proportion = FALSE,
-                   sort = FALSE,
-                   desc = TRUE,
-                   label = FALSE,
-                   label_args = list(vjust = "bottom"),
-                   facet_formula = NULL,
-                   facet_labeller = "both",
-                   facet_args = list(),
-                   coord = NULL,
-                   coord_args = list(),
-                   title = NULL,
-                   subtitle = NULL,
-                   x_axis_title = NULL,
-                   y_axis_title = NULL,
-                   caption = NULL,
-                   legend_args = list(),
-                   theme = "sncr",
-                   palette = "a2",
-                   ...) {
+                        x_variable,
+                        y_variable = NULL,
+                        weight = NULL,
+                        fill = sncr_pal()(1),
+                        color = "black",
+                        position = "dodge",
+                        proportion = FALSE,
+                        sort = FALSE,
+                        desc = TRUE,
+                        label = FALSE,
+                        label_args = list(vjust = "bottom"),
+                        facet_formula = NULL,
+                        facet_labeller = "both",
+                        facet_args = list(),
+                        coord = NULL,
+                        coord_args = list(),
+                        title = NULL,
+                        subtitle = NULL,
+                        x_axis_title = NULL,
+                        y_axis_title = NULL,
+                        caption = NULL,
+                        legend_args = list(),
+                        theme = "sncr",
+                        palette = "a2",
+                        ...) {
   
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)
@@ -92,6 +94,7 @@ gg_barchart <- function(df,
   checkmate::assert_choice(y_variable, df_names, null.ok = TRUE)
   checkmate::assert_choice(weight, df_names, null.ok = TRUE)
   checkmate::assert_flag(proportion)
+  checkmate::assert_flag(label)
   
   if (!is_color(fill)[[1]])
     checkmate::assert_choice(fill, df_names)
@@ -103,9 +106,11 @@ gg_barchart <- function(df,
   checkmate::assert_list(facet_args)
   checkmate::assert_list(coord_args)
   checkmate::assert_list(legend_args)
+  checkmate::assert_list(label_args)
   checkmate::assert_choice(palette, names(sncr_palettes))
   checkmate::assert_choice(theme, c("sncr", "grey", "gray", "minimal", "bw", "linedraw",
                                     "light", "dark", "classic", "void", "test"))
+  checkmate::assert_choice(position, c("identity", "jitter", "dodge", "stack", "fill"))
   
   # y_variable adjustments
   if (is.null(y_variable)) {
@@ -180,7 +185,7 @@ gg_barchart <- function(df,
   } else{
     y_label_arg <- label_var <- NULL
   }
-  position_fun <- match.fun(paste0("position_", position))
+  position_fun <- get(paste0("position_", position), asNamespace("ggplot2"))
   if (position == "dodge") {
     position_params <- list(width = .9)
   } else if (position == "stack" | position == "fill") {

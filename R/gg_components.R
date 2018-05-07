@@ -312,6 +312,30 @@ gg_point <- function(points = F, ...) {
 }
 
 
+
+#' GGPlot Smooth component
+#'
+#' Wrapper function for addding geom_smooth layer to a ggplot
+#'
+#' @param smooth TRUE/FALSE. if TRUE then creates geom_smooth layer with
+#'   arguments
+#' @inheritDotParams ggplot2::geom_smooth
+#' @seealso \url{http://ggplot2.tidyverse.org/reference/geom_smooth.html}
+#'
+#' @return ggplot geom_smooth layer object
+#' @export
+#' @importFrom ggplot2 geom_smooth geom_blank
+#'
+gg_smooth <- function(smooth = F, ...) {
+  checkmate::assert_flag(points)
+  if (smooth) {
+    ggplot2::geom_smooth(...)
+  } else{
+    ggplot2::geom_blank()
+  }
+}
+
+
 #' GGPlot Line Component
 #'
 #' Wrapper function for adding geom_line layer by way of stat_summary

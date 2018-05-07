@@ -15,7 +15,7 @@
 #'\url{http://ggplot2.tidyverse.org/reference/geom_histogram.html}
 #'
 #'@param data data.frame object with variable to chart
-#'@param variable variable name to chart. expects a string
+#'@param x_variable variable name to chart. expects a string
 #'@param fill either a variable name to apply a group by operation and create
 #'  subgroups of histograms or color name or hex value to fill the histogram
 #'  with color. expects a string. default is 'grey25'
@@ -41,20 +41,21 @@
 #'  control the legend formatting
 #'  \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 #'  empty list
-#'@param theme argument to change the chart theme. expects a ggplot_theme
-#'  function. default is theme_grey(). check out
+#' @param theme argument to change the chart theme. expects a ggplot_theme
+#'  name. default is "sncr" which calls theme_sncr(). check out
 #'  \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 #'  options
-#'@param palette argument to change the color palette used is either the fill or
-#'  color is set to a variable. expects a vector of either color names or hex
-#'  values. default is the Set1 Brewer Palette
-#'@inheritDotParams ggplot2::geom_histogram
-#'@seealso For more details on the geom_histogram check out
+#' @param palette argument to change the color palette used is either the fill or
+#'  color is set to a variable. expects a palette name. default is "a2" for a2 palette
+#' @inheritDotParams ggplot2::geom_histogram
+#' @seealso For more details on the geom_histogram check out
 #'  \url{http://ggplot2.tidyverse.org/reference/geom_histogram.html}
 #'
-#'@return returns a ggplot2 object
-#'@export
-#'@import ggplot2
+#' @return returns a ggplot2 object
+#' @export
+#' @importFrom ggplot2 geom_histogram
+#' @importFrom ggplot2 theme_grey theme_gray theme_minimal theme_bw theme_linedraw theme_light theme_dark theme_classic theme_void
+#' @import checkmate
 #'
 #' @examples
 #' # Create a data set

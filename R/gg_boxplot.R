@@ -24,6 +24,7 @@
 #'
 #' @return returns a ggplot2 boxplot object
 #' @export
+#' @importFrom ggplot2 geom_boxplot
 #'
 #' @examples
 #' #' # Create a data set
