@@ -3,6 +3,7 @@ package com.synchronoss.saw.scheduler.modal;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.IOException;
+import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -388,10 +389,15 @@ public class SchedulerJobDetail implements Serializable {
             type = (String) in.readObject();
             userFullName = (String) in.readObject();
         }
-        if(in.available()!=-1) {
+       try {
+            /* End date is optional data field and it will contains null value for existing schedules
+            generated prior to sip v2.6.0 , handle the Optional Data Exception explicitly to identify the end of stream*/
             Object endDt = in.readObject();
             if (endDt instanceof Date)
             endDate = (Date) endDt;
         }
+        catch (OptionalDataException e)
+        {/* catch block to avoid serialization for newly added fields.*/ }
+
     }
 }
