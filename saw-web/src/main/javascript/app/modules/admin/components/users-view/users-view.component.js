@@ -17,7 +17,7 @@ export const UsersViewComponent = {
   template,
   styles: [style],
   controller: class UsersViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope, LocalSearchService) {
+    constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -57,10 +57,14 @@ export const UsersViewComponent = {
         this._$rootScope.showProgress = false;
       });
       this.custCode = this.resp.ticket.custCode;
+      this._$timeout = $timeout;
+      self = this;
     }
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-      leftSideNav.update(AdminMenuData, 'ADMIN');
+      this._$timeout(() => {
+        const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+        leftSideNav.update(AdminMenuData, 'ADMIN');
+      });
       leftSideNav.openSidenavManually();
     }
     openNewUserModal() {

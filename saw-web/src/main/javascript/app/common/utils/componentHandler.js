@@ -22,6 +22,7 @@ export default class ComponentHandler {
         instance
       });
     }
+    console.log(this._instances[key]);
     return () => {
       return this.unregister(key, instance);
     };
@@ -55,6 +56,7 @@ export default class ComponentHandler {
   }
 
   get(key) {
+    console.log(this._instances[key]);
     return (this._instances[key] || []).slice();
   }
 

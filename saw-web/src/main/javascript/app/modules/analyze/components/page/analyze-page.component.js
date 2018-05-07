@@ -10,7 +10,7 @@ export const AnalyzePageComponent = {
   template,
   styles: [style],
   controller: class AnalyzePageController {
-    constructor($componentHandler, MenuService, $state, localStorageService, AnalyzeService) {
+    constructor($timeout, $componentHandler, MenuService, $state, localStorageService, AnalyzeService) {
       'ngInject';
 
       this.$componentHandler = $componentHandler;
@@ -18,15 +18,18 @@ export const AnalyzePageComponent = {
       this._$state = $state;
       this._AnalyzeService = AnalyzeService;
       this._localStorageService = localStorageService;
+      this._$timeout = $timeout;
+      self = this;
     }
 
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-
       this.MenuService.getMenu('ANALYZE')
         .then(data => {
           this._AnalyzeService.updateMenu(data);
-          leftSideNav.update(data, 'ANALYZE');
+          this._$timeout(() => {
+            const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+            leftSideNav.update(data, 'ANALYZE');
+          });
           this.goToDefaultChildStateIfNeeded(data);
         });
     }
