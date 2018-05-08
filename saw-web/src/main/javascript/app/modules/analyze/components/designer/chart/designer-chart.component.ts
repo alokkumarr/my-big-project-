@@ -7,6 +7,7 @@ import { ChartService } from '../../../services/chart.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import * as get from 'lodash/get';
+import * as set from 'lodash/set';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 
@@ -17,6 +18,8 @@ import * as filter from 'lodash/filter';
 export class DesignerChartComponent implements OnInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
+  _auxSettings: any = {};
+
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
   updateChart = new BehaviorSubject([]);
@@ -51,6 +54,15 @@ export class DesignerChartComponent implements OnInit {
   }
 
   @Input()
+  set auxSettings(settings) {
+    this._auxSettings = settings;
+
+    if (this._data && this._data.length) {
+      this.reloadChart(this._data, [...this.getLegendConfig()]);
+    }
+  }
+
+  @Input()
   set data(executionData) {
     this._data = executionData;
     if (executionData && executionData.length) {
@@ -64,21 +76,55 @@ export class DesignerChartComponent implements OnInit {
     this.isStockChart = this.chartType.substring(0, 2) === 'ts';
     this.chartOptions = this._chartService.getChartConfigFor(this.chartType, {
       chart: this.chartHgt,
-      legend: this._chartService.initLegend({ chartType: this.chartType })
+      legend: this._chartService.initLegend({
+        ...(this._auxSettings.legend || {}),
+        chartType: this.chartType
+      })
     });
   }
 
-  reloadChart(data) {
-    const changes = this._chartService.dataToChangeConfig(
-      this.chartType,
-      this.settings,
-      data,
-      { labels: {}, sorts: [] }
-    );
+  getLegendConfig() {
+    const align = this._chartService.LEGEND_POSITIONING[
+      get(this._auxSettings, 'legend.align')
+    ];
+    const layout = this._chartService.LAYOUT_POSITIONS[
+      get(this._auxSettings, 'legend.layout')
+    ];
+
+    if (!align || !layout) {
+      return;
+    }
+
+    return [
+      {
+        path: 'legend.align',
+        data: align.align
+      },
+      {
+        path: 'legend.verticalAlign',
+        data: align.verticalAlign
+      },
+      {
+        path: 'legend.layout',
+        data: layout.layout
+      }
+    ];
+  }
+
+  reloadChart(data, changes = []) {
+    changes = [
+      ...changes,
+      ...this._chartService.dataToChangeConfig(
+        this.chartType,
+        this.settings,
+        data,
+        { labels: {}, sorts: [] }
+      )
+    ];
 
     changes.push({
       path: 'chart.inverted',
-      data: false
+      data: Boolean(this._auxSettings.isInverted)
     });
     this.updateChart.next(changes);
   }

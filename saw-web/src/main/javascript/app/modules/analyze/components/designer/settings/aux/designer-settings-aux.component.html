@@ -1,0 +1,6 @@
+<ng-container [ngSwitch]="analysisType">
+  <designer-settings-aux-chart *ngSwitchCase="'chart'"
+    [chartType]="analysisSubtype"
+    (settingsChange)="change.emit($event)">
+  </designer-settings-aux-chart>
+</ng-container>

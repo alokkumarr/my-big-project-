@@ -10,6 +10,8 @@ import { DesignerChartComponent } from './chart';
 import {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent
@@ -37,6 +39,8 @@ export {
   DesignerChartComponent,
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
   ExpandDetailChartComponent,

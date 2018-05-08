@@ -13,18 +13,28 @@
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </designer-settings-single>
 
-<ng-container [ngSwitch]="(analysisStarter || analysis).type">
-  <designer-pivot class="designer__main"
-                  *ngSwitchCase="'pivot'"
-                  [data]="data"
-                  [sorts]="sorts"
-                  [artifactColumns]="firstArtifactColumns"
-                  [designerState]="designerState">
-  </designer-pivot>
-  <designer-chart class="designer__main"
-                  *ngSwitchCase="'chart'"
-                  [chartType]="(analysisStarter || analysis).chartType"
-                  [data]="data"
-                  [sqlBuilder]="analysis && analysis.sqlBuilder">
-  </designer-chart>
-</ng-container>
+
+<div fxLayout="column">
+  <designer-settings-aux class="designer__main"
+                         [analysisType]="(analysisStarter || analysis).type"
+                         [analysisSubtype]="(analysisStarter || analysis).chartType"
+                         (settingsChange)="onAuxSettingsChange($event)"></designer-settings-aux>
+
+  <ng-container [ngSwitch]="(analysisStarter || analysis).type">
+
+    <designer-pivot class="designer__main"
+                    *ngSwitchCase="'pivot'"
+                    [data]="data"
+                    [sorts]="sorts"
+                    [artifactColumns]="firstArtifactColumns"
+                    [designerState]="designerState">
+    </designer-pivot>
+    <designer-chart class="designer__main"
+                    *ngSwitchCase="'chart'"
+                    [chartType]="(analysisStarter || analysis).chartType"
+                    [auxSettings]="auxSettings"
+                    [data]="data"
+                    [sqlBuilder]="analysis && analysis.sqlBuilder">
+    </designer-chart>
+  </ng-container>
+</div>

@@ -55,6 +55,7 @@ export class DesignerContainerComponent {
   public DesignerStates = DesignerStates;
   public firstArtifactColumns: ArtifactColumns = [];
   public data: any = null;
+  public auxSettings: any = {};
   public sorts: Sort[] = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
@@ -101,6 +102,16 @@ export class DesignerContainerComponent {
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.filters = this.analysis.sqlBuilder.filters;
     this.sorts = this.analysis.sqlBuilder.sorts;
+
+    /* prettier-ignore */
+    this.auxSettings = {
+      ...this.auxSettings,
+      ...(this.analysis.type === 'chart' ? {
+        legend: (<any>this.analysis).legend,
+        isInverted: (<any>this.analysis).isInverted
+      } : {})
+    };
+
     this.addDefaultSorts();
     this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
   }
@@ -317,6 +328,12 @@ export class DesignerContainerComponent {
       this.updateAnalysis();
       this.data = this.data ? [...this.data] : [];
     }
+  }
+
+  onAuxSettingsChange(event) {
+    this.analysis = { ...this.analysis, ...event };
+    this.auxSettings = { ...this.auxSettings, ...event };
+    this.data = this.data ? [...this.data] : [];
   }
 
   canRequestData() {

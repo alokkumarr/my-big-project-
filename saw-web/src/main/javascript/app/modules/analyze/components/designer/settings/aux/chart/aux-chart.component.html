@@ -1,0 +1,31 @@
+<div fxLayout="row" fxLayoutAlign="space-between center">
+  <div class="button-group">
+    <button mat-icon-button>
+      <mat-icon fontIcon="icon-hor-bar-chart"
+                (click)="setInversion(true)">
+      </mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon fontIcon="icon-vert-bar-chart"
+                (click)="setInversion(false)">
+      </mat-icon>
+    </button>
+  </div>
+
+  <div>
+    <mat-form-field>
+      <mat-select placeholder="Legend Position" [(ngModel)]="legend.align" (change)="onLegendChange()">
+        <mat-option *ngFor="let pos of legend.options.align" [value]="pos.name">
+          {{ pos.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (change)="onLegendChange()">
+        <mat-option *ngFor="let layout of legend.options.layout" [value]="layout.name">
+          {{ layout.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>
