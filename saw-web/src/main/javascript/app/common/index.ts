@@ -26,8 +26,6 @@ import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-import { Router } from '@angular/router';
 
 import { FormsModule } from '@angular/forms';
 import { DndModule } from './dnd';

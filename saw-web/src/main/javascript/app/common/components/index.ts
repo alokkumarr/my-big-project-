@@ -1,7 +1,6 @@
 import * as angular from 'angular';
 import {downgradeComponent} from '@angular/upgrade/static';
 
-import {AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
 import {
   JSPlumbCanvas,
@@ -19,7 +18,6 @@ import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
-import {SidenavBtnComponent} from './sidenav';
 import {AccordionMenuComponent} from './accordionMenu/accordionMenu.component'
 import {AccordionMenuLinkComponent} from './accordionMenu/accordionMenuLink.component'
 import {SidenavComponent} from './sidenav/sidenav.component';
@@ -57,6 +55,5 @@ angular
   .directive('pivotGrid', downgradeComponent({component: PivotGridComponent}))
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
-  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
-  .component('sidenavBtn', SidenavBtnComponent);
+  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent);
 

@@ -105,10 +105,6 @@ angular
     downgradeComponent({component: LayoutHeaderComponent}) as angular.IDirectiveFactory
   )
   .component('layoutContent', LayoutContentComponent)
-  // .directive(
-  //   'layoutContent',
-  //   downgradeComponent({component: LayoutContentComponent}) as angular.IDirectiveFactory
-  // )
   .directive(
     'layoutFooter',
     downgradeComponent({component: LayoutFooterComponent}) as angular.IDirectiveFactory
