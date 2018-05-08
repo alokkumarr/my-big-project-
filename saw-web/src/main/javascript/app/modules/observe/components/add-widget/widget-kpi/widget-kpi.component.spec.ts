@@ -11,8 +11,8 @@ configureTests();
 
 describe('KPI Form Widget', () => {
   let fixture: ComponentFixture<WidgetKPIComponent>, el: HTMLElement;
-  beforeEach(done => {
-    TestBed.configureTestingModule({
+  beforeEach(() => {
+    return TestBed.configureTestingModule({
       imports: [MaterialModule, ReactiveFormsModule],
       declarations: [WidgetKPIComponent]
     })
@@ -23,7 +23,6 @@ describe('KPI Form Widget', () => {
         el = fixture.nativeElement;
 
         fixture.detectChanges();
-        done();
       });
   });
 
@@ -31,25 +30,24 @@ describe('KPI Form Widget', () => {
     expect(typeof fixture.componentInstance.applyKPI).to.equal('function');
   });
 
-  it('should disable secondary aggregation if it is selected in primary', done => {
+  it('should disable secondary aggregation if it is selected in primary', () => {
     const pAggr = fixture.componentInstance.kpiForm.get(
       'primAggregate'
     ) as FormControl;
     pAggr.setValue('avg');
 
     fixture.detectChanges();
-    fixture.whenStable().then(() => {
+    return fixture.whenStable().then(() => {
       const sAggrForm = fixture.componentInstance.kpiForm.get(
         'secAggregates'
       ) as FormGroup;
       const avgControl = sAggrForm.get('avg') as FormControl;
 
       expect(avgControl.disabled).to.be.true;
-      done();
     });
   });
 
-  it('should uncheck secondary aggregation if it is selected in primary', done => {
+  it('should uncheck secondary aggregation if it is selected in primary', () => {
     const sAggrForm = fixture.componentInstance.kpiForm.get(
       'secAggregates'
     ) as FormGroup;
@@ -64,10 +62,9 @@ describe('KPI Form Widget', () => {
     pAggr.setValue('avg');
 
     fixture.detectChanges();
-    fixture.whenStable().then(() => {
+    return fixture.whenStable().then(() => {
       expect(avgControl.disabled).to.be.true;
       expect(avgControl.value).to.be.false;
-      done();
     });
   });
 });
