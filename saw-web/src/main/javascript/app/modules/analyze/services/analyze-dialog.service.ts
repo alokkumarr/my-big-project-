@@ -62,12 +62,13 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria) {
+  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria, supportsGlobalFilters = false) {
     const data: IToolbarActionData = {
       action: 'filter',
       filters,
       artifacts,
-      booleanCriteria
+      booleanCriteria,
+      supportsGlobalFilters
     };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',

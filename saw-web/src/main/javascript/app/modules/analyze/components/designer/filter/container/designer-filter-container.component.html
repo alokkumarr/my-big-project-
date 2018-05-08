@@ -6,6 +6,7 @@
     <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: index"
                          (removeRequest)="removeFilter(i, artifact.artifactName)"
                          (filterChange)="onFilterChange()"
+                         [supportsGlobalFilters]="supportsGlobalFilters"
                          [filter]="filter"
                          [artifactColumns]="artifact.columns"
                          e2e="filter-row">

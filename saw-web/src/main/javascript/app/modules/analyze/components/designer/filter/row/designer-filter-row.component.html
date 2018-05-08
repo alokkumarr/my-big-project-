@@ -37,6 +37,12 @@
   <div fxLayout="row"
        class="filter__action__space"
        fxLayoutAlign="space-between center">
+    <mat-checkbox [checked]="filter.isGlobalFilter"
+                  *ngIf="supportsGlobalFilters"
+                  (change)="onGlobalCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Global
+    </mat-checkbox>
     <mat-checkbox [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
                   i18n>

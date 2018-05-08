@@ -1,11 +1,6 @@
 declare const require: any;
 
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as find from 'lodash/find';
 import {
   ArtifactColumns,
@@ -27,14 +22,18 @@ export class DesignerFilterRowComponent {
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
   @Input() public filter: Filter;
+  @Input() public supportsGlobalFilters: boolean;
 
   public TYPE_MAP = TYPE_MAP;
 
   onArtifactColumnSelected(columnName) {
-    const target: ArtifactColumn = find(this.artifactColumns, column => column.columnName === columnName);
+    const target: ArtifactColumn = find(
+      this.artifactColumns,
+      column => column.columnName === columnName
+    );
     this.filter.columnName = target.columnName;
     this.filter.type = target.type;
-    if (this.filter.isRuntimeFilter) {
+    if (this.filter.isRuntimeFilter || this.filter.isGlobalFilter) {
       delete this.filter.model;
     } else {
       this.filter.model = null;
@@ -44,6 +43,14 @@ export class DesignerFilterRowComponent {
 
   onFilterModelChange(filterModel: FilterModel) {
     this.filter.model = filterModel;
+  }
+
+  onGlobalCheckboxToggle(filter: Filter, checked: boolean) {
+    if (!this.supportsGlobalFilters) return;
+    filter.isGlobalFilter = checked;
+    if (checked) {
+      delete filter.model;
+    }
   }
 
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {

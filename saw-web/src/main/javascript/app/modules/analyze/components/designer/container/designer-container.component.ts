@@ -234,7 +234,8 @@ export class DesignerContainerComponent {
         .openFilterDialog(
           this.filters,
           this.analysis.artifacts,
-          this.booleanCriteria
+          this.booleanCriteria,
+          (this.analysis || this.analysisStarter).type === 'chart' // supports global filters?
         )
         .afterClosed()
         .subscribe((result: IToolbarActionResult) => {

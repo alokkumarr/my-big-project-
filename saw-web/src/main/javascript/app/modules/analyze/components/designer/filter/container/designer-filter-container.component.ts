@@ -20,6 +20,7 @@ export class DesignerFilterContainerComponent {
   @Output() public filtersChange: EventEmitter<Filter[]> = new EventEmitter();
   @Input() public artifacts: Artifact[];
   @Input() public filters: Filter[];
+  @Input() public supportsGlobalFilters: boolean;
 
   public groupedFilters;
 
