@@ -175,7 +175,7 @@ export const AnalyzePublishDialogComponent = {
         let sDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
         let cronJobName = this.model.id;
         if (!moment(sDate).isValid()) {
-          sDate = moment.utc().format();  
+          sDate = moment.utc().format();
         }
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
