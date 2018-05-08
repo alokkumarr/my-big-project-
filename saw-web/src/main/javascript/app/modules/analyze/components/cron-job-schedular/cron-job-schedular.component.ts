@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
@@ -22,7 +20,7 @@ require('./cron-job-schedular.component.scss');
 })
 
 export class CronJobSchedularComponent {
-  constructor() 
+  constructor()
   @Input() public model: any;
   @Input() public crondetails: any;
   @Output() onCronChanged: EventEmitter<any> = new EventEmitter();
@@ -221,7 +219,7 @@ export class CronJobSchedularComponent {
     this.onCronChanged.emit(this.crondetails);
   }
 
-  
+
 
   loadData() {
     this.onCronChanged.emit(this.crondetails);
@@ -240,23 +238,23 @@ export class CronJobSchedularComponent {
         hour: parseInt(fetchTime[0]),
         minute: fetchTime[1],
         hourType: meridium[0]
-      };  
+      };
     }
-    
+
 
     switch (this.scheduleType) {
     case 'hourly':
       //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
       if (isNaN(parseInt(parseCronValue[7]))) {
-        this.hourly.hours = 1; 
+        this.hourly.hours = 1;
       } else {
-        this.hourly.hours = parseInt(parseCronValue[7]);  
+        this.hourly.hours = parseInt(parseCronValue[7]);
       }
       if (isNaN(parseInt(parseCronValue[1]))) {
-        this.hourly.minutes = 0;  
+        this.hourly.minutes = 0;
       } else {
         const fetchLocalMinute = getLocalMinute(parseInt(parseCronValue[1]));
-        this.hourly.minutes = fetchLocalMinute;  
+        this.hourly.minutes = fetchLocalMinute;
       }
       break;
     case 'daily':
@@ -280,7 +278,7 @@ export class CronJobSchedularComponent {
       forEach(getWeekDays[5].split(','), day => {
         this.weekly[day] = true;
       })
-      
+
       this.weeklybasisDate = clone(modelDate); //Loading time values for weekly tab
       break;
     case 'monthly':

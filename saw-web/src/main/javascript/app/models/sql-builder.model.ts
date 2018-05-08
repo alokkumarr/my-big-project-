@@ -25,4 +25,8 @@ export interface SqlBuilderReport extends AbstractSqlBuilder {
   joins:          Join[];
 }
 
+export interface SqlBuilderEsReport extends AbstractSqlBuilder {
+  dataFields:     ArtifactColumn[];
+}
+
 export type SqlBuilder = Partial<SqlBuilderPivot> | Partial<SqlBuilderChart> | Partial<SqlBuilderReport>;
