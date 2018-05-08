@@ -1,26 +1,18 @@
-import 'jquery';
-import * as angular from 'angular';
+import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import '@uirouter/angular-hybrid';
-
-import 'angular-material';
-
+import * as angular from 'angular';
 import 'angular-local-storage';
+import 'angular-material';
 import 'angular-sanitize';
 import 'angular-translate';
-import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
 import 'angular-translate/dist/angular-translate-interpolation-messageformat/angular-translate-interpolation-messageformat';
-
-import 'ng-idle';
-
-import 'mottle';
-
+import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
-
+import 'devextreme/integration/angular';
+import 'devextreme/integration/jquery';
 import 'devextreme/localization';
-
 import 'devextreme/localization/messages/en.json';
-
 import 'devextreme/ui/data_grid';
 import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
@@ -31,7 +23,6 @@ import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
-import {CommonModule as CommonModuleAngular4} from '@angular/common';
 import { UIRouterModule } from '@uirouter/angular';
 import { BrowserModule } from '@angular/platform-browser';
 import {
@@ -82,7 +73,9 @@ import {
   toastProvider, componentHandlerProvider
 } from './services/ajs-common-providers';
 import {SearchBoxComponent} from './components/search-box';
-
+import 'jquery';
+import 'mottle';
+import 'ng-idle';
 import AppConfig from '../../../../../appConfig';
 
 export const CommonModule = 'CommonModule';
@@ -190,7 +183,6 @@ angular
     FormsModule,
     MaterialModule,
     CommonPipesModule,
-    UIRouterModule,
     DxDataGridModule,
     DxTemplateModule,
     CommonPipesModule,

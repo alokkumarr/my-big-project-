@@ -5,7 +5,7 @@
         <span class="md-title" translate="ROLES_MGMT_LIST"></span>&nbsp;
         <search-box placeholder="Search Role"
                     [value]="$ctrl.states.searchTerm"
-                    (change)="$ctrl.applySearchFilter($event)" [delay]="1000"></search-box>
+                    (searchTermChange)="$ctrl.applySearchFilter($event)" [delay]="1000"></search-box>
       </div>
       <div class="roles-view_action-panel" layout="row" layout-align="end center">
         <md-button class="btn-primary" ng-click="$ctrl.openNewRoleModal()">

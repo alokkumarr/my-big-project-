@@ -1,9 +1,13 @@
 import {
   Component,
   Input,
-  Output
+  Output,
+  EventEmitter
 } from '@angular/core';
-import { Analysis } from '../../types';
+import {
+  Analysis,
+  AnalyzeViewActionEvent
+} from '../types';
 
 const template = require('./analyze-card-view.component.html');
 
@@ -14,9 +18,10 @@ const template = require('./analyze-card-view.component.html');
 
 export class AnalyzeCardViewComponent {
 
+  @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input() analyses: Analysis[];
   @Input() analysisType: string;
-  @Input() searchTerm: string;
+  @Input() highlightTerm: string;
   @Input() cronJobs: any;
   constructor() { }
 

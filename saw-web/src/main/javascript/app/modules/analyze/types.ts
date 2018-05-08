@@ -1,15 +1,15 @@
 import {
-  Format,
-  Artifact,
   AnalysisChart,
   AnalysisReport,
-  ArtifactColumnPivot,
+  Artifact,
   ArtifactColumnChart,
+  ArtifactColumnPivot,
   ArtifactColumnReport,
-  Sort,
   Filter,
-  FilterModel,
-  AnalysisType
+  AnalysisType,
+  Sort,
+  Format,
+  FilterModel
 } from './models';
 
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
@@ -25,7 +25,8 @@ export {
   FilterModel,
   Artifact,
   AnalysisType,
-  AnalysisReport
+  AnalysisReport,
+  AnalysisChart
 };
 
 

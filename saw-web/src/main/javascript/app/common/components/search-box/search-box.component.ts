@@ -18,7 +18,7 @@ require('./search-box.component.scss');
 })
 export class SearchBoxComponent implements OnInit {
 
-  @Output() change: EventEmitter<string> = new EventEmitter();
+  @Output() searchTermChange: EventEmitter<string> = new EventEmitter();
   @Input() value: string;
   @Input() placeholder: string;
   @Input() delay: number;
@@ -56,7 +56,7 @@ export class SearchBoxComponent implements OnInit {
   }
 
   onChange(value) {
-    this.change.emit(value);
+    this.searchTermChange.emit(value);
   }
 
   doAutoFocus() {

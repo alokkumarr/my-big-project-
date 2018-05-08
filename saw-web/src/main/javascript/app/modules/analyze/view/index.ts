@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
-
 import { CommonModuleTs } from '../../../common';
-
+import { AnalyzeActionsModule } from '../actions';
 import { AnalyzeViewComponent } from './analyze-view.component';
+import { AnalyzeCardComponent } from './card';
 import { AnalyzeCardViewComponent } from './card-view';
 import { AnalyzeListViewComponent } from './list-view';
-import { AnalyzeCardComponent } from './card';
+import { AnalysesFilterPipe } from './analyses-filter.pipe';
+
+
 
 const COMPONENTS = [
   AnalyzeViewComponent,
@@ -15,8 +17,14 @@ const COMPONENTS = [
 ];
 
 @NgModule({
-  imports: [CommonModuleTs],
-  declarations: COMPONENTS,
+  imports: [
+    CommonModuleTs,
+    AnalyzeActionsModule
+  ],
+  declarations: [
+    ...COMPONENTS,
+    AnalysesFilterPipe
+  ],
   entryComponents: COMPONENTS,
   exports: [AnalyzeViewComponent]
 })

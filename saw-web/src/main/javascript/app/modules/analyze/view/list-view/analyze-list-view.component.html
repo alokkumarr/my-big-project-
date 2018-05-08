@@ -37,7 +37,10 @@
     </div>
 
     <div *dxTemplate="let cell of 'typeCellTemplate'">
-      <mat-chip class="tag-chip" [innerHtml]="cell.text | highlight: searchTerm"></mat-chip>
+      <mat-chip class="tag-chip"
+                [innerHtml]="cell.text | highlight: searchTerm"
+      >
+      </mat-chip>
     </div>
 
     <div *dxTemplate="let cell of 'highlightCellTemplate'"
@@ -49,15 +52,18 @@
     </div>
 
     <div *dxTemplate="let cell of 'actionCellTemplate'">
-      <button mat-icon-button class="list-action-button">
+      <button mat-icon-button
+              (click)="fork(cell.data)"
+              class="list-action-button">
         <mat-icon fontIcon="icon-fork"></mat-icon>
       </button>
-      <!-- <analyze-actions-menu-u analysis="report.data"
-                            exclude="fork-export"
-                            on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
-                            on-successful-execution="$ctrl.onSuccessfulExecution(analysis)"
-                            on-successful-publish="$ctrl.onSuccessfulPublish(analysis)"
-      ></analyze-actions-menu-u> -->
+      <analyze-actions-menu-u [analysis]="cell.data"
+                              exclude="fork-export"
+                              (afterDelete)="afterDelete($event)"
+                              (afterExecute)="afterExecute($event)"
+                              (afterPublish)="afterPublish($event)"
+                              (afterEdit)="afterEdit()"
+      ></analyze-actions-menu-u>
     </div>
 
   </dx-data-grid>
