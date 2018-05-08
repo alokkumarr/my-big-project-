@@ -327,7 +327,7 @@ gg_point <- function(points = F, ...) {
 #' @importFrom ggplot2 geom_smooth geom_blank
 #'
 gg_smooth <- function(smooth = F, ...) {
-  checkmate::assert_flag(points)
+  checkmate::assert_flag(smooth)
   if (smooth) {
     ggplot2::geom_smooth(...)
   } else{

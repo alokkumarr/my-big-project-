@@ -14,7 +14,7 @@
 #'This function takes any of the geom_histogram arguments
 #'\url{http://ggplot2.tidyverse.org/reference/geom_histogram.html}
 #'
-#'@param data data.frame object with variable to chart
+#'@param df data.frame object with variable to chart
 #'@param x_variable variable name to chart. expects a string
 #'@param fill either a variable name to apply a group by operation and create
 #'  subgroups of histograms or color name or hex value to fill the histogram
@@ -128,6 +128,7 @@ gg_histogram <- function(df,
     df_names,
     fill = fill,
     color = color,
+    alpha = alpha,
     aes_params = list(x = x_variable),
     geom_params = list(...)
   )

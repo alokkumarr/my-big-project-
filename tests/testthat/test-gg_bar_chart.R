@@ -16,7 +16,7 @@ d1 <- dat %>% count(cyl)
 
 
 test_that("Basic Bar Chart Unit Tests", {
-  p1 <- gg_barchart(dat, "am", title = "test", caption = "caption")
+  p1 <- gg_bar_chart(dat, "am", title = "test", caption = "caption")
   
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomBar")
@@ -36,23 +36,23 @@ test_that("Basic Bar Chart Unit Tests", {
 
 
 test_that("Proportion option Unit Tests", {
-  p2 <- gg_barchart(dat, "am", proportion = TRUE)
+  p2 <- gg_bar_chart(dat, "am", proportion = TRUE)
   expect_class(p2$layers[[1]]$stat, "StatCount")
   
 })
 
 
 test_that("Label option Unit Tests", {
-  p3 <- gg_barchart(dat, "am", proportion = TRUE, label = TRUE)
+  p3 <- gg_bar_chart(dat, "am", proportion = TRUE, label = TRUE)
   expect_class(p3$layers[[2]], "LayerInstance")
 })
 
 
 test_that("Sort option Unit Tests", {
-  p4 <- gg_barchart(dat, "am", sort = TRUE, desc = TRUE)
+  p4 <- gg_bar_chart(dat, "am", sort = TRUE, desc = TRUE)
   expect_equal(as.character(p4$mapping$x)[1], "fct_infreq")
   
-  p5 <- gg_barchart(dat, "am", sort = TRUE, desc = FALSE)
+  p5 <- gg_bar_chart(dat, "am", sort = TRUE, desc = FALSE)
   expect_equal(as.character(p5$mapping$x)[1], "fct_inorder")
 })
 

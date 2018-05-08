@@ -14,6 +14,8 @@ gg_boxplot(df, x_variable = NULL, y_variable = NULL, ymin = NULL,
   legend_args = list(), theme = "sncr", palette = "a2", ...)
 }
 \arguments{
+\item{df}{data.frame object with variable to chart}
+
 \item{x_variable}{x-variable to chart. expects a string. default is NULL. not
 a required input}
 

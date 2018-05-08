@@ -146,6 +146,7 @@ gg_boxplot <- function(df,
     colnames(df),
     fill = fill,
     color = color,
+    alpha = alpha,
     aes_params = aes_params,
     geom_params = list(stat = stat, ...)
   )

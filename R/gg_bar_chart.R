@@ -1,6 +1,6 @@
 
 
-# gg_barchart ----------------------------------------------------------------
+# gg_bar_chart ----------------------------------------------------------------
 
 
 #' GGplot2 Bar Chart
@@ -47,46 +47,46 @@
 #' d <- mtcars %>% mutate(am = as.factor(am), cyl = as.factor(cyl))
 #'
 #' # Create series of basic charts
-#' gg_barchart(d, "am")
-#' gg_barchart(d, "am", fill="steelblue", color="grey25")
-#' gg_barchart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things")
-#' gg_barchart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things", theme="minimal")
+#' gg_bar_chart(d, "am")
+#' gg_bar_chart(d, "am", fill="steelblue", color="grey25")
+#' gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things")
+#' gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things", theme="minimal")
 #'
 #' A few charts with more features
-#' gg_barchart(d, "am", proportion = T)
-#' gg_barchart(d, "am", fill="cyl")
-#' gg_barchart(d, "am", fill="cyl", position="fill")
-#' gg_barchart(d, "am", fill="cyl", label=T)
+#' gg_bar_chart(d, "am", proportion = T)
+#' gg_bar_chart(d, "am", fill="cyl")
+#' gg_bar_chart(d, "am", fill="cyl", position="fill")
+#' gg_bar_chart(d, "am", fill="cyl", label=T)
 #'
 #' # Example of x-variable and y-variable
 #' d1 <- mtcars %>% group_by(am = factor(am)) %>% summarise(count = n())
-#' gg_barchart(d1, x_variable="am", y_variable="count")
-gg_barchart <- function(df,
-                        x_variable,
-                        y_variable = NULL,
-                        weight = NULL,
-                        fill = sncr_pal()(1),
-                        color = "black",
-                        position = "dodge",
-                        proportion = FALSE,
-                        sort = FALSE,
-                        desc = TRUE,
-                        label = FALSE,
-                        label_args = list(vjust = "bottom"),
-                        facet_formula = NULL,
-                        facet_labeller = "both",
-                        facet_args = list(),
-                        coord = NULL,
-                        coord_args = list(),
-                        title = NULL,
-                        subtitle = NULL,
-                        x_axis_title = NULL,
-                        y_axis_title = NULL,
-                        caption = NULL,
-                        legend_args = list(),
-                        theme = "sncr",
-                        palette = "a2",
-                        ...) {
+#' gg_bar_chart(d1, x_variable="am", y_variable="count")
+gg_bar_chart <- function(df,
+                         x_variable,
+                         y_variable = NULL,
+                         weight = NULL,
+                         fill = sncr_pal()(1),
+                         color = "black",
+                         position = "dodge",
+                         proportion = FALSE,
+                         sort = FALSE,
+                         desc = TRUE,
+                         label = FALSE,
+                         label_args = list(vjust = "bottom"),
+                         facet_formula = NULL,
+                         facet_labeller = "both",
+                         facet_args = list(),
+                         coord = NULL,
+                         coord_args = list(),
+                         title = NULL,
+                         subtitle = NULL,
+                         x_axis_title = NULL,
+                         y_axis_title = NULL,
+                         caption = NULL,
+                         legend_args = list(),
+                         theme = "sncr",
+                         palette = "a2",
+                         ...) {
   
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)

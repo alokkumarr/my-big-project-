@@ -29,39 +29,39 @@
 #' d <- mtcars %>% mutate(am = as.factor(am))
 #'
 #' # Create series of basic charts
-#' gg_density(d, "mpg")
-#' gg_density(d, "mpg", fill="steelblue", color="grey25")
-#' gg_density(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message")
-#' gg_density(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme=theme_minimal())
+#' gg_density_chart(d, "mpg")
+#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25")
+#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message")
+#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme=theme_minimal())
 #'
 #' # A few charts with additional features
-#' gg_density(d, "mpg", fill="am", color="am")
-#' gg_density(d, "mpg", fill="am", color="am", adjust=1/2)
-#' gg_density(d, "mpg", fill="am", color="am", adjust=1/2, palette = "virdis")
-#' gg_density(d, "mpg", fill="am", facet_formula = "~am", adjust=1/2,alpha=0.1)
-#' gg_density(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2, alpha=0.1)
-#' gg_density(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), adjust=1/2,alpha=0.1)
-#' gg_density(d, "mpg", fill="am", color="am", coord="flip", adjust=1/2)
+#' gg_density_chart(d, "mpg", fill="am", color="am")
+#' gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2)
+#' gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2, palette = "virdis")
+#' gg_density_chart(d, "mpg", fill="am", facet_formula = "~am", adjust=1/2,alpha=0.1)
+#' gg_density_chart(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2, alpha=0.1)
+#' gg_density_chart(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), adjust=1/2,alpha=0.1)
+#' gg_density_chart(d, "mpg", fill="am", color="am", coord="flip", adjust=1/2)
 #'
-gg_density <- function(df,
-                       x_variable,
-                       fill = sncr_pal()(1),
-                       color = "black",
-                       alpha = 0.50,
-                       facet_formula = NULL,
-                       facet_labeller = "both",
-                       facet_args = list(),
-                       coord = NULL,
-                       coord_args = list(),
-                       title = NULL,
-                       subtitle = NULL,
-                       x_axis_title = NULL,
-                       y_axis_title = NULL,
-                       caption = NULL,
-                       legend_args = list(),
-                       theme = "sncr",
-                       palette = "a2",
-                       ...) {
+gg_density_chart<- function(df,
+                            x_variable,
+                            fill = sncr_pal()(1),
+                            color = "black",
+                            alpha = 0.50,
+                            facet_formula = NULL,
+                            facet_labeller = "both",
+                            facet_args = list(),
+                            coord = NULL,
+                            coord_args = list(),
+                            title = NULL,
+                            subtitle = NULL,
+                            x_axis_title = NULL,
+                            y_axis_title = NULL,
+                            caption = NULL,
+                            legend_args = list(),
+                            theme = "sncr",
+                            palette = "a2",
+                            ...) {
   
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)

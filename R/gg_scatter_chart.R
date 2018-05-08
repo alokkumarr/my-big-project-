@@ -15,7 +15,7 @@
 #' geom_point \url{http://ggplot2.tidyverse.org/reference/geom_point.html} and
 #' geom_smooth  \url{http://ggplot2.tidyverse.org/reference/geom_smooth.html}
 #'
-#' @inheritParams gg_linechart
+#' @inheritParams gg_line_chart
 #' @param smooth logical option to add smoother to chart
 #' @param smooth_method string name for smoother method to apply. accepts "lm",
 #'   "glm", "rlm", "loess", "gam", "rlm"
@@ -39,58 +39,65 @@
 #' d <- mtcars %>% mutate(am = as.factor(am), cyl = as.factor(cyl))
 #'
 #' # Create series of basic charts
-#' gg_scatterchart(d, y_variable = "mpg", x_variable = "wt")
-#' gg_scatterchart(d, y_variable = "mpg", x_variable = "wt")
-#' gg_scatterchart(d, y_variable = "mpg", x_variable = "wt", fill="wt")
-#' gg_scatterchart(d, y_variable ="mpg", x_variable = "wt", points=F)
+#' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt")
+#' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt")
+#' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", color="wt")
+#' gg_scatter_chart(d, y_variable ="mpg", x_variable = "wt", points=F)
 #'
 #' # Smoother Options
-#' gg_scatterchart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm") # linear model
-#' gg_scatterchart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm", smooth_ci=F, smooth_color="red")
-#' gg_scatterchart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm", smooth_ci=F, smooth_color="red", smooth_formula=y~splines::bs(x, degree=1, knots=2)) # linear spline model
-#' gg_scatterchart(d, y_variable = "vs", x_variable = "wt", smoother = TRUE, smooth_method="glm", smooth_color="red", smooth_args=list(family = "binomial")) # binomial logistic model
+#' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm") # linear model
+#' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm", smooth_ci=F, smooth_color="red")
+#' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm", smooth_ci=F, smooth_color="red", smooth_formula=y~splines::bs(x, degree=1, knots=2)) # linear spline model
+#' gg_scatter_chart(d, y_variable = "vs", x_variable = "wt", smoother = TRUE, smooth_method="glm", smooth_color="red", smooth_args=list(family = "binomial")) # binomial logistic model
 #' 
-gg_scatterchart <- function(df,
-                            x_variable,
-                            y_variable,
-                            color = "grey25",
-                            size = 2,
-                            alpha = 1,
-                            shape = 16,
-                            points = TRUE,
-                            position = "identity",
-                            smoother = FALSE,
-                            smooth_method = "auto", 
-                            smooth_args = list(),
-                            smooth_formula = as.formula("y~x"),
-                            smooth_ci = TRUE,
-                            smooth_color = 'red',
-                            smooth_fill = "grey75",
-                            facet_formula = NULL,
-                            facet_labeller = "both",
-                            facet_args = list(),
-                            coord = NULL,
-                            coord_args = list(),
-                            title = NULL,
-                            subtitle = NULL,
-                            x_axis_title = NULL,
-                            y_axis_title = NULL,
-                            caption = NULL,
-                            legend_args = list(),
-                            theme = "sncr",
-                            palette = "a2",
-                            ...) {
+gg_scatter_chart <- function(df,
+                             x_variable,
+                             y_variable,
+                             color = "grey25",
+                             size = 2,
+                             alpha = 1,
+                             shape = 16,
+                             points = TRUE,
+                             position = "identity",
+                             smoother = FALSE,
+                             smooth_method = "auto", 
+                             smooth_args = list(),
+                             smooth_formula = as.formula("y~x"),
+                             smooth_ci = TRUE,
+                             smooth_color = 'red',
+                             smooth_fill = "grey75",
+                             facet_formula = NULL,
+                             facet_labeller = "both",
+                             facet_args = list(),
+                             coord = NULL,
+                             coord_args = list(),
+                             title = NULL,
+                             subtitle = NULL,
+                             x_axis_title = NULL,
+                             y_axis_title = NULL,
+                             caption = NULL,
+                             legend_args = list(),
+                             theme = "sncr",
+                             palette = "a2",
+                             ...) {
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)
   checkmate::assert_choice(x_variable, df_names)
   checkmate::assert_choice(y_variable, df_names)
   checkmate::assert_flag(smoother)
   checkmate::assert_flag(points)
+  checkmate::assert_choice(smooth_method, c("auto", "lm", "glm", "loess", "gam", "rlm"))
+  checkmate::assert_list(smooth_args)
+  checkmate::assert_class(smooth_formula, "formula")
+  checkmate::assert_flag(smooth_ci)
+  checkmate::assert_true(is_color(smooth_color)[[1]])
+  checkmate::assert_true(is_color(smooth_fill)[[1]] )
   
-  if (!is_color(fill)[[1]])
-    checkmate::assert_choice(fill, df_names)
-  if (!is_color(color)[[1]])
+ 
+  if (!is_color(color)[[1]]) {
     checkmate::assert_choice(color, df_names)
+    smooth_color <- NULL
+  }
   if (!is.numeric(alpha))
     checkmate::assert_choice(alpha, df_names)
   if (!is.numeric(size))
@@ -98,20 +105,12 @@ gg_scatterchart <- function(df,
   if (!is.numeric(shape))
     checkmate::assert_choice(shape, df_names)
   
-  checkmate::assert_choice(smooth_method, c("auto", "lm", "glm", "loess", "gam", "rlm"))
-  checkmate::assert_list(smooth_args)
-  checkmate::assert_class(smooth_formula, "formula")
-  checkmate::assert_flag(smooth_ci)
-  checkmate::assert_true(is_color(smooth_color)[[1]])
-  checkmate::assert_true(is_color(smooth_fill)[[1]])
   checkmate::assert_choice(position, c("identity", "jitter", "dodge", "stack", "fill"))
   checkmate::assert_choice(facet_labeller,
                            c("value", "both", "context", "parsed", "wrap_gen", "bquote"))
   checkmate::assert_list(facet_args)
   checkmate::assert_list(coord_args)
   checkmate::assert_list(legend_args)
-  checkmate::assert_list(point_args)
-  checkmate::assert_list(label_args)
   checkmate::assert_choice(palette, names(sncr_palettes))
   checkmate::assert_choice(theme,
                            c(
@@ -142,7 +141,6 @@ gg_scatterchart <- function(df,
   # Get Geom Params
   params_list <- get_geom_params(
     df_names,
-    fill = fill,
     color = color,
     size = size,
     alpha = alpha,
@@ -159,19 +157,13 @@ gg_scatterchart <- function(df,
                          se = smooth_ci,
                          color = smooth_color,
                          fill = smooth_fill)
+  smoother_parms <- Filter(Negate(is.null), smoother_parms)
   
   # Set Guides Params
-  if (x_variable == fill) {
-    guides_params <- list(fill = "none")
-  } else{
-    guides_params <- list(fill = do.call("guide_legend", legend_args))
-  }
-  
   if (x_variable == color) {
-    guides_params <- modifyList(guides_params, list(color = "none"))
+    guides_params <- list(color = "none")
   } else{
-    guides_params <- modifyList(guides_params,
-                                list(color = do.call("guide_legend", legend_args)))
+    guides_params <- list(color = do.call("guide_legend", legend_args))
   }
   
   # Define Theme

@@ -40,7 +40,7 @@ test_that("Basic Histogram Unit Tests", {
 
 
 test_that("Basic Density Unit Tests", {
-  p1 <- gg_density(dat, "mpg", title = "test", caption = "caption")
+  p1 <- gg_density_chart(dat, "mpg", title = "test", caption = "caption")
   
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomDensity")
@@ -55,7 +55,7 @@ test_that("Basic Density Unit Tests", {
   expect_null(p1$plot_env$y_axis_title)
   expect_true(all.equal(p1$plot_env$theme_fun(), theme_sncr()))
   
-  p2 <- gg_density(dat, "mpg", adjust = .5)
+  p2 <- gg_density_chart(dat, "mpg", adjust = .5)
   expect_equal(p2$layers[[1]]$stat_params$adjust, .5)
 })
 

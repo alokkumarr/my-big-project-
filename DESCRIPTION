@@ -16,6 +16,7 @@ Imports:
     ggplot2,
     forcats,
     pals,
+    Hmisc,
 Suggests: 
     testthat,
     scales

@@ -8,7 +8,7 @@ library(dplyr)
 library(checkmate)
 library(proto)
 
-context("barchart unit tests")
+context("line_chart unit tests")
 
 # Create a data set
 
@@ -42,7 +42,7 @@ dat <- sim_data(1, 100, 1, seed = 319)
 test_that("Basic Line Chart Unit Tests", {
   p1 <- dat %>% 
     count(date) %>% 
-    gg_linechart(., "date", "n", title = "test", caption = "caption")
+    gg_line_chart(., "date", "n", title = "test", caption = "caption")
   
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomLine")
@@ -64,7 +64,7 @@ test_that("Grouping Options Unit Tests", {
   p2 <- dat %>% 
     group_by(cat1) %>% 
     count(date) %>% 
-    gg_linechart(., "date", "n", color = "cat1", title = "test", caption = "caption")
+    gg_line_chart(., "date", "n", color = "cat1", title = "test", caption = "caption")
   expect_equal(as.character(p2$mapping$colour), "cat1")
   expect_equal(p2$layers[[1]]$aes_params$linetype, 1)
   expect_equal(p2$layers[[1]]$aes_params$alpha, 1)
@@ -75,7 +75,7 @@ test_that("Grouping Options Unit Tests", {
 test_that("Points option Unit Tests", {
   p3 <- dat %>% 
     count(date) %>% 
-    gg_linechart(., "date", "n", points = TRUE)
+    gg_line_chart(., "date", "n", points = TRUE)
   expect_class(p3$layers[[2]]$geom, "GeomPoint")
 })
 

@@ -18,7 +18,7 @@
 #' @param points TRUE/FALSE. If TRUE scatter plot points are added to the chart
 #' @param point_args list of arguments to pass to geom_point function. default
 #'   is an empty list
-#' @inheritParams gg_barchart
+#' @inheritParams gg_bar_chart
 #' @seealso geom_label arguments
 #'   \url{http://ggplot2.tidyverse.org/reference/geom_text.html}
 #'
@@ -33,41 +33,41 @@
 #' library(ggplot2)
 #' library(dplyr)
 #' d <- mtcars %>% mutate(am = as.factor(am))
-#' gg_linechart(d, "wt", "mpg", facet_formula = ".~cyl", facet_args = list(scales = "free"), color = "blue")
-#' gg_linechart(d, "wt", "mpg")
-#' gg_linechart(d, "wt", "mpg", point = T)
-#' gg_linechart(d, "wt", "mpg", point = T, point_args = list(size = 3))
-#' gg_linechart(d, "wt", "mpg", color = "red", linetype = "dotdash")
-#' gg_linechart(d, "wt", "mpg", color = "red", point = T, point_args = list(size = 3))
-#' gg_linechart(d, "wt", "mpg", color = 'am', point = T, point_args = list(size = 3, shape = 15))
-#' gg_linechart(d, "wt", "mpg", point = T, point_args = list(size = 3, shape = 15, color = 'red'))
-gg_linechart <- function(df,
-                         x_variable,
-                         y_variable,
-                         position = "identity",
-                         color = sncr_pal()(1),
-                         size = 1,
-                         alpha = 1,
-                         linetype = 1,
-                         group = NULL,
-                         points = F,
-                         point_args = list(shape = 16),
-                         label = F,
-                         label_args = list(vjust = "bottom"),
-                         facet_formula = NULL,
-                         facet_labeller = "both",
-                         facet_args = list(),
-                         coord = NULL,
-                         coord_args = list(),
-                         title = NULL,
-                         subtitle = NULL,
-                         x_axis_title = NULL,
-                         y_axis_title = NULL,
-                         caption = NULL,
-                         legend_args = list(),
-                         theme = "sncr",
-                         palette = "a2",
-                         ...) {
+#' gg_line_chart(d, "wt", "mpg", facet_formula = ".~cyl", facet_args = list(scales = "free"), color = "blue")
+#' gg_line_chart(d, "wt", "mpg")
+#' gg_line_chart(d, "wt", "mpg", point = T)
+#' gg_line_chart(d, "wt", "mpg", point = T, point_args = list(size = 3))
+#' gg_line_chart(d, "wt", "mpg", color = "red", linetype = "dotdash")
+#' gg_line_chart(d, "wt", "mpg", color = "red", point = T, point_args = list(size = 3))
+#' gg_line_chart(d, "wt", "mpg", color = 'am', point = T, point_args = list(size = 3, shape = 15))
+#' gg_line_chart(d, "wt", "mpg", point = T, point_args = list(size = 3, shape = 15, color = 'red'))
+gg_line_chart <- function(df,
+                          x_variable,
+                          y_variable,
+                          position = "identity",
+                          color = sncr_pal()(1),
+                          size = 1,
+                          alpha = 1,
+                          linetype = 1,
+                          group = NULL,
+                          points = F,
+                          point_args = list(shape = 16),
+                          label = F,
+                          label_args = list(vjust = "bottom"),
+                          facet_formula = NULL,
+                          facet_labeller = "both",
+                          facet_args = list(),
+                          coord = NULL,
+                          coord_args = list(),
+                          title = NULL,
+                          subtitle = NULL,
+                          x_axis_title = NULL,
+                          y_axis_title = NULL,
+                          caption = NULL,
+                          legend_args = list(),
+                          theme = "sncr",
+                          palette = "a2",
+                          ...) {
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)
   checkmate::assert_choice(x_variable, df_names)
