@@ -3,14 +3,14 @@
     <div fxLayout="row" fxFlex="40">
       <div class="category-title" e2e="category-title">{{categoryName | async}}</div>
       <search-box placeholder="Search Analyses"
-                  [value]="states.searchTerm"
-                  (change)="applySearchFilter($event)"
+                  [value]="filterObj.searchTerm"
+                  (searchTermChange)="applySearchFilter($event)"
                   [delay]="1000">
       </search-box>
     </div>
 
     <div fxLayout="row" fxLayoutAlign="start center" fxFlex="40">
-      <mat-radio-group [value]="states.viewMode" (change)="onViewChange($event.value)" class="switch-view">
+      <mat-radio-group [value]="viewMode" (change)="onViewChange($event.value)" class="switch-view">
         <mat-radio-button [value]="LIST_VIEW">
           <mat-icon fontIcon="icon-Table-view" i18n-matTooltip matTooltip="List view"></mat-icon>
         </mat-radio-button>
@@ -20,7 +20,7 @@
       </mat-radio-group>
 
       <mat-form-field class="select-type">
-        <mat-select (selectionChange)="onAnalysisTypeChange($event.value)" [value]="states.analysisType">
+        <mat-select (selectionChange)="onAnalysisTypeChange($event.value)" [value]="filterObj.analysisType">
           <mat-option *ngFor="let type of analysisTypes" [value]="type.value">
             {{ type.label }}
           </mat-option>
@@ -35,17 +35,19 @@
       </button>
     </div>
   </mat-toolbar>
-  <div [ngSwitch]="states.viewMode">
+  <div [ngSwitch]="viewMode">
     <analyze-list-view-u *ngSwitchCase="LIST_VIEW"
-                         [analyses]="analyses"
+                         (action)="onAction($event)"
+                         [analyses]="filteredAnalyses | analysesFilter:filterObj.analysisType:cronJobs"
                          [analysisType]="analysisType"
-                         [searchTerm]="states.searchTermValue"
+                         [searchTerm]="filterObj.searchTermValue"
                          [cronJobs]="cronJobs">
     </analyze-list-view-u>
     <analyze-card-view-u *ngSwitchCase="CARD_VIEW"
-                         [analyses]="analyses"
+                         (action)="onAction($event)"
+                         [analyses]="filteredAnalyses | analysesFilter:filterObj.analysisType:cronJobs"
                          [analysisType]="analysisType"
-                         [searchTerm]="states.searchTermValue"
+                         [highlightTerm]="filterObj.searchTermValue"
                          [cronJobs]="cronJobs">
     </analyze-card-view-u>
   </div>

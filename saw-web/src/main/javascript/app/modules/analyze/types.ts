@@ -1,13 +1,13 @@
 import {
-  Format,
-  Artifact,
   AnalysisChart,
   AnalysisReport,
-  ArtifactColumnPivot,
+  Artifact,
   ArtifactColumnChart,
+  ArtifactColumnPivot,
   ArtifactColumnReport,
-  Sort,
   Filter,
+  Sort,
+  Format,
   FilterModel
 } from './models';
 
@@ -21,7 +21,8 @@ export {
   Format,
   Filter,
   FilterModel,
-  Artifact
+  Artifact,
+  AnalysisChart
 };
 
 

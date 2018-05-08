@@ -8,7 +8,7 @@
               ng-bind="$ctrl.category.name"></span>&nbsp;
         <search-box placeholder="Search Analyses"
                     [value]="$ctrl.states.searchTerm"
-                    (change)="$ctrl.applySearchFilter($event)" [delay]="1000"></search-box>
+                    (searchTermChange)="$ctrl.applySearchFilter($event)" [delay]="1000"></search-box>
       </div>
 
       <div layout="row" layout-align="start center">

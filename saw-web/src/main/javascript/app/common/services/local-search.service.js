@@ -1,6 +1,7 @@
 import * as filter from 'lodash/filter';
 import * as some from 'lodash/some';
 import * as trim from 'lodash/trim';
+import * as split from 'lodash/split';
 
 export class LocalSearchService {
   constructor($q) {
@@ -14,7 +15,7 @@ export class LocalSearchService {
      the exact flag is set
      */
   parseSearchTerm(searchTerm = '') {
-    const searchText = searchTerm.split(':');
+    const searchText = split(searchTerm, ':');
     const result = searchText.length > 1 ?
       {field: trim(searchText[0]), fullTerm: trim(searchText.slice(1).join(':'))} :
       {field: null, fullTerm: trim(searchText[0])};

@@ -1,15 +1,11 @@
-import {
-  Component,
-  Input
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as forEach from 'lodash/forEach';
-import * as moment from 'moment';
-import * as isEmpty from 'lodash/isEmpty';
-import cronstrue from 'cronstrue';
-
-import { Analysis } from '../../types';
-import { AnalyzeService } from '../../services/analyze.service';
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
+import { AnalyzeActionsService } from '../../actions';
+import { generateSchedule } from '../../cron';
+import { AnalyzeService } from '../../services/analyze.service';
+import { Analysis, AnalyzeViewActionEvent } from '../types';
+
 
 const template = require('./analyze-list-view.component.html');
 require('./analyze-list-view.component.scss');
@@ -20,6 +16,7 @@ require('./analyze-list-view.component.scss');
 })
 export class AnalyzeListViewComponent {
 
+  @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input() analyses: Analysis[];
   @Input() analysisType: string;
   @Input() searchTerm: string;
@@ -29,56 +26,57 @@ export class AnalyzeListViewComponent {
 
   constructor(
     private _dxDataGridService: dxDataGridService,
-    private _AnalyzeService: AnalyzeService
+    private _analyzeService: AnalyzeService,
+    private _analyzeActionsService: AnalyzeActionsService
   ) { }
 
   ngOnInit() {
     this.config = this.getGridConfig();
   }
 
-  showExecutingFlag(analysisId) {
-    return analysisId && this._AnalyzeService.isExecuting(analysisId);
-  }
-
-  generateSchedule(rowData) {
-    let scheduleHuman = '';
-    forEach(this.cronJobs, cron => {
-      if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
-        if (cron.jobDetails.activeTab === 'hourly') {
-          // there is no time stamp in hourly cron hence converting to utc and local is not required.
-          const localMinuteCron = this.extractMinute(cron.jobDetails.cronExpression);
-          scheduleHuman = cronstrue.toString(localMinuteCron);
-
-        } else {
-          const localCron = this.convertToLocal(cron.jobDetails.cronExpression);
-          scheduleHuman = cronstrue.toString(localCron);
-        }
-      }
+  afterDelete(analysis) {
+    this.action.emit({
+      action: 'delete',
+      analysis
     });
-    return scheduleHuman;
   }
 
-  extractMinute(CronUTC) {
-    const splitArray = CronUTC.split(' ');
-    const date = new Date();
-    date.setUTCHours(moment().format('HH'), splitArray[1]);
-    const UtcTime = moment.utc(date).local().format('mm').split(' ');
-    splitArray[1] = UtcTime[0];
-    return splitArray.join(' ');
+  afterExecute(analysis) {
+    this.action.emit({
+      action: 'execute',
+      analysis
+    });
   }
 
-  convertToLocal(CronUTC) {
-    const splitArray = CronUTC.split(' ');
-    const date = new Date();
-    date.setUTCHours(splitArray[2], splitArray[1]);
-    const UtcTime = moment.utc(date).local().format('mm HH').split(' ');
-    splitArray[1] = UtcTime[0];
-    splitArray[2] = UtcTime[1];
-    return splitArray.join(' ');
-
+  afterPublish(analysis) {
+    this.action.emit({
+      action: 'publish',
+      analysis
+    });
   }
 
-  checkRowType(rowData) {
+  afterEdit() {
+    this.action.emit({
+      action: 'edit'
+    });
+  }
+
+  fork(analysis) {
+    this._analyzeActionsService.fork(analysis).then(status => {
+      if (!status) {
+        return;
+      }
+      this.action.emit({
+        action: 'fork'
+      });
+    });
+  }
+
+  showExecutingFlag(analysisId) {
+    return analysisId && this._analyzeService.isExecuting(analysisId);
+  }
+
+  getRowType(rowData) {
     let analysisType = rowData.type;
     if (analysisType === 'esReport') {
       analysisType = 'REPORT';
@@ -104,13 +102,13 @@ export class AnalyzeListViewComponent {
       cellTemplate: 'highlightCellTemplate'
     }, {
       caption: 'SCHEDULED',
-      calculateCellValue: rowData => this.generateSchedule(rowData),
+      calculateCellValue: rowData => generateSchedule(this.cronJobs, rowData),
       width: '12%'
     }, {
       caption: 'TYPE',
       dataField: 'type',
       width: '8%',
-      calculateCellValue: rowData => this.checkRowType(rowData),
+      calculateCellValue: rowData => this.getRowType(rowData),
       cellTemplate: 'typeCellTemplate'
     }, {
       caption: 'CREATOR',

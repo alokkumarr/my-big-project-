@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Transition } from '@uirouter/angular';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
+import * as filter from 'lodash/filter';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
-import { Analysis } from '../types';
+import { Analysis, AnalyzeViewActionEvent } from './types';
 
 const template = require('./analyze-view.component.html');
 require('./analyze-view.component.scss');
@@ -26,7 +27,7 @@ const SEARCH_CONFIG = [
 })
 export class AnalyzeViewComponent implements OnInit {
 
-  public analyses: Analysis[];
+  public analyses: Analysis[] = [];
   public filteredAnalyses: Analysis[];
   public categoryName: Promise<string>;
   public cronJobs: any;
@@ -34,12 +35,7 @@ export class AnalyzeViewComponent implements OnInit {
   public CARD_VIEW  = 'card';
   public analysisId : string;
   public canUserCreate: boolean;
-  public states = {
-    viewMode: this.CARD_VIEW,
-    analysisType: 'all',
-    searchTerm: '',
-    searchTermValue: ''
-  };
+  public viewMode = this.CARD_VIEW;
   public analysisTypes = [
     ['all', 'All'],
     ['chart', 'Chart'],
@@ -47,6 +43,11 @@ export class AnalyzeViewComponent implements OnInit {
     ['pivot', 'Pivot'],
     ['scheduled', 'Scheduled']
   ].map(([value, label]) => ({value, label}));
+  public filterObj = {
+    analysisType: this.analysisTypes[0].value,
+    searchTerm: '',
+    searchTermValue: ''
+  };
   constructor(
     private _analyzeService: AnalyzeService,
     private _headerProgress: HeaderProgressService,
@@ -60,8 +61,7 @@ export class AnalyzeViewComponent implements OnInit {
   ngOnInit() {
     this.analysisId = this._transition.params().id;
     const savedView = <string>this._localStorage.get(VIEW_KEY);
-    console.log('savedView', savedView);
-    this.states.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
+    this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
     savedView : this.LIST_VIEW;
 
     this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
@@ -73,18 +73,38 @@ export class AnalyzeViewComponent implements OnInit {
     this.getCronJobs();
   }
 
+  onAction(event: AnalyzeViewActionEvent) {
+    switch(event.action) {
+    case 'fork':
+    case 'edit':
+      this.loadAnalyses();
+      break;
+    case 'delete':
+      this.removeDeletedAnalysis(event.analysis)
+      break;
+    case 'execute':
+    }
+  }
+
   onViewChange(view) {
-    this.states.viewMode = view;
+    this.viewMode = view;
   }
 
   onAnalysisTypeChange(type) {
-    this.states.analysisType = type;
+    this.filterObj.analysisType = type;
+  }
+
+  removeDeletedAnalysis(analysis) {
+    this.analyses = filter(this.analyses, report => {
+      return report.id !== analysis.id;
+    });
   }
 
   loadAnalyses() {
     this._headerProgress.show();
     return this._analyzeService.getAnalysesFor(this.analysisId).then(analyses => {
       this.analyses = analyses;
+      this.filteredAnalyses = analyses;
       this._headerProgress.hide();
     }).catch(() => {
       this._headerProgress.hide();
@@ -101,7 +121,6 @@ export class AnalyzeViewComponent implements OnInit {
       if (response.statusCode === 200) {
         if (!isUndefined(response)) {
           this.cronJobs = response.data;
-          console.log('cronJobs', this.cronJobs);
         } else {
           this.cronJobs = '';
         }
@@ -112,9 +131,9 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   applySearchFilter(value) {
-    this.states.searchTerm = value;
-    const searchCriteria = this._localSearch.parseSearchTerm(this.states.searchTerm);
-    this.states.searchTermValue = searchCriteria.trimmedTerm;
+    this.filterObj.searchTerm = value;
+    const searchCriteria = this._localSearch.parseSearchTerm(this.filterObj.searchTerm);
+    this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
     this._localSearch.doSearch(searchCriteria, this.analyses, SEARCH_CONFIG).then(data => {
       this.filteredAnalyses = data;
     }, err => {

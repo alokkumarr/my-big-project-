@@ -1,12 +1,11 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  Output
-} from '@angular/core';
-import { Analysis } from '../../types';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AnalyzeActionsService } from '../../actions';
+import { generateSchedule } from '../../cron';
+import { AnalyzeService } from '../../services/analyze.service';
+import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 
 const template = require('./analyze-card.component.html');
+require('./analyze-card.component.scss');
 
 @Component({
   selector: 'analyze-card-u',
@@ -15,10 +14,75 @@ const template = require('./analyze-card.component.html');
 
 export class AnalyzeCardComponent implements OnInit {
 
+  @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input() analysis: Analysis;
+  @Input() analysisType: string;
   @Input() highlightTerm: string;
   @Input() cronJobs: any;
-  constructor() { }
 
-  ngOnInit() { }
+  placeholderClass: string;
+
+  schedule: string;
+
+  constructor(
+    private _analyzeService: AnalyzeService,
+    private _analyzeActionsService: AnalyzeActionsService
+  ) { }
+
+  ngOnInit() {
+    const { type, id, chartType } = this.analysis as AnalysisChart;
+    const chartTypeString =
+    this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
+    this.schedule = generateSchedule(this.cronJobs, id);
+  }
+
+  showExecutingFlag(analysisId) {
+    return analysisId && this._analyzeService.isExecuting(analysisId);
+  }
+
+  afterDelete(analysis) {
+    this.action.emit({
+      action: 'delete',
+      analysis
+    });
+  }
+
+  afterExecute(analysis) {
+    this.action.emit({
+      action: 'execute',
+      analysis
+    });
+  }
+
+  afterPublish(analysis) {
+    this.action.emit({
+      action: 'publish',
+      analysis
+    });
+  }
+
+  afterEdit() {
+    this.action.emit({
+      action: 'edit'
+    });
+  }
+
+  fork(analysis) {
+    this._analyzeActionsService.fork(analysis).then(status => {
+      if (!status) {
+        return;
+      }
+      this.action.emit({
+        action: 'fork'
+      });
+    });
+  }
+
+  getType(type) {
+    let analysisType = type;
+    if (analysisType === 'esReport') {
+      analysisType = 'REPORT';
+    }
+    return analysisType.toUpperCase();
+  }
 }
