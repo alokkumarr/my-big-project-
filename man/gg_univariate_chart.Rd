@@ -6,9 +6,8 @@
 \usage{
 gg_univariate_chart(df, x_variable, data_name = NULL, fill = "#1D3AB2",
   color = "grey15", alpha = 0.6, bins = 13, max_bars = 20,
-  y_axis_title = "Count", caption = "Synchronoss", outlier.colour = "red",
-  outlier.shape = 1, theme = "sncr", palette = "a2",
-  plot_sizes = c(0.75, 0.25), ...)
+  y_axis_title = "Count", caption = "Synchronoss", theme = "sncr",
+  palette = "a2", plot_sizes = c(0.75, 0.25), ...)
 }
 \arguments{
 \item{data_name}{name for dataset. added to title if provided. default input
@@ -26,16 +25,17 @@ the two charts.}
   \item{y_variable}{y-variable to chart. default is NULL. If NULL then the
 x-variable is summarized and either a count or proportion is rendered.
 expects a string}
-  \item{weight}{variable to sum the count of the x_variable by. Default is NULL.
-expects a string with column name}
+  \item{weight}{variable to sum the count of the x_variable by. Default is
+NULL. expects a string with column name}
+  \item{position}{name of position function to apply}
   \item{proportion}{TRUE/FALSE. If TRUE, computes percentages, otherwise counts
 if y-variable not provided. default is FALSE}
   \item{sort}{TRUE/FALSE. If TRUE, orders the bars by either the count in the
 case of x-variable only or by the y-variable provided. Default is FALSE}
   \item{desc}{logical option to sort boxplots in descending order. Default is
 TRUE. Note sort has to be TRUE for desc option to apply}
-  \item{label}{logical. If TRUE creates a geom_label layer and sets the
-label variable to the y-variable}
+  \item{label}{logical. If TRUE creates a geom_label layer and sets the label
+variable to the y-variable}
   \item{label_args}{list of arguments passed to the geom_label layer. default
 sets the vjust to 'bottom'}
   \item{df}{data.frame object with variable to chart}
@@ -72,12 +72,13 @@ default is empty list.}
 control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
-  \item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+  \item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
   \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 }}
 }
 \value{

@@ -1,21 +1,22 @@
 
 #' GGplot Interval Chart
 #'
-#' This is a wrapper function to create a ggplot2 vertical interval chart.
-#' This function unifies much of the ggplot2 functionality into a single
-#' function. Default parameter values are set throughout to allow for quick
-#' interactive charting, but is also highly customizable to allow for more
-#' sophisicated charts.
+#' This is a wrapper function to create a ggplot2 vertical interval chart. This
+#' function unifies much of the ggplot2 functionality into a single function.
+#' Default parameter values are set throughout to allow for quick interactive
+#' charting, but is also highly customizable to allow for more sophisicated
+#' charts.
 #'
 #' This function takes any of the geom_errorbar arguments
 #' \url{http://ggplot2.tidyverse.org/reference/geom_linerange.html}
 #'
 #' @inheritParams gg_scatter_chart
 #' @inheritDotParams ggplot2::stat_summary
-#' @param lines_args list of arguments to pass to geom_line function. default
-#'   is an empty list
+#' @param lines_args list of arguments to pass to geom_line function. default is
+#'   an empty list
 #'
-#' @seealso geom_line \url{http://ggplot2.tidyverse.org/reference/geom_path.html}
+#' @seealso geom_line
+#'   \url{http://ggplot2.tidyverse.org/reference/geom_path.html}
 #'
 #' @return returns a ggplot2 graphic object
 #' @export

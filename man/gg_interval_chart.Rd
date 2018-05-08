@@ -23,8 +23,8 @@ gg_interval_chart(df, x_variable, y_variable, color = sncr_pal()(1),
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
-\item{lines_args}{list of arguments to pass to geom_line function. default
-is an empty list}
+\item{lines_args}{list of arguments to pass to geom_line function. default is
+an empty list}
 
 \item{facet_formula}{a valid r formula comprised of column names to create
 facets. expects a string. formula can either be a '~rhs' formula for a
@@ -64,13 +64,14 @@ control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
 \item{...}{other arguments passed on to \code{\link{layer}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
@@ -127,11 +128,11 @@ the default plot specification, e.g. \code{\link{borders}}.}
 returns a ggplot2 graphic object
 }
 \description{
-This is a wrapper function to create a ggplot2 vertical interval chart.
-This function unifies much of the ggplot2 functionality into a single
-function. Default parameter values are set throughout to allow for quick
-interactive charting, but is also highly customizable to allow for more
-sophisicated charts.
+This is a wrapper function to create a ggplot2 vertical interval chart. This
+function unifies much of the ggplot2 functionality into a single function.
+Default parameter values are set throughout to allow for quick interactive
+charting, but is also highly customizable to allow for more sophisicated
+charts.
 }
 \details{
 This function takes any of the geom_errorbar arguments
@@ -151,5 +152,6 @@ gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type='errorbar'
 gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type='errorbar',width=0.2,color='red',lines_args=list(color='blue'))
 }
 \seealso{
-geom_line \url{http://ggplot2.tidyverse.org/reference/geom_path.html}
+geom_line
+  \url{http://ggplot2.tidyverse.org/reference/geom_path.html}
 }

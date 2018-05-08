@@ -82,13 +82,14 @@ control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
 \item{...}{other arguments passed on to \code{\link{layer}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like

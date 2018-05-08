@@ -19,28 +19,35 @@
 #' @param y_variable y-variable to chart. default is NULL. If NULL then the
 #'   x-variable is summarized and either a count or proportion is rendered.
 #'   expects a string
-#' @param weight variable to sum the count of the x_variable by. Default is NULL.
-#'   expects a string with column name
+#' @param weight variable to sum the count of the x_variable by. Default is
+#'   NULL. expects a string with column name
+#' @param position name of position function to apply
+#' @seealso  position functions
+#'   \url{http://ggplot2.tidyverse.org/reference/#section-layer-position-adjustment}
+#'
+#'
 #' @param proportion TRUE/FALSE. If TRUE, computes percentages, otherwise counts
 #'   if y-variable not provided. default is FALSE
 #' @param sort TRUE/FALSE. If TRUE, orders the bars by either the count in the
 #'   case of x-variable only or by the y-variable provided. Default is FALSE
 #' @param desc logical option to sort boxplots in descending order. Default is
 #'   TRUE. Note sort has to be TRUE for desc option to apply
-#' @param label logical. If TRUE creates a geom_label layer and sets the
-#'   label variable to the y-variable
+#' @param label logical. If TRUE creates a geom_label layer and sets the label
+#'   variable to the y-variable
 #' @param label_args list of arguments passed to the geom_label layer. default
 #'   sets the vjust to 'bottom'
 #' @seealso geom_label arguments
 #'   \url{http://ggplot2.tidyverse.org/reference/geom_text.html}
-#'
+#' @param ... additional arguments to pass to geom_bar
 #'
 #' @return returns a ggplot2 object of a formatted bar chart
 #' @export
-#' @importFrom scales percent
 #' @importFrom ggplot2 geom_bar
-#' @importFrom ggplot2 position_identity position_jitter position_dodge position_stack position_fill
-#' @importFrom ggplot2 label_both label_value label_context label_parsed label_wrap_gen
+#' @importFrom ggplot2 position_identity position_jitter position_dodge
+#'   position_stack position_fill
+#' @importFrom ggplot2 label_both label_value label_context label_parsed
+#'   label_wrap_gen
+#' @importFrom scales percent   
 #'
 #' @examples
 #' # Create a data set
@@ -52,7 +59,7 @@
 #' gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things")
 #' gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things", theme="minimal")
 #'
-#' A few charts with more features
+#' # A few charts with more features
 #' gg_bar_chart(d, "am", proportion = T)
 #' gg_bar_chart(d, "am", fill="cyl")
 #' gg_bar_chart(d, "am", fill="cyl", position="fill")

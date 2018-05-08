@@ -76,7 +76,7 @@ test_that("Basic Boxplot Unit Tests", {
   expect_null(p1$plot_env$y_axis_title)
   expect_true(all.equal(p1$plot_env$theme_fun(), theme_sncr()))
   
-  p2 <-  gg_boxplot(dat, y_variable = "mpg", outlier.color = "red")
+  p2 <-  gg_boxplot(dat, y_variable = "mpg")
   expect_equal(p2$plot_env$params_list$geom_params$outlier.color, "red")
   
   y <- rnorm(100)

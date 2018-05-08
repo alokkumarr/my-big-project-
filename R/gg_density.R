@@ -4,25 +4,24 @@
 # gg_density_chart ----------------------------------------------------------
 
 
-#' GGplot2 Density Chart
+#'GGplot2 Density Chart
 #'
-#' This is a wrapper function to create a ggplot2 density chart. This function
-#' unifies much of the ggplot2 functionality into a single function. Default
-#' parameter values are set throughout to allow for quick interactive charting,
-#' but is also highly customizable to allow for more sophisicated charts.
+#'This is a wrapper function to create a ggplot2 density chart. This function
+#'unifies much of the ggplot2 functionality into a single function. Default
+#'parameter values are set throughout to allow for quick interactive charting,
+#'but is also highly customizable to allow for more sophisicated charts.
 #'
 #'#' This function takes any of the geom_density arguments
-#' \url{http://ggplot2.tidyverse.org/reference/geom_density.html}
+#'\url{http://ggplot2.tidyverse.org/reference/geom_density.html}
 #'
-#' @inheritParams gg_histogram
-#' @inheritDotParams ggplot2::geom_density
-#' @param alpha argument to change the colour transparency; It is a numeric in [0,1]. The default is 0.0.
-
-#' @seealso For more details on the geom_density check out
-#'   \url{http://ggplot2.tidyverse.org/reference/geom_density.html}
+#'@inheritParams gg_histogram
+#'@inheritDotParams ggplot2::geom_density
 #'
-#' @return returns a ggplot2 object
-#' @export
+#'@seealso For more details on the geom_density check out
+#'  \url{http://ggplot2.tidyverse.org/reference/geom_density.html}
+#'
+#'@return returns a ggplot2 object
+#'@export
 #'
 #' @examples
 #' # Create a data set

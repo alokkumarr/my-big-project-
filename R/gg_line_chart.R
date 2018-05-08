@@ -14,7 +14,7 @@
 #' @param y_variable y-variable to chart. expects a string. required input
 #' @inheritParams ggplot2::geom_line
 #' @param group a variable name to apply a group by operation and create
-#'  subgroups of line charts
+#'   subgroups of line charts
 #' @param points TRUE/FALSE. If TRUE scatter plot points are added to the chart
 #' @param point_args list of arguments to pass to geom_point function. default
 #'   is an empty list
@@ -25,7 +25,8 @@
 #'
 #' @return returns a ggplot2 object of a formatted bar chart
 #' @export
-#' @importFrom ggplot2 label_both label_value label_both label_context label_parsed label_wrap_gen label_bquote
+#' @importFrom ggplot2 label_both label_value label_both label_context
+#'   label_parsed label_wrap_gen label_bquote
 #' @importFrom ggplot2 geom_line aes_string guides geom_point
 #' @importFrom ggplot2 guide_legend
 #'

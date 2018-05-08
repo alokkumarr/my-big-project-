@@ -5,8 +5,6 @@
 #' GGplot2 Boxplot Chart
 #'
 #' @inheritParams gg_histogram
-#' @param x_variable x-variable to chart. expects a string. default is NULL. not
-#'   a required input
 #' @param y_variable continuous y-variable to chart. expects a string. default
 #'   is NULL. either a y-variable is required or boxplot values (ymin, lower,
 #'   middle, upper, ymax)
@@ -15,9 +13,16 @@
 #' @param middle computed middle value of boxplot. default is NULL
 #' @param upper computed upper value of boxplot. default is NULL
 #' @param ymax computed max value of boxplot. default is NULL
+#' @param outlier_color color of outlier points. default is red
+#' @param outlier_shape shape of outlier points. default is 1
+#' @param position name of position function to apply
+#' @seealso  position functions
+#'   \url{http://ggplot2.tidyverse.org/reference/#section-layer-position-adjustment}
+#'
 #' @param sort logical option to sort boxplots by y_variable. Default is FALSE
 #' @param desc logical option to sort boxplots in descending order. Default is
 #'   TRUE. Note sort has to be TRUE for desc option to apply
+#' @param ... additional arguments passed to geom_boxplot
 #'
 #'
 #' @inheritDotParams ggplot2::geom_boxplot
@@ -58,6 +63,8 @@ gg_boxplot <- function(df,
                        fill = sncr_pal()(1),
                        color = "black",
                        alpha = .50,
+                       outlier_color = "red",
+                       outlier_shape = 1,
                        position = "dodge",
                        sort = FALSE,
                        desc = TRUE,
@@ -113,14 +120,13 @@ gg_boxplot <- function(df,
     x_axis_title <- sort_params$x_axis_title
   }
   
-  y_pos_args <-
-    list(
-      ymin = ymin,
-      lower = lower,
-      middle = middle,
-      upper = upper,
-      ymax = ymax
-    )
+  y_pos_args <- list(
+    ymin = ymin,
+    lower = lower,
+    middle = middle,
+    upper = upper,
+    ymax = ymax
+  )
   aes_params <- c(x_aes_args, list(y = y_variable), y_pos_args)
   
   # Set the stat
@@ -148,7 +154,12 @@ gg_boxplot <- function(df,
     color = color,
     alpha = alpha,
     aes_params = aes_params,
-    geom_params = list(stat = stat, ...)
+    geom_params = list(
+      stat = stat,
+      outlier.color = outlier_color,
+      outlier.shape = outlier_shape,
+      ...
+    )
   )
   
   # Define Theme

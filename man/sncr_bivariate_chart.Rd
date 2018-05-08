@@ -8,8 +8,8 @@ sncr_bivariate_chart(df, x_variable, y_variable, data_name = NULL,
   fill = "grey75", color = "#1D3AB2", alpha = 0.75, interval_shape = 18,
   interval_size = 1.05, interval_chart_type = "pointrange", points = TRUE,
   smooth_degree = 3, smooth_knots = 7, smooth_ci = TRUE,
-  outlier.colour = "red", outlier.shape = 1, caption = "Synchronoss",
-  theme = "sncr", palette = "a2", plot_sizes = c(0.7, 0.3), ...)
+  caption = "Synchronoss", theme = "sncr", palette = "a2",
+  plot_sizes = c(0.7, 0.3), ...)
 }
 \arguments{
 \item{df}{data.frame object with variable to chart}
@@ -29,11 +29,15 @@ with color. expects a string. default is 'grey25'}
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
+\item{alpha}{argument to change the colour transparency; It is a numeric in
+[0,1]. The default is 0.0.}
+
 \item{interval_shape}{shape value to pass to interval chart}
 
 \item{interval_size}{size of point passed to interval chart}
 
-\item{interval_chart_type}{interval chart type. \seealso{gg_interval_chart} for options}
+\item{interval_chart_type}{interval chart type. see gg_interval_chart for
+options}
 
 \item{points}{TRUE/FALSE. If TRUE scatter plot points are added to the chart}
 
@@ -45,20 +49,20 @@ the histogram. expects a string. default is 'black'}
 
 \item{caption}{chart caption. expects a string}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
 \item{plot_sizes}{vector of two ratios that add to 1. Sets the size ratios of
   the two charts. The smooth/interval corresponds to the first ratio, the
   boxplot the second
 
-\code{\link{gg_scatter_chart}}
-\code{\link{gg_interval_chart}}}
+  \code{\link{gg_scatter_chart}} \code{\link{gg_interval_chart}}}
 
 \item{...}{other arguments passed on to \code{\link{layer}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
@@ -71,8 +75,8 @@ returns a ggplot2 graphic object
 \description{
 This is a wrapper function to create bivariate charts. continuous x-variable
 type should use a gg_scatter_chart categorical x-variable should use
-gg_interval_chart. multi-class y-variables are a special case that need not be
-included for this story
+gg_interval_chart. multi-class y-variables are a special case that need not
+be included for this story
 }
 \examples{
 Create a data set

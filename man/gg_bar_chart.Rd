@@ -22,8 +22,8 @@ gg_bar_chart(df, x_variable, y_variable = NULL, weight = NULL,
 x-variable is summarized and either a count or proportion is rendered.
 expects a string}
 
-\item{weight}{variable to sum the count of the x_variable by. Default is NULL.
-expects a string with column name}
+\item{weight}{variable to sum the count of the x_variable by. Default is
+NULL. expects a string with column name}
 
 \item{fill}{either a variable name to apply a group by operation and create
 subgroups of histograms or color name or hex value to fill the histogram
@@ -32,6 +32,8 @@ with color. expects a string. default is 'grey25'}
 \item{color}{either a variable name to apply a group by operation and create
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
+
+\item{position}{name of position function to apply}
 
 \item{proportion}{TRUE/FALSE. If TRUE, computes percentages, otherwise counts
 if y-variable not provided. default is FALSE}
@@ -42,8 +44,8 @@ case of x-variable only or by the y-variable provided. Default is FALSE}
 \item{desc}{logical option to sort boxplots in descending order. Default is
 TRUE. Note sort has to be TRUE for desc option to apply}
 
-\item{label}{logical. If TRUE creates a geom_label layer and sets the
-label variable to the y-variable}
+\item{label}{logical. If TRUE creates a geom_label layer and sets the label
+variable to the y-variable}
 
 \item{label_args}{list of arguments passed to the geom_label layer. default
 sets the vjust to 'bottom'}
@@ -86,15 +88,16 @@ control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
-\item{...}{}
+\item{...}{additional arguments to pass to geom_bar}
 
 \item{...}{Arguments passed on to \code{ggplot2::geom_bar}
 \describe{
@@ -157,7 +160,7 @@ gg_bar_chart(d, "am", fill="steelblue", color="grey25")
 gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things")
 gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things", theme="minimal")
 
-A few charts with more features
+# A few charts with more features
 gg_bar_chart(d, "am", proportion = T)
 gg_bar_chart(d, "am", fill="cyl")
 gg_bar_chart(d, "am", fill="cyl", position="fill")
@@ -168,6 +171,9 @@ d1 <- mtcars \%>\% group_by(am = factor(am)) \%>\% summarise(count = n())
 gg_bar_chart(d1, x_variable="am", y_variable="count")
 }
 \seealso{
+position functions
+  \url{http://ggplot2.tidyverse.org/reference/#section-layer-position-adjustment}
+
 geom_label arguments
   \url{http://ggplot2.tidyverse.org/reference/geom_text.html}
 }

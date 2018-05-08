@@ -9,8 +9,7 @@ gg_sort(sort, x_variable, y_variable, x_axis_title, desc = TRUE)
 \arguments{
 \item{sort}{logical option to sort boxplots by y_variable. Default is FALSE}
 
-\item{x_variable}{x-variable to chart. expects a string. default is NULL. not
-a required input}
+\item{x_variable}{variable name to chart. expects a string}
 
 \item{y_variable}{continuous y-variable to chart. expects a string. default
 is NULL. either a y-variable is required or boxplot values (ymin, lower,

@@ -35,8 +35,8 @@ subgroups of line charts}
 \item{point_args}{list of arguments to pass to geom_point function. default
 is an empty list}
 
-\item{label}{logical. If TRUE creates a geom_label layer and sets the
-label variable to the y-variable}
+\item{label}{logical. If TRUE creates a geom_label layer and sets the label
+variable to the y-variable}
 
 \item{label_args}{list of arguments passed to the geom_label layer. default
 sets the vjust to 'bottom'}
@@ -79,13 +79,14 @@ control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
 \item{...}{other arguments passed on to \code{\link{layer}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like

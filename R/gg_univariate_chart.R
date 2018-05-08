@@ -8,12 +8,11 @@
 #'   \code{\link{gg_bar_chart}} \code{\link{gg_boxplot}}
 #'   \code{\link{gg_histogram}}
 #' @param plot_sizes vector of two ratios that add to 1. Sets the size ratios of
-#'   the two charts. 
-#'   
+#'   the two charts.
+#'
 #' @return returns a ggplot2 object as a result of a call to a gg_* charting
 #'   function
 #' @export
-#' @importFrom gridExtra grid.arrange
 #' @importFrom dplyr top_n count_ select_
 #' @importFrom magrittr %>%
 #'
@@ -32,8 +31,6 @@ gg_univariate_chart <- function(df,
                                 max_bars = 20,
                                 y_axis_title = 'Count',
                                 caption = "Synchronoss",
-                                outlier.colour = "red",
-                                outlier.shape = 1,
                                 theme = "sncr",
                                 palette = "a2",
                                 plot_sizes = c(.75, .25),
@@ -82,8 +79,6 @@ gg_univariate_chart <- function(df,
       alpha = alpha,
       coord = "flip",
       caption = caption,
-      outlier.colour = outlier.colour,
-      outlier.shape = outlier.shape,
       y_axis_title = NULL,
       theme = theme,
       palette = palette,

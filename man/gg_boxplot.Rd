@@ -7,7 +7,8 @@
 gg_boxplot(df, x_variable = NULL, y_variable = NULL, ymin = NULL,
   lower = NULL, middle = NULL, upper = NULL, ymax = NULL,
   fill = sncr_pal()(1), color = "black", alpha = 0.5,
-  position = "dodge", sort = FALSE, desc = TRUE, facet_formula = NULL,
+  outlier_color = "red", outlier_shape = 1, position = "dodge",
+  sort = FALSE, desc = TRUE, facet_formula = NULL,
   facet_labeller = "both", facet_args = list(), coord = NULL,
   coord_args = list(), title = NULL, subtitle = NULL,
   x_axis_title = NULL, y_axis_title = NULL, caption = NULL,
@@ -16,8 +17,7 @@ gg_boxplot(df, x_variable = NULL, y_variable = NULL, ymin = NULL,
 \arguments{
 \item{df}{data.frame object with variable to chart}
 
-\item{x_variable}{x-variable to chart. expects a string. default is NULL. not
-a required input}
+\item{x_variable}{variable name to chart. expects a string}
 
 \item{y_variable}{continuous y-variable to chart. expects a string. default
 is NULL. either a y-variable is required or boxplot values (ymin, lower,
@@ -40,6 +40,15 @@ with color. expects a string. default is 'grey25'}
 \item{color}{either a variable name to apply a group by operation and create
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
+
+\item{alpha}{argument to change the colour transparency; It is a numeric in
+[0,1]. The default is 0.0.}
+
+\item{outlier_color}{color of outlier points. default is red}
+
+\item{outlier_shape}{shape of outlier points. default is 1}
+
+\item{position}{name of position function to apply}
 
 \item{sort}{logical option to sort boxplots by y_variable. Default is FALSE}
 
@@ -84,15 +93,16 @@ control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
-\item{...}{}
+\item{...}{additional arguments passed to geom_boxplot}
 
 \item{...}{Arguments passed on to \code{ggplot2::geom_boxplot}
 \describe{
@@ -200,4 +210,8 @@ df <- data.frame(
  y100 = max(y))
 
 gg_boxplot(df, ymin = "y0", lower = "y25", middle = "y50", upper = "y75", ymax = "y100", fill="darkorange")
+}
+\seealso{
+position functions
+  \url{http://ggplot2.tidyverse.org/reference/#section-layer-position-adjustment}
 }

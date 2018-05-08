@@ -141,21 +141,22 @@ gg_label <- function(label = NULL, y = NULL, ...) {
 #' @param color either a variable name to apply a group by operation and create
 #'   subgroups of histograms or color name or hex value to color the outlines of
 #'   the histogram. expects a string.
-#' @param linetype Line types should be specified with either an integer, a name, or
-#' with a string of an even number (up to eight) of hexadecimal digits which give
-#' the lengths in consecutive positions in the string.
-#' 0 = blank, 1 = solid, 2 = dashed, 3 = dotted, 4 = dotdash, 5 = longdash, 6 = twodash
-#' @param size Should be specified with a numerical value (in millimetres),
-#' or from a variable source
+#' @param linetype Line types should be specified with either an integer, a
+#'   name, or with a string of an even number (up to eight) of hexadecimal
+#'   digits which give the lengths in consecutive positions in the string. 0 =
+#'   blank, 1 = solid, 2 = dashed, 3 = dotted, 4 = dotdash, 5 = longdash, 6 =
+#'   twodash
+#' @param size Should be specified with a numerical value (in millimetres), or
+#'   from a variable source
 #' @param alpha sets the opacity of the points
 #' @param group a variable name to apply a group by operation and create
-#'  subgroups of line charts
-#' @param shape Shape takes four types of values: an integer in [0, 25],
-#' a single character-- which uses that character as the plotting symbol,
-#' a . to draw the smallest rectangle that is visible (i.e., about one pixel)
-#' an NA to draw nothing
-#' @param aes_params list of parameters to pass to the aes function.
-#'   default is empty list
+#'   subgroups of line charts
+#' @param shape Shape takes four types of values: an integer in [0, 25], a
+#'   single character-- which uses that character as the plotting symbol, a . to
+#'   draw the smallest rectangle that is visible (i.e., about one pixel) an NA
+#'   to draw nothing
+#' @param aes_params list of parameters to pass to the aes function. default is
+#'   empty list
 #' @param geom_params list of parameters to pass to the geom function. default
 #'   is empty list
 #'
@@ -163,7 +164,7 @@ gg_label <- function(label = NULL, y = NULL, ...) {
 #'   arguments to pass to the aes function. the second list is the updated list
 #'   of arguments to pass to the geom function
 #' @export
-#'
+#' 
 get_geom_params <- function(names,
                             fill = NULL,
                             color = NULL,

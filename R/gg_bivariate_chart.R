@@ -7,8 +7,8 @@
 #'
 #' This is a wrapper function to create bivariate charts. continuous x-variable
 #' type should use a gg_scatter_chart categorical x-variable should use
-#' gg_interval_chart. multi-class y-variables are a special case that need not be
-#' included for this story
+#' gg_interval_chart. multi-class y-variables are a special case that need not
+#' be included for this story
 #'
 #'
 #' @inheritParams gg_scatter_chart
@@ -18,15 +18,15 @@
 #'   is NULL which defers to dataset object name
 #' @param interval_shape shape value to pass to interval chart
 #' @param interval_size size of point passed to interval chart
-#' @param interval_chart_type interval chart type. \seealso{gg_interval_chart} for options
+#' @param interval_chart_type interval chart type. see gg_interval_chart for
+#'   options
 #' @param smooth_degree degree spline agrument. default is three. should be 1-3
 #' @param smooth_knots number of knots used by spline
 #' @param plot_sizes vector of two ratios that add to 1. Sets the size ratios of
 #'   the two charts. The smooth/interval corresponds to the first ratio, the
 #'   boxplot the second
 #'
-#' \code{\link{gg_scatter_chart}}
-#' \code{\link{gg_interval_chart}}
+#'   \code{\link{gg_scatter_chart}} \code{\link{gg_interval_chart}}
 #'
 #' @return returns a ggplot2 graphic object
 #' @export
@@ -55,8 +55,6 @@ sncr_bivariate_chart <- function(df,
                                  smooth_degree = 3,
                                  smooth_knots = 7,
                                  smooth_ci = TRUE,
-                                 outlier.colour = "red",
-                                 outlier.shape = 1,
                                  caption = "Synchronoss",
                                  theme = "sncr",
                                  palette = "a2",
@@ -191,10 +189,8 @@ sncr_bivariate_chart <- function(df,
       y_axis_title = x_axis_title,
       caption = caption,
       title = NULL,
-      subtitle = NULL,
-      outlier.colour = outlier.colour,
-      outlier.shape = outlier.shape
-    ) +
+      subtitle = NULL
+      ) +
       theme(axis.text.y = element_blank(),
             axis.ticks.y = element_blank())
     

@@ -7,9 +7,9 @@
 #'GGplot2 Histogram Chart
 #'
 #'This is a wrapper function to create a ggplot2 histogram chart. This function
-#'unifies much of the ggplot2 layers into a single function. Default
-#'parameter values are set throughout to allow for quick interactive charting,
-#'but is also highly customizable to allow for more sophisicated charts.
+#'unifies much of the ggplot2 layers into a single function. Default parameter
+#'values are set throughout to allow for quick interactive charting, but is also
+#'highly customizable to allow for more sophisicated charts.
 #'
 #'This function takes any of the geom_histogram arguments
 #'\url{http://ggplot2.tidyverse.org/reference/geom_histogram.html}
@@ -22,11 +22,14 @@
 #'@param color either a variable name to apply a group by operation and create
 #'  subgroups of histograms or color name or hex value to color the outlines of
 #'  the histogram. expects a string. default is 'black'
+#'@param alpha argument to change the colour transparency; It is a numeric in
+#'  [0,1]. The default is 0.0.
 #'@inheritParams gg_facet
 #'@param facet_labeller takes a string. expecting name of one of label_*
 #'  functions. ex - "both" creates a facet label with both the column name and
 #'  the value. The two most common examples are 'both' and
 #'  'value'\url{http://ggplot2.tidyverse.org/reference/#section-facetting-labels}
+#'
 #'
 #'@param facet_args a list of arguments to pass to either the facet_grid or
 #'  facet_wrap functions. default is a list with only he labeller parameter set
@@ -41,21 +44,23 @@
 #'  control the legend formatting
 #'  \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 #'  empty list
-#' @param theme argument to change the chart theme. expects a ggplot_theme
-#'  name. default is "sncr" which calls theme_sncr(). check out
+#'@param theme argument to change the chart theme. expects a ggplot_theme name.
+#'  default is "sncr" which calls theme_sncr(). check out
 #'  \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 #'  options
-#' @param palette argument to change the color palette used is either the fill or
-#'  color is set to a variable. expects a palette name. default is "a2" for a2 palette
-#' @inheritDotParams ggplot2::geom_histogram
-#' @seealso For more details on the geom_histogram check out
+#'@param palette argument to change the color palette used is either the fill or
+#'  color is set to a variable. expects a palette name. default is "a2" for a2
+#'  palette
+#'@inheritDotParams ggplot2::geom_histogram
+#'@seealso For more details on the geom_histogram check out
 #'  \url{http://ggplot2.tidyverse.org/reference/geom_histogram.html}
 #'
-#' @return returns a ggplot2 object
-#' @export
-#' @importFrom ggplot2 geom_histogram
-#' @importFrom ggplot2 theme_grey theme_gray theme_minimal theme_bw theme_linedraw theme_light theme_dark theme_classic theme_void
-#' @import checkmate
+#'@return returns a ggplot2 object
+#'@export
+#'@importFrom ggplot2 geom_histogram
+#'@importFrom ggplot2 theme_grey theme_gray theme_minimal theme_bw
+#'  theme_linedraw theme_light theme_dark theme_classic theme_void
+#'@import checkmate
 #'
 #' @examples
 #' # Create a data set

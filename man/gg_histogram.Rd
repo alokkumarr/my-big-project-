@@ -24,6 +24,9 @@ with color. expects a string. default is 'grey25'}
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
+\item{alpha}{argument to change the colour transparency; It is a numeric in
+[0,1]. The default is 0.0.}
+
 \item{facet_formula}{a valid r formula comprised of column names to create
 facets. expects a string. formula can either be a '~rhs' formula for a
 facet_wrap or 'lhs~rhs' to create a facet_grid. Default is NULL which
@@ -62,13 +65,14 @@ control the legend formatting
 \url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
 empty list}
 
-\item{theme}{argument to change the chart theme. expects a ggplot_theme
-name. default is "sncr" which calls theme_sncr(). check out
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
 
 \item{palette}{argument to change the color palette used is either the fill or
-color is set to a variable. expects a palette name. default is "a2" for a2 palette}
+color is set to a variable. expects a palette name. default is "a2" for a2
+palette}
 
 \item{...}{}
 
@@ -119,9 +123,9 @@ returns a ggplot2 object
 }
 \description{
 This is a wrapper function to create a ggplot2 histogram chart. This function
-unifies much of the ggplot2 layers into a single function. Default
-parameter values are set throughout to allow for quick interactive charting,
-but is also highly customizable to allow for more sophisicated charts.
+unifies much of the ggplot2 layers into a single function. Default parameter
+values are set throughout to allow for quick interactive charting, but is also
+highly customizable to allow for more sophisicated charts.
 }
 \details{
 This function takes any of the geom_histogram arguments
