@@ -52,6 +52,7 @@ export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;
   type: AnalysisType;
+  maxAllowed?: number;
   artifactColumns: ArtifactColumns;
   canAcceptArtifactColumn: (
     groupAdapter: IDEsignerSettingGroupAdapter

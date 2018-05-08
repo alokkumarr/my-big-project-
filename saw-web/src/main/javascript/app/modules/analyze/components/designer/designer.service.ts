@@ -155,6 +155,7 @@ export class DesignerService {
     artifactColumns,
     chartType
   ): IDEsignerSettingGroupAdapter[] {
+    const isStockChart = chartType.substring(0, 2) === 'ts';
     const chartReverseTransform = (artifactColumn: ArtifactColumnChart) => {
       artifactColumn.area = null;
       artifactColumn.checked = false;
@@ -168,11 +169,36 @@ export class DesignerService {
 
     const canAcceptNumberType = (
       groupAdapter: IDEsignerSettingGroupAdapter
-    ) => ({ type }: ArtifactColumnPivot) => NUMBER_TYPES.includes(type);
+    ) => ({ type }: ArtifactColumnChart) => {
+      if (
+        groupAdapter.maxAllowed &&
+        groupAdapter.artifactColumns.length >= groupAdapter.maxAllowed
+      )
+        return false;
+      return NUMBER_TYPES.includes(type);
+    };
+
+    const canAcceptDateType = (groupAdapter: IDEsignerSettingGroupAdapter) => ({
+      type
+    }: ArtifactColumnChart) => {
+      if (
+        groupAdapter.maxAllowed &&
+        groupAdapter.artifactColumns.length >= groupAdapter.maxAllowed
+      )
+        return false;
+      return DATE_TYPES.includes(type);
+    };
 
     const canAcceptAnyType = (
       groupAdapter: IDEsignerSettingGroupAdapter
-    ) => () => true;
+    ) => () => {
+      if (
+        groupAdapter.maxAllowed &&
+        groupAdapter.artifactColumns.length >= groupAdapter.maxAllowed
+      )
+        return false;
+      return true;
+    };
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
@@ -189,9 +215,10 @@ export class DesignerService {
 
     const chartGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
       {
-        title: 'Metric',
+        title: chartType === 'pie' ? 'Angle' : 'Metrics',
         type: 'chart',
         marker: 'y',
+        maxAllowed: ['pie', 'bubble'].includes(chartType) ? 1 : Infinity,
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptNumberType,
         transform(artifactColumn: ArtifactColumnChart) {
@@ -203,11 +230,14 @@ export class DesignerService {
         onReorder
       },
       {
-        title: 'Dimension',
+        title: chartType === 'pie' ? 'Color By' : 'Dimension',
         type: 'chart',
         marker: 'x',
+        maxAllowed: 1,
         artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptAnyType,
+        canAcceptArtifactColumn: isStockChart
+          ? canAcceptDateType
+          : canAcceptAnyType,
         transform(artifactColumn: ArtifactColumnChart) {
           artifactColumn.area = 'x';
           artifactColumn.checked = true;
@@ -217,9 +247,10 @@ export class DesignerService {
         onReorder
       },
       {
-        title: 'Group',
+        title: 'Group By',
         type: 'chart',
         marker: 'g',
+        maxAllowed: 1,
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptAnyType,
         transform(artifactColumn: ArtifactColumnChart) {
@@ -237,6 +268,7 @@ export class DesignerService {
         title: 'Size',
         type: 'chart',
         marker: 'z',
+        maxAllowed: 1,
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptNumberType,
         transform(artifactColumn: ArtifactColumnChart) {

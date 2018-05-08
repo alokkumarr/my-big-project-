@@ -92,7 +92,7 @@ export class DesignerChartComponent implements OnInit {
     ];
 
     if (!align || !layout) {
-      return;
+      return [];
     }
 
     return [
