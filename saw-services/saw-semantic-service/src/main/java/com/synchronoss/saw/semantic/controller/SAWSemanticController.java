@@ -1,21 +1,30 @@
 package com.synchronoss.saw.semantic.controller;
 
+import java.io.IOException;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
+import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONMissingSAWException;
+import com.synchronoss.saw.semantic.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import com.synchronoss.saw.semantic.service.SemanticService;
+
 
 /**
  * @author spau0004
@@ -40,7 +49,7 @@ public class SAWSemanticController {
    * @return
    */
   // TODO : Validation of schema is pending
-  @RequestMapping(value = "/{projectId}/semantic/create", method = RequestMethod.POST)
+  @RequestMapping(value = "/{projectId}/semantic/create", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public SemanticNode addSemantic(@PathVariable(name = "projectId", required = true) String projectId, @RequestBody SemanticNode requestBody) 
       throws JSONMissingSAWException {
@@ -58,6 +67,144 @@ public class SAWSemanticController {
       logger.trace("Semantic entity created : {}", objectMapper.writeValueAsString(responseObjectFuture)); 
     }  catch (CreateEntitySAWException | JsonProcessingException ex) {
       throw new CreateEntitySAWException("Problem on the storage while creating an entity");
+    }
+    return responseObjectFuture;
+  }
+  /**
+   * This method is used to read a semantic entity in mapr store with id
+   * @param Id
+   * @param request
+   * @param response
+   * @param requestBody
+   * @return
+   */
+  // TODO : Validation of schema is pending
+  @RequestMapping(value = "/{projectId}/semantic/{Id}", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  public SemanticNode readSemantic(@PathVariable(name = "projectId", required = true) String projectId, @PathVariable(name = "Id", required = true) String Id) 
+      throws JSONMissingSAWException {
+    logger.trace("Request Body to create a semantic node:{}", Id);
+    SemanticNode responseObjectFuture = null;
+    SemanticNode node = new SemanticNode();
+    ObjectMapper objectMapper = new ObjectMapper();
+   try {
+       node.set_id(Id);
+      logger.trace("Invoking service with entity id : {} ", node.get_id());
+      responseObjectFuture = semanticService.readSemantic(node);
+      logger.trace("Semantic entity created : {}", objectMapper.writeValueAsString(responseObjectFuture)); 
+    }  catch (ReadEntitySAWException | JsonProcessingException ex) {
+      throw new ReadEntitySAWException("Problem on the storage while creating an entity");
+    }
+    return responseObjectFuture;
+  }
+  /**
+   * This method is used to update a semantic entity in mapr store with id
+   * @param Id
+   * @param request
+   * @param response
+   * @param requestBody
+   * @return
+   */
+  // TODO : Validation of schema is pending
+  @RequestMapping(value = "/{projectId}/semantic/update/{Id}", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.FOUND)
+  public SemanticNode updateSemantic(@PathVariable(name = "projectId", required = true) String projectId, @PathVariable(name = "Id", required = true) String Id) 
+      throws JSONMissingSAWException {
+    logger.trace("Request Body to create a semantic node:{}", Id);
+    SemanticNode responseObjectFuture = null;
+    SemanticNode node = new SemanticNode();
+    ObjectMapper objectMapper = new ObjectMapper();
+   try {
+       node.set_id(Id);
+      logger.trace("Invoking service with entity id : {} ", node.get_id());
+      responseObjectFuture = semanticService.updateSemantic(node);
+      logger.trace("Semantic entity created : {}", objectMapper.writeValueAsString(responseObjectFuture)); 
+    }  catch (UpdateEntitySAWException | JsonProcessingException ex) {
+      throw new UpdateEntitySAWException("Problem on the storage while creating an entity");
+    }
+    return responseObjectFuture;
+  }
+  /**
+   * This method is used to delete a semantic entity in mapr store with id
+   * @param Id
+   * @param request
+   * @param response
+   * @param requestBody
+   * @return
+   */
+  // TODO : Validation of schema is pending
+  @RequestMapping(value = "/{projectId}/semantic/delete/{Id}", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public SemanticNode deleteSemantic(@PathVariable(name = "projectId", required = true) String projectId, @PathVariable(name = "Id", required = true) String Id) 
+      throws JSONMissingSAWException {
+    logger.trace("Request Body to create a semantic node:{}", Id);
+    SemanticNode responseObjectFuture = null;
+    SemanticNode node = new SemanticNode();
+    ObjectMapper objectMapper = new ObjectMapper();
+   try {
+       node.set_id(Id);
+      logger.trace("Invoking service with entity id : {} ", node.get_id());
+      responseObjectFuture = semanticService.deleteSemantic(node);
+      logger.trace("Semantic entity created : {}", objectMapper.writeValueAsString(responseObjectFuture)); 
+    }  catch (DeleteEntitySAWException | JsonProcessingException ex) {
+      throw new DeleteEntitySAWException("Problem on the storage while creating an entity");
+    }
+    return responseObjectFuture;
+  }
+  
+  /**
+   * This method is used to filter a semantic entity in mapr store with id
+   * @param Id
+   * @param request
+   * @param response
+   * @param requestBody
+   * @return
+   */
+  // TODO : Validation of schema is pending
+  @RequestMapping(value = "/{projectId}/semantic/filter", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public SemanticNodes searchSemantic(@PathVariable(name = "projectId", required = true) String projectId, @RequestParam Map<String, String> queryMap) 
+      throws JSONMissingSAWException {
+    SemanticNodes responseObjectFuture = null;
+    SemanticNode node = new SemanticNode();
+    ObjectMapper objectMapper = new ObjectMapper();
+   try {
+       SemanticNode requestBody = objectMapper.readValue(objectMapper.writeValueAsString(queryMap),SemanticNode.class);
+      logger.trace("Search Request Body : {} ", requestBody);
+      responseObjectFuture = semanticService.search(node);
+      logger.trace("Search Semantic Result : {}", objectMapper.writeValueAsString(responseObjectFuture)); 
+    }  catch (ReadEntitySAWException | JsonProcessingException ex) {
+      throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
+    } catch (IOException e) {
+      throw new ReadEntitySAWException("Problem on the storage while reading an entity",e);
+    }
+    return responseObjectFuture;
+  }
+  /**
+   * This method is used to list the semantic entities
+   * @param Id
+   * @param request
+   * @param response
+   * @param requestBody
+   * @return
+   */
+  // TODO : Validation of schema is pending
+  @RequestMapping(value = "/{projectId}/semantic/list", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public SemanticNodes searchSemanticWithOutArtifacts(@PathVariable(name = "projectId", required = true) String projectId, @RequestParam Map<String, String> queryMap) 
+      throws JSONMissingSAWException {
+    SemanticNodes responseObjectFuture = null;
+    SemanticNode node = new SemanticNode();
+    ObjectMapper objectMapper = new ObjectMapper();
+   try {
+       SemanticNode requestBody = objectMapper.readValue(objectMapper.writeValueAsString(queryMap),SemanticNode.class);
+      logger.trace("Search Request Body : {} ", requestBody);
+      responseObjectFuture = semanticService.search(node);
+      logger.trace("Search Semantic Result : {}", objectMapper.writeValueAsString(responseObjectFuture)); 
+    }  catch (ReadEntitySAWException | JsonProcessingException ex) {
+      throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
+    } catch (IOException e) {
+      throw new ReadEntitySAWException("Problem on the storage while reading an entity",e);
     }
     return responseObjectFuture;
   }

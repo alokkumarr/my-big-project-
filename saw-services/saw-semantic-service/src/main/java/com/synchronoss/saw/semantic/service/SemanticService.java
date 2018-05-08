@@ -15,10 +15,11 @@ public interface SemanticService {
   String SemanticDataSet = "semanticDataSet";
   String nodeCategoryConvention = "SemanticNode";
   public SemanticNode addSemantic(SemanticNode node) throws JSONValidationSAWException, CreateEntitySAWException;
-  public SemanticNode getDashboardbyCriteria(SemanticNode node) throws JSONValidationSAWException, ReadEntitySAWException;
+  public SemanticNode readSemantic(SemanticNode node) throws JSONValidationSAWException, ReadEntitySAWException;
   public SemanticNode updateSemantic(SemanticNode node) throws JSONValidationSAWException, UpdateEntitySAWException;
   public SemanticNode deleteSemantic(SemanticNode node) throws JSONValidationSAWException, DeleteEntitySAWException;
   public SemanticNodes search(SemanticNode node) throws JSONValidationSAWException, ReadEntitySAWException;
+  public SemanticNodes list(SemanticNode node) throws JSONValidationSAWException, ReadEntitySAWException;
   default String generateId() throws JSONValidationSAWException{
     String id = UUID.randomUUID().toString() + delimiter + SemanticDataSet + delimiter
         + System.currentTimeMillis();

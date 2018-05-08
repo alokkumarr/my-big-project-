@@ -21,9 +21,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.semantic.model.NodeCategory;
+import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+import sncr.bda.store.generic.schema.Query;
 
 @Component
 public class SAWSemanticUtils {
@@ -69,7 +71,7 @@ public class SAWSemanticUtils {
     return headers;
 }
   
-  public static List<MetaDataStoreStructure> node2JsonString(NodeCategory node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
+  public static List<MetaDataStoreStructure> node2JSONObject(NodeCategory node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if (node != null) {
       metaDataStoreStructure.setSource(node);
@@ -84,6 +86,31 @@ public class SAWSemanticUtils {
     listOfMetadata.add(metaDataStoreStructure);
     return listOfMetadata;
   }
+  
+  public static String node2JsonString(SemanticNode node, String basePath, String Id, Action action, Category category, Query query) 
+      throws JsonProcessingException
+  {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+   
+    if(node !=null){
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null){
+      metaDataStoreStructure.setId(Id);
+    }
+    if (query!=null){
+      metaDataStoreStructure.setQuery(query);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+   
+    return objectMapper.writeValueAsString(listOfMetadata);
+  }
+
   
   
   private static String getSeperatedColumns(Set<String> headers, Map<String, Object> map, String separator) {
