@@ -180,6 +180,7 @@ export const AnalyzePublishDialogComponent = {
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
+          this.crondetails.cronexp = '';
           sDate = moment.utc().format();
         }
         this.model.schedule = {
