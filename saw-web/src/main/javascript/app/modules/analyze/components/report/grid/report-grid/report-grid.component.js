@@ -2,6 +2,7 @@ import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
 import * as find from 'lodash/find';
+import * as isFinite from 'lodash/isFinite';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
@@ -9,15 +10,18 @@ import * as $ from 'jquery';
 import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
-import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../../consts';
+import {
+  NUMBER_TYPES,
+  DATE_TYPES,
+  FLOAT_TYPES,
+  INT_TYPES,
+  DEFAULT_PRECISION
+} from '../../../../consts';
 import {getFormatter} from '../../../../../../common/utils/numberFormatter';
-
-const DEFAULT_PRECISION = 2;
 
 export const ReportGridComponent = {
   template,
-  style: [style],
+  // style: [style],
   bindings: {
     reportGridContainer: '<',
     reportGridNode: '<',
@@ -161,19 +165,35 @@ export const ReportGridComponent = {
       }
     }
 
+    /**
+     * addAggregateConditionalFormat
+     * Adds conditional formatting if applicable based on the
+     * aggregate selected for the column.
+     *
+     * @param column
+     * @returns {undefined}
+     */
+    addAggregateConditionalFormat(column) {
+      const isNumberType = NUMBER_TYPES.includes(column.type);
+      if (isNumberType && ['percentage', 'avg'].includes(column.aggregate)) {
+        if (!column.format) {
+          column.format = {};
+        }
+        column.format[column.aggregate] = true;
+        column.format.precision = isFinite(column.format.precision) ? column.format.precision : DEFAULT_PRECISION;
+      } else if (INT_TYPES.includes(column.type)) {
+        column.format = column.format || {};
+        delete column.format.precision;
+      }
+    }
+
     prepareGridColumns(columns) {
       if (isEmpty(columns)) {
         return null;
       }
       return map(columns, column => {
         const isNumberType = NUMBER_TYPES.includes(column.type);
-        if (isNumberType && column.aggregate === 'percentage') {
-          if (!column.format) {
-            column.format = {};
-          }
-          column.format.percentage = true;
-          column.format.precision = DEFAULT_PRECISION;
-        }
+        this.addAggregateConditionalFormat(column);
 
         if (column.type === 'timestamp') {
           column.type = 'date';

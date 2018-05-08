@@ -1,6 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as defaults from 'lodash/defaults';
 import * as upperCase from 'lodash/upperCase';
 import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
@@ -8,6 +9,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { DATE_PRESETS_OBJ } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
+import { DashboardService } from '../../services/dashboard.service';
+import { Subscription } from 'rxjs/Subscription';
 
 const template = require('./observe-kpi.component.html');
 require('./observe-kpi.component.scss');
@@ -16,8 +19,9 @@ require('./observe-kpi.component.scss');
   selector: 'observe-kpi',
   template
 })
-export class ObserveKPIComponent implements OnInit {
+export class ObserveKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
+  _executedKPI: any;
 
   /* Used to dynamically adjust font-size based on tile height */
   fontMultipliers = {
@@ -28,16 +32,28 @@ export class ObserveKPIComponent implements OnInit {
   datePresetObj = DATE_PRESETS_OBJ;
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   secondaryResult: Array<{ name: string; value: string | number }> = [];
+  kpiFilterSubscription: Subscription;
 
-  constructor(private observe: ObserveService) {}
+  constructor(
+    private observe: ObserveService,
+    private dashboardService: DashboardService
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.kpiFilterSubscription = this.dashboardService.onFilterKPI.subscribe(
+      this.onFilterKPI.bind(this)
+    );
+  }
+
+  ngOnDestroy() {
+    this.kpiFilterSubscription && this.kpiFilterSubscription.unsubscribe();
+  }
 
   @Input()
   set kpi(data) {
     if (isEmpty(data)) return;
     this._kpi = data;
-    this.executeKPI();
+    this.executeKPI(this._kpi);
   }
 
   @Input()
@@ -48,22 +64,43 @@ export class ObserveKPIComponent implements OnInit {
     }
   }
 
-  get filterLabel() {
-    if (!this._kpi) return '';
+  onFilterKPI(filterModel) {
+    if (!this._kpi || !filterModel) return;
 
-    const preset = get(this._kpi, 'filters.0.model.preset');
+    if (!filterModel.preset) return this.executeKPI(this._kpi);
+
+    const filter = defaults(
+      {},
+      {
+        model: filterModel
+      },
+      get(this._kpi, 'filters.0')
+    );
+    const kpi = defaults({}, { filters: [filter] }, this._kpi);
+
+    return this.executeKPI(kpi);
+  }
+
+  get filterLabel() {
+    if (!this._executedKPI && !this._kpi) return '';
+
+    const preset = get(
+      this._executedKPI || this._kpi,
+      'filters.0.model.preset'
+    );
     return get(this.datePresetObj, `${preset}.label`);
   }
 
-  executeKPI() {
-    const dataFieldName = get(this._kpi, 'dataFields.0.name');
+  executeKPI(kpi) {
+    this._executedKPI = kpi;
+    const dataFieldName = get(kpi, 'dataFields.0.name');
     const [primaryAggregate, ...secondaryAggregates] = get(
-      this._kpi,
+      kpi,
       'dataFields.0.aggregate',
       []
     );
     this.observe
-      .executeKPI(this._kpi)
+      .executeKPI(kpi)
       /* Parse kpi execution results into primary and secondary aggregation results */
       .map(res => {
         const primary = {

@@ -1,0 +1,3 @@
+dl.root:   hdfs:///data/bda
+http.port: 15020
+seeds:     2784

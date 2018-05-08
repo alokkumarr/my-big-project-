@@ -19,7 +19,6 @@ import { AnalyzeChartSettingsComponent } from './components/chart/settings/analy
 import { CronDatePickerComponent } from './components/cron-date-picker/cron-date-picker.component';
 import { CronJobSchedularComponent } from './components/cron-job-schedular/cron-job-schedular.component';
 import { AnalyzeDescriptionDialogComponent } from './components/description-dialog/analyze-description-dialog.component';
-import { ArtifactColumns2PivotFieldsPipe, DesignerContainerComponent, DesignerDateFilterComponent, DesignerDescriptionComponent, DesignerDialogComponent, DesignerFilterContainerComponent, DesignerFilterRowComponent, DesignerHeaderComponent, DesignerNumberFilterComponent, DesignerPivotComponent, DesignerPreviewDialogComponent, DesignerSaveComponent, DesignerService, DesignerSettingsGroupComponent, DesignerSettingsSingleComponent, DesignerSortComponent, DesignerStringFilterComponent, DesignerToolbarComponent, ExpandDetailPivotComponent, ExpandableFieldComponent, ToolbarActionDialogComponent } from './components/designer';
 import { AnalyzeDialogComponent } from './components/dialog/analyze-dialog.component';
 import { AnalyzeExecutedDetailComponent } from './components/executed-detail/analyze-executed-detail.component';
 import { AnalyzeChartDetailComponent } from './components/executed-detail/chart/analyze-chart-detail.component';
@@ -66,14 +65,35 @@ import { SortService } from './services/sort.service';
 import { transitions } from './transitions';
 import { AnalyzeViewComponent as AnalyzeViewUpgraded, AnalyzeViewModule } from './view';
 
-
-
-
-
-
-
-
-
+import {
+  DesignerDialogComponent,
+  DesignerContainerComponent,
+  DesignerHeaderComponent,
+  DesignerToolbarComponent,
+  DesignerPivotComponent,
+  DesignerReportComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
+  DesignerSettingsGroupComponent,
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent,
+  ToolbarActionDialogComponent,
+  DesignerSortComponent,
+  DesignerDescriptionComponent,
+  DesignerSaveComponent,
+  DesignerFilterContainerComponent,
+  DesignerFilterRowComponent,
+  DesignerStringFilterComponent,
+  DesignerDateFilterComponent,
+  DesignerNumberFilterComponent,
+  DesignerPreviewDialogComponent,
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout,
+  DesignerService,
+  ArtifactColumns2PivotFieldsPipe
+} from './components/designer';
+import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
 
 
 export const AnalyzeModule = 'AnalyzeModule';
@@ -133,6 +153,7 @@ angular.module(AnalyzeModule, [
   .component('numberFilter', NumberFilterComponent)
   .component('dateFilter', DateFilterComponent)
   .component('filterChips', FilterChipsComponent)
+  .directive('filterChipsU', downgradeComponent({component: FilterChipsUpgraded}) as angular.IDirectiveFactory)
   .component('analyzeFilterRow', AnalyzeFilterRowComponent)
   .component('analyzeFilterModal', AnalyzeFilterModalComponent)
   .component('analyzeDescriptionDialog', AnalyzeDescriptionDialogComponent)
@@ -166,7 +187,10 @@ angular.module(AnalyzeModule, [
     DesignerHeaderComponent,
     DesignerToolbarComponent,
     DesignerPivotComponent,
-    DesignerSettingsSingleComponent,
+    DesignerReportComponent,
+    DesignerSettingsSingleTableComponent,
+    DesignerSettingsMultiTableComponent,
+    DesignerSettingsQueryComponent,
     DesignerSettingsGroupComponent,
     ExpandableFieldComponent,
     ExpandDetailPivotComponent,
@@ -182,7 +206,10 @@ angular.module(AnalyzeModule, [
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     CronJobSchedularComponent,
-    CronDatePickerComponent
+    CronDatePickerComponent,
+    SingleTableDesignerLayout,
+    MultiTableDesignerLayout,
+    FilterChipsUpgraded
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -191,9 +218,12 @@ angular.module(AnalyzeModule, [
     DesignerHeaderComponent,
     DesignerToolbarComponent,
     DesignerPivotComponent,
+    DesignerReportComponent,
     ExpandableFieldComponent,
     ExpandDetailPivotComponent,
-    DesignerSettingsSingleComponent,
+    DesignerSettingsSingleTableComponent,
+    DesignerSettingsMultiTableComponent,
+    DesignerSettingsQueryComponent,
     DesignerSettingsGroupComponent,
     ToolbarActionDialogComponent,
     DesignerSortComponent,
@@ -206,7 +236,10 @@ angular.module(AnalyzeModule, [
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     CronJobSchedularComponent,
-    CronDatePickerComponent
+    CronDatePickerComponent,
+    SingleTableDesignerLayout,
+    MultiTableDesignerLayout,
+    FilterChipsUpgraded
   ],
   providers: [
     $mdDialogProvider,

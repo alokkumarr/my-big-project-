@@ -9,7 +9,7 @@ export interface ArtifactColumn {
   type:           string;
   format:         Format | string | null;
   aliasName:      string;
-  aggregate?:     string;
+  aggregate?:     'sum' | 'avg' | 'min' | 'max' | 'count' | 'percentage';
   name?:          string;
 }
 
@@ -32,4 +32,6 @@ export interface ArtifactColumnReport extends ArtifactColumn {
   hide?:          boolean;
   tableName?:     string;
   joinEligible?:  boolean;
+  visibleIndex?:  number;
+  visible:        boolean;
 }

@@ -1,0 +1,9 @@
+# Values for Charter-sc application
+app.key             = Charter.SmartCare
+streams_1.topic     = data1
+streams_1.queue     = bda/data/streams/charter-sc1
+streams_2.topic     = data1
+streams_2.queue     = bda/data/streams/charter-sc2
+app.class           = synchronoss.handlers.charter.smartcare.CharterEventHandler
+key.serializer      = org.apache.kafka.common.serialization.StringSerializer
+value.serializer    = org.apache.kafka.common.serialization.StringSerializer

@@ -1,0 +1,58 @@
+[
+{
+  "action" : "update",
+  "output" : "hdfs:///var/bda/xdf-srux/upd1.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::101",
+	"source" : {
+    	"userData" : {
+					"createdBy" : "S.Nathan",
+					"description" : "Testing update",
+					"category" : "XDF-1145"
+			},
+			"systrem" : { 
+			
+				"project" : "xda-ux-sr-comp-dev",						
+				"name" : "DSSN1", 
+				"type" : "fs", 
+				"catalog" : "manager", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 20 
+			}, 
+			"transformations" : [ "transformation::spark-sql::4", "transformation::spark-sql::2" ]
+	}
+},
+{
+  "action" : "update",
+  "output" : "hdfs:///var/bda/xdf-srux/upd2.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::102",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "V.Anisimov",
+					"description" : "no description",
+					"category" : "XDF-1145"					
+			},
+			
+			"system" : { 
+				"project" : "xda-ux-sr-comp-dev",			
+				"name" : "DS2", 
+				"type" : "fs", 
+				"catalog" : "svolkov", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 20 
+				
+			}, 
+	   
+			"transformations" : [ "transformation::spark-sql::2" ]
+	}
+	
+}
+]

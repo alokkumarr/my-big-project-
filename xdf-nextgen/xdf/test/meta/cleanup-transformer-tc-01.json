@@ -1,0 +1,16 @@
+[
+{
+  "action" : "delete",
+  "output" : "hdfs:///var/bda/xdf-srux/transformer-cleanup-tc01-0.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "xda-ux-sr-comp-dev::TRTEST01_RES"
+},
+{
+  "action" : "delete",
+  "output" : "hdfs:///var/bda/xdf-srux/transformer-cleanup-tc01-1.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "xda-ux-sr-comp-dev::TRTEST01_REJECTED"
+}
+]

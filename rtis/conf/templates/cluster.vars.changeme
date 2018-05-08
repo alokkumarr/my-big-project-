@@ -1,0 +1,13 @@
+# This file is stored here for reference only,
+# edited version of this file must be present in /etc/bda
+# for RPM package installation.
+##
+# Values for Charter-sc application
+app.key             = CHANGE_ME # Charter.SmartCare
+streams_1.topic     = CHANGE_ME # data1
+streams_1.queue     = CHANGE_ME # bda/data/streams/charter-sc1
+streams_2.topic     = CHANGE_ME # data1
+streams_2.queue     = CHANGE_ME # bda/data/streams/charter-sc2
+app.class           = CHANGE_ME # synchronoss.handlers.charter.smartcare.CharterEventHandler
+key.serializer      = CHANGE_ME # org.apache.kafka.common.serialization.StringSerializer
+value.serializer    = CHANGE_ME # org.apache.kafka.common.serialization.StringSerializer

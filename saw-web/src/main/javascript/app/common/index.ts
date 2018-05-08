@@ -13,7 +13,13 @@ import 'angular-sanitize';
 import 'angular-translate';
 import 'angular-translate/dist/angular-translate-interpolation-messageformat/angular-translate-interpolation-messageformat';
 import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
-import { DxDataGridModule, DxPivotGridComponent, DxPivotGridModule, DxTemplateModule } from 'devextreme-angular';
+import {
+  DxPivotGridModule,
+  DxPivotGridComponent,
+  DxDataGridModule,
+  DxDataGridComponent,
+  DxTemplateModule
+} from 'devextreme-angular';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 import 'devextreme/integration/angular';
@@ -26,18 +32,35 @@ import 'mottle';
 import 'ng-idle';
 import AppConfig from '../../../../../appConfig';
 // import from login module
-import { AuthServiceFactory } from '../../login/services/auth.service';
-import { JwtService } from '../../login/services/jwt.service';
-import { UserService } from '../../login/services/user.service';
-import { MaterialModule } from '../material.module';
-import { CommonComponentModule } from './components';
-import { ChartService } from './components/charts/chart.service';
-import { DataFormatDialogComponent } from './components/data-format-dialog';
-import { DateFormatDialogComponent } from './components/date-format-dialog';
-import { ErrorDetailComponent } from './components/error-detail';
-import { PivotGridComponent } from './components/pivot-grid/pivot-grid.component';
 import { SearchBoxComponent } from './components/search-box';
-import { CommonDirectiveModule } from './directives';
+import 'devextreme/integration/jquery';
+import 'devextreme/integration/angular';
+
+import { MaterialModule } from '../material.module';
+
+import { ChartService } from './components/charts/chart.service';
+import {CommonComponentModule} from './components';
+import {CommonDirectiveModule} from './directives';
+// import from login module
+import {AuthServiceFactory} from '../../login/services/auth.service';
+import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {ErrorDetailComponent} from './components/error-detail';
+import {DataFormatDialogComponent} from './components/data-format-dialog';
+import {ConfirmDialogComponent} from './components/confirm-dialog';
+import {ReportGridComponent} from './components/report-grid';
+import {
+  JsPlumbConnectorComponent,
+  JsPlumbCanvasComponent,
+  JsPlumbTableComponent,
+  JsPlumbJoinLabelComponent,
+  JoinDialogComponent,
+  JsPlumbEndpointComponent
+} from './components/js-plumb';
+import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
+import {DateFormatDialogComponent} from './components/date-format-dialog';
+import { AggregateChooserComponent } from './components/aggregate-chooser';
+import {UserService} from '../../login/services/user.service';
+import {JwtService} from '../../login/services/jwt.service';
 import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import { E2eDirective } from './directives/e2e.directive';
 import { DndModule } from './dnd';
@@ -49,17 +72,6 @@ import { ErrorDetailDialogService } from './services/error-detail-dialog.service
 import { ErrorDetailService } from './services/error-detail.service';
 import ComponentHandler from './utils/componentHandler';
 import EventEmitter from './utils/eventEmitter';
-
-
-
-
-
-
-
-
-
-
-
 
 export const CommonModule = 'CommonModule';
 
@@ -107,25 +119,47 @@ angular
     DxTemplateModule,
     FormsModule,
     MaterialModule,
+    FlexLayoutModule,
     DndModule,
     DxPivotGridModule,
-    CommonPipesModule
+    CommonPipesModule,
+    DxDataGridModule
   ],
   declarations: [
     PivotGridComponent,
+    ReportGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
     E2eDirective,
     DataFormatDialogComponent,
     DateFormatDialogComponent,
-    SearchBoxComponent
+    SearchBoxComponent,
+    ConfirmDialogComponent,
+    JsPlumbCanvasComponent,
+    JsPlumbEndpointComponent,
+    JsPlumbTableComponent,
+    JsPlumbConnectorComponent,
+    JsPlumbJoinLabelComponent,
+    JoinDialogComponent,
+    DateFormatDialogComponent,
+    AliasRenameDialogComponent,
+    AggregateChooserComponent
   ],
   entryComponents: [
     PivotGridComponent,
+    ReportGridComponent,
     ErrorDetailComponent,
     DataFormatDialogComponent,
     DateFormatDialogComponent,
-    SearchBoxComponent
+    SearchBoxComponent,
+    ConfirmDialogComponent,
+    JsPlumbCanvasComponent,
+    JsPlumbTableComponent,
+    JsPlumbJoinLabelComponent,
+    JoinDialogComponent,
+    DateFormatDialogComponent,
+    AliasRenameDialogComponent,
+    AggregateChooserComponent
   ],
   exports: [
     DndModule,
@@ -142,13 +176,25 @@ angular
     DxTemplateModule,
     CommonPipesModule,
     PivotGridComponent,
+    ReportGridComponent,
     DxPivotGridComponent,
+    DxDataGridComponent,
     ClickToCopyDirective,
     ErrorDetailComponent,
     DataFormatDialogComponent,
+    ConfirmDialogComponent,
+    JsPlumbCanvasComponent,
+    JsPlumbEndpointComponent,
+    JsPlumbTableComponent,
+    JsPlumbConnectorComponent,
+    JsPlumbJoinLabelComponent,
+    JoinDialogComponent,
     DateFormatDialogComponent,
     E2eDirective,
-    SearchBoxComponent
+    SearchBoxComponent,
+    AliasRenameDialogComponent,
+    AggregateChooserComponent,
+    E2eDirective
   ],
   providers: [
     ErrorDetailService,
