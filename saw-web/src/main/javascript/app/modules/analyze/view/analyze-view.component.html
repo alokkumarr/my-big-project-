@@ -29,6 +29,7 @@
     </div>
     <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
       <button *ngIf="canUserCreate"
+              (click)="openNewAnalysisModal()"
               mat-raised-button
               color="primary">
         + <span i18n>Analysis</span>

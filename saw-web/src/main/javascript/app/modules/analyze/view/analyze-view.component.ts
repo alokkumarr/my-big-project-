@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Transition } from '@uirouter/angular';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
@@ -55,7 +55,8 @@ export class AnalyzeViewComponent implements OnInit {
     private _localStorage: LocalStorageService,
     private _jwt: JwtService,
     private _localSearch: LocalSearchService,
-    private _toastMessage: ToastService
+    private _toastMessage: ToastService,
+    @Inject('$mdDialog') private _$mdDialog: any
   ) { }
 
   ngOnInit() {
@@ -97,6 +98,28 @@ export class AnalyzeViewComponent implements OnInit {
   removeDeletedAnalysis(analysis) {
     this.analyses = filter(this.analyses, report => {
       return report.id !== analysis.id;
+    });
+  }
+
+  openNewAnalysisModal() {
+    this._headerProgress.show();
+    this._analyzeService.getSemanticLayerData().then(metrics => {
+      this._headerProgress.hide();
+      this._$mdDialog.show({
+        controller: scope => {
+          scope.metrics = metrics;
+          scope.subCategory = this.analysisId;
+        },
+        template: '<analyze-new metrics="metrics" sub-category="{{::subCategory}}"></analyze-new>',
+        fullscreen: true,
+        controllerAs: '$ctrl',
+        multiple: false,
+        autoWrap: false,
+        focusOnOpen: false,
+        clickOutsideToClose: true
+      });
+    }).catch(() => {
+      this._headerProgress.hide();
     });
   }
 
