@@ -55,7 +55,6 @@ export class AnalyzeActionsMenuComponent {
   ) {}
 
   ngOnInit() {
-    console.log('exclude:', this.exclude);
     const actionsToExclude = isString(this.exclude) ? this.exclude.split('-') : [];
     this.actions = filter(this.actions, ({value}) => {
       const notExcluded = !actionsToExclude.includes(value);
