@@ -1,5 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <div class="button-group">
+  <div class="button-group" *ngIf="showInversion">
     <button mat-icon-button>
       <mat-icon fontIcon="icon-hor-bar-chart"
                 (click)="setInversion(true)">
@@ -12,7 +12,7 @@
     </button>
   </div>
 
-  <div>
+  <div *ngIf="showLegendOpts">
     <mat-form-field>
       <mat-select placeholder="Legend Position" [(ngModel)]="legend.align" (change)="onLegendChange()">
         <mat-option *ngFor="let pos of legend.options.align" [value]="pos.name">

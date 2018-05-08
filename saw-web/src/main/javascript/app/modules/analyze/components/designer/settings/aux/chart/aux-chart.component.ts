@@ -28,10 +28,22 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
 
   legend: any;
 
+  showLegendOpts: boolean;
+  showInversion: boolean;
+
   constructor(private chartService: ChartService) {}
 
   ngOnInit() {
     this.legend = this.chartService.initLegend({ chartType: this.chartType });
+    this.showLegendOpts = this.chartType !== 'pie';
+    this.showInversion = [
+      'column',
+      'bar',
+      'line',
+      'area',
+      'combo',
+      'stack'
+    ].includes(this.chartType);
   }
 
   setInversion(isInverted) {
