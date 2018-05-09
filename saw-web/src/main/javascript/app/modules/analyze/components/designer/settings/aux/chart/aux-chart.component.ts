@@ -69,7 +69,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
 
   onLegendChange() {
     this.change.emit({
-      subject: 'inversion',
+      subject: 'legend',
       data: {
         legend: {
           align: this.legend.align,
