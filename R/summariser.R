@@ -16,6 +16,11 @@
 #'@return returns DataFrame with one row for each unique combination of grouping
 #'  variables provided
 #'
+#'@export
+#'@import dplyr
+#'@import checkmate
+#'@import sparklyr
+#'
 #'@examples
 #'library(dplyr)
 #'
@@ -24,7 +29,7 @@
 #'           group_vars = c("Species"),
 #'           measure_vars = c("Sepal.Length", "Sepal.Width"),
 #'           fun = c("sum", "mean"))
-#'@export
+
 summariser <- function(df, group_vars, measure_vars, fun, ...) {
   UseMethod("summariser")
 }

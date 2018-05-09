@@ -26,6 +26,9 @@ already exists?}
 
 \item{...}{}
 }
+\value{
+Spark Dataframe
+}
 \description{
 Function to read files into Spark. Supports several file types, including
 text, csv, parquet, and json

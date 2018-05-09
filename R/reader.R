@@ -19,10 +19,8 @@
 #'   already exists?
 #' @param ...
 #'
-#' @return
+#' @return Spark Dataframe
 #' @export
-#'
-#' @examples
 reader <- function(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE, ...) {
   checkmate::assert_class(sc, "spark_connection")
   checkmate::assert_character(name)
