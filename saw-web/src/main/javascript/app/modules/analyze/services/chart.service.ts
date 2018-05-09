@@ -378,7 +378,13 @@ export class ChartService {
     if (sorts && sorts.length) {
       forEach(categories, (v, k) => {
         const field =
-          filter(fieldsArray, field => field.checked === k)[0] || {};
+          filter(
+            fieldsArray,
+            field =>
+              (typeof field.checked === 'string'
+                ? field.checked
+                : field.area) === k
+          )[0] || {};
         const sortField =
           filter(
             sorts,
@@ -583,7 +589,10 @@ export class ChartService {
     return reduce(
       fieldsArray,
       (accumulator, field) => {
-        accumulator[field.checked] = field.columnName;
+        accumulator[
+          typeof field.checked === 'string' ? field.checked : field.area
+        ] =
+          field.columnName;
         return accumulator;
       },
       {}

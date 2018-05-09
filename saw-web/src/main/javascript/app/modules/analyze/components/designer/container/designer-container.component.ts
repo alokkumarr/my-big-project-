@@ -354,7 +354,17 @@ export class DesignerContainerComponent {
   }
 
   getFirstArtifactColumns() {
-    return [...this.analysis.artifacts[0].columns];
+    const indices = {};
+    return map(get(this.analysis, 'artifacts.0.columns') || [], column => {
+      if (column.checked && column.checked !== true) {
+        column.area = column.checked;
+        column.checked = true;
+        indices[column.area] = indices[column.area] || 0;
+        column.areaIndex = indices[column.area]++;
+      }
+
+      return column;
+    });
   }
 
   updateAnalysis() {
