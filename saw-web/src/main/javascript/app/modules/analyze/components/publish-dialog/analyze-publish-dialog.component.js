@@ -6,7 +6,6 @@ import * as first from 'lodash/first';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as moment from 'moment';
-import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
