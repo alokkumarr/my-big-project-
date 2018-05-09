@@ -30,3 +30,7 @@ already exists?}
 Function to read files into Spark. Supports several file types, including
 text, csv, parquet, and json
 }
+\details{
+If directory path provided, reader will scan the directory and calculate the
+most frequency file type and apply the appropriate read function
+}
