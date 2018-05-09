@@ -1,7 +1,7 @@
 <mat-accordion>
-  <mat-expansion-panel class="menu-panel-header" [expanded]="expanded">
+  <mat-expansion-panel class="menu-panel-header sidenav-mainmenu" [expanded]="expanded">
     <mat-expansion-panel-header *ngIf="!hasChildren()">
-      <mat-panel-title>
+      <mat-panel-title class="sidenav-mainmenu">
           <span [innerHtml]="metadata.name"></span>
       </mat-panel-title>
     </mat-expansion-panel-header>
@@ -13,7 +13,7 @@
     </div> -->
 
     <div *ngIf="!hasChildren()">
-      <div class="menu-panel-content" *ngFor="let item of metadata.children">
+      <div class="menu-panel-content sidenav-mainmenu" *ngFor="let item of metadata.children">
         <a [class.activeButton]="checkActiveMenu(item.url)" [attr.href]="item.url" [class.active]="active">{{item.name}}</a>
       </div>
     </div>

@@ -2,7 +2,7 @@
   color: #0096D5;
 }
 
-.menu-panel-content a {
+.menu-panel-content.sidenav-mainmenu a {
   display: block;
   padding: 0 24px;
   line-height: 40px;
@@ -15,17 +15,8 @@
   color: #0096D5 !important;
 }
 
-.menu-panel-header {
+.menu-panel-header.sidenav-mainmenu {
   border-top: 1px solid #EEE;
-}
-
-.mat-expansion-panel {
-  box-shadow: none !important;
-}
-
-.mat-expansion-panel-header {
-  padding: 0 !important;
-  width: 92%;
 }
 
 .no-children {
@@ -39,7 +30,7 @@
   }
 }
 
-mat-panel-title {
+mat-panel-title.sidenav-mainmenu {
   border-radius: 0;
   color: #5C6670;
   cursor: pointer;
