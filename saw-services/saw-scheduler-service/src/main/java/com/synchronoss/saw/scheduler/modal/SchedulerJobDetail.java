@@ -340,7 +340,7 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(description);
         out.writeObject(emailList);
         out.writeObject(fileType);
-        if (ftp!=null || ftp.size()>0)
+        if (ftp!=null && ftp.size()>0)
         out.writeObject(ftp);
         out.writeObject(jobGroup);
         out.writeObject(jobName);

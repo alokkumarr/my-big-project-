@@ -177,7 +177,7 @@ export const AnalyzePublishDialogComponent = {
           this.crondetails.cronexp = '';
           this.crondetails.startDate = moment.utc().format();
         }
-
+        
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
