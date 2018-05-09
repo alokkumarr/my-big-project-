@@ -355,7 +355,6 @@ export class DesignerService {
   }
 
   getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {
-    console.log(artifactColumns, type);
     const pivotFields = fpPipe(
       fpFilter(
         (artifactColumn: ArtifactColumnPivot) =>

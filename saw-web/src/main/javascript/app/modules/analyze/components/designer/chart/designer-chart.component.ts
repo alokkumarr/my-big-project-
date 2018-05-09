@@ -2,6 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 const template = require('./designer-chart.component.html');
 require('./designer-chart.component.scss');
 
+import { DesignerStates } from '../container';
+import { CHART_TYPES_OBJ } from '../../../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../services/chart.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -21,6 +23,8 @@ export class DesignerChartComponent implements OnInit {
   _sqlBuilder: SqlBuilderChart;
   _data: Array<any>;
   _auxSettings: any = {};
+  DesignerStates = DesignerStates;
+  CHART_TYPES_OBJ = CHART_TYPES_OBJ;
 
   settings: { xaxis: any; yaxis: Array<any>; zaxis: any; groupBy: any };
   chartOptions: any;
@@ -29,6 +33,8 @@ export class DesignerChartComponent implements OnInit {
     height: 500
   };
   isStockChart: boolean;
+
+  @Input() designerState: DesignerStates;
 
   @Input() chartType: string;
 
