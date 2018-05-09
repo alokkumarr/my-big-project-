@@ -2,12 +2,14 @@ import { Component, OnInit, Input } from '@angular/core';
 const template = require('./designer-chart.component.html');
 require('./designer-chart.component.scss');
 
-import { SqlBuilderChart } from '../types';
+import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../../services/chart.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
+import * as clone from 'lodash/clone';
+import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 
@@ -29,6 +31,8 @@ export class DesignerChartComponent implements OnInit {
   isStockChart: boolean;
 
   @Input() chartType: string;
+
+  @Input() sorts: Array<Sort> = [];
 
   @Input()
   set sqlBuilder(data: SqlBuilderChart) {
@@ -66,7 +70,7 @@ export class DesignerChartComponent implements OnInit {
   set data(executionData) {
     this._data = executionData;
     if (executionData && executionData.length) {
-      this.reloadChart(executionData);
+      this.reloadChart(executionData, [...this.getLegendConfig()]);
     }
   }
 
@@ -77,7 +81,7 @@ export class DesignerChartComponent implements OnInit {
     this.chartOptions = this._chartService.getChartConfigFor(this.chartType, {
       chart: this.chartHgt,
       legend: this._chartService.initLegend({
-        ...(this._auxSettings.legend || {}),
+        ...({ legend: this._auxSettings.legend } || {}),
         chartType: this.chartType
       })
     });
@@ -117,8 +121,8 @@ export class DesignerChartComponent implements OnInit {
       ...this._chartService.dataToChangeConfig(
         this.chartType,
         this.settings,
-        data,
-        { labels: {}, sorts: [] }
+        map(data || [], clone),
+        { labels: {}, sorts: this.sorts }
       )
     ];
 

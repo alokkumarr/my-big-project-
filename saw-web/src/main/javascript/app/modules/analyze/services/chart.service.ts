@@ -382,7 +382,9 @@ export class ChartService {
         const sortField =
           filter(
             sorts,
-            sortF => sortF.field.dataField === field.columnName
+            sortF =>
+              (sortF.field ? sortF.field.dataField : sortF.columnName) ===
+              field.columnName
           )[0] || {};
         categories[k] = fpOrderBy(
           value => this.getSortValue(field, value),

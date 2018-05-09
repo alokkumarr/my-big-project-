@@ -23,18 +23,31 @@ const INVERTING_OPTIONS = [
 })
 export class DesignerSettingsAuxChartComponent implements OnInit {
   @Input() chartType: string;
+  @Input() isInverted: boolean;
 
   @Output('settingsChange') change = new EventEmitter();
-
-  legend: any;
 
   showLegendOpts: boolean;
   showInversion: boolean;
 
+  @Input('legend')
+  set analysisLegend(data: any) {
+    if (!data) return;
+
+    this.legend = this.legend || {};
+    this.legend.align = data.align;
+    this.legend.layout = data.layout;
+  }
+
+  legend: any;
+
   constructor(private chartService: ChartService) {}
 
   ngOnInit() {
-    this.legend = this.chartService.initLegend({ chartType: this.chartType });
+    this.legend = this.chartService.initLegend({
+      ...(this.legend ? { legend: this.legend } : {}),
+      chartType: this.chartType
+    });
     this.showLegendOpts = this.chartType !== 'pie';
     this.showInversion = [
       'column',
@@ -47,6 +60,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
   }
 
   setInversion(isInverted) {
+    this.isInverted = isInverted;
     this.change.emit({
       isInverted
     });

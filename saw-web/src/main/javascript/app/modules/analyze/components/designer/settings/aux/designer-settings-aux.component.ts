@@ -9,6 +9,7 @@ const template = require('./designer-settings-aux.component.html');
 export class DesignerSettingsAuxComponent implements OnInit {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
+  @Input() auxSettings: any;
 
   @Output('settingsChange') change = new EventEmitter();
 

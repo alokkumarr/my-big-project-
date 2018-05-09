@@ -101,7 +101,6 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
     case AnalyseTypes.Report:
       return openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
     case AnalyseTypes.Chart:
-      return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
     case AnalyseTypes.Pivot:
       return AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode)
         .afterClosed().first().toPromise();

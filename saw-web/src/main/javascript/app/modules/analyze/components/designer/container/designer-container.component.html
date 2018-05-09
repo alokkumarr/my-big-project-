@@ -16,6 +16,7 @@
 
 <div fxLayout="column">
   <designer-settings-aux class="designer__main"
+                         [auxSettings]="auxSettings"
                          [analysisType]="(analysisStarter || analysis).type"
                          [analysisSubtype]="(analysisStarter || analysis).chartType"
                          (settingsChange)="onAuxSettingsChange($event)"></designer-settings-aux>
@@ -32,6 +33,7 @@
     <designer-chart class="designer__main"
                     *ngSwitchCase="'chart'"
                     [chartType]="(analysisStarter || analysis).chartType"
+                    [sorts]="sorts"
                     [auxSettings]="auxSettings"
                     [data]="data"
                     [sqlBuilder]="analysis && analysis.sqlBuilder">
