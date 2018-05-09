@@ -9,6 +9,7 @@ import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as moment from 'moment';
+import "../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css";
 
 import {
   getLocalMinute, generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
@@ -55,6 +56,9 @@ export class CronJobSchedularComponent {
   	this.weekly = {};
   	this.monthly = {};
   	this.yearly = {};
+    this.selectedMoments = [];
+    this.selectedMoments.push(new Date(moment().local().startOf('day').format()));
+    this.selectedMoments.push(new Date(moment().local().endOf('day').format()));
 
     this.hours = this.range(0,23);
     this.minutes = this.range(0,59);
@@ -227,12 +231,18 @@ export class CronJobSchedularComponent {
   }
 
   cronChange() {
+    this.startDate = '';
+    this.endDate = '';
+    if (this.scheduleType !== 'immediate') {
+      this.startDate = (isUndefined(this.selectedMoments[0]) || this.selectedMoments[1] === null ? moment.utc() : this.selectedMoments[0]);
+      this.endDate = (isUndefined(this.selectedMoments[1]) || this.selectedMoments[1] === null ? '' : this.selectedMoments[1]);
+    }
     this.crondetails = {
       cronexp: this.CronExpression,
       activeTab: this.scheduleType,
       activeRadio: this.activeRadio,
-      startDate: (new Date(this.startDate) === 'Invalid Date' ? '' : new Date(this.startDate)),
-      endDate: (new Date(this.endDate) === 'Invalid Date' ? '' : new Date(this.endDate))
+      startDate: this.startDate,
+      endDate: this.endDate
     }
     this.onCronChanged.emit(this.crondetails);
   }
@@ -242,11 +252,10 @@ export class CronJobSchedularComponent {
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
     this.activeRadio = this.crondetails.activeRadio;
-    this.startDate = new Date(this.crondetails.startDate);
-    this.endDate = '';
-    if (this.crondetails.endDate !== null && this.crondetails.endDate !== '') {
-      this.endDate = new Date(this.crondetails.endDate);
-      this.endDate = moment(this.endDate).subtract(1, 'days');
+    this.selectedMoments = [];
+    this.selectedMoments.push(new Date(moment(this.crondetails.startDate).local()));
+    if (!isUndefined(this.crondetails.endDate) && this.crondetails.endDate !== null) {
+      this.selectedMoments.push(new Date(moment(this.crondetails.endDate).local()));
     }
     
     if (isEmpty(this.crondetails.cronexp)) {

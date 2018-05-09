@@ -119,16 +119,22 @@
 </div>
 
 <div class="dateDetails" *ngIf="scheduleType !== 'immediate'">
-  <mat-form-field>
-    <input matInput [matDatepicker]="fromDatePicker" [max]="endDate" [(ngModel)]="startDate" [value]="startDate" (dateChange)="cronChange();" placeholder="Start date" />
-    <mat-datepicker-toggle matSuffix [for]="fromDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #fromDatePicker ng-model-options="{ timezone: 'utc' }"></mat-datepicker>
-  </mat-form-field>
-  <span class="clear" (click)="startDate = '';cronChange();">Clear</span><br/>
-  <mat-form-field>
-    <input matInput [matDatepicker]="toDatePicker" [min]="startDate" [(ngModel)]="endDate" [value]="endDate" (dateChange)="cronChange();" placeholder="End date" />
-    <mat-datepicker-toggle matSuffix [for]="toDatePicker"></mat-datepicker-toggle>
-    <mat-datepicker #toDatePicker ng-model-options="{ timezone: 'utc' }"></mat-datepicker> 
-  </mat-form-field>
-  <span class="clear" (click)="endDate = '';cronChange();">Clear</span><br/>
+  <label>
+      Start Date:
+      <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12"
+             [(ngModel)]="selectedMoments"
+             [selectMode]="'rangeFrom'"
+             (ngModelChange)="cronChange()">
+      <owl-date-time #dt12></owl-date-time>
+  </label>
+  <br/><br/>
+  <label>
+      End Date:
+      <input [owlDateTimeTrigger]="dt13" [owlDateTime]="dt13"
+             [(ngModel)]="selectedMoments"
+             [selectMode]="'rangeTo'"
+             (ngModelChange)="cronChange()">
+      <owl-date-time #dt13></owl-date-time>
+  </label>
+  <span class="clear" (click)="selectedMoments = []">Clear</span><br/>
 </div>

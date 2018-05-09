@@ -1,10 +1,14 @@
 cron-job-schedular {
   border: 1px solid #CCC;
 
-  .dateDetails .clear {
-    color: #0096D5;
-    cursor: pointer;
-    font-size: 14px;
+  .dateDetails {
+    margin: 18px;
+
+    .clear {
+      color: #0096D5;
+      cursor: pointer;
+      font-size: 14px;
+    }
   }
 
   mat-tab-group mat-tab-header div div div .mat-tab-label {

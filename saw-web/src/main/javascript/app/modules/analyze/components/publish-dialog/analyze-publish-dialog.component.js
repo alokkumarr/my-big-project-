@@ -171,18 +171,14 @@ export const AnalyzePublishDialogComponent = {
         };
         this.triggerSchedule();
       } else if (this.validateForm()) {
-        const eDate = ((!isUndefined(this.crondetails.endDate) && moment(this.crondetails.endDate).isValid()) ? moment.utc(this.crondetails.endDate).endOf('day').add(1, 'days') : '');
-        let sDate = (moment(this.crondetails.startDate).isSame(moment(), 'day') ? moment().utc() : moment.utc(this.crondetails.startDate).startOf('day'));
         let cronJobName = this.model.id;
-        if (!moment(sDate).isValid()) {
-          sDate = moment.utc().format();
-        }
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
           this.crondetails.cronexp = '';
-          sDate = moment.utc().format();
+          this.crondetails.startDate = moment.utc().format();
         }
+
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -195,11 +191,11 @@ export const AnalyzePublishDialogComponent = {
           ftp: this.ftp,
           fileType: 'csv',
           jobName: cronJobName,
-          endDate: eDate,
+          endDate: this.crondetails.endDate,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: sDate,
+          jobScheduleTime: this.crondetails.startDate,
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };
