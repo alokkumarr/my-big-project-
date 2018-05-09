@@ -214,6 +214,7 @@ public class ExportServiceImpl implements ExportService{
         });
       }
 
+      // this export is synchronous
       if (ftp!=null && ftp != "") {
 
         // Do the background work beforehand
@@ -250,7 +251,7 @@ public class ExportServiceImpl implements ExportService{
           // we directly get response and start processing this.
           ResponseEntity<DataResponse> entity = restTemplate.exchange(url, HttpMethod.GET,
               requestEntity, DataResponse.class);
-          logger.debug("[Success] Response :" + entity.getStatusCode());
+//          logger.debug("[Success] Response :" + entity.getStatusCode());
 
           try {
             // create a directory with unique name in published location to avoid file conflict for dispatch.
@@ -368,6 +369,7 @@ public class ExportServiceImpl implements ExportService{
                         .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
                         .collect(Collectors.joining(",")));
                 osw.write("\n");
+                logger.debug("Header for csv file: " + header);
               } else {
                 // ideally we shouldn't be using collectors but it's a single row so it
                 // won't hamper memory consumption
@@ -376,6 +378,7 @@ public class ExportServiceImpl implements ExportService{
                         .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
                         .collect(Collectors.joining(",")));
                 osw.write("\n");
+                logger.debug("Line Item for report: " + line.toString());
               }
             }
           } catch (Exception e) {
