@@ -3,6 +3,6 @@
     [isInverted]="auxSettings.isInverted"
     [legend]="auxSettings.legend"
     [chartType]="analysisSubtype"
-    (settingsChange)="change.emit($event)">
+    (change)="change.emit($event)">
   </designer-settings-aux-chart>
 </ng-container>

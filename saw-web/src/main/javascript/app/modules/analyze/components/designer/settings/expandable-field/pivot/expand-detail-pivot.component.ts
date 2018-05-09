@@ -1,7 +1,15 @@
-declare const require: any;
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import * as moment from 'moment';
-import { ArtifactColumnPivot, Format } from '../../../types';
+import {
+  ArtifactColumnPivot,
+  Format,
+  DesignerChangeEvent
+} from '../../../types';
 import {
   AGGREGATE_TYPES,
   DATE_INTERVALS,
@@ -17,8 +25,6 @@ import {
   isFormatted
 } from '../../../../../../../common/utils/numberFormatter';
 
-import { FieldChangeEvent } from '../../single';
-
 const template = require('./expand-detail-pivot.component.html');
 
 const FLOAT_SAMPLE = 1000.33333;
@@ -28,7 +34,7 @@ const INT_SAMPLE = 1000;
   template
 })
 export class ExpandDetailPivotComponent {
-  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnPivot;
 
@@ -41,7 +47,7 @@ export class ExpandDetailPivotComponent {
   public dateSample: string;
   public isFloat: boolean;
 
-  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
+  constructor(private _analyzeDialogService: AnalyzeDialogService) { }
 
   ngOnInit() {
     const type = this.artifactColumn.type;
@@ -53,7 +59,7 @@ export class ExpandDetailPivotComponent {
 
   onAliasChange(value) {
     this.artifactColumn.aliasName = value;
-    this.change.emit({ requiresDataChange: false });
+    this.change.emit({ subject: 'aliasName' });
   }
 
   onDateIntervalChange(value) {
@@ -61,14 +67,14 @@ export class ExpandDetailPivotComponent {
     if (this.artifactColumn.dateInterval !== 'day') {
       this.artifactColumn.format = DEFAULT_DATE_FORMAT.value;
     }
-    this.change.emit({ requiresDataChange: true });
+    this.change.emit({ subject: 'dateInterval' });
   }
 
   onFormatChange(format: Format | string) {
     if (format) {
       this.artifactColumn.format = format;
       this.changeSample();
-      this.change.emit({ requiresDataChange: false });
+      this.change.emit({ subject: 'format' });
     }
   }
 

@@ -1,5 +1,7 @@
-import { DesignerSettingsSingleComponent } from './single';
+import { DesignerSettingsSingleTableComponent } from './single';
+import { DesignerSettingsMultiTableComponent } from './multi';
 import { DesignerSettingsGroupComponent } from './group';
+import { DesignerSettingsQueryComponent } from './query';
 import {
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
@@ -10,7 +12,9 @@ import {
   DesignerSettingsAuxChartComponent
 } from './aux';
 export {
-  DesignerSettingsSingleComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
   DesignerSettingsGroupComponent,
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent,

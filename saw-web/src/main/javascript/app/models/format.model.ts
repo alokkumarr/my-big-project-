@@ -4,4 +4,5 @@ export interface Format {
   comma?:          boolean;
   currency?:       string;
   currencySymbol?: string;
+  percentage?:     boolean;
 }

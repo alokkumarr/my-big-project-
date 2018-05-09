@@ -1,6 +1,15 @@
-declare const require: any;
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { ArtifactColumn, ArtifactColumnChart, AnalysisType } from '../../types';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
+import {
+  ArtifactColumn,
+  ArtifactColumnChart,
+  AnalysisType,
+  DesignerChangeEvent
+} from '../../types';
 import {
   TYPE_ICONS_OBJ,
   AGGREGATE_TYPES,
@@ -11,13 +20,12 @@ import {
 
 const template = require('./expandable-field.component.html');
 require('./expandable-field.component.scss');
-import { FieldChangeEvent } from '../single';
 @Component({
   selector: 'expandable-field',
   template
 })
 export class ExpandableFieldComponent {
-  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
@@ -35,11 +43,11 @@ export class ExpandableFieldComponent {
 
   onAggregateChange(value) {
     this.artifactColumn.aggregate = value;
-    this.change.emit({ requiresDataChange: true });
+    this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
   }
 
   onComboTypeChange(comboType) {
     (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
-    this.change.emit({ requiresDataChange: false });
+    this.change.emit({ subject: 'comboType', column: this.artifactColumn });
   }
 }

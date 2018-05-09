@@ -7,6 +7,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
 import * as concat from 'lodash/concat';
 import * as flatMap from 'lodash/flatMap';
 import * as take from 'lodash/take';
@@ -22,7 +23,11 @@ import {
   ArtifactColumn,
   ArtifactColumns,
   ArtifactColumnPivot,
-  ArtifactColumnChart
+  ArtifactColumnChart,
+  SqlBuilder,
+  SqlBuilderPivot,
+  SqlBuilderEsReport,
+  SqlBuilderChart
 } from './types';
 import {
   NUMBER_TYPES,
@@ -46,8 +51,8 @@ export class DesignerService {
     return this._analyzeService.getDataBySettings(analysis);
   }
 
-  getDataForAnalysisPreview(analysis) {
-    return this._analyzeService.previewExecution(analysis);
+  getDataForAnalysisPreview(analysis, options) {
+    return this._analyzeService.previewExecution(analysis, options);
   }
 
   getCategories(privilege) {
@@ -354,7 +359,9 @@ export class DesignerService {
     adapter.onReorder(adapter.artifactColumns);
   }
 
-  getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {
+  getPartialPivotSqlBuilder(
+    artifactColumns: ArtifactColumns
+  ): Partial<SqlBuilderPivot> {
     const pivotFields = fpPipe(
       fpFilter(
         (artifactColumn: ArtifactColumnPivot) =>
@@ -377,7 +384,17 @@ export class DesignerService {
         })
       )
     )(artifactColumns);
+    return {
+      rowFields: pivotFields.row || [],
+      columnFields: pivotFields.column || [],
+      // the data field must be non-empty
+      dataFields: pivotFields.data
+    };
+  }
 
+  getPartialChartSqlBuilder(
+    artifactColumns: ArtifactColumns
+  ): Partial<SqlBuilderChart> {
     const chartFields = fpPipe(
       fpFilter(
         (artifactColumn: ArtifactColumnChart) =>
@@ -410,23 +427,18 @@ export class DesignerService {
       )
     )(artifactColumns);
 
-    /* prettier-ignore */
-    switch (type) {
-    case 'pivot':
-      return {
-        rowFields: pivotFields.row || [],
-        columnFields: pivotFields.column || [],
-        // the data field must be non-empty
-        dataFields: pivotFields.data
-      };
-    case 'chart':
-      return {
-        dataFields: [...(chartFields.y || []), ...(chartFields.z || [])],
-        nodeFields: [...(chartFields.x || []), ...(chartFields.g || [])]
-      }
-    case 'report':
-      return {};
-    }
+    return {
+      dataFields: [...(chartFields.y || []), ...(chartFields.z || [])],
+      nodeFields: [...(chartFields.x || []), ...(chartFields.g || [])]
+    };
+  }
+
+  getPartialEsReportSqlBuilder(
+    artifactColumns: ArtifactColumns
+  ): Partial<SqlBuilderEsReport> {
+    return {
+      dataFields: filter(artifactColumns, 'checked')
+    };
   }
 
   parseData(data, sqlBuilder) {

@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { downgradeComponent } from '@angular/upgrade/static';
 import * as angular from 'angular';
 import * as Highstock from 'highcharts/highstock';

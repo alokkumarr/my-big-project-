@@ -7,7 +7,7 @@ import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 
-import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS, Events} from '../../consts';
+import {ANALYSIS_METHODS, Events} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -117,28 +117,11 @@ export const AnalyzeNewComponent = {
     createAnalysis() {
       let tpl;
       let model;
-      let type;
-      const semanticId = this.selectedMetric.id;
-      const metricName = this.selectedMetric.metricName;
-      const mode = ENTRY_MODES.NEW;
 
       switch (this.selectedAnalysisMethod) {
       /* eslint-disable no-fallthrough */
       case 'table:esReport':
-        type = AnalyseTypes.ESReport;
       case 'table:report':
-        tpl = `<analyze-report model="model" mode="${mode}"></analyze-report>`;
-        model = {
-          type: type || AnalyseTypes.Report,
-          name: 'Untitled Analysis',
-          description: '',
-          categoryId: this.subCategory,
-          semanticId,
-          metricName,
-          scheduled: null
-        };
-        break;
-      /* eslint-enable no-fallthrough */
       case 'table:pivot':
       case 'chart:column':
       case 'chart:bar':

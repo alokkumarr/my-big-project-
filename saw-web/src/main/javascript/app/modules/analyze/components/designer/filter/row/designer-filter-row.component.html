@@ -6,16 +6,22 @@
        class="filter__data__space"
        fxLayoutAlign="start">
     <mat-form-field>
-      <mat-select placeholder="Column"
-                  (selectionChange)="onArtifactColumnSelected($event.value)"
-                  [value]="filter.columnName"
-                  e2e="filter-select">
-        <mat-option *ngFor="let artifactColumn of artifactColumns"
-                    [value]="artifactColumn.columnName"
-                    [e2e]="'filter-select-option-' + (artifactColumn.displayName)">
+      <input type="text" placeholder="Column" matInput
+             #autoInput
+             e2e="filter-autocomplete-input"
+             [matAutocomplete]="auto"
+             [formControl]="formControl"/>
+      <button mat-button *ngIf="autoInput.value" matSuffix mat-icon-button (click)="clearInput()">
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+      <mat-autocomplete #auto="matAutocomplete"
+                        [displayWith]="displayWith"
+                        (optionSelected)="onArtifactColumnSelected($event.option.value.columnName)">
+        <mat-option *ngFor="let artifactColumn of filteredColumns | async"
+                    [value]="artifactColumn">
           {{ artifactColumn.displayName }}
         </mat-option>
-      </mat-select>
+      </mat-autocomplete>
     </mat-form-field>
 
     <div *ngIf="!filter.isRuntimeFilter && !filter.isGlobalFilter" style="margin-left: 10px;">

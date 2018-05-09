@@ -1,6 +1,5 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
-import * as deepClone from 'lodash/cloneDeep';
 
 import {AnalyseTypes, Events} from '../../consts';
 
@@ -30,7 +29,15 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function fork(analysis) {
     const model = clone(analysis);
     model.name += ' Copy';
-    return openEditModal(model, 'fork');
+    return openEditModal(model, 'fork').then(status => {
+      if (!status) {
+        return status;
+      }
+
+      $eventEmitter.emit(Events.AnalysesRefresh);
+
+      return status;
+    });
   }
 
   function edit(analysis) {
@@ -88,21 +95,13 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function openEditModal(analysis, mode) {
     /* Delayed injection of service to battle issues with downgradeModule */
     const AnalyzeDialogService = $injector.get('AnalyzeDialogService');
-    const openModal = template => showDialog({
-      template,
-      controller: scope => {
-        scope.model = deepClone(analysis);
-      },
-      multiple: true
-    });
 
     switch (analysis.type) {
+    case AnalyseTypes.Chart:
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
-      return openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
-    case AnalyseTypes.Chart:
     case AnalyseTypes.Pivot:
-      return AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode)
+      return AnalyzeDialogService.openEditAnalysisDialog(analysis, mode)
         .afterClosed().first().toPromise();
     default:
     }

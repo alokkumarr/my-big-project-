@@ -8,7 +8,8 @@ import {
   ArtifactColumnReport,
   Sort,
   Filter,
-  FilterModel
+  FilterModel,
+  AnalysisType
 } from './models';
 
 export type ArtifactColumns =
@@ -23,15 +24,17 @@ export type ArtifactColumn =
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
+  ArtifactColumnReport,
   Sort,
   Format,
   Filter,
   FilterModel,
-  Artifact
+  Artifact,
+  AnalysisType,
+  AnalysisReport
 };
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
-export type AnalysisType = 'report' | 'chart' | 'pivot';
 export type ChartType =
   | 'line'
   | 'column'
@@ -65,7 +68,9 @@ export type DesignerToolbarAciton =
   | 'sort'
   | 'preview'
   | 'filter'
-  | 'save';
+  | 'save'
+  | 'refresh'
+  | 'modeToggle';
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;

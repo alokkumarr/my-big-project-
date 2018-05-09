@@ -18,6 +18,16 @@ import { ToolbarActionDialogComponent } from '../components/designer/toolbar-act
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
+import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
+import { ConfirmDialogData } from '../../../common/types';
+
+const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
+  title: 'Are you sure you want to proceed?',
+  content:
+    'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
+  positiveActionLabel: 'Save',
+  negativeActionLabel: 'Cancel'
+};
 
 @Injectable()
 export class AnalyzeDialogService {
@@ -31,7 +41,7 @@ export class AnalyzeDialogService {
     return this.openAnalysisDialog(data);
   }
 
-  openEditAdnalysisDialog(analysis: Analysis, mode: DesignerMode = 'edit') {
+  openEditAnalysisDialog(analysis: Analysis, mode: DesignerMode = 'edit') {
     const data: AnalysisDialogData = {
       analysis,
       designerMode: mode
@@ -49,20 +59,27 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSortDialog(sorts: Sort[], artifactColumns: ArtifactColumns) {
+  openSortDialog(sorts: Sort[], artifacts: Artifact[]) {
     const data: IToolbarActionData = {
       action: 'sort',
       sorts,
-      artifactColumns
+      artifacts
     };
+
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data
     } as MatDialogConfig);
   }
 
-  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria, supportsGlobalFilters = false) {
+  openFilterDialog(
+    filters: Filter[],
+    artifacts: Artifact[],
+    booleanCriteria,
+    supportsGlobalFilters = false
+  ) {
     const data: IToolbarActionData = {
       action: 'filter',
       filters,
@@ -73,6 +90,7 @@ export class AnalyzeDialogService {
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data
     } as MatDialogConfig);
   }
@@ -129,6 +147,14 @@ export class AnalyzeDialogService {
       width: 'auto',
       height: 'auto',
       data
+    } as MatDialogConfig);
+  }
+
+  openQueryConfirmationDialog() {
+    return this.dialog.open(ConfirmDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: CONFIRM_DIALOG_DATA
     } as MatDialogConfig);
   }
 }

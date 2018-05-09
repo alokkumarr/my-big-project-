@@ -1,4 +1,3 @@
-declare const require: any;
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import * as get from 'lodash/get';
 import * as moment from 'moment';

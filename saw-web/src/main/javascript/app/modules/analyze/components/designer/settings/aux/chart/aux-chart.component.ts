@@ -25,7 +25,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
   @Input() chartType: string;
   @Input() isInverted: boolean;
 
-  @Output('settingsChange') change = new EventEmitter();
+  @Output() change = new EventEmitter();
 
   showLegendOpts: boolean;
   showInversion: boolean;
@@ -62,15 +62,19 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
   setInversion(isInverted) {
     this.isInverted = isInverted;
     this.change.emit({
-      isInverted
+      subject: 'inversion',
+      data: { isInverted }
     });
   }
 
   onLegendChange() {
     this.change.emit({
-      legend: {
-        align: this.legend.align,
-        layout: this.legend.layout
+      subject: 'inversion',
+      data: {
+        legend: {
+          align: this.legend.align,
+          layout: this.legend.layout
+        }
       }
     });
   }

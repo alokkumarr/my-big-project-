@@ -1,0 +1,34 @@
+<designer-settings-single-table class="designer__data-settings"
+                   [analysisType]="analysisType"
+                   [analysisSubtype]="analysisSubtype"
+                   (change)="change.emit($event)"
+                   [artifacts]="artifacts">
+</designer-settings-single-table>
+
+<div fxLayout="column">
+  <designer-settings-aux class="designer__content"
+                         [auxSettings]="auxSettings"
+                         [analysisType]="analysisType"
+                         [analysisSubtype]="analysisSubtype"
+                         (change)="change.emit($event)"></designer-settings-aux>
+
+  <ng-container [ngSwitch]="analysisType">
+
+    <designer-pivot class="designer__content"
+                    *ngSwitchCase="'pivot'"
+                    [data]="data"
+                    [sorts]="sorts"
+                    [artifacts]="artifacts"
+                    [designerState]="designerState">
+    </designer-pivot>
+    <designer-chart class="designer__content"
+                    *ngSwitchCase="'chart'"
+                    [chartType]="analysisSubtype"
+                    [sorts]="sorts"
+                    [auxSettings]="auxSettings"
+                    [data]="data"
+                    [designerState]="designerState"
+                    [sqlBuilder]="sqlBuilder">
+    </designer-chart>
+  </ng-container>
+</div>

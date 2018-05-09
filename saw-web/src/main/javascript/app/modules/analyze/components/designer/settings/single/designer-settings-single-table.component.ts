@@ -1,4 +1,3 @@
-declare const require: any;
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
@@ -10,18 +9,17 @@ import * as isEmpty from 'lodash/isEmpty';
 import { DesignerService } from '../../designer.service';
 import {
   IDEsignerSettingGroupAdapter,
+  Artifact,
   ArtifactColumn,
   ArtifactColumns,
-  ArtifactColumnFilter
+  ArtifactColumnFilter,
+  ArtifactColumnPivot,
+  DesignerChangeEvent
 } from '../../types';
 import { TYPE_ICONS_OBJ, TYPE_ICONS, TYPE_MAP } from '../../../../consts';
 
-const template = require('./designer-settings-single.component.html');
-require('./designer-settings-single.component.scss');
-
-export type FieldChangeEvent = {
-  requiresDataChange: boolean;
-};
+const template = require('./designer-settings-single-table.component.html');
+require('./designer-settings-single-table.component.scss');
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
 const FILTER_CHANGE_DEBOUNCE_TIME = 300;
@@ -31,16 +29,18 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
  * pivot or chart
  */
 @Component({
-  selector: 'designer-settings-single',
+  selector: 'designer-settings-single-table',
   template
 })
-export class DesignerSettingsSingleComponent {
+export class DesignerSettingsSingleTableComponent {
   @Output()
-  public settingsChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
-  @Input('artifactColumns')
-  public set setArtifactColumns(artifactColumns: ArtifactColumns) {
-    this.artifactColumns = artifactColumns;
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Input('artifacts')
+  public set setArtifactColumns(artifacts: Artifact[]) {
+    if (!isEmpty(artifacts)) {
+      this.artifactColumns = artifacts[0].columns;
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+    }
   }
   @Input('analysisType') type: string;
   @Input('analysisSubtype') subType: string;
@@ -87,15 +87,15 @@ export class DesignerSettingsSingleComponent {
 
   onFieldsChange() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    this._changeSettingsDebounced({ requiresDataChange: true });
+    this._changeSettingsDebounced({ subject: 'selectedFields' });
   }
 
-  onFieldPropChange(event: FieldChangeEvent) {
+  onFieldPropChange(event: DesignerChangeEvent) {
     this._changeSettingsDebounced(event);
   }
 
-  _changeSettingsDebounced(event: FieldChangeEvent) {
-    this.settingsChange.emit(event);
+  _changeSettingsDebounced(event: DesignerChangeEvent) {
+    this.change.emit(event);
   }
 
   getUnselectedArtifactColumns() {

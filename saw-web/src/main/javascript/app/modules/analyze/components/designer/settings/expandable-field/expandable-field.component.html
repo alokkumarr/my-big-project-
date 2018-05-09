@@ -1,37 +1,30 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <button mat-icon-button>
-      <mat-icon fontIcon="icon-expand"
-                (click)="toggleExpansion()">
+      <mat-icon fontIcon="icon-expand" (click)="toggleExpansion()">
       </mat-icon>
     </button>
-    <div class="expandable-field__name"
-         fxLayout="row" fxLayoutAlign="space-between center">
+    <div class="expandable-field__name" fxLayout="row" fxLayoutAlign="space-between center">
       {{ artifactColumn.alias || artifactColumn.displayName }}
-      <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
-                class="expandable-field__icon">
+      <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon" class="expandable-field__icon">
       </mat-icon>
     </div>
   </div>
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <div *ngIf="artifactColumn.comboType">
-      <button mat-icon-button
-              [matMenuTriggerFor]="comboTypeSelect"
-              class="expandable-field__option-button">
+      <button mat-icon-button [matMenuTriggerFor]="comboTypeSelect" class="expandable-field__option-button">
         <mat-icon [fontIcon]="COMBO_TYPES_OBJ[artifactColumn.comboType].icon"></mat-icon>
       </button>
       <mat-menu #comboTypeSelect="matMenu">
-        <button mat-menu-item
-                *ngFor="let comboType of COMBO_TYPES; trackBy: index"
-                (click)="onComboTypeChange(comboType.value)">
+        <button mat-menu-item *ngFor="let comboType of COMBO_TYPES; trackBy: index" (click)="onComboTypeChange(comboType.value)">
           <mat-icon [fontIcon]="comboType.icon"></mat-icon>
           <span style="margin-left: 20px;">{{comboType.label}}</span>
         </button>
       </mat-menu>
     </div>
 
-    <div *ngIf="artifactColumn.aggregate">
+    <!-- <div *ngIf="artifactColumn.aggregate">
       <button mat-icon-button
               [matMenuTriggerFor]="aggregatemenu"
               class="expandable-field__option-button">
@@ -45,29 +38,23 @@
           <span style="margin-left: 20px;">{{aggregateType.label}}</span>
         </button>
       </mat-menu>
-    </div>
+    </div> -->
 
-    <button mat-icon-button
-            class="expandable-field__remove-btn"
-            (click)="removeRequest.emit()">
-      <mat-icon fontIcon="icon-close"
-                class="expandable-field__remove-icon">
+    <aggregate-chooser-u *ngIf="artifactColumn.aggregate" (change)="onAggregateChange($event)" [type]="artifactColumn.type" [aggregate]="artifactColumn.aggregate">
+    </aggregate-chooser-u>
+
+    <button mat-icon-button class="expandable-field__remove-btn" (click)="removeRequest.emit()">
+      <mat-icon fontIcon="icon-close" class="expandable-field__remove-icon">
       </mat-icon>
     </button>
   </div>
 </div>
 
-<div *ngIf="isExpanded"
-     [ngSwitch]="analysisType"
-     class="expandable-field__details">
-  <expand-detail-pivot *ngSwitchCase="'pivot'"
-                       (change)="change.emit($event)"
-                       [artifactColumn]="artifactColumn">
+<div *ngIf="isExpanded" [ngSwitch]="analysisType" class="expandable-field__details">
+  <expand-detail-pivot *ngSwitchCase="'pivot'" (change)="change.emit($event)" [artifactColumn]="artifactColumn">
 
   </expand-detail-pivot>
-  <expand-detail-chart *ngSwitchCase="'chart'"
-                       (change)="change.emit($event)"
-                       [artifactColumn]="artifactColumn">
+  <expand-detail-chart *ngSwitchCase="'chart'" (change)="change.emit($event)" [artifactColumn]="artifactColumn">
 
   </expand-detail-chart>
 </div>

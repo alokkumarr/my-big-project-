@@ -1,14 +1,24 @@
-import { SqlBuilder, SqlBuilderPivot, SqlBuilderChart } from '../../models';
+import {
+  SqlBuilder,
+  SqlBuilderPivot,
+  SqlBuilderChart,
+  SqlBuilderReport,
+  SqlBuilderEsReport,
+  Join,
+  AnalysisType
+} from '../../models';
+import { JsPlumbCanvasChangeEvent } from '../../../../common/components/js-plumb/types';
 import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
-  AnalysisType,
+  AnalysisReport,
   Sort,
   Filter,
   FilterModel,
   ArtifactColumnPivot,
   ArtifactColumnChart,
+  ArtifactColumnReport,
   ArtifactColumn,
   ArtifactColumns,
   IToolbarActionData,
@@ -21,13 +31,17 @@ import {
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
+  ArtifactColumnReport,
   Analysis,
+  AnalysisReport,
   DesignerMode,
   AnalysisStarter,
   AnalysisType,
   SqlBuilder,
   SqlBuilderPivot,
   SqlBuilderChart,
+  SqlBuilderReport,
+  SqlBuilderEsReport,
   Sort,
   Filter,
   FilterModel,
@@ -37,7 +51,9 @@ export {
   IToolbarActionData,
   DesignerToolbarAciton,
   IToolbarActionResult,
-  Format
+  Format,
+  Join,
+  JsPlumbCanvasChangeEvent
 };
 
 export type ArtifactColumnFilter = {
@@ -64,3 +80,27 @@ export interface IDEsignerSettingGroupAdapter {
   // a callback to change soomething when the indexes change in artifactColumns
   onReorder: (artifactColumns: ArtifactColumns) => void;
 }
+export type DesignerChangeEvent = {
+  subject:
+    | 'format'
+    | 'aggregate'
+    | 'dateInterval'
+    | 'aliasName'
+    | 'sort'
+    | 'filter'
+    | 'filterRemove'
+    | 'comboType'
+    | 'legend'
+    | 'inversion'
+    // adding | removing | changing fields in the field chooser for pivot grid and chart designer
+    | 'selectedFields'
+    | 'joins'
+    | 'artifactPosition'
+    | 'column'
+    | 'removeColumn'
+    | 'visibleIndex'
+    | 'submitQuery'
+    | 'changeQuery';
+  column?: ArtifactColumn;
+  data?: any;
+};
