@@ -147,21 +147,6 @@
 			<version>${metadata.api}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-date-extract-api</artifactId>
-			<version>${revision}</version>
-		</dependency>
-				<dependency>
-			<groupId>com.univocity</groupId>
-			<artifactId>univocity-parsers</artifactId>
-			<version>2.5.9</version>
-		</dependency>
-		<dependency>
-			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-inspect-data-api</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.mapr.db</groupId>
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
@@ -198,12 +183,12 @@
 					<execution>
 						<phase>test</phase>
 						<configuration>
-							<configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml</configLocation>
+							<configLocation>${project.basedir}/../../src/main/resources/google_checks.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>warning</violationSeverity>
 							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
 								make also these files conform to checkstyle rules and remove the exclusions -->
-							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*</excludes>
+							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*,**/SAWSeman*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>
