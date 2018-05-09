@@ -28,13 +28,19 @@ imputer <- function(df,
   checkmate::assert_choice(fun, c("mean", "mode", "constant"))
   checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
 
-  if(! is.null(group_vars) & fun != "constant") {
+  if (!is.null(group_vars) & fun != "constant") {
     df <- group_by_at(df, group_vars)
   }
 
-  impute_fun <- match.fun(paste("impute", fun, sep="_"))
+  impute_fun <- match.fun(paste("impute", fun, sep = "_"))
   impute_args <- modifyList(list(df = df, measure_vars = measure_vars), list(...))
-  do.call("impute_fun", impute_args)
+  results <- do.call("impute_fun", impute_args)
+
+  if (!is.null(group_vars) & fun != "constant") {
+    results <- dplyr::ungroup(results)
+  }
+
+  results
 }
 
 
@@ -46,7 +52,6 @@ is_na <- function(x) any(is.na(x))
 
 
 # impute mean -------------------------------------------------------------
-
 
 
 #' Impute Mean
@@ -127,7 +132,7 @@ impute_constant <- function(df,
     if (length(numeric_vars) == 0)
       message("numeric fill provided but no numeric measure variables provided")
     impute_constant_at_num(df, numeric_vars, fill)
-  } else{
+  } else {
     char_vars <- setdiff(measure_vars, numeric_vars)
     if (length(char_vars) == 0)
       message("character fill provided but no character measure variables provided")
@@ -206,6 +211,7 @@ impute_mode <- function(df, measure_vars = NULL) {
 
   impute_mode_at(df, measure_vars)
 }
+
 
 #' Impute Mode At
 #'

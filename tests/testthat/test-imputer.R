@@ -12,12 +12,12 @@ context("imputer function unit tests")
 # Function to create simulated data
 sim_data <- function(n_ids, n_recs, n_iter, seed = 319){
 
+  set.seed(seed)
   n <- n_ids * n_recs
   ids <- 1:n_ids
   dates <- seq(from=Sys.Date()-365, to=Sys.Date(), by="day")
   cat1 <- c("A", "B")
   cat2 <- c("X", "Y", "Z")
-
 
   do.call("rbind",
           replicate(n_iter,
