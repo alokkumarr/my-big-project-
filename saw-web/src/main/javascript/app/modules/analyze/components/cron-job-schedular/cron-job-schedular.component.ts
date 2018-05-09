@@ -57,8 +57,7 @@ export class CronJobSchedularComponent {
   	this.monthly = {};
   	this.yearly = {};
     this.selectedMoments = [];
-    this.selectedMoments.push(new Date(moment().local().startOf('day').format()));
-    this.selectedMoments.push(new Date(moment().local().endOf('day').format()));
+    this.selectedMoments.push(new Date(moment().local().format()));
 
     this.hours = this.range(0,23);
     this.minutes = this.range(0,59);
