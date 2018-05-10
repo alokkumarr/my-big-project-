@@ -19,6 +19,7 @@ layout-header header {
       div mat-icon {
         margin-top: 7px;
         font-size: 16px;
+        margin-right: 16px;
       }
     }
 
@@ -59,4 +60,8 @@ header .company-logo {
 .mat-icon-help {
   color: #5C6670;
   font-size: 20px;
+}
+
+header .mat-toolbar mat-progress-bar {
+  margin-top: 30px;
 }

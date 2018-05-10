@@ -4,7 +4,7 @@
 
 .menu-panel-content.sidenav-mainmenu a {
   display: block;
-  padding: 0 24px;
+  padding: 0 15px;
   line-height: 40px;
   max-height: 60px;
   font-weight: 400;
@@ -16,17 +16,18 @@
 }
 
 .menu-panel-header.sidenav-mainmenu {
-  border-top: 1px solid #EEE;
+  border-bottom: 1px solid #EEE;
 }
 
 .no-children {
   cursor: pointer;
-  line-height: 54px;
+  line-height: 40px;
   overflow: hidden;
-  padding: 0 24px;
+  padding: 0 14px;
 
   a {
     color: #333;
+    font-weight: normal;
   }
 }
 
@@ -40,7 +41,7 @@ mat-panel-title.sidenav-mainmenu {
   max-height: 54px;
   margin: 0;
   overflow: hidden;
-  padding: 0 24px;
+  padding: 0 8px;
   text-align: left;
   text-decoration: none;
   white-space: normal;
@@ -52,3 +53,6 @@ mat-expansion-panel.sidenav-mainmenu {
   box-shadow: none !important;
 }
 
+mat-expansion-panel-header.sidenav-mainmenu {
+  height: 40px !important;
+}

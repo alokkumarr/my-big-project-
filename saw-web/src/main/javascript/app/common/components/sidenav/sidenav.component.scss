@@ -1,7 +1,7 @@
 .sidenav-container {
   position: fixed !important;
-  width: 20%;
-  margin-top: 70px;
+  width: 16%;
+  margin-top: 64px;
 }
 
 sidenav {
@@ -15,5 +15,14 @@ sidenav {
 }
 
 .sidebar-header {
-  margin-left: 10px;
+  border-bottom: 1px solid #EEE;
+
+  h3 {
+    padding-left: 7px;
+  }
+}
+
+.sidemenu.backdrop {
+  width: 600%;
+  height: 900px;
 }

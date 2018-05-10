@@ -1,10 +1,12 @@
-<div layout="row">
-  <mat-icon fontIcon="icon-menu" (click)="sidenav.toggle()"></mat-icon>
-  <mat-sidenav-container class="md-whiteframe-4dp">
-    <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container">
-      <h3 class="sidebar-header"><span>{{getMenuHeader()}}</span></h3>
-      <accordion-menu [source]="menu"></accordion-menu>
-    </mat-sidenav>
-    <br/>
-  </mat-sidenav-container>
-</div>
+  <div layout="row">
+    <mat-icon fontIcon="icon-menu" (click)="sidenav.toggle()"></mat-icon>
+    <mat-sidenav-container class="md-whiteframe-4dp">
+      <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container sidebar-header md-whiteframe-4dp, md-whiteframe-z2">
+        <h3><span>{{getMenuHeader()}}</span></h3>
+        <accordion-menu [source]="menu"></accordion-menu>
+      </mat-sidenav>
+      <br/>
+    </mat-sidenav-container>
+  </div>
+  <div class="sidemenu backdrop" (click)="sidenav.toggle()">
+  </div>
