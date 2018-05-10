@@ -28,5 +28,8 @@ export { Schedule } from './schedule.model';
 export { Sort } from './sort.model';
 export {
   SqlBuilder,
-  SqlBuilderPivot
+  SqlBuilderPivot,
+  SqlBuilderReport,
+  SqlBuilderEsReport
 } from './sql-builder.model';
+export { AnalysisType } from './analysis-type.model';

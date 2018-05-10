@@ -1,4 +1,3 @@
-declare const require: any;
 import {
   Component,
   Input,
@@ -8,7 +7,8 @@ import {
 import * as moment from 'moment';
 import {
   ArtifactColumnPivot,
-  Format
+  Format,
+  DesignerChangeEvent
 }  from '../../../types';
 import {
   AGGREGATE_TYPES,
@@ -24,8 +24,6 @@ import {
   isFormatted
 } from '../../../../../../../common/utils/numberFormatter';
 
-import { FieldChangeEvent } from '../../single';
-
 const template = require('./expand-detail-pivot.component.html');
 
 const FLOAT_SAMPLE = 1000.33333;
@@ -35,7 +33,7 @@ const INT_SAMPLE = 1000;
   template
 })
 export class ExpandDetailPivotComponent {
-  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnPivot;
 
@@ -62,7 +60,7 @@ export class ExpandDetailPivotComponent {
 
   onAliasChange(value) {
     this.artifactColumn.aliasName = value;
-    this.change.emit({requiresDataChange: false});
+    this.change.emit({subject: 'aliasName'});
   }
 
   onDateIntervalChange(value) {
@@ -70,14 +68,14 @@ export class ExpandDetailPivotComponent {
     if (this.artifactColumn.dateInterval !== 'day') {
       this.artifactColumn.format = DEFAULT_DATE_FORMAT.value;
     }
-    this.change.emit({requiresDataChange: true});
+    this.change.emit({subject: 'dateInterval'});
   }
 
   onFormatChange(format: Format | string) {
     if (format) {
       this.artifactColumn.format = format;
       this.changeSample();
-      this.change.emit({requiresDataChange: false});
+      this.change.emit({subject: 'format'});
     }
   }
 

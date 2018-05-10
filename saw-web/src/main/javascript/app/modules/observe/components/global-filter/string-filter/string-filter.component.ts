@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete'
 import { FormControl } from '@angular/forms';
