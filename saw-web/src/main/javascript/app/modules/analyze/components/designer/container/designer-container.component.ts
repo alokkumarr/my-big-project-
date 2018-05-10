@@ -144,7 +144,8 @@ export class DesignerContainerComponent {
             joins: []
           };
         }
-        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+        this.artifacts = this.analysis.artifacts;
+        this.initAuxSettings();
         this.analysis.edit = this.analysis.edit || false;
         unset(this.analysis, 'supports');
         unset(this.analysis, 'categoryId');
@@ -159,33 +160,48 @@ export class DesignerContainerComponent {
     this.booleanCriteria = sqlBuilder.booleanCriteria;
     this.isInQueryMode = this.analysis.edit;
 
-    /* prettier-ignore */
-    this.auxSettings = {
-      ...this.auxSettings,
-      ...(this.analysis.type === 'chart' ? {
-        legend: (<any>this.analysis).legend,
-        isInverted: (<any>this.analysis).isInverted
-      } : {})
-    };
+    this.initAuxSettings();
 
     this.addDefaultSorts();
   }
 
+  initAuxSettings() {
+    /* prettier-ignore */
+    switch(this.analysis.type) {
+    case 'chart':
+      if (this.designerMode === 'new') {
+        (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
+      }
+      this.auxSettings = {
+        ...this.auxSettings,
+        ...(this.analysis.type === 'chart' ? {
+          legend: (<any>this.analysis).legend,
+          isInverted: (<any>this.analysis).isInverted
+        } : {})
+      };
+      break;
+    }
+  }
+
   fixLegacyArtifacts(artifacts): Array<Artifact> {
-    const indices = {};
-    forEach(artifacts, table => {
-      table.columns = map(table.columns, column => {
-        if (column.checked && column.checked !== true) {
-          column.area = column.checked;
-          column.checked = true;
-          indices[column.area] = indices[column.area] || 0;
-          column.areaIndex = indices[column.area]++;
-        }
+    /* prettier-ignore */
+    switch(this.analysis.type) {
+    case 'chart':
+      const indices = {};
+      forEach(artifacts, table => {
+        table.columns = map(table.columns, column => {
+          if (column.checked && column.checked !== true) {
+            column.area = column.checked;
+            column.checked = true;
+            indices[column.area] = indices[column.area] || 0;
+            column.areaIndex = indices[column.area]++;
+          }
 
-        return column;
+          return column;
+        });
       });
-    });
-
+      break;
+    }
     return artifacts;
   }
 
