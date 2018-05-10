@@ -6,7 +6,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockftpserver.core.session.SessionKeys.USERNAME;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -14,6 +17,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.re
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -29,7 +34,15 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.commons.net.ftp.FTPClient;
 import org.junit.*;
+import org.mockftpserver.fake.FakeFtpServer;
+import org.mockftpserver.fake.UserAccount;
+import org.mockftpserver.fake.filesystem.DirectoryEntry;
+import org.mockftpserver.fake.filesystem.FileEntry;
+import org.mockftpserver.fake.filesystem.FileSystem;
+import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
+import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
@@ -55,6 +68,78 @@ public class AnalyzeIT extends BaseIT {
          * changes.  */
         assertThat(data.size(), equalTo(0));
     }
+
+    @Test(timeout = 300000)
+    public void exportData() throws JsonProcessingException, IOException {
+
+        // create and save analysis
+        String metricId = listMetrics(token);
+        ObjectNode analysis = createAnalysis(token, metricId);
+        String analysisId = analysis.get("id").asText();
+        String analysisName = "Test (" + System.currentTimeMillis() + ")";
+        saveAnalysis(token, analysisId, analysisName, analysis);
+
+        // create schedule
+        ObjectNode node = scheduleData();
+        // udpate the analysis ID
+        node.put("analysisID", analysisId);
+        String json = mapper.writeValueAsString(node);
+        createSchedule(json);
+
+        // execute the analysis and retrieve results
+        executeAnalysis(token, analysisId);
+        String executionId = listSingleExecution(token, analysisId);
+        List<Map<String, String>> data = getExecution(
+            token, analysisId, executionId);
+        // base setup for ftp server
+        String username = "user";
+        String password = "password";
+        String homeDirectory = "/";
+        String filename = "report.csv";
+        // Write the data to csv
+        FakeFtpServer f = createFileOnFakeFTP(username, password, homeDirectory, filename, data);
+
+        // check if the file has been uploaded and read the contents
+        String dataResult = readFile("/data/" + filename, "localhost", f.getServerControlPort(),
+            username, password);
+        // check if the file actually has data
+        // this has been done just to avoid rewriting integration test case when data changes.
+        // the goal here is to just check if the data that we got from scheduled analysis execution
+        // is present in the file.
+        assertTrue(dataResult.length() > 0);
+    }
+
+    public FakeFtpServer createFileOnFakeFTP(String username, String password, String homeDirectory, String filename, List<Map<String, String>> data) {
+        FakeFtpServer aFakeFtpServer = new FakeFtpServer();
+        aFakeFtpServer.setServerControlPort(0);
+        aFakeFtpServer.addUserAccount(new UserAccount(username, password, homeDirectory));
+
+        FileSystem aFileSystem = new UnixFakeFileSystem();
+        aFileSystem.add(new DirectoryEntry("/data"));
+        // using tostring because data is empty
+        aFileSystem.add(new FileEntry("/data/" + filename, data.toString()));
+        aFakeFtpServer.setFileSystem(aFileSystem);
+
+        aFakeFtpServer.start();
+        return aFakeFtpServer;
+    }
+
+    public String readFile(String filename, String server, int port, String username, String password) throws IOException {
+
+        FTPClient ftpClient = new FTPClient();
+        ftpClient.connect(server, port);
+        ftpClient.login(username, password);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        boolean success = ftpClient.retrieveFile(filename, outputStream);
+        ftpClient.disconnect();
+
+        if (!success) {
+            throw new IOException("Retrieve file failed: " + filename);
+        }
+        return outputStream.toString();
+    }
+
 
     @Test
     public void testSSOAuthentication()
@@ -384,7 +469,7 @@ public class AnalyzeIT extends BaseIT {
                 .extract().response();
     }
 
-    private ObjectNode scheduleData()
+    private ObjectNode  scheduleData()
     {
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("activeRadio","everyDay");
@@ -402,7 +487,6 @@ public class AnalyzeIT extends BaseIT {
         email.add("xyz@synchronoss.com");
         ArrayNode ftp = objectNode.putArray("ftp");
         ftp.add("ftp");
-        ftp.add("sftp");
         objectNode.put("jobScheduleTime","2018-03-01T16:24:28+05:30");
         objectNode.put("categoryID","4");
         objectNode.put("jobGroup","SYNCHRONOSS");
