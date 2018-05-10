@@ -66,6 +66,13 @@ detect.data.frame <- function(df,
   checkmate::assert_number(max_anoms, lower=0, upper=1)
   checkmate::assert_number(trend_window, lower=0, upper=1)
 
+  if(alpha > .1 ){
+    message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
+  }
+
+  if(max_anoms > .1 ){
+    message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
+  }
 
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
   n <- nrow(df)
@@ -93,7 +100,7 @@ detect.data.frame <- function(df,
   } else if (direction == "neg") {
     df$resid_std <- (median(df$resid) - df$resid) / mad(df$resid)
   } else {
-    abs(df$resid_std <- (df$resid - median(df$resid)) / mad(df$resid))
+    df$resid_std <- abs((df$resid - median(df$resid)) / mad(df$resid))
   }
 
   df$anomaly <- ifelse(df$resid_std > cv, 1, 0)
@@ -117,6 +124,7 @@ detect.grouped_df <- function(df,
                               max_anoms = .01,
                               trend_window = 0.75){
 
+
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_choice(measure_var, df_names)
@@ -134,7 +142,6 @@ detect.grouped_df <- function(df,
   if(max_anoms > .1 ){
     message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
   }
-
 
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
   p <- ifelse(two_tail, 1-alpha/2, 1-alpha)
@@ -266,6 +273,7 @@ detecter.tbl_spark <- function(df,
     sparklyr::spark_apply(.,
                           function(e, l) {
                             library(a2munge)
+                            #library(checkmate)
                             index_var <- l$i_var
                             measure_var <- l$m_var
                             freq <- l$freq
@@ -274,8 +282,14 @@ detecter.tbl_spark <- function(df,
                             max_anoms <- l$anoms
                             detect_fun <- l$fun
                             trend_win <- l$trend_win
-                            detect_fun(e[, c(index_var, measure_var)], NULL, NULL,
-                                       freq, dir, alpha, max_anoms, trend_win)
+                            detect_fun(e[, c(index_var, measure_var)],
+                                       index_var,
+                                       measure_var,
+                                       freq,
+                                       dir,
+                                       alpha,
+                                       max_anoms,
+                                       trend_win)
                           },
                           group_by = c(group_vars, "measure"),
                           names = c(index_var,
@@ -293,7 +307,7 @@ detecter.tbl_spark <- function(df,
                               a = alpha,
                               anoms = max_anoms,
                               trend_win = trend_window,
-                              fun = match.fun("detect")
+                              fun = get("detect", asNamespace("a2munge"))
                             )
                           }) %>%
     select_at(c(

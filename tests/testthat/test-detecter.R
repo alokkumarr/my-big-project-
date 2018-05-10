@@ -11,7 +11,7 @@ library(checkmate)
 context("detecter function unit tests")
 
 
-# Create toy dataset
+# Create toy datasets
 set.seed(319)
 id_vars <- seq(101, 200, by=1)
 dates <- seq(from=Sys.Date()-365, to=Sys.Date(), by="day")
@@ -42,6 +42,11 @@ dat4 <- data.frame(date = as.character(seq(from = Sys.Date() - (n-1), to = Sys.D
                                             list(order = c(1,0,0), ar = 0.7),
                                             rand.gen = function(n, ...) rt(n, df = 2))))
 
+dat5 <- data.frame(index = 1:n,
+                  y = as.numeric(arima.sim(n = n,
+                                           list(order = c(1,0,0), ar = 0.7)))) %>%
+                    mutate(y = ifelse(index %in% c(50, 100, 150), -10, y))
+
 # Create Spark Connection and read in some data
 sc <- spark_connect(master = "local")
 
@@ -50,6 +55,7 @@ dat1_tbl <- copy_to(sc, dat1, overwrite = TRUE)
 dat2_tbl <- copy_to(sc, dat2, overwrite = TRUE)
 dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
 dat4_tbl <- copy_to(sc, dat4, overwrite = TRUE)
+dat5_tbl <- copy_to(sc, dat5, overwrite = TRUE)
 
 dat4_tbl <- mutate(dat4_tbl, date = to_date(date))
 
@@ -82,6 +88,30 @@ r_detect3 <- dat3 %>%
            measure_vars = "y",
            frequency = 7,
            direction = "pos",
+           alpha = 0.01,
+           max_anoms = 0.05,
+           trend_window = .75)
+
+
+r_detect5 <- dat5 %>%
+  detecter(.,
+           index_var = "index",
+           group_vars = NULL,
+           measure_vars = "y",
+           frequency = 7,
+           direction = "neg",
+           alpha = 0.01,
+           max_anoms = 0.05,
+           trend_window = .75)
+
+
+r_detect5b <- dat5 %>%
+  detecter(.,
+           index_var = "index",
+           group_vars = NULL,
+           measure_vars = "y",
+           frequency = 7,
+           direction = "both",
            alpha = 0.01,
            max_anoms = 0.05,
            trend_window = .75)
@@ -136,6 +166,33 @@ spk_detect4 <- dat4_tbl %>%
            trend_window = .75) %>%
   collect()
 
+
+spk_detect5 <- dat5_tbl %>%
+  detecter(.,
+           index_var = "index",
+           group_vars = NULL,
+           measure_vars = "y",
+           frequency = 7,
+           direction = "neg",
+           alpha = 0.01,
+           max_anoms = 0.05,
+           trend_window = .75) %>%
+  collect()
+
+
+spk_detect5b <- dat5_tbl %>%
+  detecter(.,
+           index_var = "index",
+           group_vars = NULL,
+           measure_vars = "y",
+           frequency = 7,
+           direction = "both",
+           alpha = 0.01,
+           max_anoms = 0.05,
+           trend_window = .75) %>%
+  collect()
+
+
 test_that("detecter methods consistent", {
   expect_equal(
     spk_detect1 %>%
@@ -175,6 +232,7 @@ test_that("detecter return correct dimensions", {
   expect_equal(nrow(r_detect3), nrow(dat3))
 })
 
+
 test_that("direction option works as expected", {
 
   r_detect1b <- dat1 %>%
@@ -195,5 +253,27 @@ test_that("direction option works as expected", {
 test_that("detecter preserves index var date type", {
 
   expect_class(spk_detect4[[1]], "Date")
+})
+
+
+
+test_that("neg direction option works as expected", {
+
+  r_detect5_anoms <- r_detect5 %>% filter(anomaly == 1)
+  spk_detect5_anoms <- spk_detect5 %>% filter(anomaly == 1)
+
+  expect_subset(c(50, 100, 150), r_detect5_anoms$index)
+  expect_subset(c(50, 100, 150), spk_detect5_anoms$index)
+})
+
+
+
+test_that("both direction option works as expected", {
+
+  r_detect5b_anoms <- r_detect5b %>% filter(anomaly == 1)
+  spk_detect5b_anoms <- spk_detect5b %>% filter(anomaly == 1)
+
+  expect_subset(c(50, 100, 150), r_detect5b_anoms$index)
+  expect_subset(c(50, 100, 150), spk_detect5b_anoms$index)
 })
 
