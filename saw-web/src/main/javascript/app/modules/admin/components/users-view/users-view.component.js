@@ -191,7 +191,7 @@ export const UsersViewComponent = {
       return false;
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
       if (!isUndefined(value)) {
         this.states.searchTerm = value;
       }
