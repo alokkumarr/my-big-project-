@@ -368,7 +368,7 @@ public class ExportServiceImpl implements ExportService{
                     Arrays.stream(exportBean.getColumnHeader())
                         .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
                         .collect(Collectors.joining(",")));
-                osw.write("\n");
+                osw.write(System.getProperty("line.separator"));
                 logger.debug("Header for csv file: " + header);
               } else {
                 // ideally we shouldn't be using collectors but it's a single row so it
@@ -377,7 +377,7 @@ public class ExportServiceImpl implements ExportService{
                     Arrays.stream(exportBean.getColumnHeader())
                         .map(val -> "\"" + ((LinkedHashMap) line).get(val) + "\"")
                         .collect(Collectors.joining(",")));
-                osw.write("\n");
+                osw.write(System.getProperty("line.separator"));
                 logger.debug("Line Item for report: " + line.toString());
               }
             }
