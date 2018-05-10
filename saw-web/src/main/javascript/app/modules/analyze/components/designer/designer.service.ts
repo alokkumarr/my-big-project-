@@ -85,13 +85,15 @@ export class DesignerService {
     };
 
     const canAcceptNumberType = (
-      groupAdapter: IDEsignerSettingGroupAdapter
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      _
     ) => ({ type }: ArtifactColumnPivot) =>
       areLessThenMaxFields(groupAdapter.artifactColumns) &&
       NUMBER_TYPES.includes(type);
 
     const canAcceptAnyType = (
-      groupAdapter: IDEsignerSettingGroupAdapter
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      _
     ) => () => areLessThenMaxFields(groupAdapter.artifactColumns);
 
     const applyDataFieldDefaults = artifactColumn => {
@@ -173,35 +175,29 @@ export class DesignerService {
     };
 
     const canAcceptNumberType = (
-      groupAdapter: IDEsignerSettingGroupAdapter
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => ({ type }: ArtifactColumnChart) => {
-      if (
-        groupAdapter.maxAllowed &&
-        groupAdapter.artifactColumns.length >= groupAdapter.maxAllowed
-      )
-        return false;
+      const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+      if (groupAdapter.artifactColumns.length >= maxAllowed) return false;
       return NUMBER_TYPES.includes(type);
     };
 
-    const canAcceptDateType = (groupAdapter: IDEsignerSettingGroupAdapter) => ({
-      type
-    }: ArtifactColumnChart) => {
-      if (
-        groupAdapter.maxAllowed &&
-        groupAdapter.artifactColumns.length >= groupAdapter.maxAllowed
-      )
-        return false;
+    const canAcceptDateType = (
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      groupAdapters: Array<IDEsignerSettingGroupAdapter>
+    ) => ({ type }: ArtifactColumnChart) => {
+      const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+      if (groupAdapter.artifactColumns.length >= maxAllowed) return false;
       return DATE_TYPES.includes(type);
     };
 
     const canAcceptAnyType = (
-      groupAdapter: IDEsignerSettingGroupAdapter
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => () => {
-      if (
-        groupAdapter.maxAllowed &&
-        groupAdapter.artifactColumns.length >= groupAdapter.maxAllowed
-      )
-        return false;
+      const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
+      if (groupAdapter.artifactColumns.length >= maxAllowed) return false;
       return true;
     };
 
@@ -223,7 +219,8 @@ export class DesignerService {
         title: chartType === 'pie' ? 'Angle' : 'Metrics',
         type: 'chart',
         marker: 'y',
-        maxAllowed: ['pie', 'bubble'].includes(chartType) ? 1 : Infinity,
+        maxAllowed: () =>
+          ['pie', 'bubble'].includes(chartType) ? 1 : Infinity,
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptNumberType,
         transform(artifactColumn: ArtifactColumnChart) {
@@ -238,7 +235,7 @@ export class DesignerService {
         title: chartType === 'pie' ? 'Color By' : 'Dimension',
         type: 'chart',
         marker: 'x',
-        maxAllowed: 1,
+        maxAllowed: () => 1,
         artifactColumns: [],
         canAcceptArtifactColumn: isStockChart
           ? canAcceptDateType
@@ -255,7 +252,13 @@ export class DesignerService {
         title: 'Group By',
         type: 'chart',
         marker: 'g',
-        maxAllowed: 1,
+        maxAllowed: (_, groupAdapters) => {
+          /* Don't allow columns in 'group by' if more than one column on y axis */
+          return find(groupAdapters, ad => ad.marker === 'y').artifactColumns
+            .length > 1
+            ? 0
+            : 1;
+        },
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptAnyType,
         transform(artifactColumn: ArtifactColumnChart) {
@@ -273,7 +276,7 @@ export class DesignerService {
         title: 'Size',
         type: 'chart',
         marker: 'z',
-        maxAllowed: 1,
+        maxAllowed: () => 1,
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptNumberType,
         transform(artifactColumn: ArtifactColumnChart) {
@@ -324,7 +327,9 @@ export class DesignerService {
     let addedSuccessfully = false;
 
     forEach(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (adapter.canAcceptArtifactColumn(adapter)(artifactColumn)) {
+      if (
+        adapter.canAcceptArtifactColumn(adapter, groupAdapters)(artifactColumn)
+      ) {
         this.addArtifactColumnIntoGroup(artifactColumn, adapter, 0);
         addedSuccessfully = true;
         return false;

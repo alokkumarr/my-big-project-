@@ -68,10 +68,14 @@ export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;
   type: AnalysisType;
-  maxAllowed?: number;
+  maxAllowed?: (
+    groupAdapter: IDEsignerSettingGroupAdapter,
+    groupAdapters: Array<IDEsignerSettingGroupAdapter>
+  ) => number;
   artifactColumns: ArtifactColumns;
   canAcceptArtifactColumn: (
-    groupAdapter: IDEsignerSettingGroupAdapter
+    groupAdapter: IDEsignerSettingGroupAdapter,
+    groupAdapters: Array<IDEsignerSettingGroupAdapter>
   ) => (artifactColumn: ArtifactColumn) => boolean;
   // a callback to possibly transform the artifactColumn added to a group
   transform: (artifactColumn: ArtifactColumn) => void;

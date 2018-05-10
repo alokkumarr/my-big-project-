@@ -3,6 +3,7 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as filter from 'lodash/filter';
+import * as forEach from 'lodash/forEach';
 import * as debounce from 'lodash/debounce';
 import * as isEmpty from 'lodash/isEmpty';
 
@@ -86,8 +87,31 @@ export class DesignerSettingsSingleTableComponent {
   }
 
   onFieldsChange() {
+    this.syncMaxAllowed();
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     this._changeSettingsDebounced({ subject: 'selectedFields' });
+  }
+
+  /**
+   * syncMaxAllowed
+   * If any area has more columns than it allows, remove extra columns
+   *
+   * @returns {undefined}
+   */
+  syncMaxAllowed() {
+    forEach(this.groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
+      if (!adapter.maxAllowed) return;
+
+      const extraColumns: Array<ArtifactColumn> = adapter.artifactColumns.slice(
+        adapter.maxAllowed(adapter, this.groupAdapters)
+      );
+
+      if (!extraColumns.length) return;
+
+      forEach(extraColumns, col => {
+        this._designerService.removeArtifactColumnFromGroup(col, adapter);
+      });
+    });
   }
 
   onFieldPropChange(event: DesignerChangeEvent) {

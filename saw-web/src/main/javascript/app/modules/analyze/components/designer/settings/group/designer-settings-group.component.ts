@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {
   ArtifactColumn,
   ArtifactColumns,
@@ -22,10 +17,15 @@ require('./designer-settings-group.component.scss');
 })
 export class DesignerSettingsGroupComponent {
   @Output() public fieldsChange: EventEmitter<null> = new EventEmitter();
-  @Output() public fieldPropChange: EventEmitter<DesignerChangeEvent> = new EventEmitter();
-  @Output() public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
+  @Output()
+  public fieldPropChange: EventEmitter<
+    DesignerChangeEvent
+  > = new EventEmitter();
+  @Output()
+  public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
   @Input() public groupAdapter: IDEsignerSettingGroupAdapter;
+  @Input() public groupAdapters: Array<IDEsignerSettingGroupAdapter>;
 
   public dndSortableContainerObj = {};
   public allowDropFn;
@@ -42,11 +42,12 @@ export class DesignerSettingsGroupComponent {
     this.fieldsChange.emit();
   };
 
-  constructor(private _designerService: DesignerService) { }
+  constructor(private _designerService: DesignerService) {}
 
   ngOnInit() {
     this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(
-      this.groupAdapter
+      this.groupAdapter,
+      this.groupAdapters
     );
   }
 
