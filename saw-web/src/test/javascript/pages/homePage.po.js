@@ -4,9 +4,9 @@ const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const analyzePage = require('../../javascript/pages/analyzePage.po');
 
 module.exports = {
-  mainMenuExpandBtn: element(by.css('button[e2e="main-menu-expand-btn"]')),
+  mainMenuExpandBtn: element(by.css('mat-icon[e2e="main-menu-expand-btn"]')),
   mainMenuCollapseBtn: element(by.css('button[e2e="main-menu-collapse-btn"]')),
-  accountSettingsMenuBtn: element(by.css('button[e2e="account-settings-menu-btn"]')),
+  accountSettingsMenuBtn: element(by.css('mat-icon[e2e="account-settings-menu-btn"]')),
   adminMenuOption: element(by.css('a[e2e="account-settings-selector-admin"]')),
   changePasswordMenuOption: element(by.css('button[e2e="account-settings-selector-change-password"]')),
   cardViewButton: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),

@@ -161,8 +161,8 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 const doAccountAction = action => {
   navigateToHome();
   doMdSelectOption({
-    parentElem: element(by.css('header > md-toolbar')),
-    btnSelector: 'button[e2e="account-settings-menu-btn"]',
+    parentElem: element(by.css('header > mat-toolbar')),
+    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.driver.wait(() => {
