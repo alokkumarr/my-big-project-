@@ -6,6 +6,7 @@ library(testthat)
 library(a2munge)
 library(sparklyr)
 library(dplyr)
+library(checkmate)
 
 context("detecter function unit tests")
 
@@ -36,6 +37,10 @@ dat3 <- rbind(data.frame(index = 1:n,
                                                   rand.gen = function(n, ...) rt(n, df = 1))),
                          group = "B"))
 
+dat4 <- data.frame(date = as.character(seq(from = Sys.Date() - (n-1), to = Sys.Date(), by = "day")),
+                   y = as.numeric(arima.sim(n = n,
+                                            list(order = c(1,0,0), ar = 0.7),
+                                            rand.gen = function(n, ...) rt(n, df = 2))))
 
 # Create Spark Connection and read in some data
 sc <- spark_connect(master = "local")
@@ -44,7 +49,9 @@ sc <- spark_connect(master = "local")
 dat1_tbl <- copy_to(sc, dat1, overwrite = TRUE)
 dat2_tbl <- copy_to(sc, dat2, overwrite = TRUE)
 dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
+dat4_tbl <- copy_to(sc, dat4, overwrite = TRUE)
 
+dat4_tbl <- mutate(dat4_tbl, date = to_date(date))
 
 r_detect1 <- dat1 %>%
   detecter(.,
@@ -117,6 +124,17 @@ spk_detect3 <- dat3_tbl %>%
   collect()
 
 
+spk_detect4 <- dat4_tbl %>%
+  detecter(.,
+           index_var = "date",
+           group_vars = NULL,
+           measure_vars = "y",
+           frequency = 7,
+           direction = "pos",
+           alpha = 0.01,
+           max_anoms = 0.05,
+           trend_window = .75) %>%
+  collect()
 
 test_that("detecter methods consistent", {
   expect_equal(
@@ -172,3 +190,10 @@ test_that("direction option works as expected", {
 
   expect_true(all(r_detect1$index %in% r_detect1b$index))
 })
+
+
+test_that("detecter preserves index var date type", {
+
+  expect_class(spk_detect4[[1]], "Date")
+})
+
