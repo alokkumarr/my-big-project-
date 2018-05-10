@@ -254,12 +254,12 @@ detecter.tbl_spark <- function(df,
   checkmate::assert_choice(measure_vars, df_names)
   checkmate::assert_choice(group_vars, df_names, null.ok = TRUE)
 
+
+  index_date_chk <- df_schema[[index_var]]$type == "DateType"
+
   if(index_date_chk) {
     df <- dplyr::mutate_at(df, index_var, as.character)
   }
-
-
-  index_date_chk <- df_schema[[index_var]]$type == "DateType"
 
   results <- df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
