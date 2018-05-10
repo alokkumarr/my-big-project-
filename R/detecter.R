@@ -70,7 +70,7 @@ detect.data.frame <- function(df,
     message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
   }
 
-  if(max_anoms > .1 ){
+  if (max_anoms > .1) {
     message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
   }
 
@@ -116,14 +116,13 @@ detect.data.frame <- function(df,
 #' @rdname detect
 #' @export
 detect.grouped_df <- function(df,
-                              index_var,
-                              measure_var,
+                              index_var = NULL,
+                              measure_var = NULL,
                               frequency,
                               direction = 'pos',
                               alpha = .01,
                               max_anoms = .01,
                               trend_window = 0.75){
-
 
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
@@ -135,7 +134,7 @@ detect.grouped_df <- function(df,
   checkmate::assert_number(max_anoms, lower=0, upper=1)
   checkmate::assert_number(trend_window, lower=0, upper=1)
 
-  if(alpha > .1 ){
+  if (alpha > .1) {
     message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
   }
 
@@ -210,6 +209,7 @@ detecter.data.frame <- function(df,
                                 max_anoms = .01,
                                 trend_window = 0.75){
 
+
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_choice(measure_vars, df_names)
@@ -248,18 +248,18 @@ detecter.tbl_spark <- function(df,
                                alpha = .01,
                                max_anoms = .01,
                                trend_window = 0.75){
-
   df_names <- colnames(df)
   df_schema <- sdf_schema(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_choice(measure_vars, df_names)
   checkmate::assert_choice(group_vars, df_names, null.ok = TRUE)
 
-  index_date_chk <- df_schema[[index_var]]$type == "DateType"
-
   if(index_date_chk) {
     df <- dplyr::mutate_at(df, index_var, as.character)
   }
+
+
+  index_date_chk <- df_schema[[index_var]]$type == "DateType"
 
   results <- df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
@@ -322,7 +322,7 @@ detecter.tbl_spark <- function(df,
     ))
 
   if(index_date_chk) {
-    results <- dplyr::mutate_at(results, index_var, funs(to_date))
+    results <- dplyr::mutate_at(results, index_var,  funs(to_date))
   }
 
   results
