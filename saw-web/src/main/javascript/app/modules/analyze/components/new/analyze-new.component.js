@@ -125,20 +125,7 @@ export const AnalyzeNewComponent = {
       switch (this.selectedAnalysisMethod) {
       /* eslint-disable no-fallthrough */
       case 'table:esReport':
-        type = AnalyseTypes.ESReport;
       case 'table:report':
-        tpl = `<analyze-report model="model" mode="${mode}"></analyze-report>`;
-        model = {
-          type: type || AnalyseTypes.Report,
-          name: 'Untitled Analysis',
-          description: '',
-          categoryId: this.subCategory,
-          semanticId,
-          metricName,
-          scheduled: null
-        };
-        break;
-      /* eslint-enable no-fallthrough */
       case 'table:pivot':
         this.openUpgradedModal();
         return;

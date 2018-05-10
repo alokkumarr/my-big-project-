@@ -6,18 +6,19 @@
   </mat-form-field>
   <mat-form-field>
     <mat-select placeholder="Operator"
-                e2e="filter-number-select"
+                e2e="filter-number-operator-select"
                 (selectionChange)="onOperatorChange($event.value)"
                 [value]="filterModel.operator">
       <mat-option *ngFor="let operator of OPERATORS"
                   [value]="operator.value"
-                  [e2e]="'filter-number-option-' + operator.label">
+                  [attr.e2e]="'filter-number-operator-option-' + operator.label">
         {{ operator.label }}
       </mat-option>
     </mat-select>
   </mat-form-field>
   <mat-form-field>
     <input matInput type="number"
+            e2e="designer-number-filter-input"
             (input)="onValueChange($event.target.value)"
             [value]="filterModel.value"/>
   </mat-form-field>

@@ -48,7 +48,8 @@ export default class AbstractDesignerComponentController {
     this.onClearAllFilters();
   }
 
-  onFilterRemoved(/* index */) {
+  onFilterRemoved(index) {
+    this.filters.splice(index, 1);
     this.didAnalysisChange = true;
     this.startDraftMode();
   }

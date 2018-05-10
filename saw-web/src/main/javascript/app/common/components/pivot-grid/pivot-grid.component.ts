@@ -1,5 +1,9 @@
-declare const require: any;
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
@@ -19,7 +23,11 @@ import * as isUndefined from 'lodash/isUndefined';
 import { Subject } from 'rxjs/Subject';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-import { ArtifactColumnPivot, Sort } from '../../../modules/analyze/models';
+import {
+  ArtifactColumnPivot,
+  Sort,
+  Format
+} from '../../../models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
@@ -321,7 +329,7 @@ export class PivotGridComponent {
 
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
-          const percent = cloned.aggregate == 'percentage' ? true : false;
+          const percent = (cloned.aggregate == 'percentage' ? true : false);
 
           if (!isUndefined(artifactColumn.format)) {
             artifactColumn.format.percentage = percent;

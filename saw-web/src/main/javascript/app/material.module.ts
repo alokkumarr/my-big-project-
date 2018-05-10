@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NouisliderModule } from 'ng2-nouislider';
@@ -32,6 +30,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCardModule} from '@angular/material/card';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
+import {ReactiveFormsModule} from '@angular/forms';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 require('nouislider/distribute/nouislider.min.css');
@@ -40,6 +39,7 @@ import '../../../../themes/_angular_next.scss';
 @NgModule({
   imports: [
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     MatButtonModule,
     MatRadioModule,
     MatSelectModule,
@@ -66,6 +66,9 @@ import '../../../../themes/_angular_next.scss';
     MatTabsModule,
     MatDividerModule,
     MatMomentDateModule,
+    MatToolbarModule,
+    MatSlideToggleModule,
+    MatDividerModule,
     NouisliderModule
   ],
   providers: [MatIconRegistry],
@@ -96,6 +99,9 @@ import '../../../../themes/_angular_next.scss';
     MatTabsModule,
     MatDividerModule,
     MatMomentDateModule,
+    MatToolbarModule,
+    MatSlideToggleModule,
+    MatDividerModule,
     NouisliderModule
   ]
 })

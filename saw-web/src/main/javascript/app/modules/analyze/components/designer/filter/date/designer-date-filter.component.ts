@@ -1,5 +1,3 @@
-declare const require: any;
-
 import {
   Component,
   Input,
@@ -41,54 +39,55 @@ export class DesignerDateFilterComponent {
   @Output() public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
   @Input() public filterModel: FilterModel;
 
-  date = new FormControl({value: moment(), disabled: true});
+  lteFC = new FormControl({value: null, disabled: true});
+  gteFC = new FormControl({value: null, disabled: true});
   datePreset = new FormControl({value: null, disabled: false})
   showDateFields = false;
   presets = DATE_PRESETS;
 
-  public tempModel = {
-    gte: null,
-    lte: null,
-    preset: CUSTOM_DATE_PRESET_VALUE
-  }
+  public tempModel;
 
-  init() {
-    if (!this.filterModel) {
-      this.filterModel = {};
-    } else {
-      this.datePreset.setValue(this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE);
+  ngOnInit() {
+    if (this.filterModel) {
       this.tempModel = {
         gte: moment(this.filterModel.gte),
         lte: moment(this.filterModel.lte),
         preset: this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE
       }
+      this.lteFC.setValue(this.tempModel.lte);
+      this.gteFC.setValue(this.tempModel.gte);
+    } else {
+      this.tempModel = {
+        gte: null,
+        lte: null,
+        preset: CUSTOM_DATE_PRESET_VALUE
+      };
     }
-
-    this.showDateFields = (this.tempModel || this.filterModel).preset === CUSTOM_DATE_PRESET_VALUE;
-  }
-
-  ngOnInit() {
-    this.init();
-  }
-
-  ngOnChanges() {
-    this.init();
+    this.datePreset.setValue(this.tempModel.preset);
+    this.showDateFields = this.tempModel.preset === CUSTOM_DATE_PRESET_VALUE;
   }
 
   onPresetChange(change) {
-    this.filterModel.preset = change.value;
+    this.tempModel.preset = change.value;
     if (change.value !== CUSTOM_DATE_PRESET_VALUE) {
-      delete this.filterModel.gte;
-      delete this.filterModel.lte;
+      this.tempModel.gte = null;
+      this.tempModel.lte = null;
     }
 
     this.showDateFields = change.value === CUSTOM_DATE_PRESET_VALUE;
-    this.filterModelChange.emit(this.filterModel);
+    this.filterModelChange.emit(this.getFormattedModel(this.tempModel));
   }
 
   modelChange(value, prop: 'lte' | 'gte') {
     this.tempModel[prop] = value;
-    this.filterModel[prop] = value.format(DATE_FORMAT);
-    this.filterModelChange.emit(this.filterModel);
+    this.filterModelChange.emit(this.getFormattedModel(this.tempModel));
+  }
+
+  getFormattedModel({lte, gte, preset}) {
+    return {
+      lte: lte ? lte.format(DATE_FORMAT) : null,
+      gte: gte ? gte.format(DATE_FORMAT) : null,
+      preset
+    }
   }
 }
