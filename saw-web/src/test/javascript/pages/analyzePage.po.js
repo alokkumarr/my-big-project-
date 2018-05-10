@@ -3,13 +3,13 @@ const commonFunctions = require('../helpers/commonFunctions.js');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
 const designModePage = require('./designModePage.po');
-const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
+const getCards = name => element.all(by.css('mat-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
 
 const getCard = name => getCards(name).first();
 
-const firstCard = element.all(by.css('md-card[e2e="analysis-card"]')).first();
+const firstCard = element.all(by.css('mat-card[e2e="analysis-card"]')).first();
 
 const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"]'));
 
@@ -55,7 +55,7 @@ const doAnalysisAction = (name, action) => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
-      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);  
+      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
@@ -255,7 +255,7 @@ module.exports = {
     getCardTitle,
     doAnalysisAction,
     getAnalysisActionOptions,
-    confirmDeleteBtn: element(by.cssContainingText('button[ng-click="dialog.hide()"]', 'Delete')),
+    confirmDeleteBtn: element(by.css('button[e2e="confirm-dialog-ok-btn"]')),
     doAccountAction,
     firstCard,
     getForkBtn,
@@ -281,10 +281,10 @@ module.exports = {
 
   // OLD test elements
   analysisElems: {
-    listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
-    cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),
+    listView: element(by.css('[e2e="analyze-list-view"]')),
+    cardView: element(by.css('[e2e="analyze-card-view"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
-    addAnalysisBtn: element(by.css('[ng-click="$ctrl.openNewAnalysisModal()"]')),
+    addAnalysisBtn: element(by.css('[e2e="open-new-analysis-modal"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
     designerDialog: element(by.css('.ard_canvas')),
@@ -326,11 +326,11 @@ module.exports = {
   },
 
   validateCardView() {
-    expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
+    expect(this.analysisElems.cardView.getAttribute('class')).toContain('mat-radio-checked');
   },
 
   validateListView() {
-    expect(this.analysisElems.listView.getAttribute('aria-checked')).toEqual('true');
+    expect(this.analysisElems.listView.getAttribute('class')).toContain('mat-radio-checked');
   },
 
   validateNewAnalyze() {

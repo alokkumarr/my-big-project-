@@ -23,6 +23,8 @@ export class AnalyzeCardComponent implements OnInit {
   placeholderClass: string;
 
   schedule: string;
+  // type identifier used for e2e tag
+  typeIdentifier: string;
 
   constructor(
     private _analyzeService: AnalyzeService,
@@ -31,9 +33,9 @@ export class AnalyzeCardComponent implements OnInit {
 
   ngOnInit() {
     const { type, id, chartType } = this.analysis as AnalysisChart;
-    const chartTypeString =
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.schedule = generateSchedule(this.cronJobs, id);
+    this.typeIdentifier = `analysis-type:${type}${chartType ? `:${chartType}` : ''}`;
   }
 
   showExecutingFlag(analysisId) {

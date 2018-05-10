@@ -48,21 +48,22 @@ export class AnalyzeActionsService {
   }
 
   openDeleteModal(analysis) {
-    // TODO  when report designer upgrade is merged, use the new confirmation dialog for this
-    // const confirm = $mdDialog.confirm()
-    //   .title('Are you sure you want to delete this analysis?')
-    //   .textContent('Any published analyses will also be deleted.')
-    //   .ok('Delete')
-    //   .cancel('Cancel');
-
-    // return $mdDialog.show(confirm).then(() => {
-    //   return removeAnalysis(analysis);
-    // }, err => {
-    //   if (err) {
-    //     $log.error(err);
-    //   }
-    // });
-    return Promise.resolve('placeholder');
+    return new Promise(resolve => {
+      this._analyzeDialogService.openDeleteConfirmationDialog().afterClosed().subscribe({
+        next: result => {
+          if (result) {
+            this.removeAnalysis(analysis).then(deletionSuccess => {
+              resolve(deletionSuccess);
+            });
+          } else {
+            resolve(false);
+          }
+        },
+        error: () => {
+          resolve(false);
+        }
+      });
+    });
   }
 
   openEditModal(analysis, mode: 'edit' | 'fork') {
@@ -81,7 +82,7 @@ export class AnalyzeActionsService {
     case AnalyseTypes.Chart:
       return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
     case AnalyseTypes.Pivot:
-      return this._analyzeDialogService.openEditAdnalysisDialog(analysis, mode)
+      return this._analyzeDialogService.openEditAnalysisDialog(analysis, mode)
         .afterClosed().first().toPromise();
     default:
     }
@@ -96,6 +97,18 @@ export class AnalyzeActionsService {
         scope.model = analysis;
         scope.onPublish = this.doPublish;
       }
+    });
+  }
+
+  removeAnalysis(analysis) {
+    this._headerProgressService.show();
+    return this._analyzeService.deleteAnalysis(analysis).then(() => {
+      this._headerProgressService.hide();
+      this._toastMessage.info('Analysis deleted.');
+      return true;
+    }, err => {
+      this._headerProgressService.hide();
+      this._toastMessage.error(err.message || 'Analysis not deleted.');
     });
   }
 

@@ -35,7 +35,7 @@ export class AnalyzeViewComponent implements OnInit {
   public CARD_VIEW  = 'card';
   public analysisId : string;
   public canUserCreate: boolean;
-  public viewMode = this.CARD_VIEW;
+  public viewMode = this.LIST_VIEW;
   public analysisTypes = [
     ['all', 'All'],
     ['chart', 'Chart'],
@@ -99,6 +99,9 @@ export class AnalyzeViewComponent implements OnInit {
     this.analyses = filter(this.analyses, report => {
       return report.id !== analysis.id;
     });
+    this.filteredAnalyses = filter(this.filteredAnalyses, report => {
+      return report.id !== analysis.id;
+    });
   }
 
   openNewAnalysisModal() {
@@ -117,6 +120,10 @@ export class AnalyzeViewComponent implements OnInit {
         autoWrap: false,
         focusOnOpen: false,
         clickOutsideToClose: true
+      }).then(result => {
+        if (result) {
+          this.loadAnalyses();
+        }
       });
     }).catch(() => {
       this._headerProgress.hide();
