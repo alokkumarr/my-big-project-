@@ -122,7 +122,7 @@ sampler.tbl_spark <- function(df,
                                     replacement = replace,
                                     seed = seed)
   } else {
-    checkmate::assert_number(size, lower = 0, upper = Inf)
+    checkmate::assert_number(size, lower = 1, upper = Inf)
     results <- head(df, size)
   }
 
@@ -132,7 +132,6 @@ sampler.tbl_spark <- function(df,
 
 
 # Collecter ---------------------------------------------------------------
-
 
 
 
@@ -161,7 +160,14 @@ collecter <- function(df,
   checkmate::assert_flag(sample)
 
   if (sample) {
-    do.call("sampler", modifyList(list(df = df), list(...))) %>%
+    do.call("sampler",
+            list(
+              df = df,
+              method = method,
+              size = size,
+              replace = replace,
+              seed = seed
+            )) %>%
       dplyr::collect()
   } else {
     dplyr::collect(df)
