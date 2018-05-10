@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card e2e="analysis-card">
 
   <mat-card-header fxLayout="row" fxLayoutAlign="end center">
     <mat-chip class="tag-chip status-chip"
@@ -7,12 +7,15 @@
     >
     EXECUTING
     </mat-chip>
-    <mat-chip class="tag-chip basic-mat-chip"
+    <mat-chip class="tag-chip mat-basic-chip"
               [innerHtml]="getType(analysis.type) | highlight: highlightTerm"
     ></mat-chip>
   </mat-card-header>
 
-  <mat-card-content fxLayout="row" fxLayoutAlign="center center">
+  <mat-card-content fxLayout="row"
+                    fxLayoutAlign="center center"
+                    [attr.e2e]="typeIdentifier"
+  >
     <div class="saw-ac-placeholder"
           [ngClass]="placeholderClass"
           [uiParams]="{analysisId: analysis.id, analysis: analysis}"
@@ -40,6 +43,7 @@
     <mat-card-actions fxLayout="row" fxLayoutAlign="center center">
       <button mat-icon-button
               (click)="fork(analysis)"
+              e2e="action-fork-btn"
               class="list-action-button"
               i18n-matTooltip="Fork"
               matTooltip="Fork"

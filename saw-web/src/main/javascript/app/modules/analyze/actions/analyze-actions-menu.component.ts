@@ -93,8 +93,10 @@ export class AnalyzeActionsMenuComponent {
   }
 
   delete() {
-    this._analyzeActionsService.delete(this.analysis).then(analysis => {
-      // this.afterDelete.emit(analysis);
+    this._analyzeActionsService.delete(this.analysis).then(wasSuccessful => {
+      if (wasSuccessful) {
+        this.afterDelete.emit(this.analysis);
+      }
     });
   }
 

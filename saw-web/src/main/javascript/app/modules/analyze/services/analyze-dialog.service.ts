@@ -21,12 +21,6 @@ import { DateFormatDialogComponent } from '../../../common/components/date-forma
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../common/types';
 
-const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
-  title: 'Are you sure you want to proceed?',
-  content: 'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
-  positiveActionLabel: 'Save',
-  negativeActionLabel: 'Cancel'
-};
 @Injectable()
 export class AnalyzeDialogService {
   constructor(public dialog: MatDialog) {}
@@ -141,11 +135,41 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
+  openDeleteConfirmationDialog() {
+    const deleteConfirmation = {
+      title: 'Are you sure you want to delete this analysis?',
+      content: 'Any published analyses will also be deleted.',
+      positiveActionLabel: 'Delete',
+      negativeActionLabel: 'Cancel'
+    };
+    return this.openConfirmationDialog(deleteConfirmation);
+  }
+
+  openDiscardConfirmationDialog() {
+    const discardConfirmation = {
+      title: 'There are unsaved changes',
+      content: 'Do you want to discard unsaved changes and go back?',
+      positiveActionLabel: 'Discard',
+      negativeActionLabel: 'Cancel'
+    };
+    return this.openConfirmationDialog(discardConfirmation);
+  }
+
   openQueryConfirmationDialog() {
+    const queryConfirmation = {
+      title: 'Are you sure you want to proceed?',
+      content: 'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
+      positiveActionLabel: 'Save',
+      negativeActionLabel: 'Cancel'
+    };
+    return this.openConfirmationDialog(queryConfirmation);
+  }
+
+  openConfirmationDialog(data: ConfirmDialogData) {
     return this.dialog.open(ConfirmDialogComponent, {
       width: 'auto',
       height: 'auto',
-      data: CONFIRM_DIALOG_DATA
+      data
     } as MatDialogConfig);
   }
 }

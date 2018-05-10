@@ -105,12 +105,9 @@ describe('Create report type analysis: createReport.test.js', () => {
     const stringFilterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
 
-    reportDesigner.gridExpandBtn.click();
-
     commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
-    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 
     const appliedFilter = filters.getAppliedFilter(fieldName);
