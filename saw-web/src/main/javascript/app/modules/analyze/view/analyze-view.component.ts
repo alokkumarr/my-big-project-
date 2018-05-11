@@ -3,6 +3,7 @@ import { Transition, StateService } from '@uirouter/angular';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
+import * as findIndex from 'lodash/findIndex';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { AnalyzeService } from '../services/analyze.service';
@@ -82,10 +83,15 @@ export class AnalyzeViewComponent implements OnInit {
       this.loadAnalyses();
       break;
     case 'delete':
-      this.removeDeletedAnalysis(event.analysis)
+      // this.removeDeletedAnalysis(event.analysis);
+      this.spliceAnalyses(event.analysis, false);
       break;
     case 'execute':
       this.goToAnalysis(event.analysis);
+      break;
+    case 'publish':
+      this.afterPublish(event.analysis);
+      break;
     }
   }
 
@@ -99,6 +105,26 @@ export class AnalyzeViewComponent implements OnInit {
 
   goToAnalysis(analysis) {
     this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
+  }
+
+  afterPublish(analysis) {
+    this.getCronJobs();
+    /* Update the new analysis in the current list */
+    const index = findIndex(this.analyses, ({id}) => id === analysis.id);
+    this.analyses.splice(index, 1, analysis);
+    this._state.go('analyze.view', {id: analysis.categoryId});
+  }
+
+  spliceAnalyses(analysis, replace) {
+    const index = findIndex(this.analyses, ({id}) => id === analysis.id);
+    const filteredIndex = findIndex(this.filteredAnalyses, ({id}) => id === analysis.id);
+    if (replace) {
+      this.analyses.splice(index, 1, analysis);
+      this.analyses.splice(filteredIndex, 1, analysis);
+    } else {
+      this.analyses.splice(index, 1);
+      this.analyses.splice(filteredIndex, 1);
+    }
   }
 
   removeDeletedAnalysis(analysis) {
