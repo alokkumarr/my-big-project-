@@ -130,12 +130,12 @@ public class Request {
         if (analyzeAndValidate(item)){
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
-            try {
-                os = HFileOperations.writeToFile(rFile);
-            } catch (FileNotFoundException e1) {
-                logger.error("Could not write response to file: " + rFile, e1);
-                return;
-            }
+//            try {
+//                os = HFileOperations.writeToFile(rFile);
+//            } catch (FileNotFoundException e1) {
+//                logger.error("Could not write response to file: " + rFile, e1);
+//                return;
+//            }
 
             try {
                 switch (action) {
