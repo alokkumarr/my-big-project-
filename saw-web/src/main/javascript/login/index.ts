@@ -12,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import {downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
 
 import AppConfig from '../../../../appConfig';
 
@@ -20,8 +21,8 @@ import {themeConfig} from './theme';
 import {runConfig} from './run';
 
 import {AuthServiceFactory} from './services/auth.service';
-import {UserService} from './services/user.service';
-import {JwtService} from './services/jwt.service';
+import { UserService } from './services/user.service';
+import { JwtService } from './services/jwt.service';
 
 import {LayoutContentComponent, LayoutFooterComponent} from './layout';
 
@@ -43,8 +44,10 @@ angular
   .run(runConfig)
   .value('AppConfig', AppConfig)
   .factory('AuthService', AuthServiceFactory)
-  .service('UserService', UserService)
-  .service('JwtService', JwtService)
+  .factory('UserService', downgradeInjectable(UserService) as Function)
+  //.service('UserService', UserService)
+  //.service('JwtService', JwtService)
+  .factory('JwtService', downgradeInjectable(JwtService) as Function)
   .component('layoutContent', LayoutContentComponent)
   .component('layoutFooter', LayoutFooterComponent)
   .component('passwordChangeComponent', PasswordChangeComponent)
@@ -56,7 +59,8 @@ angular
   imports: [
     BrowserModule,
     UpgradeModule
-  ]
+  ],
+  providers:[JwtService, UserService]
 })
 export class NewLoginModule {
   constructor() { }

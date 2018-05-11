@@ -1,16 +1,16 @@
+import { Inject } from '@angular/core';
+import {Http, HTTP_PROVIDERS} from '@angular/http';
 import * as get from 'lodash/get';
+import * as fpGet from 'lodash/fp/get';
+//import { JwtService } from '../../services/jwt.service';
+
+import APP_CONFIG from '../../../../../appConfig';
 
 export class UserService {
-  constructor($window, $http, $state, AppConfig, JwtService) {
-    'ngInject';
-
-    this._$window = $window;
-    this._$http = $http;
-    this._$state = $state;
-    this._AppConfig = AppConfig;
-    this._JwtService = JwtService;
-    this.refreshTokenEndpoint = 'getNewAccessToken';
-  }
+  constructor(private _JwtService: JwtService) {}
+  
+  private loginUrl = fpGet('login.url', APP_CONFIG);
+  private refreshTokenEndpoint = 'getNewAccessToken';
 
   attemptAuth(formData) {
     const LoginDetails = {
@@ -20,7 +20,7 @@ export class UserService {
 
     const route = '/doAuthenticate';
 
-    return this._$http.post(this._AppConfig.login.url + route, LoginDetails)
+    return this._$http.post(this.loginUrl + route, LoginDetails)
       .then(response => {
         const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
 
@@ -44,7 +44,7 @@ export class UserService {
   exchangeLoginToken(token) {
     const route = '/authentication';
 
-    return this._$http.get(this._AppConfig.login.url + route, {
+    return this._$http.get(this.loginUrl + route, {
       params: {
         jwt: token
       }
@@ -66,15 +66,15 @@ export class UserService {
     const token = this._JwtService.get();
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
-    const resp = angular.fromJson(this._$window.atob(base64));
+    const resp = angular.fromJson(window.atob(base64));
 
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + token;
 
-    return this._$http.post(this._AppConfig.login.url + route, resp.ticket.ticketId)
+    return this._$http.post(this.loginUrl + route, resp.ticket.ticketId)
       .then(() => {
         this._JwtService.destroy();
         if (path === 'logout') {
-          this._$state.reload();
+          window.location.reload();
         }
       });
   }
@@ -88,7 +88,7 @@ export class UserService {
     }
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
-    const resp = angular.fromJson(this._$window.atob(base64));
+    const resp = angular.fromJson(window.atob(base64));
     const LoginDetails = {
       masterLoginId: resp.ticket.masterLoginId,
       oldPassword: credentials.formData.oldPwd,
@@ -98,7 +98,7 @@ export class UserService {
 
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
 
-    return this._$http.post(this._AppConfig.login.url + route, LoginDetails)
+    return this._$http.post(this.loginUrl + route, LoginDetails)
       .then(res => {
         if (res.data.valid) {
           this.logout('change');
@@ -110,7 +110,7 @@ export class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = `${this._$window.location.href.split('/preResetPwd')[0]}/resetPassword`;
+    const productUrl = `${window.location.href.split('/preResetPwd')[0]}/resetPassword`;
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
@@ -119,7 +119,7 @@ export class UserService {
 
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
 
-    return this._$http.post(this._AppConfig.login.url + route, LoginDetails)
+    return this._$http.post(this.loginUrl + route, LoginDetails)
       .then(res => {
         return res;
       });
@@ -133,7 +133,7 @@ export class UserService {
       cnfNewPassword: credentials.confNewPwd
     };
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
-    return this._$http.post(this._AppConfig.login.url + route, ResetPasswordDetails)
+    return this._$http.post(this.loginUrl + route, ResetPasswordDetails)
       .then(res => {
         return res;
       });
@@ -141,7 +141,7 @@ export class UserService {
 
   verify(hashCode) {
     const route = '/vfyRstPwd';
-    return this._$http.post(this._AppConfig.login.url + route, hashCode)
+    return this._$http.post(this.loginUrl + route, hashCode)
       .then(res => {
         return res;
       });
@@ -149,7 +149,7 @@ export class UserService {
 
   redirect(baseURL) {
     const route = '/auth/redirect';
-    return this._$http.post(this._AppConfig.login.url + route, baseURL)
+    return this._$http.post(this.loginUrl + route, baseURL)
       .then(res => {
         return res;
       });
@@ -157,7 +157,7 @@ export class UserService {
 
   refreshAccessToken(rtoken = this._JwtService.getRefreshToken()) {
     const route = `/${this.refreshTokenEndpoint}`;
-    return this._$http.post(this._AppConfig.login.url + route, rtoken)
+    return this._$http.post(this.loginUrl + route, rtoken)
       .then(response => {
         const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
         // Store the user's info for easy lookup
