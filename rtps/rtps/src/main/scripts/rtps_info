@@ -1,0 +1,16 @@
+#!/bin/bash
+awk "(\$1 == \"${1:-:}:\"){print \$2; exit;}" $0; exit
+# values provided from pom
+name:    ${app.name}
+version: ${app.version}
+release: ${app.release}
+#
+user:    ${app.user}
+group:   ${app.group}
+#
+optdir:  ${app.optDir}    # /dfs/opt/bda/xdf/xdf-$version
+#vardir:  ${app.varDir}    # /dfs/var/bda/xdf
+#
+# more values can be added on the box 
+# TBD: rpm.host - installation host
+#

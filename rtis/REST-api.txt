@@ -1,0 +1,139 @@
+GET method:
+
+# Status request
+http://realtime.sncrbda.dev.cloud.synchronoss.net/sr
+Resp:
+{"service":"FrontEnd-Server","status":"Alive"}  
+# Status can be "Stale"
+=======
+Front End RESTful API
+
+# CLI bash helpers
+urlenc() { python -c 'import sys;import urllib;print urllib.quote(sys.argv[1])' "${1:?}"; }
+getsr()  { local host=${1:?}; echo URL: $host/sr; echo RSP: $( curl -qsS $host/sr ); }
+getctl() { local host=${1:?} cmd=${2:?} parms; [[ ${3:-} ]] && parms='&PARAMETERS='$( urlenc "$3" )
+URL="$host/control?CMD=$cmd${parms:-}"; echo URL: "$URL"; echo RSP: "$( curl -qsS "$URL" )"; }
+
+# Variable for sample run
+HOST=https://realtime.sncrbda.dev.cloud.synchronoss.net
+
+###############################################
+### Status request (status: Alive, Slate, ?)
+$ curl -qsS https://realtime.sncrbda.dev.cloud.synchronoss.net/sr
+{"service":"FrontEnd-Server","status":"Alive"}
+$ getsr $HOST
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/sr
+RSP: {"service":"FrontEnd-Server","status":"Alive"}
+
+###########
+# Controls
+###########
+getApps      - csv list of all applications;
+getList      - streams for each application;
+getList ..   - streams for specified application;
+getActive    - active stream for each application;
+getActive .. - streams for specified application;
+setActive .. - set active stream for specified application,
+               returns previous active stream,
+               to verify success, use getActive;
+
+###############################################
+# Returns csv list of all applications
+$ getctl $HOST getApps
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/control?CMD=getApps
+RSP: {"result":"ok","appkeylist":"generic,Charter.SmartCare,countly_event,countly_crash"}
+
+###############################################
+# Returns list of streams for all applications
+$ getctl $HOST getList
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/control?CMD=getList
+RSP: {"result":"ok",
+      "generic":[{"streams_1":"string_streams_1"},{"streams_2":"string_streams_2"}],
+      "Charter.SmartCare":[{"streams_1":"main/data/streams/charter-sc1"},{"streams_2":"main/data/streams/charter-sc2"}],
+      "countly_event":[{"streams_1":"main/data/streams/countlyevents1"},{"streams_2":"main/data/streams/countlyevents2"}],
+      "countly_crash":[{"streams_1":"main/data/streams/crashreports1"},{"streams_2":"main/data/streams/crashreports2"}]
+      }
+
+###############################################
+# Returns list of streams for specified application
+$ getctl $HOST getList '{"AppKey" : "Charter.SmartCare"}'
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/control?CMD=getList&PARAMETERS=%7B%22AppKey%22%20%3A%20%22Charter.SmartCare%22%7D
+RSP: {"result":"ok","Charter.SmartCare":["main/data/streams/charter-sc1","main/data/streams/charter-sc2"]}
+
+###############################################
+# Returns active stream of each application
+$ getctl $HOST getActive
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/control?CMD=getActive
+RSP: {"result":"ok","generic":"string_streams_1","Charter.SmartCare":"main/data/streams/charter-sc1","countly_event":"main/data/streams/countlyevents1","countly_crash":"main/data/streams/crashreports1"}
+
+###############################################
+# Returns active stream for specified application
+$ getctl $HOST getActive '{"AppKey" : "Charter.SmartCare"}'
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/control?CMD=getActive&PARAMETERS=%7B%22AppKey%22%20%3A%20%22Charter.SmartCare%22%7D
+RSP: {"result":"ok","Charter.SmartCare":"main/data/streams/charter-sc1"}
+
+###############################################
+# Sets active stream for specified application, returns previous active stream
+$ getctl $HOST setActive '{"AppKey" : "countly_crash", "Stream":"main/data/streams/crashreports2"}'
+URL: https://realtime.sncrbda.dev.cloud.synchronoss.net/control?CMD=setActive&PARAMETERS=%7B%22AppKey%22%20%3A%20%22countly_crash%22%2C%20%22Stream%22%3A%22main/data/streams/crashreports2%22%7D
+RSP: {"result":"ok","countly_crash":"main/data/streams/crashreports1"}
+
+####################
+# Charter.SC CLI
+File: /opt/bda/apps/charter-sc/sbin/manage_stream
+Usage: manage-stream <rtis-host> <command> <new-active-stream>
+<command> - getList - list streams on the host
+          - getActive - get active stream on the host
+          - setActive - set active stream on the host
+
+<<<<<<< HEAD
+####################
+# From SR, 3:42 PM 1/30/2017
+Alexey, Sergey,
+Now we can use RTIS control interface with POST method.
+Here is documentation. Please note, header "Content-Type:application/json" must be set.
+All three commands with parameters are tested.
+-----------------------------------------------------------------------------------------
+POST method:
+ 
+curl -XPOST -H Content-Type:application/json \
+    rtfe101.sncrbda.dev.cloud.synchronoss.net:9100/control?CMD=getList \
+    --data '{"AppKey" : "Charter.SmartCare"}'
+RESP:
+{"result":"ok","Charter.SmartCare":["main/data/streams/charter-sc1","main/data/streams/charter-sc2"]}[
+ 
+curl -XPOST -H Content-Type:application/json \
+    rtfe101.sncrbda.dev.cloud.synchronoss.net:9100/control?CMD=getActive \
+    --data '{"AppKey":"Charter.SmartCare"}'
+RESP:
+{"result":"ok","Charter.SmartCare":"main/data/streams/charter-sc1"}
+
+curl -XPOST -H Content-Type:application/json \
+  rtfe101.sncrbda.dev.cloud.synchronoss.net:9100/control?CMD=setActive \
+  --data '{"AppKey":"Charter.SmartCare","Stream":"main/data/streams/charter-sc1"}'
+RESP:
+{"result":"ok","Charter.SmartCare":"main/data/streams/charter-sc2"}
+-----------------------------------------------------------------------------------------
+=======
+-----------------------------------------------------------------------------------------
+POST method:
+
+curl -XPOST -H "Content-Type:application/json" \
+rtfe101.sncrbda.dev.cloud.synchronoss.net:9100/control?CMD=getActive --data '{"AppKey" : "Charter.SmartCare"}' 
+RESP:
+{"result":"ok","Charter.SmartCare":"main/data/streams/charter-sc1"}
+
+curl -XPOST -H "Content-Type:application/json" \
+rtfe101.sncrbda.dev.cloud.synchronoss.net:9100/control?CMD=getList --data '{"AppKey" : "Charter.SmartCare"}' 
+RESP:
+{"result":"ok","Charter.SmartCare":["main/data/streams/charter-sc1","main/data/streams/charter-sc2"]}[
+
+curl -XPOST -H "Content-Type:application/json" \
+rtfe101.sncrbda.dev.cloud.synchronoss.net:9100/control?CMD=setActive \
+--data '{"AppKey" : "Charter.SmartCare", "Stream":"main/data/streams/charter-sc1"}' 
+RESP:
+{"result":"ok","Charter.SmartCare":"main/data/streams/charter-sc2"}
+
+-----------------------------------------------------------------------------------------
+					
+>>>>>>> 494c97e461e1e60ba56538b82772cfaf467ad878

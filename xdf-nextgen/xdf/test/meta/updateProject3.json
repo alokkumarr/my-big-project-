@@ -1,0 +1,20 @@
+{
+  "action" : "update",
+  "output" : "hdfs:///var/bda/xdf-ngdev/project.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "Project",
+	"id" : "P3",
+	"source" : {
+		"description" : "new descdription",
+		"projectLevelParameters" : [
+				{"name": "spark.master",            "value": "yarn"}, 
+				{"name": "spark.yarn.queue",        "value":"xdf"},  
+				{"name": "spark.driver.memory",     "value":"1g"}, 
+				{"name": "spark.executor.memory",   "value":"6g"},  
+				{"name": "spark.executor.cores",    "value":"4"}, 
+				{"name": "spark.executor.instances","value":"8"},
+				{"name": "spark.yarn.tags",         "value":"XDA-SR-UX"}
+		]
+	}
+}
+

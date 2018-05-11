@@ -12,6 +12,8 @@
     "postinstall": "node node_modules/protractor/bin/webdriver-manager update",
     "e2e": "protractor conf/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js",
+    "precommit": "node .githook-precommit.js",
+    "commitmsg": "node .githook-commitmsg.js",
     "prepush": "npm run -s eslint lint",
     "lint": "tslint --project tsconfig.json -c conf/tslint-prod.json",
     "eslint": "eslint -c .eslintrc --ext .js ./src",

@@ -17,9 +17,6 @@
     <saw.docker.skip.machine>false</saw.docker.skip.machine>
     <!-- Default AWS region for Docker Machine -->
     <saw.aws.region>us</saw.aws.region>
-    <!-- Bind to all interfaces so that Docker Machine environment can
-         be accessed remotely -->
-    <saw.docker.ip>0.0.0.0</saw.docker.ip>
     <!-- Configure timestamp format suitable for use in Docker Machine
          hostnames -->
     <maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
@@ -212,7 +209,7 @@
         </executions>
         <configuration>
           <systemPropertyVariables>
-            <saw.docker.host>${docker.host.address}</saw.docker.host>
+            <saw.docker.host>${saw.docker.ip}</saw.docker.host>
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
           </systemPropertyVariables>
         </configuration>
@@ -296,7 +293,6 @@
                 </network>
                 <ports>
                   <port>+saw.docker.ip:saw.docker.port:80</port>
-                  <port>+saw.docker.ip:saw.kibana.port:5601</port>
                   <port>+saw.docker.ip:saw.journal.port:19531</port>
                 </ports>
                 <!-- Run privileged for systemd -->

@@ -31,21 +31,4 @@ expandable-field {
   .expandable-field__remove-btn {
     margin-left: 10px;
   }
-
-  .expandable-field__option-button {
-    width: auto;
-    color: $primary-grey-g3;
-
-    & > .mat-button-wrapper {
-      width: auto;
-
-      & > .mat-icon {
-        width: auto;
-
-        &::before {
-          width: auto;
-        }
-      }
-    }
-  }
 }

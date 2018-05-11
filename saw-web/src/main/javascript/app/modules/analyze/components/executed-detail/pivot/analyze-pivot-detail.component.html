@@ -16,10 +16,10 @@
 
   <md-card-content>
     <div layout="column" layout-align="space-between start">
-      <filter-chips filters="$ctrl.filters.selected"
-                    on-clear-all-filters="$ctrl.onClearAllFilters()"
-                    on-filter-removed="$ctrl.onFilterRemoved(chip)">
-      </filter-chips>
+      <filter-chips-u [filters]="$ctrl.analysis.sqlBuilder.filters"
+                      [readonly]="true"
+                      [artifacts]="$ctrl.analysis.artifacts">
+      </filter-chips-u>
     </div>
 
     <div layout="column" layout-align="space-between center">

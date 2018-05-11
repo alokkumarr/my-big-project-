@@ -1,0 +1,19 @@
+
+// Script
+
+String testStr = (( ROW.containsKey("strVal") )? ROW.get("strVal"): "no value") + " updated in Janino script";
+
+result.put( "strVal", testStr);
+result.put( "intVal", 2000);
+result.put( "F1", 3000);
+result.put( "F2", " another string field, collect ts: " + System.currentTimeMillis());
+
+
+return result;
+ 
+ 
+ 
+ 
+ 
+
+ 

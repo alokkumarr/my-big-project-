@@ -1,0 +1,51 @@
+<configuration>
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder>
+      <pattern>%coloredLevel - %logger - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${log.dir}/app_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>3</maxHistory>
+      <totalSizeCap>200MB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+  <logger level="ERROR" name="RejectedRequests">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <logger level="ERROR" name="synchronoss.handlers.charter.smartcare.CharterEventHandler">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <!--
+      The logger name is typically the Java/Scala package name.
+      This configures the log level to log at for a package and its children packages.
+    -->
+  <logger level="ERROR" name="play">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <logger level="ERROR" name="controllers">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <logger level="ERROR" name="mapr.streaming.EventHandler">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <logger level="ERROR" name="mapr.streaming.EventSender">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <logger level="ERROR" name="exceptions">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <root level="ERROR">
+    <!--  <appender-ref ref="STDOUT" />-->
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>

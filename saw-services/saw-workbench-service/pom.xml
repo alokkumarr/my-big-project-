@@ -23,7 +23,7 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
-		<metadata.api>1.0.11</metadata.api>
+		<metadata.api>${revision}</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
  	</properties>
 
@@ -171,8 +171,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
+<<<<<<< HEAD
 			<artifactId>xdf-ext</artifactId>
 			<version>1.0.8</version>
+=======
+			<artifactId>xdf</artifactId>
+			<version>${revision}</version>
+>>>>>>> 53c1d602d774426d163b6ce26b9ddc41eb43921f
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
