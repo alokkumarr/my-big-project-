@@ -17,10 +17,12 @@ export class AnalyzeActionsService {
     private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
     private _analyzeDialogService: AnalyzeDialogService,
-    private _headerProgressService: HeaderProgressService,
+    private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
     @Inject('$mdDialog') private _$mdDialog: any
-  ) {}
+  ) {
+    this.doPublish = this.doPublish.bind(this);
+  }
 
   execute(analysis) {
     return this._filterService.getRuntimeFilterValues(analysis).then(model => {
@@ -101,28 +103,28 @@ export class AnalyzeActionsService {
   }
 
   removeAnalysis(analysis) {
-    this._headerProgressService.show();
+    this._headerProgress.show();
     return this._analyzeService.deleteAnalysis(analysis).then(() => {
-      this._headerProgressService.hide();
+      this._headerProgress.hide();
       this._toastMessage.info('Analysis deleted.');
       return true;
     }, err => {
-      this._headerProgressService.hide();
+      this._headerProgress.hide();
       this._toastMessage.error(err.message || 'Analysis not deleted.');
     });
   }
 
   doPublish(analysis) {
     const execute = false;
-    this._headerProgressService.show();
+    this._headerProgress.show();
     return this._analyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
-      this._headerProgressService.hide();
+      this._headerProgress.hide();
       this._toastMessage.info(execute ?
         'Analysis has been updated.' :
         'Analysis schedule changes have been updated.');
       return updatedAnalysis;
     }, () => {
-      this._headerProgressService.hide();
+      this._headerProgress.hide();
     });
   }
 
