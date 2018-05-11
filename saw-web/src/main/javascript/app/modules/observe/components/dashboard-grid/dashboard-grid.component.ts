@@ -117,7 +117,7 @@ export class DashboardGridComponent
   }
 
   getMinColumns() {
-    if (this.mode === DASHBOARD_MODES.CREATE) return 8;
+    if (this.mode === DASHBOARD_MODES.CREATE) return 64;
 
     const savedMinCols = get(this.model, 'options.0.minCols');
     return savedMinCols ? savedMinCols : 4;
