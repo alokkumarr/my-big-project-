@@ -54,7 +54,10 @@
     <div *dxTemplate="let cell of 'actionCellTemplate'">
       <button mat-icon-button
               (click)="fork(cell.data)"
-              class="list-action-button">
+              class="list-action-button"
+              i18n-matTooltip="Fork Analysis"
+              matTooltip="Fork Analysis"
+      >
         <mat-icon fontIcon="icon-fork"></mat-icon>
       </button>
       <analyze-actions-menu-u [analysis]="cell.data"
