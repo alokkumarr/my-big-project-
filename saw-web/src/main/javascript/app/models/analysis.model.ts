@@ -7,6 +7,7 @@ import { OutputFile } from './output-file.model';
 import { LabelOptions } from './label-options.model';
 import { Legend } from './legend.model';
 import { Axis } from './axis.model';
+import { AnalysisType } from './analysis-type.model';
 
 export interface Analysis {
   description:      string;
@@ -20,7 +21,7 @@ export interface Analysis {
   metric:           string;
   metricName:       string;
   name:             string;
-  type:             'report' | 'pivot' | 'chart';
+  type:             AnalysisType;
   saved:            boolean;
   semanticId:       string;
   scheduled:        null;

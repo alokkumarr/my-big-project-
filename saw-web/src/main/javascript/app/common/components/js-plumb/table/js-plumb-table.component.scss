@@ -1,0 +1,72 @@
+@import "themes/base/colors";
+
+.jsp-table {
+  position: absolute;
+  box-shadow: initial;
+  background: #FFF;
+  border: 1px solid #D1D3D3;
+  border-radius: 3px;
+  width: 265px;
+
+  .table-name {
+    padding: 0 0 10px 10px;
+
+    span {
+      background-color: #FFF;
+      font-weight: bold;
+      color: $primary-blue-b2;
+    }
+  }
+
+  mat-checkbox {
+    //margin-bottom: 8px;
+    .mat-label {
+      display: block !important;
+    }
+  }
+
+  mat-list > mat-list-item.mat-list-item {
+    height: auto;
+    padding-bottom: 5px;
+    padding-top: 5px;
+
+    .jsp-table__column {
+      width: 100%;
+
+      .jsp-table__column-name {
+        padding-left: 10px;
+        font-size: 14px;
+        line-height: 16px;
+        word-wrap: break-word;
+        width: 90%;
+      }
+
+      .jsp-table__column-actions {
+        height: 22px;
+      }
+    }
+  }
+
+  .jsp-endpoint-TopCenter,
+  .jsp-endpoint-BottomCenter,
+  .jsp-endpoint-LeftMiddle,
+  .jsp-endpoint-RightMiddle {
+    display: inline-block;
+  }
+
+  .jsp-endpoint-LeftMiddle {
+    position: absolute;
+    top: 50%;
+    left: 0;
+  }
+
+  .jsp-endpoint-RightMiddle {
+    position: absolute;
+    top: 50%;
+    right: 0;
+  }
+
+  .icon-close {
+    padding-left: 12px;
+  }
+}

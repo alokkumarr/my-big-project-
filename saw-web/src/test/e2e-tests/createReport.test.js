@@ -100,10 +100,12 @@ describe('Create report type analysis: createReport.test.js', () => {
     commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.refreshBtn);
 
     // Should apply filters
-    const filters = analyzePage.filtersDialog;
+    const filters = analyzePage.filtersDialogUpgraded;
     const filterAC = filters.getFilterAutocomplete(0);
     const stringFilterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
+
+    reportDesigner.gridExpandBtn.click();
 
     commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
@@ -116,11 +118,11 @@ describe('Create report type analysis: createReport.test.js', () => {
     expect(appliedFilter.isPresent()).toBe(true);
 
     // Save
-    const save = analyzePage.saveDialog;
+    const save = analyzePage.saveDialogUpgraded;
     const designer = analyzePage.designerDialog;
     commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
 
-    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
+    commonFunctions.waitFor.elementToBeVisible(designer.saveDialogUpgraded);
     expect(designer.saveDialog).toBeTruthy();
 
     save.nameInput.clear().sendKeys(reportName);
