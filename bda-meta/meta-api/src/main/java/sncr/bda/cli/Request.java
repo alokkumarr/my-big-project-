@@ -10,7 +10,7 @@ import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.DataSetStore;
-import sncr.bda.metastore.ProjectStore;
+import sncr.bda.metastore.PortalDataSetStore;
 import sncr.bda.metastore.TransformationStore;
 
 import java.io.FileNotFoundException;
@@ -72,6 +72,29 @@ public class Request {
         request = jsonParser.parse(jStr);
     }
 
+    public JsonObject search() {
+        JsonObject result = null;
+
+        try {
+            if (request.isJsonObject()) {
+                if (analyzeAndValidateSearch(request.getAsJsonObject())) {
+                    Map<String, Document> searchResult = doSearch();
+
+                    if (searchResult != null) {
+                        return convertSearchResultToJson(searchResult);
+                    }
+                    else {
+
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Cannot process the request " + request + ", " + ex.getMessage());
+        }
+
+        return result;
+    }
+
 
     public void process(){
         try {
@@ -123,7 +146,8 @@ public class Request {
                         doAction(item);
                         break;
                     case search:
-                        doSearch();
+                        Map<String, Document> searchResult = doSearch();
+                        writeSearchResult(searchResult);
                         break;
                     default:
                         logger.warn("Action is not supported");
@@ -150,7 +174,7 @@ public class Request {
     }
 
 
-    private void doSearch() throws Exception {
+    private Map<String, Document> doSearch() throws Exception {
 
         maprDBCondition =  MapRDB.newCondition();
 
@@ -205,23 +229,26 @@ public class Request {
                 TransformationStore tr = new TransformationStore(xdfRoot);
                 searchResult = tr.search(maprDBCondition);
                 break;
+            case PortalDataSet:
+                PortalDataSetStore pdss = new PortalDataSetStore(xdfRoot);
+                searchResult = pdss.search(maprDBCondition);
+                break;
             default:
                 logger.error("Not supported category");
-                return;
+                return searchResult;
         }
-        writeSearchResult(searchResult);
+        return searchResult;
     }
 
-    private void writeSearchResult(Map<String, Document> searchResult) {
-
+    private JsonObject convertSearchResultToJson(Map<String, Document> searchResult) {
         if (searchResult == null || searchResult.isEmpty()) {
             logger.info("No data found");
-            return;
+            return null;
         }
+
         JsonObject response = new JsonObject();
         response.addProperty("scope", "search");
         JsonArray respJA = new JsonArray();
-        response.add("result", respJA);
         final int[] c = {0};
         searchResult.forEach( (id, doc) ->
             {
@@ -232,10 +259,27 @@ public class Request {
                 respJA.add(docDesc);
             }
         );
-        try {
-            os.write(response.toString().getBytes());
-        } catch (IOException e) {
-            logger.error("Could not write data to response file: ", e);
+
+        response.add("result", respJA);
+        return response;
+    }
+
+    private void writeSearchResult(Map<String, Document> searchResult) {
+
+        if (searchResult == null || searchResult.isEmpty()) {
+            logger.info("No data found");
+            return;
+        }
+
+
+        JsonObject object = convertSearchResultToJson(searchResult);
+
+        if (object != null) {
+            try {
+                os.write(object.toString().getBytes());
+            } catch (IOException e) {
+                logger.error("Could not write data to response file: ", e);
+            }
         }
 
     }
@@ -312,6 +356,17 @@ public class Request {
                     case delete: ts.delete(id); break;
                     case update: ts.update(id, item); break;
                     case read: result = ts.read(id); break;
+                    default:
+                        logger.warn("Action is not supported");
+                }
+                break;
+            case PortalDataSet:
+                PortalDataSetStore pdss = new PortalDataSetStore(xdfRoot);
+                switch (action){
+                    case create: pdss.create(id, src); break;
+                    case delete: pdss.delete(id); break;
+                    case update: pdss.update(id, src); break;
+                    case read: result = pdss.read(id); break;
                     default:
                         logger.warn("Action is not supported");
                 }
@@ -445,7 +500,7 @@ public class Request {
     }
 
 
-    enum Actions{
+    public enum Actions{
         read,
         create,
         update,
@@ -453,10 +508,11 @@ public class Request {
         search;
     }
 
-    enum MetaCategory{
+    public enum MetaCategory{
         Project,
         Transformation,
         DataSet,
+        PortalDataSet,
         AuditLog,
         DataPod,
         DataSegment;

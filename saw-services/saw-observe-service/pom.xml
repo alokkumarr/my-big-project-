@@ -94,11 +94,11 @@
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
 		
-		<dependency>
-			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-json-store-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.synchronoss.saw</groupId>-->
+			<!--<artifactId>saw-json-store-api</artifactId>-->
+			<!--<version>${project.version}</version>-->
+		<!--</dependency>-->
 		
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
@@ -136,7 +136,12 @@
 			<artifactId>SDNotify</artifactId>
 			<version>1.1</version>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>meta-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>
