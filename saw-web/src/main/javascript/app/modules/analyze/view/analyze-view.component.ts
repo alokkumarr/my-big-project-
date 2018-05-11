@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Transition } from '@uirouter/angular';
+import { Transition, StateService } from '@uirouter/angular';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
 import * as filter from 'lodash/filter';
@@ -52,6 +52,7 @@ export class AnalyzeViewComponent implements OnInit {
     private _analyzeService: AnalyzeService,
     private _headerProgress: HeaderProgressService,
     private _transition: Transition,
+    private _state: StateService,
     private _localStorage: LocalStorageService,
     private _jwt: JwtService,
     private _localSearch: LocalSearchService,
@@ -84,6 +85,7 @@ export class AnalyzeViewComponent implements OnInit {
       this.removeDeletedAnalysis(event.analysis)
       break;
     case 'execute':
+      this.goToAnalysis(event.analysis);
     }
   }
 
@@ -93,6 +95,10 @@ export class AnalyzeViewComponent implements OnInit {
 
   onAnalysisTypeChange(type) {
     this.filterObj.analysisType = type;
+  }
+
+  goToAnalysis(analysis) {
+    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
   }
 
   removeDeletedAnalysis(analysis) {
