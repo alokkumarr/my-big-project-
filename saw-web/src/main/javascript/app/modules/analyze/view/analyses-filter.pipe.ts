@@ -14,8 +14,8 @@ export class AnalysesFilterPipe implements PipeTransform {
     }
     return filter(analyses, analysis => {
       switch(type) {
-      case 'schedule':
-        return this.isInCronJobs(cronJobs, analysis.id)
+      case 'scheduled':
+        return this.isInCronJobs(cronJobs, analysis.id);
       default:
         return type === analysis.type;
       }
