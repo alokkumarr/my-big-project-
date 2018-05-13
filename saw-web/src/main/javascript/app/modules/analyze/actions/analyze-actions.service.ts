@@ -78,11 +78,10 @@ export class AnalyzeActionsService {
     });
 
     switch (analysis.type) {
-    case AnalyseTypes.ESReport:
-    case AnalyseTypes.Report:
-      return openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
     case AnalyseTypes.Chart:
       return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+    case AnalyseTypes.ESReport:
+    case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
       return this._analyzeDialogService.openEditAnalysisDialog(analysis, mode)
         .afterClosed().first().toPromise();
