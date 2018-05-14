@@ -1,19 +1,28 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, Component } from '@angular/core';
 import { JwtService } from './jwt.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
 import * as get from 'lodash/get';
 import * as fpGet from 'lodash/fp/get';
 
+import 'rxjs/add/observable/of';
 
 import APP_CONFIG from '../../../../../appConfig';
 
+@Component({
+/* . . . */
+  providers: [JwtService]
+})
+
 @Injectable()
 export class UserService {
-  constructor(private _JwtService: JwtService) {}
+  constructor(private _JwtService: JwtService, private _$http: HttpClient) {}
   
   private loginUrl = fpGet('login.url', APP_CONFIG);
   private refreshTokenEndpoint = 'getNewAccessToken';
 
-  attemptAuth(formData) {
+
+  attemptAuth(formData): Observable<any> {
     const LoginDetails = {
       masterLoginId: formData.masterLoginId,
       password: formData.authpwd
@@ -21,16 +30,16 @@ export class UserService {
 
     const route = '/doAuthenticate';
 
-    return this._$http.post(this.loginUrl + route, LoginDetails)
-      .then(response => {
-        const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
+    return this._$http
+      .post(this.loginUrl + route, LoginDetails)
+      .map(response => {
+        const resp = this._JwtService.parseJWT(get(response, 'aToken'));
 
         // Store the user's info for easy lookup
         if (this._JwtService.isValid(resp)) {
           // this._JwtService.destroy();
-          this._JwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+          this._JwtService.set(get(response, 'aToken'), get(response, 'rToken'));
         }
-
         return resp;
       });
   }
@@ -50,12 +59,12 @@ export class UserService {
         jwt: token
       }
     }).then(response => {
-      const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
+      const resp = this._JwtService.parseJWT(get(response, 'aToken'));
 
       // Store the user's info for easy lookup
       if (this._JwtService.isValid(resp)) {
         // this._JwtService.destroy();
-        this._JwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+        this._JwtService.set(get(response, 'aToken'), get(response, 'rToken'));
       }
 
       return true;
@@ -160,11 +169,11 @@ export class UserService {
     const route = `/${this.refreshTokenEndpoint}`;
     return this._$http.post(this.loginUrl + route, rtoken)
       .then(response => {
-        const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
+        const resp = this._JwtService.parseJWT(get(response, 'aToken'));
         // Store the user's info for easy lookup
         if (this._JwtService.isValid(resp)) {
           // this._JwtService.destroy();
-          this._JwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+          this._JwtService.set(get(response, 'aToken'), get(response, 'rToken'));
         }
         return resp;
       }, err => {

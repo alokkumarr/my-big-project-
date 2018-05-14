@@ -13,6 +13,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import {downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import {FlexLayoutModule} from '@angular/flex-layout';
+import {MaterialModule} from '../app/material.module';
 
 import AppConfig from '../../../../appConfig';
 
@@ -26,7 +30,7 @@ import { UserService } from './services/user.service';
 
 import {LayoutContentComponent, LayoutFooterComponent} from './layout';
 
-import {LoginComponent} from './components/login/login.component';
+import { LoginComponent } from './components/login/login.component';
 import {PasswordChangeComponent} from './components/password-change/password-change.component';
 import {PasswordPreResetComponent} from './components/password-pre-reset/password-pre-reset.component';
 import {PasswordResetComponent} from './components/password-reset/password-reset.component';
@@ -53,13 +57,23 @@ angular
   .component('passwordChangeComponent', PasswordChangeComponent)
   .component('passwordPreResetComponent', PasswordPreResetComponent)
   .component('passwordResetComponent', PasswordResetComponent)
-  .component('loginComponent', LoginComponent);
+  .component('loginComponent', LoginComponent)
+  .directive(
+    'loginComponent',
+    downgradeComponent({component: LoginComponent}) as angular.IDirectiveFactory
+  );
 
 @NgModule({
   imports: [
     BrowserModule,
-    UpgradeModule
+    UpgradeModule,
+    HttpClientModule,
+    FormsModule,
+    MaterialModule,
+    FlexLayoutModule
   ],
+  declarations: [LoginComponent],
+  entryComponents: [LoginComponent],
   providers:[JwtService, UserService]
 })
 export class NewLoginModule {

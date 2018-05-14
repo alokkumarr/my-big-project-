@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject } from '@angular/core';
 import * as get from 'lodash/get';
 import * as has from 'lodash/has';
 import * as padStart from 'lodash/padStart';
@@ -22,7 +22,6 @@ const PRIVILEGE_INDEX = {
   ALL: 8
 };
 
-@Injectable()
 export class JwtService {
   //private api = fpGet('api.url', APP_CONFIG);
   private jwtKey = fpGet('login.jwtKey', APP_CONFIG);
