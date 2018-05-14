@@ -130,12 +130,14 @@ public class Request {
         if (analyzeAndValidate(item)){
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
-//            try {
-//                os = HFileOperations.writeToFile(rFile);
-//            } catch (FileNotFoundException e1) {
-//                logger.error("Could not write response to file: " + rFile, e1);
-//                return;
-//            }
+            if (rFile != null && !rFile.isEmpty()) {
+                try {
+                    os = HFileOperations.writeToFile(rFile);
+                } catch (FileNotFoundException e1) {
+                    logger.error("Could not write response to file: " + rFile, e1);
+                    return;
+                }
+            }
 
             try {
                 switch (action) {
@@ -276,7 +278,9 @@ public class Request {
 
         if (object != null) {
             try {
-                os.write(object.toString().getBytes());
+                if (os != null) {
+                    os.write(object.toString().getBytes());
+                }
             } catch (IOException e) {
                 logger.error("Could not write data to response file: ", e);
             }
@@ -391,7 +395,9 @@ public class Request {
                 response.add("result", new JsonPrimitive(e.getMessage()));
             }
             logger.debug("Response: \n" + response.toString());
-            os.write(response.toString().getBytes());
+            if (os != null) {
+                os.write(response.toString().getBytes());
+            }
         } catch (IOException e2) {
             logger.error("IOException at attempt to write result: " + rFile, e2);
             return;
