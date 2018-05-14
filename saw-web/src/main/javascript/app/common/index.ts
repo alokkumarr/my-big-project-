@@ -58,6 +58,7 @@ import {
 } from './components/js-plumb';
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
 import {DateFormatDialogComponent} from './components/date-format-dialog';
+import { ChoiceGroupComponent } from './components/choice-group-u';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
@@ -143,7 +144,8 @@ angular
     JoinDialogComponent,
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
-    AggregateChooserComponent
+    AggregateChooserComponent,
+    ChoiceGroupComponent
   ],
   entryComponents: [
     PivotGridComponent,
@@ -159,7 +161,8 @@ angular
     JoinDialogComponent,
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
-    AggregateChooserComponent
+    AggregateChooserComponent,
+    ChoiceGroupComponent
   ],
   exports: [
     DndModule,
@@ -194,7 +197,8 @@ angular
     SearchBoxComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
-    E2eDirective
+    E2eDirective,
+    ChoiceGroupComponent
   ],
   providers: [
     ErrorDetailService,
