@@ -21,8 +21,8 @@ import {themeConfig} from './theme';
 import {runConfig} from './run';
 
 import {AuthServiceFactory} from './services/auth.service';
-import { UserService } from './services/user.service';
 import { JwtService } from './services/jwt.service';
+import { UserService } from './services/user.service';
 
 import {LayoutContentComponent, LayoutFooterComponent} from './layout';
 

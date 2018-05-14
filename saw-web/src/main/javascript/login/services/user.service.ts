@@ -1,11 +1,12 @@
-import { Inject } from '@angular/core';
-import {Http, HTTP_PROVIDERS} from '@angular/http';
+import { Inject, Injectable } from '@angular/core';
+import { JwtService } from './jwt.service';
 import * as get from 'lodash/get';
 import * as fpGet from 'lodash/fp/get';
-//import { JwtService } from '../../services/jwt.service';
+
 
 import APP_CONFIG from '../../../../../appConfig';
 
+@Injectable()
 export class UserService {
   constructor(private _JwtService: JwtService) {}
   
