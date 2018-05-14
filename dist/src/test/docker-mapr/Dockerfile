@@ -3,6 +3,15 @@ FROM maprtech/mapr-1base:5.2.0
 
 # Enable installing documentation for packages
 RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
+#Change the mapr-node hostname to saw-mapr same as container name.
+RUN sed -i -e 's/HOSTNAME=localhost.localdomain/HOSTNAME=saw-mapr/g' \
+    /etc/sysconfig/network
+# Workaround for issue sed: "cannot rename /etc/sedl8ySxL: Device or resource busy"
+#Docker treats /etc/hosts differently. It overwrites it whenever
+#it wants without any regard for your modifications.
+RUN cp /etc/hosts ~/hosts.new
+RUN sed -i -e 's/demo.mapr.io/saw-mapr/g' ~/hosts.new
+RUN cat ~/hosts.new > /etc/hosts
 
 # Install system utilities
 # Workaround: Docker image builds occasionally fail with a "failure:
@@ -18,7 +27,7 @@ RUN yum -y -q --nogpgcheck install sudo
 #
 # Note: A local Spark context is used to conserve memory in
 # development mode.  Uncomment below to install YARN for testing.
-#RUN yum -y -q install mapr-resourcemanager mapr-nodemanager
+RUN yum -y -q install mapr-resourcemanager mapr-nodemanager
 
 #
 # Install Spark
@@ -34,28 +43,29 @@ RUN sed -i -e 's,ecosystem-5.x,MEP/MEP-3.0.1,' \
     /etc/yum.repos.d/mapr_ecosystem.repo
 # Workaround: Installing mapr-spark gives RPM checksum error if patch
 # repository is enabled, so disable it for now and rebuild Yum cache
-#RUN rm /etc/yum.repos.d/mapr_patch.repo && yum clean all
-#RUN yum -y -q --nogpgcheck install mapr-spark-master mapr-spark
-#RUN ln -s /opt/mapr/spark/spark-* /opt/mapr/spark/spark-current
+RUN rm /etc/yum.repos.d/mapr_patch.repo && yum clean all
+RUN yum -y -q --nogpgcheck install mapr-spark-master mapr-spark
+RUN ln -s /opt/mapr/spark/spark-* /opt/mapr/spark/spark-current
 # Workaround: Replace default container hostname with localhost
-#RUN sed -i -e 's,72ba20be3774,localhost,' \
-#    /opt/mapr/spark/spark-current/conf/spark-defaults.conf \
-#    /opt/mapr/spark/spark-current/conf/spark-env.sh
+RUN sed -i -e 's,72ba20be3774,localhost,' \
+   /opt/mapr/spark/spark-current/conf/spark-defaults.conf \
+   /opt/mapr/spark/spark-current/conf/spark-env.sh
 # Configure Spark slaves
-#RUN echo localhost > /opt/mapr/spark/spark-current/conf/slaves
+RUN echo localhost > /opt/mapr/spark/spark-current/conf/slaves
 # Workaround: The default configuration binds to localhost by default,
 # so remove those lines to bind to all interfaces and allow access
 # from other containers
-#RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
-#    -e 's/export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=1g/' \
-#    /opt/mapr/spark/spark-current/conf/spark-env.sh
+RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
+    -e 's/export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=1g/' \
+    /opt/mapr/spark/spark-current/conf/spark-env.sh
 
 #
 # Install Livy
 #
 # Workaround: Installing mapr-spark gives RPM checksum error if patch
 # repository is enabled, so disable it for now and rebuild Yum cache
-RUN rm /etc/yum.repos.d/mapr_patch.repo && yum clean all
+#RUN chmod a+x /etc/yum.repos.d/mapr_patch.repo
+#RUN rm /etc/yum.repos.d/mapr_patch.repo && yum clean all
 RUN yum -y -q install mapr-hue-livy
 RUN echo "livy.spark.master = local[*]" \
     >> /opt/mapr/hue-livy/hue-livy-3.12.0/conf/livy.conf

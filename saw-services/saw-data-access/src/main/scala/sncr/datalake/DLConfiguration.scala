@@ -1,6 +1,7 @@
 package sncr.datalake
 
-import java.io.IOException
+import java.io._
+import java.util.zip.{ZipEntry, ZipOutputStream}
 
 import com.typesafe.config.Config
 import files.HFileOperations
@@ -9,6 +10,8 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.saw.common.config.SAWServiceConfig
+
+import scala.reflect.io.File
 
 /**
   *  The object holds Spark execution and MapR filesystem configuration variables and
@@ -62,8 +65,13 @@ object DLConfiguration {
 
   val jarFiles = HFileOperations.listJarFiles(jarLocation, ".jar")
   logger debug s"Attach to Spark job the following jar files: ${jarFiles.mkString("[", ", ", "]")}"
-
-
+  if(cfg.hasPath("yarn")) {
+    val yarnJar = if(cfg.hasPath("yarn.spark.jars")) cfg.getString("yarn.spark.jars") else ""
+    val sparkZips = if(cfg.hasPath("yarn.spark.zips")) cfg.getString("yarn.spark.zips") else ""
+    // create zip file if not exists.
+    if( (File(yarnJar).exists) && !File(yarnJar).exists)
+      createSparkZipFile(yarnJar,sparkZips)
+  }
   /**
     *  The method should be called to create and configure Spark context.
     * PLease note, method attaches to Spark context jars files that will be copied to
@@ -82,7 +90,10 @@ object DLConfiguration {
     setIfPathExists(sparkConf, "spark.yarn.queue", cfg, getPathByExecutor("yarn.queue", executor))
     sparkConf.set ("spark.executor.memory", cfg.getString(getPathByExecutor("executor.memory", executor)))
     sparkConf.set ("spark.cores.max", cfg.getString(getPathByExecutor("cores.max", executor)))
-    sparkConf.set ("driver.memory", cfg.getString ("driver.memory") )
+    sparkConf.set ("driver.memory", cfg.getString ("driver.memory"))
+    setIfPathExists(sparkConf,"spark.hadoop.yarn.resourcemanager.hostname",cfg,"yarn.resourcemanager.hostname")
+    setIfPathExists(sparkConf,"spark.yarn.jars",cfg,"yarn.spark.jars")
+    setIfPathExists(sparkConf,"spark.yarn.archive",cfg,"yarn.spark.zips")
     setIfPathExists(sparkConf, "spark.driver.port", cfg, "driver.port")
     setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host")
     setIfPathExists(sparkConf, "spark.driver.bindAddress", cfg, "driver.bindAddress")
@@ -110,6 +121,31 @@ object DLConfiguration {
     } else {
       logger.debug("Configuration path not found")
     }
+  }
+
+  /**
+    * Create zip file to set the spark.yarn.archive properties.
+    * @param jarLocation
+    * @param out
+    * @return
+    */
+  private def createSparkZipFile(jarLocation :String, out :String): String =
+  {
+    val jarFiles = HFileOperations.listJarFiles(jarLocation, ".jar")
+    val zip = new ZipOutputStream(new FileOutputStream(out))
+    jarFiles.foreach { name =>
+      zip.putNextEntry(new ZipEntry(name))
+      val in = new BufferedInputStream(new FileInputStream(name))
+      var b = in.read()
+      while (b > -1) {
+        zip.write(b)
+        b = in.read()
+      }
+      in.close()
+      zip.closeEntry()
+    }
+    zip.close()
+    out
   }
 }
 
