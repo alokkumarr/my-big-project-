@@ -67,7 +67,7 @@ export class AnalyzeNewDialogComponent {
             accumulator[type] = true;
           });
         } else {
-          accumulator[method.type] = true;
+          method.disabled = !supportMap[method.type];
         }
         return accumulator;
       },{})
