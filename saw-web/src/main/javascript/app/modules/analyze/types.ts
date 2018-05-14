@@ -71,3 +71,10 @@ export interface IToolbarActionResult {
   booleanCriteria?: string;
   isSaveSuccessful?: boolean;
 }
+
+export interface IAnalysisMethod {
+  label: string;
+  icon: {font: string};
+  type: string;
+  supportedTypes: string[];
+}
