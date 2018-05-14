@@ -2,7 +2,11 @@ cron-job-schedular {
   border: 1px solid #CCC;
 
   .dateDetails {
-    margin: 18px;
+    margin: 12px;
+
+    label {
+      margin-right: 20px;
+    }
 
     .clear {
       color: #0096D5;
