@@ -124,7 +124,7 @@
       <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12"
              [(ngModel)]="selectedMoments"
              [selectMode]="'rangeFrom'"
-             (ngModelChange)="cronChange()">
+             (ngModelChange)="cronChange()" />
       <owl-date-time #dt12></owl-date-time>
   </label>
   <label style="margin-left: 5px;">
@@ -132,7 +132,7 @@
       <input [owlDateTimeTrigger]="dt13" [owlDateTime]="dt13"
              [(ngModel)]="selectedMoments"
              [selectMode]="'rangeTo'"
-             (ngModelChange)="cronChange()">
+             (ngModelChange)="cronChange()" />
       <owl-date-time #dt13></owl-date-time>
   </label>
   <span class="clear" (click)="selectedMoments = []">Clear</span><br/>

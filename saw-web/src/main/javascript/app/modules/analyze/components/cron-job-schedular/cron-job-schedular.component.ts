@@ -9,7 +9,7 @@ import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as moment from 'moment';
-import "../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css";
+import '../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css';
 
 import {
   getLocalMinute, generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
