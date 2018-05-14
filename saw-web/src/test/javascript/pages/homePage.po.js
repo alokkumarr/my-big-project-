@@ -21,7 +21,7 @@ module.exports = {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
   },
   subCategory: subCategoryName => {
-    return element(by.xpath(`(//span[text()='${subCategoryName}'])[1]`));
+    return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
   },
   navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
   createAnalysis: (metricName, analysisType) => createAnalysis(metricName, analysisType),
