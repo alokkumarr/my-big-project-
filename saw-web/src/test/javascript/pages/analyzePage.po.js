@@ -177,8 +177,8 @@ function navigateToHome() {
 module.exports = {
   newDialog: {
     getMetricRadioButtonElementByName: name => element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
-    getMetricSelectedRadioButtonElementByName: name => element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
-    getAnalysisTypeButtonElementByType: name => element(by.css(`button[e2e="choice-group-item-type-${name}"]`)),
+    getMetricSelectedRadioButtonElementByName: name => element(by.css(`mat-radio-button.mat-radio-checked[e2e="metric-name-${name}"]`)),
+    getAnalysisTypeButtonElementByType: name => element(by.css(`[e2e="choice-group-item-type-${name}"]`)),
     createBtn: element(by.css('button[e2e="create-analysis-btn"]'))
   },
   designerDialog: {
