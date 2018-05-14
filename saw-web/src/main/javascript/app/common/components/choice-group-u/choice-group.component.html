@@ -6,6 +6,7 @@
           class="choice-group__item"
           [class.selected]="value === item"
           [class.disabled]="item.disabled"
+          [attr.e2e]="'choice-group-item-type-' + item.type"
           mat-button
   >
     <mat-icon [fontIcon]="item.icon.font"></mat-icon>
