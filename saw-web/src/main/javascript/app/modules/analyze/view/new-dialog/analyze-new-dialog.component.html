@@ -5,6 +5,7 @@
     <label i18n>What would you like to analyze?</label>
     <mat-radio-group (change)="onMetricSelected($event.value)" fxLayout="row wrap" class="container">
       <mat-radio-button *ngFor="let metric of data.metrics; trackBy: index"
+                        [attr.e2e]="'metric-name-' + metric.metricName"
                         [value]="metric"
                         fxFlex="33"
       >
