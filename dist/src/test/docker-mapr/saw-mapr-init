@@ -26,6 +26,11 @@ set -x
 # when MapR-FS available.
 sudo -u mapr hadoop fs -mkdir -p /apps/spark
 
+#set mapr-node hostname to saw-mapr same as container name.
+hostname saw-mapr
+#Restart the mapr to take effect of changed hostname.
+service mapr-warden restart
+
 # Workaround: Using "/usr/sbin/lsof -i :7222" or similar as
 # healthcheck indicates success too early, as the MapR image
 # /usr/bin/init-script restarts services once, so hook into the init

@@ -3,15 +3,6 @@ FROM maprtech/mapr-1base:5.2.0
 
 # Enable installing documentation for packages
 RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
-#Change the mapr-node hostname to saw-mapr same as container name.
-RUN sed -i -e 's/HOSTNAME=localhost.localdomain/HOSTNAME=saw-mapr/g' \
-    /etc/sysconfig/network
-# Workaround for issue sed: "cannot rename /etc/sedl8ySxL: Device or resource busy"
-#Docker treats /etc/hosts differently. It overwrites it whenever
-#it wants without any regard for your modifications.
-RUN cp /etc/hosts ~/hosts.new
-RUN sed -i -e 's/demo.mapr.io/saw-mapr/g' ~/hosts.new
-RUN cat ~/hosts.new > /etc/hosts
 
 # Install system utilities
 # Workaround: Docker image builds occasionally fail with a "failure:
