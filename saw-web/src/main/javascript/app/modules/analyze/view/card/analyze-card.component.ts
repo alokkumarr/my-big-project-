@@ -8,7 +8,7 @@ const template = require('./analyze-card.component.html');
 require('./analyze-card.component.scss');
 
 @Component({
-  selector: 'analyze-card-u',
+  selector: 'analyze-card',
   template
 })
 

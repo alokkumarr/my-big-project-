@@ -3,10 +3,10 @@ import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as moment from 'moment';
 
-export function generateSchedule(cronJobs, rowData) {
+export function generateSchedule(cronJobs, id) {
   let scheduleHuman = '';
   forEach(cronJobs, cron => {
-    if (cron.jobDetails.analysisID === rowData.id && !isEmpty(cron.jobDetails.cronExpression)) {
+    if (cron.jobDetails.analysisID === id && !isEmpty(cron.jobDetails.cronExpression)) {
       if (cron.jobDetails.activeTab === 'hourly') {
         // there is no time stamp in hourly cron hence converting to utc and local is not required.
         const localMinuteCron = extractMinute(cron.jobDetails.cronExpression);
