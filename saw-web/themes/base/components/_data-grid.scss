@@ -13,6 +13,34 @@ div[dx-data-grid] {
   }
 }
 
+.dx-datagrid {
+  color: $grid-text-color !important;
+  background-color: #fff;
+}
+
+.dx-datagrid .dx-row-alt > td {
+  background-color: $grid-hover-color !important;
+}
+
+.dx-datagrid-headers {
+  border-bottom: none !important;
+  font-size: 12px;
+
+  .dx-header-row {
+  background-color: $grid-header-bg-color !important;
+  height: 36px;
+  }
+}
+
+tr.dx-row.dx-header-row[role="row"] td[role="columnheader"] {
+  color: $grid-header-color !important;
+  font-weight: 600;
+}
+
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+  border-bottom: none !important;
+}
+
 .dx-datagrid .dx-row > td {
   padding: 3px 7px !important;
 }
