@@ -69,7 +69,7 @@ object DLConfiguration {
     val yarnJar = if(cfg.hasPath("yarn.spark.jars")) cfg.getString("yarn.spark.jars") else ""
     val sparkZips = if(cfg.hasPath("yarn.spark.zips")) cfg.getString("yarn.spark.zips") else ""
     // create zip file if not exists.
-    if( (File(yarnJar).exists) && !File(yarnJar).exists)
+    if(File(yarnJar).exists && !File(sparkZips).exists)
       createSparkZipFile(yarnJar,sparkZips)
   }
   /**
@@ -131,11 +131,12 @@ object DLConfiguration {
     */
   private def createSparkZipFile(jarLocation :String, out :String): String =
   {
+    logger.info("sparkzip file doesn't exists trying to create in location: "+out)
     val jarFiles = HFileOperations.listJarFiles(jarLocation, ".jar")
     val zip = new ZipOutputStream(new FileOutputStream(out))
     jarFiles.foreach { name =>
       zip.putNextEntry(new ZipEntry(name))
-      val in = new BufferedInputStream(new FileInputStream(name))
+      val in = new BufferedInputStream(new FileInputStream(jarLocation+File.separator+name))
       var b = in.read()
       while (b > -1) {
         zip.write(b)
@@ -145,6 +146,7 @@ object DLConfiguration {
       zip.closeEntry()
     }
     zip.close()
+    logger.trace("sparkZip created successfully.")
     out
   }
 }
