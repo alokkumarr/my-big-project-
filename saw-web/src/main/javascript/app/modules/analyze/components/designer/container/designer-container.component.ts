@@ -539,10 +539,13 @@ export class DesignerContainerComponent {
       break;
     case 'format':
     case 'aliasName':
-    case 'sort':
       // reload frontEnd
       this.artifacts = [...this.artifacts];
       break;
+    case 'sort':
+      this.cleanSorts();
+      this.addDefaultSorts();
+      this.requestDataIfPossible();
     case 'comboType':
       this.updateAnalysis();
       this.data = this.data ? [...this.data] : [];
