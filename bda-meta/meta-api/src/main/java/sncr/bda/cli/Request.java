@@ -2,6 +2,7 @@ package sncr.bda.cli;
 
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.ojai.Document;
@@ -107,6 +108,7 @@ public class Request {
             }
         } catch (Exception ex) {
             logger.error("Cannot process the request " + request + ", " + ex.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(ex));
         }
 
         return result;
