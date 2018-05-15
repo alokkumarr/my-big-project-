@@ -61,6 +61,9 @@ export const AnalyzeCardComponent = {
     }
 
     extractMinute(CronUTC) {
+      if (CronUTC.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
+        return CronUTC;
+      }
       const splitArray = CronUTC.split(' ');
       const date = new Date();
       date.setUTCHours(moment().format('HH'), splitArray[1]);

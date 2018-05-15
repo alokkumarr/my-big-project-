@@ -1,9 +1,13 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { MatTabChangeEvent } from '@angular/material';
+import {FormControl} from '@angular/forms';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as moment from 'moment';
+import '../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css';
 
 import {
   getLocalMinute, generateHourlyCron, generateDailyCron, generateWeeklyCron, generateMonthlyCron, generateYearlyCron, isValid, convertToLocal
@@ -50,8 +54,10 @@ export class CronJobSchedularComponent {
   	this.weekly = {};
   	this.monthly = {};
   	this.yearly = {};
+    this.selectedMoments = [];
+    this.selectedMoments.push(new Date(moment().local().format()));
 
-    this.hours = this.range(1,23);
+    this.hours = this.range(0,23);
     this.minutes = this.range(0,59);
     this.days = this.range(1, 31);
     this.months = this.range(1,12);
@@ -117,6 +123,7 @@ export class CronJobSchedularComponent {
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
+    //this.startDate = new Date();
   }
 
   private range(start: number, end: number): number[] {
@@ -147,9 +154,13 @@ export class CronJobSchedularComponent {
     this.yearly = {};
   }
 
-  openSchedule(event, scheduleType) {
+  openSchedule(scheduleType) {
     this.resetData();
-  	this.scheduleType = scheduleType;
+    if (scheduleType.tab.textLabel.toLowerCase() === 'weekly') {
+      this.scheduleType = 'weeklybasis'
+    } else {
+      this.scheduleType = scheduleType.tab.textLabel.toLowerCase();
+    }
   }
 
   onDateChange(event) {
@@ -166,21 +177,24 @@ export class CronJobSchedularComponent {
     switch (this.scheduleType) {
     case 'immediate':
       if (this.immediate.immediatetype === 'currenttime') {
-        this.cronChange('', this.scheduleType, this.immediate.immediatetype);
+        this.activeRadio = this.immediate.immediatetype;
+        this.cronChange();
       }
       break;
     case 'hourly':
       //Generating Cron expression for selections made in hourly tab
       this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, '');
+        this.activeRadio = '';
+        this.cronChange();
       }
       break;
     case 'daily':
       //Generating Cron expression for selections made in daily tab
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, this.daily.dailyType);
+        this.activeRadio = this.daily.dailyType;
+        this.cronChange();
       }
       break;
     case 'weeklybasis':
@@ -190,40 +204,57 @@ export class CronJobSchedularComponent {
           .join(',');
       this.CronExpression = generateWeeklyCron(days, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, '');
+        this.activeRadio = '';
+        this.cronChange();
       }
       break;
     case 'monthly':
       //Generating Cron expression for selections made in monthly tab
       this.CronExpression = generateMonthlyCron(this.monthly, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, this.monthly.monthlyType);
+        this.activeRadio = this.monthly.monthlyType;
+        this.cronChange();
       }
       break;
     case 'yearly':
       //Generating Cron expression for selections made in yearly tab
       this.CronExpression = generateYearlyCron(this.yearly, dateSelects);
       if (isValid(this.CronExpression)) {
-        this.cronChange(this.CronExpression, this.scheduleType, this.yearly.yearlyType);
+        this.activeRadio = this.yearly.yearlyType;
+        this.cronChange();
       }
       break;
     }
   }
 
-  cronChange(CronExpression, activeTab, activeRadio) {
+  cronChange() {
+    this.startDate = '';
+    this.endDate = '';
+    if (this.scheduleType !== 'immediate') {
+      this.startDate = (isUndefined(this.selectedMoments[0]) || this.selectedMoments[1] === null ? moment.utc() : this.selectedMoments[0]);
+      this.endDate = (isUndefined(this.selectedMoments[1]) || this.selectedMoments[1] === null ? '' : this.selectedMoments[1]);
+    }
     this.crondetails = {
-      cronexp: CronExpression,
-      activeTab: activeTab,
-      activeRadio: activeRadio
+      cronexp: this.CronExpression,
+      activeTab: this.scheduleType,
+      activeRadio: this.activeRadio,
+      startDate: this.startDate,
+      endDate: this.endDate
     }
     this.onCronChanged.emit(this.crondetails);
   }
 
-
-
   loadData() {
+    this.CronExpression = this.crondetails.cronexp;
     this.onCronChanged.emit(this.crondetails);
     this.scheduleType = this.crondetails.activeTab;
+    this.activeRadio = this.crondetails.activeRadio;
+    this.selectedMoments = [];
+    this.selectedMoments.push(new Date(moment(this.crondetails.startDate).local()));
+    if (!isUndefined(this.crondetails.endDate) && this.crondetails.endDate !== null) {
+      this.selectedMoments.push(new Date(moment(this.crondetails.endDate).local()));
+    }
+    
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
@@ -238,26 +269,25 @@ export class CronJobSchedularComponent {
         hour: parseInt(fetchTime[0]),
         minute: fetchTime[1],
         hourType: meridium[0]
-      };
+      };  
     }
-
 
     switch (this.scheduleType) {
     case 'hourly':
-      //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
-      if (isNaN(parseInt(parseCronValue[7]))) {
-        this.hourly.hours = 1;
+      const fetchLocalMinute;
+      this.selectedTab = 1;
+      if (this.crondetails.cronexp.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
+        this.hourly.hours = 0;
+        fetchLocalMinute = parseCronValue[1].split('/');
+        this.hourly.minutes = (isNaN(parseInt(fetchLocalMinute[0])) ? 1 : parseInt(fetchLocalMinute[0]));
       } else {
-        this.hourly.hours = parseInt(parseCronValue[7]);
-      }
-      if (isNaN(parseInt(parseCronValue[1]))) {
-        this.hourly.minutes = 0;
-      } else {
-        const fetchLocalMinute = getLocalMinute(parseInt(parseCronValue[1]));
-        this.hourly.minutes = fetchLocalMinute;
+        //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
+        this.hourly.hours = (isNaN(parseInt(parseCronValue[7])) ? 1 : parseInt(parseCronValue[7]));
+        this.hourly.minutes = (isNaN(parseInt(parseCronValue[1])) ? 0 : getLocalMinute(parseInt(parseCronValue[1])));
       }
       break;
     case 'daily':
+      this.selectedTab = 2;
       //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       this.daily.dailyType = this.crondetails.activeRadio;
       if (this.daily.dailyType === 'everyDay') {
@@ -273,15 +303,17 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'weeklybasis':
+      this.selectedTab = 3;
       //Loading/displying values for Cron expression for daily tab selection in UI Templete.
       let getWeekDays = this.crondetails.cronexp.split(' ');
       forEach(getWeekDays[5].split(','), day => {
         this.weekly[day] = true;
       })
-
+      
       this.weeklybasisDate = clone(modelDate); //Loading time values for weekly tab
       break;
     case 'monthly':
+      this.selectedTab = 4;
       //Loading/displying values for Cron expression for monthly tab selection in UI Templete.
       this.monthly.monthlyType = this.crondetails.activeRadio;
       if (this.monthly.monthlyType === 'monthlyDay') {
@@ -308,6 +340,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'yearly':
+      this.selectedTab = 5;
       //Loading/displying values for Cron expression for yearly tab selection in UI Templete.
       this.yearly.yearlyType = this.crondetails.activeRadio;
       if (this.yearly.yearlyType === 'yearlyMonth') {

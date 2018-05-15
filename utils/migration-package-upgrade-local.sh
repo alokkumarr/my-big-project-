@@ -5,7 +5,7 @@ set -eux
 ## Note: In case of SAW build package structure changes in future,This script need to be adjusted acordingly.
 
 ##Clean the local docker instance before start upgrade.
-docker rm -f $(docker ps -a -q)
+#docker rm -f $(docker ps -a -q)
 
 # Store the working directory to run the upgrade Test.
 workingDir=$(pwd)
@@ -21,7 +21,7 @@ if [ -d "$DIRECTORY" ]; then
   else
   mkdir $DIRECTORY
   cd $DIRECTORY
-  git clone ssh://git@stash.synchronoss.net:7999/bda/saw.git
+  git clone ssh://git@stash.synchronoss.net:7999/bda/sip.git
   #git checkout -b latestTag_v2.5.1 v2.5.1
   cd saw 
 fi
