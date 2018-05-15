@@ -4,6 +4,7 @@ import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
+import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as orderBy from 'lodash/orderBy';
@@ -573,9 +574,19 @@ export class DesignerContainerComponent {
       const length = get(this.analysis, 'sqlBuilder.dataFields.length');
       return isNumber(length) ? length > 0 : false;
     case 'chart':
-      const dataLength = get(this.analysis, 'sqlBuilder.dataFields.length', 0);
-      const nonDataLength = get(this.analysis, 'sqlBuilder.nodeFields.length', 0);
-      return dataLength && nonDataLength;
+      /* At least one y and x field needs to be present. If this is a bubble chart,
+       * at least one z axis field is also needed */
+      const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
+      const requestCondition = [
+        find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
+        find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
+        /* prettier-ignore */
+        ...((<any>this.analysis).chartType === 'bubble' ?
+        [
+          find(sqlBuilder.dataFields || [], field => field.checked === 'z')
+        ] : [])
+      ]
+      return every(requestCondition, Boolean);
     case 'report':
     case 'esReport':
       return true;
