@@ -37,7 +37,6 @@ export const AnalyzeViewComponent = {
       this._$rootScope = $rootScope;
       this._analysisCache = [];
       this._$injector = $injector;
-      
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
