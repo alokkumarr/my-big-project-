@@ -203,7 +203,17 @@ export class DesignerService {
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-      if (['column', 'bar', 'line', 'area', 'combo'].includes(chartType)) {
+      if (
+        [
+          'column',
+          'bar',
+          'line',
+          'area',
+          'combo',
+          'tsspline',
+          'tspane'
+        ].includes(chartType)
+      ) {
         artifactColumn.comboType = 'column';
       }
     };
@@ -252,7 +262,7 @@ export class DesignerService {
       ...(chartType === 'bubble' ? [
         {
           title: 'Size',
-          type: 'chart',
+          type: 'chart' as AnalysisType,
           marker: 'z',
           maxAllowed: () => 1,
           artifactColumns: [],
