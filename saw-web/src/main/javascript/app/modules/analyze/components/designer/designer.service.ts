@@ -248,8 +248,26 @@ export class DesignerService {
         reverseTransform: chartReverseTransform,
         onReorder
       },
+      /* prettier-ignore */
+      ...(chartType === 'bubble' ? [
+        {
+          title: 'Size',
+          type: 'chart',
+          marker: 'z',
+          maxAllowed: () => 1,
+          artifactColumns: [],
+          canAcceptArtifactColumn: canAcceptNumberType,
+          transform(artifactColumn: ArtifactColumnChart) {
+            artifactColumn.area = 'z';
+            artifactColumn.checked = true;
+            applyDataFieldDefaults(artifactColumn);
+          },
+          reverseTransform: chartReverseTransform,
+          onReorder
+        }
+      ] : []),
       {
-        title: 'Group By',
+        title: chartType === 'bubble' ? 'Color By' : 'Group By',
         type: 'chart',
         marker: 'g',
         maxAllowed: (_, groupAdapters) => {
@@ -270,24 +288,6 @@ export class DesignerService {
         onReorder
       }
     ];
-
-    if (chartType === 'bubble') {
-      chartGroupAdapters.push({
-        title: 'Size',
-        type: 'chart',
-        marker: 'z',
-        maxAllowed: () => 1,
-        artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptNumberType,
-        transform(artifactColumn: ArtifactColumnChart) {
-          artifactColumn.area = 'z';
-          artifactColumn.checked = true;
-          applyDataFieldDefaults(artifactColumn);
-        },
-        reverseTransform: chartReverseTransform,
-        onReorder
-      });
-    }
 
     this._distributeArtifactColumnsIntoGroups(
       artifactColumns,
