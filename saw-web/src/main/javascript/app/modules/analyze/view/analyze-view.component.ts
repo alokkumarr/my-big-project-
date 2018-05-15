@@ -149,6 +149,7 @@ export class AnalyzeViewComponent implements OnInit {
         data: {
           metrics,
           id: this.analysisId
+<<<<<<< HEAD
         }
       } as MatDialogConfig).afterClosed().subscribe(
         isSavedSuccessfully => {
@@ -156,6 +157,15 @@ export class AnalyzeViewComponent implements OnInit {
             this.loadAnalyses()
           }
         }
+=======
+        }
+      } as MatDialogConfig).afterClosed().subscribe(
+        isSavedSuccessfully => {
+          if (isSavedSuccessfully) {
+            this.loadAnalyses()
+          }
+        }
+>>>>>>> 1ced193d6a81b3da39e4f51e1eb4d27b9ac2ee55
       );
     }).catch(() => {
       this._headerProgress.hide();
