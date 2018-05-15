@@ -10,9 +10,10 @@ import {
 } from '../types';
 
 const template = require('./analyze-card-view.component.html');
+require('./analyze-card-view.component.scss');
 
 @Component({
-  selector: 'analyze-card-view-u',
+  selector: 'analyze-card-view',
   template
 })
 

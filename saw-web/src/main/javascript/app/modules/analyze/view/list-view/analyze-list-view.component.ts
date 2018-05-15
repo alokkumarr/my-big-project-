@@ -11,7 +11,7 @@ const template = require('./analyze-list-view.component.html');
 require('./analyze-list-view.component.scss');
 
 @Component({
-  selector: 'analyze-list-view-u',
+  selector: 'analyze-list-view',
   template
 })
 export class AnalyzeListViewComponent {
@@ -102,7 +102,7 @@ export class AnalyzeListViewComponent {
       cellTemplate: 'highlightCellTemplate'
     }, {
       caption: 'SCHEDULED',
-      calculateCellValue: rowData => generateSchedule(this.cronJobs, rowData),
+      calculateCellValue: rowData => generateSchedule(this.cronJobs, rowData.id),
       width: '12%'
     }, {
       caption: 'TYPE',

@@ -6,11 +6,11 @@
        fxFlex.md="50"
        fxFlex="100"
   >
-    <analyze-card-u (action)="action.emit($event)"
+    <analyze-card (action)="action.emit($event)"
                     [highlightTerm]="highlightTerm"
                     [analysis]="analysis"
                     [cronJobs]="cronJobs"
-    ></analyze-card-u>
+    ></analyze-card>
   </div>
 
   <div class="analyze-view_no-results"
