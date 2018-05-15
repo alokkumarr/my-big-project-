@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { Component, Input, EventEmitter, Output } from '@angular/core';
 import { MatTabChangeEvent } from '@angular/material';
 import {FormControl} from '@angular/forms';
@@ -26,7 +24,7 @@ require('./cron-job-schedular.component.scss');
 })
 
 export class CronJobSchedularComponent {
-  constructor() 
+  constructor()
   @Input() public model: any;
   @Input() public crondetails: any;
   @Output() onCronChanged: EventEmitter<any> = new EventEmitter();

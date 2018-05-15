@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { Component, Input, Output, EventEmitter, ViewChild} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';

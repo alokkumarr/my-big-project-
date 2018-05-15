@@ -1,12 +1,12 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
   <mat-form-field>
-    <mat-select placeholder="OPERATOR"
+    <mat-select placeholder="Operator"
                 e2e="filter-number-select"
                 (selectionChange)="onPresetSelected($event.value)"
                 [value]="filterModel.operator">
       <mat-option *ngFor="let OPERATOR of OPERATORS"
                   [value]="OPERATOR.value"
-                  [e2e]="'filter-number-option-' + OPERATOR.label">
+                  [attr.e2e]="'filter-number-option-' + OPERATOR.label">
         {{ OPERATOR.label }}
       </mat-option>
     </mat-select>
@@ -27,6 +27,6 @@
            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
            matChipInputAddOnBlur="true"
            (matChipInputTokenEnd)="add($event)"
-           e2e="filter-string-input"/>
+           e2e="designer-filter-string-input"/>
   </mat-chip-list>
 </mat-form-field>

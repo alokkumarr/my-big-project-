@@ -1,5 +1,3 @@
-declare const require: any;
-
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';

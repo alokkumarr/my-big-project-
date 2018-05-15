@@ -10,7 +10,7 @@
   <designer-sort *ngSwitchCase="'sort'"
                   (sortsChange)="onSortsChange($event)"
                   [sorts]="data.sorts"
-                  [artifactColumns]="data.artifactColumns">
+                  [artifacts]="data.artifacts">
   </designer-sort>
   <designer-filter-container *ngSwitchCase="'filter'"
                   (filtersChange)="onFiltersChange($event)"
@@ -57,6 +57,7 @@
         </button>
         <button *ngSwitchCase="'filter'"
                 (click)="onOk()"
+                e2e="apply-filter-btn"
                 mat-raised-button color="primary" i18n>
           Apply Filters
         </button>
@@ -67,10 +68,11 @@
         </button>
         <button *ngSwitchCase="'save'"
                 (click)="save()"
+                e2e="save-dialog-save-analysis"
                 mat-raised-button color="primary" i18n>
           Save
         </button>
     </div>
-    <button mat-button i18n (click)="onBack()">Cancel</button>
+    <button mat-button i18n (click)="onBack()" e2e="designer-dialog-cancel">Cancel</button>
   </div>
 </div>

@@ -20,7 +20,7 @@
 
       <div class="ard_actions" flex>
         <md-button ng-click="$ctrl.openSaveChartModal($event)"
-                   e2e="open-save-modal"
+                   e2e="designer-save-btn"
                    translate="SAVE">
         </md-button>
       </div>
@@ -109,10 +109,11 @@
       </div>
       <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">
         <md-card-content layout="column">
-          <filter-chips filters="$ctrl.filters"
-                        on-clear-all-filters="$ctrl.onClearAllFilters()"
-                        on-filter-removed="$ctrl.onFilterRemoved(index)">
-          </filter-chips>
+
+          <filter-chips-u (remove)="$ctrl.onFilterRemoved($event)"
+                          (remove-all)="$ctrl.onClearAllFilters()"
+                          [filters]="$ctrl.filters">
+          </filter-chips-u>
           <h3 translate="CHART_OPTIONS"></h3>
           <div layout="column" ng-if="!$ctrl.multyYCharts.includes($ctrl.model.chartType)">
             <div layout="row" layout-align="center">
@@ -200,7 +201,7 @@
                     </md-button>
                   </md-menu-item>
                 </md-menu-content>
-              </md-menu> 
+              </md-menu>
               <!-- END -->
             </div>
             <div layout="row"
