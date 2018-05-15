@@ -91,16 +91,24 @@ dat_tbl <- dat_tbl %>%
 
 # Data Creation End -------------------------------------------------------
 
+# Convert DS to char for comparision --------------------------------------
 
-mean(dat$metric1, na.rm = TRUE)
-
-dat_tbl %>%
-  filter(., !is.na(metric1)) %>%
-  summarise(., mn_metric1 = mean(metric1))
-
-dat_tbl %>%
-  filter(., !is.na(metric3)) %>%
-  summarise(., mn_metric3 = mean(metric3))
+to_char_ds <- function(df) {
+  char_df <- df %>%
+    mutate(
+      id= as.character(id),
+      date = as.character(date),
+      cat1 = as.character(cat1),
+      cat2 = as.character(cat2),
+      metric1 = as.character(metric1),
+      metric2 = as.character(metric2),
+      metric3 = as.character(metric3),
+      index = as.character(index)
+      
+    )
+  
+  return(char_df)
+}
 
 
 # Test Bed Begin ----------------------------------------------------------
@@ -194,13 +202,13 @@ test_that("imputer mode methods consistent", {
 
 spk_imp_const <- dat_tbl %>%
   imputer(.,
-          measure_vars = c("metric1"),
+          measure_vars = c("metric1","metric3"),
           fun = "constant",
           fill = 8)
 
 r_imp_const <- dat %>%
   imputer(.,
-          measure_vars = c("metric1"),
+          measure_vars = c("metric1","metric3"),
           fun = "constant",
           fill = 8)
 
@@ -211,12 +219,12 @@ test_that("imputer constant value replace methods consistent", {
   expect_equal(
     spk_imp_const %>%
       collect() %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5) ,
     r_imp_const %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5)
@@ -245,23 +253,25 @@ r_imp_const_char <- dat %>%
   )
 
 
+char_spk_imp_const_char <- to_char_ds(spk_imp_const_char) 
+char_r_imp_const_char <- to_char_ds(r_imp_const_char)
+
+
 # Compare both spark and R data set with constant function --------------------
 
 test_that("imputer constant value replace methods consistent", {
   expect_equal(
-    spk_imp_const_char %>%
+    char_spk_imp_const_char %>%
       arrange(index) %>%
       collect() %>%
-      select_if(is.character) %>%
       as.data.frame() ,
-    r_imp_const_char %>%
+    char_r_imp_const_char %>%
       arrange(index) %>%
       collect() %>%
-      select_if(is.character) %>%
       as.data.frame()
   )
   
-  expect_equal(colnames(spk_imp_const_char), colnames(r_imp_const_char))
+  expect_equal(colnames(char_spk_imp_const_char), colnames(char_r_imp_const_char))
 })
 
 
@@ -280,12 +290,12 @@ test_that("imputer mean methods consistent", {
   expect_equal(
     spk_imp_no_measure %>%
       collect() %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5) ,
     r_imp_no_measure %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5)
@@ -506,25 +516,25 @@ r_const_char_no_measure <- dat %>%
   imputer(., fun = "constant",
           fill = "S")
 
+spk_const_char_no_measure_to_char <- to_char_ds(spk_const_char_no_measure)
+
+r_const_char_no_measure_to_char <- to_char_ds(r_const_char_no_measure)
+
 
 #Compare both spark and R data set with mean function
 
 test_that("imputer mean methods consistent", {
   expect_equal(
-    spk_const_char_no_measure %>%
+    spk_const_char_no_measure_to_char %>%
       collect() %>%
-      arrange(id, date, cat1, cat2) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5) ,
-    r_const_char_no_measure %>%
-      arrange(id, date, cat1, cat2) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5)
+      arrange(index) %>%
+      as.data.frame() ,
+    r_const_char_no_measure_to_char %>%
+      arrange(index) %>%
+      as.data.frame()
   )
-  expect_equal(colnames(spk_const_char_no_measure),
-               colnames(r_const_char_no_measure))
+  expect_equal(colnames(spk_const_char_no_measure_to_char),
+               colnames(r_const_char_no_measure_to_char))
 })
 
 
@@ -682,12 +692,12 @@ test_that("imputer mean methods consistent", {
   expect_equal(
     spk_imp_constant %>%
       collect() %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5) ,
     r_imp_constant %>%
-      arrange(id, date, cat1, cat2) %>%
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5)
@@ -745,22 +755,23 @@ r_imp_const_char_no_measure <- dat %>%
 
 # Compare both spark and R data set with impute_constant function ---------
 
-test_that("imputer mean methods consistent", {
+spk_imp_const_no_measure_to_char <- to_char_ds(spk_imp_const_char_no_measure) 
+r_imp_const_no_measure_to_char <- to_char_ds(r_imp_const_char_no_measure)
+
+
+# Compare both spark and R data set with constant function --------------------
+
+test_that("imputer constant value replace methods consistent", {
   expect_equal(
-    spk_imp_const_char_no_measure %>%
+    spk_imp_const_no_measure_to_char %>%
+      arrange(index) %>%
       collect() %>%
-      arrange(id, date, cat1, cat2) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5) ,
-    r_imp_const_char_no_measure %>%
-      arrange(id, date, cat1, cat2) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5)
+      as.data.frame() ,
+    r_imp_const_no_measure_to_char %>%
+      arrange(index) %>%
+      collect() %>%
+      as.data.frame()
   )
-  expect_equal(
-    colnames(spk_imp_const_char_no_measure),
-    colnames(r_imp_const_char_no_measure)
-  )
+  
+  expect_equal(colnames(spk_imp_const_no_measure_to_char), colnames(r_imp_const_no_measure_to_char))
 })
