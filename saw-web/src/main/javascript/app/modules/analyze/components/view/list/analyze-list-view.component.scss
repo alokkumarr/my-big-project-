@@ -3,6 +3,10 @@
 analyze-list-view {
   .branded-column-name {
     color: $primary-blue-b2;
-    font-weight: bolder;
+    font-weight: bold;
+  }
+
+  md-card md-card-content {
+    padding: 0;
   }
 }
