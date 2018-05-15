@@ -75,18 +75,35 @@ public class Request {
     public JsonObject search() {
         JsonObject result = null;
 
+        //TODO: Change all debug statements from error mode to debug mode
+
         try {
             if (request.isJsonObject()) {
+                logger.debug("Processing request object");
                 if (analyzeAndValidateSearch(request.getAsJsonObject())) {
+                    logger.error("Query String " + this.query);
+                    logger.error("Filters " + this.filter);
                     Map<String, Document> searchResult = doSearch();
 
                     if (searchResult != null) {
                         return convertSearchResultToJson(searchResult);
                     }
-                    else {
+                }
+            } else if (request.isJsonArray()) {
+                logger.error("Processing request array");
+                JsonArray ja = request.getAsJsonArray();
 
+                JsonObject jobj = ja.get(0).getAsJsonObject();
+                if (analyzeAndValidateSearch(jobj)) {
+                    logger.error("Query String " + this.query);
+                    logger.error("Filters " + this.filter);
+                    Map<String, Document> searchResult = doSearch();
+
+                    if (searchResult != null) {
+                        return convertSearchResultToJson(searchResult);
                     }
                 }
+
             }
         } catch (Exception ex) {
             logger.error("Cannot process the request " + request + ", " + ex.getMessage());
@@ -198,6 +215,10 @@ public class Request {
                 String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
                 String cond = cjo.getAsJsonPrimitive("condition").getAsString();
                 String val = cjo.getAsJsonPrimitive("value").getAsString();
+
+                logger.error("Query Values: field-path= " + fp + ", condition = " + cond + ", value = " + val);
+
+
                 if (fp != null && fp.isEmpty() && cond != null && cond.isEmpty() && val != null && val.isEmpty())
                 {
                     if (cond.equalsIgnoreCase("like"))

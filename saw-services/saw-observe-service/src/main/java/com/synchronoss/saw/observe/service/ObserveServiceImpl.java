@@ -157,6 +157,8 @@ public class ObserveServiceImpl implements ObserveService {
           Request request = new Request(searchQuery);
           JsonObject searchResult = request.search();
 
+          logger.debug("Search Result " + searchResult);
+
           if (searchResult != null && searchResult.has("result")) {
               JsonElement resultArray = searchResult.get("result");
               logger.debug("Entity has been retrieved successfully :" + resultArray.toString());
