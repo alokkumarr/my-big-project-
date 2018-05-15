@@ -331,14 +331,17 @@ public class ExportServiceImpl implements ExportService{
                     logger.debug("Uploaded to ftp alias: "+alias.getCustomerName()+":"+alias.getHost());
                   }
                 }
-                logger.debug("Deleting exported file.");
-                serviceUtils.deleteFile(exportBean.getFileName(),true);
-                serviceUtils.deleteFile(zipFileName,true);
               } catch (IOException e) {
                 logger.error(e.getMessage());
               }
             }
 
+            // deleting the files
+            logger.debug("Deleting exported file.");
+            serviceUtils.deleteFile(exportBean.getFileName(),true);
+            serviceUtils.deleteFile(zipFileName,true);
+
+            // close the streams
             zos.close();
             fos_zip.close();
 
