@@ -1,6 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { Artifact, DesignerChangeEvent, Sort, SqlBuilder } from '../../types';
+import {
+  Artifact,
+  DesignerChangeEvent,
+  Sort,
+  Filter,
+  SqlBuilder
+} from '../../types';
 import { DesignerStates } from '../../container';
 
 const template = require('./single-table-designer-layout.component.html');
@@ -18,6 +24,17 @@ export class SingleTableDesignerLayout {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() sorts: Sort[];
+  @Input() filters: Filter[];
   @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;
+
+  onRemoveFilter(index) {
+    this.filters.splice(index, 1);
+    this.change.emit({ subject: 'filter' });
+  }
+
+  onRemoveFilterAll() {
+    this.filters.splice(0, this.filters.length);
+    this.change.emit({ subject: 'filter' });
+  }
 }
