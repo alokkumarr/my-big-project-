@@ -529,6 +529,7 @@ export class DesignerContainerComponent {
     switch (event.subject) {
     case 'selectedFields':
       this.cleanSorts();
+      this.addDefaultSorts();
       this.requestDataIfPossible();
       break;
     case 'dateInterval':
