@@ -406,6 +406,7 @@ public class AnalyzeIT extends BaseIT {
         objectNode.put("jobScheduleTime","2018-03-01T16:24:28+05:30");
         objectNode.put("categoryID","4");
         objectNode.put("jobGroup","SYNCHRONOSS");
+        objectNode.put("endDate", "2099-03-01T16:24:28+05:30");
      return objectNode;
     }
 
