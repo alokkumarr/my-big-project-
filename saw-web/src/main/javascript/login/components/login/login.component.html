@@ -9,7 +9,7 @@
 
   <form name="loginForm" method="post">
     <div class="error-msg"
-         ng-bind="$ctrl.states.error"></div>
+         [innerHtml]="states.error"></div>
 
     <label>Username</label>
     <mat-form-field>

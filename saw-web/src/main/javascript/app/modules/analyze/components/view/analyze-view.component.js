@@ -35,10 +35,9 @@ export const AnalyzeViewComponent = {
       this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
-      this._JwtService = JwtService;
       this._analysisCache = [];
-      this.resp = this._JwtService.getTokenObj();
-
+      this._$injector = $injector;
+      
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
@@ -59,6 +58,9 @@ export const AnalyzeViewComponent = {
       this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
         this.loadAnalyses();
       });
+
+      this._JwtService = this._$injector.get('JwtService');
+      this.resp = this._JwtService.getTokenObj();
 
       this.loadCategory();
       this.loadAnalyses();

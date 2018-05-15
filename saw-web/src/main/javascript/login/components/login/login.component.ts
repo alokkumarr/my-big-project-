@@ -28,6 +28,7 @@ export class LoginComponent {
         if (this._JwtService.isValid(data)) {
           window.location.assign('./');
         } else {
+          console.log(this._JwtService.getValidityReason(data));
           this.states.error = this._JwtService.getValidityReason(data);
         }
       }
@@ -35,6 +36,6 @@ export class LoginComponent {
   }
 
   reset() {
-    //this._$state.go('preResetPassword');
+    window.location.assign('preResetPassword');
   }
 }

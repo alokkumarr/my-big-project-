@@ -58,7 +58,7 @@ export class UserService {
       params: {
         jwt: token
       }
-    }).then(response => {
+    }).subscribe(response => {
       const resp = this._JwtService.parseJWT(get(response, 'aToken'));
 
       // Store the user's info for easy lookup
@@ -81,7 +81,7 @@ export class UserService {
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + token;
 
     return this._$http.post(this.loginUrl + route, resp.ticket.ticketId)
-      .then(() => {
+      .subscribe(() => {
         this._JwtService.destroy();
         if (path === 'logout') {
           window.location.reload();
@@ -109,7 +109,7 @@ export class UserService {
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
 
     return this._$http.post(this.loginUrl + route, LoginDetails)
-      .then(res => {
+      .subscribe(res => {
         if (res.data.valid) {
           this.logout('change');
         }
@@ -130,7 +130,7 @@ export class UserService {
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
 
     return this._$http.post(this.loginUrl + route, LoginDetails)
-      .then(res => {
+      .subscribe(res => {
         return res;
       });
   }
@@ -144,7 +144,7 @@ export class UserService {
     };
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
     return this._$http.post(this.loginUrl + route, ResetPasswordDetails)
-      .then(res => {
+      .subscribe(res => {
         return res;
       });
   }
@@ -160,7 +160,7 @@ export class UserService {
   redirect(baseURL) {
     const route = '/auth/redirect';
     return this._$http.post(this.loginUrl + route, baseURL)
-      .then(res => {
+      .subscribe(res => {
         return res;
       });
   }
@@ -168,7 +168,7 @@ export class UserService {
   refreshAccessToken(rtoken = this._JwtService.getRefreshToken()) {
     const route = `/${this.refreshTokenEndpoint}`;
     return this._$http.post(this.loginUrl + route, rtoken)
-      .then(response => {
+      .subscribe(response => {
         const resp = this._JwtService.parseJWT(get(response, 'aToken'));
         // Store the user's info for easy lookup
         if (this._JwtService.isValid(resp)) {
