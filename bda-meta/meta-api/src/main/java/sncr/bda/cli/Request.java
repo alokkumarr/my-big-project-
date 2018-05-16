@@ -76,14 +76,12 @@ public class Request {
     public JsonObject search() {
         JsonObject result = null;
 
-        //TODO: Change all debug statements from error mode to debug mode
-
         try {
             if (request.isJsonObject()) {
                 logger.debug("Processing request object");
                 if (analyzeAndValidate(request.getAsJsonObject())) {
-                    logger.error("Query String " + this.query);
-                    logger.error("Filters " + this.filter);
+                    logger.debug("Query String " + this.query);
+                    logger.debug("Filters " + this.filter);
                     Map<String, Document> searchResult = doSearch();
 
                     if (searchResult != null) {
@@ -96,8 +94,8 @@ public class Request {
 
                 JsonObject jobj = ja.get(0).getAsJsonObject();
                 if (analyzeAndValidate(jobj)) {
-                    logger.error("Query String " + this.query);
-                    logger.error("Filters " + this.filter);
+                    logger.debug("Query String " + this.query);
+                    logger.debug("Filters " + this.filter);
                     Map<String, Document> searchResult = doSearch();
 
                     if (searchResult != null) {
@@ -218,10 +216,10 @@ public class Request {
                 String cond = cjo.getAsJsonPrimitive("condition").getAsString();
                 String val = cjo.getAsJsonPrimitive("value").getAsString();
 
-                logger.error("Query Values: field-path= " + fp + ", condition = " + cond + ", value = " + val);
+                logger.debug("Query Values: field-path= " + fp + ", condition = " + cond + ", value = " + val);
 
 
-                if (fp != null && fp.isEmpty() && cond != null && cond.isEmpty() && val != null && val.isEmpty())
+                if (fp != null && !fp.isEmpty() && cond != null && !cond.isEmpty() && val != null && !val.isEmpty())
                 {
                     if (cond.equalsIgnoreCase("like"))
                         maprDBCondition.like(fp, val);
