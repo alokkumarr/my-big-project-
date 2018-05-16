@@ -1,7 +1,6 @@
 package com.synchronoss.saw.export.generate;
 
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -188,7 +187,7 @@ public class ExportServiceImpl implements ExportService{
 
               FileOutputStream fos = new FileOutputStream(file);
               OutputStreamWriter osw = new OutputStreamWriter(fos);
-              streamToCSVReport(entity, exportBean, osw);
+              streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
 
               osw.close();
               fos.close();
@@ -233,47 +232,37 @@ public class ExportServiceImpl implements ExportService{
         long limitPerPage = Long.parseLong(exportChunkSize);
         long page = 0; // just to keep hold of last not processed data in for loop
 
-        // number of pages to process
-        // example 1: if ftp size is set to 10 then 10/10000 = 0, but still there's one page to process
-        // example 2: if ftp size is 3500 and step size is 1000 then division is 3 but pages are 4
-        long noOfPages = Long.parseLong(ftpExportSize)/limitPerPage + 1;
+        double noOfPages = Double.parseDouble(ftpExportSize)/limitPerPage;
 
-        for (int i = 1; i <= noOfPages; i+=1) {
+        for (int i = 1; i < noOfPages; i+=1) {
           // get data in pages and keep storing it to file
           // do not use entire ftpexportsize else there will be no data
           // this happens because of memory issues / JVM configuration.
           // This page number will make sure that we process the last bit of info
           page = i;
-
           // Paginated URL for limitPerPage records till the end of the file.
-          String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page="+page+"&pageSize="
-              +limitPerPage+"&analysisType=report";
+          String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+ executionId +"/data?page="+ page
+              +"&pageSize="
+              + limitPerPage +"&analysisType=report";
           // we directly get response and start processing this.
           ResponseEntity<DataResponse> entity = restTemplate.exchange(url, HttpMethod.GET,
               requestEntity, DataResponse.class);
-//          logger.debug("[Success] Response :" + entity.getStatusCode());
 
-          try {
-            // create a directory with unique name in published location to avoid file conflict for dispatch.
-            File file = new File(exportBean.getFileName());
-            file.getParentFile().mkdirs();
+          streamResponseToFile(exportBean, limitPerPage, entity);
 
-            // if the file is found, append the content
-            // this is basically for entire for loop to execute correctly on the same file
-            // as no two executions are going to have same ID.
-            FileOutputStream fos = new FileOutputStream(file, true);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
+        }
+        // final rows to process
+        long leftOutRows = Long.parseLong(ftpExportSize) - page * limitPerPage;
+        if (leftOutRows > 0) {
+          // Paginated URL for limitPerPage records till the end of the file.
+          String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+ executionId +"/data?page="+ page
+              +"&pageSize="
+              + limitPerPage +"&analysisType=report";
+          // we directly get response and start processing this.
+          ResponseEntity<DataResponse> entity = restTemplate.exchange(url, HttpMethod.GET,
+              requestEntity, DataResponse.class);
 
-            // stream the page output to file.
-            streamToCSVReport(entity, exportBean, osw);
-
-            osw.close();
-            fos.close();
-
-
-          } catch (IOException e) {
-            logger.error("Exception occurred while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
-          }
+          streamResponseToFile(exportBean, leftOutRows, entity);
         }
 
         // zip the contents of the file
@@ -353,9 +342,38 @@ public class ExportServiceImpl implements ExportService{
     }
   }
 
-  private void streamToCSVReport(ResponseEntity<DataResponse> entity, ExportBean exportBean,
+  private void streamResponseToFile(ExportBean exportBean, long limitPerPage,
+      ResponseEntity<DataResponse> entity) {
+    try {
+      // create a directory with unique name in published location to avoid file conflict for dispatch.
+      File file = new File(exportBean.getFileName());
+      file.getParentFile().mkdirs();
+
+      // if the file is found, append the content
+      // this is basically for entire for loop to execute correctly on the same file
+      // as no two executions are going to have same ID.
+      FileOutputStream fos = new FileOutputStream(file, true);
+      OutputStreamWriter osw = new OutputStreamWriter(fos);
+
+      // stream the page output to file.
+      streamToCSVReport(entity, limitPerPage, exportBean, osw);
+
+      osw.close();
+      fos.close();
+
+
+    } catch (IOException e) {
+      logger.error("Exception occurred while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
+    }
+  }
+
+
+  private void streamToCSVReport(ResponseEntity<DataResponse> entity, long LimittoExport, ExportBean exportBean,
       OutputStreamWriter osw) {
-    entity.getBody().getData().stream().forEach(
+    entity.getBody().getData()
+        .stream()
+        .limit(LimittoExport)
+        .forEach(
         line -> {
           try {
             if( line instanceof LinkedHashMap) {

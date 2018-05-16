@@ -62,7 +62,12 @@ class AnalysisExecutions extends BaseController {
         // result holder
         val data = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
         // process only the required rows and not entire data set
-        dataStream.skip((page-1) * pageSize)
+        val skipVal = if ((page - 1) * pageSize > 0) {
+          (page - 1) * pageSize
+        } else {
+          0
+        }
+        dataStream.skip(skipVal)
           .limit(pageSize)
           .iterator().asScala
           .foreach(line => {
