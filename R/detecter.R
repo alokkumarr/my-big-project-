@@ -4,18 +4,17 @@
 #' statistical anomlies in the dataset based on configurable theshold
 #' parameters.
 #'
-#' Function is similiar to Seasonl Hybrid ESD algorithm discussed
-#' here \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
+#' Function is similiar to Seasonl Hybrid ESD algorithm discussed here
+#' \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
 #' \code{\link[AnomalyDetection]{AnomalyDetectionTs}}
 #'
 #'
 #' @param df dataframe
-#' @param index_var index date/datetime variable. Default is NULL which will set
-#'   the index variable to the first column in the dataframe
-#' @param measure_var numeric measure variable to analyze. Default is NULL which
-#'   will set the measure variable to the second column in the dataframe
+#' @param index_var index date/datetime variable
+#' @param measure_var numeric measure variable to analyze
 #' @param frequency numeric period length of seasonality. Ex - 7 for daily data
-#'   with weekly seasonality
+#'   with weekly seasonality. see
+#'   \url{https://robjhyndman.com/hyndsight/seasonal-periods/} for more details
 #' @param direction character input for direction of anomalies to detect.
 #'   Options are 'pos' - only positive anomalies are detected, 'neg' only
 #'   negative anomalies are detected, or 'both' for both 'pos' and 'neg'
@@ -49,53 +48,32 @@ detect <- function(df,
 #' @rdname detect
 #' @export
 detect.data.frame <- function(df,
-                              index_var = NULL,
-                              measure_var = NULL,
+                              index_var,
+                              measure_var,
                               frequency,
                               direction = 'pos',
                               alpha = .01,
                               max_anoms = .01,
                               trend_window = 0.75) {
 
-  stopifnot(any(class(df) %in% c("data.frame")))
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_choice(measure_var, df_names)
+  checkmate::assert_subset(class(df[[measure_var]]), c("numeric", "integer"))
+  checkmate::assert_choice(direction, c("pos", "both", "neg"))
+  checkmate::assert_number(frequency, lower=2, upper=Inf)
+  checkmate::assert_number(alpha, lower=0, upper=1)
+  checkmate::assert_number(max_anoms, lower=0, upper=1)
+  checkmate::assert_number(trend_window, lower=0, upper=1)
 
-  if (is.null(index_var))
-    index_var <- colnames(df)[1]
-  if (is.null(measure_var))
-    measure_var <- colnames(df)[2]
-
-  stopifnot(class(df[[measure_var]]) %in% c("numeric", "integer"))
-
-  if (!direction %in% c("pos", "both", "neg")) {
-    stop("direction should be either 'pos', 'both' or 'neg'")
-  }
-
-  if (alpha > .1) {
+  if(alpha > .1 ){
     message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
-  }
-
-  if (alpha < 0 | alpha > 1) {
-    stop("alpha has to be greater than zero and less than 1")
   }
 
   if (max_anoms > .1) {
     message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
   }
 
-  if (max_anoms < 0 | max_anoms > 1) {
-    stop("max_anoms has to be greater than zero and less than 1")
-  }
-
-  if (trend_window < 0 | trend_window > 1) {
-    stop("trend_window has to be greater than zero and less than 1. Recommend 0.5 or 0.75")
-  }
-
-  if (frequency < 1 | is.null(frequency)) {
-    stop("frequency must be positive. see https://robjhyndman.com/hyndsight/seasonal-periods/ for guidance")
-  }
-
-
-  col_names <- colnames(df)
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
   n <- nrow(df)
   ma <- max_anoms * n
@@ -122,14 +100,14 @@ detect.data.frame <- function(df,
   } else if (direction == "neg") {
     df$resid_std <- (median(df$resid) - df$resid) / mad(df$resid)
   } else {
-    abs(df$resid_std <- (df$resid - median(df$resid)) / mad(df$resid))
+    df$resid_std <- abs((df$resid - median(df$resid)) / mad(df$resid))
   }
 
   df$anomaly <- ifelse(df$resid_std > cv, 1, 0)
   df <- df[order(df$resid_std, decreasing = T), ]
   df$metric_index <- 1:n
   df$anomaly <- ifelse(df$metric_index > ma, 0, df$anomaly)
-  df[order(df[[index_var]]), c(col_names, "seasonal", "trend", "resid", "anomaly")]
+  df[order(df[[index_var]]), c(df_names, "seasonal", "trend", "resid", "anomaly")]
 }
 
 
@@ -138,45 +116,31 @@ detect.data.frame <- function(df,
 #' @rdname detect
 #' @export
 detect.grouped_df <- function(df,
-                              index_var,
-                              measure_var,
+                              index_var = NULL,
+                              measure_var = NULL,
                               frequency,
                               direction = 'pos',
                               alpha = .01,
                               max_anoms = .01,
                               trend_window = 0.75){
 
-  stopifnot(any(class(df) %in% c("data.frame")))
-  stopifnot(class(df[[measure_var]]) %in% c("numeric", "integer"))
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_choice(measure_var, df_names)
+  checkmate::assert_subset(class(df[[measure_var]]), c("numeric", "integer"))
+  checkmate::assert_choice(direction, c("pos", "both", "neg"))
+  checkmate::assert_number(frequency, lower=2, upper=Inf)
+  checkmate::assert_number(alpha, lower=0, upper=1)
+  checkmate::assert_number(max_anoms, lower=0, upper=1)
+  checkmate::assert_number(trend_window, lower=0, upper=1)
 
-  if(! direction %in% c("pos", "both", "neg")){
-    stop("direction should be either 'pos', 'both' or 'neg'")
-  }
-
-  if(alpha > .1 ){
+  if (alpha > .1) {
     message("alpha input larger than norm - anomaly threshold may be low. Recommend 0.01 or 0.001")
-  }
-
-  if(alpha < 0 | alpha > 1){
-    stop("alpha has to be greater than zero and less than 1")
   }
 
   if(max_anoms > .1 ){
     message("max anoms input larger than norm - anomaly threshold may be low. Recommend 0.05 or 0.01")
   }
-
-  if(max_anoms < 0 | max_anoms > 1){
-    stop("max_anoms has to be greater than zero and less than 1")
-  }
-
-  if(trend_window < 0 | trend_window > 1){
-    stop("trend_window has to be greater than zero and less than 1. Recommend 0.5 or 0.75")
-  }
-
-  if (frequency < 1 | is.null(frequency)) {
-    stop("frequency must be positive. see https://robjhyndman.com/hyndsight/seasonal-periods/ for guidance")
-  }
-
 
   two_tail <- ifelse(direction == "both", TRUE, FALSE)
   p <- ifelse(two_tail, 1-alpha/2, 1-alpha)
@@ -245,15 +209,11 @@ detecter.data.frame <- function(df,
                                 max_anoms = .01,
                                 trend_window = 0.75){
 
-  if(! index_var %in% colnames(df)){
-    stop("index_var not a valid column name for dataframe input")
-  }
-  if(! all(group_vars %in% colnames(df))){
-    stop("group_vars not all valid column names for dataframe input")
-  }
-  if(! all(measure_vars %in% colnames(df))){
-    stop("measure_vars not all valid column names for dataframe input")
-  }
+
+  df_names <- colnames(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_choice(measure_vars, df_names)
+  checkmate::assert_choice(group_vars, df_names, null.ok = TRUE)
 
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
@@ -288,19 +248,20 @@ detecter.tbl_spark <- function(df,
                                alpha = .01,
                                max_anoms = .01,
                                trend_window = 0.75){
-
-  if(! index_var %in% colnames(df)){
-    stop("index_var not a valid column name for dataframe input")
-  }
-  if(! all(group_vars %in% colnames(df))){
-    stop("group_vars not all valid column names for dataframe input")
-  }
-  if(! all(measure_vars %in% colnames(df))){
-    stop("measure_vars not all valid column names for dataframe input")
-  }
+  df_names <- colnames(df)
+  df_schema <- sdf_schema(df)
+  checkmate::assert_choice(index_var, df_names)
+  checkmate::assert_choice(measure_vars, df_names)
+  checkmate::assert_choice(group_vars, df_names, null.ok = TRUE)
 
 
-  df %>%
+  index_date_chk <- df_schema[[index_var]]$type == "DateType"
+
+  if(index_date_chk) {
+    df <- dplyr::mutate_at(df, index_var, as.character)
+  }
+
+  results <- df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
     a2munge::melter(
       .,
@@ -312,6 +273,7 @@ detecter.tbl_spark <- function(df,
     sparklyr::spark_apply(.,
                           function(e, l) {
                             library(a2munge)
+                            #library(checkmate)
                             index_var <- l$i_var
                             measure_var <- l$m_var
                             freq <- l$freq
@@ -320,18 +282,22 @@ detecter.tbl_spark <- function(df,
                             max_anoms <- l$anoms
                             detect_fun <- l$fun
                             trend_win <- l$trend_win
-                            detect_fun(e[, c(index_var, measure_var)], NULL, NULL,
-                                       freq, dir, alpha, max_anoms, trend_win)
+                            detect_fun(e[, c(index_var, measure_var)],
+                                       index_var,
+                                       measure_var,
+                                       freq,
+                                       dir,
+                                       alpha,
+                                       max_anoms,
+                                       trend_win)
                           },
                           group_by = c(group_vars, "measure"),
-                          names = c(
-                            index_var,
-                            "value",
-                            "seasonal",
-                            "trend",
-                            "resid",
-                            "anomaly"
-                          ),
+                          names = c(index_var,
+                                    "value",
+                                    "seasonal",
+                                    "trend",
+                                    "resid",
+                                    "anomaly"),
                           context = {
                             l = list(
                               i_var = index_var,
@@ -341,10 +307,25 @@ detecter.tbl_spark <- function(df,
                               a = alpha,
                               anoms = max_anoms,
                               trend_win = trend_window,
-                              fun = match.fun("detect")
+                              fun = get("detect", asNamespace("a2munge"))
                             )
                           }) %>%
-    select_at(c(index_var, group_vars, "measure", "value", "seasonal", "trend", "resid", "anomaly"))
+    select_at(c(
+      index_var,
+      group_vars,
+      "measure",
+      "value",
+      "seasonal",
+      "trend",
+      "resid",
+      "anomaly"
+    ))
+
+  if(index_date_chk) {
+    results <- dplyr::mutate_at(results, index_var,  funs(to_date))
+  }
+
+  results
 }
 
 

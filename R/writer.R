@@ -47,6 +47,12 @@ writer.tbl_spark <- function(df,
   checkmate::assert_choice(mode, c('error', 'append', 'overwrite', 'ignore'), null.ok = TRUE)
   checkmate::assert_subset(partition_by, colnames(df), empty.ok = TRUE)
 
+  if( grepl("hdfs://|s3a://|file://", path)) {
+    protocol <- paste0(strsplit(path, "//")[[1]][1],  "//")
+    path <- gsub(protocol, "", path)
+  } else {
+    protocol <- ""
+  }
   type <- tools::file_ext(path)
   name <- gsub(paste0(".", type), "", basename(path))
   base_dir <- dirname(path)
@@ -62,7 +68,11 @@ writer.tbl_spark <- function(df,
   }
 
   spark_write_fun <- match.fun(paste("spark_write", type, sep = "_"))
-  spark_write_fun(x = df, path = file_tmp_folder, mode = mode, partition_by = partition_by, ...)
+  spark_write_fun(x = df,
+                  path = paste0(protocol, file_tmp_folder),
+                  mode = mode,
+                  partition_by = partition_by,
+                  ...)
 
   if (sum(grepl(type, dir(file_tmp_folder))) == 0) {
     sub_folders <- dir(file_tmp_folder)
