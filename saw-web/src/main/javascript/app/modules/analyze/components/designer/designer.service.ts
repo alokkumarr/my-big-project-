@@ -313,6 +313,7 @@ export class DesignerService {
     };
     fpPipe(
       fpFilter('checked'),
+      fpSortBy('areaIndex'),
       fpGroupBy(groupByProps[analysisType]),
       groupedColumns => {
         forEach(groupAdapters, adapter => {

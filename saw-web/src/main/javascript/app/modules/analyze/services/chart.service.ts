@@ -946,9 +946,12 @@ export class ChartService {
           settings.xaxis,
           attr => attr.checked === 'x' || attr.area === 'x'
         ) || {},
-      y: filter(
-        settings.yaxis,
-        attr => attr.checked === 'y' || attr.area === 'y'
+      y: sortBy(
+        filter(
+          settings.yaxis,
+          attr => attr.checked === 'y' || attr.area === 'y'
+        ),
+        'areaIndex'
       ),
       z: find(
         settings.zaxis,
