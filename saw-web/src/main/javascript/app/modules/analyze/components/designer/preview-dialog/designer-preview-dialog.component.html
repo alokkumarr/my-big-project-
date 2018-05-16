@@ -1,28 +1,25 @@
-<header fxLayout="row" fxLayoutAlign="start center">
-  <button mat-icon-button
-          (click)="close()">
-    <mat-icon fontIcon="icon-remove"></mat-icon>
+<div mat-dialog-title>
+  <button mat-button mat-dialog-close>
+    <mat-icon fontIcon="icon-arrow-left"></mat-icon>
   </button>
-  <div class="preview__title">
-    <strong>
-      {{analysis.name}}
-    </strong>
+  <span class="header-name">{{analysis.name}}</span>
+  <div matTooltip="Metric Name" class="header-description">
+    &#40;&nbsp;
+    <mat-icon fontIcon="icon-report"></mat-icon>
+    <span i18n>{{analysis.metricName}}</span>&nbsp;&#41;
   </div>
-</header>
+  <span fxFlex></span>
+  <button mat-icon-button mat-dialog-close>
+    <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
+  </button>
+</div>
 
 <div class="preview-container">
-  <pivot-grid *ngIf="previewData && analysis.type === 'pivot'"
-              [artifactColumns]="artifactColumns"
-              [sorts]="data.analysis.sqlBuilder.sorts"
-              [data]="previewData"
-              mode="preview">
+  <pivot-grid *ngIf="previewData && analysis.type === 'pivot'" [artifactColumns]="artifactColumns" [sorts]="data.analysis.sqlBuilder.sorts"
+    [data]="previewData" mode="preview">
   </pivot-grid>
-  <report-grid-upgraded *ngIf="analysis.type === 'report' || analysis.type === 'esReport'"
-                        [artifacts]="analysis.edit ? null : analysis.artifacts"
-                        [query]="analysis.queryManual"
-                        [sorts]="analysis.sqlBuilder.sorts"
-                        [dataLoader]="dataLoader"
-                        [isEditable]="false">
+  <report-grid-upgraded *ngIf="analysis.type === 'report' || analysis.type === 'esReport'" [artifacts]="analysis.edit ? null : analysis.artifacts"
+    [query]="analysis.queryManual" [sorts]="analysis.sqlBuilder.sorts" [dataLoader]="dataLoader" [isEditable]="false">
   </report-grid-upgraded>
   <designer-chart *ngIf="analysis.type === 'chart'"
                   [chartType]="analysis.chartType"
