@@ -409,6 +409,7 @@ export class DesignerService {
         (artifactColumn: ArtifactColumnChart) =>
           artifactColumn.checked && artifactColumn.area
       ),
+      fpSortBy('areaIndex'),
       fpGroupBy('area'),
       fpMapValues(
         fpMap((artifactColumn: ArtifactColumnChart) => {
