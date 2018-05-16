@@ -28,7 +28,10 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
   @Output() change = new EventEmitter();
 
   showLegendOpts: boolean;
+  showLabelOpts: boolean = true;
   showInversion: boolean;
+
+  @Input() labelOptions: { enabled: boolean; value: string };
 
   @Input('legend')
   set analysisLegend(data: any) {
@@ -49,6 +52,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
       chartType: this.chartType
     });
     this.showLegendOpts = this.chartType !== 'pie';
+    this.showLabelOpts = this.chartType === 'pie';
     this.showInversion = [
       'column',
       'bar',
@@ -64,6 +68,18 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
     this.change.emit({
       subject: 'inversion',
       data: { isInverted }
+    });
+  }
+
+  onLabelOptsChange(evt) {
+    this.change.emit({
+      subject: 'labelOptions',
+      data: {
+        labelOptions: {
+          enabled: this.labelOptions.enabled,
+          value: this.labelOptions.value
+        }
+      }
     });
   }
 

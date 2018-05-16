@@ -16,6 +16,14 @@
     </mat-form-field>
   </div>
 
+  <div *ngIf="showLabelOpts" fxLayout="row" fxLayoutAlign="start center" class="aux__label__options">
+    <mat-checkbox [(ngModel)]="labelOptions.enabled" (change)="onLabelOptsChange($event)">Show Labels</mat-checkbox>
+    <mat-radio-group *ngIf="labelOptions.enabled" [(ngModel)]="labelOptions.value" (change)="onLabelOptsChange($event)">
+      <mat-radio-button value="data">Show Data</mat-radio-button>
+      <mat-radio-button value="percentage">Show Percentage</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
   <div class="button-group" *ngIf="showInversion">
     <button mat-icon-button [color]="isInverted === true ? 'primary': ''">
       <mat-icon fontIcon="icon-hor-bar-chart"

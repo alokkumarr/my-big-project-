@@ -128,7 +128,11 @@ export class DesignerChartComponent implements OnInit {
         this.chartType,
         this.settings,
         map(data || [], clone),
-        { labels: {}, sorts: this.sorts }
+        {
+          labels: {},
+          labelOptions: get(this._auxSettings, 'labelOptions', {}),
+          sorts: this.sorts
+        }
       )
     ];
 

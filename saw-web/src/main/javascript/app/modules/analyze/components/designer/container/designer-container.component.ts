@@ -170,6 +170,7 @@ export class DesignerContainerComponent {
     /* prettier-ignore */
     switch(this.analysis.type) {
     case 'chart':
+      this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
         (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
@@ -178,6 +179,7 @@ export class DesignerContainerComponent {
         ...this.auxSettings,
         ...(this.analysis.type === 'chart' ? {
           legend: (<any>this.analysis).legend,
+          labelOptions: (<any>this.analysis).labelOptions || {},
           isInverted: (<any>this.analysis).isInverted
         } : {})
       };
@@ -550,6 +552,11 @@ export class DesignerContainerComponent {
       this.requestDataIfPossible();
     case 'comboType':
       this.updateAnalysis();
+      this.data = this.data ? [...this.data] : [];
+      break;
+    case 'labelOptions':
+      (<any>this.analysis).labelOptions = event.data.labelOptions;
+      this.auxSettings = { ...this.auxSettings, ...event.data };
       this.data = this.data ? [...this.data] : [];
       break;
     case 'legend':
