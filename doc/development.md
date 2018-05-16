@@ -59,6 +59,13 @@ execute the following commands to start SAW in Docker containers:
         $ mvn package
         $ mvn -Ddocker-start=local
 
+SAW also Support data-lake report execution with YARN.
+To run SAW system locally with YARN execute the following commands:
+           
+        $ cd saw
+        $ mvn package
+        $ mvn -Ddocker-start=local-with-yarn
+
 Note: The Docker daemon must be running to be able to build and run
 containers.  If you are unable to run Docker containers locally, see
 instructions for using the Docker Machine [cloud] alternative.

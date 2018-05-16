@@ -33,6 +33,7 @@
     <saw.livy.port>18998</saw.livy.port>
     <saw.kibana.port>15601</saw.kibana.port>
     <saw.journal.port>19531</saw.journal.port>
+    <saw.yarn.enabled>false</saw.yarn.enabled>
   </properties>
   <dependencies>
     <dependency>
@@ -224,6 +225,9 @@
           <!-- Ignore the Docker Machine configuration by default, and
                only enable it from the cloud profile when needed -->
           <skipMachine>${saw.docker.skip.machine}</skipMachine>
+          <buildArgs>
+            <yarn_enabled>${saw.yarn.enabled}</yarn_enabled>
+          </buildArgs>
           <!-- Configure Docker Machine -->
           <machine>
             <name>user-${maven.build.timestamp}</name>
@@ -517,6 +521,24 @@
         <!-- Limit access to local machine only when no remote access
              needed -->
         <saw.docker.ip>127.0.0.1</saw.docker.ip>
+      </properties>
+    </profile>
+    <!-- Docker with Yarn enable-->
+    <profile>
+      <id>docker-start-local-with-yarn</id>
+      <activation>
+        <property>
+          <name>docker-start</name>
+          <value>local-with-yarn</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- Disable Docker Machine configuration when using local -->
+        <saw.docker.skip.machine>true</saw.docker.skip.machine>
+        <!-- Limit access to local machine only when no remote access
+             needed -->
+        <saw.docker.ip>127.0.0.1</saw.docker.ip>
+        <saw.yarn.enabled>true</saw.yarn.enabled>
       </properties>
     </profile>
     <!-- Cloud Docker profile -->
