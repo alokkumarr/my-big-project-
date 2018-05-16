@@ -50,11 +50,19 @@ const doAnalysisAction = (name, action) => {
   commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
   toggle.click();
+
   toggle.getAttribute('aria-owns').then(id => {
-    const actionButton = element(by.id(id))
-      .element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
-    commonFunctions.waitFor.elementToBeVisible(actionButton);
-    commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+    if (id) {
+      const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
+      commonFunctions.waitFor.elementToBeVisible(actionButton);
+      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);  
+    } else {
+      const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
+      menu.getAttribute('class').then(className => {
+        commonFunctions.waitFor.elementToBeVisible(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+      });
+    }
     // actionButton.click();
   });
 };
@@ -161,8 +169,8 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 const doAccountAction = action => {
   navigateToHome();
   doMdSelectOption({
-    parentElem: element(by.css('header > md-toolbar')),
-    btnSelector: 'button[e2e="account-settings-menu-btn"]',
+    parentElem: element(by.css('header > mat-toolbar')),
+    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.driver.wait(() => {

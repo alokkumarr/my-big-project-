@@ -25,7 +25,8 @@ import 'devextreme/ui/data_grid';
 import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DndModule } from './dnd';
@@ -49,6 +50,9 @@ import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {AccordionMenuLinkComponent} from './components/accordionMenu/accordionMenuLink.component';
+import {AccordionMenuComponent} from './components/accordionMenu/accordionMenu.component';
+import {SidenavComponent} from './components/sidenav/sidenav.component';
 import {ErrorDetailComponent} from './components/error-detail';
 import {DataFormatDialogComponent} from './components/data-format-dialog';
 import {ConfirmDialogComponent} from './components/confirm-dialog';
@@ -71,7 +75,7 @@ import {ErrorDetailService} from './services/error-detail.service';
 import {ErrorDetailDialogService} from './services/error-detail-dialog.service';
 import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import {
-  toastProvider
+  toastProvider, componentHandlerProvider
 } from './services/ajs-common-providers';
 
 import AppConfig from '../../../../../appConfig';
@@ -130,6 +134,10 @@ angular
     ErrorDetailComponent,
     E2eDirective,
     DataFormatDialogComponent,
+    DateFormatDialogComponent,
+    SidenavComponent,
+    AccordionMenuComponent,
+    AccordionMenuLinkComponent,
     ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbEndpointComponent,
@@ -146,6 +154,10 @@ angular
     ReportGridComponent,
     ErrorDetailComponent,
     DataFormatDialogComponent,
+    DateFormatDialogComponent,
+    SidenavComponent,
+    AccordionMenuComponent,
+    AccordionMenuLinkComponent,
     ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbTableComponent,
@@ -172,6 +184,10 @@ angular
     JsPlumbJoinLabelComponent,
     JoinDialogComponent,
     DateFormatDialogComponent,
+    E2eDirective,
+    SidenavComponent,
+    AccordionMenuComponent,
+    AccordionMenuLinkComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     E2eDirective
@@ -180,7 +196,9 @@ angular
     ErrorDetailService,
     ErrorDetailDialogService,
     toastProvider,
-    ChartService
-  ]
+    ChartService,
+    componentHandlerProvider
+  ],
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
 export class CommonModuleTs {}
