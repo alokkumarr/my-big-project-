@@ -99,8 +99,11 @@ public class GatewayController {
    * @throws ServletException 
    * @throws FileUploadException 
  */
-@RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS, PUT})
+@RequestMapping(value = "/{path:^(?!actuator).*$}/**", method = {GET, POST, DELETE, OPTIONS, PUT})
   @ResponseBody
+  /* Note: Spring Boot Actuator paths are excluded from proxying above
+   * to allow downstream health check requests to pass without an
+   * authentication token */
   public ResponseEntity<?> proxyRequest(HttpServletRequest request, HttpServletResponse response,
       @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles) throws  IOException, URISyntaxException, ServletException, FileUploadException {
   HttpUriRequest proxiedRequest = null;
