@@ -742,6 +742,8 @@ export class ChartService {
     const yField = get(fields, 'y.0', {});
     const yLabel =
       get(opts, 'labels.y') ||
+      yField.alias ||
+      yField.aliasName ||
       `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
 
     const labelOptions = get(opts, 'labelOptions', {
