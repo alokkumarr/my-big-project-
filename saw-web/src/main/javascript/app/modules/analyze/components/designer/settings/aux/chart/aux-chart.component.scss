@@ -3,5 +3,13 @@ designer-settings-aux-chart {
     display: flex;
     align-items: center;
   }
+
+  .aux__label__options {
+    width: 100%;
+
+    mat-checkbox {
+      margin-right: 40px;
+    }
+  }
 }
 

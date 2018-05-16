@@ -1,5 +1,6 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import {AnalyseTypes, Events} from '../../consts';
 
@@ -27,7 +28,7 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   }
 
   function fork(analysis) {
-    const model = clone(analysis);
+    const model = cloneDeep(analysis);
     model.name += ' Copy';
     return openEditModal(model, 'fork').then(status => {
       if (!status) {
@@ -41,7 +42,7 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   }
 
   function edit(analysis) {
-    return openEditModal(clone(analysis), 'edit').then(status => {
+    return openEditModal(cloneDeep(analysis), 'edit').then(status => {
       if (!status) {
         return status;
       }

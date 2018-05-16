@@ -215,7 +215,7 @@ export class ObserveChartComponent {
     const y = filter(this.settings.yaxis, y => (y.area || y.checked) === 'y');
     const z = find(this.settings.zaxis, z => (z.area || z.checked) === 'z');
 
-    const allFields = [g, x, ...y, z];
+    const allFields = [x, g, ...y, z];
 
     let nodeFields = filter(allFields, this.isNodeField);
     const dataFields = filter(allFields, this.isDataField);

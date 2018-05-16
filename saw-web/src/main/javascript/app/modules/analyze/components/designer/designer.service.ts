@@ -203,7 +203,11 @@ export class DesignerService {
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-      if (['column', 'bar', 'line', 'area', 'combo'].includes(chartType)) {
+      if (['column', 'line', 'area'].includes(chartType)) {
+        artifactColumn.comboType = chartType;
+      } else if (['tsspline', 'tsPane'].includes(chartType)) {
+        artifactColumn.comboType = 'line';
+      } else if (['combo', 'bar'].includes(chartType)) {
         artifactColumn.comboType = 'column';
       }
     };
@@ -248,8 +252,26 @@ export class DesignerService {
         reverseTransform: chartReverseTransform,
         onReorder
       },
+      /* prettier-ignore */
+      ...(chartType === 'bubble' ? [
+        {
+          title: 'Size',
+          type: 'chart' as AnalysisType,
+          marker: 'z',
+          maxAllowed: () => 1,
+          artifactColumns: [],
+          canAcceptArtifactColumn: canAcceptNumberType,
+          transform(artifactColumn: ArtifactColumnChart) {
+            artifactColumn.area = 'z';
+            artifactColumn.checked = true;
+            applyDataFieldDefaults(artifactColumn);
+          },
+          reverseTransform: chartReverseTransform,
+          onReorder
+        }
+      ] : []),
       {
-        title: 'Group By',
+        title: chartType === 'bubble' ? 'Color By' : 'Group By',
         type: 'chart',
         marker: 'g',
         maxAllowed: (_, groupAdapters) => {
@@ -271,24 +293,6 @@ export class DesignerService {
       }
     ];
 
-    if (chartType === 'bubble') {
-      chartGroupAdapters.push({
-        title: 'Size',
-        type: 'chart',
-        marker: 'z',
-        maxAllowed: () => 1,
-        artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptNumberType,
-        transform(artifactColumn: ArtifactColumnChart) {
-          artifactColumn.area = 'z';
-          artifactColumn.checked = true;
-          applyDataFieldDefaults(artifactColumn);
-        },
-        reverseTransform: chartReverseTransform,
-        onReorder
-      });
-    }
-
     this._distributeArtifactColumnsIntoGroups(
       artifactColumns,
       chartGroupAdapters,
@@ -309,6 +313,7 @@ export class DesignerService {
     };
     fpPipe(
       fpFilter('checked'),
+      fpSortBy('areaIndex'),
       fpGroupBy(groupByProps[analysisType]),
       groupedColumns => {
         forEach(groupAdapters, adapter => {
@@ -405,6 +410,7 @@ export class DesignerService {
         (artifactColumn: ArtifactColumnChart) =>
           artifactColumn.checked && artifactColumn.area
       ),
+      fpSortBy('areaIndex'),
       fpGroupBy('area'),
       fpMapValues(
         fpMap((artifactColumn: ArtifactColumnChart) => {

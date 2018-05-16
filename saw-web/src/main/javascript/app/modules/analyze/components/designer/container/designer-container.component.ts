@@ -4,6 +4,7 @@ import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
 import * as isNumber from 'lodash/isNumber';
+import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as orderBy from 'lodash/orderBy';
@@ -169,13 +170,16 @@ export class DesignerContainerComponent {
     /* prettier-ignore */
     switch(this.analysis.type) {
     case 'chart':
+      this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
+        (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
       }
       this.auxSettings = {
         ...this.auxSettings,
         ...(this.analysis.type === 'chart' ? {
           legend: (<any>this.analysis).legend,
+          labelOptions: (<any>this.analysis).labelOptions || {},
           isInverted: (<any>this.analysis).isInverted
         } : {})
       };
@@ -529,6 +533,7 @@ export class DesignerContainerComponent {
     switch (event.subject) {
     case 'selectedFields':
       this.cleanSorts();
+      this.addDefaultSorts();
       this.requestDataIfPossible();
       break;
     case 'dateInterval':
@@ -538,12 +543,20 @@ export class DesignerContainerComponent {
       break;
     case 'format':
     case 'aliasName':
-    case 'sort':
       // reload frontEnd
       this.artifacts = [...this.artifacts];
       break;
+    case 'sort':
+      this.cleanSorts();
+      this.addDefaultSorts();
+      this.requestDataIfPossible();
     case 'comboType':
       this.updateAnalysis();
+      this.data = this.data ? [...this.data] : [];
+      break;
+    case 'labelOptions':
+      (<any>this.analysis).labelOptions = event.data.labelOptions;
+      this.auxSettings = { ...this.auxSettings, ...event.data };
       this.data = this.data ? [...this.data] : [];
       break;
     case 'legend':
@@ -569,9 +582,19 @@ export class DesignerContainerComponent {
       const length = get(this.analysis, 'sqlBuilder.dataFields.length');
       return isNumber(length) ? length > 0 : false;
     case 'chart':
-      const dataLength = get(this.analysis, 'sqlBuilder.dataFields.length', 0);
-      const nonDataLength = get(this.analysis, 'sqlBuilder.nodeFields.length', 0);
-      return dataLength && nonDataLength;
+      /* At least one y and x field needs to be present. If this is a bubble chart,
+       * at least one z axis field is also needed */
+      const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
+      const requestCondition = [
+        find(sqlBuilder.dataFields || [], field => field.checked === 'y'),
+        find(sqlBuilder.nodeFields || [], field => field.checked === 'x'),
+        /* prettier-ignore */
+        ...((<any>this.analysis).chartType === 'bubble' ?
+        [
+          find(sqlBuilder.dataFields || [], field => field.checked === 'z')
+        ] : [])
+      ]
+      return every(requestCondition, Boolean);
     case 'report':
     case 'esReport':
       return true;

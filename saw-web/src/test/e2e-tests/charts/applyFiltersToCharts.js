@@ -5,7 +5,7 @@ const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const {hasClass} = require('../../javascript/helpers/utils');
+const utils = require('../../javascript/helpers/utils');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
@@ -59,7 +59,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
-    const doesDataNeedRefreshing = hasClass(refreshBtn, 'mat-primary');
+    const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
 
     // Search field and add that into group by section.
@@ -96,7 +96,20 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 
     //TODO: Need to check that filters applied or not.
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterText);
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterClear);
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.selectedFiltersText);
+    validateSelectedFilters([fieldName]);
 
   });
+
+  const validateSelectedFilters = (filters) => {
+
+    analyzePage.appliedFiltersDetails.selectedFilters.map(function(elm) {
+      return elm.getText();
+    }).then(function(displayedFilters) {
+      expect(utils.arrayContainsArray(displayedFilters, filters)).toBeTruthy();
+    });
+  };
 
 });

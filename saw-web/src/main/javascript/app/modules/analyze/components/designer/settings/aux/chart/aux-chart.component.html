@@ -1,17 +1,4 @@
-<div fxLayout="row" fxLayoutAlign="space-between center">
-  <div class="button-group" *ngIf="showInversion">
-    <button mat-icon-button [color]="isInverted === true ? 'primary': ''">
-      <mat-icon fontIcon="icon-hor-bar-chart"
-                (click)="setInversion(true)">
-      </mat-icon>
-    </button>
-    <button mat-icon-button [color]="isInverted === false ? 'primary': ''">
-      <mat-icon fontIcon="icon-vert-bar-chart"
-                (click)="setInversion(false)">
-      </mat-icon>
-    </button>
-  </div>
-
+<div fxLayout="row-reverse" fxLayoutAlign="space-between center">
   <div *ngIf="showLegendOpts">
     <mat-form-field>
       <mat-select placeholder="Legend Position" [(ngModel)]="legend.align" (change)="onLegendChange()">
@@ -27,5 +14,26 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
+  </div>
+
+  <div *ngIf="showLabelOpts" fxLayout="row" fxLayoutAlign="start center" class="aux__label__options">
+    <mat-checkbox [(ngModel)]="labelOptions.enabled" (change)="onLabelOptsChange($event)">Show Labels</mat-checkbox>
+    <mat-radio-group *ngIf="labelOptions.enabled" [(ngModel)]="labelOptions.value" (change)="onLabelOptsChange($event)">
+      <mat-radio-button value="data">Show Data</mat-radio-button>
+      <mat-radio-button value="percentage">Show Percentage</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="button-group" *ngIf="showInversion">
+    <button mat-icon-button [color]="isInverted === true ? 'primary': ''">
+      <mat-icon fontIcon="icon-hor-bar-chart"
+                (click)="setInversion(true)">
+      </mat-icon>
+    </button>
+    <button mat-icon-button [color]="isInverted === false ? 'primary': ''">
+      <mat-icon fontIcon="icon-vert-bar-chart"
+                (click)="setInversion(false)">
+      </mat-icon>
+    </button>
   </div>
 </div>

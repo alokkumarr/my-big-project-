@@ -15,7 +15,7 @@ import {
   isFormatted
 } from '../../../../../../../common/utils/numberFormatter';
 
-import { FieldChangeEvent } from '../../single';
+import { DesignerChangeEvent } from '../../../types';
 
 const template = require('./expand-detail-chart.component.html');
 
@@ -26,7 +26,8 @@ const INT_SAMPLE = 1000;
   template
 })
 export class ExpandDetailChartComponent {
-  @Output() public change: EventEmitter<FieldChangeEvent> = new EventEmitter();
+  @Output()
+  public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnChart;
 
@@ -49,7 +50,7 @@ export class ExpandDetailChartComponent {
 
   onAliasChange(value) {
     this.artifactColumn.aliasName = value;
-    this.change.emit({ requiresDataChange: false });
+    this.change.emit({ subject: 'aliasName' });
   }
 
   onFormatChange(format: Format | string) {
@@ -57,7 +58,7 @@ export class ExpandDetailChartComponent {
       this.artifactColumn.format = format;
       this.artifactColumn.dateFormat = format as string;
       this.changeSample();
-      this.change.emit({ requiresDataChange: true });
+      this.change.emit({ subject: 'format' });
     }
   }
 

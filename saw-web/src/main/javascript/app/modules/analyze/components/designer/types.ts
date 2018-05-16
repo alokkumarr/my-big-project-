@@ -94,6 +94,7 @@ export type DesignerChangeEvent = {
     | 'filter'
     | 'filterRemove'
     | 'comboType'
+    | 'labelOptions'
     | 'legend'
     | 'inversion'
     // adding | removing | changing fields in the field chooser for pivot grid and chart designer

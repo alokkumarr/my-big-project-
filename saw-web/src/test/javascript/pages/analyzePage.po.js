@@ -202,7 +202,7 @@ module.exports = {
   },
 
   designerDialog: {
-    saveDialog: element(by.css('analyze-save-dialog')),
+    saveDialog: element(by.css('[e2e="save-dialog-save-analysis"]')),
     saveDialogUpgraded: element(by.css('designer-save')),
     chart: {
       getFieldPlusIcon: value => element(by.xpath(`//button[@e2e="designer-add-btn-${value}"]/descendant::*[@ng-reflect-font-icon="icon-plus"]`)),
@@ -258,6 +258,12 @@ module.exports = {
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
   },
+  appliedFiltersDetails: {
+    filterText:element(by.xpath('//span[@class="filter-counter"]')),
+    filterClear:element(by.xpath('//button[contains(@class,"filter-clear-all")]')),
+    selectedFilters: element.all(by.xpath('//filter-chips-u/descendant::mat-chip')),
+    selectedFiltersText: element(by.xpath('//filter-chips-u/descendant::mat-chip')),
+  },
   detail: {
     getAnalysisChartType
   },
@@ -286,10 +292,12 @@ module.exports = {
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
+    selectedCategoryUpdated: element(by.xpath('//mat-select[@e2e="save-dialog-selected-category"]/descendant::div[@class="mat-select-arrow-wrapper"]')),
     nameInput: element(by.css('input[e2e="save-dialog-name"]')),
     descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
-    cancelBtn: element(by.css('button[translate="CANCEL"]'))
+    cancelBtn: element(by.css('button[translate="CANCEL"]')),
+    selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
 
   // OLD test elements
@@ -337,7 +345,6 @@ module.exports = {
     reportGridContainer: element(by.css('.ard_details-grid')),
     cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
-
   validateCardView() {
     expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
   },

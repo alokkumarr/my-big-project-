@@ -474,7 +474,7 @@ export class ChartService {
   }
 
   getSerie(
-    { alias, type, displayName, comboType, aggregate, chartType },
+    { alias, aliasName, type, displayName, comboType, aggregate, chartType },
     index,
     fields,
     chartTypeOverride
@@ -493,7 +493,10 @@ export class ChartService {
       aggrSymbol = '%';
     }
     return {
-      name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
+      name:
+        alias ||
+        aliasName ||
+        `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       aggrSymbol,
       aggregate,
       type: splinifiedChartType,
@@ -739,6 +742,8 @@ export class ChartService {
     const yField = get(fields, 'y.0', {});
     const yLabel =
       get(opts, 'labels.y') ||
+      yField.alias ||
+      yField.aliasName ||
       `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
 
     const labelOptions = get(opts, 'labelOptions', {
@@ -797,9 +802,10 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            if (!isUndefined(field.alias)) {
+            if (!isUndefined(field.alias) || !isUndefined(field.aliasName)) {
               return (
                 field.alias ||
+                field.aliasName ||
                 `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${
                   field.displayName
                 }`
@@ -850,6 +856,7 @@ export class ChartService {
     forEach(fields, (field, index) => {
       const titleText =
         field.alias ||
+        field.aliasName ||
         `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
       changes.push({
         labels: {
@@ -889,6 +896,7 @@ export class ChartService {
     const labels = {
       x:
         get(fields, 'x.alias') ||
+        get(fields, 'x.aliasName') ||
         get(opts, 'labels.x') ||
         get(fields, 'x.displayName', '')
     };
@@ -938,9 +946,12 @@ export class ChartService {
           settings.xaxis,
           attr => attr.checked === 'x' || attr.area === 'x'
         ) || {},
-      y: filter(
-        settings.yaxis,
-        attr => attr.checked === 'y' || attr.area === 'y'
+      y: sortBy(
+        filter(
+          settings.yaxis,
+          attr => attr.checked === 'y' || attr.area === 'y'
+        ),
+        'areaIndex'
       ),
       z: find(
         settings.zaxis,
@@ -1033,6 +1044,7 @@ export class ChartService {
 
       const xAxisString = `<tr>
         <th>${fields.x.alias ||
+          fields.x.aliasName ||
           get(opts, 'labels.x', '') ||
           fields.x.displayName}:</th>
         <td>{${xStringValue}}</td>
@@ -1040,6 +1052,7 @@ export class ChartService {
 
       const yAxisString = `<tr>
         <th>${fields.y.alias ||
+          fields.y.aliasName ||
           get(opts, 'labels.y', '') ||
           (point ? point.series.name : '{series.name}')}:</th>
         <td>${
@@ -1058,6 +1071,7 @@ export class ChartService {
 
       const zAxisString = fields.z
         ? `<tr><th>${fields.z.alias ||
+            fields.z.aliasName ||
             get(opts, 'labels.z', '') ||
             fields.z.displayName}:</th><td>${
             point ? round(point.z, 2) : '{point.z:,.2f}'

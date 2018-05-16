@@ -21,7 +21,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
   let metricName = 'MCT TMO Session ES';
-  const sizeByName = 'Activated Active Subscriber Count';
+  const sizeByName = 'Activated No Usage Subscriber Count';
 
   const dataProvider = {
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
@@ -71,10 +71,12 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     it('should verify preview for ' + description, () => {
       if (data.chartType === 'chart:bubble') {
         metricName = 'PTT Subscr Detail';
-        yAxisName = 'Call Billed Unit';
-        xAxisName = 'Account Segment';
-        groupName = 'Account Name';
+        yAxisName = 'Activated Active Subscriber Count';
+        xAxisName = 'Activated Inactive Subscriber Count';
+        groupName = 'Apps Version';
       }
+
+      let chartTyp = data.chartType.split(":")[1];
 
       login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
@@ -84,37 +86,35 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       //Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
-      //Select fields
-      if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
-        y = chartDesigner.getYRadio(yAxisName);
+      // Select fields
+      // Wait for field input box.
+      commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
+      // Search field and add that into metric section.
+      analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
+      // Search field and add that into dimension section.
+      analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
-        // Also select Color by
-        const sizeBy = chartDesigner.getZRadio(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(sizeBy);
-      } else if (data.chartType === 'chart:stack') {  // if chart is stacked - select Y radio instead of checkbox
-        y = chartDesigner.getYRadio(yAxisName);
-      } else {
-        y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
+      // Search field and add that into size section.
+      if (data.chartType === 'chart:bubble') {
+        analyzePage.designerDialog.chart.fieldSearchInput.clear();
+        analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(sizeByName);
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
       }
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
-      commonFunctions.waitFor.elementToBeClickableAndClick(y);
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
-
-      //If Combo then add one more field
-      if (data.chartType === 'chart:combo') {
-        const y2 = chartDesigner.getYCheckBox(yAxisName2);
-        commonFunctions.waitFor.elementToBeClickableAndClick(y2);
-      }
-
-      //Refresh
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
+      // Search field and add that into group by section. i.e. Color by
+      analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
 
       // Navigate to Preview
       commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
 
       // Verify axis to be present on Preview Mode
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(yAxisName));
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(xAxisName));
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
 
     // Navigates to specific category where analysis creation should happen
