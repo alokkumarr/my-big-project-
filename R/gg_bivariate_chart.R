@@ -1,7 +1,7 @@
 
 
 
-# sncr_bivariate_chart ----------------------------------------------------------------
+# gg_bivariate_chart ----------------------------------------------------------------
 
 #' GGplot2 Bi-variate Chart
 #'
@@ -37,29 +37,29 @@
 #' Create a data set
 #' library(dplyr)
 #' d <- mtcars %>% mutate(am = as.factor(am), cyl = as.factor(cyl))
-#' sncr_bivariate_chart(d, x_variable='cyl', y_variable='am')
-#' sncr_bivariate_chart(d, x_variable='mpg', y_variable='am', smooth_ci = F)
-#' sncr_bivariate_chart(d, x_variable='cyl', y_variable='mpg', width=0.2)
-#' sncr_bivariate_chart(d, x_variable='mpg', y_variable='wt')
-sncr_bivariate_chart <- function(df,
-                                 x_variable,
-                                 y_variable,
-                                 data_name = NULL,
-                                 fill = "grey75",
-                                 color = "#1D3AB2",
-                                 alpha = 0.75,
-                                 interval_shape = 18,
-                                 interval_size = 1.05,
-                                 interval_chart_type = "pointrange",
-                                 points = TRUE,
-                                 smooth_degree = 3,
-                                 smooth_knots = 7,
-                                 smooth_ci = TRUE,
-                                 caption = "Synchronoss",
-                                 theme = "sncr",
-                                 palette = "a2",
-                                 plot_sizes = c(.7, .3),
-                                 ...) {
+#' gg_bivariate_chart(d, x_variable='cyl', y_variable='am')
+#' gg_bivariate_chart(d, x_variable='mpg', y_variable='am', smooth_ci = F)
+#' gg_bivariate_chart(d, x_variable='cyl', y_variable='mpg', width=0.2)
+#' gg_bivariate_chart(d, x_variable='mpg', y_variable='wt')
+gg_bivariate_chart <- function(df,
+                               x_variable,
+                               y_variable,
+                               data_name = NULL,
+                               fill = "grey75",
+                               color = "#1D3AB2",
+                               alpha = 0.75,
+                               interval_shape = 18,
+                               interval_size = 1.05,
+                               interval_chart_type = "pointrange",
+                               points = TRUE,
+                               smooth_degree = 3,
+                               smooth_knots = 7,
+                               smooth_ci = TRUE,
+                               caption = "Synchronoss",
+                               theme = "sncr",
+                               palette = "a2",
+                               plot_sizes = c(.7, .3),
+                               ...) {
   checkmate::assert_true(any(class(df) %in% "data.frame"))
   df_names <- colnames(df)
   checkmate::assert_choice(x_variable, df_names)
@@ -104,7 +104,7 @@ sncr_bivariate_chart <- function(df,
   if (y_var_char) {
     if (df %>% dplyr::count_(y_variable) %>% nrow() > 2) {
       stop(
-        "y-variable input has more than 2 distinct categories\nMultinomial targets are not currently supported in the sncr_bivariate_chart function"
+        "y-variable input has more than 2 distinct categories\nMultinomial targets are not currently supported in the gg_bivariate_chart function"
       )
     } else{
       # Get first factor
@@ -127,23 +127,23 @@ sncr_bivariate_chart <- function(df,
   if (x_var_char) {
     # error bar with bar chart
     p1 <- gg_interval_chart(
-        df,
-        x_variable = x_variable,
-        y_variable = y_variable,
-        chart_type = interval_chart_type,
-        shape = interval_shape,
-        size = interval_size,
-        color = color,
-        lines_args = list(color = "black"),
-        alpha = alpha,
-        title = title,
-        subtitle = subtitle,
-        caption = NULL,
-        y_axis_title = y_axis_title,
-        x_axis_title = x_variable,
-        theme = theme,
-        palette = palette
-      )
+      df,
+      x_variable = x_variable,
+      y_variable = y_variable,
+      chart_type = interval_chart_type,
+      shape = interval_shape,
+      size = interval_size,
+      color = color,
+      lines_args = list(color = "black"),
+      alpha = alpha,
+      title = title,
+      subtitle = subtitle,
+      caption = NULL,
+      y_axis_title = y_axis_title,
+      x_axis_title = x_variable,
+      theme = theme,
+      palette = palette
+    )
     p2 <- gg_bar_chart(
       df,
       x_variable = x_variable,
@@ -186,11 +186,11 @@ sncr_bivariate_chart <- function(df,
       theme = theme,
       palette = palette,
       x_axis_title = "",
-      y_axis_title = x_axis_title,
+      y_axis_title = x_variable,
       caption = caption,
       title = NULL,
       subtitle = NULL
-      ) +
+    ) +
       theme(axis.text.y = element_blank(),
             axis.ticks.y = element_blank())
     
