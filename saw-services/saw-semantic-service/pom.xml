@@ -19,7 +19,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<json.validate>2.2.6</json.validate>
-		<start-class>com.synchronoss.saw.semantic.SAWWorkBenchServiceApplication</start-class>
+		<start-class>com.synchronoss.saw.semantic.SAWSemanticServiceApplication</start-class>
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
@@ -168,6 +168,7 @@
 					<showWarnings>true</showWarnings>
 				</configuration>
 			</plugin>
+ 		 
  			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -186,9 +187,7 @@
 							<configLocation>${project.basedir}/../../src/main/resources/google_checks.xml</configLocation>
 							<includeTestSourceDirectory>true</includeTestSourceDirectory>
 							<violationSeverity>warning</violationSeverity>
-							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
-								make also these files conform to checkstyle rules and remove the exclusions -->
-							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*,**/SAWSeman*</excludes>
+							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*,**/SAWSeman*,**/Seman*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>
@@ -196,6 +195,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>

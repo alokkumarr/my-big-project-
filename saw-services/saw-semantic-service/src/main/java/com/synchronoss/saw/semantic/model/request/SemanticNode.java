@@ -10,22 +10,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"customerCode", "projectCode", "dataSetId", "username", "dataSecurityKey",
-    "module", "metricName", "supports", "artifacts", "esRepository", "repository"})
 public class SemanticNode {
-
 
 
   @JsonProperty("statusMessage")
   private String statusMessage;
-
+  @JsonProperty("type")
+  private String type;
   @JsonProperty("_id")
   private String _id;
-  
   @JsonProperty("createdBy")
   private String createdBy;
   @JsonProperty("updatedBy")
@@ -61,6 +57,16 @@ public class SemanticNode {
    */
   @JsonProperty("dataSetId")
   private List<Object> dataSetId = null;
+
+  @JsonProperty("groupByColumns")
+  private List<Object> groupByColumns = null;
+
+  @JsonProperty("sqlBuilder")
+  private Object sqlBuilder = null;
+
+  @JsonProperty("saved")
+  private Boolean saved = false;
+
   /**
    * The Username Schema
    * <p>
@@ -118,7 +124,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("esRepository")
-  private EsRepository esRepository;
+  private Object esRepository;
   /**
    * The Repository Schema
    * <p>
@@ -127,9 +133,39 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("repository")
-  private Repository repository;
+  private Object repository;
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+  @JsonProperty("groupByColumns")
+  public List<Object> getGroupByColumns() {
+    return groupByColumns;
+  }
+
+  @JsonProperty("groupByColumns")
+  public void setGroupByColumns(List<Object> groupByColumns) {
+    this.groupByColumns = groupByColumns;
+  }
+
+  @JsonProperty("sqlBuilder")
+  public Object getSqlBuilder() {
+    return sqlBuilder;
+  }
+
+  @JsonProperty("sqlBuilder")
+  public void setSqlBuilder(Object sqlBuilder) {
+    this.sqlBuilder = sqlBuilder;
+  }
+
+  @JsonProperty("saved")
+  public Boolean getSaved() {
+    return saved;
+  }
+
+  @JsonProperty("saved")
+  public void setSaved(Boolean saved) {
+    this.saved = saved;
+  }
 
   /**
    * The Customercode Schema
@@ -142,14 +178,25 @@ public class SemanticNode {
   public String getCustomerCode() {
     return customerCode;
   }
+
   @JsonProperty("_id")
   public String get_id() {
     return _id;
   }
-  
+
   @JsonProperty("_id")
   public void set_id(String _id) {
     this._id = _id;
+  }
+
+  @JsonProperty("type")
+  public String getType() {
+    return type;
+  }
+
+  @JsonProperty("type")
+  public void setType(String type) {
+    this.type = type;
   }
 
   /**
@@ -350,7 +397,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("esRepository")
-  public EsRepository getEsRepository() {
+  public Object getEsRepository() {
     return esRepository;
   }
 
@@ -362,7 +409,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("esRepository")
-  public void setEsRepository(EsRepository esRepository) {
+  public void setEsRepository(Object esRepository) {
     this.esRepository = esRepository;
   }
 
@@ -374,7 +421,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("repository")
-  public Repository getRepository() {
+  public Object getRepository() {
     return repository;
   }
 
@@ -386,7 +433,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("repository")
-  public void setRepository(Repository repository) {
+  public void setRepository(Object repository) {
     this.repository = repository;
   }
 
@@ -409,35 +456,42 @@ public class SemanticNode {
   public void setStatusMessage(String statusMessage) {
     this.statusMessage = statusMessage;
   }
-  
+
   @JsonProperty("createdBy")
   public String getCreatedBy() {
     return createdBy;
   }
+
   @JsonProperty("createdBy")
   public void setCreatedBy(String createdBy) {
     this.createdBy = createdBy;
   }
+
   @JsonProperty("updatedBy")
   public String getUpdatedBy() {
     return updatedBy;
   }
+
   @JsonProperty("updatedBy")
   public void setUpdatedBy(String updatedBy) {
     this.updatedBy = updatedBy;
   }
+
   @JsonProperty("createdAt")
   public String getCreatedAt() {
     return createdAt;
   }
+
   @JsonProperty("createdAt")
   public void setCreatedAt(String createdAt) {
     this.createdAt = createdAt;
   }
+
   @JsonProperty("updatedAt")
   public String getUpdatedAt() {
     return updatedAt;
   }
+
   @JsonProperty("updatedAt")
   public void setUpdatedAt(String updatedAt) {
     this.updatedAt = updatedAt;

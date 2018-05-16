@@ -7,15 +7,14 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 
 import com.synchronoss.saw.semantic.SAWSemanticUtils;
-
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.semantic.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
 
-import com.synchronoss.saw.semantic.model.Action.Verb;
-import com.synchronoss.saw.semantic.model.NodeCategory;
+import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
+import com.synchronoss.saw.semantic.model.request.Content;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 
@@ -32,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.store.generic.schema.Action;
@@ -42,7 +42,7 @@ import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 import sncr.bda.store.generic.schema.Query;
 import sncr.bda.store.generic.schema.Query.Conjunction;
 
-
+@Service
 public class SemanticServiceImpl implements SemanticService {
 
   private static final Logger logger = LoggerFactory.getLogger(SemanticServiceImpl.class);
@@ -57,29 +57,28 @@ public class SemanticServiceImpl implements SemanticService {
   public SemanticNode addSemantic(SemanticNode node)
       throws JSONValidationSAWException, CreateEntitySAWException {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
+    SemanticNode responseNode = new SemanticNode();
     node.setCreatedAt(format.format(new Date()));
     node.setCreatedBy(node.getUsername());
+    ObjectMapper mapper = new ObjectMapper();
     try {
-      NodeCategory nodeCategory = new NodeCategory();
-      nodeCategory.setNodeCategory(nodeCategoryConvention);
-      nodeCategory.setId(node.get_id());
-      com.synchronoss.saw.semantic.model.Action internalAction =
-          new com.synchronoss.saw.semantic.model.Action();
-      internalAction.setVerb(Verb.CREATE);
-      internalAction.setContent(node);
-      nodeCategory.setAction(internalAction);
-      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(nodeCategory,
-          basePath, node.get_id(), Action.CREATE, Category.SEMANTIC);
-      logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
+      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
+          node.get_id(), Action.create, Category.Semantic);
+      logger.trace("Before invoking request to MaprDB JSON store :{}",
+          mapper.writeValueAsString(structure));
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      node.setStatusMessage("Entity is created successfully");
+      responseNode.set_id(node.get_id());
+      responseNode.setCreatedAt(node.getCreatedAt());
+      responseNode.setCreatedBy(node.getCreatedBy());
+      responseNode.setSaved(true);
+      responseNode.setStatusMessage("Entity is created successfully");
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
       throw new CreateEntitySAWException("Problem on the storage while creating an entity.", ex);
     }
     logger.debug("Response : " + node.toString());
-    return node;
+    return responseNode;
   }
 
 
@@ -89,31 +88,22 @@ public class SemanticServiceImpl implements SemanticService {
       throws JSONValidationSAWException, ReadEntitySAWException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("reading semantic from the store with an Id : {}", node.get_id());
-    SemanticNode responseObject = new SemanticNode();
-    responseObject.set_id(node.get_id());
+    SemanticNode nodeRetrieved = null;
     try {
-      NodeCategory nodeCategory = new NodeCategory();
-      nodeCategory.setNodeCategory(nodeCategoryConvention);
-      nodeCategory.setId(node.get_id());
-      com.synchronoss.saw.semantic.model.Action internalAction =
-          new com.synchronoss.saw.semantic.model.Action();
-      internalAction.setVerb(Verb.READ);
-      internalAction.setContent(node);
-      nodeCategory.setAction(internalAction);
-      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(nodeCategory,
-          basePath, node.get_id(), Action.READ, Category.SEMANTIC);
+      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
+          node.get_id(), Action.read, Category.Semantic);
+      logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
       String jsonStringFromStore = requestMetaDataStore.getResult().toString();
-      responseObject.setStatusMessage("Entity has been retrieved successfully");
       ObjectMapper mapper = new ObjectMapper();
-      NodeCategory nodeCategoryData = mapper.readValue(jsonStringFromStore, NodeCategory.class);
-      responseObject = mapper.readValue(nodeCategoryData.getAction().getContent().toString(),
-          SemanticNode.class);
+      nodeRetrieved = mapper.readValue(jsonStringFromStore, SemanticNode.class);
+      logger.trace("Id: {}", nodeRetrieved.get_id());
+      nodeRetrieved.setStatusMessage("Entity has retrieved successfully");
     } catch (Exception ex) {
       throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
     }
-    return responseObject;
+    return nodeRetrieved;
   }
 
   @Override
@@ -121,33 +111,25 @@ public class SemanticServiceImpl implements SemanticService {
       throws JSONValidationSAWException, UpdateEntitySAWException {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("updating semantic from the store with an Id : {}", node.get_id());
-    SemanticNode responseObject = new SemanticNode();
-    responseObject.set_id(node.get_id());
-    node.setUpdatedBy(node.getUsername());
+    Preconditions.checkArgument(node.getUpdatedBy() != null, "Updated by mandatory attribute.");
+    SemanticNode responseNode = new SemanticNode();
+    node.setUpdatedBy(node.getUpdatedBy());
     node.setUpdatedAt(format.format(new Date()));
     try {
-      NodeCategory nodeCategory = new NodeCategory();
-      nodeCategory.setNodeCategory(nodeCategoryConvention);
-      nodeCategory.setId(node.get_id());
-      com.synchronoss.saw.semantic.model.Action internalAction =
-          new com.synchronoss.saw.semantic.model.Action();
-      internalAction.setVerb(Verb.UPDATE);
-      internalAction.setContent(node);
-      nodeCategory.setAction(internalAction);
-      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(nodeCategory,
-          basePath, node.get_id(), Action.UPDATE, Category.SEMANTIC);
+      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
+          node.get_id(), Action.update, Category.Semantic);
+      logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      String jsonStringFromStore = requestMetaDataStore.getResult().toString();
-      responseObject.setStatusMessage("Entity has been updated successfully");
-      ObjectMapper mapper = new ObjectMapper();
-      NodeCategory nodeCategoryData = mapper.readValue(jsonStringFromStore, NodeCategory.class);
-      responseObject = mapper.readValue(nodeCategoryData.getAction().getContent().toString(),
-          SemanticNode.class);
+      responseNode.set_id(node.get_id());
+      responseNode.setUpdatedBy(node.getUpdatedBy());
+      responseNode.setUpdatedAt(format.format(new Date()));
+      responseNode.setSaved(true);
+      responseNode.setStatusMessage("Entity has been updated successfully");
     } catch (Exception ex) {
       throw new UpdateEntitySAWException("Problem on the storage while updating an entity", ex);
     }
-    return responseObject;
+    return responseNode;
   }
 
   @Override
@@ -156,21 +138,14 @@ public class SemanticServiceImpl implements SemanticService {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("Deleting semantic from the store with an Id : {}", node.get_id());
     SemanticNode responseObject = new SemanticNode();
-    responseObject.set_id(node.get_id());
     try {
-      NodeCategory nodeCategory = new NodeCategory();
-      nodeCategory.setNodeCategory(nodeCategoryConvention);
-      nodeCategory.setId(node.get_id());
-      com.synchronoss.saw.semantic.model.Action internalAction =
-          new com.synchronoss.saw.semantic.model.Action();
-      internalAction.setVerb(Verb.DELETE);
-      internalAction.setContent(node);
-      nodeCategory.setAction(internalAction);
-      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(nodeCategory,
-          basePath, node.get_id(), Action.UPDATE, Category.SEMANTIC);
+      List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
+          node.get_id(), Action.delete, Category.Semantic);
+      logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      responseObject.setStatusMessage("Entity has been updated successfully");
+      responseObject.set_id(node.get_id());
+      responseObject.setStatusMessage("Entity has been deleted successfully.");
     } catch (Exception ex) {
       throw new UpdateEntitySAWException("Problem on the storage while updating an entity", ex);
     }
@@ -231,11 +206,12 @@ public class SemanticServiceImpl implements SemanticService {
       }
       query.setFilter(filters);
       String searchQuery = SAWSemanticUtils.node2JsonString(node, basePath, node.get_id(),
-          Action.SEARCH, Category.SEMANTIC, query);
+          Action.search, Category.Semantic, query);
       logger.debug("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
       requestMetaDataStore.process();
       List<SemanticNode> semanticNodes = new ArrayList<SemanticNode>();
+
       ObjectMapper mapper = new ObjectMapper();
       if (requestMetaDataStore.getSearchResultJsonArray() != null
           && requestMetaDataStore.getSearchResultJsonArray().size() > 0) {
@@ -250,10 +226,9 @@ public class SemanticServiceImpl implements SemanticService {
                 .getAsJsonObject().getAsJsonObject(String.valueOf(j)));
             String jsonString = resultArray.getAsJsonArray().get(i).getAsJsonObject()
                 .getAsJsonObject(String.valueOf(j)).toString();
-            NodeCategory nodeCategory = mapper.readValue(jsonString, NodeCategory.class);
-            SemanticNode semanticNode =
-                mapper.readValue(mapper.writeValueAsString(nodeCategory.getAction().getContent()),
-                    SemanticNode.class);
+            SemanticNode semanticNode = mapper.readValue(jsonString, SemanticNode.class);
+            logger.trace("Id: {}", semanticNode.get_id());
+            semanticNode.setStatusMessage("Entity has retrieved successfully");
             semanticNodes.add(semanticNode);
           }
         }
@@ -270,12 +245,14 @@ public class SemanticServiceImpl implements SemanticService {
   }
 
 
-
   @Override
-  public SemanticNodes list(SemanticNode node)
+  public BackCompatibleStructure list(SemanticNode node)
       throws JSONValidationSAWException, ReadEntitySAWException {
     logger.trace("search criteria :{}", node);
-    SemanticNodes responseNode = new SemanticNodes();
+    BackCompatibleStructure structure = new BackCompatibleStructure();
+    Content  content = new Content();
+    List<Content> contents = new ArrayList<>();
+
     try {
       Query query = new Query();
       query.setConjunction(Conjunction.AND);
@@ -325,16 +302,16 @@ public class SemanticServiceImpl implements SemanticService {
       }
       query.setFilter(filters);
       String searchQuery = SAWSemanticUtils.node2JsonString(node, basePath, node.get_id(),
-          Action.SEARCH, Category.SEMANTIC, query);
+          Action.search, Category.Semantic, query);
       logger.debug("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
       requestMetaDataStore.process();
-      List<SemanticNode> semanticNodes = new ArrayList<SemanticNode>();
+      List<Object> semanticNodes = new ArrayList<Object>();
       ObjectMapper mapper = new ObjectMapper();
       if (requestMetaDataStore.getSearchResultJsonArray() != null
           && requestMetaDataStore.getSearchResultJsonArray().size() > 0) {
         JsonElement resultArray = requestMetaDataStore.getSearchResultJsonArray();
-        logger.debug("Entity has been retrieved successfully :" + resultArray.toString());
+        logger.debug("Entity has retrieved successfully :" + resultArray.toString());
         if (resultArray.isJsonArray()) {
           for (int i = 0, j = 1; i < resultArray.getAsJsonArray().size(); i++, j++) {
             logger.debug("Inside resultArray.isJsonArray() ");
@@ -344,28 +321,28 @@ public class SemanticServiceImpl implements SemanticService {
                 .getAsJsonObject().getAsJsonObject(String.valueOf(j)));
             String jsonString = resultArray.getAsJsonArray().get(i).getAsJsonObject()
                 .getAsJsonObject(String.valueOf(j)).toString();
-            NodeCategory nodeCategory = mapper.readValue(jsonString, NodeCategory.class);
-            SemanticNode semanticNodeTemp =
-                mapper.readValue(mapper.writeValueAsString(nodeCategory.getAction().getContent()),
-                    SemanticNode.class);
+
+            SemanticNode semanticNodeTemp = mapper.readValue(jsonString, SemanticNode.class);
+            logger.trace("Id: {}", semanticNodeTemp.get_id());
+            semanticNodeTemp.setStatusMessage("Entity has been retrieved successfully");
             SemanticNode semanticNode = new SemanticNode();
             org.springframework.beans.BeanUtils.copyProperties(semanticNodeTemp, semanticNode,
                 "dataSetId", "dataSecurityKey", "esRepository", "repository", "artifacts");
             semanticNodes.add(semanticNode);
           }
         }
-        responseNode.setSemanticNodes(semanticNodes);
+        content.setContents(semanticNodes);
+        contents.add(content);
+        structure.setContents(contents);
       } else {
         throw new ReadEntitySAWException("There is no data avaiable for the given criteria");
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
       throw new ReadEntitySAWException(
-          "While retrieving it has been found that Entity does not exist.");
+          "While retrieving it has been found that Entity does not exist");
     }
-    return responseNode;
+    return structure;
   }
-
-
 }
 

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.synchronoss.saw.semantic.model.NodeCategory;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
@@ -30,6 +30,7 @@ import sncr.bda.store.generic.schema.Query;
 @Component
 public class SAWSemanticUtils {
   public final static String COMMA = ",";
+  public final static String PATH_SEARCH = "action.content.";
 
   public ObjectMapper getMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -70,13 +71,24 @@ public class SAWSemanticUtils {
     }
     return headers;
 }
+  public static void checkMandatoryFields (SemanticNode node) {
+    Preconditions.checkArgument(node!=null, "Request body is empty");
+    Preconditions.checkArgument(node.getUsername()!=null, "username cannot be null");
+    Preconditions.checkArgument(node.getCustomerCode()!=null, "customer code cannot be null");
+    Preconditions.checkArgument(node.getProjectCode()!=null, "project code cannot be null");
+    Preconditions.checkArgument(node.getSupports()!=null, "supports cannot be null");
+    Preconditions.checkArgument(node.getArtifacts()!=null, "artifacts code cannot be null");
+    Preconditions.checkArgument(node.getMetricName()!=null, "metric name code cannot be null");
+    Preconditions.checkArgument(node.getModule()!=null, "module cannot be null");
+    Preconditions.checkArgument(node.getType()!=null, "type code cannot be null");
+  }
   
-  public static List<MetaDataStoreStructure> node2JSONObject(NodeCategory node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
+  public static List<MetaDataStoreStructure> node2JSONObject(SemanticNode node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id != null) {
+    if (node.get_id()!=null || Id !=null) {
       metaDataStoreStructure.setId(Id);
     }
     metaDataStoreStructure.setAction(action);

@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Action {
-  CREATE("create"),
-  DELETE("delete"),
-  READ("read"),
-  UPDATE("update"),
-  SEARCH("search");
+  create("create"),
+  delete("delete"),
+  read("read"),
+  update("update"),
+  search("search");
   private final String value;
   private final static Map<String, Action> CONSTANTS = new HashMap<String, Action>();
 

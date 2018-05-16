@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "node-category",
-    "id",
     "action"
 })
 public class NodeCategory {
@@ -32,8 +31,6 @@ public class NodeCategory {
      * 
      * 
      */
-    @JsonProperty("id")
-    private String id;
     @JsonProperty("action")
     private Action action;
     @JsonIgnore
@@ -53,8 +50,6 @@ public class NodeCategory {
     /**
      * The Node Category Schema 
      * <p>
-     * 
-     * 
      */
     @JsonProperty("node-category")
     public void setNodeCategory(String nodeCategory) {
@@ -64,25 +59,7 @@ public class NodeCategory {
     /**
      * The Projectcode Schema 
      * <p>
-     * 
-     * 
      */
-    @JsonProperty("id")
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * The Projectcode Schema 
-     * <p>
-     * 
-     * 
-     */
-    @JsonProperty("id")
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @JsonProperty("action")
     public Action getAction() {
         return action;

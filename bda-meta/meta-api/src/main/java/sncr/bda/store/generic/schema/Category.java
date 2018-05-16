@@ -7,14 +7,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Category {
   
-  DATA_SET("DataSet"),
-  TRANSFORMATION("Transformation"),
-  DATA_POD("DataPod"),
-  DATA_SEGMENT("DataSegment"),
-  PORTALDATASET("PortalDataset"),
-  PROJECT("Project"),
-  AUDIT_LOG("AuditLog"),
-  SEMANTIC("Semantic");  
+  DataSet("DataSet"),
+  Transformation("Transformation"),
+  DataPod("DataPod"),
+  DataSegment("DataSegment"),
+  PortalDataset("PortalDataset"),
+  Project("Project"),
+  AuditLog("AuditLog"),
+  Semantic("Semantic");  
 private final String value;
 private final static Map<String, Category> CONSTANTS = new HashMap<String, Category>();
 

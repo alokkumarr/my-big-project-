@@ -159,6 +159,20 @@ The request body shall provide the query, storage type & other details. The belo
 6. Implicit ES Query validation.
 7. Every incoming request to this story proxy service will be validated in gateway service layer.
 
+=== SAW Semantic Service
+
+The SAW Semantic Service enables the consumer to store the semantic metadata of SIP. The intention of this services
+to provide CRUD operations to deal with semantic metadata
+
+.Figure: Executing an data query using the SAW Proxy Service
+plantuml::saw-design/figure-semantic-sequence.pum[format=svg]
+
+1. Create Integrated Semantic Node JSON structure for both elastic search as well as data lake data pods.
+2. The structure is consistent with that used by SAW Analyze module and Observe modules in the store.
+3. This service should be consumable by
+        3.1 SAW Analyze Module
+        3.2 SAW Workbench Module
+
 ==== Apache Spark
 
 The Apache Spark executor supports analyses of type report.

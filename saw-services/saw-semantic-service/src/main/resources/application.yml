@@ -9,7 +9,7 @@ spring:
       max-file-size: 25MB
 logging:
   level:
-    com.synchronoss.saw.workbench: INFO
+    com.synchronoss.saw.semantic: TRACE
     sncr.bda: INFO
 server:
   address: localhost
@@ -26,4 +26,4 @@ application:
         queue-capacity: 10000
 
 metastore:
-    base:  hdfs:///main/        
+    base:  hdfs:///main/

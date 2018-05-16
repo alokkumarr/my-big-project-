@@ -9,7 +9,7 @@ spring:
       max-file-size: 25MB
 logging:
   level:
-    com.synchronoss.saw.workbench: INFO
+    com.synchronoss.saw.semantic: TRACE
 server:
   address: localhost
   port: 9901
@@ -23,11 +23,5 @@ application:
         core-pool-size: 10
         max-pool-size: 50
         queue-capacity: 10000
-workbench:
-        project-key: "{{ saw_workbench_project_key | default('workbench') }}"
-        project-path: "{{ saw_workbench_project_path | default('/raw') }}"
-        project-root: "{{ saw_workbench_project_root | default('maprfs:///main') }}"
-        preview-limit: {{ saw_workbench_preview_limit | default('100') }}
-        livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
 metastore:
     base:  {{ saw_workbench_metadata | default('hdfs:///main/') }}

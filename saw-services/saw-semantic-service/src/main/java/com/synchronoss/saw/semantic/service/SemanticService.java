@@ -1,10 +1,12 @@
 package com.synchronoss.saw.semantic.service;
 
+
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.semantic.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
+import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import java.util.UUID;
@@ -30,7 +32,7 @@ public interface SemanticService {
   public SemanticNodes search(SemanticNode node)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
-  public SemanticNodes list(SemanticNode node)
+  public BackCompatibleStructure list(SemanticNode node)
       throws JSONValidationSAWException, ReadEntitySAWException;
 
   /**
