@@ -81,7 +81,7 @@ public class Request {
         try {
             if (request.isJsonObject()) {
                 logger.debug("Processing request object");
-                if (analyzeAndValidateSearch(request.getAsJsonObject())) {
+                if (analyzeAndValidate(request.getAsJsonObject())) {
                     logger.error("Query String " + this.query);
                     logger.error("Filters " + this.filter);
                     Map<String, Document> searchResult = doSearch();
@@ -95,7 +95,7 @@ public class Request {
                 JsonArray ja = request.getAsJsonArray();
 
                 JsonObject jobj = ja.get(0).getAsJsonObject();
-                if (analyzeAndValidateSearch(jobj)) {
+                if (analyzeAndValidate(jobj)) {
                     logger.error("Query String " + this.query);
                     logger.error("Filters " + this.filter);
                     Map<String, Document> searchResult = doSearch();
