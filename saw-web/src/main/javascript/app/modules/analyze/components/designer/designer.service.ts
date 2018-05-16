@@ -224,7 +224,7 @@ export class DesignerService {
         type: 'chart',
         marker: 'y',
         maxAllowed: () =>
-          ['pie', 'bubble'].includes(chartType) ? 1 : Infinity,
+          ['pie', 'bubble', 'stack'].includes(chartType) ? 1 : Infinity,
         artifactColumns: [],
         canAcceptArtifactColumn: canAcceptNumberType,
         transform(artifactColumn: ArtifactColumnChart) {
