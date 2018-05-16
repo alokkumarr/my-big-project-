@@ -63,6 +63,12 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
     ].includes(this.chartType);
   }
 
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.onLegendChange();
+    }, 50);
+  }
+
   setInversion(isInverted) {
     this.isInverted = isInverted;
     this.change.emit({
