@@ -203,17 +203,11 @@ export class DesignerService {
 
     const applyDataFieldDefaults = artifactColumn => {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-      if (
-        [
-          'column',
-          'bar',
-          'line',
-          'area',
-          'combo',
-          'tsspline',
-          'tspane'
-        ].includes(chartType)
-      ) {
+      if (['column', 'line', 'area'].includes(chartType)) {
+        artifactColumn.comboType = chartType;
+      } else if (['tsspline', 'tsPane'].includes(chartType)) {
+        artifactColumn.comboType = 'line';
+      } else if (['combo', 'bar'].includes(chartType)) {
         artifactColumn.comboType = 'column';
       }
     };
