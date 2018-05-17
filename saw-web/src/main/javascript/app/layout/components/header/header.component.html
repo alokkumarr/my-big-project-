@@ -9,7 +9,7 @@
       <div layout="row" class="lh-links">
         <div *ngFor="let module of modules"
               class="link"
-              uiSref="analyze"
+              uiSref="{{module.productModName.toLowerCase()}}"
               uiSrefActive="m-active"
               translate="{{module.productModName}}">{{module.productModName}}
         </div>
@@ -26,6 +26,7 @@
           </button>
           <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()" e2e="account-settings-selector-logout">
+            <a (click)="logout()"></a>
             <ng-container i18n>Log Out</ng-container>
           </button>
         </mat-menu>
