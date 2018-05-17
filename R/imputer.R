@@ -29,24 +29,13 @@ imputer <- function(df,
   checkmate::assert_choice(fun, c("mean", "mode", "constant"))
   checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
 
-<<<<<<< HEAD
   if(! is.null(group_vars) & fun != "constant") {
     df <- dplyr::group_by_at(df, group_vars)
-=======
-  if (!is.null(group_vars) & fun != "constant") {
-    df <- group_by_at(df, group_vars)
->>>>>>> 09a22eb681e49401670d559aad76b0cc651fb63f
   }
 
-  impute_fun <- match.fun(paste("impute", fun, sep = "_"))
+  impute_fun <- match.fun(paste("impute", fun, sep="_"))
   impute_args <- modifyList(list(df = df, measure_vars = measure_vars), list(...))
-  results <- do.call("impute_fun", impute_args)
-
-  if (!is.null(group_vars) & fun != "constant") {
-    results <- dplyr::ungroup(results)
-  }
-
-  results
+  do.call("impute_fun", impute_args)
 }
 
 
@@ -77,6 +66,7 @@ na_cols <- function(df) {
 
 
 # impute mean -------------------------------------------------------------
+
 
 
 #' Impute Mean
@@ -139,20 +129,8 @@ impute_constant <- function(df,
   char_cols <-
     intersect(setdiff(colnames(df), df_numeric_cols), df_na_cols)
 
-<<<<<<< HEAD
   if (is.null(measure_vars)) {
     measure_vars <- df_na_cols
-=======
-  if (fill_type %in% c("numeric", "integer")) {
-    if (length(numeric_vars) == 0)
-      message("numeric fill provided but no numeric measure variables provided")
-    impute_constant_at_num(df, numeric_vars, fill)
-  } else {
-    char_vars <- setdiff(measure_vars, numeric_vars)
-    if (length(char_vars) == 0)
-      message("character fill provided but no character measure variables provided")
-    impute_constant_at_chr(df, char_vars, fill)
->>>>>>> 09a22eb681e49401670d559aad76b0cc651fb63f
   }
 
   fill_type <- class(fill)
@@ -201,19 +179,6 @@ impute_mode <- function(df, measure_vars = NULL) {
     measure_vars <- intersect(measure_vars, df_na_cols)
   }
 
-<<<<<<< HEAD
-=======
-  impute_mode_at(df, measure_vars)
-}
-
-
-#' Impute Mode At
-#'
-#' Internal function to impute Mode at specific columns
-impute_mode_at <- function(df, measure_vars) {
-  checkmate::assert_true(any(class(df) %in% c("data.frame", "tbl_spark")))
-  checkmate::assert_subset(measure_vars, colnames(df))
->>>>>>> 09a22eb681e49401670d559aad76b0cc651fb63f
   for(mv in measure_vars) {
     fill <- df %>%
       dplyr::count(!! rlang::sym(mv), sort=TRUE) %>%

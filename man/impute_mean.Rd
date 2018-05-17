@@ -4,7 +4,7 @@
 \alias{impute_mean}
 \title{Impute Mean}
 \usage{
-impute_mean(df, measure_vars = NULL)
+impute_mean(df, measure_vars)
 }
 \arguments{
 \item{df}{Spark or R data.frame}

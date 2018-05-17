@@ -10,7 +10,8 @@ imputer(df, group_vars = NULL, measure_vars = NULL, fun = "mean", ...)
 \item{df}{Spark or R data.frame}
 
 \item{group_vars}{optional grouping variable input. Only valid for mean and
-mode impute functions. default is NULL which applies no grouping}
+mode impute functions. default is NULL which applies no grouping. note -
+mode function does not supporting grouping}
 
 \item{measure_vars}{optional character vector of column names to apply impute
 function on. default is NULL which applies impute on all columns with

@@ -20,14 +20,14 @@ detecter(df, index_var, group_vars, measure_vars, frequency, direction, alpha,
 \arguments{
 \item{df}{dataframe}
 
-\item{index_var}{index date/datetime variable. Default is NULL which will set
-the index variable to the first column in the dataframe}
+\item{index_var}{index date/datetime variable}
 
 \item{group_vars}{optional vector of grouping variables to apply dectect
 function to. default is NULL - no grouping}
 
 \item{frequency}{numeric period length of seasonality. Ex - 7 for daily data
-with weekly seasonality}
+with weekly seasonality. see
+\url{https://robjhyndman.com/hyndsight/seasonal-periods/} for more details}
 
 \item{direction}{character input for direction of anomalies to detect.
 Options are 'pos' - only positive anomalies are detected, 'neg' only

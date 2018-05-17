@@ -20,3 +20,6 @@ imputed Spark or R data.frame
 Function to impute missing values with the most frequent values (mode). Applied columwise -
 the most frequent value imputed is the by column
 }
+\details{
+impute mode does not support grouping currently
+}

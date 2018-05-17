@@ -9,25 +9,24 @@
 detect(df, index_var, measure_var, frequency, direction, alpha, max_anoms,
   trend_window)
 
-\method{detect}{data.frame}(df, index_var = NULL, measure_var = NULL,
-  frequency, direction = "pos", alpha = 0.01, max_anoms = 0.01,
+\method{detect}{data.frame}(df, index_var, measure_var, frequency,
+  direction = "pos", alpha = 0.01, max_anoms = 0.01,
   trend_window = 0.75)
 
-\method{detect}{grouped_df}(df, index_var, measure_var, frequency,
-  direction = "pos", alpha = 0.01, max_anoms = 0.01,
+\method{detect}{grouped_df}(df, index_var = NULL, measure_var = NULL,
+  frequency, direction = "pos", alpha = 0.01, max_anoms = 0.01,
   trend_window = 0.75)
 }
 \arguments{
 \item{df}{dataframe}
 
-\item{index_var}{index date/datetime variable. Default is NULL which will set
-the index variable to the first column in the dataframe}
+\item{index_var}{index date/datetime variable}
 
-\item{measure_var}{numeric measure variable to analyze. Default is NULL which
-will set the measure variable to the second column in the dataframe}
+\item{measure_var}{numeric measure variable to analyze}
 
 \item{frequency}{numeric period length of seasonality. Ex - 7 for daily data
-with weekly seasonality}
+with weekly seasonality. see
+\url{https://robjhyndman.com/hyndsight/seasonal-periods/} for more details}
 
 \item{direction}{character input for direction of anomalies to detect.
 Options are 'pos' - only positive anomalies are detected, 'neg' only
@@ -56,7 +55,7 @@ statistical anomlies in the dataset based on configurable theshold
 parameters.
 }
 \details{
-Function is similiar to Seasonl Hybrid ESD algorithm discussed
-here \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
+Function is similiar to Seasonl Hybrid ESD algorithm discussed here
+\url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
 \code{\link[AnomalyDetection]{AnomalyDetectionTs}}
 }

@@ -20,8 +20,8 @@ sim_data <- function(n_ids, n_recs, n_iter, seed = 319) {
                by = "day")
   cat1 <- c("A", "B")
   cat2 <- c("X", "Y", "Z")
-  
-  
+
+
   do.call("rbind",
           replicate(n_iter,
                     {
@@ -49,7 +49,7 @@ sc <- spark_connect(master = "local")
 
 
 
-dat <- sim_data(3, 3, 1, seed = 319) %>%
+dat <- sim_data(3, 10, 1, seed = 319) %>%
   mutate(index = row_number())
 
 dat <- dat %>%
@@ -104,9 +104,9 @@ to_char_ds <- function(df) {
       metric2 = as.character(metric2),
       metric3 = as.character(metric3),
       index = as.character(index)
-      
+
     )
-  
+
   return(char_df)
 }
 
@@ -229,7 +229,7 @@ test_that("imputer constant value replace methods consistent", {
       as.data.frame() %>%
       round(5)
   )
-  
+
   expect_equal(colnames(spk_imp_const), colnames(r_imp_const))
 })
 
@@ -253,7 +253,7 @@ r_imp_const_char <- dat %>%
   )
 
 
-char_spk_imp_const_char <- to_char_ds(spk_imp_const_char) 
+char_spk_imp_const_char <- to_char_ds(spk_imp_const_char)
 char_r_imp_const_char <- to_char_ds(r_imp_const_char)
 
 
@@ -270,7 +270,7 @@ test_that("imputer constant value replace methods consistent", {
       collect() %>%
       as.data.frame()
   )
-  
+
   expect_equal(colnames(char_spk_imp_const_char), colnames(char_r_imp_const_char))
 })
 
@@ -395,7 +395,7 @@ r_imp_group_mean <- dat %>%
 test_that("imputer mean with group-by methods consistent", {
   spk_imp_ungroup_mean <- ungroup(spk_imp_group_mean)
   r_imp_ungroup_mean <- ungroup(r_imp_group_mean)
-  
+
   expect_equal(
     spk_imp_ungroup_mean %>%
       collect() %>%
@@ -440,7 +440,7 @@ r_imp_group_mode <- dat %>%
 test_that("imputer mean with group-by methods consistent", {
   spk_imp_ungroup_mode <- ungroup(spk_imp_group_mode)
   r_imp_ungroup_mode <- ungroup(r_imp_group_mode)
-  
+
   expect_equal(
     spk_imp_ungroup_mode %>%
       collect() %>%
@@ -468,7 +468,7 @@ spk_imp_group_const <- dat_tbl %>%
     measure_vars = c("metric1", "metric3"),
     fun = "constant",
     fill = 5
-    
+
   )
 
 
@@ -487,7 +487,7 @@ r_imp_group_const <- dat %>%
 test_that("imputer mean with group-by methods consistent", {
   spk_imp_ungroup_const <- ungroup(spk_imp_group_const)
   r_imp_ungroup_const <- ungroup(r_imp_group_const)
-  
+
   expect_equal(
     spk_imp_ungroup_const %>%
       collect() %>%
@@ -660,7 +660,7 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      # round(5) ,
     r_imp_mode_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
@@ -755,7 +755,7 @@ r_imp_const_char_no_measure <- dat %>%
 
 # Compare both spark and R data set with impute_constant function ---------
 
-spk_imp_const_no_measure_to_char <- to_char_ds(spk_imp_const_char_no_measure) 
+spk_imp_const_no_measure_to_char <- to_char_ds(spk_imp_const_char_no_measure)
 r_imp_const_no_measure_to_char <- to_char_ds(r_imp_const_char_no_measure)
 
 
@@ -772,6 +772,6 @@ test_that("imputer constant value replace methods consistent", {
       collect() %>%
       as.data.frame()
   )
-  
+
   expect_equal(colnames(spk_imp_const_no_measure_to_char), colnames(r_imp_const_no_measure_to_char))
 })
