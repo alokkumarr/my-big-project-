@@ -544,9 +544,13 @@ public abstract class AbstractComponent implements WithContext {
                         String dsname = id.substring(id.indexOf(MetadataStore.delimiter) + MetadataStore.delimiter.length());
                         Map<String, Object> outDS = ngctx.outputDataSets.get(dsname);
                         JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
-
                         logger.trace("Extracted schema: " + schema.toString());
-                        services.md.updateDS(id, ngctx, ds, schema);
+
+                        // Set record count
+                        long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
+                        logger.trace("Extracted record count " + recordCount);
+
+                        services.md.updateDS(id, ngctx, ds, schema, recordCount);
 
                     } catch (Exception e) {
                         error = "Could not update DS/ write AuditLog entry to DS, id = " + id;

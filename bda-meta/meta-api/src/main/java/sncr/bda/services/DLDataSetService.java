@@ -185,7 +185,7 @@ public class DLDataSetService {
     }
 
 
-    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema) throws Exception {
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount) throws Exception {
 
         if (schema == null || ds == null)
             throw new IllegalArgumentException("Schema/DS descriptor must not be null");
@@ -194,6 +194,7 @@ public class DLDataSetService {
         JsonObject trans = new JsonObject();
         trans.addProperty("asOutput",  ctx.transformationID);
         ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
         ds.getAsJsonObject().add("transformations", trans);
         ds.getAsJsonObject().add("asOfNow", status);
 
