@@ -63,7 +63,7 @@ import { FilterService } from './services/filter.service';
 import { PivotService } from './services/pivot.service';
 import { SortService } from './services/sort.service';
 import { transitions } from './transitions';
-import { AnalyzeViewComponent as AnalyzeViewUpgraded, AnalyzeViewModule } from './view';
+import { AnalyzeViewModule } from './view';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
@@ -124,10 +124,6 @@ angular.module(AnalyzeModule, [
   .component('reportFormatDialog', ReportFormatDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
-  .directive(
-    'analyzeViewU',
-    downgradeComponent({component: AnalyzeViewUpgraded}) as angular.IDirectiveFactory
-  )
   .component('analyzeCardsView', AnalyzeCardsViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeListView', AnalyzeListViewComponent)
@@ -179,15 +175,12 @@ angular.module(AnalyzeModule, [
     AceEditorModule,
     FormsModule,
     ReactiveFormsModule,
-<<<<<<< HEAD
     BrowserModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
-    AnalyzeViewModule
-=======
+    AnalyzeViewModule,
     AnalyzeViewModule,
     AnalyzeActionsModule
->>>>>>> Added type filters ot main page.
   ],
   declarations: [
     AnalyzeReportQueryComponent,
@@ -219,7 +212,6 @@ angular.module(AnalyzeModule, [
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
     FilterChipsUpgraded,
-    AnalyzeViewUpgraded,
     CronDatePickerComponent
   ],
   entryComponents: [
@@ -251,7 +243,6 @@ angular.module(AnalyzeModule, [
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
     FilterChipsUpgraded,
-    AnalyzeViewUpgraded,
     CronDatePickerComponent
   ],
   providers: [
