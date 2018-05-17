@@ -12,6 +12,12 @@ sidenav {
     position: fixed;
     margin: -47px 0 1px 10px;
   }
+
+  mat-sidenav {
+    &.sidenav-closed:not(.ng-animating) * {
+      visibility: hidden;
+    }
+  }
 }
 
 .sidebar-header {
