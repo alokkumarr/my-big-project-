@@ -12,8 +12,14 @@ import {
   AnalysisType
 } from './models';
 
-export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
-export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart | ArtifactColumnReport;
+export type ArtifactColumns =
+  | ArtifactColumnPivot[]
+  | ArtifactColumnChart[]
+  | ArtifactColumnReport[];
+export type ArtifactColumn =
+  | ArtifactColumnPivot
+  | ArtifactColumnChart
+  | ArtifactColumnReport;
 
 export {
   ArtifactColumnPivot,
@@ -28,30 +34,43 @@ export {
   AnalysisReport
 };
 
-
 export type DesignerMode = 'edit' | 'fork' | 'new';
-export type ChartType = 'line' | 'column' | 'bar' | 'area' | 'pie' | 'scatter' | 'bubble';
+export type ChartType =
+  | 'line'
+  | 'column'
+  | 'bar'
+  | 'area'
+  | 'pie'
+  | 'scatter'
+  | 'bubble';
 
 export type Analysis = AnalysisChart | AnalysisReport;
 
 export type AnalysisStarter = {
-  name: string,
-  description: string,
-  scheduled: null,
+  name: string;
+  description: string;
+  scheduled: null;
   semanticId: string;
   categoryId: string;
   metricName: string;
   type: AnalysisType;
   chartType?: ChartType;
-}
-
-export type AnalysisDialogData = {
-  designerMode: DesignerMode,
-  analysisStarter?: AnalysisStarter,
-  analysis?: Analysis
 };
 
-export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'save' | 'refresh' | 'modeToggle';
+export type AnalysisDialogData = {
+  designerMode: DesignerMode;
+  analysisStarter?: AnalysisStarter;
+  analysis?: Analysis;
+};
+
+export type DesignerToolbarAciton =
+  | 'description'
+  | 'sort'
+  | 'preview'
+  | 'filter'
+  | 'save'
+  | 'refresh'
+  | 'modeToggle';
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;
@@ -61,6 +80,7 @@ export interface IToolbarActionData {
   booleanCriteria?: string;
   description?: string;
   analysis?: Analysis;
+  supportsGlobalFilters?: boolean;
 }
 
 export interface IToolbarActionResult {

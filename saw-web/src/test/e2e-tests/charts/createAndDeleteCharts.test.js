@@ -14,6 +14,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
+
   const chartDesigner = analyzePage.designerDialog.chart;
   const chartName = `e2e chart ${(new Date()).toString()}`;
   const chartDescription = 'descr';
@@ -22,7 +23,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const yAxisName2 = 'Available Items';
   let groupName = 'Source OS';
   let metricName = 'MCT TMO Session ES';
-  const sizeByName = 'Activated Active Subscriber Count';
+  const sizeByName = 'Activated No Usage Subscriber Count';
 
   const dataProvider = {
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
@@ -38,9 +39,9 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
     'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
-    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
-    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
+     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
+     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
+     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
 
   beforeAll(function () {
@@ -72,9 +73,9 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     it('should create and delete ' + description, () => {
       if (data.chartType === 'chart:bubble') {
         metricName = 'PTT Subscr Detail';
-        yAxisName = 'Call Billed Unit';
-        xAxisName = 'Account Segment';
-        groupName = 'Account Name';
+        yAxisName = 'Activated Active Subscriber Count';
+        xAxisName = 'Activated Inactive Subscriber Count';
+        groupName = 'Apps Version';
       }
 
       login.loginAs(data.user);
@@ -82,35 +83,28 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       // Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
+      // Select fields
+      // Wait for field input box.
+      commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
+      // Search field and add that into metric section.
+      analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
+      // Search field and add that into dimension section.
+      analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
-      //Select fields
-      if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
-        y = chartDesigner.getYRadio(yAxisName);
-
-        // Also select Color by
-        const sizeBy = chartDesigner.getZRadio(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(sizeBy);
-      } else if (data.chartType === 'chart:stack') {  // if chart is stacked - select Y radio instead of checkbox
-        y = chartDesigner.getYRadio(yAxisName);
-      } else {
-        y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
+      // Search field and add that into size section.
+      if (data.chartType === 'chart:bubble') {
+        analyzePage.designerDialog.chart.fieldSearchInput.clear();
+        analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(sizeByName);
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
       }
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
-      commonFunctions.waitFor.elementToBeClickableAndClick(y);
-
-      //If combo chart then do not check group by
-      if (data.chartType !== 'chart:combo') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
-      }
-
-      //If Combo then add one more field
-      if (data.chartType === 'chart:combo') {
-        const y2 = chartDesigner.getYCheckBox(yAxisName2);
-        commonFunctions.waitFor.elementToBeClickableAndClick(y2);
-      }
-
-      //Refresh
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
+      // Search field and add that into group by section. i.e. Color by
+      analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
 
       //Save
       const save = analyzePage.saveDialog;
@@ -120,6 +114,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
       save.nameInput.clear().sendKeys(chartName);
       save.descriptionInput.clear().sendKeys(chartDescription);
+      commonFunctions.waitFor.elementToBeClickableAndClick(save.selectedCategoryUpdated);
+      commonFunctions.waitFor.elementToBeClickableAndClick(save.selectCategoryToSave(subCategoryName));
       commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 

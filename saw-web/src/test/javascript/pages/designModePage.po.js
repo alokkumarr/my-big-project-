@@ -6,6 +6,7 @@ module.exports = {
   aggregateFunctionButton: aggregateFunction => element(by.xpath(`//mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   aggregateFunctionMenuItem: aggregateFunction => element(by.xpath(`//button[@role="menuitem"]/mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   filterWindow: {
+    numberInputUpgraded: element(by.css('input[e2e="designer-number-filter-input"]')),
     numberInput: element(by.xpath("(//input[@type='number'])[2]")),
     columnDropDown: element(by.css('input[e2e="filter-autocomplete-input"]')),
     columnNameDropDownItem: columnName => element(by.xpath(`(//mat-option/span[contains(text(),"${columnName}")])[1]`)),

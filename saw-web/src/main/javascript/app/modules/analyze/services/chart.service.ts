@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as clone from 'lodash/clone';
@@ -34,7 +36,15 @@ import * as toString from 'lodash/toString';
 import * as replace from 'lodash/replace';
 import * as isUndefined from 'lodash/isUndefined';
 
-import {NUMBER_TYPES, FLOAT_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
+import * as Highcharts from 'highcharts/highcharts';
+
+import {
+  NUMBER_TYPES,
+  FLOAT_TYPES,
+  DATE_TYPES,
+  AGGREGATE_TYPES_OBJ,
+  CHART_COLORS
+} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -84,7 +94,6 @@ const stackConfig = config => {
 };
 
 const donutConfig = config => {
-
   set(config, 'chart.type', 'pie');
   return pieConfig(config);
 };
@@ -92,11 +101,13 @@ const donutConfig = config => {
 const pieConfig = config => {
   delete config.xAxis;
   delete config.yAxis;
-  set(config, 'series', [{
-    name: 'Brands',
-    colorByPoint: true,
-    data: []
-  }]);
+  set(config, 'series', [
+    {
+      name: 'Brands',
+      colorByPoint: true,
+      data: []
+    }
+  ]);
   set(config, 'plotOptions.pie.showInLegend', false);
   return config;
 };
@@ -119,19 +130,21 @@ const addCommas = nStr => {
   return x1 + x2;
 };
 
+@Injectable()
 export class ChartService {
-  constructor(Highcharts) {
-    'ngInject';
-
-    this._Highcharts = Highcharts;
-    this.LEGEND_POSITIONING = LEGEND_POSITIONING;
-    this.LAYOUT_POSITIONS = LAYOUT_POSITIONS;
-  }
+  _Highcharts = Highcharts;
+  LEGEND_POSITIONING = LEGEND_POSITIONING;
+  LAYOUT_POSITIONS = LAYOUT_POSITIONS;
+  constructor() {}
 
   updateAnalysisModel(analysis) {
+    /* prettier-ignore */
     switch (analysis.chartType) {
     case 'pie':
-      analysis.labelOptions = analysis.labelOptions || {enabled: true, value: 'percentage'};
+      analysis.labelOptions = analysis.labelOptions || {
+        enabled: true,
+        value: 'percentage'
+      };
       break;
     default:
       break;
@@ -140,8 +153,15 @@ export class ChartService {
   }
 
   initLegend(analysis) {
-    const initialLegendPosition = analysis.chartType === 'combo' ? 'top' : analysis.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
-    const initialLegendLayout = (analysis.chartType === 'combo' || analysis.chartType.substring(0, 2) === 'ts') ? 'horizontal' : 'vertical';
+    const initialLegendPosition =
+      analysis.chartType === 'combo'
+        ? 'top'
+        : analysis.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
+    const initialLegendLayout =
+      analysis.chartType === 'combo' ||
+      analysis.chartType.substring(0, 2) === 'ts'
+        ? 'horizontal'
+        : 'vertical';
 
     return {
       align: get(analysis, 'legend.align', initialLegendPosition),
@@ -159,11 +179,13 @@ export class ChartService {
     const legendLayout = LAYOUT_POSITIONS[get(options, 'legend.layout')];
 
     const SPACING = 45;
-    const HEIGHT = (angular.isUndefined(options.chart) ? 400 : options.chart.height);
+    const HEIGHT = isUndefined(options.chart) ? 400 : options.chart.height;
 
     const config = {
       chart: {
-        type: ['combo', 'bar'].includes(type) ? null : this.splinifyChartType(type),
+        type: ['combo', 'bar'].includes(type)
+          ? null
+          : this.splinifyChartType(type),
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -177,16 +199,18 @@ export class ChartService {
         layout: legendLayout.layout,
         enabled: false
       },
-      series: [{
-        name: 'Series 1',
-        data: []
-      }],
+      series: [
+        {
+          name: 'Series 1',
+          data: []
+        }
+      ],
       yAxis: {
-        title: {x: -15}
+        title: { x: -15 }
       },
       xAxis: {
         categories: [],
-        title: {y: 15}
+        title: { y: 15 }
       }
     };
 
@@ -201,19 +225,29 @@ export class ChartService {
     const config = {
       yAxisLabels: [],
       axisLabels: {
-        x: 'Dimensions', y: 'Metrics', z: 'Z-Axis', g: 'Group By'
+        x: 'Dimensions',
+        y: 'Metrics',
+        z: 'Z-Axis',
+        g: 'Group By'
       },
       renamable: {
-        x: true, y: true, z: false, g: false
+        x: true,
+        y: true,
+        z: false,
+        g: false
       },
       required: {
-        x: true, y: true, z: false, g: false
+        x: true,
+        y: true,
+        z: false,
+        g: false
       },
       labelOptions: [],
       customTooltip: true,
       legend: true
     };
 
+    /* prettier-ignore */
     switch (type) {
     case 'bubble':
       config.axisLabels.z = 'Size By';
@@ -225,13 +259,16 @@ export class ChartService {
       config.axisLabels.y = 'Angle';
       config.axisLabels.x = 'Color By';
       config.renamable.x = false;
-      config.labelOptions = [{
-        value: 'percentage',
-        name: 'Show Percentage'
-      }, {
-        value: 'data',
-        name: 'Show Data Value'
-      }];
+      config.labelOptions = [
+        {
+          value: 'percentage',
+          name: 'Show Percentage'
+        },
+        {
+          value: 'data',
+          name: 'Show Data Value'
+        }
+      ];
       config.customTooltip = true;
       config.legend = false;
       return config;
@@ -279,7 +316,9 @@ export class ChartService {
 
     const childNode = node[`node_field_${level}`];
     if (childNode) {
-      const data = flatMap(childNode.buckets, bucket => this.parseNode(bucket, dataObj, nodeFieldMap, level + 1));
+      const data = flatMap(childNode.buckets, bucket =>
+        this.parseNode(bucket, dataObj, nodeFieldMap, level + 1)
+      );
       return data;
     }
     const datum = this.parseLeaf(node, dataObj);
@@ -292,13 +331,10 @@ export class ChartService {
       fpMapValues('value')
     )(node);
 
-    return assign(
-      dataFields,
-      dataObj
-    );
+    return assign(dataFields, dataObj);
   }
 
-  splitToSeriesAndCategories(parsedData, fields, {sorts}, type) {
+  splitToSeriesAndCategories(parsedData, fields, { sorts }, type) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
@@ -308,7 +344,9 @@ export class ChartService {
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
     if (!isHighStock) {
       // check if Highstock timeseries(ts) or Highchart
-      const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+      const dateFields = filter(fieldsArray, ({ type }) =>
+        DATE_TYPES.includes(type)
+      );
       this.formatDatesIfNeeded(parsedData, dateFields);
     }
     if (areMultipleYAxes) {
@@ -319,8 +357,8 @@ export class ChartService {
       const axesFieldNameMap = this.getAxesFieldNameMap(fields);
       const yField = fields.y[0];
       series = [this.getSerie(yField, 0, fields.y, type)];
-      series[0].data = map(parsedData,
-        dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])
+      series[0].data = map(parsedData, dataPoint =>
+        mapValues(axesFieldNameMap, val => dataPoint[val])
       );
     }
     // split out categories frem the data
@@ -339,8 +377,21 @@ export class ChartService {
     // sort the categories if a sort is specified for category field
     if (sorts && sorts.length) {
       forEach(categories, (v, k) => {
-        const field = filter(fieldsArray, field => field.checked === k)[0] || {};
-        const sortField = filter(sorts, sortF => sortF.field.dataField === field.columnName)[0] || {};
+        const field =
+          filter(
+            fieldsArray,
+            field =>
+              (typeof field.checked === 'string'
+                ? field.checked
+                : field.area) === k
+          )[0] || {};
+        const sortField =
+          filter(
+            sorts,
+            sortF =>
+              (sortF.field ? sortF.field.dataField : sortF.columnName) ===
+              field.columnName
+          )[0] || {};
         categories[k] = fpOrderBy(
           value => this.getSortValue(field, value),
           sortField.order === 'asc' ? 'asc' : 'desc',
@@ -381,6 +432,7 @@ export class ChartService {
   }
 
   splinifyChartType(type) {
+    /* prettier-ignore */
     switch (type) {
     case 'line':
       return 'spline';
@@ -392,7 +444,6 @@ export class ChartService {
       return 'spline';
     default:
       return type;
-
     }
   }
 
@@ -412,15 +463,22 @@ export class ChartService {
   formatDatesIfNeeded(parsedData, dateFields) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
-        forEach(dateFields, ({columnName, dateFormat}) => {
+        forEach(dateFields, ({ columnName, dateFormat }) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
-          dataPoint[columnName] = moment.utc(dataPoint[columnName]).format(momentDateFormat);
+          dataPoint[columnName] = moment
+            .utc(dataPoint[columnName])
+            .format(momentDateFormat);
         });
       });
     }
   }
 
-  getSerie({alias, type, displayName, comboType, aggregate, chartType}, index, fields, chartTypeOverride) {
+  getSerie(
+    { alias, aliasName, type, displayName, comboType, aggregate, chartType },
+    index,
+    fields,
+    chartTypeOverride
+  ) {
     let aggrSymbol = '';
     const comboGroups = fpPipe(
       fpMap('comboType'),
@@ -435,12 +493,18 @@ export class ChartService {
       aggrSymbol = '%';
     }
     return {
-      name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
+      name:
+        alias ||
+        aliasName ||
+        `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       aggrSymbol,
       aggregate,
       type: splinifiedChartType,
       dataType: type,
-      yAxis: (chartType === 'tsPane' || chartTypeOverride === 'tsPane') ? index : comboGroups[comboType],
+      yAxis:
+        chartType === 'tsPane' || chartTypeOverride === 'tsPane'
+          ? index
+          : comboGroups[comboType],
       zIndex,
       data: []
     };
@@ -453,6 +517,7 @@ export class ChartService {
   }
 
   getZIndex(type) {
+    /* prettier-ignore */
     switch (type) {
     case 'area':
       return 0;
@@ -475,10 +540,12 @@ export class ChartService {
 
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
-        series[index].data.push(assign(
-          {y: dataPoint[field.columnName]},
-          mapValues(axesFieldNameMap, val => dataPoint[val])
-        ));
+        series[index].data.push(
+          assign(
+            { y: dataPoint[field.columnName] },
+            mapValues(axesFieldNameMap, val => dataPoint[val])
+          )
+        );
       });
     });
 
@@ -492,7 +559,7 @@ export class ChartService {
     if (fields.y[0].aggregate === 'percentage') {
       aggrsymbol = '%';
     }
-    if (angular.isDefined(comboType)) {
+    if (!isUndefined(comboType)) {
       if (comboType === 'tsspline' || comboType === 'tsPane') {
         comboType = comboType === 'tsPane' ? 'spline' : comboType.slice(2);
       }
@@ -518,14 +585,21 @@ export class ChartService {
    * Ex
    * y -> AVAILABLE_MB
    */
-  getAxesFieldNameMap(fields, exclude) {
+  getAxesFieldNameMap(fields, exclude = '') {
     // Y axis ommitted because it is added in splitSeriesByYAxes
     const y = exclude === 'y' ? [] : fields.y;
     const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
-    return reduce(fieldsArray, (accumulator, field) => {
-      accumulator[field.checked] = field.columnName;
-      return accumulator;
-    }, {});
+    return reduce(
+      fieldsArray,
+      (accumulator, field) => {
+        accumulator[
+          typeof field.checked === 'string' ? field.checked : field.area
+        ] =
+          field.columnName;
+        return accumulator;
+      },
+      {}
+    );
   }
 
   addToCategory(categories, key, newCategoryValue) {
@@ -542,8 +616,11 @@ export class ChartService {
     const isAxis = key !== 'g';
     // Strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
-    const isCategoryAxis = isAxis &&
-      (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
+    const isCategoryAxis =
+      isAxis &&
+      (dataType === 'string' ||
+        dataType === 'String' ||
+        DATE_TYPES.includes(dataType));
     /* eslint-enable angular/typecheck-string */
     return isCategoryAxis;
   }
@@ -570,7 +647,6 @@ export class ChartService {
     const dataLen = data.length;
 
     for (let i = 0; i < dataLen; i += 1) {
-
       innerData.push({
         name: gCategories[i],
         y: data[i].y,
@@ -579,38 +655,44 @@ export class ChartService {
 
       const drillDataLen = data[i].drilldown.data.length;
       for (let j = 0; j < drillDataLen; j += 1) {
-        const brightness = 0.2 - (j / drillDataLen);
+        const brightness = 0.2 - j / drillDataLen;
         outerData.push({
           name: data[i].drilldown.categories[j],
           y: data[i].drilldown.data[j],
           /* eslint-disable */
-          color: this._Highcharts.Color(data[i].color).brighten(brightness).get()
+          color: this._Highcharts
+            .Color(data[i].color)
+            .brighten(brightness)
+            .get()
           /* eslint-enable */
         });
       }
     }
 
-    const {aggregate, aggrSymbol, dataType} = get(series, '0');
+    const { aggregate, aggrSymbol, dataType } = get(series, '0');
 
-    const chartSeries = [{
-      data: innerData,
-      aggrSymbol,
-      dataType,
-      aggregate,
-      dataLabels: {
-        color: '#ffffff',
-        distance: -30
+    const chartSeries = [
+      {
+        data: innerData,
+        aggrSymbol,
+        dataType,
+        aggregate,
+        dataLabels: {
+          color: '#ffffff',
+          distance: -30
+        },
+        size: '60%'
       },
-      size: '60%'
-    }, {
-      aggrSymbol,
-      dataType,
-      aggregate,
-      data: outerData,
-      size: '100%',
-      innerSize: '60%',
-      id: 'outerData'
-    }];
+      {
+        aggrSymbol,
+        dataType,
+        aggregate,
+        data: outerData,
+        size: '100%',
+        innerSize: '60%',
+        id: 'outerData'
+      }
+    ];
 
     return chartSeries;
   }
@@ -619,6 +701,7 @@ export class ChartService {
     let mapperFn;
     let chartSeries;
 
+    /* prettier-ignore */
     switch (chartType) {
     case 'column':
     case 'bar':
@@ -630,25 +713,24 @@ export class ChartService {
     case 'area':
     case 'combo':
       // the bubble chart already supports the parsed data
-      return {chartSeries: series};
+      return { chartSeries: series };
 
     case 'pie':
       if (!fields.g) {
-        mapperFn = ({x, y}) => {
+        mapperFn = ({ x, y }) => {
           const category = get(categories, `x.${x}`, toString(x || 0));
-          return {name: category, y, drilldown: category};
+          return { name: category, y, drilldown: category };
         };
         forEach(series, serie => {
           serie.data = map(serie.data, mapperFn);
         });
 
         chartSeries = series;
-
       } else {
         chartSeries = this.dataToNestedDonut(series, categories);
       }
 
-      return {chartSeries};
+      return { chartSeries };
 
     default:
       throw new Error(`Chart type: ${chartType} is not supported!`);
@@ -658,13 +740,30 @@ export class ChartService {
   getPieChangeConfig(type, settings, fields, gridData, opts) {
     const changes = [];
     const yField = get(fields, 'y.0', {});
-    const yLabel = get(opts, 'labels.y') || `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
+    const yLabel =
+      get(opts, 'labels.y') ||
+      yField.alias ||
+      yField.aliasName ||
+      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
 
-    const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
+    const labelOptions = get(opts, 'labelOptions', {
+      enabled: true,
+      value: 'percentage'
+    });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
-      const {chartSeries} = this.customizeSeriesForChartType(series, type, categories, fields, opts);
+      const { series, categories } = this.splitToSeriesAndCategories(
+        gridData,
+        fields,
+        opts,
+        type
+      );
+      const { chartSeries } = this.customizeSeriesForChartType(
+        series,
+        type,
+        categories,
+        fields
+      );
 
       forEach(chartSeries, seriesData => {
         seriesData.name = yLabel;
@@ -672,13 +771,16 @@ export class ChartService {
         seriesData.dataLabels.enabled = labelOptions.enabled;
 
         /* eslint-disable */
-        seriesData.dataLabels.formatter = function () {
+        seriesData.dataLabels.formatter = function() {
           if (this.percentage <= 5) {
             return null;
           }
-          const data = labelOptions.value === 'percentage' ? this.percentage : this.y;
+          const data =
+            labelOptions.value === 'percentage' ? this.percentage : this.y;
           const isPercent = labelOptions.value === 'percentage';
-          return `${this.point.name}: ${addCommas(round(data, 2))}${isPercent ? '%' : '' }`;
+          return `${this.point.name}: ${addCommas(round(data, 2))}${
+            isPercent ? '%' : ''
+          }`;
         };
         /* eslint-enable */
       });
@@ -700,10 +802,21 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            if (!isUndefined(field.alias)) {
-              return field.alias || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+            if (!isUndefined(field.alias) || !isUndefined(field.aliasName)) {
+              return (
+                field.alias ||
+                field.aliasName ||
+                `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${
+                  field.displayName
+                }`
+              );
             }
-            return opts.labels.y || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+            return (
+              opts.labels.y ||
+              `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${
+                field.displayName
+              }`
+            );
           }).join('<br/>');
           const isSingleField = fields.length === 1;
           return {
@@ -728,8 +841,11 @@ export class ChartService {
           change.opposite = false;
         }
         if (change.columnName) {
-          const fieldIndex = findIndex(fields, ({columnName}) => columnName === change.columnName);
-          const style = {color: CHART_COLORS[fieldIndex]};
+          const fieldIndex = findIndex(
+            fields,
+            ({ columnName }) => columnName === change.columnName
+          );
+          const style = { color: CHART_COLORS[fieldIndex] };
           change.title.style = change.title.style ? style : null;
           change.labels.style = change.labels.style ? style : null;
         }
@@ -738,7 +854,10 @@ export class ChartService {
     }
     const changes = [];
     forEach(fields, (field, index) => {
-      const titleText = field.alias || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+      const titleText =
+        field.alias ||
+        field.aliasName ||
+        `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
       changes.push({
         labels: {
           align: 'right',
@@ -775,13 +894,19 @@ export class ChartService {
 
   getBarChangeConfig(type, settings, fields, gridData, opts) {
     const labels = {
-      x: get(fields, 'x.alias') || get(opts, 'labels.x') || get(fields, 'x.displayName', '')
+      x:
+        get(fields, 'x.alias') ||
+        get(fields, 'x.aliasName') ||
+        get(opts, 'labels.x') ||
+        get(fields, 'x.displayName', '')
     };
 
-    const changes = [{
-      path: 'xAxis.title.text',
-      data: labels.x || (opts.labels && opts.labels.x)
-    }];
+    const changes = [
+      {
+        path: 'xAxis.title.text',
+        data: labels.x || (opts.labels && opts.labels.x)
+      }
+    ];
 
     const yAxesChanges = this.getYAxesChanges(type, fields.y, opts);
 
@@ -791,7 +916,12 @@ export class ChartService {
     });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
+      const { series, categories } = this.splitToSeriesAndCategories(
+        gridData,
+        fields,
+        opts,
+        type
+      );
       changes.push({
         path: 'series',
         data: series
@@ -811,15 +941,38 @@ export class ChartService {
   dataToChangeConfig(type, settings, gridData, opts) {
     let changes;
     const fields = {
-      x: find(settings.xaxis, attr => attr.checked === 'x'),
-      y: filter(settings.yaxis, attr => attr.checked === 'y'),
-      z: find(settings.zaxis, attr => attr.checked === 'z'),
-      g: find(settings.groupBy, attr => attr.checked === 'g')
+      x:
+        find(
+          settings.xaxis,
+          attr => attr.checked === 'x' || attr.area === 'x'
+        ) || {},
+      y: sortBy(
+        filter(
+          settings.yaxis,
+          attr => attr.checked === 'y' || attr.area === 'y'
+        ),
+        'areaIndex'
+      ),
+      z: find(
+        settings.zaxis,
+        attr => attr.checked === 'z' || attr.area === 'z'
+      ),
+      g: find(
+        settings.groupBy,
+        attr => attr.checked === 'g' || attr.area === 'g'
+      )
     };
 
+    /* prettier-ignore */
     switch (type) {
     case 'pie':
-      changes = this.getPieChangeConfig(type, settings, fields, gridData, opts);
+      changes = this.getPieChangeConfig(
+        type,
+        settings,
+        fields,
+        gridData,
+        opts
+      );
       break;
     case 'column':
     case 'bar':
@@ -831,14 +984,17 @@ export class ChartService {
     case 'tsspline':
     case 'tsPane':
     default:
-      changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
+      changes = this.getBarChangeConfig(
+        type,
+        settings,
+        fields,
+        gridData,
+        opts
+      );
       break;
     }
 
-    return concat(
-      changes,
-      this.addTooltipsAndLegend(fields, type, opts)
-    );
+    return concat(changes, this.addTooltipsAndLegend(fields, type, opts));
   }
 
   addTooltipsAndLegend(fields, type, opts) {
@@ -859,7 +1015,10 @@ export class ChartService {
      * @returns {undefined}
      */
     const getPrecision = (aggregate, type) => {
-      return ['percentage', 'avg'].includes(aggregate) || FLOAT_TYPES.includes(type) ? 2 : 0;
+      return ['percentage', 'avg'].includes(aggregate) ||
+        FLOAT_TYPES.includes(type)
+        ? 2
+        : 0;
     };
 
     /**
@@ -871,42 +1030,59 @@ export class ChartService {
      *
      * @returns {string}
      */
-    const tooltipFormatter = point => { // eslint-disable-line
+    const tooltipFormatter = (point = null) => {
+      // eslint-disable-line
       const options = point ? point.series.userOptions : {};
       //
       // x can be either a string, a number or a date
       // string -> use the value from categories
       // number -> restrict the number to 2 decimals
       // date -> just show the date
-      const xStringValue = point ?
-        (
-          xIsString ?
-            point.key : xIsNumber ?
-              round(point.x, 2) : point.x
-        ) :
-        (
-          xIsString ?
-            'point.key' : xIsNumber ?
-              'point.x:,.2f' : 'point.x'
-        );
+      const xStringValue = point
+        ? xIsString ? point.key : xIsNumber ? round(point.x, 2) : point.x
+        : xIsString ? 'point.key' : xIsNumber ? 'point.x:,.2f' : 'point.x';
 
       const xAxisString = `<tr>
-        <th>${fields.x.alias || get(opts, 'labels.x', '') || fields.x.displayName}:</th>
+        <th>${fields.x.alias ||
+          fields.x.aliasName ||
+          get(opts, 'labels.x', '') ||
+          fields.x.displayName}:</th>
         <td>{${xStringValue}}</td>
       </tr>`;
 
       const yAxisString = `<tr>
-        <th>${fields.y.alias || get(opts, 'labels.y', '') || (point ? point.series.name : '{series.name}')}:</th>
-        <td>${point ? round(point.y, getPrecision(options.aggregate, options.dataType)).toLocaleString() : '{point.y:,.2f}'}${point ? point.series.userOptions.aggrSymbol : '{point.series.userOptions.aggrSymbol}'}</td>
+        <th>${fields.y.alias ||
+          fields.y.aliasName ||
+          get(opts, 'labels.y', '') ||
+          (point ? point.series.name : '{series.name}')}:</th>
+        <td>${
+          point
+            ? round(
+                point.y,
+                getPrecision(options.aggregate, options.dataType)
+              ).toLocaleString()
+            : '{point.y:,.2f}'
+        }${
+        point
+          ? point.series.userOptions.aggrSymbol
+          : '{point.series.userOptions.aggrSymbol}'
+      }</td>
       </tr>`;
 
-      const zAxisString = fields.z ?
-        `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>${point ? round(point.z, 2) : '{point.z:,.2f}'}</td></tr>` :
-        '';
+      const zAxisString = fields.z
+        ? `<tr><th>${fields.z.alias ||
+            fields.z.aliasName ||
+            get(opts, 'labels.z', '') ||
+            fields.z.displayName}:</th><td>${
+            point ? round(point.z, 2) : '{point.z:,.2f}'
+          }</td></tr>`
+        : '';
 
-      const groupString = fields.g ?
-        `<tr><th>Group:</th><td>${point ? (point.g || point.name) : '{point.g}'}</td></tr>` :
-        '';
+      const groupString = fields.g
+        ? `<tr><th>Group:</th><td>${
+            point ? point.g || point.name : '{point.g}'
+          }</td></tr>`
+        : '';
 
       return {
         xAxisString,
@@ -916,7 +1092,12 @@ export class ChartService {
       };
     };
 
-    const {xAxisString, yAxisString, zAxisString, groupString} = tooltipFormatter();
+    const {
+      xAxisString,
+      yAxisString,
+      zAxisString,
+      groupString
+    } = tooltipFormatter();
 
     let tooltipObj = {
       useHTML: true,
@@ -925,8 +1106,14 @@ export class ChartService {
         ${yAxisString}
         ${zAxisString}
         ${groupString}`,
-      pointFormatter: function () { // eslint-disable-line
-        const {xAxisString, yAxisString, zAxisString, groupString} = tooltipFormatter(this);
+      pointFormatter: function() {
+        // eslint-disable-line
+        const {
+          xAxisString,
+          yAxisString,
+          zAxisString,
+          groupString
+        } = tooltipFormatter(this);
         return `${xIsNumber ? xAxisString : ''}
           ${yAxisString}
           ${zAxisString}
@@ -948,7 +1135,7 @@ export class ChartService {
           ${zAxisString}`,
         footerFormat: '</table>',
         followPointer: true
-      };
+      } as any;
     }
 
     changes.push({
@@ -967,24 +1154,24 @@ export class ChartService {
   }
 
   filterNumberTypes(attributes) {
-    return filter(attributes, attr => (
-      attr.columnName &&
-      NUMBER_TYPES.includes(attr.type)
-    ));
+    return filter(
+      attributes,
+      attr => attr.columnName && NUMBER_TYPES.includes(attr.type)
+    );
   }
 
   filterNonNumberTypes(attributes) {
-    return filter(attributes, attr => (
-      attr.columnName &&
-      !NUMBER_TYPES.includes(attr.type)
-    ));
+    return filter(
+      attributes,
+      attr => attr.columnName && !NUMBER_TYPES.includes(attr.type)
+    );
   }
 
   filterDateTypes(attributes) {
-    return filter(attributes, attr => (
-      attr.columnName &&
-      DATE_TYPES.includes(attr.type)
-    ));
+    return filter(
+      attributes,
+      attr => attr.columnName && DATE_TYPES.includes(attr.type)
+    );
   }
 
   fillSettings(artifacts, model) {
@@ -1005,6 +1192,7 @@ export class ChartService {
     let xaxis = attributes;
     const groupBy = this.filterNonNumberTypes(attributes);
 
+    /* prettier-ignore */
     switch (model.chartType) {
     case 'bubble':
       zaxis = this.filterNumberTypes(attributes);

@@ -1,7 +1,7 @@
 <div fxLayout="row"
      fxLayoutAlign="space-between center"
      [ngSwitch]="TYPE_MAP[filter.type]">
-  <div fxLayout="row"
+  <div fxLayout="row wrap"
        fxFlex="grow"
        class="filter__data__space"
        fxLayoutAlign="start">
@@ -24,7 +24,7 @@
       </mat-autocomplete>
     </mat-form-field>
 
-    <div *ngIf="!filter.isRuntimeFilter" style="margin-left: 10px;">
+    <div *ngIf="!filter.isRuntimeFilter && !filter.isGlobalFilter" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">
@@ -43,6 +43,12 @@
   <div fxLayout="row"
        class="filter__action__space"
        fxLayoutAlign="space-between center">
+    <mat-checkbox [checked]="filter.isGlobalFilter"
+                  *ngIf="supportsGlobalFilters"
+                  (change)="onGlobalCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Global
+    </mat-checkbox>
     <mat-checkbox [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
                   i18n>
