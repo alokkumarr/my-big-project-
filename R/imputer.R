@@ -9,7 +9,8 @@
 #'
 #' @param df Spark or R data.frame
 #' @param group_vars optional grouping variable input. Only valid for mean and
-#'   mode impute functions. default is NULL which applies no grouping
+#'   mode impute functions. default is NULL which applies no grouping. note -
+#'   mode function does not supporting grouping
 #' @param measure_vars optional character vector of column names to apply impute
 #'   function on. default is NULL which applies impute on all columns with
 #'   missing values
@@ -28,19 +29,13 @@ imputer <- function(df,
   checkmate::assert_choice(fun, c("mean", "mode", "constant"))
   checkmate::assert_subset(group_vars, colnames(df), empty.ok = TRUE)
 
-  if (!is.null(group_vars) & fun != "constant") {
-    df <- group_by_at(df, group_vars)
+  if(! is.null(group_vars) & fun != "constant") {
+    df <- dplyr::group_by_at(df, group_vars)
   }
 
-  impute_fun <- match.fun(paste("impute", fun, sep = "_"))
+  impute_fun <- match.fun(paste("impute", fun, sep="_"))
   impute_args <- modifyList(list(df = df, measure_vars = measure_vars), list(...))
-  results <- do.call("impute_fun", impute_args)
-
-  if (!is.null(group_vars) & fun != "constant") {
-    results <- dplyr::ungroup(results)
-  }
-
-  results
+  do.call("impute_fun", impute_args)
 }
 
 
@@ -51,7 +46,27 @@ imputer <- function(df,
 is_na <- function(x) any(is.na(x))
 
 
+
+#' Get NA Column names from dataframe
+#'
+#' Function to get the column names for any columns with missing values.
+#' Function works for both Spark and R dataframes
+#'
+#' @param df dataframe
+#'
+#' @return vector of column names
+#' @export
+na_cols <- function(df) {
+  cols <- df %>%
+    dplyr::summarise_all(funs(sum(as.numeric(is.na(.)), na.rm=TRUE))) %>%
+    collect()
+  colnames(cols)[cols > 0]
+}
+
+
+
 # impute mean -------------------------------------------------------------
+
 
 
 #' Impute Mean
@@ -63,36 +78,24 @@ is_na <- function(x) any(is.na(x))
 #'
 #' @return imputed Spark or R data.frame
 #' @export
-impute_mean <- function(df, measure_vars = NULL) {
+impute_mean <- function(df, measure_vars) {
   checkmate::assert_true(any(class(df) %in% c("data.frame", "tbl_spark")))
 
-  if(is.null(measure_vars)){
-    measure_vars <- df %>%
-      select_if(is_na) %>%
-      dplyr::select_if(is.numeric) %>%
-      colnames()
-  }
-
-  impute_mean_at(df, measure_vars)
-}
-
-
-#' Impute Mean At
-#'
-#' Internal impute mean function
-impute_mean_at <- function(df, measure_vars) {
-  checkmate::assert_true(any(class(df) %in% c("data.frame", "tbl_spark")))
-  numeric_vars <- df %>%
+  df_numeric_cols <- df %>%
     dplyr::select_if(is.numeric) %>%
     colnames()
+  df_na_cols <- na_cols(df)
 
-  checkmate::assert_subset(measure_vars, numeric_vars)
+  if(is.null(measure_vars)){
+    measure_vars <- intersect(df_numeric_cols, df_na_cols)
+  } else {
+    checkmate::assert_subset(measure_vars, df_numeric_cols)
+  }
 
   df %>%
     dplyr::mutate_at(measure_vars,
                      dplyr::funs(ifelse(is.na(.), mean(., na.rm = TRUE), .)))
 }
-
 
 
 # impute constant ---------------------------------------------------------
@@ -117,75 +120,37 @@ impute_constant <- function(df,
                             measure_vars = NULL,
                             fill = 0) {
   checkmate::assert_true(any(class(df) %in% c("data.frame", "tbl_spark")))
-  if (is.null(measure_vars)) {
-    measure_vars <- df %>%
-      select_if(is_na) %>%
-      colnames()
-  }
-  fill_type <- class(fill)
-  numeric_vars <- df %>%
-    dplyr::select_at(measure_vars) %>%
+
+  df_numeric_cols <- df %>%
     dplyr::select_if(is.numeric) %>%
     colnames()
+  df_na_cols <- na_cols(df)
+  numeric_cols <- intersect(df_numeric_cols, df_na_cols)
+  char_cols <-
+    intersect(setdiff(colnames(df), df_numeric_cols), df_na_cols)
 
-  if (fill_type %in% c("numeric", "integer")) {
-    if (length(numeric_vars) == 0)
-      message("numeric fill provided but no numeric measure variables provided")
-    impute_constant_at_num(df, numeric_vars, fill)
-  } else {
-    char_vars <- setdiff(measure_vars, numeric_vars)
-    if (length(char_vars) == 0)
-      message("character fill provided but no character measure variables provided")
-    impute_constant_at_chr(df, char_vars, fill)
+  if (is.null(measure_vars)) {
+    measure_vars <- df_na_cols
   }
+
+  fill_type <- class(fill)
+  if (fill_type %in% c("numeric", "integer")) {
+    measure_vars <- intersect(numeric_cols, measure_vars)
+  } else {
+    measure_vars <- intersect(char_cols, measure_vars)
+  }
+
+  impute_constant_at(df, measure_vars, fill)
 }
+
 
 
 #' Impute Numeric Constant At
 #'
-#' Function imputes numeric constants for numeric columns
-impute_constant_at_num <- function(df, measure_vars, fill) {
-  checkmate::assert_subset(measure_vars, colnames(df))
-  checkmate::assert_number(fill)
-  df %>%
-    dplyr::mutate_at(measure_vars, funs(ifelse(is.na(.), fill, .)))
+#' Function imputes numeric constants for specific columns
+impute_constant_at <- function(df, measure_vars, fill) {
+  dplyr::mutate_at(df, measure_vars, funs(ifelse(is.na(.), fill, .)))
 }
-
-
-#' Impute Character Constant At
-#'
-#' Function imputes character constants for numeric columns
-impute_constant_at_chr <- function(df, measure_vars, fill) {
-  checkmate::assert_subset(measure_vars, colnames(df))
-  checkmate::assert_character(fill)
-
-  df %>%
-    dplyr::mutate_at(measure_vars, funs(ifelse(is.na(.), fill, .)))
-}
-
-
-#
-# impute_constant_at_chr <- function(df, measure_vars, fill) {
-#   UseMethod("impute_constant_at_chr")
-# }
-#
-# impute_constant_at_chr.data.frame <- function(df, measure_vars, fill) {
-#   checkmate::assert_subset(measure_vars, colnames(df))
-#   checkmate::assert_character(fill)
-#
-#   df %>%
-#     dplyr::mutate_at(measure_vars, funs(ifelse(is.na(.), fill, .)))
-# }
-#
-#
-# impute_constant_at_chr.tbl_spark <- function(df, measure_vars, fill) {
-#   checkmate::assert_subset(measure_vars, colnames(df))
-#   checkmate::assert_character(fill)
-#
-#   df %>%
-#     dplyr::mutate_at(measure_vars, funs(ifelse(. == "NA", fill, .)))
-# }
-
 
 
 
@@ -197,36 +162,33 @@ impute_constant_at_chr <- function(df, measure_vars, fill) {
 #' Function to impute missing values with the most frequent values (mode). Applied columwise -
 #' the most frequent value imputed is the by column
 #'
+#' impute mode does not support grouping currently
+#'
 #' @inheritParams imputer
 #'
 #' @return imputed Spark or R data.frame
 #' @export
 impute_mode <- function(df, measure_vars = NULL) {
   checkmate::assert_true(any(class(df) %in% c("data.frame", "tbl_spark")))
+  checkmate::assert_character(group_vars(df), len = 0)
+  df_na_cols <- na_cols(df)
+
   if(is.null(measure_vars)) {
-    measure_vars <- df %>%
-      select_if(is_na) %>%
-      colnames()
+    measure_vars <- df_na_cols
+  } else {
+    measure_vars <- intersect(measure_vars, df_na_cols)
   }
 
-  impute_mode_at(df, measure_vars)
-}
-
-
-#' Impute Mode At
-#'
-#' Internal function to impute Mode at specific columns
-impute_mode_at <- function(df, measure_vars) {
-  checkmate::assert_true(any(class(df) %in% c("data.frame", "tbl_spark")))
-  checkmate::assert_subset(measure_vars, colnames(df))
   for(mv in measure_vars) {
     fill <- df %>%
-      count(!! rlang::sym(mv), sort=TRUE) %>%
-      na.omit() %>%
-      head(1) %>%
-      select_at(mv) %>%
-      collect()
-    df <- impute_constant(df, mv, fill[[1]])
+      dplyr::count(!! rlang::sym(mv), sort=TRUE) %>%
+      dplyr::filter(! is.na(!! rlang::sym(mv))) %>%
+      dplyr::filter(n == max(n, na.rm = TRUE)) %>%
+      dplyr::collect() %>%
+      dplyr::slice(1) %>%
+      dplyr::select_at(mv)
+
+    df <- impute_constant_at(df, mv, fill[[1]])
   }
   df
 }
