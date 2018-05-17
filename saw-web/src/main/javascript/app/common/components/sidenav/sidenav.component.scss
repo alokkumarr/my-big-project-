@@ -15,7 +15,7 @@ sidenav {
 
   mat-sidenav {
     &.sidenav-closed:not(.ng-animating) * {
-      visibility: hidden;
+      display: none;
     }
   }
 }
