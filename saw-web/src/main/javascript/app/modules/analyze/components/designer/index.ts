@@ -17,13 +17,6 @@ import {
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
-  DesignerFilterContainerComponent,
-  DesignerFilterRowComponent,
-  DesignerStringFilterComponent,
-  DesignerDateFilterComponent,
-  DesignerNumberFilterComponent
-} from './filter';
-import {
   SingleTableDesignerLayout,
   MultiTableDesignerLayout
 } from './layout';
@@ -50,11 +43,6 @@ export {
   DesignerSortComponent,
   DesignerDescriptionComponent,
   DesignerSaveComponent,
-  DesignerFilterContainerComponent,
-  DesignerFilterRowComponent,
-  DesignerStringFilterComponent,
-  DesignerDateFilterComponent,
-  DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayout,
   MultiTableDesignerLayout,

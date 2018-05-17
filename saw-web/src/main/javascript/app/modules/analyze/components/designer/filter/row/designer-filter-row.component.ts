@@ -29,13 +29,15 @@ require('./designer-filter-row.component.scss');
 export class DesignerFilterRowComponent {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
+  @Output() public filterModelChange: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumn[];
   @Input() public filter: Filter;
+  @Input() public isInRuntimeMode: boolean;
 
   @ViewChild('auto', {read: ViewContainerRef}) _autoComplete: ViewContainerRef;
 
   public TYPE_MAP = TYPE_MAP;
-  formControl: FormControl = new FormControl();
+  formControl: FormControl;
   filteredColumns: Observable<ArtifactColumn[]>;
 
   constructor() {
@@ -44,7 +46,10 @@ export class DesignerFilterRowComponent {
 
   ngOnInit() {
     const target = find(this.artifactColumns, ({columnName}) => columnName === this.filter.columnName);
-    this.formControl.setValue(target);
+    this.formControl = new FormControl({
+      value: target,
+      disabled: this.isInRuntimeMode
+    });
     this.filteredColumns = this.formControl.valueChanges
       .pipe(
         startWith<string | ArtifactColumn>(''),
@@ -83,6 +88,8 @@ export class DesignerFilterRowComponent {
 
   onFilterModelChange(filterModel: FilterModel) {
     this.filter.model = filterModel;
+    console.log('change');
+    this.filterModelChange.emit();
   }
 
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {

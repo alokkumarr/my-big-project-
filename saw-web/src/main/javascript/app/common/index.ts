@@ -1,7 +1,7 @@
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { UIRouterModule } from '@uirouter/angular';
@@ -118,6 +118,7 @@ angular
     DxDataGridModule,
     DxTemplateModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     FlexLayoutModule,
     DndModule,
@@ -170,6 +171,7 @@ angular
     DxDataGridModule,
     DxTemplateModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     CommonPipesModule,
     DxDataGridModule,

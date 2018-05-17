@@ -18,9 +18,9 @@ import {
 import {
   analyzeServiceProvider,
   chartServiceProvider,
-  sortServiceProvider,
-  filterServiceProvider
+  sortServiceProvider
 } from '../analyze/services/ajs-analyze-providers';
+import { FilterService } from '../analyze/services/filter.service';
 import {
   menuServiceProvider,
   componentHandlerProvider,
@@ -120,7 +120,7 @@ const components = [
     sidenavProvider,
     chartServiceProvider,
     sortServiceProvider,
-    filterServiceProvider
+    FilterService
   ]
 })
 export class ObserveUpgradeModule {}

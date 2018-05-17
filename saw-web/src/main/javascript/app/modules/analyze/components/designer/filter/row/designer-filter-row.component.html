@@ -11,7 +11,11 @@
              e2e="filter-autocomplete-input"
              [matAutocomplete]="auto"
              [formControl]="formControl"/>
-      <button mat-button *ngIf="autoInput.value" matSuffix mat-icon-button (click)="clearInput()">
+      <button *ngIf="autoInput.value"
+              (click)="clearInput()"
+              [disabled]="isInRuntimeMode"
+              matSuffix mat-icon-button mat-button
+      >
         <mat-icon fontIcon="icon-close"></mat-icon>
       </button>
       <mat-autocomplete #auto="matAutocomplete"
@@ -24,7 +28,7 @@
       </mat-autocomplete>
     </mat-form-field>
 
-    <div *ngIf="!filter.isRuntimeFilter" style="margin-left: 10px;">
+    <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : !filter.isRuntimeFilter" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">
@@ -43,7 +47,8 @@
   <div fxLayout="row"
        class="filter__action__space"
        fxLayoutAlign="space-between center">
-    <mat-checkbox [checked]="filter.isRuntimeFilter"
+    <mat-checkbox *ngIf="!isInRuntimeMode"
+                  [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
                   i18n>
       Prompt

@@ -82,17 +82,14 @@ import {
   DesignerSortComponent,
   DesignerDescriptionComponent,
   DesignerSaveComponent,
-  DesignerFilterContainerComponent,
-  DesignerFilterRowComponent,
-  DesignerStringFilterComponent,
-  DesignerDateFilterComponent,
-  DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayout,
   MultiTableDesignerLayout,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
+
+import { AnalyzeFilterModule } from './components/designer/filter';
 import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
 
 
@@ -106,7 +103,7 @@ angular.module(AnalyzeModule, [
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
   .filter('uniqueFilter', uniqueFilter)
-  .service('FilterService', FilterService)
+  .factory('FilterService', downgradeInjectable(FilterService) as Function)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
   .service('ChartService', ChartService)
@@ -178,7 +175,8 @@ angular.module(AnalyzeModule, [
     FormsModule,
     ReactiveFormsModule,
     AnalyzeViewModule,
-    AnalyzeActionsModule
+    AnalyzeActionsModule,
+    AnalyzeFilterModule
   ],
   declarations: [
     AnalyzeReportQueryComponent,
@@ -198,11 +196,6 @@ angular.module(AnalyzeModule, [
     DesignerSortComponent,
     DesignerDescriptionComponent,
     DesignerSaveComponent,
-    DesignerFilterContainerComponent,
-    DesignerFilterRowComponent,
-    DesignerStringFilterComponent,
-    DesignerDateFilterComponent,
-    DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     CronJobSchedularComponent,
@@ -229,11 +222,6 @@ angular.module(AnalyzeModule, [
     DesignerSortComponent,
     DesignerDescriptionComponent,
     DesignerSaveComponent,
-    DesignerFilterContainerComponent,
-    DesignerFilterRowComponent,
-    DesignerStringFilterComponent,
-    DesignerDateFilterComponent,
-    DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     CronJobSchedularComponent,
     CronDatePickerComponent,
@@ -245,7 +233,8 @@ angular.module(AnalyzeModule, [
     $mdDialogProvider,
     AnalyzeDialogService,
     analyzeServiceProvider,
-    DesignerService
+    DesignerService,
+    FilterService
   ]
 })
 export class AnalyzeModuleTs {}

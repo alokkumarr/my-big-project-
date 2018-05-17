@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+import {MatDialog, MatDialogConfig} from '@angular/material';
 import * as map from 'lodash/fp/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
@@ -9,6 +11,7 @@ import * as values from 'lodash/values';
 import * as find from 'lodash/find';
 
 import {OPERATORS} from '../components/filter/filters/number-filter.component';
+import { AnalyzeDialogService } from './analyze-dialog.service';
 
 export const BOOLEAN_CRITERIA = [{
   label: 'ALL',
@@ -30,13 +33,9 @@ export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
 
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
+@Injectable()
 export class FilterService {
-  constructor($q, $mdDialog) {
-    'ngInject';
-
-    this._$q = $q;
-    this._$mdDialog = $mdDialog;
-  }
+  constructor(public _dialog: AnalyzeDialogService) {}
 
   getType(inputType) {
     if (inputType === FILTER_TYPES.STRING) {
@@ -87,7 +86,8 @@ export class FilterService {
         tableName: column.table,
         columnName: column.columnName,
         isRuntimeFilter: frontendFilter.isRuntimeFilter,
-        isGlobalFilter: frontendFilter.isGlobalFilter
+        isGlobalFilter: frontendFilter.isGlobalFilter,
+        model: null
       };
       if (!(frontendFilter.isRuntimeFilter || frontendFilter.isGlobalFilter) || frontendFilter.model) {
         result.model = frontendFilter.model;
@@ -235,24 +235,24 @@ export class FilterService {
   }
 
   openRuntimeModal(analysis, filters = []) {
-    const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria" runtime="true"></analyze-filter-modal>';
-    return this._$mdDialog.show({
-      template: tpl,
-      controller: scope => {
-        scope.filters = map(this.backend2FrontendFilter.bind(this)(analysis.artifacts), filters);
-        scope.artifacts = analysis.artifacts;
-        scope.booleanCriteria = analysis.sqlBuilder.booleanCriteria;
-      },
-      fullscreen: true,
-      autoWrap: false,
-      multiple: true
-    }).then(this.onApplyFilters.bind(this)(analysis));
+    return new Promise(resolve => {
+      this._dialog.openFilterPromptDialog(filters, analysis).afterClosed().subscribe((result) => {
+        if (!result) {
+          return resolve();
+        }
+        analysis.sqlBuilder.filters = result.filters.concat(
+          filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
+        );
+
+        resolve(analysis);
+      });
+    });
   }
 
   onApplyFilters(analysis) {
     return result => {
       if (!result) {
-        return this._$q.reject(new Error('Cancelled'));
+        return Promise.reject(new Error('Cancelled'));
       }
 
       const filterPayload = map(this.frontend2BackendFilter.bind(this)(), result.filters);
@@ -271,7 +271,7 @@ export class FilterService {
     );
 
     if (!runtimeFilters.length) {
-      return this._$q.resolve(clone);
+      return Promise.resolve(clone);
     }
     return this.openRuntimeModal(clone, runtimeFilters);
   }

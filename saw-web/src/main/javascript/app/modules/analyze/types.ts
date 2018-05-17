@@ -62,6 +62,7 @@ export interface IToolbarActionData {
   booleanCriteria?: string;
   description?: string;
   analysis?: Analysis;
+  isInRuntimeMode?: boolean;
 }
 
 export interface IToolbarActionResult {

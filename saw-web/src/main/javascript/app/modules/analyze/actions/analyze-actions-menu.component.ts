@@ -88,7 +88,9 @@ export class AnalyzeActionsMenuComponent {
 
   execute() {
     this._analyzeActionsService.execute(this.analysis).then(analysis => {
-      this.afterExecute.emit(analysis);
+      if (analysis) {
+        this.afterExecute.emit(analysis);
+      }
     });
   }
 

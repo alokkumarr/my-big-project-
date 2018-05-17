@@ -7,6 +7,7 @@ import {
 import {MatChipInputEvent} from '@angular/material';
 import {ENTER, COMMA} from '@angular/cdk/keycodes';
 import * as filter from 'lodash/filter';
+import * as compact from 'lodash/compact';
 import {
   FilterModel
 } from '../../types';
@@ -72,6 +73,7 @@ export class DesignerStringFilterComponent {
   }
 
   onFilterModelChange() {
+    this.filterModel.modelValues = compact(this.filterModel.modelValues);
     this.filterModelChange.emit(this.filterModel);
   }
 
