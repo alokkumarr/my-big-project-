@@ -14,6 +14,12 @@ import 'devextreme/integration/jquery';
 import 'devextreme/localization';
 import 'devextreme/localization/messages/en.json';
 import 'devextreme/ui/data_grid';
+import 'jquery';
+import 'mottle';
+import 'ng-idle';
+import AppConfig from '../../../../../appConfig';
+// import from login module
+import { SearchBoxComponent } from './components/search-box';
 import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
@@ -37,7 +43,6 @@ import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
 
 import { ChartService } from './components/charts/chart.service';
-import {CommonServiceModule} from './services';
 import {CommonComponentModule} from './components';
 import {CommonFilterModule} from './filters';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -63,20 +68,16 @@ import {
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
 import {DateFormatDialogComponent} from './components/date-format-dialog';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
-import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
-import {ErrorDetailService} from './services/error-detail.service';
-import {ErrorDetailDialogService} from './services/error-detail-dialog.service';
 import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import {
   toastProvider, componentHandlerProvider
 } from './services/ajs-common-providers';
-import {SearchBoxComponent} from './components/search-box';
-import 'jquery';
-import 'mottle';
-import 'ng-idle';
-import AppConfig from '../../../../../appConfig';
+import { E2eDirective } from './directives/e2e.directive';
+import { CommonServiceModule } from './services';
+import { ErrorDetailDialogService } from './services/error-detail-dialog.service';
+import { ErrorDetailService } from './services/error-detail.service';
 
 export const CommonModule = 'CommonModule';
 
@@ -141,6 +142,7 @@ angular
     SidenavComponent,
     AccordionMenuComponent,
     AccordionMenuLinkComponent,
+    SearchBoxComponent,
     ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbEndpointComponent,
@@ -162,6 +164,7 @@ angular
     SidenavComponent,
     AccordionMenuComponent,
     AccordionMenuLinkComponent,
+    SearchBoxComponent,
     ConfirmDialogComponent,
     JsPlumbCanvasComponent,
     JsPlumbTableComponent,
@@ -205,6 +208,7 @@ angular
     SidenavComponent,
     AccordionMenuComponent,
     AccordionMenuLinkComponent,
+    SearchBoxComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     E2eDirective,
