@@ -55,7 +55,7 @@ class JobUtil {
 	 *  
 	 * @return Trigger
 	 */
-	protected static Trigger createCronTrigger(String triggerName, Date startTime, String cronExpression, int misFireInstruction){
+	protected static Trigger createCronTrigger(String triggerName, Date startTime, Date endTime,  String cronExpression, int misFireInstruction){
 		PersistableCronTriggerFactoryBean factoryBean = new PersistableCronTriggerFactoryBean();
 	    factoryBean.setName(triggerName);
 	    factoryBean.setStartTime(startTime);
@@ -66,7 +66,10 @@ class JobUtil {
 	    } catch (ParseException e) {
 	        e.printStackTrace();
 	    }
-	    return factoryBean.getObject();
+	    if(endTime!=null)
+	    return factoryBean.getObject().getTriggerBuilder().endAt(endTime).build();
+	    else
+	        return factoryBean.getObject();
 	}
 	
 	/**

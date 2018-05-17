@@ -44,9 +44,6 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   it('Should apply filter to column chart', () => {
     login.loginAs('admin');
 
-    // Switch to Card view
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
-
     // Create analysis
     homePage.createAnalysis(metricName, analysisType);
 

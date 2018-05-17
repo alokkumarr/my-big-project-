@@ -79,9 +79,6 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       let chartTyp = data.chartType.split(":")[1];
 
       login.loginAs(data.user);
-      homePage.mainMenuExpandBtn.click();
-      navigateToSubCategory();
-      homePage.mainMenuCollapseBtn.click();
 
       //Create analysis
       homePage.createAnalysis(metricName, data.chartType);

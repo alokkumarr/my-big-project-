@@ -1,4 +1,43 @@
 cron-job-schedular {
+  border: 1px solid #CCC;
+
+  .dateDetails {
+    margin: 12px;
+
+    label {
+      margin-right: 20px;
+    }
+
+    .clear {
+      color: #0096D5;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  }
+
+  mat-tab-group mat-tab-header div div div .mat-tab-label {
+    min-width: 80px !important;
+  }
+
+  mat-form-field {
+    width: 115px !important;
+    padding: 5px;
+  }
+
+  mat-radio-group.to-date {
+    padding-left: 90px;
+
+    .end-date {
+      padding-left: 45px;
+    }
+
+    div mat-form-field {
+      width: 115px !important;
+      float: right;
+      margin-top: -68px;
+    }
+  }
+
   .mat-select-value {
     width: 90% !important;
     padding: 8px 15px;
@@ -18,40 +57,25 @@ cron-job-schedular {
     background-color: #F1F1F1;
   }
 
-  /* Style the buttons inside the tab */
-  .tab button {
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 5px 10px;
-    transition: 0.3s;
-  }
-
-  /* Change background color of buttons on hover */
-  .tab button:hover {
-    background-color: #DDD;
-  }
-
-  /* Create an active/current tablink class */
-  .tab button.active {
-    background-color: #CCC;
-  }
-
   /* Style the tab content */
   .tabcontent {
     padding: 6px 12px;
-    border: 1px solid #CCC;
-    border-top: none;
-  }
-
-  .immediate {
-    padding: 15px 10px 0 20px;
   }
 
   .checkbox {
     text-align: center;
     margin: 0 5px 15px 42px;
   }
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-cell-selected {
+  background-color: #1A89D4;
+}
+
+.owl-dt-control-button-content {
+  color: #1A89D4 !important;
+}
+
+.owl-dt-container-info .owl-dt-container-info-active {
+  color: #1A89D4 !important;
 }

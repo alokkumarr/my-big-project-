@@ -13,6 +13,8 @@ import { AceEditorModule } from 'ng2-ace-editor';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
+import { BrowserModule } from '@angular/platform-browser';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
 import { transitions } from './transitions';
 
@@ -184,7 +186,10 @@ angular
     AceEditorModule,
     FormsModule,
     ReactiveFormsModule,
-    UChartModule
+    UChartModule,
+    BrowserModule,
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule
   ],
   declarations: [
     AnalyzeReportQueryComponent,
