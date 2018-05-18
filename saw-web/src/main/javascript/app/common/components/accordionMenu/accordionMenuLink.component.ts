@@ -16,6 +16,11 @@ export class AccordionMenuLinkComponent {
   @Input() public metadata: any;
 
   constructor(@Inject(DOCUMENT) private document: any) {}
+
+  public url: string;
+  public expanded: boolean;
+  public active: boolean;
+  public pathUrl: string;
   
   ngOnInit() {
     this.expanded = false;

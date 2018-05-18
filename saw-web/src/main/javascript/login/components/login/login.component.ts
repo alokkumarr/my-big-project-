@@ -13,17 +13,17 @@ export class LoginComponent {
 
   constructor(private _JwtService: JwtService, private _UserService: UserService) {}
 
-  private this.dataHolder = {
+  private dataHolder = {
     username: null,
     password: null
   };
 
-  private this.states = {
+  private states = {
     error: null
   };
   
   login() {
-    this._UserService.attemptAuth({masterLoginId: this.dataHolder.username,authpwd: this.dataHolder.password}).subscribe(
+    this._UserService.attemptAuth({masterLoginId: this.dataHolder.username,authpwd: this.dataHolder.password}).then(
       data => {
         if (this._JwtService.isValid(data)) {
           window.location.assign('./');

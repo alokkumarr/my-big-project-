@@ -15,8 +15,11 @@ require('./header.component.scss');
 export class LayoutHeaderComponent {
   constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any) { }
 
+  public UserDetails: any;
+  public modules: any;
+  public showAdmin: boolean;
+
   ngOnInit() {
-    this.navToggle = new EventEmitter();
     this.UserDetails = this.jwt.getTokenObj();
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
@@ -24,12 +27,8 @@ export class LayoutHeaderComponent {
     if (this.jwt.isAdmin(token)) {
       this.showAdmin = true;
     }
-    this.navOpen();
   }
 
-  navOpen() {
-    this.navToggle.emit(true);
-  }
 
   get showProgress() {
     return this._rootScope.showProgress;
