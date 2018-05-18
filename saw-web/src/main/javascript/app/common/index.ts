@@ -33,7 +33,7 @@ import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
-import {downgradeInjectable} from '@angular/upgrade/static';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
 import {
   DxPivotGridModule,
@@ -81,6 +81,10 @@ import {
   componentHandlerProvider
 } from './services/ajs-common-providers';
 
+import {
+  jwtServiceProvider,
+  userServiceProvider
+} from '../../login/services/ajs-login-providers';
 import AppConfig from '../../../../../appConfig';
 
 export const CommonModule = 'CommonModule';
@@ -116,10 +120,8 @@ angular
     return new ComponentHandler();
   })
   .factory('AuthService', AuthServiceFactory)
-  //.service('UserService', UserService)
-  //.service('JwtService', JwtService)
-  .factory('UserService', downgradeInjectable(UserService) as Function);
-  //.factory('JwtService', downgradeInjectable(JwtService) as Function);
+  .service('JwtService', JwtService)
+  .service('UserService', UserService);
 
 @NgModule({
   imports: [
@@ -202,7 +204,9 @@ angular
     ErrorDetailDialogService,
     toastProvider,
     ChartService,
-    componentHandlerProvider, UserService
+    componentHandlerProvider,
+    jwtServiceProvider,
+    userServiceProvider
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
