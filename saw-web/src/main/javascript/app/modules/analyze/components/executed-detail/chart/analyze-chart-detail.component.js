@@ -14,10 +14,10 @@ export const AnalyzeChartDetailComponent = {
     requester: '<'
   },
   controller: class AnalyzeChartDetailController {
-    constructor(ChartService, FilterService, $timeout, SortService) {
+    constructor(FilterService, $timeout, SortService, $injector) {
       'ngInject';
 
-      this._ChartService = ChartService;
+      this._$injector = $injector;
       this._FilterService = FilterService;
       this._SortService = SortService;
       this._$timeout = $timeout;
@@ -29,6 +29,7 @@ export const AnalyzeChartDetailComponent = {
     }
 
     $onInit() {
+      this._ChartService = this._$injector.get('ChartService');
       this.initAnalysis();
       this.subscription = this.requester.subscribe(options => this.request(options));
 
