@@ -19,6 +19,9 @@
 #' @param complete logical option to return original data `right_join` to
 #'   expanded dataset. FALSE returns just expanded grid. Default is TRUE
 #'
+#' @seealso \url{http://tidyr.tidyverse.org/reference/expand.html} for tidyr `expand` function which is used
+#'   internally by `expander`
+#'
 #' @return dataframe
 #' @export
 #' @importFrom tidyr full_seq expand crossing nesting complete

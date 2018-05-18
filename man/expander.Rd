@@ -49,3 +49,7 @@ expander(mtcars, id_vars = c('am', 'cyl'), complete = FALSE)
 expander(mtcars, id_vars = c('am', 'cyl'), fun = funs(carb = 1:5), complete = TRUE)
 expander(mtcars, id_vars = c('am'), fun = funs(cyl = full_seq(cyl, 1)), complete = TRUE)
 }
+\seealso{
+\url{http://tidyr.tidyverse.org/reference/expand.html} for tidyr `expand` function which is used
+  internally by `expander`
+}
