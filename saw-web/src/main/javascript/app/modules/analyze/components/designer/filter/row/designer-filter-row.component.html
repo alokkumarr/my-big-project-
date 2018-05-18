@@ -1,24 +1,30 @@
 <div fxLayout="row"
      fxLayoutAlign="space-between center"
      [ngSwitch]="TYPE_MAP[filter.type]">
-  <div fxLayout="row"
+  <div fxLayout="row wrap"
        fxFlex="grow"
        class="filter__data__space"
        fxLayoutAlign="start">
     <mat-form-field>
-      <mat-select placeholder="Column"
-                  (selectionChange)="onArtifactColumnSelected($event.value)"
-                  [value]="filter.columnName"
-                  e2e="filter-select">
-        <mat-option *ngFor="let artifactColumn of artifactColumns"
-                    [value]="artifactColumn.columnName"
-                    [e2e]="'filter-select-option-' + (artifactColumn.displayName)">
+      <input type="text" placeholder="Column" matInput
+             #autoInput
+             e2e="filter-autocomplete-input"
+             [matAutocomplete]="auto"
+             [formControl]="formControl"/>
+      <button mat-button *ngIf="autoInput.value" matSuffix mat-icon-button (click)="clearInput()">
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+      <mat-autocomplete #auto="matAutocomplete"
+                        [displayWith]="displayWith"
+                        (optionSelected)="onArtifactColumnSelected($event.option.value.columnName)">
+        <mat-option *ngFor="let artifactColumn of filteredColumns | async"
+                    [value]="artifactColumn">
           {{ artifactColumn.displayName }}
         </mat-option>
-      </mat-select>
+      </mat-autocomplete>
     </mat-form-field>
 
-    <div *ngIf="!filter.isRuntimeFilter" style="margin-left: 10px;">
+    <div *ngIf="!filter.isRuntimeFilter && !filter.isGlobalFilter" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">
@@ -37,6 +43,12 @@
   <div fxLayout="row"
        class="filter__action__space"
        fxLayoutAlign="space-between center">
+    <mat-checkbox [checked]="filter.isGlobalFilter"
+                  *ngIf="supportsGlobalFilters"
+                  (change)="onGlobalCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Global
+    </mat-checkbox>
     <mat-checkbox [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
                   i18n>

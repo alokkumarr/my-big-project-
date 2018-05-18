@@ -1,18 +1,9 @@
-declare const require: any;
-
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
-import {FormControl} from '@angular/forms';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import * as moment from 'moment';
-import {MAT_DATE_FORMATS} from '@angular/material/core';
-import {
-  FilterModel
-} from '../../types';
-import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../../consts';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { FilterModel } from '../../types';
+import { CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS } from '../../../../consts';
 
 const template = require('./designer-date-filter.component.html');
 
@@ -33,62 +24,65 @@ export const MY_FORMATS = {
 @Component({
   selector: 'designer-date-filter',
   template,
-  providers: [
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS}
-  ]
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }]
 })
 export class DesignerDateFilterComponent {
-  @Output() public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
+  @Output()
+  public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
   @Input() public filterModel: FilterModel;
 
-  date = new FormControl({value: moment(), disabled: true});
-  datePreset = new FormControl({value: null, disabled: false})
+  lteFC = new FormControl({ value: null, disabled: true });
+  gteFC = new FormControl({ value: null, disabled: true });
+  datePreset = new FormControl({ value: null, disabled: false });
   showDateFields = false;
   presets = DATE_PRESETS;
 
-  public tempModel = {
-    gte: null,
-    lte: null,
-    preset: CUSTOM_DATE_PRESET_VALUE
-  }
+  public tempModel;
 
-  init() {
-    if (!this.filterModel) {
-      this.filterModel = {};
-    } else {
-      this.datePreset.setValue(this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE);
+  ngOnInit() {
+    if (this.filterModel) {
       this.tempModel = {
         gte: moment(this.filterModel.gte),
         lte: moment(this.filterModel.lte),
         preset: this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE
-      }
+      };
+      this.lteFC.setValue(this.tempModel.lte);
+      this.gteFC.setValue(this.tempModel.gte);
+    } else {
+      this.tempModel = {
+        gte: null,
+        lte: null,
+        preset: CUSTOM_DATE_PRESET_VALUE
+      };
     }
-
-    this.showDateFields = (this.tempModel || this.filterModel).preset === CUSTOM_DATE_PRESET_VALUE;
-  }
-
-  ngOnInit() {
-    this.init();
-  }
-
-  ngOnChanges() {
-    this.init();
+    this.datePreset.setValue(this.tempModel.preset);
+    this.showDateFields = this.tempModel.preset === CUSTOM_DATE_PRESET_VALUE;
   }
 
   onPresetChange(change) {
-    this.filterModel.preset = change.value;
+    this.tempModel.preset = change.value;
     if (change.value !== CUSTOM_DATE_PRESET_VALUE) {
-      delete this.filterModel.gte;
-      delete this.filterModel.lte;
+      this.tempModel.gte = null;
+      this.tempModel.lte = null;
     }
 
     this.showDateFields = change.value === CUSTOM_DATE_PRESET_VALUE;
-    this.filterModelChange.emit(this.filterModel);
+    this.filterModelChange.emit(this.getFormattedModel(this.tempModel));
   }
 
   modelChange(value, prop: 'lte' | 'gte') {
     this.tempModel[prop] = value;
-    this.filterModel[prop] = value.format(DATE_FORMAT);
-    this.filterModelChange.emit(this.filterModel);
+    this.filterModelChange.emit(this.getFormattedModel(this.tempModel));
+  }
+
+  getFormattedModel({ lte, gte, preset }) {
+    /* prettier-ignore */
+    return {
+      preset,
+      ...(preset === CUSTOM_DATE_PRESET_VALUE ? {
+        lte: lte ? lte.format(DATE_FORMAT) : null,
+        gte: gte ? gte.format(DATE_FORMAT) : null
+      } : {})
+    };
   }
 }

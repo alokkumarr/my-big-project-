@@ -24,5 +24,9 @@ export {
   Schedule,
   Sort,
   SqlBuilder,
-  SqlBuilderPivot
+  SqlBuilderPivot,
+  SqlBuilderChart,
+  SqlBuilderReport,
+  AnalysisType,
+  SqlBuilderEsReport
 } from '../../../models';

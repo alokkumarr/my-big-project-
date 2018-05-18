@@ -1,6 +1,4 @@
-declare const require: any;
-
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 const template = require('./cron-date-picker.component.html');
 
 @Component({
@@ -21,7 +19,7 @@ export class CronDatePickerComponent implements OnInit {
   }
 
   triggerChange() {
-    this.onDateChange.emit(this.model); 
+    this.onDateChange.emit(this.model);
   }
 
   private range(start: number, end: number): number[] {

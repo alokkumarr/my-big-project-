@@ -50,11 +50,19 @@ const doAnalysisAction = (name, action) => {
   commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
   toggle.click();
+
   toggle.getAttribute('aria-owns').then(id => {
-    const actionButton = element(by.id(id))
-      .element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
-    commonFunctions.waitFor.elementToBeVisible(actionButton);
-    commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+    if (id) {
+      const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
+      commonFunctions.waitFor.elementToBeVisible(actionButton);
+      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);  
+    } else {
+      const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
+      menu.getAttribute('class').then(className => {
+        commonFunctions.waitFor.elementToBeVisible(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+      });
+    }
     // actionButton.click();
   });
 };
@@ -70,6 +78,11 @@ const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e=
 
 const getAnalysisMenuButton = (analysisName) => element(by.xpath("//a[text()='" + analysisName + "']/../../../..//*[@e2e='actions-menu-toggle']"));
 
+const getChartSettingsItem = (axis, name) => {
+  return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
+    .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
+};
+
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
@@ -80,25 +93,39 @@ const getChartSettingsCheckBox = name => {
 };
 
 const filtersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
+const filtersBtnUpgraded = element(by.css('button[e2e="open-filter-modal"]'));
 
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
 
 const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
+const geFilterRowUpgraded = index => element.all(by.css('designer-filter-row')).get(index);
 
 const getFilterAutocomplete = index => getFilterRow(index)
   .element(by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input'));
+
+const getFilterAutocompleteUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="filter-autocomplete-input"]'));
 
 // If filter value type is String
 const getStringFilterInput = index => getFilterRow(index)
   .element(by.css('string-filter'))
   .element(by.css('input[aria-label="Chips input."]'));
 
+const getStringFilterInputUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="designer-filter-string-input"]'));
+
 // If filter value type is Number
 const getNumberFilterInput = index => getFilterRow(index)
   .element(by.xpath("//input[@ng-model='$ctrl.tempModel.value']"));
 
+const getNumberFilterInputUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="designer-number-filter-input"]'));
+
 const getAppliedFilter = name => element(by.css('filter-chips'))
   .element(by.cssContainingText('md-chip-template > span', name));
+
+const getAppliedFilterUpgraded = name => element(by.css('filter-chips-u'))
+  .element(by.cssContainingText('mat-chip', name));
 
 const getPivotField = name => element(by.css(`md-list-item[e2e="pivot-field-${name}"]`));
 
@@ -127,7 +154,7 @@ const doSelectPivotGroupInterval = (name, groupInterval) => {
 };
 
 const getReportField = (tableName, fieldName) => element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
-const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('md-checkbox'));
+const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('mat-checkbox'));
 //const getReportFieldCheckbox = (tableName, fieldName) =>
 // element(by.xpath(`//md-checkbox/div/span[text()='${fieldName}']/ancestor::*[contains(@e2e, '${tableName}')]`));
 const getReportFieldEndPoint = (tableName, fieldName, side) => {
@@ -147,8 +174,8 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 const doAccountAction = action => {
   navigateToHome();
   doMdSelectOption({
-    parentElem: element(by.css('header > md-toolbar')),
-    btnSelector: 'button[e2e="account-settings-menu-btn"]',
+    parentElem: element(by.css('header > mat-toolbar')),
+    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.driver.wait(() => {
@@ -167,6 +194,13 @@ function navigateToHome() {
   }, protractorConf.timeouts.fluentWait);
 };
 
+const selectFields = (name) => {
+  commonFunctions.waitFor.elementToBeVisible(this.designerDialog.chart.fieldSearchInput);
+  this.designerDialog.chart.fieldSearchInput.clear();
+  this.designerDialog.chart.fieldSearchInput.sendKeys(name);
+  commonFunctions.waitFor.elementToBeClickableAndClick(this.getFieldPlusIcon(name));
+};
+
 module.exports = {
   newDialog: {
     getMetricRadioButtonElementByName: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
@@ -174,9 +208,17 @@ module.exports = {
     getAnalysisTypeButtonElementByType: name => element(by.css(`button[e2e="item-type-${name}"]`)),
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
   },
+
   designerDialog: {
-    saveDialog: element(by.css('analyze-save-dialog')),
+    saveDialog: element(by.css('[e2e="save-dialog-save-analysis"]')),
+    saveDialogUpgraded: element(by.css('designer-save')),
     chart: {
+      getFieldPlusIcon: value => element(by.xpath(`//button[@e2e="designer-add-btn-${value}"]/descendant::*[@ng-reflect-font-icon="icon-plus"]`)),
+      getMetricsFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Metrics")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      getDimensionFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Dimension")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      getGroupByFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Group By")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      fieldSearchInput: element(by.xpath('//input[@id="mat-input-0"]')),
+      selectFields: name => selectFields(name),
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
       getYCheckBox: name => getChartSettingsCheckBox(name),
@@ -186,35 +228,49 @@ module.exports = {
       container: element(by.css('.highcharts-container ')),
       title: element(by.css('span[e2e="designer-type-chart"]')),
       getAnalysisChartType,
-      filterBtn: filtersBtn,
+      filterBtn: filtersBtnUpgraded,
       refreshBtn
     },
     pivot: {
-      title: element(by.css('span[e2e="designer-type-pivot"]')),
       getPivotFieldCheckbox,
       doSelectPivotArea,
       doSelectPivotAggregate,
       doSelectPivotGroupInterval,
-      filterBtn: filtersBtn,
+      filterBtn: filtersBtnUpgraded,
       refreshBtn
     },
     report: {
-      title: element(by.css('span[e2e="designer-type-report"]')),
       expandBtn: element(by.css('button[e2e="report-expand-btn"]')),
       getReportFieldCheckbox,
       getReportFieldEndPoint,
       getJoinlabel,
-      filterBtn: filtersBtn,
+      filterBtn: filtersBtnUpgraded,
+      gridExpandBtn: element(by.css('button[e2e="report-expand-btn"]')),
       refreshBtn
     },
-    saveBtn: element(by.css('button[e2e="open-save-modal"]'))
+    saveBtn: element(by.css('button[e2e="designer-save-btn"]'))
   },
   filtersDialog: {
     getFilterAutocomplete,
     getStringFilterInput,
     getNumberFilterInput,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
-    getAppliedFilter
+    getAppliedFilter: getAppliedFilterUpgraded
+  },
+  filtersDialogUpgraded : {
+    getFilterAutocomplete: getFilterAutocompleteUpgraded,
+    getStringFilterInput: getStringFilterInputUpgraded,
+    getNumberFilterInput: getNumberFilterInputUpgraded,
+    applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
+    getAppliedFilter: getAppliedFilterUpgraded,
+    chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
+    noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
+  },
+  appliedFiltersDetails: {
+    filterText:element(by.xpath('//span[@class="filter-counter"]')),
+    filterClear:element(by.xpath('//button[contains(@class,"filter-clear-all")]')),
+    selectedFilters: element.all(by.xpath('//filter-chips-u/descendant::mat-chip')),
+    selectedFiltersText: element(by.xpath('//filter-chips-u/descendant::mat-chip')),
   },
   detail: {
     getAnalysisChartType
@@ -235,12 +291,21 @@ module.exports = {
     getCardTypeByName: getCardTypeByName,
     getAnalysisMenuButton: getAnalysisMenuButton
   },
-  saveDialog: {
-    selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
+  saveDialogUpgraded: {
+    selectedCategory: element(by.css('[e2e="save-dialog-selected-category"]')),
     nameInput: element(by.css('input[e2e="save-dialog-name"]')),
     descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
-    cancelBtn: element(by.css('button[translate="CANCEL"]'))
+    cancelBtn: element(by.css('button[e2e="designer-dialog-cancel"]'))
+  },
+  saveDialog: {
+    selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
+    selectedCategoryUpdated: element(by.xpath('//mat-select[@e2e="save-dialog-selected-category"]/descendant::div[@class="mat-select-arrow-wrapper"]')),
+    nameInput: element(by.css('input[e2e="save-dialog-name"]')),
+    descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
+    saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
+    cancelBtn: element(by.css('button[translate="CANCEL"]')),
+    selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
 
   // OLD test elements
@@ -268,7 +333,7 @@ module.exports = {
     reportDescriptionField: element(by.model('$ctrl.model.description')),
     reportDescription: element(by.model('$ctrl.dataHolder.description')),
     saveReportDetails: element(by.css('[ng-click="$ctrl.save()"]')),
-    reportTitle: element(by.css('.e2e-report-title')),
+    reportTitle: element(by.css('.e2e-designer-title')),
     reportDescriptionBtn: element(by.partialButtonText('Description')),
     filterItemInternet: element(by.css('[aria-label="INTERNET"]')),
     filterItemComplete: element(by.css('[aria-label="Complete"]')),
@@ -288,7 +353,6 @@ module.exports = {
     reportGridContainer: element(by.css('.ard_details-grid')),
     cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
-
   validateCardView() {
     expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
   },

@@ -6,11 +6,18 @@ import {
   DesignerPivotComponent,
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
+import { DesignerChartComponent } from './chart';
+import { DesignerReportComponent } from './report';
 import {
-  DesignerSettingsSingleComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
   DesignerSettingsGroupComponent,
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent,
   ExpandableFieldComponent,
-  ExpandDetailPivotComponent
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
@@ -20,6 +27,10 @@ import {
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent
 } from './filter';
+import {
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout
+} from './layout';
 import { DesignerSaveComponent } from './save';
 import { DesignerDescriptionComponent } from './description';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
@@ -32,10 +43,17 @@ export {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
-  DesignerSettingsSingleComponent,
+  DesignerChartComponent,
+  DesignerReportComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
   DesignerSettingsGroupComponent,
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent,
   ExpandableFieldComponent,
   ExpandDetailPivotComponent,
+  ExpandDetailChartComponent,
   ToolbarActionDialogComponent,
   DesignerSortComponent,
   DesignerDescriptionComponent,
@@ -46,6 +64,8 @@ export {
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 };

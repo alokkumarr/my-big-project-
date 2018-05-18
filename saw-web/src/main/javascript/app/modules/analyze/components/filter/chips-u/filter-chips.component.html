@@ -1,0 +1,21 @@
+<div fxLayout="row" fxLayoutAlign="start center" *ngIf="filters.length > 0">
+  <div fxLayout="column">
+    <span class="filter-counter" i18n>{filters.length, plural, =1 {1 Filter} other {{{filters.length}} Filters} } Applied</span>
+    <button mat-button
+            *ngIf="!readonly"
+            (click)="onRemoveAll()"
+            color="primary"
+            class="filter-clear-all"
+            i18n>
+      Clear all
+    </button>
+  </div>
+  <mat-chip-list #chipList>
+    <mat-chip *ngFor="let filter of filters; let i = index;"
+              [removable]="!readonly"
+              (removed)="onRemove(i)">
+      {{getDisplayName(filter)}}
+      <mat-icon *ngIf="!readonly" matChipRemove fontIcon="icon-remove"></mat-icon>
+    </mat-chip>
+  </mat-chip-list>
+</div>

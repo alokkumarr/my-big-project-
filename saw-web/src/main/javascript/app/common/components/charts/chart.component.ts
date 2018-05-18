@@ -45,28 +45,18 @@ export class ChartComponent {
   }
 
   ngAfterViewInit() {
+    this.enableExport && this.enableExporting(this.config);
+    this.enableExport && this.enableExporting(this.stockConfig);
+  }
+
+  ngOnInit() {
     this.config = defaultsDeep(this.config, this.options, chartOptions);
     this.stockConfig = defaultsDeep(
       this.stockConfig,
       this.options,
       stockChartOptions
     );
-    this.enableExport && this.enableExporting(this.config);
-    this.enableExport && this.enableExporting(this.stockConfig);
-    if (this.isStockChart) {
-      this.chart = this.highstocks.stockChart(
-        this.container.nativeElement,
-        this.stockConfig
-      );
-    } else {
-      this.chart = this.highcharts.chart(
-        this.container.nativeElement,
-        this.config
-      );
-    }
-  }
 
-  ngOnInit() {
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
       this.subscription = this.updater.subscribe({

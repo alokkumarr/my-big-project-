@@ -1,8 +1,4 @@
-export {
-  Analysis,
-  AnalysisChart,
-  AnalysisReport
-} from './analysis.model';
+export { Analysis, AnalysisChart, AnalysisReport } from './analysis.model';
 export {
   ArtifactColumn,
   ArtifactColumnChart,
@@ -28,5 +24,9 @@ export { Schedule } from './schedule.model';
 export { Sort } from './sort.model';
 export {
   SqlBuilder,
-  SqlBuilderPivot
+  SqlBuilderPivot,
+  SqlBuilderChart,
+  SqlBuilderReport,
+  SqlBuilderEsReport
 } from './sql-builder.model';
+export { AnalysisType } from './analysis-type.model';

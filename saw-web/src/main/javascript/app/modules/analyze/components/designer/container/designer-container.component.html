@@ -2,18 +2,35 @@
                  [analysis]="analysis"
                  [isInDraftMode]="isInDraftMode"
                  [designerState]="designerState"
-                 (onBack)="onBack.emit()"
+                 [isInQueryMode]="isInQueryMode"
+                 (onBack)="onBack.emit(isInDraftMode)"
                  (requestAction)="onToolbarAction($event)">
 </designer-header>
 
-<designer-settings-single class="designer__data-settings"
-                   (settingsChange)="onSettingsChange($event)"
-                   [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
-</designer-settings-single>
+<div *ngIf="analysis" [ngSwitch]="layoutConfiguration" class="designer__main">
+  <single-table-designer-layout *ngSwitchCase="'single'"
+                                (change)="onSettingsChange($event)"
+                                [artifacts]="artifacts"
+                                [auxSettings]="auxSettings"
+                                [analysisType]="(analysisStarter || analysis).type"
+                                [analysisSubtype]="(analysisStarter || analysis).chartType"
+                                [data]="data"
+                                [sorts]="sorts"
+                                [filters]="filters"
+                                [sqlBuilder]="analysis && analysis.sqlBuilder"
+                                [designerState]="designerState">
+  </single-table-designer-layout>
 
-<designer-pivot class="designer__main"
-                [data]="data"
-                [sorts]="sorts"
-                [artifactColumns]="firstArtifactColumns"
-                [designerState]="designerState">
-</designer-pivot>
+  <multi-table-designer-layout *ngSwitchCase="'multi'"
+                               (change)="onSettingsChange($event)"
+                               [isInQueryMode]="isInQueryMode"
+                               [analysis]="analysis"
+                               [artifacts]="artifacts"
+                               [data]="data"
+                               [dataCount]="dataCount"
+                               [sorts]="sorts"
+                               [filters]="filters"
+                               [sqlBuilder]="analysis.sqlBuilder"
+                               [designerState]="designerState">
+  </multi-table-designer-layout>
+</div>

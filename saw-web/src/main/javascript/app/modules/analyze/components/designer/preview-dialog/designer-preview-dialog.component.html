@@ -5,16 +5,31 @@
   </button>
   <div class="preview__title">
     <strong>
-      {{data.analysis.name}}
+      {{analysis.name}}
     </strong>
   </div>
 </header>
 
 <div class="preview-container">
-  <pivot-grid *ngIf="previewData"
+  <pivot-grid *ngIf="previewData && analysis.type === 'pivot'"
               [artifactColumns]="artifactColumns"
               [sorts]="data.analysis.sqlBuilder.sorts"
               [data]="previewData"
               mode="preview">
   </pivot-grid>
+  <report-grid-upgraded *ngIf="analysis.type === 'report' || analysis.type === 'esReport'"
+                        [artifacts]="analysis.edit ? null : analysis.artifacts"
+                        [query]="analysis.queryManual"
+                        [sorts]="analysis.sqlBuilder.sorts"
+                        [dataLoader]="dataLoader"
+                        [isEditable]="false">
+  </report-grid-upgraded>
+  <designer-chart *ngIf="analysis.type === 'chart'"
+                  [chartType]="analysis.chartType"
+                  [sorts]="analysis.sqlBuilder.sorts"
+                  [auxSettings]="{isInverted: analysis.isInverted, legend: analysis.legend}"
+                  [data]="previewData"
+                  [designerState]="state"
+                  [sqlBuilder]="analysis.sqlBuilder">
+  </designer-chart>
 </div>

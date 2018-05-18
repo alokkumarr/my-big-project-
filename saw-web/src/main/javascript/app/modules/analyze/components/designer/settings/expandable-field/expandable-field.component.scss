@@ -35,12 +35,13 @@ expandable-field {
   .expandable-field__option-button {
     width: auto;
     color: $primary-grey-g3;
+    margin-left: 10px;
 
     & > .mat-button-wrapper {
       width: auto;
 
       & > .mat-icon {
-        width: auto;
+        width: 40px;
 
         &::before {
           width: auto;
