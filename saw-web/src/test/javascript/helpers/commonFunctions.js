@@ -54,7 +54,11 @@ module.exports = {
   dismissDropdownMenu: () => {
     element(by.css('md-backdrop')).click();
     expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
-  }
+  },
+  dragAndDrop(dragElement, dropElement) {
+    // You can also use the `dragAndDrop` convenience action.
+    browser.actions().dragAndDrop(dragElement, dropElement).mouseUp().perform();
+  },
 };
 
 function click(element, i) {
