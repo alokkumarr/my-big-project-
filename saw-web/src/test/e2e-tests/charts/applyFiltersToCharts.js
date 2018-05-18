@@ -22,6 +22,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      commonFunctions.openBaseUrl();
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
@@ -31,7 +32,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   afterEach(function (done) {
     setTimeout(function () {
       browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

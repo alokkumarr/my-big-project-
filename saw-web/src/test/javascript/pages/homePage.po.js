@@ -17,6 +17,9 @@ module.exports = {
   expandedCategory: categoryName => {
     return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
   },
+  category: categoryName => {
+    return element(by.xpath(`//span[contains(text(),'${categoryName}')]/parent::mat-panel-title`));
+  },
   collapsedCategory: categoryName => {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
   },
@@ -35,13 +38,16 @@ module.exports = {
  */
 const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) => {
   //Collapse default category
-  commonFunctions.waitFor.elementToBeClickableAndClick(module.exports.expandedCategory(defaultCategory));
+  commonFunctions.waitFor.elementToBeClickable(module.exports.category(defaultCategory));
+  module.exports.category(defaultCategory).click();
 
   //Navigate to Category/Sub-category
-  const collapsedCategory = module.exports.collapsedCategory(categoryName);
-  const subCategory = module.exports.subCategory(subCategoryName);
-  commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-  commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+ // const collapsedCategory = module.exports.category(categoryName);
+ // const subCategory = module.exports.subCategory(subCategoryName);
+  commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
+  module.exports.category(categoryName).click();
+  commonFunctions.waitFor.elementToBeClickable(module.exports.subCategory(subCategoryName));
+  module.exports.subCategory(subCategoryName).click();
 };
 
 const createAnalysis = (metricName, analysisType) => {

@@ -49,6 +49,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   beforeEach(function (done) {
     setTimeout(function () {
       browser.waitForAngular();
+      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -57,7 +58,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   afterEach(function (done) {
     setTimeout(function () {
       browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -79,6 +80,9 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       let chartTyp = data.chartType.split(":")[1];
 
       login.loginAs(data.user);
+      homePage.mainMenuExpandBtn.click();
+      navigateToSubCategory();
+      homePage.mainMenuCollapseBtn.click();
 
       //Create analysis
       homePage.createAnalysis(metricName, data.chartType);
@@ -117,13 +121,15 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     // Navigates to specific category where analysis creation should happen
     const navigateToSubCategory = () => {
       //Collapse default category
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
+      commonFunctions.waitFor.elementToBeClickable(homePage.category(defaultCategory))
+      homePage.category(defaultCategory).click();
 
       //Navigate to Category/Sub-category
-      const collapsedCategory = homePage.collapsedCategory(categoryName);
-      const subCategory = homePage.subCategory(subCategoryName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+      commonFunctions.waitFor.elementToBeClickable(homePage.category(categoryName));
+      homePage.category(categoryName).click();
+
+      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(subCategoryName));
+      const subCategory = homePage.subCategory(subCategoryName).click();
     };
   });
 });
