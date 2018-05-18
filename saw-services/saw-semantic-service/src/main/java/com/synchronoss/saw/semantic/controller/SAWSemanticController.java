@@ -116,7 +116,7 @@ public class SAWSemanticController {
    * @param requestBody
    * @return
    */
-  @RequestMapping(value = "/{projectId}/update/{Id}", method = RequestMethod.POST,
+  @RequestMapping(value = "/{projectId}/update/{Id}", method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.FOUND)
   public SemanticNode updateSemantic(
@@ -146,7 +146,7 @@ public class SAWSemanticController {
    * @param requestBody
    * @return
    */
-  @RequestMapping(value = "/{projectId}/delete/{Id}", method = RequestMethod.DELETE,
+  @RequestMapping(value = "/{projectId}/{Id}", method = RequestMethod.DELETE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public SemanticNode deleteSemantic(

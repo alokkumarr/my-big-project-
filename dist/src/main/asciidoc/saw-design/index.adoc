@@ -170,8 +170,8 @@ plantuml::saw-design/figure-semantic-sequence.pum[format=svg]
 1. Create Integrated Semantic Node JSON structure for both elastic search as well as data lake data pods.
 2. The structure is consistent with that used by SAW Analyze module and Observe modules in the store.
 3. This service should be consumable by
-        3.1 SAW Analyze Module
-        3.2 SAW Workbench Module
+  . SAW Analyze Module
+  . SAW Workbench Module
 
 ==== Apache Spark
 
