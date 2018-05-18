@@ -17,5 +17,6 @@ Imports:
     zoo,
     checkmate (>= 1.8.2),
 Suggests: 
-    testthat
+    testthat,
+    lubridate,
 RoxygenNote: 6.0.1.9000
