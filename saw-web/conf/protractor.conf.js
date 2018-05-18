@@ -1,5 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+var HtmlReporter = require('protractor-beautiful-reporter');
 
 /**
  * Note about intervals:
@@ -67,7 +68,7 @@ exports.timeouts = {
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
   pageResolveTimeout: pageResolveTimeout,
-  tempts: tempts
+  tempts: tempts,
 };
 
 exports.config = {
@@ -75,6 +76,7 @@ exports.config = {
   seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
+  baseUrl: webpackHelper.sawWebUrl(),
   directConnect: true,
   capabilities: {
     browserName: 'chrome',
@@ -150,6 +152,13 @@ exports.config = {
     ]
   },
   onPrepare() {
+
+    // Add a screenshot reporter and store screenshots to `/tmp/screenshots`:
+    jasmine.getEnv().addReporter(new HtmlReporter({
+      baseDirectory: 'target/screenshots',
+      preserveDirectory: false
+    }).getJasmine2Reporter());
+
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,

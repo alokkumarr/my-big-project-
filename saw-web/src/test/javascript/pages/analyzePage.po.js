@@ -168,6 +168,8 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 
 const doAccountAction = action => {
   navigateToHome();
+  browser.executeScript('window.sessionStorage.clear();');
+  browser.executeScript('window.localStorage.clear();');
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
     btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
