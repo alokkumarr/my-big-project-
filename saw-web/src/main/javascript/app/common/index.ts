@@ -116,10 +116,10 @@ angular
     return new ComponentHandler();
   })
   .factory('AuthService', AuthServiceFactory)
-  .factory('UserService', downgradeInjectable(UserService) as Function)
   //.service('UserService', UserService)
   //.service('JwtService', JwtService)
-  .factory('JwtService', downgradeInjectable(JwtService) as Function);
+  .factory('UserService', downgradeInjectable(UserService) as Function);
+  //.factory('JwtService', downgradeInjectable(JwtService) as Function);
 
 @NgModule({
   imports: [
@@ -201,7 +201,8 @@ angular
     ErrorDetailService,
     ErrorDetailDialogService,
     toastProvider,
-    ChartService, UserService, JwtService, componentHandlerProvider
+    ChartService,
+    componentHandlerProvider, UserService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

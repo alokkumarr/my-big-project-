@@ -23,7 +23,6 @@ import { FilterService } from './services/filter.service';
 import { PivotService } from './services/pivot.service';
 import { ChartService } from './services/chart.service';
 import { SortService } from './services/sort.service';
-import { JwtService } from './../../../login/services/jwt.service';
 
 import { $mdDialogProvider } from '../../common/services/ajs-common-providers';
 
@@ -176,8 +175,7 @@ angular
   .component('analyzeChart', AnalyzeChartComponent)
   .component('analyzeChartSettings', AnalyzeChartSettingsComponent)
   .component('analyzeChartPreview', AnalyzeChartPreviewComponent)
-  .component('analyzeSaveDialog', AnalyzeSaveDialogComponent)
-  .factory('JwtService', downgradeInjectable(JwtService) as Function);
+  .component('analyzeSaveDialog', AnalyzeSaveDialogComponent);
 
 @NgModule({
   imports: [
@@ -267,11 +265,7 @@ angular
     AnalyzeDialogService,
     analyzeServiceProvider,
     DesignerService,
-<<<<<<< HEAD
-    JwtService
-=======
     ChartService
->>>>>>> ab61b11196d9af159298b2c03dae506c8faad698
   ]
 })
 export class AnalyzeModuleTs {}
