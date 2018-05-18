@@ -9,7 +9,7 @@
       <div layout="row" class="lh-links">
         <div *ngFor="let module of modules"
               class="link"
-              uiSref="analyze"
+              uiSref="{{module.productModName.toLowerCase()}}"
               uiSrefActive="m-active"
               translate="{{module.productModName}}">{{module.productModName}}
         </div>

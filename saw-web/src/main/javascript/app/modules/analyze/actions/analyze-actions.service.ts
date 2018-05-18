@@ -69,17 +69,8 @@ export class AnalyzeActionsService {
   }
 
   openEditModal(analysis, mode: 'edit' | 'fork') {
-    const openModal = template => this.showDialog({
-      template,
-      controller: scope => {
-        scope.model = deepClone(analysis);
-      },
-      multiple: true
-    });
-
     switch (analysis.type) {
     case AnalyseTypes.Chart:
-      return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:

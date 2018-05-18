@@ -1,6 +1,6 @@
 export interface Sort {
-  order:      string;
+  order: string;
   columnName: string;
-  type:       string;
-  tableName:  string;
+  type: string;
+  tableName?: string;
 }

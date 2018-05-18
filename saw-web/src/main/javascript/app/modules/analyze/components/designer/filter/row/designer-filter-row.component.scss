@@ -6,4 +6,10 @@ designer-filter-row {
   .filter__data__space {
     max-width: 80%;
   }
+
+  .filter__action__space {
+    mat-checkbox:first-child {
+      margin-right: 10px;
+    }
+  }
 }

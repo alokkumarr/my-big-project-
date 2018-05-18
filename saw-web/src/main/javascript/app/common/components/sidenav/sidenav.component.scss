@@ -1,6 +1,6 @@
 .sidenav-container {
   position: fixed !important;
-  width: 16%;
+  width: 20%;
   margin-top: 64px;
 }
 
@@ -11,6 +11,12 @@ sidenav {
     font-size: 24px;
     position: fixed;
     margin: -47px 0 1px 10px;
+  }
+
+  mat-sidenav {
+    &.sidenav-closed:not(.ng-animating) * {
+      display: none;
+    }
   }
 }
 

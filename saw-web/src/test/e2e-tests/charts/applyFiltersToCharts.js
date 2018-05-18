@@ -5,7 +5,7 @@ const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const {hasClass} = require('../../javascript/helpers/utils');
+const utils = require('../../javascript/helpers/utils');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
@@ -49,32 +49,64 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
     // Select axis and grouping and refresh
     const refreshBtn = chartDesigner.refreshBtn;
-    const x = chartDesigner.getXRadio(xAxisName);
-    const y = chartDesigner.getYCheckBox(yAxisName);
-    const g = chartDesigner.getGroupRadio(groupName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(x);
-    commonFunctions.waitFor.elementToBeClickableAndClick(y);
-    commonFunctions.waitFor.elementToBeClickableAndClick(g);
-    expect(hasClass(x, 'md-checked')).toBeTruthy();
-    expect(hasClass(y, 'md-checked')).toBeTruthy();
-    expect(hasClass(g, 'md-checked')).toBeTruthy();
-    const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
+    // Wait for field input box.
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
+    // Search field and add that into dimension section.
+    analyzePage.designerDialog.chart.fieldSearchInput.clear();
+    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
+    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
+
+    const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
+
+    // Search field and add that into group by section.
+    analyzePage.designerDialog.chart.fieldSearchInput.clear();
+    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
+    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
+    // Search field and add that into metric section.
+    analyzePage.designerDialog.chart.fieldSearchInput.clear();
+    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
+    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
+
+    // Check selected field is present in respective section.
+    let y = analyzePage.designerDialog.chart.getMetricsFields(yAxisName);
+    commonFunctions.waitFor.elementToBeVisible(y);
+    expect(y.isDisplayed()).toBeTruthy();
+    let x = analyzePage.designerDialog.chart.getDimensionFields(xAxisName);
+    commonFunctions.waitFor.elementToBeVisible(x);
+    expect(x.isDisplayed()).toBeTruthy();
+    let g = analyzePage.designerDialog.chart.getGroupByFields(groupName);
+    commonFunctions.waitFor.elementToBeVisible(g);
+    expect(g.isDisplayed()).toBeTruthy();
+
     commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
 
     // Apply filters
-    const filters = analyzePage.filtersDialog;
+    const filters = analyzePage.filtersDialogUpgraded;
     const filterAC = filters.getFilterAutocomplete(0);
     const fieldName = yAxisName;
 
     commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
-    designModePage.filterWindow.numberInput.sendKeys(filterValue);
+    designModePage.filterWindow.numberInputUpgraded.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 
-    const appliedFilter = filters.getAppliedFilter(fieldName);
-    commonFunctions.waitFor.elementToBePresent(appliedFilter);
-    expect(appliedFilter.isPresent()).toBe(true);
+    //TODO: Need to check that filters applied or not.
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterText);
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterClear);
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.selectedFiltersText);
+    validateSelectedFilters([fieldName]);
+
   });
+
+  const validateSelectedFilters = (filters) => {
+
+    analyzePage.appliedFiltersDetails.selectedFilters.map(function(elm) {
+      return elm.getText();
+    }).then(function(displayedFilters) {
+      expect(utils.arrayContainsArray(displayedFilters, filters)).toBeTruthy();
+    });
+  };
+
 });

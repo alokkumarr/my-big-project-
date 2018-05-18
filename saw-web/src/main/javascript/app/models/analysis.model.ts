@@ -10,47 +10,48 @@ import { Axis } from './axis.model';
 import { AnalysisType } from './analysis-type.model';
 
 export interface Analysis {
-  description:      string;
-  checked:          null | boolean | string;
-  categoryId:       number;
-  artifacts:        Artifact[];
+  description: string;
+  checked: null | boolean | string;
+  categoryId: number;
+  artifacts: Artifact[];
   createdTimestamp: number;
-  disabled:         null | boolean | string;
-  id:               string;
-  isScheduled:      string;
-  metric:           string;
-  metricName:       string;
-  name:             string;
-  type:             AnalysisType;
-  saved:            boolean;
-  semanticId:       string;
-  scheduled:        null;
-  sqlBuilder:       SqlBuilder;
-  userId:           number;
-  userFullName:     string;
+  disabled: null | boolean | string;
+  id: string;
+  isScheduled: string;
+  metric: string;
+  metricName: string;
+  name: string;
+  type: AnalysisType;
+  saved: boolean;
+  semanticId: string;
+  scheduled: null;
+  sqlBuilder: SqlBuilder;
+  userId: number;
+  userFullName: string;
   dataSecurityKey?: string;
-  module?:          string;
-  schedule?:        Schedule;
-  repository?:      Repository;
-  esRepository?:    EsRepository;
-  scheduleHuman?:   string;
-  customerCode?:    string;
-  executionType?:   string;
-  edit?:            boolean;
-  outputFile?:      OutputFile;
-  groupByColumns?:  any[];
+  module?: string;
+  schedule?: Schedule;
+  repository?: Repository;
+  esRepository?: EsRepository;
+  scheduleHuman?: string;
+  customerCode?: string;
+  executionType?: string;
+  edit?: boolean;
+  outputFile?: OutputFile;
+  groupByColumns?: any[];
   // groupByColumns should be deprecated
 }
 
 export interface AnalysisReport extends Analysis {
-  query?:           string;
-  queryManual?:     string;
+  query?: string;
+  queryManual?: string;
 }
 
 export interface AnalysisChart extends Analysis {
-  legend?:          Legend;
-  chartType?:       string;
-  labelOptions?:    LabelOptions;
-  xAxis?:           Axis;
-  yAxis?:           Axis;
+  legend?: Legend;
+  isInverted?: boolean;
+  chartType?: string;
+  labelOptions?: LabelOptions;
+  xAxis?: Axis;
+  yAxis?: Axis;
 }

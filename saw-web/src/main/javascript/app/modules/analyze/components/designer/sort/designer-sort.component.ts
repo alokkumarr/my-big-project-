@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
@@ -15,6 +10,7 @@ import * as find from 'lodash/find';
 import * as take from 'lodash/take';
 import * as has from 'lodash/has';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isUndefined from 'lodash/isUndefined';
 import * as takeRight from 'lodash/takeRight';
 import {
   ArtifactColumns,
@@ -44,14 +40,18 @@ export class DesignerSortComponent {
   public isEmpty = isEmpty;
 
   public removeFromAvailableFields = (artifactColumn: ArtifactColumn) => {
-    this.availableFields = filter(this.availableFields,
-      ({columnName}) => columnName !== artifactColumn.columnName);
-  }
+    this.availableFields = filter(
+      this.availableFields,
+      ({ columnName }) => columnName !== artifactColumn.columnName
+    );
+  };
 
   public removeFromSortedFields = (sort: Sort) => {
-    this.sorts = filter(this.sorts,
-      ({columnName}) => columnName !== sort.columnName);
-  }
+    this.sorts = filter(
+      this.sorts,
+      ({ columnName }) => columnName !== sort.columnName
+    );
+  };
 
   public addToSortedFields = (item, index) => {
     const firstN = take(this.sorts, index);
@@ -63,10 +63,9 @@ export class DesignerSortComponent {
       ...lastN
     ];
     this.sortsChange.emit(this.sorts);
-  }
+  };
 
   isSort(item) {
-
     return has(item, 'order');
   }
 
@@ -77,29 +76,42 @@ export class DesignerSortComponent {
           const cloned = clone(column);
           cloned.tableName = artifact.artifactName;
           return cloned;
-        })
+        });
       }),
       fpFilter('checked')
     )(this.artifacts);
-    this.availableFields = this.getAvailableFields(this.checkedFields, this.sorts);
-    this.nameMap = reduce(this.checkedFields, (accumulator, field) => {
-      accumulator[field.columnName] = field.displayName;
-      return accumulator;
-    }, {});
+    this.availableFields = this.getAvailableFields(
+      this.checkedFields,
+      this.sorts
+    );
+    this.nameMap = reduce(
+      this.checkedFields,
+      (accumulator, field) => {
+        accumulator[field.columnName] = field.displayName;
+        return accumulator;
+      },
+      {}
+    );
   }
 
-  addSort(artifactColumn: ArtifactColumnReport, index: number = this.sorts.length) {
+  addSort(
+    artifactColumn: ArtifactColumnReport,
+    index: number = this.sorts.length
+  ) {
     this.removeFromAvailableFields(artifactColumn);
     this.addToSortedFields(artifactColumn, index);
   }
 
   removeSort(sort: Sort) {
     this.removeFromSortedFields(sort);
-    this.availableFields = this.getAvailableFields(this.checkedFields, this.sorts);
+    this.availableFields = this.getAvailableFields(
+      this.checkedFields,
+      this.sorts
+    );
     this.sortsChange.emit(this.sorts);
   }
 
-  transform({columnName, type, tableName}: ArtifactColumnReport): Sort {
+  transform({ columnName, type, tableName }: ArtifactColumnReport): Sort {
     return {
       tableName,
       columnName,
@@ -110,10 +122,13 @@ export class DesignerSortComponent {
 
   getAvailableFields(checkedFields: ArtifactColumns, sorts: Sort[]) {
     return filter(checkedFields, field => {
-      return !find(this.sorts, ({columnName, tableName}) => (
-        tableName === field.tableName &&
-        columnName === field.columnName
-      ));
+      return !find(
+        this.sorts,
+        ({ columnName, tableName }) =>
+          isUndefined(tableName)
+            ? columnName === field.columnName
+            : tableName === field.tableName && columnName === field.columnName
+      );
     });
   }
 
@@ -122,7 +137,7 @@ export class DesignerSortComponent {
     this.sortsChange.emit(this.sorts);
   }
 
-  trackByFn(_, {tableName, columnName}) {
+  trackByFn(_, { tableName, columnName }) {
     return `${tableName}:${columnName}`;
   }
 }
