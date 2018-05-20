@@ -36,6 +36,6 @@ export class LoginComponent {
   }
 
   reset() {
-    window.location.assign('preResetPwd');
+    window.location.assign(window.location.href + 'preResetPwd');
   }
 }
