@@ -8,15 +8,11 @@ import {
 } from '@angular/core';
 import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
-import {FormControl} from '@angular/forms';
-import {Observable} from 'rxjs/Observable';
-import {startWith} from 'rxjs/operators/startWith';
-import {map} from 'rxjs/operators/map';
-import {
-  ArtifactColumn,
-  Filter,
-  FilterModel
-} from '../../types';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import { startWith } from 'rxjs/operators/startWith';
+import { map } from 'rxjs/operators/map';
+import { ArtifactColumn, Filter, FilterModel } from '../../types';
 import { TYPE_MAP } from '../../../../consts';
 
 const template = require('./designer-filter-row.component.html');
@@ -31,9 +27,10 @@ export class DesignerFilterRowComponent {
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumn[];
   @Input() public filter: Filter;
+  @Input() public supportsGlobalFilters: boolean;
 
-  @ViewChild('auto', {read: ViewContainerRef}) _autoComplete: ViewContainerRef;
-
+  @ViewChild('auto', { read: ViewContainerRef })
+  _autoComplete: ViewContainerRef;
   public TYPE_MAP = TYPE_MAP;
   formControl: FormControl = new FormControl();
   filteredColumns: Observable<ArtifactColumn[]>;
@@ -43,14 +40,16 @@ export class DesignerFilterRowComponent {
   }
 
   ngOnInit() {
-    const target = find(this.artifactColumns, ({columnName}) => columnName === this.filter.columnName);
+    const target = find(
+      this.artifactColumns,
+      ({ columnName }) => columnName === this.filter.columnName
+    );
     this.formControl.setValue(target);
-    this.filteredColumns = this.formControl.valueChanges
-      .pipe(
-        startWith<string | ArtifactColumn>(''),
-        map(value => typeof value === 'string' ? value : value.displayName),
-        map(name => name ? this.nameFilter(name) : this.artifactColumns.slice())
-      );
+    this.filteredColumns = this.formControl.valueChanges.pipe(
+      startWith<string | ArtifactColumn>(''),
+      map(value => (typeof value === 'string' ? value : value.displayName)),
+      map(name => (name ? this.nameFilter(name) : this.artifactColumns.slice()))
+    );
   }
 
   clearInput() {
@@ -70,10 +69,13 @@ export class DesignerFilterRowComponent {
   }
 
   onArtifactColumnSelected(columnName) {
-    const target: ArtifactColumn = find(this.artifactColumns, column => column.columnName === columnName);
+    const target: ArtifactColumn = find(
+      this.artifactColumns,
+      column => column.columnName === columnName
+    );
     this.filter.columnName = target.columnName;
     this.filter.type = target.type;
-    if (this.filter.isRuntimeFilter) {
+    if (this.filter.isRuntimeFilter || this.filter.isGlobalFilter) {
       delete this.filter.model;
     } else {
       this.filter.model = null;
@@ -83,6 +85,14 @@ export class DesignerFilterRowComponent {
 
   onFilterModelChange(filterModel: FilterModel) {
     this.filter.model = filterModel;
+  }
+
+  onGlobalCheckboxToggle(filter: Filter, checked: boolean) {
+    if (!this.supportsGlobalFilters) return;
+    filter.isGlobalFilter = checked;
+    if (checked) {
+      delete filter.model;
+    }
   }
 
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {

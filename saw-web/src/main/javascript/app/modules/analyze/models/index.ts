@@ -25,6 +25,7 @@ export {
   Sort,
   SqlBuilder,
   SqlBuilderPivot,
+  SqlBuilderChart,
   SqlBuilderReport,
   AnalysisType,
   SqlBuilderEsReport

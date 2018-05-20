@@ -1,7 +1,6 @@
 import * as angular from 'angular';
 import {downgradeComponent} from '@angular/upgrade/static';
 
-import {AccordionMenu, AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
 import {
   JSPlumbCanvas,
@@ -18,7 +17,9 @@ import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
-import {SidenavComponent, SidenavBtnComponent} from './sidenav';
+import {AccordionMenuComponent} from './accordionMenu/accordionMenu.component'
+import {AccordionMenuLinkComponent} from './accordionMenu/accordionMenuLink.component'
+import {SidenavComponent} from './sidenav/sidenav.component';
 import {PivotGridComponent} from './pivot-grid/pivot-grid.component';
 import {BinaryOptionComponent} from './binary-option/binary-option.component';
 import {ReportGridDisplayComponent} from './report-grid-display/grid/report-grid-display.component';
@@ -29,8 +30,10 @@ export const CommonComponentModule = 'CommonModule.Component';
 
 angular
   .module(CommonComponentModule, [ChartsModule])
-  .component('accordionMenu', AccordionMenu)
-  .component('accordionMenuLink', AccordionMenuLink)
+  //.component('accordionMenu', AccordionMenu)
+  .directive('accordionMenu', downgradeComponent({component: AccordionMenuComponent}))
+  .directive('accordionMenuLink', downgradeComponent({component: AccordionMenuLinkComponent}))
+  //.component('accordionMenuLink', AccordionMenuLink)
   .component('badge', BadgeComponent)
   .component('binaryOption', BinaryOptionComponent)
   .component('choiceGroup', ChoiceGroupComponent)
@@ -45,9 +48,9 @@ angular
   .component('mdButtonGroup', mdButtonGroupComponent)
   .component('panel', PanelComponent)
   .component('rangeSlider', RangeSliderComponent)
-  .component('sidenav', SidenavComponent)
+  .directive('sidenav', downgradeComponent({component: SidenavComponent}))
   .directive('pivotGrid', downgradeComponent({component: PivotGridComponent}))
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
-  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
-  .component('sidenavBtn', SidenavBtnComponent);
+  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent);
+

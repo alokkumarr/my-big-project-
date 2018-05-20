@@ -16,7 +16,8 @@
   <div class="section">
     <label i18n>How would you like to analyze?</label>
     <div class="container">
-      <div *ngFor="let category of methodsCategories; trackBy: index">
+      <div *ngFor="let category of methodCategories; trackBy: index">
+        <div class="md-body-1" flex>{{category.label}}</div>
         <choice-group-u (change)="onMethodSelected($event)"
                         [items]="category.children"
                         [value]="selectedMethod"

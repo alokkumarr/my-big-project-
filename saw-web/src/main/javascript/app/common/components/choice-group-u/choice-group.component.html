@@ -1,7 +1,6 @@
 <div fxLayout="row wrap" fxLayoutAlign="start center" class="choice-group">
   <div *ngFor="let item of items; trackBy: index"
           (click)="onItemSelected(item)"
-          fxFlex="20"
           fxLayout="column" fxLayoutAlign="center center"
           class="choice-group__item"
           [class.selected]="value === item"

@@ -35,7 +35,7 @@ enum METHODS {
 })
 export class AnalyzeNewDialogComponent {
 
-  methodsCategories = ANALYSIS_METHODS;
+  methodCategories = ANALYSIS_METHODS;
   selectedMethod: IAnalysisMethod;
   selectedMetric;
 
@@ -67,16 +67,15 @@ export class AnalyzeNewDialogComponent {
             accumulator[type] = true;
           });
         } else {
-          method.disabled = !supportMap[method.type];
+          accumulator[method.type] = true;
         }
         return accumulator;
       },{})
-    )
-    (metric.supports);
+    )(metric.supports);
 
-    forEach(this.methodsCategories, category => {
+    forEach(this.methodCategories, category => {
       forEach(category.children, method => {
-        method.disabled = Boolean(supportMap[method.type]);
+        method.disabled = !supportMap[method.type];
       });
     });
 

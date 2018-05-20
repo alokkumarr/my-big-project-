@@ -85,7 +85,6 @@ export class AnalyzeViewComponent implements OnInit {
       this.loadAnalyses();
       break;
     case 'delete':
-      // this.removeDeletedAnalysis(event.analysis);
       this.spliceAnalyses(event.analysis, false);
       break;
     case 'execute':
@@ -93,6 +92,7 @@ export class AnalyzeViewComponent implements OnInit {
       break;
     case 'publish':
       this.afterPublish(event.analysis);
+      this.spliceAnalyses(event.analysis, true);
       break;
     }
   }
@@ -122,20 +122,11 @@ export class AnalyzeViewComponent implements OnInit {
     const filteredIndex = findIndex(this.filteredAnalyses, ({id}) => id === analysis.id);
     if (replace) {
       this.analyses.splice(index, 1, analysis);
-      this.analyses.splice(filteredIndex, 1, analysis);
+      this.filteredAnalyses.splice(filteredIndex, 1, analysis);
     } else {
       this.analyses.splice(index, 1);
-      this.analyses.splice(filteredIndex, 1);
+      this.filteredAnalyses.splice(filteredIndex, 1);
     }
-  }
-
-  removeDeletedAnalysis(analysis) {
-    this.analyses = filter(this.analyses, report => {
-      return report.id !== analysis.id;
-    });
-    this.filteredAnalyses = filter(this.filteredAnalyses, report => {
-      return report.id !== analysis.id;
-    });
   }
 
   openNewAnalysisModal() {
@@ -176,7 +167,7 @@ export class AnalyzeViewComponent implements OnInit {
     this._headerProgress.show();
     return this._analyzeService.getAnalysesFor(this.analysisId).then(analyses => {
       this.analyses = analyses;
-      this.filteredAnalyses = analyses;
+      this.filteredAnalyses = [...analyses];
       this._headerProgress.hide();
     }).catch(() => {
       this._headerProgress.hide();
