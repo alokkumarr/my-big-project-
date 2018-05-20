@@ -76,7 +76,7 @@ export class DesignerContainerComponent {
 
   constructor(
     private _designerService: DesignerService,
-    // private _analyzeDialogService: AnalyzeDialogService,
+    private _analyzeDialogService: AnalyzeDialogService,
     private _chartService: ChartService
   ) {}
 
