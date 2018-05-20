@@ -2,6 +2,7 @@ import { Injectable, Component, Inject } from '@angular/core';
 import { JwtService } from '../../services/jwt.service';
 import { UserService } from '../../services/user.service';
 const template = require('./login.component.html');
+require ('./login.component.scss');
 
 @Component({
   selector: 'login',
@@ -28,7 +29,6 @@ export class LoginComponent {
         if (this._JwtService.isValid(data)) {
           window.location.assign('./');
         } else {
-          console.log(this._JwtService.getValidityReason(data));
           this.states.error = this._JwtService.getValidityReason(data);
         }
       }
@@ -36,6 +36,6 @@ export class LoginComponent {
   }
 
   reset() {
-    window.location.assign('preResetPassword');
+    window.location.assign('preResetPwd');
   }
 }

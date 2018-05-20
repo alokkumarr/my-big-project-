@@ -7,29 +7,22 @@
     <span>have an account yet contact your system administrator</span>
   </div>
 
-  <form name="loginForm" method="post">
+  <form name="loginForm" class="login-form" method="post">
     <div class="error-msg"
          [innerHtml]="states.error"></div>
 
-    <label>Username</label>
     <mat-form-field>
-      <input matInput maxlength="30" [(ngModel)]="dataHolder.username"  [ngModelOptions]="{standalone: true}" required />
+      <input matInput maxlength="30" [(ngModel)]="dataHolder.username"  [ngModelOptions]="{standalone: true}" placeholder="Username" required />
     </mat-form-field>
     <br/>
 
-    <label>Password</label>
     <mat-form-field>
-      <input matInput type="password" maxlength="30" [(ngModel)]="dataHolder.password"  [ngModelOptions]="{standalone: true}" required />
+      <input matInput type="password" maxlength="30" [(ngModel)]="dataHolder.password"  placeholder="Password" [ngModelOptions]="{standalone: true}" required />
     </mat-form-field>
 
-    <div class="login-buttons"
-         layout="row" layout-align="space-between center">
-      <button mat-button (click)="reset()" class="md-primary">Forgot Password?</button>
-      <button mat-button class="btn-primary"
-                 type="submit"
-                 (click)="login()">Login
-      </button>
-
+    <div class="login-buttons button-row">
+      <button mat-button color="primary" (click)="reset()">Forgot Password?</button>
+      <button mat-raised-button color="primary" type="submit" (click)="login()">Login</button>
     </div>
   </form>
 </div>
