@@ -4,6 +4,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
 
 import {AnalyseTypes, ANALYSIS_METHODS, ENTRY_MODES} from '../../consts';
 import {IAnalysisMethod, AnalysisType, ChartType} from '../../types';
@@ -62,20 +63,21 @@ export class AnalyzeNewDialogComponent {
     const supportMap = fpPipe(
       fpFlatMap(support => support.children),
       fpReduce((accumulator, method) => {
-        if (method.supportedTypes) {
-          forEach(method.supportedTypes, type => {
-            accumulator[type] = true;
-          });
-        } else {
-          accumulator[method.type] = true;
-        }
+        accumulator[method.type] = true;
         return accumulator;
       },{})
     )(metric.supports);
 
+    console.log('supportMap', supportMap);
+    console.log('metric', metric);
+
     forEach(this.methodCategories, category => {
       forEach(category.children, method => {
-        method.disabled = !supportMap[method.type];
+        if (method.supportedTypes) {
+          method.disabled = !find(method.supportedTypes, type => supportMap[type]);
+        } else {
+          method.disabled = !supportMap[method.type];
+        }
       });
     });
 
@@ -91,7 +93,10 @@ export class AnalyzeNewDialogComponent {
     const metricName = this.selectedMetric.metricName;
     const method = this.selectedMethod.type.split(':');
     const isChartType = method[0] === 'chart';
-    const type = <AnalysisType>(isChartType ? method[0] : method[1]);
+    let type = <AnalysisType>(isChartType ? method[0] : method[1]);
+    if (type === 'report' && this.selectedMethod.supportedTypes) {
+      type = 'esReport';
+    }
     const chartType = <ChartType>(isChartType ? method[1] : null);
     const model = {
       type,

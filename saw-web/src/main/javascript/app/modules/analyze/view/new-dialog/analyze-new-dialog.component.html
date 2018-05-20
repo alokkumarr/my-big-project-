@@ -27,15 +27,15 @@
   </div>
 </mat-dialog-content>
 <mat-divider></mat-divider>
-<mat-dialog-actions>
-  <button (click)="_dialogRef.close()"
-          mat-button
-          mat-dialog-close i18n
-  >Cancel</button>
+<div fxLayout="row" fxLayoutALign="space-between center" class="dialog-actions">
   <button (click)="createAnalysis()"
           [disabled]="createButtonDisabled()"
           e2e="create-analysis-btn"
           color="primary"
           mat-raised-button i18n
   >Create Analysis</button>
-</mat-dialog-actions>
+  <button (click)="_dialogRef.close()"
+          mat-button
+          mat-dialog-close i18n
+  >Cancel</button>
+</div>
