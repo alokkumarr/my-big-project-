@@ -87,54 +87,6 @@ export class AnalyzeNewDialogComponent {
   }
 
   createAnalysis() {
-    let tpl;
-    let model;
-    let type;
-    const semanticId = this.selectedMetric.id;
-    const metricName = this.selectedMetric.metricName;
-    const mode = ENTRY_MODES.NEW;
-
-    switch (this.selectedMethod.type) {
-    /* eslint-disable no-fallthrough */
-    case 'table:esReport':
-    case 'table:report':
-    case 'table:pivot':
-      this.openUpgradedModal();
-      return;
-    default:
-      type = this.selectedMethod.type.split(':')[1];
-      tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
-      model = {
-        type: AnalyseTypes.Chart,
-        chartType: type,
-        name: 'Untitled Chart',
-        metricName,
-        semanticId,
-        description: '',
-        categoryId: this.data.id,
-        scheduled: null
-      };
-      break;
-    }
-    this._$mdDialog.show({
-      template: tpl,
-      controller: scope => {
-        scope.model = model;
-      },
-      controllerAs: '$ctrl',
-      autoWrap: false,
-      focusOnOpen: false,
-      multiple: true,
-      clickOutsideToClose: true,
-      hasBackdrop: false
-    }).then(successfullySaved => {
-      if (successfullySaved) {
-        this._dialogRef.close(successfullySaved);
-      }
-    });
-  }
-
-  openUpgradedModal() {
     const semanticId = this.selectedMetric.id;
     const metricName = this.selectedMetric.metricName;
     const method = this.selectedMethod.type.split(':');
@@ -158,5 +110,4 @@ export class AnalyzeNewDialogComponent {
         }
       });
   }
-
 }
