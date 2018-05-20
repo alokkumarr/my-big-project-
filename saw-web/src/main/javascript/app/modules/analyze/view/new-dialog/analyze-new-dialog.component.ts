@@ -68,9 +68,6 @@ export class AnalyzeNewDialogComponent {
       },{})
     )(metric.supports);
 
-    console.log('supportMap', supportMap);
-    console.log('metric', metric);
-
     forEach(this.methodCategories, category => {
       forEach(category.children, method => {
         if (method.supportedTypes) {

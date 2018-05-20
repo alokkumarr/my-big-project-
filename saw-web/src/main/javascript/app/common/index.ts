@@ -66,12 +66,8 @@ import {
   JsPlumbEndpointComponent
 } from './components/js-plumb';
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
-<<<<<<< HEAD
 import {DateFormatDialogComponent} from './components/date-format-dialog';
 import { ChoiceGroupComponent } from './components/choice-group-u';
-=======
-import { DateFormatDialogComponent } from './components/date-format-dialog';
->>>>>>> feature/SAW-1529-upgrade-main-analyze-page-to-angular
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { E2eDirective } from './directives/e2e.directive';
 import { UserService } from '../../login/services/user.service';
@@ -159,11 +155,8 @@ angular
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
-<<<<<<< HEAD
-    ChoiceGroupComponent
-=======
+    ChoiceGroupComponent,
     SearchBoxComponent
->>>>>>> feature/SAW-1529-upgrade-main-analyze-page-to-angular
   ],
   entryComponents: [
     PivotGridComponent,
@@ -183,11 +176,8 @@ angular
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
-<<<<<<< HEAD
-    ChoiceGroupComponent
-=======
+    ChoiceGroupComponent,
     SearchBoxComponent
->>>>>>> feature/SAW-1529-upgrade-main-analyze-page-to-angular
   ],
   exports: [
     DndModule,
@@ -226,11 +216,8 @@ angular
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     E2eDirective,
-<<<<<<< HEAD
-    ChoiceGroupComponent
-=======
+    ChoiceGroupComponent,
     SearchBoxComponent
->>>>>>> feature/SAW-1529-upgrade-main-analyze-page-to-angular
   ],
   providers: [
     ErrorDetailService,

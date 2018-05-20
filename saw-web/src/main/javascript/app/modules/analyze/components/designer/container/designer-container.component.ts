@@ -76,8 +76,6 @@ export class DesignerContainerComponent {
     const isReport = ['report', 'esReport'].includes(
       get(this.analysis, 'type') || get(this.analysisStarter, 'type')
     );
-    console.log('analysis', this.analysis);
-    console.log('analysisStarter', this.analysisStarter);
     this.designerState = DesignerStates.WAITING_FOR_COLUMNS;
     /* prettier-ignore */
     switch (this.designerMode) {
