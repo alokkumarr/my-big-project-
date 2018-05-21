@@ -54,7 +54,6 @@ angular
   .service('JwtService', JwtService)
   .service('UserService', UserService)
   .component('layoutContent', LayoutContentComponent)
-  .component('layoutFooter', LayoutFooterComponent)
   .component('passwordChangeComponent', PasswordChangeComponent)
   .component('passwordPreResetComponent', PasswordPreResetComponent)
   .component('passwordResetComponent', PasswordResetComponent)
