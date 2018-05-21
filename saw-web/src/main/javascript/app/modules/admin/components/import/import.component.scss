@@ -1,0 +1,27 @@
+@import "themes/base/colors";
+
+admin-analysis-import {
+  width: 100%;
+  padding: 10px;
+
+  md-card-header {
+    padding: 1px;
+  }
+
+  md-checkbox {
+    margin-bottom: 1px;
+  }
+
+  .warn-log {
+    color: $primary-orange;
+  }
+
+  .analysis-override {
+    font-size: x-small;
+  }
+
+  .upload-button {
+    color: $primary-white;
+    background-color: $primary-blue-b2;
+  }
+}
