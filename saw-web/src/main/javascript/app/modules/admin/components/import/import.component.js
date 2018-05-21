@@ -6,11 +6,12 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import {Subject} from 'rxjs/Subject';
 
+let self;
 export const AnalysisImportComponent = {
   template,
   styles: [style],
   controller: class AnalysisImportComponent extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService,
+    constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService,
       $window, $rootScope, LocalSearchService, ImportService, ExportService) {
       'ngInject';
       super($injector);
@@ -29,6 +30,8 @@ export const AnalysisImportComponent = {
       this.fileListupdater = new Subject();
       this.categories = this.getAllCategories();
       this.getMetricList();
+      this._$timeout = $timeout;
+      self = this;
     }
     getAllCategories() {
       this._$rootScope.showProgress = true;
@@ -52,8 +55,10 @@ export const AnalysisImportComponent = {
         });
     }
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-      leftSideNav.update(AdminMenuData, 'ADMIN');
+      this._$timeout(() => {
+        const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+        leftSideNav.update(AdminMenuData, 'ADMIN');
+      });
       this.files = [];
       this.analysisTableList = [];
     }

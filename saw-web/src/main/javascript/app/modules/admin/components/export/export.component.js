@@ -7,11 +7,12 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import {Subject} from 'rxjs/Subject';
 
+let self;
 export const AnalysisExportComponent = {
   template,
   styles: [style],
   controller: class AnalysisExportComponent extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $filter,
+    constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $filter,
       $mdToast, JwtService, $window, $rootScope, ExportService) {
       'ngInject';
       super($injector);
@@ -21,11 +22,15 @@ export const AnalysisExportComponent = {
       this._$rootScope = $rootScope;
       this._JwtService = JwtService;
       this.updater = new Subject();
+      this._$timeout = $timeout;
+      self = this;
     }
 
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-      leftSideNav.update(AdminMenuData, 'ADMIN');
+      this._$timeout(() => {
+        const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+        leftSideNav.update(AdminMenuData, 'ADMIN');
+      });
       this.metrics = [];
       this.analysisTableList = [];
       this.getMetricList();
