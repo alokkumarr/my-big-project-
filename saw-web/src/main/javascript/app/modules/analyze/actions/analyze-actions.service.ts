@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as clone from 'lodash/clone';
 import * as deepClone from 'lodash/cloneDeep';
 import * as defaultsDeep from 'lodash/defaultsDeep';
@@ -8,7 +9,8 @@ import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { FilterService } from '../services/filter.service';
-
+import { Analysis } from '../types';
+import { AnalyzePublishDialogComponent } from '../publish';
 
 @Injectable()
 export class AnalyzeActionsService {
@@ -19,10 +21,8 @@ export class AnalyzeActionsService {
     private _analyzeDialogService: AnalyzeDialogService,
     private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
-    @Inject('$mdDialog') private _$mdDialog: any
-  ) {
-    this.doPublish = this.doPublish.bind(this);
-  }
+    public dialog: MatDialog
+  ) {}
 
   execute(analysis) {
     return this._filterService.getRuntimeFilterValues(analysis).then(model => {
@@ -81,14 +81,27 @@ export class AnalyzeActionsService {
   }
 
   openPublishModal(analysis) {
-    const template = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
-
-    return this.showDialog({
-      template,
-      controller: scope => {
-        scope.model = analysis;
-        scope.onPublish = this.doPublish;
-      }
+    return new Promise<Analysis>((resolve, reject) => {
+      this.dialog.open(AnalyzePublishDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        data: { analysis }
+      } as MatDialogConfig).afterClosed().subscribe(analysis => {
+        if (analysis) {
+          const execute = false;
+          this._headerProgress.show();
+          this._analyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
+            this._headerProgress.hide();
+            this._toastMessage.info(execute ?
+              'Analysis has been updated.' :
+              'Analysis schedule changes have been updated.');
+            resolve(updatedAnalysis);
+          }, () => {
+            this._headerProgress.hide();
+            reject();
+          });
+        }
+      });
     });
   }
 
@@ -102,32 +115,5 @@ export class AnalyzeActionsService {
       this._headerProgress.hide();
       this._toastMessage.error(err.message || 'Analysis not deleted.');
     });
-  }
-
-  doPublish(analysis) {
-    const execute = false;
-    this._headerProgress.show();
-    return this._analyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
-      this._headerProgress.hide();
-      this._toastMessage.info(execute ?
-        'Analysis has been updated.' :
-        'Analysis schedule changes have been updated.');
-      return updatedAnalysis;
-    }, () => {
-      this._headerProgress.hide();
-    });
-  }
-
-  showDialog(config) {
-    config = defaultsDeep(config, {
-      controllerAs: '$ctrl',
-      multiple: false,
-      autoWrap: false,
-      focusOnOpen: false,
-      clickOutsideToClose: true,
-      fullscreen: false
-    });
-
-    return this._$mdDialog.show(config);
   }
 }
