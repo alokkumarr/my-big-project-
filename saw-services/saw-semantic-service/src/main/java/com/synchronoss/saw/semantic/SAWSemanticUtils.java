@@ -79,8 +79,6 @@ public class SAWSemanticUtils {
     Preconditions.checkArgument(node.getSupports()!=null, "supports cannot be null");
     Preconditions.checkArgument(node.getArtifacts()!=null, "artifacts code cannot be null");
     Preconditions.checkArgument(node.getMetricName()!=null, "metric name code cannot be null");
-    Preconditions.checkArgument(node.getModule()!=null, "module cannot be null");
-    Preconditions.checkArgument(node.getType()!=null, "type code cannot be null");
   }
   
   public static List<MetaDataStoreStructure> node2JSONObject(SemanticNode node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
