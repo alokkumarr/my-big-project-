@@ -116,7 +116,7 @@ public class SAWSemanticController {
    * @param requestBody
    * @return
    */
-  @RequestMapping(value = "/{projectId}/update/{Id}", method = RequestMethod.PUT,
+  @RequestMapping(value = "/{projectId}/{Id}", method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.FOUND)
   public SemanticNode updateSemantic(
