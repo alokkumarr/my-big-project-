@@ -29,6 +29,7 @@ import { pivotAreaTypeFilter } from './filters/pivot-area-type.filter';
 import { uniqueFilter } from './filters/unique.filter';
 
 import { AnalyzeActionsService } from './actions/analyze-actions.service';
+import { AnalyzeActionsService as OldAnalyzeActionsService } from './components/actions/analyze-actions.service';
 
 import { AnalyzePageComponent } from './components/page/analyze-page.component';
 import { AggregateChooserComponent } from './components/aggregate-chooser/aggregate-chooser.component';
@@ -63,6 +64,7 @@ import { AnalyzePublishDialogComponent } from './components/publish-dialog/analy
 import { AnalyzeChartComponent } from './components/chart/analyze-chart.component';
 import { AnalyzeChartSettingsComponent } from './components/chart/settings/analyze-chart-settings.component';
 import { AnalyzeChartPreviewComponent } from './components/chart/preview/analyze-chart-preview.component';
+import { AnalyzeActionsMenuComponent } from './components/actions/analyze-actions-menu.component';
 import { CommonModule } from '../../common';
 
 import { CommonModuleTs } from '../../common';
@@ -118,10 +120,11 @@ angular
   .service('FilterService', FilterService)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
-  .factory('AnalyzeActionsService', downgradeInjectable(AnalyzeActionsService) as Function)
+  .factory('AnalyzeActionsService', OldAnalyzeActionsService)
   .factory('ChartService', downgradeInjectable(ChartService) as Function)
   .factory('AnalyzeDialogService', downgradeInjectable(AnalyzeDialogService) as Function)
   .service('SortService', SortService)
+  .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
   .component('aggregateChooser', AggregateChooserComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
   .component('reportGridNode', ReportGridNodeComponent)
