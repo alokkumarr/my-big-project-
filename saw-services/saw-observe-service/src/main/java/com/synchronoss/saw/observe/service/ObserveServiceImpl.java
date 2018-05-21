@@ -43,8 +43,12 @@ public class ObserveServiceImpl implements ObserveService {
   @Value("${metastore.base}")
   private String basePath;
 
-  
-  private DateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+
+  /*
+   * 24-hr date time format.
+   * E.g.: 2018-05-25 13:08:25
+   */
+  private DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
   @Override
   public ObserveResponse addDashboard(Observe node)
