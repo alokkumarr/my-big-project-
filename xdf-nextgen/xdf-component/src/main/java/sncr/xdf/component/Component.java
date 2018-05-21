@@ -141,6 +141,7 @@ public abstract class Component {
                         return;
                     }
 
+                    ctx.setStartTs();
                     JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
                     if (ds == null) {
                         error = "Could not create metadata for output dataset: " + o.getDataSet();
@@ -359,7 +360,7 @@ public abstract class Component {
                     logger.trace("Extracted schema: " + schema.toString());
 
                     // Set record count
-                    long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
+                    long recordCount = (long)outDS.getOrDefault(DataSetProperties.RecordCount.name(), 0);
                     logger.trace("Extracted record count " + recordCount);
 
                     md.updateDS(id, ctx, ds, schema, recordCount);

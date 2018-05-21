@@ -264,6 +264,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
+            outputDS.put(DataSetProperties.RecordCount.name(), xdfDW.extractrecordCount(dataset));
             return 0;
         } catch (Exception e) {
             error = ExceptionUtils.getFullStackTrace(e);
