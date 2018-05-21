@@ -40,16 +40,16 @@ export const AnalysisImportComponent = {
     }
     getAllAnalysisByCategoryId(subCategoryId) {
       this._$rootScope.showProgress = true;
-      const id = subCategoryId + '';
+      const id = String(subCategoryId);
       this._ImportService.getAnalysesFor(id)
-      .then(response => {
-        this.categoryAnalysisTableList = response.data.contents.analyze;
-        this.checkMetricOfAnalysis();
-        this.checkDuplicationAnalysis();
-        this.updater.next({analysisList: this.analysisTableList});
-        this.analysisUpdater.next({analysisList: this.categoryAnalysisTableList});
-        this._$rootScope.showProgress = false;
-      });
+        .then(response => {
+          this.categoryAnalysisTableList = response.data.contents.analyze;
+          this.checkMetricOfAnalysis();
+          this.checkDuplicationAnalysis();
+          this.updater.next({analysisList: this.analysisTableList});
+          this.analysisUpdater.next({analysisList: this.categoryAnalysisTableList});
+          this._$rootScope.showProgress = false;
+        });
     }
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
@@ -74,7 +74,7 @@ export const AnalysisImportComponent = {
         if (file.type === 'application/json') {
           const reader = new FileReader();
           reader.onload = (theFile => {
-            return (e) => {
+            return e => {
               let list = [];
               list = angular.fromJson(e.srcElement.result);
               const fileObject = {
@@ -149,7 +149,7 @@ export const AnalysisImportComponent = {
       importFileAnalysis.repository = maprDbAnalysis.repository;
     }
     checkMetricOfAnalysis() {
-      if (this.analysisTableList.length > 0 ) {
+      if (this.analysisTableList.length > 0) {
         this.analysisTableList.forEach(analysisObject => {
           this.flag = 0;
           this.metrics.forEach(checkMetric => {

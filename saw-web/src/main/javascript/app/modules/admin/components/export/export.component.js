@@ -12,7 +12,7 @@ export const AnalysisExportComponent = {
   styles: [style],
   controller: class AnalysisExportComponent extends AbstractComponentController {
     constructor($componentHandler, $injector, $compile, $state, $mdDialog, $filter,
-       $mdToast, JwtService, $window, $rootScope, ExportService) {
+      $mdToast, JwtService, $window, $rootScope, ExportService) {
       'ngInject';
       super($injector);
       this.$componentHandler = $componentHandler;
@@ -43,8 +43,8 @@ export const AnalysisExportComponent = {
 
     getMetricIds(metricNames) {
       const ids = [];
-      for (let i = 0; this.metrics.length> i; i++ ) {
-        for (let j = 0; metricNames.length> j; j++ ) {
+      for (let i = 0; this.metrics.length > i; i++) {
+        for (let j = 0; metricNames.length > j; j++) {
           if (this.metrics[i].metricName === metricNames[j]) {
             ids.push(this.metrics[i].id);
           }
@@ -73,7 +73,7 @@ export const AnalysisExportComponent = {
           this.analysisTableList = [];
           if (analysis.data.contents.analyze.length > 0) {
             analysis.data.contents.analyze.forEach(element => {
-              if (element.categoryId !== null && element.name !== null ) {
+              if (element.categoryId !== null && element.name !== null) {
                 this.list.forEach(id => {
                   if (id === element.semanticId) {
                     this.analysisTableObject = {
@@ -118,7 +118,7 @@ export const AnalysisExportComponent = {
         fileExportList.forEach(exportAnalysis => {
           if (exportAnalysis.analysisList.length > 0) {
             zip.file(`${exportAnalysis.fileName}.json`,
-            new Blob([angular.toJson(exportAnalysis.analysisList)], {type: 'application/json;charset=utf-8'}));
+              new Blob([angular.toJson(exportAnalysis.analysisList)], {type: 'application/json;charset=utf-8'}));
           }
         });
         zip.generateAsync({type: 'blob'}).then(content => {
@@ -154,4 +154,4 @@ export const AnalysisExportComponent = {
       return custCode + '_' + name + '_' + formatedDate;
     }
   }
-}
+};

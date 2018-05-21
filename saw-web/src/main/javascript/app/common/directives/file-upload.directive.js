@@ -1,16 +1,16 @@
 class FileUploadDirective {
   constructor() {
-    this.restrict = 'A',
-    this.require = '?ngModel',
+    this.restrict = 'A';
+    this.require = '?ngModel';
     this.fileTypeRegex = /^file$/i;
   }
 
   link(scope, element, attrs, ngModel) {
-    if (ngModel && element[0].tagName === 'INPUT' && this.fileTypeRegex.test(attrs['type'])) {
+    if (ngModel && element[0].tagName === 'INPUT' && this.fileTypeRegex.test(attrs.type)) {
       element.on('change', () => {
-        let input = this;
+        const input = this;
         if ('multiple' in attrs) {
-          let files = Array.prototype.map.call(input.files, (file) => {
+          const files = Array.prototype.map.call(input.files, file => {
             return file;
           });
           ngModel.$setViewValue(files);

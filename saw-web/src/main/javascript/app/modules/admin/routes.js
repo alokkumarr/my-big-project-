@@ -26,7 +26,7 @@ export function routesConfig($stateProvider) {
       name: 'import',
       url: '/import',
       component: 'importComponent'
-	  }
+    }
   ];
 
   states.forEach(state => {

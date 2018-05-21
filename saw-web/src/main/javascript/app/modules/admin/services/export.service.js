@@ -1,17 +1,9 @@
 import * as forEach from 'lodash/forEach';
-import * as floor from 'lodash/floor';
 import * as set from 'lodash/set';
-import * as isEmpty from 'lodash/isEmpty';
-import * as has from 'lodash/has';
-import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGet from 'lodash/fp/get';
-import * as find from 'lodash/find';
-import * as filter from 'lodash/filter';
-import * as flatMap from 'lodash/flatMap';
-import * as cloneDeep from 'lodash/cloneDeep';
 const MODULE_NAME = 'ANALYZE';
 export class ExportService {
-  constructor($http, $q, AppConfig, JwtService, toastMessage, $translate) {
+  constructor($http, $q, AppConfig, JwtService) {
     'ngInject';
     this._$http = $http;
     this._$q = $q;
@@ -29,7 +21,7 @@ export class ExportService {
     });
     return reqParams;
   }
-  
+
   getMetricList() {
     const params = this.getRequestParams([
       ['contents.action', 'search'],
@@ -39,7 +31,7 @@ export class ExportService {
     return this._$http.post(`${this.apiUrl}/md`, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
   }
 
-  getAnalysisByMetricIds(object){
+  getAnalysisByMetricIds(object) {
     return this._$http.post(`${this.apiUrl}/analysis`, object);
   }
 }

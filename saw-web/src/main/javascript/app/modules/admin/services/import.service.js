@@ -1,17 +1,9 @@
 import * as forEach from 'lodash/forEach';
-import * as floor from 'lodash/floor';
 import * as set from 'lodash/set';
-import * as isEmpty from 'lodash/isEmpty';
-import * as has from 'lodash/has';
-import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGet from 'lodash/fp/get';
-import * as find from 'lodash/find';
-import * as filter from 'lodash/filter';
-import * as flatMap from 'lodash/flatMap';
-import * as cloneDeep from 'lodash/cloneDeep';
 const MODULE_NAME = 'ANALYZE';
 export class ImportService {
-  constructor($http, $q, AppConfig, JwtService, toastMessage, $translate) {
+  constructor($http, $q, AppConfig, JwtService) {
     'ngInject';
     this._$http = $http;
     this._$q = $q;
@@ -53,4 +45,3 @@ export class ImportService {
     return this._$http.post(`${this.apiUrl}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
   }
 }
-  
