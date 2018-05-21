@@ -2,7 +2,6 @@ import * as template from './import.component.html';
 import style from './import.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 import {AdminMenuData} from '../../consts';
-import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import {Subject} from 'rxjs/Subject';
@@ -14,6 +13,7 @@ export const AnalysisImportComponent = {
     constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService,
       $window, $rootScope, LocalSearchService, ImportService, ExportService) {
       'ngInject';
+      super($injector);
       this.$componentHandler = $componentHandler;
       this._$rootScope = $rootScope;
       this._$mdToast = $mdToast;
@@ -21,10 +21,9 @@ export const AnalysisImportComponent = {
       this._CategoriesManagementService = CategoriesManagementService;
       this._exportService = ExportService;
       this._ImportService = ImportService;
-      super($injector);
       this.metrics = [];
-      this.categoryAnalysisTableList =[];
-      this.fileTableList =[];
+      this.categoryAnalysisTableList = [];
+      this.fileTableList = [];
       this.analysisUpdater = new Subject();
       this.updater = new Subject();
       this.fileListupdater = new Subject();
@@ -33,16 +32,15 @@ export const AnalysisImportComponent = {
     }
     getAllCategories() {
       this._$rootScope.showProgress = true;
-      let id = get(this._JwtService.getTokenObj(), 'ticket.custID');
-      this._CategoriesManagementService.getActiveCategoriesList(id)
-      .then(response => {
+      const id = get(this._JwtService.getTokenObj(), 'ticket.custID');
+      this._CategoriesManagementService.getActiveCategoriesList(id).then(response => {
         this.dataHolder = response.categories;
         this._$rootScope.showProgress = false;
       });
     }
     getAllAnalysisByCategoryId(subCategoryId) {
       this._$rootScope.showProgress = true;
-      let id = subCategoryId+'';
+      const id = subCategoryId + '';
       this._ImportService.getAnalysesFor(id)
       .then(response => {
         this.categoryAnalysisTableList = response.data.contents.analyze;
@@ -74,12 +72,12 @@ export const AnalysisImportComponent = {
       this.fileTableList = [];
       this.files.forEach(file => {
         if (file.type === 'application/json') {
-          let reader = new FileReader();
-          reader.onload = ( (theFile) => {
+          const reader = new FileReader();
+          reader.onload = (theFile => {
             return (e) => {
               let list = [];
-              list = JSON.parse(e.srcElement.result);
-              let fileObject = {
+              list = angular.fromJson(e.srcElement.result);
+              const fileObject = {
                 name: '',
                 count: 0
               };
@@ -98,7 +96,7 @@ export const AnalysisImportComponent = {
               this.checkDuplicationAnalysis();
               this.updater.next({analysisList: this.analysisTableList});
               this.fileListupdater.next({fileList: this.fileTableList});
-            }
+            };
           })(file);
           reader.readAsText(file);
         } else {
@@ -113,10 +111,10 @@ export const AnalysisImportComponent = {
       this._$rootScope.showProgress = false;
     }
     checkDuplicationAnalysis() {
-      if(this.analysisTableList.length > 0 && this.categoryAnalysisTableList.length > 0) {
+      if (this.analysisTableList.length > 0 && this.categoryAnalysisTableList.length > 0) {
         this.categoryAnalysisTableList.forEach(analysis => {
           this.analysisTableList.forEach(analysisObject => {
-            if(analysisObject.analysis.name === analysis.name && !analysisObject.noMetricInd){
+            if (analysisObject.analysis.name === analysis.name && !analysisObject.noMetricInd) {
               analysisObject.duplicateAnalysisInd = true;
               analysisObject.logColor = 'red';
               analysisObject.importInd = false;
@@ -126,8 +124,8 @@ export const AnalysisImportComponent = {
           });
         });
       }
-      if(this.analysisTableList.length > 0 && this.categoryAnalysisTableList.length === 0) {
-        this.checkMetricOfAnalysis()
+      if (this.analysisTableList.length > 0 && this.categoryAnalysisTableList.length === 0) {
+        this.checkMetricOfAnalysis();
       }
     }
     changeNewAnalysisParameter(importFileAnalysis, maprDbAnalysis) {
@@ -151,16 +149,16 @@ export const AnalysisImportComponent = {
       importFileAnalysis.repository = maprDbAnalysis.repository;
     }
     checkMetricOfAnalysis() {
-      if(this.analysisTableList.length > 0 ) {
+      if (this.analysisTableList.length > 0 ) {
         this.analysisTableList.forEach(analysisObject => {
           this.flag = 0;
           this.metrics.forEach(checkMetric => {
-            if(checkMetric.metricName === analysisObject.analysis.metricName) {
+            if (checkMetric.metricName === analysisObject.analysis.metricName) {
               analysisObject.analysis.semanticId = checkMetric.id;
               this.flag = 1;
             }
           });
-          if(this.flag === 0){
+          if (this.flag === 0) {
             analysisObject.noMetricInd = true;
             analysisObject.logColor = 'red';
             analysisObject.log = 'Metric not exists.';
@@ -183,7 +181,7 @@ export const AnalysisImportComponent = {
       }
     }
     doImport(analysisList) {
-      if(this.categoryId === undefined) {
+      if (isUndefined(this.categoryId)) {
         this._$mdToast.show({
           template: '<md-toast><span>Target-Category not selected.</md-toast>',
           position: 'top left',
@@ -193,7 +191,7 @@ export const AnalysisImportComponent = {
       }
       let importCount = 0;
       analysisList.forEach(analysisObject => {
-        if(analysisObject.selection && !analysisObject.noMetricInd && !analysisObject.importInd){
+        if (analysisObject.selection && !analysisObject.noMetricInd && !analysisObject.importInd) {
           if (analysisObject.overrideInd && analysisObject.duplicateAnalysisInd) {
             this.updateOldAnalysis(analysisObject.analysis);
           }
@@ -203,7 +201,7 @@ export const AnalysisImportComponent = {
           importCount++;
         }
       });
-      if(importCount === 0) {
+      if (importCount === 0) {
         this._$mdToast.show({
           template: '<md-toast><span>select analysis to import.</md-toast>',
           position: 'top left',
@@ -227,12 +225,12 @@ export const AnalysisImportComponent = {
       this._ImportService.updateAnalysis(analysis).then(savedAnalysis => {
         this.updateLogs(savedAnalysis.name, 'Successfully Imported', '', 'green', true);
         this._$rootScope.showProgress = false;
-      }).catch((error) => {
-        this.updateLogs(savedAnalysis.name, 'Error While Importing', error, 'red', false);
+      }).catch(error => {
+        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false);
         this._$rootScope.showProgress = false;
       });
     }
-    updateLogs(analysisName, logShortMsg, logLongMsg, logColor, importFlag){
+    updateLogs(analysisName, logShortMsg, logLongMsg, logColor, importFlag) {
       this.analysisTableList.forEach(analysisObject => {
         if (analysisObject.analysis.name === analysisName) {
           analysisObject.log = logShortMsg;
@@ -243,4 +241,4 @@ export const AnalysisImportComponent = {
       this.updater.next({analysisList: this.analysisTableList});
     }
   }
-}
+};

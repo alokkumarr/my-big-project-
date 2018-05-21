@@ -38,15 +38,15 @@ export const ExportListViewComponent = {
     }
 
     reloadDataGrid(analysisList) {
-      if (this._gridListInstance != null) {
+      if (this._gridListInstance !== null) {
         this._gridListInstance.option('dataSource', analysisList);
         this._gridListInstance.refresh();
       }
     }
 
-    editRow(row, flag, index){
+    editRow(row, flag) {
       this.analysisList.forEach(analysis => {
-        if(row.data.analysis.name === analysis.analysis.name && row.data.analysis.id === analysis.analysis.id) {
+        if (row.data.analysis.name === analysis.analysis.name && row.data.analysis.id === analysis.analysis.id) {
           analysis.selection = !flag;
         }
       });
@@ -54,9 +54,9 @@ export const ExportListViewComponent = {
     onGridInitialized(e) {
       this._gridListInstance = e.component;
     }
-    selectAll (flag) {
+    selectAll(flag) {
       this.analysisList.forEach(analysis => {
-        analysis.selection = !flag
+        analysis.selection = !flag;
       });
     }
     export(analysisList) {

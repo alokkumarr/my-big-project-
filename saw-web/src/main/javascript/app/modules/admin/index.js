@@ -50,7 +50,7 @@ angular.module(AdminModule, [
   .factory('PrivilegesManagementService', PrivilegesManagementService)
   .factory('CategoriesManagementService', CategoriesManagementService)
   .service('ExportService', ExportService)
-  .service('ImportService',ImportService)
+  .service('ImportService', ImportService)
   .component('usersView', UsersViewComponent)
   .component('usersListView', UsersListViewComponent)
   .component('userDialog', UserDialogComponent)
@@ -74,7 +74,7 @@ angular.module(AdminModule, [
   .component('categoryDelete', CategoryDeleteComponent)
   .component('exportComponent', AnalysisExportComponent)
   .component('importComponent', AnalysisImportComponent)
-  .component('exportListView',ExportListViewComponent)
-  .component('importListView',ImportListViewComponent)
-  .component('analysisListView',AnalysisListViewComponent)
-  .component('importFileListView',ImportFileListViewComponent);
+  .component('exportListView', ExportListViewComponent)
+  .component('importListView', ImportListViewComponent)
+  .component('analysisListView', AnalysisListViewComponent)
+  .component('importFileListView', ImportFileListViewComponent);

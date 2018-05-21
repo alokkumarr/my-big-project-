@@ -10,7 +10,7 @@
     <div id="user-grid" dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">     
       <div data-options="dxTemplate: { name: 'selectionCellTemplate' }">
         <md-card-actions layout="row" layout-align="center center">
-          <md-checkbox ng-click="$ctrl.editRow(report, report.value, report.rowIndex)" ng-model="report.value"></md-checkbox>
+          <md-checkbox ng-click="$ctrl.editRow(report, report.value)" ng-model="report.value"></md-checkbox>
         </md-card-actions>
       </div> 
       <div data-options="dxTemplate: { name: 'analysisNameCellTemplate' }" >

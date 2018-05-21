@@ -21,7 +21,7 @@ export const AdminMenuData = [{
     id: '',
     name: 'Export Analysis',
     url: '#!/export'
-  },{
+  }, {
     id: '',
     name: 'Import Analysis',
     url: '#!/import'

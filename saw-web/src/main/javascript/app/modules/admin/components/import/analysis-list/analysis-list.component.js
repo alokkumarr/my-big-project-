@@ -37,7 +37,7 @@ export const AnalysisListViewComponent = {
     }
 
     reloadDataGrid(analysisList) {
-      if (this._gridListInstance != null) {
+      if (this._gridListInstance !== null) {
         this._gridListInstance.option('dataSource', analysisList);
         this._gridListInstance.refresh();
       }

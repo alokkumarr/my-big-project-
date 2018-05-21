@@ -11,7 +11,6 @@ import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 const MODULE_NAME = 'ANALYZE';
 export class ImportService {
-  'ngInject';
   constructor($http, $q, AppConfig, JwtService, toastMessage, $translate) {
     'ngInject';
     this._$http = $http;

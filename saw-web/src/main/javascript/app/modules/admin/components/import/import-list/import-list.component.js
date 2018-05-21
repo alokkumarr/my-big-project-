@@ -8,7 +8,7 @@ export const ImportListViewComponent = {
     updater: '<',
     onAction: '&'
   },
-  controller: class ImportListViewController{
+  controller: class ImportListViewController {
     constructor(dxDataGridService) {
       'ngInject';
       this._dxDataGridService = dxDataGridService;
@@ -38,25 +38,25 @@ export const ImportListViewComponent = {
     }
 
     reloadDataGrid(analysisList) {
-      if (this._gridListInstance != null) {
+      if (this._gridListInstance !== null) {
         this._gridListInstance.option('dataSource', analysisList);
         this._gridListInstance.refresh();
       }
     }
 
-    editRow(row, flag){
+    editRow(row, flag) {
       this.analysisList.forEach(analysis => {
-        if(row.data.analysis.name === analysis.analysis.name && row.data.analysis.id === analysis.analysis.id) {
+        if (row.data.analysis.name === analysis.analysis.name && row.data.analysis.id === analysis.analysis.id) {
           analysis.selection = !flag;
           analysis.overrideInd = false;
         }
       });
     }
-    overrideAnalysis(row){
+    overrideAnalysis(row) {
       this.analysisList.forEach(analysis => {
-        if(row.data.analysis.name === analysis.analysis.name && row.data.analysis.id === analysis.analysis.id) {
+        if (row.data.analysis.name === analysis.analysis.name && row.data.analysis.id === analysis.analysis.id) {
           analysis.selection = true;
-          if (analysis.overrideInd === undefined){
+          if (isUndefined(analysis.overrideInd)) {
             analysis.overrideInd = true;
           } else {
             analysis.overrideInd = !analysis.overrideInd;
@@ -67,9 +67,9 @@ export const ImportListViewComponent = {
     onGridInitialized(e) {
       this._gridListInstance = e.component;
     }
-    selectAll (flag) {
+    selectAll(flag) {
       this.analysisList.forEach(analysis => {
-        analysis.selection = !flag
+        analysis.selection = !flag;
         analysis.overrideInd = false;
       });
     }

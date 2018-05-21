@@ -38,7 +38,7 @@ export const ImportFileListViewComponent = {
     }
 
     reloadDataGrid(fileList) {
-      if (this._gridListInstance != null) {
+      if (this._gridListInstance !== null) {
         this._gridListInstance.option('dataSource', fileList);
         this._gridListInstance.refresh();
       }
