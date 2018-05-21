@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.*;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.ojai.joda.DateTime;
 import org.ojai.store.DocumentMutation;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
@@ -161,6 +162,8 @@ public class DLDataSetService {
      */
     private JsonElement createDSDescriptor(String id, ContextMetadata ctx, Map<String, Object> o){
         JsonObject dl = new JsonObject();
+        DateTime currentTIme = new DateTime();
+        long epochTime = currentTIme.getMillis() / 1000;
 
         //TODO:: Dormant, for future development
         String ds_type = o.containsKey(DataSetProperties.Type.name())? (String) o.get(DataSetProperties.Type.name()): Input.Dstype.BASE.toString();
@@ -173,6 +176,8 @@ public class DLDataSetService {
         dl.add(DataSetProperties.Name.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Name.name())));
         dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive( catalog ));
         dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((Integer) o.get(DataSetProperties.NumberOfFiles.name())));
+        dl.addProperty(DataSetProperties.CreatedTime.toString(), epochTime);
+        dl.addProperty(DataSetProperties.ModifiedTime.toString(), epochTime);
 
 
         //TODO:: Add transformation data from ctx
@@ -189,6 +194,15 @@ public class DLDataSetService {
 
         if (schema == null || ds == null)
             throw new IllegalArgumentException("Schema/DS descriptor must not be null");
+
+        JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
+
+        DateTime currentTime = new DateTime();
+        long modifiedTime = currentTime.getMillis() / 1000;
+        logger.debug("Dataset modified at = " + modifiedTime);
+
+        system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
+        ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
 
         JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
         JsonObject trans = new JsonObject();
