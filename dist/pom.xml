@@ -524,23 +524,6 @@
       </properties>
     </profile>
     <!-- Docker with Yarn enable-->
-    <profile>
-      <id>docker-start-local-with-yarn</id>
-      <activation>
-        <property>
-          <name>docker-start</name>
-          <value>local-with-yarn</value>
-        </property>
-      </activation>
-      <properties>
-        <!-- Disable Docker Machine configuration when using local -->
-        <saw.docker.skip.machine>true</saw.docker.skip.machine>
-        <!-- Limit access to local machine only when no remote access
-             needed -->
-        <saw.docker.ip>127.0.0.1</saw.docker.ip>
-        <saw.yarn.enabled>true</saw.yarn.enabled>
-      </properties>
-    </profile>
     <!-- Cloud Docker profile -->
     <profile>
       <id>docker-start-cloud</id>

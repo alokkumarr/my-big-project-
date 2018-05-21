@@ -25,6 +25,11 @@ cloud:
 
         $ mvn package
         $ mvn -Ddocker-start=cloud
+        
+   Running docker machine in yarn mode.
+   
+        $ mvn package
+        $ mvn -Ddocker-start=cloud -Dsaw.yarn.enabled=true
 
 6. Get the SAW start page URL by running the following command:
 
