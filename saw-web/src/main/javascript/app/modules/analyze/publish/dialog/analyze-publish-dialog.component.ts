@@ -79,7 +79,6 @@ export class AnalyzePublishDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('data', this.data);
     this.scheduleState = 'new';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH)

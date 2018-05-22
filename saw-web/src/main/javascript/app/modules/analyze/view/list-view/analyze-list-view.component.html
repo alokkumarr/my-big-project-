@@ -53,6 +53,7 @@
 
     <div *dxTemplate="let cell of 'actionCellTemplate'">
       <button mat-icon-button
+              *ngIf="canUserFork"
               (click)="fork(cell.data)"
               class="list-action-button"
               i18n-matTooltip="Fork Analysis"
