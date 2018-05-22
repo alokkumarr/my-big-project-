@@ -1,6 +1,5 @@
-<header [ngSwitch]="data.action"
-        class="dialog__header">
-  <strong *ngSwitchCase="'filter'" i18n>Filter</strong>
+<header class="dialog__header">
+  <strong i18n>Filter</strong>
 </header>
 <div class="dialog__content">
   <div class="filter-container">
@@ -15,12 +14,15 @@
                              (filterChange)="onFilterChange()"
                              (filterModelChange)="onFilterModelChange()"
                              [filter]="filter"
+                             [supportsGlobalFilters]="data.supportsGlobalFilters"
                              [isInRuntimeMode]="data.isInRuntimeMode"
                              [artifactColumns]="artifact.columns">
         </designer-filter-row>
       </div>
       <button mat-icon-button
-              [attr.e2e]="'filter-add-btn-' + artifact.artifactName">
+              *ngIf="!data.isInRuntimeMode"
+              [attr.e2e]="'filter-add-btn-' + artifact.artifactName"
+      >
         <mat-icon fontIcon="icon-plus"
                   (click)="addFilter(artifact.artifactName)"></mat-icon>
       </button>

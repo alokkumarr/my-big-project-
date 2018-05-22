@@ -17,7 +17,6 @@ import {
 } from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
-  chartServiceProvider,
   sortServiceProvider
 } from '../analyze/services/ajs-analyze-providers';
 import { FilterService } from '../analyze/services/filter.service';
@@ -34,7 +33,7 @@ import { AddTokenInterceptor } from './services/add-token.interceptor';
 import { HandleErrorInterceptor } from './services/handle-error.interceptor';
 import { RefreshTokenInterceptor } from './services/refresh-token.interceptor';
 
-import { ChartComponent } from '../../common/components/charts/chart.component';
+import { UChartModule } from '../../common/components/charts';
 
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
@@ -77,8 +76,7 @@ const components = [
   ObserveKPIComponent,
   KPIFilter,
   SaveDashboardComponent,
-  ConfirmDialogComponent,
-  ChartComponent
+  ConfirmDialogComponent
 ];
 
 @NgModule({
@@ -91,7 +89,8 @@ const components = [
     HttpClientModule,
     UIRouterUpgradeModule,
     AddWidgetModule,
-    EditWidgetModule
+    EditWidgetModule,
+    UChartModule
   ],
   declarations: components,
   entryComponents: components,
@@ -118,7 +117,6 @@ const components = [
     headerProgressProvider,
     toastProvider,
     sidenavProvider,
-    chartServiceProvider,
     sortServiceProvider,
     FilterService
   ]

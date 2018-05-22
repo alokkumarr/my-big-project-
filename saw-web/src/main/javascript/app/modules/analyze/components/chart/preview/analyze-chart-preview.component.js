@@ -14,13 +14,13 @@ export const AnalyzeChartPreviewComponent = {
     model: '<'
   },
   controller: class AnalyzeChartPreviewController {
-    constructor($componentHandler, $mdDialog, $timeout, AnalyzeService, ChartService, SortService) {
+    constructor($componentHandler, $mdDialog, $timeout, AnalyzeService, $injector, SortService) {
       'ngInject';
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
-      this._ChartService = ChartService;
+      this._$injector = $injector;
       this._SortService = SortService;
 
       this.MORE_ROWS_COUNT = 500;
@@ -29,6 +29,7 @@ export const AnalyzeChartPreviewComponent = {
     }
 
     $onInit() {
+      this._ChartService = this._$injector.get('ChartService');
       this.chart = {
         height: 680
       };

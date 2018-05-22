@@ -1,5 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+var HtmlReporter = require('protractor-beautiful-reporter');
 
 /**
  * Note about intervals:
@@ -67,7 +68,7 @@ exports.timeouts = {
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
   pageResolveTimeout: pageResolveTimeout,
-  tempts: tempts
+  tempts: tempts,
 };
 
 exports.config = {
@@ -75,6 +76,7 @@ exports.config = {
   seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
+  baseUrl: webpackHelper.sawWebUrl(),
   directConnect: true,
   capabilities: {
     browserName: 'chrome',
@@ -131,25 +133,35 @@ exports.config = {
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
+       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+      // webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
       // webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+       webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     pivots: [
-      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
+       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
     ],
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+       webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
   onPrepare() {
+
+    // Add a screenshot reporter and store screenshots to `/tmp/screenshots`:
+    jasmine.getEnv().addReporter(new HtmlReporter({
+      baseDirectory: 'target/reports',
+      preserveDirectory: false,
+      gatherBrowserLogs: false,
+      takeScreenShotsOnlyForFailedSpecs: true,
+      excludeSkippedSpecs: true
+    }).getJasmine2Reporter());
+
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,

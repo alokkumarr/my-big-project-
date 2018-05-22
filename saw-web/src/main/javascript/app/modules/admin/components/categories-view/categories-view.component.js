@@ -14,11 +14,12 @@ const SEARCH_CONFIG = [
   {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
 ];
 
+let self;
 export const CategoriesViewComponent = {
   template,
   styles: [style],
   controller: class CategoriesViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService, $window, $rootScope, LocalSearchService) {
+    constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -54,10 +55,14 @@ export const CategoriesViewComponent = {
       }).catch(() => {
         this._$rootScope.showProgress = false;
       });
+      this._$timeout = $timeout;
+      self = this;
     }
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-      leftSideNav.update(AdminMenuData, 'ADMIN');
+      this._$timeout(() => {
+        const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+        leftSideNav.update(AdminMenuData, 'ADMIN');
+      });
     }
     openNewCategoryModal() {
       this.showDialog({

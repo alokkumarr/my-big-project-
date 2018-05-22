@@ -4,9 +4,9 @@ const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const analyzePage = require('../../javascript/pages/analyzePage.po');
 
 module.exports = {
-  mainMenuExpandBtn: element(by.css('button[e2e="main-menu-expand-btn"]')),
-  mainMenuCollapseBtn: element(by.css('button[e2e="main-menu-collapse-btn"]')),
-  accountSettingsMenuBtn: element(by.css('button[e2e="account-settings-menu-btn"]')),
+  mainMenuExpandBtn: element(by.css('mat-icon[e2e="main-menu-expand-btn"]')),
+  mainMenuCollapseBtn: element(by.css('mat-icon[e2e="main-menu-expand-btn"]')),
+  accountSettingsMenuBtn: element(by.css('mat-icon[e2e="account-settings-menu-btn"]')),
   adminMenuOption: element(by.css('a[e2e="account-settings-selector-admin"]')),
   changePasswordMenuOption: element(by.css('button[e2e="account-settings-selector-change-password"]')),
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
@@ -17,11 +17,14 @@ module.exports = {
   expandedCategory: categoryName => {
     return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
   },
+  category: categoryName => {
+    return element(by.xpath(`//span[contains(text(),'${categoryName}')]/parent::mat-panel-title`));
+  },
   collapsedCategory: categoryName => {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
   },
   subCategory: subCategoryName => {
-    return element(by.xpath(`(//span[text()='${subCategoryName}'])[1]`));
+    return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
   },
   navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
   createAnalysis: (metricName, analysisType) => createAnalysis(metricName, analysisType),
@@ -35,13 +38,16 @@ module.exports = {
  */
 const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) => {
   //Collapse default category
-  commonFunctions.waitFor.elementToBeClickableAndClick(module.exports.expandedCategory(defaultCategory));
+  commonFunctions.waitFor.elementToBeClickable(module.exports.category(defaultCategory));
+  module.exports.category(defaultCategory).click();
 
   //Navigate to Category/Sub-category
-  const collapsedCategory = module.exports.collapsedCategory(categoryName);
-  const subCategory = module.exports.subCategory(subCategoryName);
-  commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-  commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+ // const collapsedCategory = module.exports.category(categoryName);
+ // const subCategory = module.exports.subCategory(subCategoryName);
+  commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
+  module.exports.category(categoryName).click();
+  commonFunctions.waitFor.elementToBeClickable(module.exports.subCategory(subCategoryName));
+  module.exports.subCategory(subCategoryName).click();
 };
 
 const createAnalysis = (metricName, analysisType) => {

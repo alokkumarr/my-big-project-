@@ -8,8 +8,6 @@ designer-header {
 
     button {
       line-height: 32px;
-      margin-right: 5px;
-      margin-left: 5px;
     }
   }
 
@@ -33,9 +31,34 @@ designer-header {
 
   .header__description {
     font-size: 14px;
+    padding-top: 5px;
+    color: $primary-grey-g3;
 
-    span {
-      color: #C7C7C7;
+    .mat-icon {
+      font-size: 14px;
+      height: 14px;
+      width: 14px;
     }
+  }
+
+  .mat-progress-bar {
+    height: 2px !important;
+  }
+
+  .mat-button-toggle-checked {
+    background-color: $primary-blue-b2;
+    color: white;
+  }
+
+  .mat-button-toggle-label-content {
+    line-height: 32px !important;
+
+    .mat-icon {
+      width: auto;
+    }
+  }
+
+  .mat-button-toggle-label-content > * {
+    vertical-align: bottom;
   }
 }

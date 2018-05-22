@@ -3,9 +3,9 @@ import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
-import * as moment from 'moment';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
+import * as moment from 'moment';
 
 import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
@@ -106,7 +106,9 @@ export const AnalyzePublishDialogComponent = {
             this.crondetails = {
               cronexp: response.data.jobDetails.cronExpression,
               activeTab: response.data.jobDetails.activeTab,
-              activeRadio: response.data.jobDetails.activeRadio
+              activeRadio: response.data.jobDetails.activeRadio,
+              startDate: response.data.jobDetails.jobScheduleTime,
+              endDate: response.data.jobDetails.endDate
             };
             if (response.data.jobDetails.analysisID) {
               this.scheduleState = 'exist';
@@ -172,7 +174,10 @@ export const AnalyzePublishDialogComponent = {
         if (this.crondetails.activeTab === 'immediate') {
           this.scheduleState = 'new';
           cronJobName = cronJobName + '-' + this.alphanumericUnique();
+          this.crondetails.cronexp = '';
+          this.crondetails.startDate = moment.utc().format();
         }
+
         this.model.schedule = {
           scheduleState: this.scheduleState,
           activeRadio: this.crondetails.activeRadio,
@@ -185,10 +190,11 @@ export const AnalyzePublishDialogComponent = {
           ftp: this.ftp,
           fileType: 'csv',
           jobName: cronJobName,
+          endDate: this.crondetails.endDate,
           metricName: this.model.metricName,
           type: this.model.type,
           userFullName: this.model.userFullName,
-          jobScheduleTime: moment.utc().format(),
+          jobScheduleTime: this.crondetails.startDate,
           categoryID: this.model.categoryId,
           jobGroup: this.resp.ticket.custCode
         };

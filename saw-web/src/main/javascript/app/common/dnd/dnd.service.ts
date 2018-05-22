@@ -7,16 +7,14 @@ import {
   ISortableDragEndEvent,
   ISortableDropEvent
 } from './types';
-import {
-  dndClasses
-} from './consts';
+import { dndClasses } from './consts';
 @Injectable()
 export class DragnDropService {
   private _payload: IDragPayload = null;
   private _element: HTMLElement = null;
   private _moveEventAccumulator: {
-    from: IDndMoveEvent<any, any>,
-    to: IDndMoveEvent<any, any>
+    from: IDndMoveEvent<any, any>;
+    to: IDndMoveEvent<any, any>;
   } = {
     from: null,
     to: null
@@ -64,10 +62,13 @@ export class DragnDropService {
     });
   }
 
-  public shouldAllowDrop(payload: IDragPayload, options: IDroppableOptions): boolean {
+  public shouldAllowDrop(
+    payload: IDragPayload,
+    options: IDroppableOptions
+  ): boolean {
     if (options) {
-      const {data, allowedZones: zones} = payload;
-      const {zone, allowDropFn} = options;
+      const { data, allowedZones: zones } = payload;
+      const { zone, allowDropFn } = options;
       const isZoneOk = this._isZoneOk(zone, zones);
       const isAllowFnOk = this._isAllowFnOk(allowDropFn, data);
 
@@ -96,12 +97,12 @@ export class DragnDropService {
     return true;
   }
 
-
   private _onMove(event: IDndMoveEvent<any, any>) {
     // because the onDragEnd event fires after the onDrop event
     // the moveFrom coms after the moveTo event
     // however we need the information from the moveFrom event first to take out the element
     // from the old group and then insert it into the new one
+    /* prettier-ignore */
     switch (event.name) {
     case 'to':
       this._moveEventAccumulator.to = event;

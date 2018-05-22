@@ -18,10 +18,11 @@ export class AnalyzeCardComponent implements OnInit {
   @Input() analysis: Analysis;
   @Input() analysisType: string;
   @Input() highlightTerm: string;
-  @Input() cronJobs: any;
+  @Input() set cronJobs(cronJobs: any) {
+    this.schedule = generateSchedule(cronJobs, this.analysis.id);
+  };
 
   placeholderClass: string;
-
   schedule: string;
   // type identifier used for e2e tag
   typeIdentifier: string;
@@ -34,7 +35,6 @@ export class AnalyzeCardComponent implements OnInit {
   ngOnInit() {
     const { type, id, chartType } = this.analysis as AnalysisChart;
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
-    this.schedule = generateSchedule(this.cronJobs, id);
     this.typeIdentifier = `analysis-type:${type}${chartType ? `:${chartType}` : ''}`;
   }
 

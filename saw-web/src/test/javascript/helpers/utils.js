@@ -18,7 +18,14 @@ function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
   // Cannot declare element before wait because of: element is not clickable error.
   commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
   parentElem.element(by.css(btnSelector)).getAttribute('aria-owns').then(id => {
-    commonFunctions.waitFor.elementToBeClickableAndClick(element(by.id(id)).element(by.css(optionSelector)));
+    if (id) {
+      commonFunctions.waitFor.elementToBeClickableAndClick(element(by.id(id)).element(by.css(optionSelector)));
+    } else {
+      const menu = parentElem.element(by.css(`${btnSelector} + mat-menu`));
+      menu.getAttribute('class').then(className => {
+        commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css(`div.${className}`)).element(by.css(optionSelector)));
+      });
+    }
   });
 }
 
@@ -30,8 +37,18 @@ function getMdSelectOptions({parentElem, btnSelector}) {
   });
 }
 
+function arrayContainsArray (superset, subset) {
+  if (0 === subset.length) {
+    return false;
+  }
+  return subset.every(function (value) {
+    return (superset.indexOf(value) >= 0);
+  });
+}
+
 module.exports = {
   hasClass,
   doMdSelectOption,
-  getMdSelectOptions
+  getMdSelectOptions,
+  arrayContainsArray
 };

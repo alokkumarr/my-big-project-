@@ -29,6 +29,7 @@ export type DesignerFilterDialogData = {
   booleanCriteria?: string;
   artifacts: Artifact[];
   isInRuntimeMode: boolean;
+  supportsGlobalFilters?: boolean;
 }
 export type DesignerFilterDialogResult = {
   filters: Filter[],
@@ -75,6 +76,7 @@ export class DesignerFilterDialogComponent implements OnInit {
       tableName,
       columnName: null,
       isRuntimeFilter: false,
+      isGlobalFilter: false,
       model: null
     }
     if (!this.groupedFilters[tableName]) {

@@ -8,6 +8,7 @@ const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
@@ -24,6 +25,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
   beforeEach(function (done) {
     setTimeout(function () {
       browser.waitForAngular();
+      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -32,7 +34,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
   afterEach(function (done) {
     setTimeout(function () {
       browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

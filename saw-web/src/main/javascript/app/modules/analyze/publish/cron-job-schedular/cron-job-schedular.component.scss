@@ -1,0 +1,81 @@
+cron-job-schedular {
+  border: 1px solid #CCC;
+
+  .dateDetails {
+    margin: 12px;
+
+    label {
+      margin-right: 20px;
+    }
+
+    .clear {
+      color: #0096D5;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  }
+
+  mat-tab-group mat-tab-header div div div .mat-tab-label {
+    min-width: 80px !important;
+  }
+
+  mat-form-field {
+    width: 115px !important;
+    padding: 5px;
+  }
+
+  mat-radio-group.to-date {
+    padding-left: 90px;
+
+    .end-date {
+      padding-left: 45px;
+    }
+
+    div mat-form-field {
+      width: 115px !important;
+      float: right;
+      margin-top: -68px;
+    }
+  }
+
+  .mat-select-value {
+    width: 90% !important;
+    padding: 8px 15px;
+  }
+
+  .mat-select {
+    position: relative !important;
+    width: 18% !important;
+    margin-left: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    margin-bottom: 10px;
+  }
+
+  .tab {
+    overflow: hidden;
+    border: 1px solid #CCC;
+    background-color: #F1F1F1;
+  }
+
+  /* Style the tab content */
+  .tabcontent {
+    padding: 6px 12px;
+  }
+
+  .checkbox {
+    text-align: center;
+    margin: 0 5px 15px 42px;
+  }
+}
+
+.owl-dt-calendar-table .owl-dt-calendar-cell-selected {
+  background-color: #1A89D4;
+}
+
+.owl-dt-control-button-content {
+  color: #1A89D4 !important;
+}
+
+.owl-dt-container-info .owl-dt-container-info-active {
+  color: #1A89D4 !important;
+}

@@ -1,10 +1,12 @@
 <div fxLayout="row"
      fxLayoutAlign="space-between center"
-     [ngSwitch]="TYPE_MAP[filter.type]">
-  <div fxLayout="row"
+>
+  <div fxLayout="row wrap"
        fxFlex="grow"
+       [ngSwitch]="TYPE_MAP[filter.type]"
        class="filter__data__space"
-       fxLayoutAlign="start">
+       fxLayoutAlign="start"
+  >
     <mat-form-field>
       <input type="text" placeholder="Column" matInput
              #autoInput
@@ -28,7 +30,7 @@
       </mat-autocomplete>
     </mat-form-field>
 
-    <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : !filter.isRuntimeFilter" style="margin-left: 10px;">
+    <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : (!filter.isRuntimeFilter && !filter.isGlobalFilter)" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">
@@ -47,6 +49,12 @@
   <div fxLayout="row"
        class="filter__action__space"
        fxLayoutAlign="space-between center">
+    <mat-checkbox [checked]="filter.isGlobalFilter"
+                  *ngIf="!isInRuntimeMode && supportsGlobalFilters"
+                  (change)="onGlobalCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Global
+    </mat-checkbox>
     <mat-checkbox *ngIf="!isInRuntimeMode"
                   [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
@@ -54,7 +62,9 @@
       Prompt
     </mat-checkbox>
 
-    <button mat-icon-button (click)="remove()">
+    <button *ngIf="!isInRuntimeMode"
+            mat-icon-button (click)="remove()"
+    >
       <mat-icon fontIcon="icon-close"
                 class="filter__remove-button__icon">
       </mat-icon>
