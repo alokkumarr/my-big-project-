@@ -5,6 +5,7 @@ import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
+import * as get from 'lodash/get';
 
 import {AnalyseTypes, ANALYSIS_METHODS, ENTRY_MODES} from '../../consts';
 import {IAnalysisMethod, AnalysisType, ChartType} from '../../types';
@@ -91,8 +92,15 @@ export class AnalyzeNewDialogComponent {
     const method = this.selectedMethod.type.split(':');
     const isChartType = method[0] === 'chart';
     let type = <AnalysisType>(isChartType ? method[0] : method[1]);
-    if (type === 'report' && this.selectedMethod.supportedTypes) {
-      type = 'esReport';
+    if (type === 'report') {
+      // set type to report or esReport
+      const children = get(this.selectedMetric, 'supports[0].children');
+      const target = find(children,
+        child => ['report', 'esReport'].includes(child.type.split(':')[1])
+      );
+      if (target) {
+        type = target.type.split(':')[1];
+      }
     }
     const chartType = <ChartType>(isChartType ? method[1] : null);
     const model = {
