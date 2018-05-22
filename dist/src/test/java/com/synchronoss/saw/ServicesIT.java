@@ -12,17 +12,17 @@ import org.junit.Test;
  * Services integration tests.  Tests health checks.
  */
 public class ServicesIT extends BaseIT {
-    private RequestSpecification spec;
+  private RequestSpecification spec;
 
-    @Before
-    public void setUp() {
-        spec = new RequestSpecBuilder().build();
-    }
+  @Before
+  public void setUp() {
+    spec = new RequestSpecBuilder().build();
+  }
 
-    @Test
-    public void testHealth() {
-        given(spec).accept("application/json")
-            .when().get("/services/actuator/health")
-            .then().statusCode(200).body("status", equalTo("UP"));
-    }
+  @Test
+  public void testHealth() {
+    given(spec).accept("application/json")
+        .when().get("/services/actuator/health")
+        .then().statusCode(200).body("status", equalTo("UP"));
+  }
 }
