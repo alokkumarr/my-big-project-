@@ -59,7 +59,7 @@ export const ExportListViewComponent = {
         analysis.selection = !flag;
       });
     }
-    export(analysisList) {
+    doExport(analysisList) {
       this.selectAllAnalysis = false;
       this.onAction({
         type: 'export',
