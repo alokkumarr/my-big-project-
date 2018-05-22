@@ -1,0 +1,27 @@
+info:
+  component: Synchronoss Semantic Service
+spring:
+  application:
+    name: saw-semantic-service
+  http:
+    multipart:
+      max-request-size: 25MB
+      max-file-size: 25MB
+logging:
+  level:
+    com.synchronoss.saw.semantic: TRACE
+server:
+  address: localhost
+  port: 9901
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
+metastore:
+    base:  {{ saw_workbench_metadata | default('hdfs:///main/') }}

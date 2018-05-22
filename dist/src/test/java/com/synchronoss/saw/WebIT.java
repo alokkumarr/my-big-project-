@@ -9,18 +9,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class WebIT extends BaseIT {
-    private RequestSpecification spec;
+  private RequestSpecification spec;
 
-    @Before
-    public void setUp() {
-        this.spec = new RequestSpecBuilder().build();
-    }
+  @Before
+  public void setUp() {
+    this.spec = new RequestSpecBuilder().build();
+  }
 
-    @Test
-    public void testWebRoot() {
-        given(spec).accept("text/html")
-            .when().get("/web/")
-            .then().statusCode(200).body(
-                "html.head.script", containsString("document.write"));
-    }
+  @Test
+  public void testWebRoot() {
+    given(spec).accept("text/html")
+        .when().get("/web/")
+        .then().statusCode(200).body(
+          "html.head.script", containsString("document.write"));
+  }
 }

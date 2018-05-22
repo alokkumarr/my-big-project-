@@ -1,0 +1,8 @@
+[Unit]
+Description=SAW Semantic Proxy Socket
+
+[Socket]
+ListenStream=127.0.0.1:9900
+
+[Install]
+WantedBy=sockets.target
