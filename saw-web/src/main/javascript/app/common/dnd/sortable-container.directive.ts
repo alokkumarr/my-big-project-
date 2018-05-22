@@ -8,12 +8,9 @@ import {
   ElementRef
 } from '@angular/core';
 
-import {
-  ISortableDropEvent,
-  SortableCallback
-} from './types';
+import { ISortableDropEvent, SortableCallback } from './types';
 import { dndClasses } from './consts';
-import {DragnDropService} from './dnd.service';
+import { DragnDropService } from './dnd.service';
 
 @Directive({
   selector: '[dndSortableContainer]'
@@ -23,9 +20,13 @@ export class DndSortableContainerDirective {
   @Input() public dndAllowDropFn: (dragData: any) => boolean;
   @Input() public dndContainer: any;
   @Input() public dndAddToCallback: SortableCallback;
-  @Output() public dndOnDrop: EventEmitter<ISortableDropEvent> = new EventEmitter<ISortableDropEvent>();
+  @Output()
+  public dndOnDrop: EventEmitter<ISortableDropEvent> = new EventEmitter<
+    ISortableDropEvent
+  >();
 
-  @HostBinding(`class.${dndClasses.dropAreaDragOver}`) private _isDropAllowed = false;
+  @HostBinding(`class.${dndClasses.dropAreaDragOver}`)
+  private _isDropAllowed = false;
 
   // counter for the enter and leave events of the containers children that bubble up
   private _counter = 0;
@@ -40,7 +41,7 @@ export class DndSortableContainerDirective {
 
   @HostListener('dragenter', ['$event'])
   onDragEnter(event) {
-    this._counter ++;
+    this._counter++;
     if (this._counter === 1) {
       // if the container is empty, add the placeholder, and set the index
       // if not, then this will be handled in the onElementDragOver event
@@ -61,7 +62,7 @@ export class DndSortableContainerDirective {
 
   @HostListener('dragleave', ['$event'])
   onDragLeave() {
-    this._counter --;
+    this._counter--;
     if (this._counter === 0) {
       this._isDropAllowed = false;
       this.removePlaceholder();
@@ -78,7 +79,7 @@ export class DndSortableContainerDirective {
 
   @HostListener('drop', ['$event'])
   onDrop() {
-    const {data} = this._dragDropService.getPayload();
+    const { data } = this._dragDropService.getPayload();
     const dropEvent = {
       index: this._newSortableIndex,
       payload: data,
@@ -128,6 +129,7 @@ export class DndSortableContainerDirective {
     this._insertionPlaceholder = this._dragDropService.getElement();
     if (where === 'inside') {
     }
+    /* prettier-ignore */
     switch (where) {
     case 'inside':
       element.append(this._insertionPlaceholder);

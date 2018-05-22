@@ -39,14 +39,6 @@ public class SimpleJob extends QuartzJobBean implements InterruptableJob{
         analysisService.executeAnalysis(job.getAnalysisID());
         analysisService.scheduleDispatch(job);
 
-		while(toStopFlag){
-			try {
-				logger.debug(" Job Running... Thread Name :"+Thread.currentThread().getName());
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				logger.error("Interrupted Exception for simple job ", e.getMessage());
-			}
-		}
 		logger.info("Thread: "+ Thread.currentThread().getName() +" stopped.");
 	}
 
