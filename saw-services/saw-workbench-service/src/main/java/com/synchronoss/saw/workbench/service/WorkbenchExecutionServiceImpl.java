@@ -109,6 +109,7 @@ public class WorkbenchExecutionServiceImpl
         String project, String name, String component, String config)
         throws Exception {
         log.info("Executing dataset transformation");
+        log.info("XDF Configuration = " + config);
         WorkbenchClient client = getWorkbenchClient();
         createDatasetDirectory(name);
         client.submit(new WorkbenchExecuteJob(

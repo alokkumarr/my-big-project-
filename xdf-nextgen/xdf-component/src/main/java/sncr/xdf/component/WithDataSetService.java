@@ -332,6 +332,8 @@ public interface WithDataSetService {
                 String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
                 String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
                 String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
+
+                String description = (output.getDescription() != null) ? output.getDescription() : "";
                 //
                 String sampling = DLDataSetOperations.SIMPLE_SAMPLING;
 
@@ -353,6 +355,7 @@ public interface WithDataSetService {
                 res_output.put(DataSetProperties.Format.name(), format);
                 res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
                 res_output.put(DataSetProperties.Mode.name(), mode);
+                res_output.put(DataSetProperties.Description.name(), description);
 
                 //TODO::Fix BDA Meta
                 res_output.put("sample", sampling);

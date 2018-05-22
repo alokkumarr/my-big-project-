@@ -1,25 +1,25 @@
 package com.synchronoss.saw.workbench.controller;
 
 import java.util.Base64;
+import java.util.Map;
+import java.util.Set;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.HeaderParam;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
@@ -45,12 +45,22 @@ public class WorkbenchExecutionController {
     @ResponseStatus(HttpStatus.OK)
     public ObjectNode create(
         @PathVariable(name = "project", required = true) String project,
-        @RequestBody ObjectNode body)
+        @RequestBody ObjectNode body,
+        @RequestHeader("Authorization") String authToken)
         throws JsonProcessingException, Exception {
         log.debug("Create dataset: project = {}", project);
         /* Extract input parameters */
         String name = body.path("name").asText();
+        String description = body.path("description").asText();
         String input = body.path("input").asText();
+
+        //TODO: Remove the hardcoded key
+        Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
+            .parseClaimsJws(authToken).getBody();
+
+        Map<String, Object> ticket = ((Map<String, Object>) ssoToken.get("ticket"));
+        String userName = (String)ticket.get("userFullName");
+
         String component = body.path("component").asText();
         JsonNode configNode = body.path("configuration");
         if (!configNode.isObject()) {
@@ -86,6 +96,7 @@ public class WorkbenchExecutionController {
         ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
         ObjectNode xdfOutput = xdfOutputs.addObject();
         xdfOutput.put("dataSet", name);
+        xdfOutput.put("desc", description);
         /* Invoke XDF component */
         return workbenchExecutionService.execute(
             project, name, component, xdfConfig.toString());
