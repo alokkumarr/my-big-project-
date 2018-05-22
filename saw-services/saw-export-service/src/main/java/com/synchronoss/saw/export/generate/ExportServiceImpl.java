@@ -139,7 +139,8 @@ public class ExportServiceImpl implements ExportService{
 
   @Override
   @Async
-  public void reportToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId) {
+  public void reportToBeDispatchedAsync(String executionId, RequestEntity request,
+      String analysisId, String analysisType) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -161,7 +162,7 @@ public class ExportServiceImpl implements ExportService{
 
       if(recipients!=null && !recipients.equals("")) {
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
-            +emailExportSize+"&analysisType=report";
+            +emailExportSize+"&analysisType="+ analysisType;
         ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
         String finalRecipients = recipients;
@@ -243,7 +244,7 @@ public class ExportServiceImpl implements ExportService{
           // Paginated URL for limitPerPage records till the end of the file.
           String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+ executionId +"/data?page="+ page
               +"&pageSize="
-              + limitPerPage +"&analysisType=report";
+              + limitPerPage +"&analysisType=" + analysisType;
           // we directly get response and start processing this.
           ResponseEntity<DataResponse> entity = restTemplate.exchange(url, HttpMethod.GET,
               requestEntity, DataResponse.class);
