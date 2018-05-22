@@ -103,6 +103,9 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 
+import { CronJobSchedularComponent } from './publish/cron-job-schedular';
+import { CronDatePickerComponent } from './publish/cron-date-picker';
+
 import { FilterChipsComponent as FilterChipsUpgraded } from './components/filter/chips-u';
 import { analyzeServiceProvider } from './services/ajs-analyze-providers';
 
@@ -142,6 +145,12 @@ angular
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
+  .directive('cronJobSchedular', downgradeComponent({
+    component: CronJobSchedularComponent
+  }) as angular.IDirectiveFactory)
+  .directive('cronDatePicker', downgradeComponent({
+    component: CronDatePickerComponent
+  }) as angular.IDirectiveFactory)
   .directive('analyzeReportQuery', downgradeComponent({
     component: AnalyzeReportQueryComponent
   }) as angular.IDirectiveFactory)

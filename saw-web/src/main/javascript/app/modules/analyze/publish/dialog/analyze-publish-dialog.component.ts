@@ -79,6 +79,7 @@ export class AnalyzePublishDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    console.log('data', this.data);
     this.scheduleState = 'new';
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH)
@@ -107,7 +108,7 @@ export class AnalyzePublishDialogComponent implements OnInit {
   fetchCronDetails() {
     const {type, id, categoryId} = this.data.analysis;
     this._headerProgress.show();
-    if (this.data.analysis.type !== 'chart') {
+    if (type !== 'chart') {
       this.getFTPLocations();
     }
     const requestCron = {
