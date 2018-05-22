@@ -15,6 +15,7 @@
   <designer-filter-container *ngSwitchCase="'filter'"
                   (filtersChange)="onFiltersChange($event)"
                   [filters]="data.filters"
+                  [supportsGlobalFilters]="data.supportsGlobalFilters"
                   [artifacts]="data.artifacts">
   </designer-filter-container>
   <designer-description *ngSwitchCase="'description'"

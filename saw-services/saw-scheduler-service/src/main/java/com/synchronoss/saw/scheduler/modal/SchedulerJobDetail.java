@@ -3,6 +3,7 @@ package com.synchronoss.saw.scheduler.modal;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.IOException;
+import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,6 +56,9 @@ public class SchedulerJobDetail implements Serializable {
    private List<String> ftp;
 
    private String fileType ;
+
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
+   private Date endDate;
 
     /**
      * Gets analysisID
@@ -304,6 +308,21 @@ public class SchedulerJobDetail implements Serializable {
         this.fileType = fileType;
     }
 
+    /**
+     * Gets endDate
+     *
+     * @return value of endDate
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * Sets endDate
+     */
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
     /**
      *
@@ -321,7 +340,7 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(description);
         out.writeObject(emailList);
         out.writeObject(fileType);
-        if (ftp!=null || ftp.size()>0)
+        if (ftp!=null && ftp.size()>0)
         out.writeObject(ftp);
         out.writeObject(jobGroup);
         out.writeObject(jobName);
@@ -329,6 +348,8 @@ public class SchedulerJobDetail implements Serializable {
         out.writeObject(metricName);
         out.writeObject(type);
         out.writeObject(userFullName);
+        if(endDate!=null)
+            out.writeObject(endDate);
 
     }
 
@@ -368,5 +389,15 @@ public class SchedulerJobDetail implements Serializable {
             type = (String) in.readObject();
             userFullName = (String) in.readObject();
         }
+       try {
+            /* End date is optional data field and it will contains null value for existing schedules
+            generated prior to sip v2.6.0 , handle the Optional Data Exception explicitly to identify the end of stream*/
+            Object endDt = in.readObject();
+            if (endDt instanceof Date)
+            endDate = (Date) endDt;
+        }
+        catch (OptionalDataException e)
+        {/* catch block to avoid serialization for newly added fields.*/ }
+
     }
 }

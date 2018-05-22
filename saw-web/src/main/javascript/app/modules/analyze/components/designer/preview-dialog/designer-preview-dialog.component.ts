@@ -1,13 +1,14 @@
-import {
-  Component,
-  Inject
-} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import {
-  Analysis,
-  ArtifactColumns
-} from '../types';
+import { Analysis, ArtifactColumns } from '../types';
 import { DesignerService } from '../designer.service';
+import { ChartService } from '../../../services/chart.service';
+import { DesignerStates } from '../container/designer-container.component';
+
+import * as isEmpty from 'lodash/isEmpty';
+import * as orderBy from 'lodash/orderBy';
+import * as get from 'lodash/get';
+import * as map from 'lodash/map';
 
 const template = require('./designer-preview-dialog.component.html');
 require('./designer-preview-dialog.component.scss');
@@ -17,41 +18,76 @@ require('./designer-preview-dialog.component.scss');
   template
 })
 export class DesignerPreviewDialogComponent {
-
   public previewData = null;
   public artifactColumns: ArtifactColumns;
   public analysis: Analysis;
-  public dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>;
+  public state = DesignerStates.SELECTION_WITH_DATA;
+  public dataLoader: (
+    options: {}
+  ) => Promise<{ data: any[]; totalCount: number }>;
 
   constructor(
     private _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {analysis: Analysis},
-    private _designerService: DesignerService
+    @Inject(MAT_DIALOG_DATA) public data: { analysis: Analysis },
+    private _designerService: DesignerService,
+    private _chartService: ChartService
   ) {
     this.analysis = data.analysis;
+    /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
       this.artifactColumns = this.analysis.artifacts[0].columns;
       break;
     case 'report':
     case 'esReport':
-      this.dataLoader = (options = {}) => this._designerService.getDataForAnalysisPreview(this.analysis, options)
-        .then(({data, count}) => ({data: data, totalCount: count}));
+      this.dataLoader = (options = {}) =>
+        this._designerService
+          .getDataForAnalysisPreview(this.analysis, options)
+          .then(({ data, count }) => ({ data: data, totalCount: count }));
       break;
     }
   }
 
   ngOnInit() {
     const analysis = this.data.analysis;
+    /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
+    case 'chart':
       this._designerService.getDataForAnalysisPreview(analysis, {})
         .then(data => {
-          this.previewData = this._designerService.parseData(data.data, analysis.sqlBuilder);
+          this.previewData = this.parseData(data.data, analysis);
         });
       break;
     }
+  }
 
+  parseData(data, analysis: Analysis) {
+    /* prettier-ignore */
+    switch (analysis.type) {
+    case 'pivot':
+      return this._designerService.parseData(data, analysis.sqlBuilder);
+    case 'report':
+    case 'esReport':
+      return data;
+    case 'chart':
+      let chartData = this._chartService.parseData(
+        data,
+        analysis.sqlBuilder
+      );
+
+      /* Order chart data manually. Backend doesn't sort chart data. */
+      const sorts = get(this.analysis, 'sqlBuilder.sorts', []);
+      if (!isEmpty(sorts)) {
+        chartData = orderBy(
+          chartData,
+          map(sorts, 'columnName'),
+          map(sorts, 'order')
+        );
+      }
+
+      return chartData;
+    }
   }
 
   close() {

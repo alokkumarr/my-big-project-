@@ -15,6 +15,7 @@ import { UrlService } from '@uirouter/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule, downgradeModule, downgradeComponent } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import {MaterialModule} from './material.module';
 
 import { routesConfig } from './routes';
 import { themeConfig } from './theme';
@@ -30,7 +31,10 @@ import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
 import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
 
-import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
+import { LayoutContentComponent } from './layout';
+
+import { LayoutHeaderComponent } from './layout/components/header/header.component';
+import { LayoutFooterComponent } from './layout/components/footer/footer.component';
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
 declare global {
@@ -46,14 +50,15 @@ declare global {
     AnalyzeModuleTs,
     ObserveUpgradeModule,
     FlexLayoutModule,
-    WorkbenchUpgradeModule
+    WorkbenchUpgradeModule,
+    MaterialModule
   ],
   exports: [FlexLayoutModule],
   providers: [
     {provide: LOCALE_ID, useValue: 'en'}
   ],
-  declarations: [ServiceBootstrapComponent],
-  entryComponents: [ServiceBootstrapComponent]
+  declarations: [ServiceBootstrapComponent, LayoutHeaderComponent, LayoutFooterComponent],
+  entryComponents: [ServiceBootstrapComponent, LayoutHeaderComponent, LayoutFooterComponent]
 })
 export class NewAppModule {
   constructor() { }
@@ -95,8 +100,14 @@ angular
     'serviceBootstrap',
     downgradeComponent({ component: ServiceBootstrapComponent }) as angular.IDirectiveFactory
   )
-  .component('layoutHeader', LayoutHeaderComponent)
+  .directive(
+    'layoutHeader',
+    downgradeComponent({component: LayoutHeaderComponent}) as angular.IDirectiveFactory
+  )
   .component('layoutContent', LayoutContentComponent)
-  .component('layoutFooter', LayoutFooterComponent);
+  .directive(
+    'layoutFooter',
+    downgradeComponent({component: LayoutFooterComponent}) as angular.IDirectiveFactory
+  );
 
 angular.bootstrap(document, [AppModule]);

@@ -39,7 +39,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.24.0</version>
+        <version>0.26.0</version>
         <!-- Mark as not inherited to avoid propagating skip setting -->
         <inherited>false</inherited>
         <configuration>

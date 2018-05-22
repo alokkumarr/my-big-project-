@@ -23,7 +23,7 @@ export class dxDataGridService {
       showBorders: false,
       rowAlternationEnabled: true,
       hoverStateEnabled: true,
-      wordWrapEnabled: true,
+      wordWrapEnabled: false,
       scrolling: {
         mode: 'virtual'
       },

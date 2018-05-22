@@ -1,27 +1,24 @@
 // import angular from 'angular';
-import {AnalyzeModule} from '../../../main/javascript/app/modules/analyze';
+import {ChartService} from '../../../main/javascript/app/modules/analyze/services/chart.service';
 import {bubbleChartDataGrouped, columnChartData, columnChartGroupedData} from './chartData';
 import {bubbleChartGrouped, columnChart, columnChartGrouped} from './sqlBuilder';
 
 describe('ChartService', () => {
 
-  let ChartService;
+  let service;
 
   beforeEach(() => {
-    angular.mock.module(AnalyzeModule);
-    angular.mock.inject($injector => {
-      ChartService = $injector.get('ChartService');
-    });
+    service = new ChartService();
   });
 
   it('ChartService exists', () => {
-    expect(ChartService).to.be.an('object');
+    expect(service).to.be.an('object');
   });
 
   describe('parseData(data, sqlBuilder)', () => {
 
     it('parses bubbleChartGrouped Data', () => {
-      const parsedData = ChartService.parseData(bubbleChartDataGrouped, bubbleChartGrouped);
+      const parsedData = service.parseData(bubbleChartDataGrouped, bubbleChartGrouped);
       expect(parsedData).to.be.an('array');
       expect(parsedData[0]).to.be.an('object');
       expect(parsedData[0]).to.have.a.property('AVAILABLE_ITEMS');
@@ -31,7 +28,7 @@ describe('ChartService', () => {
     });
 
     it('parses columnChart data', () => {
-      const parsedData = ChartService.parseData(columnChartData, columnChart);
+      const parsedData = service.parseData(columnChartData, columnChart);
       expect(parsedData).to.be.an('array');
       expect(parsedData[0]).to.be.an('object');
       expect(parsedData[0]).to.have.a.property('AVAILABLE_MB');
@@ -39,7 +36,7 @@ describe('ChartService', () => {
     });
 
     it('parses columnChartGrouped data', () => {
-      const parsedData = ChartService.parseData(columnChartGroupedData, columnChartGrouped);
+      const parsedData = service.parseData(columnChartGroupedData, columnChartGrouped);
       expect(parsedData).to.be.an('array');
       expect(parsedData[0]).to.be.an('object');
       expect(parsedData[0]).to.have.a.property('AVAILABLE_MB');

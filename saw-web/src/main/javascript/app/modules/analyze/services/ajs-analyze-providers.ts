@@ -4,7 +4,6 @@ for more details. Add all upgradable services in analyze module to this
 file. */
 
 import { AnalyzeService } from './analyze.service';
-import { ChartService } from './chart.service';
 import { SortService } from './sort.service';
 import { FilterService } from './filter.service';
 
@@ -19,17 +18,6 @@ export const analyzeServiceProvider = {
   deps: ['$injector']
 };
 
-/* Chart service adapter */
-export function chartServiceFactory(i: any) {
-  return i.get('ChartService');
-}
-
-export const chartServiceProvider = {
-  provide: ChartService,
-  useFactory: chartServiceFactory,
-  deps: ['$injector']
-}
-
 /* Sort service adapter */
 export function sortServiceFactory(i: any) {
   return i.get('SortService');
@@ -39,7 +27,7 @@ export const sortServiceProvider = {
   provide: SortService,
   useFactory: sortServiceFactory,
   deps: ['$injector']
-}
+};
 
 /* Filter service adapter */
 export function filterServiceFactory(i: any) {
@@ -50,4 +38,4 @@ export const filterServiceProvider = {
   provide: FilterService,
   useFactory: filterServiceFactory,
   deps: ['$injector']
-}
+};
