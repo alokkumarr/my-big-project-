@@ -1,7 +1,7 @@
 # Sampler Unit Tests -----------------------------------------------------
 
-library(testthat)
 library(a2munge)
+library(testthat)
 library(sparklyr)
 library(dplyr)
 
@@ -83,7 +83,7 @@ test_that("Sampler R DF expected count of 0.5 maches generated count", {
 diff_val_R <- setdiff(R_data, dat)
 
 test_that("Sampler R DF subset is derived from main set", {
-  expect_equal(n_distinct(diff_val), 0)
+  expect_equal(n_distinct(diff_val_R), 0)
 })
 
 
@@ -116,13 +116,12 @@ test_that("Saprk-data sample set is equal to expected 0.5 of total count", {
 
 diff_val_spark <- setdiff(Sprk_data, dat_tbl)
 
-
 Val_spark <- diff_val_spark %>%
   count() %>%
   collect
 
 test_that("Sampler Spark DF subset is derived from main set", {
-  expect_equal(Val_spark, 0)
+  expect_equal(Val_spark$n, 0)
 })
 
 
@@ -190,10 +189,10 @@ size_R_DF <- sampler(
   seed = NULL
 )
 
-R-sample_n <- setdiff(size_R_DF, dat)
+R_sample_n <- setdiff(size_R_DF, dat)
 
 test_that("Sampler for N records- R DF subset is derived from main set", {
-  expect_equal(n_distinct(R-sample_n), 0)
+  expect_equal(n_distinct(R_sample_n), 0)
 })
 
 
@@ -238,7 +237,7 @@ Int_data <- dat_tbl %>%
 
 exp_frac_data <- as.numeric(Int_data) * 0.2 + 10
 
-count_collect_data_R <- R_coll_frac_data %>%
+count_collect_data_R <- spark_coll_frac_data %>%
   count() %>%
   collect
 
