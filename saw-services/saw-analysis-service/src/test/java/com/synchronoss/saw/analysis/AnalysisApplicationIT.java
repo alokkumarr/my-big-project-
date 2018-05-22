@@ -18,16 +18,16 @@ import org.springframework.test.web.servlet.MockMvc;
 @RunWith(SpringRunner.class)
 @WebMvcTest
 public class AnalysisApplicationIT {
-    private Logger logger = LoggerFactory.getLogger("test");
+  private Logger logger = LoggerFactory.getLogger("test");
 
-    private BasicJsonTester json = new BasicJsonTester(getClass());
+  private BasicJsonTester json = new BasicJsonTester(getClass());
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @Test
-    public void testHealth() throws Exception {
-        mockMvc.perform(get("/health")).andExpect(status().isOk())
-            .andExpect(content().string(equalTo("OK")));
-    }
+  @Test
+  public void testHealth() throws Exception {
+    mockMvc.perform(get("/health")).andExpect(status().isOk())
+        .andExpect(content().string(equalTo("OK")));
+  }
 }

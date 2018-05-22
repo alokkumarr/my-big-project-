@@ -1,15 +1,5 @@
 package com.synchronoss.saw.observe;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -24,10 +14,18 @@ import com.synchronoss.saw.observe.model.Content;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveNode;
 import com.synchronoss.saw.observe.model.ObserveResponse;
-import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Action;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category;
+import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure;
 import com.synchronoss.saw.observe.model.store.Query;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ObserveUtils {
@@ -44,9 +42,6 @@ public class ObserveUtils {
   }
 
   /**
-   * Clone an existing result as a new one, filtering out http headers that not should be moved on
-   * and so on...
-   *
    * @param result
    * @param <T>
    * @return
@@ -74,8 +69,9 @@ public class ObserveUtils {
     ProcessingReport report = validator.validate(schema, data);
     return report.isSuccess();
   }
-  
-  public static Observe getObserveNode (String json, String node) throws JsonProcessingException, IOException {
+
+  public static Observe getObserveNode(String json, String node)
+      throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -84,21 +80,21 @@ public class ObserveUtils {
     JsonNode observeNode = contentNode.get("observe").get(0);
     String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
     JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
-    ObserveNode observeTreeNode = objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
+    ObserveNode observeTreeNode =
+        objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
     Observe observeTree = observeTreeNode.getObserve();
-    return observeTree; 
+    return observeTree;
   }
-  
-  public static String node2JsonString(Observe node, String basePath, String Id, Action action, Category category) 
-      throws JsonProcessingException
-  {
+
+  public static String node2JsonString(Observe node, String basePath, String Id, Action action,
+      Category category) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
-   
-    if(node !=null){
+
+    if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id !=null){
+    if (Id != null) {
       metaDataStoreStructure.setId(Id);
     }
     metaDataStoreStructure.setAction(action);
@@ -106,23 +102,22 @@ public class ObserveUtils {
     metaDataStoreStructure.setXdfRoot(basePath);
     List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
     listOfMetadata.add(metaDataStoreStructure);
-   
+
     return objectMapper.writeValueAsString(listOfMetadata);
   }
 
-  public static String node2JsonString(Observe node, String basePath, String Id, Action action, Category category, Query query) 
-      throws JsonProcessingException
-  {
+  public static String node2JsonString(Observe node, String basePath, String Id, Action action,
+      Category category, Query query) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
-   
-    if(node !=null){
+
+    if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id !=null){
+    if (Id != null) {
       metaDataStoreStructure.setId(Id);
     }
-    if (query!=null){
+    if (query != null) {
       metaDataStoreStructure.setQuery(query);
     }
     metaDataStoreStructure.setAction(action);
@@ -133,14 +128,14 @@ public class ObserveUtils {
     return objectMapper.writeValueAsString(listOfMetadata);
   }
 
-  public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(Observe node, String basePath, String output, String Id, Action action, Category category) 
-      throws JsonProcessingException
-  {
+  public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(Observe node,
+      String basePath, String output, String Id, Action action, Category category)
+      throws JsonProcessingException {
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
-    if(node !=null){
+    if (node != null) {
       metaDataStoreStructure.setSource(node);
     }
-    if (Id !=null){
+    if (Id != null) {
       metaDataStoreStructure.setId(Id);
     }
     metaDataStoreStructure.setAction(action);
@@ -150,8 +145,8 @@ public class ObserveUtils {
     listOfMetadata.add(metaDataStoreStructure);
     return listOfMetadata;
   }
-  
-  public static ObserveResponse prepareResponse(Observe node, String message){
+
+  public static ObserveResponse prepareResponse(Observe node, String message) {
     ObserveResponse createresponse = new ObserveResponse();
     createresponse.setMessage(message);
     createresponse.setId(node.get_id());
@@ -163,5 +158,5 @@ public class ObserveUtils {
     createresponse.setContents(content);
     return createresponse;
   }
-  
+
 }
