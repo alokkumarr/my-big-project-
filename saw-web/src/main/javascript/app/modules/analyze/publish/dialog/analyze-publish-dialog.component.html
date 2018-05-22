@@ -9,6 +9,7 @@
         <label class="field-label" i18n>Publish to</label>
         <div style="max-width: 200px;">
           <mat-select placeholder="Select a Category"
+                      class="publish-select"
                       (selectionChange)="onCategorySelected($event.value)"
                       [value]="data.analysis.categoryId">
             <mat-optgroup *ngFor="let category of categories" [label]="category.name">
@@ -55,7 +56,7 @@
                         (selectionChange)="onLocationSelected($event.value)"
                         placeholder="Select FTP Location"
                         md-container-class="ftp-select"
-                        class="ftp-select-box"
+                        class="publish-select ftp-select-box"
                         multiple
             >
               <mat-option *ngFor="let location of locations" [value]="location">{{ location }}</mat-option>
