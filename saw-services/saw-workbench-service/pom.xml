@@ -202,7 +202,6 @@
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
       <version>${jjwt.version}</version>
-      <scope>compile</scope>
     </dependency>
   </dependencies>
 	<build>

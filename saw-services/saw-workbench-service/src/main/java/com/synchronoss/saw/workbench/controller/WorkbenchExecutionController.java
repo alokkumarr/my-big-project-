@@ -3,9 +3,7 @@ package com.synchronoss.saw.workbench.controller;
 
 import java.util.Base64;
 import java.util.Map;
-import java.util.Set;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.HeaderParam;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,6 +22,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+
+import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+import sncr.bda.datasets.conf.DataSetProperties;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -68,8 +70,10 @@ public class WorkbenchExecutionController {
         Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
             .parseClaimsJws(authToken).getBody();
 
-        Map<String, Object> ticket = ((Map<String, Object>) ssoToken.get("ticket"));
-        String userName = (String)ticket.get("userFullName");
+        Map<String, Object> ticket =
+            ((Map<String, Object>) ssoToken.get("ticket"));
+        String userName = (String) ticket.get("userFullName");
+        log.info(userName);
 
         String component = body.path("component").asText();
         JsonNode configNode = body.path("configuration");
@@ -107,6 +111,12 @@ public class WorkbenchExecutionController {
         ObjectNode xdfOutput = xdfOutputs.addObject();
         xdfOutput.put("dataSet", name);
         xdfOutput.put("desc", description);
+
+        ObjectNode userData = mapper.createObjectNode();
+        userData.put("createdBy", userName);
+
+
+        xdfOutput.set("userData", userData);
         /* Invoke XDF component */
         return workbenchExecutionService.execute(
             project, name, component, xdfConfig.toString());
