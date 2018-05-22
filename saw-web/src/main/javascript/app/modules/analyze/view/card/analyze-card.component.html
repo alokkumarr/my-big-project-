@@ -44,6 +44,7 @@
       <button mat-icon-button
               (click)="fork(analysis)"
               e2e="action-fork-btn"
+              *ngIf="canUserFork"
               class="list-action-button"
               i18n-matTooltip="Fork Analysis"
               matTooltip="Fork Analysis"

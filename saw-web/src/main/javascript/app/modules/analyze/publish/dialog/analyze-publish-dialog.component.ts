@@ -107,7 +107,7 @@ export class AnalyzePublishDialogComponent implements OnInit {
   fetchCronDetails() {
     const {type, id, categoryId} = this.data.analysis;
     this._headerProgress.show();
-    if (this.data.analysis.type !== 'chart') {
+    if (type !== 'chart') {
       this.getFTPLocations();
     }
     const requestCron = {
