@@ -1,4 +1,4 @@
-import { Injectable, Component, Inject, EventEmitter , ChangeDetectorRef} from '@angular/core';
+import { Injectable, Component, Inject } from '@angular/core';
 import * as get from 'lodash/get';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
@@ -13,16 +13,9 @@ require('./header.component.scss');
 
 @Injectable()
 export class LayoutHeaderComponent {
-  constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any, private cdRef:ChangeDetectorRef) { }
+  constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any) { }
 
-  public isLoading: boolean;
-
-  ngAfterViewChecked() {
-    setTimeout(() => {
-      this.isLoading = this._rootScope.showProgress;
-    });
-    this.cdRef.detectChanges();
-  }
+  public isLoading: false;
 
   ngOnInit() {
     this.UserDetails = this.jwt.getTokenObj();
@@ -35,6 +28,7 @@ export class LayoutHeaderComponent {
   }
 
   get showProgress() {
+    this.isLoading = this._rootScope.showProgress;
     return this.isLoading;
   }
 
