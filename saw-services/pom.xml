@@ -150,7 +150,6 @@
 		<module>saw-inspect-data-api</module>
 		<module>saw-observe-service</module>
 		<module>saw-scheduler-service</module>
-		<module>saw-json-store-api</module>
 		<module>saw-proxy-service</module>
 		<module>saw-semantic-service</module>
 		<module>dist</module>

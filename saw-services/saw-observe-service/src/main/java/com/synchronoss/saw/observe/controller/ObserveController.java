@@ -108,6 +108,7 @@ public class ObserveController {
      * required to handle the My DashBoard (private)feature.
      */
     // observe.setCreatedBy(userId);
+
     responseObjectFuture = observeService.getDashboardbyCategoryId(observe);
     return responseObjectFuture;
   }
