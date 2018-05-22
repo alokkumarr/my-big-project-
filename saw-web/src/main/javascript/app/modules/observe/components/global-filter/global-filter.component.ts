@@ -1,11 +1,17 @@
-import { Component, AfterViewInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  AfterViewInit,
+  OnDestroy,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { GlobalFilterService } from '../../services/global-filter.service';
-import { Subscription } from 'rxjs/Subscription'
+import { Subscription } from 'rxjs/Subscription';
 
 import * as isArray from 'lodash/isArray';
 import * as map from 'lodash/map';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../../../../common/consts';
+import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
 
 const template = require('./global-filter.component.html');
 require('./global-filter.component.scss');
@@ -14,21 +20,19 @@ require('./global-filter.component.scss');
   selector: 'global-filter',
   template
 })
-
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();
 
   private globalFilters = [];
   private filterChangeSubscription: Subscription;
 
-  constructor(
-    private filters: GlobalFilterService
-  ) { }
+  constructor(private filters: GlobalFilterService) {}
 
   ngAfterViewInit() {
     this.globalFilters = [];
-    this.filterChangeSubscription =  this.filters.onFilterChange
-      .subscribe(this.onFilterChange.bind(this))
+    this.filterChangeSubscription = this.filters.onFilterChange.subscribe(
+      this.onFilterChange.bind(this)
+    );
   }
 
   addFilterType(filt) {
@@ -38,7 +42,7 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
     } else if (this.isType('date', filt.type)) {
       uiType = 'date';
     }
-    return {...filt, ...{ uiType }};
+    return { ...filt, ...{ uiType } };
   }
 
   onFilterChange(data) {
@@ -55,16 +59,16 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   }
 
   isType(type, input) {
-    switch(type){
-    case 'number':
-      return NUMBER_TYPES.includes(input);
+    switch (type) {
+      case 'number':
+        return NUMBER_TYPES.includes(input);
 
-    case 'date':
-      return DATE_TYPES.includes(input);
+      case 'date':
+        return DATE_TYPES.includes(input);
 
-    case 'string':
-    default:
-      return type === 'string';
+      case 'string':
+      default:
+        return type === 'string';
     }
   }
 

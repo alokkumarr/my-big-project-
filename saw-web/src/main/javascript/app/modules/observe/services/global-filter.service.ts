@@ -8,7 +8,6 @@ import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class GlobalFilterService {
-
   private rawFilters = [];
   private updatedFilters = [];
   public onFilterChange = new Subject();
@@ -16,7 +15,7 @@ export class GlobalFilterService {
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
 
-  constructor() { }
+  constructor() {}
 
   initialise() {
     this.rawFilters = [];
@@ -41,12 +40,20 @@ export class GlobalFilterService {
    * @returns
    * @memberof GlobalFilterService
    */
-  getDisplayNameFor(artifacts: Array<any>, columnName: string, tableName: string) {
-    const col = find(artifacts, column =>
-      column.columnName === columnName &&
-      (column.table || column.tableName) === tableName
+  getDisplayNameFor(
+    artifacts: Array<any>,
+    columnName: string,
+    tableName: string
+  ) {
+    const col = find(
+      artifacts,
+      column =>
+        column.columnName === columnName &&
+        (column.table || column.tableName) === tableName
     );
-    return col ? (col.aliasName || col.displayName || col.columnName) : columnName;
+    return col
+      ? col.aliasName || col.displayName || col.columnName
+      : columnName;
   }
 
   /**
@@ -59,17 +66,19 @@ export class GlobalFilterService {
   addFilter(filt: Array<any>) {
     const validFilter = [];
     forEach(filt, f => {
-      const exists = findIndex(this.rawFilters, rf => (
-        rf.semanticId === f.semanticId &&
-        rf.columnName === f.columnName &&
-        rf.tableName === f.tableName
-      ));
+      const exists = findIndex(
+        this.rawFilters,
+        rf =>
+          rf.semanticId === f.semanticId &&
+          rf.columnName === f.columnName &&
+          rf.tableName === f.tableName
+      );
 
       if (!(exists >= 0)) {
         this.rawFilters.push(f);
         validFilter.push(f);
       }
-    })
+    });
     if (validFilter.length) {
       this.onFilterChange.next(validFilter);
     }
@@ -81,12 +90,14 @@ export class GlobalFilterService {
    * @param {any} {data, valid}
    * @memberof GlobalFilterService
    */
-  updateFilter({data, valid}) {
-    const id = findIndex(this.updatedFilters, f => (
-      f.semanticId === data.semanticId &&
-      f.columnName === data.columnName &&
-      f.tableName === data.tableName
-    ));
+  updateFilter({ data, valid }) {
+    const id = findIndex(
+      this.updatedFilters,
+      f =>
+        f.semanticId === data.semanticId &&
+        f.columnName === data.columnName &&
+        f.tableName === data.tableName
+    );
 
     /* Push or replace existing filter */
     if (id >= 0 && !valid) {

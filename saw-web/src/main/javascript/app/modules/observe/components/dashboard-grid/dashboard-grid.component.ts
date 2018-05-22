@@ -99,6 +99,7 @@ export class DashboardGridComponent
     };
 
     this.enableChartDownload = this.isViewMode();
+    this.filters.initialise();
   }
 
   ngAfterViewInit() {
@@ -136,13 +137,13 @@ export class DashboardGridComponent
           }, 500);
         }
       );
-
-      this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
-        data => {
-          this.onApplyGlobalFilters(data);
-        }
-      );
     }
+
+    this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
+      data => {
+        this.onApplyGlobalFilters(data);
+      }
+    );
   }
 
   isViewMode() {
@@ -202,30 +203,28 @@ export class DashboardGridComponent
   }
 
   addGlobalFilters(analysis) {
-    if (this.mode === DASHBOARD_MODES.VIEW) {
-      const columns = flatMap(analysis.artifacts, table => table.columns);
+    const columns = flatMap(analysis.artifacts, table => table.columns);
 
-      const filters = get(analysis, 'sqlBuilder.filters', []);
+    const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(
-        filter(
-          map(filters, flt => ({
-            ...flt,
-            ...{
-              semanticId: analysis.semanticId,
-              metricName: analysis.metricName,
-              esRepository: analysis.esRepository,
-              displayName: this.filters.getDisplayNameFor(
-                columns,
-                flt.columnName,
-                flt.tableName
-              )
-            }
-          })),
-          f => f.isGlobalFilter
-        )
-      );
-    }
+    this.filters.addFilter(
+      filter(
+        map(filters, flt => ({
+          ...flt,
+          ...{
+            semanticId: analysis.semanticId,
+            metricName: analysis.metricName,
+            esRepository: analysis.esRepository,
+            displayName: this.filters.getDisplayNameFor(
+              columns,
+              flt.columnName,
+              flt.tableName
+            )
+          }
+        })),
+        f => f.isGlobalFilter
+      )
+    );
   }
 
   /**

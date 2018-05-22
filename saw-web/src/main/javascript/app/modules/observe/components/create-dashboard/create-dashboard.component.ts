@@ -85,6 +85,11 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     });
   }
 
+  openFilters() {
+    this.sidebarWidget = 'filter';
+    this.widgetSidenav.open();
+  }
+
   checkEmpty(dashboard) {
     this.fillState =
       get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
