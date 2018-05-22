@@ -122,7 +122,7 @@ expander.tbl_spark <- function(df,
 
   if(complete) {
    results <- df %>%
-      dplyr::left_join(
+      dplyr::right_join(
         dplyr::copy_to(sc, dfr, overwrite = TRUE),
         by = intersect(df_names, colnames(dfr))
           )
