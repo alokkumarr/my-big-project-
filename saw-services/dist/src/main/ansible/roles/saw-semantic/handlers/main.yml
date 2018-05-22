@@ -1,0 +1,3 @@
+- name: restart saw-semantic
+  # Stop service, to trigger restart by socket activation
+  systemd: name=saw-semantic state=stopped daemon_reload=true

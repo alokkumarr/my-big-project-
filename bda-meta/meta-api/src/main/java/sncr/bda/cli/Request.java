@@ -46,6 +46,7 @@ import static sncr.bda.cli.Request.MetaCategory.*;
  * }
  * Created by srya0001 on 11/4/2017.
  */
+@Deprecated
 public class Request {
 
     private static final Logger logger = Logger.getLogger(Request.class);
