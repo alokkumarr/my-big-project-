@@ -23,6 +23,7 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
+    <jjwt.version>0.7.0</jjwt.version>
 		<metadata.api>${revision}</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
 	</properties>
@@ -197,7 +198,13 @@
 			<artifactId>livy-client-http</artifactId>
 			<version>0.3.0</version>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>${jjwt.version}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>

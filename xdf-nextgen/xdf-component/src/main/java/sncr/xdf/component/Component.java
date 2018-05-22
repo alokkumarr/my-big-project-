@@ -245,6 +245,7 @@ public abstract class Component {
         ComponentConfiguration cfg = null;
         try {
             cfg = validateConfig(config);
+            logger.info("Component configuration = " + cfg);
         } catch (Exception e) {
             error = "Configuration is not valid, reason : " +  e.getMessage();
             logger.error(e);
@@ -283,6 +284,7 @@ public abstract class Component {
 
         try {
             ctx = new Context(componentName, batchId, appId, cfg);
+            ctx.user = "Sunil";
         } catch (Exception e) {
             logger.error("Could not create context: ", e);
             return -1;
@@ -394,6 +396,7 @@ public abstract class Component {
     public static int startComponent(Component self, String dataLakeRoot, String config, String app, String batch)
     {
         logger.debug(String.format("Component [%s] has been started...", self.componentName));
+        logger.info("Configuration: " + config);
 
         try {
             if (self.Init(config, app, batch, dataLakeRoot) == 0) {
