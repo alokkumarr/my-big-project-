@@ -101,6 +101,9 @@ import {
 import { AnalyzeFilterModule } from './components/designer/filter';
 import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
 
+import { CronJobSchedularComponent } from './publish/cron-job-schedular';
+import { CronDatePickerComponent } from './publish/cron-date-picker';
+
 import { analyzeServiceProvider } from './services/ajs-analyze-providers';
 
 import { AnalyzeDialogService } from './services/analyze-dialog.service';
@@ -139,6 +142,12 @@ angular
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
+  .directive('cronJobSchedular', downgradeComponent({
+    component: CronJobSchedularComponent
+  }) as angular.IDirectiveFactory)
+  .directive('cronDatePicker', downgradeComponent({
+    component: CronDatePickerComponent
+  }) as angular.IDirectiveFactory)
   .directive('analyzeReportQuery', downgradeComponent({
     component: AnalyzeReportQueryComponent
   }) as angular.IDirectiveFactory)

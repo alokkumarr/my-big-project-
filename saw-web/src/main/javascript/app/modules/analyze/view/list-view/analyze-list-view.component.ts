@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../cron';
 import { AnalyzeService } from '../../services/analyze.service';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
+import { JwtService } from '../../../../../login/services/jwt.service';
 
 
 const template = require('./analyze-list-view.component.html');
@@ -17,17 +19,27 @@ require('./analyze-list-view.component.scss');
 export class AnalyzeListViewComponent {
 
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
-  @Input() analyses: Analysis[];
+  @Input('analyses') set setAnalyses(analyses: Analysis[]) {
+    this.analyses = analyses;
+    if (!isEmpty(analyses)) {
+      this.canUserFork = this._jwt.hasPrivilege('FORK', {
+        subCategoryId: analyses[0].categoryId
+      });
+    }
+  };
   @Input() analysisType: string;
   @Input() searchTerm: string;
   @Input() cronJobs: any;
 
   public config: any;
+  public canUserFork = false;
+  public analyses: Analysis[];
 
   constructor(
     private _dxDataGridService: dxDataGridService,
     private _analyzeService: AnalyzeService,
-    private _analyzeActionsService: AnalyzeActionsService
+    private _analyzeActionsService: AnalyzeActionsService,
+    private _jwt: JwtService
   ) { }
 
   ngOnInit() {

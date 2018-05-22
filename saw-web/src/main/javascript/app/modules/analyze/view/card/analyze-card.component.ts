@@ -3,6 +3,7 @@ import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../cron';
 import { AnalyzeService } from '../../services/analyze.service';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
+import { JwtService } from '../../../../../login/services/jwt.service';
 
 const template = require('./analyze-card.component.html');
 require('./analyze-card.component.scss');
@@ -26,13 +27,18 @@ export class AnalyzeCardComponent implements OnInit {
   schedule: string;
   // type identifier used for e2e tag
   typeIdentifier: string;
+  canUserFork = false;
 
   constructor(
     private _analyzeService: AnalyzeService,
-    private _analyzeActionsService: AnalyzeActionsService
+    private _analyzeActionsService: AnalyzeActionsService,
+    private _jwt: JwtService
   ) { }
 
   ngOnInit() {
+    this.canUserFork = this._jwt.hasPrivilege('FORK', {
+      subCategoryId: this.analysis.categoryId
+    });
     const { type, id, chartType } = this.analysis as AnalysisChart;
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${chartType ? `:${chartType}` : ''}`;
