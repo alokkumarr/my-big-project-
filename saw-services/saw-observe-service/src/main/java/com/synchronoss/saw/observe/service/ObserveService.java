@@ -12,11 +12,21 @@ public interface ObserveService {
 
   String delimiter = "::";
   String PortalDataSet = "PortalDataSet";
-  public ObserveResponse addDashboard(Observe node) throws JSONValidationSAWException, CreateEntitySAWException;
-  public ObserveResponse getDashboardbyCriteria(Observe node) throws JSONValidationSAWException, ReadEntitySAWException;
-  public ObserveResponse updateDashboard(Observe node) throws JSONValidationSAWException, UpdateEntitySAWException;
-  public ObserveResponse deleteDashboard(Observe node) throws JSONValidationSAWException, DeleteEntitySAWException;
+
+  public ObserveResponse addDashboard(Observe node)
+      throws JSONValidationSAWException, CreateEntitySAWException;
+
+  public ObserveResponse getDashboardbyCriteria(Observe node)
+      throws JSONValidationSAWException, ReadEntitySAWException;
+
+  public ObserveResponse updateDashboard(Observe node)
+      throws JSONValidationSAWException, UpdateEntitySAWException;
+
+  public ObserveResponse deleteDashboard(Observe node)
+      throws JSONValidationSAWException, DeleteEntitySAWException;
+
   public String generateId() throws JSONValidationSAWException;
+
   public ObserveResponse getDashboardbyCategoryId(Observe node)
       throws JSONValidationSAWException, ReadEntitySAWException;
 }

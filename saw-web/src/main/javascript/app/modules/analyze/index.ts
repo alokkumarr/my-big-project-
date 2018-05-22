@@ -14,7 +14,6 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
 import { BrowserModule } from '@angular/platform-browser';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
 import { transitions } from './transitions';
 
@@ -28,6 +27,9 @@ import { $mdDialogProvider } from '../../common/services/ajs-common-providers';
 
 import { pivotAreaTypeFilter } from './filters/pivot-area-type.filter';
 import { uniqueFilter } from './filters/unique.filter';
+
+import { AnalyzeActionsService } from './actions/analyze-actions.service';
+import { AnalyzeActionsService as OldAnalyzeActionsService } from './components/actions/analyze-actions.service';
 
 import { AnalyzePageComponent } from './components/page/analyze-page.component';
 import { AggregateChooserComponent } from './components/aggregate-chooser/aggregate-chooser.component';
@@ -62,12 +64,12 @@ import { AnalyzePublishDialogComponent } from './components/publish-dialog/analy
 import { AnalyzeChartComponent } from './components/chart/analyze-chart.component';
 import { AnalyzeChartSettingsComponent } from './components/chart/settings/analyze-chart-settings.component';
 import { AnalyzeChartPreviewComponent } from './components/chart/preview/analyze-chart-preview.component';
-import { CronJobSchedularComponent } from './components/cron-job-schedular/cron-job-schedular.component';
-import { CronDatePickerComponent } from './components/cron-date-picker/cron-date-picker.component';
+import { AnalyzeActionsMenuComponent } from './components/actions/analyze-actions-menu.component';
 import { CommonModule } from '../../common';
 
 import { CommonModuleTs } from '../../common';
 import { UChartModule } from '../../common/components/charts';
+import { AnalyzePublishDialogModule } from './publish';
 import {
   DesignerDialogComponent,
   DesignerContainerComponent,
@@ -118,9 +120,11 @@ angular
   .service('FilterService', FilterService)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
+  .factory('AnalyzeActionsService', OldAnalyzeActionsService)
   .factory('ChartService', downgradeInjectable(ChartService) as Function)
   .factory('AnalyzeDialogService', downgradeInjectable(AnalyzeDialogService) as Function)
   .service('SortService', SortService)
+  .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
   .component('aggregateChooser', AggregateChooserComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
   .component('reportGridNode', ReportGridNodeComponent)
@@ -140,9 +144,6 @@ angular
   .component('analyzeReport', AnalyzeReportComponent)
   .directive('analyzeReportQuery', downgradeComponent({
     component: AnalyzeReportQueryComponent
-  }) as angular.IDirectiveFactory)
-  .directive('cronJobSchedular', downgradeComponent({
-    component: CronJobSchedularComponent
   }) as angular.IDirectiveFactory)
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeSortDialog', AnalyzeSortDialogComponent)
@@ -178,11 +179,10 @@ angular
     ReactiveFormsModule,
     UChartModule,
     BrowserModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule,
     AnalyzeViewModule,
     AnalyzeViewModule,
-    AnalyzeActionsModule
+    AnalyzeActionsModule,
+    AnalyzePublishDialogModule
   ],
   declarations: [
     AnalyzeReportQueryComponent,
@@ -213,12 +213,9 @@ angular
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
-    CronJobSchedularComponent,
-    CronDatePickerComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
-    FilterChipsUpgraded,
-    CronDatePickerComponent
+    FilterChipsUpgraded
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -248,19 +245,17 @@ angular
     DesignerDateFilterComponent,
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
-    CronJobSchedularComponent,
-    CronDatePickerComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
-    FilterChipsUpgraded,
-    CronDatePickerComponent
+    FilterChipsUpgraded
   ],
   providers: [
     $mdDialogProvider,
     AnalyzeDialogService,
     analyzeServiceProvider,
     DesignerService,
-    ChartService
+    ChartService,
+    AnalyzeActionsService
   ]
 })
 export class AnalyzeModuleTs {}

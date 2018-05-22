@@ -50,6 +50,11 @@
       <artifactId>saw-storage-proxy-service</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>saw-semantic-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
