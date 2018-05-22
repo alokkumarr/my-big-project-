@@ -6,9 +6,9 @@ package com.sncr.saw.security.app;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -20,8 +20,8 @@ import com.sncr.saw.security.common.bean.JwtFilter;
 public class NSSOApplicationMicro extends SpringBootServletInitializer {
 
 	@Bean
-	public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
-		return new TomcatServletWebServerFactory();
+	public TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory() {
+		return new TomcatEmbeddedServletContainerFactory();
 	}
 
 	@Override
