@@ -402,7 +402,7 @@ at a time for processign reports, can be configured using following config param
 .saw-config
 [source, yaml]
 ----
-export_chunk_size=10000
+saw_export_chunk_size=10000
 ----
 
 

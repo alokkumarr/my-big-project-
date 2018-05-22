@@ -98,7 +98,7 @@ saw_email_export_size=50000
 saw_ftp_export_size=1000000
 
 ## chunk size for export functionality
-export_chunk_size=10000
+saw_export_chunk_size=10000
 
 
 [saw-security]
