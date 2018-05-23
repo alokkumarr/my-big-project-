@@ -163,7 +163,7 @@ indexer.tbl_spark <- function(df,
 #' df <- data.frame(today = Sys.Date())
 #' date_parter(df, "today")
 date_parter <- function(df, measure_vars, label, abbr) {
-  UseMethod(date_parter)
+  UseMethod("date_parter")
 }
 
 
@@ -190,7 +190,7 @@ date_parter.data.frame <- function(df, measure_vars, label = FALSE, abbr = FALSE
         day_of_month = day(.),
         day_of_week = wday(., abbr = abbr, label = label),
         day_of_year = yday(.),
-        days_left_in_month = days_in_month(.) - day
+        days_left_in_month = days_in_month(.) - day(.)
       )
     )
 }
