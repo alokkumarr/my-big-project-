@@ -255,9 +255,8 @@ public class ExportServiceImpl implements ExportService{
         // final rows to process
         long leftOutRows = Long.parseLong(ftpExportSize) - page * limitPerPage;
         // if limits are set in such a way that no of pages becomes zero, then there's just one page to process for entire data.
-        if (noOfPages == 0 ) {
-          page = 1;
-        }
+        // process the remaining page
+        page+=1;
         if (leftOutRows > 0) {
           // Paginated URL for limitPerPage records till the end of the file.
           String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+ executionId +"/data?page="+ page
