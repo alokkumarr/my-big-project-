@@ -20,6 +20,7 @@
         <include>${project.groupId}:saw-observe-service</include>
         <include>${project.groupId}:saw-scheduler-service</include>
         <include>${project.groupId}:saw-storage-proxy-service</include>
+        <include>${project.groupId}:saw-semantic-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>

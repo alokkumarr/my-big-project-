@@ -4,7 +4,7 @@
 #
 set -eu
 
-name="demo.mapr.io"
+name="saw-mapr"
 # Workaround: As Docker DNS lookups do not work inside CentOS 7
 # containers for now, Docker links are used as a workaround.  The
 # hostname and port for Docker links is provided in environment

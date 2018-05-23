@@ -11,7 +11,8 @@ import java.text.ParsePosition;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Utility class for Date related functions
@@ -19,7 +20,7 @@ import org.apache.log4j.Logger;
  * @date Jun 1, 2007
  */
 public class DateUtil {
-	private static Logger logger = Logger.getLogger(DateUtil.class
+	private static Logger logger = LoggerFactory.getLogger(DateUtil.class
 			.getName());
 	public static final String PATTERN_MMDDYYYY = "MM/dd/yyyy";
 	public static final String PATTERN_YYYYMMDD = "yyyyMMdd";

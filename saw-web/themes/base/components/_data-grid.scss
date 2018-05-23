@@ -12,3 +12,65 @@ div[dx-data-grid] {
     background-color: $grid-hover-color;
   }
 }
+
+.dx-datagrid {
+  color: $grid-text-color !important;
+  background-color: #fff;
+}
+
+.dx-datagrid .dx-row-alt > td {
+  background-color: $grid-hover-color !important;
+}
+
+.dx-datagrid-headers {
+  border-bottom: none !important;
+  font-size: 12px;
+
+  .dx-header-row {
+  background-color: $grid-header-bg-color !important;
+  height: 36px;
+  }
+}
+
+tr.dx-row.dx-header-row[role="row"] td[role="columnheader"] {
+  color: $grid-header-color !important;
+  font-weight: 600;
+}
+
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+  border-bottom: none !important;
+}
+
+.dx-datagrid .dx-row > td {
+  padding: 3px 7px !important;
+}
+
+.dx-datagrid {
+  line-height: normal !important;
+}
+
+.dx-datagrid-headers .dx-header-row > td {
+  padding: 7px !important;
+}
+
+.dx-datagrid-content .dx-datagrid-table .dx-row > td {
+  vertical-align: middle !important;
+}
+
+.dx-pivotgrid td {
+  vertical-align: middle !important;
+}
+
+.dx-pivotgrid .dx-pivotgrid-area td {
+  padding: 3px 10px !important;
+}
+
+.dx-pivotgrid-fields-container .dx-area-field.dx-area-box {
+  margin-bottom: 0 !important;
+  padding: 7px 10px !important;
+}
+
+.dx-pivotgrid .dx-pivotgrid-fields-area-head td {
+  padding: 7px 2px !important;
+}
+
