@@ -81,8 +81,8 @@ export class AnalyzeService {
     return reqParams;
   }
 
-  getExportData(analysisId, executionId) {
-    return this._$http.get(`${this.url}/exports/${executionId}/executions/${analysisId}/data`)
+  getExportData(analysisId, executionId, analysisType) {
+    return this._$http.get(`${this.url}/exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}`)
       .then(fpGet('data.data'));
   }
 

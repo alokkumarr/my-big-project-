@@ -60,8 +60,8 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function print() {
   }
 
-  function exportAnalysis(analysisId, executionId) {
-    return AnalyzeService.getExportData(analysisId, executionId);
+  function exportAnalysis(analysisId, executionId, analysisType) {
+    return AnalyzeService.getExportData(analysisId, executionId, analysisType);
   }
 
   function deleteAnalysis(analysis) {
