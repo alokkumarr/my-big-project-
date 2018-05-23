@@ -1,23 +1,23 @@
 package sncr.bda.admin;
 
-import com.google.gson.*;
-import com.mapr.db.MapRDB;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
-import sncr.bda.base.MetadataStore;
-import sncr.bda.base.WithSearchInMetastore;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mapr.db.MapRDB;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
 import sncr.bda.metastore.TransformationStore;
 import sncr.bda.services.DLMetadata;
-
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by srya0001 on 12/1/2017.
@@ -145,8 +145,6 @@ public class ProjectAdmin extends ProjectStore{
         Document prj = table.findById(name);
         if (prj == null)
              throw new Exception("ProjectService with name: " + name + " not found");
-
-        JsonArray je = new JsonArray();
         JsonObject fromDoc = this.toJsonElement(prj).getAsJsonObject();
         JsonArray plp = fromDoc.getAsJsonArray(PLP);
         if (plp == null ) {
@@ -200,6 +198,11 @@ public class ProjectAdmin extends ProjectStore{
         table.flush();
         HFileOperations.deleteEnt(getRoot() + Path.SEPARATOR + name);
     }
+    
+    public Map<String, Document> search(QueryCondition qc) throws Exception {
+      logger.trace("Search query on search " + qc.toString());
+      return searchAsMap(table, qc);
+  }
 
     public static void main(String args[]){
         try {
@@ -211,12 +214,11 @@ public class ProjectAdmin extends ProjectStore{
             String prjName = args[1];
             String prjDesc = args[2];
 
-            String propFile = null;
-            if (args.length == 4) propFile = args[3];
-
             System.out.println(String.format("Create project with name: %s and description: %s", prjName, prjDesc));
             ProjectAdmin ps = new ProjectAdmin(root);
 /*
+            String propFile = null;
+            if (args.length == 4) propFile = args[3];
             if (propFile == null)
                 //ps.createProject(prjName, prjDesc);
             else{

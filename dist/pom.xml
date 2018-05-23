@@ -13,17 +13,22 @@
   <name>saw-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Name used for Docker Machine.  Should include the username to
+         enable identifying the owner of a machine in AWS.  -->
+    <sip.cloud.name>${user.name}</sip.cloud.name>
+    <!-- Default AWS region for Docker Machine -->
+    <sip.cloud.region>us</sip.cloud.region>
+    <!-- AWS secret key -->
+    <sip.cloud.key>AKIAIMXBE56B6CRN6GKA</sip.cloud.key>
+    <sip.cloud.key.secret>${env.SIP_CLOUD_KEY_SECRET}</sip.cloud.key.secret>
     <!-- Enable Docker Machine configuration by default -->
     <saw.docker.skip.machine>false</saw.docker.skip.machine>
-    <!-- Default AWS region for Docker Machine -->
-    <saw.aws.region>us</saw.aws.region>
-    <!-- Configure timestamp format suitable for use in Docker Machine
-         hostnames -->
-    <maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
     <!-- SAW Docker environment ports -->
     <saw.docker.port>80</saw.docker.port>
     <saw.mapr.web.port>18443</saw.mapr.web.port>
     <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
+    <saw.mapr.yarn.rm.port>18030</saw.mapr.yarn.rm.port>
+    <saw.mapr.yarn.nm.port>18031</saw.mapr.yarn.nm.port>
     <saw.yarn.resource.port>18088</saw.yarn.resource.port>
     <saw.yarn.node.port>18042</saw.yarn.node.port>
     <saw.spark.master.port>18080</saw.spark.master.port>
@@ -31,6 +36,7 @@
     <saw.livy.port>18998</saw.livy.port>
     <saw.kibana.port>15601</saw.kibana.port>
     <saw.journal.port>19531</saw.journal.port>
+    <saw.yarn.enabled>false</saw.yarn.enabled>
   </properties>
   <dependencies>
     <dependency>
@@ -135,7 +141,7 @@
         <version>1.0.0</version>
         <configuration>
           <files>
-            <file>${project.basedir}/src/test/cloud/cloud-region-${saw.aws.region}.properties</file>
+            <file>${project.basedir}/src/test/cloud/cloud-region-${sip.cloud.region}.properties</file>
           </files>
         </configuration>
         <executions>
@@ -209,7 +215,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.25.2</version>
+        <version>0.26.0</version>
         <configuration>
           <!-- Automatically create required Docker networks -->
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
@@ -222,22 +228,24 @@
           <!-- Ignore the Docker Machine configuration by default, and
                only enable it from the cloud profile when needed -->
           <skipMachine>${saw.docker.skip.machine}</skipMachine>
+          <buildArgs>
+            <yarn_enabled>${saw.yarn.enabled}</yarn_enabled>
+          </buildArgs>
           <!-- Configure Docker Machine -->
           <machine>
-            <name>user-${maven.build.timestamp}</name>
+            <name>user-${sip.cloud.name}</name>
             <autoCreate>true</autoCreate>
+            <regenerateCertsAfterStart>true</regenerateCertsAfterStart>
             <createOptions>
               <driver>amazonec2</driver>
-              <amazonec2-region>${saw.docker.machine.aws.region}</amazonec2-region>
-              <amazonec2-access-key>${env.SAW_AWS_ACCESS_KEY_ID}</amazonec2-access-key>
-              <amazonec2-secret-key>${env.SAW_AWS_SECRET_ACCESS_KEY}</amazonec2-secret-key>
+              <amazonec2-region>${sip.cloud.aws.region}</amazonec2-region>
+              <amazonec2-access-key>${sip.cloud.key}</amazonec2-access-key>
+              <amazonec2-secret-key>${sip.cloud.key.secret}</amazonec2-secret-key>
               <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
-              <!-- Use spot instance for cost savings and removing EBS volume upon termination -->
-              <amazonec2-request-spot-instance/>
               <amazonec2-root-size>32</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
-              <amazonec2-ami>${saw.docker.machine.aws.ami}</amazonec2-ami>
+              <amazonec2-ami>${sip.cloud.aws.ami}</amazonec2-ami>
               <amazonec2-ssh-user>centos</amazonec2-ssh-user>
               <amazonec2-userdata>${project.basedir}/src/test/cloud/cloud-config.yaml</amazonec2-userdata>
               <amazonec2-monitoring/>
@@ -332,6 +340,8 @@
                   <port>+saw.docker.ip:saw.mapr.cldb.port:7222</port>
                   <port>+saw.docker.ip:saw.yarn.resource.port:8088</port>
                   <port>+saw.docker.ip:saw.yarn.node.port:8042</port>
+                  <port>+saw.docker.ip:saw.mapr.yarn.rm.port:8030</port>
+                  <port>+saw.docker.ip:saw.mapr.yarn.nm.port:8031</port>
                   <port>+saw.docker.ip:saw.spark.master.port:8080</port>
                   <port>+saw.docker.ip:saw.spark.worker.port:8081</port>
                   <port>+saw.docker.ip:saw.livy.port:8998</port>
@@ -515,6 +525,7 @@
         <saw.docker.ip>127.0.0.1</saw.docker.ip>
       </properties>
     </profile>
+    <!-- Docker with Yarn enable-->
     <!-- Cloud Docker profile -->
     <profile>
       <id>docker-start-cloud</id>
@@ -524,13 +535,10 @@
           <value>cloud</value>
         </property>
       </activation>
-      <properties>
-        <saw.aws.region>${env.SAW_AWS_REGION}</saw.aws.region>
-      </properties>
       <build>
         <plugins>
-          <!-- Enable Enforcer plug-in to ensure that required SAW_AWS_*
-               environment variables have been set -->
+          <!-- Enable Enforcer plug-in to ensure that required
+               properties and environment variables have been set -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-enforcer-plugin</artifactId>
@@ -539,18 +547,18 @@
               <skip>false</skip>
               <rules>
                 <requireProperty>
-                  <property>env.SAW_AWS_REGION</property>
-                  <message>The environment variable SAW_AWS_REGION must be set</message>
+                  <property>sip.cloud.region</property>
                   <regex>(us|in)</regex>
-                  <regexMessage>Region must be one of the supported regions: "us" or "in"</regexMessage>
+                  <regexMessage>The "sip.cloud.region" property must be set to one of the following values: "us" or "in"</regexMessage>
                 </requireProperty>
                 <requireProperty>
-                  <property>env.SAW_AWS_ACCESS_KEY_ID</property>
-                  <message>The environment variable SAW_AWS_ACCESS_KEY_ID must be set</message>
+                  <property>env.SIP_CLOUD_KEY_SECRET</property>
+                  <message>The environment variable SIP_CLOUD_KEY_SECRET must be set (please ask a team member for the secret key)</message>
                 </requireProperty>
                 <requireProperty>
-                  <property>env.SAW_AWS_SECRET_ACCESS_KEY</property>
-                  <message>The environment variable SAW_AWS_SECRET_ACCESS_KEY must be set</message>
+                  <property>sip.cloud.name</property>
+                  <regex>\w{4}\d{4}(-.*)?</regex>
+                  <regexMessage>The "sip.cloud.name" property must start with a Synchronoss Active Directory username in the form "abcd0001"</regexMessage>
                 </requireProperty>
               </rules>
               <fail>true</fail>

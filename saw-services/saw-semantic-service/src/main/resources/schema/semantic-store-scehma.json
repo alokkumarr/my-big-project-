@@ -1,0 +1,41 @@
+{
+  "definitions":{},
+  "$schema":"http://json-schema.org/draft-04/schema#",
+  "id":"http://www.synchronoss.com",
+  "type":"object",
+  "properties":{
+    "node-category":{
+      "id":"/properties/node-category",
+      "type":"string",
+      "title":"The Node Category Schema "
+    },
+    "id":{
+      "id":"/properties/projectCode",
+      "type":"string",
+      "title":"The Projectcode Schema "
+    },
+    "action":{
+      "id":"/properties/action",
+      "type":"object",
+      "properties":{
+        "verb":{
+          "id":"/properties/verb",
+          "type":"string",
+          "title":"The Node Category Schema",
+          "default":"create",
+          "enum":[
+            "create",
+            "read",
+            "update",
+            "delete"
+          ]
+        },
+        "content":{
+          "id":"/properties/content",
+          "type":"object",
+          "title":"The content"
+        }
+      }
+    }
+  }
+}
