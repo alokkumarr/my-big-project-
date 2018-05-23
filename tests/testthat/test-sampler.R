@@ -71,7 +71,7 @@ R_data <- sampler(
 
 R_data_count <- n_distinct(R_data)
 
-count_data_r <- as.integer(n_distinct(dat) * 0.5) + 10
+count_data_r <- as.integer(n_distinct(dat) * 0.5) + 20
 
 test_that("Sampler R DF expected count of 0.5 maches generated count", {
   expect_lte(R_data_count, count_data_r)
@@ -235,7 +235,7 @@ Int_data <- dat_tbl %>%
   count() %>%
   collect
 
-exp_frac_data <- as.numeric(Int_data) * 0.2 + 10
+exp_frac_data <- as.numeric(Int_data) * 0.2 + 20
 
 count_collect_data_R <- spark_coll_frac_data %>%
   count() %>%
