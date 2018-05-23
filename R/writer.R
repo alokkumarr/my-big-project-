@@ -109,11 +109,14 @@ writer.tbl_spark <- function(df,
         }
       }
     }
-  } else{
+  } else {
     files <- dir(file_tmp_folder)
     n_files <- length(files)
     if (n_files > 0) {
       for (i in seq_along(files)) {
+        imax <- suppressWarnings(as.numeric(
+          gsub(paste(c(type, name, "\\-",  "\\_", "\\."), collapse="|"), "", files)))
+        imax <- ifelse(is.na(imax), 0, imax)
         isep <- ifelse(sum(grepl(type, files)) == 1, "", paste0("-", imax+1))
         if (grepl(paste0("\\.", type), files[i])) {
           new_file <- paste0(base_dir, "/", paste0(name, isep), paste(".", type, sep = ""))

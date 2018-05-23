@@ -205,5 +205,3 @@ test_that("seperator input works as expected on column names", {
   expect_equal(colnames(spk_wide), colnames(r_wide))
 })
 
-
-spark_disconnect(sc)
