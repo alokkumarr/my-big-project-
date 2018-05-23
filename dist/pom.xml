@@ -261,6 +261,8 @@
               <amazonec2-ami>${sip.cloud.aws.ami}</amazonec2-ami>
               <amazonec2-ssh-user>centos</amazonec2-ssh-user>
               <amazonec2-userdata>${project.basedir}/src/test/cloud/cloud-config.yaml</amazonec2-userdata>
+              <!-- Set IAM instance profile to get AWS Route 53 permissions -->
+              <amazonec2-iam-instance-profile>UserEnvironment</amazonec2-iam-instance-profile>
               <amazonec2-monitoring/>
               <!--
                   Workaround: Docker Machine defaults to devicemapper,
