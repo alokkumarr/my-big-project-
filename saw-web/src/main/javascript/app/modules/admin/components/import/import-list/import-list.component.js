@@ -129,6 +129,9 @@ export const ImportListViewComponent = {
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
+        scrolling: {
+          scrollingEnabled: false
+        },
         paging: {
           pageSize: 10
         },

@@ -39,6 +39,8 @@ export const AnalysisImportComponent = {
       this._CategoriesManagementService.getActiveCategoriesList(id).then(response => {
         this.dataHolder = response.categories;
         this._$rootScope.showProgress = false;
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
     getAllAnalysisByCategoryId(subCategoryId) {
@@ -51,6 +53,8 @@ export const AnalysisImportComponent = {
           this.checkDuplicationAnalysis();
           this.updater.next({analysisList: this.analysisTableList});
           this.analysisUpdater.next({analysisList: this.categoryAnalysisTableList});
+          this._$rootScope.showProgress = false;
+        }).catch(() => {
           this._$rootScope.showProgress = false;
         });
     }
@@ -220,7 +224,8 @@ export const AnalysisImportComponent = {
         this.changeNewAnalysisParameter(analysis, initAnalysis);
         this.updateOldAnalysis(analysis);
         this._$rootScope.showProgress = false;
-      }).catch(() => {
+      }).catch(error => {
+        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false);
         this._$rootScope.showProgress = false;
       });
     }
