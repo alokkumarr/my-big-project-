@@ -660,7 +660,7 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      # round(5) ,
+       round(5) ,
     r_imp_mode_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
