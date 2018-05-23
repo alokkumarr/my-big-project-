@@ -10,14 +10,24 @@ process.chdir('..')
 
 var params = process.env.GIT_PARAMS || '';
 var message = fs.readFileSync(params);
-var subject = message.toString().split(/\n/)[0];
+var lines = message.toString().split(/\n/);
+var subject = lines[0];
 
-if (!subject.match(/^(SIP-\d+|WIP): .*/)) {
+if (!subject.match(/^(SIP-\d+:|WIP:|Merge) .*/)) {
   console.log('Error: Git commit message does not start with ticket ID');
   console.log('Expected: "SIP-<nnnn>: <subject>"');
   console.log('Actual: "' + subject + '"');
   console.log();
   console.log('Please read: https://chris.beams.io/posts/git-commit/');
+  console.log();
+  console.log('Full commit message:');
+  console.log();
+  for (var i = 0; i < lines.length; i++) {
+    if (!lines[i].match(/^\w*#/)) {
+      console.log('> ' + lines[i]);
+    }
+  }
+  console.log();
   code = 1;
 }
 

@@ -50,6 +50,9 @@ workbench:
 proxy:
     service:
         host: http://localhost:9800
+datapod:
+    service:
+        host: http://localhost:9900
 
 api:
   gateway:
@@ -111,3 +114,9 @@ api:
         -   location: ${proxy.service.host}
             method: POST
             path: '[/]proxy.*'
+        -   location: ${datapod.service.host}
+            method: POST
+            path: '[/]internal/semantic.*'
+        -   location: ${datapod.service.host}
+            method: GET
+            path: '[/]internal/semantic.*'

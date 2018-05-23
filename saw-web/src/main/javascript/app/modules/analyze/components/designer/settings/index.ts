@@ -10,7 +10,7 @@ import {
 import {
   DesignerSettingsAuxComponent,
   DesignerSettingsAuxChartComponent
-} from './aux';
+} from './aux-settings';
 export {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,

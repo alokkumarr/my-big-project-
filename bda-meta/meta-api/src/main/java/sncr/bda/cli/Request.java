@@ -2,6 +2,7 @@ package sncr.bda.cli;
 
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.ojai.Document;
@@ -10,7 +11,7 @@ import sncr.bda.admin.ProjectAdmin;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.DataSetStore;
-import sncr.bda.metastore.ProjectStore;
+import sncr.bda.metastore.PortalDataSetStore;
 import sncr.bda.metastore.TransformationStore;
 
 import java.io.FileNotFoundException;
@@ -46,6 +47,7 @@ import static sncr.bda.cli.Request.MetaCategory.*;
  * }
  * Created by srya0001 on 11/4/2017.
  */
+
 public class Request {
 
     private static final Logger logger = Logger.getLogger(Request.class);
@@ -70,6 +72,45 @@ public class Request {
     {
         jsonParser = new JsonParser();
         request = jsonParser.parse(jStr);
+    }
+
+    public JsonObject search() {
+        JsonObject result = null;
+
+        try {
+            if (request.isJsonObject()) {
+                logger.debug("Processing request object");
+                if (analyzeAndValidate(request.getAsJsonObject())) {
+                    logger.debug("Query String " + this.query);
+                    logger.debug("Filters " + this.filter);
+                    Map<String, Document> searchResult = doSearch();
+
+                    if (searchResult != null) {
+                        return convertSearchResultToJson(searchResult);
+                    }
+                }
+            } else if (request.isJsonArray()) {
+                logger.error("Processing request array");
+                JsonArray ja = request.getAsJsonArray();
+
+                JsonObject jobj = ja.get(0).getAsJsonObject();
+                if (analyzeAndValidate(jobj)) {
+                    logger.debug("Query String " + this.query);
+                    logger.debug("Filters " + this.filter);
+                    Map<String, Document> searchResult = doSearch();
+
+                    if (searchResult != null) {
+                        return convertSearchResultToJson(searchResult);
+                    }
+                }
+
+            }
+        } catch (Exception ex) {
+            logger.error("Cannot process the request " + request + ", " + ex.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(ex));
+        }
+
+        return result;
     }
 
 
@@ -107,11 +148,13 @@ public class Request {
         if (analyzeAndValidate(item)){
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
-            try {
-                os = HFileOperations.writeToFile(rFile);
-            } catch (FileNotFoundException e1) {
-                logger.error("Could not write response to file: " + rFile, e1);
-                return;
+            if (rFile != null && !rFile.isEmpty()) {
+                try {
+                    os = HFileOperations.writeToFile(rFile);
+                } catch (FileNotFoundException e1) {
+                    logger.error("Could not write response to file: " + rFile, e1);
+                    return;
+                }
             }
 
             try {
@@ -123,7 +166,8 @@ public class Request {
                         doAction(item);
                         break;
                     case search:
-                        doSearch();
+                        Map<String, Document> searchResult = doSearch();
+                        writeSearchResult(searchResult);
                         break;
                     default:
                         logger.warn("Action is not supported");
@@ -150,7 +194,7 @@ public class Request {
     }
 
 
-    private void doSearch() throws Exception {
+    private Map<String, Document> doSearch() throws Exception {
 
         maprDBCondition =  MapRDB.newCondition();
 
@@ -172,7 +216,11 @@ public class Request {
                 String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
                 String cond = cjo.getAsJsonPrimitive("condition").getAsString();
                 String val = cjo.getAsJsonPrimitive("value").getAsString();
-                if (fp != null && fp.isEmpty() && cond != null && cond.isEmpty() && val != null && val.isEmpty())
+
+                logger.debug("Query Values: field-path= " + fp + ", condition = " + cond + ", value = " + val);
+
+
+                if (fp != null && !fp.isEmpty() && cond != null && !cond.isEmpty() && val != null && !val.isEmpty())
                 {
                     if (cond.equalsIgnoreCase("like"))
                         maprDBCondition.like(fp, val);
@@ -205,23 +253,26 @@ public class Request {
                 TransformationStore tr = new TransformationStore(xdfRoot);
                 searchResult = tr.search(maprDBCondition);
                 break;
+            case PortalDataSet:
+                PortalDataSetStore pdss = new PortalDataSetStore(xdfRoot);
+                searchResult = pdss.search(maprDBCondition);
+                break;
             default:
                 logger.error("Not supported category");
-                return;
+                return searchResult;
         }
-        writeSearchResult(searchResult);
+        return searchResult;
     }
 
-    private void writeSearchResult(Map<String, Document> searchResult) {
-
+    private JsonObject convertSearchResultToJson(Map<String, Document> searchResult) {
         if (searchResult == null || searchResult.isEmpty()) {
             logger.info("No data found");
-            return;
+            return null;
         }
+
         JsonObject response = new JsonObject();
         response.addProperty("scope", "search");
         JsonArray respJA = new JsonArray();
-        response.add("result", respJA);
         final int[] c = {0};
         searchResult.forEach( (id, doc) ->
             {
@@ -232,10 +283,29 @@ public class Request {
                 respJA.add(docDesc);
             }
         );
-        try {
-            os.write(response.toString().getBytes());
-        } catch (IOException e) {
-            logger.error("Could not write data to response file: ", e);
+
+        response.add("result", respJA);
+        return response;
+    }
+
+    private void writeSearchResult(Map<String, Document> searchResult) {
+
+        if (searchResult == null || searchResult.isEmpty()) {
+            logger.info("No data found");
+            return;
+        }
+
+
+        JsonObject object = convertSearchResultToJson(searchResult);
+
+        if (object != null) {
+            try {
+                if (os != null) {
+                    os.write(object.toString().getBytes());
+                }
+            } catch (IOException e) {
+                logger.error("Could not write data to response file: ", e);
+            }
         }
 
     }
@@ -316,6 +386,17 @@ public class Request {
                         logger.warn("Action is not supported");
                 }
                 break;
+            case PortalDataSet:
+                PortalDataSetStore pdss = new PortalDataSetStore(xdfRoot);
+                switch (action){
+                    case create: pdss.create(id, src); break;
+                    case delete: pdss.delete(id); break;
+                    case update: pdss.update(id, src); break;
+                    case read: result = pdss.read(id); break;
+                    default:
+                        logger.warn("Action is not supported");
+                }
+                break;
             default:
                 logger.error("Not supported category");
                 return;
@@ -336,7 +417,9 @@ public class Request {
                 response.add("result", new JsonPrimitive(e.getMessage()));
             }
             logger.debug("Response: \n" + response.toString());
-            os.write(response.toString().getBytes());
+            if (os != null) {
+                os.write(response.toString().getBytes());
+            }
         } catch (IOException e2) {
             logger.error("IOException at attempt to write result: " + rFile, e2);
             return;
@@ -445,7 +528,7 @@ public class Request {
     }
 
 
-    enum Actions{
+    public enum Actions{
         read,
         create,
         update,
@@ -453,10 +536,11 @@ public class Request {
         search;
     }
 
-    enum MetaCategory{
+    public enum MetaCategory{
         Project,
         Transformation,
         DataSet,
+        PortalDataSet,
         AuditLog,
         DataPod,
         DataSegment;
