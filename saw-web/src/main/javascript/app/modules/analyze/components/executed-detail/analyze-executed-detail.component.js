@@ -11,7 +11,7 @@ import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
-import * as moment from 'moment';
+//import * as moment from 'moment';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 
