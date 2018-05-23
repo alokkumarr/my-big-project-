@@ -29,18 +29,25 @@ public class DataExportController {
 
   @Autowired
   private ExportService exportService;
-  
+
   @RequestMapping(value = "/{analysisId}/executions/{executionId}/data", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
-  public ListenableFuture<ResponseEntity<DataResponse>> exportAnalyses (@PathVariable("executionId") String executionId, @PathVariable("analysisId") String analysisId,
-        HttpServletRequest request, HttpServletResponse response){
-        logger.debug("executionId in export {}", executionId);
-        logger.debug(request.getHeader("Authorization"));
-        logger.debug(request.getHeader("Host"));
-        ListenableFuture<ResponseEntity<DataResponse>> responseObjectFuture = null;
-        responseObjectFuture = exportService.dataToBeExportedAsync(executionId, request,analysisId);
-        return responseObjectFuture;
+  public ListenableFuture<ResponseEntity<DataResponse>> exportAnalyses(
+      @PathVariable("executionId") String executionId,
+      @PathVariable("analysisId") String analysisId,
+      HttpServletRequest request, HttpServletResponse response) {
+
+    String analysisType = request.getParameter("analysisType");
+    if (analysisType.equals("") || analysisType.isEmpty()) {
+      analysisType = "report"; // by default assume that it's report
     }
+    logger.debug("executionId in export {}", executionId);
+    logger.debug(request.getHeader("Authorization"));
+    logger.debug(request.getHeader("Host"));
+    ListenableFuture<ResponseEntity<DataResponse>> responseObjectFuture = null;
+    responseObjectFuture = exportService.dataToBeExportedAsync(executionId, request, analysisId, analysisType);
+    return responseObjectFuture;
+  }
 
   @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch/{type}", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
