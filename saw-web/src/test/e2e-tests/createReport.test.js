@@ -42,6 +42,8 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      commonFunctions.openBaseUrl();
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -49,7 +51,7 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -77,7 +79,9 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Select fields and refresh
     tables.forEach(table => {
       table.fields.forEach(field => {
+        browser.executeScript(scrollIntoView, reportDesigner.getReportFieldCheckbox(table.name, field));
         commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.getReportFieldCheckbox(table.name, field));
+        browser.sleep(500);
       });
     });
 
@@ -145,4 +149,8 @@ describe('Create report type analysis: createReport.test.js', () => {
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
   });
+
+  var scrollIntoView = function (element) {
+    arguments[0].scrollIntoView();
+  };
 });

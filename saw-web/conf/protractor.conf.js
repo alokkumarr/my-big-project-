@@ -76,6 +76,7 @@ exports.config = {
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
+  baseUrl: webpackHelper.sawWebUrl(),
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
