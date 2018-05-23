@@ -55,7 +55,7 @@ const doAnalysisAction = (name, action) => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
-      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);  
+      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
@@ -262,6 +262,7 @@ module.exports = {
     getStringFilterInput: getStringFilterInputUpgraded,
     getNumberFilterInput: getNumberFilterInputUpgraded,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
+    getAppliedFilterUpdated: feild => element(by.xpath(`//mat-chip[contains(text(),"${feild}")]`)),
     getAppliedFilter: getAppliedFilterUpgraded,
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),

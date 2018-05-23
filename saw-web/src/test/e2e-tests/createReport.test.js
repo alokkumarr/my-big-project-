@@ -118,7 +118,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
 
-    const appliedFilter = filters.getAppliedFilter(fieldName);
+    const appliedFilter = filters.getAppliedFilterUpdated(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
 
