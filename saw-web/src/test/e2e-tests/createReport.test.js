@@ -42,6 +42,7 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      commonFunctions.logOutByClearingLocalStorage();
       commonFunctions.openBaseUrl();
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
