@@ -201,7 +201,7 @@ export const AnalyzeExecutedDetailComponent = {
             },
             keys
           };
-          json2csv(this.formatDates(data), (err, csv) => {
+          json2csv(data, (err, csv) => {
             if (err) {
               this._$translate('ERROR_EXPORT_FAILED').then(translation => {
                 this._toastMessage.error(translation);
@@ -226,21 +226,21 @@ export const AnalyzeExecutedDetailComponent = {
       }
     }
 
-    formatDates(data) {
-      const ks = keys(data[0] || {});
-      const formats = [
-        moment.ISO_8601,
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, data => {
-        forEach(ks, key => {
-          if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).format('YYYY-MM-DD');
-          }
-        });
-      });
-      return data;
-    }
+    // formatDates(data) {
+    //   const ks = keys(data[0] || {});
+    //   const formats = [
+    //     moment.ISO_8601,
+    //     'MM/DD/YYYY  :)  HH*mm*ss'
+    //   ];
+    //   forEach(data, data => {
+    //     forEach(ks, key => {
+    //       if (moment(data[key], formats, true).isValid()) {
+    //         data[key] = moment(data[key]).format('YYYY-MM-DD');
+    //       }
+    //     });
+    //   });
+    //   return data;
+    // }
 
     replaceCSVHeader(csv, fields) {
       const firstNewLine = indexOf(csv, '\n');
