@@ -71,7 +71,7 @@ R_data <- sampler(
 
 R_data_count <- n_distinct(R_data)
 
-count_data_r <- as.integer(n_distinct(dat) * 0.5) + 20
+count_data_r <- as.integer(n_distinct(dat) * 0.5) + 50
 
 test_that("Sampler R DF expected count of 0.5 maches generated count", {
   expect_lte(R_data_count, count_data_r)
