@@ -186,7 +186,7 @@ const doAccountAction = action => {
 };
 
 function navigateToHome() {
-  browser.driver.get(webpackHelper.sawWebUrl());
+  browser.get(browser.baseUrl);
   return browser.driver.wait(() => {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
