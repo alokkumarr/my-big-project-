@@ -420,7 +420,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=${docker.host.address}/${saw.docker.port}</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}</arguments>
             </configuration>
           </execution>
         </executions>
