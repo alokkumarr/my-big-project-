@@ -14,6 +14,18 @@ export const AdminMenuData = [{
   id: '',
   name: 'Category',
   url: '#!/categories'
+}, {
+  id: '',
+  name: 'Export/Import',
+  children: [{
+    id: '',
+    name: 'Export Analysis',
+    url: '#!/export'
+  }, {
+    id: '',
+    name: 'Import Analysis',
+    url: '#!/import'
+  }]
 }];
 
 export const UsersTableHeader = [{

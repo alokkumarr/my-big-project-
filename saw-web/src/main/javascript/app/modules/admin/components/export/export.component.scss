@@ -1,0 +1,45 @@
+@import "themes/base/colors";
+
+export-component {
+  width: 100%;
+  padding: 10px;
+
+  .md-chips.md-removable md-chip {
+    padding-right: 28px;
+  }
+
+  md-icon {
+    margin-bottom: 24px;
+    margin-left: -6px;
+    font-size: x-small;
+    color: $primary-white !important;
+  }
+
+  button.metric-close-chip {
+    position: relative;
+    height: 24px;
+    width: 24px;
+    line-height: 30px;
+    text-align: center;
+    background: $primary-grey-g2;
+    border-radius: 50%;
+    border: none;
+    box-shadow: none;
+    margin-top: 4px;
+    margin-right: 5px;
+    transition: background 0.15s linear;
+    display: block;
+  }
+
+  button.metric-close-chip:hover {
+    background: $secondary-red;
+  }
+
+  md-checkbox {
+    margin-bottom: 1px;
+  }
+
+  md-card-header {
+    padding: 1px;
+  }
+}
