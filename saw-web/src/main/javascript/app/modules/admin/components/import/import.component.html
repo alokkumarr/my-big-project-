@@ -1,0 +1,48 @@
+<admin-analysis-import>
+    <md-toolbar class="secondary-toolbar">
+        <div class="md-toolbar-tools" layout-align="start center">
+            <div class="categories-view_search-panel" layout="row" layout-align="start center">
+                <span class="md-title" translate="IMPORT_LABEL"></span>
+            </div>      
+        </div>
+    </md-toolbar>
+    <div class="layout-row">
+            <label class="md-button">Attach Json files</label>
+        <input type="file" id="input-file-id" class="ng-hide" ng-change="$ctrl.readFiles()"
+                file-upload ng-model="$ctrl.files" multiple accept="json/*"/>
+                <label for="input-file-id" class="md-button md-raised upload-button"
+                translate="IMPORT_BROWSE"></label>
+    </div>
+    <import-file-list-view
+    file-list = "$ctrl.fileTableList"
+    updater = "$ctrl.fileListupdater"
+    onAction = ""
+    ></import-file-list-view>
+    
+    <md-input-container>
+        <label translate="IMPORT_SELECT_CAT"></label>
+        <md-select 
+            e2e="save-dialog-selected-category"
+            ng-change="$ctrl.getAllAnalysisByCategoryId($ctrl.categoryId)"
+            ng-model="::$ctrl.categoryId">
+        <md-optgroup ng-repeat="category in $ctrl.dataHolder" ng-if="category.moduleName === 'ANALYZE'"
+        label="{{::category.categoryName}}">
+            <md-option
+                ng-repeat="subCategory in category.subCategories"
+                ng-bind="::subCategory.subCategoryName"
+                ng-value="subCategory.subCategoryId"></md-option>
+            </md-optgroup>
+        </md-select>
+    </md-input-container>
+    <import-list-view
+        id="import-grid-dir"
+        analysis-list="$ctrl.analysisTableList"
+        updater="$ctrl.updater"
+        on-action="$ctrl.onListAction(type, model)">
+    </import-list-view>
+    <analysis-list-view
+    id="analysis-grid-dir"
+    analysis-list="$ctrl.categoryAnalysisTableList"
+    updater="$ctrl.analysisUpdater"
+    ></analysis-list-view>
+</admin-analysis-import>
