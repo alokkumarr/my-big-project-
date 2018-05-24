@@ -122,7 +122,7 @@ export const AnalyzeViewComponent = {
       }).then(analyses => {
         this._analysisCache = analyses;
         this.analyses = analyses;
-        this.updater.next({analyses});
+        this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
         this._$rootScope.showProgress = false;
       }).catch(() => {
         this._$rootScope.showProgress = false;
@@ -134,7 +134,7 @@ export const AnalyzeViewComponent = {
       this.states.searchTermValue = searchCriteria.trimmedTerm;
       this._LocalSearchService.doSearch(searchCriteria, this._analysisCache, SEARCH_CONFIG).then(data => {
         this.analyses = data;
-        this.updater.next({analyses: this.analyses});
+        this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
       }, err => {
         this._toastMessage.error(err.message);
       });
@@ -161,7 +161,7 @@ export const AnalyzeViewComponent = {
       remove(this.analyses, report => {
         return report.id === analysis.id;
       });
-      this.updater.next({analyses: this.analyses});
+      this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
     }
 
     /* ACTIONS */
@@ -191,7 +191,7 @@ export const AnalyzeViewComponent = {
         return id === analysis.id;
       });
       this.analyses.splice(analysisId, 1, analysis);
-      this.updater.next({analyses: this.analyses});
+      this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
       this._$state.go('analyze.view', {id: analysis.categoryId});
     }
 

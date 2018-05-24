@@ -50,8 +50,8 @@ export const AnalyzeListViewComponent = {
 
     onUpdate({analysisType, analyses}) {
       /* eslint-disable */
-      analysisType && this.onUpdateAnalysisType(analysisType);
       analyses && this.reloadDataGrid(analyses);
+      analysisType && this.onUpdateAnalysisType(analysisType);
       /* eslint-enable */
     }
 
