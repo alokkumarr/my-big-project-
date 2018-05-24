@@ -24,7 +24,15 @@ import {CategoryDialogComponent} from './components/category-dialog/category-dia
 import {CategoryNewComponent} from './components/category-new/category-new.component';
 import {CategoryEditComponent} from './components/category-edit/category-edit.component';
 import {CategoryDeleteComponent} from './components/category-delete/category-delete.component';
+import {AnalysisExportComponent} from './components/export/export.component';
+import {AnalysisImportComponent} from './components/import/import.component';
+import {ExportListViewComponent} from './components/export/export-list/export-list.component';
+import {ImportListViewComponent} from './components/import/import-list/import-list.component';
+import {AnalysisListViewComponent} from './components/import/analysis-list/analysis-list.component';
+import {ImportFileListViewComponent} from './components/import/import-file-list/import-file-list.component';
 
+import {ExportService} from './services/export.service';
+import {ImportService} from './services/import.service';
 import {UsersManagementService} from './services/users.service';
 import {RolesManagementService} from './services/roles.service';
 import {PrivilegesManagementService} from './services/privileges.service';
@@ -41,6 +49,8 @@ angular.module(AdminModule, [
   .factory('RolesManagementService', RolesManagementService)
   .factory('PrivilegesManagementService', PrivilegesManagementService)
   .factory('CategoriesManagementService', CategoriesManagementService)
+  .service('ExportService', ExportService)
+  .service('ImportService', ImportService)
   .component('usersView', UsersViewComponent)
   .component('usersListView', UsersListViewComponent)
   .component('userDialog', UserDialogComponent)
@@ -61,4 +71,10 @@ angular.module(AdminModule, [
   .component('categoryDialog', CategoryDialogComponent)
   .component('categoryNew', CategoryNewComponent)
   .component('categoryEdit', CategoryEditComponent)
-  .component('categoryDelete', CategoryDeleteComponent);
+  .component('categoryDelete', CategoryDeleteComponent)
+  .component('exportComponent', AnalysisExportComponent)
+  .component('importComponent', AnalysisImportComponent)
+  .component('exportListView', ExportListViewComponent)
+  .component('importListView', ImportListViewComponent)
+  .component('analysisListView', AnalysisListViewComponent)
+  .component('importFileListView', ImportFileListViewComponent);
