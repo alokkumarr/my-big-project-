@@ -79,7 +79,9 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       let chartTyp = data.chartType.split(":")[1];
 
       login.loginAs(data.user);
-
+      homePage.mainMenuExpandBtn.click();
+      homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
+      homePage.mainMenuCollapseBtn.click();
       //Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
@@ -114,16 +116,5 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
 
-    // Navigates to specific category where analysis creation should happen
-    const navigateToSubCategory = () => {
-      //Collapse default category
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
-
-      //Navigate to Category/Sub-category
-      const collapsedCategory = homePage.collapsedCategory(categoryName);
-      const subCategory = homePage.subCategory(subCategoryName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
-    };
   });
 });
