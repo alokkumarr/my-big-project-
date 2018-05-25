@@ -17,6 +17,12 @@ module.exports = {
   expandedCategory: categoryName => {
     return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
   },
+  expandedCategoryUpdated: categoryName => {
+    return element(by.xpath(`//span[contains(text(),"${categoryName}")]/parent::*/parent::*/parent::mat-expansion-panel-header[contains(@class,"mat-expanded")]`));
+  },
+  collapsedCategoryUpdated: categoryName => {
+    return element(by.xpath(`//span[contains(text(),"${categoryName}")]/parent::*/parent::*/parent::mat-expansion-panel-header[not(contains(@class,"mat-expanded"))]`));
+  },
   collapsedCategory: categoryName => {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
   },
@@ -24,9 +30,27 @@ module.exports = {
     return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
   },
   navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
+  navigateToSubCategoryUpdated: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory),
   createAnalysis: (metricName, analysisType) => createAnalysis(metricName, analysisType),
 };
 
+/*
+ * Navigates to specific category where analysis creation should happen
+ * @defaultCategory - category which should be collapsed before proceeding next
+ * @categoryName - category to expand to reach subcategory
+ * @subCategoryName - desirable category to expand
+ */
+const navigateToSubCategoryUpdated = (categoryName, subCategoryName, defaultCategory) => {
+  //Collapse default category
+  commonFunctions.waitFor.elementToBeClickableAndClick(module.exports.expandedCategoryUpdated(defaultCategory));
+  browser.sleep(2000); // TODO:This sleep is temporary fix,need to add better logic here.
+  //Navigate to Category/Sub-category
+  const collapsedCategory = module.exports.collapsedCategoryUpdated(categoryName);
+  const subCategory = module.exports.subCategory(subCategoryName);
+  commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
+  browser.sleep(2000); // TODO:This sleep is temporary fix,need to add better logic here.
+  commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+};
 /*
  * Navigates to specific category where analysis creation should happen
  * @defaultCategory - category which should be collapsed before proceeding next
