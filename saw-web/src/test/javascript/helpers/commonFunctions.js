@@ -59,6 +59,16 @@ module.exports = {
     // You can also use the `dragAndDrop` convenience action.
     browser.actions().dragAndDrop(dragElement, dropElement).mouseUp().perform();
   },
+  openBaseUrl() {
+    browser.driver.get(protractorConf.config.baseUrl);
+  },
+  logOutByClearingLocalStorage() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();')
+  },
+  scrollIntoView(element) {
+    arguments[0].scrollIntoView();
+  },
 };
 
 function click(element, i) {
