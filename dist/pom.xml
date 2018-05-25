@@ -246,7 +246,7 @@
           </buildArgs>
           <!-- Configure Docker Machine -->
           <machine>
-            <name>user-${sip.cloud.name}</name>
+            <name>sip-${sip.cloud.name}</name>
             <autoCreate>true</autoCreate>
             <regenerateCertsAfterStart>true</regenerateCertsAfterStart>
             <createOptions>
