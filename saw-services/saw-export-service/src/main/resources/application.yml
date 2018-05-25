@@ -41,3 +41,4 @@ ftp:
     file: /opt/bda/saw-export-service/conf/ftp-details.json
 
 
+exportChunkSize: 10000
