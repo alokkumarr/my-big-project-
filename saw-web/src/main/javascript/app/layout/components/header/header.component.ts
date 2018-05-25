@@ -23,6 +23,10 @@ export class LayoutHeaderComponent {
     this.cdRef.detectChanges();
   }
 
+  public UserDetails: any;
+  public modules: any;
+  public showAdmin: boolean;
+
   ngOnInit() {
     this.UserDetails = this.jwt.getTokenObj();
     const token = this.jwt.getTokenObj();
