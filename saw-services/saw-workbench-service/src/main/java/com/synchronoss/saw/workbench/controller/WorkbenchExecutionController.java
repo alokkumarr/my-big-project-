@@ -154,34 +154,34 @@ public class WorkbenchExecutionController {
     return workbenchExecutionService.preview(project, name);
   }
 
-    /**
-     * This method is to preview the data.
-     * @param project is of type String.
-     * @param previewId is of type String.
-     * @return ObjectNode is of type Object.
-     * @throws JsonProcessingException when this exceptional condition happens.
-     * @throws Exception when this exceptional condition happens.
+  /**
+   * This method is to preview the data.
+   * @param project is of type String.
+   * @param previewId is of type String.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/previews/{previewId}", method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
+                            @PathVariable(name = "previewId", required = true) String previewId)
+      throws JsonProcessingException, Exception {
+    log.debug("Get dataset preview: project = {}", project);
+    /* Get previously created preview */
+    ObjectNode body = workbenchExecutionService.getPreview(previewId);
+    /*
+     * If preview was not found, response to indicate that preview has not been created yet
      */
-    @RequestMapping(value = "{project}/previews/{previewId}", method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-                              @PathVariable(name = "previewId", required = true) String previewId)
-        throws JsonProcessingException, Exception {
-        log.debug("Get dataset preview: project = {}", project);
-        /* Get previously created preview */
-        ObjectNode body = workbenchExecutionService.getPreview(previewId);
-        /*
-         * If preview was not found, response to indicate that preview has not been created yet
-         */
-        if (body == null) {
-            throw new NotFoundException();
-        }
-        /* Otherwise return the preview contents */
-        return body;
+    if (body == null) {
+      throw new NotFoundException();
     }
+    /* Otherwise return the preview contents */
+    return body;
+  }
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
+  @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
   private static class NotFoundException extends RuntimeException {
     private static final long serialVersionUID = 412355610432444770L;
   }
