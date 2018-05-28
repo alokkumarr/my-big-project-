@@ -188,7 +188,7 @@ const doAccountAction = action => {
 };
 
 function navigateToHome() {
-  browser.driver.get(webpackHelper.sawWebUrl());
+  browser.get(browser.baseUrl);
   return browser.driver.wait(() => {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
@@ -264,6 +264,7 @@ module.exports = {
     getStringFilterInput: getStringFilterInputUpgraded,
     getNumberFilterInput: getNumberFilterInputUpgraded,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
+    getAppliedFilterUpdated: feild => element(by.xpath(`//mat-chip[contains(text(),"${feild}")]`)),
     getAppliedFilter: getAppliedFilterUpgraded,
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),

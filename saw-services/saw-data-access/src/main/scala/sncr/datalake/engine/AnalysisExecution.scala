@@ -164,19 +164,27 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     *
     * @return List<Map<…>> data structure
     */
-  def loadExecution(id: String, limit: Integer = 10000) : java.util.List[java.util.Map[String, (String, Object)]] = {
+  def loadExecution(id: String, limit: Integer = 10000) : java.util.stream.Stream[String] = {
     /* Note: If loading of execution results is reimplemented in any other
      * service as part of a refactoring, it should be implemented
      * using Java streams to allow processing the data using a
      * streaming approach. This avoids risking out of memory errors
      * due to loading the entire execution result into memory at the
      * same time. */
-    val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
+
+    // use this as just a data type holder
+    // val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
+    val results = new java.util.ArrayList[String]
+    // not resultsStream will have required data type.
+    var resultsStream = results.stream()
+
     val resultNode = AnalysisResult(null, id)
+
     if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
       m_log.debug("Data location property not found: {}", id)
-      return results
+      return resultsStream
     }
+
     resultNode.getObject("dataLocation") match {
       case Some(dir: String) => {
         val files = try {
@@ -185,41 +193,28 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
         } catch {
           case e: Throwable => {
             m_log.debug("Exception while getting result files: {}", e)
-            return results
+            return resultsStream
           }
         }
         /* Filter out the JSON files which contain the result rows */
         files.filter(_.getPath.getName.endsWith(".json")).foreach(file => {
           m_log.debug("Filtered file: " + file.getPath.getName)
           val is = HFileOperations.readFileToInputStream(file.getPath.toString)
+          // stream of all the "string" values for one file.
           val reader = new BufferedReader(new InputStreamReader(is))
-          /* Use an iterator over the lines of the file, which map to rows of the results encoded as JSON */
-          reader.lines.iterator.asScala.foreach(line => {
-            val resultsRow = new java.util.HashMap[String, (String, Object)]
-            parse(line) match {
-              case obj: JObject => {
-                /* Convert the parsed JSON to the data type expected by the
-                 * loadExecution method signature */
-                val rowMap = obj.extract[Map[String, Any]]
-                rowMap.keys.foreach(key => {
-                  rowMap.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
-                })
-              }
-              case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
-            }
-            results.add(resultsRow)
-            if (limit > 0 && results.size() >= limit) {
-              return results
-            }
-          })
+          // merge each file to a resultsStream
+          resultsStream = java.util.stream.Stream.concat(resultsStream, reader.lines)
+
         })
+        // this can very well be an infinite stream if we don't give it a limit
+        return resultsStream
       }
       case obj => {
         m_log.debug("Data location not found for results: {}", id)
-        return results
+        return resultsStream
       }
     }
-    results
+    resultsStream
   }
 
   def loadESExecutionData(anres: AnalysisResult) : JValue  = AnalysisNodeExecutionHelper.loadESAnalysisResult(anres)

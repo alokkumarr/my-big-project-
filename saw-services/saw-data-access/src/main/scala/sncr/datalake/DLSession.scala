@@ -341,7 +341,7 @@ object DLSession
 
   //TODO:: Essentially this call materializes Dataset, it needs to be investigated to choose optimal approach
   //to bing data from datalake
-  def convert(df: DataFrame, limit: Int): util.List[util.Map[String, (String, Object)]] =  convert(df.head(limit), df.dtypes)
+  def convert(df: DataFrame, limit: Int): util.List[util.Map[String, (String, Object)]] = convert(df.head(limit), df.dtypes)
 
   DLConfiguration.initSpark()
 }

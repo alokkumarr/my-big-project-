@@ -95,5 +95,19 @@
   "TOOLTIP_DELETE_SUB_CATEGORY":"Delete Sub Category",
   
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
-  "TOOLTIP_ROLE_ANAS_MSG":"Automatically create default privileges to the My Analyses category for any user assigned to this Role. At least one privilege per Role is needed for application access."
+  "TOOLTIP_ROLE_ANAS_MSG":"Automatically create default privileges to the My Analyses category for any user assigned to this Role. At least one privilege per Role is needed for application access.",
+
+  "LIST_VIEW_EXPORT":"Export Analysis Table",
+  "EXPORT_BUTTON":"Export",
+  "EXPORT_LABEL":"Export Analysis",
+  "SELECT_METRIC_EXPORT":"Select Metrics",
+  "SELECTED_METRIC_EXPORT":"Selected Metrics",
+
+  "IMPORT_CAT_ANALYSIS_LIST_VIEW":"Analysis from selected Category",
+  "IMPORT_FILE_ANALYSIS_LIST_VIEW":"Import Files Details",
+  "IMPORT_ANALYSIS_LIST_VIEW":"Import Analysis Table",
+  "IMPORT_BUTTON":"Import",
+  "IMPORT_LABEL":"Import Analysis",
+  "IMPORT_BROWSE":"Browse",
+  "IMPORT_SELECT_CAT":"Select a Category"
 }

@@ -187,7 +187,8 @@ export const AnalyzeExecutedDetailComponent = {
       } else {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
-        this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
+        const analysisType = this.analysis.type;
+        this._AnalyzeActionsService.exportAnalysis(analysisId, executionId, analysisType).then(data => {
           let fields = this.getCheckedFieldsForExport(this.analysis, data);
           fields = this.checkColumnName(fields);
           const keys = map(fields, 'columnName');

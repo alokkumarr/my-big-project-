@@ -1,4 +1,4 @@
-import { Injectable, Component, Inject, EventEmitter } from '@angular/core';
+import { Injectable, Component, Inject, ChangeDetectorRef } from '@angular/core';
 import * as get from 'lodash/get';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
@@ -13,10 +13,21 @@ require('./header.component.scss');
 
 @Injectable()
 export class LayoutHeaderComponent {
-  constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any) { }
+  constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any, private cdRef:ChangeDetectorRef) { }
+
+  public isLoading: false;
+
+  ngAfterViewChecked() {
+    if (this.isLoading === this._rootScope.showProgress) return;
+    this.isLoading = this._rootScope.showProgress;
+    this.cdRef.detectChanges();
+  }
+
+  public UserDetails: any;
+  public modules: any;
+  public showAdmin: boolean;
 
   ngOnInit() {
-    this.navToggle = new EventEmitter();
     this.UserDetails = this.jwt.getTokenObj();
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
@@ -24,15 +35,10 @@ export class LayoutHeaderComponent {
     if (this.jwt.isAdmin(token)) {
       this.showAdmin = true;
     }
-    this.navOpen();
-  }
-
-  navOpen() {
-    this.navToggle.emit(true);
   }
 
   get showProgress() {
-    return this._rootScope.showProgress;
+    return this.isLoading;
   }
 
   logout() {

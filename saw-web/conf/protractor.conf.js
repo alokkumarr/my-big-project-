@@ -78,6 +78,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   baseUrl: webpackHelper.sawWebUrl(),
   directConnect: true,
+  baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
@@ -186,7 +187,7 @@ exports.config = {
     jasmine.getEnv().addReporter(junitReporter);
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
-    browser.driver.get(webpackHelper.sawWebUrl());
+    browser.driver.get(browser.baseUrl);
 
     return browser.driver.wait(() => {
       return browser.driver.getCurrentUrl().then(url => {

@@ -66,6 +66,9 @@ module.exports = {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();')
   },
+  scrollIntoView(element) {
+    arguments[0].scrollIntoView();
+  },
 };
 
 function click(element, i) {

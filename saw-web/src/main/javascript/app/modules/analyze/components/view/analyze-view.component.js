@@ -32,10 +32,7 @@ export const AnalyzeViewComponent = {
       this._LocalSearchService = LocalSearchService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
-      this._JwtService = JwtService;
       this._analysisCache = [];
-      this.resp = this._JwtService.getTokenObj();
-
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
@@ -51,13 +48,14 @@ export const AnalyzeViewComponent = {
       this.updater = new Subject();
       this.canUserCreate = false;
       this.loadCards = false;
+      this._JwtService = JwtService;
+      this.resp = this._JwtService.getTokenObj();
     }
 
     $onInit() {
       this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
         this.loadAnalyses();
       });
-
       this.loadCategory();
       this.loadAnalyses();
       this.canUserCreate = this._JwtService.hasPrivilege('CREATE', {

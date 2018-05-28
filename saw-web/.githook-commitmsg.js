@@ -13,7 +13,7 @@ var message = fs.readFileSync(params);
 var lines = message.toString().split(/\n/);
 var subject = lines[0];
 
-if (!subject.match(/^(SIP-\d+|WIP): .*/)) {
+if (!subject.match(/^(SIP-\d+:|WIP:|Merge) .*/)) {
   console.log('Error: Git commit message does not start with ticket ID');
   console.log('Expected: "SIP-<nnnn>: <subject>"');
   console.log('Actual: "' + subject + '"');

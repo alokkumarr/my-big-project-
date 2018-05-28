@@ -13,6 +13,11 @@ cloud:
 
         $ mvn package
         $ mvn -Ddocker-start=cloud
+        
+   Running docker machine in yarn mode.
+   
+        $ mvn package
+        $ mvn -Ddocker-start=cloud -Dsaw.yarn.enabled=true
 
 4. Run the following command to get the name of your Docker Machine:
 
