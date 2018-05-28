@@ -6,48 +6,50 @@ package sncr.bda.datasets.conf;
 public enum DataSetProperties {
 
         Name("name"),
-        PhysicalLocation ("physicalLocation"),
-        Type ("dstype"),
-        Format ("format"),
-        Catalog ("catalog"),
-        StartTS ("started"),
-        FinishTS ("finished"),
-        ComponentProducer ("transformation"),
-        Transformations ("transformations"),
-        isNewDataSet ("isNewDataSet"),
-        Exists ("exists"),
-        Empty ("empty"),
-        NumberOfFiles ("numberOfFiles"),
-        MetaCreatedBy ("metaCreatedBy"),
+        PhysicalLocation("physicalLocation"),
+        Type("dstype"),
+        Format("format"),
+        Catalog("catalog"),
+        StartTS("started"),
+        FinishTS("finished"),
+        ComponentProducer("transformation"),
+        Transformations("transformations"),
+        isNewDataSet("isNewDataSet"),
+        Exists("exists"),
+        Empty("empty"),
+        NumberOfFiles("numberOfFiles"),
+        MetaCreatedBy("metaCreatedBy"),
         Category("category"),
         SubCategory("subCategory"),
-        MetaDescription ("metaDescription"),
+        MetaDescription("metaDescription"),
         Mode("mode"),
-        Creator("createdBy"),
-        Description ("description"),
-        UserData("userData"),
-        Id ("_id"),
-        Status ("status"),
-        Project ( "project"),
-        BatchID ("batchID"),
+        createdBy("createdBy"),
+        modifiedBy("modifiedBy"),
+        Description("description"),
+        UserData("userdata"),
+        Id("_id"),
+        Status("status"),
+        Project("project"),
+        BatchID("batchID"),
         User("user"),
         System("system"),
         Schema("schema"),
         RecordCount("recordCount"),
         Sample("sample"),
+        size("size"),
         PartitionKeys("partitionsKeys"),
         CreatedTime("createdTime"),
         ModifiedTime("modifiedTime");
 
-    private final String intName;
+  private final String intName;
 
-    DataSetProperties(String in){
-        intName = in;
-    }
+  DataSetProperties(String in) {
+    intName = in;
+  }
 
-    public String toString(){
-        return intName;
-    }
+  public String toString() {
+    return intName;
+  }
 
 }
 

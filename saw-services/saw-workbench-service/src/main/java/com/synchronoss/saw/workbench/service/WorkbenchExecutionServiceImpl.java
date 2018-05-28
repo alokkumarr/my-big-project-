@@ -101,7 +101,7 @@ public class WorkbenchExecutionServiceImpl
     }
 
     /**
-     * Execute a transformation component on a dataset to create a new
+     * execute a transformation component on a dataset to create a new
      * dataset
      */
     @Override

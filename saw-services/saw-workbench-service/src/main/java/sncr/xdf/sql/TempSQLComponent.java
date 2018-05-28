@@ -15,7 +15,7 @@ import sncr.xdf.sql.ng.NGSQLMoveDataDescriptor;
  */
 public class TempSQLComponent extends SQLComponent {
     @Override
-    protected int Move() {
+    protected int move() {
         if (executor.getResultDataSets() == null
             || executor.getResultDataSets().size() == 0) {
             return 0;

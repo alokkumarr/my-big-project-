@@ -34,7 +34,7 @@ import java.util.Map;
  *   or using base classes:
  *      - Read data from a source (???)
  *      - Write data (DLBatchWriter)
- *      - Move data from temp location to permanent location: WithMovableResult
+ *      - move data from temp location to permanent location: WithMovableResult
  *      - Read and write result from/to metadata
  *      - Support Spark context
  *      and so on.
@@ -495,7 +495,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
 
                 ctx.mdOutputDSMap.forEach((id, ds) -> {
                     try {
-                        //TODO:: Move it after merge to appropriate place
+                        //TODO:: move it after merge to appropriate place
                         //ctx.transformationID = transformationID;
                         ngctx.ale_id = ale_id;
                         ngctx.status = status;
