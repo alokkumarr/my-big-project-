@@ -5,6 +5,7 @@ import * as get from 'lodash/get';
 import * as flatMap from 'lodash/flatMap';
 
 import * as template from './analyze-report-detail.component.html';
+import {AGGREGATE_TYPES_OBJ} from '../../../consts.js';
 
 export const AnalyzeReportDetailComponent = {
   template,
@@ -59,6 +60,9 @@ export const AnalyzeReportDetailComponent = {
         forEach(columns, column => {
           if (aggregates.columnName === column.columnName) {
             column.aggregate = aggregates.aggregate;
+          }
+          if (AGGREGATE_TYPES_OBJ[column.aggregate]) {
+            column.type = AGGREGATE_TYPES_OBJ[column.aggregate].type;
           }
           column.reportType = analysis.type;
         });
