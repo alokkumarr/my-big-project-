@@ -1,0 +1,23 @@
+.login-form mat-form-field {
+  width: 100%;
+}
+
+.login-buttons {
+  .mat-button {
+    padding: 0 !important;
+  }
+
+  .forgot-password {
+    margin-top: 10px;
+    float: left;
+  }
+
+  .mat-raised-button {
+    float: right;
+  }
+}
+
+layout-footer .powered-logo-container {
+  margin-left: 46% !important;
+}
+
