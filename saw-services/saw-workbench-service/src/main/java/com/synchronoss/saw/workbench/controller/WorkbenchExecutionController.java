@@ -23,10 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import org.springframework.web.bind.annotation.*;
-
-
-import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -34,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import sncr.bda.datasets.conf.DataSetProperties;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -61,96 +56,95 @@ public class WorkbenchExecutionController {
    * @throws JsonProcessingException When unable to decode the string
    * @throws Exception General Exception
    */
-    @RequestMapping(
-        value = "{project}/datasets", method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ObjectNode create(
-        @PathVariable(name = "project", required = true) String project,
-        @RequestBody ObjectNode body,
-        @RequestHeader("Authorization") String authToken)
-        throws JsonProcessingException, Exception {
-        log.debug("Create dataset: project = {}", project);
-        /* Extract input parameters */
-        String name = body.path("name").asText();
-        String description = body.path("description").asText();
-        String input = body.path("input").asText();
+  @RequestMapping(
+      value = "{project}/datasets", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ObjectNode create(
+      @PathVariable(name = "project", required = true) String project,
+      @RequestBody ObjectNode body,
+      @RequestHeader("Authorization") String authToken)
+      throws JsonProcessingException, Exception {
+    log.debug("Create dataset: project = {}", project);
+    /* Extract input parameters */
+    final String name = body.path("name").asText();
+    final String description = body.path("description").asText();
+    String input = body.path("input").asText();
 
-        //TODO: Remove the hardcoded key
-        Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
-            .parseClaimsJws(authToken).getBody();
+    //TODO: Remove the hardcoded key
+    Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
+        .parseClaimsJws(authToken).getBody();
 
-        Map<String, Object> ticket =
-            ((Map<String, Object>) ssoToken.get("ticket"));
-        String userName = (String) ticket.get("userFullName");
-        log.info(userName);
+    Map<String, Object> ticket =
+        ((Map<String, Object>) ssoToken.get("ticket"));
+    String userName = (String) ticket.get("userFullName");
+    log.info(userName);
 
-        String component = body.path("component").asText();
-        JsonNode configNode = body.path("configuration");
-        if (!configNode.isObject()) {
-            throw new RuntimeException(
-                "Expected config to be an object: " + configNode);
-        }
-        ObjectNode config = (ObjectNode) configNode;
-        /* Build XDF component-specific configuration */
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode xdfConfig = mapper.createObjectNode();
-        ObjectNode xdfComponentConfig = xdfConfig.putObject(component);
-        if (component.equals("parser")) {
-            String rawDirectory = defaultProjectRoot + defaultProjectPath;
-            String file = config.path("file").asText();
-            config.put("file", rawDirectory + "/" + file);
-            xdfConfig.set(component, config);
-        } else if (component.equals("sql")) {
-            xdfComponentConfig.put("scriptLocation", "inline");
-            String script = config.path("script").asText();
-            String encoded = Base64.getEncoder()
-                .encodeToString(script.getBytes("utf-8"));
-            xdfComponentConfig.put("script", encoded);
-        } else {
-            throw new RuntimeException("Unknown component: " + component);
-        }
-        /* Build inputs */
-        if (!component.equals("parser")) {
-            ArrayNode xdfInputs = xdfConfig.putArray("inputs");
-            ObjectNode xdfInput = xdfInputs.addObject();
-            xdfInput.put("dataSet", input);
-        }
-        /* Build outputs */
-        ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
-        ObjectNode xdfOutput = xdfOutputs.addObject();
-        xdfOutput.put("dataSet", name);
-        xdfOutput.put("desc", description);
-
-        ObjectNode userData = mapper.createObjectNode();
-        userData.put("createdBy", userName);
-
-
-        xdfOutput.set("userData", userData);
-        /* Invoke XDF component */
-        return workbenchExecutionService.execute(
-            project, name, component, xdfConfig.toString());
+    String component = body.path("component").asText();
+    JsonNode configNode = body.path("configuration");
+    if (!configNode.isObject()) {
+      throw new RuntimeException(
+        "Expected config to be an object: " + configNode);
     }
-
-    /**
-     * This method is to preview the data.
-     * @param project is of type String.
-     * @param body is of type Object.
-     * @return ObjectNode is of type Object.
-     * @throws JsonProcessingException when this exceptional condition happens.
-     * @throws Exception when this exceptional condition happens.
-     */
-    @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-                              @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
-        log.debug("Create dataset preview: project = {}", project);
-        /* Extract dataset name which is to be previewed */
-        String name = body.path("name").asText();
-        /* Start asynchronous preview creation */
-        return workbenchExecutionService.preview(project, name);
+    ObjectNode config = (ObjectNode) configNode;
+    /* Build XDF component-specific configuration */
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode xdfConfig = mapper.createObjectNode();
+    ObjectNode xdfComponentConfig = xdfConfig.putObject(component);
+    if (component.equals("parser")) {
+      String rawDirectory = defaultProjectRoot + defaultProjectPath;
+      String file = config.path("file").asText();
+      config.put("file", rawDirectory + "/" + file);
+      xdfConfig.set(component, config);
+    } else if (component.equals("sql")) {
+      xdfComponentConfig.put("scriptLocation", "inline");
+      String script = config.path("script").asText();
+      String encoded = Base64.getEncoder()
+          .encodeToString(script.getBytes("utf-8"));
+      xdfComponentConfig.put("script", encoded);
+    } else {
+      throw new RuntimeException("Unknown component: " + component);
     }
+    /* Build inputs */
+    if (!component.equals("parser")) {
+      ArrayNode xdfInputs = xdfConfig.putArray("inputs");
+      ObjectNode xdfInput = xdfInputs.addObject();
+      xdfInput.put("dataSet", input);
+    }
+    /* Build outputs */
+    ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
+    ObjectNode xdfOutput = xdfOutputs.addObject();
+    xdfOutput.put("dataSet", name);
+    xdfOutput.put("desc", description);
+
+    ObjectNode userData = mapper.createObjectNode();
+    userData.put("createdBy", userName);
+
+    xdfOutput.set("userData", userData);
+    /* Invoke XDF component */
+    return workbenchExecutionService.execute(
+      project, name, component, xdfConfig.toString());
+  }
+
+  /**
+   * This method is to preview the data.
+   * @param project is of type String.
+   * @param body is of type Object.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
+                          @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
+    log.debug("Create dataset preview: project = {}", project);
+    /* Extract dataset name which is to be previewed */
+    String name = body.path("name").asText();
+    /* Start asynchronous preview creation */
+    return workbenchExecutionService.preview(project, name);
+  }
 
   @ResponseStatus(
       value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")

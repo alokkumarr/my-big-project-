@@ -12,26 +12,26 @@ import sncr.xdf.sql.ng.NGSQLMoveDataDescriptor;
  * removed when NGSQLComponent taken into use.
  */
 public class TempSqlComponent extends SQLComponent {
-    @Override
-    protected int Move() {
-        if (executor.getResultDataSets() == null || executor.getResultDataSets().size() == 0) {
-            return 0;
-        }
-        Map<String, SQLDescriptor> resultDataSets = executor.getResultDataSets();
-        outputDataSets.forEach((on, obDesc) -> {
-            List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
-            String partKeys = on + ": ";
-            for (String s : kl) {
-                partKeys += s + " ";
-            }
-            MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(resultDataSets.get(on),
-                (String) obDesc.get(DataSetProperties.PhysicalLocation.name()), kl);
-            resultDataDesc.add(desc);
-        });
-        int ret = 0;
-        if (this instanceof WithMovableResult) {
-            ret = ((WithMovableResult) this).doMove(ctx, resultDataDesc);
-        }
-        return ret;
+  @Override
+  protected int move() {
+    if (executor.getResultDataSets() == null || executor.getResultDataSets().size() == 0) {
+      return 0;
     }
+    Map<String, SQLDescriptor> resultDataSets = executor.getResultDataSets();
+    outputDataSets.forEach((on, obDesc) -> {
+      List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
+      String partKeys = on + ": ";
+      for (String s : kl) {
+        partKeys += s + " ";
+      }
+      MoveDataDescriptor desc = new NGSQLMoveDataDescriptor(resultDataSets.get(on),
+          (String) obDesc.get(DataSetProperties.PhysicalLocation.name()), kl);
+      resultDataDesc.add(desc);
+    });
+    int ret = 0;
+    if (this instanceof WithMovableResult) {
+      ret = ((WithMovableResult) this).doMove(ctx, resultDataDesc);
+    }
+    return ret;
+  }
 }

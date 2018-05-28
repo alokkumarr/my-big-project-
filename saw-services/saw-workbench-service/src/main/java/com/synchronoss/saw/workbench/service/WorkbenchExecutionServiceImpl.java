@@ -67,62 +67,72 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     cacheWorkbenchClient();
   }
 
-    /**
-     * Get Workbench Livy client to be used for Livy jobs.
+  /**
+   * Get Workbench Livy client to be used for Livy jobs.
+   */
+  private WorkbenchClient getWorkbenchClient() throws Exception {
+    /*
+     * Synchronize access to the cached client to ensure that the current client is handed out only
+     * to a single caller and that a new client is put into place before the next caller
      */
-    private WorkbenchClient getWorkbenchClient() throws Exception {
+    synchronized (cachedClient) {
+      try {
+        if (cachedClient == null) {
+          log.debug("Create Workbench Livy client on demand");
+          cacheWorkbenchClient();
+        }
+        return cachedClient;
+      } finally {
         /*
-         * Synchronize access to the cached client to ensure that the current client is handed out only
-         * to a single caller and that a new client is put into place before the next caller
+         * Create a new Workbench Livy client for the next operation
          */
-        synchronized (cachedClient) {
-            try {
-                if (cachedClient == null) {
-                    log.debug("Create Workbench Livy client on demand");
-                    cacheWorkbenchClient();
-                }
-                return cachedClient;
-            } finally {
-                /*
-                 * Create a new Workbench Livy client for the next operation
-                 */
-                cacheWorkbenchClient();
-            }
-        }
+        cacheWorkbenchClient();
+      }
     }
+  }
 
-    private void cacheWorkbenchClient() throws Exception {
-        log.debug("Caching Workbench Livy client");
-        cachedClient = new WorkbenchClient(livyUri);
-    }
+  private void cacheWorkbenchClient() throws Exception {
+    log.debug("Caching Workbench Livy client");
+    cachedClient = new WorkbenchClient(livyUri);
+  }
 
-    /**
-     * execute a transformation component on a dataset to create a new
-     * dataset
-     */
-    @Override
-    public ObjectNode execute(
-        String project, String name, String component, String config)
-        throws Exception {
-        log.info("Executing dataset transformation");
-        log.info("XDF Configuration = " + config);
-        WorkbenchClient client = getWorkbenchClient();
-        createDatasetDirectory(name);
-        client.submit(new WorkbenchExecuteJob(
-                          root, project, component, config));
-        ObjectNode root = mapper.createObjectNode();
-        return root;
-    }
 
-    /**
-     * Execute a transformation component on a dataset to create a new dataset.
-     */
-    private void createDatasetDirectory(String name) throws Exception {
-        String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
-        if (!HFileOperations.exists(path)) {
-            HFileOperations.createDir(path);
-        }
+  //  /**
+  //   * execute a transformation component on a dataset to create a new
+  //   * dataset
+  //   */
+
+  /**
+   * Runs the given component using XDF hooks.
+   * @param project Project ID
+   * @param name Name of the dataset
+   * @param component Component name
+   * @param config Conponent configuration
+   * @return Object Node
+   * @throws Exception Incase of failures
+   */
+  @Override
+  public ObjectNode execute(
+      String project, String name, String component, String config) throws Exception {
+    log.info("Executing dataset transformation");
+    log.info("XDF Configuration = " + config);
+    WorkbenchClient client = getWorkbenchClient();
+    createDatasetDirectory(name);
+    client.submit(new WorkbenchExecuteJob(
+                root, project, component, config));
+    ObjectNode root = mapper.createObjectNode();
+    return root;
+  }
+
+  /**
+   * Execute a transformation component on a dataset to create a new dataset.
+   */
+  private void createDatasetDirectory(String name) throws Exception {
+    String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
+    if (!HFileOperations.exists(path)) {
+      HFileOperations.createDir(path);
     }
+  }
 
   @Value("${metastore.base}")
   @NotNull
