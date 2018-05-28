@@ -67,8 +67,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         Parser component = new Parser();
         try {
             // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -77,7 +77,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
     }
 
-    protected int Execute(){
+    protected int execute(){
 
         int retval = 0;
 
@@ -166,7 +166,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         return compConf;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 

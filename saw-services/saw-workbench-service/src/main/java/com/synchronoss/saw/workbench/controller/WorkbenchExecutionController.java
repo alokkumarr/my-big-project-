@@ -1,6 +1,5 @@
 package com.synchronoss.saw.workbench.controller;
 
-
 import java.util.Base64;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
@@ -13,18 +12,35 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 import java.util.Base64;
 import javax.validation.constraints.NotNull;
+
+import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+
+import java.util.Base64;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.*;
 
 
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import sncr.bda.datasets.conf.DataSetProperties;
 
 @RestController
@@ -44,12 +60,13 @@ public class WorkbenchExecutionController {
   private WorkbenchExecutionService workbenchExecutionService;
 
   /**
-   * This method is to list the datasets.
-   * @param project is of type String.
-   * @param body is of type Object.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
+   * Create dataset function.
+   * @param project Project ID
+   * @param body Body Parameters
+   * @param authToken Authentication Token header
+   * @return Returns an object node
+   * @throws JsonProcessingException When unable to decode the string
+   * @throws Exception General Exception
    */
     @RequestMapping(
         value = "{project}/datasets", method = RequestMethod.POST,
@@ -122,56 +139,56 @@ public class WorkbenchExecutionController {
             project, name, component, xdfConfig.toString());
     }
 
-  /**
-   * This method is to preview the data.
-   * @param project is of type String.
-   * @param body is of type Object.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
-   */
-  @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
-  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-      @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
-    log.debug("Create dataset preview: project = {}", project);
-    /* Extract dataset name which is to be previewed */
-    String name = body.path("name").asText();
-    /* Start asynchronous preview creation */
-    return workbenchExecutionService.preview(project, name);
-  }
-
-  /**
-   * This method is to preview the data.
-   * @param project is of type String.
-   * @param previewId is of type String.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
-   */
-  @RequestMapping(value = "{project}/previews/{previewId}", method = RequestMethod.GET,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
-  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-      @PathVariable(name = "previewId", required = true) String previewId)
-      throws JsonProcessingException, Exception {
-    log.debug("Get dataset preview: project = {}", project);
-    /* Get previously created preview */
-    ObjectNode body = workbenchExecutionService.getPreview(previewId);
-    /*
-     * If preview was not found, response to indicate that preview has not been created yet
+    /**
+     * This method is to preview the data.
+     * @param project is of type String.
+     * @param body is of type Object.
+     * @return ObjectNode is of type Object.
+     * @throws JsonProcessingException when this exceptional condition happens.
+     * @throws Exception when this exceptional condition happens.
      */
-    if (body == null) {
-      throw new NotFoundException();
+    @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
+                              @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
+        log.debug("Create dataset preview: project = {}", project);
+        /* Extract dataset name which is to be previewed */
+        String name = body.path("name").asText();
+        /* Start asynchronous preview creation */
+        return workbenchExecutionService.preview(project, name);
     }
-    /* Otherwise return the preview contents */
-    return body;
-  }
 
-  @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
-  private static class NotFoundException extends RuntimeException {
+    /**
+     * This method is to preview the data.
+     * @param project is of type String.
+     * @param previewId is of type String.
+     * @return ObjectNode is of type Object.
+     * @throws JsonProcessingException when this exceptional condition happens.
+     * @throws Exception when this exceptional condition happens.
+     */
+    @RequestMapping(value = "{project}/previews/{previewId}", method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
+                              @PathVariable(name = "previewId", required = true) String previewId)
+        throws JsonProcessingException, Exception {
+        log.debug("Get dataset preview: project = {}", project);
+        /* Get previously created preview */
+        ObjectNode body = workbenchExecutionService.getPreview(previewId);
+        /*
+         * If preview was not found, response to indicate that preview has not been created yet
+         */
+        if (body == null) {
+            throw new NotFoundException();
+        }
+        /* Otherwise return the preview contents */
+        return body;
+    }
 
-    private static final long serialVersionUID = 412355610432444770L;
-  }
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
+    private static class NotFoundException extends RuntimeException {
+
+        private static final long serialVersionUID = 412355610432444770L;
+    }
 }

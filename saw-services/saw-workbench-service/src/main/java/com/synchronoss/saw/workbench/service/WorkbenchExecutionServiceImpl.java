@@ -96,7 +96,10 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
         cachedClient = new WorkbenchClient(livyUri);
     }
 
-
+    /**
+     * execute a transformation component on a dataset to create a new
+     * dataset
+     */
     @Override
     public ObjectNode execute(
         String project, String name, String component, String config)
