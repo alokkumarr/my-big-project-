@@ -40,6 +40,12 @@ export const AnalyzeListViewComponent = {
       });
     }
 
+    $onChanges(changes) {
+      if (changes.cronJobs && this._gridListInstance) {
+        this.onUpdateAnalysisType(this.analysisType);
+      }
+    }
+
     showExecutingFlag(analysisId) {
       return analysisId && this._AnalyzeService.isExecuting(analysisId);
     }
@@ -57,6 +63,7 @@ export const AnalyzeListViewComponent = {
 
     onUpdateAnalysisType(analysisType) {
       let scheduleState;
+      this.analysisType = analysisType;
       if (analysisType === 'all') {
         this._gridListInstance.clearFilter();
       } else if (analysisType === 'scheduled') {
