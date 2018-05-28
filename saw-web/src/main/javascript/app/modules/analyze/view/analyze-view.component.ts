@@ -97,6 +97,7 @@ export class AnalyzeViewComponent implements OnInit {
 
   onViewChange(view) {
     this.viewMode = view;
+    this._localStorage.set(VIEW_KEY, view);
   }
 
   onAnalysisTypeChange(type) {
