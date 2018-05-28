@@ -26,6 +26,7 @@
     <jjwt.version>0.7.0</jjwt.version>
 		<metadata.api>${revision}</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+    <jjwt.version>0.7.0</jjwt.version>
 	</properties>
 
 	<dependencies>
