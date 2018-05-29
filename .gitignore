@@ -1,3 +1,7 @@
+
+derby.log
+logs/
+
 .Rproj.user
 .Rhistory
 .RData
