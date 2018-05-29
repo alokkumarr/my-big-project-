@@ -539,12 +539,16 @@ export class DesignerContainerComponent {
     case 'dateInterval':
     case 'aggregate':
     case 'filter':
+    case 'format':
       this.requestDataIfPossible();
       break;
-    case 'format':
     case 'aliasName':
       // reload frontEnd
+      this.updateAnalysis();
       this.artifacts = [...this.artifacts];
+      if (this.analysis.type === 'chart') {
+        this.refreshDataObject();
+      }
       break;
     case 'sort':
       this.cleanSorts();
@@ -552,12 +556,12 @@ export class DesignerContainerComponent {
       this.requestDataIfPossible();
     case 'comboType':
       this.updateAnalysis();
-      this.data = this.data ? [...this.data] : [];
+      this.refreshDataObject();
       break;
     case 'labelOptions':
       (<any>this.analysis).labelOptions = event.data.labelOptions;
       this.auxSettings = { ...this.auxSettings, ...event.data };
-      this.data = this.data ? [...this.data] : [];
+      this.refreshDataObject();
       break;
     case 'legend':
       if (!event.data || !event.data.legend) return;
@@ -572,6 +576,16 @@ export class DesignerContainerComponent {
       this.artifacts = [...this.artifacts];
       break;
     }
+  }
+
+  /**
+   * refreshFrontData Refreshes the data object to trigger
+   * updates on child components
+   *
+   * @returns {undefined}
+   */
+  refreshDataObject() {
+    this.data = this.data ? [...this.data] : [];
   }
 
   canRequestData() {

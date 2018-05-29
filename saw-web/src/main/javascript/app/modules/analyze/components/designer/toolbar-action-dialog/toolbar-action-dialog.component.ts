@@ -2,10 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
-import {
-  IToolbarActionData,
-  IToolbarActionResult
-} from '../types';
+import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 
 const template = require('./toolbar-action-dialog.component.html');
@@ -16,13 +13,15 @@ require('./toolbar-action-dialog.component.scss');
   template
 })
 export class ToolbarActionDialogComponent {
+  showProgressBar = false;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
     private _designerService: DesignerService
-  ) { }
+  ) {}
 
   ngOnInit() {
+    /* prettier-ignore */
     switch (this.data.action) {
     case 'sort':
       this.data.sorts = cloneDeep(this.data.sorts);
@@ -63,6 +62,7 @@ export class ToolbarActionDialogComponent {
 
   onOk() {
     let result: IToolbarActionResult = {};
+    /* prettier-ignore */
     switch (this.data.action) {
     case 'sort':
       result.sorts = this.data.sorts;
@@ -79,13 +79,17 @@ export class ToolbarActionDialogComponent {
   }
 
   save() {
-    this._designerService.saveAnalysis(this.data.analysis)
+    this.showProgressBar = true;
+    this._designerService
+      .saveAnalysis(this.data.analysis)
       .then(response => {
         this.data.analysis.id = response.id;
-      }).finally(() => {
+      })
+      .finally(() => {
+        this.showProgressBar = false;
         const result: IToolbarActionResult = {
           isSaveSuccessful: true
-        }
+        };
         this.dialogRef.close(result);
       });
   }

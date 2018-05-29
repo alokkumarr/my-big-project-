@@ -5,11 +5,14 @@ toolbar-action-dialog {
   padding: 10px;
 
   .dialog__header {
-    padding: 10px;
     border-bottom: 1px solid $primary-grey-g2;
 
     strong {
       font-size: 20px;
+    }
+
+    mat-progress-bar {
+      margin-top: 10px;
     }
   }
 
