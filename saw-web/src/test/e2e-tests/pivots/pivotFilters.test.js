@@ -313,7 +313,8 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -321,8 +322,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

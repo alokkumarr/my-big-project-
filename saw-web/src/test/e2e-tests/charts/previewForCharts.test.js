@@ -48,7 +48,8 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -56,8 +57,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -89,23 +89,23 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
       // Search field and add that into metric section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
+      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(yAxisName);
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
       // Search field and add that into dimension section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
+      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(xAxisName);
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
       // Search field and add that into size section.
       if (data.chartType === 'chart:bubble') {
-        analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(sizeByName);
+        // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+        analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(sizeByName);
         commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
       }
       // Search field and add that into group by section. i.e. Color by
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
+      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(groupName);
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
 
       // Navigate to Preview

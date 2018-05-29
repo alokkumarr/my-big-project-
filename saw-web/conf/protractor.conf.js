@@ -1,5 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+var HtmlReporter = require('protractor-beautiful-reporter');
 
 /**
  * Note about intervals:
@@ -86,7 +87,7 @@ exports.config = {
         '--start-fullscreen', // enable for Mac OS
         '--headless',
         '--disable-gpu',
-        '--window-size=2880,1800'
+        '--window-size=1280,1696'
       ]
     },
     'moz:firefoxOptions': {
@@ -134,7 +135,7 @@ exports.config = {
     root: [
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
+     // webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
       // webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
@@ -143,14 +144,22 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
-    pivots: [
-      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
-    ],
-    authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
-    ]
+     pivots: [
+       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
+     ],
+     authentication: [
+       webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+     ]
   },
   onPrepare() {
+    // Add a screenshot reporter and store screenshots to `/target/reports`:
+    jasmine.getEnv().addReporter(new HtmlReporter({
+      baseDirectory: 'target/reports',
+      gatherBrowserLogs: false,
+      excludeSkippedSpecs: true,
+      preserveDirectory: false,
+    }).getJasmine2Reporter());
+
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,

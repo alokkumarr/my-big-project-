@@ -22,7 +22,8 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -31,7 +32,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   afterEach(function (done) {
     setTimeout(function () {
       browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -52,20 +53,20 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     // Wait for field input box.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
     // Search field and add that into dimension section.
-    analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
+    // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+    analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(xAxisName);
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
     const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
 
     // Search field and add that into group by section.
-    analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
+    // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+    analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(groupName);
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
     // Search field and add that into metric section.
-    analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
+    // analyzePage.designerDialog.chart.fieldSearchInput.clear();
+    analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(yAxisName);
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
 
     // Check selected field is present in respective section.
