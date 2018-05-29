@@ -75,6 +75,10 @@ to_char_ds <- function(df) {
 
     )
 
+  # Chris Note- This is a more compact, dynamic version:
+  # char_df <- df %>%
+  #   mutate_all(as.character)
+
   return(char_df)
 }
 
@@ -184,13 +188,13 @@ expand_nest_complete_spark_DS <-
 test_that("expander results right nested with complete DS=TRUE for Spark DS", {
   expect_equal(
     expand_nest_complete %>%
-      collect() %>%
-      arrange(id, metric1) %>%
+      arrange(index) %>%             # arranging by index which is unique per record
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5) ,
     expand_nest_complete_spark_DS %>%
-      arrange(id, metric1) %>%
+      collect() %>%                   # collect was missing
+      arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
       round(5)
@@ -234,7 +238,8 @@ expand_crossing_spark_DS <-
     mode = "crossing",
     complete = FALSE
   ) %>%
-  collect() %>% arrange(id, metric1)
+  collect() %>%
+  arrange(id, metric1)
 
 test_that("expander with Crossing with only id_vars as output for spark DS ", {
   expect_equal(expand_crossing_spark_DS, expand_crossing)
@@ -332,7 +337,8 @@ fun_expander_val_seris <-
     complete = TRUE
   ) %>%
   select(., id, date, cat1, cat2, metric1, metric2, metric3, index) %>%
-  collect() %>%
+  mutate(metric2 = round(metric2, 5))  %>%
+  mutate_at(c("cat1", "cat2"), as.character) %>%
   arrange(id, metric1, metric3)
 
 dist_id <- dat %>% distinct(id)
@@ -347,7 +353,8 @@ join_data <-
             by = c('id', 'metric1', 'metric3')) %>%
   select(., id, date, cat1, cat2, metric1, metric2, metric3, index) %>%
   collect() %>%
-  arrange(id, metric1, metric3)
+  arrange(id, metric1, metric3) %>%
+  mutate(metric2 = round(ifelse(is.na(metric2), NA, metric2), 5))
 
 fun_expander_val_seris_char <- to_char_ds(fun_expander_val_seris)
 join_data_char <- to_char_ds(join_data)
@@ -368,25 +375,28 @@ fun_expander_val_seris_tbl <-
   ) %>%
   select(., id, date, cat1, cat2, metric1, metric2, metric3, index) %>%
   collect() %>%
-  arrange(id, metric1, metric3)
-
-fun_expander_val_seris_tbl$date <-
-  as.Date(fun_expander_val_seris_tbl$date) + 1
-
-fun_expander_val_seris_tbl$metric2 <-
-  round(fun_expander_val_seris_tbl$metric2, 5)
-
-fun_expander_val_seris$metric2 <-
-  round(fun_expander_val_seris$metric2, 5)
-
-fun_expander_val_seris_tbl_char <-
-  to_char_ds(fun_expander_val_seris_tbl)
-
-fun_expander_val_seris_char <- to_char_ds(fun_expander_val_seris)
+  arrange(id, metric1, metric3) %>%
+  # Converting NaNs to NA http://onetipperday.sterding.com/2012/08/difference-between-na-and-nan-in-r.html
+  # NaNs not exactly the same as NAs but functionality are very similiar
+  mutate(metric2 = round(ifelse(is.na(metric2), NA, metric2), 5))
+#
+# fun_expander_val_seris_tbl$date <-
+#   as.Date(fun_expander_val_seris_tbl$date) + 1
+#
+# fun_expander_val_seris_tbl$metric2 <-
+#   round(fun_expander_val_seris_tbl$metric2, 5)
+#
+# fun_expander_val_seris$metric2 <-
+#   round(fun_expander_val_seris$metric2, 5)
+#
+# fun_expander_val_seris_tbl_char <-
+#   to_char_ds(fun_expander_val_seris_tbl)
+#
+# fun_expander_val_seris_char <- to_char_ds(fun_expander_val_seris)
 
 test_that("Expander for sequence data is correct for full DS for spark DS", {
-  expect_equal(fun_expander_val_seris_tbl_char,
-               fun_expander_val_seris_char)
+  expect_equal(fun_expander_val_seris_tbl,
+               fun_expander_val_seris)
 
 })
 
@@ -401,7 +411,6 @@ fun_expander_date_seris_dat <-
     complete = TRUE
   ) %>%
   select(., id, date, cat1, cat2, metric1, metric2, metric3, index) %>%
-  collect() %>%
   arrange(id, metric1, metric3)
 
 min_date <- min(dat$date)
@@ -410,31 +419,17 @@ max_date <- max(dat$date)
 uq_id <- dat %>% distinct(id)
 uq_met <- dat %>% distinct(metric1)
 inc_date <- seq(min_date, max_date, by = 1)
-cart_data <- expand.grid(uq_id$id, uq_met$metric1)
-cart_data2 <- merge(x = cart_data, y = inc_date, by = NULL)
 
-colnames(cart_data2)[1] <- "id"
-colnames(cart_data2)[2] <- "metric1"
-colnames(cart_data2)[3] <- "date"
+# More than two variables can be used in expand.grid
+cart_data <- expand.grid(id = uq_id$id, metric1 = uq_met$metric1, date = inc_date)
 
-
-join_cart_data <-
-  left_join(x = cart_data2,
-            y = dat,
-            by = c('id', 'metric1')) %>%
+join_cart_data <- left_join(x = cart_data,
+                            y = dat,
+                            by = c('id', 'metric1', 'date')) %>%   # Adding date to the join
   arrange(id, metric1)
 
-colnames(join_cart_data)[3] <- "date"
-
-join_cart_data <- join_cart_data %>%
-  subset(., select = -c(date.y))
-
-fun_expander_date_seris_dat <-
-  to_char_ds(fun_expander_date_seris_dat)
-join_cart_data <- to_char_ds(join_cart_data)
-
 test_that("Expander for sequence data for date is correct for full DS", {
-  expect_equal(fun_expander_date_seris_dat, join_cart_data)
+  expect_equal(to_char_ds(fun_expander_date_seris_dat), to_char_ds(join_cart_data))
 })
 
 
@@ -450,13 +445,15 @@ fun_expander_date_seris_tbl <-
   ) %>%
   select(., id, date, cat1, cat2, metric1, metric2, metric3, index) %>%
   collect() %>%
-  arrange(id, metric1, metric3)
+  mutate(metric2 = round(ifelse(is.na(metric2), NA, metric2), 5)) %>%
+  arrange(id, metric1, metric3) %>%
+  to_char_ds()
 
-fun_expander_date_seris_dat <-
-  to_char_ds(fun_expander_date_seris_dat)
 
-fun_expander_date_seris_tbl <-
-  to_char_ds(fun_expander_date_seris_tbl)
+fun_expander_date_seris_dat <- fun_expander_date_seris_dat %>%
+  # metric2 had more digits in dat vs tbl
+  mutate(metric2 = round(ifelse(is.na(metric2), NA, metric2), 5)) %>%
+  to_char_ds()
 
 test_that("Expander for sequence data for date is correct for full DS for Spark DS", {
   expect_equal(fun_expander_date_seris_dat, fun_expander_date_seris_tbl)
@@ -510,6 +507,7 @@ test_that("Expander for sequence data gives correct result for selected ID-vars 
                fun_expander_val_seris_not_full)
 })
 
+
 #Test 15:Expander-with fun for sequence data complete=False for Date ----------------------------
 
 fun_expander_date_seris_dat_not_complete <-
@@ -543,6 +541,7 @@ cart_data2 <- cart_data2 %>%
 test_that("Expander for date sequence gives correct result for selected ID-vars", {
   expect_equal(fun_expander_date_seris_dat_not_complete, cart_data2)
 })
+
 
 #Test 16:Expander-with fun for sequence data complete=False for Date with spark DS ----------------------------
 
