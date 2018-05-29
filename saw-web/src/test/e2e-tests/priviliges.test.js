@@ -289,7 +289,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
       commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
@@ -298,7 +298,6 @@ describe('Privileges tests: privileges.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);

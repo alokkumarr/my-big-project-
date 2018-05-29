@@ -13,9 +13,12 @@ describe('Login Tests: login.test.js', () => {
     'admin': {user: users.admin.loginId},
     'user': {user: users.userOne.loginId},
   };
-
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  });
   beforeEach(function (done) {
     setTimeout(function () {
+      commonFunctions.logOutByClearingLocalStorage();
       commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
@@ -24,7 +27,6 @@ describe('Login Tests: login.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
