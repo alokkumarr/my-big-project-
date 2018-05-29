@@ -315,7 +315,7 @@ describe('Privileges tests: privileges.test.js', () => {
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
-        element(analyzePage.analysisElems.addAnalysisBtn.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.addAnalysisBtn.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.create,
             "Create button expected to be " + data.create + " on Analyze Page, but was " + !data.create);
         }));
@@ -323,8 +323,7 @@ describe('Privileges tests: privileges.test.js', () => {
         // Go to Card View
         commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
-        // Validate presence of menu on card
-        element(analyzePage.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
@@ -336,7 +335,7 @@ describe('Privileges tests: privileges.test.js', () => {
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isDisplayed()).toBe(data.fork,
+            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isPresent()).toBe(data.fork,
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);

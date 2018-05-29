@@ -50,10 +50,10 @@ const doAnalysisAction = (name, action) => {
   commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
   toggle.click();
-
-  toggle.getAttribute('aria-owns').then(id => {
+  const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
+  menuItems.getAttribute('id').then(id => {
     if (id) {
-      const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
+      const actionButton = element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
       commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
     } else {
