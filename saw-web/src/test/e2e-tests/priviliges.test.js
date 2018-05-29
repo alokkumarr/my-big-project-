@@ -299,6 +299,7 @@ describe('Privileges tests: privileges.test.js', () => {
   afterEach(function (done) {
     setTimeout(function () {
       commonFunctions.logOutByClearingLocalStorage();
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -327,13 +328,11 @@ describe('Privileges tests: privileges.test.js', () => {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
-
         // Validate presence on menu items in card menu
         if (data.cardOptions) {
-          analyzePage.main.getAnalysisActionOptions(analyzePage.main.firstCard).then(options => {
+          analyzePage.main.getAnalysisActionOptionsNew(analyzePage.main.firstCard).then(options => {
             let analysisOptions = options;
             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
-
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
@@ -348,12 +347,12 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
-          expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
+          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('[class="cdk-overlay-container"]')));
+          commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
+          expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
         }
-
         // Go to executed analysis page
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)

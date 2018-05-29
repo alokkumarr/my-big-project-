@@ -90,25 +90,21 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
       // Search field and add that into metric section.
       // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      // browser.sleep(500);
       analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(yAxisName);
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
       // Search field and add that into dimension section.
       // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      // browser.sleep(500);
       analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(xAxisName);
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
       // Search field and add that into size section.
       if (data.chartType === 'chart:bubble') {
         // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        // browser.sleep(500);
         analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(sizeByName);
         commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
       }
       // Search field and add that into group by section. i.e. Color by
       // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      // browser.sleep(500);
       analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(groupName);
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
 
