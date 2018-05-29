@@ -293,8 +293,8 @@ export const AnalyzeExecutedDetailComponent = {
     loadLastPublishedAnalysis() {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
-        this.loadExecutionData(true)();
       }
+      this.loadExecutionData(true)();
     }
 
     loadExecutedAnalyses(analysisId) {
