@@ -24,6 +24,7 @@ export class DesignerHeaderComponent {
   @Input() public isInDraftMode: boolean;
   @Input() public isInQueryMode: boolean;
   @Input() public designerState: DesignerStates;
+  @Input() public areMinRequirmentsMet: boolean;
 
   public DesignerStates = DesignerStates;
 }
