@@ -75,23 +75,19 @@ export const CHART_DATE_FORMATS_OBJ = fpPipe(
 export const AGGREGATE_TYPES = [{
   label: 'Total',
   value: 'sum',
-  icon: 'icon-Sum',
-  type: 'decimal'
+  icon: 'icon-Sum'
 }, {
   label: 'Average',
   value: 'avg',
-  icon: 'icon-AVG',
-  type: 'decimal'
+  icon: 'icon-AVG'
 }, {
   label: 'Mininum',
   value: 'min',
-  icon: 'icon-MIN',
-  type: 'long'
+  icon: 'icon-MIN'
 }, {
   label: 'Maximum',
   value: 'max',
-  icon: 'icon-MAX',
-  type: 'long'
+  icon: 'icon-MAX'
 }, {
   label: 'Count',
   value: 'count',
@@ -100,8 +96,7 @@ export const AGGREGATE_TYPES = [{
 }, {
   label: 'Percentage',
   value: 'percentage',
-  icon: 'icon-Percentage',
-  type: 'decimal'
+  icon: 'icon-Percentage'
 }];
 
 export const AGGREGATE_STRING_TYPES = [{

@@ -22,6 +22,7 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
+import {AGGREGATE_TYPES_OBJ} from '../../consts.js';
 import {
   ArtifactColumnReport,
   Artifact,
@@ -326,6 +327,9 @@ export class ReportGridComponent {
         const isNumberType = NUMBER_TYPES.includes(column.type);
         const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, column.type, column.aggregate);
         const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
+        if (AGGREGATE_TYPES_OBJ[column.aggregate]) {
+          column.type = AGGREGATE_TYPES_OBJ[column.aggregate].type || column.type;
+        }
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),

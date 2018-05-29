@@ -62,11 +62,10 @@ export const AnalyzeReportDetailComponent = {
             column.aggregate = aggregates.aggregate;
           }
           if (AGGREGATE_TYPES_OBJ[column.aggregate]) {
-            column.type = AGGREGATE_TYPES_OBJ[column.aggregate].type;
+            column.type = AGGREGATE_TYPES_OBJ[column.aggregate].type || column.type;
           }
           column.reportType = analysis.type;
         });
-
       });
       return columns;
     }
