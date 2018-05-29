@@ -50,12 +50,14 @@ const doAnalysisAction = (name, action) => {
   commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
   toggle.click();
+  browser.sleep(500);
   const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
   menuItems.getAttribute('id').then(id => {
     if (id) {
-      const actionButton = element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
+      const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
       commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+      browser.sleep(500);
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
