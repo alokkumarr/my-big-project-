@@ -2,7 +2,7 @@ import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-import {AnalyseTypes, Events} from '../../consts';
+import {AnalyseTypes} from '../../consts';
 
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/toPromise';
@@ -92,7 +92,7 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
             return {};
           }
           return status;
-        });;
+        });
     default:
     }
   }
