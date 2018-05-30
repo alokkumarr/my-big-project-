@@ -321,7 +321,7 @@ export class AnalyzeService {
     const updatePromise = this.updateAnalysis(model);
 
     updatePromise.then(analysis => {
-      return this.applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(({data}) => {
+      return this.applyAnalysis(model, EXECUTION_MODES.LIVE).then(({data}) => {
         return {analysis, data};
       });
     });
