@@ -13,6 +13,8 @@ import {
   Validators
 } from '@angular/forms';
 
+import { nonEmpty } from '../../../validators/non-empty.validator';
+
 import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
@@ -78,7 +80,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     });
 
     this.kpiForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, nonEmpty()]],
       dateField: ['', Validators.required],
       gte: [
         moment(),
