@@ -5,7 +5,7 @@ import {
   MatDialog,
   MatDialogConfig
 } from '@angular/material';
-import { AnalysisStarter } from '../../../types'
+import { AnalysisDialogData, DesignerSaveEvent } from '../types'
 import { ConfirmDialogComponent } from '../../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../../common/types';
 
@@ -25,7 +25,7 @@ const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
 export class DesignerDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<DesignerDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: AnalysisStarter,
+    @Inject(MAT_DIALOG_DATA) public data: AnalysisDialogData,
     private _dialog: MatDialog
   ) { }
 
@@ -41,8 +41,11 @@ export class DesignerDialogComponent {
     }
   }
 
-  onSave(isSaveSuccesful) {
-    this.dialogRef.close(isSaveSuccesful);
+  onSave({isSaveSuccessful, analysis}: DesignerSaveEvent) {
+    this.dialogRef.close({
+      isSaveSuccessful,
+      analysis
+    });
   }
 
   warnUser() {

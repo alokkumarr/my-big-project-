@@ -3,6 +3,8 @@ import * as isString from 'lodash/isString';
 import * as invoke from 'lodash/invoke';
 import * as upperCase from 'lodash/upperCase';
 
+import {Events} from '../../consts';
+
 import * as template from './analyze-actions-menu.component.html';
 
 export const AnalyzeActionsMenuComponent = {
@@ -16,11 +18,12 @@ export const AnalyzeActionsMenuComponent = {
     onExport: '&'
   },
   controller: class AnalyzeActionsMenuController {
-    constructor(AnalyzeActionsService, $state, JwtService) {
+    constructor(AnalyzeActionsService, $state, JwtService, $eventEmitter) {
       'ngInject';
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
       this._JwtService = JwtService;
+      this._$eventEmitter = $eventEmitter;
 
       this.ACTIONS = [{
         label: 'EXECUTE',
@@ -80,7 +83,12 @@ export const AnalyzeActionsMenuComponent = {
     }
 
     edit() {
-      this._AnalyzeActionsService.edit(this.analysis);
+      return this._AnalyzeActionsService.edit(this.analysis).then(result => {
+        if (!result.isSaveSuccessful) {
+          return result;
+        }
+        this._$eventEmitter.emit(Events.AnalysesRefresh);
+      });
     }
 
     publish() {

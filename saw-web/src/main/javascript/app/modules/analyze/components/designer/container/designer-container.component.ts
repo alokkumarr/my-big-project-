@@ -28,7 +28,8 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent,
   ArtifactColumn,
-  Format
+  Format,
+  DesignerSaveEvent
 } from '../types';
 import {
   FLOAT_TYPES,
@@ -60,7 +61,7 @@ export class DesignerContainerComponent {
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
-  @Output() public onSave: EventEmitter<boolean> = new EventEmitter();
+  @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   public isInDraftMode: boolean = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
@@ -372,7 +373,10 @@ export class DesignerContainerComponent {
       .afterClosed()
       .subscribe((result: IToolbarActionResult) => {
         if (result) {
-          this.onSave.emit(result.isSaveSuccessful);
+          this.onSave.emit({
+            isSaveSuccessful: result.isSaveSuccessful,
+            analysis: result.analysis
+          });
           this.isInDraftMode = false;
         }
       });

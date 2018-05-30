@@ -30,27 +30,11 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function fork(analysis) {
     const model = cloneDeep(analysis);
     model.name += ' Copy';
-    return openEditModal(model, 'fork').then(status => {
-      if (!status) {
-        return status;
-      }
-
-      $eventEmitter.emit(Events.AnalysesRefresh);
-
-      return status;
-    });
+    return openEditModal(model, 'fork');
   }
 
   function edit(analysis) {
-    return openEditModal(cloneDeep(analysis), 'edit').then(status => {
-      if (!status) {
-        return status;
-      }
-
-      $eventEmitter.emit(Events.AnalysesRefresh);
-
-      return status;
-    });
+    return openEditModal(cloneDeep(analysis), 'edit');
   }
 
   function publish(analysis) {
@@ -103,7 +87,12 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
       return AnalyzeDialogService.openEditAnalysisDialog(analysis, mode)
-        .afterClosed().first().toPromise();
+        .afterClosed().first().toPromise().then(status => {
+          if (!status) {
+            return {};
+          }
+          return status;
+        });;
     default:
     }
   }
