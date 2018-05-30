@@ -21,5 +21,23 @@ widget-kpi {
         }
       }
     }
+
+    .bullet-measures {
+      display: flex;
+      flex-direction: row;
+
+      mat-form-field {
+        display: flex;
+        flex: 1 1 48%;
+
+        & > .mat-form-field-wrapper {
+          width: 98%;
+        }
+      }
+
+      .mat-form-field-infix {
+        width: auto;
+      }
+    }
   }
 }

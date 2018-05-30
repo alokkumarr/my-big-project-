@@ -20,6 +20,7 @@ require('./edit-widget.component.scss');
 export class EditWidgetComponent implements OnInit {
   editItem: any;
   _model: any;
+  kpiType: string;
 
   @Input() container: MatSidenav;
   @Output() onWidgetAction = new EventEmitter();
@@ -32,13 +33,18 @@ export class EditWidgetComponent implements OnInit {
   set model(data) {
     if (!data) return;
     this._model = data;
-    if (data.kpi) {
+    if (data.kpi || data.bullet) {
+      this.kpiType = data.kpi ? 'kpi' : 'bullet';
       this.prepareKPI(data);
     }
   }
 
   onKPIAction({ kpi }) {
-    this._model.kpi = kpi;
+    if (this.kpiType === 'bullet') {
+      this._model.bullet = kpi;
+    } else {
+      this._model.kpi = kpi;
+    }
     try {
       this.container.close();
     } catch (err) {
@@ -49,8 +55,9 @@ export class EditWidgetComponent implements OnInit {
   }
 
   prepareKPI(model) {
+    const semId = model.kpi ? model.kpi.semanticId : model.bullet.semanticId;
     this.observe
-      .getArtifacts({ semanticId: model.kpi.semanticId })
+      .getArtifacts({ semanticId: semId })
       .map(metric => {
         if (!metric) return;
         metric.kpiColumns = flatMap(metric.artifacts, table => {
@@ -74,11 +81,17 @@ export class EditWidgetComponent implements OnInit {
       })
       .subscribe(metric => {
         if (!metric) return;
-
-        this.editItem = {
-          kpi: clone(model.kpi),
-          metric
-        };
+        if (this.kpiType === 'bullet') {
+          this.editItem = {
+            bullet: clone(model.bullet),
+            metric
+          };
+        } else {
+          this.editItem = {
+            kpi: model.kpi ? clone(model.kpi) : clone(model.bullet),
+            metric
+          };
+        }
       });
   }
 }

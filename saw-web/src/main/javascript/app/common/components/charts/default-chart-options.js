@@ -1,6 +1,4 @@
-import {
-  CHART_COLORS
-} from '../../consts';
+import {CHART_COLORS} from '../../consts';
 
 export const globalChartOptions = {
   lang: {
@@ -42,8 +40,10 @@ export const chartOptions = {
   tooltip: {
     useHTML: true,
     valueDecimals: 2,
-    headerFormat: '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
-    pointFormat: '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
+    headerFormat:
+      '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
+    pointFormat:
+      '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
       'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
   },
   title: {
@@ -121,8 +121,10 @@ export const stockChartOptions = {
     useHTML: true,
     valueDecimals: 2,
     split: false,
-    headerFormat: '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
-    pointFormat: '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
+    headerFormat:
+      '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
+    pointFormat:
+      '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
       'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
   },
   title: {
@@ -137,6 +139,52 @@ export const stockChartOptions = {
       fontSize: '15px',
       color: '#303030'
     }
+  },
+  credits: false
+};
+
+export const bulletChartOptions = {
+  chart: {
+    type: 'bullet',
+    inverted: true,
+    marginLeft: 135,
+    spacingTop: 50,
+    marginTop: 100,
+    height: 170
+  },
+  exporting: {
+    enabled: false
+  },
+  title: {
+    text: ''
+  },
+  legend: {
+    enabled: false
+  },
+  plotOptions: {
+    series: {
+      pointPadding: 0.25,
+      borderWidth: 0,
+      color: '#0096d5',
+      targetOptions: {
+        width: '200%'
+      }
+    }
+  },
+  tooltip: {
+    enabled: true,
+    useHTML: true,
+    pointFormat: '<b>{point.y}</b> (with target at {point.target})'
+  },
+  series: [
+    {
+      data: []
+    }
+  ],
+  yAxis: {
+    gridLineWidth: 0,
+    title: null,
+    plotBands: []
   },
   credits: false
 };

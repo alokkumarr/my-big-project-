@@ -10,6 +10,9 @@ import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
+import * as last from 'lodash/last';
+import * as add from 'lodash/add';
 
 import { JwtService } from '../../../../login/services/jwt.service';
 import { MenuService } from '../../../common/services/menu.service';
@@ -237,5 +240,46 @@ export class ObserveService {
     });
 
     return count;
+  }
+
+  buildPlotBandsForBullet(b1, b2, bulletVal, bullTarget) {
+    const plotBands = [];
+    const seriesData = [
+      { y: bulletVal, target: bullTarget }
+    ];
+    if (!isUndefined(b1) && isUndefined(b2)) {
+      plotBands.push(
+        {
+          from: 0,
+          to: b1,
+          color: '#dc4306'
+        },
+        {
+          from: b1,
+          to: 9e9,
+          color: '#97cc0f'
+        }
+      );
+    } else {
+      plotBands.push(
+        {
+          from: 0,
+          to: b1,
+          color: '#dc4306'
+        },
+        {
+          from: b1,
+          to: b2,
+          color: '#f5a623'
+        },
+        {
+          from: b2,
+          to: add(b2, 9e9),
+          color: '#97cc0f'
+        }
+      );
+    }
+
+    return { plotBands, seriesData };
   }
 }

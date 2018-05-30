@@ -41,12 +41,25 @@
     </mat-select>
   </mat-form-field>
 
-  <div class="secondary-aggregate-form" formGroupName="secAggregates">
+  <div class="secondary-aggregate-form" formGroupName="secAggregates" *ngIf="_kpiType!== 'bullet'">
     <h4>Secondary Aggregations</h4>
     <mat-slide-toggle *ngFor="let ag of aggregations" [formControlName]="ag.value">
       {{ag.name}}
     </mat-slide-toggle>
   </div>
+
+  <div class="bullet-measures" *ngIf="_kpiType=== 'bullet'">
+    <mat-form-field>
+      <input matInput type="number" placeholder="Measure 1" formControlName="measure1" />
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput type="number" placeholder="Measure 2" formControlName="measure2" />
+    </mat-form-field>
+  </div>
+  <mat-form-field *ngIf="_kpiType=== 'bullet'">
+    <input matInput type="number" placeholder="Metric Target" formControlName="target" />
+  </mat-form-field>
+
 
   <button mat-raised-button color="primary" (click)="applyKPI()" [disabled]="kpiForm.invalid">
     Apply

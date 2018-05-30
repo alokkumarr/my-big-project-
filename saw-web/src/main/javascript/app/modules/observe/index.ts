@@ -39,6 +39,7 @@ import { ObservePageComponent } from './components/observe-page/observe-page.com
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
+import { ObserveKPIBulletComponent } from './components/observe-kpi-bullet/observe-kpi-bullet.component';
 import { KPIFilter } from './components/kpi-filter/kpi-filter.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
 import { EditWidgetModule } from './components/edit-widget/edit-widget.module';
@@ -74,6 +75,7 @@ const components = [
   CreateDashboardComponent,
   ObserveChartComponent,
   ObserveKPIComponent,
+  ObserveKPIBulletComponent,
   KPIFilter,
   SaveDashboardComponent,
   ConfirmDialogComponent

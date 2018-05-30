@@ -73,7 +73,7 @@ export class AddWidgetComponent implements OnInit {
   onKPIAction({ kpi }) {
     this.widgetStepper.previous();
     this.onWidgetAction.emit({
-      widget: 'KPI',
+      widget: this.model.type.name === 'Bullet KPI' ? 'BULLET' : 'KPI',
       action: WIDGET_ACTIONS.ADD,
       data: kpi
     });
