@@ -79,7 +79,7 @@
             "artifactName": "sample",
             "columns": [
               {
-                "name": "string.keyword",
+                "name": "string",
                 "type": "string",
                 "columnName": "string.keyword",
                 "displayName": "String",
