@@ -244,8 +244,8 @@ class Analysis extends BaseController {
             case _ => {}
           }
           if (executionType==null || executionType.isEmpty){
-           // Consider the default Execution type as oneTime to have better control of execution.
-            executionType = "onetime"
+           // Consider the default Execution type as regularExecution for the backward compatibility.
+            executionType = "regularExecution"
           }
 
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
