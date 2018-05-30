@@ -45,6 +45,7 @@ require('./widget-kpi.component.scss');
 export class WidgetKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
   _metric: any;
+  _kpiType: string;
 
   @Output() onKPIAction = new EventEmitter();
 
@@ -92,7 +93,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       ],
       filter: [this.dateFilters[0].value, Validators.required],
       primAggregate: [this.aggregations[0].value, Validators.required],
-      secAggregates: this.fb.group(secAggregateControls)
+      secAggregates: this.fb.group(secAggregateControls),
+      target: [0, [Validators.required, nonEmpty()]],
+      measure1: [''],
+      measure2: ['']
     });
 
     /* Only show date inputs if custom filter is selected */
@@ -151,6 +155,16 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       .get('dateField')
       .setValue(kpiDateField || data.dateColumns[0].columnName);
   }
+  /**
+   * Type is required to support normal KPI's and bullet KPI with the same component
+   *
+   * @memberof WidgetKPIComponent
+   */
+  @Input()
+  set type(data: any) {
+    if (!data) return;
+    this._kpiType = data;
+  }
 
   /**
    * Updates the form with the data present in kpi structure
@@ -164,6 +178,15 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this._kpi = data;
 
     data.name && this.kpiForm.get('name').setValue(data.name);
+
+    const target = get(data, 'target');
+    target && this.kpiForm.get('target').setValue(target);
+
+    const measure1 = get(data, 'measure1');
+    measure1 && this.kpiForm.get('measure1').setValue(measure1);
+    
+    const measure2 = get(data, 'measure2');
+    measure2 && this.kpiForm.get('measure2').setValue(measure2);
 
     const dateField = get(data, 'filters.0.columnName');
     dateField && this.kpiForm.get('dateField').setValue(dateField);
@@ -235,6 +258,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    */
   applyKPI() {
     const dataField = get(this._kpi, 'dataFields.0');
+    const dataFieldDispName = get(this._kpi, 'name');
     const dateField = find(
       this._metric.dateColumns,
       col => col.columnName === this.kpiForm.get('dateField').value
@@ -247,6 +271,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this.onKPIAction.emit({
       kpi: assign({}, this._kpi, {
         name: this.kpiForm.get('name').value,
+        target: this.kpiForm.get('target').value,
+        measure1: this.kpiForm.get('measure1').value,
+        measure2: this.kpiForm.get('measure2').value,
+        dataFieldDispName: dataFieldDispName,
         dataFields: [
           {
             columnName: dataField.columnName,

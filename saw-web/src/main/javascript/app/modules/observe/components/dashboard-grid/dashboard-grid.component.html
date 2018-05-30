@@ -2,7 +2,7 @@
   <gridster-item [item]="item" *ngFor="let item of dashboard" [ngClass]="item.kpi ? 'cell-kpi' : 'cell-analysis'">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <div class="tile-actions">
-      <button mat-icon-button (click)="editTile(item)" *ngIf="!isViewMode() && item.kpi">
+      <button mat-icon-button (click)="editTile(item)" *ngIf="!isViewMode() && (item.kpi || item.bullet)">
         <mat-icon fontIcon="icon-edit-solid"></mat-icon>
       </button>
       <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
@@ -16,6 +16,11 @@
 
     <ng-container *ngIf="item.kpi">
       <observe-kpi [kpi]="item.kpi" [dimensions]="item.dimensions"></observe-kpi>
+    </ng-container>
+
+    <ng-container *ngIf="item.bullet">
+      <observe-kpi-bullet class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
+        [bulletKpi]="item.bullet" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-kpi-bullet>
     </ng-container>
   </gridster-item>
 </gridster>

@@ -84,3 +84,9 @@ export const KPI_AGGREGATIONS = [
   { name: 'Maximum', value: 'max' },
   { name: 'Count', value: 'count' }
 ];
+
+export const BULLET_CHART_OPTIONS = {
+  chart: {
+    type: 'bullet'
+  }
+};

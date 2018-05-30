@@ -172,7 +172,7 @@ export class DashboardGridComponent
   }
 
   editTile(item: GridsterItem) {
-    if (!item.kpi) return;
+    if (!item.kpi && !item.bullet) return;
 
     this.dashboardService.onEditItem.next(item);
   }
@@ -188,6 +188,9 @@ export class DashboardGridComponent
     const dimensions = this.getDimensions(item);
     if (item.kpi) {
       item.dimensions = dimensions;
+      return;
+    } else if (item.bullet) {
+      item.updater.next([{ path: 'chart.width', data: dimensions.width - 20 }]);
       return;
     }
     item.updater.next([
@@ -336,6 +339,8 @@ export class DashboardGridComponent
       return 'analysis';
     } else if (tile.kpi) {
       return 'kpi';
+    } else if (tile.bullet) {
+      return 'bullet';
     }
 
     return 'custom';
@@ -359,7 +364,8 @@ export class DashboardGridComponent
         y: tile.y,
         cols: tile.cols,
         rows: tile.rows,
-        kpi: tile.kpi
+        kpi: tile.kpi,
+        bullet: tile.bullet
       })),
       filters: [],
       options: [

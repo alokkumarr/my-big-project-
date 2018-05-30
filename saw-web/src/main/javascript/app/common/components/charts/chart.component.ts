@@ -12,7 +12,8 @@ import * as isArray from 'lodash/isArray';
 import {
   globalChartOptions,
   chartOptions,
-  stockChartOptions
+  stockChartOptions,
+  bulletChartOptions
 } from './default-chart-options';
 import * as isUndefined from 'lodash/isUndefined';
 
@@ -50,7 +51,10 @@ export class ChartComponent {
   }
 
   ngOnInit() {
-    this.config = defaultsDeep(this.config, this.options, chartOptions);
+    this.config =
+      this.options.chart.type === 'bullet'
+        ? defaultsDeep(this.config, this.options, bulletChartOptions)
+        : defaultsDeep(this.config, this.options, chartOptions);
     this.stockConfig = defaultsDeep(
       this.stockConfig,
       this.options,

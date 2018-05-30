@@ -155,6 +155,23 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     }
   }
 
+  onBulletAction(action, data) {
+    /* prettier-ignore */
+    switch(action) {
+    case WIDGET_ACTIONS.ADD:
+      if (!data) return;
+
+      const item = {
+        cols: 20,
+        rows: 8,
+        bullet: data,
+        updater: new BehaviorSubject({})
+      };
+      this.requester.next({action: 'add', data: item});
+      break;
+    }
+  }
+
   onWidgetAction({ widget, action, data }) {
     /* prettier-ignore */
     switch (widget) {
@@ -163,6 +180,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       break;
     case 'KPI':
       this.onKPIAction(action, data);
+      break;
+    case 'BULLET':
+      this.onBulletAction(action, data);
       break;
     }
   }
