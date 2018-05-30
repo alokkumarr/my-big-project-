@@ -84,7 +84,8 @@ export class ToolbarActionDialogComponent {
         this.data.analysis.id = response.id;
       }).finally(() => {
         const result: IToolbarActionResult = {
-          isSaveSuccessful: true
+          isSaveSuccessful: true,
+          analysis: this.data.analysis
         }
         this.dialogRef.close(result);
       });

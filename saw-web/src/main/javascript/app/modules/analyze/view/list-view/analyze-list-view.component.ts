@@ -67,9 +67,10 @@ export class AnalyzeListViewComponent {
     });
   }
 
-  afterEdit() {
+  afterEdit(analysis) {
     this.action.emit({
-      action: 'edit'
+      action: 'edit',
+      analysis
     });
   }
 

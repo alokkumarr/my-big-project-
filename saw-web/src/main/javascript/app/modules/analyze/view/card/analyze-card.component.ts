@@ -69,9 +69,10 @@ export class AnalyzeCardComponent implements OnInit {
     });
   }
 
-  afterEdit() {
+  afterEdit(analysis) {
     this.action.emit({
-      action: 'edit'
+      action: 'edit',
+      analysis
     });
   }
 
