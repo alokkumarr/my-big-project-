@@ -222,6 +222,19 @@ export class DesignerContainerComponent {
           type: node.type
         });
       });
+    } else {
+      forEach(this.sorts, sort => {
+        forEach(sqlBuilder.nodeFields || [], node => {
+          // check if sort already exits for this particular node
+          if (node.columnName !== sort.columnName) {
+            this.sorts.push({
+              order: 'asc',
+              columnName: node.columnName,
+              type: node.type
+            });
+          }
+        });
+      });
     }
   }
 
