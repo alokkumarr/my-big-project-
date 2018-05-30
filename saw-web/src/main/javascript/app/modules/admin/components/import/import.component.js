@@ -195,6 +195,7 @@ export const AnalysisImportComponent = {
         break;
       case 'exportLog':
         this.exportAllLogs(payload);
+        break;
       default:
       }
     }
@@ -283,7 +284,9 @@ export const AnalysisImportComponent = {
       if (exportList.length > 0) {
         const converter = require('json-2-csv');
         converter.json2csv(exportList, (err, csv) => {
-          if (err) throw err;
+          if (err) {
+            throw err;
+          }
           const FileSaver = require('file-saver');
           const logFileName = this.getLogFileName();
           const newData = new Blob([csv], {type: 'text/csv;charset=utf-8'});
