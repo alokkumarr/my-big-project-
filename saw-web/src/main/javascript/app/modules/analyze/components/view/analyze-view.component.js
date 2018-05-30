@@ -36,6 +36,7 @@ export const AnalyzeViewComponent = {
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
       this._analysisCache = [];
+      this.analyses = null;
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
@@ -55,6 +56,7 @@ export const AnalyzeViewComponent = {
     }
 
     $onInit() {
+      this.analyses = null;
       this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
         this.loadAnalyses();
       });
