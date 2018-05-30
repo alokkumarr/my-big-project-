@@ -1,8 +1,8 @@
 package sncr.datalake.engine
 
-import files.HFileOperations;
+import files.HFileOperations
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
-import org.json4s.{JObject, DefaultFormats}
+import org.json4s.{DefaultFormats, JObject}
 import org.json4s.native.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.ExecutionStatus.ExecutionStatus
@@ -14,7 +14,8 @@ import sncr.metadata.engine.ProcessingResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
-import scala.collection.JavaConverters._
+
+import sncr.datalake.DLConfiguration
 
 import scala.concurrent.Future
 
@@ -41,7 +42,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
-  def startExecution(sqlRuntime: String = null): Unit =
+  def startExecution(sqlRuntime: String = null, limit: Integer= DLConfiguration.rowLimit): Unit =
   {
     try {
       analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
@@ -62,12 +63,12 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.createAnalysisResult(id, null)
         }
         case ExecutionType.onetime => {
-          analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.executeSQLWithLimit(limit)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.preview => {
-          analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.executeSQLWithLimit(limit)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
           analysisNodeExecution.executeSQLNoDataLoad()
@@ -187,6 +188,56 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
 
     resultNode.getObject("dataLocation") match {
       case Some(dir: String) => {
+        val files = try {
+          /* Get list of all files in the execution result directory */
+          HFileOperations.getFilesStatus(dir)
+        } catch {
+          case e: Throwable => {
+            m_log.debug("Exception while getting result files: {}", e)
+            return resultsStream
+          }
+        }
+        /* Filter out the JSON files which contain the result rows */
+        files.filter(_.getPath.getName.endsWith(".json")).foreach(file => {
+          m_log.debug("Filtered file: " + file.getPath.getName)
+          val is = HFileOperations.readFileToInputStream(file.getPath.toString)
+          // stream of all the "string" values for one file.
+          val reader = new BufferedReader(new InputStreamReader(is))
+          // merge each file to a resultsStream
+          resultsStream = java.util.stream.Stream.concat(resultsStream, reader.lines)
+
+        })
+        // this can very well be an infinite stream if we don't give it a limit
+        return resultsStream
+      }
+      case obj => {
+        m_log.debug("Data location not found for results: {}", id)
+        return resultsStream
+      }
+    }
+    resultsStream
+  }
+
+  /**
+    * Returns the rows of the query execution result
+    *
+    * @return List<Map<…>> data structure
+    */
+  def loadOneTimeExecution(outputLocation: String, limit: Integer = DLConfiguration.rowLimit) : java.util.stream.Stream[String] = {
+
+    // use this as just a data type holder
+    // val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
+    val results = new java.util.ArrayList[String]
+    // not resultsStream will have required data type.
+    var resultsStream = results.stream()
+
+    if (outputLocation==null || outputLocation.isEmpty) {
+      m_log.debug("Data location property not found: {}", id)
+      return resultsStream
+    }
+
+    outputLocation match {
+      case (dir: String) => {
         val files = try {
           /* Get list of all files in the execution result directory */
           HFileOperations.getFilesStatus(dir)
