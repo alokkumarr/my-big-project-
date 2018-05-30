@@ -327,14 +327,15 @@ export class ReportGridComponent {
         const isNumberType = NUMBER_TYPES.includes(column.type);
         const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, column.type, column.aggregate);
         const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
+        let type = column.type;
         if (AGGREGATE_TYPES_OBJ[column.aggregate]) {
-          column.type = AGGREGATE_TYPES_OBJ[column.aggregate].type || column.type;
+          type = AGGREGATE_TYPES_OBJ[column.aggregate].type || column.type;
         }
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),
-          dataType: isNumberType? 'number' : column.type,
-          type: column.type,
+          dataType: isNumberType ? 'number' : column.type,
+          type,
           visibleIndex: column.visibleIndex,
           visible: isUndefined(column.visible) ? true : column.visible,
           payload: column,
