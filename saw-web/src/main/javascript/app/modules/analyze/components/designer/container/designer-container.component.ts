@@ -538,7 +538,6 @@ export class DesignerContainerComponent {
       this.addDefaultSorts();
       this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
-      console.log('selectedFields: ', this.areMinRequirmentsMet);
       break;
     case 'dateInterval':
     case 'aggregate':

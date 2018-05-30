@@ -40,7 +40,7 @@
 
     <button mat-button
             e2e="refresh-data-btn"
-            *ngIf="analysis && analysis.type === 'report' && !isInQueryMode"
+            *ngIf="analysis && (analysis.type === 'report' || analysis.type === 'esReport') && !isInQueryMode"
             [disabled]="!areMinRequirmentsMet"
             [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
             (click)="requestAction.emit('refresh')">
