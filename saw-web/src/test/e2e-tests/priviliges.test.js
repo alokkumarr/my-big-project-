@@ -289,7 +289,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
       commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
@@ -298,8 +298,8 @@ describe('Privileges tests: privileges.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       commonFunctions.logOutByClearingLocalStorage();
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -315,7 +315,7 @@ describe('Privileges tests: privileges.test.js', () => {
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
-        element(analyzePage.analysisElems.addAnalysisBtn.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.addAnalysisBtn.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.create,
             "Create button expected to be " + data.create + " on Analyze Page, but was " + !data.create);
         }));
@@ -323,22 +323,19 @@ describe('Privileges tests: privileges.test.js', () => {
         // Go to Card View
         commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
-        // Validate presence of menu on card
-        element(analyzePage.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
-
         // Validate presence on menu items in card menu
         if (data.cardOptions) {
-          analyzePage.main.getAnalysisActionOptions(analyzePage.main.firstCard).then(options => {
+          analyzePage.main.getAnalysisActionOptionsNew(analyzePage.main.firstCard).then(options => {
             let analysisOptions = options;
             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
-
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isDisplayed()).toBe(data.fork,
+            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isPresent()).toBe(data.fork,
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
@@ -349,12 +346,12 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
-          expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
+          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('[class="cdk-overlay-container"]')));
+          commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
+          expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
         }
-
         // Go to executed analysis page
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)

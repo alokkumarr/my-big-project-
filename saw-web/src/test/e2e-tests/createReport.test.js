@@ -42,7 +42,8 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -50,15 +51,13 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to Report', () => {
@@ -116,9 +115,9 @@ describe('Create report type analysis: createReport.test.js', () => {
     // TODO: below code is not working in headless mode something is wrong with chrome. will test again and enable it.
     // commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[@class="dx-datagrid" or contains(@class,"non-ideal-state__container ")]')));
     //
-    // const appliedFilter = filters.getAppliedFilterUpdated(fieldName);
-    // commonFunctions.waitFor.elementToBePresent(appliedFilter);
-    // expect(appliedFilter.isPresent()).toBe(true);
+    const appliedFilter = filters.getAppliedFilter(fieldName);
+    commonFunctions.waitFor.elementToBePresent(appliedFilter);
+    expect(appliedFilter.isPresent()).toBe(true);
 
     // Save
     const save = analyzePage.saveDialogUpgraded;

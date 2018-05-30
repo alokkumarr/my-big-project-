@@ -30,6 +30,14 @@ function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
   });
 }
 
+function getMdSelectOptionsNew({parentElem, btnSelector}) {
+  commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
+  const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
+  return menuItems.getAttribute('id').then(id => {
+    return element(by.id(id));
+  });
+}
+
 function getMdSelectOptions({parentElem, btnSelector}) {
   commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
   const btn = parentElem.element(by.css(btnSelector));
@@ -51,5 +59,6 @@ module.exports = {
   hasClass,
   doMdSelectOption,
   getMdSelectOptions,
+  getMdSelectOptionsNew,
   arrayContainsArray
 };

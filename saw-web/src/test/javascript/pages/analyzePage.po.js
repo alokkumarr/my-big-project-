@@ -1,4 +1,4 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
+const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
@@ -50,12 +50,14 @@ const doAnalysisAction = (name, action) => {
   commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
   toggle.click();
-
-  toggle.getAttribute('aria-owns').then(id => {
+  browser.sleep(500);
+  const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
+  menuItems.getAttribute('id').then(id => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
       commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+      browser.sleep(500);
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
@@ -67,6 +69,12 @@ const doAnalysisAction = (name, action) => {
   });
 };
 
+const getAnalysisActionOptionsNew = name => {
+  return getMdSelectOptionsNew({
+    parentElem: getCard(name),
+    btnSelector: 'button[e2e="actions-menu-toggle"]'
+  });
+};
 const getAnalysisActionOptions = name => {
   return getMdSelectOptions({
     parentElem: getCard(name),
@@ -279,12 +287,14 @@ module.exports = {
     getAnalysisChartType
   },
   main: {
+    actionMenuOptions : element(by.xpath('//div[contains(@class,"mat-menu-panel")]')),
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
     getAnalysisCards: getCards,
     getCardTitle,
     doAnalysisAction,
     getAnalysisActionOptions,
+    getAnalysisActionOptionsNew,
     confirmDeleteBtn: element(by.css('button[e2e="confirm-dialog-ok-btn"]')),
     doAccountAction,
     firstCard,

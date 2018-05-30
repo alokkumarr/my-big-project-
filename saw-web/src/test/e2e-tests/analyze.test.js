@@ -24,7 +24,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
+      commonFunctions.logOutByClearingLocalStorage();
       commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
@@ -33,8 +33,8 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.openBaseUrl();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
