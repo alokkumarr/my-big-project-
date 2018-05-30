@@ -12,11 +12,12 @@ export const AnalysisImportComponent = {
   styles: [style],
   controller: class AnalysisImportComponent extends AbstractComponentController {
     constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService,
-      $window, $rootScope, LocalSearchService, ImportService, ExportService) {
+      $window, $rootScope, LocalSearchService, ImportService, ExportService, $filter) {
       'ngInject';
       super($injector);
       this.$componentHandler = $componentHandler;
       this._$rootScope = $rootScope;
+      this._$filter = $filter;
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._CategoriesManagementService = CategoriesManagementService;
@@ -126,6 +127,8 @@ export const AnalysisImportComponent = {
             if (analysisObject.analysis.name === analysis.name && !analysisObject.noMetricInd) {
               analysisObject.duplicateAnalysisInd = true;
               analysisObject.logColor = 'red';
+              analysisObject.errorMsg = 'Analysis already exists.';
+              analysisObject.errorInd = false;
               analysisObject.importInd = false;
               this.changeExistsAnalysisParameter(analysisObject.analysis, analysis);
               analysisObject.log = 'Analysis already exists.';
@@ -170,6 +173,8 @@ export const AnalysisImportComponent = {
           if (this.flag === 0) {
             analysisObject.noMetricInd = true;
             analysisObject.logColor = 'red';
+            analysisObject.errorMsg = 'Metric not exists.';
+            analysisObject.errorInd = true;
             analysisObject.log = 'Metric not exists.';
           } else {
             analysisObject.duplicateAnalysisInd = false;
@@ -177,6 +182,8 @@ export const AnalysisImportComponent = {
             analysisObject.importInd = false;
             analysisObject.logColor = 'green';
             analysisObject.log = '';
+            analysisObject.errorMsg = '';
+            analysisObject.errorInd = false;
           }
         });
       }
@@ -186,6 +193,8 @@ export const AnalysisImportComponent = {
       case 'import':
         this.doImport(payload);
         break;
+      case 'exportLog':
+        this.exportAllLogs(payload);
       default:
       }
     }
@@ -225,7 +234,7 @@ export const AnalysisImportComponent = {
         this.updateOldAnalysis(analysis);
         this._$rootScope.showProgress = false;
       }).catch(error => {
-        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false);
+        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false, true);
         this._$rootScope.showProgress = false;
       });
     }
@@ -233,22 +242,59 @@ export const AnalysisImportComponent = {
       this._$rootScope.showProgress = true;
       analysis.categoryId = this.categoryId;
       this._ImportService.updateAnalysis(analysis).then(savedAnalysis => {
-        this.updateLogs(savedAnalysis.name, 'Successfully Imported', '', 'green', true);
+        this.updateLogs(savedAnalysis.name, 'Successfully Imported', '', 'green', true, false);
         this._$rootScope.showProgress = false;
       }).catch(error => {
-        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false);
+        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false, true);
         this._$rootScope.showProgress = false;
       });
     }
-    updateLogs(analysisName, logShortMsg, logLongMsg, logColor, importFlag) {
+    updateLogs(analysisName, logShortMsg, logLongMsg, logColor, importFlag, errorFlag) {
       this.analysisTableList.forEach(analysisObject => {
         if (analysisObject.analysis.name === analysisName) {
           analysisObject.log = logShortMsg;
+          analysisObject.errorMsg = logLongMsg;
+          analysisObject.errorInd = errorFlag;
           analysisObject.logColor = logColor;
           analysisObject.importInd = importFlag;
         }
       });
       this.updater.next({analysisList: this.analysisTableList});
+    }
+    exportAllLogs(analysisList) {
+      const exportList = [];
+      analysisList.forEach(analysis => {
+        if (analysis.errorInd) {
+          const logObject = {
+            analysisName: '',
+            analysisType: '',
+            metricName: '',
+            errorType: '',
+            errorMessage: ''
+          };
+          logObject.analysisName = analysis.analysis.name;
+          logObject.analysisType = analysis.analysis.type || '';
+          logObject.metricName = analysis.analysis.metricName;
+          logObject.errorType = analysis.errorMsg.data.error.type;
+          logObject.errorMessage = analysis.errorMsg.data.error.message;
+          exportList.push(logObject);
+        }
+      });
+      if (exportList.length > 0) {
+        const converter = require('json-2-csv');
+        converter.json2csv(exportList, (err, csv) => {
+          if (err) throw err;
+          const FileSaver = require('file-saver');
+          const logFileName = this.getLogFileName();
+          const newData = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+          FileSaver.saveAs(newData, logFileName);
+        });
+      }
+    }
+    getLogFileName() {
+      const d = new Date();
+      const formatedDate = this._$filter('date')(d, 'yyyyMMddHHmmss');
+      return 'log' + formatedDate + '.csv';
     }
   }
 };

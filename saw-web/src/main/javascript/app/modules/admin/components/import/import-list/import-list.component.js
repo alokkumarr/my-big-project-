@@ -9,9 +9,10 @@ export const ImportListViewComponent = {
     onAction: '&'
   },
   controller: class ImportListViewController {
-    constructor(dxDataGridService) {
+    constructor(dxDataGridService, $mdDialog) {
       'ngInject';
       this._dxDataGridService = dxDataGridService;
+      this._$mdDialog = $mdDialog;
       this._gridListInstance = null;
       this.selectAllAnalysis = false;
     }
@@ -80,6 +81,21 @@ export const ImportListViewComponent = {
         model: analysisList
       });
     }
+    doLogExport(analysisList) {
+      this.onAction({
+        type: 'exportLog',
+        model: analysisList
+      });
+    }
+    displayError(error) {
+      const confirm = this._$mdDialog.confirm()
+        .title('Error')
+        .textContent(angular.toJson(error.data))
+        .ok('Ok');
+      this._$mdDialog.show(confirm).then(() => {
+      });
+    }
+
     validation() {
       if (this.analysisList.length > 0) {
         return false;
@@ -92,7 +108,7 @@ export const ImportListViewComponent = {
         caption: 'Select All to Import',
         dataField: 'selection',
         allowSorting: false,
-        alignment: 'center',
+        alignment: 'left',
         width: '10%',
         headerCellTemplate: '<md-checkbox ng-click="$ctrl.selectAll($ctrl.selectAllAnalysis)" ng-model="$ctrl.selectAllAnalysis">Select All to Import</md-checkbox>',
         cellTemplate: 'selectionCellTemplate'
