@@ -254,7 +254,7 @@ export class CronJobSchedularComponent {
     if (!isUndefined(this.crondetails.endDate) && this.crondetails.endDate !== null) {
       this.selectedMoments.push(new Date(moment(this.crondetails.endDate).local()));
     }
-    
+
     if (isEmpty(this.crondetails.cronexp)) {
       return;
     }
@@ -269,7 +269,7 @@ export class CronJobSchedularComponent {
         hour: parseInt(fetchTime[0]),
         minute: fetchTime[1],
         hourType: meridium[0]
-      };  
+      };
     }
 
     switch (this.scheduleType) {
@@ -309,7 +309,7 @@ export class CronJobSchedularComponent {
       forEach(getWeekDays[5].split(','), day => {
         this.weekly[day] = true;
       })
-      
+
       this.weeklybasisDate = clone(modelDate); //Loading time values for weekly tab
       break;
     case 'monthly':

@@ -16,7 +16,7 @@
       <mat-option *ngFor="let hour of hours" [value]="hour">
         {{hour}}
     </mat-option>
-  </mat-select> hour(s) on minute 
+  </mat-select> hour(s) on minute
   <mat-select [(ngModel)]="hourly.minutes" (selectionChange)="regenerateCron('')">
       <mat-option *ngFor="let minute of minutes" [value]="minute">
         {{minute}}
@@ -41,7 +41,7 @@
 
 <div *ngIf="scheduleType === 'weeklybasis'" [ngClass]="{'active': scheduleType === 'weeklybasis'}" class="tabcontent">
   <div *ngFor="let day of dayStrings">
-    <input class="checkbox" type="checkbox" [(ngModel)]="weekly[day]" (change)="regenerateCron(weeklybasisDate)" /> {{day | i18nPlural: DayMapping}}  
+    <input class="checkbox" type="checkbox" [(ngModel)]="weekly[day]" (change)="regenerateCron(weeklybasisDate)" /> {{day | i18nPlural: DayMapping}}
   </div>
   <br/>
   Start Time
@@ -55,7 +55,7 @@
       <mat-option *ngFor="let day of days" [value]="day">
         {{day | i18nPlural: NumberMapping}}
       </mat-option>
-    </mat-select> Day of every 
+    </mat-select> Day of every
     <mat-select placeholder="Month" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron(specificDayMonth)" [disabled]="monthly.monthlyType !== 'monthlyDay'">
       <mat-option *ngFor="let month of months" [value]="month">
         {{month}}
@@ -90,7 +90,7 @@
       <mat-option *ngFor="let monthString of monthStrings" [value]="monthString.value">
         {{monthString.label}}
       </mat-option>
-    </mat-select> on the  
+    </mat-select> on the
     <mat-select placeholder="Days" [(ngModel)]="yearly.specificMonthDayDay" (selectionChange)="regenerateCron(specificMonthDayYear)" [disabled]="yearly.yearlyType !== 'yearlyMonth'">
       <mat-option *ngFor="let day of days" [value]="day">
         {{day | i18nPlural: NumberMapping}}
@@ -108,7 +108,7 @@
       <mat-option *ngFor="let dayString of dayStrings" [value]="dayString">
       {{dayString}}
       </mat-option>
-    </mat-select>of 
+    </mat-select>of
     <mat-select placeholder="Month" [(ngModel)]="yearly.specificMonthWeekMonth" (selectionChange)="regenerateCron(specificMonthWeekYear)" [disabled]="yearly.yearlyType !== 'yearlyDay'">
       <mat-option *ngFor="let monthString of monthStrings" [value]="monthString.value">
         {{monthString.label}}
@@ -121,7 +121,7 @@
 <div class="dateDetails" *ngIf="scheduleType !== 'immediate'">
   <label>
       Start Date:
-      <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12"
+      <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12" [max]="selectedMoments[1]"
              [(ngModel)]="selectedMoments"
              [selectMode]="'rangeFrom'"
              (ngModelChange)="cronChange()" />
@@ -129,7 +129,7 @@
   </label>
   <label style="margin-left: 5px;">
       End Date:
-      <input [owlDateTimeTrigger]="dt13" [owlDateTime]="dt13"
+      <input [owlDateTimeTrigger]="dt13" [owlDateTime]="dt13" [min]="selectedMoments[0]"
              [(ngModel)]="selectedMoments"
              [selectMode]="'rangeTo'"
              (ngModelChange)="cronChange()" />
