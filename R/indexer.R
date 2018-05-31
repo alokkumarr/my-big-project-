@@ -57,10 +57,9 @@ indexer.data.frame <- function(df,
   checkmate::assert_number(periods, lower = 1)
   checkmate::assert_string(label, null.ok = TRUE)
 
-
   if (is.null(label)) {
-    label <-
-      paste(paste0(periods, substr(units, 0, nchar(units) - 1)), "periods_since", origin, sep = "_")
+    per_label <- if (periods == 1) units else paste0(periods, substr(units, 0, nchar(units) - 1), "_periods")
+    label <- paste(per_label, "since", origin, sep = "_")
   }
   label <- rlang::quo_name(label)
   units_fun <- get(units, asNamespace("lubridate"))
@@ -99,8 +98,8 @@ indexer.tbl_spark <- function(df,
 
 
   if (is.null(label)) {
-    label <-
-      paste(paste0(periods, substr(units, 0, nchar(units) - 1)), "periods_since", origin, sep = "_")
+    per_label <- if (periods == 1) units else paste0(periods, substr(units, 0, nchar(units) - 1), "_periods")
+    label <- paste(per_label, "since", origin, sep = "_")
   }
   label <- rlang::quo_name(label)
 
