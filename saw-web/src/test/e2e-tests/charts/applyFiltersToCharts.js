@@ -6,7 +6,6 @@ const protractor = require('protractor');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const utils = require('../../javascript/helpers/utils');
-const designModePage = require('../../javascript/pages/designModePage.po.js');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;

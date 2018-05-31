@@ -87,7 +87,7 @@ exports.config = {
         '--start-fullscreen', // enable for Mac OS
         '--headless',
         '--disable-gpu',
-        '--window-size=1280,1696'
+        '--window-size=2880,1800'
       ]
     },
     'moz:firefoxOptions': {
