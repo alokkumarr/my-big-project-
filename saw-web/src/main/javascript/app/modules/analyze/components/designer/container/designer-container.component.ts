@@ -28,7 +28,8 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent,
   ArtifactColumn,
-  Format
+  Format,
+  AnalysisReport
 } from '../types';
 import {
   FLOAT_TYPES,
@@ -250,7 +251,8 @@ export class DesignerContainerComponent {
   }
 
   requestDataIfPossible() {
-    if (this.canRequestData()) {
+    this.areMinRequirmentsMet = this.canRequestData();
+    if (this.areMinRequirmentsMet) {
       this.requestData();
     } else {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -486,6 +488,7 @@ export class DesignerContainerComponent {
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
+      this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'submitQuery':
@@ -620,6 +623,10 @@ export class DesignerContainerComponent {
   }
 
   canRequestReport(artifacts) {
+    if (this.analysis.edit) {
+      return Boolean((<AnalysisReport>this.analysis).queryManual);
+    };
+
     let atLeastOneIsChecked = false;
     forEach(artifacts, artifact => {
       forEach(artifact.columns, column => {
