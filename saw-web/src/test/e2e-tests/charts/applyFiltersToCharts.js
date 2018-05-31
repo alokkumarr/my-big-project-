@@ -6,6 +6,7 @@ const protractor = require('protractor');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const utils = require('../../javascript/helpers/utils');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
@@ -52,23 +53,19 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const refreshBtn = chartDesigner.refreshBtn;
     // Wait for field input box.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-    // Search field and add that into dimension section.
-    // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(xAxisName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
+    // Search field and add that into dimension section.
+    designModePage.chart.addFieldButton(xAxisName).click();
+    browser.sleep(200);
     const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
 
     // Search field and add that into group by section.
-    // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(groupName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
+    designModePage.chart.addFieldButton(groupName).click();
+    browser.sleep(200);
     // Search field and add that into metric section.
-    // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(yAxisName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
-
+    designModePage.chart.addFieldButton(yAxisName).click();
+    browser.sleep(200);
     // Check selected field is present in respective section.
     let y = analyzePage.designerDialog.chart.getMetricsFields(yAxisName);
     commonFunctions.waitFor.elementToBeVisible(y);

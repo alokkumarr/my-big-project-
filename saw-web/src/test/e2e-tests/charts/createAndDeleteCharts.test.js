@@ -9,6 +9,7 @@ const homePage = require('../../javascript/pages/homePage.po');
 const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
@@ -89,25 +90,20 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
       // Search field and add that into metric section.
-      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(yAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
+      designModePage.chart.addFieldButton(yAxisName).click();
+      browser.sleep(200);
       // Search field and add that into dimension section.
-      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(xAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
+      designModePage.chart.addFieldButton(xAxisName).click();
+      browser.sleep(200);
 
       // Search field and add that into size section.
       if (data.chartType === 'chart:bubble') {
-        // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
+        designModePage.chart.addFieldButton(sizeByName).click();
+        browser.sleep(200);
       }
       // Search field and add that into group by section. i.e. Color by
-      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(groupName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
-
+      designModePage.chart.addFieldButton(groupName).click();
+      browser.sleep(200);
       //Save
       const save = analyzePage.saveDialog;
       const designer = analyzePage.designerDialog;

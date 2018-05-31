@@ -88,32 +88,27 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       // Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-      // Search field and add that into metric section.
-      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(yAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
-      // Search field and add that into dimension section.
-      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(xAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
-
-      // Search field and add that into size section.
+      // Metric section.
+      designModePage.chart.addFieldButton(yAxisName).click();
+      browser.sleep(200);
+      // Dimension section.
+      designModePage.chart.addFieldButton(xAxisName).click();
+      browser.sleep(200);
+      // Size section.
       if (data.chartType === 'chart:bubble') {
-        // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
+        designModePage.chart.addFieldButton(sizeByName).click();
+        browser.sleep(200);
       }
-      // Search field and add that into group by section. i.e. Color by
-      // analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.clear().sendKeys(groupName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
+      // Group by section. i.e. Color by
+      designModePage.chart.addFieldButton(groupName).click();
+      browser.sleep(200);
 
       // Navigate to Preview
       commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
 
       // Verify axis to be present on Preview Mode
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
 
   });
