@@ -67,7 +67,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.preview => {
-          analysisNodeExecution.executeSQLWithLimit(limit)
+          analysisNodeExecution.executeSQLWithLimit(DLConfiguration.rowLimit)
           analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
