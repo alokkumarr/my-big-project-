@@ -620,6 +620,10 @@ export class DesignerContainerComponent {
   }
 
   canRequestReport(artifacts) {
+    if (this.analysis.edit) {
+      return true;
+    };
+
     let atLeastOneIsChecked = false;
     forEach(artifacts, artifact => {
       forEach(artifact.columns, column => {
