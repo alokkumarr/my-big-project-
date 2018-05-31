@@ -14,6 +14,7 @@ require('./toolbar-action-dialog.component.scss');
 })
 export class ToolbarActionDialogComponent {
   showProgressBar = false;
+  filterValid: boolean = true;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
@@ -40,7 +41,9 @@ export class ToolbarActionDialogComponent {
     this.data.sorts = sorts;
   }
 
-  onFiltersChange(filters) {
+  onFiltersChange({ filters, valid }) {
+    console.log(filters, valid);
+    this.filterValid = valid;
     this.data.filters = filters;
   }
 

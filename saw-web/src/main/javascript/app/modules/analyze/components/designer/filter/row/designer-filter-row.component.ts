@@ -85,6 +85,7 @@ export class DesignerFilterRowComponent {
 
   onFilterModelChange(filterModel: FilterModel) {
     this.filter.model = filterModel;
+    this.filterChange.emit();
   }
 
   onGlobalCheckboxToggle(filter: Filter, checked: boolean) {
