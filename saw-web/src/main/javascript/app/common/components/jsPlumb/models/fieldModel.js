@@ -41,7 +41,7 @@ export class FieldModel {
 
   set checked(val) {
     this._checked = val;
-    if (this.table.canvas) {
+    if (this.table && this.table.canvas) {
       this.table.canvas.component._$eventEmitter.emit('changed');
     }
   }
