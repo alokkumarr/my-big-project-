@@ -16,18 +16,21 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
-import sncr.bda.core.file.HFileOperations;
-import sncr.xdf.adapters.writers.DLBatchWriter;
-import sncr.xdf.component.*;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
-import sncr.xdf.file.DLDataSetOperations;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.adapters.writers.DLBatchWriter;
+import sncr.xdf.adapters.writers.MoveDataDescriptor;
+import sncr.xdf.component.Component;
+import sncr.xdf.component.WithDataSetService;
+import sncr.xdf.component.WithMovableResult;
+import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.exceptions.XDFException;
+import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
-import sncr.xdf.adapters.writers.MoveDataDescriptor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,9 +48,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private int headerSize;
     private String sourcePath;
     private String tempDir;
+
     private String outputDataSetName;
     private String outputDataSetLocation;
     private String outputFormat;
+
+    private String rejectedDatasetName;
+    private String rejectedDatasetLocation;
+    private String rejectedDataFormat;
 
     private LongAccumulator errCounter;
     private LongAccumulator recCounter;
@@ -56,6 +64,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private List<String> tsFormats;
     private StructType internalSchema;
     private Integer outputNOF;
+
+    public static final String REJECTED_FLAG = "__REJ_FLAG";
+    public static final String REJ_REASON = "__REJ_REASON";
 
     private List<String> pkeys;
 
@@ -92,27 +103,48 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
-        schema = createSchema(ctx.componentConfiguration.getParser().getFields(), false);
+        schema = createSchema(ctx.componentConfiguration.getParser().getFields(), false, false);
         tsFormats = createTsFormatList(ctx.componentConfiguration.getParser().getFields());
         logger.info(tsFormats);
 
-        internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true);
+        internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true, true);
 
         // Output data set
-        if(outputDataSets.size() != 1){
-            // error - must be only one for parser
-            logger.error("Found multiple output data set definitions");
+        if (outputDataSets.size() == 0) {
+            logger.error("Output dataset not defined");
             return -1;
         }
 
-        Map.Entry<String, Map<String, Object>> ds =  (Map.Entry<String, Map<String, Object>>)outputDataSets.entrySet().toArray()[0];
-        outputDataSetName = ds.getKey();
-        outputDataSetLocation = (String) ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-        outputFormat = (String) ds.getValue().get(DataSetProperties.Format.name());
-        outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
-        pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
+        Map<String, Object> outputDataset = getOutputDatasetDetails();
+        logger.debug("Output dataset details = " + outputDataset);
+        outputDataSetName = outputDataset.get(DataSetProperties.Name.name()).toString();
+        outputDataSetLocation = outputDataset.get(DataSetProperties.PhysicalLocation.name()).toString();
+        outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
+        outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
+        pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
 
         logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
+
+        //TODO: Extract the rejected dataset path and format here - Sunil
+        Map<String, Object> rejDs = getRejectDatasetDetails();
+
+        logger.debug("Rejected dataset details = " + rejDs);
+        if (rejDs != null) {
+//            rejectedDatasetName = DATASET.rejected.toString();
+            rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
+            rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
+            rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
+
+            logger.debug("Rejected dataset " + rejectedDatasetName + " at "
+                + rejectedDatasetLocation + " with format " + rejectedDataFormat);
+
+            if (rejectedDataFormat == null || rejectedDataFormat.length() == 0) {
+                rejectedDataFormat = "parquet";
+            }
+
+            logger.info("Rejected data set " + rejectedDatasetName + " located at " + rejectedDatasetLocation
+                + " with format " + rejectedDataFormat);
+        }
 
         //TODO: If data set exists and flag is not append - error
         // This is good for UI what about pipeline? Talk to Suren
@@ -186,15 +218,26 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             .textFile(sourcePath, 1)
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
 
-
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
-
-        scala.collection.Seq<Column> scalaList=
+        // Create output dataset
+        scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
+        JavaRDD<Row> outputRdd = getOutputData(rdd);
+        Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+        logger.debug("Output dataset = " + outputDataset.count() );
+        writeDataset(outputDataset, outputFormat, tempDir);
 
-        //TODO: Change here
-        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
-        writeDataset(filteredDataset, outputFormat.toString(), tempDir);
+        //TODO: Write rejected datasets
+        if (rejectedDatasetLocation != null) {
+            // Get all entries which are not rejected
+            JavaRDD<Row> rejectedRdd = rdd.subtract(outputRdd);
+
+            logger.debug("Rejected RDD = " + rejectedRdd.count());
+
+            logger.debug("Rejected dataset = " + rejectedRdd.count());
+
+            writeRdd(rejectedRdd, rejectedDatasetLocation);
+        }
+
         resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
 
         return 0;
@@ -232,15 +275,27 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             .keys()
             .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
 
-
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
-        // TODO: Filter out all rejected records
-
-        scala.collection.Seq<Column> scalaList=
+        // Create output dataset
+        scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        Dataset<Row> filteredDataset = df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0));
+        JavaRDD<Row> outputRdd = getOutputData(rdd);
+        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);;
+        writeDataset(df, outputFormat, destDir.toString());
 
-        return writeDataset(filteredDataset, outputFormat, destDir.toString());
+        //TODO: Write rejected datasets
+        if (rejectedDatasetLocation != null) {
+            // Get all entries which are not rejected
+            JavaRDD<Row> rejectedRdd = rdd.subtract(outputRdd);
+
+            logger.debug("Rejected RDD = " + rejectedRdd.count());
+
+
+            logger.debug("Rejected dataset = " + rejectedRdd.count());
+
+            writeRdd(rejectedRdd, rejectedDatasetLocation);
+        }
+
+        return 0;
     }
 
     /**
@@ -270,7 +325,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             logger.error("Error at writing result: " + error);
             return -1;
         }
+    }
 
+    private boolean writeRdd(JavaRDD<Row> rdd, String path) {
+        if (rdd != null && path != null) {
+            logger.debug("Writing data to location " + path);
+            rdd.saveAsTextFile(path);
+        } else {
+            logger.info("Nothing to write");
+        }
+
+        return true;
     }
 
     private static List<Column> createFieldList(List<Field> fields){
@@ -286,7 +351,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         List<String> retval = new ArrayList<>();
         for(Field field : fields){
             if (field.getType().equals(CsvInspectorRowProcessor.T_DATETIME) &&
-            field.getFormat() != null && !field.getFormat().isEmpty()){
+                field.getFormat() != null && !field.getFormat().isEmpty()){
                 retval.add(field.getFormat());
                 logger.info("Found date field " + field.getName() + " format: " + field.getFormat());
             } else {
@@ -295,9 +360,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
         return retval;
     }
-    private static StructType createSchema(List<Field> fields, boolean addRejectedFlag){
+    private static StructType createSchema(List<Field> fields, boolean addRejectedFlag,boolean addReasonFlag){
 
-        StructField[] structFields = new StructField[fields.size() + (addRejectedFlag ? 1 : 0)];
+        StructField[] structFields = new StructField[fields.size() + (addRejectedFlag ? 1 : 0)
+            + (addReasonFlag ? 1 : 0)];
         int i = 0;
         for(Field field : fields){
 
@@ -307,9 +373,38 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
 
         if(addRejectedFlag){
-            structFields[i] = new StructField("__REJ_FLAG", DataTypes.IntegerType, true, Metadata.empty());
+            structFields[i] = new StructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty());
         }
+        if (addReasonFlag) {
+            structFields[i+1] = new StructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty());
+        }
+
         return  new StructType(structFields);
+    }
+
+    private Map<String, Object> getOutputDatasetDetails() {
+        Map<String, Object> outputDataset = null;
+
+        outputDataset = outputs.get(DATASET.output.toString());
+        logger.debug("Rejected dataset = " + outputDataset);
+
+        return outputDataset;
+    }
+
+    private Map<String, Object> getRejectDatasetDetails() {
+        Map<String, Object> rejectDataset = null;
+
+        rejectDataset = outputs.get(DATASET.rejected.toString());
+        logger.debug("Rejected dataset = " + rejectDataset);
+
+        return rejectDataset;
+    }
+
+    private JavaRDD<Row> getOutputData (JavaRDD<Row> parsedData) {
+        int rejectedColumn = internalSchema.length() - 2;
+        JavaRDD<Row> outputRdd = parsedData.filter(row -> (int)row.get(rejectedColumn) == 0);
+
+        return outputRdd;
     }
 
     private static DataType convertXdfToSparkType(String xdfType){
@@ -320,6 +415,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 return DataTypes.LongType;
             case CsvInspectorRowProcessor.T_DOUBLE:
                 return DataTypes.DoubleType;
+            case CsvInspectorRowProcessor.T_INTEGER:
+                return DataTypes.IntegerType;
             case CsvInspectorRowProcessor.T_DATETIME:
                 return DataTypes.TimestampType;  // TODO: Implement proper format for timestamp
             default:

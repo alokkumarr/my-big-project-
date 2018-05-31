@@ -1,0 +1,14 @@
+12312312731827318273182377192312|"Test string 0"|28/02/2017 08:12:12|2018-31-02T00:00:00|Rejected (Integer value out of range)
+111|"Test string1"|28/02/2017 08:12:12|2018-31-02T00:00:00|Rejected (Formatted date is not according to the format)
+112|"Test string2"|28/02/2017 08:12:12|2018-01-02T00:00:00|Accepted
+113|Test String 3|28/02/2017 12:12:00|Rejected (Less number of columns)
+114|Test String 4|28/02/2017 12:12:00|2018-01-02T00:00:00|Hello|Rejected (More number of columns)
+ |"Test String 5"|28/02/2017 08:12:12|2018-01-02T00:00:00|Accepted (Null values are accepted)
+115|Test "String" 6|28/02/2017 08:12:12|2018-01-02T00:00:00|Accepted
+116|Test "String 7|28/02/2017 08:12:12|2018-01-02T00:00:00|Rejected (Unbalanced quotes)
+117|0Binary|28/02/2017 08:12:12|2018-01-02T00:00:00|Rejected (Unbalanced quotes)
+118|"0Binary"|28/02/2017 08:12:12|2018-01-02T00:00:00|Rejected (Unbalanced quotes)
+
+||||
+ | | | |
+||||Accepted (At least column is non-null)

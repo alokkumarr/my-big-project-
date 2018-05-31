@@ -13,6 +13,8 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 
 import java.text.SimpleDateFormat;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class ConvertToRow implements Function<String, Row> {
@@ -32,6 +34,10 @@ public class ConvertToRow implements Function<String, Row> {
     private LongAccumulator recCounter;
     private LongAccumulator errCounter;
 
+    public static String DEFAULT_DATE_FORMAT = "dd/MM/yy HH:mm:ss";
+
+    private SimpleDateFormat df;
+
     public ConvertToRow(StructType schema,
                         List<String> tsFormats,
                         String lineSeparator,
@@ -50,8 +56,16 @@ public class ConvertToRow implements Function<String, Row> {
         this.charToEscapeQuoteEscaping = charToEscapeQuoteEscaping;
         this.errCounter = errorCounter;
         this.recCounter = recordCounter;
+
+        df = new SimpleDateFormat();
+        /*
+           Strictly validate the date
+           01/01/2016 00:00:00 (January 01 2016) - Valid
+           29/02/2015 00:00:00 (February 29 2015) - Invalid
+         */
+        df.setLenient(false);
     }
-    public Row call(String in) throws Exception {
+    public Row call(String line) throws Exception {
 
         if(parser == null){
             CsvParserSettings settings = new CsvParserSettings();
@@ -71,51 +85,120 @@ public class ConvertToRow implements Function<String, Row> {
             parser = new CsvParser(settings);
         }
 
-        Object[] record = new Object[schema.length() + 1];
+        Object[] record = new Object[schema.length() + 2];
         record[schema.length()] = 0;
 
-        String[] parsed = parser.parseLine(in);
+        String[] parsed = parser.parseLine(line);
 
-        if( parsed == null || parsed.length != schema.fields().length){
+        if (parsed == null) {
+            logger.info("Unable to parse the record");
+            errCounter.add(1);
+
+            String srcRecord[] = line.split(String.valueOf(delimiter));
+
+            System.arraycopy(srcRecord, 0, record, 0, srcRecord.length);
+
+            record[schema.length() + 1] = "Unable to parse the record";
+            record[schema.length()] = 1;
+        } else if(parsed.length != schema.fields().length){
             // Create record with rejected flag
             errCounter.add(1);
+            // Copy columns from input string to output record
+            if (parsed.length < schema.length()) {
+                System.arraycopy(parsed, 0, record, 0, parsed.length);
+            } else {
+                System.arraycopy(parsed, 0, record, 0, schema.length());
+            }
+            record[schema.length() + 1] = "Invalid number of columns";
             record[schema.length()] = 1;
         } else {
             // TODO: Faster implementation will require automatic Janino code generation
             try {
+                if (Arrays.stream(parsed).filter(val -> val != null).count() == 0) {
+                    throw new Exception("All fields are null");
+                }
                 int i = 0;
                 for (StructField sf : schema.fields()) {
-                    if (sf.dataType().equals(DataTypes.StringType)) {
+                    //Should accept null values unless mentioned as mandatory
+                    //Reject rows with all null fields
+
+                    if (parsed[i] == null) {
                         record[i] = parsed[i];
-                    }
-                    if (sf.dataType().equals(DataTypes.LongType)) {
-                        record[i] = Long.parseLong(parsed[i]);
-                    }
-                    if (sf.dataType().equals(DataTypes.DoubleType)) {
-                        record[i] = Double.parseDouble(parsed[i]);
-                    }
-                    if (sf.dataType().equals(DataTypes.TimestampType)) {
-                        SimpleDateFormat df;
-                        if (!tsFormats.get(i).isEmpty()) {
-                            df = new SimpleDateFormat(tsFormats.get(i));
-                        } else {
-                            // TODO: pass default timestamp format as a parameter
-                            df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+                    } else {
+                        if (sf.dataType().equals(DataTypes.StringType)) {
+                            if (validateString(parsed[i])) {
+                                record[i] = parsed[i];
+                            } else {
+                                throw new Exception("Invalid string value " + parsed[i]);
+                            }
                         }
-                        record[i] = new java.sql.Timestamp(df.parse(parsed[i]).getTime());
+                        else if (sf.dataType().equals(DataTypes.LongType)) {
+                            record[i] = Long.parseLong(parsed[i]);
+                        }
+                        else if (sf.dataType().equals(DataTypes.DoubleType)) {
+                            record[i] = Double.parseDouble(parsed[i]);
+                        }
+                        else if (sf.dataType().equals(DataTypes.IntegerType)) {
+                            record[i] = Integer.parseInt(parsed[i]);
+                        }
+                        else if (sf.dataType().equals(DataTypes.TimestampType)) {
+                            if (!tsFormats.get(i).isEmpty()) {
+                                df.applyPattern(tsFormats.get(i));
+                            } else {
+                                df.applyPattern(DEFAULT_DATE_FORMAT);
+                            }
+                            record[i] = new java.sql.Timestamp(df.parse(parsed[i]).getTime());
+                        }
                     }
                     i++;
                 }
             } catch(Exception e){
                 errCounter.add(1);
+
+                // Copy columns from input string to output record
+                System.arraycopy(parsed, 0, record, 0, schema.length());
                 record[schema.length()] = 1;
+                record[schema.length() + 1] = e.getClass().getCanonicalName() + ": " + e.getMessage();
+
+                //TODO; Not working - Sunil
+//                record = new Object[]{line, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()};
             }
         }
         recCounter.add(1);
         return  RowFactory.create(record);
     }
 
-        private String codeGen(){
+    private boolean validateString(String inputString) {
+        boolean status = true;
+
+        status = validateQuoteBalance(inputString, this.quoteChar);
+
+        return status;
+    }
+
+    private boolean validateQuoteBalance(String inputString, char quoteCharacter) {
+        boolean status = true;
+
+        int charCount = countChar(inputString, quoteCharacter);
+
+        status = (charCount % 2) == 0 ? true : false;
+
+        return status;
+    }
+
+    private int countChar(String inputString, char character) {
+        int count = 0;
+
+        for(char c: inputString.toCharArray()) {
+            if (c == character) {
+                count += 1;
+            }
+        }
+
+        return count;
+    }
+
+    private String codeGen(){
 
         StringBuffer sb = new StringBuffer();
         Integer i = 0;

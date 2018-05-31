@@ -56,6 +56,11 @@ public abstract class Component {
     private Map<String, JsonElement> mdInputDSMap;
     private String transformationID;
 
+    public static enum DATASET {
+        input,
+        output,
+        rejected
+    };
 
 
     public String getError(){
