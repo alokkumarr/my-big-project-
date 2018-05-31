@@ -42,7 +42,6 @@ export class ToolbarActionDialogComponent {
   }
 
   onFiltersChange({ filters, valid }) {
-    console.log(filters, valid);
     this.filterValid = valid;
     this.data.filters = filters;
   }
