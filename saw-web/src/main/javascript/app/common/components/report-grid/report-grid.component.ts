@@ -324,17 +324,20 @@ export class ReportGridComponent {
       fpFlatMap((artifact: Artifact) => artifact.columns),
       fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
-        const isNumberType = NUMBER_TYPES.includes(column.type);
-        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, column.type, column.aggregate);
-        const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
+        let isNumberType = NUMBER_TYPES.includes(column.type);
+        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
         let type = column.type;
-        if (AGGREGATE_TYPES_OBJ[column.aggregate]) {
-          type = AGGREGATE_TYPES_OBJ[column.aggregate].type || column.type;
+        if (aggregate && ['percentage', 'count'].includes(aggregate.value)) {
+          type = aggregate.type || column.type;
+          isNumberType = true;
         }
+        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
+        const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
+
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),
-          dataType: isNumberType ? 'number' : column.type,
+          dataType: isNumberType ? 'number' : type,
           type,
           visibleIndex: column.visibleIndex,
           visible: isUndefined(column.visible) ? true : column.visible,
