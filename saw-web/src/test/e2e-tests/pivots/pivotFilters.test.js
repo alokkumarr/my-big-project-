@@ -313,8 +313,6 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -322,15 +320,13 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.logOutByClearingLocalStorage();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

@@ -27,8 +27,8 @@ enum METHODS {
   CHART_BUBBLE = 'chart:bubble',
   CHART_AREA = 'chart:area',
   CHART_COMBO = 'chart:combo',
-  CHART_TSSPLINE = 'chart:tsspline',
-  CHART_TSPANE = 'chart:tsPane'
+  CHART_TSSPLINE = 'chart:tspline',
+  CHART_TSPANE = 'chart:tsareaspline'
 }
 
 @Component({

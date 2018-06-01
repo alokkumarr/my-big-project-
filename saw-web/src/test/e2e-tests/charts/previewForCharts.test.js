@@ -48,8 +48,6 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -57,15 +55,13 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.logOutByClearingLocalStorage();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -81,55 +77,36 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
       login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
-      navigateToSubCategory();
+      homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();
-
       //Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
       // Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-      // Search field and add that into metric section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
-      // Search field and add that into dimension section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
-
-      // Search field and add that into size section.
+      // Metric section.
+      designModePage.chart.addFieldButton(yAxisName).click();
+      browser.sleep(200);
+      // Dimension section.
+      designModePage.chart.addFieldButton(xAxisName).click();
+      browser.sleep(200);
+      // Size section.
       if (data.chartType === 'chart:bubble') {
-        analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
+        designModePage.chart.addFieldButton(sizeByName).click();
+        browser.sleep(200);
       }
-      // Search field and add that into group by section. i.e. Color by
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
+      // Group by section. i.e. Color by
+      designModePage.chart.addFieldButton(groupName).click();
+      browser.sleep(200);
 
       // Navigate to Preview
       commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
 
       // Verify axis to be present on Preview Mode
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
 
-    // Navigates to specific category where analysis creation should happen
-    const navigateToSubCategory = () => {
-      //Collapse default category
-      commonFunctions.waitFor.elementToBeClickable(homePage.category(defaultCategory))
-      homePage.category(defaultCategory).click();
-
-      //Navigate to Category/Sub-category
-      commonFunctions.waitFor.elementToBeClickable(homePage.category(categoryName));
-      homePage.category(categoryName).click();
-
-      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(subCategoryName));
-      const subCategory = homePage.subCategory(subCategoryName).click();
-    };
   });
 });

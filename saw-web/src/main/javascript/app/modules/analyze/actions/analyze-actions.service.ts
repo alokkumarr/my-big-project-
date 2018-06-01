@@ -88,7 +88,7 @@ export class AnalyzeActionsService {
         data: { analysis }
       } as MatDialogConfig).afterClosed().subscribe(analysis => {
         if (analysis) {
-          const execute = false;
+          const execute = true;
           this._headerProgress.show();
           this._analyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
             this._headerProgress.hide();

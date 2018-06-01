@@ -3,8 +3,8 @@ const users = require('../data/users.js');
 
 module.exports = {
   loginElements: {
-    userNameField: element(by.id('input_0')),
-    passwordField: element(by.id('input_1')),
+    userNameField: element(by.id('mat-input-0')),
+    passwordField: element(by.id('mat-input-1')),
     loginBtn: element(by.buttonText('Login')),
     invalidErr: element(by.css('.err-msg'))
   },

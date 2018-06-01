@@ -19,17 +19,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
   }
   beforeEach((done) => {
     setTimeout(() => {
-      browser.waitForAngular();
-      commonFunctions.openBaseUrl();
     expect(browser.getCurrentUrl()).toContain('/login');
-    done();
-    }, CONFIG.timeouts.pageResolveTimeout);
-  });
-
-  afterEach((done) => {
-    setTimeout(() => {
-    browser.waitForAngular();
-    commonFunctions.logOutByClearingLocalStorage();
     done();
     }, CONFIG.timeouts.pageResolveTimeout);
   });
@@ -38,10 +28,17 @@ describe('Workbench Tests : workbench.test.js',  () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
-  afterAll(() => {
-    browser.executeScript('window.sessionStorage.clear();');
-  browser.executeScript('window.localStorage.clear();');
+  afterEach(function (done) {
+    setTimeout(function () {
+      analyzePage.main.doAccountAction('logout');
+      done();
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
+
+  afterAll(function () {
+    commonFunctions.logOutByClearingLocalStorage();
+  });
+
 
   Using(UserLists, function (data, description) {
     const fieldSeparatorStr = ",";

@@ -11,7 +11,6 @@ import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
-import * as moment from 'moment';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 
@@ -187,7 +186,8 @@ export const AnalyzeExecutedDetailComponent = {
       } else {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
-        this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
+        const analysisType = this.analysis.type;
+        this._AnalyzeActionsService.exportAnalysis(analysisId, executionId, analysisType).then(data => {
           let fields = this.getCheckedFieldsForExport(this.analysis, data);
           fields = this.checkColumnName(fields);
           const keys = map(fields, 'columnName');
@@ -201,7 +201,7 @@ export const AnalyzeExecutedDetailComponent = {
             },
             keys
           };
-          json2csv(this.formatDates(data), (err, csv) => {
+          json2csv(data, (err, csv) => {
             if (err) {
               this._$translate('ERROR_EXPORT_FAILED').then(translation => {
                 this._toastMessage.error(translation);
@@ -224,22 +224,6 @@ export const AnalyzeExecutedDetailComponent = {
         }
         return columnName;
       }
-    }
-
-    formatDates(data) {
-      const ks = keys(data[0] || {});
-      const formats = [
-        moment.ISO_8601,
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, data => {
-        forEach(ks, key => {
-          if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).format('YYYY-MM-DD');
-          }
-        });
-      });
-      return data;
     }
 
     replaceCSVHeader(csv, fields) {
@@ -292,8 +276,8 @@ export const AnalyzeExecutedDetailComponent = {
     loadLastPublishedAnalysis() {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
-        this.loadExecutionData(true)();
       }
+      this.loadExecutionData(true)();
     }
 
     loadExecutedAnalyses(analysisId) {

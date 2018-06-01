@@ -17,6 +17,9 @@ export class SidenavComponent {
   @Input() id: any;
 
   constructor(@Inject('$componentHandler') private chp: ComponentHandler) { }
+
+  public unregister: any;
+  public _moduleName: string;
   
   ngOnInit() {
   	this.unregister = this.chp.register(this.id, this);

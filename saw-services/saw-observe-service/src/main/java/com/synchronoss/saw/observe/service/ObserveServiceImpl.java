@@ -2,6 +2,8 @@ package com.synchronoss.saw.observe.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import com.synchronoss.saw.observe.ObserveUtils;
 import com.synchronoss.saw.observe.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.observe.exceptions.DeleteEntitySAWException;
@@ -17,7 +19,7 @@ import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Action;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category;
 import com.synchronoss.saw.observe.model.store.Query;
 import com.synchronoss.saw.observe.model.store.Query.Conjunction;
-import com.synchronoss.saw.store.cli.Request;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import sncr.bda.cli.Request;
+import sncr.bda.metastore.PortalDataSetStore;
 
 @Service
 public class ObserveServiceImpl implements ObserveService {
@@ -36,7 +40,13 @@ public class ObserveServiceImpl implements ObserveService {
 
   @Value("${metastore.base}")
   private String basePath;
-  private DateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+
+
+  /*
+   * 24-hr date time format.
+   * E.g.: 2018-05-25 13:08:25
+   */
+  private DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
   @Override
   public ObserveResponse addDashboard(Observe node)
@@ -65,15 +75,17 @@ public class ObserveServiceImpl implements ObserveService {
     ObserveResponse response = new ObserveResponse();
     try {
       response.setId(node.getEntityId());
-      Request request = new Request(ObserveUtils.node2JsonString(node, basePath, node.getEntityId(),
-          Action.READ, Category.USER_INTERFACE));
-      request.process();
-      String jsonStringFromStore = request.getResult().toString();
+
+      // Get the data for the given dataset id using PortalDatasetStore
+      PortalDataSetStore store = new PortalDataSetStore(basePath);
+      String id = node.getEntityId();
+
+      String jsonStringFromStore = store.read(id).toString();
       response.setMessage("Entity has been retrieved successfully");
       ObjectMapper mapper = new ObjectMapper();
       Observe observeData = mapper.readValue(jsonStringFromStore, Observe.class);
-      response =
-          ObserveUtils.prepareResponse(observeData, "Entity has been retrieved successfully");
+      response = ObserveUtils.prepareResponse(observeData,
+          "Entity has been retrieved successfully");
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);
       throw new ReadEntitySAWException(
@@ -130,11 +142,11 @@ public class ObserveServiceImpl implements ObserveService {
     try {
       Query query = new Query();
       query.setConjunction(Conjunction.AND);
-      final List<Filter> filters = new ArrayList<>();
       Filter filterCategory = new Filter();
       filterCategory.setFieldPath("categoryId");
       filterCategory.setCondition(Condition.EQ);
       filterCategory.setValue(node.getCategoryId());
+      List<Filter> filters = new ArrayList<>();
       filters.add(filterCategory);
       if (node.getCreatedBy() != null) {
         Filter filterUser = new Filter();
@@ -144,14 +156,16 @@ public class ObserveServiceImpl implements ObserveService {
         filters.add(filterUser);
       }
       query.setFilter(filters);
-      String searchQuery = ObserveUtils.node2JsonString(node, basePath, node.getEntityId(),
-          Action.SEARCH, Category.USER_INTERFACE, query);
+      String searchQuery = ObserveUtils.node2JsonString(
+          node, basePath, node.getEntityId(), Action.SEARCH, Category.USER_INTERFACE, query);
       logger.debug("Search Query getDashboardbyCategoryId :" + searchQuery);
       Request request = new Request(searchQuery);
-      request.process();
-      if (request.getSearchResultJsonArray() != null
-          && request.getSearchResultJsonArray().size() > 0) {
-        JsonElement resultArray = request.getSearchResultJsonArray();
+      JsonObject searchResult = request.search();
+
+      logger.debug("Search Result " + searchResult);
+
+      if (searchResult != null && searchResult.has("result")) {
+        JsonElement resultArray = searchResult.get("result");
         logger.debug("Entity has been retrieved successfully :" + resultArray.toString());
         Content content = new Content();
         List<Observe> observeList = new ArrayList<Observe>();
@@ -159,12 +173,13 @@ public class ObserveServiceImpl implements ObserveService {
         if (resultArray.isJsonArray()) {
           for (int i = 0, j = 1; i < resultArray.getAsJsonArray().size(); i++, j++) {
             logger.debug("Inside resultArray.isJsonArray() ");
-            logger.debug(
-                " element.isJsonArray() :" + resultArray.getAsJsonArray().get(i).isJsonArray());
-            logger.debug(" element.isJsonObject() :" + resultArray.getAsJsonArray().get(i)
-                .getAsJsonObject().getAsJsonObject(String.valueOf(j)));
-            String jsonString = resultArray.getAsJsonArray().get(i).getAsJsonObject()
-                .getAsJsonObject(String.valueOf(j)).toString();
+            logger.debug(" element.isJsonArray() :"
+                + resultArray.getAsJsonArray().get(i).isJsonArray());
+            logger.debug(" element.isJsonObject() :"
+                + resultArray.getAsJsonArray().get(i).getAsJsonObject()
+                .getAsJsonObject(String.valueOf(j)));
+            String jsonString = resultArray.getAsJsonArray().get(i)
+                .getAsJsonObject().getAsJsonObject(String.valueOf(j)).toString();
             Observe observeData = mapper.readValue(jsonString, Observe.class);
             observeList.add(observeData);
           }
@@ -173,8 +188,9 @@ public class ObserveServiceImpl implements ObserveService {
         response.setContents(content);
         response.setMessage("Entity has been retrieved successfully");
       } else {
-        response.setMessage("There is no data avaiable for the category Id & user Id"
-            + node.getCategoryId() + ":" + node.getCreatedBy());
+        response.setMessage(
+            "There is no data avaiable for the category Id & user Id"
+                + node.getCategoryId() + ":" + node.getCreatedBy());
       }
     } catch (Exception ex) {
       logger.error("While retrieving it has been found that Entity does not exist.", ex);

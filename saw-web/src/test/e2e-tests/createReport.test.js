@@ -42,7 +42,6 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -50,14 +49,13 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to Report', () => {
@@ -78,7 +76,9 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Select fields and refresh
     tables.forEach(table => {
       table.fields.forEach(field => {
+        browser.executeScript(scrollIntoView, reportDesigner.getReportFieldCheckbox(table.name, field));
         commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.getReportFieldCheckbox(table.name, field));
+        browser.sleep(500);
       });
     });
 
@@ -110,7 +110,9 @@ describe('Create report type analysis: createReport.test.js', () => {
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
     commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
-
+    // TODO: below code is not working in headless mode something is wrong with chrome. will test again and enable it.
+    // commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[@class="dx-datagrid" or contains(@class,"non-ideal-state__container ")]')));
+    //
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
@@ -143,4 +145,8 @@ describe('Create report type analysis: createReport.test.js', () => {
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
   });
+
+  var scrollIntoView = function (element) {
+    arguments[0].scrollIntoView();
+  };
 });
