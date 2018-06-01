@@ -18,7 +18,6 @@ describe('Login Tests: login.test.js', () => {
   });
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
       commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
