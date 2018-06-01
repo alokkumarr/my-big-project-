@@ -24,7 +24,6 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -32,10 +31,13 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
-      commonFunctions.openBaseUrl();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
+  });
+
+  afterAll(function () {
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
     using(userDataProvider, function (data, description) {

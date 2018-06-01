@@ -1,6 +1,5 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-var HtmlReporter = require('protractor-beautiful-reporter');
 
 /**
  * Note about intervals:
@@ -87,7 +86,7 @@ exports.config = {
         '--start-fullscreen', // enable for Mac OS
         '--headless',
         '--disable-gpu',
-        '--window-size=1280,1696'
+        '--window-size=2880,1800'
       ]
     },
     'moz:firefoxOptions': {
@@ -152,14 +151,6 @@ exports.config = {
     ]
   },
   onPrepare() {
-    // Add a screenshot reporter and store screenshots to `/target/reports`:
-    jasmine.getEnv().addReporter(new HtmlReporter({
-      baseDirectory: 'target/reports',
-      gatherBrowserLogs: false,
-      excludeSkippedSpecs: true,
-      preserveDirectory: false
-    }).getJasmine2Reporter());
-
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,
