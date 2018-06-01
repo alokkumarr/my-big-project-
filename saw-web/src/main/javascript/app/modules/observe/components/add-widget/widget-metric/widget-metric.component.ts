@@ -93,6 +93,7 @@ export class WidgetMetricComponent implements OnInit {
           {
             columnName: column.columnName,
             name: column.columnName,
+            displayName: column.displayName,
             aggregate: []
           }
         ],

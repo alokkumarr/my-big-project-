@@ -90,3 +90,9 @@ export const BULLET_CHART_OPTIONS = {
     type: 'bullet'
   }
 };
+
+export const BULLET_CHART_COLORS = [
+  { value: 'rog', b1: '#C0463F', b2: '#EE754E', b3: '#99BA33' },
+  { value: 'greys', b1: '#666', b2: '#999', b3: '#BBB' },
+  { value: 'blues', b1: '#568ED5', b2: '#8DB4E3', b3: '#DDE6F3' }
+];

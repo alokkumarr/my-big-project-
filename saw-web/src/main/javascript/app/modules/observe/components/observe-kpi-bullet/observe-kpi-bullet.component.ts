@@ -136,18 +136,19 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
     const kpiTitle = get(kpi, 'name');
     const kpiFilter = this.filterLabel();
     const primaryAggregate = get(kpi, 'dataFields.0.aggregate', []);
+    const categories = get(kpi, 'dataFields.0.displayName', '');
     this.observe.executeKPI(kpi).subscribe(res => {
       const count: number = get(
         res,
         `data.current.${dataFieldName}._${primaryAggregate}`
       );
       const { plotBands, seriesData } = this.observe.buildPlotBandsForBullet(
+        this.item.bullet.bulletPalette,
         this.item.bullet.measure1,
         this.item.bullet.measure2,
         toNumber(count),
         this.item.bullet.target
       );
-      const categories = [this.item.bullet.dataFieldDispName];
       changes.push(
         {
           path: 'title.text',
@@ -159,7 +160,7 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
         },
         {
           path: 'xAxis.categories',
-          data: categories
+          data: [categories]
         },
         {
           path: 'yAxis.plotBands',

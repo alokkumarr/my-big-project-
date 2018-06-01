@@ -39,5 +39,44 @@ widget-kpi {
         width: auto;
       }
     }
+
+    .bullet-bands {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      align-content: center;
+      padding-bottom: 9px;
+
+      & > span {
+        flex: 1 1 40%;
+      }
+
+      mat-button-toggle {
+        color: black;
+        opacity: 0.5;
+      }
+
+      .mat-button-toggle-checked {
+        opacity: 1 !important;
+      }
+
+      .rog {
+        background: linear-gradient(to right, #C0463F 0, #C0463F 33.333%, #EE754E 33.333%, #EE754E 66.666%, #99BA33 66.666%, #99BA33 100%);
+        margin-right: 1px;
+      }
+
+      .grey {
+        background: linear-gradient(to right, #666 0, #666 33.333%, #999 33.333%, #999 66.666%, #BBB 66.666%, #BBB 100%);
+        margin-right: 1px;
+      }
+
+      .blues {
+        background: linear-gradient(to right, #568ED5 0, #568ED5 33.333%, #8DB4E3 33.333%, #8DB4E3 66.666%, #DDE6F3 66.666%, #DDE6F3 100%);
+      }
+
+      .text {
+        opacity: 0.5;
+      }
+    }
   }
 }

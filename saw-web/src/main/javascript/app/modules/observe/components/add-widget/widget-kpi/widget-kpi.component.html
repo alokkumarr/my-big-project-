@@ -1,4 +1,4 @@
-<form [formGroup]="kpiForm">
+<form [formGroup]="kpiForm" autocomplete="off">
   <mat-form-field>
     <input matInput placeholder="KPI Name" formControlName="name" />
   </mat-form-field>
@@ -47,20 +47,34 @@
       {{ag.name}}
     </mat-slide-toggle>
   </div>
+  <div *ngIf="_kpiType=== 'bullet'">
+    <div class="bullet-measures">
+      <mat-form-field>
+        <input matInput type="number" placeholder="Measure 1" formControlName="measure1" />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="number" placeholder="Measure 2" formControlName="measure2" />
+      </mat-form-field>
+    </div>
+    <mat-form-field>
+      <input matInput type="number" placeholder="Metric Target" formControlName="target" />
+    </mat-form-field>
 
-  <div class="bullet-measures" *ngIf="_kpiType=== 'bullet'">
-    <mat-form-field>
-      <input matInput type="number" placeholder="Measure 1" formControlName="measure1" />
-    </mat-form-field>
-    <mat-form-field>
-      <input matInput type="number" placeholder="Measure 2" formControlName="measure2" />
-    </mat-form-field>
+    <div class="bullet-bands">
+      <span> Band Color Palette : </span>
+      <mat-button-toggle-group #bulletPalette="matButtonToggleGroup" [(ngModel)]="bandPaletteValue" [value]="bandPaletteValue" [ngModelOptions]="{standalone: true}">
+        <mat-button-toggle value="rog" class="rog">
+          <span class="text">ROG</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="greys" class="grey">
+          <span class="text">GREYS</span>
+        </mat-button-toggle>
+        <mat-button-toggle value="blues" class="blues">
+          <span class="text">BLUES</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
   </div>
-  <mat-form-field *ngIf="_kpiType=== 'bullet'">
-    <input matInput type="number" placeholder="Metric Target" formControlName="target" />
-  </mat-form-field>
-
-
   <button mat-raised-button color="primary" (click)="applyKPI()" [disabled]="kpiForm.invalid">
     Apply
   </button>
