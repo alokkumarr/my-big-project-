@@ -132,7 +132,7 @@ to the below SAW environment configuration (`saw-config`).
 Additional parameter added to control large file export from FTP/email dispatch.
 In case of any higher memory/CPU load on (saw-transport service/export service) server,
 this parameter can be set lower value.
-(In case of  high load below property can be .)
+
      saw_export_chunk_size=10000
 
 === Interfaces
