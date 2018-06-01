@@ -19,7 +19,7 @@
     </ng-container>
 
     <ng-container *ngIf="item.bullet">
-      <observe-kpi-bullet class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
+      <observe-kpi-bullet [item]="item" (onRefresh)="refreshTile($event)"
         [bulletKpi]="item.bullet" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-kpi-bullet>
     </ng-container>
   </gridster-item>

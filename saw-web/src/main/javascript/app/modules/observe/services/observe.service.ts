@@ -252,12 +252,12 @@ export class ObserveService {
         {
           from: 0,
           to: b1,
-          color: '#dc4306'
+          color: '#c0463f'
         },
         {
           from: b1,
           to: 9e9,
-          color: '#97cc0f'
+          color: '#99ba33'
         }
       );
     } else {
@@ -265,17 +265,17 @@ export class ObserveService {
         {
           from: 0,
           to: b1,
-          color: '#dc4306'
+          color: '#c0463f'
         },
         {
           from: b1,
           to: b2,
-          color: '#f5a623'
+          color: '#ee754e'
         },
         {
           from: b2,
           to: add(b2, 9e9),
-          color: '#97cc0f'
+          color: '#99ba33'
         }
       );
     }
