@@ -29,7 +29,8 @@ import {
   DesignerChangeEvent,
   ArtifactColumn,
   Format,
-  DesignerSaveEvent
+  DesignerSaveEvent,
+  AnalysisReport
 } from '../types';
 import {
   FLOAT_TYPES,
@@ -74,6 +75,8 @@ export class DesignerContainerComponent {
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
+  // minimum requirments for requesting data, obtained with: canRequestData()
+  public areMinRequirmentsMet = false;
 
   constructor(
     private _designerService: DesignerService,
@@ -165,6 +168,7 @@ export class DesignerContainerComponent {
     this.initAuxSettings();
 
     this.addDefaultSorts();
+    this.areMinRequirmentsMet = this.canRequestData();
   }
 
   initAuxSettings() {
@@ -248,8 +252,8 @@ export class DesignerContainerComponent {
   }
 
   requestDataIfPossible() {
-    this.updateAnalysis();
-    if (this.canRequestData()) {
+    this.areMinRequirmentsMet = this.canRequestData();
+    if (this.areMinRequirmentsMet) {
       this.requestData();
     } else {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -346,7 +350,6 @@ export class DesignerContainerComponent {
         });
       break;
     case 'save':
-      this.updateAnalysis();
       if (this.isInQueryMode && !this.analysis.edit) {
         this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
           if (result) {
@@ -477,6 +480,7 @@ export class DesignerContainerComponent {
       this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.areMinRequirmentsMet = this.canRequestData();
       break;
     case 'removeColumn':
       this.cleanSorts();
@@ -488,6 +492,7 @@ export class DesignerContainerComponent {
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
+      this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'submitQuery':
@@ -538,6 +543,7 @@ export class DesignerContainerComponent {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
       break;
     case 'dateInterval':
@@ -593,6 +599,7 @@ export class DesignerContainerComponent {
   }
 
   canRequestData() {
+    this.updateAnalysis();
     // there has to be at least 1 data field, to make a request
     /* prettier-ignore */
     switch (this.analysis.type) {
@@ -615,8 +622,28 @@ export class DesignerContainerComponent {
       return every(requestCondition, Boolean);
     case 'report':
     case 'esReport':
-      return true;
+      return this.canRequestReport(this.analysis.artifacts);
     }
+  }
+
+  canRequestReport(artifacts) {
+    if (this.analysis.edit) {
+      return Boolean((<AnalysisReport>this.analysis).queryManual);
+    };
+
+    let atLeastOneIsChecked = false;
+    forEach(artifacts, artifact => {
+      forEach(artifact.columns, column => {
+        if (column.checked) {
+          atLeastOneIsChecked = true;
+          return false;
+        }
+      });
+      if (atLeastOneIsChecked) {
+        return false;
+      }
+    });
+    return atLeastOneIsChecked;
   }
 
   updateAnalysis() {
