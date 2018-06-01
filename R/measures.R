@@ -168,9 +168,6 @@ rmse.tbl_spark <- function(x, predicted, actual){
 
 
 
-
-
-
 #' @export MAPE
 #' @rdname measures
 MAPE <- measure(id = "MAPE",
@@ -212,3 +209,31 @@ mape.tbl_spark <- function(x, predicted, actual){
     dplyr::collect()
 }
 
+
+#' @export Silhouette
+#' @rdname measures
+Silhouette <- measure(id = "Silhouette",
+                      method = "silhouette",
+                      method_args = list("x", "predicted", "actual"),
+                      minimize = FALSE,
+                      best = 1,
+                      worst = -1,
+                      properties = c("modeler", "segmenter"),
+                      name = "Silhouette internal cluster quality index",
+                      note = "The metric computes the Silhouette measure using the squared Euclidean distance. The Silhouette is a measure for the validation of the consistency within clusters")
+
+#' Generic silhouette function
+#' @export
+silhouette <- function(...){
+  UseMethod("silhouette")
+}
+
+
+#' @export
+#' @rdname silhouette
+silhouette.tbl_spark <- function(x, predicted) {
+  checkmate::assert_choice(predicted, colnames(x))
+
+  sparklyr::ml_clustering_evaluator(x, prediction_col = predicted) %>%
+    dplyr::collect()
+}

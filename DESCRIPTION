@@ -9,13 +9,14 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     dplyr,
-    sparklyr (>= 0.7.0),
+    sparklyr (>= 0.8.0),
     magrittr,
     reshape2,
     tidyr,
     rlang,
     zoo,
     checkmate (>= 1.8.2),
+    purrr,
 Suggests: 
      lubridate,
      testthat
