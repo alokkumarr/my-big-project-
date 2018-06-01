@@ -7,16 +7,18 @@ import {
   ViewChild,
   EventEmitter
 } from '@angular/core';
+import * as moment from 'moment';
 import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as toNumber from 'lodash/toNumber';
-import { Observable } from 'rxjs/Observable';
+import * as defaults from 'lodash/defaults';
 
 import { DATE_PRESETS_OBJ, BULLET_CHART_OPTIONS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 
+import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -57,10 +59,14 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.kpiFilterSubscription = this.dashboardService.onFilterKPI.subscribe(
+      this.onFilterKPI.bind(this)
+    );
     this.subscribeToRequester();
   }
 
   ngOnDestroy() {
+    this.kpiFilterSubscription && this.kpiFilterSubscription.unsubscribe();
     this.requesterSubscription.unsubscribe();
   }
 
@@ -84,10 +90,51 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
     this.chartUpdater.next(changes);
   }
 
+  onFilterKPI(filterModel) {
+    if (!this._kpi || !filterModel) return;
+
+    if (!filterModel.preset) return this.executeKPI(this._kpi);
+
+    const filter = defaults(
+      {},
+      {
+        model: filterModel
+      },
+      get(this._kpi, 'filters.0')
+    );
+    const kpi = defaults({}, { filters: [filter] }, this._kpi);
+
+    return this.executeKPI(kpi);
+  }
+
+  filterLabel() {
+    if (!this._executedKPI && !this._kpi) return '';
+
+    const preset = get(
+      this._executedKPI || this._kpi,
+      'filters.0.model.preset'
+    );
+    const filter = get(this.datePresetObj, `${preset}.label`);
+    if (filter === 'Custom') {
+      const gte = moment(
+        get(this._executedKPI || this._kpi, 'filters.0.model.gte'),
+        'YYYY-MM-DD HH:mm:ss'
+      ).format('YYYY/MM/DD');
+      const lte = moment(
+        get(this._executedKPI || this._kpi, 'filters.0.model.lte'),
+        'YYYY-MM-DD HH:mm:ss'
+      ).format('YYYY/MM/DD');
+      return `${gte} - ${lte}`;
+    } else {
+      return filter;
+    }
+  }
+
   executeKPI(kpi, changes = []) {
     this._executedKPI = kpi;
     const dataFieldName = get(kpi, 'dataFields.0.name');
-    const kpiName = get(kpi, 'name');
+    const kpiTitle = get(kpi, 'name');
+    const kpiFilter = this.filterLabel();
     const primaryAggregate = get(kpi, 'dataFields.0.aggregate', []);
     this.observe.executeKPI(kpi).subscribe(res => {
       const count: number = get(
@@ -104,7 +151,11 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
       changes.push(
         {
           path: 'title.text',
-          data: kpiName
+          data: kpiTitle
+        },
+        {
+          path: 'subtitle.text',
+          data: kpiFilter
         },
         {
           path: 'xAxis.categories',

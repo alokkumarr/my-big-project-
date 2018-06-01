@@ -148,8 +148,6 @@ export const bulletChartOptions = {
     type: 'bullet',
     inverted: true,
     marginLeft: 135,
-    spacingTop: 50,
-    marginTop: 100,
     height: 170
   },
   exporting: {
@@ -158,6 +156,11 @@ export const bulletChartOptions = {
   title: {
     text: ''
   },
+  subtitle: {
+    text: '',
+    align: 'right',
+    x: -10
+  },
   legend: {
     enabled: false
   },
@@ -165,7 +168,7 @@ export const bulletChartOptions = {
     series: {
       pointPadding: 0.25,
       borderWidth: 0,
-      color: '#0096d5',
+      color: '#000',
       targetOptions: {
         width: '200%'
       }

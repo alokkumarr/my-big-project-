@@ -189,10 +189,7 @@ export class DashboardGridComponent
     if (item.kpi) {
       item.dimensions = dimensions;
       return;
-    } else if (item.bullet) {
-      item.updater.next([{ path: 'chart.width', data: dimensions.width - 20 }]);
-      return;
-    }
+    } 
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
@@ -275,7 +272,10 @@ export class DashboardGridComponent
     }
 
     forEach(get(this.model, 'tiles', []), tile => {
-      if (tile.kpi) {
+      if (tile.bullet) {
+        tile.updater = new BehaviorSubject({});
+      }
+      if (tile.kpi || tile.bullet) {
         this.dashboard.push(tile);
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         setTimeout(() => {
