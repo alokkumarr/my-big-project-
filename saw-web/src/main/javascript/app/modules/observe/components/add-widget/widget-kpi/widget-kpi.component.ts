@@ -23,6 +23,8 @@ import * as assign from 'lodash/assign';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
+import * as toNumber from 'lodash/toNumber';
 
 import * as moment from 'moment';
 import { requireIf } from '../../../validators/required-if.validator';
@@ -46,6 +48,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
   _metric: any;
   _kpiType: string;
+  bandPaletteValue: string;
 
   @Output() onKPIAction = new EventEmitter();
 
@@ -184,9 +187,11 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
 
     const measure1 = get(data, 'measure1');
     measure1 && this.kpiForm.get('measure1').setValue(measure1);
-    
+
     const measure2 = get(data, 'measure2');
     measure2 && this.kpiForm.get('measure2').setValue(measure2);
+
+    this.bandPaletteValue = isUndefined(data.bulletPalette) ? 'rog' : data.bulletPalette;
 
     const dateField = get(data, 'filters.0.columnName');
     dateField && this.kpiForm.get('dateField').setValue(dateField);
@@ -258,7 +263,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    */
   applyKPI() {
     const dataField = get(this._kpi, 'dataFields.0');
-    const dataFieldDispName = get(this._kpi, 'name');
     const dateField = find(
       this._metric.dateColumns,
       col => col.columnName === this.kpiForm.get('dateField').value
@@ -271,14 +275,15 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this.onKPIAction.emit({
       kpi: assign({}, this._kpi, {
         name: this.kpiForm.get('name').value,
-        target: this.kpiForm.get('target').value,
-        measure1: this.kpiForm.get('measure1').value,
-        measure2: this.kpiForm.get('measure2').value,
-        dataFieldDispName: dataFieldDispName,
+        target: toNumber(this.kpiForm.get('target').value),
+        measure1: toNumber(this.kpiForm.get('measure1').value),
+        measure2: toNumber(this.kpiForm.get('measure2').value),
+        bulletPalette: this.bandPaletteValue,
         dataFields: [
           {
             columnName: dataField.columnName,
             name: dataField.name,
+            displayName: dataField.displayName,
             aggregate: [
               this.kpiForm.get('primAggregate').value,
               ...map(secondaryAggregates, ag => ag.value)
