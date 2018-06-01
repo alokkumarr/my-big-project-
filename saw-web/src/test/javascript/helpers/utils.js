@@ -17,6 +17,8 @@ function hasClass(element, cls) {
 function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
   // Cannot declare element before wait because of: element is not clickable error.
   commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
+  browser.sleep(100);
+  commonFunctions.waitFor.elementToBePresent(element(by.xpath('//div[contains(@class,"mat-menu-content")]')));
   commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[contains(@class,"mat-menu-content")]')));
   parentElem.element(by.css(btnSelector)).getAttribute('aria-owns').then(id => {
     if (id) {

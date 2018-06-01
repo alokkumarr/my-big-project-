@@ -48,8 +48,6 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -57,14 +55,13 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

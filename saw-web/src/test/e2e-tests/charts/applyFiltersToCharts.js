@@ -22,8 +22,6 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -31,16 +29,15 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.logOutByClearingLocalStorage();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
+
 
   it('Should apply filter to column chart', () => {
     login.loginAs('admin');
@@ -56,8 +53,9 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     // Search field and add that into dimension section.
     designModePage.chart.addFieldButton(xAxisName).click();
     browser.sleep(200);
-    const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
-    expect(doesDataNeedRefreshing).toBeTruthy();
+    // Refresh button is removed as part of 3363
+    // const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
+    // expect(doesDataNeedRefreshing).toBeTruthy();
 
     // Search field and add that into group by section.
     designModePage.chart.addFieldButton(groupName).click();
@@ -75,8 +73,8 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     let g = analyzePage.designerDialog.chart.getGroupByFields(groupName);
     commonFunctions.waitFor.elementToBeVisible(g);
     expect(g.isDisplayed()).toBeTruthy();
-
-    commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
+    // Refresh button is removed as part of 3363
+    // commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
 
     // Apply filters
     const filters = analyzePage.filtersDialogUpgraded;

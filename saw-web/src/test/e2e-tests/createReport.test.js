@@ -42,8 +42,6 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
-      commonFunctions.openBaseUrl();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -51,7 +49,7 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      commonFunctions.logOutByClearingLocalStorage();
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
