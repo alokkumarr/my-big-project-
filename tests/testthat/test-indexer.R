@@ -23,7 +23,7 @@ sim_data <- function(n_ids, n_recs, n_iter, seed = 319) {
                by = "day")
   cat1 <- c("A", "B")
   cat2 <- c("X", "Y", "Z")
-  
+
   do.call("rbind",
           replicate(n_iter,
                     {
@@ -74,7 +74,7 @@ to_char_ds <- function(df) {
       metric3 = as.character(metric3),
       index = as.character(index)
     )
-  
+
   return(char_df)
 }
 
@@ -240,28 +240,72 @@ Unit_Days_R_DS <-
           "date",
           origin = "2018-05-20",
           units = "days",
-          periods = 1)
-
-colnames(Unit_Days_R_DS)[9] <- "date_dif"
-
-Unit_Days_R_DS <- Unit_Days_R_DS %>%
-  select(id, date, Unit_Days_R_DS$`days_since_2018-05-20`) %>%
-  collect()
+          periods = 1) %>%
+  select(index, date, `days_since_2018-05-20`)
 
 Unit_Days_spark_DS <-
-  indexer(tbl, "date", origin = "2018-05-20", units = "days")
-
-Unit_Days_spark_DS <- Unit_Days_spark_DS %>%
-  select(id, date, Unit_Days_spark_DS$`days_since_2018-05-20`) %>%
-  collect()
-
-Unit_Days_spark_DS$date <-
-  as.Date(Unit_Days_spark_DS$date) + 1
-
+  indexer(tbl, "date", origin = "2018-05-20", units = "days") %>%
+  collect()  %>%
+  select(index, date, `days_since_2018-05-20`) %>%
+  as.data.frame()
 
 test_that("indexer differece between spark and R DS", {
   expect_equal(Unit_Days_R_DS, Unit_Days_spark_DS)
 })
+
+
+
+# Test 7.5 : Test months unit ---------------------------------------------
+
+df <- data.frame(today = today(), date1 = today() - days(1:31))
+df_tbl <- copy_to(sc, df %>% mutate_all(as.character), overwrite = TRUE)
+df_tbl <- mutate_all(df_tbl, funs(to_date))
+
+months_r <- indexer(df,
+                    "today",
+                    origin = "date1",
+                    units = "months",
+                    periods = 1) %>%
+  mutate_at("months_since_date1", funs(round(., 4)))
+
+months_spk <- indexer(df_tbl,
+                      "today",
+                      origin = "date1",
+                      units = "months",
+                      periods = 1) %>%
+  collect() %>%
+  as.data.frame() %>%
+  mutate_at("months_since_date1", funs(round(., 4)))
+
+
+test_that("indexer differece between spark and R DS for months units", {
+  expect_equal(months_r, months_spk)
+})
+
+
+# Test 7.75 : Test days unit ---------------------------------------------
+
+days_r <- indexer(df,
+                  "today",
+                  origin = "date1",
+                  units = "days",
+                  periods = 1) %>%
+  mutate_at("days_since_date1", funs(round(., 4)))
+
+days_spk <- indexer(df_tbl,
+                    "today",
+                    origin = "date1",
+                    units = "days",
+                    periods = 1) %>%
+  collect() %>%
+  as.data.frame() %>%
+  mutate_at("days_since_date1", funs(round(., 4)))
+
+
+test_that("indexer differece between spark and R DS for months units", {
+  expect_equal(days_r, days_spk)
+})
+
 
 
 # Test 8:Check for date difference when region and DS date --------
@@ -271,26 +315,18 @@ ds_R <-
           "date",
           origin = "2018-05-31",
           units = "months",
-          periods = 1)
+          periods = 1) %>%
+  select(index, date, `months_since_2018-05-31`)
 
 ds_sp <-
-  indexer(tbl, "date", origin = "2018-05-31", units = "months")
+  indexer(tbl, "date", origin = "2018-05-31", units = "months") %>%
+  collect()  %>%
+  select(index, date, `months_since_2018-05-31`) %>%
+  as.data.frame()
 
-ac <- ds_R %>%
-  select(., id, date, ds_R$`months_since_2018-05-31`) %>%
-  collect() %>%
-  arrange(id)
-
-sc1 <- ds_sp %>%
-  select(., id, date, ds_R$`months_since_2018-05-31`) %>%
-  collect() %>%
-  arrange(id)
-
-sc1$date <-
-  as.Date(sc1$date) + 1
 
 test_that("indexer differece between spark and R DS", {
-  expect_equal(ac, sc1)
+  expect_equal(ds_R, ds_sp)
 })
 
 
@@ -303,10 +339,14 @@ sys_year <- as.numeric(format(systm_date, format = "%Y"))
 sys_month <- as.numeric(format(systm_date, format = "%m"))
 sys_date <- as.numeric(format(systm_date, format = "%d"))
 quater_val <- sys_month / 4
-quater_of_year <- ceiling(quater)
+quater_of_year <- ceiling(quater_val)
 week_of_d <- as.numeric(format(systm_date, format = "%W"))
-day_of_week <-  as.numeric(format(systm_date, format = "%w"))
 day_of_year <-  as.numeric(format(systm_date, format = "%j"))
+
+# Indexer uses lubridate::wday() for day_of_week
+#day_of_week <-  as.numeric(format(systm_date, format = "%w"))
+day_of_week <- lubridate::wday(systm_date$today)
+
 
 mod_val <- sys_year %% 4
 remaining_days_of_yr <-

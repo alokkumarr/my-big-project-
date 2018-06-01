@@ -49,7 +49,7 @@ sc <- spark_connect(master = "local")
 
 
 
-dat <- sim_data(3, 10, 1, seed = 319) %>%
+dat <- sim_data(10, 10, 1, seed = 319) %>%
   mutate(index = row_number())
 
 dat <- dat %>%
@@ -660,7 +660,7 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      # round(5) ,
+       round(5) ,
     r_imp_mode_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%

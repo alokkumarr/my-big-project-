@@ -33,6 +33,7 @@ indexer <- function(df, measure_vars, origin, units, periods, label) {
 
 #' @rdname indexer
 #' @export
+#' @importFrom lubridate interval
 indexer.data.frame <- function(df,
                                measure_vars,
                                origin = "2000-01-01",
@@ -68,11 +69,11 @@ indexer.data.frame <- function(df,
     checkmate::assert_true(any(is.Date(origin), is.POSIXct(origin), is.Date(as.Date(origin))))
     df %>%
       dplyr::mutate_at(measure_vars,
-                       funs(!!label := interval(origin, .) / units_fun(periods)))
+                       funs(!!label := interval(., origin) / units_fun(periods) * -1))
   } else {
     df %>%
       dplyr::mutate_at(measure_vars,
-                       funs(!!label := interval(!!rlang::sym(origin), .) / units_fun(periods)))
+                       funs(!!label := interval(., !!rlang::sym(origin)) / units_fun(periods) * -1))
   }
 }
 
