@@ -17,8 +17,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
 
   const chartDesigner = analyzePage.designerDialog.chart;
-  const chartName = `e2e chart ${(new Date()).toString()}`;
-  const chartDescription = 'descr';
   let xAxisName = 'Source Manufacturer';
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
@@ -51,14 +49,14 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      expect(browser.getCurrentUrl()).toContain('/login');
+     // expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+     // analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -75,8 +73,10 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
         xAxisName = 'Activated Inactive Subscriber Count';
         groupName = 'Apps Version';
       }
+      let chartName = `e2e ${description} ${(new Date()).toString()}`;
+      let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
-      login.loginAs(data.user);
+      login.loginAsV2(data.user);
       homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();
@@ -124,6 +124,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
       analyzePage.analysisElems.cardView.click();
       //Verify if created appeared in list
+      commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
       commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
       createdAnalysis.click();
       commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);

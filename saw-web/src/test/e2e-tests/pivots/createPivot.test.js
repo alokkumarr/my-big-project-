@@ -23,14 +23,14 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -41,7 +41,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
 
   it('Should apply filter to Pivot', () => {
-    loginPage.loginAs('admin');
+    loginPage.loginAsV2('admin');
     commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
     commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
     analyzePage.analysisElems.cardView.click();
