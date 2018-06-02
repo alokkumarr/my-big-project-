@@ -11,6 +11,8 @@ const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const utils = require('../javascript/helpers/utils');
+let descriptionText;
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -398,8 +400,13 @@ describe('Privileges tests: privileges.test.js', () => {
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
       homePage.mainMenuExpandBtn.click();
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
+      homePage.subCategory(data.subCategory).click();
+      const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
+      expect(doesDataNeedRefreshing).toBeTruthy();
       homePage.mainMenuCollapseBtn.click();
+
     };
   });
 });

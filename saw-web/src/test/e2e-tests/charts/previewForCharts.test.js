@@ -86,25 +86,28 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
       // Metric section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
       designModePage.chart.addFieldButton(yAxisName).click();
-      browser.sleep(200);
       // Dimension section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
       designModePage.chart.addFieldButton(xAxisName).click();
-      browser.sleep(200);
       // Size section.
       if (data.chartType === 'chart:bubble') {
+        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
         designModePage.chart.addFieldButton(sizeByName).click();
-        browser.sleep(200);
       }
       // Group by section. i.e. Color by
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
       designModePage.chart.addFieldButton(groupName).click();
-      browser.sleep(200);
 
       // Navigate to Preview
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.previewBtn);
+      designModePage.previewBtn.click();
 
       // Verify axis to be present on Preview Mode
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
       commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
       commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
 

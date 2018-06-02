@@ -3,6 +3,7 @@ const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
+var fs = require('fs');
 
 module.exports = {
   waitFor: {
@@ -70,6 +71,11 @@ module.exports = {
   },
   scrollIntoView(element) {
     arguments[0].scrollIntoView();
+  },
+  writeScreenShot(data, filename) {
+    var stream = fs.createWriteStream(filename);
+    stream.write(new Buffer(data, 'base64'));
+    stream.end();
   },
 };
 

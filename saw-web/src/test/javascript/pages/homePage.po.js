@@ -25,6 +25,8 @@ module.exports = {
   },
   collapsedCategory: categoryName => {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
+  },category: catName =>{
+    return element(by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`));
   },
   subCategory: subCategoryName => {
     return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
@@ -42,14 +44,17 @@ module.exports = {
  */
 const navigateToSubCategoryUpdated = (categoryName, subCategoryName, defaultCategory) => {
   //Collapse default category
-  commonFunctions.waitFor.elementToBeClickableAndClick(module.exports.expandedCategoryUpdated(defaultCategory));
-  browser.sleep(2000); // TODO:This sleep is temporary fix,need to add better logic here.
-  //Navigate to Category/Sub-category
-  const collapsedCategory = module.exports.collapsedCategoryUpdated(categoryName);
+  commonFunctions.waitFor.elementToBeClickable(module.exports.expandedCategoryUpdated(defaultCategory));
+  module.exports.expandedCategoryUpdated(defaultCategory).click();
+  commonFunctions.waitFor.elementToBePresent(module.exports.category(categoryName));
+  commonFunctions.waitFor.elementToBeVisible(module.exports.category(categoryName));
+  //Navigate to Category/Sub-category, expand category
+  commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
+  module.exports.category(categoryName).click();
+
   const subCategory = module.exports.subCategory(subCategoryName);
-  commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-  browser.sleep(2000); // TODO:This sleep is temporary fix,need to add better logic here.
-  commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+  commonFunctions.waitFor.elementToBeClickable(subCategory);
+  subCategory.click();
 };
 /*
  * Navigates to specific category where analysis creation should happen
@@ -72,13 +77,14 @@ const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) =
 };
 
 const createAnalysis = (metricName, analysisType) => {
-  commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
-  browser.sleep(1000);
+  commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.addAnalysisBtn);
+  analyzePage.analysisElems.addAnalysisBtn.click();
   let count = 0;
   clickOnMetricRadioAndOnAnalysisType(metricName, analysisType, count);
 
   commonFunctions.waitFor.elementToBeEnabledAndVisible(analyzePage.newDialog.createBtn);
-  commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.newDialog.createBtn);
+  commonFunctions.waitFor.elementToBeClickable(analyzePage.newDialog.createBtn);
+  analyzePage.newDialog.createBtn.click();
 };
 
 /*
@@ -89,13 +95,14 @@ const clickOnMetricRadioAndOnAnalysisType = (metricName, analysisType, i) => {
   const newDialog = analyzePage.newDialog;
   const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
   const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
-
-  commonFunctions.waitFor.elementToBeClickableAndClick(metricElement);
+  commonFunctions.waitFor.elementToBeClickable(metricElement);
+  metricElement.click();
 
   // Check if metric selected
   browser.wait(EC.presenceOf(newDialog.getMetricSelectedRadioButtonElementByName(metricName)), 1000).then(
     function () {
-      commonFunctions.waitFor.elementToBeClickableAndClick(analysisTypeElement);
+      commonFunctions.waitFor.elementToBeClickable(analysisTypeElement);
+      analysisTypeElement.click();
     }, function (err) {
       if (err) {
         console.log("AnalysisType is not clickable. Retrying click on Metric Radio Button. Tempts done: " + (i + 1));

@@ -47,22 +47,22 @@ const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
-  commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
+  commonFunctions.waitFor.elementToBeClickable(toggle);
   toggle.click();
-  browser.sleep(500);
   const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
   menuItems.getAttribute('id').then(id => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
-      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
-      browser.sleep(500);
+      commonFunctions.waitFor.elementToBeClickable(actionButton);
+      actionButton.click();
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
         commonFunctions.waitFor.elementToBeVisible(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
-        commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        commonFunctions.waitFor.elementToBeClickable(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)).click();
       });
     }
     // actionButton.click();

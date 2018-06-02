@@ -332,14 +332,20 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
   using(dataProvider, function (data, description) {
     it('Should add filter to pivot:  ' + description, () => {
       loginPage.loginAs(data.user);
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.cardViewButton);
+
+      commonFunctions.waitFor.elementToBeVisible(homePage.cardViewButton);
+      commonFunctions.waitFor.elementToBeClickable(homePage.cardViewButton);
+      homePage.cardViewButton.click();
 
       // Create Pivot
       homePage.createAnalysis(metricName, analysisType);
 
       // Add fields (string, date, number)
+      commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(dateFieldName));
       designModePage.pivot.addFieldButton(dateFieldName).click();
+      commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(numberFieldName));
       designModePage.pivot.addFieldButton(numberFieldName).click();
+      commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(stringFieldName));
       designModePage.pivot.addFieldButton(stringFieldName).click();
 
       // Create filter object. Specify type and preset/operator
@@ -360,53 +366,69 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
         filter.columnName = stringFieldName;
       }
 
-
       // Scenario for group intervals
       if (data.groupIntervalSpecified) {
+        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName));
         designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName).click();
+        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDown);
         designModePage.pivot.groupIntervalDropDown.click();
+        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDownElement(data.groupInterval));
         designModePage.pivot.groupIntervalDropDownElement(data.groupInterval).click();
       }
 
       // Scenario for aggregate functions
       if (data.aggregateFunction) {
-        commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.aggregateFunctionButton("Sum"));
+        commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionButton("Sum"));
+        designModePage.aggregateFunctionButton("Sum").click();
         // Have to add sleep for elements to be rendered. They appear in DOM faster than they can be actually clicked
-        browser.sleep(1000);
-        commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+        commonFunctions.waitFor.elementToBeVisible(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+        commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+        designModePage.aggregateFunctionMenuItem(data.aggregateFunction).click();
       }
 
       // Add filter
       const filterWindow = designModePage.filterWindow;
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.filterBtn);
-      browser.sleep(1000); // headless mode makes fake click on columnDropDown without wait
-      commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.columnDropDown);
-      commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.columnNameDropDownItem(filter.columnName));
+      commonFunctions.waitFor.elementToBeVisible(designModePage.filterBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.filterBtn);
+      designModePage.filterBtn.click();
+      commonFunctions.waitFor.elementToBeClickable(filterWindow.columnDropDown);
+      filterWindow.columnDropDown.click();
+      commonFunctions.waitFor.elementToBeClickable(filterWindow.columnNameDropDownItem(filter.columnName));
+      filterWindow.columnNameDropDownItem(filter.columnName).click();
 
       // Scenario for dates
       if (data.fieldType === 'date') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.date.presetDropDown);
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.date.presetDropDownItem(data.preset));
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.date.presetDropDown);
+        filterWindow.date.presetDropDown.click();
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.date.presetDropDownItem(data.preset));
+        filterWindow.date.presetDropDownItem(data.preset).click();
       }
 
       // Scenario for numbers
       if (data.fieldType === 'number') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.operator);
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.operatorDropDownItem(data.operator));
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.input);
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.number.operator);
+        filterWindow.number.operator.click();
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.number.operatorDropDownItem(data.operator));
+        filterWindow.number.operatorDropDownItem(data.operator).click();
+        commonFunctions.waitFor.elementToBeVisible(filterWindow.number.input);
+        filterWindow.number.input.click();
         filterWindow.number.input.clear().sendKeys(data.value);
       }
 
       // Scenario for strings
       if (data.fieldType === 'string') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.operator);
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.operatorDropDownItem(data.operator));
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.string.operator);
+        filterWindow.string.operator.click();
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.string.operatorDropDownItem(data.operator));
+        filterWindow.string.operatorDropDownItem(data.operator).click();
         // TODO rewrite since there is layout error
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.input);
+        commonFunctions.waitFor.elementToBeVisible(filterWindow.string.input);
+        filterWindow.string.input.click();
         filterWindow.string.input.clear().sendKeys(data.value);
       }
 
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.applyFiltersBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.applyFiltersBtn);
+      designModePage.applyFiltersBtn.click();
       commonElementsPage.ifErrorPrintTextAndFailTest();
     });
   });

@@ -15,9 +15,12 @@ module.exports = {
     const passwordElem = this.loginElements.passwordField;
     const loginElem = this.loginElements.loginBtn;
 
+    commonFunctions.waitFor.elementToBeVisible(userElem);
     userElem.clear().sendKeys(user);
+    commonFunctions.waitFor.elementToBeVisible(passwordElem);
     passwordElem.clear().sendKeys(password);
-    commonFunctions.waitFor.elementToBeClickableAndClick(loginElem);
+    commonFunctions.waitFor.elementToBeClickable(loginElem);
+    loginElem.click();
     return commonFunctions.waitFor.pageToBeReady(/analyze/);
   },
 
