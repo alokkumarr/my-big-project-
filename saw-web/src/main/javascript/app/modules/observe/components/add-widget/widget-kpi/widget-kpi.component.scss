@@ -40,12 +40,17 @@ widget-kpi {
       }
     }
 
+    .target {
+      display: flex;
+      flex-direction: column;
+    }
+
     .bullet-bands {
       display: flex;
       flex-direction: row;
       align-items: center;
       align-content: center;
-      padding-bottom: 9px;
+      padding-bottom: 25px;
 
       & > span {
         flex: 1 1 40%;

@@ -23,7 +23,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 const template = require('./observe-kpi-bullet.component.html');
-require('./observe-kpi-bullet.component.scss');
 
 @Component({
   selector: 'observe-kpi-bullet',

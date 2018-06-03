@@ -30,7 +30,7 @@ export const widgetTypes: Array<WidgetType> = [
   {
     name: 'Bullet KPI',
     id: Widget.BULLET,
-    description: 'Visualize a metric performance at any point in time',
+    description: 'Metric performance at any point in time',
     disabled: false,
     icon: 'custom-widget'
   } /*, {
