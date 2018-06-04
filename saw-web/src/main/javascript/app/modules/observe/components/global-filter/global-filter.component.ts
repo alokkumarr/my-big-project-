@@ -59,16 +59,17 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   }
 
   isType(type, input) {
+    /* prettier-ignore */
     switch (type) {
-      case 'number':
-        return NUMBER_TYPES.includes(input);
+    case 'number':
+      return NUMBER_TYPES.includes(input);
 
-      case 'date':
-        return DATE_TYPES.includes(input);
+    case 'date':
+      return DATE_TYPES.includes(input);
 
-      case 'string':
-      default:
-        return type === 'string';
+    case 'string':
+    default:
+      return type === 'string';
     }
   }
 

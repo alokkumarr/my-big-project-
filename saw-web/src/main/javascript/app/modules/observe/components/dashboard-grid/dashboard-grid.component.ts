@@ -21,9 +21,11 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
 import * as flatMap from 'lodash/flatMap';
+import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
 
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
@@ -207,21 +209,36 @@ export class DashboardGridComponent
 
     const filters = get(analysis, 'sqlBuilder.filters', []);
 
+    window['gf'] = this.filters;
     this.filters.addFilter(
       filter(
-        map(filters, flt => ({
-          ...flt,
-          ...{
-            semanticId: analysis.semanticId,
-            metricName: analysis.metricName,
-            esRepository: analysis.esRepository,
-            displayName: this.filters.getDisplayNameFor(
-              columns,
-              flt.columnName,
-              flt.tableName
-            )
+        map(filters, flt => {
+          const existingFilter = find(
+            get(this.model, 'filters') || [],
+            dashFilt =>
+              dashFilt.semanticId === analysis.semanticId &&
+              dashFilt.tableName === flt.tableName &&
+              dashFilt.columnName === flt.columnName
+          );
+
+          if (existingFilter) {
+            existingFilter.isGlobalFilter = true;
           }
-        })),
+
+          return {
+            ...(existingFilter || flt),
+            ...{
+              semanticId: analysis.semanticId,
+              metricName: analysis.metricName,
+              esRepository: analysis.esRepository,
+              displayName: this.filters.getDisplayNameFor(
+                columns,
+                flt.columnName,
+                flt.tableName
+              )
+            }
+          };
+        }),
         f => f.isGlobalFilter
       )
     );
@@ -361,7 +378,7 @@ export class DashboardGridComponent
         rows: tile.rows,
         kpi: tile.kpi
       })),
-      filters: [],
+      filters: flatMap(values(this.filters.globalFilters)),
       options: [
         {
           minCols:
