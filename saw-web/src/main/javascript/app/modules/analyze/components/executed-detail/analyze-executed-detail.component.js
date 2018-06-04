@@ -276,8 +276,8 @@ export const AnalyzeExecutedDetailComponent = {
     loadLastPublishedAnalysis() {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
-        this.loadExecutionData(true)();
       }
+      this.loadExecutionData(true)();
     }
 
     loadExecutedAnalyses(analysisId) {
@@ -298,7 +298,16 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     edit() {
-      this._AnalyzeActionsService.edit(this.analysis);
+      this._AnalyzeActionsService.edit(this.analysis).then(result => {
+        if (!result) {
+          return;
+        }
+        const {isSaveSuccessful, analysis} = result;
+        if (isSaveSuccessful) {
+          this.analysis = analysis;
+          this.refreshData();
+        }
+      });
     }
 
     publish() {
