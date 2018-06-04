@@ -28,7 +28,7 @@ export const widgetTypes: Array<WidgetType> = [
     icon: 'kpi-widget'
   },
   {
-    name: 'Bullet KPI',
+    name: 'Actual vs Target KPI',
     id: Widget.BULLET,
     description: 'Metric performance at any point in time',
     disabled: false,
