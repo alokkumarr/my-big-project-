@@ -29,15 +29,18 @@ import java.time.LocalDateTime
 import scala.collection.JavaConverters._
 
 import executor.ReportExecutorQueue
+import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.engine.{Fields, MDObjectStruct, MetadataDictionary}
 import sncr.saw.common.config.SAWServiceConfig
+
+import scala.reflect.io.File
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
   val executorRegularQueue = new ReportExecutorQueue("regular")
   val executorFastQueue = new ReportExecutorQueue("fast")
   var totalRows: Int = 0;
-  
+
   /**
     * List analyses.  At the moment only used by scheduler to list
     * analyses that are scheduled.
@@ -59,7 +62,7 @@ class Analysis extends BaseController {
     val search = Map[String, Any]("isScheduled" -> "true")
     /* Get all analyses */
     val analyses = analysisNode.find(search).map {
-      _("content") match {
+      _ ("content") match {
         case obj: JObject => obj
         case obj: JValue => unexpectedElement("object", obj)
       }
@@ -72,18 +75,17 @@ class Analysis extends BaseController {
     }).map(analysis => {
       /* Return only schedule view */
       ("id", (analysis \ "id")) ~
-      ("name",(analysis \ "name")) ~
-      ("description",(analysis \ "description")) ~
-      ("metricName",(analysis \ "metricName")) ~
-      ("userFullName",(analysis \ "userFullName")) ~
-      ("schedule", (analysis \ "schedule")) ~
-      ("type", (analysis \ "type"))
+        ("name", (analysis \ "name")) ~
+        ("description", (analysis \ "description")) ~
+        ("metricName", (analysis \ "metricName")) ~
+        ("userFullName", (analysis \ "userFullName")) ~
+        ("schedule", (analysis \ "schedule")) ~
+        ("type", (analysis \ "type"))
     })
     ("analyses", analyses)
   }
 
-  def getMetadataByID (analysisId:String): Result =
-  {
+  def getMetadataByID(analysisId: String): Result = {
     handle((json, ticket) => {
       if (analysisId != null) {
         getAnalysisMetadataByID(analysisId)
@@ -92,14 +94,15 @@ class Analysis extends BaseController {
       }
     })
   }
-/** Return the analysis metadata by id field,
-  * Currently this is only used in back-end pivot table creation. */
-  private def getAnalysisMetadataByID(analysisId :String): JObject = {
+
+  /** Return the analysis metadata by id field,
+    * Currently this is only used in back-end pivot table creation. */
+  private def getAnalysisMetadataByID(analysisId: String): JObject = {
     val analysisNode = new AnalysisNode
     val search = Map[String, Any]("id" -> analysisId)
     /* Get analyses by ID */
     val analysis = analysisNode.find(search).map {
-      _("content") match {
+      _ ("content") match {
         case obj: JObject => obj
         case obj: JValue => unexpectedElement("object", obj)
       }
@@ -130,9 +133,9 @@ class Analysis extends BaseController {
             (ticket.userId, ticket.userFullName)
         }
         val instanceJson: JObject = ("semanticId", semanticId) ~
-        ("createdTimestamp", Instant.now().toEpochMilli()) ~
-        ("userId", userId.asInstanceOf[Number].longValue) ~
-        ("userFullName", userFullName)
+          ("createdTimestamp", Instant.now().toEpochMilli()) ~
+          ("userId", userId.asInstanceOf[Number].longValue) ~
+          ("userFullName", userFullName)
         val analysisId = UUID.randomUUID.toString
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
@@ -141,7 +144,7 @@ class Analysis extends BaseController {
         val mergeJson = contentsAnalyze(
           semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
         val responseJson = json merge mergeJson
-        val analysisJson = (responseJson \ "contents" \ "analyze")(0)
+        val analysisJson = (responseJson \ "contents" \ "analyze") (0)
         val analysisNode = new AnalysisNode(analysisJson)
         val semanticNode = readSemanticNode(semanticId)
         for ((category, id) <- semanticNode.getRelatedNodes) {
@@ -157,8 +160,8 @@ class Analysis extends BaseController {
       }
       case "update" => {
         m_log.trace("dataSecurityKey before processing in update: {}", dataSecurityKey);
-        var dskStr : String = ""
-        if(dataSecurityKey.size()>0){
+        var dskStr: String = ""
+        if (dataSecurityKey.size() > 0) {
           //dskStr = dataSecurityKey.asScala.mkString(",") ;
           dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
           m_log.trace("dskStr after processing in update: {}", dskStr);
@@ -184,50 +187,49 @@ class Analysis extends BaseController {
         json merge contentsAnalyze(readAnalysisJson(analysisId))
       }
       case "search" => {
-        val keys = (json \ "contents" \ "keys")(0) match {
+        val keys = (json \ "contents" \ "keys") (0) match {
           case keys: JObject => keys
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
-        m_log.debug("search key"+keys);
+        m_log.debug("search key" + keys);
         val categoryId = extractKey(json, "categoryId")
-        if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product,categoryId) && !ticket.get.roleType.equalsIgnoreCase("Admin"))
-          json merge contentsAnalyze(searchAnalysisJson(keys),ticket.get.userId.toString)
+        if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product, categoryId) && !ticket.get.roleType.equalsIgnoreCase("Admin"))
+          json merge contentsAnalyze(searchAnalysisJson(keys), ticket.get.userId.toString)
         else
           json merge contentsAnalyze(searchAnalysisJson(keys))
       }
       case "export" => {
-        val keys = (json \ "contents" \ "keys")(0) match {
+        val keys = (json \ "contents" \ "keys") (0) match {
           case keys: JObject => keys
           case obj => throw new ClientException("Expected object, got: " + obj)
-      }
-        m_log.debug("search key"+keys);
+        }
+        m_log.debug("search key" + keys);
         json merge contentsAnalyze(searchAnalysisJson(keys))
-     }
+      }
       case "execute" => {
 
         logWithTime(m_log, "Execute analysis from controller", {
           m_log.trace("dataSecurityKey before processing in execute: {}", dataSecurityKey);
-          var dskStr : String = ""
-          if(dataSecurityKey.size()>0){
+          var dskStr: String = ""
+          if (dataSecurityKey.size() > 0) {
             //dskStr = dataSecurityKey.asScala.mkString(",") ;
             dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
             m_log.trace("dskStr after processing in execute: {}", dskStr);
           }
 
           val analysisId = extractAnalysisId(json)
-	  var executionType: String = null
+          var executionType: String = null
           var queryRuntime: String = null
-            (json \ "contents" \ "analyze") match {
+          (json \ "contents" \ "analyze") match {
             case obj: JArray => {
               val analysis = analysisJson(json, dskStr)
               val analysisType = (analysis \ "type")
-    	      val typeInfo = analysisType.extract[String]
-    	      if (typeInfo.equals("report"))
-    	      {
-	        /* Build query based on analysis supplied in request body */
-                executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
-	        val runtime = (executionType == ExecutionType.onetime.toString
-            || executionType == ExecutionType.regularExecution.toString)
+              val typeInfo = analysisType.extract[String]
+              executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
+              if (typeInfo.equals("report")) {
+                /* Build query based on analysis supplied in request body */
+                val runtime = (executionType == ExecutionType.onetime.toString
+                  || executionType == ExecutionType.regularExecution.toString)
                 m_log.debug("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
@@ -236,13 +238,19 @@ class Analysis extends BaseController {
                   case obj: JString => obj.extract[String]
                   case obj => unexpectedElement("string", obj)
                 }
-              m_log.info("RUNTIME_QUERY_RUNTIME"+queryRuntime)
-              }}
+                m_log.info("RUNTIME_QUERY_RUNTIME" + queryRuntime)
+              }
+            }
             case _ => {}
           }
+          if (executionType==null || executionType.isEmpty){
+           // Consider the default Execution type as regularExecution for the backward compatibility.
+            executionType = "regularExecution"
+          }
+
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
           val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
-          contentsAnalyze(("data", data)~ ("totalRows",totalRows))
+          contentsAnalyze(("data", data) ~ ("totalRows", totalRows))
         })
 
       }
@@ -267,7 +275,7 @@ class Analysis extends BaseController {
 
   private def extractKey(json: JValue, property: String) = {
     try {
-      val JString(value) = (json \ "contents" \ "keys")(0) \ property
+      val JString(value) = (json \ "contents" \ "keys") (0) \ property
       value
     } catch {
       case e: Exception =>
@@ -275,7 +283,7 @@ class Analysis extends BaseController {
     }
   }
 
-  def analysisJson(json: JValue, DSK : String): JObject = {
+  def analysisJson(json: JValue, DSK: String): JObject = {
     val analysisListJson = json \ "contents" \ "analyze"
     val analysisJson = analysisListJson match {
       case array: JArray => {
@@ -300,26 +308,25 @@ class Analysis extends BaseController {
     }
     val analysisType = (analysisListJson \ "type");
     val typeInfo = analysisType.extract[String];
-    if ( typeInfo.equals("report") ){
-    val query = (analysis \ "queryManual") match {
-      case JNothing => QueryBuilder.build(analysis,false,DSK)
-      case obj: JString => obj.extract[String]
-      case obj => unexpectedElement("string", obj)
+    if (typeInfo.equals("report")) {
+      val query = (analysis \ "queryManual") match {
+        case JNothing => QueryBuilder.build(analysis, false, DSK)
+        case obj: JString => obj.extract[String]
+        case obj => unexpectedElement("string", obj)
+      }
+      m_log.info("REPORT_QUERY:" + query)
+      val queryJson: JObject = ("query", JString(query)) ~
+        ("outputFile",
+          ("outputFormat", "json") ~ ("outputFileName", "test.json"))
+      return analysis merge (queryJson)
     }
-      m_log.info("REPORT_QUERY:"+query)
-    val queryJson: JObject = ("query", JString(query)) ~
-    ("outputFile",
-      ("outputFormat", "json") ~ ("outputFileName", "test.json"))
-     return analysis merge(queryJson)
-    }
-    else 
-    {
-     return analysis
+    else {
+      return analysis
     }
   }
 
   private def readAnalysisJson
-    (analysisId: String, semantic: Boolean = false): JObject = {
+  (analysisId: String, semantic: Boolean = false): JObject = {
     val analysisNode = if (semantic) {
       readSemanticNode(analysisId)
     } else {
@@ -340,11 +347,11 @@ class Analysis extends BaseController {
   }
 
   private def searchAnalysisJson
-    (keys: JObject, semantic: Boolean = false): List[JObject] = {
+  (keys: JObject, semantic: Boolean = false): List[JObject] = {
     val analysisNode = new AnalysisNode
     val search = keys.extract[Map[String, Any]]
     analysisNode.find(search).map {
-      _("content") match {
+      _ ("content") match {
         case obj: JObject => obj
         case obj: JValue => unexpectedElement("object", obj)
       }
@@ -361,15 +368,17 @@ class Analysis extends BaseController {
 
   /**
     * Return the list of analysis created in my analysis category by requested user.
+    *
     * @param analyses
     * @param userId
     * @return
     */
   private def contentsAnalyze(analyses: List[JObject], userId: String): JObject = {
-    ("contents", ("analyze", JArray(analyses.filter(_.values.get("userId").get==userId.toInt))))
+    ("contents", ("analyze", JArray(analyses.filter(_.values.get("userId").get == userId.toInt))))
   }
 
   var result: String = null
+
   def setResult(r: String): Unit = result = r
 
   def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue = null, dataSecurityKeyStr: String): JValue = {
@@ -426,60 +435,65 @@ class Analysis extends BaseController {
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
+      /* skip the resultNode creation for preview/onetime execution result node */
+      // TODO:: Reverting will be handled as part of SIP-2513
+    /*  if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {*/
 
-      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
-      // The below block is for execution result to store
-      if (data != null) {
-        var nodeExists = false
-        try {
-          m_log debug s"Remove result: " + analysisResultNodeID
-          resultNode = AnalysisResult(analysisId, analysisResultNodeID)
-          nodeExists = true
+        var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+        // The below block is for execution result to store
+        if (data != null) {
+          var nodeExists = false
+          try {
+            m_log debug s"Remove result: " + analysisResultNodeID
+            resultNode = AnalysisResult(analysisId, analysisResultNodeID)
+            nodeExists = true
+          }
+          catch {
+            case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+          }
+          if (nodeExists) resultNode.delete
+
+          schema = JObject(JField("schema", JString("Does not need int the case of the Chart")))
+          descriptor = new JObject(List(
+            JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("id", JString(analysisId)),
+            JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("execution_result", JString("success")),
+            JField("type", JString("pivot")),
+            JField("execution_result", JString("success")),
+            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("exec-code", JInt(0)),
+            JField("execution_start_ts", JString(timestamp))
+          ))
+          m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
-        catch {
-          case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+        else {
+          val errorMsg = "There is no result for query criteria";
+          descriptor = new JObject(List(
+            JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("id", JString(analysisId)),
+            JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("execution_result", JString("failed")),
+            JField("execution_finish_ts", JLong(-1L)),
+            JField("type", JString("pivot")),
+            JField("exec-code", JInt(1)),
+            JField("execution_start_ts", JString(timestamp)),
+            JField("error_message", JString(errorMsg))
+          ))
         }
-        if (nodeExists) resultNode.delete
 
-        schema = JObject(JField("schema", JString("Does not need int the case of the Chart")))
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("execution_result", JString("success")),
-          JField("type", JString("pivot")),
-          JField("execution_result", JString("success")),
-          JField("execution_finish_ts", JLong(finishedTS)),
-          JField("exec-code", JInt(0)),
-          JField("execution_start_ts", JString(timestamp))
-        ))
-        m_log debug s"Create result: with content: ${compact(render(descriptor))}"
-      }
-      else {
-        val errorMsg = "There is no result for query criteria";
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("execution_result", JString("failed")),
-          JField("execution_finish_ts", JLong(-1L)),
-          JField("type", JString("pivot")),
-          JField("exec-code", JInt(1)),
-          JField("execution_start_ts", JString(timestamp)),
-          JField("error_message", JString(errorMsg))
-        ))
-      }
-
-      var descriptorPrintable: JValue = null
-      resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
-      if (data != null) {
-        resultNode.addObject("data", myArray, schema);
-        val (res, msg) = resultNode.create;
-        m_log debug s"Analysis result creation: $res ==> $msg"
-      }
-      else {
-        descriptorPrintable = descriptor
-      }
+        var descriptorPrintable: JValue = null
+        resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
+        if (data != null) {
+          resultNode.addObject("data", myArray, schema);
+          val (res, msg) = resultNode.create;
+          m_log debug s"Analysis result creation: $res ==> $msg"
+        }
+        else {
+          descriptorPrintable = descriptor
+        }
+     // }
 
       return myArray
     }
@@ -501,60 +515,65 @@ class Analysis extends BaseController {
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
       m_log.trace("esReport dataset: {}", myArray)
-
       var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
-      // The below block is for execution result to store
-      if (data != null) {
-        var nodeExists = false
-        try {
-          m_log debug s"Remove result: " + analysisResultNodeID
-          resultNode = AnalysisResult(analysisId, analysisResultNodeID)
-          nodeExists = true
-        }
-        catch {
-          case e: Exception => m_log debug("Tried to load node: {}", e.toString)
-        }
-        if (nodeExists) resultNode.delete
+      /* skip the resultNode creation for preview/onetime execution result node */
+      // TODO:: Reverting will be handled as part of SIP-2513
+     /* if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {*/
 
-        schema = JObject(JField("schema", JString("Does not need int")))
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("execution_result", JString("success")),
-          JField("type", JString("esReport")),
-          JField("execution_result", JString("success")),
-          JField("execution_finish_ts", JLong(finishedTS)),
-          JField("exec-code", JInt(0)),
-          JField("execution_start_ts", JString(timestamp))
-        ))
-        m_log debug s"Create result: with content: ${compact(render(descriptor))}"
-      }
-      else {
-        val errorMsg = "There is no result for query criteria";
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("execution_result", JString("failed")),
-          JField("execution_finish_ts", JLong(-1L)),
-          JField("type", JString("esReport")),
-          JField("exec-code", JInt(1)),
-          JField("execution_start_ts", JString(timestamp)),
-          JField("error_message", JString(errorMsg))
-        ))
-      }
+        // The below block is for execution result to store
+        if (data != null) {
+          var nodeExists = false
+          try {
+            m_log debug s"Remove result: " + analysisResultNodeID
+            resultNode = AnalysisResult(analysisId, analysisResultNodeID)
+            nodeExists = true
+          }
+          catch {
+            case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+          }
+          if (nodeExists) resultNode.delete
 
-      var descriptorPrintable: JValue = null
-      resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
-      if (data != null) {
-        resultNode.addObject("data", myArray, schema);
-        val (res, msg) = resultNode.create;
-        m_log debug s"Analysis result creation: $res ==> $msg"
-      }
-      else {
-        descriptorPrintable = descriptor
-      }
+          schema = JObject(JField("schema", JString("Does not need int")))
+          descriptor = new JObject(List(
+            JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("id", JString(analysisId)),
+            JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("execution_result", JString("success")),
+            JField("type", JString("esReport")),
+            JField("execution_result", JString("success")),
+            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("exec-code", JInt(0)),
+            JField("execution_start_ts", JString(timestamp))
+          ))
+          m_log debug s"Create result: with content: ${compact(render(descriptor))}"
+        }
+        else {
+          val errorMsg = "There is no result for query criteria";
+          descriptor = new JObject(List(
+            JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("id", JString(analysisId)),
+            JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("execution_result", JString("failed")),
+            JField("execution_finish_ts", JLong(-1L)),
+            JField("type", JString("esReport")),
+            JField("exec-code", JInt(1)),
+            JField("execution_start_ts", JString(timestamp)),
+            JField("error_message", JString(errorMsg))
+          ))
+        }
+
+        var descriptorPrintable: JValue = null
+        resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
+        if (data != null) {
+          resultNode.addObject("data", myArray, schema);
+          val (res, msg) = resultNode.create;
+          m_log debug s"Analysis result creation: $res ==> $msg"
+        }
+        else {
+          descriptorPrintable = descriptor
+        }
+     // }
 
       return getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray)
     }
@@ -571,59 +590,63 @@ class Analysis extends BaseController {
       }
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
-      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
-      // The below block is for execution result to store
-      if (data != null) {
-        var nodeExists = false
-        try {
-          m_log debug s"Remove result: " + analysisResultNodeID
-          resultNode = AnalysisResult(analysisId, analysisResultNodeID)
-          nodeExists = true
+      /* skip the resultNode creation for preview/onetime execution result node */
+      // TODO:: Reverting will be handled as part of SIP-2513
+     /* if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {*/
+        var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+        // The below block is for execution result to store
+        if (data != null) {
+          var nodeExists = false
+          try {
+            m_log debug s"Remove result: " + analysisResultNodeID
+            resultNode = AnalysisResult(analysisId, analysisResultNodeID)
+            nodeExists = true
+          }
+          catch {
+            case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+          }
+          if (nodeExists) resultNode.delete
+
+          schema = JObject(JField("schema", JString("Does not need int the case of the Chart")))
+          descriptor = new JObject(List(
+            JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("id", JString(analysisId)),
+            JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("type", JString("chart")),
+            JField("execution_result", JString("success")),
+            JField("exec-code", JInt(0)),
+            JField("execution_start_ts", JString(timestamp))
+          ))
+          m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
-        catch {
-          case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+        else {
+          val errorMsg = "There is no result for query criteria";
+          descriptor = new JObject(List(
+            JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("id", JString(analysisId)),
+            JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+            JField("execution_result", JString("failed")),
+            JField("execution_finish_ts", JLong(-1L)),
+            JField("type", JString("chart")),
+            JField("exec-code", JInt(1)),
+            JField("execution_start_ts", JString(timestamp)),
+            JField("error_message", JString(errorMsg))
+          ))
         }
-        if (nodeExists) resultNode.delete
 
-        schema = JObject(JField("schema", JString("Does not need int the case of the Chart")))
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("execution_finish_ts", JLong(finishedTS)),
-          JField("type", JString("chart")),
-          JField("execution_result", JString("success")),
-          JField("exec-code", JInt(0)),
-          JField("execution_start_ts", JString(timestamp))
-        ))
-        m_log debug s"Create result: with content: ${compact(render(descriptor))}"
-      }
-      else {
-        val errorMsg = "There is no result for query criteria";
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-          JField("execution_result", JString("failed")),
-          JField("execution_finish_ts", JLong(-1L)),
-          JField("type", JString("chart")),
-          JField("exec-code", JInt(1)),
-          JField("execution_start_ts", JString(timestamp)),
-          JField("error_message", JString(errorMsg))
-        ))
-      }
-
-      var descriptorPrintable: JValue = null
-      resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
-      if (data != null) {
-        resultNode.addObject("data", myArray, schema);
-        val (res, msg) = resultNode.create;
-        m_log debug s"Analysis result creation: $res ==> $msg"
-      }
-      else {
-        descriptorPrintable = descriptor
-      }
-
+        var descriptorPrintable: JValue = null
+        resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
+        if (data != null) {
+          resultNode.addObject("data", myArray, schema);
+          val (res, msg) = resultNode.create;
+          m_log debug s"Analysis result creation: $res ==> $msg"
+        }
+        else {
+          descriptorPrintable = descriptor
+        }
+     // }
       m_log.trace("chart dataset: {}", myArray)
       return myArray
     }
@@ -662,7 +685,7 @@ class Analysis extends BaseController {
             case ExecutionType.regularExecution => executorRegularQueue
             case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
-          executorQueue.send(executionTypeEnum, analysisId, resultId, query)
+          executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
         })
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
@@ -685,24 +708,20 @@ class Analysis extends BaseController {
         }
         else {
           /* Load execution results from data lake (instead of from Spark driver) */
-          execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
-            .limit(DLConfiguration.rowLimit)
-            .iterator.asScala
-            .foreach(line => {
-              val resultsRow = new java.util.HashMap[String, (String, Object)]
-              parse(line) match {
-                case obj: JObject => {
-                  /* Convert the parsed JSON to the data type expected by the
-                   * loadExecution method signature */
-                  val rowMap = obj.extract[Map[String, Any]]
-                  rowMap.keys.foreach(key => {
-                    rowMap.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
-                  })
-                  resultData.add(resultsRow)
-                }
-                case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
-              }
-            })
+          /* Performance consideration: For preview and one time analysis execution,no need to
+            create resultNode, transport service will directly read data from data lake for */
+          // TODO:: Reverting and will be handled as part of SIP-2513
+        /*  if (executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+            || executionType.equalsIgnoreCase(ExecutionType.preview.toString)) {
+            val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(DLConfiguration.commonLocation) +
+              File.separator + "preview-" + execution.getId
+            val resultStream = execution.loadOneTimeExecution(outputLocation, DLConfiguration.rowLimit)
+            prepareResultDataFromStream(resultStream, resultData)
+          }
+          else {*/
+            val resultStream = execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
+            prepareResultDataFromStream(resultStream, resultData)
+         // }
           m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
           m_log.trace("when data is not available in cache size of limit {}", limit);
           m_log.trace("when data is not available in cache size of start {}", start);
@@ -725,37 +744,39 @@ class Analysis extends BaseController {
   }
 
   import scala.collection.JavaConversions._
-  def processReportResult(data: util.List[util.Map[String, (String, Object)]]) : JValue = {
-    if ( data == null || data.isEmpty) return JArray(List())
+
+  def processReportResult(data: util.List[util.Map[String, (String, Object)]]): JValue = {
+    if (data == null || data.isEmpty) return JArray(List())
     JArray(data.map(m => {
-       JObject(m.keySet().map(k =>
-          JField(k, m.get(k)._1 match {
-            case "StringType" => JString(m.get(k)._2.asInstanceOf[String])
-            case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
-            case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
-            case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
-            case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
-            /* It is possible that the data type information returned from the
-             * Spark SQL Executor might not always come through
-             * reliably.  So as a fallback also perform conversions
-             * based on the Java object classes.  */
-            case dataType => m.get(k)._2 match {
-              case obj: String => JString(obj)
-              case obj: java.lang.Integer => JInt(obj.intValue())
-              case obj: java.lang.Long => JLong(obj.longValue())
-              case obj: java.lang.Float => JDouble(obj.floatValue())
-              case obj: java.lang.Double => JDouble(obj.doubleValue())
-              case obj: java.lang.Boolean => JBool(obj.booleanValue())
-              case obj: java.sql.Date => JLong(obj.getTime())
-              case obj: scala.math.BigInt => JLong(obj.toLong)
-              case obj =>
-                throw new RuntimeException(
-                  "Unsupported data type in result: " + dataType
-                    + ", object class: " + obj.getClass.getName)
-            }
-          })
-         ).toList
-       )}
+      JObject(m.keySet().map(k =>
+        JField(k, m.get(k)._1 match {
+          case "StringType" => JString(m.get(k)._2.asInstanceOf[String])
+          case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
+          case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
+          case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+          case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
+          /* It is possible that the data type information returned from the
+           * Spark SQL Executor might not always come through
+           * reliably.  So as a fallback also perform conversions
+           * based on the Java object classes.  */
+          case dataType => m.get(k)._2 match {
+            case obj: String => JString(obj)
+            case obj: java.lang.Integer => JInt(obj.intValue())
+            case obj: java.lang.Long => JLong(obj.longValue())
+            case obj: java.lang.Float => JDouble(obj.floatValue())
+            case obj: java.lang.Double => JDouble(obj.doubleValue())
+            case obj: java.lang.Boolean => JBool(obj.booleanValue())
+            case obj: java.sql.Date => JLong(obj.getTime())
+            case obj: scala.math.BigInt => JLong(obj.toLong)
+            case obj =>
+              throw new RuntimeException(
+                "Unsupported data type in result: " + dataType
+                  + ", object class: " + obj.getClass.getName)
+          }
+        })
+      ).toList
+      )
+    }
     ).toList)
   }
 
@@ -769,8 +790,8 @@ class Analysis extends BaseController {
     }) ~ (name, value)
   }
 
-  private def getESReportData(executionId: String, page: Int,pageSize: Int, analysisType: String,data: JValue): JValue = {
-    if ( analysisType.equalsIgnoreCase("esReport")) {
+  private def getESReportData(executionId: String, page: Int, pageSize: Int, analysisType: String, data: JValue): JValue = {
+    if (analysisType.equalsIgnoreCase("esReport")) {
       var pagingData: JValue = null
       val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
       data.extract[scala.List[Map[String, Any]]]
@@ -789,5 +810,26 @@ class Analysis extends BaseController {
       pagingData
     }
     else throw new Exception("Unsupported data format")
+  }
+
+  private def prepareResultDataFromStream(resultStream: java.util.stream.Stream[String],
+                                          resultData: java.util.List[java.util.Map[String, (String, Object)]]): Unit = {
+    resultStream.limit(DLConfiguration.rowLimit)
+      .iterator.asScala
+      .foreach(line => {
+        val resultsRow = new java.util.HashMap[String, (String, Object)]
+        parse(line) match {
+          case obj: JObject => {
+            /* Convert the parsed JSON to the data type expected by the
+            * loadExecution method signature */
+            val rowMap = obj.extract[Map[String, Any]]
+            rowMap.keys.foreach(key => {
+              rowMap.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
+            })
+            resultData.add(resultsRow)
+          }
+          case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
+        }
+      })
   }
 }

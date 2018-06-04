@@ -179,6 +179,38 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
 
 
   /**
+    * The function executes statement with row limit, registers it as @param viewName
+    * BUT it does not load data to data cache
+    *
+    * @param viewName - temp view/table name
+    * @param sql  - statement to execute
+    * @param limit - limit the rows
+    * @return - result indicator
+    */
+  protected def execute(viewName: String, sql: String,limit : Integer) : (Integer, String) = {
+    try{
+      m_log debug s"Execute SQL: $sql, view name: $viewName"
+      val newSql = createSQlWithLimit(sql,limit)
+      m_log.debug("Onetime/Preview sql : "+newSql)
+      val newDf = sparkSession.sql(newSql)
+      newDf.createOrReplaceTempView(viewName)
+      if (nativeloadedData.get(viewName).isDefined) nativeloadedData -= viewName
+      nativeloadedData += (viewName -> newDf)
+      lastUsed = System.currentTimeMillis
+    }
+    catch{
+      case x: Throwable => {
+        val m = s"Could not execute SQL for view/object $viewName"
+        m_log.error(m, x)
+
+        return ( ProcessingResult.Error.id, m + ": " + x.getMessage)
+      }
+    }
+    (ProcessingResult.Success.id, "Success")
+  }
+
+
+  /**
     * The method materializes Dataset on local machine to Iterator.
     * It could be a preview data (data sample) or
     * It could be entire data file - BE CAREFUL
@@ -222,7 +254,21 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     loadedData += (viewName -> data)
   }
 
-
+  /**
+    * Create SQl with limit for performance improvements.
+    * @param sql
+    * @param limit
+    * @return
+    */
+   private def createSQlWithLimit(sql : String ,limit :Integer): String =
+   {
+     val tokens = sql.trim.split("\\s+")
+    val keyword = tokens.filter(t => t.equalsIgnoreCase("LIMIT"))
+     if (keyword==null || keyword.isEmpty)
+       sql+" LIMIT "+limit
+     else
+       sql
+   }
 
   /**
     * Save data object with doName into location in given format
