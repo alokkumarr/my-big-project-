@@ -63,7 +63,7 @@ module.exports = {
     browser.actions().dragAndDrop(dragElement, dropElement).mouseUp().perform();
   },
   openBaseUrl() {
-    browser.driver.get(protractorConf.config.baseUrl);
+    browser.get(protractorConf.config.baseUrl);
   },
   logOutByClearingLocalStorage() {
     browser.executeScript('window.sessionStorage.clear();');
