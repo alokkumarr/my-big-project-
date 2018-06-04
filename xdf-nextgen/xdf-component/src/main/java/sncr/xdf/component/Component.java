@@ -394,6 +394,7 @@ public abstract class Component {
     public static int startComponent(Component self, String dataLakeRoot, String config, String app, String batch)
     {
         logger.debug(String.format("Component [%s] has been started...", self.componentName));
+        logger.info("Component Config = " + config);
 
         try {
             if (self.Init(config, app, batch, dataLakeRoot) == 0) {

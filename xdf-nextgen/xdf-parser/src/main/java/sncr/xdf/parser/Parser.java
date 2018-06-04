@@ -385,8 +385,11 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private Map<String, Object> getOutputDatasetDetails() {
         Map<String, Object> outputDataset = null;
 
+        logger.info("Outputs = " + outputs);
+        logger.info("Output DS = " + outputDataSets);
+
         outputDataset = outputs.get(DATASET.output.toString());
-        logger.debug("Rejected dataset = " + outputDataset);
+        logger.debug("Output dataset = " + outputDataset);
 
         return outputDataset;
     }
