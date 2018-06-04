@@ -22,11 +22,7 @@ public class WebSecurityConfig extends
     http
       .headers().cacheControl().disable()
         .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Origin", "*"))
-        .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"))
-        .addHeaderWriter(new StaticHeadersWriter("Cache-Control", "private, max-age=86400, stale-while-revalidate=604800"));
-        
-    	
-    http.headers().frameOptions().disable();
+        .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"));
         
     
     http

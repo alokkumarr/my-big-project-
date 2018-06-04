@@ -11,6 +11,8 @@ const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const utils = require('../javascript/helpers/utils');
+let descriptionText;
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -289,14 +291,14 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -307,7 +309,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
-        loginPage.loginAs(data.user);
+        loginPage.loginAsV2(data.user);
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
@@ -398,8 +400,13 @@ describe('Privileges tests: privileges.test.js', () => {
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
       homePage.mainMenuExpandBtn.click();
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
+      homePage.subCategory(data.subCategory).click();
+      const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
+      expect(doesDataNeedRefreshing).toBeTruthy();
       homePage.mainMenuCollapseBtn.click();
+
     };
   });
 });

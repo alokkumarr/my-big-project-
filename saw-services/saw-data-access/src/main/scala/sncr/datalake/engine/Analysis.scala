@@ -87,12 +87,13 @@ class Analysis(val analysisId : String) {
     * the execution object, but no need for the Spark SQL executor to do anything with it
     */
 
-  def executeAndWait(execType: ExecutionType, sqlRuntime: String = null, resultId: String = null) : AnalysisExecution =
+  def executeAndWait(execType: ExecutionType, sqlRuntime: String = null, resultId: String = null,
+                     limit: Integer = DLConfiguration.rowLimit) : AnalysisExecution =
   {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType, resultId)
     logWithTime(m_log, "Execute Spark SQL query", {
-      analysisExecution.startExecution(sqlRuntime)
+      analysisExecution.startExecution(sqlRuntime,limit)
     })
     startTS = analysisExecution.getStartedTimestamp
     finishedTS = analysisExecution.getFinishedTimestamp

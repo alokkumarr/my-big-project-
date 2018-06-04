@@ -22,14 +22,14 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      expect(browser.getCurrentUrl()).toContain('/login');
+     // expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+     // analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -40,7 +40,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
 
   it('Should apply filter to column chart', () => {
-    login.loginAs('admin');
+    login.loginAsV2('admin');
 
     // Create analysis
     homePage.createAnalysis(metricName, analysisType);
@@ -51,18 +51,19 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
 
     // Search field and add that into dimension section.
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
     designModePage.chart.addFieldButton(xAxisName).click();
-    browser.sleep(200);
     // Refresh button is removed as part of 3363
     // const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
     // expect(doesDataNeedRefreshing).toBeTruthy();
 
     // Search field and add that into group by section.
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
     designModePage.chart.addFieldButton(groupName).click();
-    browser.sleep(200);
     // Search field and add that into metric section.
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
     designModePage.chart.addFieldButton(yAxisName).click();
-    browser.sleep(200);
+
     // Check selected field is present in respective section.
     let y = analyzePage.designerDialog.chart.getMetricsFields(yAxisName);
     commonFunctions.waitFor.elementToBeVisible(y);
@@ -80,12 +81,13 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const filters = analyzePage.filtersDialogUpgraded;
     const filterAC = filters.getFilterAutocomplete(0);
     const fieldName = yAxisName;
-
-    commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.filterBtn);
+    commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
+    chartDesigner.filterBtn.click();
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     designModePage.filterWindow.numberInputUpgraded.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
-    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
+    filters.applyBtn.click();
 
     //TODO: Need to check that filters applied or not.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterText);
