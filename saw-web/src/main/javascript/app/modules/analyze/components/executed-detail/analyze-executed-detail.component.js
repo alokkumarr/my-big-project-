@@ -277,7 +277,10 @@ export const AnalyzeExecutedDetailComponent = {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
       }
-      this.loadExecutionData(true)();
+
+      if (!['report', 'esReport'].includes(this.analysis.type)) {
+        this.loadExecutionData(true)();
+      }
     }
 
     loadExecutedAnalyses(analysisId) {
