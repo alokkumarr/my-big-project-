@@ -72,7 +72,7 @@ public class HFileOperations {
         try {
             Path path = new Path(fileName);
             Configuration conf = new Configuration();
-            fs = FileSystem.get(conf);
+            fs = getFileSystem(path,conf);
             FSDataOutputStream fout_stream = fs.create(path, true);
             return fout_stream.getWrappedStream();
         } catch (Exception e) {
