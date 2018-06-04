@@ -226,6 +226,10 @@ export const ReportGridDisplayComponent = {
         const isNumberType = NUMBER_TYPES.includes(column.type);
 
         this.addAggregateConditionalFormat(column);
+        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        if (aggregate && ['count'].includes(aggregate.value)) {
+          column.type = aggregate.type || column.type;
+        }
 
         const field = {
           caption: column.aliasName || column.alias || column.displayName || column.name,
@@ -242,10 +246,8 @@ export const ReportGridDisplayComponent = {
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
         }
-        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
-        if (aggregate && ['percentage', 'count'].includes(aggregate.value)) {
-          field.dataType = aggregate.type || column.type;
-        }
+
+        console.log(field);
         return field;
       });
     }
