@@ -246,7 +246,6 @@ export const ReportGridDisplayComponent = {
         if (aggregate && ['count'].includes(aggregate.value)) {
           field.dataType = aggregate.type || column.type;
         }
-        console.log(field);
         return field;
       });
     }
