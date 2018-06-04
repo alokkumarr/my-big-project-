@@ -42,9 +42,9 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     .appName("SAW-SQL-Executor::" + (if(sessionName == "unnamed") id else sessionName))
     .getOrCreate()
 
-   /* ToDo:: Below spark listener doesn't work with spark 2.1 to find the records count
-     Looks new listeners are added in spark 2.2 same needs to be validated once we upgrade
-     spark version*/
+   /* ToDo:: Below spark listener doesn't work with spark 2.1 to find the records count.
+     As per spark community, new listeners added in spark 2.2 and same needs to be
+     validated while spark version upgrade */
 
   /* var recordsWrittenCount = 0l*/
  /* sparkSession.sparkContext.addSparkListener(new SparkListener() {
@@ -306,6 +306,10 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
         /** Workaround : Spark ignores the null values fields while writing Datasets into JSON files.
           * convert the null values into default values for corresponding data type
           * (For example : String as "", int/double as 0 and 0.0 etc.) to preserve column with null values. */
+        /**
+          * Dataframe is persisted to avoid revaluation, this can be removed once
+          * logic moved to spark listener implementation, since with current spark 2.1 version
+          * spark listener doesn't work as expected */
         val dfWithDefaultValue = df.na.fill("").na.fill(0).persist(StorageLevel.MEMORY_AND_DISK_2)
         dfWithDefaultValue.write.json(location);
         m_log.info("recordCount: " + dfWithDefaultValue.count())
