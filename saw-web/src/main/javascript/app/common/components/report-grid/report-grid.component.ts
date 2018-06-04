@@ -22,7 +22,7 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
-import {AGGREGATE_TYPES_OBJ} from '../../consts.js';
+import {AGGREGATE_TYPES_OBJ, DATE_FORMATS_OBJ} from '../../consts.js';
 import {
   ArtifactColumnReport,
   Artifact,
@@ -329,7 +329,13 @@ export class ReportGridComponent {
         let type = column.type;
         if (aggregate && ['count'].includes(aggregate.value)) {
           type = aggregate.type || column.type;
-          isNumberType = true;
+          isNumberType = true;          
+          if (DATE_FORMATS_OBJ[column.format]) {
+            delete column.format;
+            column.format = {
+              comma : false
+            }
+          }
         }
         const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
         const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
@@ -360,6 +366,7 @@ export class ReportGridComponent {
       !NUMBER_TYPES.includes(type)) {
       return format;
     }
+
     return {
       ...format,
       precision: DEFAULT_PRECISION,
