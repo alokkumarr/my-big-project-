@@ -6,6 +6,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isFunction from 'lodash/isFunction';
 import * as moment from 'moment';
 import '../../../../../../../../node_modules/ng-pick-datetime/assets/style/picker.min.css';
 
@@ -167,6 +168,12 @@ export class CronJobSchedularComponent {
     this.regenerateCron(event);
   }
 
+  afterPickerClosed(element) {
+    if (element && isFunction(element.blur)) {
+      element.blur();
+    }
+  }
+
   generateImmediateSchedule(value) {
     this.scheduleType = 'immediate';
     this.immediate.immediatetype = 'currenttime';
@@ -227,7 +234,7 @@ export class CronJobSchedularComponent {
     }
   }
 
-  cronChange() {
+  cronChange(e) {
     this.startDate = '';
     this.endDate = '';
     if (this.scheduleType !== 'immediate') {

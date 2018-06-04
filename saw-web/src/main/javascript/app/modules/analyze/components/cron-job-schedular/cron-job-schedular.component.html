@@ -122,18 +122,22 @@
   <label>
       Start Date:
       <input [owlDateTimeTrigger]="dt12" [owlDateTime]="dt12" [max]="selectedMoments[1]"
+             class="cron-scheduler__input"
              [(ngModel)]="selectedMoments"
              [selectMode]="'rangeFrom'"
+             #startDateInput
              (ngModelChange)="cronChange()" />
-      <owl-date-time #dt12></owl-date-time>
+      <owl-date-time #dt12 (afterPickerClosed)="afterPickerClosed(startDateInput)" ></owl-date-time>
   </label>
   <label style="margin-left: 5px;">
       End Date:
       <input [owlDateTimeTrigger]="dt13" [owlDateTime]="dt13" [min]="selectedMoments[0]"
+             class="cron-scheduler__input"
              [(ngModel)]="selectedMoments"
              [selectMode]="'rangeTo'"
+             #endDateInput
              (ngModelChange)="cronChange()" />
-      <owl-date-time #dt13></owl-date-time>
+      <owl-date-time #dt13 (afterPickerClosed)="afterPickerClosed(endDateInput)" ></owl-date-time>
   </label>
   <span class="clear" (click)="selectedMoments = []">Clear</span><br/>
 </div>
