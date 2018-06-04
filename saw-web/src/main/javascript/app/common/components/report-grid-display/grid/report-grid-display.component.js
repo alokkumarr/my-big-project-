@@ -14,7 +14,7 @@ import DataSource from 'devextreme/data/data_source';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES, INT_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES, INT_TYPES, AGGREGATE_TYPES_OBJ} from '../../../consts.js';
 import {getFormatter} from '../../../utils/numberFormatter';
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -242,7 +242,10 @@ export const ReportGridDisplayComponent = {
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
         }
-
+        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        if (aggregate && ['percentage', 'count'].includes(aggregate.value)) {
+          field.dataType = aggregate.type || column.type;
+        }
         return field;
       });
     }
