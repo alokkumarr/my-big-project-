@@ -17,7 +17,6 @@ import 'devextreme/ui/data_grid';
 import 'jquery';
 import 'mottle';
 import 'ng-idle';
-import AppConfig from '../../../../../appConfig';
 // import from login module
 import { SearchBoxComponent } from './components/search-box';
 import 'devextreme/integration/jquery';
@@ -31,6 +30,8 @@ import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import { UIRouterModule } from '@uirouter/angular';
 import { BrowserModule } from '@angular/platform-browser';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
 import {
   DxPivotGridModule,
   DxPivotGridComponent,
@@ -80,6 +81,12 @@ import {
 } from './services/ajs-common-providers';
 import { CommonServiceModule } from './services';
 
+import {
+  jwtServiceProvider,
+  userServiceProvider
+} from '../../login/services/ajs-login-providers';
+import AppConfig from '../../../../../appConfig';
+
 export const CommonModule = 'CommonModule';
 
 const moduleDependencies = [
@@ -114,8 +121,8 @@ angular
   })
   .directive('searchBox', downgradeComponent({component: SearchBoxComponent}))
   .factory('AuthService', AuthServiceFactory)
-  .service('UserService', UserService)
-  .service('JwtService', JwtService);
+  .service('JwtService', JwtService)
+  .service('UserService', UserService);
 
 @NgModule({
   imports: [
@@ -222,7 +229,9 @@ angular
     ErrorDetailDialogService,
     toastProvider,
     ChartService,
-    componentHandlerProvider
+    componentHandlerProvider,
+    jwtServiceProvider,
+    userServiceProvider
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

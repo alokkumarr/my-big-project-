@@ -7,32 +7,24 @@
     <span>have an account yet contact your system administrator</span>
   </div>
 
-  <form name="loginForm" method="post">
+  <form name="loginForm" class="login-form" method="post">
     <div class="error-msg"
-         ng-bind="$ctrl.states.error"></div>
+         [innerHtml]="states.error"></div>
 
-    <md-input-container>
-      <label>Username</label>
-      <input type="text" maxlength="30" required
-             ng-model="$ctrl.dataHolder.username"/>
-    </md-input-container>
+    <mat-form-field>
+      <input matInput maxlength="30" [(ngModel)]="dataHolder.username"  [ngModelOptions]="{standalone: true}" placeholder="Username" required />
+    </mat-form-field>
     <br/>
 
-    <md-input-container>
-      <label>Password</label>
-      <input type="password" maxlength="30" required
-             ng-model="$ctrl.dataHolder.password"/>
-    </md-input-container>
+    <mat-form-field>
+      <input matInput type="password" maxlength="30" [(ngModel)]="dataHolder.password"  placeholder="Password" [ngModelOptions]="{standalone: true}" required />
+    </mat-form-field>
 
-    <div class="login-buttons"
-         layout="row" layout-align="space-between center">
-      <md-button ng-click="$ctrl.reset()" class="md-primary">Forgot Password?</md-button>
-      <md-button class="btn-primary"
-                 type="submit"
-                 ng-disabled="loginForm.$invalid"
-                 ng-click="loginForm.$valid && $ctrl.login()">Login
-      </md-button>
-
+    <div class="login-buttons button-row">
+      <div class="forgot-password">
+        <a (click)="reset()">Forgot Password?</a>  
+      </div>
+      <button mat-raised-button color="primary" type="submit" (click)="login()">Login</button>
     </div>
   </form>
 </div>

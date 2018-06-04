@@ -7,3 +7,11 @@
       ng-if="$ctrl.searchTerm && !$ctrl.analyses.length">
   <span translate="NO_MATCHING_RESULTS"></span>
 </div>
+<div class="analyze-view_no-results"
+      ng-if="!$ctrl.searchTerm && $ctrl.analysisType !== 'all' && $ctrl.analyses && !($ctrl.analyses | filter:$ctrl.filterReports).length">
+  <span translate="NO_ANALYSES_FOR_TYPE"></span>
+</div>
+<div class="analyze-view_no-results"
+      ng-if="!$ctrl.searchTerm && $ctrl.analysisType === 'all' && $ctrl.analyses && !$ctrl.analyses.length">
+  <span translate="NO_ANALYSES_FOR_CATEGORY"></span>
+</div>

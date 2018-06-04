@@ -1,4 +1,4 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
+const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
@@ -47,26 +47,34 @@ const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
-  commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
+  commonFunctions.waitFor.elementToBeClickable(toggle);
   toggle.click();
-
-  toggle.getAttribute('aria-owns').then(id => {
+  const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
+  menuItems.getAttribute('id').then(id => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
-      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+      commonFunctions.waitFor.elementToBeClickable(actionButton);
+      actionButton.click();
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
         commonFunctions.waitFor.elementToBeVisible(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
-        commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        commonFunctions.waitFor.elementToBeClickable(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)).click();
       });
     }
     // actionButton.click();
   });
 };
 
+const getAnalysisActionOptionsNew = name => {
+  return getMdSelectOptionsNew({
+    parentElem: getCard(name),
+    btnSelector: 'button[e2e="actions-menu-toggle"]'
+  });
+};
 const getAnalysisActionOptions = name => {
   return getMdSelectOptions({
     parentElem: getCard(name),
@@ -173,8 +181,6 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 
 const doAccountAction = action => {
   navigateToHome();
-  browser.executeScript('window.sessionStorage.clear();');
-  browser.executeScript('window.localStorage.clear();');
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
     btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
@@ -188,7 +194,7 @@ const doAccountAction = action => {
 };
 
 function navigateToHome() {
-  browser.driver.get(webpackHelper.sawWebUrl());
+  browser.get(browser.baseUrl);
   return browser.driver.wait(() => {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
@@ -264,6 +270,7 @@ module.exports = {
     getStringFilterInput: getStringFilterInputUpgraded,
     getNumberFilterInput: getNumberFilterInputUpgraded,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
+    getAppliedFilterUpdated: feild => element(by.xpath(`//mat-chip[contains(text(),"${feild}")]`)),
     getAppliedFilter: getAppliedFilterUpgraded,
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
@@ -278,12 +285,14 @@ module.exports = {
     getAnalysisChartType
   },
   main: {
+    actionMenuOptions : element(by.xpath('//div[contains(@class,"mat-menu-panel")]')),
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
     getAnalysisCards: getCards,
     getCardTitle,
     doAnalysisAction,
     getAnalysisActionOptions,
+    getAnalysisActionOptionsNew,
     confirmDeleteBtn: element(by.css('button[e2e="confirm-dialog-ok-btn"]')),
     doAccountAction,
     firstCard,

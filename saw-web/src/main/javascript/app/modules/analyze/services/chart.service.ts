@@ -280,8 +280,8 @@ export class ChartService {
     case 'spline':
     case 'stack':
     case 'scatter':
-    case 'tsspline':
-    case 'tsPane':
+    case 'tsline':
+    case 'tsareaspline':
     default:
       return config;
     }
@@ -438,9 +438,9 @@ export class ChartService {
       return 'spline';
     case 'area':
       return 'areaspline';
-    case 'tsspline':
+    case 'tsline':
       return 'spline';
-    case 'tsPane':
+    case 'tsareaspline':
       return 'spline';
     default:
       return type;
@@ -502,7 +502,7 @@ export class ChartService {
       type: splinifiedChartType,
       dataType: type,
       yAxis:
-        chartType === 'tsPane' || chartTypeOverride === 'tsPane'
+        chartType === 'tsareaspline' || chartTypeOverride === 'tsareaspline'
           ? index
           : comboGroups[comboType],
       zIndex,
@@ -560,8 +560,8 @@ export class ChartService {
       aggrsymbol = '%';
     }
     if (!isUndefined(comboType)) {
-      if (comboType === 'tsspline' || comboType === 'tsPane') {
-        comboType = comboType === 'tsPane' ? 'spline' : comboType.slice(2);
+      if (comboType === 'tsline' || comboType === 'tsareaspline') {
+        comboType = comboType === 'tsareaspline' ? 'spline' : comboType.slice(2);
       }
     }
 
@@ -796,7 +796,7 @@ export class ChartService {
   getYAxesChanges(type, fields, opts) {
     const panes = fields.length;
     const labelHeight = 15;
-    if (type !== 'tsPane') {
+    if (type !== 'tsareaspline') {
       const changes = fpPipe(
         fpGroupBy('comboType'),
         fpToPairs,
@@ -981,8 +981,8 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'bubble':
-    case 'tsspline':
-    case 'tsPane':
+    case 'tsline':
+    case 'tsareaspline':
     default:
       changes = this.getBarChangeConfig(
         type,
@@ -1203,8 +1203,8 @@ export class ChartService {
         groupBy
       };
       break;
-    case 'tsspline':
-    case 'tsPane':
+    case 'tsline':
+    case 'tsareaspline':
       xaxis = this.filterDateTypes(attributes);
       settingsObj = {
         xaxis,

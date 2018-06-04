@@ -68,8 +68,8 @@ export const AnalyzeNewComponent = {
               this.isOfType(method, 'chart:pie') ||
               this.isOfType(method, 'chart:combo') ||
               this.isOfType(method, 'chart:area') ||
-              this.isOfType(method, 'chart:tsspline') ||
-              this.isOfType(method, 'chart:tsPane')) :
+              this.isOfType(method, 'chart:tsline') ||
+              this.isOfType(method, 'chart:tsareaspline')) :
             false;
           set(method, 'disabled', !isSupported);
         });
@@ -133,8 +133,8 @@ export const AnalyzeNewComponent = {
       case 'chart:bubble':
       case 'chart:area':
       case 'chart:combo':
-      case 'chart:tsspline':
-      case 'chart:tsPane':
+      case 'chart:tsline':
+      case 'chart:tsareaspline':
         this.openUpgradedModal();
         return;
       default:

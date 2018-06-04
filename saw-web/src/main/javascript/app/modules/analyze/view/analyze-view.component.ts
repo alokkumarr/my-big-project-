@@ -79,8 +79,10 @@ export class AnalyzeViewComponent implements OnInit {
   onAction(event: AnalyzeViewActionEvent) {
     switch(event.action) {
     case 'fork':
-    case 'edit':
       this.loadAnalyses();
+      break;
+    case 'edit':
+      this.spliceAnalyses(event.analysis, true);
       break;
     case 'delete':
       this.spliceAnalyses(event.analysis, false);
@@ -97,6 +99,7 @@ export class AnalyzeViewComponent implements OnInit {
 
   onViewChange(view) {
     this.viewMode = view;
+    this._localStorage.set(VIEW_KEY, view);
   }
 
   onAnalysisTypeChange(type) {

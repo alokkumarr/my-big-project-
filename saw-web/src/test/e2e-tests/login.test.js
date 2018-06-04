@@ -13,31 +13,30 @@ describe('Login Tests: login.test.js', () => {
     'admin': {user: users.admin.loginId},
     'user': {user: users.userOne.loginId},
   };
-
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  });
   beforeEach(function (done) {
     setTimeout(function () {
-      commonFunctions.openBaseUrl();
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.logOutByClearingLocalStorage();
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(userDataProvider, function (data, description) {
     it('Should successfully logged in by ' + description, function () {
-      loginPage.userLogin(data.user, users.anyUser.password);
+      loginPage.userLoginV2(data.user, users.anyUser.password);
       expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
     });
   });

@@ -36,6 +36,8 @@
   "MORE": "More",
   "NEVER": "Never",
   "NO_MATCHING_RESULTS": "No matching results",
+  "NO_ANALYSES_FOR_TYPE": "There are no Analyses of selected type.",
+  "NO_ANALYSES_FOR_CATEGORY": "There are no Analyses for this category.",
   "N_FILTERS_APPLIED": "{N, plural, one{1 Filter} other{# Filters} } Applied",
   "NTH_WEEK": "{N, selectordinal, one{#st} two{#nd} few{#rd} other{#th} } Week",
   "OCCURENCES": "occurences",

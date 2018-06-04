@@ -2,6 +2,10 @@
   yum:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: present
+  register: result
+  until: 'result.rc == 0'
+  retries: 5
+  delay: 10
 - name: Install NGINX package
   yum: name=nginx state=present
 - name: Install NGINX SAW proxy configuration

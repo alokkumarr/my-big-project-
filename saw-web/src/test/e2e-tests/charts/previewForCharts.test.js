@@ -48,24 +48,20 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.openBaseUrl();
-      expect(browser.getCurrentUrl()).toContain('/login');
+     // expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
-      commonFunctions.logOutByClearingLocalStorage();
+    //  analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -79,57 +75,41 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
       let chartTyp = data.chartType.split(":")[1];
 
-      login.loginAs(data.user);
+      login.loginAsV2(data.user);
       homePage.mainMenuExpandBtn.click();
-      navigateToSubCategory();
+      homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();
-
       //Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
       // Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-      // Search field and add that into metric section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
-      // Search field and add that into dimension section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
-
-      // Search field and add that into size section.
+      // Metric section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
+      designModePage.chart.addFieldButton(yAxisName).click();
+      // Dimension section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
+      designModePage.chart.addFieldButton(xAxisName).click();
+      // Size section.
       if (data.chartType === 'chart:bubble') {
-        analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
+        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
+        designModePage.chart.addFieldButton(sizeByName).click();
       }
-      // Search field and add that into group by section. i.e. Color by
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
+      // Group by section. i.e. Color by
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
+      designModePage.chart.addFieldButton(groupName).click();
 
       // Navigate to Preview
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.previewBtn);
+      designModePage.previewBtn.click();
 
       // Verify axis to be present on Preview Mode
       commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
       commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
 
-    // Navigates to specific category where analysis creation should happen
-    const navigateToSubCategory = () => {
-      //Collapse default category
-      commonFunctions.waitFor.elementToBeClickable(homePage.category(defaultCategory))
-      homePage.category(defaultCategory).click();
-
-      //Navigate to Category/Sub-category
-      commonFunctions.waitFor.elementToBeClickable(homePage.category(categoryName));
-      homePage.category(categoryName).click();
-
-      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(subCategoryName));
-      const subCategory = homePage.subCategory(subCategoryName).click();
-    };
   });
 });
