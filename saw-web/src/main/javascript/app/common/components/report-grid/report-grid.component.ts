@@ -327,7 +327,7 @@ export class ReportGridComponent {
         let isNumberType = NUMBER_TYPES.includes(column.type);
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
         let type = column.type;
-        if (aggregate && ['percentage', 'count'].includes(aggregate.value)) {
+        if (aggregate && ['count'].includes(aggregate.value)) {
           type = aggregate.type || column.type;
           isNumberType = true;
         }

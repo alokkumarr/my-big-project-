@@ -243,9 +243,10 @@ export const ReportGridDisplayComponent = {
           field.format = 'yyyy-MM-dd';
         }
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
-        if (aggregate && ['percentage', 'count'].includes(aggregate.value)) {
+        if (aggregate && ['count'].includes(aggregate.value)) {
           field.dataType = aggregate.type || column.type;
         }
+        console.log(field);
         return field;
       });
     }
