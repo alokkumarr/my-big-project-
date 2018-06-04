@@ -45,7 +45,6 @@ module.exports = {
             optionSelector: `button[e2e="account-settings-selector-logout"]`
           });
           commonFunctions.logOutByClearingLocalStorage();
-          browser.waitForAngular();
           expect(browser.getCurrentUrl()).toContain('/login');
           return self.userLogin(user, password);
         }

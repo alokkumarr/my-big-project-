@@ -277,7 +277,10 @@ export const AnalyzeExecutedDetailComponent = {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
       }
-      this.loadExecutionData(true)();
+
+      if (!['report', 'esReport'].includes(this.analysis.type)) {
+        this.loadExecutionData(true)();
+      }
     }
 
     loadExecutedAnalyses(analysisId) {
@@ -298,7 +301,16 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     edit() {
-      this._AnalyzeActionsService.edit(this.analysis);
+      this._AnalyzeActionsService.edit(this.analysis).then(result => {
+        if (!result) {
+          return;
+        }
+        const {isSaveSuccessful, analysis} = result;
+        if (isSaveSuccessful) {
+          this.analysis = analysis;
+          this.refreshData();
+        }
+      });
     }
 
     publish() {

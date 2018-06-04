@@ -16,6 +16,7 @@ import sncr.datalake.engine.Analysis
 import sncr.datalake.engine.ExecutionType
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import files.HFileOperations
+import sncr.datalake.DLConfiguration
 import sncr.saw.common.config.SAWServiceConfig
 
 import scala.reflect.io.File
@@ -82,7 +83,8 @@ class ReportExecutorQueue(val executorType: String) {
   /**
    * Send request to execute report to queue
    */
-  def send(executionType: ExecutionType, analysisId: String, resultId: String, query: String) {
+  def send(executionType: ExecutionType, analysisId: String, resultId: String, query: String,
+           limit: Integer = DLConfiguration.rowLimit ) {
     /* Automatically create queue before sending if it does not exist */
     createIfNotExists()
     log.debug("Starting send: {}", executorType)
@@ -93,7 +95,7 @@ class ReportExecutorQueue(val executorType: String) {
       "org.apache.kafka.common.serialization.StringSerializer")
     val producer = new KafkaProducer[String, String](properties)
     producer.send(new ProducerRecord[String, String](
-      ExecutorTopic, executionType + "," + analysisId + "," + resultId + "," + query))
+      ExecutorTopic, executionType + "," + analysisId + "," + resultId +","+limit + "," + query ))
     producer.flush
     producer.close
     log.debug("Finished send")
@@ -127,7 +129,7 @@ class ReportExecutorQueue(val executorType: String) {
     val records = consumer.poll(pollTimeout)
     val executions = records.asScala.map(record => {
       log.debug("Received message: {} {}", executorType, record: Any);
-      val Array(executionType, analysisId, resultId, query) = record.value.split(",", 4)
+      val Array(executionType, analysisId, resultId , limit, query) = record.value.split(",",5)
       val executionTypeEnum = executionType match {
         case "preview" => ExecutionType.preview
         case "onetime" => ExecutionType.onetime
@@ -137,7 +139,7 @@ class ReportExecutorQueue(val executorType: String) {
       }
       /* Save execution as a function to be invoked only after MapR streams
        * consumer has been closed */
-      () => execute(analysisId, resultId, query, executionTypeEnum)
+      () => execute(analysisId, resultId, query, executionTypeEnum,Integer.parseInt(limit))
     })
     /* Close MapR streams consumer before starting to execute, to unblock
      * other consumers that need to read messages from the same
@@ -151,11 +153,11 @@ class ReportExecutorQueue(val executorType: String) {
     executions.foreach(_())
   }
 
-  private def execute(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
+  private def execute(analysisId: String, resultId: String, query: String, executionType: ExecutionType,limit : Integer ) {
     try {
       log.debug("Executing analysis {}, result {}", analysisId, resultId: Any)
       val analysis = new Analysis(analysisId)
-      analysis.executeAndWait(executionType, query, resultId)
+      analysis.executeAndWait(executionType, query, resultId,limit)
     } catch {
       case e: Exception =>
         log.error("Error while executing analysis " + analysisId, e)

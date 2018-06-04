@@ -82,7 +82,7 @@ export class ToolbarActionDialogComponent {
         const result: IToolbarActionResult = {
           isSaveSuccessful: true,
           analysis: this.data.analysis
-        }
+        };
         this.dialogRef.close(result);
       });
   }
