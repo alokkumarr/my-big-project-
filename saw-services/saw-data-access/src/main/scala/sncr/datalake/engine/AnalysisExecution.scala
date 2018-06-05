@@ -257,8 +257,11 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
                 val rowMap = obj.extract[Map[String, Any]]
                 rowMap.keys.foreach(key => {
                   if (key.equalsIgnoreCase("recordCount")) {
-                    rowCount = Long.unbox(rowMap.get(key))
-                  };
+                    rowMap.get(key) match {
+                      case Some(count) =>
+                        rowCount = count.asInstanceOf[BigInt].toLong
+                    }
+                  }
                 })
               }
           }})})

@@ -56,15 +56,22 @@ class AnalysisExecutions extends BaseController {
 
         /* To maintain the backward compatibility check the row count with
            execution result */
-        if(totalRows==0) {
+        if (totalRows == 0) {
           totalRows = execution.loadExecution(executionId).count()
-           if(totalRows>0) {
-             log.info("recordCount"+ totalRows)
-             // if count not available in node and fetched from execution result, add count for next time reuse.
-             val resultNode = AnalysisResult(null, executionId)
-             resultNode.getObject("dataLocation")
-               DLSession.createRecordCount(String.valueOf(resultNode.getObject("dataLocation")),totalRows);
-           }
+          if (totalRows > 0) {
+            log.info("recordCount" + totalRows)
+            // if count not available in node and fetched from execution result, add count for next time reuse.
+            val resultNode = AnalysisResult(null, executionId)
+            resultNode.getObject("dataLocation") match {
+              case Some(dir: String) => {
+                // Get list of all files in the execution result directory
+                DLSession.createRecordCount(dir, totalRows)
+              }
+              case obj => {
+                log.debug("Data location not found for results: {}", executionId)
+              }
+            }
+          }
         }
         // result holder
         val data = new java.util.ArrayList[java.util.Map[String, (String, Object)]]

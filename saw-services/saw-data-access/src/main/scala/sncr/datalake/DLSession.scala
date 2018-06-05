@@ -413,7 +413,7 @@ object DLSession
     var node = mapper.createObjectNode()
     var os = HFileOperations.writeToFile(location+ File.separator+"_recordCount")
     node.put("recordCount",recordCount)
-    os.write(node.binaryValue())
+    os.write(mapper.writeValueAsBytes(node))
     os.flush()
     os.close()
   }
