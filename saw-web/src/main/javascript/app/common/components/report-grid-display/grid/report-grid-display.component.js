@@ -232,10 +232,6 @@ export const ReportGridDisplayComponent = {
           column.type = aggregate.type || column.type;
         }
 
-        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
-        if (aggregate && ['count'].includes(aggregate.value)) {
-          column.type = aggregate.type || column.type;
-        }
         const field = {
           caption: column.aliasName || column.alias || column.displayName || column.name,
           dataField: this.getDataField(column),
