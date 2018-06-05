@@ -1,10 +1,15 @@
 package sncr.datalake
 
+import java.io.OutputStream
 import java.util
 import java.util.UUID
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
+import files.HFileOperations
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.storage.StorageLevel
 import org.json4s.JsonAST.{JString, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -13,6 +18,7 @@ import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.metadata.engine.ProcessingResult
 
 import scala.collection.mutable
+import scala.reflect.io.File
 
 /**
   * This is base class to be used for all SAW related Spark executors.
@@ -35,6 +41,20 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   lazy val sparkSession = SparkSession.builder().config(sparkConf)
     .appName("SAW-SQL-Executor::" + (if(sessionName == "unnamed") id else sessionName))
     .getOrCreate()
+
+   /* ToDo:: Below spark listener doesn't work with spark 2.1 to find the records count.
+     As per spark community, new listeners added in spark 2.2 and same needs to be
+     validated while spark version upgrade */
+
+  /* var recordsWrittenCount = 0l*/
+ /* sparkSession.sparkContext.addSparkListener(new SparkListener() {
+    override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
+      synchronized {
+        recordsWrittenCount += taskEnd.taskMetrics.outputMetrics.recordsWritten
+      }
+    }
+  })*/
+
 
   /**
     * loadedData - java collection contains ONLY data sample
@@ -286,12 +306,22 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
         /** Workaround : Spark ignores the null values fields while writing Datasets into JSON files.
           * convert the null values into default values for corresponding data type
           * (For example : String as "", int/double as 0 and 0.0 etc.) to preserve column with null values. */
-        val dfWithDefaultValue = df.na.fill("").na.fill(0)
-        dfWithDefaultValue.write.json(location); (ProcessingResult.Success.id, "Data have been successfully saved as json file")
+        /**
+          * Dataframe is persisted to avoid revaluation, this can be removed once
+          * logic moved to spark listener implementation, since with current spark 2.1 version
+          * spark listener doesn't work as expected */
+        val dfWithDefaultValue = df.na.fill("").na.fill(0).persist(StorageLevel.MEMORY_AND_DISK_2)
+        dfWithDefaultValue.write.json(location);
+        m_log.info("recordCount: " + dfWithDefaultValue.count())
+        DLSession.createRecordCount(location,dfWithDefaultValue.count())
+        // unpersist the dataframe to release memory.
+        dfWithDefaultValue.unpersist()
+        (ProcessingResult.Success.id, "Data have been successfully saved as json file")
+
       case _ =>  (ProcessingResult.Success.id,  ErrorCodes.UnsupportedFormat + ": " + format )
+
     }
   }
-
 
   import scala.collection.JavaConversions._
 
@@ -378,6 +408,16 @@ object DLSession
     }).toList
   }
 
+  def createRecordCount(location :String , recordCount:Long ): Unit = {
+    var mapper = new ObjectMapper()
+    var node = mapper.createObjectNode()
+    var os = HFileOperations.writeToFile(location+ File.separator+"_recordCount")
+    node.put("recordCount",recordCount)
+    os.write(mapper.writeValueAsBytes(node))
+    os.flush()
+    os.close()
+  }
+
   val sessions: mutable.LinkedHashMap[String, DLSession] = new mutable.LinkedHashMap()
   lazy val cManager = new CacheManagement
 
@@ -390,4 +430,5 @@ object DLSession
   def convert(df: DataFrame, limit: Int): util.List[util.Map[String, (String, Object)]] = convert(df.head(limit), df.dtypes)
 
   DLConfiguration.initSpark()
+
 }
