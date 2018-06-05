@@ -7,7 +7,6 @@ export const AnalyzeCardsViewComponent = {
   bindings: {
     analyses: '<',
     analysisType: '<',
-    filter: '<',
     onAction: '&',
     searchTerm: '<',
     cronJobs: '<'

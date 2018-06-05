@@ -4,8 +4,14 @@ FROM centos/systemd
 # Enable installing documentation for packages
 RUN sed -i -e '/^tsflags=nodocs$/d' /etc/yum.conf
 
-# Install system utilities
+# Make EPEL package repository available
 RUN yum -y -q --nogpgcheck install epel-release
+# Workaround: The repository mirrors seem to have an issue which
+# causes "repomd.xml does not match metalink for epel" errors, so
+# enable the repository baseurl for now.
+RUN sed -i -e 's/^#baseurl=/baseurl=/' /etc/yum.repos.d/epel.repo
+
+# Install system utilities
 RUN yum -y -q --nogpgcheck install man less file iproute lsof nc bind-utils \
     smem sudo mlocate
 
