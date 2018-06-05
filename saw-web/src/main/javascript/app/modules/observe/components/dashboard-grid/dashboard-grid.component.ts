@@ -81,6 +81,7 @@ export class DashboardGridComponent
 
     this.columns = this.getMinColumns();
     this.options = {
+      disableWindowResize: true,
       gridType: 'scrollVertical',
       minCols: this.columns,
       maxCols: 100,

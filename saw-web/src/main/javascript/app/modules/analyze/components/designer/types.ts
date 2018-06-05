@@ -25,7 +25,8 @@ import {
   DesignerToolbarAciton,
   IToolbarActionResult,
   Artifact,
-  Format
+  Format,
+  AnalysisDialogData
 } from '../../types';
 
 export {
@@ -53,7 +54,8 @@ export {
   IToolbarActionResult,
   Format,
   Join,
-  JsPlumbCanvasChangeEvent
+  JsPlumbCanvasChangeEvent,
+  AnalysisDialogData
 };
 
 export type ArtifactColumnFilter = {
@@ -109,3 +111,8 @@ export type DesignerChangeEvent = {
   column?: ArtifactColumn;
   data?: any;
 };
+
+export type DesignerSaveEvent = {
+  isSaveSuccessful: boolean,
+  analysis: Analysis
+}

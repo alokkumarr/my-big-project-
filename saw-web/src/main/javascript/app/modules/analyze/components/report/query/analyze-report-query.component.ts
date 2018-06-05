@@ -28,7 +28,7 @@ require('./analyze-report-query.component.scss');
 })
 export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @Input() query: string;
-  @Output() change = new EventEmitter<string>();
+  @Output() queryChange = new EventEmitter<string>();
 
   @ViewChild('editor') editor: AceEditorComponent;
 
@@ -127,6 +127,6 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   }
 
   queryUpdated(query) {
-    this.change.emit(query);
+    this.queryChange.emit(query);
   }
 }
