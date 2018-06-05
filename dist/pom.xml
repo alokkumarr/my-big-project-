@@ -277,10 +277,21 @@
           </machine>
           <images>
             <image>
-              <name>saw:${project.version}</name>
-              <alias>saw</alias>
+              <name>sip-base:${project.version}</name>
               <build>
                 <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
+                <dockerFile>Dockerfile-base</dockerFile>
+              </build>
+              <run>
+                <skip>true</skip>
+              </run>
+            </image>
+            <image>
+              <name>sip-admin:${project.version}</name>
+              <alias>sip-admin</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
+                <dockerFile>Dockerfile-admin</dockerFile>
                 <assembly>
                   <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                           xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
@@ -306,10 +317,6 @@
                 <network>
                   <name>saw</name>
                 </network>
-                <ports>
-                  <port>+saw.docker.ip:saw.docker.port:80</port>
-                  <port>+saw.docker.ip:saw.journal.port:19531</port>
-                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <!-- Restart containers when Docker engine comes up
@@ -339,8 +346,96 @@
               </run>
             </image>
             <image>
-              <name>saw-mapr:${project.version}</name>
-              <alias>saw-mapr</alias>
+              <name>sip-proxy:${project.version}</name>
+              <alias>sip-proxy</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
+                <dockerFile>Dockerfile-proxy</dockerFile>
+              </build>
+              <run>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <ports>
+                  <port>+saw.docker.ip:saw.docker.port:80</port>
+                </ports>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-base:${project.version}</name>
+              <!-- Note: The node has a suffix "1", because additional
+                   SAW nodes might be added for high availability
+                   configurations -->
+              <alias>sip-saw1</alias>
+              <run>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-base:${project.version}</name>
+              <alias>sip-saw2</alias>
+              <run>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <!-- Development environments are for now by default
+                     only single SAW node environments, at least until
+                     everyone has moved to cloud deployments with more
+                     memory.  So skip running the second SAW container
+                     by default. -->
+                <skip>true</skip>
+                <wait>
+                  <healthy>true</healthy>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-elastic:${project.version}</name>
+              <alias>sip-elastic</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
+                <dockerFile>Dockerfile-elastic</dockerFile>
+              </build>
+              <run>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-mapr:${project.version}</name>
+              <alias>sip-mapr</alias>
               <build>
                 <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
               </build>
@@ -348,7 +443,6 @@
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
-                  <alias>saw-mapr</alias>
                 </network>
                 <ports>
                   <port>+saw.docker.ip:saw.mapr.web.port:8443</port>
