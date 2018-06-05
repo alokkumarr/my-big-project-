@@ -18,25 +18,25 @@ describe('Login Tests: login.test.js', () => {
   });
   beforeEach(function (done) {
     setTimeout(function () {
-      //expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    //commonFunctions.logOutByClearingLocalStorage();
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(userDataProvider, function (data, description) {
     it('Should successfully logged in by ' + description, function () {
-      loginPage.userLoginV2(data.user, users.anyUser.password);
+      loginPage.userLogin(data.user, users.anyUser.password);
       expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
     });
   });
