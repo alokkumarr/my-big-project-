@@ -91,10 +91,10 @@ exports.config = {
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
-    }// not using right now, so commented
-    // 'moz:firefoxOptions': {
-    //   args: ['--headless']
-    // }
+    },// not using right now, so commented
+    'moz:firefoxOptions': {
+      args: ['--headless']
+    }
   },
   jasmineNodeOpts: {
     defaultTimeoutInterval: defaultTimeoutInterval,
@@ -175,15 +175,15 @@ exports.config = {
       //   output/junitresults-example2.xml
       consolidateAll: true
     });
-
-    let HtmlReporter = require('protractor-beautiful-reporter');
-    jasmine.getEnv().addReporter(new HtmlReporter({
-      baseDirectory: 'target/reports',
-      excludeSkippedSpecs: true,
-      takeScreenShotsForSkippedSpecs: true,
-      preserveDirectory: false,
-      gatherBrowserLogs: false
-    }).getJasmine2Reporter());
+    // Commented below code to check wthether that causes e2e failures in bamboo.
+    // let HtmlReporter = require('protractor-beautiful-reporter');
+    // jasmine.getEnv().addReporter(new HtmlReporter({
+    //   baseDirectory: 'target/reports',
+    //   excludeSkippedSpecs: true,
+    //   takeScreenShotsForSkippedSpecs: true,
+    //   preserveDirectory: false,
+    //   gatherBrowserLogs: false
+    // }).getJasmine2Reporter());
 
     jasmine.getEnv().addReporter(junitReporter);
 
