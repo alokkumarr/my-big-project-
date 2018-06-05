@@ -85,7 +85,6 @@ exports.config = {
       args: [
         '--disable-extensions',
         '--disable-web-security',
-        '--reduce-security-for-testing',
         '--start-fullscreen', // enable for Mac OS
         '--headless',
         '--disable-gpu',

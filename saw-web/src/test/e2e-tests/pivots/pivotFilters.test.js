@@ -313,14 +313,14 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   beforeEach(function (done) {
     setTimeout(function () {
-      //expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-     // analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -331,7 +331,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   using(dataProvider, function (data, description) {
     it('Should add filter to pivot:  ' + description, () => {
-      loginPage.loginAsV2(data.user);
+      loginPage.loginAs(data.user);
 
       commonFunctions.waitFor.elementToBeVisible(homePage.cardViewButton);
       commonFunctions.waitFor.elementToBeClickable(homePage.cardViewButton);

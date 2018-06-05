@@ -42,14 +42,14 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-     // expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-     // analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -59,7 +59,7 @@ describe('Create report type analysis: createReport.test.js', () => {
   });
 
   it('Should apply filter to Report', () => {
-    loginPage.loginAsV2('admin');
+    loginPage.loginAs('admin');
 
     // Switch to Card View
     commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
@@ -109,14 +109,16 @@ describe('Create report type analysis: createReport.test.js', () => {
     const fieldName = tables[0].fields[0];
 
     commonFunctions.waitFor.elementToBeClickable(reportDesigner.filterBtn);
+
     reportDesigner.filterBtn.click()
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
     commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
     filters.applyBtn.click();
+    browser.sleep(1000);
     // TODO: below code is not working in headless mode something is wrong with chrome. will test again and enable it.
     // commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[@class="dx-datagrid" or contains(@class,"non-ideal-state__container ")]')));
-    //
+    // Verify the applied filters
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     commonFunctions.waitFor.elementToBeVisible(appliedFilter);
