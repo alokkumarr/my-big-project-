@@ -135,9 +135,13 @@ public abstract class Component {
 
                 mdOutputDSMap = new HashMap<>();
                 final int[] rc = {0};
+
+
                 ctx.componentConfiguration.getOutputs().forEach(o ->
                 {
-                    logger.debug("Add output object to data object repository: " + o.getDataSet());
+                    logger.debug("Output Object = " + o);
+                    logger.info("Add output object to data object repository: " + o.getDataSet());
+
 
                     if (!mddl.discoverAndvalidateOutputDataSet(outputDataSets.get(o.getDataSet()))){
                         error = "Could not validate output dataset: " + o.getDataSet();
@@ -176,6 +180,7 @@ public abstract class Component {
                 });
                 if (rc[0] != 0) return rc[0];
             }
+            logger.info(mdOutputDSMap);
             return 0;
 
         } catch (Exception e) {

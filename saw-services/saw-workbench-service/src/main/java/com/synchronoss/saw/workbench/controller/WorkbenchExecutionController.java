@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sncr.xdf.component.Component;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -87,6 +88,7 @@ public class WorkbenchExecutionController {
     ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
     ObjectNode xdfOutput = xdfOutputs.addObject();
     xdfOutput.put("dataSet", name);
+    xdfOutput.put("name", Component.DATASET.output.name());
     /* Invoke XDF component */
     return workbenchExecutionService.execute(project, name, component, xdfConfig.toString());
   }
