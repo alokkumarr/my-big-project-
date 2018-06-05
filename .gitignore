@@ -1,9 +1,8 @@
 derby.log
-/logs
+logs/
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-.derby.log
 metastore_db/
 a2munge.Rproj
