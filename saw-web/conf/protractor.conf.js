@@ -83,8 +83,9 @@ exports.config = {
     maxInstances: 4,
     chromeOptions: {
       args: [
-        'disable-extensions',
-        'disable-web-security',
+        '--disable-extensions',
+        '--disable-web-security',
+        "--reduce-security-for-testing",
         '--start-fullscreen', // enable for Mac OS
         '--headless',
         '--disable-gpu',
