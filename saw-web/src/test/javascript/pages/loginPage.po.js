@@ -44,7 +44,7 @@ module.exports = {
             btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
             optionSelector: `button[e2e="account-settings-selector-logout"]`
           });
-          browser.waitForAngular();
+          commonFunctions.logOutByClearingLocalStorage();
           expect(browser.getCurrentUrl()).toContain('/login');
           return self.userLogin(user, password);
         }
