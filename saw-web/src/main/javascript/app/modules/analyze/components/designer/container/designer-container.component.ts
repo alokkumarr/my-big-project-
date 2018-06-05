@@ -214,6 +214,23 @@ export class DesignerContainerComponent {
     return artifacts;
   }
 
+  checkNodeForSorts() {
+    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+    const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
+    forEach(this.sorts, sort => {
+      forEach(sqlBuilder.nodeFields || [], node => {
+        // check if sort already exits for this particular node
+        if (node.columnName !== sort.columnName) {
+          this.sorts.push({
+            order: 'asc',
+            columnName: node.columnName,
+            type: node.type
+          });
+        }
+      });
+    });
+  }
+
   addDefaultSorts() {
     if ((this.analysisStarter || this.analysis).type !== 'chart') return;
 
@@ -225,19 +242,6 @@ export class DesignerContainerComponent {
           order: 'asc',
           columnName: node.columnName,
           type: node.type
-        });
-      });
-    } else {
-      forEach(this.sorts, sort => {
-        forEach(sqlBuilder.nodeFields || [], node => {
-          // check if sort already exits for this particular node
-          if (node.columnName !== sort.columnName) {
-            this.sorts.push({
-              order: 'asc',
-              columnName: node.columnName,
-              type: node.type
-            });
-          }
         });
       });
     }
@@ -556,6 +560,7 @@ export class DesignerContainerComponent {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.checkNodeForSorts();
       this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
       break;
