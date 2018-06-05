@@ -66,6 +66,7 @@ module.exports = {
     browser.get(protractorConf.config.baseUrl);
   },
   logOutByClearingLocalStorage() {
+    //browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();')
   },
   scrollIntoView(element) {
