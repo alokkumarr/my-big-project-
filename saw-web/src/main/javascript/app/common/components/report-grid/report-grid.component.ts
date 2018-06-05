@@ -329,7 +329,7 @@ export class ReportGridComponent {
         let type = column.type;
         if (aggregate && ['count'].includes(aggregate.value)) {
           type = aggregate.type || column.type;
-          isNumberType = true;
+          isNumberType = true;          
           if (DATE_FORMATS_OBJ[column.format]) {
             delete column.format;
             column.format = {
@@ -366,6 +366,7 @@ export class ReportGridComponent {
       !NUMBER_TYPES.includes(type)) {
       return format;
     }
+
     return {
       ...format,
       precision: DEFAULT_PRECISION,
