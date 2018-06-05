@@ -15,7 +15,7 @@ load_semantic() {
     local semantic=semantic.json
     $sudo_mapr hadoop fs -mkdir -p $datalake
     $sudo_mapr hadoop fs -put -f $dir/$semantic $datalake
-    $sudo_mapr $mdcli -i $datalake/$semantic -o $datalake/$semantic-output
+    $mdcli -i $datalake/$semantic -o $datalake/$semantic-output
 }
 
 curl_json() {
@@ -23,7 +23,7 @@ curl_json() {
 }
 
 load_data() {
-    local index_url="http://localhost:8200/sample"
+    local index_url="http://sip-elastic:8200/sample"
     echo "Loading sample Elasticsearch data"
     curl_json PUT "$index_url" $dir/index.json
     for data in $dir/data-*.json; do
