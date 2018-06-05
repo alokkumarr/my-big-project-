@@ -86,7 +86,11 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   @Input()
   set filter(data) {
     this._filter = data;
-    console.log(data);
+
+    if (data.model && data.model.modelValues) {
+      this.value = [...data.model.modelValues];
+      this.cacheFilters();
+    }
 
     this.loadSuggestions();
   }
@@ -128,7 +132,7 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
       .subscribe((data: Array<string>) => {
         this.suggestions = data;
 
-        this.loadDefaults();
+        this.loadDefaults(true);
         this.cacheFilters();
       });
   }

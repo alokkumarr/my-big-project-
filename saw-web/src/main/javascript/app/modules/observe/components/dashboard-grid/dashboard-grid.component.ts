@@ -209,10 +209,10 @@ export class DashboardGridComponent
 
     const filters = get(analysis, 'sqlBuilder.filters', []);
 
-    window['gf'] = this.filters;
     this.filters.addFilter(
       filter(
         map(filters, flt => {
+          /* Find if a global filter already exists in dashboard with same attributes */
           const existingFilter = find(
             get(this.model, 'filters') || [],
             dashFilt =>
@@ -277,7 +277,11 @@ export class DashboardGridComponent
       );
 
       const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
-      tile.analysis = { ...tile.origAnalysis, ...{ sqlBuilder } };
+      tile.analysis = {
+        ...tile.origAnalysis,
+        ...{ sqlBuilder },
+        _executeTile: true
+      };
 
       this.dashboard.splice(id, 1, { ...tile });
     });
@@ -288,9 +292,22 @@ export class DashboardGridComponent
       return;
     }
 
+    let length = get(this.model, 'tiles', []).length;
+
+    const tileLoaded = () => {
+      if (--length > 0) {
+        return;
+      }
+
+      /* All tiles have been initialised with data. Apply global filters
+       * if necessary */
+      this.onApplyGlobalFilters(this.filters.globalFilters);
+    };
+
     forEach(get(this.model, 'tiles', []), tile => {
       if (tile.kpi) {
         this.dashboard.push(tile);
+        tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         setTimeout(() => {
           this.refreshTile(tile);
@@ -299,15 +316,17 @@ export class DashboardGridComponent
       }
 
       this.analyze.readAnalysis(tile.id).then(data => {
-        tile.analysis = data;
+        tile.analysis = { ...data, _executeTile: false };
         tile.origAnalysis = data;
         this.addGlobalFilters(data);
         tile.updater = new BehaviorSubject({});
         this.dashboard.push(tile);
+        tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         this.refreshTile(tile);
       });
     });
+
     this.initialised = true;
   }
 
