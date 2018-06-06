@@ -248,7 +248,6 @@ export const ReportGridDisplayComponent = {
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
         }
-        console.log(field);
         return field;
       });
     }

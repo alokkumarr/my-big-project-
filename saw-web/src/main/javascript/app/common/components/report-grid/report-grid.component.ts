@@ -350,7 +350,6 @@ export class ReportGridComponent {
           },
           ...this.getSortingPart(column)
         }
-        console.log(field);
         return field;
       })
     )(artifacts);
