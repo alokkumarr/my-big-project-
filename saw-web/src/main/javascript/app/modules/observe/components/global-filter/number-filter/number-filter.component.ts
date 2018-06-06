@@ -72,9 +72,11 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
     if (data.model) {
       this.value = [data.model.otherValue, data.model.value];
       this.cacheFilters();
+      this.loadMinMax(true);
+    } else {
+      this.value = [this.defaults.min, this.defaults.max];
+      this.loadMinMax(false);
     }
-
-    this.loadMinMax();
   }
 
   /**
@@ -82,7 +84,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
    *
    * @memberof GlobalNumberFilterComponent
    */
-  loadMinMax() {
+  loadMinMax(useCache: boolean = false) {
     this.observe.getModelValues(this._filter).subscribe(data => {
       this.defaults.min = parseFloat(get(data, `_min`, this.defaults.min));
       this.defaults.max = parseFloat(get(data, `_max`, this.defaults.max));
@@ -92,7 +94,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
         https://github.com/tb/ng2-nouislider/blob/master/src/nouislider.ts#L154
       */
       setTimeout(() => {
-        this.loadDefaults(true);
+        this.loadDefaults(useCache);
         this.cacheFilters();
       }, 10);
     });

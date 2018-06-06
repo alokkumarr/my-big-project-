@@ -90,9 +90,10 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     if (data.model && data.model.modelValues) {
       this.value = [...data.model.modelValues];
       this.cacheFilters();
+      this.loadSuggestions(true);
+    } else {
+      this.loadSuggestions();
     }
-
-    this.loadSuggestions();
   }
 
   filterSuggestions(str: string) {
@@ -126,13 +127,13 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
    *
    * @memberof GlobalStringFilterComponent
    */
-  loadSuggestions() {
+  loadSuggestions(useCache: boolean = false) {
     this.observe
       .getModelValues(this._filter)
       .subscribe((data: Array<string>) => {
         this.suggestions = data;
 
-        this.loadDefaults(true);
+        this.loadDefaults(useCache);
         this.cacheFilters();
       });
   }

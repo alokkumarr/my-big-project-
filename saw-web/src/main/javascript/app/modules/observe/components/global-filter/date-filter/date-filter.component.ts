@@ -75,10 +75,14 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       get(this._filter, 'model.preset') || CUSTOM_DATE_PRESET_VALUE;
     this.model.gte = moment(get(this._filter, 'model.gte'));
     this.model.lte = moment(get(this._filter, 'model.lte'));
-    this.cacheFilters();
+    if (data.model) {
+      this.cacheFilters();
+      this.loadDateRange(true);
+    } else {
+      this.loadDateRange(false);
+    }
 
     this.onPresetChange({ value: this.model.preset });
-    this.loadDateRange();
   }
 
   /**
@@ -100,7 +104,7 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
    *
    * @memberof GlobalDateFilterComponent
    */
-  loadDateRange() {
+  loadDateRange(useCache: boolean = false) {
     this.observe
       .getModelValues(this._filter)
       .subscribe((data: { _min: string; _max: string }) => {
@@ -109,7 +113,7 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
           max: moment(parseInt(data._max))
         };
 
-        this.loadDefaults(true);
+        this.loadDefaults(useCache);
         this.cacheFilters();
       });
   }

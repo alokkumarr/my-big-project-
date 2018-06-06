@@ -301,7 +301,9 @@ export class DashboardGridComponent
 
       /* All tiles have been initialised with data. Apply global filters
        * if necessary */
-      this.onApplyGlobalFilters(this.filters.globalFilters);
+      setTimeout(() => {
+        this.onApplyGlobalFilters(this.filters.globalFilters);
+      }, 500);
     };
 
     forEach(get(this.model, 'tiles', []), tile => {
