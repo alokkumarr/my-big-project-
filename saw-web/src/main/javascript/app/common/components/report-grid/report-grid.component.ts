@@ -336,6 +336,8 @@ export class ReportGridComponent {
               comma : false
             }
           }
+        } else if (column.type === 'date') {
+          column.format = 'monthAndYear';
         }
         const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
         const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
