@@ -333,9 +333,8 @@ export class ReportGridComponent {
           isNumberType = true;   
         }
 
-        let preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
-        let format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
-
+        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
+        const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),
@@ -349,6 +348,10 @@ export class ReportGridComponent {
             column[prop] = value;
           },
           ...this.getSortingPart(column)
+        }
+
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format) && !aggregate) {
+          field.format = 'yyyy-MM-dd';
         }
         return field;
       })

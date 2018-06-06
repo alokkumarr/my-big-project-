@@ -245,7 +245,7 @@ export const ReportGridDisplayComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type
         };
 
-        if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format) && !aggregate) {
           field.format = 'yyyy-MM-dd';
         }
         return field;
