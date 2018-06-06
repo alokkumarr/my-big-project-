@@ -1,6 +1,14 @@
 <form [formGroup]="kpiForm" autocomplete="off">
   <mat-form-field>
-    <input matInput placeholder="KPI Name" formControlName="name" />
+    <input matInput placeholder="KPI Name" formControlName="name" maxlength="25" />
+    <mat-error *ngIf="kpiName.errors?.required">
+      Name is
+      <strong>required</strong>.
+    </mat-error>
+    <mat-error *ngIf="kpiName.errors?.maxlength">
+      Name can be max
+      <strong>25 characters</strong> long.
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field *ngIf="_metric">
@@ -42,11 +50,20 @@
   </mat-form-field>
 
   <div class="secondary-aggregate-form" formGroupName="secAggregates" *ngIf="_kpiType!== 'bullet'">
-    <h4>Secondary Aggregations</h4>
+    <strong>Secondary Aggregations</strong>
     <mat-slide-toggle *ngFor="let ag of aggregations" [formControlName]="ag.value">
       {{ag.name}}
     </mat-slide-toggle>
   </div>
+
+  <div class="kpi-bg" formGroupName="kpiBgColor" *ngIf="_kpiType!== 'bullet'">
+    <strong> Select KPI Background Color : </strong>
+    <mat-button-toggle-group #kpiBG="matButtonToggleGroup" [(ngModel)]="kpiBgColorValue" [value]="kpiBgColorValue" [ngModelOptions]="{standalone: true}">
+      <mat-button-toggle *ngFor="let bg of kpiBgColors" [style.background-color]="bg.value" [style.color]="bg.value" [value]="bg.label">
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
   <div *ngIf="_kpiType=== 'bullet'">
     <div class="bullet-measures">
       <mat-form-field>
@@ -61,8 +78,9 @@
     </mat-form-field>
 
     <div class="bullet-bands">
-      <span> Band Color Palette : </span>
-      <mat-button-toggle-group #bulletPalette="matButtonToggleGroup" [(ngModel)]="bandPaletteValue" [value]="bandPaletteValue" [ngModelOptions]="{standalone: true}">
+      <strong>Select Band Color Palette : </strong>
+      <mat-button-toggle-group #bulletPalette="matButtonToggleGroup" [(ngModel)]="bandPaletteValue" [value]="bandPaletteValue"
+        [ngModelOptions]="{standalone: true}">
         <mat-button-toggle value="rog" class="rog">
           <span class="text">ROG</span>
         </mat-button-toggle>

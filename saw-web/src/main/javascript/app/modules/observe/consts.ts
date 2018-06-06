@@ -96,3 +96,17 @@ export const BULLET_CHART_COLORS = [
   { value: 'greys', b1: '#666', b2: '#999', b3: '#BBB' },
   { value: 'blues', b1: '#568ED5', b2: '#8DB4E3', b3: '#DDE6F3' }
 ];
+
+export const KPI_BG_COLORS = [
+  { label: 'green', value: '#67B829' },
+  { label: 'purple', value: '#7C38BC' },
+  { label: 'blue', value: '#0f61c8' },
+  { label: 'orange', value: '#f7aa46' },
+  { label: 'pink', value: '#fb6263' },
+  { label: 'mint', value: '#00B19D' },
+  { label: 'skyblue', value: '#40bcea' },
+  { label: 'yellow', value: '#fcd036' },
+  { label: 'red', value: '#d6080e' },
+  { label: 'black', value: '#2c2e2f' },
+  { label: 'maroon', value: '#cc3f44' }
+];

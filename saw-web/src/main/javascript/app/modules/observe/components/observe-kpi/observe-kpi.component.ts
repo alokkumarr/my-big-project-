@@ -1,13 +1,17 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as defaults from 'lodash/defaults';
 import * as upperCase from 'lodash/upperCase';
 import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
+import * as trim from 'lodash/trim';
+import * as isUndefined from 'lodash/isUndefined';
+
 import { Observable } from 'rxjs/Observable';
 
-import { DATE_PRESETS_OBJ } from '../../consts';
+import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -22,6 +26,8 @@ require('./observe-kpi.component.scss');
 export class ObserveKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
   _executedKPI: any;
+  primaryChange: number;
+  bgColor: string;
 
   /* Used to dynamically adjust font-size based on tile height */
   fontMultipliers = {
@@ -59,7 +65,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   @Input()
   set dimensions(data) {
     if (data && data.height > 0) {
-      this.fontMultipliers.primary = data.height / 100;
+      this.fontMultipliers.primary = data.height / 160;
       this.fontMultipliers.secondary = Math.min(2, data.height / 100);
     }
   }
@@ -93,6 +99,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   executeKPI(kpi) {
     this._executedKPI = kpi;
+    this.bgColor = isUndefined(kpi.kpiBgColor) ? 'black' : get(find(KPI_BG_COLORS, ['label',kpi.kpiBgColor]), 'value');
     const dataFieldName = get(kpi, 'dataFields.0.name');
     const [primaryAggregate, ...secondaryAggregates] = get(
       kpi,
@@ -125,12 +132,12 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         const currentParsed = parseFloat(primary.current) || 0;
         const priorParsed = parseFloat(primary.prior);
         const change =
-          round((currentParsed - priorParsed) * 100 / priorParsed, 2) || 0;
-
+          round(((currentParsed - priorParsed) * 100) / priorParsed) || 0;
+        this.primaryChange = change;
         this.primaryResult = {
           current: round(currentParsed, 2),
           prior: priorParsed,
-          change: change >= 0 ? `+${change}` : `${change}`
+          change: trim(change, '-')
         };
 
         this.secondaryResult = secondary;

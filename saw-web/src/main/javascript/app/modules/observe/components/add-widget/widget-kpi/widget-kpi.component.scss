@@ -2,7 +2,7 @@ widget-kpi {
   form {
     display: flex;
     flex-direction: column;
-    padding-top: 15px;
+    padding-top: 5px;
 
     .secondary-aggregate-form {
       display: flex;
@@ -17,8 +17,26 @@ widget-kpi {
         }
 
         &:last-child {
-          padding-bottom: 20px;
+          padding-bottom: 15px;
         }
+      }
+    }
+
+    .kpi-bg {
+      padding-bottom: 25px;
+
+      & > .mat-button-toggle-group {
+        flex-wrap: nowrap;
+
+        & > .mat-button-toggle {
+          max-width: 30px;
+          max-height: 24px;
+          margin: 0.7px;
+        }
+      }
+
+      .mat-button-toggle-checked {
+        border: groove #000;
       }
     }
 
@@ -63,7 +81,7 @@ widget-kpi {
 
       .mat-button-toggle-checked {
         opacity: 1 !important;
-        border: groove #1A89D4;
+        border: groove #000;
       }
 
       .rog {

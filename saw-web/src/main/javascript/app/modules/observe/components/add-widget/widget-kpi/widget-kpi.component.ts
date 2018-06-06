@@ -34,7 +34,8 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS_OBJ,
   DATE_PRESETS,
-  KPI_AGGREGATIONS
+  KPI_AGGREGATIONS,
+  KPI_BG_COLORS
 } from '../../../consts';
 
 const template = require('./widget-kpi.component.html');
@@ -49,12 +50,14 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   _metric: any;
   _kpiType: string;
   bandPaletteValue: string;
+  kpiBgColorValue: string;
 
   @Output() onKPIAction = new EventEmitter();
 
   dateFilters = DATE_PRESETS;
   showDateFields = false;
   aggregations = KPI_AGGREGATIONS;
+  kpiBgColors = KPI_BG_COLORS;
 
   kpiForm: FormGroup;
   datePresetSubscription: Subscription;
@@ -84,7 +87,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     });
 
     this.kpiForm = this.fb.group({
-      name: ['', [Validators.required, nonEmpty()]],
+      name: ['', [Validators.required, Validators.maxLength(30), nonEmpty()]],
       dateField: ['', Validators.required],
       gte: [
         moment(),
@@ -99,7 +102,8 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       secAggregates: this.fb.group(secAggregateControls),
       target: [0, [Validators.required, nonEmpty()]],
       measure1: [''],
-      measure2: ['']
+      measure2: [''],
+      kpiBgColor: ['blue', Validators.required]
     });
 
     /* Only show date inputs if custom filter is selected */
@@ -116,6 +120,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     this.primaryAggregationSubscription = this.kpiForm
       .get('primAggregate')
       .valueChanges.subscribe(this.updateSecondaryAggregations.bind(this));
+  }
+
+  get kpiName() {
+    return this.kpiForm.get('name');
   }
 
   /**
@@ -191,7 +199,13 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
     const measure2 = get(data, 'measure2');
     measure2 && this.kpiForm.get('measure2').setValue(measure2);
 
-    this.bandPaletteValue = isUndefined(data.bulletPalette) ? 'rog' : data.bulletPalette;
+    this.kpiBgColorValue = isUndefined(data.kpiBgColor)
+      ? 'black'
+      : data.kpiBgColor;
+
+    this.bandPaletteValue = isUndefined(data.bulletPalette)
+      ? 'rog'
+      : data.bulletPalette;
 
     const dateField = get(data, 'filters.0.columnName');
     dateField && this.kpiForm.get('dateField').setValue(dateField);
@@ -278,6 +292,7 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
         target: toNumber(this.kpiForm.get('target').value),
         measure1: toNumber(this.kpiForm.get('measure1').value),
         measure2: toNumber(this.kpiForm.get('measure2').value),
+        kpiBgColor: this.kpiBgColorValue,
         bulletPalette: this.bandPaletteValue,
         dataFields: [
           {

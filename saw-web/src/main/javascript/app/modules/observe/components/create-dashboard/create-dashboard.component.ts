@@ -146,8 +146,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       if (!data) return;
 
       const item = {
-        cols: 12,
-        rows: 7,
+        cols: 13,
+        rows: 6,
+        resizeEnabled: false,
         kpi: data
       };
       this.requester.next({action: 'add', data: item});

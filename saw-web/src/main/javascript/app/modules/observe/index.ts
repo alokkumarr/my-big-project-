@@ -5,6 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
+import { CountoModule }  from 'angular2-counto';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
@@ -92,7 +93,8 @@ const components = [
     UIRouterUpgradeModule,
     AddWidgetModule,
     EditWidgetModule,
-    UChartModule
+    UChartModule,
+    CountoModule
   ],
   declarations: components,
   entryComponents: components,
