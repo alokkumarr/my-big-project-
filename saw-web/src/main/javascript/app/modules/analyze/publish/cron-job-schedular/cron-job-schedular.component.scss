@@ -15,6 +15,10 @@ cron-job-schedular {
     }
   }
 
+  input.cron-scheduler__input:focus {
+    outline: none;
+  }
+
   mat-tab-group mat-tab-header div div div .mat-tab-label {
     min-width: 80px !important;
   }

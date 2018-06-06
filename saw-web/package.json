@@ -7,6 +7,7 @@
     "start:prod": "webpack-dev-server --config conf/webpack.conf.js --env production",
     "styleguide": "webpack-dev-server --config conf/webpack.styleguide.js",
     "styleguide:build": "webpack --config conf/webpack.styleguide.js",
+    "pretest": "npm run -s eslint lint",
     "test": "karma start conf/karma.conf.js --single-run",
     "test:watch": "karma start conf/karma.conf.js --watch",
     "postinstall": "node node_modules/protractor/bin/webdriver-manager update",
@@ -14,9 +15,8 @@
     "express": "node src/main/javascript/middlelayer/index.js",
     "precommit": "node .githook-precommit.js",
     "commitmsg": "node .githook-commitmsg.js",
-    "prepush": "npm run -s eslint lint",
     "lint": "tslint --project tsconfig.json -c conf/tslint-prod.json",
-    "eslint": "eslint -c .eslintrc --ext .js ./src",
+    "eslint": "eslint -c .eslintrc --max-warnings 0 --ext .js ./src",
     "eslint:fix": "npm run eslint -- --fix",
     "lint:fix": "npm run lint -- --fix",
     "lint:style:fix": "stylelint --fix src/main/javascript/app/**/*.scss"
