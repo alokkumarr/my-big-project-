@@ -22,14 +22,14 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-     // expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-     // analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -40,7 +40,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
 
   it('Should apply filter to column chart', () => {
-    login.loginAsV2('admin');
+    login.loginAs('admin');
 
     // Create analysis
     homePage.createAnalysis(metricName, analysisType);

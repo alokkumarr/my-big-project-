@@ -291,14 +291,14 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      //expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -309,7 +309,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
-        loginPage.loginAsV2(data.user);
+        loginPage.loginAs(data.user);
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
@@ -319,7 +319,8 @@ describe('Privileges tests: privileges.test.js', () => {
         }));
 
         // Go to Card View
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+        analyzePage.analysisElems.cardView.click();
 
         element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
@@ -344,12 +345,15 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('[class="cdk-overlay-container"]')));
+          commonFunctions.waitFor.elementToBeClickable(element(by.css('[class="cdk-overlay-container"]')));
+          element(by.css('[class="cdk-overlay-container"]')).click();
           commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
           expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
         }
         // Go to executed analysis page
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.main.firstCardTitle);
+        analyzePage.main.firstCardTitle.click();
+
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
@@ -372,7 +376,8 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          commonFunctions.waitFor.elementToBeClickableAndClick(executedAnalysis.actionsMenuBtn);
+          commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
+          executedAnalysis.actionsMenuBtn.click();
 
           element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.execute,
