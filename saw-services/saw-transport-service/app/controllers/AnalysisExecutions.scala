@@ -18,16 +18,27 @@ class AnalysisExecutions extends BaseController {
   def list(analysisId: String): Result = {
     handle((json, ticket) => {
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      val executions = analysis.listExecutions.map(result => {
+      val sortedExecutions = analysis.listExecutions.map(result => {
         val content = result.getCachedData("content") match {
           case obj: JObject => obj
           case obj: JValue => unexpectedElement("object", obj)
         }
         val id = Bytes.toString(result.getRowKey)
-        ("id", id) ~
-          ("finished", (content \ "execution_finish_ts").extractOpt[Long]) ~
-          ("status", (content \ "exec-msg").extractOpt[String])
+        (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String])
+      }).sortBy(result =>result._2).reverse
+      var count = 0
+      val junkExecution = new Array[String](sortedExecutions.size+1-5)
+      val executions = sortedExecutions.filter(result =>{
+        count = count+1
+        if(count<=5) true
+        else { junkExecution(count-5) = result._1
+          false }
+      }).map(result => {
+        ("id", result._1) ~
+          ("finished", result._2) ~
+          ("status", result._3)
       })
+
       /* Note: Keep "results" property for API backwards compatibility */
       ("executions", executions) ~ ("results", executions): JValue
     })
