@@ -84,7 +84,10 @@ export class JsPlumbTableComponent {
   }
 
   clearAggregate(column) {
+    console.log(column);
     unset(column, 'aggregate');
+    unset(column, 'format');
+    console.log(column);
     this.change.emit({subject: 'aggregate'});
   }
 }

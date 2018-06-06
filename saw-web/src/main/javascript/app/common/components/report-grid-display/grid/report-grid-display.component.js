@@ -224,12 +224,13 @@ export const ReportGridDisplayComponent = {
           column.type = 'date';
         }
 
-        const isNumberType = NUMBER_TYPES.includes(column.type);
+        let isNumberType = NUMBER_TYPES.includes(column.type);
 
         this.addAggregateConditionalFormat(column);
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
         if (aggregate && ['count'].includes(aggregate.value)) {
           column.type = aggregate.type || column.type;
+          isNumberType = true;
         }
 
         const field = {
@@ -247,6 +248,7 @@ export const ReportGridDisplayComponent = {
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
         }
+        console.log(field);
         return field;
       });
     }

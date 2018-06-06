@@ -325,22 +325,16 @@ export class ReportGridComponent {
       fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
+        
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
         let type = column.type;
         if (aggregate && ['count'].includes(aggregate.value)) {
           type = aggregate.type || column.type;
-          isNumberType = true;          
-          if (DATE_FORMATS_OBJ[column.format]) {
-            delete column.format;
-            column.format = {
-              comma : false
-            }
-          }
-        } else if (column.type === 'date') {
-          column.format = 'monthAndYear';
+          isNumberType = true;   
         }
-        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
-        const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
+
+        let preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
+        let format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
 
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
@@ -356,6 +350,7 @@ export class ReportGridComponent {
           },
           ...this.getSortingPart(column)
         }
+        console.log(field);
         return field;
       })
     )(artifacts);
