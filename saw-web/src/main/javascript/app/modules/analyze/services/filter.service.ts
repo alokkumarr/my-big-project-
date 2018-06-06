@@ -87,7 +87,7 @@ export class FilterService {
         columnName: column.columnName,
         isRuntimeFilter: frontendFilter.isRuntimeFilter,
         isGlobalFilter: frontendFilter.isGlobalFilter,
-        model: null
+        model: undefined
       };
       if (!(frontendFilter.isRuntimeFilter || frontendFilter.isGlobalFilter) || frontendFilter.model) {
         result.model = frontendFilter.model;
