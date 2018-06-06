@@ -7,7 +7,7 @@ import {
   Filter,
   SqlBuilder
 } from '../../types';
-import { DesignerStates } from '../../container';
+import { DesignerStates } from '../../consts';
 
 const template = require('./single-table-designer-layout.component.html');
 require('./single-table-designer-layout.component.scss');
