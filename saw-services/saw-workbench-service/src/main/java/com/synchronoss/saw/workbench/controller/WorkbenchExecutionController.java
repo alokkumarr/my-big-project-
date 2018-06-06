@@ -1,13 +1,13 @@
 package com.synchronoss.saw.workbench.controller;
 
-import java.util.Base64;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+import java.util.Base64;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,114 +21,126 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
-
 @RestController
 @RequestMapping("/internal/workbench/projects/")
 public class WorkbenchExecutionController {
-    private final Logger log = LoggerFactory.getLogger(getClass().getName());
+  private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    @Value("${workbench.project-root}")
-    @NotNull
-    private String defaultProjectRoot;
+  @Value("${workbench.project-root}")
+  @NotNull
+  private String defaultProjectRoot;
 
-    @Value("${workbench.project-path}")
-    @NotNull
-    private String defaultProjectPath;
+  @Value("${workbench.project-path}")
+  @NotNull
+  private String defaultProjectPath;
 
-    @Autowired
-    private WorkbenchExecutionService workbenchExecutionService;
+  @Autowired
+  private WorkbenchExecutionService workbenchExecutionService;
 
-    @RequestMapping(
-        value = "{project}/datasets", method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ObjectNode create(
-        @PathVariable(name = "project", required = true) String project,
-        @RequestBody ObjectNode body)
-        throws JsonProcessingException, Exception {
-        log.debug("Create dataset: project = {}", project);
-        /* Extract input parameters */
-        String name = body.path("name").asText();
-        String input = body.path("input").asText();
-        String component = body.path("component").asText();
-        JsonNode configNode = body.path("configuration");
-        if (!configNode.isObject()) {
-            throw new RuntimeException(
-                "Expected config to be an object: " + configNode);
-        }
-        ObjectNode config = (ObjectNode) configNode;
-        /* Build XDF component-specific configuration */
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode xdfConfig = mapper.createObjectNode();
-        ObjectNode xdfComponentConfig = xdfConfig.putObject(component);
-        if (component.equals("parser")) {
-            String rawDirectory = defaultProjectRoot + defaultProjectPath;
-            String file = config.path("file").asText();
-            config.put("file", rawDirectory + "/" + file);
-            xdfConfig.set(component, config);
-        } else if (component.equals("sql")) {
-            xdfComponentConfig.put("scriptLocation", "inline");
-            String script = config.path("script").asText();
-            String encoded = Base64.getEncoder()
-                .encodeToString(script.getBytes("utf-8"));
-            xdfComponentConfig.put("script", encoded);
-        } else {
-            throw new RuntimeException("Unknown component: " + component);
-        }
-        /* Build inputs */
-        if (!component.equals("parser")) {
-            ArrayNode xdfInputs = xdfConfig.putArray("inputs");
-            ObjectNode xdfInput = xdfInputs.addObject();
-            xdfInput.put("dataSet", input);
-        }
-        /* Build outputs */
-        ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
-        ObjectNode xdfOutput = xdfOutputs.addObject();
-        xdfOutput.put("dataSet", name);
-        /* Invoke XDF component */
-        return workbenchExecutionService.execute(
-            project, name, component, xdfConfig.toString());
+  /**
+   * This method is to list the datasets.
+   * @param project is of type String.
+   * @param body is of type Object.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/datasets", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ObjectNode create(@PathVariable(name = "project", required = true) String project,
+      @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
+    log.debug("Create dataset: project = {}", project);
+    /* Extract input parameters */
+    final String name = body.path("name").asText();
+    final String input = body.path("input").asText();
+    final String component = body.path("component").asText();
+    JsonNode configNode = body.path("configuration");
+    if (!configNode.isObject()) {
+      throw new RuntimeException("Expected config to be an object: " + configNode);
     }
-
-    @RequestMapping(
-        value = "{project}/previews", method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ObjectNode preview(
-        @PathVariable(name = "project", required = true) String project,
-        @RequestBody ObjectNode body)
-        throws JsonProcessingException, Exception {
-        log.debug("Create dataset preview: project = {}", project);
-        /* Extract dataset name which is to be previewed */
-        String name = body.path("name").asText();
-        /* Start asynchronous preview creation */
-        return workbenchExecutionService.preview(project, name);
+    ObjectNode config = (ObjectNode) configNode;
+    /* Build XDF component-specific configuration */
+    ObjectMapper mapper = new ObjectMapper();
+    ObjectNode xdfConfig = mapper.createObjectNode();
+    ObjectNode xdfComponentConfig = xdfConfig.putObject(component);
+    if (component.equals("parser")) {
+      String rawDirectory = defaultProjectRoot + defaultProjectPath;
+      String file = config.path("file").asText();
+      config.put("file", rawDirectory + "/" + file);
+      xdfConfig.set(component, config);
+    } else if (component.equals("sql")) {
+      xdfComponentConfig.put("scriptLocation", "inline");
+      String script = config.path("script").asText();
+      String encoded = Base64.getEncoder().encodeToString(script.getBytes("utf-8"));
+      xdfComponentConfig.put("script", encoded);
+    } else {
+      throw new RuntimeException("Unknown component: " + component);
     }
-
-    @RequestMapping(
-        value = "{project}/previews/{previewId}",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public ObjectNode preview(
-        @PathVariable(name = "project", required = true) String project,
-        @PathVariable(name = "previewId", required = true) String previewId)
-        throws JsonProcessingException, Exception {
-        log.debug("Get dataset preview: project = {}", project);
-        /* Get previously created preview */
-        ObjectNode body = workbenchExecutionService.getPreview(previewId);
-        /* If preview was not found, response to indicate that preview
-         * has not been created yet */
-        if (body == null) {
-            throw new NotFoundException();
-        }
-        /* Otherwise return the preview contents */
-        return body;
+    /* Build inputs */
+    if (!component.equals("parser")) {
+      ArrayNode xdfInputs = xdfConfig.putArray("inputs");
+      ObjectNode xdfInput = xdfInputs.addObject();
+      xdfInput.put("dataSet", input);
     }
+    /* Build outputs */
+    ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
+    ObjectNode xdfOutput = xdfOutputs.addObject();
+    xdfOutput.put("dataSet", name);
+    /* Invoke XDF component */
+    return workbenchExecutionService.execute(project, name, component, xdfConfig.toString());
+  }
 
-    @ResponseStatus(
-        value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
-    private static class NotFoundException extends RuntimeException {
+  /**
+   * This method is to preview the data.
+   * @param project is of type String.
+   * @param body is of type Object.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
+      @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
+    log.debug("Create dataset preview: project = {}", project);
+    /* Extract dataset name which is to be previewed */
+    String name = body.path("name").asText();
+    /* Start asynchronous preview creation */
+    return workbenchExecutionService.preview(project, name);
+  }
+
+  /**
+   * This method is to preview the data.
+   * @param project is of type String.
+   * @param previewId is of type String.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/previews/{previewId}", method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
+      @PathVariable(name = "previewId", required = true) String previewId)
+      throws JsonProcessingException, Exception {
+    log.debug("Get dataset preview: project = {}", project);
+    /* Get previously created preview */
+    ObjectNode body = workbenchExecutionService.getPreview(previewId);
+    /*
+     * If preview was not found, response to indicate that preview has not been created yet
+     */
+    if (body == null) {
+      throw new NotFoundException();
     }
+    /* Otherwise return the preview contents */
+    return body;
+  }
+
+  @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
+  private static class NotFoundException extends RuntimeException {
+
+    private static final long serialVersionUID = 412355610432444770L;
+  }
 }

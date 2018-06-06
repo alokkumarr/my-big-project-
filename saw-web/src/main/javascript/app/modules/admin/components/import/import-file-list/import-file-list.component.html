@@ -1,0 +1,27 @@
+<md-card>
+  <md-card-header layout="row" layout-align="end start">
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline" translate="IMPORT_FILE_ANALYSIS_LIST_VIEW"></span>        
+      </md-card-title-text>
+    </md-card-title>
+  </md-card-header>     
+  <md-card-content layout="row">
+    <div id="user-grid" dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">     
+      <div data-options="dxTemplate: { name: 'selectionCellTemplate' }">
+        <md-card-actions layout="row" layout-align="center center">
+          <md-checkbox ng-click="$ctrl.editRow(report, report.value, report.rowIndex)" 
+          ng-disabled="report.data.disabled"
+          ng-model="report.value"></md-checkbox>
+        </md-card-actions>
+      </div> 
+      <div data-options="dxTemplate: { name: 'fileNameCellTemplate' }" >
+        <span ng-bind-html="report.value"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'analysisCountCellTemplate' }" >
+        <span ng-bind-html="report.value"></span>   
+      </div>        
+    </div>
+  </md-card-content>
+</md-card>
+      

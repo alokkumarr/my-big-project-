@@ -92,6 +92,14 @@ export const ReportGridDisplayComponent = {
         load: options => {
           return this.source({options})
             .then(({data, count}) => {
+              if (!this.columns) {
+                /* Refresh columns based on grid data if query report */
+                this._$timeout(() => {
+                  const cols = this._getDxColumns([], data);
+                  this._gridInstance.option('columns', cols);
+                }, 200);
+              }
+
               return {data, totalCount: count};
             });
         }

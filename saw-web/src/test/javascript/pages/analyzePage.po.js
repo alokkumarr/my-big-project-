@@ -55,7 +55,7 @@ const doAnalysisAction = (name, action) => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
-      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);  
+      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
@@ -77,6 +77,11 @@ const getAnalysisActionOptions = name => {
 const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
 
 const getAnalysisMenuButton = (analysisName) => element(by.xpath("//a[text()='" + analysisName + "']/../../../..//*[@e2e='actions-menu-toggle']"));
+
+const getChartSettingsItem = (axis, name) => {
+  return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
+    .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
+};
 
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
@@ -181,12 +186,19 @@ const doAccountAction = action => {
 };
 
 function navigateToHome() {
-  browser.driver.get(webpackHelper.sawWebUrl());
+  browser.get(browser.baseUrl);
   return browser.driver.wait(() => {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
     });
   }, protractorConf.timeouts.fluentWait);
+};
+
+const selectFields = (name) => {
+  commonFunctions.waitFor.elementToBeVisible(this.designerDialog.chart.fieldSearchInput);
+  this.designerDialog.chart.fieldSearchInput.clear();
+  this.designerDialog.chart.fieldSearchInput.sendKeys(name);
+  commonFunctions.waitFor.elementToBeClickableAndClick(this.getFieldPlusIcon(name));
 };
 
 module.exports = {
@@ -196,10 +208,17 @@ module.exports = {
     getAnalysisTypeButtonElementByType: name => element(by.css(`button[e2e="item-type-${name}"]`)),
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
   },
+
   designerDialog: {
-    saveDialog: element(by.css('analyze-save-dialog')),
+    saveDialog: element(by.css('[e2e="save-dialog-save-analysis"]')),
     saveDialogUpgraded: element(by.css('designer-save')),
     chart: {
+      getFieldPlusIcon: value => element(by.xpath(`//button[@e2e="designer-add-btn-${value}"]/descendant::*[@ng-reflect-font-icon="icon-plus"]`)),
+      getMetricsFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Metrics")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      getDimensionFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Dimension")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      getGroupByFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Group By")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      fieldSearchInput: element(by.xpath('//input[@id="mat-input-0"]')),
+      selectFields: name => selectFields(name),
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
       getYCheckBox: name => getChartSettingsCheckBox(name),
@@ -209,7 +228,7 @@ module.exports = {
       container: element(by.css('.highcharts-container ')),
       title: element(by.css('span[e2e="designer-type-chart"]')),
       getAnalysisChartType,
-      filterBtn: filtersBtn,
+      filterBtn: filtersBtnUpgraded,
       refreshBtn
     },
     pivot: {
@@ -243,7 +262,16 @@ module.exports = {
     getStringFilterInput: getStringFilterInputUpgraded,
     getNumberFilterInput: getNumberFilterInputUpgraded,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
-    getAppliedFilter: getAppliedFilterUpgraded
+    getAppliedFilterUpdated: feild => element(by.xpath(`//mat-chip[contains(text(),"${feild}")]`)),
+    getAppliedFilter: getAppliedFilterUpgraded,
+    chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
+    noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
+  },
+  appliedFiltersDetails: {
+    filterText:element(by.xpath('//span[@class="filter-counter"]')),
+    filterClear:element(by.xpath('//button[contains(@class,"filter-clear-all")]')),
+    selectedFilters: element.all(by.xpath('//filter-chips-u/descendant::mat-chip')),
+    selectedFiltersText: element(by.xpath('//filter-chips-u/descendant::mat-chip')),
   },
   detail: {
     getAnalysisChartType
@@ -273,10 +301,12 @@ module.exports = {
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
+    selectedCategoryUpdated: element(by.xpath('//mat-select[@e2e="save-dialog-selected-category"]/descendant::div[@class="mat-select-arrow-wrapper"]')),
     nameInput: element(by.css('input[e2e="save-dialog-name"]')),
     descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
-    cancelBtn: element(by.css('button[translate="CANCEL"]'))
+    cancelBtn: element(by.css('button[translate="CANCEL"]')),
+    selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
 
   // OLD test elements
@@ -324,7 +354,6 @@ module.exports = {
     reportGridContainer: element(by.css('.ard_details-grid')),
     cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
-
   validateCardView() {
     expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
   },

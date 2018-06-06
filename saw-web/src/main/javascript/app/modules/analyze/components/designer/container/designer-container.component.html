@@ -1,5 +1,6 @@
 <designer-header class="designer__header"
                  [analysis]="analysis"
+                 [areMinRequirmentsMet]="areMinRequirmentsMet"
                  [isInDraftMode]="isInDraftMode"
                  [designerState]="designerState"
                  [isInQueryMode]="isInQueryMode"
@@ -11,8 +12,13 @@
   <single-table-designer-layout *ngSwitchCase="'single'"
                                 (change)="onSettingsChange($event)"
                                 [artifacts]="artifacts"
+                                [auxSettings]="auxSettings"
+                                [analysisType]="(analysisStarter || analysis).type"
+                                [analysisSubtype]="(analysisStarter || analysis).chartType"
                                 [data]="data"
                                 [sorts]="sorts"
+                                [filters]="filters"
+                                [sqlBuilder]="analysis && analysis.sqlBuilder"
                                 [designerState]="designerState">
   </single-table-designer-layout>
 

@@ -1,8 +1,8 @@
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as clone from 'lodash/clone';
-import * as deepClone from 'lodash/cloneDeep';
+import * as cloneDeep from 'lodash/cloneDeep';
 
-import {AnalyseTypes, Events} from '../../consts';
+import {AnalyseTypes} from '../../consts';
 
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/toPromise';
@@ -28,29 +28,13 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   }
 
   function fork(analysis) {
-    const model = clone(analysis);
+    const model = cloneDeep(analysis);
     model.name += ' Copy';
-    return openEditModal(model, 'fork').then(status => {
-      if (!status) {
-        return status;
-      }
-
-      $eventEmitter.emit(Events.AnalysesRefresh);
-
-      return status;
-    });
+    return openEditModal(model, 'fork');
   }
 
   function edit(analysis) {
-    return openEditModal(clone(analysis), 'edit').then(status => {
-      if (!status) {
-        return status;
-      }
-
-      $eventEmitter.emit(Events.AnalysesRefresh);
-
-      return status;
-    });
+    return openEditModal(cloneDeep(analysis), 'edit');
   }
 
   function publish(analysis) {
@@ -60,8 +44,8 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function print() {
   }
 
-  function exportAnalysis(analysisId, executionId) {
-    return AnalyzeService.getExportData(analysisId, executionId);
+  function exportAnalysis(analysisId, executionId, analysisType) {
+    return AnalyzeService.getExportData(analysisId, executionId, analysisType);
   }
 
   function deleteAnalysis(analysis) {
@@ -96,22 +80,19 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
   function openEditModal(analysis, mode) {
     /* Delayed injection of service to battle issues with downgradeModule */
     const AnalyzeDialogService = $injector.get('AnalyzeDialogService');
-    const openModal = template => showDialog({
-      template,
-      controller: scope => {
-        scope.model = deepClone(analysis);
-      },
-      multiple: true
-    });
 
     switch (analysis.type) {
     case AnalyseTypes.Chart:
-      return openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
       return AnalyzeDialogService.openEditAnalysisDialog(analysis, mode)
-        .afterClosed().first().toPromise();
+        .afterClosed().first().toPromise().then(status => {
+          if (!status) {
+            return {};
+          }
+          return status;
+        });
     default:
     }
   }

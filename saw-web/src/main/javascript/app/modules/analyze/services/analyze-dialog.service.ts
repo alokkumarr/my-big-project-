@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 
 import {
   AnalysisDialogData,
@@ -23,10 +23,12 @@ import { ConfirmDialogData } from '../../../common/types';
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'Are you sure you want to proceed?',
-  content: 'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
+  content:
+    'If you save changes to sql query, you will not be able to go back to designer view for this analysis.',
   positiveActionLabel: 'Save',
   negativeActionLabel: 'Cancel'
 };
+
 @Injectable()
 export class AnalyzeDialogService {
   constructor(public dialog: MatDialog) {}
@@ -62,7 +64,8 @@ export class AnalyzeDialogService {
       action: 'sort',
       sorts,
       artifacts
-    }
+    };
+
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -71,13 +74,19 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria) {
+  openFilterDialog(
+    filters: Filter[],
+    artifacts: Artifact[],
+    booleanCriteria,
+    supportsGlobalFilters = false
+  ) {
     const data: IToolbarActionData = {
       action: 'filter',
       filters,
       artifacts,
-      booleanCriteria
-    }
+      booleanCriteria,
+      supportsGlobalFilters
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -89,7 +98,7 @@ export class AnalyzeDialogService {
   openPreviewDialog(analysis: Analysis) {
     const data = {
       analysis
-    }
+    };
     return this.dialog.open(DesignerPreviewDialogComponent, {
       width: '100vw',
       maxWidth: '100vw',
@@ -102,7 +111,7 @@ export class AnalyzeDialogService {
     const data: IToolbarActionData = {
       action: 'description',
       description
-    }
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: '500px',
       height: 'auto',
@@ -118,22 +127,22 @@ export class AnalyzeDialogService {
         format,
         type
       }
-    } as MatDialogConfig)
+    } as MatDialogConfig);
   }
 
-  openDateFormatDialog(format: string) {
+  openDateFormatDialog(format: string, availableFormats) {
     return this.dialog.open(DateFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
-      data: { format }
-    } as MatDialogConfig)
+      data: { format, availableFormats }
+    } as MatDialogConfig);
   }
 
   openSaveDialog(analysis: Analysis) {
     const data: IToolbarActionData = {
       action: 'save',
       analysis
-    }
+    };
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',

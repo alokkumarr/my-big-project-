@@ -1,0 +1,42 @@
+<admin-analysis-export>
+    <md-toolbar class="secondary-toolbar">
+        <div class="md-toolbar-tools" layout-align="start center">
+            <div class="categories-view_search-panel" layout="row" layout-align="start center">
+                <span class="md-title" translate="EXPORT_LABEL"></span>
+            </div>      
+        </div>
+    </md-toolbar>
+    <div>
+        <md-input-container> <label
+                translate="SELECT_METRIC_EXPORT"></label> <md-select ng-model="$ctrl.seletedMetrics"
+                ng-change="$ctrl.getAnalysisByMetricIds($ctrl.seletedMetrics)"
+                multiple="{{false}}" required> <md-option
+                ng-repeat="metric in $ctrl.metrics" ng-value="metric.metricName"
+                ng-bind="::metric.metricName"></md-option> </md-select>
+        </md-input-container>
+        <div class="form-container" layout="column">
+            <label translate="SELECTED_METRIC_EXPORT"></label>
+              <md-chips ng-model="$ctrl.seletedMetrics"
+              readonly="true"
+              md-on-remove="$ctrl.getAnalysisByMetricIds($ctrl.seletedMetrics)"
+              md-removable="true">
+                <md-chip-template >
+                  <span>
+                    <strong>{{$chip}}</strong>
+                  </span>
+                </md-chip-template>
+                <button md-chip-remove class="md-primary metric-close-chip">
+                    <md-icon md-font-icon="icon-close"></md-icon>
+                </button>
+              </md-chips> 
+          </div>
+          <div>
+              <export-list-view
+              id="export-grid-dir"
+              analysis-list="$ctrl.analysisTableList"
+              updater="$ctrl.updater"
+              on-action="$ctrl.onListAction(type, model)"
+              ></export-list-view>
+          </div>
+    </div>
+</admin-analysis-export>

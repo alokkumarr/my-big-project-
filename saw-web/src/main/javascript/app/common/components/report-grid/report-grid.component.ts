@@ -62,7 +62,7 @@ type ReportGridField = {
   changeColumnProp: Function;
 }
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 25;
 const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
 @Component({
   selector: 'report-grid-upgraded',
@@ -130,7 +130,7 @@ export class ReportGridComponent {
   public showBorders = false;
   public rowAlternationEnabled = true;
   public hoverStateEnabled = true;
-  public wordWrapEnabled = true;
+  public wordWrapEnabled = false;
   public scrolling = {mode: 'Virtual'};
   public sorting = {mode: 'multiple'};
   public columnChooser;
@@ -140,7 +140,7 @@ export class ReportGridComponent {
   public paging;
   public pager = {
     showNavigationButtons: true,
-    allowedPageSizes: [DEFAULT_PAGE_SIZE, 25, 50, 100],
+    allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
     showPageSizeSelector: true
   };
   public loadPanel;

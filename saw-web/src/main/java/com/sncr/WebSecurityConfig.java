@@ -20,12 +20,9 @@ public class WebSecurityConfig extends
   protected void configure(HttpSecurity http) throws Exception {
 	  logger.debug(this.getClass().getName() + " - configure - START");
     http
-      .headers()
+      .headers().cacheControl().disable()
         .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Origin", "*"))
         .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"));
-        
-    	
-    http.headers().frameOptions().disable();
         
     
     http

@@ -1,6 +1,8 @@
 - name: restart saw-transport
   # Stop service, to trigger restart by socket activation
-  systemd: name=saw-transport state=stopped daemon_reload=true
+  systemd: name=saw-transport state=stopped
+  # Note: "daemon_reload=true" disabled above in an attempt to reduce
+  # occurences of failing to stop saw-transport service errors
 # Workaround: The Ansible systemd module fails with an "Could not find
 # the requested service saw-transport-executor@*" error when working
 # with wildcards, so work around this by enumerating instances for

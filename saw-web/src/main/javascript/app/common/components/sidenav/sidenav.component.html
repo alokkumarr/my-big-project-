@@ -1,7 +1,9 @@
   <div layout="row">
     <mat-icon fontIcon="icon-menu" (click)="sidenav.toggle()" e2e="main-menu-expand-btn"></mat-icon>
     <mat-sidenav-container class="md-whiteframe-4dp">
-      <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container sidebar-header md-whiteframe-4dp, md-whiteframe-z2">
+      <mat-sidenav #sidenav fxFlex="100%" mode="side"
+        class="sidenav-container sidebar-header md-whiteframe-4dp, md-whiteframe-z2"
+        [ngClass]="{'sidenav-closed': !sidenav.opened}">
         <h3><span>{{getMenuHeader()}}</span></h3>
         <accordion-menu [source]="menu"></accordion-menu>
       </mat-sidenav>

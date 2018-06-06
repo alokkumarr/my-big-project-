@@ -1,0 +1,9 @@
+<ng-container [ngSwitch]="analysisType">
+  <designer-settings-aux-chart *ngSwitchCase="'chart'"
+    [isInverted]="auxSettings.isInverted"
+    [legend]="auxSettings.legend"
+    [labelOptions]="auxSettings.labelOptions"
+    [chartType]="analysisSubtype"
+    (change)="change.emit($event)">
+  </designer-settings-aux-chart>
+</ng-container>

@@ -4,6 +4,7 @@ import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
 import * as isEmpty from 'lodash/isEmpty';
+import {Events} from '../../../consts';
 
 export const AnalyzeListViewComponent = {
   template,
@@ -18,13 +19,14 @@ export const AnalyzeListViewComponent = {
     cronJobs: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService) {
+    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService, $eventEmitter) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._AnalyzeService = AnalyzeService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._JwtService = JwtService;
+      this._$eventEmitter = $eventEmitter;
 
       this._gridListInstance = null;
 
@@ -40,6 +42,12 @@ export const AnalyzeListViewComponent = {
       });
     }
 
+    $onChanges(changes) {
+      if (changes.cronJobs && this._gridListInstance) {
+        this.onUpdateAnalysisType(this.analysisType);
+      }
+    }
+
     showExecutingFlag(analysisId) {
       return analysisId && this._AnalyzeService.isExecuting(analysisId);
     }
@@ -50,13 +58,14 @@ export const AnalyzeListViewComponent = {
 
     onUpdate({analysisType, analyses}) {
       /* eslint-disable */
-      analysisType && this.onUpdateAnalysisType(analysisType);
       analyses && this.reloadDataGrid(analyses);
+      analysisType && this.onUpdateAnalysisType(analysisType);
       /* eslint-enable */
     }
 
     onUpdateAnalysisType(analysisType) {
       let scheduleState;
+      this.analysisType = analysisType;
       if (analysisType === 'all') {
         this._gridListInstance.clearFilter();
       } else if (analysisType === 'scheduled') {
@@ -80,7 +89,12 @@ export const AnalyzeListViewComponent = {
     }
 
     fork(analysis) {
-      this._AnalyzeActionsService.fork(analysis);
+      this._AnalyzeActionsService.fork(analysis).then(result => {
+        if (!result.isSaveSuccessful) {
+          return result;
+        }
+        this._$eventEmitter.emit(Events.AnalysesRefresh);
+      });
     }
 
     onSuccessfulDeletion(analysis) {

@@ -34,8 +34,8 @@ export class SortService {
 
   getArtifactColumns2SortFieldMapper() {
     return fpPipe(
-      fpFilter(({checked}) => checked &&
-        (checked === 'x' || checked === 'g')),
+      fpFilter(({checked, area}) => checked &&
+        (checked === 'x' || checked === 'g' || area === 'x' || area === 'g')),
       fpMap(artifactColumn => {
         return {
           type: artifactColumn.type,

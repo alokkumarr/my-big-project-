@@ -205,7 +205,9 @@ public class CreatePivotTable {
                     pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(count++).setDataField(true);
                     break;
                 case COUNT:
-                    pivotTable.addColumnLabel(DataConsolidateFunction.COUNT,count,dataField.getColumnName());
+                    /* Count is already calculated by elastic search aggregation, no need to calculate it again. consider the default
+                     value as sum to display count value */
+                    pivotTable.addColumnLabel(DataConsolidateFunction.SUM,count,dataField.getColumnName());
                     pivotTable.addDataColumn(count,true);
                     pivotTable.getCTPivotTableDefinition().getPivotFields().getPivotFieldArray(count++).setDataField(true);
                     break;

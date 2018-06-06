@@ -1,6 +1,6 @@
-<analyze-report-query [query]="analysis.queryManual || analysis.query"
+<analyze-report-query [query]="analysis.queryManual"
                       [artifacts]="artifacts"
-                      (change)="onQueryChange($event)"
+                      (queryChange)="onQueryChange($event)"
                       style="padding: 20px; display: block;"
 ></analyze-report-query>
 
