@@ -180,7 +180,7 @@ public abstract class Component {
                 });
                 if (rc[0] != 0) return rc[0];
             }
-            logger.info(mdOutputDSMap);
+            logger.debug(mdOutputDSMap);
             return 0;
 
         } catch (Exception e) {
