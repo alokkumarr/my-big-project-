@@ -48,14 +48,14 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-     // expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-    //  analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -75,7 +75,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
       let chartTyp = data.chartType.split(":")[1];
 
-      login.loginAsV2(data.user);
+      login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();

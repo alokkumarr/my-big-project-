@@ -25,12 +25,12 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const sizeByName = 'Activated No Usage Subscriber Count';
 
   const dataProvider = {
-    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
-    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
-    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
     'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
     'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
     'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
+    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
+    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
+    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},    
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
     'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
@@ -49,14 +49,14 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-     // expect(browser.getCurrentUrl()).toContain('/login');
+      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-     // analyzePage.main.doAccountAction('logout');
+      analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -76,7 +76,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       let chartName = `e2e ${description} ${(new Date()).toString()}`;
       let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
-      login.loginAsV2(data.user);
+      login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();
