@@ -25,6 +25,7 @@ saw_spark_master_url=local[*]
 saw_zookeeper_quorum=saw-mapr
 saw_metadata_path=/main/metadata/
 saw_report_executor_path=/main/
+saw_execution_history=3
 saw_observe_metastore=hdfs:///main/
 
 #

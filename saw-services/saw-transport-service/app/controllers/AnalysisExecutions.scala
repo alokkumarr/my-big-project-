@@ -9,6 +9,7 @@ import play.mvc.{Http, Result, Results}
 import sncr.datalake.DLSession
 import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDObjectStruct
+import sncr.saw.common.config.SAWServiceConfig
 
 import scala.collection.JavaConverters._
 
@@ -27,11 +28,14 @@ class AnalysisExecutions extends BaseController {
         (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String])
       }).sortBy(result =>result._2).reverse
       var count = 0
-      val junkExecution = new Array[String](sortedExecutions.size+1-5)
+      val execHistory = SAWServiceConfig.executionHistory
+      var junkSize = if(sortedExecutions.size < execHistory)
+        1 else (sortedExecutions.size+1-execHistory)
+      val junkExecution = new Array[String](junkSize)
       val executions = sortedExecutions.filter(result =>{
         count = count+1
-        if(count<=5) true
-        else { junkExecution(count-5) = result._1
+        if(count<=execHistory) true
+        else { junkExecution(count-execHistory) = result._1
           false }
       }).map(result => {
         ("id", result._1) ~
