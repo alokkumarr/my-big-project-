@@ -40,14 +40,14 @@
   <analyze-list-view *ngSwitchCase="LIST_VIEW"
                         (action)="onAction($event)"
                         [analyses]="filteredAnalyses | analysesFilter:filterObj.analysisType:cronJobs"
-                        [analysisType]="analysisType"
+                        [analysisType]="filterObj.analysisType"
                         [searchTerm]="filterObj.searchTermValue"
                         [cronJobs]="cronJobs">
   </analyze-list-view>
   <analyze-card-view *ngSwitchCase="CARD_VIEW"
                         (action)="onAction($event)"
                         [analyses]="filteredAnalyses | analysesFilter:filterObj.analysisType:cronJobs"
-                        [analysisType]="analysisType"
+                        [analysisType]="filterObj.analysisType"
                         [highlightTerm]="filterObj.searchTermValue"
                         [cronJobs]="cronJobs">
   </analyze-card-view>
