@@ -279,8 +279,7 @@
             <image>
               <name>sip-base:${project.version}</name>
               <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                <dockerFile>Dockerfile-base</dockerFile>
+                <dockerFileDir>${project.basedir}/src/test/docker-base</dockerFileDir>
               </build>
               <run>
                 <skip>true</skip>
@@ -290,8 +289,7 @@
               <name>sip-admin:${project.version}</name>
               <alias>sip-admin</alias>
               <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                <dockerFile>Dockerfile-admin</dockerFile>
+                <dockerFileDir>${project.basedir}/src/test/docker-admin</dockerFileDir>
                 <assembly>
                   <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                           xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
@@ -349,8 +347,7 @@
               <name>sip-proxy:${project.version}</name>
               <alias>sip-proxy</alias>
               <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                <dockerFile>Dockerfile-proxy</dockerFile>
+                <dockerFileDir>${project.basedir}/src/test/docker-proxy</dockerFileDir>
               </build>
               <run>
                 <namingStrategy>alias</namingStrategy>
@@ -416,8 +413,7 @@
               <name>sip-elastic:${project.version}</name>
               <alias>sip-elastic</alias>
               <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                <dockerFile>Dockerfile-elastic</dockerFile>
+                <dockerFileDir>${project.basedir}/src/test/docker-elastic</dockerFileDir>
               </build>
               <run>
                 <namingStrategy>alias</namingStrategy>
