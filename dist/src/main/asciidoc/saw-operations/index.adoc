@@ -68,6 +68,19 @@ installations and upgrades.  It is recommended to put it under version
 control that is stored on the deploy host and backed up to another
 location.
 
+==== Running SAW on YARN.
+
+Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
+in version v2.6.0.
+To configure and run the saw-executor in yarn mode default configuration properties
+are provided in `saw-config` copy those properties change as per enviroment.
+
+To configuring additional properties for spark and yarn,set configuration as java
+option since SparkConf loads defaults from system properties(start with spark.*)
+and the classpath.'
+
+  Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
+
 === Installing
 
 Execute the following steps to install SAW:
@@ -106,6 +119,26 @@ Before upgrading, install and configure Apache Livy from the MapR
 Ecosystem Pack as described in the updated <<Prerequisites>>.  Also
 add the `saw_workbench_livy_uri` parameter to the SAW environment
 configuration (`saw-config`).
+
+==== Upgrading to SAW 2.6
+
+Before upgrading, If SAW require to run saw-executor in YARN mode
+configure as described in the updated <<Running SAW on YARN>>. Update
+to the below SAW environment configuration (`saw-config`).
+
+    saw_spark_master_url=yarn
+    saw_spark_yarn_queue_regular=saw-regular
+    saw_spark_yarn_queue_fast=saw-fast
+    saw_spark_yarn_jars=/opt/mapr/spark/spark-2.1.0/jars
+    saw_spark_yarn_zips=/opt/saw/service/spark.zip
+    # Zip file will be automatically get created if not exists in mention location.
+    saw_spark_yarn_resource_manager=saw-mapr
+
+Additional parameter added to control large file export from FTP/email dispatch.
+In case of any higher memory/CPU load on (saw-transport service/export service) server,
+this parameter can be set lower value.
+
+     saw_export_chunk_size=10000
 
 === Interfaces
 
