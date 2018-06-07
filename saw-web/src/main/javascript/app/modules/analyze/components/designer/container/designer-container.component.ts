@@ -71,6 +71,7 @@ export class DesignerContainerComponent {
   public dataCount: number;
   public auxSettings: any = {};
   public sorts: Sort[] = [];
+  public sortFlag = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
@@ -217,18 +218,20 @@ export class DesignerContainerComponent {
   checkNodeForSorts() {
     if ((this.analysisStarter || this.analysis).type !== 'chart') return;
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
-    forEach(this.sorts, sort => {
-      forEach(sqlBuilder.nodeFields || [], node => {
-        // check if sort already exits for this particular node
-        if (node.columnName !== sort.columnName) {
-          this.sorts.push({
-            order: 'asc',
-            columnName: node.columnName,
-            type: node.type
-          });
-        }
+    forEach(sqlBuilder.nodeFields, node => {
+      let identical = false;
+      forEach(this.sorts || [], sort => {
+         identical = (node.columnName === sort.columnName);
       });
+      if(!identical) {
+        this.sortFlag.push({
+          order: 'asc',
+          columnName: node.columnName,
+          type: node.type
+        });
+      }
     });
+    this.sorts = this.sortFlag.concat(this.sorts);
   }
 
   addDefaultSorts() {
