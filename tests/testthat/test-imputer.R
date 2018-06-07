@@ -49,7 +49,7 @@ sc <- spark_connect(master = "local")
 
 
 
-dat <- sim_data(3, 10, 1, seed = 319) %>%
+dat <- sim_data(10, 10, 1, seed = 319) %>%
   mutate(index = row_number())
 
 dat <- dat %>%
