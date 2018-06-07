@@ -26,15 +26,15 @@ RUN chmod a+x /root/saw-deploy
 
 RUN chmod a+x /root
 # Add SAW Analyze test data
-COPY saw-metrics /root/saw-metrics/
-COPY saw-metrics/sample-spark/saw-analyze-spark-testdata.service /etc/systemd/system/
-COPY saw-metrics/sample-elasticsearch/saw-analyze-elasticsearch-testdata.service /etc/systemd/system/
-RUN systemctl enable saw-analyze-spark-testdata
-RUN systemctl enable saw-analyze-elasticsearch-testdata
+COPY saw-analyze-samples /root/saw-analyze-samples/
+COPY saw-analyze-samples/sample-spark/saw-analyze-spark-samples.service /etc/systemd/system/
+COPY saw-analyze-samples/sample-elasticsearch/saw-analyze-elasticsearch-samples.service /etc/systemd/system/
+RUN systemctl enable saw-analyze-spark-samples
+RUN systemctl enable saw-analyze-elasticsearch-samples
 # Add SAW Workbench test data
-COPY saw-workbench /root/saw-workbench/
-COPY saw-workbench/saw-workbench-testdata.service /etc/systemd/system/
-RUN systemctl enable saw-workbench-testdata
+COPY saw-workbench-samples /root/saw-workbench-samples/
+COPY saw-workbench-samples/saw-workbench-samples.service /etc/systemd/system/
+RUN systemctl enable saw-workbench-samples
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-*/sample-*/load*
 
