@@ -8,6 +8,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
 import * as trim from 'lodash/trim';
 import * as isUndefined from 'lodash/isUndefined';
+import * as moment from 'moment';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -39,6 +40,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   secondaryResult: Array<{ name: string; value: string | number }> = [];
   kpiFilterSubscription: Subscription;
+  filterLabel: string;
 
   constructor(
     private observe: ObserveService,
@@ -87,19 +89,35 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     return this.executeKPI(kpi);
   }
 
-  get filterLabel() {
+  getFilterLabel() {
     if (!this._executedKPI && !this._kpi) return '';
 
     const preset = get(
       this._executedKPI || this._kpi,
       'filters.0.model.preset'
     );
-    return get(this.datePresetObj, `${preset}.label`);
+    const filter = get(this.datePresetObj, `${preset}.label`);
+    if (filter === 'Custom') {
+      const gte = moment(
+        get(this._executedKPI || this._kpi, 'filters.0.model.gte'),
+        'YYYY-MM-DD HH:mm:ss'
+      ).format('YYYY/MM/DD');
+      const lte = moment(
+        get(this._executedKPI || this._kpi, 'filters.0.model.lte'),
+        'YYYY-MM-DD HH:mm:ss'
+      ).format('YYYY/MM/DD');
+      return `${gte} - ${lte}`;
+    } else {
+      return filter;
+    }
   }
 
   executeKPI(kpi) {
     this._executedKPI = kpi;
-    this.bgColor = isUndefined(kpi.kpiBgColor) ? 'black' : get(find(KPI_BG_COLORS, ['label',kpi.kpiBgColor]), 'value');
+    this.filterLabel = this.getFilterLabel();
+    this.bgColor = isUndefined(kpi.kpiBgColor)
+      ? '#0f61c8'
+      : get(find(KPI_BG_COLORS, ['label', kpi.kpiBgColor]), 'value');
     const dataFieldName = get(kpi, 'dataFields.0.name');
     const [primaryAggregate, ...secondaryAggregates] = get(
       kpi,
