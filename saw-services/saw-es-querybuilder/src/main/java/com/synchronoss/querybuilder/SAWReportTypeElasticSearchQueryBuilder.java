@@ -120,10 +120,17 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                             rangeQueryBuilder.gte(item.getModel().getGte());
                             builder.add(rangeQueryBuilder);
                         }
+
+                        if (sqlBuilderNode.getBooleanCriteria().value().equals(SqlBuilder.BooleanCriteria.AND.value())) {
+                            boolQueryBuilder.must(builder.get(builder.size() -1));
+                        } else {
+                            boolQueryBuilder.should(builder.get(builder.size() -1));
+                        }
                     }
                     // make the query based on the filter given
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
                         builder = QueryBuilderUtil.stringFilterReport(item, builder);
+                        boolQueryBuilder.must(builder.get(builder.size() -1));
                     }
 
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
@@ -131,6 +138,12 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
                             || item.getType().value().toLowerCase().equals(Filter.Type.LONG.value().toLowerCase())) {
                         builder = QueryBuilderUtil.numericFilterReport(item, builder);
+
+                        if (sqlBuilderNode.getBooleanCriteria().value().equals(SqlBuilder.BooleanCriteria.AND.value())) {
+                            boolQueryBuilder.must(builder.get(builder.size() -1));
+                        } else {
+                            boolQueryBuilder.should(builder.get(builder.size() -1));
+                        }
                     }
 
                 }
@@ -158,30 +171,30 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                             rangeQueryBuilder.gte(item.getModel().getGte());
                             builder.add(rangeQueryBuilder);
                         }
+
+                        if (sqlBuilderNode.getBooleanCriteria().value().equals(SqlBuilder.BooleanCriteria.AND.value())) {
+                            boolQueryBuilder.must(builder.get(builder.size() -1));
+                        } else {
+                            boolQueryBuilder.should(builder.get(builder.size() -1));
+                        }
                     }
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
                         builder = QueryBuilderUtil.stringFilterReport(item, builder);
+                        boolQueryBuilder.must(builder.get(builder.size() -1));
                     }
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
                             .getType().value().toLowerCase().equals(Filter.Type.INT.value().toLowerCase()))
                             || item.getType().value().toLowerCase().equals(Filter.Type.FLOAT.value().toLowerCase())
                             || item.getType().value().toLowerCase().equals(Filter.Type.LONG.value().toLowerCase())) {
                         builder = QueryBuilderUtil.numericFilterReport(item, builder);
+
+                        if (sqlBuilderNode.getBooleanCriteria().value().equals(SqlBuilder.BooleanCriteria.AND.value())) {
+                            boolQueryBuilder.must(builder.get(builder.size() -1));
+                        } else {
+                            boolQueryBuilder.should(builder.get(builder.size() -1));
+                        }
                     }
                 }
-            }
-            if (sqlBuilderNode.getBooleanCriteria().value().equals(SqlBuilder.BooleanCriteria.AND.value())) {
-                builder.forEach(item -> {
-                    boolQueryBuilder.must(item);
-                });
-            } else {
-                builder.forEach(item -> {
-                    if(item.getType().value().equals(Filter.Type.STRING.value())) {
-                        boolQueryBuilder.must(item);
-                    } else {
-                        boolQueryBuilder.should(item);
-                    }
-                });
             }
             searchSourceBuilder.query(boolQueryBuilder);
         }
