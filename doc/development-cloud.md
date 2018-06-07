@@ -23,13 +23,12 @@ cloud:
 
         $ docker-machine ls
 
-5. Get the remote Docker Machine host IP address by running the
-   following command:
+5. Get the SIP start page URL by running the following command:
 
-        $ docker-machine ip <name>
+        $ docker-machine ssh <name> sip-url
 
-6. Navigate to the SAW start page in your browser using the IP address
-   retrieved in the previous step (`http://<ip-address>/`)
+6. Navigate to the SIP start page in your browser using the URL
+   address retrieved in the previous step
 
 Note: The first run will take longer to complete.  Subsequent runs
 using the same remote machine will be faster and take only a couple of
