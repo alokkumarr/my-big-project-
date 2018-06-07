@@ -75,6 +75,11 @@ in version v2.6.0.
 To configure and run the saw-executor in yarn mode default configuration properties
 are provided in `saw-config` copy those properties change as per enviroment.
 
+To configuring additional properties for spark and yarn,set configuration as java
+option since SparkConf loads defaults from system properties(start with spark.*)
+and the classpath.'
+
+  Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
 
 === Installing
 
