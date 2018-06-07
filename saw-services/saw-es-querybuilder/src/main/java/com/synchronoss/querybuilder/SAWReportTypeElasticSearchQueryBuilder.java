@@ -176,7 +176,11 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                 });
             } else {
                 builder.forEach(item -> {
-                    boolQueryBuilder.should(item);
+                    if(item.getType().value().equals(Filter.Type.STRING.value())) {
+                        boolQueryBuilder.must(item);
+                    } else {
+                        boolQueryBuilder.should(item);
+                    }
                 });
             }
             searchSourceBuilder.query(boolQueryBuilder);
