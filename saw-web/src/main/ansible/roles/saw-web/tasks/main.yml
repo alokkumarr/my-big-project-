@@ -4,9 +4,11 @@
   template: src=server.xml dest=/usr/share/tomcat/conf
 - name: Enable and start Tomcat service
   systemd: name=tomcat enabled=true state=started
-- name: Install SAW Web package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Web package
+  copy: src="{{ item }}" dest=/tmp/saw-web.rpm
   with_fileglob: ["../rpms/saw-web-*.rpm"]
+- name: Install SAW Web package
+  yum: name=/tmp/saw-web.rpm state=present
   # Workaround: Any previously deployed and exploded WAR needs to be
   # removed before deploying a new version of the WAR.  This
   # workaround can be removed when/if SAW Web is converted to a Spring

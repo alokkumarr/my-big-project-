@@ -1,6 +1,8 @@
-- name: Install SAW Semantic Service package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Semantic Service package
+  copy: src="{{ item }}" dest=/tmp/saw-semantic.rpm
   with_fileglob: ["../rpms/saw-semantic-*.rpm"]
+- name: Install SAW Semantic Service package
+  yum: name=/tmp/saw-semantic.rpm state=present
   notify:
     - restart saw-semantic
 - name: Install SAW Semantic Service configuration file

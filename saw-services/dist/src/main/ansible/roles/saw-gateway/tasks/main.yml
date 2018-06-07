@@ -1,6 +1,8 @@
-- name: Install SAW Gateway Service package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Gateway Service package
+  copy: src="{{ item }}" dest=/tmp/saw-gateway.rpm
   with_fileglob: ["../rpms/saw-gateway-*.rpm"]
+- name: Install SAW Gateway Service package
+  yum: name=/tmp/saw-gateway.rpm state=present
   notify:
     - restart saw-gateway
 - name: Install SAW Gateway Service configuration file
