@@ -171,6 +171,7 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
         }
       );
       this.reloadChart(changes);
+      this.item && this.onRefresh.emit(this.item);
     });
   }
 }
