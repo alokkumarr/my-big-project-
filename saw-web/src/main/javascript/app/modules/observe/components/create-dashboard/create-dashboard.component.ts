@@ -163,7 +163,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
       const item = {
         cols: 20,
-        rows: 7,
+        rows: 6,
         bullet: data,
         updater: new BehaviorSubject({})
       };
