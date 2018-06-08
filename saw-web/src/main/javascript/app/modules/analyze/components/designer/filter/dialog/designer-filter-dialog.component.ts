@@ -43,7 +43,6 @@ export type DesignerFilterDialogResult = {
 export class DesignerFilterDialogComponent implements OnInit {
   artifacts: Artifact[];
   filters: Filter[];
-  isInRuntimeMode: boolean;
   groupedFilters;
   areFiltersValid: boolean = false;
 
@@ -121,7 +120,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     let areValid = true;
     forEach(filters, ({type, model, isRuntimeFilter}: Filter) => {
       if (!model) {
-        areValid = Boolean(isRuntimeFilter);
+        areValid = Boolean(this.data.isInRuntimeMode ? false : isRuntimeFilter);
       } else if (type === 'string') {
         areValid = this.isStringFilterValid(model);
       } else if (NUMBER_TYPES.includes(type)) {
