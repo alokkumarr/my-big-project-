@@ -67,7 +67,8 @@ import {
   JsPlumbEndpointComponent
 } from './components/js-plumb';
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
-import { DateFormatDialogComponent } from './components/date-format-dialog';
+import {DateFormatDialogComponent} from './components/date-format-dialog';
+import { ChoiceGroupComponent } from './components/choice-group-u';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { E2eDirective } from './directives/e2e.directive';
 import { UserService } from '../../login/services/user.service';
@@ -161,6 +162,7 @@ angular
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
+    ChoiceGroupComponent,
     SearchBoxComponent
   ],
   entryComponents: [
@@ -181,6 +183,7 @@ angular
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
+    ChoiceGroupComponent,
     SearchBoxComponent
   ],
   exports: [
@@ -220,6 +223,7 @@ angular
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     E2eDirective,
+    ChoiceGroupComponent,
     SearchBoxComponent
   ],
   providers: [
