@@ -93,24 +93,26 @@ public class ConvertToRow implements Function<String, Row> {
         if (parsed == null) {
             logger.info("Unable to parse the record");
             errCounter.add(1);
+            record = createRejectedRecord(line, "Unable to parse the record");
 
-            String srcRecord[] = line.split(String.valueOf(delimiter));
-
-            System.arraycopy(srcRecord, 0, record, 0, srcRecord.length);
-
-            record[schema.length() + 1] = "Unable to parse the record";
-            record[schema.length()] = 1;
+//            String srcRecord[] = line.split(String.valueOf(delimiter));
+//
+//            System.arraycopy(srcRecord, 0, record, 0, srcRecord.length);
+//
+//            record[schema.length()] = 1;
+//            record[schema.length() + 1] = "Unable to parse the record";
         } else if(parsed.length != schema.fields().length){
             // Create record with rejected flag
             errCounter.add(1);
+            record = createRejectedRecord(line, "Invalid number of columns");
             // Copy columns from input string to output record
-            if (parsed.length < schema.length()) {
-                System.arraycopy(parsed, 0, record, 0, parsed.length);
-            } else {
-                System.arraycopy(parsed, 0, record, 0, schema.length());
-            }
-            record[schema.length() + 1] = "Invalid number of columns";
-            record[schema.length()] = 1;
+//            if (parsed.length < schema.length()) {
+//                System.arraycopy(parsed, 0, record, 0, parsed.length);
+//            } else {
+//                System.arraycopy(parsed, 0, record, 0, schema.length());
+//            }
+//            record[schema.length()] = 1;
+//            record[schema.length() + 1] = "Invalid number of columns";
         } else {
             // TODO: Faster implementation will require automatic Janino code generation
             try {
@@ -156,16 +158,27 @@ public class ConvertToRow implements Function<String, Row> {
                 errCounter.add(1);
 
                 // Copy columns from input string to output record
-                System.arraycopy(parsed, 0, record, 0, schema.length());
-                record[schema.length()] = 1;
-                record[schema.length() + 1] = e.getClass().getCanonicalName() + ": " + e.getMessage();
+//                System.arraycopy(parsed, 0, record, 0, schema.length());
+//                record[schema.length()] = 1;
+//                record[schema.length() + 1] = e.getClass().getCanonicalName() + ": " + e.getMessage();
 
                 //TODO; Not working - Sunil
 //                record = new Object[]{line, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()};
+                record = createRejectedRecord(line, e.getMessage());
             }
         }
         recCounter.add(1);
         return  RowFactory.create(record);
+    }
+
+    private Object[] createRejectedRecord (String line, String rejectReason) {
+        Object []record = new Object[this.schema.length() + 2];
+
+        record[0] = line;
+        record[this.schema.length()] = 1;
+        record[this.schema.length() + 1] = rejectReason;
+
+        return record;
     }
 
     private boolean validateString(String inputString) {

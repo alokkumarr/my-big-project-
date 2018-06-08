@@ -367,8 +367,10 @@ public abstract class Component {
                     Map<String, Object> outDS = outputDataSets.get(dsname);
                     JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
 
-                    logger.trace("Extracted schema: " + schema.toString());
-                    md.updateDS(id, ctx, ds, schema);
+                    if (schema != null) {
+                        logger.trace("Extracted schema: " + schema.toString());
+                        md.updateDS(id, ctx, ds, schema);
+                    }
 
                 } catch (Exception e) {
                     error = "Could not update DS/ write AuditLog entry to DS, id = " + id;

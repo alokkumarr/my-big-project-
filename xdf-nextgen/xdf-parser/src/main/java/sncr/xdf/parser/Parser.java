@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
@@ -224,18 +225,15 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         JavaRDD<Row> outputRdd = getOutputData(rdd);
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         logger.debug("Output dataset = " + outputDataset.count() );
-        writeDataset(outputDataset, outputFormat, tempDir);
+        boolean status = writeDataset(outputDataset, outputFormat, tempDir);
 
-        //TODO: Write rejected datasets
-        if (rejectedDatasetLocation != null) {
-            // Get all entries which are not rejected
-            JavaRDD<Row> rejectedRdd = rdd.subtract(outputRdd);
+        if (!status) {
+            return -1;
+        }
 
-            logger.debug("Rejected RDD = " + rejectedRdd.count());
-
-            logger.debug("Rejected dataset = " + rejectedRdd.count());
-
-            writeRdd(rejectedRdd, rejectedDatasetLocation);
+        status = writeRejectedData(rdd, outputRdd, rejectedDatasetLocation);
+        if (!status) {
+            logger.error("Failed to write rejected data");
         }
 
         resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
@@ -282,20 +280,46 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);;
         writeDataset(df, outputFormat, destDir.toString());
 
-        //TODO: Write rejected datasets
-        if (rejectedDatasetLocation != null) {
-            // Get all entries which are not rejected
-            JavaRDD<Row> rejectedRdd = rdd.subtract(outputRdd);
-
-            logger.debug("Rejected RDD = " + rejectedRdd.count());
-
-
-            logger.debug("Rejected dataset = " + rejectedRdd.count());
-
-            writeRdd(rejectedRdd, rejectedDatasetLocation);
-        }
+        writeRejectedData(rdd, outputRdd, rejectedDatasetLocation);
 
         return 0;
+    }
+
+    /**
+     * Extract all the rejected records from the full rdd and write it in the specified location.
+     *
+     * @param fullRdd Complete RDD which contains both output and rejected records
+     * @param outputRdd Contains output records
+     * @param location Physical location to which rejected records need to be written
+     * @return
+     *      true - if write is successful
+     *      false - if location is not specified or write operation fails
+     *
+     */
+
+    private boolean writeRejectedData (JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd,
+                                       String location) {
+        boolean status = true;
+
+        try {
+            if(location != null) {
+                // Get all entries which are rejected
+                JavaRDD<Row> rejectedRdd = fullRdd.subtract(outputRdd).map(record ->
+                    RowFactory.create(record.get(0), record.get(record.length() - 1)));
+
+                rejectedRdd.collect().forEach(System.out::println);
+                logger.debug("Rejected RDD = " + rejectedRdd.count());
+
+                writeRdd(rejectedRdd, location);
+            } else {
+                status = false;
+            }
+        } catch (Exception exception) {
+            logger.error(exception);
+            status = false;
+        }
+
+        return status;
     }
 
     /**
@@ -313,17 +337,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
      * @return
      * @throws XDFException
      */
-    private int writeDataset(Dataset<Row> dataset, String format, String path) {
+    private boolean writeDataset(Dataset<Row> dataset, String format, String path) {
         try {
             DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, pkeys);
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
-            return 0;
+            return true;
         } catch (Exception e) {
             error = ExceptionUtils.getFullStackTrace(e);
             logger.error("Error at writing result: " + error);
-            return -1;
+            return false;
         }
     }
 
