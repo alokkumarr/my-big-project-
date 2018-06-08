@@ -11,7 +11,7 @@ import {
   Sort,
   Filter
 } from '../types';
-import { DesignerStates } from '../container';
+import { DesignerStates } from '../consts';
 
 const template = require('./designer-report.component.html');
 require('./designer-report.component.scss');

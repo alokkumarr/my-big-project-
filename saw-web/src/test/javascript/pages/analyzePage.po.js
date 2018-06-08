@@ -1,15 +1,15 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
+const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
 const designModePage = require('./designModePage.po');
-const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
+const getCards = name => element.all(by.css('mat-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
 
 const getCard = name => getCards(name).first();
 
-const firstCard = element.all(by.css('md-card[e2e="analysis-card"]')).first();
+const firstCard = element.all(by.css('mat-card[e2e="analysis-card"]')).first();
 
 const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"]'));
 
@@ -47,26 +47,34 @@ const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
-  commonFunctions.waitFor.elementToBeClickable(toggle);
   commonFunctions.waitFor.elementToBeVisible(toggle);
+  commonFunctions.waitFor.elementToBeClickable(toggle);
   toggle.click();
-
-  toggle.getAttribute('aria-owns').then(id => {
+  const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
+  menuItems.getAttribute('id').then(id => {
     if (id) {
       const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
-      commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+      commonFunctions.waitFor.elementToBeClickable(actionButton);
+      actionButton.click();
     } else {
       const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
         commonFunctions.waitFor.elementToBeVisible(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
-        commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        commonFunctions.waitFor.elementToBeClickable(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)).click();
       });
     }
     // actionButton.click();
   });
 };
 
+const getAnalysisActionOptionsNew = name => {
+  return getMdSelectOptionsNew({
+    parentElem: getCard(name),
+    btnSelector: 'button[e2e="actions-menu-toggle"]'
+  });
+};
 const getAnalysisActionOptions = name => {
   return getMdSelectOptions({
     parentElem: getCard(name),
@@ -277,13 +285,15 @@ module.exports = {
     getAnalysisChartType
   },
   main: {
+    actionMenuOptions : element(by.xpath('//div[contains(@class,"mat-menu-panel")]')),
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
     getAnalysisCards: getCards,
     getCardTitle,
     doAnalysisAction,
     getAnalysisActionOptions,
-    confirmDeleteBtn: element(by.cssContainingText('button[ng-click="dialog.hide()"]', 'Delete')),
+    getAnalysisActionOptionsNew,
+    confirmDeleteBtn: element(by.css('button[e2e="confirm-dialog-ok-btn"]')),
     doAccountAction,
     firstCard,
     getForkBtn,
@@ -311,10 +321,10 @@ module.exports = {
 
   // OLD test elements
   analysisElems: {
-    listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
-    cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),
+    listView: element(by.css('[e2e="analyze-list-view"]')),
+    cardView: element(by.css('[e2e="analyze-card-view"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
-    addAnalysisBtn: element(by.css('[ng-click="$ctrl.openNewAnalysisModal()"]')),
+    addAnalysisBtn: element(by.css('[e2e="open-new-analysis-modal"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
     designerDialog: element(by.css('.ard_canvas')),
@@ -355,11 +365,11 @@ module.exports = {
     cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
   validateCardView() {
-    expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
+    expect(this.analysisElems.cardView.getAttribute('class')).toContain('mat-radio-checked');
   },
 
   validateListView() {
-    expect(this.analysisElems.listView.getAttribute('aria-checked')).toEqual('true');
+    expect(this.analysisElems.listView.getAttribute('class')).toContain('mat-radio-checked');
   },
 
   validateNewAnalyze() {

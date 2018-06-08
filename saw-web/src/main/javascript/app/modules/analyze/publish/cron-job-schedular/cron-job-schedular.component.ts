@@ -25,7 +25,6 @@ require('./cron-job-schedular.component.scss');
 })
 
 export class CronJobSchedularComponent {
-  constructor()
   @Input() public model: any;
   @Input() public crondetails: any;
   @Output() onCronChanged: EventEmitter<any> = new EventEmitter();

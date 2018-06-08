@@ -1,0 +1,52 @@
+@import "themes/base/colors";
+
+analyze-view-u {
+  width: 100%;
+
+  .category-title {
+    color: #636363;
+    font-weight: bold;
+  }
+
+  .mat-toolbar.mat-toolbar-single-row {
+    background-color: transparent;
+  }
+
+  .select-type {
+    width: 140px;
+    font-size: 16px;
+  }
+
+  .switch-view {
+    margin-right: 20px;
+    display: inline-flex;
+
+    mat-radio-button {
+      margin: 0;
+      padding-right: 3px;
+
+      mat-icon {
+        font-size: 14px;
+        color: $primary-grey-g4;
+      }
+
+      &.mat-radio-checked {
+        mat-icon {
+          color: $primary-blue-b2;
+        }
+      }
+
+      .mat-radio-container {
+        display: none;
+      }
+
+      .mat-radio-label {
+        margin: 0;
+
+        mat-icon {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
