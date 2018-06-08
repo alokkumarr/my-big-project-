@@ -112,6 +112,7 @@ export class DesignerStringFilterComponent {
     this.tempValue = '';
     this.filterModel.modelValues = [];
     this.filterModel.operator = value;
+    this.onFilterModelChange();
   }
 
   onValueChange(value) {
