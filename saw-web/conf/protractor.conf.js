@@ -1,5 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+const generate = require('../src/test/javascript/data/generateTestData');
 
 /**
  * Note about intervals:
@@ -18,20 +19,20 @@ const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 30000;
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
  */
 
-const implicitlyWait = webpackHelper.distRun() ? 600000 : 10000;
+const implicitlyWait = webpackHelper.distRun() ? 600000 : 20000;
 const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 30000; // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 600000 : 10000;
+const fluentWait = webpackHelper.distRun() ? 600000 : 20000;
 
 /**
  * Default time to wait in ms before a test fails
  * Fixes error: jasmine default timeout interval
  */
-const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 10000;
+const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 20000;
 // = 30 | 5 min. Sometimes test can execute for a long time
 const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 600000;
 
@@ -72,25 +73,25 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  //seleniumAddress: 'http://localhost:4444/wd/hub', // no where used, and all tests are passing, hence commented, will enable if there are test failures because of this.
+  seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
-  baseUrl: 'http://localhost:3000',
+  baseUrl: webpackHelper.sawWebUrl(),
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
     maxInstances: 4,
     chromeOptions: {
       args: [
-        '--disable-extensions',
-        '--disable-web-security',
+        'disable-extensions',
+        'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless',
+        //'--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
-    },// not using right now, so commented
+    },
     'moz:firefoxOptions': {
       args: ['--headless']
     }
@@ -111,39 +112,15 @@ exports.config = {
      * working tests (working reliably without flakiness) incrementally one by one in continuous integration, while
      * working on fixing the rest.
      */
-    authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
-    ],
-    charts: [
-      /*webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')*/
-    ],
-    pivots: [
-      /*webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js'),
-       webpackHelper.root(testDir + '/e2e-tests/pivots/createPivot.test.js')*/
-    ],
-    root: [
-      /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
-       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
-       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),*/
-    ]
-  } : {
-    /**
-     * Suites for test run invoked from Protractor directly on local saw-web front-end development server
-     */
     root: [
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      // webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
-      // webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     charts: [
+      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js')
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
@@ -151,8 +128,37 @@ exports.config = {
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
+  } : {
+    /**
+     * Suites for test run invoked from Protractor directly on local saw-web front-end development server
+     */
+    // root: [
+    //   webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
+    //   webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
+    //   webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
+    // ],
+    charts: [
+      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
+      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
+     // webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
+    ],
+    // pivots: [
+    //   webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
+    // ],
+    // authentication: [
+    //   webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
+    // ],
+    debug: [
+      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
+    ]
   },
+
   onPrepare() {
+    // Gerenate test data
+    let token = generate.token();
+    //console.log("aToken: " + token);
+    generate.usersRolesPrivilegesCategories(token);
+
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,
@@ -174,20 +180,10 @@ exports.config = {
       //   output/junitresults-example2.xml
       consolidateAll: true
     });
-    // Commented below code to check wthether that causes e2e failures in bamboo.
-    // let HtmlReporter = require('protractor-beautiful-reporter');
-    // jasmine.getEnv().addReporter(new HtmlReporter({
-    //   baseDirectory: 'target/reports',
-    //   excludeSkippedSpecs: true,
-    //   takeScreenShotsForSkippedSpecs: true,
-    //   preserveDirectory: false,
-    //   gatherBrowserLogs: false
-    // }).getJasmine2Reporter());
-
     jasmine.getEnv().addReporter(junitReporter);
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
-    browser.driver.get(browser.baseUrl);
+    browser.driver.get(webpackHelper.sawWebUrl());
 
     return browser.driver.wait(() => {
       return browser.driver.getCurrentUrl().then(url => {

@@ -4,17 +4,18 @@ const homePage = require('../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const dataSets = require('../javascript/data/datasets');
 
 describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
   const reportDescription = 'e2e report description';
   const tables = [{
-    name: 'MCT_DN_SESSION_SUMMARY',
+    name: 'SALES',
     fields: [
-      'Available (MB)',
-      'Source OS',
-      'Source Model'
+      'Integer',
+      'String',
+      'Date'
     ]
   }/*, {
     name: 'MCT_CONTENT_SUMMARY',
@@ -28,8 +29,8 @@ describe('Create report type analysis: createReport.test.js', () => {
     tableB: tables[1].name,
     fieldB: 'Session Id'
   };*/
-  const filterValue = 'ANDROID';
-  const metricName = 'MCT TMO Session DL';
+  const filterValue = 'String';
+  const metricName = dataSets.report;
   const analysisType = 'table:report';
 
   beforeAll(function () {
@@ -55,15 +56,15 @@ describe('Create report type analysis: createReport.test.js', () => {
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
   });
 
-  it('Should apply filter to Report', () => {
+  it('Should apply filter to Report', () => { // SAWQA-4146
     loginPage.loginAs('admin');
 
     // Switch to Card View
-    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-    analyzePage.analysisElems.cardView.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
     // Create Report
     homePage.createAnalysis(metricName, analysisType);
@@ -77,9 +78,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Select fields and refresh
     tables.forEach(table => {
       table.fields.forEach(field => {
-        browser.executeScript(scrollIntoView, reportDesigner.getReportFieldCheckbox(table.name, field));
-        commonFunctions.waitFor.elementToBeClickable(reportDesigner.getReportFieldCheckbox(table.name, field));
-        reportDesigner.getReportFieldCheckbox(table.name, field).click();
+        commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.getReportFieldCheckbox(table.name, field));
       });
     });
 
@@ -99,44 +98,35 @@ describe('Create report type analysis: createReport.test.js', () => {
         .isPresent()
     ).toBe(true);*/
 
-    commonFunctions.waitFor.elementToBeClickable(reportDesigner.refreshBtn);
-    reportDesigner.refreshBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.refreshBtn);
 
     // Should apply filters
-    const filters = analyzePage.filtersDialogUpgraded;
+    const filters = analyzePage.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
     const stringFilterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
 
-    commonFunctions.waitFor.elementToBeClickable(reportDesigner.filterBtn);
-
-    reportDesigner.filterBtn.click()
+    commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.filterBtn);
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
-    commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
-    filters.applyBtn.click();
-    browser.sleep(1000);
-    // TODO: below code is not working in headless mode something is wrong with chrome. will test again and enable it.
-    // commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[@class="dx-datagrid" or contains(@class,"non-ideal-state__container ")]')));
-    // Verify the applied filters
+    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
+    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
+
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
-    commonFunctions.waitFor.elementToBeVisible(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
 
     // Save
-    const save = analyzePage.saveDialogUpgraded;
+    const save = analyzePage.saveDialog;
     const designer = analyzePage.designerDialog;
-    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-    designer.saveBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
 
-    commonFunctions.waitFor.elementToBeVisible(designer.saveDialogUpgraded);
+    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
     expect(designer.saveDialog).toBeTruthy();
 
     save.nameInput.clear().sendKeys(reportName);
     save.descriptionInput.clear().sendKeys(reportDescription);
-    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
-    save.saveBtn.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
 
     const createdAnalysis = analyzePage.main.getCardTitle(reportName);
 
@@ -149,14 +139,9 @@ describe('Create report type analysis: createReport.test.js', () => {
     main.getAnalysisCards(reportName).count()
       .then(count => {
         main.doAnalysisAction(reportName, 'delete');
-        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
-        main.confirmDeleteBtn.click();
+        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
         commonFunctions.waitFor.cardsCountToUpdate(cards, count);
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
   });
-
-  var scrollIntoView = function (element) {
-    arguments[0].scrollIntoView();
-  };
 });

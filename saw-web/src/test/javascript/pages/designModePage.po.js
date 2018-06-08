@@ -15,9 +15,10 @@ module.exports = {
       presetDropDownItem: presetName => element(by.xpath(`//mat-option[contains(text(),"${presetName}")]`))
     },
     string: {
-      operator: element(by.xpath('//mat-select[@placeholder="OPERATOR"]')),
-      operatorDropDownItem: operator => element(by.xpath(`//span[contains(text(),"${operator}")]`)),
-      input: element(by.xpath(`//*[@e2e="filter-string-input"]`))
+      operator: element(by.xpath('//mat-select[@placeholder="Operator"]')),
+      operatorDropDownItem: operator => element(by.css(`mat-option[e2e="filter-number-option-${operator}"]`)),
+      input: element(by.xpath(`(//input[contains(@id,"mat-input-")])[position()=3]`)),
+      isInIsNotInInput: element(by.xpath(`//input[@e2e="designer-filter-string-input"]`)),
     },
     number: {
       operator: element(by.css('mat-select[e2e="filter-number-operator-select"]')),

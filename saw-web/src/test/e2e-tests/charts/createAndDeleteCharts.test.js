@@ -9,38 +9,42 @@ const homePage = require('../../javascript/pages/homePage.po');
 const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
+const categories = require('../../javascript/data/categories');
+const subCategories = require('../../javascript/data/subCategories');
+const dataSets = require('../../javascript/data/datasets');
 const designModePage = require('../../javascript/pages/designModePage.po.js');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
-  const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
-  const categoryName = 'AT Analysis Category DO NOT TOUCH';
-  const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
-
+  const defaultCategory = categories.privileges.name;
+  const categoryName = categories.analyses.name;
+  const subCategoryName = subCategories.createAnalysis.name;
   const chartDesigner = analyzePage.designerDialog.chart;
-  let xAxisName = 'Source Manufacturer';
-  let yAxisName = 'Available MB';
-  const yAxisName2 = 'Available Items';
-  let groupName = 'Source OS';
-  let metricName = 'MCT TMO Session ES';
-  const sizeByName = 'Activated No Usage Subscriber Count';
+  // const chartName = `e2e chart ${(new Date()).toString()}`;
+  // const chartDescription = 'descr';
+  const yAxisName = 'Double';
+  const yAxisName2 = 'Long';
+  const xAxisName = 'Integer';
+  const groupName = 'Date';
+  const metricName = dataSets.pivotChart;
+  const sizeByName = 'Float';
 
   const dataProvider = {
-    'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
-    'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
-    'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
-    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
-    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
-    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},    
-    'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
-    'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
-    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
-    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'},
-    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
-    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
-    'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
-     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
-     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
+    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, //SAWQA-323
+    // 'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, //SAWQA-4475
+    // 'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, //SAWQA-569
+    // 'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'}, //SAWQA-4477
+    // 'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'}, //SAWQA-832
+    // 'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, //SAWQA-4478
+    // 'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
+    // 'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
+    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
+    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676
+    // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602
+    // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678
+    // 'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
+    // 'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
+    // 'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
+    // 'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'} //SAWQA-4680
   };
 
   beforeAll(function () {
@@ -49,6 +53,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -56,34 +61,31 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
   });
 
   using(dataProvider, function (data, description) {
     it('should create and delete ' + description, () => {
-      if (data.chartType === 'chart:bubble') {
-        metricName = 'PTT Subscr Detail';
-        yAxisName = 'Activated Active Subscriber Count';
-        xAxisName = 'Activated Inactive Subscriber Count';
-        groupName = 'Apps Version';
-      }
-      let chartName = `e2e ${description} ${(new Date()).toString()}`;
-      let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
-
       login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();
+
+      let chartName = `e2e ${description} ${(new Date()).toString()}`;
+      let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
+
       // Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
-      // Select fields
+      //Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
       // Search field and add that into metric section.
@@ -99,6 +101,12 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
         commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
         designModePage.chart.addFieldButton(sizeByName).click();
       }
+       //If Combo then add one more field
+       if (data.chartType === 'chart:combo') {
+        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
+        designModePage.chart.addFieldButton(yAxisName2).click();
+      }
+
       // Search field and add that into group by section. i.e. Color by
       commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
       designModePage.chart.addFieldButton(groupName).click();
