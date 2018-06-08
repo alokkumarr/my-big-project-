@@ -60,6 +60,7 @@ export class DesignerFilterDialogComponent implements OnInit {
         this.addFilter(name, true);
       }
     });
+    this.onFiltersChange();
   }
 
   onFilterModelChange() {
