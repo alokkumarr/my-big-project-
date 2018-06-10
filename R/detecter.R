@@ -116,8 +116,8 @@ detect.data.frame <- function(df,
 #' @rdname detect
 #' @export
 detect.grouped_df <- function(df,
-                              index_var = NULL,
-                              measure_var = NULL,
+                              index_var,
+                              measure_var,
                               frequency,
                               direction = 'pos',
                               alpha = .01,
@@ -211,9 +211,10 @@ detecter.data.frame <- function(df,
 
 
   df_names <- colnames(df)
+  checkmate::assert_number(length(index_var), lower=1, upper=1)
   checkmate::assert_choice(index_var, df_names)
-  checkmate::assert_choice(measure_vars, df_names)
-  checkmate::assert_choice(group_vars, df_names, null.ok = TRUE)
+  checkmate::assert_subset(measure_vars, df_names)
+  checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)
 
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
@@ -250,9 +251,10 @@ detecter.tbl_spark <- function(df,
                                trend_window = 0.75){
   df_names <- colnames(df)
   df_schema <- sdf_schema(df)
+  checkmate::assert_number(length(index_var), lower=1, upper=1)
   checkmate::assert_choice(index_var, df_names)
-  checkmate::assert_choice(measure_vars, df_names)
-  checkmate::assert_choice(group_vars, df_names, null.ok = TRUE)
+  checkmate::assert_subset(measure_vars, df_names)
+  checkmate::assert_subset(group_vars, df_names, empty.ok = TRUE)
 
 
   index_date_chk <- df_schema[[index_var]]$type == "DateType"
