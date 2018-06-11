@@ -4,11 +4,11 @@
 #
 set -eu
 
-name="saw-mapr"
+name="sip-mapr"
 # Workaround: As Docker DNS lookups do not work inside CentOS 7
 # containers for now, Docker links are used as a workaround.  The
 # hostname and port for Docker links is provided in environment
 # variables, so insert them here.
-host="saw-mapr:7222"
+host="sip-mapr:7222"
 
 /opt/mapr/server/configure.sh -N $name -c -C $host
