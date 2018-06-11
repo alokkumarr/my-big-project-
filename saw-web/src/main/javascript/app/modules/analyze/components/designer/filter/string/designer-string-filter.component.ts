@@ -69,7 +69,7 @@ export class DesignerStringFilterComponent {
       };
       this.tempValue = '';
     } else {
-      this.tempValue = this.filterModel.modelValues[0];
+      this.tempValue = this.filterModel.modelValues[0] || '';
     }
   }
 
