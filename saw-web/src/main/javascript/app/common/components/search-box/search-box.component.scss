@@ -8,7 +8,7 @@ search-box {
     flex-wrap: nowrap;
     width: 100%;
 
-    md-icon {
+    mat-icon {
       outline: none;
       height: 30px;
       min-height: 30px;
@@ -46,8 +46,8 @@ search-box {
       margin-left: -1px;
       width: 0;
       max-width: 306px;
-      height: 30px;
-      min-height: 30px;
+      height: 20px;
+      min-height: 20px;
       padding: 0;
       background-color: #F6F8FB;
       color: #5C6670;
@@ -61,7 +61,7 @@ search-box {
     }
 
     &.m-search-visible {
-      md-icon {
+      mat-icon {
         background-color: #F6F8FB;
         border-color: #CECECE;
 

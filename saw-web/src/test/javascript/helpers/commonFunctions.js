@@ -3,6 +3,7 @@ const EC = protractor.ExpectedConditions;
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
+var fs = require('fs');
 
 module.exports = {
   waitFor: {
@@ -17,7 +18,9 @@ module.exports = {
     },
     elementToBeEnabledAndVisible: element => {
      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-     },
+     },elementToBeNotVisible: element =>{
+      browser.wait(EC.not(EC.presenceOf(element)), fluentWait, "Element \"" + element.locator() + "\" is present");
+    },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
       let count = 0;
@@ -60,14 +63,19 @@ module.exports = {
     browser.actions().dragAndDrop(dragElement, dropElement).mouseUp().perform();
   },
   openBaseUrl() {
-    browser.driver.get(protractorConf.config.baseUrl);
+    browser.get(protractorConf.config.baseUrl);
   },
   logOutByClearingLocalStorage() {
-    browser.executeScript('window.sessionStorage.clear();');
+    //browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();')
   },
   scrollIntoView(element) {
     arguments[0].scrollIntoView();
+  },
+  writeScreenShot(data, filename) {
+    var stream = fs.createWriteStream(filename);
+    stream.write(new Buffer(data, 'base64'));
+    stream.end();
   },
 };
 

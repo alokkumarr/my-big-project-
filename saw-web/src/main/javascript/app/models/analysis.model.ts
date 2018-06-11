@@ -39,6 +39,7 @@ export interface Analysis {
   edit?: boolean;
   outputFile?: OutputFile;
   groupByColumns?: any[];
+  crondetails?: any;
   // groupByColumns should be deprecated
 }
 

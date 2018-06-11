@@ -31,6 +31,13 @@ module.exports = {
     groupIntervalDropDown: element(by.xpath(`//mat-select[@placeholder='Group interval']`)),
     groupIntervalDropDownElement: groupIntervalName => element(by.xpath(`//span[@class="mat-option-text" and contains(text(), '${groupIntervalName}')]`)),
     addFilter: filterObject => addFilter(filterObject)
+  },
+  chart: {
+    addFieldButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/following-sibling::*)[1]`)),
+    expandSelectedFieldPropertiesButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/preceding-sibling::*)[1]`)),
+    groupIntervalDropDown: element(by.xpath(`//mat-select[@placeholder='Group interval']`)),
+    groupIntervalDropDownElement: groupIntervalName => element(by.xpath(`//span[@class="mat-option-text" and contains(text(), '${groupIntervalName}')]`)),
+    addFilter: filterObject => addFilter(filterObject)
   }
 };
 

@@ -72,23 +72,25 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  //seleniumAddress: 'http://localhost:4444/wd/hub', // no where used, and all tests are passing, hence commented, will enable if there are test failures because of this.
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
+    shardTestFiles: true,
+    maxInstances: 4,
     chromeOptions: {
       args: [
-        'disable-extensions',
-        'disable-web-security',
+        '--disable-extensions',
+        '--disable-web-security',
         '--start-fullscreen', // enable for Mac OS
         '--headless',
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
-    },
+    },// not using right now, so commented
     'moz:firefoxOptions': {
       args: ['--headless']
     }
@@ -134,14 +136,14 @@ exports.config = {
     root: [
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
+      // webpackHelper.root(testDir + '/e2e-tests/workbench.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
       // webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js')
     ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
@@ -172,6 +174,16 @@ exports.config = {
       //   output/junitresults-example2.xml
       consolidateAll: true
     });
+    // Commented below code to check wthether that causes e2e failures in bamboo.
+    // let HtmlReporter = require('protractor-beautiful-reporter');
+    // jasmine.getEnv().addReporter(new HtmlReporter({
+    //   baseDirectory: 'target/reports',
+    //   excludeSkippedSpecs: true,
+    //   takeScreenShotsForSkippedSpecs: true,
+    //   preserveDirectory: false,
+    //   gatherBrowserLogs: false
+    // }).getJasmine2Reporter());
+
     jasmine.getEnv().addReporter(junitReporter);
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS

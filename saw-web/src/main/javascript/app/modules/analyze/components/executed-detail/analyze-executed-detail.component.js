@@ -11,7 +11,6 @@ import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
-import * as moment from 'moment';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 
@@ -202,7 +201,7 @@ export const AnalyzeExecutedDetailComponent = {
             },
             keys
           };
-          json2csv(this.formatDates(data), (err, csv) => {
+          json2csv(data, (err, csv) => {
             if (err) {
               this._$translate('ERROR_EXPORT_FAILED').then(translation => {
                 this._toastMessage.error(translation);
@@ -225,22 +224,6 @@ export const AnalyzeExecutedDetailComponent = {
         }
         return columnName;
       }
-    }
-
-    formatDates(data) {
-      const ks = keys(data[0] || {});
-      const formats = [
-        moment.ISO_8601,
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, data => {
-        forEach(ks, key => {
-          if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).format('YYYY-MM-DD');
-          }
-        });
-      });
-      return data;
     }
 
     replaceCSVHeader(csv, fields) {
@@ -293,6 +276,9 @@ export const AnalyzeExecutedDetailComponent = {
     loadLastPublishedAnalysis() {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
+      }
+
+      if (!['report', 'esReport'].includes(this.analysis.type)) {
         this.loadExecutionData(true)();
       }
     }
@@ -315,7 +301,16 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     edit() {
-      this._AnalyzeActionsService.edit(this.analysis);
+      this._AnalyzeActionsService.edit(this.analysis).then(result => {
+        if (!result) {
+          return;
+        }
+        const {isSaveSuccessful, analysis} = result;
+        if (isSaveSuccessful) {
+          this.analysis = analysis;
+          this.refreshData();
+        }
+      });
     }
 
     publish() {

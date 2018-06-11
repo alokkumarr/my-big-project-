@@ -4,6 +4,7 @@ const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Login Tests: login.test.js', () => {
 
@@ -12,7 +13,9 @@ describe('Login Tests: login.test.js', () => {
     'admin': {user: users.admin.loginId},
     'user': {user: users.userOne.loginId},
   };
-
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
+  });
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');
@@ -22,15 +25,13 @@ describe('Login Tests: login.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(userDataProvider, function (data, description) {

@@ -90,7 +90,8 @@ export class ToolbarActionDialogComponent {
       .finally(() => {
         this.showProgressBar = false;
         const result: IToolbarActionResult = {
-          isSaveSuccessful: true
+          isSaveSuccessful: true,
+          analysis: this.data.analysis
         };
         this.dialogRef.close(result);
       });
