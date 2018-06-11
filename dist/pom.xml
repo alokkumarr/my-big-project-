@@ -21,6 +21,8 @@
     <!-- AWS secret key -->
     <sip.cloud.key>AKIAIMXBE56B6CRN6GKA</sip.cloud.key>
     <sip.cloud.key.secret>${env.SIP_CLOUD_KEY_SECRET}</sip.cloud.key.secret>
+    <!-- Time to allow base container to boot up, in milliseconds -->
+    <sip.docker.wait.time>60000</sip.docker.wait.time>
     <!-- Enable Docker Machine configuration by default -->
     <saw.docker.skip.machine>false</saw.docker.skip.machine>
     <!-- SAW Docker environment ports -->
@@ -363,6 +365,7 @@
                 </restartPolicy>
                 <wait>
                   <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
             </image>
@@ -383,6 +386,7 @@
                 </restartPolicy>
                 <wait>
                   <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
             </image>
@@ -406,6 +410,7 @@
                 <skip>true</skip>
                 <wait>
                   <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
             </image>
@@ -426,6 +431,7 @@
                 </restartPolicy>
                 <wait>
                   <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
             </image>
