@@ -221,17 +221,17 @@ export class DesignerContainerComponent {
     forEach(sqlBuilder.nodeFields, node => {
       let identical = false;
       forEach(this.sorts || [], sort => {
-         identical = (node.columnName === sort.columnName);
+        const hasSort = this.sorts.some(sort => node.columnName === sort.columnName);
+        if (!hasSort) {
+          this.sortFlag.push({
+            order: 'asc',
+            columnName: node.columnName,
+            type: node.type
+          });
+          this.sorts = this.sortFlag.concat(this.sorts);
+        }
       });
-      if(!identical) {
-        this.sortFlag.push({
-          order: 'asc',
-          columnName: node.columnName,
-          type: node.type
-        });
-      }
     });
-    this.sorts = this.sortFlag.concat(this.sorts);
   }
 
   addDefaultSorts() {
