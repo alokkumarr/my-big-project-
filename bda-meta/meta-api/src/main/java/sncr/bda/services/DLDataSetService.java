@@ -5,11 +5,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.*;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.ojai.store.DocumentMutation;
+import org.ojai.joda.DateTime;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
 import sncr.bda.exceptions.BDAException;
-import sncr.bda.conf.Output;
 import sncr.bda.context.ContextMetadata;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -44,7 +43,7 @@ public class DLDataSetService {
     private Map<String, Map<String, Object>> repository;
     private DataSetStore dsStore;
 
-    public String getRoot(){
+    public String getRoot() {
         return dsStore.getRoot();
     }
 
@@ -59,23 +58,23 @@ public class DLDataSetService {
 
         logger.trace("Save changes in data Object repository");
 
-        repository.keySet().forEach(  k -> {
+        repository.keySet().forEach(k -> {
             Map<String, Object> entry = repository.get(k);
             String dt = format.format(new Timestamp(new Date().getTime()));
-            if (entry.containsKey(DataSetProperties.isNewDataSet.name())){
+            if (entry.containsKey(DataSetProperties.isNewDataSet.name())) {
                 String metadataFileName = buildMetadataFileName(ctx, entry);
-                logger.trace("New file in Data Object repository: " + metadataFileName );
+                logger.trace("New file in Data Object repository: " + metadataFileName);
                 Dataset dataset = new Dataset();
                 dataset.setComponent(ctx.componentName);
 
-                String desc = (entry.containsKey(DataSetProperties.MetaDescription.name()))?(String)
-                        entry.get(DataSetProperties.MetaDescription.name()):"__none__";
+                String desc = (entry.containsKey(DataSetProperties.MetaDescription.name())) ? (String)
+                    entry.get(DataSetProperties.MetaDescription.name()) : "__none__";
                 dataset.setDescription(desc);
                 dataset.setFormat((String) entry.get(DataSetProperties.Format.name()));
                 ObjectMapper mapper = new ObjectMapper();
                 mapper.configure(SerializationFeature.INDENT_OUTPUT, true)
-                        .configure(ALLOW_COMMENTS, true)
-                        .configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
+                    .configure(ALLOW_COMMENTS, true)
+                    .configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
                 OutputStream os = null;
                 try {
                     os = HFileOperations.writeToFile(metadataFileName);
@@ -95,29 +94,28 @@ public class DLDataSetService {
     private String buildMetadataFileName(ContextMetadata ctx, Map<String, Object> ds) {
         StringBuilder sb = new StringBuilder(dsStore.getRoot());
         sb.append(Path.SEPARATOR + ctx.applicationID)
-        .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-        .append(Path.SEPARATOR + PREDEF_DATA_SOURCE)
-        .append(Path.SEPARATOR + ds.get(DataSetProperties.Catalog.name()))
-        .append(Path.SEPARATOR + ds.get(DataSetProperties.Name.name()))
-        .append(Path.SEPARATOR + MetadataBase.FILE_DESCRIPTOR);
+            .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
+            .append(Path.SEPARATOR + PREDEF_DATA_SOURCE)
+            .append(Path.SEPARATOR + ds.get(DataSetProperties.Catalog.name()))
+            .append(Path.SEPARATOR + ds.get(DataSetProperties.Name.name()))
+            .append(Path.SEPARATOR + MetadataBase.FILE_DESCRIPTOR);
 
         logger.debug(String.format("Resolve metadata storage of %s dataset to location: %s",
-                ds.get(DataSetProperties.Name.name()), sb.toString()));
+            ds.get(DataSetProperties.Name.name()), sb.toString()));
         return sb.toString();
     }
 
 
-    public void logMetadata(){
+    public void logMetadata() {
         logger.debug("Metadata: \n");
         repository.keySet().forEach(n ->
             {
                 Map<String, Object> props = repository.get(n);
-                logger.debug( String.format("Property: %s", n));
-                props.forEach( (pn, pv ) -> logger.debug(String.format("%s => %s", pn, pv)));
+                logger.debug(String.format("Property: %s", n));
+                props.forEach((pn, pv) -> logger.debug(String.format("%s => %s", pn, pv)));
             }
         );
     }
-
 
 
     /**
@@ -128,6 +126,7 @@ public class DLDataSetService {
      * - user entered data
      * - DL metadata
      * If processMap dataset is not found - the component creates it with all data available.
+     *
      * @param ctx
      * @param o
      * @return
@@ -137,14 +136,13 @@ public class DLDataSetService {
             String id = generateDSID(ctx, o);
             if (!o.containsKey(DataSetProperties.Id.toString()))
                 o.put(DataSetProperties.Id.toString(), id);
-                JsonElement ds = dsStore.read(id);
-            if ( ds == null ){
+            JsonElement ds = dsStore.read(id);
+            if (ds == null) {
                 JsonElement je = createDSDescriptor(id, ctx, o);
                 dsStore.create(id, je);
                 return je;
-            }
-        else
-            return ds;
+            } else
+                return ds;
         } catch (Exception e) {
             logger.error("Could not read or create Data set: ", e);
             return null;
@@ -154,25 +152,51 @@ public class DLDataSetService {
     /**
      * The method is to create Json structure from
      * dataset descriptor, with metadata that must be provided through Context object
+     *
      * @param id
      * @param ctx
-     * @param o - output dataset descriptor
+     * @param o   - output dataset descriptor
      * @return result JSON structure
      */
-    private JsonElement createDSDescriptor(String id, ContextMetadata ctx, Map<String, Object> o){
+    private JsonElement createDSDescriptor(String id, ContextMetadata ctx, Map<String, Object> o) {
         JsonObject dl = new JsonObject();
+        DateTime currentTIme = new DateTime();
+        long epochTime = currentTIme.getMillis() / 1000;
 
         //TODO:: Dormant, for future development
-        String ds_type = o.containsKey(DataSetProperties.Type.name())? (String) o.get(DataSetProperties.Type.name()): Input.Dstype.BASE.toString();
-        String catalog = o.containsKey(DataSetProperties.Catalog.name())? (String) o.get(DataSetProperties.Catalog.name()): DEFAULT_CATALOG;
+        String ds_type = o.containsKey(DataSetProperties.Type.name()) ? (String) o.get(DataSetProperties.Type.name()) : Input.Dstype.BASE.toString();
+        String catalog = o.containsKey(DataSetProperties.Catalog.name()) ? (String) o.get(DataSetProperties.Catalog.name()) : DEFAULT_CATALOG;
 
-        dl.add(DataSetProperties.User.toString(), new JsonPrimitive(ctx.user));
+        // Extract user information from output dataset
+        Object userDataObject = o.get(DataSetProperties.UserData.name());
+        logger.info("Creating DS Descriptor");
+        logger.debug("UserData Object = " + userDataObject);
+        if (userDataObject != null) {
+            JsonObject userData = (JsonObject) userDataObject;
+
+            if (userData.has(DataSetProperties.createdBy.name())) {
+                String createdBy = userData.get(DataSetProperties.createdBy.name()).getAsString();
+                logger.error("Created by " + DataSetProperties.createdBy.name() + " " + createdBy);
+                dl.add(DataSetProperties.createdBy.toString(), new JsonPrimitive(createdBy));
+            }
+
+            if (userData.has(DataSetProperties.modifiedBy.name())) {
+                String modifiedBy = userData.get(DataSetProperties.modifiedBy.name()).getAsString();
+                logger.error("Modified by " + DataSetProperties.modifiedBy.name() + " " + modifiedBy);
+                dl.add(DataSetProperties.modifiedBy.toString(), new JsonPrimitive(modifiedBy));
+            }
+        }
+
+//        dl.add(DataSetProperties.User.toString(), new JsonPrimitive(ctx.user));
         dl.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
         dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(ds_type));
-        dl.add(DataSetProperties.Format.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Format.name())));
-        dl.add(DataSetProperties.Name.toString(), new JsonPrimitive( (String) o.get(DataSetProperties.Name.name())));
-        dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive( catalog ));
+        dl.add(DataSetProperties.Format.toString(), new JsonPrimitive((String) o.get(DataSetProperties.Format.name())));
+        dl.add(DataSetProperties.Name.toString(), new JsonPrimitive((String) o.get(DataSetProperties.Name.name())));
+        dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive(catalog));
         dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((Integer) o.get(DataSetProperties.NumberOfFiles.name())));
+        dl.addProperty(DataSetProperties.CreatedTime.toString(), epochTime);
+        dl.addProperty(DataSetProperties.ModifiedTime.toString(), epochTime);
+        dl.addProperty(DataSetProperties.Description.toString(), (String) o.get(DataSetProperties.Description.name()));
 
 
         //TODO:: Add transformation data from ctx
@@ -185,22 +209,31 @@ public class DLDataSetService {
     }
 
 
-    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema) throws Exception {
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount) throws Exception {
 
         if (schema == null || ds == null)
             throw new IllegalArgumentException("Schema/DS descriptor must not be null");
 
+        JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
+
+        DateTime currentTime = new DateTime();
+        long modifiedTime = currentTime.getMillis() / 1000;
+        logger.debug("Dataset modified at = " + modifiedTime);
+
+        system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
+        ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
+
         JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
         JsonObject trans = new JsonObject();
-        trans.addProperty("asOutput",  ctx.transformationID);
+        trans.addProperty("asOutput", ctx.transformationID);
         ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
         ds.getAsJsonObject().add("transformations", trans);
         ds.getAsJsonObject().add("asOfNow", status);
 
         dsStore.update(id, ds);
         return ds;
     }
-
 
 
     //TODO: talk about ID generation

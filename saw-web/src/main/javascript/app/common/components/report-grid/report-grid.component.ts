@@ -22,6 +22,7 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
+import {AGGREGATE_TYPES_OBJ, DATE_FORMATS_OBJ} from '../../consts.js';
 import {
   ArtifactColumnReport,
   Artifact,
@@ -323,14 +324,22 @@ export class ReportGridComponent {
       fpFlatMap((artifact: Artifact) => artifact.columns),
       fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
-        const isNumberType = NUMBER_TYPES.includes(column.type);
-        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, column.type, column.aggregate);
+        let isNumberType = NUMBER_TYPES.includes(column.type);
+        
+        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        let type = column.type;
+        if (aggregate && ['count'].includes(aggregate.value)) {
+          type = aggregate.type || column.type;
+          isNumberType = true;   
+        }
+
+        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);
         const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),
-          dataType: isNumberType? 'number' : column.type,
-          type: column.type,
+          dataType: isNumberType ? 'number' : type,
+          type,
           visibleIndex: column.visibleIndex,
           visible: isUndefined(column.visible) ? true : column.visible,
           payload: column,
@@ -339,6 +348,10 @@ export class ReportGridComponent {
             column[prop] = value;
           },
           ...this.getSortingPart(column)
+        }
+
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format) && !aggregate) {
+          field.format = 'yyyy-MM-dd';
         }
         return field;
       })
@@ -352,6 +365,7 @@ export class ReportGridComponent {
       !NUMBER_TYPES.includes(type)) {
       return format;
     }
+
     return {
       ...format,
       precision: DEFAULT_PRECISION,

@@ -1,4 +1,4 @@
-@import "themes/base/colors";
+@import 'themes/base/colors';
 
 workbench-page {
   width: 99.5%;
@@ -47,15 +47,5 @@ workbench-page {
   .mat-tab-link {
     font-size: 17px;
     font-weight: 600;
-  }
-}
-
-.full-screen-dialog {
-  width: 100%;
-  height: 100%;
-  max-width: 100% !important;
-
-  mat-dialog-container {
-    max-width: 100%;
   }
 }

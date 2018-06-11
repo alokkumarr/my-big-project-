@@ -1159,15 +1159,17 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public String getUserEmailId(String userId) {
 		String message = null;
-		String sql = "select ci.email from USERS u, USER_CONTACT uc, CONTACT_INFO ci " + " where u.user_id=?"
-				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+//		String sql = "select ci.email as email from USERS u, USER_CONTACT uc, CONTACT_INFO ci " + " where u.user_id=?"
+//				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+
+		String sql = "select u.email from USERS u where u.user_id=? LIMIT 1";
 
 		try {
-			return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, userId);
-				}
-			}, new UserRepositoryImpl.EmailExtractor());
+			// return email from database
+			String email = (String) jdbcTemplate.queryForObject(
+					sql, new Object[] { userId }, String.class);
+			return email;
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;

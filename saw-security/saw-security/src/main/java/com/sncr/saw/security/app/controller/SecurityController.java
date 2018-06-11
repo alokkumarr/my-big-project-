@@ -3,6 +3,8 @@
  */
 package com.sncr.saw.security.app.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
@@ -80,6 +82,8 @@ public class SecurityController {
 
 	@Autowired
 	SSORequestHandler ssoRequestHandler;
+
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -1431,6 +1435,18 @@ public class SecurityController {
 			return catList;
 		}
 		return catList;
+	}
+
+	/**
+	 * Return response indicating the status of the health of the
+	 * service.  Used by load balancer to route requests to healthy
+	 * instances of the service to provide high availability.
+	 */
+	@RequestMapping("/actuator/health")
+	public ObjectNode health() {
+		ObjectNode root = mapper.createObjectNode();
+		root.put("status", "UP");
+		return root;
 	}
 
 	/**

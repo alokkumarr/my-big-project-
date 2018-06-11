@@ -96,20 +96,37 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     cachedClient = new WorkbenchClient(livyUri);
   }
 
+
+  //  /**
+  //   * execute a transformation component on a dataset to create a new
+  //   * dataset
+  //   */
+
   /**
-   * Execute a transformation component on a dataset to create a new dataset.
+   * Runs the given component using XDF hooks.
+   * @param project Project ID
+   * @param name Name of the dataset
+   * @param component Component name
+   * @param config Conponent configuration
+   * @return Object Node
+   * @throws Exception Incase of failures
    */
   @Override
-  public ObjectNode execute(String project, String name, String component, String config)
-      throws Exception {
+  public ObjectNode execute(
+      String project, String name, String component, String config) throws Exception {
     log.info("Executing dataset transformation");
+    log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(name);
-    client.submit(new WorkbenchExecuteJob(root, project, component, config));
+    client.submit(new WorkbenchExecuteJob(
+                root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
     return root;
   }
 
+  /**
+   * Execute a transformation component on a dataset to create a new dataset.
+   */
   private void createDatasetDirectory(String name) throws Exception {
     String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
     if (!HFileOperations.exists(path)) {

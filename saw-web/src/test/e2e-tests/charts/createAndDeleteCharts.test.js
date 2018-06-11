@@ -9,6 +9,7 @@ const homePage = require('../../javascript/pages/homePage.po');
 const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
@@ -16,8 +17,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
 
   const chartDesigner = analyzePage.designerDialog.chart;
-  const chartName = `e2e chart ${(new Date()).toString()}`;
-  const chartDescription = 'descr';
   let xAxisName = 'Source Manufacturer';
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
@@ -26,12 +25,12 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const sizeByName = 'Activated No Usage Subscriber Count';
 
   const dataProvider = {
-    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
-    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
-    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
     'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
     'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
     'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
+    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
+    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
+    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},    
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
     'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
@@ -50,7 +49,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -58,15 +56,13 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -77,6 +73,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
         xAxisName = 'Activated Inactive Subscriber Count';
         groupName = 'Apps Version';
       }
+      let chartName = `e2e ${description} ${(new Date()).toString()}`;
+      let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
       login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
@@ -89,47 +87,50 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
       // Search field and add that into metric section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
+      designModePage.chart.addFieldButton(yAxisName).click();
+
       // Search field and add that into dimension section.
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
+      designModePage.chart.addFieldButton(xAxisName).click();
 
       // Search field and add that into size section.
       if (data.chartType === 'chart:bubble') {
-        analyzePage.designerDialog.chart.fieldSearchInput.clear();
-        analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(sizeByName));
+        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
+        designModePage.chart.addFieldButton(sizeByName).click();
       }
       // Search field and add that into group by section. i.e. Color by
-      analyzePage.designerDialog.chart.fieldSearchInput.clear();
-      analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
-
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
+      designModePage.chart.addFieldButton(groupName).click();
       //Save
       const save = analyzePage.saveDialog;
       const designer = analyzePage.designerDialog;
-      commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
+      commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+      designer.saveBtn.click();
 
       commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
       save.nameInput.clear().sendKeys(chartName);
       save.descriptionInput.clear().sendKeys(chartDescription);
-      commonFunctions.waitFor.elementToBeClickableAndClick(save.selectedCategoryUpdated);
-      commonFunctions.waitFor.elementToBeClickableAndClick(save.selectCategoryToSave(subCategoryName));
-      commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
+      commonFunctions.waitFor.elementToBeClickable(save.selectedCategoryUpdated);
+      save.selectedCategoryUpdated.click();
+      commonFunctions.waitFor.elementToBeClickable(save.selectCategoryToSave(subCategoryName));
+      save.selectCategoryToSave(subCategoryName).click();
+      commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
+      save.saveBtn.click();
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
       //Change to Card View
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
-
+      commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+      commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+      analyzePage.analysisElems.cardView.click();
       //Verify if created appeared in list
-      commonFunctions.waitFor.elementToBeClickableAndClick(createdAnalysis);
-      commonFunctions.waitFor.elementToBeClickableAndClick(savedAlaysisPage.backButton);
+      commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
+      commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
+      createdAnalysis.click();
+      commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
+      savedAlaysisPage.backButton.click();
       /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
         .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
-
       //Verify chart type on home page
       analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
         expect(actualChartType).toEqual(data.chartType,
@@ -140,8 +141,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       const cards = main.getAnalysisCards(chartName);
       cards.count().then(count => {
         main.doAnalysisAction(chartName, 'delete');
-        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
-
+        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
+        main.confirmDeleteBtn.click();
         commonFunctions.waitFor.cardsCountToUpdate(cards, count);
 
         //Expect to be deleted

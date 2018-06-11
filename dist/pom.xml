@@ -246,7 +246,7 @@
           </buildArgs>
           <!-- Configure Docker Machine -->
           <machine>
-            <name>user-${sip.cloud.name}</name>
+            <name>sip-${sip.cloud.name}</name>
             <autoCreate>true</autoCreate>
             <regenerateCertsAfterStart>true</regenerateCertsAfterStart>
             <createOptions>
@@ -254,13 +254,15 @@
               <amazonec2-region>${sip.cloud.aws.region}</amazonec2-region>
               <amazonec2-access-key>${sip.cloud.key}</amazonec2-access-key>
               <amazonec2-secret-key>${sip.cloud.key.secret}</amazonec2-secret-key>
-              <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
-              <amazonec2-root-size>32</amazonec2-root-size>
+              <amazonec2-instance-type>t2.2xlarge</amazonec2-instance-type>
+              <amazonec2-root-size>64</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
               <amazonec2-ami>${sip.cloud.aws.ami}</amazonec2-ami>
               <amazonec2-ssh-user>centos</amazonec2-ssh-user>
               <amazonec2-userdata>${project.basedir}/src/test/cloud/cloud-config.yaml</amazonec2-userdata>
+              <!-- Set IAM instance profile to get AWS Route 53 permissions -->
+              <amazonec2-iam-instance-profile>UserEnvironment</amazonec2-iam-instance-profile>
               <amazonec2-monitoring/>
               <!--
                   Workaround: Docker Machine defaults to devicemapper,
