@@ -216,6 +216,7 @@ export class DesignerContainerComponent {
   }
 
   checkNodeForSorts() {
+    this.sortFlag = [];
     if ((this.analysisStarter || this.analysis).type !== 'chart') return;
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
     forEach(sqlBuilder.nodeFields, node => {
@@ -223,12 +224,12 @@ export class DesignerContainerComponent {
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(sort => node.columnName === sort.columnName);
         if (!hasSort) {
-          this.sortFlag.push({
+          this.sorts.push({
             order: 'asc',
             columnName: node.columnName,
             type: node.type
           });
-          this.sorts = this.sortFlag.concat(this.sorts);
+          //this.sorts = this.sortFlag.concat(this.sorts);
         }
       });
     });
