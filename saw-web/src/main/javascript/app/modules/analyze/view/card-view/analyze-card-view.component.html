@@ -1,0 +1,28 @@
+<div fxLayout="row wrap"
+     fxLayoutAlign="start start"
+>
+  <div *ngFor="let analysis of analyses"
+       fxFlex.gt-md="33"
+       fxFlex.md="50"
+       fxFlex="100"
+  >
+    <analyze-card (action)="action.emit($event)"
+                    [highlightTerm]="highlightTerm"
+                    [analysis]="analysis"
+                    [cronJobs]="cronJobs"
+    ></analyze-card>
+  </div>
+
+  <div class="analyze-card-view__no-results"
+        *ngIf="highlightTerm && !analyses.length">
+    <span i18n>No matching results</span>
+  </div>
+  <div class="analyze-card-view__no-results"
+      *ngIf="!highlightTerm && analysisType !== 'all' && analyses && !analyses.length">
+    <span i18n>There are no Analyses of selected type.</span>
+  </div>
+  <div class="analyze-card-view__no-results"
+      *ngIf="!highlightTerm && analysisType === 'all' && analyses && !analyses.length">
+    <span i18n>There are no Analyses for this category.</span>
+  </div>
+</div>

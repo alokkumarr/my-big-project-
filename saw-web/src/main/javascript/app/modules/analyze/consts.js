@@ -128,7 +128,7 @@ export const COMBO_TYPES_OBJ = fpPipe(
 
 export const TSCOMBO_TYPES = [{
   label: 'line',
-  value: 'tsspline',
+  value: 'tsline',
   icon: 'icon-line-chart'
 }, {
   label: 'column',
@@ -140,7 +140,7 @@ export const TSCOMBO_TYPES = [{
   icon: 'icon-area-chart'
 }, {
   label: 'line',
-  value: 'tsPane',
+  value: 'tsareaspline',
   icon: 'icon-line-chart'
 }];
 
@@ -219,12 +219,12 @@ export const ANALYSIS_METHODS = [
       {
         label: 'Time series chart',
         icon: {font: 'icon-timeseries-chart'},
-        type: 'chart:tsspline'
+        type: 'chart:tsline'
       },
       {
         label: 'Time series multi pane',
         icon: {font: 'icon-Candlestick-icon'},
-        type: 'chart:tsPane'
+        type: 'chart:tsareaspline'
       }
     ]
   }
