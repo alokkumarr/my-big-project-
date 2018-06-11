@@ -173,6 +173,9 @@ export class DashboardGridComponent
       changed: true,
       dashboard: this.prepareDashboard()
     });
+    if (item.analysis) {
+      this.onAnalysisRemove();
+    }
   }
 
   editTile(item: GridsterItem) {
@@ -318,11 +321,8 @@ export class DashboardGridComponent
       }
 
       this.analyze.readAnalysis(tile.id).then(data => {
-        tile.analysis = { ...data, _executeTile: false };
-        tile.origAnalysis = data;
-        this.addGlobalFilters(data);
-        tile.updater = new BehaviorSubject({});
-        this.dashboard.push(tile);
+        tile.analysis = data;
+        this.addAnalysisTile(tile);
         tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         this.refreshTile(tile);
@@ -330,6 +330,33 @@ export class DashboardGridComponent
     });
 
     this.initialised = true;
+  }
+
+  addAnalysisTile(tile) {
+    if (!tile.analysis) {
+      return;
+    }
+
+    tile.analysis = { ...tile.analysis, _executeTile: false };
+    tile.origAnalysis = tile.analysis;
+    this.addGlobalFilters(tile.analysis);
+    tile.updater = tile.updater || new BehaviorSubject({});
+    this.dashboard.push(tile);
+  }
+
+  onAnalysisRemove() {
+    const analysisTiles = filter(this.dashboard, tile => tile.analysis);
+    const globalFilters = filter(
+      flatMap(analysisTiles, tile =>
+        map(get(tile.analysis, 'sqlBuilder.filters') || [], f => {
+          f.semanticId = tile.analysis.semanticId;
+          return f;
+        })
+      ),
+      f => f.isGlobalFilter
+    );
+
+    this.filters.removeInvalidFilters(globalFilters);
   }
 
   /* Enables 2 way communication. The parent can request dashboard or send updates
@@ -340,7 +367,11 @@ export class DashboardGridComponent
         /* prettier-ignore */
         switch (req.action) {
         case 'add':
-          this.dashboard.push(req.data);
+          if (req.data && req.data.analysis) {
+            this.addAnalysisTile(req.data);
+          } else {
+            this.dashboard.push(req.data);
+          }
           this.getDashboard.emit({
             changed: true,
             dashboard: this.prepareDashboard()

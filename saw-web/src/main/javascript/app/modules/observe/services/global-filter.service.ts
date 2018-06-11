@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as forEach from 'lodash/forEach';
+import * as filter from 'lodash/filter';
 import * as find from 'lodash/find';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
@@ -56,6 +57,13 @@ export class GlobalFilterService {
       : columnName;
   }
 
+  areFiltersEqual(f1, f2) {
+    return (
+      f1.semanticId === f2.semanticId &&
+      f1.tableName === f2.tableName &&
+      f1.columnName === f2.columnName
+    );
+  }
   /**
    * Merges the existing raw filters with input array of filters.
    * Only adds filters which aren't already present.
@@ -66,12 +74,8 @@ export class GlobalFilterService {
   addFilter(filt: Array<any>) {
     const validFilter = [];
     forEach(filt, f => {
-      const exists = findIndex(
-        this.rawFilters,
-        rf =>
-          rf.semanticId === f.semanticId &&
-          rf.columnName === f.columnName &&
-          rf.tableName === f.tableName
+      const exists = findIndex(this.rawFilters, rf =>
+        this.areFiltersEqual(rf, f)
       );
 
       if (!(exists >= 0)) {
@@ -82,6 +86,17 @@ export class GlobalFilterService {
     if (validFilter.length) {
       this.onFilterChange.next(validFilter);
     }
+  }
+
+  removeInvalidFilters(filt: Array<any>) {
+    this.rawFilters = filter(this.rawFilters, rf =>
+      find(filt, f => this.areFiltersEqual(f, rf))
+    );
+    this.updatedFilters = filter(this.updatedFilters, uf =>
+      find(filt, f => this.areFiltersEqual(f, uf))
+    );
+
+    this.onFilterChange.next(null);
   }
 
   /**

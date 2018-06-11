@@ -10,6 +10,8 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as isArray from 'lodash/isArray';
 import * as map from 'lodash/map';
+import * as filter from 'lodash/filter';
+import * as find from 'lodash/find';
 
 import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
 
@@ -47,7 +49,11 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
 
   onFilterChange(data) {
     if (!data) {
-      this.globalFilters = [];
+      this.globalFilters = filter(this.globalFilters, gf =>
+        find(this.filters.rawGlobalFilters, rf =>
+          this.filters.areFiltersEqual(rf, gf)
+        )
+      );
     } else if (isArray(data)) {
       this.globalFilters.push.apply(
         this.globalFilters,
