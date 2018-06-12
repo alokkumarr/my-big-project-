@@ -8,6 +8,11 @@ analyze-view-u {
     font-weight: bold;
   }
 
+  .analyses-container {
+    margin: 0 10px;
+    padding: 0;
+  }
+
   .mat-toolbar.mat-toolbar-single-row {
     background-color: transparent;
   }
@@ -15,6 +20,12 @@ analyze-view-u {
   .select-type {
     width: 140px;
     font-size: 16px;
+
+    .mat-input-infix.mat-form-field-infix {
+      border: solid $primary-grey-g1 1px;
+      margin-top: 0.84375em;
+      padding: 0.4375em 1em;
+    }
   }
 
   .switch-view {
