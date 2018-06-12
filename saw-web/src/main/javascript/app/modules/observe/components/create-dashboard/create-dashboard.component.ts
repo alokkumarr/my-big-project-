@@ -106,6 +106,12 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     }
   }
 
+  sidenavStateChange(data) {
+    if (this.sidebarWidget === 'filter') {
+      this.globalFilterService.onSidenavStateChange.next(data);
+    }
+  }
+
   onApplyGlobalFilter(globalFilters): void {
     if (!globalFilters) {
       this.widgetSidenav.close();
