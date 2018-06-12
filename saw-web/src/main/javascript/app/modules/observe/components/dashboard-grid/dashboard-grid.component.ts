@@ -221,7 +221,8 @@ export class DashboardGridComponent
             dashFilt =>
               dashFilt.semanticId === analysis.semanticId &&
               dashFilt.tableName === flt.tableName &&
-              dashFilt.columnName === flt.columnName
+              dashFilt.columnName === flt.columnName &&
+              flt.isGlobalFilter
           );
 
           if (existingFilter) {
