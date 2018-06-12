@@ -13,7 +13,9 @@ logging:
   level:
     com.synchronoss.saw.gateway: INFO
 server:
-  address: localhost
+  # Note: Bind to all available addresses (not just localhost) so that
+  # a proxy which might be on another host can connect
+  address: 0.0.0.0
   port: 9100
   context-path: ''
   maxHttpHeaderSize: 65536

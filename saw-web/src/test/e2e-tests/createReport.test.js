@@ -42,7 +42,6 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -50,22 +49,21 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to Report', () => {
     loginPage.loginAs('admin');
 
     // Switch to Card View
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+    analyzePage.analysisElems.cardView.click();
 
     // Create Report
     homePage.createAnalysis(metricName, analysisType);
@@ -80,8 +78,8 @@ describe('Create report type analysis: createReport.test.js', () => {
     tables.forEach(table => {
       table.fields.forEach(field => {
         browser.executeScript(scrollIntoView, reportDesigner.getReportFieldCheckbox(table.name, field));
-        commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.getReportFieldCheckbox(table.name, field));
-        browser.sleep(500);
+        commonFunctions.waitFor.elementToBeClickable(reportDesigner.getReportFieldCheckbox(table.name, field));
+        reportDesigner.getReportFieldCheckbox(table.name, field).click();
       });
     });
 
@@ -101,7 +99,8 @@ describe('Create report type analysis: createReport.test.js', () => {
         .isPresent()
     ).toBe(true);*/
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.refreshBtn);
+    commonFunctions.waitFor.elementToBeClickable(reportDesigner.refreshBtn);
+    reportDesigner.refreshBtn.click();
 
     // Should apply filters
     const filters = analyzePage.filtersDialogUpgraded;
@@ -109,31 +108,35 @@ describe('Create report type analysis: createReport.test.js', () => {
     const stringFilterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
 
-    reportDesigner.gridExpandBtn.click();
+    commonFunctions.waitFor.elementToBeClickable(reportDesigner.filterBtn);
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(reportDesigner.filterBtn);
+    reportDesigner.filterBtn.click()
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
-    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
+    filters.applyBtn.click();
+    browser.sleep(1000);
     // TODO: below code is not working in headless mode something is wrong with chrome. will test again and enable it.
     // commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[@class="dx-datagrid" or contains(@class,"non-ideal-state__container ")]')));
-    //
-    // const appliedFilter = filters.getAppliedFilterUpdated(fieldName);
-    // commonFunctions.waitFor.elementToBePresent(appliedFilter);
-    // expect(appliedFilter.isPresent()).toBe(true);
+    // Verify the applied filters
+    const appliedFilter = filters.getAppliedFilter(fieldName);
+    commonFunctions.waitFor.elementToBePresent(appliedFilter);
+    commonFunctions.waitFor.elementToBeVisible(appliedFilter);
+    expect(appliedFilter.isPresent()).toBe(true);
 
     // Save
     const save = analyzePage.saveDialogUpgraded;
     const designer = analyzePage.designerDialog;
-    commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
+    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+    designer.saveBtn.click();
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialogUpgraded);
     expect(designer.saveDialog).toBeTruthy();
 
     save.nameInput.clear().sendKeys(reportName);
     save.descriptionInput.clear().sendKeys(reportDescription);
-    commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
+    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
+    save.saveBtn.click();
 
     const createdAnalysis = analyzePage.main.getCardTitle(reportName);
 
@@ -146,7 +149,8 @@ describe('Create report type analysis: createReport.test.js', () => {
     main.getAnalysisCards(reportName).count()
       .then(count => {
         main.doAnalysisAction(reportName, 'delete');
-        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
+        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
+        main.confirmDeleteBtn.click();
         commonFunctions.waitFor.cardsCountToUpdate(cards, count);
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });

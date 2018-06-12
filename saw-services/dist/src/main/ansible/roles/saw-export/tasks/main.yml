@@ -1,6 +1,8 @@
-- name: Install SAW Export Service package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Export package
+  copy: src="{{ item }}" dest=/tmp/saw-export.rpm
   with_fileglob: ["../rpms/saw-export-*.rpm"]
+- name: Install SAW Export Service package
+  yum: name=/tmp/saw-export.rpm state=present
   notify:
     - restart saw-export
 - name: Install SAW export Service configuration file

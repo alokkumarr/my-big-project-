@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Analyze Elasticsearch samples loader
+After=saw-deploy.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/saw-analyze-samples/sample-elasticsearch/load-metric
+SyslogIdentifier=saw-analyze-elasticsearch-samples
+
+[Install]
+WantedBy=saw-deploy.service
