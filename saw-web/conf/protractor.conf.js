@@ -142,10 +142,10 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
     ],
-     pivots: [
+    pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
      ],
-     authentication: [
+    authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
      ],
     debug: [
