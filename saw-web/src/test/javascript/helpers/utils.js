@@ -39,7 +39,8 @@ function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
 }
 
 function getMdSelectOptionsNew({parentElem, btnSelector}) {
-  commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
+  commonFunctions.waitFor.elementToBeClickable(parentElem.element(by.css(btnSelector)));
+  parentElem.element(by.css(btnSelector)).click();
   const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
   return menuItems.getAttribute('id').then(id => {
     return element(by.id(id));
@@ -47,7 +48,8 @@ function getMdSelectOptionsNew({parentElem, btnSelector}) {
 }
 
 function getMdSelectOptions({parentElem, btnSelector}) {
-  commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
+  commonFunctions.waitFor.elementToBeClickable(parentElem.element(by.css(btnSelector)));
+  parentElem.element(by.css(btnSelector)).click();
   const btn = parentElem.element(by.css(btnSelector));
   return btn.getAttribute('aria-owns').then(id => {
     return element(by.id(id));

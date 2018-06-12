@@ -18,7 +18,6 @@ module.exports = {
     const passwordElem = this.loginElements.passwordField;
     const loginElem = this.loginElements.loginBtn;
     commonFunctions.waitFor.elementToBeVisible(userElem);
-    console.log('User------>'+user)
     userElem.clear().sendKeys(user);
     commonFunctions.waitFor.elementToBeVisible(passwordElem);
     passwordElem.clear().sendKeys(password);

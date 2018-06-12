@@ -20,13 +20,15 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   const subCategoryName = subCategories.createAnalysis.name;
   const chartDesigner = analyzePage.designerDialog.chart;
   const yAxisName = 'Double';
-  const xAxisName = 'Integer';
+  const xAxisName = 'Date';
   const yAxisName2 = 'Long';
-  const groupName = 'Date';
+  const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
 
   const dataProvider = {
+    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, // SAW-4788
+    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, // SAW-4744
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, // SAW-4793
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, // SAW-4733
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, // SAW-4792
@@ -37,8 +39,6 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, // SAW-4740
     'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, // SAW-4789
     'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, // SAW-4741
-    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, // SAW-4788
-    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, // SAW-4744
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, // SAW-4787
     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, // SAW-4745
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, // SAW-4786
@@ -51,7 +51,6 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -59,7 +58,6 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -72,57 +70,54 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should verify preview for ' + description, () => {
+      let chartTyp = data.chartType.split(":")[1];
       login.loginAs(data.user);
       homePage.mainMenuExpandBtn.click();
-      navigateToSubCategory();
+      homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
       homePage.mainMenuCollapseBtn.click();
 
-      //Create analysis
+      let chartName = `e2e ${description} ${(new Date()).toString()}`;
+      let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
+
+      // Create analysis
       homePage.createAnalysis(metricName, data.chartType);
 
       //Select fields
-      if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
-        y = chartDesigner.getYRadio(yAxisName);
+      // Wait for field input box.
+      commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
+    
+      // Dimension section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
+      designModePage.chart.addFieldButton(xAxisName).click();
 
-        // Also select Color by
-        const sizeBy = chartDesigner.getZRadio(sizeByName);
-        commonFunctions.waitFor.elementToBeClickableAndClick(sizeBy);
-      } else if (data.chartType === 'chart:stack') {  // if chart is stacked - select Y radio instead of checkbox
-        y = chartDesigner.getYRadio(yAxisName);
-      } else {
-        y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
+      // Group by section. i.e. Color by
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
+      designModePage.chart.addFieldButton(groupName).click();
+
+      // Metric section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
+      designModePage.chart.addFieldButton(yAxisName).click();
+
+      // Size section.
+      if (data.chartType === 'chart:bubble') {
+        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
+        designModePage.chart.addFieldButton(sizeByName).click();
       }
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
-      commonFunctions.waitFor.elementToBeClickableAndClick(y);
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
-
       //If Combo then add one more field
       if (data.chartType === 'chart:combo') {
-        const y2 = chartDesigner.getYCheckBox(yAxisName2);
-        commonFunctions.waitFor.elementToBeClickableAndClick(y2);
-      }
-
-      //Refresh
-      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
+        commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
+        designModePage.chart.addFieldButton(yAxisName2).click();
+      }  
 
       // Navigate to Preview
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.previewBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.previewBtn);
+      designModePage.previewBtn.click();
 
       // Verify axis to be present on Preview Mode
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(yAxisName));
-      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(xAxisName));
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, yAxisName, "yaxis"));
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
+      commonFunctions.waitFor.elementToBeVisible(previewPage.axisTitleUpdated(chartTyp, xAxisName, "xaxis"));
     });
-
-    // Navigates to specific category where analysis creation should happen
-    const navigateToSubCategory = () => {
-      //Collapse default category
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
-
-      //Navigate to Category/Sub-category
-      const collapsedCategory = homePage.collapsedCategory(categoryName);
-      const subCategory = homePage.subCategory(subCategoryName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
-    };
   });
 });

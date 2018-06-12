@@ -22,29 +22,29 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   // const chartName = `e2e chart ${(new Date()).toString()}`;
   // const chartDescription = 'descr';
   const yAxisName = 'Double';
+  const xAxisName = 'Date';
   const yAxisName2 = 'Long';
-  const xAxisName = 'Integer';
-  const groupName = 'Date';
+  const groupName = 'String';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
 
   const dataProvider = {
+    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602
+    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, //SAWQA-323
-    // 'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, //SAWQA-4475
-    // 'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, //SAWQA-569
-    // 'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'}, //SAWQA-4477
-    // 'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'}, //SAWQA-832
-    // 'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, //SAWQA-4478
-    // 'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
-    // 'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
-    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
-    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676
-    // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602
-    // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678
-    // 'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
-    // 'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
-    // 'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
-    // 'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'} //SAWQA-4680
+    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, //SAWQA-4475
+    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, //SAWQA-569
+    'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'}, //SAWQA-4477
+    'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'}, //SAWQA-832
+    'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, //SAWQA-4478
+    'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
+    'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
+    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676
+    'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
+    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
+    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'} //SAWQA-4680
   };
 
   beforeAll(function () {
@@ -53,7 +53,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -61,7 +60,6 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -88,28 +86,28 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       //Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-      // Search field and add that into metric section.
-      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
-      designModePage.chart.addFieldButton(yAxisName).click();
-
-      // Search field and add that into dimension section.
+      // Dimension section.
       commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
       designModePage.chart.addFieldButton(xAxisName).click();
 
-      // Search field and add that into size section.
+      // Group by section. i.e. Color by
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
+      designModePage.chart.addFieldButton(groupName).click();
+
+      // Metric section.
+      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
+      designModePage.chart.addFieldButton(yAxisName).click();
+
+      // Size section.
       if (data.chartType === 'chart:bubble') {
         commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(sizeByName));
         designModePage.chart.addFieldButton(sizeByName).click();
       }
-       //If Combo then add one more field
-       if (data.chartType === 'chart:combo') {
+      //If Combo then add one more field
+      if (data.chartType === 'chart:combo') {
         commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
         designModePage.chart.addFieldButton(yAxisName2).click();
       }
-
-      // Search field and add that into group by section. i.e. Color by
-      commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
-      designModePage.chart.addFieldButton(groupName).click();
       //Save
       const save = analyzePage.saveDialog;
       const designer = analyzePage.designerDialog;

@@ -13,6 +13,7 @@ const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
+const utils = require('../javascript/helpers/utils');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -168,123 +169,123 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privilege for admin': { // SAWQA-4845
-      user: 'admin',
-      subCategory: subCategories.create.name,
-      cardOptions: false,
-      viewOptions: false,
-      create: true,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Edit privilege for admin': {  // SAWQA-4846
-      user: 'admin',
-      subCategory: subCategories.edit.name,
-      cardOptions: true,
-      viewOptions: false,
-      create: false,
-      edit: true,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Fork privilege for admin': {  // SAWQA-4847
-      user: 'admin',
-      subCategory: subCategories.fork.name,
-      cardOptions: false,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: true,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Publish privilege for admin': { // SAWQA-4848
-      user: 'admin',
-      subCategory: subCategories.publish.name,
-      cardOptions: true,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: true,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Execute privilege for admin': { // SAWQA-4849
-      user: 'admin',
-      subCategory: subCategories.execute.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: true,
-      export: false,
-      delete: false
-    },
-    'Export privilege for admin': { // SAWQA-4850
-      user: 'admin',
-      subCategory: subCategories.export.name,
-      cardOptions: false,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: true,
-      delete: false
-    },
-    'Delete privilege for admin': { // SAWQA-4851
-      user: 'admin',
-      subCategory: subCategories.delete.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: true
-    },
-    'View privilege for admin': { // SAWQA-4852
-      user: 'admin',
-      subCategory: subCategories.view.name,
-      cardOptions: false,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Multiple privileges for admin': { // SAWQA-4853
-      user: 'admin',
-      subCategory: subCategories.multiple.name,
-      cardOptions: true,
-      viewOptions: false,
-      create: true,
-      edit: false,
-      fork: true,
-      publish: true,
-      execute: false,
-      export: false,
-      delete: false
-    }
+    // 'Create privilege for admin': { // SAWQA-4845
+    //   user: 'admin',
+    //   subCategory: subCategories.create.name,
+    //   cardOptions: false,
+    //   viewOptions: false,
+    //   create: true,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Edit privilege for admin': {  // SAWQA-4846
+    //   user: 'admin',
+    //   subCategory: subCategories.edit.name,
+    //   cardOptions: true,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: true,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Fork privilege for admin': {  // SAWQA-4847
+    //   user: 'admin',
+    //   subCategory: subCategories.fork.name,
+    //   cardOptions: false,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: false,
+    //   fork: true,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Publish privilege for admin': { // SAWQA-4848
+    //   user: 'admin',
+    //   subCategory: subCategories.publish.name,
+    //   cardOptions: true,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: true,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Execute privilege for admin': { // SAWQA-4849
+    //   user: 'admin',
+    //   subCategory: subCategories.execute.name,
+    //   cardOptions: true,
+    //   viewOptions: true,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: true,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Export privilege for admin': { // SAWQA-4850
+    //   user: 'admin',
+    //   subCategory: subCategories.export.name,
+    //   cardOptions: false,
+    //   viewOptions: true,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: true,
+    //   delete: false
+    // },
+    // 'Delete privilege for admin': { // SAWQA-4851
+    //   user: 'admin',
+    //   subCategory: subCategories.delete.name,
+    //   cardOptions: true,
+    //   viewOptions: true,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: true
+    // },
+    // 'View privilege for admin': { // SAWQA-4852
+    //   user: 'admin',
+    //   subCategory: subCategories.view.name,
+    //   cardOptions: false,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Multiple privileges for admin': { // SAWQA-4853
+    //   user: 'admin',
+    //   subCategory: subCategories.multiple.name,
+    //   cardOptions: true,
+    //   viewOptions: false,
+    //   create: true,
+    //   edit: false,
+    //   fork: true,
+    //   publish: true,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // }
   };
 
   beforeAll(function () {
@@ -314,35 +315,33 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
+      
         loginPage.loginAs(data.user);
-        //navigateToDefaultSubCategory();
-        navigateToSubCategory();
+        navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
-        element(analyzePage.analysisElems.addAnalysisBtn.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.addAnalysisBtn.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.create,
             "Create button expected to be " + data.create + " on Analyze Page, but was " + !data.create);
         }));
 
         // Go to Card View
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+        analyzePage.analysisElems.cardView.click();
 
-        // Validate presence of menu on card
-        element(analyzePage.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
-
         // Validate presence on menu items in card menu
         if (data.cardOptions) {
-          analyzePage.main.getAnalysisActionOptions(analyzePage.main.firstCard).then(options => {
+          analyzePage.main.getAnalysisActionOptionsNew(analyzePage.main.firstCard).then(options => {
             let analysisOptions = options;
             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
-
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isDisplayed()).toBe(data.fork,
+            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isPresent()).toBe(data.fork,
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
@@ -353,12 +352,15 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
-          expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
+          commonFunctions.waitFor.elementToBeClickable(element(by.css('[class="cdk-overlay-container"]')));
+          element(by.css('[class="cdk-overlay-container"]')).click();
+          commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
+          expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
         }
-
         // Go to executed analysis page
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.main.firstCardTitle);
+        analyzePage.main.firstCardTitle.click();
+
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
@@ -381,7 +383,8 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          commonFunctions.waitFor.elementToBeClickableAndClick(executedAnalysis.actionsMenuBtn);
+          commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
+          executedAnalysis.actionsMenuBtn.click();
 
           element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.execute,
@@ -409,23 +412,18 @@ describe('Privileges tests: privileges.test.js', () => {
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
       homePage.mainMenuExpandBtn.click();
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeVisible(homePage.collapsedCategoryUpdated(categoryName));
+      commonFunctions.waitFor.elementToBeClickable(homePage.collapsedCategoryUpdated(categoryName));
+      homePage.collapsedCategoryUpdated(categoryName).click();
+      browser.sleep(200);
+      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
+      homePage.subCategory(data.subCategory).click();
+      browser.sleep(200);
+      const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
+      expect(doesDataNeedRefreshing).toBeTruthy();
       homePage.mainMenuCollapseBtn.click();
-    };
 
-    // Navigates to specific category where analysis creation should happen
-    const navigateToSubCategory = () => {
-      // Expand menu
-      homePage.mainMenuExpandBtn.click();
-
-      //Navigate to Category/Sub-category
-      const collapsedCategory = homePage.collapsedCategory(categoryName);
-      const subCategory = homePage.subCategory(data.subCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
-
-      // Collapse menu
-      homePage.mainMenuCollapseBtn.click();
     };
   });
 });
