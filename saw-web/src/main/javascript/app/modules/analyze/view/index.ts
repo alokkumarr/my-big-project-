@@ -5,6 +5,7 @@ import { AnalyzeViewComponent } from './analyze-view.component';
 import { AnalyzeCardComponent } from './card';
 import { AnalyzeCardViewComponent } from './card-view';
 import { AnalyzeListViewComponent } from './list-view';
+import { AnalyzeNewDialogComponent } from './new-dialog';
 import { AnalysesFilterPipe } from './analyses-filter.pipe';
 
 
@@ -13,7 +14,8 @@ const COMPONENTS = [
   AnalyzeViewComponent,
   AnalyzeCardViewComponent,
   AnalyzeListViewComponent,
-  AnalyzeCardComponent
+  AnalyzeCardComponent,
+  AnalyzeNewDialogComponent
 ];
 
 @NgModule({

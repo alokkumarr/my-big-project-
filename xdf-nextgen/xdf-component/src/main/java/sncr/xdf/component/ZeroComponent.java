@@ -25,8 +25,8 @@ public class ZeroComponent extends Component implements WithMovableResult, WithS
         ZeroComponent component = new ZeroComponent();
         try {
             // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -35,13 +35,13 @@ public class ZeroComponent extends Component implements WithMovableResult, WithS
         }
     }
 
-    protected int Execute(){
+    protected int execute(){
         logger.info("Zero component does not do transformations! It only moves (copy) input dataset to output dataset");
         return 0;
     }
 
     @Override
-    protected int Move(){
+    protected int move(){
 
         if (inputDataSets == null || inputDataSets.isEmpty())
         {
@@ -69,10 +69,10 @@ public class ZeroComponent extends Component implements WithMovableResult, WithS
             outDesc.get(DataSetProperties.Format.name()),
             outDesc.get(DataSetProperties.Mode.name())));
 
-        return super.Move();
+        return super.move();
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 

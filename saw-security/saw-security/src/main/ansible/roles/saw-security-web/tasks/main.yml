@@ -6,9 +6,11 @@
   file: path=/etc/bda state=directory
 - name: Create SAW Security variables file
   template: src=saw-security.vars dest=/etc/bda/saw-security.vars
-- name: Install SAW Security package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Security package
+  copy: src="{{ item }}" dest=/tmp/saw-security.rpm
   with_fileglob: ["../rpms/saw-security-*.rpm"]
+- name: Install SAW Security package
+  yum: name=/tmp/saw-security.rpm state=present
   notify:
     - restart saw-security
 - name: Run SAW Security configuration initialization
