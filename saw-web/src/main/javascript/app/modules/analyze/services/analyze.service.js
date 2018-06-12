@@ -39,6 +39,7 @@ export class AnalyzeService {
       this._menuResolver = resolve;
     });
     this._executingAnalyses = {};
+    this._executions = {};
   }
 
   /* Maintains a list of analyses being executed.
@@ -55,6 +56,10 @@ export class AnalyzeService {
 
   didExecutionFail(analysisId) {
     return EXECUTION_STATES.ERROR === this._executingAnalyses[analysisId];
+  }
+
+  executionFor(analysisId) {
+    return this._executions[analysisId];
   }
 
   /* getRequestParams will generate the base structure and auto-fill it
@@ -152,10 +157,12 @@ export class AnalyzeService {
       this._$translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
         this._toastMessage.info(msg);
       });
+      this._executions[model.id] = deferred.promise;
+
       this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      this.applyAnalysis(model).then(({data}) => {
+      this.applyAnalysis(model).then(({data, count}) => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
-        deferred.resolve(data);
+        deferred.resolve({data, count});
       }, err => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);

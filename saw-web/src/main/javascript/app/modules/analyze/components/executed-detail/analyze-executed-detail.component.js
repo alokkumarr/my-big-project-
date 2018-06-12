@@ -233,13 +233,16 @@ export const AnalyzeExecutedDetailComponent = {
       return replace(csv, firstRow, displayNames);
     }
 
-    loadExecutionData(updateRequester = false) {
+    loadExecutionData(updateRequester = false, loadFromCurrentExecution = false) {
       return (options = {}) => {
         if (this._executionId) {
           this._$rootScope.showProgress = true;
           options.analysisType = this.analysis.type;
 
-          return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
+          const job = this.isExecuting || loadFromCurrentExecution ?
+            this._AnalyzeService.executionFor(this.analysis.id) :
+            this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options);
+          return job
             .then(({data, count}) => {
               this._$rootScope.showProgress = false;
               if (updateRequester) {
@@ -273,27 +276,37 @@ export const AnalyzeExecutedDetailComponent = {
 
     /* If data for a particular execution is not requested,
        load data from the most recent execution */
-    loadLastPublishedAnalysis() {
+    loadLastPublishedAnalysis(loadFromCurrentExecution = false) {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
       }
 
       if (!['report', 'esReport'].includes(this.analysis.type)) {
-        this.loadExecutionData(true)();
+        this.loadExecutionData(true, loadFromCurrentExecution)();
       }
     }
 
     loadExecutedAnalyses(analysisId) {
       this._$rootScope.showProgress = true;
-      this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
-        .then(analyses => {
-          this.analyses = analyses;
-          this._$rootScope.showProgress = false;
-          this.loadLastPublishedAnalysis();
-        }, err => {
-          this._$rootScope.showProgress = false;
-          throw err;
+      const loadMethod = loadFromCurrentExecution => {
+        this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
+          .then(analyses => {
+            this.analyses = analyses;
+            this._$rootScope.showProgress = false;
+            this.loadLastPublishedAnalysis(loadFromCurrentExecution);
+          }, err => {
+            this._$rootScope.showProgress = false;
+            throw err;
+          });
+      };
+
+      if (this.isExecuting) {
+        this._AnalyzeService.executionFor(analysisId).then(() => {
+          loadMethod(this.isExecuting);
         });
+      } else {
+        loadMethod(false);
+      }
     }
 
     fork() {
