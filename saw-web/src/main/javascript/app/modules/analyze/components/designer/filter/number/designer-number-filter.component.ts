@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FilterModel } from '../../types';
+
 import * as isFinite from 'lodash/isFinite';
+import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./designer-number-filter.component.html');
 require('./designer-number-filter.component.scss');
@@ -35,6 +37,16 @@ export const OPERATORS = [
     label: 'Between'
   }
 ];
+
+export const isValid = (model: FilterModel) => {
+  model = model || {};
+
+  return (
+    model.operator &&
+    isFinite(model.value) &&
+    (model.operator !== 'BTW' ? true : isFinite(model.otherValue))
+  );
+};
 
 @Component({
   selector: 'designer-number-filter',

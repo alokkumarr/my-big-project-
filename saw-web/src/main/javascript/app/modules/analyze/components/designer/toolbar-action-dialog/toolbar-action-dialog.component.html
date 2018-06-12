@@ -60,6 +60,7 @@
         </button>
         <button *ngSwitchCase="'filter'"
                 (click)="onOk()"
+                [disabled]="!filterValid"
                 e2e="apply-filter-btn"
                 mat-raised-button color="primary" i18n>
           Apply Filters
