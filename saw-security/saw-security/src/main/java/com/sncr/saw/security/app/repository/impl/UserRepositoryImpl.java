@@ -1159,10 +1159,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public String getUserEmailId(String userId) {
 		String message = null;
-//		String sql = "select ci.email as email from USERS u, USER_CONTACT uc, CONTACT_INFO ci " + " where u.user_id=?"
-//				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
-
-		String sql = "select u.email from USERS u where u.user_id=? LIMIT 1";
+		String sql = "select u.email from USERS u where u.user_id=?";
 
 		try {
 			// return email from database
