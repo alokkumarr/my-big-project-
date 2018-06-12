@@ -80,8 +80,8 @@ RUN chmod a+x /root/saw-mapr-init
 # Try reducing MapR container startup time
 RUN sed -i -e 's/^sleep 60/sleep 30/' /usr/bin/init-script
 
-# set mapr-node hostname to saw-mapr same as container name and cluster name
-RUN sed -i -e 's/demo.mapr.io/saw-mapr/g' /usr/bin/init-script
+# set mapr-node hostname to sip-mapr same as container name and cluster name
+RUN sed -i -e 's/demo.mapr.io/sip-mapr/g' /usr/bin/init-script
 
 # Workaround: Bamboo builds fail with no space left error, so reduce
 # loopack disk size.  Additionally put on volume, which has more space

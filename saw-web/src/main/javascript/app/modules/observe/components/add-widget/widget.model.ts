@@ -1,7 +1,8 @@
 export enum Widget {
   ANALYSIS,
   KPI,
-  CUSTOM
+  CUSTOM,
+  BULLET
 }
 
 export interface WidgetType {
@@ -25,6 +26,13 @@ export const widgetTypes: Array<WidgetType> = [
     description: 'Capture a metric at any point in time',
     disabled: false,
     icon: 'kpi-widget'
+  },
+  {
+    name: 'Actual vs Target KPI',
+    id: Widget.BULLET,
+    description: 'Metric performance at any point in time',
+    disabled: false,
+    icon: 'custom-widget'
   } /*, {
   name: 'Custom Widget',
   id: Widget.CUSTOM,

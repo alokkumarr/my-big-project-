@@ -63,3 +63,22 @@ md-chip {
     }
   }
 }
+
+mat-chip {
+  &.tag-chip {
+    height: 100%;
+    padding: 3px;
+    margin-left: 5px;
+    border-radius: 1px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: $tag-bg-color;
+    color: $tag-text-color;
+
+    &.status-chip {
+      background-color: $secondary-orange;
+      color: white;
+    }
+  }
+}

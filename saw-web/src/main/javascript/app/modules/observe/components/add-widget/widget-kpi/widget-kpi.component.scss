@@ -2,7 +2,7 @@ widget-kpi {
   form {
     display: flex;
     flex-direction: column;
-    padding-top: 15px;
+    padding-top: 5px;
 
     .secondary-aggregate-form {
       display: flex;
@@ -17,8 +17,89 @@ widget-kpi {
         }
 
         &:last-child {
-          padding-bottom: 20px;
+          padding-bottom: 15px;
         }
+      }
+    }
+
+    .kpi-bg {
+      padding-bottom: 25px;
+
+      & > .mat-button-toggle-group {
+        flex-wrap: nowrap;
+
+        & > .mat-button-toggle {
+          max-width: 30px;
+          max-height: 24px;
+          margin: 0.7px;
+        }
+      }
+
+      .mat-button-toggle-checked {
+        border: groove #000;
+      }
+    }
+
+    .bullet-measures {
+      display: flex;
+      flex-direction: row;
+
+      mat-form-field {
+        display: flex;
+        flex: 1 1 48%;
+
+        & > .mat-form-field-wrapper {
+          width: 98%;
+        }
+      }
+
+      .mat-form-field-infix {
+        width: auto;
+      }
+    }
+
+    .target {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bullet-bands {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      align-content: center;
+      padding-bottom: 25px;
+
+      & > span {
+        flex: 1 1 40%;
+      }
+
+      mat-button-toggle {
+        color: black;
+        opacity: 0.5;
+      }
+
+      .mat-button-toggle-checked {
+        opacity: 1 !important;
+        border: groove #000;
+      }
+
+      .rog {
+        background: linear-gradient(to right, #C0463F 0, #C0463F 33.333%, #EE754E 33.333%, #EE754E 66.666%, #99BA33 66.666%, #99BA33 100%);
+        margin-right: 1px;
+      }
+
+      .grey {
+        background: linear-gradient(to right, #666 0, #666 33.333%, #999 33.333%, #999 66.666%, #BBB 66.666%, #BBB 100%);
+        margin-right: 1px;
+      }
+
+      .blues {
+        background: linear-gradient(to right, #568ED5 0, #568ED5 33.333%, #8DB4E3 33.333%, #8DB4E3 66.666%, #DDE6F3 66.666%, #DDE6F3 100%);
+      }
+
+      .text {
+        opacity: 0.5;
       }
     }
   }

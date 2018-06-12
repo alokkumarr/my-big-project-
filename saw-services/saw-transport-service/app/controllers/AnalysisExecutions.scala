@@ -148,7 +148,7 @@ class AnalysisExecutions extends BaseController {
           else throw new Exception("Unsupported data format")
         }
         else null
-      } // end of chart & pivot
+      } // end of chart & PIVOT
     })
   }
 
@@ -157,4 +157,6 @@ class AnalysisExecutions extends BaseController {
       analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
     })
   }
+
+
 }

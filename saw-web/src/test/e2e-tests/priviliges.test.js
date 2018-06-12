@@ -11,6 +11,8 @@ const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const utils = require('../javascript/helpers/utils');
+let descriptionText;
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -289,7 +291,6 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -297,15 +298,13 @@ describe('Privileges tests: privileges.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -314,30 +313,28 @@ describe('Privileges tests: privileges.test.js', () => {
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
-        element(analyzePage.analysisElems.addAnalysisBtn.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.addAnalysisBtn.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.create,
             "Create button expected to be " + data.create + " on Analyze Page, but was " + !data.create);
         }));
 
         // Go to Card View
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+        analyzePage.analysisElems.cardView.click();
 
-        // Validate presence of menu on card
-        element(analyzePage.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
-
         // Validate presence on menu items in card menu
         if (data.cardOptions) {
-          analyzePage.main.getAnalysisActionOptions(analyzePage.main.firstCard).then(options => {
+          analyzePage.main.getAnalysisActionOptionsNew(analyzePage.main.firstCard).then(options => {
             let analysisOptions = options;
             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
-
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isDisplayed()).toBe(data.fork,
+            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isPresent()).toBe(data.fork,
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
@@ -348,12 +345,15 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          commonFunctions.waitFor.elementToBeClickableAndClick(element(by.css('md-backdrop')));
-          expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
+          commonFunctions.waitFor.elementToBeClickable(element(by.css('[class="cdk-overlay-container"]')));
+          element(by.css('[class="cdk-overlay-container"]')).click();
+          commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
+          expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
         }
-
         // Go to executed analysis page
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.main.firstCardTitle);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.main.firstCardTitle);
+        analyzePage.main.firstCardTitle.click();
+
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
@@ -376,7 +376,8 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          commonFunctions.waitFor.elementToBeClickableAndClick(executedAnalysis.actionsMenuBtn);
+          commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
+          executedAnalysis.actionsMenuBtn.click();
 
           element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.execute,
@@ -404,8 +405,13 @@ describe('Privileges tests: privileges.test.js', () => {
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
       homePage.mainMenuExpandBtn.click();
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
+      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
+      homePage.subCategory(data.subCategory).click();
+      const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
+      expect(doesDataNeedRefreshing).toBeTruthy();
       homePage.mainMenuCollapseBtn.click();
+
     };
   });
 });
