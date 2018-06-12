@@ -10,6 +10,7 @@ if (__PRODUCTION__) {
   apiUrl = 'https://sawdev-bda-velocity-vacum-np.sncrcorp.net';
 }
 /* eslint-enable */
+apiUrl = apiUrl + '/saw';
 
 export default {
   login: {
