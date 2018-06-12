@@ -52,9 +52,7 @@ export class GlobalFilterService {
         column.columnName === columnName &&
         (column.table || column.tableName) === tableName
     );
-    return col
-      ? col.aliasName || col.displayName || col.columnName
-      : columnName;
+    return col ? col.displayName || col.columnName : columnName;
   }
 
   areFiltersEqual(f1, f2) {
