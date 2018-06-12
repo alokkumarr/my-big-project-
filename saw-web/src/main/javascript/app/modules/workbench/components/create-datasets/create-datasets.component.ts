@@ -121,6 +121,7 @@ export class CreateDatasetsComponent implements OnInit {
   triggerParser() {
     const payload = {
       'name': this.nameFormGroup.value.nameControl,
+      'description': this.nameFormGroup.value.descControl,
       'component': 'parser',
       'configuration':
       {

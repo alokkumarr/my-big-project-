@@ -38,8 +38,8 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         ESLoaderComponent component = new ESLoaderComponent();
 
         try {
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -49,7 +49,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     }
 
     @Override
-    protected int Execute() {
+    protected int execute() {
         int retVal = 0;
         try {
             ESLoader esLoaderConfig = this.ctx.componentConfiguration.getEsLoader();
@@ -83,7 +83,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     }
 
     @Override
-    protected int Archive() {
+    protected int archive() {
         return 0;
     }
 

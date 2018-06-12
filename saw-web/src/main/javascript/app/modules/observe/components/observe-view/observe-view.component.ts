@@ -98,7 +98,7 @@ export class ObserveViewComponent implements OnInit {
         dashboard: this.dashboard,
         mode: 'edit'
       },
-      maxWidth: '100%'
+      maxWidth: '1600px'
     });
   }
 
@@ -108,7 +108,7 @@ export class ObserveViewComponent implements OnInit {
       data: {
         mode: 'create'
       },
-      maxWidth: '100%'
+      maxWidth: '1600px'
     });
   }
 

@@ -12,7 +12,6 @@ import {
 } from './jsPlumb';
 import {PanelComponent} from './panel';
 import {ErrorDetailComponent} from './error-detail';
-import {SearchBoxComponent} from './search-box/search-box.component';
 import {CollapserComponent} from './collapser/collapser.component';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
@@ -49,8 +48,6 @@ angular
   .component('mdButtonGroup', mdButtonGroupComponent)
   .component('panel', PanelComponent)
   .component('rangeSlider', RangeSliderComponent)
-  .component('searchBox', SearchBoxComponent)
-  //.component('sidenav', SidenavComponent)
   .directive('sidenav', downgradeComponent({component: SidenavComponent}))
   .directive('pivotGrid', downgradeComponent({component: PivotGridComponent}))
   .component('reportGridDisplay', ReportGridDisplayComponent)

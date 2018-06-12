@@ -3,7 +3,7 @@
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <div class="backdrop" *ngIf="!isViewMode()">
       <div class="tile-actions">
-        <button mat-icon-button (click)="editTile(item)" *ngIf="item.kpi">
+        <button mat-icon-button (click)="editTile(item)" *ngIf="(item.kpi || item.bullet)">
           <mat-icon fontIcon="icon-edit-solid"></mat-icon>
         </button>
         <button mat-icon-button (click)="removeTile(item)">
@@ -18,6 +18,11 @@
 
     <ng-container *ngIf="item.kpi">
       <observe-kpi [kpi]="item.kpi" [dimensions]="item.dimensions"></observe-kpi>
+    </ng-container>
+
+    <ng-container *ngIf="item.bullet">
+      <observe-kpi-bullet [item]="item" (onRefresh)="refreshTile($event)"
+        [bulletKpi]="item.bullet" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-kpi-bullet>
     </ng-container>
   </gridster-item>
 </gridster>

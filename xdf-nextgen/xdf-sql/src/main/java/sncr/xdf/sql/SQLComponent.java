@@ -32,8 +32,8 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
         SQLComponent component = new SQLComponent();
         try {
             // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -42,7 +42,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
         }
     }
 
-    protected int Execute(){
+    protected int execute(){
         try {
             executor = new JobExecutor(ctx, inputDataSets, outputDataSets);
             String script;
@@ -71,7 +71,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
         return 0;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
@@ -112,7 +112,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
 
 
     @Override
-    protected int Move(){
+    protected int move(){
 
         if (executor.getResultDataSets() == null ||
             executor.getResultDataSets().size() == 0 )
@@ -139,7 +139,7 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
 
             }
         );
-        return super.Move();
+        return super.move();
     }
 
 }

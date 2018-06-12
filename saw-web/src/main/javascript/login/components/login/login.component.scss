@@ -18,6 +18,10 @@
 }
 
 layout-footer .powered-logo-container {
-  margin-left: 46% !important;
+  text-align: center;
+
+  .powered-logo {
+    margin: 0 auto;
+  }
 }
 

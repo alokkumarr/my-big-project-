@@ -8,7 +8,7 @@ import {
   Analysis,
   DesignerToolbarAciton
 } from '../types';
-import { DesignerStates } from '../container';
+import { DesignerStates } from '../consts';
 
 const template = require('./designer-header.component.html');
 require('./designer-header.component.scss');

@@ -205,7 +205,7 @@ export class DesignerService {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
       if (['column', 'line', 'area'].includes(chartType)) {
         artifactColumn.comboType = chartType;
-      } else if (['tsspline', 'tsPane'].includes(chartType)) {
+      } else if (['tsline', 'tsareaspline'].includes(chartType)) {
         artifactColumn.comboType = 'line';
       } else if (['combo', 'bar'].includes(chartType)) {
         artifactColumn.comboType = 'column';

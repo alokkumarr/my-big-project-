@@ -173,7 +173,7 @@ export class DashboardGridComponent
   }
 
   editTile(item: GridsterItem) {
-    if (!item.kpi) return;
+    if (!item.kpi && !item.bullet) return;
 
     this.dashboardService.onEditItem.next(item);
   }
@@ -190,7 +190,7 @@ export class DashboardGridComponent
     if (item.kpi) {
       item.dimensions = dimensions;
       return;
-    }
+    } 
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
@@ -273,7 +273,10 @@ export class DashboardGridComponent
     }
 
     forEach(get(this.model, 'tiles', []), tile => {
-      if (tile.kpi) {
+      if (tile.bullet) {
+        tile.updater = new BehaviorSubject({});
+      }
+      if (tile.kpi || tile.bullet) {
         this.dashboard.push(tile);
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         setTimeout(() => {
@@ -337,6 +340,8 @@ export class DashboardGridComponent
       return 'analysis';
     } else if (tile.kpi) {
       return 'kpi';
+    } else if (tile.bullet) {
+      return 'bullet';
     }
 
     return 'custom';
@@ -360,7 +365,8 @@ export class DashboardGridComponent
         y: tile.y,
         cols: tile.cols,
         rows: tile.rows,
-        kpi: tile.kpi
+        kpi: tile.kpi,
+        bullet: tile.bullet
       })),
       filters: [],
       options: [

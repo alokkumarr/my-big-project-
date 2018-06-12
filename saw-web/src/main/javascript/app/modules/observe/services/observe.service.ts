@@ -10,11 +10,14 @@ import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
+import * as add from 'lodash/add';
 
 import { JwtService } from '../../../../login/services/jwt.service';
 import { MenuService } from '../../../common/services/menu.service';
 import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../../../appConfig';
+import { BULLET_CHART_COLORS } from '../consts';
 
 @Injectable()
 export class ObserveService {
@@ -237,5 +240,46 @@ export class ObserveService {
     });
 
     return count;
+  }
+
+  buildPlotBandsForBullet(bandColVal, b1, b2, bulletVal, bullTarget) {
+    const cb = find(BULLET_CHART_COLORS, { 'value': bandColVal });
+    const plotBands = [];
+    const seriesData = [{ y: bulletVal, target: bullTarget }];
+    if (b1 === 0 || b2 === 0) {
+      const bt1 = b1 === 0 ? b2 : b1;
+      plotBands.push(
+        {
+          from: 0,
+          to: bt1,
+          color: cb.b1
+        },
+        {
+          from: bt1,
+          to: 9e9,
+          color: cb.b3
+        }
+      );
+    } else {
+      plotBands.push(
+        {
+          from: 0,
+          to: b1,
+          color: cb.b1
+        },
+        {
+          from: b1,
+          to: b2,
+          color: cb.b2
+        },
+        {
+          from: b2,
+          to: add(b2, 9e9),
+          color: cb.b3
+        }
+      );
+    }
+
+    return { plotBands, seriesData };
   }
 }

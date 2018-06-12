@@ -33,25 +33,17 @@ import {
   AnalysisReport
 } from '../types';
 import {
+  DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
   DATE_TYPES,
   NUMBER_TYPES
-} from '../../../consts';
+} from '../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { ChartService } from '../../../services/chart.service';
 
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
-
-export enum DesignerStates {
-  WAITING_FOR_COLUMNS,
-  NO_SELECTION,
-  SELECTION_WAITING_FOR_DATA,
-  SELECTION_WITH_NO_DATA,
-  SELECTION_WITH_DATA,
-  SELECTION_OUT_OF_SYNCH_WITH_DATA
-}
 
 @Component({
   selector: 'designer-container',
