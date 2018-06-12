@@ -259,7 +259,7 @@ export class DashboardGridComponent
   onApplyGlobalFilters(filterGroup) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
-      if (tile.type !== 'analysis') return;
+      if (this.tileType(tile) !== 'analysis') return;
 
       const gFilters = filterGroup[tile.analysis.semanticId] || [];
 
@@ -332,12 +332,12 @@ export class DashboardGridComponent
     this.initialised = true;
   }
 
-  addAnalysisTile(tile) {
+  addAnalysisTile(tile, executeTile = false) {
     if (!tile.analysis) {
       return;
     }
 
-    tile.analysis = { ...tile.analysis, _executeTile: false };
+    tile.analysis = { ...tile.analysis, _executeTile: executeTile };
     tile.origAnalysis = tile.analysis;
     this.addGlobalFilters(tile.analysis);
     tile.updater = tile.updater || new BehaviorSubject({});
@@ -348,10 +348,13 @@ export class DashboardGridComponent
     const analysisTiles = filter(this.dashboard, tile => tile.analysis);
     const globalFilters = filter(
       flatMap(analysisTiles, tile =>
-        map(get(tile.analysis, 'sqlBuilder.filters') || [], f => {
-          f.semanticId = tile.analysis.semanticId;
-          return f;
-        })
+        map(
+          get(tile.origAnalysis || tile.analysis, 'sqlBuilder.filters') || [],
+          f => {
+            f.semanticId = tile.analysis.semanticId;
+            return f;
+          }
+        )
       ),
       f => f.isGlobalFilter
     );
@@ -368,7 +371,7 @@ export class DashboardGridComponent
         switch (req.action) {
         case 'add':
           if (req.data && req.data.analysis) {
-            this.addAnalysisTile(req.data);
+            this.addAnalysisTile(req.data, true);
           } else {
             this.dashboard.push(req.data);
           }
