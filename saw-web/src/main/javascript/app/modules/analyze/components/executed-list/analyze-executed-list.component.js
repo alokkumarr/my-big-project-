@@ -30,7 +30,7 @@ export const AnalyzeExecutedListComponent = {
         dataField: 'finished',
         dataType: 'date',
         calculateCellValue: rowData => {
-          return moment.tz(rowData.finished, 'Etc/UTC|Universal').local().format('YYYY/MM/DD h:mm A');
+          return moment.tz(rowData.finished,'Etc/UTC|Universal').local().format('YYYY/MM/DD h:mm A');
         },
         allowSorting: true,
         alignment: 'left',
