@@ -19,14 +19,14 @@ a REST API for creating and executing analyses.  SAW Security manages
 authentication and privileges of users.
 
 .Figure: SAW modules and their dependencies
-plantuml::saw-design/figure-modules.pum[format=svg]
+plantuml::sip-design/figure-modules.pum[format=svg]
 
 The modules can be taken into use independently, as long as their
 dependencies are also provided.  Typically all three modules are used
 together.
 
 .Figure: External SAW interfaces and their use
-plantuml::saw-design/figure-interfaces.pum[format=svg]
+plantuml::sip-design/figure-interfaces.pum[format=svg]
 
 == SAW Web
 
@@ -47,7 +47,7 @@ implemented in Java and the Spring Framework.  As an exception, the
 SAW Transport Service is implemented in Scala and the Play framework.
 
 .Figure: SAW Services and their dependencies
-plantuml::saw-design/figure-services.pum[format=svg]
+plantuml::sip-design/figure-services.pum[format=svg]
 
 SAW Services use MapR-DB for persistence, using the OJAI interface.
 As an exception, the SAW Transport Service uses the MapR-DB binary
@@ -118,7 +118,7 @@ analysis to execute as input, translates it into a query and executes
 the query and finally provides the results back to the client.
 
 .Figure: Executing an analysis using the SAW Execution Service
-plantuml::saw-design/figure-execution-sequence.pum[format=svg]
+plantuml::sip-design/figure-execution-sequence.pum[format=svg]
 
 The SAW Execution Service supports two types of storage: Apache Spark
 and Elasticsearch.  Analyses of type report are executed on Apache
@@ -132,7 +132,7 @@ project definition to execute as input, translates it into a Datalake operation 
 the operation's activity in MaprDB and finally provides the results back to the client.
 
 .Figure: Executing an analysis using the SAW Workbench Service
-plantuml::saw-design/figure-workbench-sequence.pum[format=svg]
+plantuml::sip-design/figure-workbench-sequence.pum[format=svg]
 
 The SAW Workbench Service supports three types of storage: Apache Spark,
 MaprDB & Elasticsearch. This module supports & exposes xdf-nextgen related REST API,
@@ -146,7 +146,7 @@ The purpose is to bring back all of transformation which is being done currently
 needs to deal with two common formats i.e JSON or Tabular (flat structure CSV) irrespective of storage layer.
 
 .Figure: Executing an data query using the SAW Proxy Service
-plantuml::saw-design/figure-proxy-sequence.pum[format=svg]
+plantuml::sip-design/figure-proxy-sequence.pum[format=svg]
 
 The request body shall provide the query, storage type & other details. The below are salient feature for the service which are as follows:
 1. It will return either in JSON or Tabular Format.
@@ -165,7 +165,7 @@ The SAW Semantic Service enables the consumer to store the semantic metadata of 
 to provide CRUD operations to deal with semantic metadata
 
 .Figure: Executing an data query using the SAW Proxy Service
-plantuml::saw-design/figure-semantic-sequence.pum[format=svg]
+plantuml::sip-design/figure-semantic-sequence.pum[format=svg]
 
 1. Create Integrated Semantic Node JSON structure for both elastic search as well as data lake data pods.
 2. The structure is consistent with that used by SAW Analyze module and Observe modules in the store.
@@ -255,7 +255,7 @@ Spring Framework and uses a MariaDB database to persist authentication
 and privilege information.
 
 .Figure: The SAW Security Service and dependencies
-plantuml::saw-design/figure-security.pum[format=svg]
+plantuml::sip-design/figure-security.pum[format=svg]
 
 A client authenticated to the SAW Security Service by sending a to the
 REST API.  The credentials and privileges are checked against the SAW
@@ -263,4 +263,4 @@ Security database, after which a token is issued and returned in the
 response to the client.
 
 .Figure: Authenticating a client using the SAW Security Service
-plantuml::saw-design/figure-security-sequence.pum[format=svg]
+plantuml::sip-design/figure-security-sequence.pum[format=svg]
