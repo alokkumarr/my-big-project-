@@ -1,4 +1,5 @@
-= Synchronoss Analytics Workbench
+= Synchronoss Insights Platform
+Version {project-version}
 :docinfo: shared
 :nofooter:
 
@@ -14,22 +15,22 @@ application for different roles:
 | Using the web application to design and execute analyses
 | User
 
-| link:saw-rest-api/index.html[SAW REST API Guide]
-| Consuming the SAW REST API to develop third-party integrations
+| link:sip-rest-api/index.html[SIP REST API Guide]
+| Consuming the SIP REST API to develop third-party integrations
 | Developer
 
-| link:saw-operations/index.html[SAW Operations Guide]
+| link:sip-operations/index.html[SIP Operations Guide]
 | Installing, maintaining and administering, including creating
   semantic configurations
 | Administrator
 
-| link:saw-design/index.html[SAW Design Guide]
+| link:sip-design/index.html[SIP Design Guide]
 | Understanding the high-level design of the application and its
   modules
 | Technical
 |===
 
 The above documents are also available in PDF format for download:
-link:saw-rest-api/index.pdf[SAW REST API Guide],
-link:saw-operations/index.pdf[SAW Operations Guide],
-link:saw-design/index.pdf[SAW Design Guide].
+link:sip-rest-api/index.pdf[SIP REST API Guide],
+link:sip-operations/index.pdf[SIP Operations Guide],
+link:sip-design/index.pdf[SIP Design Guide].
