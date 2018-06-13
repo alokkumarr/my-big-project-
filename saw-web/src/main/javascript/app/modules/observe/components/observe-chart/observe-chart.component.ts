@@ -128,11 +128,13 @@ export class ObserveChartComponent {
     );
     this.chartService.updateAnalysisModel(this.analysis);
 
-    this.onRefreshData().then(data => {
-      this.gridData = data;
-      this.reloadChart(this.settings, this.gridData, this.labels);
-      this.item && this.onRefresh.emit(this.item);
-    });
+    if (isUndefined(this.analysis._executeTile) || this.analysis._executeTile) {
+      this.onRefreshData().then(data => {
+        this.gridData = data;
+        this.reloadChart(this.settings, this.gridData, this.labels);
+        this.item && this.onRefresh.emit(this.item);
+      });
+    }
   }
 
   isNodeField(field) {

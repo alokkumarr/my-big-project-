@@ -17,7 +17,8 @@ const template = require('./observe-view.component.html');
 
 @Component({
   selector: 'observe-view',
-  template
+  template,
+  providers: [GlobalFilterService]
 })
 export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
@@ -48,7 +49,6 @@ export class ObserveViewComponent implements OnInit {
   ngOnInit() {
     if (this.dashboardId) {
       this.loadDashboard();
-      this.filters.initialise();
     }
   }
 

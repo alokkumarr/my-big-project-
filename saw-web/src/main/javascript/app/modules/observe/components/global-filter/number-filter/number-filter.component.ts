@@ -1,9 +1,17 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
 import { Subscription } from 'rxjs/Subscription';
 import * as get from 'lodash/get';
+import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./number-filter.component.html');
 
@@ -16,10 +24,11 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
 
   private _filter;
   private step = 1; // tslint:disable-line
-  private defaults: {min, max} = {min: 1, max: 100};
-  private filterCache: {operator?, start?, end?};
+  private defaults: { min; max } = { min: 1, max: 100 };
+  private filterCache: { operator?; start?; end? };
   private value: Array<number>;
-  private config = { // tslint:disable-line
+  private config = {
+    // tslint:disable-line
     tooltips: true
   };
   private clearFiltersListener: Subscription;
@@ -29,7 +38,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   constructor(
     private observe: ObserveService,
     private filters: GlobalFilterService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
@@ -41,11 +50,13 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       this.cacheFilters();
     });
 
-    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(state => {
-      if (!state) {
-        this.loadDefaults(true); // load cached filter data since last apply
+    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(
+      state => {
+        if (!state) {
+          this.loadDefaults(true); // load cached filter data since last apply
+        }
       }
-    });
+    );
   }
 
   ngOnDestroy() {
@@ -54,11 +65,18 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
     this.closeFiltersListener.unsubscribe();
   }
 
-  @Input() set filter(data) {
+  @Input()
+  set filter(data) {
     this._filter = data;
 
-    this.loadMinMax();
-    this.value = [this.defaults.min, this.defaults.max];
+    if (data.model) {
+      this.value = [data.model.otherValue, data.model.value];
+      this.cacheFilters();
+      this.loadMinMax(true);
+    } else {
+      this.value = [this.defaults.min, this.defaults.max];
+      this.loadMinMax(false);
+    }
   }
 
   /**
@@ -66,7 +84,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
    *
    * @memberof GlobalNumberFilterComponent
    */
-  loadMinMax() {
+  loadMinMax(useCache: boolean = false) {
     this.observe.getModelValues(this._filter).subscribe(data => {
       this.defaults.min = parseFloat(get(data, `_min`, this.defaults.min));
       this.defaults.max = parseFloat(get(data, `_max`, this.defaults.max));
@@ -76,7 +94,7 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
         https://github.com/tb/ng2-nouislider/blob/master/src/nouislider.ts#L154
       */
       setTimeout(() => {
-        this.loadDefaults();
+        this.loadDefaults(useCache);
         this.cacheFilters();
       }, 10);
     });
@@ -105,14 +123,17 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
    * @memberof GlobalNumberFilterComponent
    */
   loadDefaults(fromCache = false) {
-    if ((fromCache && !this.filterCache)) {
+    if (fromCache && !this.filterCache) {
       return;
     }
 
-    const loadData = fromCache ? this.filterCache : {
-      start: this.defaults.min,
-      end: this.defaults.max
-    };
+    /* prettier-ignore */
+    const loadData = fromCache
+      ? this.filterCache
+      : {
+        start: this.defaults.min,
+        end: this.defaults.max
+      };
 
     this.value = [loadData.start, loadData.end];
     this.onSliderChange(this.value);
@@ -138,7 +159,6 @@ export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.onModelChange.emit({data: payload, valid: true});
+    this.onModelChange.emit({ data: payload, valid: true });
   }
 }
-
