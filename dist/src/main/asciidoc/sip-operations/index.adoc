@@ -162,6 +162,44 @@ config file to support larger files upload (more than 1MB)
 
        client_max_body_size 25m;
 
+== Monitoring
+
+To support monitoring of a SIP environment, services expose health
+checks.
+
+=== Health checks
+
+SIP consists of services that are each performing some function,
+either by responding to incoming requests or executing something on a
+schedule.  The services are typically expected to be functioning
+normally, meaning they are in a healthy state.  However, in certain
+situations the services might not be able to perform the functions
+expected from them, in which case they are deemed to be in an
+unhealthy state.  Services expose health checks that allow external
+actors to verify the health state of a service.  This can be used in
+operations to detect issues early and pinpoint the source of a
+problem.  The health checks are additionally internally used for high
+availability, to route requests to services that are in a healthy
+state.
+
+Health checks of services are accessed through a REST API.  Each
+service's endpoint exposes a `/actuator/health` resource, which
+indicates the health status of the service.  If the response is `HTTP
+200 OK` and the contents is a JSON object with the property `status`
+set to `UP`, the service is healthy.  Any other HTTP response code or
+status value indicates the service is not healthy.
+
+The following shows a response indicating the Security Service is in a
+healthy state:
+
+        $ curl https://<sip-proxy>/saw/security/actuator/health
+        HTTP/1.1 200 
+        Content-Type: application/json; charset=UTF-8
+        <...>
+        {
+            "status": "UP"
+        }
+
 == Maintenance and troubleshooting
 
 === Accessing application logs
@@ -199,6 +237,26 @@ using the following commands:
 Where `<saw-service>` is one of the SAW systemd services (for example
 `saw-gateway`), which can be listed using the `sudo systemctl
 list-units saw-\*` command shown in the previous section.
+
+=== High availability and restoring failed nodes
+
+SIP provides high availability, so that if a single node in the
+environment fails or becomes unavailable services will keep working
+normally.
+
+After a node failure, the SIP environment should be restored to its
+original node count and layout as soon as possible to ensure high
+availability.  Do this using the following steps:
+
+. Provision a new node with the same specifications as the failed node
+
+. If the hostname of the new node is different from the hostname of
+  the failed node, update references to the old hostname in the SIP
+  environment configuration (`saw-config`) to refer to the new
+  hostname
+
+. Rerun the SIP deployment to restore software and configuration on
+the new node
 
 === Clearing the Transport Service Executor queues
 
