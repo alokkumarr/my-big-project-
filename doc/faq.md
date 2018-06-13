@@ -23,10 +23,10 @@ command works.
 
 # How can I run a command inside the SAW Docker container?
 
-Execute the following command to get a shell inside the SAW Docker
+Execute the following command to get a shell inside a SIP Docker
 container:
 
-        docker exec -it saw bash
+        docker exec -it sip-admin bash
 
 # What can I do if my Docker container reports running out of disk space?
 

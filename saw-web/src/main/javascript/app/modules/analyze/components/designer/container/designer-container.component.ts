@@ -28,28 +28,22 @@ import {
   IToolbarActionResult,
   DesignerChangeEvent,
   ArtifactColumn,
-  Format
+  Format,
+  DesignerSaveEvent,
+  AnalysisReport
 } from '../types';
 import {
+  DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
   DATE_TYPES,
   NUMBER_TYPES
-} from '../../../consts';
+} from '../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { ChartService } from '../../../services/chart.service';
 
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
-
-export enum DesignerStates {
-  WAITING_FOR_COLUMNS,
-  NO_SELECTION,
-  SELECTION_WAITING_FOR_DATA,
-  SELECTION_WITH_NO_DATA,
-  SELECTION_WITH_DATA,
-  SELECTION_OUT_OF_SYNCH_WITH_DATA
-}
 
 @Component({
   selector: 'designer-container',
@@ -60,7 +54,7 @@ export class DesignerContainerComponent {
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
-  @Output() public onSave: EventEmitter<boolean> = new EventEmitter();
+  @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   public isInDraftMode: boolean = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
@@ -69,10 +63,13 @@ export class DesignerContainerComponent {
   public dataCount: number;
   public auxSettings: any = {};
   public sorts: Sort[] = [];
+  public sortFlag = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
+  // minimum requirments for requesting data, obtained with: canRequestData()
+  public areMinRequirmentsMet = false;
 
   constructor(
     private _designerService: DesignerService,
@@ -164,6 +161,7 @@ export class DesignerContainerComponent {
     this.initAuxSettings();
 
     this.addDefaultSorts();
+    this.areMinRequirmentsMet = this.canRequestData();
   }
 
   initAuxSettings() {
@@ -209,6 +207,24 @@ export class DesignerContainerComponent {
     return artifacts;
   }
 
+  checkNodeForSorts() {
+    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+    const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
+    forEach(sqlBuilder.nodeFields, node => {
+      let identical = false;
+      forEach(this.sorts || [], sort => {
+        const hasSort = this.sorts.some(sort => node.columnName === sort.columnName);
+        if (!hasSort) {
+          this.sorts.push({
+            order: 'asc',
+            columnName: node.columnName,
+            type: node.type
+          });
+        }
+      });
+    });
+  }
+
   addDefaultSorts() {
     if ((this.analysisStarter || this.analysis).type !== 'chart') return;
 
@@ -247,8 +263,8 @@ export class DesignerContainerComponent {
   }
 
   requestDataIfPossible() {
-    this.updateAnalysis();
-    if (this.canRequestData()) {
+    this.areMinRequirmentsMet = this.canRequestData();
+    if (this.areMinRequirmentsMet) {
       this.requestData();
     } else {
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
@@ -345,7 +361,6 @@ export class DesignerContainerComponent {
         });
       break;
     case 'save':
-      this.updateAnalysis();
       if (this.isInQueryMode && !this.analysis.edit) {
         this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
           if (result) {
@@ -372,7 +387,10 @@ export class DesignerContainerComponent {
       .afterClosed()
       .subscribe((result: IToolbarActionResult) => {
         if (result) {
-          this.onSave.emit(result.isSaveSuccessful);
+          this.onSave.emit({
+            isSaveSuccessful: result.isSaveSuccessful,
+            analysis: result.analysis
+          });
           this.isInDraftMode = false;
         }
       });
@@ -473,6 +491,7 @@ export class DesignerContainerComponent {
       this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      this.areMinRequirmentsMet = this.canRequestData();
       break;
     case 'removeColumn':
       this.cleanSorts();
@@ -484,6 +503,7 @@ export class DesignerContainerComponent {
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
+      this.areMinRequirmentsMet = this.canRequestData();
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       break;
     case 'submitQuery':
@@ -534,6 +554,8 @@ export class DesignerContainerComponent {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.checkNodeForSorts();
+      this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
       break;
     case 'dateInterval':
@@ -589,6 +611,7 @@ export class DesignerContainerComponent {
   }
 
   canRequestData() {
+    this.updateAnalysis();
     // there has to be at least 1 data field, to make a request
     /* prettier-ignore */
     switch (this.analysis.type) {
@@ -611,8 +634,28 @@ export class DesignerContainerComponent {
       return every(requestCondition, Boolean);
     case 'report':
     case 'esReport':
-      return true;
+      return this.canRequestReport(this.analysis.artifacts);
     }
+  }
+
+  canRequestReport(artifacts) {
+    if (this.analysis.edit) {
+      return Boolean((<AnalysisReport>this.analysis).queryManual);
+    };
+
+    let atLeastOneIsChecked = false;
+    forEach(artifacts, artifact => {
+      forEach(artifact.columns, column => {
+        if (column.checked) {
+          atLeastOneIsChecked = true;
+          return false;
+        }
+      });
+      if (atLeastOneIsChecked) {
+        return false;
+      }
+    });
+    return atLeastOneIsChecked;
   }
 
   updateAnalysis() {

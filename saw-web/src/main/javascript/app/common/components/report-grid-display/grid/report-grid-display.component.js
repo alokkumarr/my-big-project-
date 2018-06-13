@@ -14,7 +14,7 @@ import DataSource from 'devextreme/data/data_source';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES, INT_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES, INT_TYPES, AGGREGATE_TYPES_OBJ} from '../../../consts.js';
 import {getFormatter} from '../../../utils/numberFormatter';
 
 const DEFAULT_PAGE_SIZE = 10;
@@ -223,9 +223,15 @@ export const ReportGridDisplayComponent = {
         if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';
         }
-        const isNumberType = NUMBER_TYPES.includes(column.type);
+
+        let isNumberType = NUMBER_TYPES.includes(column.type);
 
         this.addAggregateConditionalFormat(column);
+        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        if (aggregate && ['count'].includes(aggregate.value)) {
+          column.type = aggregate.type || column.type;
+          isNumberType = true;
+        }
 
         const field = {
           caption: column.aliasName || column.alias || column.displayName || column.name,
@@ -239,10 +245,9 @@ export const ReportGridDisplayComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type
         };
 
-        if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format) && !aggregate) {
           field.format = 'yyyy-MM-dd';
         }
-
         return field;
       });
     }

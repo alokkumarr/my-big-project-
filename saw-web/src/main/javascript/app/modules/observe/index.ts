@@ -5,6 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
+import { CountoModule }  from 'angular2-counto';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
@@ -17,9 +18,9 @@ import {
 } from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
-  sortServiceProvider,
-  filterServiceProvider
+  sortServiceProvider
 } from '../analyze/services/ajs-analyze-providers';
+import { FilterService } from '../analyze/services/filter.service';
 import {
   menuServiceProvider,
   componentHandlerProvider,
@@ -39,6 +40,7 @@ import { ObservePageComponent } from './components/observe-page/observe-page.com
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
+import { ObserveKPIBulletComponent } from './components/observe-kpi-bullet/observe-kpi-bullet.component';
 import { KPIFilter } from './components/kpi-filter/kpi-filter.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
 import { EditWidgetModule } from './components/edit-widget/edit-widget.module';
@@ -52,7 +54,6 @@ import {
   GlobalNumberFilterComponent,
   GlobalStringFilterComponent
 } from './components/global-filter';
-import { GlobalFilterService } from './services/global-filter.service';
 import { DashboardService } from './services/dashboard.service';
 import { CommonModule } from '../../common';
 
@@ -74,6 +75,7 @@ const components = [
   CreateDashboardComponent,
   ObserveChartComponent,
   ObserveKPIComponent,
+  ObserveKPIBulletComponent,
   KPIFilter,
   SaveDashboardComponent,
   ConfirmDialogComponent
@@ -90,7 +92,8 @@ const components = [
     UIRouterUpgradeModule,
     AddWidgetModule,
     EditWidgetModule,
-    UChartModule
+    UChartModule,
+    CountoModule
   ],
   declarations: components,
   entryComponents: components,
@@ -106,7 +109,6 @@ const components = [
       useClass: RefreshTokenInterceptor,
       multi: true
     },
-    GlobalFilterService,
     DashboardService,
     ObserveService,
     jwtServiceProvider,
@@ -118,7 +120,7 @@ const components = [
     toastProvider,
     sidenavProvider,
     sortServiceProvider,
-    filterServiceProvider
+    FilterService
   ]
 })
 export class ObserveUpgradeModule {}

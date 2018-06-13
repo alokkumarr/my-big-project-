@@ -44,8 +44,8 @@ public class TransformerComponent extends Component implements WithMovableResult
     public static void main(String[] args){
         TransformerComponent component = new TransformerComponent();
         try {
-           if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+           if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
            }
         } catch (Exception e){
@@ -63,7 +63,7 @@ public class TransformerComponent extends Component implements WithMovableResult
     }
 
     @Override
-    protected int Execute(){
+    protected int execute(){
         try {
              tempLocation = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
 
@@ -224,12 +224,12 @@ public class TransformerComponent extends Component implements WithMovableResult
         return dt;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
     @Override
-    protected int Move(){
+    protected int move(){
 
         List<Map<String, Object>> dss = new ArrayList<>();
         dss.add(outputs.get(RequiredNamedParameters.Output.toString()));
@@ -246,7 +246,7 @@ public class TransformerComponent extends Component implements WithMovableResult
             resultDataDesc.add(desc);
             logger.debug(String.format("DataSet %s will be moved to %s", name, dest));
         }
-        return super.Move();
+        return super.move();
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {

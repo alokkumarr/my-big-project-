@@ -91,11 +91,13 @@ export const AGGREGATE_TYPES = [{
 }, {
   label: 'Count',
   value: 'count',
-  icon: 'icon-Count'
+  icon: 'icon-Count',
+  type: 'long'
 }, {
   label: 'Percentage',
   value: 'percentage',
-  icon: 'icon-Percentage'
+  icon: 'icon-Percentage',
+  type: 'float'
 }];
 
 export const AGGREGATE_STRING_TYPES = [{

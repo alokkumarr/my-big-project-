@@ -1,12 +1,12 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
   <mat-form-field>
     <mat-select placeholder="Operator"
-                e2e="filter-number-select"
+                e2e="filter-string-select"
                 (selectionChange)="onPresetSelected($event.value)"
                 [value]="filterModel.operator">
       <mat-option *ngFor="let OPERATOR of OPERATORS"
                   [value]="OPERATOR.value"
-                  [attr.e2e]="'filter-number-option-' + OPERATOR.label">
+                  [attr.e2e]="'filter-string-option-' + OPERATOR.label">
         {{ OPERATOR.label }}
       </mat-option>
     </mat-select>

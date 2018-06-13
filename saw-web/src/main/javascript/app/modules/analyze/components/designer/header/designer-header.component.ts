@@ -8,7 +8,7 @@ import {
   Analysis,
   DesignerToolbarAciton
 } from '../types';
-import { DesignerStates } from '../container';
+import { DesignerStates } from '../consts';
 
 const template = require('./designer-header.component.html');
 require('./designer-header.component.scss');
@@ -24,6 +24,7 @@ export class DesignerHeaderComponent {
   @Input() public isInDraftMode: boolean;
   @Input() public isInQueryMode: boolean;
   @Input() public designerState: DesignerStates;
+  @Input() public areMinRequirmentsMet: boolean;
 
   public DesignerStates = DesignerStates;
 }

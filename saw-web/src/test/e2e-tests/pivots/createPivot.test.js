@@ -23,7 +23,6 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -31,20 +30,21 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
+
 
   it('Should apply filter to Pivot', () => {
     loginPage.loginAs('admin');
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+    analyzePage.analysisElems.cardView.click();
 
     // Create Pivot
     homePage.createAnalysis(metricName, analysisType);
@@ -55,19 +55,28 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     const stringFilterInput = filters.getStringFilterInput(0);
     const fieldName = columnField;
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.filterBtn);
+    commonFunctions.waitFor.elementToBeVisible(pivotDesigner.filterBtn);
+    commonFunctions.waitFor.elementToBeClickable(pivotDesigner.filterBtn);
+    pivotDesigner.filterBtn.click();
+
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeVisible(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
+    filters.applyBtn.click();
+
     const filterName = filters.getAppliedFilter(fieldName);
 
     commonFunctions.waitFor.elementToBePresent(filterName);
+    commonFunctions.waitFor.elementToBeVisible(filterName);
     expect(filterName.isPresent()).toBe(true);
 
     // Should select row, column and data fields and refresh data
     const refreshBtn = pivotDesigner.refreshBtn;
+    commonFunctions.waitFor.elementToBeVisible(pivotDesigner.getPivotFieldCheckbox(dataField));
+    commonFunctions.waitFor.elementToBeClickable(pivotDesigner.getPivotFieldCheckbox(dataField));
+    pivotDesigner.getPivotFieldCheckbox(dataField).click();
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.getPivotFieldCheckbox(dataField));
     pivotDesigner.doSelectPivotArea(dataField, 'data');
     pivotDesigner.doSelectPivotAggregate(dataField, 'sum');
 

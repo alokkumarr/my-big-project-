@@ -22,7 +22,6 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -30,16 +29,15 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
+
 
   it('Should apply filter to column chart', () => {
     login.loginAs('admin');
@@ -51,22 +49,20 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const refreshBtn = chartDesigner.refreshBtn;
     // Wait for field input box.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-    // Search field and add that into dimension section.
-    analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(xAxisName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(xAxisName));
 
-    const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
-    expect(doesDataNeedRefreshing).toBeTruthy();
+    // Search field and add that into dimension section.
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
+    designModePage.chart.addFieldButton(xAxisName).click();
+    // Refresh button is removed as part of 3363
+    // const doesDataNeedRefreshing = utils.hasClass(refreshBtn, 'mat-primary');
+    // expect(doesDataNeedRefreshing).toBeTruthy();
 
     // Search field and add that into group by section.
-    analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(groupName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(groupName));
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
+    designModePage.chart.addFieldButton(groupName).click();
     // Search field and add that into metric section.
-    analyzePage.designerDialog.chart.fieldSearchInput.clear();
-    analyzePage.designerDialog.chart.fieldSearchInput.sendKeys(yAxisName);
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.designerDialog.chart.getFieldPlusIcon(yAxisName));
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
+    designModePage.chart.addFieldButton(yAxisName).click();
 
     // Check selected field is present in respective section.
     let y = analyzePage.designerDialog.chart.getMetricsFields(yAxisName);
@@ -78,19 +74,20 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     let g = analyzePage.designerDialog.chart.getGroupByFields(groupName);
     commonFunctions.waitFor.elementToBeVisible(g);
     expect(g.isDisplayed()).toBeTruthy();
-
-    commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
+    // Refresh button is removed as part of 3363
+    // commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
 
     // Apply filters
     const filters = analyzePage.filtersDialogUpgraded;
     const filterAC = filters.getFilterAutocomplete(0);
     const fieldName = yAxisName;
-
-    commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.filterBtn);
+    commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
+    chartDesigner.filterBtn.click();
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     designModePage.filterWindow.numberInputUpgraded.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
-    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
+    filters.applyBtn.click();
 
     //TODO: Need to check that filters applied or not.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterText);

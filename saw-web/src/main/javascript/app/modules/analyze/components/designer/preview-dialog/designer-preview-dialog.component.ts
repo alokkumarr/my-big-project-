@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Analysis, ArtifactColumns } from '../types';
 import { DesignerService } from '../designer.service';
 import { ChartService } from '../../../services/chart.service';
-import { DesignerStates } from '../container/designer-container.component';
+import { DesignerStates } from '../consts';
 
 import * as isEmpty from 'lodash/isEmpty';
 import * as orderBy from 'lodash/orderBy';

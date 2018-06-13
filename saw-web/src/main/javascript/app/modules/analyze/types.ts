@@ -1,15 +1,15 @@
 import {
-  Format,
-  Artifact,
   AnalysisChart,
   AnalysisReport,
-  ArtifactColumnPivot,
+  Artifact,
   ArtifactColumnChart,
+  ArtifactColumnPivot,
   ArtifactColumnReport,
-  Sort,
   Filter,
-  FilterModel,
-  AnalysisType
+  AnalysisType,
+  Sort,
+  Format,
+  FilterModel
 } from './models';
 
 export type ArtifactColumns =
@@ -31,7 +31,8 @@ export {
   FilterModel,
   Artifact,
   AnalysisType,
-  AnalysisReport
+  AnalysisReport,
+  AnalysisChart
 };
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
@@ -80,7 +81,6 @@ export interface IToolbarActionData {
   booleanCriteria?: string;
   description?: string;
   analysis?: Analysis;
-  supportsGlobalFilters?: boolean;
 }
 
 export interface IToolbarActionResult {
@@ -89,4 +89,12 @@ export interface IToolbarActionResult {
   filters?: Filter[];
   booleanCriteria?: string;
   isSaveSuccessful?: boolean;
+  analysis?: Analysis;
+}
+
+export interface IAnalysisMethod {
+  label: string;
+  icon: {font: string};
+  type: string;
+  supportedTypes: string[];
 }

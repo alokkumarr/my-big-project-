@@ -1,5 +1,13 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete'
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild
+} from '@angular/core';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { FormControl } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
@@ -16,7 +24,6 @@ const template = require('./string-filter.component.html');
   selector: 'g-string-filter',
   template
 })
-
 export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
@@ -24,7 +31,7 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   filterCtrl: FormControl;
   private _filter;
   private value: Array<string> = [];
-  private filterCache: {values?: Array<string>, textValue?: string};
+  private filterCache: { values?: Array<string>; textValue?: string };
   private suggestions = [];
   private valueChangeListener: Subscription;
   private clearFiltersListener: Subscription;
@@ -39,7 +46,10 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     this.filterCtrl = new FormControl();
     this.filteredSuggestions = this.filterCtrl.valueChanges.pipe(
       startWith(''),
-      map(state => state ? this.filterSuggestions(state) : this.suggestions.slice())
+      map(
+        state =>
+          state ? this.filterSuggestions(state) : this.suggestions.slice()
+      )
     );
   }
 
@@ -57,11 +67,13 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
       this.cacheFilters();
     });
 
-    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(state => {
-      if (!state) {
-        this.loadDefaults(true); // load cached filter data since last apply
+    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(
+      state => {
+        if (!state) {
+          this.loadDefaults(true); // load cached filter data since last apply
+        }
       }
-    });
+    );
   }
 
   ngOnDestroy() {
@@ -71,21 +83,30 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
     this.closeFiltersListener.unsubscribe();
   }
 
-  @Input() set filter(data) {
+  @Input()
+  set filter(data) {
     this._filter = data;
 
-    this.loadSuggestions();
+    if (data.model && data.model.modelValues) {
+      this.value = [...data.model.modelValues];
+      this.cacheFilters();
+      this.loadSuggestions(true);
+    } else {
+      this.loadSuggestions();
+    }
   }
 
   filterSuggestions(str: string) {
-    return this.suggestions.filter(sugg =>
-      sugg.toLowerCase().indexOf(str.toLowerCase()) === 0);
+    return this.suggestions.filter(
+      sugg => sugg.toLowerCase().indexOf(str.toLowerCase()) === 0
+    );
   }
 
   onInputChange(evt) {
     const val = (this.filterCtrl.value || '').replace(/;$/, ''); // remove trailing semicolon
 
-    if ([13, 186].includes(evt.keyCode) && val) { // on pressing 'Enter' or semicolon (;)
+    if ([13, 186].includes(evt.keyCode) && val) {
+      // on pressing 'Enter' or semicolon (;)
       this.value.push(val);
       this.filterCtrl.setValue('');
     }
@@ -106,13 +127,15 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
    *
    * @memberof GlobalStringFilterComponent
    */
-  loadSuggestions() {
-    this.observe.getModelValues(this._filter).subscribe((data: Array<string>) => {
-      this.suggestions = data;
+  loadSuggestions(useCache: boolean = false) {
+    this.observe
+      .getModelValues(this._filter)
+      .subscribe((data: Array<string>) => {
+        this.suggestions = data;
 
-      this.loadDefaults();
-      this.cacheFilters();
-    });
+        this.loadDefaults(useCache);
+        this.cacheFilters();
+      });
   }
 
   /**
@@ -136,7 +159,7 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
    * @memberof GlobalStringFilterComponent
    */
   loadDefaults(fromCache = false) {
-    if ((fromCache && !this.filterCache)) {
+    if (fromCache && !this.filterCache) {
       return;
     }
 
@@ -151,10 +174,7 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   }
 
   isValid(): boolean {
-    return this.filterCtrl.value || (
-      this.value &&
-      this.value.length
-    );
+    return this.filterCtrl.value || (this.value && this.value.length);
   }
 
   /**
@@ -167,14 +187,15 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
       ...this._filter,
       ...{
         model: {
-          modelValues: this.filterCtrl.value ? [this.filterCtrl.value, ...this.value] : this.value,
+          modelValues: this.filterCtrl.value
+            ? [this.filterCtrl.value, ...this.value]
+            : this.value,
 
           // We don't allow anything else than 'is in' sql operation on strings from dashboards for now
           operator: 'ISIN'
         }
       }
     };
-    this.onModelChange.emit({data: payload, valid: this.isValid()});
+    this.onModelChange.emit({ data: payload, valid: this.isValid() });
   }
 }
-

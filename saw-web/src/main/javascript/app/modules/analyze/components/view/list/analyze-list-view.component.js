@@ -4,6 +4,7 @@ import * as forEach from 'lodash/forEach';
 import cronstrue from 'cronstrue';
 import * as moment from 'moment';
 import * as isEmpty from 'lodash/isEmpty';
+import {Events} from '../../../consts';
 
 export const AnalyzeListViewComponent = {
   template,
@@ -18,13 +19,14 @@ export const AnalyzeListViewComponent = {
     cronJobs: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService) {
+    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService, $eventEmitter) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._AnalyzeService = AnalyzeService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._JwtService = JwtService;
+      this._$eventEmitter = $eventEmitter;
 
       this._gridListInstance = null;
 
@@ -87,7 +89,12 @@ export const AnalyzeListViewComponent = {
     }
 
     fork(analysis) {
-      this._AnalyzeActionsService.fork(analysis);
+      this._AnalyzeActionsService.fork(analysis).then(result => {
+        if (!result.isSaveSuccessful) {
+          return result;
+        }
+        this._$eventEmitter.emit(Events.AnalysesRefresh);
+      });
     }
 
     onSuccessfulDeletion(analysis) {
@@ -139,6 +146,7 @@ export const AnalyzeListViewComponent = {
         cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
+        dataField: 'scheduled',
         calculateCellValue: rowData => {
           return this.generateSchedule(rowData);
         },

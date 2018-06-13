@@ -16,7 +16,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
   "_id",
   "system",
   "userData",
-  "asOfNow"
+  "asOfNow",
+  "schema",
+  "recordCount"
 })
 public class DataSet {
 
@@ -48,11 +50,11 @@ public class DataSet {
     @JsonProperty("recordCount")
     private long recordCount;
     
-    @JsonProperty("createdTime")
-    private long createdTime;
-
-    @JsonProperty("modifiedTime")
-    private long modifiedTime;
+//    @JsonProperty("createdTime")
+//    private long createdTime;
+//
+//    @JsonProperty("modifiedTime")
+//    private long modifiedTime;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -135,25 +137,25 @@ public class DataSet {
         this.recordCount = recordCount;
     }
 
-    @JsonProperty("createdTime")
-    public long getCreatedTime() {
-        return this.createdTime;
-    }
-
-    @JsonProperty("createdTime")
-    public void setCreatedTime(long createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    @JsonProperty("modifiedTime")
-    public long getModifiedTime() {
-        return this.modifiedTime;
-    }
-
-    @JsonProperty("modifiedTime")
-    public void setModifiedTime(long modifiedTime) {
-        this.modifiedTime = modifiedTime;
-    }
+//    @JsonProperty("createdTime")
+//    public long getCreatedTime() {
+//        return this.createdTime;
+//    }
+//
+//    @JsonProperty("createdTime")
+//    public void setCreatedTime(long createdTime) {
+//        this.createdTime = createdTime;
+//    }
+//
+//    @JsonProperty("modifiedTime")
+//    public long getModifiedTime() {
+//        return this.modifiedTime;
+//    }
+//
+//    @JsonProperty("modifiedTime")
+//    public void setModifiedTime(long modifiedTime) {
+//        this.modifiedTime = modifiedTime;
+//    }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {

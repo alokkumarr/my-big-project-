@@ -8,11 +8,9 @@ import java.util.UUID
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import com.typesafe.config.Config
-import org.apache.hadoop.fs.Path
 import org.json4s.JsonAST.{JObject, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.datalake.engine.ExecutionStatus
 import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.datalake.{DLConfiguration, DLSession}
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
@@ -20,6 +18,8 @@ import sncr.metadata.datalake.DataObject
 import sncr.metadata.engine.{Fields, MDObjectStruct}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.saw.common.config.SAWServiceConfig
+
+import scala.reflect.io.File
 /**
   * Created by srya0001 on 5/18/2017.
   */
@@ -131,6 +131,18 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     (lastSQLExecRes, lastSQLExecMessage)
   }
 
+  /**
+    * Wrapper for base method to execute SQL statement with row limit , the method does not materialized data
+    *
+    * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
+    * @return
+    */
+  def executeSQLWithLimit(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
+    val (llastSQLExecRes, llastSQLExecMessage) = execute(analysisKey, sql,limit)
+    lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
+    (lastSQLExecRes, lastSQLExecMessage)
+  }
+
   def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysisKey)
 
 
@@ -209,6 +221,20 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       out.write(pretty(render(descriptorPrintable)).getBytes())
       out.flush()
     }
+  }
+
+  /**
+    * The method creates AnalysisResult for one time/preview execution:
+    * 1. Creates result of SQL execution
+    * 2. write the output with preview identifier to differentiate from actual execution history,
+    *  these location can be cleaned up on periodic basis, since execution results are for one time use.
+    */
+  def createAnalysisResultForOneTime(resId: String): Unit = {
+    val previewLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(initOutputLocation)+
+      File.separator+ "preview-"+resId
+    saveData(analysisKey,previewLocation , outputType)
+    finishedTS = System.currentTimeMillis
+    m_log debug("finishedTS:"+ finishedTS)
   }
 
 

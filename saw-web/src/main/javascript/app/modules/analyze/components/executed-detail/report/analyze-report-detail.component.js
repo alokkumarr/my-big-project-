@@ -62,7 +62,6 @@ export const AnalyzeReportDetailComponent = {
           }
           column.reportType = analysis.type;
         });
-
       });
       return columns;
     }
