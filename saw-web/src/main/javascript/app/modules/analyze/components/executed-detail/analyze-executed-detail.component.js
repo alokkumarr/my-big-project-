@@ -69,18 +69,23 @@ export const AnalyzeExecutedDetailComponent = {
 
       if (analysis) {
         this.analysis = analysis;
+        this.executeAndInit();
+      } else {
+        this.loadAnalysisById(analysisId).then(() => {
+          this.executeAndInit();
+        });
+      }
+    }
+
+    executeAndInit() {
+      this.executeAnalysis().finally(() => {
         this.watchAnalysisExecution();
         this.setPrivileges();
         if (!this.analysis.schedule) {
           this.isPublished = false;
         }
-        this.loadExecutedAnalyses(analysisId);
-      } else {
-        this.loadAnalysisById(analysisId).then(() => {
-          this.watchAnalysisExecution();
-          this.loadExecutedAnalyses(analysisId);
-        });
-      }
+        this.loadExecutedAnalyses(this.analysis.id);
+      });
     }
 
     watchAnalysisExecution() {
@@ -113,11 +118,14 @@ export const AnalyzeExecutedDetailComponent = {
 
     refreshData() {
       const gotoLastPublished = () => {
-        this._$state.go('analyze.executedDetail', {
-          analysisId: this.analysis.id,
-          analysis: this.analysis,
-          executionId: null
-        }, {reload: true});
+        this.analyses = null;
+        this._executionId = null;
+        this.loadExecutedAnalyses(this.analysis.id);
+        // this._$state.go('analyze.executedDetail', {
+        //   analysisId: this.analysis.id,
+        //   analysis: this.analysis,
+        //   executionId: null
+        // }, {reload: true});
       };
 
       if (this._executionToast) {
@@ -134,7 +142,7 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     executeAnalysis() {
-      this._AnalyzeActionsService.execute(this.analysis);
+      return this._AnalyzeActionsService.execute(this.analysis);
     }
 
     setPrivileges() {
@@ -264,10 +272,6 @@ export const AnalyzeExecutedDetailComponent = {
         .then(analysis => {
           this.analysis = analysis;
           this._$rootScope.showProgress = false;
-          this.setPrivileges();
-          if (!this.analysis.schedule) {
-            this.isPublished = false;
-          }
         }, err => {
           this._$rootScope.showProgress = false;
           throw err;

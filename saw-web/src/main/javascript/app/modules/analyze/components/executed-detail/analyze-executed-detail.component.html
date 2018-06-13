@@ -56,7 +56,7 @@
       </div>
     </div>
   </md-card>
-  <div ng-switch="$ctrl.analysis.type" ng-if="$ctrl.analyses.length">
+  <div ng-switch="$ctrl.analysis.type" ng-if="$ctrl.analyses && $ctrl.analyses.length">
     <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-chart-detail>
     <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" requester="$ctrl.requester" source="$ctrl.reportSource(options)"></analyze-report-detail>
     <analyze-report-detail ng-switch-when="esReport" analysis="$ctrl.analysis" requester="$ctrl.requester" source="$ctrl.reportSource(options)"></analyze-report-detail>
