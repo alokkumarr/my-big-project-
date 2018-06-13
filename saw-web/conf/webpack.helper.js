@@ -26,7 +26,7 @@ module.exports = {
     if (distRun()) {
       var host = browser.params.saw.docker.host;
       var port = browser.params.saw.docker.port;
-      return 'http://' + host + ':' + port + '/web/';
+      return 'http://' + host + ':' + port + '/saw/web/';
     }
     //return 'http://localhost:3000/';
     return 'http://localhost/web/';

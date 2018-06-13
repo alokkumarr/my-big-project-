@@ -34,7 +34,7 @@ import java.util.Map;
  *   or using base classes:
  *      - Read data from a source (???)
  *      - Write data (DLBatchWriter)
- *      - Move data from temp location to permanent location: WithMovableResult
+ *      - move data from temp location to permanent location: WithMovableResult
  *      - Read and write result from/to metadata
  *      - Support Spark context
  *      and so on.
@@ -495,7 +495,7 @@ public abstract class AsynchAbstractComponent implements WithContext{
 
                 ctx.mdOutputDSMap.forEach((id, ds) -> {
                     try {
-                        //TODO:: Move it after merge to appropriate place
+                        //TODO:: move it after merge to appropriate place
                         //ctx.transformationID = transformationID;
                         ngctx.ale_id = ale_id;
                         ngctx.status = status;
@@ -507,7 +507,12 @@ public abstract class AsynchAbstractComponent implements WithContext{
 
                         if (schema != null) {
                             logger.trace("Extracted schema: " + schema.toString());
-                            services.md.updateDS(id, ngctx, ds, schema);
+
+                            // Set record count
+                            long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
+                            logger.trace("Extracted record count " + recordCount);
+
+                            services.md.updateDS(id, ngctx, ds, schema, recordCount);
                         }
                         else{
                             logger.warn("The component was not able to get schema from NG context, assume something went wrong");

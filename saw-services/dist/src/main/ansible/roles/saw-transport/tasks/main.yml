@@ -1,6 +1,8 @@
-- name: Install SAW Transport Service package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Transport Service package
+  copy: src="{{ item }}" dest=/tmp/saw-transport.rpm
   with_fileglob: ["../rpms/saw-transport-*.rpm"]
+- name: Install SAW Transport Service package
+  yum: name=/tmp/saw-transport.rpm state=present
   notify:
     - restart saw-transport
     - restart saw-transport-executor-regular

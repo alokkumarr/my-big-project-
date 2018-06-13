@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { configureTests } from '../../../../../../../../test/javascript/helpers/configureTests';
-import { ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 
 import { MaterialModule } from '../../../../../material.module';
@@ -13,7 +13,7 @@ describe('KPI Form Widget', () => {
   let fixture: ComponentFixture<WidgetKPIComponent>, el: HTMLElement;
   beforeEach(done => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule, ReactiveFormsModule],
+      imports: [MaterialModule, ReactiveFormsModule, FormsModule],
       declarations: [WidgetKPIComponent]
     })
       .compileComponents()

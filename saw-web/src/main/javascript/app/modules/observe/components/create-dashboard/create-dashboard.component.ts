@@ -28,6 +28,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
+import { GlobalFilterService } from '../../services/global-filter.service';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
@@ -38,7 +39,7 @@ const MARGIN_BETWEEN_TILES = 10;
   selector: 'create-dashboard',
   template,
   animations,
-  providers: [DashboardService]
+  providers: [DashboardService, GlobalFilterService]
 })
 export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   public fillState = 'empty';
@@ -57,6 +58,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     private dialog: MatDialog,
     private router: UIRouter,
     private menu: MenuService,
+    private globalFilterService: GlobalFilterService,
     private dashboardService: DashboardService,
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
@@ -85,6 +87,11 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     });
   }
 
+  openFilters() {
+    this.sidebarWidget = 'filter';
+    this.widgetSidenav.open();
+  }
+
   checkEmpty(dashboard) {
     this.fillState =
       get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
@@ -97,6 +104,22 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     } else if (data.save) {
       this.openSaveDialog(data.dashboard);
     }
+  }
+
+  sidenavStateChange(data) {
+    if (this.sidebarWidget === 'filter') {
+      this.globalFilterService.onSidenavStateChange.next(data);
+    }
+  }
+
+  onApplyGlobalFilter(globalFilters): void {
+    if (!globalFilters) {
+      this.widgetSidenav.close();
+      return;
+    }
+
+    this.globalFilterService.onApplyFilter.next(globalFilters);
+    this.widgetSidenav.close();
   }
 
   updateWidgetLog(dashboard) {
@@ -146,9 +169,26 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       if (!data) return;
 
       const item = {
-        cols: 16,
-        rows: 8,
+        cols: 13,
+        rows: 6,
         kpi: data
+      };
+      this.requester.next({action: 'add', data: item});
+      break;
+    }
+  }
+
+  onBulletAction(action, data) {
+    /* prettier-ignore */
+    switch(action) {
+    case WIDGET_ACTIONS.ADD:
+      if (!data) return;
+
+      const item = {
+        cols: 20,
+        rows: 6,
+        bullet: data,
+        updater: new BehaviorSubject({})
       };
       this.requester.next({action: 'add', data: item});
       break;
@@ -163,6 +203,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       break;
     case 'KPI':
       this.onKPIAction(action, data);
+      break;
+    case 'BULLET':
+      this.onBulletAction(action, data);
       break;
     }
   }
