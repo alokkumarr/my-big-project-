@@ -54,7 +54,6 @@ import {
   GlobalNumberFilterComponent,
   GlobalStringFilterComponent
 } from './components/global-filter';
-import { GlobalFilterService } from './services/global-filter.service';
 import { DashboardService } from './services/dashboard.service';
 import { CommonModule } from '../../common';
 
@@ -110,7 +109,6 @@ const components = [
       useClass: RefreshTokenInterceptor,
       multi: true
     },
-    GlobalFilterService,
     DashboardService,
     ObserveService,
     jwtServiceProvider,

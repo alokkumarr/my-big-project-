@@ -17,6 +17,7 @@ require('./toolbar-action-dialog.component.scss');
 })
 export class ToolbarActionDialogComponent {
   showProgressBar = false;
+  filterValid: boolean = true;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
