@@ -9,6 +9,7 @@ import play.mvc.{Http, Result, Results}
 import sncr.datalake.DLSession
 import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDObjectStruct
+import sncr.saw.common.config.SAWServiceConfig
 
 import scala.collection.JavaConverters._
 
@@ -18,16 +19,30 @@ class AnalysisExecutions extends BaseController {
   def list(analysisId: String): Result = {
     handle((json, ticket) => {
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      val executions = analysis.listExecutions.map(result => {
+      val sortedExecutions = analysis.listExecutions.map(result => {
         val content = result.getCachedData("content") match {
           case obj: JObject => obj
           case obj: JValue => unexpectedElement("object", obj)
         }
         val id = Bytes.toString(result.getRowKey)
-        ("id", id) ~
-          ("finished", (content \ "execution_finish_ts").extractOpt[Long]) ~
-          ("status", (content \ "exec-msg").extractOpt[String])
+        (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String])
+      }).sortBy(result =>result._2).reverse
+      var count = 0
+      val execHistory = SAWServiceConfig.executionHistory
+      var junkSize = if(sortedExecutions.size < execHistory)
+        1 else (sortedExecutions.size+1-execHistory)
+      val junkExecution = new Array[String](junkSize)
+      val executions = sortedExecutions.filter(result =>{
+        count = count+1
+        if(count<=execHistory) true
+        else { junkExecution(count-execHistory) = result._1
+          false }
+      }).map(result => {
+        ("id", result._1) ~
+          ("finished", result._2) ~
+          ("status", result._3)
       })
+
       /* Note: Keep "results" property for API backwards compatibility */
       ("executions", executions) ~ ("results", executions): JValue
     })
@@ -133,7 +148,7 @@ class AnalysisExecutions extends BaseController {
           else throw new Exception("Unsupported data format")
         }
         else null
-      } // end of chart & pivot
+      } // end of chart & PIVOT
     })
   }
 
@@ -142,4 +157,6 @@ class AnalysisExecutions extends BaseController {
       analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
     })
   }
+
+
 }

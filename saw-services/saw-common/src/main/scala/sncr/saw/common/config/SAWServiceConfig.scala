@@ -30,5 +30,6 @@ object SAWServiceConfig {
   lazy val metadataConfig : Config = conf.getConfig("metadata")
   lazy val executorConfig :Config = conf.getConfig("report.executor")
   lazy val spark_conf : Config = conf.getConfig("spark")
-
+  lazy val executionHistory : Int = if (conf.hasPath("execution.history"))
+    conf.getInt("execution.history") else 5
 }

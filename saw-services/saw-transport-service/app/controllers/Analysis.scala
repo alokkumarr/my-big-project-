@@ -436,9 +436,9 @@ class Analysis extends BaseController {
       val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
       /* skip the resultNode creation for preview/onetime execution result node */
-      // TODO:: Reverting will be handled as part of SIP-2513
-    /*  if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {*/
+
+      if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
 
         var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
         // The below block is for execution result to store
@@ -493,7 +493,7 @@ class Analysis extends BaseController {
         else {
           descriptorPrintable = descriptor
         }
-     // }
+      }
 
       return myArray
     }
@@ -517,9 +517,8 @@ class Analysis extends BaseController {
       m_log.trace("esReport dataset: {}", myArray)
       var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       /* skip the resultNode creation for preview/onetime execution result node */
-      // TODO:: Reverting will be handled as part of SIP-2513
-     /* if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {*/
+      if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
 
         // The below block is for execution result to store
         if (data != null) {
@@ -573,7 +572,7 @@ class Analysis extends BaseController {
         else {
           descriptorPrintable = descriptor
         }
-     // }
+      }
 
       return getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray)
     }
@@ -591,9 +590,9 @@ class Analysis extends BaseController {
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
       /* skip the resultNode creation for preview/onetime execution result node */
-      // TODO:: Reverting will be handled as part of SIP-2513
-     /* if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {*/
+
+    if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
         var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
         // The below block is for execution result to store
         if (data != null) {
@@ -646,7 +645,7 @@ class Analysis extends BaseController {
         else {
           descriptorPrintable = descriptor
         }
-     // }
+      }
       m_log.trace("chart dataset: {}", myArray)
       return myArray
     }
@@ -710,18 +709,18 @@ class Analysis extends BaseController {
           /* Load execution results from data lake (instead of from Spark driver) */
           /* Performance consideration: For preview and one time analysis execution,no need to
             create resultNode, transport service will directly read data from data lake for */
-          // TODO:: Reverting and will be handled as part of SIP-2513
-        /*  if (executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
+
+        if (executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
             || executionType.equalsIgnoreCase(ExecutionType.preview.toString)) {
             val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(DLConfiguration.commonLocation) +
               File.separator + "preview-" + execution.getId
             val resultStream = execution.loadOneTimeExecution(outputLocation, DLConfiguration.rowLimit)
             prepareResultDataFromStream(resultStream, resultData)
           }
-          else {*/
+          else {
             val resultStream = execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
             prepareResultDataFromStream(resultStream, resultData)
-         // }
+          }
           m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
           m_log.trace("when data is not available in cache size of limit {}", limit);
           m_log.trace("when data is not available in cache size of start {}", start);
