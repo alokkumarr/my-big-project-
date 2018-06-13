@@ -69,6 +69,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     public static final String REJECTED_FLAG = "__REJ_FLAG";
     public static final String REJ_REASON = "__REJ_REASON";
 
+    private JavaRDD<Row> rejectedDataCollector;
+
     private List<String> pkeys;
 
     {
@@ -158,10 +160,14 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         //System.exit(0);
 
         try {
+            FileStatus[] test = fs.globStatus(new Path(sourcePath));
+            logger.debug("Test " + test + " Size = " + test.length);
             if(headerSize >= 1) {
+                logger.debug("Header present");
                 FileStatus[] files = fs.globStatus(new Path(sourcePath));
                 // Check if directory has been given
                 if(files.length == 1 && files[0].isDirectory()){
+                    logger.debug("Files length = 1 and is a directory");
                     // If so - we have to process all the files inside - create the mask
                     sourcePath += Path.SEPARATOR + "*";
                     // ... and query content
@@ -169,7 +175,15 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 }
                 retval = parseFiles(files,  DLDataSetOperations.MODE_APPEND);
             } else {
+                logger.debug("No Header");
                 retval = parse(DLDataSetOperations.MODE_APPEND);
+            }
+
+            //Write rejected data
+            if (this.rejectedDataCollector != null) {
+                logger.debug("Writing rejected data in the end");
+                writeRdd(rejectedDataCollector.map(row -> row.mkString(String.valueOf(" | "))),
+                    rejectedDatasetLocation);
             }
         }catch (IOException e){
             retval =  -1;
@@ -215,14 +229,18 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         logger.info("Parsing " + sourcePath + " to " + tempDir);
         logger.info("Header size : " + headerSize);
 
-        JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(sourcePath, 1)
-            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
+        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+            .textFile(sourcePath, 1);
 
+        rdd.collect().forEach(System.out::println);
+
+        JavaRDD<Row> parsedRdd = rdd.map(
+            new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
+                '\'', recCounter, errCounter));
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        JavaRDD<Row> outputRdd = getOutputData(rdd);
+        JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
         logger.debug("Output dataset = " + outputDataset.count() );
         boolean status = writeDataset(outputDataset, outputFormat, tempDir);
@@ -231,7 +249,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             return -1;
         }
 
-        status = writeRejectedData(rdd, outputRdd, rejectedDatasetLocation);
+        status = collectRejectedData(parsedRdd, outputRdd, rejectedDatasetLocation);
         if (!status) {
             logger.error("Failed to write rejected data");
         }
@@ -263,8 +281,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         logger.info("Parsing " + file + " to " + destDir);
         logger.info("Header size : " + headerSize);
 
-        JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
-            .textFile(file.toString(), 1)
+        JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
+            .textFile(file.toString(), 1);
+
+        JavaRDD<Row> parseRdd = rdd
             // Add line numbers
             .zipWithIndex()
             // Filter out header based on line number
@@ -276,11 +296,13 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         // Create output dataset
         scala.collection.Seq<Column> outputColumns =
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
-        JavaRDD<Row> outputRdd = getOutputData(rdd);
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);;
+        JavaRDD<Row> outputRdd = getOutputData(parseRdd);
+        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+
+        logger.debug("Dest dir for file " + file + " = " + destDir);
         writeDataset(df, outputFormat, destDir.toString());
 
-        writeRejectedData(rdd, outputRdd, rejectedDatasetLocation);
+        collectRejectedData(parseRdd, outputRdd, rejectedDatasetLocation);
 
         return 0;
     }
@@ -297,25 +319,30 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
      *
      */
 
-    private boolean writeRejectedData (JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd,
-                                       String location) {
+    private boolean collectRejectedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd,
+                                        String location) {
         boolean status = true;
 
         try {
             if(location != null) {
                 // Get all entries which are rejected
-                JavaRDD<Row> rejectedRdd = fullRdd.subtract(outputRdd).map(record ->
-                    RowFactory.create(record.get(0), record.get(record.length() - 1)));
+                logger.debug("Collecting rejected data");
+                JavaRDD<Row> rejectedRdd = fullRdd.subtract(outputRdd)
+                    .map(record ->
+                        RowFactory.create(record.get(0), record.get(record.length() - 1)));
 
                 rejectedRdd.collect().forEach(System.out::println);
-                logger.debug("Rejected RDD = " + rejectedRdd.count());
-
-                writeRdd(rejectedRdd, location);
+                if (this.rejectedDataCollector == null) {
+                    rejectedDataCollector = rejectedRdd;
+                } else {
+                    rejectedDataCollector = rejectedDataCollector.union(rejectedRdd);
+                }
             } else {
                 status = false;
             }
         } catch (Exception exception) {
             logger.error(exception);
+            logger.debug(ExceptionUtils.getStackTrace(exception));
             status = false;
         }
 
@@ -351,10 +378,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
     }
 
-    private boolean writeRdd(JavaRDD<Row> rdd, String path) {
+    private boolean writeRdd(JavaRDD rdd, String path) {
         if (rdd != null && path != null) {
             logger.debug("Writing data to location " + path);
-            rdd.saveAsTextFile(path);
+            rdd.coalesce(1).saveAsTextFile(path);
         } else {
             logger.info("Nothing to write");
         }

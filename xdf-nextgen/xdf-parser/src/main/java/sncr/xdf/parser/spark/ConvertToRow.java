@@ -164,7 +164,11 @@ public class ConvertToRow implements Function<String, Row> {
 
                 //TODO; Not working - Sunil
 //                record = new Object[]{line, 1, e.getClass().getCanonicalName() + ": " + e.getMessage()};
-                record = createRejectedRecord(line, e.getMessage());
+                if (e instanceof NumberFormatException){
+                    record = createRejectedRecord(line, "Invalid number format " + e.getMessage());
+                } else {
+                    record = createRejectedRecord(line, e.getMessage());
+                }
             }
         }
         recCounter.add(1);
