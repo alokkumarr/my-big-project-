@@ -144,10 +144,10 @@ exports.config = {
     ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
-     ],
+    ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
-     ],
+    ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
