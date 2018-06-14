@@ -24,7 +24,7 @@ import 'devextreme/integration/angular';
 
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
@@ -133,6 +133,7 @@ angular
     DxDataGridModule,
     DxTemplateModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     FlexLayoutModule,
     DndModule,
@@ -195,6 +196,7 @@ angular
     DxDataGridModule,
     DxTemplateModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     CommonPipesModule,
     DxDataGridModule,
