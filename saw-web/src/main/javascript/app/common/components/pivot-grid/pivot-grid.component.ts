@@ -82,10 +82,8 @@ export class PivotGridComponent {
   }
   @Input('data')
   set setData(data: any[]) {
-    if (!isUndefined(data)) {
-      this.data = this.preProcessData(data);
-      this.setPivotData();  
-    }
+    this.data = this.preProcessData(data);
+    this.setPivotData();  
   }
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public fields: any[];
