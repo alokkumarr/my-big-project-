@@ -8,16 +8,7 @@ application for different roles:
 
 .Documentation
 |===
-| Title | Description | Role
-
-| SAW User Guidefootnote:[See help link embedded in the Synchronoss
-  Analytics Workbench web application]
-| Using the web application to design and execute analyses
-| User
-
-| link:sip-rest-api/index.html[SIP REST API Guide]
-| Consuming the SIP REST API to develop third-party integrations
-| Developer
+| Title | Description | Roles
 
 | link:sip-operations/index.html[SIP Operations Guide]
 | Installing, maintaining and administering, including creating
@@ -27,10 +18,20 @@ application for different roles:
 | link:sip-design/index.html[SIP Design Guide]
 | Understanding the high-level design of the application and its
   modules
-| Technical
+| Technical, architect
+
+| link:sip-rest-api/index.html[SIP Developer Guide]
+| Consuming the SIP REST API to develop third-party integrations
+| Developer, integrator
+
+| SAW User Guidefootnote:[See help link embedded in the Synchronoss
+  Analytics Workbench web application]
+| Using the web application to design and execute analyses
+| User, analyst
+
 |===
 
 The above documents are also available in PDF format for download:
-link:sip-rest-api/index.pdf[SIP REST API Guide],
 link:sip-operations/index.pdf[SIP Operations Guide],
-link:sip-design/index.pdf[SIP Design Guide].
+link:sip-design/index.pdf[SIP Design Guide],
+link:sip-rest-api/index.pdf[SIP Developer Guide].
