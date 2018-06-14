@@ -18,9 +18,9 @@ import {
 } from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
-  sortServiceProvider,
-  filterServiceProvider
+  sortServiceProvider
 } from '../analyze/services/ajs-analyze-providers';
+import { FilterService } from '../analyze/services/filter.service';
 import {
   menuServiceProvider,
   componentHandlerProvider,
@@ -54,7 +54,6 @@ import {
   GlobalNumberFilterComponent,
   GlobalStringFilterComponent
 } from './components/global-filter';
-import { GlobalFilterService } from './services/global-filter.service';
 import { DashboardService } from './services/dashboard.service';
 import { CommonModule } from '../../common';
 
@@ -110,7 +109,6 @@ const components = [
       useClass: RefreshTokenInterceptor,
       multi: true
     },
-    GlobalFilterService,
     DashboardService,
     ObserveService,
     jwtServiceProvider,
@@ -122,7 +120,7 @@ const components = [
     toastProvider,
     sidenavProvider,
     sortServiceProvider,
-    filterServiceProvider
+    FilterService
   ]
 })
 export class ObserveUpgradeModule {}

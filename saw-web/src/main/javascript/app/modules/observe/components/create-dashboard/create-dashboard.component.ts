@@ -28,6 +28,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as findIndex from 'lodash/findIndex';
+import { GlobalFilterService } from '../../services/global-filter.service';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
@@ -38,7 +39,7 @@ const MARGIN_BETWEEN_TILES = 10;
   selector: 'create-dashboard',
   template,
   animations,
-  providers: [DashboardService]
+  providers: [DashboardService, GlobalFilterService]
 })
 export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
   public fillState = 'empty';
@@ -57,6 +58,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     private dialog: MatDialog,
     private router: UIRouter,
     private menu: MenuService,
+    private globalFilterService: GlobalFilterService,
     private dashboardService: DashboardService,
     private observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
@@ -85,6 +87,11 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     });
   }
 
+  openFilters() {
+    this.sidebarWidget = 'filter';
+    this.widgetSidenav.open();
+  }
+
   checkEmpty(dashboard) {
     this.fillState =
       get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
@@ -97,6 +104,22 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     } else if (data.save) {
       this.openSaveDialog(data.dashboard);
     }
+  }
+
+  sidenavStateChange(data) {
+    if (this.sidebarWidget === 'filter') {
+      this.globalFilterService.onSidenavStateChange.next(data);
+    }
+  }
+
+  onApplyGlobalFilter(globalFilters): void {
+    if (!globalFilters) {
+      this.widgetSidenav.close();
+      return;
+    }
+
+    this.globalFilterService.onApplyFilter.next(globalFilters);
+    this.widgetSidenav.close();
   }
 
   updateWidgetLog(dashboard) {
