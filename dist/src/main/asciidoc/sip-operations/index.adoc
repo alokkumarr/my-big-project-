@@ -1,4 +1,4 @@
-= SAW Operations Guide
+= SIP Operations Guide
 Version {project-version}
 :toc:
 :nofooter:
@@ -7,7 +7,7 @@ Version {project-version}
 
 == Introduction
 
-This document describes how to install, configure and troubleshoot SAW
+This document describes how to install, configure and troubleshoot SIP
 and its modules in an environment.
 
 == Installing and configuring

@@ -21,6 +21,13 @@ export const MY_FORMATS = {
   }
 };
 
+export const isValid = (model: FilterModel): boolean => {
+  model = model || {};
+  return model.preset === CUSTOM_DATE_PRESET_VALUE
+    ? Boolean(model.lte && model.gte)
+    : Boolean(model.preset);
+};
+
 @Component({
   selector: 'designer-date-filter',
   template,

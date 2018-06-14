@@ -1,8 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
+import {
+  IToolbarActionData,
+  IToolbarActionResult
+} from '../types';
 import * as filter from 'lodash/filter';
-import { IToolbarActionData, IToolbarActionResult } from '../types';
 import { DesignerService } from '../designer.service';
 
 const template = require('./toolbar-action-dialog.component.html');
@@ -14,6 +17,7 @@ require('./toolbar-action-dialog.component.scss');
 })
 export class ToolbarActionDialogComponent {
   showProgressBar = false;
+  filterValid: boolean = true;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
@@ -26,9 +30,6 @@ export class ToolbarActionDialogComponent {
     case 'sort':
       this.data.sorts = cloneDeep(this.data.sorts);
       break;
-    case 'filter':
-      this.data.filters = cloneDeep(this.data.filters);
-      break;
     }
   }
 
@@ -38,10 +39,6 @@ export class ToolbarActionDialogComponent {
 
   onSortsChange(sorts) {
     this.data.sorts = sorts;
-  }
-
-  onFiltersChange(filters) {
-    this.data.filters = filters;
   }
 
   onBooleanCriteriaChange(booleanCriteria) {
@@ -66,10 +63,6 @@ export class ToolbarActionDialogComponent {
     switch (this.data.action) {
     case 'sort':
       result.sorts = this.data.sorts;
-      break;
-    case 'filter':
-      result.filters = filter(this.data.filters, 'columnName');
-      result.booleanCriteria = this.data.booleanCriteria;
       break;
     case 'description':
       result.description = this.data.description;

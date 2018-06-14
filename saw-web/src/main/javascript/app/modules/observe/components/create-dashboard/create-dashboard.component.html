@@ -9,6 +9,9 @@
     <!-- <button mat-button>
       Description
     </button> -->
+    <button mat-button (click)="openFilters()" [disabled]="this.fillState === 'empty'">
+      Filter
+    </button>
     <button mat-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
       Save
     </button>
@@ -17,9 +20,10 @@
 <div mat-dialog-content>
 
   <mat-sidenav-container class="widget-container" [autosize]="false">
-    <mat-sidenav #widgetChoice mode="over" [opened]="false" position="end">
+    <mat-sidenav #widgetChoice mode="over" [opened]="false" position="end" (openedChange)="sidenavStateChange($event)">
       <add-widget [style.display]="sidebarWidget !== 'add' ? 'none' : ''" [container]="widgetChoice" (onWidgetAction)="onWidgetAction($event)"></add-widget>
       <edit-widget *ngIf="sidebarWidget === 'edit'" [container]="widgetChoice" (onWidgetAction)="onWidgetAction($event)" [model]="editItem"></edit-widget>
+      <global-filter [style.display]="sidebarWidget !== 'filter' ? 'none' : ''" (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
 
     </mat-sidenav>
 
