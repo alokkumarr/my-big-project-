@@ -111,7 +111,10 @@ export const AnalyzeExecutedDetailComponent = {
       }
     }
 
-    refreshData() {
+    refreshData(showToast) {
+      if (isUndefined(showToast)) {
+        showToast = true;
+      }
       const gotoLastPublished = () => {
         this._$state.go('analyze.executedDetail', {
           analysisId: this.analysis.id,
@@ -124,13 +127,15 @@ export const AnalyzeExecutedDetailComponent = {
         this._toastMessage.clear(this._executionToast);
       }
 
-      this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
-        timeOut: 0,
-        extendedTimeOut: 0,
-        closeButton: true,
-        tapToDismiss: true,
-        onTap: gotoLastPublished.bind(this)
-      });
+      if (showToast) {
+        this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
+          timeOut: 0,
+          extendedTimeOut: 0,
+          closeButton: true,
+          tapToDismiss: true,
+          onTap: gotoLastPublished.bind(this)
+        });  
+      }
     }
 
     executeAnalysis() {
@@ -308,7 +313,8 @@ export const AnalyzeExecutedDetailComponent = {
         const {isSaveSuccessful, analysis} = result;
         if (isSaveSuccessful) {
           this.analysis = analysis;
-          this.refreshData();
+          let showToast = false;
+          this.refreshData(showToast);
         }
       });
     }
