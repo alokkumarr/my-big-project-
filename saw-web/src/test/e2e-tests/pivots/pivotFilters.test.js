@@ -396,6 +396,8 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
       commonFunctions.waitFor.elementToBeVisible(designModePage.filterBtn);
       commonFunctions.waitFor.elementToBeClickable(designModePage.filterBtn);
       designModePage.filterBtn.click();
+      commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('sample'));
+      designModePage.filterWindow.addFilter('sample').click();
       commonFunctions.waitFor.elementToBeClickable(filterWindow.columnDropDown);
       filterWindow.columnDropDown.click();
       commonFunctions.waitFor.elementToBeClickable(filterWindow.columnNameDropDownItem(filter.columnName));

@@ -87,6 +87,10 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const fieldName = yAxisName;
     commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
     chartDesigner.filterBtn.click();
+
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('sample'));
+    designModePage.filterWindow.addFilter('sample').click();
+
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     designModePage.filterWindow.numberInputUpgraded.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);

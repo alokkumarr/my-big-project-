@@ -6,6 +6,7 @@ module.exports = {
   aggregateFunctionButton: aggregateFunction => element(by.xpath(`//mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   aggregateFunctionMenuItem: aggregateFunction => element(by.xpath(`//button[@role="menuitem"]/mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   filterWindow: {
+    addFilter: tableName => element(by.css(`[e2e="filter-add-btn-${tableName}"]`)),
     numberInputUpgraded: element(by.css('input[e2e="designer-number-filter-input"]')),
     numberInput: element(by.xpath("(//input[@type='number'])[2]")),
     columnDropDown: element(by.css('input[e2e="filter-autocomplete-input"]')),
@@ -16,7 +17,7 @@ module.exports = {
     },
     string: {
       operator: element(by.xpath('//mat-select[@placeholder="Operator"]')),
-      operatorDropDownItem: operator => element(by.css(`mat-option[e2e="filter-number-option-${operator}"]`)),
+      operatorDropDownItem: operator => element(by.css(`mat-option[e2e="filter-string-option-${operator}"]`)),
       input: element(by.xpath(`(//input[contains(@id,"mat-input-")])[position()=3]`)),
       isInIsNotInInput: element(by.xpath(`//input[@e2e="designer-filter-string-input"]`)),
     },

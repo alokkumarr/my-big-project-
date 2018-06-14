@@ -27,8 +27,8 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   const sizeByName = 'Float';
 
   const dataProvider = {
-    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, // SAW-4788
-    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, // SAW-4744
+    // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, // SAW-4788---disbaled in the UI
+    // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, // SAW-4744---disbaled in the UI
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, // SAW-4793
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, // SAW-4733
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, // SAW-4792
@@ -37,8 +37,8 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, // SAW-4737
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, // SAW-4790
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, // SAW-4740
-    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, // SAW-4789
-    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, // SAW-4741
+    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, // SAW-4789 ---disbaled in the UI
+    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, // SAW-4741 ---disbaled in the UI
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, // SAW-4787
     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, // SAW-4745
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, // SAW-4786

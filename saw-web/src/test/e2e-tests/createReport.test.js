@@ -5,6 +5,7 @@ const protractor = require('protractor');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const dataSets = require('../javascript/data/datasets');
+const designModePage = require('../javascript/pages/designModePage.po.js');
 
 describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;
@@ -111,8 +112,11 @@ describe('Create report type analysis: createReport.test.js', () => {
     const fieldName = tables[0].fields[0];
 
     commonFunctions.waitFor.elementToBeClickable(reportDesigner.filterBtn);
+    reportDesigner.filterBtn.click();
 
-    reportDesigner.filterBtn.click()
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter(tables[0].name));
+    designModePage.filterWindow.addFilter(tables[0].name).click();
+
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
     commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
