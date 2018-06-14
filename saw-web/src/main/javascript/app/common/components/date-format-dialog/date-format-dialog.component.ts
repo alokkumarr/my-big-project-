@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { DATE_FORMATS } from '../../consts';
+import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./date-format-dialog.component.html');
 require('./date-format-dialog.component.scss');
@@ -22,6 +23,9 @@ export class DateFormatDialogComponent {
     }
   ) {
     this.dateFormats = this.data.availableFormats || DATE_FORMATS;
+    if (isUndefined(this.data.format)) {
+      this.data.format = 'yyyy-MM-dd';
+    }
   }
 
   close() {

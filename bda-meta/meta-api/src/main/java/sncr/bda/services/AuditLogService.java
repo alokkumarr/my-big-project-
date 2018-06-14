@@ -46,7 +46,7 @@ public class AuditLogService {
                                               Map<String, Map<String, Object>> output) {
         JsonObject ale = new JsonObject();
 
-        ale.add(DataSetProperties.Creator.toString(), new JsonPrimitive(ctx.user));
+        ale.add(DataSetProperties.createdBy.toString(), new JsonPrimitive(ctx.user));
         ale.add(DataSetProperties.Status.toString(), new JsonPrimitive(status));
         ale.add(DataSetProperties.BatchID.toString(), new JsonPrimitive(ctx.batchID));
 

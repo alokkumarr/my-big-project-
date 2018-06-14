@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Workbench samples loader
+After=saw-deploy.service
+
+[Service]
+Type=oneshot
+ExecStart=/root/saw-workbench-samples/sample-csv/load
+SyslogIdentifier=saw-workbench-samples
+
+[Install]
+WantedBy=saw-deploy.service

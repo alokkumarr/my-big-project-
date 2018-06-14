@@ -31,6 +31,13 @@ public class Output {
     @Expose
     private String dataSet;
     /**
+     * Description of dataset
+     */
+    @SerializedName("desc")
+    @Expose
+    private String description;
+
+    /**
      * Data format
      * 
      */
@@ -100,10 +107,12 @@ public class Output {
      * @param format
      * @param partitionKeys
      * @param dataSet
+     * @param description
      */
-    public Output(String name, String dataSet, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, sncr.bda.conf.Input.Dstype dstype, Set<String> partitionKeys, String catalog, String parent, Object userdata) {
+    public Output(String name, String dataSet, String description, sncr.bda.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, sncr.bda.conf.Input.Dstype dstype, Set<String> partitionKeys, String catalog, String parent, Object userdata) {
         this.name = name;
         this.dataSet = dataSet;
+        this.description = description;
         this.format = format;
         this.mode = mode;
         this.numberOfFiles = numberOfFiles;
@@ -163,6 +172,30 @@ public class Output {
 
     public Output withDataSet(String dataSet) {
         this.dataSet = dataSet;
+        return this;
+    }
+
+    /**
+     * Description of dataset
+     *
+     * @return
+     *      Dataset desciption
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Description of dataset
+     *
+     * @param description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Output withDescription(String description) {
+        this.description = description;
         return this;
     }
 
@@ -373,7 +406,7 @@ public class Output {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(dataSet).append(format).append(mode).append(numberOfFiles).append(dstype).append(partitionKeys).append(catalog).append(parent).append(userdata).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(description).append(format).append(mode).append(numberOfFiles).append(dstype).append(partitionKeys).append(catalog).append(parent).append(userdata).toHashCode();
     }
 
     @Override
@@ -385,7 +418,7 @@ public class Output {
             return false;
         }
         Output rhs = ((Output) other);
-        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dstype, rhs.dstype).append(partitionKeys, rhs.partitionKeys).append(catalog, rhs.catalog).append(parent, rhs.parent).append(userdata, rhs.userdata).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(description, rhs.description).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dstype, rhs.dstype).append(partitionKeys, rhs.partitionKeys).append(catalog, rhs.catalog).append(parent, rhs.parent).append(userdata, rhs.userdata).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

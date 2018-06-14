@@ -274,8 +274,8 @@ public interface WithDLBatchWriter {
                 outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
 
                 //Add timestamp fields
-                outputDS.put(DataSetProperties.CreatedTime.name(), currentTime);
-                outputDS.put(DataSetProperties.ModifiedTime.name(), currentTime);
+//                outputDS.put(DataSetProperties.CreatedTime.name(), currentTime);
+//                outputDS.put(DataSetProperties.ModifiedTime.name(), currentTime);
             }
             else{
                 Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
@@ -286,8 +286,8 @@ public interface WithDLBatchWriter {
                 outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
 
                 //Add timestamp fields
-                outputDS2.put(DataSetProperties.CreatedTime.name(), currentTime);
-                outputDS2.put(DataSetProperties.ModifiedTime.name(), currentTime);
+//                outputDS2.put(DataSetProperties.CreatedTime.name(), currentTime);
+//                outputDS2.put(DataSetProperties.ModifiedTime.name(), currentTime);
             }
 
 

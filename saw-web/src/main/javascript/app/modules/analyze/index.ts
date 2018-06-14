@@ -1,20 +1,19 @@
-import * as angular from 'angular';
-import {
-  downgradeInjectable,
-  downgradeComponent
-} from '@angular/upgrade/static';
-import { NgModule } from '@angular/core';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
+import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { downgradeComponent, downgradeInjectable } from '@angular/upgrade/static';
+import * as angular from 'angular';
+import { LocalStorageModule } from 'angular-2-local-storage';
+import { AnalyzeViewModule } from './view';
+import { AnalyzeActionsModule } from './actions';
+
 import { MaterialModule } from '../../material.module';
 import { AceEditorModule } from 'ng2-ace-editor';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
 import { BrowserModule } from '@angular/platform-browser';
-import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
 import { transitions } from './transitions';
 
@@ -29,14 +28,11 @@ import { $mdDialogProvider } from '../../common/services/ajs-common-providers';
 import { pivotAreaTypeFilter } from './filters/pivot-area-type.filter';
 import { uniqueFilter } from './filters/unique.filter';
 
+import { AnalyzeActionsService } from './actions/analyze-actions.service';
+import { AnalyzeActionsService as OldAnalyzeActionsService } from './components/actions/analyze-actions.service';
+
 import { AnalyzePageComponent } from './components/page/analyze-page.component';
 import { AggregateChooserComponent } from './components/aggregate-chooser/aggregate-chooser.component';
-import { AnalyzeActionsService } from './components/actions/analyze-actions.service';
-import { AnalyzeActionsMenuComponent } from './components/actions/analyze-actions-menu.component';
-import { AnalyzeViewComponent } from './components/view/analyze-view.component';
-import { AnalyzeCardsViewComponent } from './components/view/card/analyze-cards-view.component';
-import { AnalyzeCardComponent } from './components/view/card/analyze-card.component';
-import { AnalyzeListViewComponent } from './components/view/list/analyze-list-view.component';
 import { AnalyzeExecutedListComponent } from './components/executed-list/analyze-executed-list.component';
 import { AnalyzeReportDetailComponent } from './components/executed-detail/report/analyze-report-detail.component';
 import { AnalyzePivotDetailComponent } from './components/executed-detail/pivot/analyze-pivot-detail.component';
@@ -68,12 +64,12 @@ import { AnalyzePublishDialogComponent } from './components/publish-dialog/analy
 import { AnalyzeChartComponent } from './components/chart/analyze-chart.component';
 import { AnalyzeChartSettingsComponent } from './components/chart/settings/analyze-chart-settings.component';
 import { AnalyzeChartPreviewComponent } from './components/chart/preview/analyze-chart-preview.component';
-import { CronJobSchedularComponent } from './components/cron-job-schedular/cron-job-schedular.component';
-import { CronDatePickerComponent } from './components/cron-date-picker/cron-date-picker.component';
+import { AnalyzeActionsMenuComponent } from './components/actions/analyze-actions-menu.component';
 import { CommonModule } from '../../common';
 
 import { CommonModuleTs } from '../../common';
 import { UChartModule } from '../../common/components/charts';
+import { AnalyzePublishDialogModule } from './publish';
 import {
   DesignerDialogComponent,
   DesignerContainerComponent,
@@ -95,11 +91,6 @@ import {
   DesignerSortComponent,
   DesignerDescriptionComponent,
   DesignerSaveComponent,
-  DesignerFilterContainerComponent,
-  DesignerFilterRowComponent,
-  DesignerStringFilterComponent,
-  DesignerDateFilterComponent,
-  DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayout,
   MultiTableDesignerLayout,
@@ -107,7 +98,12 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 
-import { FilterChipsComponent as FilterChipsUpgraded } from './components/filter/chips-u';
+import { AnalyzeFilterModule } from './components/designer/filter';
+import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
+
+import { CronJobSchedularComponent } from './publish/cron-job-schedular';
+import { CronDatePickerComponent } from './publish/cron-date-picker';
+
 import { analyzeServiceProvider } from './services/ajs-analyze-providers';
 
 import { AnalyzeDialogService } from './services/analyze-dialog.service';
@@ -121,15 +117,13 @@ angular
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
   .filter('uniqueFilter', uniqueFilter)
-  .service('FilterService', FilterService)
+  .factory('FilterService', downgradeInjectable(FilterService) as Function)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
+  .factory('AnalyzeActionsService', OldAnalyzeActionsService)
   .factory('ChartService', downgradeInjectable(ChartService) as Function)
+  .factory('AnalyzeDialogService', downgradeInjectable(AnalyzeDialogService) as Function)
   .service('SortService', SortService)
-  .factory('AnalyzeDialogService', downgradeInjectable(
-    AnalyzeDialogService
-  ) as Function)
-  .factory('AnalyzeActionsService', AnalyzeActionsService)
   .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
   .component('aggregateChooser', AggregateChooserComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
@@ -138,10 +132,6 @@ angular
   .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('reportFormatDialog', ReportFormatDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
-  .component('analyzeView', AnalyzeViewComponent)
-  .component('analyzeCardsView', AnalyzeCardsViewComponent)
-  .component('analyzeCard', AnalyzeCardComponent)
-  .component('analyzeListView', AnalyzeListViewComponent)
   .component('analyzeExecutedList', AnalyzeExecutedListComponent)
   .component('analyzeReportDetail', AnalyzeReportDetailComponent)
   .component('analyzePivotDetail', AnalyzePivotDetailComponent)
@@ -152,11 +142,14 @@ angular
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
-  .directive('analyzeReportQuery', downgradeComponent({
-    component: AnalyzeReportQueryComponent
-  }) as angular.IDirectiveFactory)
   .directive('cronJobSchedular', downgradeComponent({
     component: CronJobSchedularComponent
+  }) as angular.IDirectiveFactory)
+  .directive('cronDatePicker', downgradeComponent({
+    component: CronDatePickerComponent
+  }) as angular.IDirectiveFactory)
+  .directive('analyzeReportQuery', downgradeComponent({
+    component: AnalyzeReportQueryComponent
   }) as angular.IDirectiveFactory)
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeSortDialog', AnalyzeSortDialogComponent)
@@ -180,6 +173,10 @@ angular
 @NgModule({
   imports: [
     CommonModuleAngular4,
+    LocalStorageModule.withConfig({
+      prefix: 'symmetra',
+      storageType: 'localStorage'
+    }),
     CommonModuleTs,
     MaterialModule,
     FlexLayoutModule,
@@ -188,8 +185,11 @@ angular
     ReactiveFormsModule,
     UChartModule,
     BrowserModule,
-    OwlDateTimeModule,
-    OwlNativeDateTimeModule
+    AnalyzeViewModule,
+    AnalyzeViewModule,
+    AnalyzeActionsModule,
+    AnalyzeFilterModule,
+    AnalyzePublishDialogModule
   ],
   declarations: [
     AnalyzeReportQueryComponent,
@@ -213,15 +213,8 @@ angular
     DesignerSortComponent,
     DesignerDescriptionComponent,
     DesignerSaveComponent,
-    DesignerFilterContainerComponent,
-    DesignerFilterRowComponent,
-    DesignerStringFilterComponent,
-    DesignerDateFilterComponent,
-    DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
-    CronJobSchedularComponent,
-    CronDatePickerComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
     FilterChipsUpgraded
@@ -248,14 +241,7 @@ angular
     DesignerSortComponent,
     DesignerDescriptionComponent,
     DesignerSaveComponent,
-    DesignerFilterContainerComponent,
-    DesignerFilterRowComponent,
-    DesignerStringFilterComponent,
-    DesignerDateFilterComponent,
-    DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
-    CronJobSchedularComponent,
-    CronDatePickerComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
     FilterChipsUpgraded
@@ -265,7 +251,9 @@ angular
     AnalyzeDialogService,
     analyzeServiceProvider,
     DesignerService,
-    ChartService
+    FilterService,
+    ChartService,
+    AnalyzeActionsService
   ]
 })
 export class AnalyzeModuleTs {}

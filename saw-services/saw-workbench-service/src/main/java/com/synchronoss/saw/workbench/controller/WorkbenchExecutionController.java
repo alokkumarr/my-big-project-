@@ -5,22 +5,33 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+
 import java.util.Base64;
+import java.util.Map;
 import javax.validation.constraints.NotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sncr.xdf.component.Component;
+import sncr.bda.datasets.conf.DataSetProperties;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -39,26 +50,47 @@ public class WorkbenchExecutionController {
   private WorkbenchExecutionService workbenchExecutionService;
 
   /**
-   * This method is to list the datasets.
-   * @param project is of type String.
-   * @param body is of type Object.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
+   * Create dataset function.
+   * @param project Project ID
+   * @param body Body Parameters
+   * @param authToken Authentication Token header
+   * @return Returns an object node
+   * @throws JsonProcessingException When unable to decode the string
+   * @throws Exception General Exception
    */
-  @RequestMapping(value = "{project}/datasets", method = RequestMethod.POST,
+  @RequestMapping(
+      value = "{project}/datasets", method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public ObjectNode create(@PathVariable(name = "project", required = true) String project,
-      @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
+  public ObjectNode create(
+      @PathVariable(name = "project", required = true) String project,
+      @RequestBody ObjectNode body,
+      @RequestHeader("Authorization") String authToken)
+      throws JsonProcessingException, Exception {
     log.debug("Create dataset: project = {}", project);
+    log.info("Auth token = {}", authToken);
+    if (authToken.startsWith("Bearer")) {
+      authToken = authToken.substring("Bearer ".length());
+    }
     /* Extract input parameters */
     final String name = body.path("name").asText();
-    final String input = body.path("input").asText();
-    final String component = body.path("component").asText();
+    final String description = body.path("description").asText();
+    String input = body.path("input").asText();
+
+    //TODO: Remove the hardcoded key
+    Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
+        .parseClaimsJws(authToken).getBody();
+
+    Map<String, Object> ticket =
+        ((Map<String, Object>) ssoToken.get("ticket"));
+    String userName = (String) ticket.get("userFullName");
+    log.info(userName);
+
+    String component = body.path("component").asText();
     JsonNode configNode = body.path("configuration");
     if (!configNode.isObject()) {
-      throw new RuntimeException("Expected config to be an object: " + configNode);
+      throw new RuntimeException(
+        "Expected config to be an object: " + configNode);
     }
     ObjectNode config = (ObjectNode) configNode;
     /* Build XDF component-specific configuration */
@@ -73,7 +105,8 @@ public class WorkbenchExecutionController {
     } else if (component.equals("sql")) {
       xdfComponentConfig.put("scriptLocation", "inline");
       String script = config.path("script").asText();
-      String encoded = Base64.getEncoder().encodeToString(script.getBytes("utf-8"));
+      String encoded = Base64.getEncoder()
+          .encodeToString(script.getBytes("utf-8"));
       xdfComponentConfig.put("script", encoded);
     } else {
       throw new RuntimeException("Unknown component: " + component);
@@ -89,23 +122,33 @@ public class WorkbenchExecutionController {
     ObjectNode xdfOutput = xdfOutputs.addObject();
     xdfOutput.put("dataSet", name);
     xdfOutput.put("name", Component.DATASET.output.name());
+    xdfOutput.put("desc", description);
+
+    ObjectNode userData = mapper.createObjectNode();
+    userData.put(DataSetProperties.createdBy.toString(), userName);
+
+
+    xdfOutput.set(DataSetProperties.UserData.toString(), userData);
     /* Invoke XDF component */
-    return workbenchExecutionService.execute(project, name, component, xdfConfig.toString());
+    return workbenchExecutionService.execute(
+      project, name, component, xdfConfig.toString());
   }
 
   /**
-   * This method is to preview the data.
-   * @param project is of type String.
-   * @param body is of type Object.
-   * @return ObjectNode is of type Object.
-   * @throws JsonProcessingException when this exceptional condition happens.
-   * @throws Exception when this exceptional condition happens.
+   * Preview dataset function.
+   *
+   * @param project Project ID
+   * @param body Body Parameters
+   * @return Returns a preview
+   * @throws JsonProcessingException When not able to get the preview
+   * @throws Exception General Exception
    */
+
   @RequestMapping(value = "{project}/previews", method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-      @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
+                          @RequestBody ObjectNode body) throws JsonProcessingException, Exception {
     log.debug("Create dataset preview: project = {}", project);
     /* Extract dataset name which is to be previewed */
     String name = body.path("name").asText();
@@ -125,7 +168,7 @@ public class WorkbenchExecutionController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public ObjectNode preview(@PathVariable(name = "project", required = true) String project,
-      @PathVariable(name = "previewId", required = true) String previewId)
+                            @PathVariable(name = "previewId", required = true) String previewId)
       throws JsonProcessingException, Exception {
     log.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
@@ -142,7 +185,6 @@ public class WorkbenchExecutionController {
 
   @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
   private static class NotFoundException extends RuntimeException {
-
     private static final long serialVersionUID = 412355610432444770L;
   }
 }

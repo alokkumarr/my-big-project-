@@ -40,7 +40,8 @@
 
     <button mat-button
             e2e="refresh-data-btn"
-            [disabled]="isInQueryMode"
+            *ngIf="analysis && (analysis.type === 'report' || analysis.type === 'esReport') && !isInQueryMode"
+            [disabled]="!areMinRequirmentsMet"
             [color]="designerState === DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA ? 'primary' : ''"
             (click)="requestAction.emit('refresh')">
       <ng-container i18n>Refresh Data</ng-container>
@@ -54,6 +55,7 @@
     </button> -->
 
     <button mat-button
+            [disabled]="!areMinRequirmentsMet"
             e2e="open-preview-modal"
             (click)="requestAction.emit('preview')">
       <mat-icon fontIcon="icon-full-screen"></mat-icon>
@@ -77,6 +79,7 @@
     </button>
 
     <button mat-raised-button
+            [disabled]="!areMinRequirmentsMet"
             e2e="designer-save-btn"
             color="primary"
             (click)="requestAction.emit('save')">
