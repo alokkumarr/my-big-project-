@@ -14,7 +14,6 @@ import { AnalyzePublishDialogComponent } from '../publish';
 
 @Injectable()
 export class AnalyzeActionsService {
-
   constructor(
     private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
@@ -51,69 +50,87 @@ export class AnalyzeActionsService {
 
   openDeleteModal(analysis) {
     return new Promise(resolve => {
-      this._analyzeDialogService.openDeleteConfirmationDialog().afterClosed().subscribe({
-        next: result => {
-          if (result) {
-            this.removeAnalysis(analysis).then(deletionSuccess => {
-              resolve(deletionSuccess);
-            });
-          } else {
+      this._analyzeDialogService
+        .openDeleteConfirmationDialog()
+        .afterClosed()
+        .subscribe({
+          next: result => {
+            if (result) {
+              this.removeAnalysis(analysis).then(deletionSuccess => {
+                resolve(deletionSuccess);
+              });
+            } else {
+              resolve(false);
+            }
+          },
+          error: () => {
             resolve(false);
           }
-        },
-        error: () => {
-          resolve(false);
-        }
-      });
+        });
     });
   }
 
   openEditModal(analysis, mode: 'edit' | 'fork') {
+    /* prettier-ignore */
     switch (analysis.type) {
     case AnalyseTypes.Chart:
     case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
     case AnalyseTypes.Pivot:
-      return this._analyzeDialogService.openEditAnalysisDialog(analysis, mode)
-        .afterClosed().first().toPromise();
+      return this._analyzeDialogService
+        .openEditAnalysisDialog(analysis, mode)
+        .afterClosed()
+        .first()
+        .toPromise();
     default:
     }
   }
 
   openPublishModal(analysis) {
     return new Promise<Analysis>((resolve, reject) => {
-      this.dialog.open(AnalyzePublishDialogComponent, {
-        width: 'auto',
-        height: 'auto',
-        data: { analysis }
-      } as MatDialogConfig).afterClosed().subscribe(analysis => {
-        if (analysis) {
-          const execute = true;
-          this._headerProgress.show();
-          this._analyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
-            this._headerProgress.hide();
-            this._toastMessage.info(execute ?
-              'Analysis has been updated.' :
-              'Analysis schedule changes have been updated.');
-            resolve(updatedAnalysis);
-          }, () => {
-            this._headerProgress.hide();
-            reject();
-          });
-        }
-      });
+      this.dialog
+        .open(AnalyzePublishDialogComponent, {
+          width: 'auto',
+          height: 'auto',
+          data: { analysis }
+        } as MatDialogConfig)
+        .afterClosed()
+        .subscribe(analysis => {
+          if (analysis) {
+            const execute = true;
+            this._headerProgress.show();
+            this._analyzeService.publishAnalysis(analysis, execute).then(
+              updatedAnalysis => {
+                this._headerProgress.hide();
+                this._toastMessage.info(
+                  execute
+                    ? 'Analysis has been updated.'
+                    : 'Analysis schedule changes have been updated.'
+                );
+                resolve(updatedAnalysis);
+              },
+              () => {
+                this._headerProgress.hide();
+                reject();
+              }
+            );
+          }
+        });
     });
   }
 
   removeAnalysis(analysis) {
     this._headerProgress.show();
-    return this._analyzeService.deleteAnalysis(analysis).then(() => {
-      this._headerProgress.hide();
-      this._toastMessage.info('Analysis deleted.');
-      return true;
-    }, err => {
-      this._headerProgress.hide();
-      this._toastMessage.error(err.message || 'Analysis not deleted.');
-    });
+    return this._analyzeService.deleteAnalysis(analysis).then(
+      () => {
+        this._headerProgress.hide();
+        this._toastMessage.info('Analysis deleted.');
+        return true;
+      },
+      err => {
+        this._headerProgress.hide();
+        this._toastMessage.error(err.message || 'Analysis not deleted.');
+      }
+    );
   }
 }

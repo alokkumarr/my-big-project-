@@ -561,7 +561,8 @@ export class ChartService {
     }
     if (!isUndefined(comboType)) {
       if (comboType === 'tsline' || comboType === 'tsareaspline') {
-        comboType = comboType === 'tsareaspline' ? 'spline' : comboType.slice(2);
+        comboType =
+          comboType === 'tsareaspline' ? 'spline' : comboType.slice(2);
       }
     }
 

@@ -78,7 +78,19 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     executeAndInit() {
-      this.executeAnalysis().finally(() => {
+      const resolved = this._$q.defer();
+      resolved.resolve();
+
+      this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
+
+      let job;
+      if (this.isExecuting || this.analysis.type === 'report') {
+        job = resolved.promise;
+      } else {
+        job = this.executeAnalysis();
+      }
+
+      job.then(() => {
         this.watchAnalysisExecution();
         this.setPrivileges();
         if (!this.analysis.schedule) {
@@ -90,7 +102,6 @@ export const AnalyzeExecutedDetailComponent = {
 
     watchAnalysisExecution() {
       this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
-
       this._executionWatcher = this._$scope.$watch(
         () => this._AnalyzeService.isExecuting(this.analysis.id),
         (newVal, prevVal) => {
@@ -306,7 +317,7 @@ export const AnalyzeExecutedDetailComponent = {
 
       if (this.isExecuting) {
         this._AnalyzeService.executionFor(analysisId).then(() => {
-          loadMethod(this.isExecuting);
+          loadMethod(true);
         });
       } else {
         loadMethod(false);
