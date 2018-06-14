@@ -7,19 +7,23 @@ const privileges = require('../../javascript/data/privileges');
 const request = require('sync-request');
 const globalVariables = require('../../javascript/helpers/globalVariables');
 const dataSets = require('../../javascript/data/datasets');
-
-const url = 'http://localhost/'; // API base url
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const urlParser = require('url');
+//const url = 'http://localhost/'; // API base url
 const activeStatusInd = 1; // shared for all users
 const custSysId = 1; // shared for all users
 const customerId = 1; // shared for all users
 const customerCode = 'SYNCHRONOSS'; // shared for all users
 const productId = 1; // shared for all users
 const moduleId = 1; // shared for all users
+let url = '';
 
 module.exports = {
   // Generates token for admin which has been created on docker start
-  token: () => {
+  token: (baseUrl) => {
     const payload = {'masterLoginId': users.masterAdmin.loginId, 'password': users.masterAdmin.password};
+    const q = urlParser.parse(baseUrl, true);
+    url = 'http://'+q.host+'/'; // API base url
     return 'Bearer '.concat(JSON.parse(request('POST', url + 'security/doAuthenticate',
       {json: payload}).getBody()).aToken);
   },
