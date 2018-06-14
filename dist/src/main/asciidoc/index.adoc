@@ -20,7 +20,7 @@ application for different roles:
   modules
 | Technical, architect
 
-| link:sip-rest-api/index.html[SIP Developer Guide]
+| link:sip-developer/index.html[SIP Developer Guide]
 | Consuming the SIP REST API to develop third-party integrations
 | Developer, integrator
 
@@ -34,4 +34,4 @@ application for different roles:
 The above documents are also available in PDF format for download:
 link:sip-operations/index.pdf[SIP Operations Guide],
 link:sip-design/index.pdf[SIP Design Guide],
-link:sip-rest-api/index.pdf[SIP Developer Guide].
+link:sip-developer/index.pdf[SIP Developer Guide].
