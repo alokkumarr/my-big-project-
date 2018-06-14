@@ -52,22 +52,24 @@
     </div>
 
     <div *dxTemplate="let cell of 'actionCellTemplate'">
-      <button mat-icon-button
-              *ngIf="canUserFork"
-              (click)="fork(cell.data)"
-              class="list-action-button"
-              i18n-matTooltip="Fork Analysis"
-              matTooltip="Fork Analysis"
-      >
-        <mat-icon fontIcon="icon-fork"></mat-icon>
-      </button>
-      <analyze-actions-menu-u [analysis]="cell.data"
-                              exclude="fork-export"
-                              (afterDelete)="afterDelete($event)"
-                              (afterExecute)="afterExecute($event)"
-                              (afterPublish)="afterPublish($event)"
-                              (afterEdit)="afterEdit($event)"
-      ></analyze-actions-menu-u>
+      <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
+        <button mat-icon-button
+                *ngIf="canUserFork"
+                (click)="fork(cell.data)"
+                class="list-action__button"
+                i18n-matTooltip="Fork Analysis"
+                matTooltip="Fork Analysis"
+        >
+          <mat-icon fontIcon="icon-fork"></mat-icon>
+        </button>
+        <analyze-actions-menu-u [analysis]="cell.data"
+                                exclude="fork-export"
+                                (afterDelete)="afterDelete($event)"
+                                (afterExecute)="afterExecute($event)"
+                                (afterPublish)="afterPublish($event)"
+                                (afterEdit)="afterEdit($event)"
+        ></analyze-actions-menu-u>
+      </div>
     </div>
 
   </dx-data-grid>
