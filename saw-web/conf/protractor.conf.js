@@ -80,8 +80,8 @@ exports.config = {
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
-    shardTestFiles: true,
-    maxInstances: 4,
+    // shardTestFiles: true,
+    // maxInstances: 4,
     chromeOptions: {
       args: [
         'disable-extensions',
