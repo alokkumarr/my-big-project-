@@ -136,7 +136,7 @@ export const TSCOMBO_TYPES = [{
   icon: 'icon-vert-bar-chart'
 }, {
   label: 'area',
-  value: 'tsPane',
+  value: 'tsareaspline',
   icon: 'icon-area-chart'
 }, {
   label: 'line',
