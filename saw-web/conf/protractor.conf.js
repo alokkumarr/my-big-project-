@@ -1,6 +1,7 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const generate = require('../src/test/javascript/data/generateTestData');
+var retry = require('protractor-retry').retry;
 
 /**
  * Note about intervals:
@@ -41,6 +42,10 @@ const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 60000
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
 const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 600000;
+/**
+ * number of failed retry, 5 times in bamboo and 2 times in local
+ */
+const maxRetryForFailedTests = webpackHelper.distRun() ? 5 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -152,8 +157,11 @@ exports.config = {
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
   },
-
+  onCleanUp: function (results) {
+    retry.onCleanUp(results);
+  },
   onPrepare() {
+    retry.onPrepare();
     // Gerenate test data
     let token = generate.token(browser.baseUrl);
     //console.log("aToken: " + token);
@@ -190,5 +198,8 @@ exports.config = {
         return /login/.test(url);
       });
     }, pageResolveTimeout);
+  },
+  afterLaunch: function() {
+    return retry.afterLaunch(maxRetryForFailedTests);
   }
 };
