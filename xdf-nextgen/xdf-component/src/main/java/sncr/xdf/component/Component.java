@@ -402,16 +402,18 @@ public abstract class Component {
                     String dsname = id.substring(id.indexOf(MetadataStore.delimiter)
                         + MetadataStore.delimiter.length());
                     Map<String, Object> outDataset = outputDataSets.get(dsname);
-                    JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
-                    logger.trace("Extracted schema: " + schema.toString());
 
                     // Set record count
                     long recordCount = (long) outDataset.getOrDefault(DataSetProperties.RecordCount.name(),
                         (long) 0);
                     logger.trace("Extracted record count " + recordCount);
 
-                    md.updateDS(id, ctx, ds, schema, recordCount);
-
+                    //Extract schema
+                    JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
+                    if (schema != null) {
+                        logger.trace("Extracted schema: " + schema.toString());
+                        md.updateDS(id, ctx, ds, schema, recordCount);
+                    }
                 } catch (Exception e) {
                     error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
                     logger.error(error);
