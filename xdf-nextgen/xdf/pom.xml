@@ -48,11 +48,6 @@
       <artifactId>xdf-sql</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.synchronoss.bda</groupId>-->
-      <!--<artifactId>xdf-esloader</artifactId>-->
-      <!--<version>${project.version}</version>-->
-    <!--</dependency>-->
   </dependencies>
 
 
