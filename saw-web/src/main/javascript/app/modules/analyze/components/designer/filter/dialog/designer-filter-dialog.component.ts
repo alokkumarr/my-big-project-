@@ -120,7 +120,7 @@ export class DesignerFilterDialogComponent implements OnInit {
   validateFilters(filters) {
     let areValid = true;
     forEach(filters, ({type, model, isRuntimeFilter, isGlobalFilter}: Filter) => {
-      if (isGlobalFilter) {
+      if (!isRuntimeFilter && isGlobalFilter) {
         areValid = true;
       } else if (!model) {
         areValid = Boolean(this.data.isInRuntimeMode ? false : isRuntimeFilter);
