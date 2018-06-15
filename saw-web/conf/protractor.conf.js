@@ -118,10 +118,10 @@ exports.config = {
      * working on fixing the rest.
      */
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
       //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
       //webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
-    ],
+    ]
     // charts: [
     //   webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
     //   webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
