@@ -138,15 +138,9 @@ class SAWChartTypeElasticSearchQueryBuilder {
               rangeQueryBuilder.gte(item.getModel().getGte());
               builder.add(rangeQueryBuilder);
             }
-            if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
-              boolQueryBuilder.must(builder.get(builder.size() - 1));
-            } else {
-              boolQueryBuilder.should(builder.get(builder.size() - 1));
-            }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
             builder = QueryBuilderUtil.stringFilterChart(item, builder);
-            boolQueryBuilder.must(builder.get(builder.size() - 1));
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
@@ -154,11 +148,6 @@ class SAWChartTypeElasticSearchQueryBuilder {
               || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
             
             builder = QueryBuilderUtil.numericFilterChart(item, builder);
-            if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
-              boolQueryBuilder.must(builder.get(builder.size() - 1));
-            } else {
-              boolQueryBuilder.should(builder.get(builder.size() - 1));
-            }
             
           }
         }
@@ -186,16 +175,10 @@ class SAWChartTypeElasticSearchQueryBuilder {
               rangeQueryBuilder.gte(item.getModel().getGte());
               builder.add(rangeQueryBuilder);
             }
-            if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
-              boolQueryBuilder.must(builder.get(builder.size() - 1));
-            } else {
-              boolQueryBuilder.should(builder.get(builder.size() - 1));
-            }
           }
           // make the query based on the filter given
           if (item.getType().value().equals(Type.STRING.value())) {
             builder = QueryBuilderUtil.stringFilterChart(item, builder);
-            boolQueryBuilder.must(builder.get(builder.size() - 1));
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
@@ -203,15 +186,26 @@ class SAWChartTypeElasticSearchQueryBuilder {
               || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
             
             builder = QueryBuilderUtil.numericFilterChart(item, builder);
-            if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
-              boolQueryBuilder.must(builder.get(builder.size() - 1));
-            } else {
-              boolQueryBuilder.should(builder.get(builder.size() - 1));
-            }
           }
         }
       }
-
+      if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
+        builder.forEach(item -> {
+          boolQueryBuilder.must(item);
+        });
+      } else {
+        builder.forEach(item -> {
+          if(item.getType().value().equals(Type.STRING.value()))
+          {
+            // regardless of ALL or ANY, as per inputs given
+            // we should have MUST for string filters.
+            boolQueryBuilder.must(item);
+          }
+          else {
+            boolQueryBuilder.should(item);
+          }
+        });
+      }
       searchSourceBuilder.query(boolQueryBuilder);
     }
     List<com.synchronoss.querybuilder.model.chart.NodeField>  nodeFields = sqlBuilderNode.getNodeFields();
