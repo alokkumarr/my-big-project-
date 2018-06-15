@@ -118,21 +118,21 @@ exports.config = {
      * working on fixing the rest.
      */
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
       //webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
+    ],
+    charts: [
+      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+      //webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
+      //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+    ],
+    pivots: [
+      //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
+    ],
+    authentication: [
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
-    // charts: [
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
-    // ],
-    // pivots: [
-    //   webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
-    // ],
-    // authentication: [
-    //   webpackHelper.root(testDir + '/e2e-tests/login.test.js')
-    // ]
   } : {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
