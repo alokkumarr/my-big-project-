@@ -1,4 +1,4 @@
-This directory contains the source for the rendered SAW documentation.
+This directory contains the source for the rendered SIP documentation.
 Files ending in `.adoc` are rendered using [Asciidoctor].  Files
 ending in `.pum` are rendered using [PlantUML].
 
