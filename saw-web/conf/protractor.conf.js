@@ -128,7 +128,7 @@ exports.config = {
       //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     pivots: [
-      //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
     ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js')
