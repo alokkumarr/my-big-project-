@@ -264,3 +264,40 @@ response to the client.
 
 .Figure: Authenticating a client using the SAW Security Service
 plantuml::sip-design/figure-security-sequence.pum[format=svg]
+
+== High availability
+
+SIP is required to provide high availability of its services.  If one
+node in the SIP environment fails or becomes unavailable, services are
+expected to keep working normally.
+
+=== Health checks
+
+High availability is achieved using different techniques based on the
+type of the service.  Common to all services are the use of health
+checks.  Services provide health checks to indicate if they are able
+to serve requests normally.  This allows service clients (which can be
+external or other SIP services) to only route requests to service
+instances which are indicated as being healthy.  See the SIP
+Operations Guide for more details on service health checks.
+
+=== High availability for stateless services
+
+SIP provides high availability for stateless services by running
+multiple redundant instances of them on separate nodes.  If one node
+fails and makes the service running on that node unavailable, the
+service instance on the other node can keep serving requests.
+
+=== High availability proxy
+
+SIP provides a high availability proxy by default, which allows
+external clients to connect to a single host, which in turn routes the
+request to the appropriate service instance based on health checks.
+This is implemented using http://www.haproxy.org/[HAProxy].
+
+Using the high availability proxy simplifies SIP client requirements,
+because it removes the need for clients to keep track of multiple SIP
+service instances and their health statuses.  The downside of using it
+is that if the high availability proxy itself becomes unavailable, for
+example due to the node that it is running on failing, clients will
+not be able to connect at all.
