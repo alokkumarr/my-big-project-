@@ -294,7 +294,6 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -302,7 +301,6 @@ describe('Privileges tests: privileges.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
