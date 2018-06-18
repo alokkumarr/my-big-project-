@@ -27,8 +27,8 @@ enum METHODS {
   CHART_BUBBLE = 'chart:bubble',
   CHART_AREA = 'chart:area',
   CHART_COMBO = 'chart:combo',
-  CHART_TSSPLINE = 'chart:tspline',
-  CHART_TSPANE = 'chart:tsareaspline'
+  CHART_TSSPLINE = 'chart:tsspline',
+  CHART_TSPANE = 'chart:tsPane'
 }
 
 @Component({
@@ -71,7 +71,9 @@ export class AnalyzeNewDialogComponent {
 
     forEach(this.methodCategories, category => {
       forEach(category.children, method => {
-        if (method.supportedTypes) {
+        if (method.typeOnBackEnd) {
+          method.disabled = !supportMap[method.typeOnBackEnd];
+        } else if (method.supportedTypes) {
           method.disabled = !find(method.supportedTypes, type => supportMap[type]);
         } else {
           method.disabled = !supportMap[method.type];

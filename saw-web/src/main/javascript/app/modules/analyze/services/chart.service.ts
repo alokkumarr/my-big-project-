@@ -280,8 +280,8 @@ export class ChartService {
     case 'spline':
     case 'stack':
     case 'scatter':
-    case 'tsline':
-    case 'tsareaspline':
+    case 'tsspline':
+    case 'tsPane':
     default:
       return config;
     }
@@ -434,13 +434,13 @@ export class ChartService {
   splinifyChartType(type) {
     /* prettier-ignore */
     switch (type) {
-    case 'line':
-      return 'spline';
     case 'area':
-      return 'areaspline';
-    case 'tsline':
-      return 'spline';
     case 'tsareaspline':
+      return 'areaspline';
+    case 'line':
+    case 'tsspline':
+    case 'tsline':
+    case 'tsPane':
       return 'spline';
     default:
       return type;
@@ -502,7 +502,7 @@ export class ChartService {
       type: splinifiedChartType,
       dataType: type,
       yAxis:
-        chartType === 'tsareaspline' || chartTypeOverride === 'tsareaspline'
+        chartType === 'tsPane' || chartTypeOverride === 'tsPane'
           ? index
           : comboGroups[comboType],
       zIndex,
@@ -560,8 +560,8 @@ export class ChartService {
       aggrsymbol = '%';
     }
     if (!isUndefined(comboType)) {
-      if (comboType === 'tsline' || comboType === 'tsareaspline') {
-        comboType = comboType === 'tsareaspline' ? 'spline' : comboType.slice(2);
+      if (comboType === 'tsspline' || comboType === 'tsPane') {
+        comboType = comboType === 'tsPane' ? 'spline' : comboType.slice(2);
       }
     }
 
@@ -796,7 +796,7 @@ export class ChartService {
   getYAxesChanges(type, fields, opts) {
     const panes = fields.length;
     const labelHeight = 15;
-    if (type !== 'tsareaspline') {
+    if (type !== 'tsPane') {
       const changes = fpPipe(
         fpGroupBy('comboType'),
         fpToPairs,
@@ -981,8 +981,8 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'bubble':
-    case 'tsline':
-    case 'tsareaspline':
+    case 'tsspline':
+    case 'tsPane':
     default:
       changes = this.getBarChangeConfig(
         type,
@@ -1203,8 +1203,8 @@ export class ChartService {
         groupBy
       };
       break;
-    case 'tsline':
-    case 'tsareaspline':
+    case 'tsspline':
+    case 'tsPane':
       xaxis = this.filterDateTypes(attributes);
       settingsObj = {
         xaxis,

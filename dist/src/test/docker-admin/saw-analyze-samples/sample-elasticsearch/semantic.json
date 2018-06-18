@@ -64,8 +64,32 @@
                 "label": "Bubble Chart",
                 "icon": "icon-vert-bar-chart",
                 "type": "chart:bubble"
+              },
+              {
+                "label": "Time Series Chart",
+                "icon": "icon-timeseries-chart",
+                "type": "chart:tsline"
+              },
+              {
+                "label": "Time series multi pane",
+                "icon": "icon-Candlestick-icon",
+                "type": "chart:tsareaspline"
+              },
+              {
+                "label": "Area Chart",
+                "icon": "icon-area-chart",
+                "type": "chart:area"
+              },
+              {
+                "label": "Combo Chart",
+                "icon": "icon-combo-chart",
+                "type": "chart:combo"
+              },
+              {
+                "label": "Pie Chart",
+                "icon": "icon-pie-chart",
+                "type": "chart:pie"
               }
-
             ]
           }
         ],
