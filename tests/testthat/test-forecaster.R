@@ -11,12 +11,20 @@ library(sparklyr)
 
 context("forecaster unit tests")
 
-
+# Create simulated dataset
 n <- 200
 dat1 <- data.frame(index = 1:n,
                    y = as.numeric(arima.sim(n = n,
                                             list(order = c(1,0,0), ar = 0.7),
                                             rand.gen = function(n, ...) rt(n, df = 2))))
+
+# Create Spark Connection
+spark_home_dir <- sparklyr::spark_installed_versions() %>%
+  as.data.frame() %>%
+  dplyr::filter(spark == "2.3.0") %>%
+  dplyr::pull(dir)
+
+sc <- spark_connect(master = "local", spark_home = spark_home_dir)
 
 
 test_that("No holdout sampling test case", {
@@ -105,8 +113,7 @@ test_that("Multiple Model with Test Holdout test case", {
                    name = "test") %>%
     add_holdout_samples(splits = c(.6, .2, .2)) %>%
     add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima",
-              class = "forecast_model") %>%
+              method = "auto.arima") %>%
     add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
               method = "ets") %>%
     train_models(.) %>%
@@ -320,9 +327,6 @@ test_that("Spark Forecaster test case", {
 
   dat3 <- rbind(dat1 %>% mutate(group = "A"),
                 dat1 %>% mutate(group = "B"))
-
-  # Create Spark Connection and read in some data
-  sc <- spark_connect(master = "local")
 
   # Load data into Spark
   dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)

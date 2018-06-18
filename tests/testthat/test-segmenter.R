@@ -10,8 +10,14 @@ library(sparklyr)
 
 context("segmenter unit tests")
 
-spark_home_set(path = "C:\\Users\\chaa0001\\AppData\\Local\\spark\\spark-2.3.0-bin-hadoop2.7")
-sc <- spark_connect(master = "local")
+# Create Spark Connection
+spark_home_dir <- sparklyr::spark_installed_versions() %>%
+  as.data.frame() %>%
+  dplyr::filter(spark == "2.3.0") %>%
+  dplyr::pull(dir)
+sc <- spark_connect(master = "local", spark_home =spark_home_dir)
+
+# Copy data to spark
 df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
 
 
@@ -72,7 +78,7 @@ test_that("Segmenter Evaluate Model", {
 
   expect_subset("data.frame", class(s1$evaluate))
   expect_equal(nrow(s1$evaluate), 1)
-  expact_subset("silhouette", colnames(s1$evaluate))
+  expect_subset("silhouette", colnames(s1$evaluate))
 })
 
 
@@ -94,7 +100,8 @@ test_that("Segmenter Selects Best Model", {
   expect_equal(
     s1$evaluate %>%
       top_n(1, silhouette) %>%
-      pull(model),
+      pull(model) %>%
+      head(1),
     s1$final_model$id
   )
 })
