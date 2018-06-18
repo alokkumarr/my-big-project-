@@ -195,15 +195,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
         });
       } else {
         builder.forEach(item -> {
-          if(item.getType().value().equals(Type.STRING.value()))
-          {
-            // regardless of ALL or ANY, as per inputs given
-            // we should have MUST for string filters.
-            boolQueryBuilder.must(item);
-          }
-          else {
-            boolQueryBuilder.should(item);
-          }
+          boolQueryBuilder.should(item);
         });
       }
       searchSourceBuilder.query(boolQueryBuilder);
