@@ -434,12 +434,12 @@ export class ChartService {
   splinifyChartType(type) {
     /* prettier-ignore */
     switch (type) {
-    case 'line':
-      return 'spline';
     case 'area':
+    case 'tsareaspline':
       return 'areaspline';
+    case 'line':
     case 'tsspline':
-      return 'spline';
+    case 'tsline':
     case 'tsPane':
       return 'spline';
     default:
