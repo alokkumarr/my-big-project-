@@ -1,5 +1,8 @@
 #
-# Testing container image for SIP Proxy node.
+# SIP testing image image for proxy node.
+#
+# The proxy node runs HAProxy, Squid (forward proxy) and nginx (static
+# files for development).
 #
 
 # Start from SIP base image
