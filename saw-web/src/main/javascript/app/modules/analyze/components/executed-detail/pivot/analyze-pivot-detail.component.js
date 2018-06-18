@@ -4,6 +4,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import * as template from './analyze-pivot-detail.component.html';
 
+let self;
 export const AnalyzePivotDetailComponent = {
   template,
   bindings: {
@@ -11,13 +12,15 @@ export const AnalyzePivotDetailComponent = {
     requester: '<'
   },
   controller: class AnalyzePivotDetailController {
-    constructor(FilterService, PivotService) {
+    constructor(FilterService, PivotService, $timeout) {
       'ngInject';
       this._isEmpty = isEmpty;
       this._PivotService = PivotService;
       this._FilterService = FilterService;
       this.pivotGridUpdater = new BehaviorSubject({});
       this.dataSource = {};
+      this._$timeout = $timeout;
+      self = this;
     }
 
     $onInit() {
@@ -32,7 +35,9 @@ export const AnalyzePivotDetailComponent = {
         return;
       }
 
-      this.data = this._PivotService.parseData(data, this.analysis.sqlBuilder);
+      this._$timeout(() => {
+        self.data = this._PivotService.parseData(data, this.analysis.sqlBuilder);
+      });
       /* eslint-disable no-unused-expressions */
     }
 
