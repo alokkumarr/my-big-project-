@@ -81,7 +81,6 @@ export interface IToolbarActionData {
   booleanCriteria?: string;
   description?: string;
   analysis?: Analysis;
-  supportsGlobalFilters?: boolean;
 }
 
 export interface IToolbarActionResult {

@@ -15,6 +15,10 @@ import {
 } from '../types';
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
+import {
+  DesignerFilterDialogComponent,
+  DesignerFilterDialogData
+} from '../components/designer/filter';
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
@@ -66,20 +70,29 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterDialog(
-    filters: Filter[],
-    artifacts: Artifact[],
-    booleanCriteria,
-    supportsGlobalFilters = false
-  ) {
-    const data: IToolbarActionData = {
-      action: 'filter',
+  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria, supportsGlobalFilters = false) {
+    const data: DesignerFilterDialogData = {
       filters,
       artifacts,
       booleanCriteria,
-      supportsGlobalFilters
-    };
-    return this.dialog.open(ToolbarActionDialogComponent, {
+      supportsGlobalFilters,
+      isInRuntimeMode: false
+    }
+    return this.dialog.open(DesignerFilterDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data
+    } as MatDialogConfig);
+  }
+
+  openFilterPromptDialog(filters, analysis) {
+    const data: DesignerFilterDialogData = {
+      filters,
+      artifacts: analysis.artifacts,
+      isInRuntimeMode: true
+    }
+    return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
       height: 'auto',
       autoFocus: false,
