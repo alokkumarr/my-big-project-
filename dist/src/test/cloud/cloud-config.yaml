@@ -34,6 +34,10 @@ write_files:
     content: |
       #!/bin/bash
       set -eu
+      if [[ "$(hostname)" == sip-auto* ]]; then
+          echo "Skipping name registration for continuous integration"
+          exit 0
+      fi
       hosted_zone_id="/hostedzone/ZAO306VHTKPTB"
       public_ip=$(curl -sS http://169.254.169.254/latest/meta-data/public-ipv4)
       changes=$(cat <<EOF
