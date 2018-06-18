@@ -63,18 +63,10 @@ analyze-card {
       background-image: url('~img/charts/chart-stack.png');
     }
 
-    &.m-chart-tsline {
-      background-image: url('~img/charts/timeseries-chart.png');
-    }
-    // added for backwards compatibility, tssline was changed to tsline
     &.m-chart-tsspline {
       background-image: url('~img/charts/timeseries-chart.png');
     }
 
-    &.m-chart-tsareaspline {
-      background-image: url('~img/charts/timeseries-multi-chart.png');
-    }
-    // added for backwards compatibility, tsPane was changed to tsareaspline
     &.m-chart-tsPane {
       background-image: url('~img/charts/timeseries-multi-chart.png');
     }
