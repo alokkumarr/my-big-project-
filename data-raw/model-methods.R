@@ -53,7 +53,7 @@ segment_methods <- data.frame(
     "ml_kmeans",
     "ml_bisecting_kmeans",
     "ml_lda",
-    " ml_gaussian_mixture"
+    "ml_gaussian_mixture"
   ),
   name = c(
     "Spark ML K-Means",

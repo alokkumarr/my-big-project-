@@ -18,9 +18,8 @@ new_model <- function(pipe,
                       performance) {
   checkmate::assert_class(pipe, "pipeline")
   checkmate::assert_character(target, null.ok = TRUE)
-  checkmate::assert_list(method_args)
-  checkmate::assert_function(match.fun(method), args = names(method_args))
   checkmate::assert_choice(method, choices = model_methods$method)
+  checkmate::assert_list(method_args)
   checkmate::assert_character(desc)
   checkmate::assert_path_for_output(path, overwrite = FALSE)
   checkmate::assert_character(id)
@@ -31,6 +30,13 @@ new_model <- function(pipe,
   checkmate::assert_list(performance, null.ok = TRUE)
 
   .method <- method
+  method_fun <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package) %>%
+    asNamespace() %>%
+    get(method, .)
+  checkmate::assert_function(method_fun, args = names(method_args))
+
   method_class <- model_methods %>%
     dplyr::filter(method == .method) %>%
     tidyr::unnest(class) %>%

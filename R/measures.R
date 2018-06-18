@@ -231,9 +231,8 @@ silhouette <- function(...){
 
 #' @export
 #' @rdname silhouette
-silhouette.tbl_spark <- function(x, predicted) {
+silhouette.tbl_spark <- function(x, predicted = "predicted") {
   checkmate::assert_choice(predicted, colnames(x))
 
-  sparklyr::ml_clustering_evaluator(x, prediction_col = predicted) %>%
-    dplyr::collect()
+  sparklyr::ml_clustering_evaluator(x, prediction_col = predicted)
 }

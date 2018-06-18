@@ -81,7 +81,18 @@ execute <- function(x, pipe){
 
 #' @rdname execute
 #' @export
-execute.tbl_spark <- execute.data.frame <- function(x, pipe){
+execute.data.frame <- function(x, pipe){
+  checkmate::assert_class(pipe, "pipeline")
+  a1 <- Sys.time()
+  pipe$output <- pipe$expr(x)
+  a2 <- Sys.time()
+  pipe$runtime <- as.numeric(a2 - a1)
+  pipe
+}
+
+#' @rdname execute
+#' @export
+execute.tbl_spark <-  function(x, pipe){
   checkmate::assert_class(pipe, "pipeline")
   a1 <- Sys.time()
   pipe$output <- pipe$expr(x)

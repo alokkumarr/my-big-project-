@@ -4,6 +4,7 @@ Version: 0.0.0.9000
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: Statistical model building and predicting framework for forecasting, regression, classification and clustering use cases.
 Depends: R (>= 3.4.1)
+SystemRequirements: Spark (>= 2.3.0)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true

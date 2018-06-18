@@ -248,9 +248,9 @@ get_best_model <- function(obj) {
     dplyr::group_by(model) %>%
     dplyr::summarise_at(obj$measure$method, mean) %>%
     dplyr::arrange_at(obj$measure$method,
-                      .funs = ifelse(obj$measure$minimize, identity, desc)) %>%
+                      .funs = ifelse(obj$measure$minimize, identity, dplyr::desc)) %>%
     head(1) %>%
-    .$model
+    pull(model)
   get_models(obj, ids = id)[[1]]
 }
 
