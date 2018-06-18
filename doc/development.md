@@ -241,6 +241,30 @@ environment using the related [Bamboo deployment project].
 [Bamboo build plan]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
 [Bamboo deployment project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/deployments
 
+## Setting up an environment for automatic deployment
+
+To set up a environment for automatic deployment as part of continuous
+integration:
+
+1. Provision the environment according to the requirements in the
+   "Installing and Configuring" section of the [SIP Operations Guide]
+   
+2. Create a `sip` user on nodes of the environment, to be used for
+   executing the deployment.  Add `sip ALL=(ALL) NOPASSWD:ALL` to
+   `/etc/sudoers.d/sip`, to ensure the deployment has needed
+   privileges.
+
+3. Go to the [Bamboo deployment project], add the new environment (use
+   an existing environment as a template by cloning it) and update the
+   password of the `sip` user in required places
+
+4. Update the SIP environment configuration (embedded in the shell
+   script of the last task), to ensure parameters have values that
+   correspond to the new environment, for example hostnames matching
+   the environment
+
+[SIP Operations Guide]: ../dist/src/main/asciidoc/sip-operations/index.adoc
+
 # Making a release
 
 To make a release of the project, execute the following steps:
