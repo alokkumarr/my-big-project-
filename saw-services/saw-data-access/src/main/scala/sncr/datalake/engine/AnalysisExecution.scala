@@ -65,15 +65,11 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
         }
         case ExecutionType.onetime => {
           analysisNodeExecution.executeSQLWithLimit(limit)
-          // TODO:: Reverting will be handled as part of SIP-2513
-        //  analysisNodeExecution.createAnalysisResultForOneTime(id)
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.preview => {
           analysisNodeExecution.executeSQLWithLimit(DLConfiguration.rowLimit)
-          // TODO:: Reverting will be handled as part of SIP-2513
-         // analysisNodeExecution.createAnalysisResultForOneTime(id)
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
           analysisNodeExecution.executeSQLNoDataLoad()

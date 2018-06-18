@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import * as get from 'lodash/get';
 import * as moment from 'moment';
 
@@ -7,20 +14,22 @@ import { Subscription } from 'rxjs/Subscription';
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
-import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../../analyze/consts';
+import {
+  CUSTOM_DATE_PRESET_VALUE,
+  DATE_PRESETS
+} from '../../../../analyze/consts';
 const template = require('./date-filter.component.html');
 
 @Component({
   selector: 'g-date-filter',
   template
 })
-
 export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   private _filter;
   private model: any = {};
-  private filterCache: {gte?, lte?, preset?};
+  private filterCache: { gte?; lte?; preset? };
   private presets = DATE_PRESETS; // tslint:disable-line
-  private defaults: {min, max};
+  private defaults: { min; max };
   private showDateFields: boolean; // tslint:disable-line
   private clearFiltersListener: Subscription;
   private applyFiltersListener: Subscription;
@@ -31,7 +40,7 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   constructor(
     private observe: ObserveService,
     private filters: GlobalFilterService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.clearFiltersListener = this.filters.onClearAllFilters.subscribe(() => {
@@ -43,11 +52,13 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       this.cacheFilters();
     });
 
-    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(state => {
-      if (!state) {
-        this.loadDefaults(true); // load cached filter data since last apply
+    this.closeFiltersListener = this.filters.onSidenavStateChange.subscribe(
+      state => {
+        if (!state) {
+          this.loadDefaults(true); // load cached filter data since last apply
+        }
       }
-    });
+    );
   }
 
   ngOnDestroy() {
@@ -56,15 +67,22 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
     this.closeFiltersListener.unsubscribe();
   }
 
-  @Input() set filter(data) {
+  @Input()
+  set filter(data) {
     this._filter = data;
 
-    this.model.preset = this._filter.preset || CUSTOM_DATE_PRESET_VALUE;
+    this.model.preset =
+      get(this._filter, 'model.preset') || CUSTOM_DATE_PRESET_VALUE;
     this.model.gte = moment(get(this._filter, 'model.gte'));
     this.model.lte = moment(get(this._filter, 'model.lte'));
+    if (data.model) {
+      this.cacheFilters();
+      this.loadDateRange(true);
+    } else {
+      this.loadDateRange(false);
+    }
 
-    this.onPresetChange({value: this.model.preset});
-    this.loadDateRange();
+    this.onPresetChange({ value: this.model.preset });
   }
 
   /**
@@ -86,16 +104,18 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
    *
    * @memberof GlobalDateFilterComponent
    */
-  loadDateRange() {
-    this.observe.getModelValues(this._filter).subscribe((data: {_min: string, _max: string}) => {
-      this.defaults = {
-        min: moment(parseInt(data._min)),
-        max: moment(parseInt(data._max))
-      };
+  loadDateRange(useCache: boolean = false) {
+    this.observe
+      .getModelValues(this._filter)
+      .subscribe((data: { _min: string; _max: string }) => {
+        this.defaults = {
+          min: moment(parseInt(data._min)),
+          max: moment(parseInt(data._max))
+        };
 
-      this.loadDefaults();
-      this.cacheFilters();
-    });
+        this.loadDefaults(useCache);
+        this.cacheFilters();
+      });
   }
 
   /**
@@ -111,13 +131,16 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const loadData = fromCache ? this.filterCache : {
-      preset: CUSTOM_DATE_PRESET_VALUE,
-      gte: this.defaults.min,
-      lte: this.defaults.max
-    };
+    /* prettier-ignore */
+    const loadData = fromCache
+      ? this.filterCache
+      : {
+        preset: CUSTOM_DATE_PRESET_VALUE,
+        gte: this.defaults.min,
+        lte: this.defaults.max
+      };
 
-    this.onPresetChange({value: loadData.preset});
+    this.onPresetChange({ value: loadData.preset });
     this.onDateChange('gte', {
       value: loadData.gte
     });
@@ -145,11 +168,10 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
    * @memberof GlobalDateFilterComponent
    */
   isValid(filt): boolean {
-    return filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
-      (
-        filt.model.lte &&
-        filt.model.gte
-      );
+    return (
+      filt.model.preset !== CUSTOM_DATE_PRESET_VALUE ||
+      (filt.model.lte && filt.model.gte)
+    );
   }
 
   /**
@@ -176,6 +198,6 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       delete payload.model.gte;
     }
 
-    this.onModelChange.emit({data: payload, valid: this.isValid(payload)});
+    this.onModelChange.emit({ data: payload, valid: this.isValid(payload) });
   }
 }
