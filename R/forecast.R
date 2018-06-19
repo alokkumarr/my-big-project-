@@ -1,58 +1,11 @@
 
-
-#
-# # Forecast methods currently supported
-# forecast_methods <- c(
-#   "Arima" = "Arima",
-#   "Fractionally Differenced Arima"= "arfima",
-#   "Auto Arima" = "auto.arima",
-#   "Auto Fourier" = "auto_fourier",
-#   "ETS with boxcox, ARIMA errors, Trend and Seasonal" = "bats",
-#   "Exponentially Smoothing State Space"  = "ets",
-#   "Neural Network Time Series" = "nnetar",
-#   "BATS with Trigonometric Seasonal" = "tbats"
-# )
-
-# Forecast methods currently supported
-forecast_methods <- data.frame(
-  method =  c(
-    "Arima",
-    "arfima",
-    "auto.arima",
-    "auto_fourier",
-    "bats",
-    "ets",
-    "nnetar",
-    "tbats"
-  ),
-  name = c(
-    "Arima",
-    "Fractionally Differenced Arima",
-    "Auto Arima",
-    "Auto Fourier",
-    "ETS with boxcox, ARIMA errors, Trend and Seasonal",
-    "Exponentially Smoothing State Space",
-    "Neural Network Time Series",
-    "BATS with Trigonometric Seasonal"
-  ),
-  package = c(
-    "forecast",
-    "forecast",
-    "forecast",
-    "a2modeler",
-    "forecast",
-    "forecast",
-    "forecast",
-    "forecast"
-  )
-)
+# Forecast Model Class Methods --------------------------------------------
 
 
 #' @rdname fit
 #' @export
 fit.forecast_model <- function(obj, data, ...) {
   checkmate::assert_data_frame(data)
-  checkmate::assert_choice(obj$method, as.character(forecast_methods$method))
 
   y <- as.numeric(data[[obj$target]])
   x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
@@ -63,8 +16,7 @@ fit.forecast_model <- function(obj, data, ...) {
   }
 
   args <- modifyList(obj$method_args, list(y = y, xreg = xreg))
-  pkg <- as.character(dplyr::filter(forecast_methods, method == obj$method)$package)
-  fun <- get(obj$method, asNamespace(pkg))
+  fun <- get(obj$method, asNamespace(obj$package))
   m <- do.call(fun, args)
   obj$fit <- m
   obj$last_updated <- Sys.time()

@@ -22,7 +22,7 @@ new_modeler <- function(df,
                         ...){
 
 
-  checkmate::assert_character(target)
+  checkmate::assert_character(target, null.ok = TRUE)
   checkmate::assert_character(type)
   checkmate::assert_character(name)
   checkmate::assert_character(id)
@@ -217,9 +217,12 @@ get_target <- function(obj) {
 #' @export
 get_evalutions <- function(obj) {
   checkmate::assert_class(obj, "modeler")
-  mdls <- suppressWarnings(bind_rows(lapply(obj$models, function(m)
-    data.frame(method = as.character(m$method))),
-    .id = "model"))
+  # mdls <- suppressWarnings(bind_rows(lapply(obj$models, function(m)
+  #   data.frame(method = as.character(m$method))),
+  #   .id = "model"))
+  mdls <-
+    suppressWarnings(purrr::map_dfr(obj$models, function(x)
+      data.frame(method = x$method), .id = "model"))
 
   if (nrow(obj$evaluate) == 0) {
     obj$evaluate
@@ -245,9 +248,9 @@ get_best_model <- function(obj) {
     dplyr::group_by(model) %>%
     dplyr::summarise_at(obj$measure$method, mean) %>%
     dplyr::arrange_at(obj$measure$method,
-                      .funs = ifelse(obj$measure$minimize, identity, desc)) %>%
+                      .funs = ifelse(obj$measure$minimize, identity, dplyr::desc)) %>%
     head(1) %>%
-    .$model
+    pull(model)
   get_models(obj, ids = id)[[1]]
 }
 
@@ -365,7 +368,7 @@ print.modeler <- summary.modeler <- function(obj) {
   cat("\nmeasure ----------------------------", "\n\n")
   cat("measure name:", obj$measure$name, "\n")
   cat("\nmodels ----------------------------", "\n\n")
-  print(get_models_status(f1))
+  print(get_models_status(obj))
   cat("\nevaluation ----------------------------", "\n\n")
   print(get_evalutions(obj))
   cat("\nfinal model ----------------------------", "\n")

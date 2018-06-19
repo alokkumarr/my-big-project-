@@ -105,7 +105,6 @@ evaluate_models.forecaster <- function(obj, ids = NULL) {
 }
 
 
-
 #' @rdname set_final_model
 #' @export
 set_final_model.forecaster <- function(obj,
@@ -246,8 +245,7 @@ auto_forecaster <- function(df,
                  name = "auto-forecaster") %>%
     add_holdout_samples(., splits = splits) %>%
     add_models(pipe = if(is.null(pipe)) pipeline() else pipe,
-               models = models,
-               class = "forecast_model") %>%
+               models = models) %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE) %>%
@@ -313,7 +311,7 @@ forecaster.data.frame <- function(df,
                       target = "y",
                       index_var = index_var,
                       periods  = periods,
-                      unit = NULL,
+                      unit = unit,
                       pipe = pipe,
                       models = models,
                       splits = splits,
@@ -392,8 +390,7 @@ forecaster.tbl_spark <- function(df,
                               add_holdout_samples(., splits = l$splits) %>%
                               add_models(.,
                                          pipe = l$pipe,
-                                         models = l$models,
-                                         class = "forecast_model") %>%
+                                         models = l$models) %>%
                               train_models(.) %>%
                               evaluate_models(.) %>%
                               set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)

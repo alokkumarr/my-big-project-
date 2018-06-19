@@ -6,7 +6,7 @@ new_predictions <- function(predictions,
                             type,
                             id,
                             desc) {
-  checkmate::assert_subset(class(predictions), c("data.frame", "tbl_spark"))
+  checkmate::assert_true(any(class(predictions) %in% c("data.frame", "tbl_spark")))
   checkmate::assert_class(model, "model")
   checkmate::assert_character(id)
   checkmate::assert_character(desc)

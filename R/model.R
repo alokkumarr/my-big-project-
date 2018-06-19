@@ -9,7 +9,6 @@ new_model <- function(pipe,
                       target,
                       method,
                       method_args,
-                      class,
                       desc,
                       path,
                       id,
@@ -18,10 +17,9 @@ new_model <- function(pipe,
                       fit,
                       performance) {
   checkmate::assert_class(pipe, "pipeline")
-  checkmate::assert_character(target)
+  checkmate::assert_character(target, null.ok = TRUE)
+  checkmate::assert_choice(method, choices = model_methods$method)
   checkmate::assert_list(method_args)
-  checkmate::assert_function(match.fun(method), args = names(method_args))
-  checkmate::assert_choice(class, choices = c("forecast_model", "spark.ml", "h2o"))
   checkmate::assert_character(desc)
   checkmate::assert_path_for_output(path, overwrite = FALSE)
   checkmate::assert_character(id)
@@ -31,6 +29,22 @@ new_model <- function(pipe,
   checkmate::assert_list(fit, null.ok = TRUE)
   checkmate::assert_list(performance, null.ok = TRUE)
 
+  .method <- method
+  method_fun <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package) %>%
+    asNamespace() %>%
+    get(method, .)
+  checkmate::assert_function(method_fun, args = names(method_args))
+
+  method_class <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    tidyr::unnest(class) %>%
+    dplyr::pull(class) %>%
+    as.character()
+  method_package <- model_methods %>%
+    dplyr::filter(method == .method) %>%
+    dplyr::pull(package)
 
   structure(
     list(
@@ -38,6 +52,7 @@ new_model <- function(pipe,
       target = target,
       method = method,
       method_args = method_args,
+      package = method_package,
       desc = desc,
       path = path,
       id = id,
@@ -46,7 +61,7 @@ new_model <- function(pipe,
       fit = fit,
       performance = performance
     ),
-    class = c(class, "model")
+    class = c(method_class, "model")
   )
 }
 
@@ -78,14 +93,12 @@ valid_model <- function(x) {
 #' @param ... additional arguments to pass to model method
 #' @param desc optional model description
 #' @param path optional file path to save model
-#' @param class string of model class. ex - forecaster_model for a forecast model
 #'
 #' @export
 model <- function(pipe,
                   target,
                   method,
                   ...,
-                  class,
                   desc = NULL,
                   path = NULL) {
   id <- sparklyr::random_string("model")
@@ -100,7 +113,6 @@ model <- function(pipe,
       target = target,
       method = method,
       method_args = list(...),
-      class = class,
       desc = desc,
       path = path,
       id = id,
@@ -131,10 +143,15 @@ add_model <-function(obj,
                      pipe = NULL,
                      method,
                      ...,
-                     class,
                      desc = NULL,
                      path = NULL) {
   checkmate::assert_class(obj, "modeler")
+
+  type_methods <- model_methods %>%
+    dplyr::filter(type == obj$type) %>%
+    dplyr::pull(method) %>%
+    as.character()
+  checkmate::assert_choice(method, type_methods)
 
   if(is.null(pipe))
     pipe <- pipeline()
@@ -143,7 +160,6 @@ add_model <-function(obj,
              target = obj$target,
              method = method,
              ...,
-             class = class,
              desc = desc,
              path = path)
   m$status <- "added"
@@ -163,14 +179,12 @@ add_model <-function(obj,
 #' @param obj modeler object
 #' @param pipe pipeline object
 #' @param models list with models method and list of arguments in each element
-#' @param class modeler object class
 #'
 #' @export
 #' @return modeler object with models added
 add_models <- function(obj,
                        pipe = NULL,
-                       models,
-                       class) {
+                       models) {
   checkmate::assert_class(obj, "modeler")
   checkmate::assert_class(models, "list")
 
@@ -183,7 +197,6 @@ add_models <- function(obj,
       list(pipe = pipe,
            target = obj$target,
            method = models[[i]]$method,
-           class = class,
            desc = NULL,
            path = NULL),
       models[[i]]$method_args)
