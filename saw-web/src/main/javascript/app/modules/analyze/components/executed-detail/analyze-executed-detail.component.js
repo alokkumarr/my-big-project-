@@ -333,7 +333,6 @@ export const AnalyzeExecutedDetailComponent = {
         const {isSaveSuccessful, analysis} = result;
         if (isSaveSuccessful) {
           this.analysis = analysis;
-          this.refreshData();
         }
       });
     }

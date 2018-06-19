@@ -6,11 +6,16 @@ analyze-list-view {
     font-weight: bolder;
   }
 
-  .list-action-button {
-    display: inline-flex;
-    min-width: 24px;
-    min-height: 24px;
-    line-height: 24px;
+  .list-action__container {
+    max-height: 24px;
     height: 24px;
+
+    .list-action__button {
+      display: inline-flex;
+      min-width: 24px;
+      min-height: 24px;
+      line-height: 24px;
+      height: 24px;
+    }
   }
 }
