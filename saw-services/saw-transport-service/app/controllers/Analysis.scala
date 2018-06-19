@@ -461,7 +461,7 @@ class Analysis extends BaseController {
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("success")),
             JField("type", JString("pivot")),
-            JField("ExecutionType", JString(executionType)),
+            JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
@@ -478,7 +478,7 @@ class Analysis extends BaseController {
             JField("execution_result", JString("failed")),
             JField("execution_finish_ts", JLong(-1L)),
             JField("type", JString("pivot")),
-            JField("ExecutionType", JString(executionType)),
+            JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
             JField("error_message", JString(errorMsg))
@@ -542,7 +542,7 @@ class Analysis extends BaseController {
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("success")),
             JField("type", JString("esReport")),
-            JField("ExecutionType", JString(executionType)),
+            JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
@@ -559,7 +559,7 @@ class Analysis extends BaseController {
             JField("execution_result", JString("failed")),
             JField("execution_finish_ts", JLong(-1L)),
             JField("type", JString("esReport")),
-            JField("ExecutionType", JString(executionType)),
+            JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
             JField("error_message", JString(errorMsg))
@@ -618,7 +618,7 @@ class Analysis extends BaseController {
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("type", JString("chart")),
-            JField("ExecutionType", JString(executionType)),
+            JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
             JField("exec-code", JInt(0)),
             JField("execution_start_ts", JString(timestamp))
@@ -634,7 +634,7 @@ class Analysis extends BaseController {
             JField("execution_result", JString("failed")),
             JField("execution_finish_ts", JLong(-1L)),
             JField("type", JString("chart")),
-            JField("ExecutionType", JString(executionType)),
+            JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
             JField("error_message", JString(errorMsg))

@@ -27,7 +27,7 @@ class AnalysisExecutions extends BaseController {
         }
         val id = Bytes.toString(result.getRowKey)
         (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String],
-          (content \ "ExecutionType").extractOpt[String] )
+          (content \ "executionType").extractOpt[String])
       }).sortBy(result =>result._2).reverse
       var count = 0
       val execHistory = SAWServiceConfig.executionHistory
@@ -41,7 +41,7 @@ class AnalysisExecutions extends BaseController {
           false }
       }).map(result => {
         var executionType = ""
-        if(result._4.get.equalsIgnoreCase(
+        if(result._4!= None && result._4.get.equalsIgnoreCase(
           ExecutionType.scheduled.toString))
           executionType ="Scheduled"
         else
@@ -50,8 +50,6 @@ class AnalysisExecutions extends BaseController {
           ("finished", result._2) ~
           ("status", result._3)  ~
           ("executionType",executionType)
-
-
       })
 
       /* Note: Keep "results" property for API backwards compatibility */
