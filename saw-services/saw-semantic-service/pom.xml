@@ -24,7 +24,7 @@
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
 		<metadata.api>${revision}</metadata.api>
-		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+		<mapr.db.version>6.0.1-mapr</mapr.db.version>
 	</properties>
 
 	<dependencies>
