@@ -97,6 +97,7 @@ export class DesignerFilterRowComponent {
     if (checked) {
       delete filter.model;
     }
+    this.filterModelChange.emit();
   }
 
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {
