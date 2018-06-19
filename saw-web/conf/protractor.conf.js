@@ -67,6 +67,7 @@ const protractorPath = 'target/protractor-reports';
  * Amount of attempts to retry doing action on element
  */
 const tempts = 10;
+let token;
 
 exports.timeouts = {
   fluentWait: fluentWait,
@@ -145,7 +146,8 @@ exports.config = {
     charts: [
       webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'), // TCs linked
+      webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js') // TCs linked
     ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
@@ -163,7 +165,7 @@ exports.config = {
   onPrepare() {
     retry.onPrepare();
     // Gerenate test data
-    let token = generate.token(browser.baseUrl);
+    token = generate.token(browser.baseUrl);
     //console.log("aToken: " + token);
     generate.usersRolesPrivilegesCategories(token);
 
@@ -192,7 +194,6 @@ exports.config = {
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
-
     return browser.driver.wait(() => {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);

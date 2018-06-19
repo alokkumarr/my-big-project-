@@ -20,6 +20,8 @@ module.exports = {
      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
      },elementToBeNotVisible: element =>{
       browser.wait(EC.not(EC.presenceOf(element)), fluentWait, "Element \"" + element.locator() + "\" is present");
+    },textToBePresent:(element, value)=>{
+      browser.wait(EC.textToBePresentInElement(element, value), fluentWait);
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
