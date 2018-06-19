@@ -1159,7 +1159,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public String getUserEmailId(String userId) {
 		String message = null;
-		String sql = "select u.email from USERS u where u.user_id=?";
+		String sql = "select u.email from USERS u where u.user_id=? and u.ACTIVE_STATUS_IND = '1'";
 
 		try {
 			// return email from database
