@@ -49,6 +49,6 @@ export class PasswordResetComponent {
   }
 
   login() {
-    window.location.assign('./login');
+    window.location.assign('./');
   }
 }
