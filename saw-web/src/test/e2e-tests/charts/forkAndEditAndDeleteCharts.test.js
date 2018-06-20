@@ -17,7 +17,7 @@ let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
 let ApiUtils = require('../../javascript/api/APiUtils');
 const globalVariables = require('../../javascript/helpers/globalVariables');
 
-describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
+describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
@@ -78,7 +78,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   });
 
   using(dataProvider, function (data, description) {
-    it('should edit and delete ' + description, () => {
+    it('should fork, edit and delete ' + description, () => {
         let currentTime = new Date().getTime();
         let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
@@ -103,15 +103,14 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
         createdAnalysis.click();
         
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
-        savedAlaysisPage.editBtn.click();
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.forkBtn);
+        savedAlaysisPage.forkBtn.click();
         
         const designer = analyzePage.designerDialog;
-        commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
             for (var i = 0; i < deleteElements.length; ++i) {
+                commonFunctions.waitFor.elementToBeClickable(deleteElements[i]);
                 deleteElements[i].click();
             }
         });
@@ -142,11 +141,11 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         const save = analyzePage.saveDialog;
         commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
         designer.saveBtn.click();
-        let updatedName = name +' updated';
-        let updatedDescription = description + 'updated';
+        let forkedName = name +' forked';
+        let forkedDescription = description + 'forked';
         commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
-        save.nameInput.clear().sendKeys(updatedName);
-        save.descriptionInput.clear().sendKeys(updatedDescription);
+        save.nameInput.clear().sendKeys(forkedName);
+        save.descriptionInput.clear().sendKeys(forkedDescription);
         commonFunctions.waitFor.elementToBeClickable(save.selectedCategoryUpdated);
         save.selectedCategoryUpdated.click();
         commonFunctions.waitFor.elementToBeClickable(save.selectCategoryToSave(subCategoryName));
@@ -154,11 +153,27 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
         save.saveBtn.click();
 
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.forkBtn);
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
+        savedAlaysisPage.backButton.click();
+        //Verify chart type on home page
+        analyzePage.main.getCardTypeByName(forkedName).then(actualChartType =>
+        expect(actualChartType).toEqual(data.chartType,
+          "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
+        
+          const forkedAnalysis = analyzePage.main.getCardTitle(forkedName);
+        //Change to Card View
+        commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+        analyzePage.analysisElems.cardView.click();
+        //Verify if created appeared in list
+        commonFunctions.waitFor.elementToBeVisible(forkedAnalysis);
+        commonFunctions.waitFor.elementToBeClickable(forkedAnalysis);
+        forkedAnalysis.click();
+
         //Verify updated details.
-        commonFunctions.waitFor.textToBePresent(savedAlaysisPage.analysisViewPageElements.title, updatedName);
-        expect(savedAlaysisPage.analysisViewPageElements.title.getText()).toBe(updatedName);
-        expect(savedAlaysisPage.analysisViewPageElements.description.getText()).toBe(updatedDescription);
+        expect(savedAlaysisPage.analysisViewPageElements.title.getText()).toBe(forkedName);
+        expect(savedAlaysisPage.analysisViewPageElements.description.getText()).toBe(forkedDescription);
         
         //Delete created chart
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);

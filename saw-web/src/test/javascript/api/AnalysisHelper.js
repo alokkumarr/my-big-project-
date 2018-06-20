@@ -23,9 +23,9 @@ let RequestModel = require('./RequestModel');
 class AnalysisHelper {
 
     
-    createChart(url, token,name, description) {
+    createChart(url, token,name, description, type) {
         let semanticId = this.getSemanticId(url,dataSets.pivotChart, token); // Get semanticId (dataset ID)
-        return this.generateChart(url,semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token,name, description);
+        return this.generateChart(url,semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token,name, description, type);
     }
     //TODO:
     delete(params) {
@@ -86,7 +86,7 @@ class AnalysisHelper {
         return returnValue;
       }
     
-    generateChart(url,semanticId, dataSetName, user, subCategory, token, name, description) {
+    generateChart(url,semanticId, dataSetName, user, subCategory, token, name, description, type) {
         // Create chart
         const createPayload = {
           'contents': {
@@ -100,15 +100,14 @@ class AnalysisHelper {
         };
         // Get chart ID
         const chartID = apiCall.post(url + 'services/analysis', createPayload, token).contents.analyze[0].id;
-        //customerCode, chartID, action, dataSetName, semanticId, userId, loginId, e2eId, subCategoryId) {
+        //Update charts with fields
         let currentTimeStamp = new Date().getTime();
         const updatePayload = new RequestModel().getPayload(customerCode,chartID,'update',
-                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp);
+                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, type);
         apiCall.post(url + 'services/analysis', updatePayload, token);
-
+        //Execute the analysis
         const executePayload = new RequestModel().getPayload(customerCode,chartID,'execute',
-                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp);
-        apiCall.post(url + 'services/analysis', updatePayload, token);
+                                        dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, type);
         return apiCall.post(url + 'services/analysis', executePayload, token);
     }
 
