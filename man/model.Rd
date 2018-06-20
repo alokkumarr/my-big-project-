@@ -4,7 +4,7 @@
 \alias{model}
 \title{Model Class Helper}
 \usage{
-model(pipe, target, method, ..., class, desc = NULL, path = NULL)
+model(pipe, target, method, ..., desc = NULL, path = NULL)
 }
 \arguments{
 \item{pipe}{pipeline object. default is empty pipeline which applies no
@@ -13,8 +13,6 @@ data transformations}
 \item{method}{string input of model method}
 
 \item{...}{additional arguments to pass to model method}
-
-\item{class}{string of model class. ex - forecaster_model for a forecast model}
 
 \item{desc}{optional model description}
 

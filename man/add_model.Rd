@@ -4,7 +4,7 @@
 \alias{add_model}
 \title{Add Model to Modeler Object function}
 \usage{
-add_model(obj, pipe = NULL, method, ..., class, desc = NULL, path = NULL)
+add_model(obj, pipe = NULL, method, ..., desc = NULL, path = NULL)
 }
 \arguments{
 \item{obj}{modeler object}
@@ -15,8 +15,6 @@ data transformations}
 \item{method}{string input of model method}
 
 \item{...}{additional arguments to pass to model method}
-
-\item{class}{string of model class. ex - forecaster_model for a forecast model}
 
 \item{desc}{optional model description}
 
