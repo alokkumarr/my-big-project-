@@ -172,8 +172,7 @@ public class UserRepositoryImpl implements UserRepository {
 		// change the pass
 		// update pass history
 		String encNewPass = Ccode.cencode(newPass).trim();
-		String sql = "SELECT U.USER_SYS_ID FROM USERS U, CONTACT_INFO C, USER_CONTACT UC WHERE  U.USER_SYS_ID = UC.USER_SYS_ID "
-				+ "AND UC.CONTACT_INFO_SYS_ID=C.CONTACT_INFO_SYS_ID AND U.USER_ID = ?";
+		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
