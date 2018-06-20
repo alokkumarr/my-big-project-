@@ -1,0 +1,39 @@
+{
+  "parser": {
+    "fields": [
+      { "name": "ID", "type": "integer"},
+      { "name": "Field1", "type": "string"},
+      { "name": "F_date", "type": "date"},
+      { "name": "Formatted_date", "type": "date", "format": "yyyy-MM-dd'T'HH:mm:ss"},
+      { "name": "Comment", "type": "string" }
+    ],
+    "file" : "hdfs:///data/bda/tc102-B180223T113033.748/raw/tc102-data.dat",
+    "lineSeparator": "\n",
+    "delimiter": "|",
+    "quoteChar": "\"",
+    "quoteEscape": "\\",
+    "headerSize": 0
+  },
+  "outputs" : [
+    {"name":"OutputDataset1",
+      "dataSet" : "PARSE_OUT",
+      "catalog": "dout",
+      "format": "json",
+      "metadata": {
+        "createdBy": "Aksu",
+        "description": "parser component test",
+        "tags": ["XDF", "NG", "Metadata"]
+      }
+    }
+  ],
+  "parameters" : [
+    {"name": "spark.master","value": "yarn"},
+    {"name": "spark.driver.memory","value": "1g"},
+    {"name": "spark.cores.max","value": "1"},
+    {"name": "spark.executor.memory","value": "1g"},
+    {"name": "spark.executor.cores","value": "1"},
+    {"name": "spark.executor.instances","value": "1"},
+    {"name": "spark.yarn.tags", "value": "XNG-TC"}
+
+  ]
+}
