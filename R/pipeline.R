@@ -52,7 +52,9 @@ print.pipeline <- function(pipe) {
   cat("Expression:\n")
   print(pipe$expr)
   cat("\nCreated at:", as.character(pipe$created_on), "\n")
-  cat("Runtime:", round(pipe$runtime, 2), "seconds\n\n")
+  cat("Runtime:", ifelse(is.null(pipe$runtime),
+                         "not executed yet\n",
+                         paste(round(pipe$runtime, 2), "seconds\n\n")))
   cat("Sample Output:\n")
   head(pipe$ouput)
 }
@@ -89,6 +91,7 @@ execute.data.frame <- function(x, pipe){
   pipe$runtime <- as.numeric(a2 - a1)
   pipe
 }
+
 
 #' @rdname execute
 #' @export
@@ -158,7 +161,7 @@ flow <- function(x, pipe){
 #' @examples
 #'
 #' pipe <- pipeline(expr = function(e) mean(e$mpg))
-#' flow(mtcars, pipe)
+#' test(mtcars, pipe, 10)
 test <- function(x, pipe, n){
   UseMethod("test")
 }
@@ -166,7 +169,21 @@ test <- function(x, pipe, n){
 
 #' @export
 #' @rdname test
-test.pipeline <- function(x, pipe, n = 100){
+test.modeler <- function(x, pipe, n = 100){
+  flow(head(x$data, n), pipe)
+}
+
+
+#' @export
+#' @rdname test
+test.tbl_spark <- function(x, pipe, n = 100){
+  flow(head(x, n), pipe)
+}
+
+
+#' @export
+#' @rdname test
+test.data.frame <- function(x, pipe, n = 100){
   flow(head(x, n), pipe)
 }
 

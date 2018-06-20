@@ -17,7 +17,7 @@ index <- function(x, unit) {
 }
 
 
-#' @rdname
+#' @rdname index
 #' @export
 index.numeric <- index.integer <- function(x, unit = NULL) {
   unit <- mean(diff(x))

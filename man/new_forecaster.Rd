@@ -46,5 +46,6 @@ for date index variable.}
 Creates a forecaster object which inherits from modeler class
 }
 \seealso{
-Other use cases: \code{\link{modeler}}
+Other use cases: \code{\link{modeler}},
+  \code{\link{new_segmenter}}
 }

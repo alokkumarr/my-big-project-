@@ -4,7 +4,7 @@
 \alias{add_models}
 \title{Add Multiple Models to Modeler Object function}
 \usage{
-add_models(obj, pipe = NULL, models, class)
+add_models(obj, pipe = NULL, models)
 }
 \arguments{
 \item{obj}{modeler object}
@@ -12,8 +12,6 @@ add_models(obj, pipe = NULL, models, class)
 \item{pipe}{pipeline object}
 
 \item{models}{list with models method and list of arguments in each element}
-
-\item{class}{modeler object class}
 }
 \value{
 modeler object with models added
