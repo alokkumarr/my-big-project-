@@ -98,7 +98,8 @@ scale_color_sncr <- function(palette = "a2", discrete = TRUE, reverse = FALSE, .
 #' @param ... Additional arguments passed to discrete_scale() or
 #'            scale_fill_gradientn(), used respectively when discrete is TRUE or FALSE
 #'
-scale_fill_sncr <- function(palette = "main", discrete = TRUE, reverse = FALSE, ...) {
+#' @export
+scale_fill_sncr <- function(palette = "a2", discrete = TRUE, reverse = FALSE, ...) {
   checkmate::assert_choice(palette, names(sncr_palettes))
   checkmate::assert_flag(discrete)
   pal <- sncr_pal(palette = palette, reverse = reverse)

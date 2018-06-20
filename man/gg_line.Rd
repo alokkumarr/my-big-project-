@@ -56,7 +56,7 @@ the default plot specification, e.g. \code{\link{borders}}.}
 }}
 }
 \value{
-either a
+either a ggplot geom_line layer object or NULL
 }
 \description{
 Wrapper function for adding geom_line layer by way of stat_summary

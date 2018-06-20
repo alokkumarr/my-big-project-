@@ -4,7 +4,7 @@
 \alias{scale_fill_sncr}
 \title{Fill scale constructor for Synchronoss colors}
 \usage{
-scale_fill_sncr(palette = "main", discrete = TRUE, reverse = FALSE, ...)
+scale_fill_sncr(palette = "a2", discrete = TRUE, reverse = FALSE, ...)
 }
 \arguments{
 \item{palette}{Character name of palette in sncr_palettes}
