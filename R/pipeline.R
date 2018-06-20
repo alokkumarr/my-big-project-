@@ -158,7 +158,7 @@ flow <- function(x, pipe){
 #' @examples
 #'
 #' pipe <- pipeline(expr = function(e) mean(e$mpg))
-#' flow(mtcars, pipe)
+#' test(mtcars, pipe, 10)
 test <- function(x, pipe, n){
   UseMethod("test")
 }
@@ -166,7 +166,21 @@ test <- function(x, pipe, n){
 
 #' @export
 #' @rdname test
-test.pipeline <- function(x, pipe, n = 100){
+test.modeler <- function(x, pipe, n = 100){
+  flow(head(x$data, n), pipe)
+}
+
+
+#' @export
+#' @rdname test
+test.tbl_spark <- function(x, pipe, n = 100){
+  flow(head(x, n), pipe)
+}
+
+
+#' @export
+#' @rdname test
+test.data.frame <- function(x, pipe, n = 100){
   flow(head(x, n), pipe)
 }
 
