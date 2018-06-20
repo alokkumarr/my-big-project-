@@ -2,12 +2,18 @@
 % Please edit documentation in R/pipeline.R
 \name{test}
 \alias{test}
-\alias{test.pipeline}
+\alias{test.modeler}
+\alias{test.tbl_spark}
+\alias{test.data.frame}
 \title{Pipeline Test function}
 \usage{
 test(x, pipe, n)
 
-\method{test}{pipeline}(x, pipe, n = 100)
+\method{test}{modeler}(x, pipe, n = 100)
+
+\method{test}{tbl_spark}(x, pipe, n = 100)
+
+\method{test}{data.frame}(x, pipe, n = 100)
 }
 \arguments{
 \item{x}{input object to apply pipeline expression on. Can either be
@@ -26,5 +32,5 @@ Test function applies pipeline expression on sample of data only.
 \examples{
 
 pipe <- pipeline(expr = function(e) mean(e$mpg))
-flow(mtcars, pipe)
+test(mtcars, pipe, 10)
 }

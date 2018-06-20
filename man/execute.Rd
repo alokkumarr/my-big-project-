@@ -2,12 +2,15 @@
 % Please edit documentation in R/pipeline.R
 \name{execute}
 \alias{execute}
+\alias{execute.data.frame}
 \alias{execute.tbl_spark}
 \alias{execute.NULL}
 \alias{execute.modeler}
 \title{Pipeline Execute function}
 \usage{
 execute(x, pipe)
+
+\method{execute}{data.frame}(x, pipe)
 
 \method{execute}{tbl_spark}(x, pipe)
 
