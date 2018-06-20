@@ -19,7 +19,6 @@ public class SQLMoveDataDescriptor extends MoveDataDescriptor {
                 keys
               );
         this.dest = destDir;
-        this.source +=  Path.SEPARATOR + descriptor.targetObjectName;
     }
 
 }
