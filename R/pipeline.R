@@ -54,6 +54,7 @@ print.pipeline <- function(pipe) {
   cat("\nCreated at:", as.character(pipe$created_on), "\n")
   cat("Runtime:", ifelse(is.null(pipe$runtime),
                          "< not run yet > \n",
+                         "not executed yet\n",
                          paste(round(pipe$runtime, 2), "seconds\n\n")))
   cat("Sample Output:\n")
   head(pipe$ouput)
@@ -91,6 +92,7 @@ execute.data.frame <- function(x, pipe){
   pipe$runtime <- as.numeric(a2 - a1)
   pipe
 }
+
 
 #' @rdname execute
 #' @export
