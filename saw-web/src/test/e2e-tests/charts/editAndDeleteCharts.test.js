@@ -107,11 +107,10 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         savedAlaysisPage.editBtn.click();
         
         const designer = analyzePage.designerDialog;
-        commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
             for (var i = 0; i < deleteElements.length; ++i) {
+                commonFunctions.waitFor.elementToBeClickable(deleteElements[i]);
                 deleteElements[i].click();
             }
         });
