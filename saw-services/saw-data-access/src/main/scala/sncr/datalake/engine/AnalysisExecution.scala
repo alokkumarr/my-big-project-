@@ -61,23 +61,19 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       execType match {
         case ExecutionType.scheduled => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResult(id, null,ExecutionType.scheduled.toString)
         }
         case ExecutionType.onetime => {
           analysisNodeExecution.executeSQLWithLimit(limit)
-          // TODO:: Reverting will be handled as part of SIP-2513
-        //  analysisNodeExecution.createAnalysisResultForOneTime(id)
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.preview => {
           analysisNodeExecution.executeSQLWithLimit(DLConfiguration.rowLimit)
-          // TODO:: Reverting will be handled as part of SIP-2513
-         // analysisNodeExecution.createAnalysisResultForOneTime(id)
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.regularExecution.toString)
         }
       }
       analysisNodeExecution.setFinishTime

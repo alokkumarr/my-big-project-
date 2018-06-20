@@ -14,31 +14,15 @@
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <div *ngIf="artifactColumn.comboType">
       <button mat-icon-button [matMenuTriggerFor]="comboTypeSelect" class="expandable-field__option-button">
-        <mat-icon [fontIcon]="COMBO_TYPES_OBJ[artifactColumn.comboType].icon"></mat-icon>
+        <mat-icon [fontIcon]="getComboIcon(artifactColumn.comboType)"></mat-icon>
       </button>
       <mat-menu #comboTypeSelect="matMenu">
-        <button mat-menu-item *ngFor="let comboType of COMBO_TYPES; trackBy: index" (click)="onComboTypeChange(comboType.value)">
+        <button mat-menu-item *ngFor="let comboType of comboTypes; trackBy: index" (click)="onComboTypeChange(comboType.value)">
           <mat-icon [fontIcon]="comboType.icon"></mat-icon>
           <span style="margin-left: 20px;">{{comboType.label}}</span>
         </button>
       </mat-menu>
     </div>
-
-    <!-- <div *ngIf="artifactColumn.aggregate">
-      <button mat-icon-button
-              [matMenuTriggerFor]="aggregatemenu"
-              class="expandable-field__option-button">
-        <mat-icon [fontIcon]="AGGREGATE_TYPES_OBJ[artifactColumn.aggregate].icon"></mat-icon>
-      </button>
-      <mat-menu #aggregatemenu="matMenu">
-        <button mat-menu-item
-                *ngFor="let aggregateType of AGGREGATE_TYPES; trackBy: index"
-                (click)="onAggregateChange(aggregateType.value)">
-          <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
-          <span style="margin-left: 20px;">{{aggregateType.label}}</span>
-        </button>
-      </mat-menu>
-    </div> -->
 
     <aggregate-chooser-u *ngIf="artifactColumn.aggregate" (change)="onAggregateChange($event)" [type]="artifactColumn.type" [aggregate]="artifactColumn.aggregate">
     </aggregate-chooser-u>
