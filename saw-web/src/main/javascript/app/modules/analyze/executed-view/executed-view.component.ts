@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Transition } from '@uirouter/angular';
+import { Transition, StateService } from '@uirouter/angular';
 import * as get from 'lodash/get';
 import { Subscription } from 'rxjs/Subscription';
 
 import { AnalyzeService } from '../services/analyze.service';
+import { AnalyzeExportService } from '../services/analyze-export.service';
 import {
   ExecuteService,
   IExecuteEvent,
@@ -36,18 +37,22 @@ export class ExecutedViewComponent implements OnInit {
   canUserExecute = false;
   isExecuting = false;
   executionSub: Subscription;
+  executionId: string;
 
   constructor(
     private _executeService: ExecuteService,
     private _headerProgressService: HeaderProgressService,
     private _analyzeService: AnalyzeService,
     private _transition: Transition,
+    private _state: StateService,
     private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService
+    private _jwt: JwtService,
+    private _analyzeExportService: AnalyzeExportService
   ) {}
 
   ngOnInit() {
     const { analysis, analysisId, executionId } = this._transition.params();
+    this.executionId = executionId;
     if (analysis) {
       this.analysis = analysis;
       this.setPrivileges(analysis);
@@ -82,6 +87,7 @@ export class ExecutedViewComponent implements OnInit {
       // get the last execution id and load the data for that analysis
       this.loadExecutedAnalyses(analysisId).then(analyses => {
         const lastExecutionId = get(analyses, '[0].id', null);
+        this.executionId = lastExecutionId;
         if (lastExecutionId) {
           this.loadDataOrSetDataLoader(
             analysisId,
@@ -167,22 +173,38 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   edit() {
-
+    this._analyzeActionsService.edit(this.analysis).then(result => {
+      if (!result) {
+        return;
+      }
+      // const {isSaveSuccessful, analysis} = result;
+      // if (isSaveSuccessful) {
+      //   this.analysis = analysis;
+      //   this.refreshData();
+      // }
+    });
   }
 
   fork() {
-
+    this._analyzeActionsService.fork(this.analysis);
   }
 
   publish() {
-
+    this._analyzeActionsService.publish(this.analysis);
   }
 
-  afterDelete() {
-
+  afterDelete(analysis) {
+    this._state.go('analyze.view', {id: analysis.categoryId});
   }
 
   exportData() {
-
+    if (this.analysis.type === 'pivot') {
+      // export from front end
+      // this.requester.next({
+      //   exportAnalysis: true
+      // });
+    } else {
+      this._analyzeExportService.export(this.analysis, this.executionId);
+    }
   }
 }

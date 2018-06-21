@@ -6,6 +6,7 @@ import { ExecutedListComponent } from './list';
 import { ExecutedReportViewComponent } from './report';
 import { ExecuteService } from '../services/execute.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
+import { AnalyzeExportService } from '../services/analyze-export.service';
 
 const COMPONENTS = [
   ExecutedViewComponent,
@@ -24,7 +25,8 @@ const COMPONENTS = [
   entryComponents: COMPONENTS,
   providers: [
     ExecuteService,
-    ToastService
+    ToastService,
+    AnalyzeExportService
   ],
   exports: [ExecutedViewComponent]
 })

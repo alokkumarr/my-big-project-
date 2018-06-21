@@ -116,4 +116,8 @@ export class AnalyzeActionsService {
       this._toastMessage.error(err.message || 'Analysis not deleted.');
     });
   }
+
+  exportAnalysis(analysisId, executionId, analysisType) {
+    return this._analyzeService.getExportData(analysisId, executionId, analysisType);
+  }
 }
