@@ -10,6 +10,7 @@ import {
   EXECUTION_STATES
 } from '../services/execute.service';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
+import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
 import { JwtService } from '../../../../login/services/jwt.service';
@@ -32,6 +33,7 @@ export class ExecutedViewComponent implements OnInit {
   canUserPublish = false;
   canUserFork = false;
   canUserEdit = false;
+  canUserExecute = false;
   isExecuting = false;
   executionSub: Subscription;
 
@@ -40,6 +42,7 @@ export class ExecutedViewComponent implements OnInit {
     private _headerProgressService: HeaderProgressService,
     private _analyzeService: AnalyzeService,
     private _transition: Transition,
+    private _analyzeActionsService: AnalyzeActionsService,
     private _jwt: JwtService
   ) {}
 
@@ -67,6 +70,10 @@ export class ExecutedViewComponent implements OnInit {
     this.isExecuting = e.executionState === EXECUTION_STATES.EXECUTING;
   }
 
+  executeAnalysis(analysis) {
+    this._analyzeActionsService.execute(analysis);
+  }
+
   loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysisType) {
     if (executionId) {
       this.loadExecutedAnalyses(analysisId);
@@ -75,11 +82,13 @@ export class ExecutedViewComponent implements OnInit {
       // get the last execution id and load the data for that analysis
       this.loadExecutedAnalyses(analysisId).then(analyses => {
         const lastExecutionId = get(analyses, '[0].id', null);
-        this.loadDataOrSetDataLoader(
-          analysisId,
-          lastExecutionId,
-          analysisType
-        );
+        if (lastExecutionId) {
+          this.loadDataOrSetDataLoader(
+            analysisId,
+            lastExecutionId,
+            analysisType
+          );
+        }
       });
     }
   }
@@ -142,6 +151,9 @@ export class ExecutedViewComponent implements OnInit {
       subCategoryId: categoryId
     });
     this.canUserFork = this._jwt.hasPrivilege('FORK', {
+      subCategoryId: categoryId
+    });
+    this.canUserExecute = this._jwt.hasPrivilege('EXECUTE', {
       subCategoryId: categoryId
     });
     this.canUserEdit = this._jwt.hasPrivilege('EDIT', {

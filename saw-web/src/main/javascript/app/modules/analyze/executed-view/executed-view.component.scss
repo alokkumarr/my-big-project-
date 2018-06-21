@@ -3,6 +3,16 @@
 executed-view {
   width: 100%;
 
+  .prompt-execution-container {
+    padding: 50px;
+    text-align: center;
+    font-size: 14px;
+
+    button {
+      margin-top: 15px;
+    }
+  }
+
   .mat-card {
     color: $primary-grey-g4;
     padding: 0;

@@ -45,7 +45,15 @@
       </div>
   </mat-toolbar>
   <mat-card>
-    <div *ngIf="analysis" [ngSwitch]="analysis.type">
+    <div *ngIf="analyses && !analyses.length">
+      <div class="prompt-execution-container" fxLayout="column" fxLayoutAlign="center center">
+        <span i18n>This analysis hasn't been been executed yet. Execute it now?</span>
+          <button mat-raised-button color="primary" [disabled]="!analysis" (click)="executeAnalysis(analysis)" i18n>
+            Execute
+          </button>
+      </div>
+    </div>
+    <div *ngIf="analysis && analyses && analyses.length" [ngSwitch]="analysis.type">
       <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                             [analysis]="analysis"
                             [dataLoader]="dataLoader"
@@ -75,7 +83,7 @@
 
   <mat-card style="padding: 5px;">
     <mat-card-title><span class="mat-card-title" i18n>Previous Versions</span></mat-card-title>
-    <executed-list *ngIf="analysis && analyses"
+    <executed-list *ngIf="analysis && analyses && analyses.length"
                    [analyses]="analyses"
                    [analysis]="analysis"
     ></executed-list>
