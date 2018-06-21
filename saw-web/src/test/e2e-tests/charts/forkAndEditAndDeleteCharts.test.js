@@ -137,6 +137,10 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
             commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
             designModePage.chart.addFieldButton(yAxisName2).click();
         }
+        //Verify chart axis and group by
+        commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, metrics, "yaxis"));
+        commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, dimension, "xaxis"));
+        commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy(type));
         //Save
         const save = analyzePage.saveDialog;
         commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
@@ -174,7 +178,6 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         //Verify updated details.
         expect(savedAlaysisPage.analysisViewPageElements.title.getText()).toBe(forkedName);
         expect(savedAlaysisPage.analysisViewPageElements.description.getText()).toBe(forkedDescription);
-        
         //Delete created chart
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
         savedAlaysisPage.actionsMenuBtn.click();

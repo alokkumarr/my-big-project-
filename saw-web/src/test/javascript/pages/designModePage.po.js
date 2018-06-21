@@ -41,7 +41,10 @@ module.exports = {
     expandSelectedFieldPropertiesButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/preceding-sibling::*)[1]`)),
     groupIntervalDropDown: element(by.xpath(`//mat-select[@placeholder='Group interval']`)),
     groupIntervalDropDownElement: groupIntervalName => element(by.xpath(`//span[@class="mat-option-text" and contains(text(), '${groupIntervalName}')]`)),
-    addFilter: filterObject => addFilter(filterObject)
+    addFilter: filterObject => addFilter(filterObject),
+    getAxisLabel: (chartType, axisLabel, axis) => element(by.xpath(`//chart[@ng-reflect-e2e="chart-type:${chartType}"]/descendant::*[name()="svg"]/descendant::*[contains(@class,"highcharts-axis highcharts-${axis}")]/descendant::*[contains(text(),"${axisLabel}")]`)),
+    groupBy: chartType => element(by.xpath(`//chart[@ng-reflect-e2e="chart-type:${chartType}"]/descendant::*[name()="svg"]/descendant::*[@class="highcharts-legend"]`))
+  
   }
 };
 

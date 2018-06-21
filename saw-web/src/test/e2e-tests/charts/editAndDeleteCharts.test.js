@@ -137,6 +137,11 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
             commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
             designModePage.chart.addFieldButton(yAxisName2).click();
         }
+         //Verify chart axis and group by
+         commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, metrics, "yaxis"));
+         commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, dimension, "xaxis"));
+         commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy(type));
+
         //Save
         const save = analyzePage.saveDialog;
         commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
