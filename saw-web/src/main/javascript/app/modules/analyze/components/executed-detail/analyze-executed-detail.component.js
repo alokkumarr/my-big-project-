@@ -25,7 +25,7 @@ export const AnalyzeExecutedDetailComponent = {
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
     constructor($injector, $eventEmitter, AnalyzeService, $state, $rootScope, JwtService, fileService,
-      toastMessage, AnalyzeActionsService, $scope, $q, $translate) {
+      $window, toastMessage, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
 
@@ -39,6 +39,7 @@ export const AnalyzeExecutedDetailComponent = {
       this._$scope = $scope;
       this._$q = $q;
       this._toastMessage = toastMessage;
+      this._$window = $window;
       this._JwtService = JwtService;
       this._executionId = $state.params.executionId;
       this._executionWatcher = null;
@@ -50,6 +51,10 @@ export const AnalyzeExecutedDetailComponent = {
       this.isExecuting = false;
 
       this.requester = new BehaviorSubject({});
+    }
+
+    back() {
+      this._$window.history.back();
     }
 
     $onInit() {
