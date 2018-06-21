@@ -29,6 +29,7 @@ export const AnalyzeExecutedDetailComponent = {
       'ngInject';
       super($injector);
 
+      this._isAutoExecution = false;
       this._AnalyzeService = AnalyzeService;
       this._$translate = $translate;
       this._fileService = fileService;
@@ -88,8 +89,10 @@ export const AnalyzeExecutedDetailComponent = {
       let job;
       if (this.isExecuting || this.analysis.type === 'report' || this._executionId) {
         job = resolved.promise;
+        this._isAutoExecution = this.isExecuting;
       } else {
         job = this.executeAnalysis();
+        this._isAutoExecution = true;
       }
 
       job.then(() => {
@@ -130,6 +133,10 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     refreshData() {
+      if (this._isAutoExecution) {
+        this._isAutoExecution = false;
+        return;
+      }
       const gotoLastPublished = () => {
         this.analyses = null;
         this._executionId = null;
