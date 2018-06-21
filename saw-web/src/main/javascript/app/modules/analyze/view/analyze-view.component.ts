@@ -2,7 +2,6 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
-import * as filter from 'lodash/filter';
 import * as findIndex from 'lodash/findIndex';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { JwtService } from '../../../../login/services/jwt.service';

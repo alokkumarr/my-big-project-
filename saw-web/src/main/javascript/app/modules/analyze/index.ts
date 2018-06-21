@@ -6,6 +6,7 @@ import { downgradeComponent, downgradeInjectable } from '@angular/upgrade/static
 import * as angular from 'angular';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AnalyzeViewModule } from './view';
+import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
 
 import { MaterialModule } from '../../material.module';
@@ -189,7 +190,7 @@ angular
     UChartModule,
     BrowserModule,
     AnalyzeViewModule,
-    AnalyzeViewModule,
+    ExecutedViewModule,
     AnalyzeActionsModule,
     AnalyzePublishDialogModule
   ],

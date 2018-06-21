@@ -1,7 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../cron';
-import { AnalyzeService } from '../../services/analyze.service';
+import {
+  ExecuteService,
+  IExecuteEvent,
+  EXECUTION_STATES
+} from '../../services/execute.service';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../../login/services/jwt.service';
 
@@ -28,11 +32,12 @@ export class AnalyzeCardComponent implements OnInit {
   // type identifier used for e2e tag
   typeIdentifier: string;
   canUserFork = false;
+  isExecuting = false;
 
   constructor(
-    private _analyzeService: AnalyzeService,
     private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService
+    private _jwt: JwtService,
+    private _executeService: ExecuteService
   ) { }
 
   ngOnInit() {
@@ -42,10 +47,13 @@ export class AnalyzeCardComponent implements OnInit {
     const { type, id, chartType } = this.analysis as AnalysisChart;
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${chartType ? `:${chartType}` : ''}`;
+
+    this.onExecutionEvent = this.onExecutionEvent.bind(this);
+    this._executeService.subscribe(id, this.onExecutionEvent);
   }
 
-  showExecutingFlag(analysisId) {
-    return analysisId && this._analyzeService.isExecuting(analysisId);
+  onExecutionEvent(e: IExecuteEvent) {
+    this.isExecuting = e.executionState === EXECUTION_STATES.EXECUTING;
   }
 
   afterDelete(analysis) {

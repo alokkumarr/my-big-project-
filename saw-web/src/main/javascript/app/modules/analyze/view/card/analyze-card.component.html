@@ -2,7 +2,7 @@
 
   <mat-card-header fxLayout="row" fxLayoutAlign="end center">
     <mat-chip class="tag-chip status-chip"
-              *ngIf="showExecutingFlag(analysis.id)"
+              *ngIf="isExecuting"
               i18n
     >
     EXECUTING
@@ -53,6 +53,7 @@
       </button>
       <analyze-actions-menu-u [analysis]="analysis"
                               exclude="fork-export"
+                              [actionsToDisable]="isExecuting ? 'execute' : ''"
                               (afterDelete)="afterDelete($event)"
                               (afterExecute)="afterExecute($event)"
                               (afterPublish)="afterPublish($event)"

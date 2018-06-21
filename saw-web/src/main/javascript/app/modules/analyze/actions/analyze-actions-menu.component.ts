@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpReduce from 'lodash/fp/reduce';
 import * as isString from 'lodash/isString';
 import * as upperCase from 'lodash/upperCase';
 import { JwtService } from '../../../../login/services/jwt.service';
@@ -22,6 +24,16 @@ export class AnalyzeActionsMenuComponent {
   @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
   @Input() analysis: Analysis;
   @Input() exclude: string;
+  @Input('actionsToDisable') set disabledActions(actionsToDisable: string) {
+    this.actionsToDisable = fpPipe(
+      actionsToDisableString => isString(actionsToDisableString) ? actionsToDisableString.split('-') : [],
+      fpReduce((acc, action) => {
+        acc[action] = true;
+        return acc;
+      }, {})
+    )(actionsToDisable);
+  };
+  public actionsToDisable = {};
 
   actions = [{
     label: 'Execute',

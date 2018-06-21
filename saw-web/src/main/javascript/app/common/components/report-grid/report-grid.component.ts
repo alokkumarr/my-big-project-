@@ -16,6 +16,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
+import * as isEmpty from 'lodash/isEmpty';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import DataSource from 'devextreme/data/data_source';
 import { DateFormatDialogComponent } from '../date-format-dialog';
@@ -95,6 +96,10 @@ export class ReportGridComponent {
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
     }
+
+    if (isEmpty(this.columns)) {
+      this.columns = null;
+    }
   };
   @Input('queryColumns') set setQueryColumns(queryColumns) {
     // TODO merge with SAW - 2002 for queryColumns
@@ -144,7 +149,6 @@ export class ReportGridComponent {
     showPageSizeSelector: true
   };
   public loadPanel;
-  public summary = {calculateCustomSummary: () => `Showing 10 out of 10000 rows. Click on 'Preview' to see more.`};
 
   constructor(
     private _dialog: MatDialog,

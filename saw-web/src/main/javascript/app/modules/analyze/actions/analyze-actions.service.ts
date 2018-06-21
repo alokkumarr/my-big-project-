@@ -1,14 +1,13 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as clone from 'lodash/clone';
-import * as deepClone from 'lodash/cloneDeep';
-import * as defaultsDeep from 'lodash/defaultsDeep';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { FilterService } from '../services/filter.service';
+import { ExecuteService } from '../services/execute.service';
 import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish';
 
@@ -18,6 +17,7 @@ export class AnalyzeActionsService {
   constructor(
     private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
+    private _executeService: ExecuteService,
     private _analyzeDialogService: AnalyzeDialogService,
     private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
@@ -26,7 +26,7 @@ export class AnalyzeActionsService {
 
   execute(analysis) {
     return this._filterService.getRuntimeFilterValues(analysis).then(model => {
-      this._analyzeService.executeAnalysis(model);
+      this._executeService.executeAnalysis(model);
       return model;
     });
   }
