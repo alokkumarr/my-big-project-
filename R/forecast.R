@@ -134,47 +134,6 @@ get_coefs.forecast_model <- function(mobj){
 }
 
 
-#' Tidy Forecast Model Performance Object
-#
-#' @param mobj forecast model object as a result of fit function
-#' @rdname get_performance
-#' @export
-tidy_performance.forecast_model <- function(mobj) {
-  checkmate::assert_choice(mobj$status, c("trained", "evaluated", "selected", "final"))
-
-  lapply(mobj$performance, function(z) {
-    lapply(z, function(x) {
-      x %>%
-        dplyr::select(1:2) %>%
-        setNames(c("index", "predicted"))
-    }) %>%
-      dplyr::bind_rows(.id = "sample")
-  }) %>%
-    dplyr::bind_rows(.id = "indicie") %>%
-    dplyr::mutate(model = mobj$id)
-}
-
-
-
-#' @rdname evaluate
-#' @export
-evaluate.forecast_model <- function(mobj, target_df, measure) {
-
-   mobj$evaluate <- tidy_performance(mobj) %>%
-    dplyr::inner_join(target_df, by = "index") %>%
-    dplyr::group_by(model, sample, indicie) %>%
-    dplyr::do(data.frame(
-      match.fun(measure$method)(.,
-                                actual = mobj$target,
-                                predicted = "predicted")
-    )) %>%
-    dplyr::ungroup() %>%
-    setNames(c("model", "sample", "indicie", measure$method))
-
-   mobj
-}
-
-
 
 #' @rdname train
 #' @export
@@ -187,21 +146,29 @@ train.forecast_model <- function(mobj, indicies, level) {
     checkmate::assert_subset(names(index), c("train", "validation", "test"))
 
     # Fit model to training sample
-    mobj <- fit(mobj,
-                data = mobj$pipe$output %>% dplyr::slice(train_index))
+    mdf <- mobj$pipe$output %>%
+      dplyr::slice(train_index)
+    mobj <- fit(mobj, data = mdf)
     fitted <- fitted(mobj)
-    train <- data.frame("index" = index$train, "fitted" = fitted)
+    train <- mdf %>%
+      dplyr::select_at(mobj$index_var) %>%
+      dplyr::mutate(fitted = fitted)
     perf <- list("train" = train)
 
     # Add predictions for validation, test or both
     samples <- names(index)[! sapply(index, is.null)]
     for(smpl in setdiff(samples, "train")){
       smpl_index <- index[[smpl]]
+      sdf <- mobj$pipe$output %>%
+        dplyr::slice(smpl_index)
       predicted <- predict(mobj,
-                           data = mobj$pipe$output %>% dplyr::slice(smpl_index),
+                           data = sdf,
                            periods = length(smpl_index),
                            level = level)
-      smpl_list <- list(data.frame("index" = smpl_index, predicted))
+      smpl_list <- sdf %>%
+        dplyr::select_at(mobj$index_var) %>%
+        dplyr::bind_cols(predicted) %>%
+        list()
       names(smpl_list) <- smpl
       perf <- c(perf, smpl_list)
     }

@@ -41,27 +41,6 @@ new_segmenter <- function(df,
 }
 
 
-#' @rdname train_models
-#' @export
-train_models.segmenter <- function(obj, ids = NULL) {
-  checkmate::assert_character(ids, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(ids))
-    status <- status[names(status) %in% ids]
-  ids <- names(status == "added")
-  indicies <- get_indicies(obj)
-
-  for (id in ids) {
-    model <- get_models(obj, ids = id)[[1]]
-    model$pipe <- execute(obj$data, model$pipe)
-    model$index_var <- obj$index_var
-    model <- train(model, indicies)
-    obj$models[[id]] <- model
-  }
-  obj
-}
-
 
 #' @rdname evaluate_models
 #' @export
@@ -81,7 +60,6 @@ evaluate_models.segmenter <- function(obj, ids = NULL) {
   }
   obj
 }
-
 
 
 #' @rdname set_final_model

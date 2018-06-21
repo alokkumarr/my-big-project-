@@ -205,8 +205,10 @@ get_models <- function(obj, ids = NULL, status = NULL) {
 #' @param obj modeler object
 #' @export
 get_target <- function(obj) {
-  checkmate::assert_class(obj, "modeler")
-  get_target_df(obj$data, obj$target)
+  checkmate::assert_subset("modeler", class(obj))
+  #get_target_df(obj$data, obj$target)
+  obj$data %>%
+    dplyr::select_at(c(obj$index_var, obj$target))
 }
 
 
@@ -274,6 +276,28 @@ train_models <- function(obj, ...) {
 }
 
 
+#' @rdname train_models
+#' @export
+train_models.modeler <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
+
+  status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% ids]
+  ids <- names(status == "added")
+  indicies <- get_indicies(obj)
+
+  for (id in ids) {
+    model <- get_models(obj, ids = id)[[1]]
+    model$pipe <- execute(obj$data, model$pipe)
+    model$index_var <- obj$index_var
+    model <- train(model, indicies, level = obj$conf_levels)
+    obj$models[[id]] <- model
+  }
+  obj
+}
+
+
 #' Evalutate Models Generic Function
 #'
 #' Evaluate the accuracy of all trained models.
@@ -285,6 +309,26 @@ train_models <- function(obj, ...) {
 #' @return updated modeler object
 evaluate_models <- function(obj, ...) {
   UseMethod("evaluate_models")
+}
+
+
+#' @rdname evaluate_models
+#' @export
+evaluate_models.modeler <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
+
+  status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% ids]
+  ids <- names(status == "trained")
+
+  for (id in ids) {
+    model <- get_models(obj, id = id)[[1]]
+    model <- evaluate(model, obj$measure)
+    obj$models[[id]] <- model
+    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
+  }
+  obj
 }
 
 
