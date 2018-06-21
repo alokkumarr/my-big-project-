@@ -8,6 +8,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
 import * as trim from 'lodash/trim';
 import * as isUndefined from 'lodash/isUndefined';
+import * as isFinite from 'lodash/isFinite';
 import * as moment from 'moment';
 
 import { Observable } from 'rxjs/Observable';
@@ -149,8 +150,9 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       .subscribe(({ primary, secondary }) => {
         const currentParsed = parseFloat(primary.current) || 0;
         const priorParsed = parseFloat(primary.prior);
-        const change =
+        let change =
           round(((currentParsed - priorParsed) * 100) / priorParsed) || 0;
+        change = isFinite(change) ? change : 0;
         this.primaryChange = change;
         this.primaryResult = {
           current: round(currentParsed, 2),
