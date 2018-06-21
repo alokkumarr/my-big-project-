@@ -86,7 +86,7 @@ export const AnalyzeExecutedDetailComponent = {
       this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
 
       let job;
-      if (this.isExecuting || this.analysis.type === 'report') {
+      if (this.isExecuting || this.analysis.type === 'report' || this._executionId) {
         job = resolved.promise;
       } else {
         job = this.executeAnalysis();
@@ -168,6 +168,14 @@ export const AnalyzeExecutedDetailComponent = {
       this.canUserEdit = this._JwtService.hasPrivilege('EDIT', {
         subCategoryId: this.analysis.categoryId,
         creatorId: this.analysis.userId
+      });
+    }
+
+    gotoExecution(executionId) {
+      this._$state.go('analyze.executedDetail', {
+        executionId,
+        analysisId: this.analysis.id,
+        analysis: this.analysis
       });
     }
 
