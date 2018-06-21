@@ -29,7 +29,7 @@ TABLE Scripts Starts
   CONFIG_VAL_CODE      	VARCHAR(100)  NOT NULL,
   CONFIG_VAL_DESC     	VARCHAR(255)  NOT NULL,
   CONFIG_VAL_OBJ_TYPE	  VARCHAR(100) NOT NULL,
-  CONFIG_VAL_REF        VARCHAR(100) NOT NULL,
+  CONFIG_VAL_OBJ_GROUP       VARCHAR(100) NOT NULL,
   ACTIVE_STATUS_IND     TINYINT NOT NULL,
   CREATED_DATE    			DATETIME NOT NULL,
   CREATED_BY       			VARCHAR(255)NOT NULL,
@@ -65,8 +65,8 @@ DML Scripts starts
 ********************************************************************************/
 
 INSERT INTO CONFIG_VAL (`CONFIG_VAL_SYS_ID`, `CONFIG_VAL_CODE`, `CONFIG_VAL_DESC`, `CONFIG_VAL_OBJ_TYPE`,
-`CONFIG_VAL_REF`, `ACTIVE_STATUS_IND`, `CREATED_DATE` , CREATED_BY )
-VALUES ('1', 'es-analysis-auto-refresh', 'Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page',
+`CONFIG_VAL_OBJ_GROUP`, `ACTIVE_STATUS_IND`, `CREATED_DATE` , CREATED_BY )
+VALUES ('1', 'es-analysis-auto-refresh', 'Charts,Pivots and ES Reports Execute each time when land on View Analysis Page',
 'CUSTOMER', 'SYNCHRONOSS', '1', now(), 'Saw-Admin' );
 
 
