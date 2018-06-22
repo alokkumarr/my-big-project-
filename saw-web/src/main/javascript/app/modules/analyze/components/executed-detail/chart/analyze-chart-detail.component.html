@@ -11,22 +11,41 @@
   </md-card-title>
 
   <md-card-content>
-
     <div layout="column" layout-align="space-between start">
       <filter-chips-u [filters]="$ctrl.analysis.sqlBuilder.filters"
                       [readonly]="true"
                       [artifacts]="$ctrl.analysis.artifacts">
       </filter-chips-u>
     </div>
-
-    <div layout="column" layout-align="space-between center">
-      <chart [updater]="$ctrl.chartUpdater"
-             [options]="$ctrl.chartOptions"
-             [is-stock-chart]="$ctrl.isStockChart"
-             [enable-export]="true"
-             e2e="{{'chart-type:' + $ctrl.analysis.chartType}}">
-      </chart>
+  
+    <div ng-if="!$ctrl.toggleToGrid">
+      <mat-icon class="mat-icon material-icons icon-report" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid">
+        <md-tooltip>
+          <span>Toggle to Grid</span>
+        </md-tooltip>
+      </mat-icon>
+      <div layout="column" layout-align="space-between center" ng-if="!$ctrl.toggleToGrid">
+        <chart [updater]="$ctrl.chartUpdater"
+               [options]="$ctrl.chartOptions"
+               [is-stock-chart]="$ctrl.isStockChart"
+               [enable-export]="true"
+               e2e="{{'chart-type:' + $ctrl.analysis.chartType}}">
+        </chart>
+      </div>  
     </div>
-
+    
+    <div ng-if="$ctrl.toggleToGrid">
+      <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid">
+        <md-tooltip>Toggle to Chart</md-tooltip>
+      </mat-icon>
+      <div layout="column" layout-align="space-between center">
+        <report-grid-display-container data="$ctrl.gridData"
+                              columns="$ctrl.columns"
+                              show-checked="$ctrl.showChecked"
+                              source="$ctrl.source(options)"
+                              groups="$ctrl.analysis.groupByColumns">
+        </report-grid-display-container>
+      </div>
+    </div>
   </md-card-content>
 </md-card>

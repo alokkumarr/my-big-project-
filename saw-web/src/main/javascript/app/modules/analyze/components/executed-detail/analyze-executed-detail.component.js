@@ -51,6 +51,7 @@ export const AnalyzeExecutedDetailComponent = {
       this.canUserEdit = false;
       this.isPublished = false;
       this.isExecuting = false;
+      this.lastExecutionId = '';
 
       this.requester = new BehaviorSubject({});
     }
@@ -281,6 +282,7 @@ export const AnalyzeExecutedDetailComponent = {
       if (!['report', 'esReport'].includes(this.analysis.type)) {
         this.loadExecutionData(true)();
       }
+      this.lastExecutionId = this._executionId
     }
 
     loadExecutedAnalyses(analysisId) {
