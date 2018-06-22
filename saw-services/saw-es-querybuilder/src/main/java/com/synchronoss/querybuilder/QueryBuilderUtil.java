@@ -16,8 +16,8 @@ import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
 
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.Filter;
@@ -59,11 +59,11 @@ public class QueryBuilderUtil {
 		  if (columnField.getGroupInterval()!=null){
 			aggregationBuilder = AggregationBuilders.
 					dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
-					dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(Order.KEY_DESC);
+					dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-		        .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
+		        .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
@@ -83,11 +83,11 @@ public class QueryBuilderUtil {
 			  if (rowField.getGroupInterval()!=null){
 	            aggregationBuilder = AggregationBuilders.
 	                    dateHistogram(aggregationName).field(rowField.getColumnName()).format(DATE_FORMAT).
-	                    dateHistogramInterval(groupInterval(rowField.getGroupInterval().value())).order(Order.KEY_DESC);
+	                    dateHistogramInterval(groupInterval(rowField.getGroupInterval().value())).order(BucketOrder.key(false));
 	            }
 	          else {
 	            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName())
-	                .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
+	                .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
 	          }
 			}
 			else {
@@ -221,11 +221,11 @@ public class QueryBuilderUtil {
   		  if (nodeField.getGroupInterval()!=null){
               aggregationBuilder = AggregationBuilders.
                       dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
-                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(Order.KEY_DESC);
+                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(false));
               }
             else {
               aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                  .format(nodeField.getDateFormat()).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
+                  .format(nodeField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
 		}
 		else{
