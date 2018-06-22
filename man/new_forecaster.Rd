@@ -2,7 +2,6 @@
 % Please edit documentation in R/forecaster.R
 \name{new_forecaster}
 \alias{new_forecaster}
-\alias{forecaster}
 \title{Forecaster Constructer Function}
 \usage{
 new_forecaster(df, target, index_var, unit = NULL, frequency = NULL,

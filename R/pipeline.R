@@ -54,10 +54,9 @@ print.pipeline <- function(pipe) {
   cat("\nCreated at:", as.character(pipe$created_on), "\n")
   cat("Runtime:", ifelse(is.null(pipe$runtime),
                          "< not run yet > \n",
-                         "not executed yet\n",
                          paste(round(pipe$runtime, 2), "seconds\n\n")))
   cat("Sample Output:\n")
-  head(pipe$ouput)
+  print(head(pipe$output))
 }
 
 

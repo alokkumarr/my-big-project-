@@ -205,8 +205,10 @@ get_models <- function(obj, ids = NULL, status = NULL) {
 #' @param obj modeler object
 #' @export
 get_target <- function(obj) {
-  checkmate::assert_class(obj, "modeler")
-  get_target_df(obj$data, obj$target)
+  checkmate::assert_subset("modeler", class(obj))
+  #get_target_df(obj$data, obj$target)
+  obj$data %>%
+    dplyr::select_at(c(obj$index_var, obj$target))
 }
 
 
@@ -274,6 +276,28 @@ train_models <- function(obj, ...) {
 }
 
 
+#' @rdname train_models
+#' @export
+train_models.modeler <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
+
+  status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% ids]
+  ids <- names(status == "added")
+  indicies <- get_indicies(obj)
+
+  for (id in ids) {
+    model <- get_models(obj, ids = id)[[1]]
+    model$pipe <- execute(obj$data, model$pipe)
+    model$index_var <- obj$index_var
+    model <- train(model, indicies, level = obj$conf_levels)
+    obj$models[[id]] <- model
+  }
+  obj
+}
+
+
 #' Evalutate Models Generic Function
 #'
 #' Evaluate the accuracy of all trained models.
@@ -285,6 +309,26 @@ train_models <- function(obj, ...) {
 #' @return updated modeler object
 evaluate_models <- function(obj, ...) {
   UseMethod("evaluate_models")
+}
+
+
+#' @rdname evaluate_models
+#' @export
+evaluate_models.modeler <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
+
+  status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% ids]
+  ids <- names(status == "trained")
+
+  for (id in ids) {
+    model <- get_models(obj, id = id)[[1]]
+    model <- evaluate(model, obj$measure)
+    obj$models[[id]] <- model
+    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
+  }
+  obj
 }
 
 
@@ -303,6 +347,59 @@ evaluate_models <- function(obj, ...) {
 set_final_model <- function(obj, method, id, reevaluate, refit) {
   UseMethod("set_final_model")
 }
+
+
+#' @rdname set_final_model
+#' @export
+set_final_model.modeler <- function(obj,
+                                    method,
+                                    id = NULL,
+                                    reevaluate = TRUE,
+                                    refit = TRUE) {
+  checkmate::assert_choice(method, c("manual", "best"))
+  checkmate::assert_character(id, null.ok = TRUE)
+  checkmate::assert_flag(reevaluate)
+  checkmate::assert_flag(refit)
+  if (!is.null(id))
+    checkmate::assert_choice(id, names(get_models(obj)))
+  if (method == "manual" & is.null(id))
+    stop("final model not selected: id not provided for manual method")
+
+  if (method == "best") {
+    model <- get_best_model(obj)
+    id <- model$id
+  }else{
+    model <- get_models(obj, ids = id)[[1]]
+  }
+
+  model$status <- "selected"
+  obj$models[[id]] <- model
+  df_index <- holdout(obj$data, 1)$head
+
+  if (reevaluate) {
+    if (is.null(obj$samples$test_holdout_prct)) {
+      warning("Missing Test Holdout Sample. Final Model not re-evaluated.")
+    } else{
+      val_indicie <- list("test_holdout" =
+                            list("train" = setdiff(df_index, obj$samples$test_index),
+                                 "test"  = obj$samples$test_index))
+      remodel <- train(model, val_indicie, obj$conf_levels)
+      remodel <- evaluate(remodel, obj$measure)
+      obj$evaluate <- rbind(obj$evaluate, remodel$evaluate)
+    }
+  }
+
+  if (refit) {
+    refit_indicie <- list("train" = list("train" = df_index))
+    final_model <- train(model, refit_indicie, level = obj$conf_level)
+    obj$final_model <- final_model
+  }else{
+    obj$final_model <- model
+  }
+
+  obj
+}
+
 
 
 #' Get Target Dataframe Generic Method

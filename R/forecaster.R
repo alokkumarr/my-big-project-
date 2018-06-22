@@ -13,7 +13,6 @@
 #' @param prediction_conf_levels prediction confidence levels. Default is 80 &
 #'   95% CIs
 #' @family use cases
-#' @aliases forecaster
 #' @export
 new_forecaster <- function(df,
                            target,
@@ -57,104 +56,6 @@ new_forecaster <- function(df,
 
 # Forecaster Class Methods ------------------------------------------------
 
-
-
-#' @rdname train_models
-#' @export
-train_models.forecaster <- function(obj, ids = NULL) {
-  checkmate::assert_character(ids, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(ids))
-    status <- status[names(status) %in% ids]
-  ids <- names(status == "added")
-  indicies <- get_indicies(obj)
-
-  for (id in ids) {
-    model <- get_models(obj, ids = id)[[1]]
-    checkmate::assert_class(model, "forecast_model")
-    model$pipe <- execute(obj$data, model$pipe)
-    model$index_var <- obj$index_var
-    model <- train(model, indicies, level = obj$conf_levels)
-    obj$models[[id]] <- model
-  }
-  obj
-}
-
-
-
-#' @rdname evaluate_models
-#' @export
-evaluate_models.forecaster <- function(obj, ids = NULL) {
-  checkmate::assert_character(ids, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(ids))
-    status <- status[names(status) %in% ids]
-  ids <- names(status == "trained")
-  target_df <- get_target(obj) %>% dplyr::mutate(index = row_number())
-
-  for (id in ids) {
-    model <- get_models(obj, id = id)[[1]]
-    checkmate::assert_class(model, "forecast_model")
-    model <- evaluate(model, target_df, obj$measure)
-    obj$models[[id]] <- model
-    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
-  }
-  obj
-}
-
-
-#' @rdname set_final_model
-#' @export
-set_final_model.forecaster <- function(obj,
-                                       method,
-                                       id = NULL,
-                                       reevaluate = TRUE,
-                                       refit = TRUE) {
-  checkmate::assert_choice(method, c("manual", "best"))
-  checkmate::assert_character(id, null.ok = TRUE)
-  checkmate::assert_flag(reevaluate)
-  checkmate::assert_flag(refit)
-  if (!is.null(id))
-    checkmate::assert_choice(id, names(get_models(obj)))
-  if (method == "manual" & is.null(id))
-    stop("final model not selected: id not provided for manual method")
-
-  if (method == "best") {
-    model <- get_best_model(obj)
-    id <- model$id
-  }else{
-    model <- get_models(obj, ids = id)[[1]]
-  }
-
-  model$status <- "selected"
-  obj$models[[id]] <- model
-
-  if (reevaluate) {
-    if (is.null(obj$samples$test_holdout_prct)) {
-      warning("Missing Test Holdout Sample. Final Model not re-evaluated.")
-    } else{
-      val_indicie <- list("test_holdout" =
-                            list("train" = setdiff(1:nrow(obj$data), obj$samples$test_index),
-                                 "test"  = obj$samples$test_index))
-      remodel <- train(model, val_indicie, obj$conf_levels)
-      target_df <- get_target(obj) %>% dplyr::mutate(index = row_number())
-      remodel <- evaluate(remodel, target_df, obj$measure)
-      obj$evaluate <- rbind(obj$evaluate, remodel$evaluate)
-    }
-  }
-
-  if (refit) {
-    refit_indicie <- list("train" = list("train" = 1:nrow(obj$data)))
-    final_model <- train(model, refit_indicie, level = obj$conf_level)
-    obj$final_model <- final_model
-  }else{
-    obj$final_model <- model
-  }
-
-  obj
-}
 
 
 
@@ -214,6 +115,24 @@ predict.forecaster <- function(obj,
 #' @export
 #'
 #' @examples
+#'
+#'# Create simulated dataset
+#'n <- 200
+#'dat1 <- data.frame(index = 1:n,
+#'                   y = as.numeric(arima.sim(n = n,
+#'                                            list(order = c(1,0,0), ar = 0.7),
+#'                                            rand.gen = function(n, ...) rt(n, df = 2))))
+#'
+#' af1 <- auto_forecaster(dat1,
+#'                        target = "y",
+#'                        index_var = "index",
+#'                        periods = 10,
+#'                        unit = NULL,
+#'                        models = list(
+#'                                      list(method = "auto.arima", method_args = list()),
+#'                                      list(method = "ets", method_args = list())
+#'                                      )
+#'   )
 auto_forecaster <- function(df,
                             target,
                             index_var,
@@ -244,8 +163,7 @@ auto_forecaster <- function(df,
                  unit = unit,
                  name = "auto-forecaster") %>%
     add_holdout_samples(., splits = splits) %>%
-    add_models(pipe = if(is.null(pipe)) pipeline() else pipe,
-               models = models) %>%
+    add_models(pipe = pipe, models = models) %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE) %>%
@@ -291,34 +209,37 @@ forecaster.data.frame <- function(df,
   checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
                             min.len = 1, max.len = 2)
 
-  if(is.null(pipe))
-    pipe <- pipeline(expr = function(x) x[, "y", drop=FALSE])
-
   conf_levels_names <- do.call("c",
                                lapply(conf_levels,
                                       function(x)
                                         paste(c("lower", "upper"), x, sep = "")))
+
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
-    a2munge::melter(.,
-                    id_vars = c(index_var, group_vars),
-                    measure_vars,
-                    variable_name = "measure",
-                    value_name = "y") %>%
-    dplyr::group_by_at(c(group_vars, "measure")) %>%
-    dplyr::do(
-      auto_forecaster(.,
-                      target = "y",
-                      index_var = index_var,
-                      periods  = periods,
-                      unit = unit,
-                      pipe = pipe,
-                      models = models,
-                      splits = splits,
-                      conf_levels = conf_levels) %>%
-        .$predictions
+    a2munge::melter(
+      .,
+      id_vars = c(index_var, group_vars),
+      measure_vars,
+      variable_name = "measure",
+      value_name = "y"
     ) %>%
-    dplyr::ungroup() %>%
+    dplyr::group_by_at(c(group_vars, "measure")) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(predictions = purrr::map(
+      data,
+      ~ auto_forecaster(
+        .,
+        target = "y",
+        index_var = index_var,
+        periods  = periods,
+        unit = unit,
+        pipe = pipe,
+        models = models,
+        splits = splits,
+        conf_levels = conf_levels
+      )
+    )) %>%
+    tidyr::unnest(predictions %>% purrr::map("predictions")) %>%
     dplyr::select_at(c(index_var, group_vars, "measure", "mean", conf_levels_names))
 }
 
@@ -381,6 +302,8 @@ forecaster.tbl_spark <- function(df,
                             library(dplyr)
                             library(checkmate)
                             library(lubridate)
+                            library(tidyr)
+                            library(purrr)
 
                             f1 <- new_forecaster(e[, c(l$target, l$index_var)],
                                                  target = l$target,

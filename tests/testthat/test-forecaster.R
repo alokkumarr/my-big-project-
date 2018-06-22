@@ -33,8 +33,7 @@ test_that("No holdout sampling test case", {
                        target = "y",
                        index_var = "index",
                        name = "test") %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
@@ -58,13 +57,12 @@ test_that("Validation only holdout sampling test case", {
                        index_var = "index",
                        name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  f2_preds <- predict(f2, 10)
+  f2_preds <- predict(f2, periods = 10, level = c(80, 95))
 
   expect_class(f2, "forecaster")
   expect_class(f2$final_model, "forecast_model")
@@ -82,15 +80,13 @@ test_that("Multiple Model test case", {
                    index_var = "index",
                    name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "ets") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
 
-  f3_preds <- predict(f3, 10)
+  f3_preds <- predict(f3, periods = 10, level = c(80, 95))
 
   expect_class(f3, "forecaster")
   expect_class(f3$final_model, "forecast_model")
@@ -112,15 +108,13 @@ test_that("Multiple Model with Test Holdout test case", {
                    index_var = "index",
                    name = "test") %>%
     add_holdout_samples(splits = c(.6, .2, .2)) %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "ets") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
 
-  f4_preds <- predict(f4, 10)
+  f4_preds <- predict(f4, periods = 10, level = c(80, 95))
 
   expect_class(f4, "forecaster")
   expect_class(f4$final_model, "forecast_model")
@@ -142,16 +136,14 @@ test_that("Multiple Model with Manual set final model method test case", {
                    index_var = "index",
                    name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "ets") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
     evaluate_models(.)
 
   f5 <- set_final_model(f5, method = "manual", id = names(get_models(f5))[2],
                         reevaluate = FALSE, refit = TRUE)
-  f5_preds <- predict(f5, 10)
+  f5_preds <- predict(f5, periods = 10, level = c(80, 95))
 
   expect_class(f5, "forecaster")
   expect_class(f5$final_model, "forecast_model")
@@ -170,8 +162,7 @@ test_that("Covariate test case", {
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
-    add_model(pipe = pipeline(),
-              method = "auto.arima") %>%
+    add_model(pipe = pipeline(), method = "auto.arima") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
@@ -194,8 +185,7 @@ test_that("Prediction index test case", {
                    target = "y",
                    index_var = "index",
                    name = "test") %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
@@ -204,12 +194,11 @@ test_that("Prediction index test case", {
   dat3 <- dat1 %>% mutate(index = seq(Sys.Date()-days(n-1), Sys.Date(), by="day"))
 
   f8 <- new_forecaster(df = dat3,
-                   target = "y",
-                   index_var = "index",
-                   unit = "days",
-                   name = "test") %>%
-    add_model(pipe = pipeline(expr = function(x) x %>% select(y)),
-              method = "auto.arima") %>%
+                       target = "y",
+                       index_var = "index",
+                       unit = "days",
+                       name = "test") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
     evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
@@ -320,8 +309,6 @@ test_that("Auto Forecaster data.frame test case", {
 
 
 
-
-
 test_that("Spark Forecaster test case", {
 
 
@@ -332,15 +319,15 @@ test_that("Spark Forecaster test case", {
   dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
 
   r_f1 <- forecaster(dat3,
-                    index_var = "index",
-                    group_vars = "group",
-                    measure_vars = c("y"),
-                    periods = 10,
-                    unit = NULL,
-                    pipe = NULL,
-                    models = list(
-                      list(method = "auto.arima", method_args = list()),
-                      list(method = "ets", method_args = list())))
+                     index_var = "index",
+                     group_vars = "group",
+                     measure_vars = c("y"),
+                     periods = 10,
+                     unit = NULL,
+                     pipe = NULL,
+                     models = list(
+                       list(method = "auto.arima", method_args = list()),
+                       list(method = "ets", method_args = list())))
 
   spk_f1 <- forecaster(dat3_tbl,
                        index_var = "index",

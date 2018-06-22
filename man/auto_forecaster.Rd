@@ -38,3 +38,23 @@ Creates automated forecasts for univariate time series.
 \details{
 Convience wrapper to create complete forecaster pipeline
 }
+\examples{
+
+# Create simulated dataset
+n <- 200
+dat1 <- data.frame(index = 1:n,
+                  y = as.numeric(arima.sim(n = n,
+                                           list(order = c(1,0,0), ar = 0.7),
+                                           rand.gen = function(n, ...) rt(n, df = 2))))
+
+af1 <- auto_forecaster(dat1,
+                       target = "y",
+                       index_var = "index",
+                       periods = 10,
+                       unit = NULL,
+                       models = list(
+                                     list(method = "auto.arima", method_args = list()),
+                                     list(method = "ets", method_args = list())
+                                     )
+  )
+}

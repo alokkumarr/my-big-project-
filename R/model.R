@@ -270,9 +270,40 @@ train <- function(...) {
 #'
 #' @return returns evaluted model object
 #' @export
-evaluate <- function(mobj, target_df, measure) {
+evaluate <- function(mobj, measure) {
   UseMethod("evaluate")
 }
+
+
+#' @rdname evaluate
+#' @export
+evaluate.model <- function(mobj, measure) {
+  checkmate::assert_class(measure, "measure")
+
+  mobj$evaluate <- purrr::map_df(mobj$performance,
+                                 ~purrr::map_df(.,
+                                                bind_rows,
+                                                .id = "sample"),
+                                 .id="indicie") %>%
+    dplyr::inner_join(mobj$pipe$output %>%
+                        select_at(c(mobj$target, mobj$index_var)),
+                      by = mobj$index_var)  %>%
+    dplyr::mutate(model = mobj$id) %>%
+    dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
+    dplyr::select_at(c("indicie", "sample", "model", mobj$index_var, mobj$target, "predicted")) %>%
+    dplyr::group_by(model, sample, indicie) %>%
+    dplyr::do(data.frame(
+      match.fun(measure$method)(.,
+                                actual = mobj$target,
+                                predicted = "predicted")
+    )) %>%
+    dplyr::ungroup() %>%
+    setNames(c("model", "sample", "indicie", measure$method))
+
+  mobj
+}
+
+
 
 #' Return a Model Fit
 #'
