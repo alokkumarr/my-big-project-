@@ -1,5 +1,10 @@
 = SIP Developer Guide
 include::header.adoc[]
+// Show only one level of sections due to the large amount of sections
+// coming from the automatically generated REST API documentation
+:toclevels: 1
+
+= Sample requests
 
 == Authenticate
 
@@ -145,3 +150,38 @@ To support case insensitive filter for data lake analysis, there are no
 additional setting required. By default saw has native support for this option.
 
 
+= Security Service API
+
+include::{snippets}/swagger-security/paths.adoc[]
+include::{snippets}/swagger-security/definitions.adoc[]
+include::{snippets}/swagger-security/security.adoc[]
+
+= Semantic Service API
+
+include::{snippets}/swagger-semantic/paths.adoc[]
+include::{snippets}/swagger-semantic/definitions.adoc[]
+include::{snippets}/swagger-semantic/security.adoc[]
+
+= Scheduler Service API
+
+include::{snippets}/swagger-scheduler/paths.adoc[]
+include::{snippets}/swagger-scheduler/definitions.adoc[]
+include::{snippets}/swagger-scheduler/security.adoc[]
+
+= Observe Service API
+
+include::{snippets}/swagger-observe/paths.adoc[]
+include::{snippets}/swagger-observe/definitions.adoc[]
+include::{snippets}/swagger-observe/security.adoc[]
+
+= Proxy Service API
+
+include::{snippets}/swagger-proxy/paths.adoc[]
+include::{snippets}/swagger-proxy/definitions.adoc[]
+include::{snippets}/swagger-proxy/security.adoc[]
+
+= Workbench Service API
+
+include::{snippets}/swagger-workbench/paths.adoc[]
+include::{snippets}/swagger-workbench/definitions.adoc[]
+include::{snippets}/swagger-workbench/security.adoc[]
