@@ -7,7 +7,7 @@
 fit.spark_ml <- function(mobj, data) {
   checkmate::assert_class(data, "tbl_spark")
 
-  x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
+  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
   fn <- as.formula(paste(mobj$target, "~", paste(x_vars, collapse = "+")))
   args <- modifyList(mobj$method_args, list(x = data, formula = fn))
   fun <- get(mobj$method, asNamespace(mobj$package))

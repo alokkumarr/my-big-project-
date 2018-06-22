@@ -40,6 +40,6 @@ cases. Modeler is the base class from which the other more specific use cases
 like forecaster, regresser, segmenter, etc... inherit form
 }
 \seealso{
-Other use cases: \code{\link{new_forecaster}},
-  \code{\link{new_segmenter}}
+Other use cases: \code{\link{new_classifier}},
+  \code{\link{new_forecaster}}, \code{\link{new_segmenter}}
 }

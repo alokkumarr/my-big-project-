@@ -24,7 +24,7 @@ df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
 test_that("Classifier Constructer", {
 
   c1 <- new_classifier(df = df, target = "am", name = "test")
-  expect_class(c1, "classifer")
+  expect_class(c1, "classifier")
 })
 
 
@@ -43,7 +43,7 @@ test_that("Classifier Selects Best Model", {
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   expect_subset("spark_ml", class(c1$final_model))
-  expect_subset("ml_model_classification", class(c1$final_model))
+  expect_subset("spark_ml_classification", class(c1$final_model))
   expect_subset(
     c1$final_model$id,
     c1$evaluate %>%
