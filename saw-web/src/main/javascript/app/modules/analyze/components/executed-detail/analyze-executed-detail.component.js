@@ -92,11 +92,11 @@ export const AnalyzeExecutedDetailComponent = {
         this._isAutoExecution = this.isExecuting;
       } else {
         job = this.executeAnalysis();
-        this._isAutoExecution = true;
       }
 
       job.then(() => {
         this.watchAnalysisExecution();
+        this._isAutoExecution = this.isExecuting;
         this.setPrivileges();
         if (!this.analysis.schedule) {
           this.isPublished = false;
