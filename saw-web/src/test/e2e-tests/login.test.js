@@ -32,8 +32,7 @@ describe('Login Tests: login.test.js', () => {
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(userDataProvider, function (data, description) {

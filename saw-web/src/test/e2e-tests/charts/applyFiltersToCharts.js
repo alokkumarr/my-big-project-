@@ -38,8 +38,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to column chart', () => { // SAWQA-174
