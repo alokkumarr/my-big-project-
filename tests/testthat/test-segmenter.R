@@ -97,12 +97,11 @@ test_that("Segmenter Selects Best Model", {
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   expect_subset("spark_ml", class(s1$final_model))
-  expect_equal(
+  expect_subset(
+    s1$final_model$id,
     s1$evaluate %>%
       top_n(1, silhouette) %>%
-      pull(model) %>%
-      head(1),
-    s1$final_model$id
+      pull(model)
   )
 })
 

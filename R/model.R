@@ -287,7 +287,7 @@ evaluate.model <- function(mobj, measure) {
                                  .id="indicie") %>%
     dplyr::inner_join(mobj$pipe$output %>%
                         select_at(c(mobj$target, mobj$index_var)),
-                      by = mobj$index_var)  %>%
+                      by = mobj$index_var) %>%
     dplyr::mutate(model = mobj$id) %>%
     dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
     dplyr::select_at(c("indicie", "sample", "model", mobj$index_var, mobj$target, "predicted")) %>%

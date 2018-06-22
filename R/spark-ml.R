@@ -4,18 +4,18 @@
 #' Spark ML fit method
 #' @rdname fit
 #' @export
-fit.spark_ml <- function(obj, data) {
+fit.spark_ml <- function(mobj, data) {
   checkmate::assert_class(data, "tbl_spark")
 
   x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
-  fn <- as.formula(paste(obj$target, "~", paste(x_vars, collapse = "+")))
-  args <- modifyList(obj$method_args, list(x = data, formula = fn))
-  fun <- get(obj$method, asNamespace(obj$package))
+  fn <- as.formula(paste(mobj$target, "~", paste(x_vars, collapse = "+")))
+  args <- modifyList(mobj$method_args, list(x = data, formula = fn))
+  fun <- get(mobj$method, asNamespace(mobj$package))
   m <- do.call(fun, args)
-  obj$fit <- m
-  obj$last_updated <- Sys.time()
-  obj$status <- "trained"
-  obj
+  mobj$fit <- m
+  mobj$last_updated <- Sys.time()
+  mobj$status <- "trained"
+  mobj
 }
 
 
@@ -23,7 +23,20 @@ fit.spark_ml <- function(obj, data) {
 #' @rdname fitted
 #' @export
 fitted.spark_ml <- function(obj) {
-  obj$fit$model$summary$predictions %>%
+  if(! is.null(obj$fit$model$summary)){
+    obj$fit$model$summary$predictions %>%
+      dplyr::select(index, predicted = prediction, features)
+  }else{
+    predict(obj, obj$pipe$output)
+  }
+}
+
+
+#' Fitted Method for Spark-ML Decision Tree Classification Model
+#' @rdname fitted
+#' @export
+fitted.ml_decision_tree_classification_model <- function(obj) {
+  sparklyr::sdf_predict(mobj$fit, mobj$pipe$output) %>%
     dplyr::select(index, predicted = prediction, features)
 }
 
@@ -75,34 +88,6 @@ train.spark_ml <- function(mobj, indicies, ...) {
 }
 
 
-#' Tidy Forecast Model Performance Object
-#
-#' @param mobj forecast model object as a result of fit function
-#' @rdname get_performance
-#' @export
-tidy_performance.spark_ml <- function(mobj) {
-  checkmate::assert_choice(mobj$status, c("trained", "evaluated", "selected", "final"))
-
-  for(i in seq_along(mobj$performance)) {
-    for(j in seq_along(mobj$performance[[i]])) {
-      perf <- mobj$performance[[i]][[j]] %>%
-        dplyr::select(1:3)
-      perf <- perf %>%
-        dplyr::select_(.dots = setNames(colnames(perf), c("index", "predicted", "features"))) %>%
-        dplyr::mutate(sample = names(mobj$performance)[i]) %>%
-        dplyr::mutate(indicie = names(mobj$performance[[i]])[j]) %>%
-        dplyr::mutate(model = mobj$id)
-      if(i == 1 & j == 1) {
-        perf_df <- perf
-      } else {
-        perf_df <- sparklyr::sdf_bind_rows(perf_df, perf)
-      }
-    }
-  }
-
-  perf_df
-}
-
 
 #' Evaluate Method for Spark-ML Clustering Object
 #' @rdname evaluate
@@ -119,6 +104,37 @@ evaluate.spark_ml_clustering <- function(mobj, measure) {
 
   mobj
 }
+
+
+
+#' Evaluate Method for Spark-ML Binary Classification Object
+#' @rdname evaluate
+#' @export
+evaluate.spark_ml_classification <- function(mobj, measure) {
+
+
+  mobj$evaluate <- purrr::map(mobj$performance,
+                              ~ purrr::map(., ~ inner_join(., mobj$pipe$output %>%
+                                                             select_at(
+                                                               c(mobj$target, mobj$index_var)
+                                                             ),
+                                                           by = mobj$index_var))) %>%
+    purrr::map_df(.,
+                  ~ purrr::map_df(
+                    .,
+                    match.fun(measure$method),
+                    predicted = "predicted",
+                    actual = mobj$target
+                  ),
+                  .id = "indicie") %>%
+    tidyr::gather(key = "sample", value = "value",-indicie) %>%
+    dplyr::rename_(.dots = setNames("value", measure$method)) %>%
+    dplyr::mutate(model = mobj$id) %>%
+    dplyr::select_at(c("model", "sample", "indicie", measure$method))
+
+  mobj
+}
+
 
 
 #' Summary Method for Spark-ML Object
