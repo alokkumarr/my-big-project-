@@ -42,26 +42,6 @@ new_segmenter <- function(df,
 
 
 
-#' @rdname evaluate_models
-#' @export
-evaluate_models.segmenter <- function(obj, ids = NULL) {
-  checkmate::assert_character(ids, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(ids))
-    status <- status[names(status) %in% ids]
-  ids <- names(status == "trained")
-
-  for (id in ids) {
-    model <- get_models(obj, id = id)[[1]]
-    model <- evaluate(model, obj$measure)
-    obj$models[[id]] <- model
-    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
-  }
-  obj
-}
-
-
 
 
 #' Segmenter Predict Method
