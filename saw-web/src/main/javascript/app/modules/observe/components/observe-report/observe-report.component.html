@@ -1,8 +1,7 @@
-<report-grid-upgraded *ngIf="data && data.length"
-                      (change)="onReportGridChange($event)"
+<report-grid-upgraded (change)="onReportGridChange($event)"
                       [artifacts]="analysis.edit ? null : analysis.artifacts"
                       [query]="analysis.query"
                       [sorts]="analysis.sqlBuilder.sorts"
-                      [data]="data"
+                      [dataLoader]="dataLoader"
                       [isEditable]="false">
 </report-grid-upgraded>

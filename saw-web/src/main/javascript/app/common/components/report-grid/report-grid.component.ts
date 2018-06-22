@@ -144,7 +144,7 @@ export class ReportGridComponent {
   public sorting = { mode: 'multiple' };
   public columnChooser;
   public gridWidth = '100%';
-  public gridHeight: '100%' | 'auto' = '100%';
+  public gridHeight: '100%' | 'auto' = 'auto';
   public remoteOperations;
   public paging;
   public pager = {
@@ -177,6 +177,7 @@ export class ReportGridComponent {
   ngOnInit() {
     // setup pagination for paginated data
     if (isFunction(this.dataLoader)) {
+      console.log('testing');
       this.data = new DataSource({
         load: options => this.dataLoader(options)
       });

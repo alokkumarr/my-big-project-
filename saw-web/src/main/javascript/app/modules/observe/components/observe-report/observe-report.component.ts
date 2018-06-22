@@ -31,6 +31,8 @@ export class ObserveReportComponent implements OnInit, OnDestroy {
 
   listeners: Array<Subscription> = [];
 
+  dataLoader = this.loadData.bind(this);
+
   constructor(private analyzeService: AnalyzeService) {}
 
   ngOnInit() {
@@ -41,5 +43,11 @@ export class ObserveReportComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.listeners.forEach(sub => sub.unsubscribe());
+  }
+
+  loadData(options = {}) {
+    return this.analyzeService
+      .previewExecution(this.analysis, options)
+      .then(({ data, count }) => ({ data, totalCount: count }));
   }
 }
