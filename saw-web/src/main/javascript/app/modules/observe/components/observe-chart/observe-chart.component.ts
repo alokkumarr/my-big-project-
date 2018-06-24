@@ -5,6 +5,7 @@ import {
   EventEmitter,
   ViewChild
 } from '@angular/core';
+import { DxDataGridComponent } from 'devextreme-angular';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
@@ -25,10 +26,25 @@ import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as concat from 'lodash/concat';
+import * as moment from 'moment';
 
 import { NUMBER_TYPES } from '../../../analyze/consts';
 
 const template = require('./observe-chart.component.html');
+
+type ReportGridField = {
+  caption: string;
+  dataField: string;
+  dataType: string;
+  type: string;
+  visibleIndex: number;
+  visible: boolean;
+  allowSorting?: boolean;
+  alignment?: 'center' | 'left' | 'right';
+  format?: string | object;
+  sortOrder?: 'asc' | 'desc';
+  sortIndex?: number;
+}
 
 @Component({
   selector: 'observe-chart',
@@ -42,6 +58,7 @@ export class ObserveChartComponent {
   @Input('updater') requester: BehaviorSubject<Array<any>>;
   @Output() onRefresh = new EventEmitter<any>();
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
+  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
   private chartUpdater = new BehaviorSubject([]);
   private requesterSubscription: Subscription;
@@ -53,6 +70,9 @@ export class ObserveChartComponent {
   public sorts: Array<any>;
   public filters: Array<any>;
   public isStockChart: boolean;
+  public chartToggleData: any;
+  public toggleToGrid: boolean;
+  public columns: ReportGridField[];
 
   constructor(
     public chartService: ChartService,
@@ -72,6 +92,7 @@ export class ObserveChartComponent {
       ? false
       : this.analysis.isStockChart;
     this.subscribeToRequester();
+    this.toggleToGrid = false;
   }
 
   ngOnDestroy() {
@@ -195,10 +216,33 @@ export class ObserveChartComponent {
     return changes;
   }
 
+  fetchAlias(axisName) {
+    let aliasName = axisName;
+    forEach(this.analysis.artifacts[0].columns, column => {
+      if(axisName === column.name) {
+        aliasName = column.aliasName || column.displayName;
+      }
+    });
+    return aliasName;
+  }
+
+  trimKeyword(data) {
+    let trimData = data.map(row => {
+      let obj = {};
+      for(let key in row) {
+        let trimKey = this.fetchAlias(key.split(".")[0]);
+        obj[trimKey] = row[key];
+      }
+      return obj;
+    });
+    return trimData;
+  }
+
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
     return this.analyzeService.getDataBySettings(payload).then(({ data }) => {
       const parsedData = this.chartService.parseData(data, payload.sqlBuilder);
+      this.chartToggleData = this.trimKeyword(parsedData);
       return parsedData || [];
     });
   }

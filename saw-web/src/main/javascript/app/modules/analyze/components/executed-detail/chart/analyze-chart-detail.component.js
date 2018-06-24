@@ -6,8 +6,11 @@ import * as isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as flatMap from 'lodash/flatMap';
 import * as forEach from 'lodash/forEach';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './analyze-chart-detail.component.html';
+
+const DEFAULT_PAGE_SIZE = 25;
 
 export const AnalyzeChartDetailComponent = {
   template,
@@ -42,8 +45,6 @@ export const AnalyzeChartDetailComponent = {
       });
 
       this.toggleToGrid = false;
-
-      this.source = this.loadExecutionData(false);
     }
 
     initAnalysis() {
@@ -67,9 +68,7 @@ export const AnalyzeChartDetailComponent = {
       this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {chart: this.chart, legend: this.legend});
       this.isStockChart = this.analysis.isStockChart;
 
-      //Report details
       this.columns = this.analysis.edit ? null : this._getColumns(this.analysis);
-      this.showChecked = !(get(this.analysis, 'queryManual'));
     }
 
     $onDestroy() {
@@ -134,8 +133,40 @@ export const AnalyzeChartDetailComponent = {
       this.filteredData = this._ChartService.parseData(data, this.analysis.sqlBuilder);
       this.updateChart();
 
-      this.gridData = [{refresh: true}];
+      this.loadGridData = {
+        columnMinWidth: 150,
+        columnAutoWidth: false,
+        columnResizingMode: 'widget',
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        showColumnHeaders: true,
+        showColumnLines: false,
+        showRowLines: false,
+        showBorders: false;
+        rowAlternationEnabled: true,
+        hoverStateEnabled: true,
+        wordWrapEnabled: false,
+        customizeColumns: this.customizeColumns();
+        gridWidth: '100%',
+        paging: {
+          pageSize: DEFAULT_PAGE_SIZE  
+        },
+        pager: {
+          showNavigationButtons: true,
+          allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
+          showPageSizeSelector: true
+        },
+        dataSource: this.trimKeyword(this.filteredData)
+
+      }
       /* eslint-disable no-unused-expressions */
+    }
+
+    customizeColumns(columns) {
+      forEach(columns, (col: ReportGridField) => {
+        col.allowSorting = false;
+        col.alignment = 'left';
+      });
     }
 
     onExport() {
@@ -144,22 +175,26 @@ export const AnalyzeChartDetailComponent = {
       });
     }
 
+    fetchAlias(axisName) {
+      let aliasName = axisName;
+      forEach(this.columns, column => {
+        if(axisName === column.name) {
+          aliasName = column.aliasName || column.displayName;
+        }
+      })
+      return aliasName;
+    }
+
     trimKeyword(data) {
       let trimData = data.map(row => {
         let obj = {};
         for(var key in row) {
-          let trimKey = key.split(".")[0];
+          let trimKey = this.fetchAlias(key.split(".")[0]);
           obj[trimKey] = row[key];
         }
         return obj;
       });
       return trimData;
-    }
-
-    loadExecutionData(updateRequester = false) {
-      return (options = {}) => {
-        return this._$q.resolve({data: this.trimKeyword(this.filteredData), count: this.filteredData.length});
-      }
     }
   }
 };

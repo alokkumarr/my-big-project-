@@ -17,13 +17,20 @@
                       [artifacts]="$ctrl.analysis.artifacts">
       </filter-chips-u>
     </div>
-  
-    <div ng-if="!$ctrl.toggleToGrid">
-      <mat-icon class="mat-icon material-icons icon-report" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid">
+
+    <div class="toggle-icons">
+      <mat-icon class="mat-icon material-icons icon-report" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid" ng-class="{'active':$ctrl.toggleToGrid === true}">
         <md-tooltip>
           <span>Toggle to Grid</span>
         </md-tooltip>
       </mat-icon>
+
+      <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid" ng-class="{'active':$ctrl.toggleToGrid === false}">
+        <md-tooltip>Toggle to Chart</md-tooltip>
+      </mat-icon>  
+    </div>
+    
+    <div ng-if="!$ctrl.toggleToGrid">
       <div layout="column" layout-align="space-between center" ng-if="!$ctrl.toggleToGrid">
         <chart [updater]="$ctrl.chartUpdater"
                [options]="$ctrl.chartOptions"
@@ -35,16 +42,8 @@
     </div>
     
     <div ng-if="$ctrl.toggleToGrid">
-      <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid">
-        <md-tooltip>Toggle to Chart</md-tooltip>
-      </mat-icon>
       <div layout="column" layout-align="space-between center">
-        <report-grid-display-container data="$ctrl.gridData"
-                              columns="$ctrl.columns"
-                              show-checked="$ctrl.showChecked"
-                              source="$ctrl.source(options)"
-                              groups="$ctrl.analysis.groupByColumns">
-        </report-grid-display-container>
+        <div class="chart-data-grid" dx-data-grid="$ctrl.loadGridData"></div>
       </div>
     </div>
   </md-card-content>
