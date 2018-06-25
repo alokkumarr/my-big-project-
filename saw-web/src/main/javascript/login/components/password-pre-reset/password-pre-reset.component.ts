@@ -23,14 +23,10 @@ export class PasswordPreResetComponent {
   private errorMsg;
   
   resetPwd() {
-    if (isEmpty(this.dataHolder.masterLoginId)) {
-      this.errorMsg = 'Please enter a Valid User Name';
-    } else {
-      this._UserService.preResetPwd(this.dataHolder)
-      .then(res => {
-        this.errorMsg = res.data.validityMessage;
-      });  
-    }
+    this._UserService.preResetPwd(this.dataHolder)
+    .then(res => {
+      this.errorMsg = res.data.validityMessage;
+    });
   }
 
   login() {

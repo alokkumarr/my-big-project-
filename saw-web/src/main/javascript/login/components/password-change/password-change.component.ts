@@ -23,7 +23,9 @@ export class PasswordChangeComponent {
   };
 
   private errorMsg;
-  
+
+  private formState: boolean;
+    
   changePwd() {
     const token = this._JwtService.get();
 
@@ -31,15 +33,11 @@ export class PasswordChangeComponent {
       this.errorMsg = 'Please login to change password';
       return;
     } 
-    if (isEmpty(this.formData.oldPwd) || isEmpty(this.formData.newPwd) || isEmpty(this.formData.confNewPwd)) {
-      this.errorMsg = 'Please enter all requried fields';
-      return;
-    } else {
-      this._UserService.changePwd(this)
-        .then(res => {
-          this.errorMsg = res.data.validityMessage;
-        });
-    }
+
+    this._UserService.changePwd(this)
+      .then(res => {
+        this.errorMsg = res.data.validityMessage;
+      });
   }
 
   login() {
