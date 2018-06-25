@@ -7,10 +7,11 @@ import { AnalyzeService } from '../services/analyze.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
 import {
   ExecuteService,
-  IExecuteEvent,
+  IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../services/execute.service';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
+import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
@@ -36,6 +37,7 @@ export class ExecutedViewComponent implements OnInit {
   canUserEdit = false;
   canUserExecute = false;
   isExecuting = false;
+  executionsSub: Subscription;
   executionSub: Subscription;
   executionId: string;
 
@@ -47,36 +49,91 @@ export class ExecutedViewComponent implements OnInit {
     private _state: StateService,
     private _analyzeActionsService: AnalyzeActionsService,
     private _jwt: JwtService,
-    private _analyzeExportService: AnalyzeExportService
-  ) {}
+    private _analyzeExportService: AnalyzeExportService,
+    private _toastMessage: ToastService
+  ) {
+    this.onExecutionEvent = this.onExecutionEvent.bind(this);
+    this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
+  }
 
   ngOnInit() {
-    const { analysis, analysisId, executionId } = this._transition.params();
+    const { analysis, analysisId, executionId, awaitingExecution, loadLastExecution } = this._transition.params();
+
     this.executionId = executionId;
     if (analysis) {
       this.analysis = analysis;
       this.setPrivileges(analysis);
-      // this.watchAnalysisExecution();
-      this.loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysis.type);
+
+      this.executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId);
     } else {
+      console.log('loadAnalyses');
       this.loadAnalysisById(analysisId).then(analysis => {
         this.setPrivileges(analysis);
-        // this.watchAnalysisExecution();
-        this.loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysis.type);
+
+        this.executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId);
       });
     }
-
-    this.onExecutionEvent = this.onExecutionEvent.bind(this);
-
-    this._executeService.subscribe(analysisId, this.onExecutionEvent);
+    this.executionsSub = this._executeService.subscribe(analysisId, this.onExecutionsEvent);
   }
 
-  onExecutionEvent(e: IExecuteEvent) {
-    this.isExecuting = e.executionState === EXECUTION_STATES.EXECUTING;
+  ngOnDestroy() {
+    if (this.executionsSub) {
+      this.executionsSub.unsubscribe();
+    }
   }
+
+  executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId) {
+    if (!awaitingExecution) {
+      if (executionId || loadLastExecution) {
+        this.loadExecutedAnalysesAndExecutionData(analysis.id, executionId, analysis.type);
+      } else {
+        this.executeAnalysis(analysis)
+      }
+    }
+  }
+
+  onExecutionsEvent(e: IExecuteEventEmitter) {
+    console.log('isStopped', e.subject.isStopped);
+    if (!e.subject.isStopped) {
+      e.subject.subscribe(this.onExecutionEvent);
+    }
+  }
+
+  onExecutionEvent(state: EXECUTION_STATES) {
+    this.isExecuting = state === EXECUTION_STATES.EXECUTING;
+
+    if (state === EXECUTION_STATES.SUCCESS) {
+      const thereIsDataLoaded = this.data || this.dataLoader;
+      if (thereIsDataLoaded) {
+        this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
+          timeOut: 0,
+          extendedTimeOut: 0,
+          closeButton: true,
+          onclick: this.gotoLastPublished(this.analysis)
+        });
+      } else {
+        this.loadExecutedAnalysesAndExecutionData(this.analysis.id, this.executionId, this.analysis.type);
+      }
+    }
+  }
+
+  gotoLastPublished (analysis) {
+    return () => {
+      this._toastMessage.clear();
+      this._state.go('analyze.executedDetail', {
+        analysisId: analysis.id,
+        analysis: analysis,
+        executionId: null,
+        awaitingExecution: false,
+        loadLastExecution: true
+      }, {reload: true});
+    }
+  };
 
   executeAnalysis(analysis) {
-    this._analyzeActionsService.execute(analysis);
+    this._analyzeActionsService.execute(analysis).then(() => {
+      // this.afterExecuteLaunched(analysis);
+    });
   }
 
   loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysisType) {

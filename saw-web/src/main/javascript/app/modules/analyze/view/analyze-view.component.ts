@@ -106,7 +106,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
-    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
+    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis, awaitingExecution: true});
   }
 
   afterPublish(analysis) {

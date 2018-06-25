@@ -53,6 +53,11 @@
           </button>
       </div>
     </div>
+    <filter-chips-u *ngIf="analysis"
+                    [filters]="analysis.sqlBuilder.filters"
+                    [readonly]="true"
+                    [artifacts]="analysis.artifacts">
+    </filter-chips-u>
     <div *ngIf="analysis && analyses && analyses.length" [ngSwitch]="analysis.type">
       <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                             [analysis]="analysis"
@@ -67,18 +72,20 @@
         Analysis Details
       </span>
     </mat-card-title>
-    <div>
-      <strong *ngIf="analysis.userFullName">Created By:</strong>
-      {{analysis.userFullName | changeCase:'title'}}
-    </div>
-    <div>
-      <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
-      {{analysis.scheduleHuman}}
-    </div>
-    <div class="analysis-detail-description">
-      <strong *ngIf="analysis.description">Description</strong>
-      <p>{{analysis.description}}</p>
-    </div>
+    <mat-card-content style="padding-left: 5px;">
+      <div>
+        <strong *ngIf="analysis.userFullName">Created By:</strong>
+        {{analysis.userFullName | changeCase:'title'}}
+      </div>
+      <div>
+        <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+        {{analysis.scheduleHuman}}
+      </div>
+      <div class="analysis-detail-description">
+        <strong *ngIf="analysis.description">Description</strong>
+        <p>{{analysis.description}}</p>
+      </div>
+    </mat-card-content>
   </mat-card>
 
   <mat-card style="padding: 5px;">

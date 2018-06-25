@@ -10,7 +10,7 @@ import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-const EXECUTION_MODES = {
+export const EXECUTION_MODES = {
   PREVIEW: 'preview',
   LIVE: 'live'
 };

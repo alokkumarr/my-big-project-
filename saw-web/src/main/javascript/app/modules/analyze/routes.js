@@ -18,7 +18,9 @@ export function routesConfig($stateProvider) {
       url: '/analysis/:analysisId/executed?executionId',
       component: ExecutedViewComponent,
       params: {
-        analysis: null
+        analysis: null,
+        awaitingExecution: false,
+        loadLastExecution: false
       }
     }
   ];
