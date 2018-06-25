@@ -236,3 +236,38 @@ silhouette.tbl_spark <- function(x, predicted = "predicted") {
 
   sparklyr::ml_clustering_evaluator(x, prediction_col = predicted)
 }
+
+
+#' @export AUC
+#' @rdname measures
+AUC <- measure(id = "AUC",
+               method = "auc",
+               method_args = list("x", "predicted", "actual"),
+               minimize = FALSE,
+               best = 1,
+               worst = 0,
+               properties = c("modeler", "classifier"),
+               name = "Area under the curve",
+               note = "Integral over the graph that results from computing false and true positive rates for many different thresholds.")
+
+
+#' Generic auc function
+#' @export
+auc <- function(...) {
+  UseMethod("auc")
+}
+
+
+#' @export
+#' @rdname auc
+auc.tbl_spark <- function(x, predicted, actual) {
+  checkmate::assert_choice(predicted, colnames(x))
+  checkmate::assert_choice(actual, colnames(x))
+
+  sparklyr::ml_binary_classification_evaluator(
+    x,
+    label_col = actual,
+    raw_prediction_col = predicted,
+    metric_name = "areaUnderROC"
+  )
+}

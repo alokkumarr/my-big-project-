@@ -5,6 +5,8 @@
 
 
 #' New Modeler Object Constructer function
+#' @import sparklyr
+#' @import forecast
 new_modeler <- function(df,
                         target,
                         type,

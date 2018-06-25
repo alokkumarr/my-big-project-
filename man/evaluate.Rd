@@ -4,6 +4,7 @@
 \alias{evaluate}
 \alias{evaluate.model}
 \alias{evaluate.spark_ml_clustering}
+\alias{evaluate.spark_ml_classification}
 \title{Evaluate Model Generic}
 \usage{
 evaluate(mobj, measure)
@@ -11,6 +12,8 @@ evaluate(mobj, measure)
 \method{evaluate}{model}(mobj, measure)
 
 \method{evaluate}{spark_ml_clustering}(mobj, measure)
+
+\method{evaluate}{spark_ml_classification}(mobj, measure)
 }
 \arguments{
 \item{mobj}{model object}
@@ -26,4 +29,6 @@ returns evaluted model object
 Function to evaluate the predictive performance of a model
 
 Evaluate Method for Spark-ML Clustering Object
+
+Evaluate Method for Spark-ML Binary Classification Object
 }

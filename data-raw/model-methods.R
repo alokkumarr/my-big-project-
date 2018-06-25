@@ -67,11 +67,36 @@ segment_methods <- data.frame(
 
 
 
+# Classifier Methods ------------------------------------------------------
+
+# Currently support methods
+classify_methods <- data.frame(
+  method = c(
+    "ml_logistic_regression",
+    "ml_decision_tree_classifier",
+    "ml_gbt_classifier",
+    "ml_random_forest_classifier",
+    "ml_multilayer_perceptron"
+  ),
+  name = c(
+    "Spark ML Logistic Regression Classifier",
+    "Spark ML Decision Tree Classifier",
+    "Spark ML Gradient Boosted Trees Classifier",
+    "Spark ML Random Forest Classifier",
+    "Spark ML Multilayer Perceptron Classifier"
+  ),
+  class = c(rep("spark_ml", 5), rep("spark_ml_classification", 5)),
+  package = "sparklyr"
+)
+
+
+
 # All methods -------------------------------------------------------------
 
 model_methods <- rbind(
   forecast_methods %>% dplyr::mutate(type = "forecaster"),
-  segment_methods %>% dplyr::mutate(type = "segmenter")
+  segment_methods %>% dplyr::mutate(type = "segmenter"),
+  classify_methods %>% dplyr::mutate(type = "classifier")
 ) %>%
   nest(class) %>%
   rename(class = data) %>%

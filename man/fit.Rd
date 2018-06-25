@@ -10,7 +10,7 @@
 
 fit(...)
 
-\method{fit}{spark_ml}(obj, data)
+\method{fit}{spark_ml}(mobj, data)
 }
 \description{
 Fit model to single data sample

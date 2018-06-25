@@ -3,14 +3,19 @@
 \name{fitted.forecast_model}
 \alias{fitted.forecast_model}
 \alias{fitted.spark_ml}
+\alias{fitted.ml_decision_tree_classification_model}
 \title{Forecast Model Fitted Method}
 \usage{
 \method{fitted}{forecast_model}(obj)
 
 \method{fitted}{spark_ml}(obj)
+
+\method{fitted}{ml_decision_tree_classification_model}(obj)
 }
 \description{
 Forecast Model Fitted Method
 
 Fitted Method for Spark-ML Object
+
+Fitted Method for Spark-ML Decision Tree Classification Model
 }
