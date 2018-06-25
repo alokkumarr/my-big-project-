@@ -178,11 +178,9 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     gotoExecution(executionId) {
-      this._$state.go('analyze.executedDetail', {
-        executionId,
-        analysisId: this.analysis.id,
-        analysis: this.analysis
-      });
+      this.analyses = null;
+      this._executionId = executionId;
+      this.loadExecutedAnalyses(this.analysis.id);
     }
 
     getCheckedFieldsForExport(analysis, data) {
