@@ -141,24 +141,23 @@ export const AnalyzeExecutedDetailComponent = {
         this.analyses = null;
         this._executionId = null;
         this.loadExecutedAnalyses(this.analysis.id);
-        // this._$state.go('analyze.executedDetail', {
-        //   analysisId: this.analysis.id,
-        //   analysis: this.analysis,
-        //   executionId: null
-        // }, {reload: true});
       };
 
       if (this._executionToast) {
         this._toastMessage.clear(this._executionToast);
       }
 
-      this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
-        timeOut: 0,
-        extendedTimeOut: 0,
-        closeButton: true,
-        tapToDismiss: true,
-        onTap: gotoLastPublished.bind(this)
-      });
+      if (this.analysis.type === 'report') {
+        this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
+          timeOut: 0,
+          extendedTimeOut: 0,
+          closeButton: true,
+          tapToDismiss: true,
+          onTap: gotoLastPublished.bind(this)
+        });
+      } else {
+        gotoLastPublished();
+      }
     }
 
     executeAnalysis() {
