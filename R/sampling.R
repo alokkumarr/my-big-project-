@@ -492,7 +492,7 @@ resample.data.frame <- function(x, number, amount, seed = NULL){
 
 #' @rdname resample
 #' @export
-resample.tbl_spark <- function(x, amount, seed = NULL){
+resample.tbl_spark <- function(x, number, amount, seed = NULL){
   z <- 1:sparklyr::sdf_nrow(x)
   resample(z, number, amount, seed)
 }
@@ -653,9 +653,8 @@ time_slice.integer <-
     names(train) <- labels
     names(validation) <- labels
 
-    out <- list(train = train, validation = validation)
-
-    out
+    indicies <- list(train = train, validation = validation)
+    indicies
   }
 
 
@@ -777,4 +776,161 @@ add_time_slice_samples.forecaster <- function(x,
   x$samples <- time_slice_samples
   x
 }
+
+
+
+
+
+# cross_validation_samples ------------------------------------------------
+
+
+
+#' Cross Validation Sample function
+#'
+#' Function creates a cross validation sample index from a dataset. Index can be used to
+#' create data samples
+#'
+#' @param x numeric vector, dataframe, spark dataframe, or modeler object to
+#'   create samples from
+#' @param folds number of cross validation folds
+#' @export
+cross_validation <- function(x, folds) {
+  UseMethod("cross_validation")
+}
+
+
+#' @rdname cross_validation
+#' @export
+cross_validation.numeric <- function(x, folds){
+
+  checkmate::assert_numeric(x, any.missing = FALSE)
+  checkmate::assert_number(folds, lower = 2)
+
+  n <- length(x)
+  seq_by <- floor(n/folds)
+  begin <- floor(seq(1, n, by = n/folds))
+  end <- begin + seq_by -1
+  end[folds] <- n
+
+  validation <- purrr::map2(begin, end, function(x, y) x:y)
+  train <- purrr::map(validation, function(x, index) {index[-x]}, index = x)
+  names(validation) <- paste0("fold", 1:length(validation))
+  names(train) <- paste0("fold", 1:length(train))
+
+  indicies <- list(train = train, validation = validation)
+  indicies
+}
+
+
+#' @rdname cross_validation
+#' @export
+cross_validation.data.frame <- function(x, folds){
+  z <- 1:nrow(x)
+  cross_validation(z, folds)
+}
+
+
+#' @rdname cross_validation
+#' @export
+cross_validation.tbl_spark <- function(x, folds){
+  z <- 1:sparklyr::sdf_nrow(x)
+  cross_validation(z, folds)
+}
+
+
+
+#' Add Cross Validation Samples function
+#'
+#' Function creates a new cross_validation sample object based on configuration.
+#' Each index is fold of the dataset
+#'
+#' The function creates train and validation pairs using all of the dataset rows
+#'
+#'
+#' @param x numeric vector, dataframe, spark dataframe, or modeler object to
+#'   create samples from
+#' @param folds number of cross validation folds
+#' @param test_holdout_prct amount of data to holdout out for test sample
+#' @param seed optional random seed generator
+#'
+#' @return either an updated modeler object if provided otherwise a samples
+#'   object with resamples
+#' @export
+#'
+#' @examples
+#'
+#' # Data.frame example
+#' add_cross_validation_samples(mtcars, folds = 4)
+add_cross_validation_samples <- function(x, folds, test_holdout_prct, seed){
+  UseMethod("add_cross_validation_samples")
+}
+
+
+#' @rdname add_cross_validation_samples
+#' @export
+add_cross_validation_samples.numeric <- function(x, folds, test_holdout_prct = NULL, seed = NULL){
+
+
+  if(! is.null(test_holdout_prct)){
+    s1 <- resample(x, number = 1, amount = test_holdout_prct, seed)
+    test_index <- s1[[1]]
+    x1 <- x[-test_index]
+  }else{
+    test_index <- NULL
+    x1 <- x
+  }
+  s2 <- cross_validation(x1, folds)
+
+  train_indicies <- s2$train
+  val_indicies <- s2$validation
+
+  samples(
+    validation_method = "cross_validation",
+    validation_args = list(folds = folds),
+    test_holdout_prct = test_holdout_prct,
+    test_holdout_method = "cross_validation",
+    downsample_prct = NULL,
+    train_indicies = train_indicies,
+    validation_indicies = val_indicies,
+    indicies_names = names(train_indicies),
+    test_index = test_index
+  )
+}
+
+
+#' @rdname add_cross_validation_samples
+#' @export
+add_cross_validation_samples.data.frame <- function(x, folds, test_holdout_prct = NULL, seed = NULL){
+  z <- 1:nrow(x)
+  add_cross_validation_samples(z, folds, test_holdout_prct, seed)
+}
+
+
+#' @rdname add_cross_validation_samples
+#' @export
+add_cross_validation_samples.tbl_spark <- function(x, folds, test_holdout_prct = NULL, seed = NULL){
+  z <- 1:sparklyr::sdf_nrow(x)
+  add_cross_validation_samples(z, folds, test_holdout_prct, seed)
+}
+
+
+
+#' @rdname add_cross_validation_samples
+#' @export
+add_cross_validation_samples.modeler <- function(x, folds, test_holdout_prct = NULL, seed = NULL){
+
+  cross_validation_samples <- add_cross_validation_samples(x$data, folds, test_holdout_prct, seed)
+  x$samples <- cross_validation_samples
+  x
+}
+
+
+#' @rdname add_cross_validation_samples
+#' @export
+add_cross_validation_samples.forecaster <- function(x, folds, test_holdout_prct = NULL, seed = NULL){
+
+  stop("Cross Validation not appropriate for forecasting use cases.",
+       "\n  Use either default, holdout or time_slices samples. ")
+}
+
 
