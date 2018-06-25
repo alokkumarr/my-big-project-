@@ -2,6 +2,8 @@ import {
   Component,
   Input,
   Output,
+  OnInit,
+  OnDestroy,
   EventEmitter,
   ViewChild,
   ElementRef
@@ -23,6 +25,8 @@ import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
 import { AGGREGATE_TYPES_OBJ, DATE_FORMATS_OBJ } from '../../consts.js';
+import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import {
   ArtifactColumnReport,
   Artifact,
@@ -69,12 +73,14 @@ const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
   selector: 'report-grid-upgraded',
   template
 })
-export class ReportGridComponent {
+export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
+  private listeners: Array<Subscription> = [];
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Input() query: string;
+  @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     this.sorts = reduce(
@@ -144,7 +150,7 @@ export class ReportGridComponent {
   public sorting = { mode: 'multiple' };
   public columnChooser;
   public gridWidth = '100%';
-  public gridHeight: '100%' | 'auto' = 'auto';
+  public gridHeight: '100%' | 'auto' = '100%';
   public remoteOperations;
   public paging;
   public pager = {
@@ -177,12 +183,15 @@ export class ReportGridComponent {
   ngOnInit() {
     // setup pagination for paginated data
     if (isFunction(this.dataLoader)) {
-      console.log('testing');
       this.data = new DataSource({
         load: options => this.dataLoader(options)
       });
       this.remoteOperations = { paging: true };
       this.paging = { pageSize: this.pageSize };
+    }
+
+    if (this.dimensionChanged) {
+      this.listeners.push(this.subscribeForRepaint());
     }
 
     // disable editing if needed
@@ -207,6 +216,10 @@ export class ReportGridComponent {
     }
   }
 
+  ngOnDestroy() {
+    this.listeners.forEach(sub => sub.unsubscribe());
+  }
+
   onContentReady({ component }) {
     if (this.isEditable) {
       this.updateVisibleIndices(component);
@@ -216,6 +229,14 @@ export class ReportGridComponent {
         this.isColumnChooserListenerSet = true;
       }
     }
+  }
+
+  subscribeForRepaint() {
+    return this.dimensionChanged.subscribe(() => {
+      this.dataGrid &&
+        this.dataGrid.instance &&
+        this.dataGrid.instance.repaint();
+    });
   }
 
   customizeColumns(columns) {
