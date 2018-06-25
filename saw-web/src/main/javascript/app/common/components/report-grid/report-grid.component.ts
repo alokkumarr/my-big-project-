@@ -47,6 +47,22 @@ type ReportGridSort = {
   index: number;
 }
 
+type ReportGridField = {
+  caption: string;
+  dataField: string;
+  dataType: string;
+  type: string;
+  visibleIndex: number;
+  payload: ArtifactColumnReport;
+  visible: boolean;
+  allowSorting?: boolean;
+  alignment?: 'center' | 'left' | 'right';
+  format?: string | object;
+  sortOrder?: 'asc' | 'desc';
+  sortIndex?: number;
+  changeColumnProp: Function;
+}
+
 const DEFAULT_PAGE_SIZE = 25;
 const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
 @Component({
@@ -55,6 +71,7 @@ const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
 })
 
 export class ReportGridComponent {
+  public columns: ReportGridField[];
   public data;
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;

@@ -32,20 +32,6 @@ import { NUMBER_TYPES } from '../../../analyze/consts';
 
 const template = require('./observe-chart.component.html');
 
-type ReportGridField = {
-  caption: string;
-  dataField: string;
-  dataType: string;
-  type: string;
-  visibleIndex: number;
-  visible: boolean;
-  allowSorting?: boolean;
-  alignment?: 'center' | 'left' | 'right';
-  format?: string | object;
-  sortOrder?: 'asc' | 'desc';
-  sortIndex?: number;
-}
-
 @Component({
   selector: 'observe-chart',
   template,
@@ -72,7 +58,6 @@ export class ObserveChartComponent {
   public isStockChart: boolean;
   public chartToggleData: any;
   public toggleToGrid: boolean;
-  public columns: ReportGridField[];
 
   constructor(
     public chartService: ChartService,
