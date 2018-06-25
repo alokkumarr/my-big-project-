@@ -154,9 +154,6 @@ export class AnalyzeService {
       });
 
     } else {
-      this._$translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
-        this._toastMessage.info(msg);
-      });
       this._executions[model.id] = deferred.promise;
 
       this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
