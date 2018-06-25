@@ -13,7 +13,7 @@ resample(x, number, amount, seed)
 
 \method{resample}{data.frame}(x, number, amount, seed = NULL)
 
-\method{resample}{tbl_spark}(x, amount, seed = NULL)
+\method{resample}{tbl_spark}(x, number, amount, seed = NULL)
 }
 \arguments{
 \item{x}{numeric vector, dataframe, spark dataframe, or modeler object to

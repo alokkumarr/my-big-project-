@@ -2,9 +2,9 @@
 # Sampling Uint Tests -----------------------------------------------------
 
 
+library(a2modeler)
 library(testthat)
 library(checkmate)
-library(a2modeler)
 library(sparklyr)
 library(dplyr)
 
@@ -77,7 +77,7 @@ test_that("time_slices functions work as expected", {
   s1df <- add_time_slice_samples(df, width, horizon, skip)
 
   s2x <- add_time_slice_samples(x, width, horizon, skip)
-  s2df <- add_time_slice_samples(x, width, horizon, skip)
+  s2df <- add_time_slice_samples(df, width, horizon, skip)
 
   s3x <- add_time_slice_samples(x, width, horizon, skip, fixed_width=FALSE)
   s3df <- add_time_slice_samples(x, width, horizon, skip, fixed_width=FALSE)
@@ -91,4 +91,41 @@ test_that("time_slices functions work as expected", {
   expect_equal(length(get_train_samples(s1x)[[1]]), length(get_train_samples(s1x)[[2]]))
   expect_null(get_test_samples(s1x))
   expect_true(all(unlist(lapply(s3x$train_indicies, function(x) x[1])) == 1))
+})
+
+
+
+
+
+test_that("cross_validation functions work as expected", {
+  n <- 20
+  x <- 1:n
+  df <- data.frame(x = x)
+  folds <- 4
+
+  s1x <- add_cross_validation_samples(x, folds, test_holdout_prct = NULL)
+  s1df <- add_cross_validation_samples(df, folds, test_holdout_prct = NULL)
+
+
+  expect_equal(s1x, s1df)
+  expect_equal(length(get_train_samples(s1x)), folds)
+  expect_equal(length(get_train_samples(s1x)[[1]]), n - n/folds)
+  expect_equal(length(get_train_samples(s1x)[[1]]), length(get_train_samples(s1x)[[2]]))
+  expect_null(get_test_samples(s1x))
+
+  n <- 25
+  x <- 1:n
+  df <- data.frame(x = x)
+  folds <- 5
+
+  s2x <- add_cross_validation_samples(x, folds, test_holdout_prct = .2, seed = 319)
+  s2df <- add_cross_validation_samples(df, folds, test_holdout_prct = .2, seed = 319)
+
+
+  expect_equal(s2x, s2df)
+  expect_equal(length(get_train_samples(s2x)), folds)
+  expect_equal(length(get_train_samples(s2x)[[1]]), (n-n *.2) - (n- n *.2)/folds)
+  expect_equal(length(get_train_samples(s2x)[[1]]), length(get_train_samples(s2x)[[2]]))
+  expect_equal(length(get_test_samples(s2x)), n*.2)
+
 })
