@@ -1,7 +1,7 @@
-
+.logs
+.derby.log
 .Rproj.user
 .Rhistory
-.RData
 derby.log
-.derby.log
+.RData
 logs
