@@ -71,7 +71,15 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     /*
      * Cache a Workbench Livy client to reduce startup time for first operation
      */
-    cacheWorkbenchClient();
+    try {
+      cacheWorkbenchClient();
+    } catch (Exception e) {
+      /* If Apache Livy is not installed in the environment, fail
+       * gracefully by letting the Workbench Service still start up.
+       * If Apache Livy is later installed, the Workbench Service will
+       * be able to recover by reattempting to create the client.  */
+      log.warn("Unable to create Workbench client upon startup", e);
+    }
   }
 
   /**
