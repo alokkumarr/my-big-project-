@@ -226,7 +226,9 @@ public class DLDataSetService {
         JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
         JsonObject trans = new JsonObject();
         trans.addProperty("asOutput", ctx.transformationID);
-        ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        if (schema != null) {
+            ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+        }
         ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
         ds.getAsJsonObject().add("transformations", trans);
         ds.getAsJsonObject().add("asOfNow", status);

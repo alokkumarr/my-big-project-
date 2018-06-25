@@ -25,7 +25,7 @@ public class XDFTimestampconverter implements UDF3<String, String, String, Strin
         if (_xdfDate == null || _xdfDate.trim().length() == 0) {
             return null;
         } else {
-//            _dt = (_xdfDate == null || _xdfDate.isEmpty()) ? "10000101" : _xdfDate;
+            _dt = (_xdfDate == null || _xdfDate.isEmpty()) ? "10000101" : _xdfDate;
             _tm = (_xdfTime == null || _xdfTime.isEmpty()) ? "000000" : _xdfTime;
             // Convert
             DateTimeFormatter srcDtfmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
