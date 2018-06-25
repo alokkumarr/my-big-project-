@@ -32,23 +32,23 @@
             mat-raised-button
             e2e="open-new-analysis-modal"
             color="primary">
-      + <span i18n>Analysis</span>
+      + <span i18n>ANALYSIS</span>
     </button>
   </div>
 </mat-toolbar>
-<div [ngSwitch]="viewMode">
+<mat-card [ngSwitch]="viewMode" class="analyses-container">
   <analyze-list-view *ngSwitchCase="LIST_VIEW"
                         (action)="onAction($event)"
                         [analyses]="filteredAnalyses | analysesFilter:filterObj.analysisType:cronJobs"
-                        [analysisType]="analysisType"
+                        [analysisType]="filterObj.analysisType"
                         [searchTerm]="filterObj.searchTermValue"
                         [cronJobs]="cronJobs">
   </analyze-list-view>
   <analyze-card-view *ngSwitchCase="CARD_VIEW"
                         (action)="onAction($event)"
                         [analyses]="filteredAnalyses | analysesFilter:filterObj.analysisType:cronJobs"
-                        [analysisType]="analysisType"
+                        [analysisType]="filterObj.analysisType"
                         [highlightTerm]="filterObj.searchTermValue"
                         [cronJobs]="cronJobs">
   </analyze-card-view>
-</div>
+</mat-card>

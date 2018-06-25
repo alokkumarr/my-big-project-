@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('icomoon.ttf?t1wamy') format('truetype'),
-    url('icomoon.woff?t1wamy') format('woff'),
-    url('icomoon.svg?t1wamy#icomoon') format('svg');
+    url('icomoon.ttf?up1fxn') format('truetype'),
+    url('icomoon.woff?up1fxn') format('woff'),
+    url('icomoon.svg?up1fxn#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -23,13 +23,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-Candlestick-icon-white:before {
-  content: "\e98b";
-  color: #fff;
-}
 .icon-Candlestick-icon:before {
   content: "\e98c";
-  color: #757575;
 }
 .icon-timeseries-chart:before {
   content: "\e98d";
@@ -778,4 +773,19 @@
 }
 .icon-sad:before {
   content: "\e9e8";
+}
+.icon-stop-circle:before {
+  content: "\e9f4";
+}
+.icon-arrow-down-circle:before {
+  content: "\e9f5";
+}
+.icon-arrow-up-circle:before {
+  content: "\e9f6";
+}
+.icon-arrow-down-circle-filled:before {
+  content: "\e9f7";
+}
+.icon-arrow-up-circle-filled:before {
+  content: "\e9f8";
 }

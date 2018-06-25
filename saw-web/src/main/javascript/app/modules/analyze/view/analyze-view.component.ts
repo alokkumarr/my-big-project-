@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
+import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
 import * as findIndex from 'lodash/findIndex';
@@ -8,6 +9,7 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
+import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalyzeViewActionEvent } from './types';
 
 const template = require('./analyze-view.component.html');
@@ -57,7 +59,7 @@ export class AnalyzeViewComponent implements OnInit {
     private _jwt: JwtService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
-    @Inject('$mdDialog') private _$mdDialog: any
+    public _dialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -133,23 +135,21 @@ export class AnalyzeViewComponent implements OnInit {
     this._headerProgress.show();
     this._analyzeService.getSemanticLayerData().then(metrics => {
       this._headerProgress.hide();
-      this._$mdDialog.show({
-        controller: scope => {
-          scope.metrics = metrics;
-          scope.subCategory = this.analysisId;
-        },
-        template: '<analyze-new metrics="metrics" sub-category="{{::subCategory}}"></analyze-new>',
-        fullscreen: true,
-        controllerAs: '$ctrl',
-        multiple: false,
-        autoWrap: false,
-        focusOnOpen: false,
-        clickOutsideToClose: true
-      }).then(result => {
-        if (result) {
-          this.loadAnalyses();
+      this._dialog.open(AnalyzeNewDialogComponent, {
+        width: 'auto',
+        height: 'auto',
+        autoFocus: false,
+        data: {
+          metrics,
+          id: this.analysisId
         }
-      });
+      } as MatDialogConfig).afterClosed().subscribe(
+        isSavedSuccessfully => {
+          if (isSavedSuccessfully) {
+            this.loadAnalyses()
+          }
+        }
+      );
     }).catch(() => {
       this._headerProgress.hide();
     });

@@ -26,8 +26,10 @@ export class AnalyzeActionsService {
 
   execute(analysis) {
     return this._filterService.getRuntimeFilterValues(analysis).then(model => {
-      this._executeService.executeAnalysis(model);
-      return model;
+      if (model) {
+        this._executeService.executeAnalysis(model);
+        return model;
+      }
     });
   }
 

@@ -24,7 +24,7 @@ import 'devextreme/integration/angular';
 
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
@@ -67,7 +67,8 @@ import {
   JsPlumbEndpointComponent
 } from './components/js-plumb';
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
-import { DateFormatDialogComponent } from './components/date-format-dialog';
+import {DateFormatDialogComponent} from './components/date-format-dialog';
+import { ChoiceGroupComponent } from './components/choice-group-u';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { E2eDirective } from './directives/e2e.directive';
 import { UserService } from '../../login/services/user.service';
@@ -132,6 +133,7 @@ angular
     DxDataGridModule,
     DxTemplateModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     FlexLayoutModule,
     DndModule,
@@ -161,6 +163,7 @@ angular
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
+    ChoiceGroupComponent,
     SearchBoxComponent
   ],
   entryComponents: [
@@ -181,6 +184,7 @@ angular
     DateFormatDialogComponent,
     AliasRenameDialogComponent,
     AggregateChooserComponent,
+    ChoiceGroupComponent,
     SearchBoxComponent
   ],
   exports: [
@@ -192,6 +196,7 @@ angular
     DxDataGridModule,
     DxTemplateModule,
     FormsModule,
+    ReactiveFormsModule,
     MaterialModule,
     CommonPipesModule,
     DxDataGridModule,
@@ -220,6 +225,7 @@ angular
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     E2eDirective,
+    ChoiceGroupComponent,
     SearchBoxComponent
   ],
   providers: [

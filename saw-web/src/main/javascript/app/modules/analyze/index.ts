@@ -92,11 +92,6 @@ import {
   DesignerSortComponent,
   DesignerDescriptionComponent,
   DesignerSaveComponent,
-  DesignerFilterContainerComponent,
-  DesignerFilterRowComponent,
-  DesignerStringFilterComponent,
-  DesignerDateFilterComponent,
-  DesignerNumberFilterComponent,
   DesignerPreviewDialogComponent,
   SingleTableDesignerLayout,
   MultiTableDesignerLayout,
@@ -104,10 +99,12 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 
+import { AnalyzeFilterModule } from './components/designer/filter';
+import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
+
 import { CronJobSchedularComponent } from './publish/cron-job-schedular';
 import { CronDatePickerComponent } from './publish/cron-date-picker';
 
-import { FilterChipsComponent as FilterChipsUpgraded } from './components/filter/chips-u';
 import { analyzeServiceProvider } from './services/ajs-analyze-providers';
 
 import { AnalyzeDialogService } from './services/analyze-dialog.service';
@@ -121,7 +118,7 @@ angular
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
   .filter('uniqueFilter', uniqueFilter)
-  .service('FilterService', FilterService)
+  .factory('FilterService', downgradeInjectable(FilterService) as Function)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
   .factory('AnalyzeActionsService', OldAnalyzeActionsService)
@@ -192,6 +189,7 @@ angular
     AnalyzeViewModule,
     ExecutedViewModule,
     AnalyzeActionsModule,
+    AnalyzeFilterModule,
     AnalyzePublishDialogModule
   ],
   declarations: [
@@ -216,11 +214,6 @@ angular
     DesignerSortComponent,
     DesignerDescriptionComponent,
     DesignerSaveComponent,
-    DesignerFilterContainerComponent,
-    DesignerFilterRowComponent,
-    DesignerStringFilterComponent,
-    DesignerDateFilterComponent,
-    DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     SingleTableDesignerLayout,
@@ -249,11 +242,6 @@ angular
     DesignerSortComponent,
     DesignerDescriptionComponent,
     DesignerSaveComponent,
-    DesignerFilterContainerComponent,
-    DesignerFilterRowComponent,
-    DesignerStringFilterComponent,
-    DesignerDateFilterComponent,
-    DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     SingleTableDesignerLayout,
     MultiTableDesignerLayout,
@@ -264,6 +252,7 @@ angular
     AnalyzeDialogService,
     analyzeServiceProvider,
     DesignerService,
+    FilterService,
     ChartService,
     AnalyzeActionsService
   ]

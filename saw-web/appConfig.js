@@ -7,9 +7,10 @@ if (__PRODUCTION__) {
 } else {
   // Note: To run against a local Docker environment, use localhost
   // apiUrl = 'http://localhost';
-  apiUrl = 'https://sawdev-bda-velocity-vacum-np.sncrcorp.net';
+  apiUrl = 'https://saw-bda-cert-vaste.sncrcorp.net';
 }
 /* eslint-enable */
+apiUrl = apiUrl + '/saw';
 
 export default {
   login: {

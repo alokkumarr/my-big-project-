@@ -14,6 +14,7 @@ import sncr.metadata.engine.ProcessingResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
+import scala.collection.JavaConverters._
 
 import sncr.datalake.DLConfiguration
 
@@ -60,23 +61,19 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       execType match {
         case ExecutionType.scheduled => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResult(id, null,ExecutionType.scheduled.toString)
         }
         case ExecutionType.onetime => {
           analysisNodeExecution.executeSQLWithLimit(limit)
-          // TODO:: Reverting will be handled as part of SIP-2513
-        //  analysisNodeExecution.createAnalysisResultForOneTime(id)
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.preview => {
           analysisNodeExecution.executeSQLWithLimit(DLConfiguration.rowLimit)
-          // TODO:: Reverting will be handled as part of SIP-2513
-         // analysisNodeExecution.createAnalysisResultForOneTime(id)
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.regularExecution.toString)
         }
       }
       analysisNodeExecution.setFinishTime
@@ -170,12 +167,6 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     * @return List<Map<…>> data structure
     */
   def loadExecution(id: String, limit: Integer = 10000) : java.util.stream.Stream[String] = {
-    /* Note: If loading of execution results is reimplemented in any other
-     * service as part of a refactoring, it should be implemented
-     * using Java streams to allow processing the data using a
-     * streaming approach. This avoids risking out of memory errors
-     * due to loading the entire execution result into memory at the
-     * same time. */
 
     // use this as just a data type holder
     // val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
@@ -220,6 +211,63 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       }
     }
     resultsStream
+  }
+
+
+  /**
+    * Returns the rows count of execution result
+    *
+    * @return List<Map<…>> data structure
+    */
+  def getRowCount(id: String) : Long = {
+
+    val resultNode = AnalysisResult(null, id)
+    var rowCount :Long= 0;
+
+    if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
+      m_log.debug("Data location property not found: {}", id)
+      return rowCount
+    }
+
+    resultNode.getObject("dataLocation") match {
+      case Some(dir: String) => {
+        val files = try {
+          /* Get list of all files in the execution result directory */
+          HFileOperations.getFilesStatus(dir)
+        } catch {
+          case e: Throwable => {
+            m_log.debug("Exception while getting result files: {}", e)
+            return rowCount
+          }
+        }
+        /* Filter out the recordCount file which contain the rows count */
+        files.filter(_.getPath.getName.endsWith("recordCount")).foreach(file => {
+          m_log.debug("Filtered file: " + file.getPath.getName)
+          val is = HFileOperations.readFileToInputStream(file.getPath.toString)
+          // stream of all the "string" values for one file.
+          val reader = new BufferedReader(new InputStreamReader(is))
+          reader.lines.iterator.asScala.foreach({
+            parse(_) match {
+              case obj: JObject => {
+                /* Convert the parsed JSON to the data type expected by the*/
+                val rowMap = obj.extract[Map[String, Any]]
+                rowMap.keys.foreach(key => {
+                  if (key.equalsIgnoreCase("recordCount")) {
+                    rowMap.get(key) match {
+                      case Some(count) =>
+                        rowCount = count.asInstanceOf[BigInt].toLong
+                    }
+                  }
+                })
+              }
+          }})})
+           rowCount
+        }
+      case obj => {
+        m_log.debug("Data location not found for results: {}", id)
+      }
+    rowCount
+    }
   }
 
   /**

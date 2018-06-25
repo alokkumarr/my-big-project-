@@ -20,8 +20,8 @@ public class DataProfilerComponent extends Component implements WithSparkContext
         DataProfilerComponent component = new DataProfilerComponent();
         try {
             // Spark based component
-            if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+            if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
             }
         } catch (Exception e){
@@ -36,7 +36,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
 
     // Wanted to int it without cli options
 
-    protected int Execute(){
+    protected int execute(){
         try {
             // Resolve physical PhysicalLocation
             if (ctx.componentConfiguration.getInputs() != null &&
@@ -78,10 +78,10 @@ public class DataProfilerComponent extends Component implements WithSparkContext
 
         return 0;
     }
-    protected int Move(){
+    protected int move(){
         return 0;
     }
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 

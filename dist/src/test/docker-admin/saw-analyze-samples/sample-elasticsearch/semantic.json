@@ -1,0 +1,177 @@
+[
+  {
+    "node-category": "SemanticNode",
+    "id": "340df99d-16a6-45cb-af49-5699e3337e50",
+    "action": {
+      "verb": "create",
+      "content": {
+        "id": "sample_semantic_object",
+        "dataSecurityKey": "",
+        "type": "semantic",
+        "module": "ANALYZE",
+        "metric": "sample-elasticsearch",
+        "metricName": "Sample (pivot/chart) - new",
+        "customerCode": "SYNCHRONOSS",
+        "disabled": "false",
+        "checked": "false",
+        "supports": [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "label": "Pivot",
+                "icon": "icon-pivot",
+                "type": "table:pivot"
+              },
+              {
+                "label": "Report",
+                "icon": "icon-report",
+                "type": "table:esReport"
+              }
+            ]
+          },
+          {
+            "label": "CHARTS",
+            "category": "charts",
+            "children": [
+              {
+                "label": "Column Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:column"
+              },
+              {
+                "label": "Stacked Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:stack"
+              },
+              {
+                "label": "Line Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:line"
+              },
+	      {
+                "label": "Bar Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:bar"
+              },
+	      {
+                "label": "Scatter Plot",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:scatter"
+              },
+	      {
+                "label": "Bubble Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:bubble"
+              },
+              {
+                "label": "Time Series Chart",
+                "icon": "icon-timeseries-chart",
+                "type": "chart:tsline"
+              },
+              {
+                "label": "Time series multi pane",
+                "icon": "icon-Candlestick-icon",
+                "type": "chart:tsareaspline"
+              },
+              {
+                "label": "Area Chart",
+                "icon": "icon-area-chart",
+                "type": "chart:area"
+              },
+              {
+                "label": "Combo Chart",
+                "icon": "icon-combo-chart",
+                "type": "chart:combo"
+              },
+              {
+                "label": "Pie Chart",
+                "icon": "icon-pie-chart",
+                "type": "chart:pie"
+              }
+            ]
+          }
+        ],
+        "esRepository": {
+          "storageType":"ES",
+          "indexName":"sample",
+          "type":"sample"
+        },
+        "artifacts": [
+          {
+            "artifactName": "sample",
+            "columns": [
+              {
+                "name": "string",
+                "type": "string",
+                "columnName": "string.keyword",
+                "displayName": "String",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "long",
+                "type": "long",
+                "columnName": "long",
+                "displayName": "Long",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+              },
+              {
+                "name": "float",
+                "type": "float",
+                "columnName": "float",
+                "displayName": "Float",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+              },
+              {
+                "name": "date",
+                "type": "date",
+                "columnName": "date",
+                "displayName": "Date",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+              },
+              {
+                "name": "integer",
+                "type": "integer",
+                "columnName": "integer",
+                "displayName": "Integer",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+              },
+              {
+                "name": "double",
+                "type": "double",
+                "columnName": "double",
+                "displayName": "Double",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

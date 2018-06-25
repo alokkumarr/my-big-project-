@@ -63,6 +63,7 @@ export class DesignerContainerComponent {
   public dataCount: number;
   public auxSettings: any = {};
   public sorts: Sort[] = [];
+  public sortFlag = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
@@ -204,6 +205,26 @@ export class DesignerContainerComponent {
       break;
     }
     return artifacts;
+  }
+
+  checkNodeForSorts() {
+    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+    const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
+    forEach(sqlBuilder.nodeFields, node => {
+      let identical = false;
+      forEach(this.sorts || [], sort => {
+        const hasSort = this.sorts.some(
+          sort => node.columnName === sort.columnName
+        );
+        if (!hasSort) {
+          this.sorts.push({
+            order: 'asc',
+            columnName: node.columnName,
+            type: node.type
+          });
+        }
+      });
+    });
   }
 
   addDefaultSorts() {
@@ -379,6 +400,9 @@ export class DesignerContainerComponent {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
+    if (!this.isInQueryMode) {
+      delete (this.analysis as AnalysisReport).queryManual;
+    }
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -535,6 +559,7 @@ export class DesignerContainerComponent {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.checkNodeForSorts();
       this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
       break;
@@ -621,7 +646,7 @@ export class DesignerContainerComponent {
   canRequestReport(artifacts) {
     if (this.analysis.edit) {
       return Boolean((<AnalysisReport>this.analysis).queryManual);
-    };
+    }
 
     let atLeastOneIsChecked = false;
     forEach(artifacts, artifact => {

@@ -1,9 +1,11 @@
 package sncr.xdf.component;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.fs.CreateFlag;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Options;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.log4j.Logger;
 import scala.Tuple3;
 import sncr.bda.core.file.HFileOperations;
@@ -75,8 +77,22 @@ public interface WithMovableResult {
                             Path dest = new Path(destFileName);
                             WithMovableResultHelper.logger.debug(String.format("move from: %s to %s", srcFileName, dest.toString()));
                             Options.Rename opt = (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
+
+                            WithMovableResultHelper.logger.debug("Inside Move. Source=" +
+                                srcFileName + " destination = " + destFileName);
                             Path src = new Path(srcFileName);
                             Path dst = new Path(destFileName);
+
+                            WithMovableResultHelper.logger.debug("Move Path. Source=" +
+                                src + " destination = " + dst);
+
+                            WithMovableResultHelper.logger.info("Create destination directory if " +
+                                "not exists: " + dst.getParent());
+                            ctx.fc.mkdir(dst.getParent(), FsPermission.getDirDefault(),
+                                true);
+                            //.create(dst.getParent(),
+                              //  EnumSet.of(CreateFlag.CREATE, CreateFlag.APPEND),
+                                //Options.CreateOpts.createParent());
                             ctx.fc.rename(src, dst, opt);
                         }
                         fileCounter++;
