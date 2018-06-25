@@ -3,7 +3,7 @@
 #'
 #'Appends additional calculated columns to a dataframe. Allows for grouping and
 #'ordering calculations. Additional arguments to the can be passed directly to
-#'transfomation function.
+#'transformation function.
 #'
 #'@param df DataFrame
 #'@param order_vars optional vector of column names to arrange data by. can be

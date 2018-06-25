@@ -25,7 +25,9 @@ NULL.}
 
 \item{fun}{optional expansion function. useful for expanding continuous
 variables with values that don't appear in the data (like missing dates).
-fun argument should be wrapped in `funs(...)` function}
+fun argument should be wrapped in `funs(...)` function and should assign
+the output to a valid column name  `fun = funs(name = ...)` see examples
+below}
 
 \item{mode}{expansion mode for id_vars arguments. `nesting`` mode returns all
 unique combinations of id_vars seen in the data. `crossing` mode returns
@@ -50,6 +52,6 @@ expander(mtcars, id_vars = c('am', 'cyl'), fun = funs(carb = 1:5), complete = TR
 expander(mtcars, id_vars = c('am'), fun = funs(cyl = full_seq(cyl, 1)), complete = TRUE)
 }
 \seealso{
-\url{http://tidyr.tidyverse.org/reference/expand.html} for tidyr `expand` function which is used
-  internally by `expander`
+\url{http://tidyr.tidyverse.org/reference/expand.html} for tidyr
+  `expand` function which is used internally by `expander`
 }

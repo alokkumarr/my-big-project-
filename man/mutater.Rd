@@ -39,7 +39,7 @@ DataFrame with additional calculated columns appended
 \description{
 Appends additional calculated columns to a dataframe. Allows for grouping and
 ordering calculations. Additional arguments to the can be passed directly to
-transfomation function.
+transformation function.
 }
 \examples{
 library(dplyr)

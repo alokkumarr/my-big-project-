@@ -1,6 +1,6 @@
 #'DataFrame Summariser function
 #'
-#'Aggregation function. Configuarable inputs for grouping variables, measure
+#'Aggregation function. Configurable inputs for grouping variables, measure
 #'variables and aggregation functions.
 #'
 #'@param df DataFrame

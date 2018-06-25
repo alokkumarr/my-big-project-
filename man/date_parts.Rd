@@ -14,6 +14,9 @@ default is FALSE}
 
 \item{abbr}{logical option to use abbreviate labels. default is FALSE}
 }
+\value{
+tibble with date parts
+}
 \description{
 Function to calculate date parts for Date
 }

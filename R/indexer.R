@@ -159,6 +159,7 @@ indexer.tbl_spark <- function(df,
 #' @return data.frame
 #' @importFrom lubridate year quarter month week day hour minute wday yday days_in_month
 #' @importFrom dplyr funs
+#' @export
 #' @examples
 #' df <- data.frame(today = Sys.Date())
 #' date_parter(df, "today")
