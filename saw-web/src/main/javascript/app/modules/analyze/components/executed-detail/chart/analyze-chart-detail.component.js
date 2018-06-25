@@ -16,11 +16,10 @@ export const AnalyzeChartDetailComponent = {
   template,
   bindings: {
     analysis: '<',
-    requester: '<',
-    lastExecutionId: '<'
+    requester: '<'
   },
   controller: class AnalyzeChartDetailController {
-    constructor(FilterService, $timeout, SortService, $injector, $q) {
+    constructor(FilterService, $timeout, SortService, $injector) {
       'ngInject';
 
       this._$injector = $injector;
@@ -28,7 +27,6 @@ export const AnalyzeChartDetailComponent = {
       this._SortService = SortService;
       this._$timeout = $timeout;
       this.chartUpdater = new BehaviorSubject({});
-      this._$q = $q;
       this.labels = {
         y: '', x: ''
       };
