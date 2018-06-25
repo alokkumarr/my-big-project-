@@ -58,6 +58,12 @@ public abstract class Component {
   private Map<String, JsonElement> mdInputDataSetMap;
   private String transformationId;
 
+    public enum DATASET {
+        input,
+        output,
+        rejected
+    };
+
 
   public String getError() {
     return error;
@@ -376,53 +382,55 @@ public abstract class Component {
   }
 
 
-  private int finalize(int ret) {
-    String status = (ret == 0) ? "SUCCESS" : ((ret == 1) ? "PARTIAL" : "FAILED");
-    int []rc = {0};
-    rc[0] = 0;
-    try {
-      md.writeDLFSMeta(ctx);
-      ctx.setFinishTS();
-      JsonObject ale = als.generateDSAuditLogEntry(ctx, status, inputDataSets, outputDataSets);
-      String aleId = als.createAuditLog(ctx, ale);
-      mdOutputDataSetMap.forEach((id, ds) -> {
+    private int finalize(int ret) {
+        String status = (ret == 0) ? "SUCCESS" : ((ret == 1) ? "PARTIAL" : "FAILED");
+        int []rc = {0};
+        rc[0] = 0;
         try {
-          //TODO:: move it after merge to appropriate place
-          ctx.transformationID = transformationId;
-          ctx.ale_id = aleId;
-          ctx.status = status;
+            md.writeDLFSMeta(ctx);
+            ctx.setFinishTS();
+            JsonObject ale = als.generateDSAuditLogEntry(ctx, status, inputDataSets, outputDataSets);
+            String aleId = als.createAuditLog(ctx, ale);
+            mdOutputDataSetMap.forEach((id, ds) -> {
+                try {
+                    //TODO:: move it after merge to appropriate place
+                    ctx.transformationID = transformationId;
+                    ctx.ale_id = aleId;
+                    ctx.status = status;
 
-          //TODO:: Keep it optional, schema might not be available
-          String dsname = id.substring(id.indexOf(MetadataStore.delimiter)
-              + MetadataStore.delimiter.length());
-          Map<String, Object> outDataset = outputDataSets.get(dsname);
-          JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
-          logger.trace("Extracted schema: " + schema.toString());
+                    //TODO:: Keep it optional, schema might not be available
+                    String dsname = id.substring(id.indexOf(MetadataStore.delimiter)
+                        + MetadataStore.delimiter.length());
+                    Map<String, Object> outDataset = outputDataSets.get(dsname);
 
-          // Set record count
-          long recordCount = (long) outDataset.getOrDefault(DataSetProperties.RecordCount.name(),
-              (long) 0);
-          logger.trace("Extracted record count " + recordCount);
+                    // Set record count
+                    long recordCount = (long) outDataset.getOrDefault(DataSetProperties.RecordCount.name(),
+                        (long) 0);
+                    logger.trace("Extracted record count " + recordCount);
 
-          md.updateDS(id, ctx, ds, schema, recordCount);
-
+                    //Extract schema
+                    JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
+                    if (schema != null) {
+                        logger.trace("Extracted schema: " + schema.toString());
+                        md.updateDS(id, ctx, ds, schema, recordCount);
+                    }
+                } catch (Exception e) {
+                    error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
+                    logger.error(error);
+                    logger.error("Native exception: ", e);
+                    rc[0] = -1;
+                    return;
+                }
+            });
+            transformationMd.updateStatus(transformationId, status, ctx.startTs,
+                ctx.finishedTs, aleId, ctx.batchID);
         } catch (Exception e) {
-          error = "Could not update DS/ write AuditLog entry to DS, id = " + id;
-          logger.error(error);
-          logger.error("Native exception: ", e);
-          rc[0] = -1;
-          return;
+            error = "Exception at job finalization: " + ExceptionUtils.getFullStackTrace(e);
+            logger.error(e);
+            return -1;
         }
-      });
-      transformationMd.updateStatus(transformationId, status, ctx.startTs,
-          ctx.finishedTs, aleId, ctx.batchID);
-    } catch (Exception e) {
-      error = "Exception at job finalization: " + ExceptionUtils.getFullStackTrace(e);
-      logger.error(e);
-      return -1;
+        return rc[0];
     }
-    return rc[0];
-  }
 
   protected abstract String mkConfString();
 

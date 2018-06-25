@@ -1,35 +1,14 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpFlatMap from 'lodash/fp/flatMap';
-import * as fpReduce from 'lodash/fp/reduce';
 import * as forEach from 'lodash/forEach';
-import * as find from 'lodash/find';
 import * as get from 'lodash/get';
 
-import {AnalyseTypes, ANALYSIS_METHODS, ENTRY_MODES} from '../../consts';
-import {IAnalysisMethod, AnalysisType, ChartType} from '../../types';
+import { ANALYSIS_METHODS } from '../../consts';
+import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service'
 
 const template = require('./analyze-new-dialog.component.html');
 require('./analyze-new-dialog.component.scss');
-
-enum METHODS {
-  ES_REPORT = 'table:esReport',
-  REPORT = 'table:report',
-  PIVOT = 'table:peport',
-  CHART_COLUMN= 'chart:column',
-  CHART_BAR = 'chart:bar',
-  CHART_STACK = 'chart:stack',
-  CHART_LINE = 'chart:line',
-  CHART_DONUT = 'chart:donut',
-  CHART_SCATTER = 'chart:scatter',
-  CHART_BUBBLE = 'chart:bubble',
-  CHART_AREA = 'chart:area',
-  CHART_COMBO = 'chart:combo',
-  CHART_TSSPLINE = 'chart:tsspline',
-  CHART_TSPANE = 'chart:tsPane'
-}
 
 @Component({
   selector: 'analyze-new-dialog',
@@ -43,7 +22,6 @@ export class AnalyzeNewDialogComponent {
 
   constructor(
     private _analyzeDialogService : AnalyzeDialogService,
-    @Inject('$mdDialog') private _$mdDialog: any,
     private _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       metrics: any[],
@@ -61,23 +39,16 @@ export class AnalyzeNewDialogComponent {
   }
 
   setSupportedMethods(metric) {
-    const supportMap = fpPipe(
-      fpFlatMap(support => support.children),
-      fpReduce((accumulator, method) => {
-        accumulator[method.type] = true;
-        return accumulator;
-      },{})
-    )(metric.supports);
+    const metricType = get(metric, 'esRepository.storageType');
+    const isEsMetric = metricType === 'ES';
 
     forEach(this.methodCategories, category => {
       forEach(category.children, method => {
-        if (method.typeOnBackEnd) {
-          method.disabled = !supportMap[method.typeOnBackEnd];
-        } else if (method.supportedTypes) {
-          method.disabled = !find(method.supportedTypes, type => supportMap[type]);
-        } else {
-          method.disabled = !supportMap[method.type];
-        }
+        const enableMethod = isEsMetric ?
+          true :
+          method.type === 'table:report';
+
+        method.disabled = !enableMethod;
       });
     });
 
@@ -88,23 +59,29 @@ export class AnalyzeNewDialogComponent {
     return !this.selectedMethod || !this.selectedMetric;
   }
 
+  getAnalysisType(method, metric) {
+    const [first, second] = method.type.split(':');
+    switch (first) {
+    case 'chart':
+      return {
+        type: first,
+        chartType: second
+      };
+    case 'table':
+      // handle esReport edge case
+      const metricType = get(metric, 'esRepository.storageType');
+      const isEsMetric = metricType === 'ES';
+      if (second === 'report' && isEsMetric) {
+        return { type: 'esReport' };
+      }
+      return { type: second };
+    }
+  }
+
   createAnalysis() {
     const semanticId = this.selectedMetric.id;
     const metricName = this.selectedMetric.metricName;
-    const method = this.selectedMethod.type.split(':');
-    const isChartType = method[0] === 'chart';
-    let type = <AnalysisType>(isChartType ? method[0] : method[1]);
-    if (type === 'report') {
-      // set type to report or esReport
-      const children = get(this.selectedMetric, 'supports[0].children');
-      const target = find(children,
-        child => ['report', 'esReport'].includes(child.type.split(':')[1])
-      );
-      if (target) {
-        type = target.type.split(':')[1];
-      }
-    }
-    const chartType = <ChartType>(isChartType ? method[1] : null);
+    const {type, chartType} = this.getAnalysisType(this.selectedMethod, this.selectedMetric);
     const model = {
       type,
       chartType,

@@ -1,12 +1,10 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
-import {
-  IToolbarActionData,
-  IToolbarActionResult
-} from '../types';
+import { IToolbarActionData, IToolbarActionResult } from '../types';
 import * as filter from 'lodash/filter';
 import { DesignerService } from '../designer.service';
+import { AnalysisReport } from '../types';
 
 const template = require('./toolbar-action-dialog.component.html');
 require('./toolbar-action-dialog.component.scss');
@@ -77,6 +75,10 @@ export class ToolbarActionDialogComponent {
       .saveAnalysis(this.data.analysis)
       .then(response => {
         this.data.analysis.id = response.id;
+
+        if (response.type === 'report') {
+          (this.data.analysis as AnalysisReport).query = response.query;
+        }
       })
       .finally(() => {
         this.showProgressBar = false;
