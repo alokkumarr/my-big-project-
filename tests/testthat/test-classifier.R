@@ -54,7 +54,7 @@ test_that("Classifier Selects Best Model", {
 
 
 
-test_that("Segmenter Predicts New Data", {
+test_that("Classifier Predicts New Data", {
 
   c1 <- new_classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
