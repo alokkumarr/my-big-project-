@@ -115,8 +115,22 @@ export class ReportGridComponent {
     }
     this.data = data;
   };
-  @Input('dataLoader') dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>;
+  @Input('dataLoader') set setDataLoader(dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>) {
+    // setup pagination for paginated data
+    if (isFunction(dataLoader)) {
+      this.dataLoader = dataLoader;
+      this.data = new DataSource({
+        load: options => this.dataLoader(options)
+      });
+      this.remoteOperations = {paging: true};
+      this.paging = {pageSize: this.pageSize}
+    } else {
+      throw new Error('Data loader requires a Function');
+    }
+  };
   @Input() isEditable: boolean = false;
+
+  public dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>
 
   public sorts: {};
   public artifacts: Artifact[];
@@ -166,15 +180,6 @@ export class ReportGridComponent {
   }
 
   ngOnInit() {
-    // setup pagination for paginated data
-    if (isFunction(this.dataLoader)) {
-      this.data = new DataSource({
-        load: options => this.dataLoader(options)
-      });
-      this.remoteOperations = {paging: true};
-      this.paging = {pageSize: this.pageSize}
-    }
-
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
@@ -329,12 +334,12 @@ export class ReportGridComponent {
       fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
-        
+
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
         let type = column.type;
         if (aggregate && ['count'].includes(aggregate.value)) {
           type = aggregate.type || column.type;
-          isNumberType = true;   
+          isNumberType = true;
         }
 
         const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, type, column.aggregate);

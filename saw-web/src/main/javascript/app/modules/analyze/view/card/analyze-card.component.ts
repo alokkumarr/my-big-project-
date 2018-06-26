@@ -53,7 +53,7 @@ export class AnalyzeCardComponent implements OnInit {
   }
 
   onExecutionEvent(e: IExecuteEvent) {
-    this.isExecuting = e.executionState === EXECUTION_STATES.EXECUTING;
+    this.isExecuting = e.state === EXECUTION_STATES.EXECUTING;
   }
 
   afterDelete(analysis) {

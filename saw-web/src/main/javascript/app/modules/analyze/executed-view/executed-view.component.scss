@@ -1,7 +1,16 @@
 @import "themes/base/colors";
 
+$back-button-size: 32px;
+
 executed-view {
   width: 100%;
+
+  .back-button-icon.mat-icon {
+    font-size: $back-button-size;
+    line-height: $back-button-size;
+    width: $back-button-size;
+    height: $back-button-size;
+  }
 
   .prompt-execution-container {
     padding: 50px;

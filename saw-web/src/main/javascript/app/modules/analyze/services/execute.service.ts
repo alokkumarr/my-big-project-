@@ -12,14 +12,19 @@ export enum EXECUTION_STATES {
   // TODO add a forth state
 };
 
-export interface IExecuteEventEmitter {
-  id: string,
-  subject: BehaviorSubject<EXECUTION_STATES>
+export interface IExecuteEvent {
+  response?: {data: any[], count: number},
+  state: EXECUTION_STATES
 }
 
-export interface IExecuteEvent {
+export interface IExecuteEventEmitter {
   id: string,
-  executionState: EXECUTION_STATES
+  subject: BehaviorSubject<IExecuteEvent>
+}
+
+export interface IExecuteAggregateEvent {
+  id: string,
+  state: EXECUTION_STATES
 }
 
 @Injectable()
@@ -39,7 +44,7 @@ export class ExecuteService {
 
   executeAnalysis(analysis) {
     const id = analysis.id;
-    const exec$ = new BehaviorSubject<EXECUTION_STATES>(EXECUTION_STATES.EXECUTING);
+    const exec$ = new BehaviorSubject<IExecuteEvent>({state: EXECUTION_STATES.EXECUTING});
     this.execs$.next({
       id,
       subject: exec$
@@ -47,11 +52,13 @@ export class ExecuteService {
 
     this._analyzeService.applyAnalysis(analysis, EXECUTION_MODES.LIVE, {take: 25})
     .then((response) => {
-      console.log('response', response);
-      exec$.next(EXECUTION_STATES.SUCCESS);
+      exec$.next({
+        state: EXECUTION_STATES.SUCCESS,
+        response
+      });
       exec$.complete();
     }, () => {
-      exec$.next(EXECUTION_STATES.ERROR);
+      exec$.next({state: EXECUTION_STATES.ERROR});
       exec$.complete();
     });
   }
@@ -66,13 +73,13 @@ export class ExecuteService {
   subscribeToAllExecuting(callback: (executions: Object) => void) {
     return this.execs$
       .filter(({subject}) => !subject.isStopped)
-      .mergeMap<IExecuteEventEmitter, IExecuteEvent>(
+      .mergeMap<IExecuteEventEmitter, IExecuteAggregateEvent>(
         ({id, subject}) => subject.map(
-          state => ({id, executionState: state})
+          ({state}) => ({id, state})
         )
       )
-      .scan<IExecuteEvent, Object>((acc, e) => {
-        acc[e.id] = e.executionState;
+      .scan<IExecuteAggregateEvent, Object>((acc, e) => {
+        acc[e.id] = e.state;
         return acc;
       }, {})
       .subscribe(callback);

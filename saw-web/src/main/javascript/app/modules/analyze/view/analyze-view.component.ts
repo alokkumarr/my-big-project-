@@ -89,7 +89,9 @@ export class AnalyzeViewComponent implements OnInit {
       this.spliceAnalyses(event.analysis, false);
       break;
     case 'execute':
-      this.goToAnalysis(event.analysis);
+      if (event.analysis) {
+        this.goToAnalysis(event.analysis);
+      }
       break;
     case 'publish':
       this.afterPublish(event.analysis);

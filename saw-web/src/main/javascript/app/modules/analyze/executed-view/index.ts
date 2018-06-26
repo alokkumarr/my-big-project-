@@ -7,6 +7,7 @@ import { ExecutedReportViewComponent } from './report';
 import { ExecuteService } from '../services/execute.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
+import { AnalyzeFilterModule } from '../components/designer/filter';
 
 const COMPONENTS = [
   ExecutedViewComponent,
@@ -17,6 +18,7 @@ const COMPONENTS = [
 @NgModule({
   imports: [
     CommonModuleTs,
+    AnalyzeFilterModule,
     AnalyzeActionsModule
   ],
   declarations: [

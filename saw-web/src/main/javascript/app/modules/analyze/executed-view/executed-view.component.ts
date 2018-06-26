@@ -66,7 +66,6 @@ export class ExecutedViewComponent implements OnInit {
 
       this.executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId);
     } else {
-      console.log('loadAnalyses');
       this.loadAnalysisById(analysisId).then(analysis => {
         this.setPrivileges(analysis);
 
@@ -85,7 +84,7 @@ export class ExecutedViewComponent implements OnInit {
   executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId) {
     if (!awaitingExecution) {
       if (executionId || loadLastExecution) {
-        this.loadExecutedAnalysesAndExecutionData(analysis.id, executionId, analysis.type);
+        this.loadExecutedAnalysesAndExecutionData(analysis.id, executionId, analysis.type, null);
       } else {
         this.executeAnalysis(analysis)
       }
@@ -93,28 +92,43 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   onExecutionsEvent(e: IExecuteEventEmitter) {
-    console.log('isStopped', e.subject.isStopped);
     if (!e.subject.isStopped) {
       e.subject.subscribe(this.onExecutionEvent);
     }
   }
 
-  onExecutionEvent(state: EXECUTION_STATES) {
-    this.isExecuting = state === EXECUTION_STATES.EXECUTING;
+  onExecutionEvent({state, response}) {
 
-    if (state === EXECUTION_STATES.SUCCESS) {
-      const thereIsDataLoaded = this.data || this.dataLoader;
-      if (thereIsDataLoaded) {
-        this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
-          timeOut: 0,
-          extendedTimeOut: 0,
-          closeButton: true,
-          onclick: this.gotoLastPublished(this.analysis)
-        });
-      } else {
-        this.loadExecutedAnalysesAndExecutionData(this.analysis.id, this.executionId, this.analysis.type);
-      }
+    switch (state) {
+    case EXECUTION_STATES.SUCCESS:
+      this.onExecutionSuccess(response);
+      break;
+    case EXECUTION_STATES.ERROR:
+      this.onExecutionError();
+      break;
+    default:
     }
+
+    this.isExecuting = state === EXECUTION_STATES.EXECUTING;
+  }
+
+  onExecutionSuccess(response) {
+    const thereIsDataLoaded = this.data || this.dataLoader;
+    const isDataLakeReport = this.analysis.type === 'report';
+    if (isDataLakeReport && thereIsDataLoaded) {
+      this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
+        timeOut: 0,
+        extendedTimeOut: 0,
+        closeButton: true,
+        onclick: this.gotoLastPublished(this.analysis)
+      });
+    } else {
+      this.loadExecutedAnalysesAndExecutionData(this.analysis.id, null, this.analysis.type, response);
+    }
+  }
+
+  onExecutionError() {
+    this.loadExecutedAnalysesAndExecutionData(this.analysis.id, null, this.analysis.type, null);
   }
 
   gotoLastPublished (analysis) {
@@ -136,10 +150,10 @@ export class ExecutedViewComponent implements OnInit {
     });
   }
 
-  loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysisType) {
+  loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysisType, executeResponse) {
     if (executionId) {
       this.loadExecutedAnalyses(analysisId);
-      this.loadDataOrSetDataLoader(analysisId, executionId, analysisType);
+      this.loadDataOrSetDataLoader(analysisId, executionId, analysisType, executeResponse);
     } else {
       // get the last execution id and load the data for that analysis
       this.loadExecutedAnalyses(analysisId).then(analyses => {
@@ -149,7 +163,8 @@ export class ExecutedViewComponent implements OnInit {
           this.loadDataOrSetDataLoader(
             analysisId,
             lastExecutionId,
-            analysisType
+            analysisType,
+            executeResponse
           );
         }
       });
@@ -182,16 +197,38 @@ export class ExecutedViewComponent implements OnInit {
       });
   }
 
-  loadDataOrSetDataLoader(analysisId, executionId, analysisType) {
+  loadDataOrSetDataLoader(analysisId, executionId, analysisType, executeResponse = null) {
     // report type data will be loaded by the report grid, because of the paging mechanism
     const isReportType = ['report', 'esReport'].includes(analysisType);
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
-      this.dataLoader = options => this.loadExecutionData(analysisId, executionId, analysisType, options);
+      if (executeResponse) {
+        // resolve the data that is sent by the execution
+        // and the paginated data after that
+        let isItFirstTime = true;
+        this.dataLoader = options => {
+          if (isItFirstTime) {
+            isItFirstTime = false;
+            return Promise.resolve({
+              data: executeResponse.data,
+              totalCount: executeResponse.count
+            });
+          }
+          return this.loadExecutionData(analysisId, executionId, analysisType, options);
+        }
+      } else {
+        this.dataLoader = options => {
+          return this.loadExecutionData(analysisId, executionId, analysisType, options);
+        }
+      }
     } else {
-      this.loadExecutionData(analysisId, executionId, analysisType).then(({data}) => {
-        this.data = data;
-      });
+      if (executeResponse) {
+        this.data = executeResponse.data;
+      } else {
+        this.loadExecutionData(analysisId, executionId, analysisType).then(({data}) => {
+          this.data = data;
+        });
+      }
     }
   }
 

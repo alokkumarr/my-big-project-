@@ -100,7 +100,6 @@ import {
 } from './components/designer';
 
 import { AnalyzeFilterModule } from './components/designer/filter';
-import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
 
 import { CronJobSchedularComponent } from './publish/cron-job-schedular';
 import { CronDatePickerComponent } from './publish/cron-date-picker';
@@ -158,9 +157,6 @@ angular
   .component('numberFilter', NumberFilterComponent)
   .component('dateFilter', DateFilterComponent)
   .component('filterChips', FilterChipsComponent)
-  .directive('filterChipsU', downgradeComponent({
-    component: FilterChipsUpgraded
-  }) as angular.IDirectiveFactory)
   .component('analyzeFilterRow', AnalyzeFilterRowComponent)
   .component('analyzeFilterModal', AnalyzeFilterModalComponent)
   .component('analyzeDescriptionDialog', AnalyzeDescriptionDialogComponent)
@@ -217,8 +213,7 @@ angular
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout,
-    FilterChipsUpgraded
+    MultiTableDesignerLayout
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -244,8 +239,7 @@ angular
     DesignerSaveComponent,
     DesignerPreviewDialogComponent,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout,
-    FilterChipsUpgraded
+    MultiTableDesignerLayout
   ],
   providers: [
     $mdDialogProvider,
