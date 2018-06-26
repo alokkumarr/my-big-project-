@@ -1,7 +1,7 @@
 #' Dataframe Anomaly Detection function
 #'
 #' Anomaly detection function for time series data. Function determines
-#' statistical anomlies in the dataset based on configurable theshold
+#' statistical anomalies in the dataset based on configurable threshold
 #' parameters.
 #'
 #' Function is similiar to Seasonl Hybrid ESD algorithm discussed here

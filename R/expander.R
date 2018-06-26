@@ -1,7 +1,7 @@
 
 #' Dataframe Expander Function
 #'
-#' Function to expand dataset by converting implicit missing values to explict
+#' Function to expand a dataset by converting implicit missing values to explicit
 #' values
 #'
 #' @param df dataframe
