@@ -25,8 +25,7 @@ import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.comp
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import {
   ArtifactColumnPivot,
-  Sort,
-  Format
+  Sort
 } from '../../../models';
 import {
   DATE_TYPES,

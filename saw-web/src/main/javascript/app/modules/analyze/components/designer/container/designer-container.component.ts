@@ -7,8 +7,8 @@ import * as isNumber from 'lodash/isNumber';
 import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
-import * as orderBy from 'lodash/orderBy';
 import * as map from 'lodash/map';
+import { flattenPivotData, flattenChartData } from '../../../../../common/utils/dataFlattener';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -303,26 +303,15 @@ export class DesignerContainerComponent {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return this._designerService.parseData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, analysis.sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
     case 'chart':
-      let chartData = this._chartService.parseData(
+      return flattenChartData(
         data,
         analysis.sqlBuilder
       );
-
-      /* Order chart data manually. Backend doesn't sort chart data. */
-      if (!isEmpty(this.sorts)) {
-        chartData = orderBy(
-          chartData,
-          map(this.sorts, 'columnName'),
-          map(this.sorts, 'order')
-        );
-      }
-
-      return chartData;
     }
   }
 
@@ -464,7 +453,7 @@ export class DesignerContainerComponent {
       }
       return isDataEmpty;
     case 'chart':
-      const parsedData = this._chartService.parseData(data, sqlBuilder);
+      const parsedData = flattenChartData(data, sqlBuilder);
       return isEmpty(parsedData);
     // TODO verify if the object returned is empty
     case 'report':

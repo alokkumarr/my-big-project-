@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
 import * as get from 'lodash/get';
 import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
@@ -12,6 +13,8 @@ import {
 } from '../services/execute.service';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
+import { flattenPivotData, flattenChartData } from '../../../common/utils/dataFlattener';
+import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
@@ -40,6 +43,7 @@ export class ExecutedViewComponent implements OnInit {
   executionsSub: Subscription;
   executionSub: Subscription;
   executionId: string;
+  pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
 
   constructor(
     private _executeService: ExecuteService,
@@ -227,12 +231,23 @@ export class ExecutedViewComponent implements OnInit {
       }
     } else {
       if (executeResponse) {
-        this.data = executeResponse.data;
+        this.data = this.flattenData(executeResponse.data, this.analysis);
       } else {
         this.loadExecutionData(analysisId, executionId, analysisType).then(({data}) => {
-          this.data = data;
+          this.data = this.flattenData(data, this.analysis);
         });
       }
+    }
+  }
+
+  flattenData(data, analysis) {
+    switch(analysis.type) {
+    case 'pivot':
+      return flattenPivotData(data, analysis.sqlBuilder);
+    case 'chart':
+      return flattenChartData(data, analysis.sqlBuilder);
+    default:
+      return data;
     }
   }
 
@@ -275,11 +290,11 @@ export class ExecutedViewComponent implements OnInit {
       if (!result) {
         return;
       }
-      // const {isSaveSuccessful, analysis} = result;
-      // if (isSaveSuccessful) {
-      //   this.analysis = analysis;
-      //   this.refreshData();
-      // }
+      const {isSaveSuccessful, analysis} = result;
+      if (isSaveSuccessful) {
+        this.analysis = analysis;
+        this.executeAnalysis(analysis)
+      }
     });
   }
 
@@ -298,9 +313,9 @@ export class ExecutedViewComponent implements OnInit {
   exportData() {
     if (this.analysis.type === 'pivot') {
       // export from front end
-      // this.requester.next({
-      //   exportAnalysis: true
-      // });
+      this.pivotUpdater$.next({
+        export: true
+      });
     } else {
       this._analyzeExportService.export(this.analysis, this.executionId);
     }

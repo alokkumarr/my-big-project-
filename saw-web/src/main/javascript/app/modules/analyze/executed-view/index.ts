@@ -4,6 +4,8 @@ import { AnalyzeActionsModule } from '../actions';
 import { ExecutedViewComponent } from './executed-view.component';
 import { ExecutedListComponent } from './list';
 import { ExecutedReportViewComponent } from './report';
+import { ExecutedPivotViewComponent } from './pivot';
+import { ExecutedChartViewComponent } from './chart';
 import { ExecuteService } from '../services/execute.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
@@ -12,7 +14,9 @@ import { AnalyzeFilterModule } from '../components/designer/filter';
 const COMPONENTS = [
   ExecutedViewComponent,
   ExecutedListComponent,
-  ExecutedReportViewComponent
+  ExecutedReportViewComponent,
+  ExecutedPivotViewComponent,
+  ExecutedChartViewComponent
 ];
 
 @NgModule({

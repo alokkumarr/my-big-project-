@@ -63,6 +63,15 @@
                             [analysis]="analysis"
                             [dataLoader]="dataLoader"
       ></executed-report-view>
+      <executed-pivot-view *ngSwitchCase="'pivot'"
+                           [analysis]="analysis"
+                           [data]="data"
+                           [updater]="pivotUpdater$"
+      ></executed-pivot-view>
+      <executed-chart-view *ngSwitchCase="'chart'"
+                           [analysis]="analysis"
+                           [data]="data"
+      ></executed-chart-view>
     </div>
   </mat-card>
 
