@@ -12,7 +12,7 @@
     </div>
   </mat-expansion-panel>
   <div class="no-children" *ngIf="hasChildren()">
-    <a [class.activeButton]="checkActiveMenu(metadata.url)" class="child-item" [attr.href]="metadata.url" (click)="closeSidNav()"
+    <a [class.activeButton]="checkActiveMenu(metadata.url)" class="child-item" [attr.href]="metadata.url" (click)="closeSideNav()"
       [class.active]="active">{{metadata.name}}</a>
   </div>
 </mat-accordion>
