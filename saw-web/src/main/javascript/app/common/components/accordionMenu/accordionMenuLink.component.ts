@@ -1,6 +1,7 @@
 import { Component, Input, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/platform-browser';
 import * as isUndefined from 'lodash/isUndefined';
+import {SidenavComponent } from '../sidenav';
 
 const template = require('./accordionMenuLink.component.html');
 require('./accordionMenuLink.component.scss');
@@ -15,7 +16,7 @@ export class AccordionMenuLinkComponent {
   location: Location;
   @Input() public metadata: any;
 
-  constructor(@Inject(DOCUMENT) private document: any) {}
+  constructor(@Inject(DOCUMENT) private document: any, public leftSideNav: SidenavComponent) {}
 
   public url: string;
   public expanded: boolean;
@@ -67,6 +68,10 @@ export class AccordionMenuLinkComponent {
     } else {
       return false;
     }
+  }
+
+  closeSidNav() {
+    this.leftSideNav.toggleNav();
   }
 }
 
