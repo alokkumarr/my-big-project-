@@ -303,6 +303,7 @@
                 </assembly>
               </build>
               <run>
+                <hostname>sip-admin</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -342,6 +343,7 @@
                 <dockerFileDir>${project.basedir}/src/test/docker-proxy</dockerFileDir>
               </build>
               <run>
+                <hostname>sip-proxy</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -367,6 +369,7 @@
                    configurations -->
               <alias>sip-saw1</alias>
               <run>
+                <hostname>sip-saw1</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -385,6 +388,7 @@
               <name>sip-base:${project.version}</name>
               <alias>sip-saw2</alias>
               <run>
+                <hostname>sip-saw2</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -412,6 +416,7 @@
                 <dockerFileDir>${project.basedir}/src/test/docker-elastic</dockerFileDir>
               </build>
               <run>
+                <hostname>sip-elastic</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -433,6 +438,7 @@
                 <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
               </build>
               <run>
+                <hostname>sip-mapr</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
