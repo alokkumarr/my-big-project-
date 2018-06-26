@@ -4,6 +4,7 @@ const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Login Tests: login.test.js', () => {
 
