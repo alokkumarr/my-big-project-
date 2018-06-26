@@ -88,11 +88,19 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card style="padding: 5px;">
-    <mat-card-title><span class="mat-card-title" i18n>Previous Versions</span></mat-card-title>
-    <executed-list *ngIf="analysis && analyses && analyses.length"
-                   [analyses]="analyses"
-                   [analysis]="analysis"
-    ></executed-list>
+  <mat-card>
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <span class="previous-list-title" i18n>Previous Versions</span>
+      </mat-expansion-panel-header>
+
+      <mat-divider></mat-divider>
+
+      <executed-list *ngIf="analysis && analyses && analyses.length"
+                     style="padding-top: 20px;"
+                     [analyses]="analyses"
+                     [analysis]="analysis"
+      ></executed-list>
+    </mat-expansion-panel>
   </mat-card>
 </div>

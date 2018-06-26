@@ -10,7 +10,11 @@ const template = require('./executed-list.component.html');
 
 @Component({
   selector: 'executed-list',
-  template
+  template,
+  styles: [`
+      :host {
+        display: block;
+      }`]
 })
 export class ExecutedListComponent {
   @Input('analyses') set setAnalyses(analyses: Analysis[]) {

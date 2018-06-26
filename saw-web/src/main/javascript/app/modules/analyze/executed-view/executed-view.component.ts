@@ -145,8 +145,12 @@ export class ExecutedViewComponent implements OnInit {
   };
 
   executeAnalysis(analysis) {
-    this._analyzeActionsService.execute(analysis).then(() => {
+    this._analyzeActionsService.execute(analysis).then(executionStarted => {
       // this.afterExecuteLaunched(analysis);
+      if (!executionStarted && !this.analyses) {
+        // at least load the executed analyses if none are loaded
+        this.loadExecutedAnalyses(analysis.id);
+      }
     });
   }
 
