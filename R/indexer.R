@@ -234,7 +234,7 @@ date_parter.tbl_spark <- function(df, measure_vars) {
 #' @inheritParams date_parter
 #' @return tibble with date parts
 #' @export
-#' @example
+#' @examples
 #' date_parts(Sys.Date())
 date_parts <- function(x, label = FALSE, abbr = FALSE) {
   tibble(

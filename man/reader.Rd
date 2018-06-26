@@ -4,16 +4,23 @@
 \alias{reader}
 \title{Spark Reader Function}
 \usage{
-reader(sc, name, path, repartition = 0, memory = TRUE, overwrite = TRUE,
-  ...)
+reader(sc, name, path, dfs_protocol = NULL, type = NULL, repartition = 0,
+  memory = TRUE, overwrite = TRUE, ...)
 }
 \arguments{
 \item{sc}{A spark_connection.}
 
 \item{name}{The name to assign to the newly generated table}
 
-\item{path}{The path to the file. Needs to be accessible from the cluster.
-Supports the "hdfs://", "s3a://" and "file://" protocols}
+\item{path}{The path to the file. If data is distributed, supply the dfs
+protocol seperately with dfs_protocol input}
+
+\item{dfs_protocol}{optional dfs protocol for accessing files on cluster.
+default is NULL for local file paths}
+
+\item{type}{optional file type path. Default is NULL. If provided, only files
+of type provided will be read. Can be used to wildcard file types in
+combination to a directory only path input}
 
 \item{repartition}{The number of partitions used to distribute the generated
 table. Use 0 (the default) to avoid partitioning.}
@@ -24,7 +31,7 @@ is, should the table be cached?)}
 \item{overwrite}{Logical; overwrite the table with the given name if it
 already exists?}
 
-\item{...}{}
+\item{...}{additional arguments to read function}
 }
 \value{
 Spark Dataframe
