@@ -20,7 +20,7 @@ import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
-const ALLOWED_ANALYSIS_TYPES = ['chart', 'report', 'esReport'];
+const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'widget-analysis',

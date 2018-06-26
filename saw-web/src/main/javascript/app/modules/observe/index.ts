@@ -40,6 +40,7 @@ import { ObservePageComponent } from './components/observe-page/observe-page.com
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
 import { ObserveReportComponent } from './components/observe-report/observe-report.component';
+import { ObservePivotComponent } from './components/observe-pivot/observe-pivot.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
 import { ObserveKPIBulletComponent } from './components/observe-kpi-bullet/observe-kpi-bullet.component';
 import { KPIFilter } from './components/kpi-filter/kpi-filter.component';
@@ -76,6 +77,7 @@ const components = [
   CreateDashboardComponent,
   ObserveChartComponent,
   ObserveReportComponent,
+  ObservePivotComponent,
   ObserveKPIComponent,
   ObserveKPIBulletComponent,
   KPIFilter,
