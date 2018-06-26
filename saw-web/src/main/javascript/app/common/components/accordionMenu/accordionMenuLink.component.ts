@@ -70,7 +70,7 @@ export class AccordionMenuLinkComponent {
     }
   }
 
-  closeSidNav() {
+  closeSideNav() {
     this.leftSideNav.toggleNav();
   }
 }
