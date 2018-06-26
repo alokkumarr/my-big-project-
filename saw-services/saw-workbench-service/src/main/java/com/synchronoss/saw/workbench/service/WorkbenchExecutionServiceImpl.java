@@ -51,6 +51,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
   @PostConstruct
   private void init() throws Exception {
+    /* Workaround: If the "/apps/spark" directory does not exist in
+     * the data lake, Apache Livy will fail with a file not found
+     * error.  So create the "/apps/spark" directory here.  */
+    String appsSparkPath = "/apps/spark";
+    if (!HFileOperations.exists(appsSparkPath)) {
+      HFileOperations.createDir(appsSparkPath);
+    }
     /* Initialize the previews MapR-DB table */
     try (Admin admin = MapRDB.newAdmin()) {
       if (!admin.tableExists(previewsTablePath)) {
