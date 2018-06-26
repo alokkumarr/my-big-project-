@@ -339,16 +339,17 @@ public interface WithDataSetService {
 
                 String sampling = DLDataSetOperations.SIMPLE_SAMPLING;
 
-                StringBuilder sb = new StringBuilder(dl.getRoot());
-                sb.append(Path.SEPARATOR + this.ctx.applicationID)
+                StringBuilder physicalLocationBuffer = new StringBuilder(dl.getRoot());
+                physicalLocationBuffer.append(Path.SEPARATOR + this.ctx.applicationID)
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
                         .append(Path.SEPARATOR + catalog)
                         .append(Path.SEPARATOR + output.getDataSet())
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
-                logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
-                resOutput.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+                logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), physicalLocationBuffer.toString()));
+                resOutput.put(DataSetProperties.PhysicalLocation.name(), physicalLocationBuffer
+                    .toString());
                 resOutput.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
@@ -389,7 +390,7 @@ public interface WithDataSetService {
 
                 boolean exists = false;
                 try {
-                    exists = HFileOperations.exists(sb.toString());
+                    exists = HFileOperations.exists(physicalLocationBuffer.toString());
                 } catch (Exception e) {
                     logger.warn("Could not check output data object: " + output.getDataSet());
                 }

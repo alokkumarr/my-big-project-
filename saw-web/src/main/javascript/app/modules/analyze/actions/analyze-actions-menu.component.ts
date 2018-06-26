@@ -70,11 +70,14 @@ export class AnalyzeActionsMenuComponent {
   }
 
   edit() {
-    this._analyzeActionsService.edit(this.analysis).then(({isSaveSuccessful, analysis}: DesignerSaveEvent) => {
-      if (!isSaveSuccessful) {
-        return isSaveSuccessful;
+    this._analyzeActionsService.edit(this.analysis).then((result: DesignerSaveEvent) => {
+      if (result) {
+        const {isSaveSuccessful, analysis} = result;
+        if (!isSaveSuccessful) {
+          return isSaveSuccessful;
+        }
+        this.afterEdit.emit(analysis);
       }
-      this.afterEdit.emit(analysis);
     });
   }
 
