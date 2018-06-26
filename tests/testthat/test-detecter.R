@@ -15,7 +15,8 @@ Sys.time()
 # Create toy datasets
 set.seed(319)
 id_vars <- seq(101, 200, by=1)
-dates <- seq(from=as.POSIXct(Sys.Date(),format='%a %b %d %H:%M:%S EST %Y')-365, to=as.POSIXct(Sys.Date(),format='%a %b %d %H:%M:%S EST %Y'), by="hours")
+dates <- seq(from=as.POSIXct(Sys.Date(),format='%a %b %d %H:%M:%S EST %Y')-365,
+             to=as.POSIXct(Sys.Date(),format='%a %b %d %H:%M:%S EST %Y'), by="hours")
 
 Date1 <-Sys.time() +60*60
 
@@ -46,8 +47,8 @@ dat3 <- rbind(data.frame(index = 1:n,
 # can create an hourly seq with following code
 hr_seq <- seq(Sys.time() - lubridate::hours(x=n), Sys.time(), by = "hour") %>% tail(n)
 
-# Getting error here -
-dat4 <- data.frame(date = as.character(seq(from = Sys.Date() - (n-1), to = Sys.Date(), by = "hours")),
+# Updated to datetime
+dat4 <- data.frame(datetime = as.character(hr_seq),
                    y = as.numeric(arima.sim(n = n,
                                             list(order = c(1,0,0), ar = 0.7),
                                             rand.gen = function(n, ...) rt(n, df = 2))))
@@ -142,7 +143,7 @@ dat5_tbl <- copy_to(sc, dat5, overwrite = TRUE)
 dat6_tbl <- copy_to(sc, dat6, overwrite = TRUE)
 dat6a_tbl <- copy_to(sc, dat6_new %>% mutate_at("date_time", as.character), name = "dat6a", overwrite = TRUE)
 
-dat4_tbl <- mutate(dat4_tbl, date = to_date(date))
+dat4_tbl <- mutate(dat4_tbl, datetime = unix_timestamp(datetime))
 #dat6_tbl <-  mutate(dat6_tbl, date = to_date(date)) # Converting hourly date time to date only
 
 # Converting to time stamp
@@ -246,18 +247,18 @@ spk_detect3 <- dat3_tbl %>%
            trend_window = .75) %>%
   collect()
 
-# Getting error here
-spk_detect4 <- dat4_tbl %>%
-  detecter(.,
-           index_var = "date",
-           group_vars = NULL,
-           measure_vars = "y",
-           frequency = 7,
-           direction = "pos",
-           alpha = 0.01,
-           max_anoms = 0.05,
-           trend_window = .75) %>%
-  collect()
+# # Getting error here
+# spk_detect4 <- dat4_tbl %>%
+#   detecter(.,
+#            index_var = "date",
+#            group_vars = NULL,
+#            measure_vars = "y",
+#            frequency = 7,
+#            direction = "pos",
+#            alpha = 0.01,
+#            max_anoms = 0.05,
+#            trend_window = .75) %>%
+#   collect()
 
 
 spk_detect5 <- dat5_tbl %>%
@@ -376,7 +377,36 @@ test_that("direction option works as expected", {
 
 test_that("detecter preserves index var date type", {
 
-  expect_class(spk_detect4[[1]], "Date")
+  dat1.1 <- dat1 %>%
+    mutate(date = seq(from = Sys.Date() - n() +1, to=Sys.Date(), by = "day"))
+
+  dat1.1_tbl <- dat1.1 %>%
+    mutate(date = as.character(date)) %>%
+    copy_to(sc, df = ., name = "dat1_1", overwrite = TRUE)
+  dat1.1_tbl <- dat1.1_tbl %>%
+    mutate(date = to_date(date))
+
+  r_detect1.1 <-  detecter(dat1.1,
+                           index_var = "date",
+                           group_vars = NULL,
+                           measure_vars = "y",
+                           frequency = 7,
+                           direction = "both",
+                           alpha = 0.02,
+                           max_anoms = 0.10,
+                           trend_window = .75)
+
+  spk_detect1.1 <-  detecter(dat1.1_tbl,
+                             index_var = "date",
+                             group_vars = NULL,
+                             measure_vars = "y",
+                             frequency = 7,
+                             direction = "both",
+                             alpha = 0.02,
+                             max_anoms = 0.10,
+                             trend_window = .75)
+  expect_class(r_detect1.1$date, "Date")
+  expect_equal(sdf_schema(spk_detect1.1)[[1]]$type, "DateType")
 })
 
 
@@ -404,46 +434,117 @@ test_that("both direction option works as expected", {
 
 #Test 3:Detecter with Multiple Group vars -------------------------------
 
+test_that("Detecter with Multiple Group vars", {
+  .group_vars <- c("country","state")
+  .max_anoms <- .05
 
-.group_vars <- c("country","state")
+  r_detect_multi_Group <- dat6 %>%
+    detecter(.,
+             index_var = "index",
+             group_vars = .group_vars,
+             measure_vars = "mval1",
+             frequency = 7,
+             direction = "pos",
+             alpha = 0.01,
+             max_anoms = .max_anoms,
+             trend_window = .75)
 
-r_detect_multi_Group <- dat6 %>%
-  detecter(.,
-           index_var = "index",
-           group_vars = .group_vars,
-           measure_vars = "mval1",
-           frequency = 7,
-           direction = "pos",
-           alpha = 0.01,
-           max_anoms = 0.05,
-           trend_window = .75)
+  expect_equal(
+    r_detect_multi_Group %>%
+      group_by(country, state) %>%
+      count(),
+    dat6 %>%
+      group_by(country, state) %>%
+      count()
+  )
+
+  expect_true(
+    all(
+      r_detect_multi_Group %>%
+      group_by(country, state) %>%
+      summarise(anom_avg = mean(anomaly)) %>%
+      ungroup() %>%
+      pull(anom_avg) <= .max_anoms
+    )
+  )
+
+})
+
 
 
 #Test 4:Test detecter with multiple measure variables -------------------
 
-r_detect_multi_mesure <- dat6 %>%
-  detecter(.,
-           index_var = "index",
-           group_vars = "country",
-           measure_vars = c('mval1','valu2'),
-           frequency = 7,
-           direction = "pos",
-           alpha = 0.01,
-           max_anoms = 0.05,
-           trend_window = .75)
+test_that("Detecter with Multiple Measure vars", {
+  .max_anoms <- .05
+  r_detect_multi_mesure <- dat6 %>%
+    detecter(.,
+             index_var = "index",
+             group_vars = "country",
+             measure_vars = c('mval1','valu2'),
+             frequency = 7,
+             direction = "pos",
+             alpha = 0.01,
+             max_anoms = .max_anoms,
+             trend_window = .75)
+
+  expect_equal(
+    r_detect_multi_mesure %>%
+      group_by(country, measure) %>%
+      count(),
+    dat6 %>%
+      melter(id_vars = c("index", "country"),
+             measure_vars = c('mval1','valu2'),
+             variable_name = "measure") %>%
+      group_by(country, measure) %>%
+      count()
+  )
+
+  expect_true(
+    all(
+      r_detect_multi_mesure %>%
+        group_by(country, measure) %>%
+        summarise(anom_avg = mean(anomaly)) %>%
+        ungroup() %>%
+        pull(anom_avg) <= .max_anoms
+    )
+  )
+
+})
+
+# #Test 5-Check frequency with hour data -------------------------
+
+test_that("Detecter with hourly data", {
+
+  r_detect_freq_with_hour <- dat4 %>%
+    detecter(.,
+             index_var = "datetime",
+             group_vars = NULL,
+             measure_vars = "y",
+             frequency = 24,
+             direction = "pos",
+             alpha = 0.01,
+             max_anoms = 0.05,
+             trend_window = .75)
 
 
-# #Test 5-Check frequency with every minutes data -------------------------
+  spk_detect_freq_with_hour <- dat4_tbl %>%
+    detecter(.,
+             index_var = "datetime",
+             group_vars = NULL,
+             measure_vars = "y",
+             frequency = 24,
+             direction = "pos",
+             alpha = 0.01,
+             max_anoms = 0.05,
+             trend_window = .75)
 
-r_detect_freq_with_hour <- dat6 %>%
-  detecter(.,
-           index_var = "index",
-           group_vars = c("country"),
-           measure_vars = "mval1",
-           frequency = 60,
-           direction = "pos",
-           alpha = 0.01,
-           max_anoms = 0.05,
-           trend_window = .75)
-
-
+  expect_equal(
+    r_detect_freq_with_hour %>%
+      select(value, seasonal, trend, resid, anomaly) %>%
+      round(5) ,
+    spk_detect_freq_with_hour %>%
+      collect() %>%
+      select(value, seasonal, trend, resid, anomaly) %>%
+      round(5)
+  )
+})

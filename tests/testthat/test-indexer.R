@@ -178,29 +178,14 @@ test_that("indexer differece between sysdate and today", {
 
 #Test5:Number of Months between origin and today -------------------------
 
-dif_date_months <-
-  indexer(
-    systm_date,
-    "today",
-    origin = "2018-05-25",
-    units = "months",
-    periods = 1
-  )
+.origin <- as.Date("2018-04-25")
+.date <- as.Date("2018-06-25")
 
-origin_val <- as.Date("2018-05-25")
+df <- data.frame(date = .date)
+dif_date_months <- indexer(df, "date", origin = .origin , units = "months", periods = 1)
 
-date_value <- as.data.frame(systm_date$today - origin_val)
-colnames(date_value)[1] <- "difdate"
-
-date_value <- gsub(" .*$", "", date_value$difdate)
-
-date_value <- as.numeric(date_value)
-
-Months_to_that_date <- round(date_value / 31, 8)
-
-test_that("indexer- Number of years differece between origin and today", {
-  expect_equal(dif_date_months$`months_since_2018-05-25`,
-               Months_to_that_date)
+test_that("indexer- Number of months differece between origin and today", {
+  expect_equal(dif_date_months[[2]], 2)
 })
 
 
