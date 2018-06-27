@@ -282,8 +282,8 @@ export class ExecutedViewComponent implements OnInit {
     });
   }
 
-  goBack() {
-    window.history.back();
+  goBackToMainPage(analysis) {
+    this._state.go('analyze.view', {id: get(analysis, 'categoryId')});
   }
 
   edit() {
@@ -307,7 +307,7 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   afterDelete(analysis) {
-    this._state.go('analyze.view', {id: analysis.categoryId});
+    this.goBackToMainPage(analysis);
   }
 
   exportData() {
