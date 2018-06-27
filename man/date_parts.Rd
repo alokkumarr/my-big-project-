@@ -20,3 +20,6 @@ tibble with date parts
 \description{
 Function to calculate date parts for Date
 }
+\examples{
+date_parts(Sys.Date())
+}
