@@ -35,18 +35,18 @@ time <-  Sys.time()
 
 # Test-1:Pipeliner Constructer-Test  ----------------------------------------------
 
+s1 <- new_pipeline(
+  expr = function(df) {
+    df %>%
+      mutate (index_r = ifelse(index %% 5 == 0, 1, 0))
+  },
+  output = NULL,
+  desc = "Example pipeline",
+  created_on = Sys.time(),
+  runtime = NULL
+)
 
 test_that("Pipeliner Constructer", {
-  s1 <- new_pipeline(
-    expr = function(df) {
-      df %>%
-        mutate (index_r = ifelse(index %% 5 == 0, 1, 0))
-    },
-    output = NULL,
-    desc = "Example pipeline",
-    created_on = Sys.time(),
-    runtime = NULL
-  )
   expect_class(s1, "pipeline")
 })
 
@@ -72,14 +72,15 @@ test_that("Post clean up the output should be NULL", {
 
 # Test-2:With expr = IDENTITY in pipeline constructer ---------------------
 
+s1_id <- new_pipeline(
+  expr = identity,
+  output = NULL,
+  desc = "Example pipeline",
+  created_on = Sys.time(),
+  runtime = NULL
+)
+
 test_that("Pipeliner Constructer with expression=identity", {
-  s1_id <- new_pipeline(
-    expr = identity,
-    output = NULL,
-    desc = "Example pipeline",
-    created_on = Sys.time(),
-    runtime = NULL
-  )
   expect_class(s1_id, "pipeline")
 })
 
@@ -106,14 +107,14 @@ test_that("Post clean up the output should be NULL", {
 
 # Test-3:Pipeliner function-R Dataframe-flow,execute and flush methods test----------------------------------------------
 
+pipe_1 <- pipeline(
+  expr = function(df) {
+    df %>%
+      mutate (index_r = ifelse(index %% 4 == 0, 1, 0))
+  },
+  desc = "Example pipeline output"
+)
 test_that("Pipeliner function", {
-  pipe_1 <- pipeline(
-    expr = function(df) {
-      df %>%
-        mutate (index_r = ifelse(index %% 4 == 0, 1, 0))
-    },
-    desc = "Example pipeline output"
-  )
   expect_class(pipe_1, "pipeline")
 })
 
@@ -160,6 +161,10 @@ pipe_test <- pipeline(
   desc = "Example pipeline output"
 )
 
+test_that("Pipeliner Constructer", {
+  expect_class(pipe_test, "pipeline")
+})
+
 # flow and execute output validation --------------------------------------
 
 flow_test <- a2modeler::flow(df, pipe_test)
@@ -191,11 +196,14 @@ pipe_sprk <- pipeline (
   desc = "Example pipeline"
 )
 
+test_that("Pipeliner Constructer", {
+  expect_class(pipe_sprk, "pipeline")
+})
 
 # flow and execute output validation --------------------------------------
 
-flow_test_sprk <- a2modeler::flow(df, pipe_sprk)
-pipe_ex_sprk <- execute(df, pipe_sprk)
+flow_test_sprk <- a2modeler::flow(dat, pipe_sprk)
+pipe_ex_sprk <- execute(dat, pipe_sprk)
 ex_out_sprk <- pipe_ex_sprk$output
 
 test_that("Test that Flow and execute output matches", {
@@ -229,6 +237,10 @@ pipe_modeler <- pipeline (
   },
   desc = "Example pipeline"
 )
+
+test_that("Pipeliner Constructer", {
+  expect_class(pipe_modeler, "pipeline")
+})
 
 
 # flow and execute output validation --------------------------------------
