@@ -27,17 +27,7 @@
     <saw.docker.skip.machine>false</saw.docker.skip.machine>
     <!-- SAW Docker environment ports -->
     <saw.docker.port>80</saw.docker.port>
-    <saw.mapr.web.port>18443</saw.mapr.web.port>
-    <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
-    <saw.mapr.yarn.rm.port>18030</saw.mapr.yarn.rm.port>
-    <saw.mapr.yarn.nm.port>18031</saw.mapr.yarn.nm.port>
-    <saw.yarn.resource.port>18088</saw.yarn.resource.port>
-    <saw.yarn.node.port>18042</saw.yarn.node.port>
-    <saw.spark.master.port>18080</saw.spark.master.port>
-    <saw.spark.worker.port>18081</saw.spark.worker.port>
-    <saw.livy.port>18998</saw.livy.port>
-    <saw.kibana.port>15601</saw.kibana.port>
-    <saw.journal.port>19531</saw.journal.port>
+    <saw.squid.port>3128</saw.squid.port>
     <saw.yarn.enabled>false</saw.yarn.enabled>
   </properties>
   <dependencies>
@@ -358,6 +348,7 @@
                 </network>
                 <ports>
                   <port>+saw.docker.ip:saw.docker.port:80</port>
+                  <port>+saw.docker.ip:saw.squid.port:3128</port>
                 </ports>
                 <privileged>true</privileged>
                 <restartPolicy>
@@ -446,17 +437,6 @@
                 <network>
                   <name>saw</name>
                 </network>
-                <ports>
-                  <port>+saw.docker.ip:saw.mapr.web.port:8443</port>
-                  <port>+saw.docker.ip:saw.mapr.cldb.port:7222</port>
-                  <port>+saw.docker.ip:saw.yarn.resource.port:8088</port>
-                  <port>+saw.docker.ip:saw.yarn.node.port:8042</port>
-                  <port>+saw.docker.ip:saw.mapr.yarn.rm.port:8030</port>
-                  <port>+saw.docker.ip:saw.mapr.yarn.nm.port:8031</port>
-                  <port>+saw.docker.ip:saw.spark.master.port:8080</port>
-                  <port>+saw.docker.ip:saw.spark.worker.port:8081</port>
-                  <port>+saw.docker.ip:saw.livy.port:8998</port>
-                </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
                 <wait>
