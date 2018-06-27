@@ -46,6 +46,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      new AnalysisHelper().delete(host, token, protractorConf.config.customerCode, analysisId);
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);

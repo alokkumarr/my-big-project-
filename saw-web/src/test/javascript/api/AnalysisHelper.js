@@ -27,9 +27,19 @@ class AnalysisHelper {
         let semanticId = this.getSemanticId(url,dataSets.pivotChart, token); // Get semanticId (dataset ID)
         return this.generateChart(url,semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token,name, description, type);
     }
-    //TODO:
-    delete(params) {
-        
+     /**
+     * @description Deletes analysis based on id for given customer
+     * @param {String} host 
+     * @param {String} token 
+     * @param {String} customerCode 
+     * @param {String} id 
+     * @returns {Object}
+     */
+    delete(host, token, customerCode, id) {
+      
+      let deletePayload = new RequestModel().getAnalyzeDeletePayload(customerCode, id);
+      //Make a delete api call
+      return apiCall.post(host + 'services/analysis', deletePayload, token);
     }
     //TODO:
     update(params) {
