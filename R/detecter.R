@@ -94,20 +94,24 @@ detect.data.frame <- function(df,
   df$seasonal <- df_stl$seasonal
   df$trend <- df_stl$trend
   df$resid <- df_stl$remainder
+  df_mad <- mad(df$resid)
+  df_med <- median(df$resid)
+  df$lower <- df$trend + df$seasonal + df_med - abs(cv) * df_mad
+  df$upper <- df$trend + df$seasonal + df_med + abs(cv) * df_mad
 
   if (direction == "pos") {
-    df$resid_std <- (df$resid - median(df$resid)) / mad(df$resid)
+    df$resid_std <- (df$resid - df_med) / df_mad
   } else if (direction == "neg") {
-    df$resid_std <- (median(df$resid) - df$resid) / mad(df$resid)
+    df$resid_std <- (df_med - df$resid) / df_mad
   } else {
-    df$resid_std <- abs((df$resid - median(df$resid)) / mad(df$resid))
+    df$resid_std <- abs((df$resid - df_med)) / df_mad
   }
 
   df$anomaly <- ifelse(df$resid_std > cv, 1, 0)
   df <- df[order(df$resid_std, decreasing = T), ]
   df$metric_index <- 1:n
   df$anomaly <- ifelse(df$metric_index > ma, 0, df$anomaly)
-  df[order(df[[index_var]]), c(df_names, "seasonal", "trend", "resid", "anomaly")]
+  df[order(df[[index_var]]), c(df_names, "seasonal", "trend", "resid", "lower", "upper", "anomaly")]
 }
 
 
@@ -166,11 +170,13 @@ detect.grouped_df <- function(df,
     } else{
       abs((. - median(.)) / mad(.))
     })) %>%
-    dplyr::mutate(anomaly = ifelse(resid_std > cv, 1, 0)) %>%
+    dplyr::mutate(lower = trend + seasonal + median(resid) - abs(cv) * mad(resid),
+                  upper = trend + seasonal + median(resid) + abs(cv) * mad(resid),
+                  anomaly = ifelse(resid_std > cv, 1, 0)) %>%
     dplyr::arrange(desc(resid_std)) %>%
     dplyr::mutate(anomaly = ifelse(row_number() > max_anoms*n(), 0, anomaly)) %>%
     dplyr::arrange_at(index_var) %>%
-    dplyr::select_at(c(index_var, measure_var, 'seasonal', 'trend', 'resid', 'anomaly'))
+    dplyr::select_at(c(index_var, measure_var, 'seasonal', 'trend', "lower", "upper", 'resid', 'anomaly'))
 }
 
 
@@ -274,7 +280,7 @@ detecter.tbl_spark <- function(df,
     ) %>%
     sparklyr::spark_apply(.,
                           function(e, l) {
-                            library(a2munge)
+                            #library(a2munge)
                             #library(checkmate)
                             index_var <- l$i_var
                             measure_var <- l$m_var
@@ -299,6 +305,8 @@ detecter.tbl_spark <- function(df,
                                     "seasonal",
                                     "trend",
                                     "resid",
+                                    "lower",
+                                    "upper",
                                     "anomaly"),
                           context = {
                             l = list(
@@ -320,6 +328,8 @@ detecter.tbl_spark <- function(df,
       "seasonal",
       "trend",
       "resid",
+      "lower",
+      "upper",
       "anomaly"
     ))
 
