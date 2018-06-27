@@ -177,6 +177,7 @@ export class ReportGridComponent {
         this.pageSize = instance.pageSize();
       }
     };
+    this.customizeColumns = this.customizeColumns.bind(this);
   }
 
   ngOnInit() {
@@ -213,7 +214,7 @@ export class ReportGridComponent {
 
   customizeColumns(columns) {
     forEach(columns, (col: ReportGridField) => {
-      col.allowSorting = false;
+      col.allowSorting = !this.isEditable;
       col.alignment = 'left';
     });
   }
