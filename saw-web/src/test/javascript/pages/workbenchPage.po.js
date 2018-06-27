@@ -3,6 +3,9 @@ const commonFunctions = require('../helpers/commonFunctions.js');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
 const designModePage = require('./designModePage.po');
+/* const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
+  return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
+}); */
 const getSelectedFileName = (index) => {`button[e2e="actions-menu-selector-${action}"]`
    return element(by.css('div.dx-datagrid-content table tbody tr'));
 };
@@ -26,11 +29,11 @@ module.exports = {
           menuAction: element(by.css('button.mat-menu-item[role="menuitem"]')),
           firstWindowStepperFwd: element(by.css('mat-step[e2e="create-dataset-first-window"] button[e2e="first-window-stepperFwd"]')),
           firstWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-first-window"] button[e2e="first-window-stepperCancel"]')),
-
+          
           secondWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-second-window"] button[e2e="second-window-stepperCancel"]')),
           secondWindowStepperFwd: element(by.css('mat-step[e2e="create-dataset-second-window"] button[e2e="second-window-stepperFwd"]')),
           secondWindowStepperPrev: element(by.css('mat-step[e2e="create-dataset-second-window"] button[e2e="second-window-stepperPrev"]')),
-
+          
           thirdWindowStepperCancel: element(by.css('mat-step[e2e="create-dataset-third-window"] button[e2e="third-window-stepperCancel"]')),
           thirdWindowStepperFwd: element(by.css('mat-step[e2e="create-dataset-third-window"] button[e2e="third-window-stepperFwd"]')),
           thirdWindowStepperPrev: element(by.css('mat-step[e2e="create-dataset-third-window"] button[e2e="third-window-stepperPrev"]')),
@@ -61,8 +64,8 @@ module.exports = {
         dataSetName: element(by.css('input[e2e="dataset-name"]')),
         dataSetDescription: element(by.css('input[e2e="dataset-desc"]')),
         fileUploadElem: element(by.css('button[e2e="upload-selected-file"]')),
-        createNewFolderElem: element(by.css('button[e2e="create-new-folder"]')),
-        fileInputElem: element(by.css('input[e2e="uploaded-file" type="file"]')),
+        createNewFolderElem: element(by.css('button[e2e="create-new-folder"]')),       
+        fileInputElem: element(by.css('input[e2e="uploaded-file" type="file"]')),                
     },
     validateCardViewMode() {
         expect(this.workbenchElems.view.getAttribute('ng-reflect-value')).toEqual('card');
@@ -77,8 +80,8 @@ module.exports = {
         expect(this.workbenchElems.data.getAttribute('ng-reflect-value')).toEqual('pods');
     },
     uploadFile(absolutePath, elem) {
-        element(by.css('input[e2e="uploaded-file"]')).sendKeys(absolutePath);
+        element(by.css('input[e2e="uploaded-file"]')).sendKeys(absolutePath);    
         browser.actions().sendKeys(protractor.Key.ENTER).perform();
         // element(by.css('input[e2e="upload-selected-file"]')).click();
     }
-};
+}; 
