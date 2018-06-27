@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
@@ -81,8 +76,10 @@ export class PivotGridComponent {
   }
   @Input('data')
   set setData(data: any[]) {
-    this.data = this.preProcessData(data);
-    this.setPivotData();
+    setTimeout(() => {
+      this.data = this.preProcessData(data);
+      this.setPivotData();
+    }, 100);
   }
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public fields: any[];
@@ -328,7 +325,7 @@ export class PivotGridComponent {
 
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
-          const percent = (cloned.aggregate == 'percentage' ? true : false);
+          const percent = cloned.aggregate == 'percentage' ? true : false;
 
           if (!isUndefined(artifactColumn.format)) {
             artifactColumn.format.percentage = percent;

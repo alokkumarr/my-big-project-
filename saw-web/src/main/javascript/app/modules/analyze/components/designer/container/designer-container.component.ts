@@ -20,15 +20,12 @@ import {
   SqlBuilderReport,
   SqlBuilderPivot,
   SqlBuilderChart,
-  ArtifactColumns,
   Artifact,
   DesignerToolbarAciton,
   Sort,
   Filter,
   IToolbarActionResult,
   DesignerChangeEvent,
-  ArtifactColumn,
-  Format,
   DesignerSaveEvent,
   AnalysisReport
 } from '../types';
@@ -36,8 +33,7 @@ import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES,
-  NUMBER_TYPES
+  DATE_TYPES
 } from '../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { ChartService } from '../../../services/chart.service';

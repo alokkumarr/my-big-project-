@@ -28,6 +28,7 @@ public class TicketDetails implements Serializable {
 	private String roleCode;
 	private String roleType;
 	private List<DSKDetails> dataSKey;
+    private List<String> CustomConfig;
 	private Long userId;
 	private ArrayList<Products> products;
 	
@@ -74,9 +75,23 @@ public class TicketDetails implements Serializable {
 		this.dataSKey = dataSKey;
 	}
 
-	
+    /**
+     * Gets CustomConfig
+     *
+     * @return value of CustomConfig
+     */
+    public List<String> getCustomConfig() {
+        return CustomConfig;
+    }
 
-	/**
+    /**
+     * Sets CustomConfig
+     */
+    public void setCustomConfig(List<String> customConfig) {
+        CustomConfig = customConfig;
+    }
+
+    /**
 	 * @return the userName
 	 */
 	public String getUserFullName() {
