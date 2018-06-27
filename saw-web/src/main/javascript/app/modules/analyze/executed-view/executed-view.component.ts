@@ -294,7 +294,6 @@ export class ExecutedViewComponent implements OnInit {
       const {isSaveSuccessful, analysis} = result;
       if (isSaveSuccessful) {
         this.analysis = analysis;
-        this.executeAnalysis(analysis)
       }
     });
   }
