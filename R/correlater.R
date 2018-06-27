@@ -128,8 +128,6 @@ correlater.data.frame <- function(df,
                                   output_col_names = c("var1", "var2", "cor"),
                                   remove_diag = FALSE) {
 
-  variables <- colnames(df)
-  checkmate::assert_choice(target_var, variables, null.ok = TRUE)
   checkmate::assert_choice(transform,
                            c("standardize", "standardizer", "normalize", "normalizer"),
                            null.ok = TRUE)
@@ -139,7 +137,8 @@ correlater.data.frame <- function(df,
   # Select only numeric columns
   df <- df %>%
     dplyr::select_if(is.numeric)
-
+  variables <- colnames(df)
+  checkmate::assert_choice(target_var, variables, null.ok = TRUE)
 
   if(! is.null(transform)) {
     if (transform %in% c("standardize", "standardizer")) {
