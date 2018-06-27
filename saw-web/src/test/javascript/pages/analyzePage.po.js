@@ -274,6 +274,7 @@ module.exports = {
     getAppliedFilter: getAppliedFilterUpgraded,
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
+    prompt: element(by.xpath(`//span[contains(text(),'Prompt')]/parent::*`)),
   },
   appliedFiltersDetails: {
     filterText:element(by.xpath('//span[@class="filter-counter"]')),
