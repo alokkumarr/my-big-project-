@@ -53,7 +53,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           case "ES" :  
             String action = proxy.getAction().value();         
             if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) 
-                || action.equals(Action.SNCRPIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value())){
+                || action.equals(Action.PIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value())){
                         
                         
                           if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value())){
@@ -88,7 +88,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                           }// Action only to support JSON format
                           else {
                             switch (action){
-                              case "sncrpivot" : 
+                              case "pivot" : 
                                                if (proxy.getSqlBuilder()!=null){
                                                  Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");  
                                                  String query = proxy.getQuery();

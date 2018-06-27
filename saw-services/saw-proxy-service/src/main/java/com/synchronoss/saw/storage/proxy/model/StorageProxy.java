@@ -632,7 +632,7 @@ public class StorageProxy {
         DELETE("delete"),
         UPDATE("update"),
         AGGREGATE("aggregate"),
-        SNCRPIVOT("sncrpivot");
+        PIVOT("pivot");
         private final String value;
         private final static Map<String, StorageProxy.Action> CONSTANTS = new HashMap<String, StorageProxy.Action>();
 

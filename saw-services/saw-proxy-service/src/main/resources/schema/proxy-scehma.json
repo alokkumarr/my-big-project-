@@ -29,7 +29,7 @@
                "delete",
                "update",
                "aggregate",
-               "sncrpivot"
+               "pivot"
             ]
          },
          "query":{

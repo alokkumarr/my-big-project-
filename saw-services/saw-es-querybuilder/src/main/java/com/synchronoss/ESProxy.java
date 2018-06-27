@@ -1,5 +1,7 @@
 package com.synchronoss;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -10,67 +12,105 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"storage_type", "index_name", "object_type", "verb", "query", "module_name",
-    "username", "dsk"})
+@JsonPropertyOrder({"storage", "indexName", "objectType", "action", "query", "moduleName",
+    "username", "dataSecurityKey", "resultFormat", "requestedTime", "productCode","requestBy"})
 public class ESProxy {
 
-  @JsonProperty("storage_type")
+  @JsonProperty("storage")
   private String storageType;
-  @JsonProperty("index_name")
+  @JsonProperty("indexName")
   private String indexName;
-  @JsonProperty("object_type")
+  @JsonProperty("objectType")
   private String objectType;
-  @JsonProperty("verb")
-  private String verb;
+  @JsonProperty("action")
+  private String action = "search";
   @JsonProperty("query")
   private String query;
-  @JsonProperty("module_name")
-  private String moduleName;
-  @JsonProperty("username")
-  private String username;
-  @JsonProperty("dsk")
+  @JsonProperty("moduleName")
+  private String moduleName ="ANALYZE";
+  @JsonProperty("dataSecurityKey")
   private String dsk;
+  @JsonProperty("resultFormat")
+  private String resultFormat = "json";
+  @JsonProperty("productCode")
+  private String productCode;
+  @JsonProperty("requestBy")
+  private String requestBy;
+  @JsonProperty("requestedTime")
+  private String requestedTime = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(new Date());
+  
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-  @JsonProperty("storage_type")
+  @JsonProperty("storage")
   public String getStorageType() {
     return storageType;
   }
 
-  @JsonProperty("storage_type")
+  @JsonProperty("storage")
   public void setStorageType(String storageType) {
     this.storageType = storageType;
   }
 
-  @JsonProperty("index_name")
+  @JsonProperty("indexName")
   public String getIndexName() {
     return indexName;
   }
 
-  @JsonProperty("index_name")
+  @JsonProperty("indexName")
   public void setIndexName(String indexName) {
     this.indexName = indexName;
   }
 
-  @JsonProperty("object_type")
+  @JsonProperty("objectType")
   public String getObjectType() {
     return objectType;
   }
 
-  @JsonProperty("object_type")
+  @JsonProperty("objectType")
   public void setObjectType(String objectType) {
     this.objectType = objectType;
   }
 
-  @JsonProperty("verb")
-  public String getVerb() {
-    return verb;
+  @JsonProperty("action")
+  public String getAction() {
+    return action;
   }
-
-  @JsonProperty("verb")
-  public void setVerb(String verb) {
-    this.verb = verb;
+  @JsonProperty("action")
+  public void setAction(String action) {
+    this.action = action;
+  }
+  @JsonProperty("resultFormat")
+  public String getResultFormat() {
+    return resultFormat;
+  }
+  @JsonProperty("resultFormat")
+  public void setResultFormat(String resultFormat) {
+    this.resultFormat = resultFormat;
+  }
+  @JsonProperty("productCode")
+  public String getProductCode() {
+    return productCode;
+  }
+  @JsonProperty("productCode")
+  public void setProductCode(String productCode) {
+    this.productCode = productCode;
+  }
+  @JsonProperty("resultFormat")
+  public String getRequestedTime() {
+    return requestedTime;
+  }
+  @JsonProperty("resultFormat")
+  public void setRequestedTime(String requestedTime) {
+    this.requestedTime = requestedTime;
+  }
+  @JsonProperty("requestBy")
+  public String getRequestBy() {
+    return requestBy;
+  }
+  @JsonProperty("requestBy")
+  public void setRequestBy(String requestBy) {
+    this.requestBy = requestBy;
   }
 
   @JsonProperty("query")
@@ -83,32 +123,22 @@ public class ESProxy {
     this.query = query;
   }
 
-  @JsonProperty("module_name")
+  @JsonProperty("moduleName")
   public String getModuleName() {
     return moduleName;
   }
 
-  @JsonProperty("module_name")
+  @JsonProperty("moduleName")
   public void setModuleName(String moduleName) {
     this.moduleName = moduleName;
   }
 
-  @JsonProperty("username")
-  public String getUsername() {
-    return username;
-  }
-
-  @JsonProperty("username")
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  @JsonProperty("dsk")
+  @JsonProperty("dataSecurityKey")
   public String getDsk() {
     return dsk;
   }
 
-  @JsonProperty("dsk")
+  @JsonProperty("dataSecurityKey")
   public void setDsk(String dsk) {
     this.dsk = dsk;
   }
