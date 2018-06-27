@@ -118,7 +118,7 @@ export class AnalyzeViewComponent implements OnInit {
     /* Update the new analysis in the current list */
     const index = findIndex(this.analyses, ({id}) => id === analysis.id);
     this.analyses.splice(index, 1, analysis);
-    this._state.go('analyze.view', {id: analysis.categoryId});
+    this.goToAnalysis(analysis)
   }
 
   spliceAnalyses(analysis, replace) {
