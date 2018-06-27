@@ -51,7 +51,7 @@ dataframe with same number of records as input dataframe. Appends
 }
 \description{
 Anomaly detection function for time series data. Function determines
-statistical anomlies in the dataset based on configurable theshold
+statistical anomalies in the dataset based on configurable threshold
 parameters.
 }
 \details{

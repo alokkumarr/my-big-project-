@@ -41,7 +41,7 @@ expanded dataset. FALSE returns just expanded grid. Default is TRUE}
 dataframe
 }
 \description{
-Function to expand dataset by converting implicit missing values to explict
+Function to expand a dataset by converting implicit missing values to explicit
 values
 }
 \examples{

@@ -16,8 +16,8 @@ Imports:
     rlang,
     zoo,
     checkmate (>= 1.8.2),
+    lubridate,
 Suggests: 
     testthat,
-    lubridate,
     purrr,
 RoxygenNote: 6.0.1.9000
