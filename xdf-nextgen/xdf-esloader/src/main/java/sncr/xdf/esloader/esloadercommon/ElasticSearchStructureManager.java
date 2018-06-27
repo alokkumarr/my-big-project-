@@ -167,52 +167,60 @@ public class ElasticSearchStructureManager {
         if(arrayIndex.size() > 0) {
             logger.debug("Aliases = " + aliases);
             for (Map.Entry<String, Alias.Mode> alias : aliases.entrySet()) {
-                boolean b = false;
+                boolean status = false;
                 String errorMessage = "";
                 String aliasName = alias.getKey();
                 logger.info("Processing command '" + alias.getValue().toString() + "' for '" + aliasName + "' alias.");
                 logger.info("List of new indices : " + arrayIndex);
                 switch (alias.getValue()) {
                     case APPEND: {
+                        logger.debug("Processing alias in append mode");
                         errorMessage = "Cant add alias " + aliasName + " to indices " + arrayIndex;
-                        b = esClient.esIndexAddAlias( aliasName, arrayIndex.toArray(new String[arrayIndex.size()]));
+                        status = esClient.esIndexAddAlias( aliasName, arrayIndex.toArray(new String[arrayIndex.size()]));
                         break;
                     }
                     case REPLACE: {
+                        logger.debug("Processing alias in replace mode");
                         if(!esClient.esAliasExists(alias.getKey())){
+                            logger.debug("Alias doesn't exist");
                             // Alias doesn't exists - just append and create new one
                             errorMessage = "Cant add alias " + aliasName + " to index (indices) " + arrayIndex;
-                            b = esClient.esIndexAddAlias(
+                            status = esClient.esIndexAddAlias(
                                     alias.getKey(),
                                     arrayIndex.toArray(new String[arrayIndex.size()]));
                         } else {
+                            logger.debug("Alias exists trying to remove");
                             // Get list of indices currently attached to alias
                             List<String> oldIndices =  esClient.esAliasListIndices( alias.getKey());
+                            logger.debug("Old indices = " + oldIndices);
 
                             if(oldIndices.size() > 0) {
                                 // Detach those indices from alias
                                 errorMessage = "Can't remove alias "  + aliasName + " from the list of existing indices " + oldIndices;
-                                b = esClient.esIndexRemoveAlias( alias.getKey(),
+                                status = esClient.esIndexRemoveAlias( alias.getKey(),
                                         oldIndices.toArray(new String[oldIndices.size()]));
-                                if (b) {
+
+                                logger.debug("Remove alias status = " + status);
+                                if (status) {
                                     // Attach new indices to alias
                                     errorMessage = "Can't add alias "  + aliasName + " to the list of indices " + arrayIndex;
-                                    b = esClient.esIndexAddAlias(alias.getKey(),
+                                    status = esClient.esIndexAddAlias(alias.getKey(),
                                             arrayIndex.toArray(new String[arrayIndex.size()]));
-                                    if (b) {
-                                        // Drop old indices if they are not part of other aliases
+                                    if (status) {
+                                        logger.debug("Safe delete indices " + oldIndices);
                                         esClient.esIndexSafeDelete(oldIndices.toArray(new String[oldIndices.size()]));
+//                                    // Drop old indices if they are not part of other aliases
                                     } // <-- Add alias successfull
-                                } //<-- Disassociate index successfull
+                                } //<-- Dissassociate index successfull
                             } else {
-                                b = false;
+                                status = false;
                                 errorMessage = "Cant retrieve list of indices for " + aliasName + " alias.";
                             }
                         } //<-- if(!ElasticSearchUtil.esAliasExists())...
                         break;
                     }
                 } //<-- switch
-                if(!b){
+                if(!status){
                     // Error - throw exception
                     throw new Exception(errorMessage);
                 }
