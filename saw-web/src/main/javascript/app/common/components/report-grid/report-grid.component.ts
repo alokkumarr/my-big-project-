@@ -252,7 +252,6 @@ export class ReportGridComponent {
       return;
     }
     if (!this.isEditable || !this.columns) {
-      event.items = [];
       return;
     }
     event.items = [{
