@@ -7,6 +7,7 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods.parse
 import play.mvc.{Http, Result, Results}
 import sncr.datalake.DLSession
+import sncr.datalake.engine.ExecutionType
 import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDObjectStruct
 import sncr.saw.common.config.SAWServiceConfig
@@ -25,7 +26,8 @@ class AnalysisExecutions extends BaseController {
           case obj: JValue => unexpectedElement("object", obj)
         }
         val id = Bytes.toString(result.getRowKey)
-        (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String])
+        (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String],
+          (content \ "executionType").extractOpt[String])
       }).sortBy(result =>result._2).reverse
       var count = 0
       val execHistory = SAWServiceConfig.executionHistory
@@ -38,9 +40,16 @@ class AnalysisExecutions extends BaseController {
         else { junkExecution(count-execHistory) = result._1
           false }
       }).map(result => {
+        var executionType = ""
+        if(result._4!= None && result._4.get.equalsIgnoreCase(
+          ExecutionType.scheduled.toString))
+          executionType ="Scheduled"
+        else
+          executionType = "On-Demand"
         ("id", result._1) ~
           ("finished", result._2) ~
-          ("status", result._3)
+          ("status", result._3)  ~
+          ("executionType",executionType)
       })
 
       /* Note: Keep "results" property for API backwards compatibility */

@@ -21,18 +21,18 @@
         </div>
         <div class="descr margin-btm-9">
           <div>Description:
-            <span [innerHTML]="sets?.userData?.description"></span>
+            <span [innerHTML]="sets?.system?.description"></span>
           </div>
         </div>
         <div class="margin-btm-9" fxLayout="row">
           <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added by:
-            <span [innerHTML]="sets.system.user"></span>
+            <span [innerHTML]="sets.system.createdBy"></span>
           </div>
           <div fxFlex="65
                     " fxLayout="column" fxLayoutAlign="center end">Last updated by:
             <div fxLayout="row" style="align-items: baseline;">
-              <span [innerHTML]="sets.system.user"></span> @
-              <span class="mat-caption" [innerHTML]="sets.asOfNow.finished"></span>
+              <!-- <span [innerHTML]="sets.system.user"></span> @ -->
+              <span> {{sets.system.modifiedTime * 1000 | date: 'short'}}</span>
             </div>
           </div>
         </div>

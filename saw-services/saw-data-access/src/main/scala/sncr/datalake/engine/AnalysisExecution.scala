@@ -61,7 +61,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
       execType match {
         case ExecutionType.scheduled => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResult(id, null,ExecutionType.scheduled.toString)
         }
         case ExecutionType.onetime => {
           analysisNodeExecution.executeSQLWithLimit(limit)
@@ -73,7 +73,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
         }
         case ExecutionType.regularExecution => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null)
+          analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.regularExecution.toString)
         }
       }
       analysisNodeExecution.setFinishTime

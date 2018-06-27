@@ -16,7 +16,8 @@ import java.util.Map;
 public class CsvInspectorRowProcessor extends ObjectRowProcessor {
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(CsvInspectorRowProcessor.class);
-    
+
+    public final static String T_INTEGER = "integer";
     public final static String T_STRING = "string";
     public final static String T_DOUBLE = "double";
     public final static String T_LONG = "long";
