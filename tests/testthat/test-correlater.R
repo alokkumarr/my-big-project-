@@ -2,8 +2,8 @@
 # correlater unit tests ---------------------------------------------------
 
 
-library(testthat)
 library(a2munge)
+library(testthat)
 library(sparklyr)
 library(dplyr)
 
@@ -88,3 +88,12 @@ test_that("correlater inputs work as expected", {
   expect_error(mtcars %>% correlater(., transform = "gobbler"))
 })
 
+
+
+test_that("correlater can handle datasets with categorical variables", {
+  iris_cor <- correlater(iris)
+  expect_equal(iris %>%
+                 select_if(is.numeric) %>%
+                 colnames(),
+               unique(iris_cor$var1))
+})
