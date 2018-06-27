@@ -87,7 +87,8 @@ export class ExecutedViewComponent implements OnInit {
 
   executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId) {
     if (!awaitingExecution) {
-      if (executionId || loadLastExecution) {
+      const isDataLakeReport = analysis.type === 'report';
+      if (executionId || loadLastExecution || isDataLakeReport) {
         this.loadExecutedAnalysesAndExecutionData(analysis.id, executionId, analysis.type, null);
       } else {
         this.executeAnalysis(analysis)
