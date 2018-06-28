@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Analysis } from '../../types';
+import { Analysis, Artifact } from '../../types';
 
 const template = require('./executed-report-view.component.html');
 
@@ -10,8 +10,14 @@ const template = require('./executed-report-view.component.html');
 })
 
 export class ExecutedReportViewComponent {
-  @Input() analysis: Analysis;
+  @Input('analysis') set setAnalysis(analysis: Analysis) {
+    this.analysis = analysis;
+    this.artifacts = analysis.edit ? null : analysis.artifacts;
+  };
   @Input() dataLoader: Function;
+
+  analysis: Analysis;
+  artifacts: Artifact[];
 
   constructor() { }
 

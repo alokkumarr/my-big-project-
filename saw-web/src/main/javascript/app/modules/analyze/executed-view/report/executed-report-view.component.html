@@ -1,6 +1,6 @@
 <report-grid-upgraded *ngIf="analysis && dataLoader"
                       (change)="onReportGridChange($event)"
-                      [artifacts]="analysis.artifacts"
+                      [artifacts]="artifacts"
                       [sorts]="analysis.sqlBuilder.sorts || analysis.sqlBuilder.orderByColumns"
                       [dataLoader]="dataLoader">
 </report-grid-upgraded>
