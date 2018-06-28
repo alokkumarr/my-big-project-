@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Transition, StateService } from '@uirouter/angular';
-import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 
 export enum EXECUTION_STATES {
@@ -34,9 +32,7 @@ export class ExecuteService {
   execs$: ReplaySubject<IExecuteEventEmitter>
 
   constructor(
-    private _toastMessage: ToastService,
-    private _analyzeService: AnalyzeService,
-    private _state: StateService
+    private _analyzeService: AnalyzeService
   ) {
     const bufferSize = 10;
     this.execs$ = new ReplaySubject<IExecuteEventEmitter>(bufferSize);

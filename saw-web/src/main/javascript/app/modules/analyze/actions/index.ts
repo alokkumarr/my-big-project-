@@ -3,6 +3,7 @@ import { CommonModuleTs } from '../../../common';
 import { AnalyzeActionsMenuComponent } from './analyze-actions-menu.component';
 import { AnalyzeActionsService } from './analyze-actions.service';
 import { ExecuteService } from '../services/execute.service';
+import { PublishService } from '../services/publish.service';
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import { ExecuteService } from '../services/execute.service';
   entryComponents: [AnalyzeActionsMenuComponent],
   providers: [
     AnalyzeActionsService,
-    ExecuteService
+    ExecuteService,
+    PublishService
   ],
   exports: [
     AnalyzeActionsMenuComponent

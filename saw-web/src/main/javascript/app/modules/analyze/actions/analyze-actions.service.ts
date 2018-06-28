@@ -8,6 +8,7 @@ import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { FilterService } from '../services/filter.service';
 import { ExecuteService } from '../services/execute.service';
+import { PublishService } from '../services/publish.service';
 import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish';
 
@@ -17,6 +18,7 @@ export class AnalyzeActionsService {
     private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
     private _executeService: ExecuteService,
+    private _publishService: PublishService,
     private _analyzeDialogService: AnalyzeDialogService,
     private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
@@ -101,7 +103,7 @@ export class AnalyzeActionsService {
           if (analysis) {
             const execute = true;
             this._headerProgress.show();
-            this._analyzeService.publishAnalysis(analysis, execute).then(
+            this._publishService.publishAnalysis(analysis, execute).then(
               updatedAnalysis => {
                 this._headerProgress.hide();
                 this._toastMessage.info(

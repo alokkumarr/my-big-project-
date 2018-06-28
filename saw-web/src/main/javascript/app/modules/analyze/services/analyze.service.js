@@ -169,23 +169,18 @@ export class AnalyzeService {
     return deferred.promise;
   }
 
-  publishAnalysis(model, execute = false) {
-    if (model.schedule.scheduleState === 'new') {
-      this._$http.post(`${this.url}/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+  changeSchedule(analysis) {
+    const schedule = analysis.schedule;
+    const scheduleState = schedule.scheduleState;
+    switch (scheduleState) {
+    case 'new':
+      return this._$http.post(`${this.url}/scheduler/schedule`, schedule);
+    case 'exist':
+      return this._$http.post(`${this.url}/scheduler/update`, schedule);
+    case 'delete':
+      return this._$http.post(`${this.url}/scheduler/delete`, schedule);
+    default:
     }
-    if (model.schedule.scheduleState === 'exist') {
-      this._$http.post(`${this.url}/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
-    }
-    if (model.schedule.scheduleState === 'delete') {
-      this._$http.post(`${this.url}/scheduler/delete`, model.schedule);
-    }
-
-    return this.updateAnalysis(model).then(analysis => {
-      if (execute) {
-        this.executeAnalysis(model);
-      }
-      return analysis;
-    });
   }
 
   getCronDetails(requestBody) {
