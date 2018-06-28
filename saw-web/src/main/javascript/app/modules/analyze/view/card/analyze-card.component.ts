@@ -4,6 +4,7 @@ import { generateSchedule } from '../../cron';
 import {
   ExecuteService,
   IExecuteEvent,
+  IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../../services/execute.service';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
@@ -38,7 +39,10 @@ export class AnalyzeCardComponent implements OnInit {
     private _analyzeActionsService: AnalyzeActionsService,
     private _jwt: JwtService,
     private _executeService: ExecuteService
-  ) { }
+  ) {
+    this.onExecutionEvent = this.onExecutionEvent.bind(this);
+    this.onExecutionsEvent = this.onExecutionsEvent.bind(this);
+  }
 
   ngOnInit() {
     this.canUserFork = this._jwt.hasPrivilege('FORK', {
@@ -48,8 +52,13 @@ export class AnalyzeCardComponent implements OnInit {
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
     this.typeIdentifier = `analysis-type:${type}${chartType ? `:${chartType}` : ''}`;
 
-    this.onExecutionEvent = this.onExecutionEvent.bind(this);
-    this._executeService.subscribe(id, this.onExecutionEvent);
+    this._executeService.subscribe(id, this.onExecutionsEvent);
+  }
+
+  onExecutionsEvent(e: IExecuteEventEmitter) {
+    if (!e.subject.isStopped) {
+      e.subject.subscribe(this.onExecutionEvent);
+    }
   }
 
   onExecutionEvent(e: IExecuteEvent) {
