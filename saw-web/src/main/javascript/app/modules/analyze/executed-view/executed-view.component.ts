@@ -3,6 +3,7 @@ import { Transition, StateService } from '@uirouter/angular';
 import * as get from 'lodash/get';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { AnalyzeService } from '../services/analyze.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
@@ -44,6 +45,7 @@ export class ExecutedViewComponent implements OnInit {
   executionSub: Subscription;
   executionId: string;
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
+  chartUpdater$: BehaviorSubject<Object[]> = new BehaviorSubject<Object[]>([]);
 
   constructor(
     private _executeService: ExecuteService,

@@ -1,3 +1,6 @@
-<div>
-  EXEcuted chart
-</div>
+<chart [updater]="updater"
+       [options]="chartOptions"
+       [isStockChart]="isStockChart"
+       [enableExport]="true"
+       e2e="{{'chart-type:' + analysis.chartType}}">
+</chart>
