@@ -29,7 +29,7 @@ public class ESProxy {
   @JsonProperty("moduleName")
   private String moduleName ="ANALYZE";
   @JsonProperty("dataSecurityKey")
-  private String dsk;
+  private Object dsk;
   @JsonProperty("resultFormat")
   private String resultFormat = "json";
   @JsonProperty("productCode")
@@ -96,11 +96,11 @@ public class ESProxy {
   public void setProductCode(String productCode) {
     this.productCode = productCode;
   }
-  @JsonProperty("resultFormat")
+  @JsonProperty("requestedTime")
   public String getRequestedTime() {
     return requestedTime;
   }
-  @JsonProperty("resultFormat")
+  @JsonProperty("requestedTime")
   public void setRequestedTime(String requestedTime) {
     this.requestedTime = requestedTime;
   }
@@ -134,12 +134,12 @@ public class ESProxy {
   }
 
   @JsonProperty("dataSecurityKey")
-  public String getDsk() {
+  public Object getDsk() {
     return dsk;
   }
 
   @JsonProperty("dataSecurityKey")
-  public void setDsk(String dsk) {
+  public void setDsk(Object dsk) {
     this.dsk = dsk;
   }
 

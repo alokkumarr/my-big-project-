@@ -41,6 +41,7 @@ public class SAWElasticTransportService {
   private static String HITS= "hits";
   private static String _SOURCE ="_source";
   private Integer timeOut = 3;
+  private static String endpoint = "internal/proxy/storage/";
 
   private static String execute(String query, String jsonString, String dsk, String username,
     String moduleName,boolean isReport, Integer timeOut) throws JsonProcessingException, IOException, NullPointerException{
@@ -56,19 +57,22 @@ public class SAWElasticTransportService {
     esProxy.setStorageType("ES");
     esProxy.setIndexName(indexName);
     esProxy.setObjectType(type);
-    esProxy.setAction("search");
+    if (isReport) {
+    esProxy.setAction("search");} 
+    else {esProxy.setAction("aggregate");}
     esProxy.setQuery(query);
     esProxy.setModuleName(moduleName);
-    esProxy.setDsk(dsk);
+    List<Object> dataSecurityKey = new ArrayList<>();
+    esProxy.setDsk(dataSecurityKey);
     esProxy.setRequestBy(username);
     esProxy.setProductCode("SIP");
-    esProxy.setRequestBy(username);
     esProxy.setResultFormat("json");
     ObjectMapper mapper = new ObjectMapper();
     mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     mapper.disable(SerializationFeature.INDENT_OUTPUT);
+    logger.trace("Request Body in es-querybuilder "+ mapper.writeValueAsString(esProxy));
     RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
-    Request req = new Request.Builder().post(body).url(url).build();
+    Request req = new Request.Builder().post(body).url(url + endpoint).build();
     logger.trace("Elasticsearch request: {}", req);
     Response response = client.newCall(req).execute();
     logger.trace("Elasticsearch response: {}", response);
@@ -84,10 +88,10 @@ public class SAWElasticTransportService {
       JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
       // For elastic search report data
       if(isReport) {
-          if (finalResponse.get("aggregations")!=null)
+          if (finalResponse!=null)
           {
               return buildAggregatedReportData(jsonString,
-                      finalResponse.get("aggregations")).toString();
+                      finalResponse).toString();
           }
           else
           {
@@ -95,7 +99,7 @@ public class SAWElasticTransportService {
           }
       }
       // In case of Pivot and chart
-      return finalResponse.get("aggregations").toString();
+      return finalResponse.toString();
   }
 
   /**
@@ -191,18 +195,18 @@ public class SAWElasticTransportService {
         esProxy.setStorageType("ES");
         esProxy.setIndexName(executionObject.getEsRepository().getIndexName());
         esProxy.setObjectType(executionObject.getEsRepository().getType());
-        esProxy.setAction("search");
+        esProxy.setAction("aggregate");
         esProxy.setQuery(executionObject.getSearchSourceBuilder().toString());
         esProxy.setModuleName("OBSERVE");
-        esProxy.setDsk("dataSecurityKey");
         esProxy.setRequestBy("transportsvc@synchronoss.com");
         esProxy.setProductCode("SIP");
         esProxy.setResultFormat("json");
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        logger.trace("Request Body in es-querybuilder "+ mapper.writeValueAsString(esProxy));
         RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
-        Request req = new Request.Builder().post(body).url(url).build();
+        Request req = new Request.Builder().post(body).url(url + endpoint).build();
         logger.trace("Elasticsearch request: {}", req);
         Response response = null;
             response = client.newCall(req).execute();
@@ -216,7 +220,7 @@ public class SAWElasticTransportService {
             throw new NullPointerException("Data is not available based on provided query criteria");
         }
         JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
-        return buildGlobalFilterData(finalResponse.get("aggregations"),executionObject.getGlobalFilter());
+        return buildGlobalFilterData(finalResponse,executionObject.getGlobalFilter());
     }
     private static String buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter)
     {
@@ -258,16 +262,16 @@ public class SAWElasticTransportService {
         esProxy.setStorageType("ES");
         esProxy.setIndexName(executionObject.getEsRepository().getIndexName());
         esProxy.setObjectType(executionObject.getEsRepository().getType());
-        esProxy.setAction("search");
+        esProxy.setAction("aggregate");
         esProxy.setQuery(searchSourceBuilder.toString());
         esProxy.setModuleName("OBSERVE");
-        esProxy.setDsk("dataSecurityKey");
         esProxy.setRequestBy("transportsvc@synchronoss.com");
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         mapper.disable(SerializationFeature.INDENT_OUTPUT);
+        logger.trace("Request Body in es-querybuilder "+ mapper.writeValueAsString(esProxy));
         RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
-        Request req = new Request.Builder().post(body).url(url).build();
+        Request req = new Request.Builder().post(body).url(url + endpoint).build();
         logger.trace("Elasticsearch request: {}", req);
         Response response = null;
         response = client.newCall(req).execute();
@@ -281,9 +285,47 @@ public class SAWElasticTransportService {
             throw new NullPointerException("Data is not available based on provided query criteria");
         }
         JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
-        return finalResponse.get("aggregations");
+        return finalResponse;
     }
     public Integer getTimeOut() {
       return timeOut;
+    }
+    
+    public static void main(String[] args) throws IOException {
+      OkHttpClient client = new OkHttpClient();
+      client.setConnectTimeout(10, TimeUnit.MINUTES);
+      client.setReadTimeout(10, TimeUnit.MINUTES);
+      MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+      ESProxy esProxy = new ESProxy();
+      esProxy.setStorageType("ES");
+      esProxy.setIndexName("mct_tmo_session");
+      esProxy.setObjectType("session");
+      esProxy.setAction("aggregate");
+      String query = "{\"size\":0,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\"}}}}}}";
+      esProxy.setQuery(query);
+      esProxy.setModuleName("ANALYZE");
+      esProxy.setRequestBy("saurav");
+      esProxy.setProductCode("SIP");
+      esProxy.setRequestBy("saurav");
+      esProxy.setResultFormat("json");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      mapper.disable(SerializationFeature.INDENT_OUTPUT);
+      RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
+      Request req = new Request.Builder().post(body).url("http://localhost:9800/internal/proxy/storage/").build();
+      logger.trace("Elasticsearch request: {}", req);
+      Response response = client.newCall(req).execute();
+      logger.trace("Elasticsearch response: {}", response);
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      String responseString = response.body().string();
+      logger.trace("responseStringdfd" +responseString);
+      JsonNode esResponse = objectMapper.readTree(responseString);
+      if (esResponse.get("data") == null)
+      {
+        throw new NullPointerException("Data is not available based on provided query criteria");
+      }
+        JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+        System.out.println(finalResponse.toString());
     }
 }

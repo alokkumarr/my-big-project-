@@ -26,6 +26,6 @@ elastic-search:
            transport-hosts: {{ saw_elasticsearch_host }}
            transport-ports: {{ saw_elasticsearch_port }}
 elastic-xpack :
-          cluster-active: {{ saw_elasticsearch_xpack | default(false) }}
+          cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           clsuter-username: {{ saw_elasticsearch_username | default('') }}
           cluster-password: {{ saw_elasticsearch_password | default('') }}

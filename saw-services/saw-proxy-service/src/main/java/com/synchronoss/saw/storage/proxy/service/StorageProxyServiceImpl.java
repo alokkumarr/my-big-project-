@@ -36,6 +36,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   
   private String dateFormat="yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
+  private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
   
   @Autowired
   private StorageConnectorService storageConnectorService;
@@ -53,7 +54,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           case "ES" :  
             String action = proxy.getAction().value();         
             if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) 
-                || action.equals(Action.PIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value())){
+                || action.equals(Action.PIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value()) || action.equals(Action.AGGREGATE.value())){
                         
                         
                           if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value())){
@@ -198,7 +199,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                               proxy.setData(data);
                                               }
                                               else {
-                                                proxy.setStatusMessage("There are no documents available with the provided");
+                                                proxy.setStatusMessage("There are no documents available with the provided query.");
                                               }
                                               } // end of check for the size 50000
                                               else {
@@ -206,15 +207,59 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                               }
                                               }
                                               else{
-                                                proxy.setStatusMessage("Please provide size & from parameter in query.");
+                                                proxy.setStatusMessage("Please provide size or both parameter in query.");
                                                 proxy.setPageSize(0);
                                                 proxy.setPageNum(0);
                                               }
                                               break;
-                                          }
-                            // TODO: Execute Query or perform 'search' & 'sncrpivot' prepare response based on the specification (either JSON or Tabular) 
-                            // TODO: Convert data either into tabular or JSON
-                          }
+                              case "aggregate" :  
+                                Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");
+                                String aggregateQuery = proxy.getQuery();
+                                int size =0;
+                                proxy.setPageSize(0);
+                                proxy.setPageNum(0);
+                                if(aggregateQuery.contains("size")){
+                                  Pattern p = Pattern.compile(SIZE_REG_EX, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                                  Matcher m = p.matcher(aggregateQuery);
+                                  if (m.find())
+                                  {
+                                      String fromSize_1=m.group(1).trim();
+                                      String fromSize_1_Num=m.group(2);
+                                      
+                                      if (fromSize_1.equals("size")){
+                                        size = Integer.parseInt(fromSize_1_Num);
+                                        }
+                                      else{
+                                        size = 0;
+                                  } // parsing of size & from
+                                  }
+                                  if (size==0){
+                                    SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
+                                    if (proxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
+                                        logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
+                                            ObjectMapper mapperObj = new ObjectMapper();
+                                            String jsonString = mapperObj.writeValueAsString(sncrPivotResponse.getAggregations());
+                                            JsonNode objectNode = mapperObj.readTree(jsonString);
+                                            List<Object> data = new ArrayList<>();
+                                            data.add(objectNode);
+                                            proxy.setData(data);
+                                            }
+                                    else {
+                                      proxy.setStatusMessage("Aggregate action's does not support flattening of data yet.");
+                                    }
+                                  } // end of size==0 if block
+                                  else {
+                                    proxy.setStatusMessage("Aggregate action's size cannot be greater than zero.");
+                                  } // end of size==0 else block 
+                           } // end of aggregate size block 
+                                else{
+                                  proxy.setStatusMessage("Please provide size parameter in query.");
+                                  proxy.setPageSize(0);
+                                  proxy.setPageNum(0);
+                           }      
+                          break; 
+                          } // end of action
+                        } // // end of action operation else block
             } // end of action operation  if block
             else {
               proxy.setStatusMessage("This "+action+" is not yet supported by StorageType :" + storageType);
@@ -240,7 +285,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               // TODO: Convert data either into tabular or JSON
           
         } // end of switch statement
-    response = StorageProxyUtils.prepareResponse(proxy, "data is retrieved");
+    response = StorageProxyUtils.prepareResponse(proxy, proxy!=null? proxy.getStatusMessage():"data is retrieved.");
     } // end of schema validation if block
     else {
       response = StorageProxyUtils.prepareResponse(proxy, "provided JSON input is not valid.");

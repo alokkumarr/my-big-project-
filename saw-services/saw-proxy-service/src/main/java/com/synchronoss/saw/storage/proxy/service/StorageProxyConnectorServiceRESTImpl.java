@@ -44,7 +44,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   private static final Logger logger = LoggerFactory.getLogger(StorageProxyConnectorServiceRESTImpl.class);
   @Value("${elastic-xpack.cluster-active}")
   @NotNull
-  private Boolean active;
+  private Boolean active = false;
 
   @Value("${elastic-xpack.clsuter-username}")
   private String username;

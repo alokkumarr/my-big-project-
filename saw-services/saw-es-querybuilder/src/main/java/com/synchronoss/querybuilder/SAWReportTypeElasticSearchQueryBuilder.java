@@ -60,6 +60,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     public String buildDataQuery(Integer size) throws IOException, ProcessingException {
         SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(getJsonString(), "sqlBuilder");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.from(0);
         searchSourceBuilder.size(size);
         if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
             throw new NullPointerException(
