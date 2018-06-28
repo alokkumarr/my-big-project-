@@ -10,12 +10,14 @@ describe('Login Tests: login.test.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
   const userDataProvider = {
-    'admin': {user: users.admin.loginId},
-    'user': {user: users.userOne.loginId},
+    'admin': {user: users.admin.loginId}, // SAWQA-1
+    'user': {user: users.userOne.loginId} // SAWQA-5
   };
+
   beforeAll(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
+
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');

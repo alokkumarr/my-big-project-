@@ -17,6 +17,7 @@ trait MDContentBuilder extends SourceAsJson{
       val attributeVal = attr._2 match {
         case "JString" => { val v = (content \ attr._1).extractOpt[String]; if (v.isDefined && v.nonEmpty) JString(v.get) else JNothing}
         case "JArray" => val v = (content \ attr._1).extractOpt[JArray]; if (v.isDefined && v.nonEmpty) v.get else JNothing
+        case "JObject" => val v = (content \ attr._1).extractOpt[JObject]; if (v.isDefined && v.nonEmpty) v.get else JNothing
         case _ => JNothing
       }
       (attr._1, attributeVal)
@@ -61,10 +62,8 @@ object SemanticNodeModel{
       ("disabled","JString"),
       ("checked","JString"),
       ("supports","JArray"),
+      ("esRepository","JObject"),
       ("module","JString")
     ))
-
-
-
 }
 

@@ -175,7 +175,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       return
     }
     executeSQL(rowLim)
-    createAnalysisResult(resId, out)
+    createAnalysisResult(resId, out,null)
   }
 
   def getDataIterator : java.util.Iterator[java.util.HashMap[String, (String, Object)]] = dataIterator(analysisKey)
@@ -201,13 +201,14 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     * 2. if out parameter is not null - appends it this ResultNode represented in JSON format.
     *
     */
-  def createAnalysisResult(resId: String = null, out: OutputStream = null): Unit = {
+  def createAnalysisResult(resId: String = null, out: OutputStream = null, executionType :String): Unit = {
 
     createAnalysisResultHeader(resId)
     saveData(analysisKey, outputLocation, outputType)
     finishedTS = System.currentTimeMillis
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JLong(finishedTS)),
+      JField("executionType", JString(executionType)),
       JField("exec-code", JLong(lastSQLExecRes)),
       JField("exec-msg", JString(lastSQLExecMessage))
     ))

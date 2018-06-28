@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 import io.jsonwebtoken.Claims;
@@ -17,7 +16,6 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -30,7 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.component.Component;
 
 @RestController
 @RequestMapping("/internal/workbench/projects/")
@@ -67,7 +67,7 @@ public class WorkbenchExecutionController {
       @RequestHeader("Authorization") String authToken)
       throws JsonProcessingException, Exception {
     log.debug("Create dataset: project = {}", project);
-    log.info("Auth token = {}", authToken);
+    log.debug("Auth token = {}", authToken);
     if (authToken.startsWith("Bearer")) {
       authToken = authToken.substring("Bearer ".length());
     }
@@ -120,6 +120,7 @@ public class WorkbenchExecutionController {
     ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
     ObjectNode xdfOutput = xdfOutputs.addObject();
     xdfOutput.put("dataSet", name);
+    xdfOutput.put("name", Component.DATASET.output.name());
     xdfOutput.put("desc", description);
 
     ObjectNode userData = mapper.createObjectNode();

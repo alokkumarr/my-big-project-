@@ -8,14 +8,13 @@ const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
   const userDataProvider = {
-    'admin': {user: users.admin.loginId},
-    'user': {user: users.userOne.loginId},
+    'admin': {user: users.admin.loginId}, // SAWQA-76
+    'user': {user: users.userOne.loginId}, // SAWQA-4833
   };
 
   beforeAll(function () {
@@ -24,6 +23,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -31,23 +31,21 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
-  });
-
     using(userDataProvider, function (data, description) {
       it('should display list view by default by ' + description, function () {
+        expect(browser.getCurrentUrl()).toContain('/login');
         loginPage.userLogin(data.user, users.anyUser.password);
         analyzePage.validateListView();
       });
 
     it(description + ' should land on analyze page', function () {
-      loginPage.userLoginV2(data.user, users.anyUser.password);
+      loginPage.userLogin(data.user, users.anyUser.password);
       // the app should automatically navigate to the analyze page
       // and when its on there the current module link is disabled
       const alreadyOnAnalyzePage = ec.urlContains('/analyze');

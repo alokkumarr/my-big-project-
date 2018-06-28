@@ -20,15 +20,12 @@ import {
   SqlBuilderReport,
   SqlBuilderPivot,
   SqlBuilderChart,
-  ArtifactColumns,
   Artifact,
   DesignerToolbarAciton,
   Sort,
   Filter,
   IToolbarActionResult,
   DesignerChangeEvent,
-  ArtifactColumn,
-  Format,
   DesignerSaveEvent,
   AnalysisReport
 } from '../types';
@@ -36,8 +33,7 @@ import {
   DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES,
-  NUMBER_TYPES
+  DATE_TYPES
 } from '../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { ChartService } from '../../../services/chart.service';
@@ -213,7 +209,9 @@ export class DesignerContainerComponent {
     forEach(sqlBuilder.nodeFields, node => {
       let identical = false;
       forEach(this.sorts || [], sort => {
-        const hasSort = this.sorts.some(sort => node.columnName === sort.columnName);
+        const hasSort = this.sorts.some(
+          sort => node.columnName === sort.columnName
+        );
         if (!hasSort) {
           this.sorts.push({
             order: 'asc',
@@ -398,6 +396,9 @@ export class DesignerContainerComponent {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
+    if (!this.isInQueryMode) {
+      delete (this.analysis as AnalysisReport).queryManual;
+    }
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -641,7 +642,7 @@ export class DesignerContainerComponent {
   canRequestReport(artifacts) {
     if (this.analysis.edit) {
       return Boolean((<AnalysisReport>this.analysis).queryManual);
-    };
+    }
 
     let atLeastOneIsChecked = false;
     forEach(artifacts, artifact => {

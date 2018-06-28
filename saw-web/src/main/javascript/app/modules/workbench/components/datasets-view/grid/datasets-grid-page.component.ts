@@ -58,25 +58,25 @@ export class DatasetsGridPageComponent implements OnInit {
       caption: 'Data Set Name',
       dataField: 'system.name',
       alignment: 'left',
-      width: '35%',
+      width: '20%',
       cellTemplate: 'nameCellTemplate',
       cssClass: 'branded-column-name'
+    },{
+      dataField: 'system.description',
+      caption: 'Description',
+      width: '25%',
+      dataType: 'String',
+      cellTemplate: 'creatorCellTemplate'
     }, {
       caption: 'Size',
       dataField: 'system.numberOfFiles',
       dataType: 'number',
       width: '10%'
     }, {
-      dataField: 'system.user',
+      dataField: 'system.createdBy',
       caption: 'Added By',
       width: '13%',
       dataType: 'string',
-      cellTemplate: 'creatorCellTemplate'
-    }, {
-      dataField: 'system.format',
-      caption: 'Type',
-      width: '10%',
-      dataType: 'String',
       cellTemplate: 'creatorCellTemplate'
     }, {
       dataField: 'dataPods.numberOfPods',
@@ -84,7 +84,7 @@ export class DatasetsGridPageComponent implements OnInit {
       width: '8%',
       dataType: 'number'
     }, {
-      dataField: 'asOfNow.finished',
+      dataField: 'system.modifiedTime',
       caption: 'Last Updated',
       cellTemplate: 'timecreatedCellTemplate',
       width: '12%',
