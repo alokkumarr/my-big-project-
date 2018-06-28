@@ -45,7 +45,7 @@ export class ExecutedViewComponent implements OnInit {
   executionSub: Subscription;
   executionId: string;
   pivotUpdater$: Subject<IPivotGridUpdate> = new Subject<IPivotGridUpdate>();
-  chartUpdater$: BehaviorSubject<Object[]> = new BehaviorSubject<Object[]>([]);
+  chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
 
   constructor(
     private _executeService: ExecuteService,
@@ -313,12 +313,17 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   exportData() {
-    if (this.analysis.type === 'pivot') {
-      // export from front end
+    switch (this.analysis.type) {
+    case 'pivot':
+    // export from front end
       this.pivotUpdater$.next({
         export: true
       });
-    } else {
+      break;
+    case 'chart':
+      this.chartUpdater$.next({export: true});
+      break;
+    default:
       this._analyzeExportService.export(this.analysis, this.executionId);
     }
   }

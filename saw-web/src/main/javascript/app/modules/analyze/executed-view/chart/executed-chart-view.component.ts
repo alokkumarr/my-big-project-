@@ -22,7 +22,11 @@ export class ExecutedChartViewComponent {
     this.initChartOptions(analysis);
   };
   @Input('data') set setData(data: any[]) {
-    this.updateChart(data, this.analysis);
+    const updates = this.getChartUpdates(data, this.analysis);
+    setTimeout(() => {
+      // defer updating the chart so that the chart has time to initialize
+      this.updater.next(updates);
+    });
   };
 
   analysis: AnalysisChart;
@@ -50,7 +54,7 @@ export class ExecutedChartViewComponent {
     this.isStockChart = analysis.isStockChart;
   }
 
-  updateChart(data, analysis) {
+  getChartUpdates(data, analysis) {
     const settings = this._chartService.fillSettings(analysis.artifacts, analysis);
     const sorts = analysis.sqlBuilder.sorts;
     const labels = {
@@ -66,7 +70,7 @@ export class ExecutedChartViewComponent {
       );
     }
 
-    let changes = [
+    return [
       ...this._chartService.dataToChangeConfig(
         analysis.chartType,
         settings,
@@ -76,7 +80,5 @@ export class ExecutedChartViewComponent {
       {path: 'title.text', data: analysis.name},
       {path: 'chart.inverted', data: analysis.isInverted}
     ];
-
-    this.updater.next(changes);
   }
 }

@@ -30,7 +30,7 @@
         <analyze-actions-menu-u *ngIf="analysis"
                                 [analysis]="analysis"
                                 exclude="publish-fork-edit"
-                                [actionsToDisable]="(isExecuting ? 'execute' : '') + (analysis.type === 'chart' ? 'export' : '')"
+                                [actionsToDisable]="isExecuting ? 'execute' : ''"
                                 (afterDelete)="afterDelete(analysis)"
                                 (afterExport)="exportData()"
         ></analyze-actions-menu-u>
