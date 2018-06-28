@@ -1,4 +1,4 @@
-import { Injectable, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { JwtService } from '../../services/jwt.service';
 import { UserService } from '../../services/user.service';
 import * as isEmpty from 'lodash/isEmpty';
@@ -11,7 +11,6 @@ require ('./password-pre-reset.component.scss');
   template
 })
 
-@Injectable()
 export class PasswordPreResetComponent {
 
   constructor(private _JwtService: JwtService, private _UserService: UserService) {}

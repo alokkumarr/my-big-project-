@@ -1,4 +1,4 @@
-import { Injectable, Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { JwtService } from '../../services/jwt.service';
 import { UserService } from '../../services/user.service';
 import * as isEmpty from 'lodash/isEmpty';
@@ -10,7 +10,6 @@ const template = require('./password-reset.component.html');
   template
 })
 
-@Injectable()
 export class PasswordResetComponent {
   constructor(private _JwtService: JwtService, private _UserService: UserService) {}
 

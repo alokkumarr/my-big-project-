@@ -1,4 +1,4 @@
-import { Injectable, Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { JwtService } from '../../services/jwt.service';
 import { UserService } from '../../services/user.service';
 import * as isUndefined from 'lodash/isUndefined';
@@ -11,7 +11,6 @@ require ('./login.component.scss');
   template
 })
 
-@Injectable()
 export class LoginComponent {
 
   constructor(private _JwtService: JwtService, private _UserService: UserService) {}
