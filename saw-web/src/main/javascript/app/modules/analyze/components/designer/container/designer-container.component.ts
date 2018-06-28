@@ -649,6 +649,15 @@ export class DesignerContainerComponent {
   }
 
   updateAnalysis() {
+    const { edit, type, artifacts } = this.analysis;
+    if (type === 'report' && edit) {
+      // reset checked fields, sorts, and filters for query mode report analysis
+      this.filters = [];
+      this.sorts = [];
+      forEach(artifacts, artifact => {
+        forEach(artifact.column, col => col.checked = false);
+      });
+    }
     this.analysis.sqlBuilder = this.getSqlBuilder();
   }
 
