@@ -1,8 +1,24 @@
+const globalVariables = require('../helpers/globalVariables');
+
+const description = 'Category created for e2e testing'; // same for all categories
+const nullValue = 'NULL';
+
 const categories = {
-  category: {
-    name: "AT Category DO NOT TOUCH"
+
+  privileges: {
+    name: 'AT Privileges Category ' + globalVariables.e2eId,
+    description: description,
+    id: nullValue,
+    type: nullValue,
+    code: nullValue
   },
-  subCategory: {}
+  analyses: {
+    name: 'AT Analysis Category ' + globalVariables.e2eId,
+    description: description,
+    id: nullValue,
+    type: nullValue,
+    code: nullValue
+  }
 };
 
 module.exports = categories;

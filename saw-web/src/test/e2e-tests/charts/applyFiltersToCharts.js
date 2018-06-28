@@ -6,14 +6,15 @@ const protractor = require('protractor');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const utils = require('../../javascript/helpers/utils');
+const dataSets = require('../../javascript/data/datasets');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
-  const xAxisName = 'Source Manufacturer';
-  const yAxisName = 'Available MB';
+  const yAxisName = 'Integer';
+  const xAxisName = 'String';
   const filterValue = '123';
-  const groupName = 'Source OS';
-  const metricName = 'MCT TMO Session ES';
+  const groupName = 'Date';
+  const metricName = dataSets.pivotChart;
   const analysisType = 'chart:column';
 
   beforeAll(function () {
@@ -22,6 +23,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -29,6 +31,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -38,8 +41,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     commonFunctions.logOutByClearingLocalStorage();
   });
 
-
-  it('Should apply filter to column chart', () => {
+  it('Should apply filter to column chart', () => { // SAWQA-174
     login.loginAs('admin');
 
     // Create analysis
@@ -49,6 +51,10 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const refreshBtn = chartDesigner.refreshBtn;
     // Wait for field input box.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
+
+    // Search field and add that into metric section.
+    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
+    designModePage.chart.addFieldButton(yAxisName).click();
 
     // Search field and add that into dimension section.
     commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
@@ -60,9 +66,6 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     // Search field and add that into group by section.
     commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(groupName));
     designModePage.chart.addFieldButton(groupName).click();
-    // Search field and add that into metric section.
-    commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName));
-    designModePage.chart.addFieldButton(yAxisName).click();
 
     // Check selected field is present in respective section.
     let y = analyzePage.designerDialog.chart.getMetricsFields(yAxisName);
@@ -83,6 +86,10 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const fieldName = yAxisName;
     commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
     chartDesigner.filterBtn.click();
+
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('sample'));
+    designModePage.filterWindow.addFilter('sample').click();
+
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     designModePage.filterWindow.numberInputUpgraded.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
@@ -105,5 +112,4 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
       expect(utils.arrayContainsArray(displayedFilters, filters)).toBeTruthy();
     });
   };
-
 });
