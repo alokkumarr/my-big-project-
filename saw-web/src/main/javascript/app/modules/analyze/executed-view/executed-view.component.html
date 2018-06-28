@@ -45,6 +45,12 @@
       </div>
   </mat-toolbar>
   <mat-card>
+    <filter-chips-u *ngIf="analysis"
+                    [filters]="analysis.sqlBuilder.filters"
+                    [readonly]="true"
+                    [artifacts]="analysis.artifacts">
+    </filter-chips-u>
+
     <div *ngIf="analyses && !analyses.length">
       <div class="prompt-execution-container" fxLayout="column" fxLayoutAlign="center center">
         <span i18n>This analysis hasn't been been executed yet. Execute it now?</span>
@@ -53,11 +59,7 @@
           </button>
       </div>
     </div>
-    <filter-chips-u *ngIf="analysis"
-                    [filters]="analysis.sqlBuilder.filters"
-                    [readonly]="true"
-                    [artifacts]="analysis.artifacts">
-    </filter-chips-u>
+
     <div *ngIf="analysis && analyses && analyses.length" [ngSwitch]="analysis.type">
       <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                             [analysis]="analysis"
