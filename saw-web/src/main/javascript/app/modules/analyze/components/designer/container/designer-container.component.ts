@@ -285,7 +285,7 @@ export class DesignerContainerComponent {
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
-          this.data = this.parseData(response.data, this.analysis);
+          this.data = this.flattenData(response.data, this.analysis);
         }
       },
       err => {
@@ -295,7 +295,7 @@ export class DesignerContainerComponent {
     );
   }
 
-  parseData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
