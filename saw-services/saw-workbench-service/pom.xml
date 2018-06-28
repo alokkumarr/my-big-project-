@@ -314,6 +314,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-workbench</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-workbench-service</name>

@@ -217,6 +217,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-storage-proxy-service</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service</name>
