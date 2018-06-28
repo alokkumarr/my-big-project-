@@ -176,7 +176,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                 });
             } else {
                 builder.forEach(item -> {
-                    boolQueryBuilder.should(item);
+                  boolQueryBuilder.should(item);
                 });
             }
             searchSourceBuilder.query(boolQueryBuilder);
