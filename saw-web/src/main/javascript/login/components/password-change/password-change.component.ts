@@ -36,11 +36,17 @@ export class PasswordChangeComponent {
 
     this._UserService.changePwd(this)
       .then(res => {
-        this.errorMsg = res.data.validityMessage;
+        if (res.data.valid) {
+          this._UserService.logout('logout').then(() => {
+            window.location.assign('./login.html?changePassMsg='+res.data.validityMessage);
+          });
+        } else {
+          this.errorMsg = res.data.validityMessage;
+        }
       });
   }
 
-  login() {
+  cancel() {
     window.location.assign('./');
   }
 }
