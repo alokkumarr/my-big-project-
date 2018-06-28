@@ -5,3 +5,8 @@
   # the saw-deploy service to fail, so skip it for development
   # containers for now
   when: lookup('env', 'container') != 'docker'
+# If the host is configured using SELinux, Ansible requires that
+# "libselinux-pytnon" is installed (see the "Managed Node
+# Requirements" section in the Ansible Installation Guide
+- name: Install libselinux-python for Ansible
+  yum: name=libselinux-python
