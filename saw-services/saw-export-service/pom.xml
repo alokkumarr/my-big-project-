@@ -262,6 +262,15 @@
 									<file>src/main/resources/ftp-details.json</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>%systemd_post saw-export.service</script>
+							</afterInstallation>
+							<beforeRemoval>
+							  <script>%systemd_preun saw-export.service</script>
+							</beforeRemoval>
+							<afterRemoval>
+							  <script>%systemd_postun saw-export.service</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

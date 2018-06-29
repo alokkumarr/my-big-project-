@@ -286,6 +286,15 @@
 									<file>src/main/system/saw-semantic-proxy.socket</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>%systemd_post saw-semantic.service</script>
+							</afterInstallation>
+							<beforeRemoval>
+							  <script>%systemd_preun saw-semantic.service</script>
+							</beforeRemoval>
+							<afterRemoval>
+							  <script>%systemd_postun saw-semantic.service</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

@@ -345,6 +345,15 @@
 									<file>src/main/system/saw-workbench-proxy.socket</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>%systemd_post saw-workbench.service</script>
+							</afterInstallation>
+							<beforeRemoval>
+							  <script>%systemd_preun saw-workbench.service</script>
+							</beforeRemoval>
+							<afterRemoval>
+							  <script>%systemd_postun saw-workbench.service</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

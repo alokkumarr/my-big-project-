@@ -241,6 +241,15 @@
 
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>%systemd_post saw-storage-proxy.service</script>
+							</afterInstallation>
+							<beforeRemoval>
+							  <script>%systemd_preun saw-storage-proxy.service</script>
+							</beforeRemoval>
+							<afterRemoval>
+							  <script>%systemd_postun saw-storage-proxy.service</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>
