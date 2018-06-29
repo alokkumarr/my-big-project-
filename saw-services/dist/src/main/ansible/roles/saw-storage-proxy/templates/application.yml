@@ -20,7 +20,7 @@ application:
         max-pool-size: 50
         queue-capacity: 10000
 schema:
-    file: /opt/bda/saw-proxy-service/conf/proxy-schema.json
+    file: /opt/bda/saw-storage-proxy-service/conf/proxy-schema.json
 elastic-search:
            cluster-name: {{ saw_elasticsearch_cluster_name }}
            transport-hosts: {{ saw_elasticsearch_host }}
