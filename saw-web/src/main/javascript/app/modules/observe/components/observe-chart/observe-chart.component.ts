@@ -31,6 +31,7 @@ import * as moment from 'moment';
 import { NUMBER_TYPES } from '../../../analyze/consts';
 
 const template = require('./observe-chart.component.html');
+require('./observe-chart.component.scss');
 
 @Component({
   selector: 'observe-chart',
@@ -201,22 +202,26 @@ export class ObserveChartComponent {
     return changes;
   }
 
-  fetchAlias(axisName) {
+  fetchColumnData(axisName, value) {
     let aliasName = axisName;
     forEach(this.analysis.artifacts[0].columns, column => {
       if(axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
+        value = column.type === 'date' ? moment(value).format(column.dateFormat) : value;
+        if(column.aggregate === 'percentage' || column.aggregate === 'avg') {
+          value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+        }
       }
-    });
-    return aliasName;
+    })
+    return {aliasName, value};
   }
 
   trimKeyword(data) {
     let trimData = data.map(row => {
       let obj = {};
       for(let key in row) {
-        let trimKey = this.fetchAlias(key.split(".")[0]);
-        obj[trimKey] = row[key];
+        let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+        obj[trimKey.aliasName] = trimKey.value;
       }
       return obj;
     });

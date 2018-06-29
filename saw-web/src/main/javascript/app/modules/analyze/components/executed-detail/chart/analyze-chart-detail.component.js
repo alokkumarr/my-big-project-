@@ -119,7 +119,6 @@ export const AnalyzeChartDetailComponent = {
         {path: 'title.text', data: this.analysis.name},
         {path: 'chart.inverted', data: this.analysis.isInverted}
       ]);
-
       this.chartUpdater.next(changes);
     }
 
@@ -129,6 +128,7 @@ export const AnalyzeChartDetailComponent = {
         return;
       }
       this.filteredData = this._ChartService.parseData(data, this.analysis.sqlBuilder);
+      const gridData = this.filteredData;
       this.updateChart();
 
       this.loadGridData = {
@@ -154,7 +154,7 @@ export const AnalyzeChartDetailComponent = {
           allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
           showPageSizeSelector: true
         },
-        dataSource: this.trimKeyword(this.filteredData)
+        dataSource: this.trimKeyword(gridData)
 
       }
       /* eslint-disable no-unused-expressions */
@@ -173,22 +173,29 @@ export const AnalyzeChartDetailComponent = {
       });
     }
 
-    fetchAlias(axisName) {
+    isFloat(n){
+      return Number(n) === n && n % 1 !== 0;
+    }
+
+    fetchColumnData(axisName, value) {
       let aliasName = axisName;
       forEach(this.columns, column => {
         if(axisName === column.name) {
           aliasName = column.aliasName || column.displayName;
         }
+        if(axisName === column.name && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
+          value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+        }
       })
-      return aliasName;
+      return {aliasName, value};
     }
 
     trimKeyword(data) {
       let trimData = data.map(row => {
         let obj = {};
         for(var key in row) {
-          let trimKey = this.fetchAlias(key.split(".")[0]);
-          obj[trimKey] = row[key];
+          let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+          obj[trimKey.aliasName] = trimKey.value;
         }
         return obj;
       });
