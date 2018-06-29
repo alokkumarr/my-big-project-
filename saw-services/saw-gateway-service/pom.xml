@@ -193,13 +193,10 @@
 								</entry>
 							</entries>
 							<afterInstallation>
-							  <script>%systemd_post saw-gateway.service</script>
+							  <script>systemctl daemon-reload</script>
 							</afterInstallation>
-							<beforeRemoval>
-							  <script>%systemd_preun saw-gateway.service</script>
-							</beforeRemoval>
 							<afterRemoval>
-							  <script>%systemd_postun saw-gateway.service</script>
+							  <script>systemctl daemon-reload</script>
 							</afterRemoval>
 							<signature>
 								<skip>true</skip>

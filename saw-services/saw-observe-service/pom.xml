@@ -250,13 +250,10 @@
 								</entry>
 							</entries>
 							<afterInstallation>
-							  <script>%systemd_post saw-observe.service</script>
+							  <script>systemctl daemon-reload</script>
 							</afterInstallation>
-							<beforeRemoval>
-							  <script>%systemd_preun saw-observe.service</script>
-							</beforeRemoval>
 							<afterRemoval>
-							  <script>%systemd_postun saw-observe.service</script>
+							  <script>systemctl daemon-reload</script>
 							</afterRemoval>
 							<signature>
 								<skip>true</skip>
