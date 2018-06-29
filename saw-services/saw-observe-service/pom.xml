@@ -218,6 +218,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-observe</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-observe-service</name>
