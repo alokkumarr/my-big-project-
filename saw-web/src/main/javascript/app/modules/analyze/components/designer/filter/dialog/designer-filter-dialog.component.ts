@@ -74,6 +74,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     const newFilter: Filter = {
       type: null,
       tableName,
+      isOptional: false,
       columnName: null,
       isRuntimeFilter: false,
       isGlobalFilter: false,
@@ -123,11 +124,14 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   validateFilters(filters) {
     let areValid = true;
-    forEach(filters, ({type, model, isRuntimeFilter, isGlobalFilter}: Filter) => {
+    forEach(filters, ({type, model, isRuntimeFilter, isGlobalFilter, isOptional}: Filter) => {
       if (!isRuntimeFilter && isGlobalFilter) {
         areValid = true;
       } else if (!model) {
-        areValid = Boolean(this.data.isInRuntimeMode ? false : isRuntimeFilter);
+        areValid = Boolean(this.data.isInRuntimeMode ?
+          isOptional && isRuntimeFilter :
+          isRuntimeFilter
+        );
       } else if (type === 'string') {
         areValid = this.isStringFilterValid(model);
       } else if (NUMBER_TYPES.includes(type)) {

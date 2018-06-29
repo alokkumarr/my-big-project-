@@ -106,6 +106,11 @@ export class DesignerFilterRowComponent {
     this.filterModelChange.emit();
   }
 
+  onOptionalCheckboxToggle(filter: Filter, checked: boolean) {
+    filter.isOptional = checked;
+    this.filterModelChange.emit();
+  }
+
   remove() {
     this.removeRequest.emit();
   }
