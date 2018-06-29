@@ -74,10 +74,10 @@ public class AnalyzeIT extends BaseIT {
 
         // create and save analysis
         String metricId = listMetrics(token);
-        ObjectNode analysis = createAnalysis(token, metricId);
+        ObjectNode analysis = createDLReportAnalysis(token, metricId);
         String analysisId = analysis.get("id").asText();
-        String analysisName = "Test (" + System.currentTimeMillis() + ")";
-        saveAnalysis(token, analysisId, analysisName, analysis);
+        String analysisName = "Test DL Report (" + System.currentTimeMillis() + ")";
+        saveDLReportAnalysis(token, analysisId, analysisName, analysis);
 
         // create schedule
         ObjectNode node = scheduleData();
@@ -220,6 +220,28 @@ public class AnalyzeIT extends BaseIT {
     return (ObjectNode) root.get("contents").get("analyze").get(0);
   }
 
+  private ObjectNode createDLReportAnalysis(String token, String metricId)
+      throws JsonProcessingException {
+    ObjectNode node = mapper.createObjectNode();
+    ObjectNode contents = node.putObject("contents");
+    contents.put("action", "create");
+    ArrayNode keys = contents.putArray("keys");
+    ObjectNode key = keys.addObject();
+    key.put("customerCode", "SYNCHRONOSS");
+    key.put("module", "ANALYZE");
+    key.put("id", metricId);
+    key.put("analysisType", "report");
+    String json = mapper.writeValueAsString(node);
+    Response response = given(spec)
+        .header("Authorization", "Bearer " + token)
+        .body(json)
+        .when().post("/services/analysis")
+        .then().assertThat().statusCode(200)
+        .extract().response();
+    ObjectNode root = response.as(ObjectNode.class);
+    return (ObjectNode) root.get("contents").get("analyze").get(0);
+  }
+
   private void saveAnalysis(String token, String analysisId,
                             String analysisName, ObjectNode analysis)
       throws JsonProcessingException {
@@ -276,6 +298,110 @@ public class AnalyzeIT extends BaseIT {
         .then().assertThat().statusCode(200);
   }
 
+
+  private void saveDLReportAnalysis(String token, String analysisId,
+      String analysisName, ObjectNode analysis)
+      throws JsonProcessingException {
+    analysis.put("saved", true);
+    analysis.put("categoryId", 4);
+    analysis.put("name", analysisName);
+    analysis.set("sqlBuilder", sqlBuilderDLReport());
+    ArrayNode artifacts = analysis.putArray("artifacts");
+    // replace this logic with object node / array node in future
+    String artifactDefinition = ""
+        + "{\n"
+        + "            \\\"artifactName\\\": \\\"SALES\\\",\n"
+        + "            \\\"columns\\\": [\n"
+        + "              {\n"
+        + "                \\\"name\\\": \\\"string\\\",\n"
+        + "                \\\"type\\\": \\\"string\\\",\n"
+        + "                \\\"columnName\\\": \\\"string\\\",\n"
+        + "                \\\"displayName\\\": \\\"String\\\",\n"
+        + "                \\\"aliasName\\\": \\\"\\\",\n"
+        + "                \\\"table\\\": \\\"sales\\\",\n"
+        + "                \\\"joinEligible\\\": true,\n"
+        + "                \\\"filterEligible\\\": true,\n"
+        + "                \\\"checked\\\": true\n"
+        + "              },\n"
+        + "              {\n"
+        + "                \\\"name\\\": \\\"long\\\",\n"
+        + "                \\\"type\\\": \\\"long\\\",\n"
+        + "                \\\"columnName\\\": \\\"long\\\",\n"
+        + "                \\\"displayName\\\": \\\"Long\\\",\n"
+        + "                \\\"aliasName\\\": \\\"\\\",\n"
+        + "                \\\"table\\\": \\\"sample\\\",\n"
+        + "                \\\"joinEligible\\\": false,\n"
+        + "                \\\"filterEligible\\\": true,\n"
+        + "                \\\"checked\\\": true\n"
+        + "              },\n"
+        + "              {\n"
+        + "                \\\"name\\\": \\\"float\\\",\n"
+        + "                \\\"type\\\": \\\"float\\\",\n"
+        + "                \\\"columnName\\\": \\\"float\\\",\n"
+        + "                \\\"displayName\\\": \\\"Float\\\",\n"
+        + "                \\\"aliasName\\\": \\\"\\\",\n"
+        + "                \\\"table\\\": \\\"sales\\\",\n"
+        + "                \\\"joinEligible\\\": false,\n"
+        + "                \\\"filterEligible\\\": true,\n"
+        + "                \\\"checked\\\": true,\n"
+        + "                \\\"format\\\": {\n"
+        + "                  \\\"precision\\\": 2\n"
+        + "                }\n"
+        + "              },\n"
+        + "              {\n"
+        + "                \\\"name\\\": \\\"date\\\",\n"
+        + "                \\\"type\\\": \\\"date\\\",\n"
+        + "                \\\"columnName\\\": \\\"date\\\",\n"
+        + "                \\\"displayName\\\": \\\"Date\\\",\n"
+        + "                \\\"aliasName\\\": \\\"\\\",\n"
+        + "                \\\"table\\\": \\\"sales\\\",\n"
+        + "                \\\"joinEligible\\\": false,\n"
+        + "                \\\"filterEligible\\\": true,\n"
+        + "                \\\"checked\\\": true,\n"
+        + "                \\\"format\\\": \\\"yyyy-MM-dd\\\"\n"
+        + "              },\n"
+        + "              {\n"
+        + "                \\\"name\\\": \\\"integer\\\",\n"
+        + "                \\\"type\\\": \\\"integer\\\",\n"
+        + "                \\\"columnName\\\": \\\"integer\\\",\n"
+        + "                \\\"displayName\\\": \\\"Integer\\\",\n"
+        + "                \\\"aliasName\\\": \\\"\\\",\n"
+        + "                \\\"table\\\": \\\"sample\\\",\n"
+        + "                \\\"joinEligible\\\": false,\n"
+        + "                \\\"filterEligible\\\": true,\n"
+        + "                \\\"checked\\\": true\n"
+        + "              },\n"
+        + "              {\n"
+        + "                \\\"name\\\": \\\"double\\\",\n"
+        + "                \\\"type\\\": \\\"double\\\",\n"
+        + "                \\\"columnName\\\": \\\"double\\\",\n"
+        + "                \\\"displayName\\\": \\\"Double\\\",\n"
+        + "                \\\"aliasName\\\": \\\"\\\",\n"
+        + "                \\\"table\\\": \\\"sales\\\",\n"
+        + "                \\\"joinEligible\\\": false,\n"
+        + "                \\\"filterEligible\\\": true,\n"
+        + "                \\\"checked\\\": true,\n"
+        + "                \\\"format\\\": {\n"
+        + "                  \\\"precision\\\": 2\n"
+        + "                }\n"
+        + "              }";
+    artifacts.add(artifactDefinition);
+    ObjectNode node = mapper.createObjectNode();
+    ObjectNode contents = node.putObject("contents");
+    contents.put("action", "update");
+    ArrayNode keys = contents.putArray("keys");
+    ObjectNode key = keys.addObject();
+    key.put("id", analysisId);
+    ArrayNode analyze = contents.putArray("analyze");
+    analyze.add(analysis);
+    String json = mapper.writeValueAsString(node);
+    given(spec)
+        .header("Authorization", "Bearer " + token)
+        .body(json)
+        .when().post("/services/analysis")
+        .then().assertThat().statusCode(200);
+  }
+
   private ObjectNode sqlBuilder() {
     ObjectNode sqlBuilder = mapper.createObjectNode();
     sqlBuilder.put("booleanCriteria", "AND");
@@ -296,6 +422,15 @@ public class AnalyzeIT extends BaseIT {
     dataField.put("columnName", "integer");
     dataField.put("aggregate", "sum");
     dataField.put("name", "integer");
+    return sqlBuilder;
+  }
+
+  private ObjectNode sqlBuilderDLReport() {
+    ObjectNode sqlBuilder = mapper.createObjectNode();
+    sqlBuilder.put("booleanCriteria", "AND");
+    sqlBuilder.putArray("filters");
+    sqlBuilder.putArray("orderByColumns");
+    sqlBuilder.putArray("joins");
     return sqlBuilder;
   }
 
