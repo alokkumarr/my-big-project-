@@ -31,7 +31,7 @@
         <app.user>mapr</app.user>
         <app.group>mapr</app.group>
         <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
-        <es.version>5.4.0</es.version>
+        <es.version>6.3.0</es.version>
         <threeten.extra>1.2</threeten.extra>
         <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
         <rpm.ts.root>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}</rpm.ts.root>
