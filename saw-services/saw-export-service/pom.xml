@@ -263,13 +263,10 @@
 								</entry>
 							</entries>
 							<afterInstallation>
-							  <script>%systemd_post saw-export.service</script>
+							  <script>systemctl daemon-reload</script>
 							</afterInstallation>
-							<beforeRemoval>
-							  <script>%systemd_preun saw-export.service</script>
-							</beforeRemoval>
 							<afterRemoval>
-							  <script>%systemd_postun saw-export.service</script>
+							  <script>systemctl daemon-reload</script>
 							</afterRemoval>
 							<signature>
 								<skip>true</skip>
