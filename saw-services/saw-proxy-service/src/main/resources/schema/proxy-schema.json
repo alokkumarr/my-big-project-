@@ -121,6 +121,13 @@
             "title":"The Modulename Schema",
             "description":"An explanation about the purpose of this instance."
          },
+         "aggregationData":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/aggregationData",
+            "type":"string",
+            "title":"The AggregationData Schema",
+            "description":"An explanation about the purpose of this instance."
+         },
+         
          "dataSecurityKey":{
             "id":"http://synchronoss.com/proxy.json/items/properties/dataSecurityKey",
             "type":"array",

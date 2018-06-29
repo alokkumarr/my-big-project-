@@ -81,25 +81,25 @@ public class SAWElasticTransportService {
     String responseString = response.body().string();
     logger.trace("responseStringdfd" +responseString);
     JsonNode esResponse = objectMapper.readTree(responseString);
-    if (esResponse.get("data") == null)
+    if (esResponse.get("aggregationData") == null)
     {
       throw new NullPointerException("Data is not available based on provided query criteria");
     }
-      JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+      JsonNode finalResponse = objectMapper.readTree(esResponse.get("aggregationData").toString());
+      logger.trace("esResponse.get(\"aggregationData\").toString() :" +esResponse.get("aggregationData").toString());
       // For elastic search report data
       if(isReport) {
           if (finalResponse!=null)
           {
-              return buildAggregatedReportData(jsonString,
-                      finalResponse).toString();
+              return buildAggregatedReportData(jsonString,finalResponse.get("aggregationData")).toString();
           }
           else
           {
-              return buildReportData(esResponse.get("data")).toString();
+              return buildReportData(esResponse.get("aggregationData")).toString();
           }
       }
       // In case of Pivot and chart
-      return finalResponse.toString();
+      return esResponse.get("aggregationData").toString();
   }
 
   /**
@@ -216,10 +216,10 @@ public class SAWElasticTransportService {
         String responseString = response.body().string();
         logger.trace("responseStringdfd" + responseString);
         JsonNode esResponse = objectMapper.readTree(responseString);
-        if (esResponse.get("data") == null) {
+        if (esResponse.get("aggregationData") == null) {
             throw new NullPointerException("Data is not available based on provided query criteria");
         }
-        JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+        JsonNode finalResponse = objectMapper.readTree(esResponse.get("aggregationData").toString());
         return buildGlobalFilterData(finalResponse,executionObject.getGlobalFilter());
     }
     private static String buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter)
@@ -281,10 +281,10 @@ public class SAWElasticTransportService {
         String responseString = response.body().string();
         logger.trace("responseStringdfd" + responseString);
         JsonNode esResponse = objectMapper.readTree(responseString);
-        if (esResponse.get("data") == null) {
+        if (esResponse.get("aggregationData") == null) {
             throw new NullPointerException("Data is not available based on provided query criteria");
         }
-        JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+        JsonNode finalResponse = objectMapper.readTree(esResponse.get("aggregationData").toString());
         return finalResponse;
     }
     public Integer getTimeOut() {
@@ -321,11 +321,11 @@ public class SAWElasticTransportService {
       String responseString = response.body().string();
       logger.trace("responseStringdfd" +responseString);
       JsonNode esResponse = objectMapper.readTree(responseString);
-      if (esResponse.get("data") == null)
+      if (esResponse.get("aggregationData") == null)
       {
         throw new NullPointerException("Data is not available based on provided query criteria");
       }
-        JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
+        JsonNode finalResponse = objectMapper.readTree(esResponse.get("aggregationData").toString());
         System.out.println(finalResponse.toString());
     }
 }

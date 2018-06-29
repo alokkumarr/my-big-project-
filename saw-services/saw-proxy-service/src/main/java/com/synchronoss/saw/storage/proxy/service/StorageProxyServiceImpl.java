@@ -237,12 +237,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                     SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
                                     if (proxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
                                         logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
-                                            ObjectMapper mapperObj = new ObjectMapper();
-                                            String jsonString = mapperObj.writeValueAsString(sncrPivotResponse.getAggregations());
-                                            JsonNode objectNode = mapperObj.readTree(jsonString);
-                                            List<Object> data = new ArrayList<>();
-                                            data.add(objectNode);
-                                            proxy.setData(data);
+                                            proxy.setAggregationData(sncrPivotResponse.getAggregations());
                                             }
                                     else {
                                       proxy.setStatusMessage("Aggregate action's does not support flattening of data yet.");
