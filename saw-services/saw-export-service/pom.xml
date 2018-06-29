@@ -227,6 +227,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-export</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-export-service</name>
