@@ -89,8 +89,8 @@ exports.config = {
     'browserstack.key': 'kmQmdoqpTu8jsgYHHSR3',
     'browserstack.local': true,
     'browserName': 'chrome',
-    shardTestFiles: true,
-    maxInstances: 4,
+   // shardTestFiles: true,
+   // maxInstances: 4,
     chromeOptions: {
       args: [
         'disable-extensions',
