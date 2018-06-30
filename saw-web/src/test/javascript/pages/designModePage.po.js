@@ -2,6 +2,8 @@ module.exports = {
   previewBtn: element(by.css('button[e2e="open-preview-modal"]')),
   filterBtn: element(by.xpath('//button/span[text()="Filter"]')),
   applyFiltersBtn: element(by.xpath('//span[contains(text(),"Apply Filters")]')),
+  backButton: element(by.css(' [fonticon="icon-arrow-left"]')),
+ 
   // available functions: Sum, AVG, MIN, MAX, Count
   aggregateFunctionButton: aggregateFunction => element(by.xpath(`//mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   aggregateFunctionMenuItem: aggregateFunction => element(by.xpath(`//button[@role="menuitem"]/mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),

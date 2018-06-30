@@ -319,6 +319,9 @@ module.exports = {
     cancelBtn: element(by.css('button[translate="CANCEL"]')),
     selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
+  prompt:{
+    filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
+  },
 
   // OLD test elements
   analysisElems: {

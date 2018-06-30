@@ -7,7 +7,11 @@ module.exports = {
   exportMenuOption: element(by.css('button[e2e="actions-menu-selector-export"]')),
   deleteMenuOption: element(by.css('button[e2e="actions-menu-selector-delete"]')),
   deleteConfirmButton: element(by.xpath('//button[text()="Delete"]')),
-  
+  listView: {
+    analysisByName: name => element(by.xpath[`//a[text()='${name}']`]),
+    actionMenu: element(by.css[`[e2e="actions-menu-toggle"]`]),
+    
+  },  
   chartTypes: {
     column: element(by.xpath('//*[contains(@class,"highcharts-column-series")]'))
   },

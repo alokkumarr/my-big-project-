@@ -30,7 +30,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
   const groupName = 'Date';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
-
+  let analysisId;
   let host;
   let token; 
   const dataProvider = {
@@ -46,7 +46,6 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      new AnalysisHelper().delete(host, token, protractorConf.config.customerCode, analysisId);
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -54,6 +53,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      new AnalysisHelper().delete(host, token, protractorConf.config.customerCode, analysisId);
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -73,13 +73,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
         new AnalysisHelper().createChart(host, token,name,description, type);
 
         login.loginAs(data.user);
-       
-        homePage.mainMenuExpandBtn.click();
-        browser.sleep(1000);
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-        browser.sleep(1000);
-        homePage.mainMenuCollapseBtn.click();
-        browser.sleep(1000);
         //Change to Card View.
         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
         commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
@@ -90,7 +84,10 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
         commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
         commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
         createdAnalysis.click();
-
+        //get analysis id from current url
+        browser.getCurrentUrl().then(url => {
+          analysisId = commonFunctions.getAnalysisIdFromUrl(url);
+        });
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         savedAlaysisPage.editBtn.click();
         //apply filters
@@ -116,16 +113,40 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
         commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterClear);
         commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.selectedFiltersText);
         validateSelectedFilters([fieldName]);
-        
-        // //Delete created chart
-        // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
-        // savedAlaysisPage.actionsMenuBtn.click();
-        // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.deleteMenuOption);
-        // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.deleteMenuOption);
-        // savedAlaysisPage.deleteMenuOption.click();
-        // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.deleteConfirmButton);
-        // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.deleteConfirmButton);
-        // savedAlaysisPage.deleteConfirmButton.click();
+
+         //Save
+        const save = analyzePage.saveDialog;
+        const designer = analyzePage.designerDialog;
+        commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+        designer.saveBtn.click();
+        commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
+        commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
+        save.saveBtn.click();
+        //From analysis detail page
+        //Execute the analysis and verify it asks for prompt filter
+        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
+        savedAlaysisPage.actionsMenuBtn.click();
+
+        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
+        savedAlaysisPage.executeMenuOption.click();
+
+        //Verify filter dailog
+        commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.filterDialog);
+        expect(analyzePage.prompt.filterDialog).toBeTruthy();
+
+
+        // //Click on Action menu
+        // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.listView.actionMenu);
+        // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.listView.actionMenu);
+        // savedAlaysisPage.listView.actionMenu.click();
+        // //Click on execute
+        // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
+        // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
+        // savedAlaysisPage.executeMenuOption.click();
+        // //Verify prompt filter is displayed
+
     });
 
     const validateSelectedFilters = (filters) => {

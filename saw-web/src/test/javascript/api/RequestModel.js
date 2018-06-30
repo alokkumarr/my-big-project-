@@ -215,6 +215,28 @@ class RequsetModel {
         return chartBody;
     }
 
+    /**
+     * @description Builds delete playload for analyze module
+     * @param {String} customerCode 
+     * @param {String} id 
+     * @returns {Object}
+     */
+    getAnalyzeDeletePayload(customerCode, id){
+      let deletePayload = {
+        'contents': {
+          'keys': [
+            {
+              'customerCode': customerCode,
+              'module': 'ANALYZE',
+              'id': id
+            }
+          ],
+          'action': 'delete'
+        }
+      };
+      return deletePayload;
+    }
+
 }
 
 module.exports = RequsetModel;

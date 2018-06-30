@@ -67,6 +67,12 @@ const protractorPath = 'target/protractor-reports';
  * Amount of attempts to retry doing action on element
  */
 const tempts = 10;
+
+/**
+ * All tests are running for customer
+ */
+const customerCode = 'SYNCHRONOSS';
+
 let token;
 
 exports.timeouts = {
@@ -82,6 +88,7 @@ exports.config = {
   seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
+  customerCode:customerCode,
   directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
