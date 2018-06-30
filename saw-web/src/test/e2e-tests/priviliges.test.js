@@ -307,7 +307,7 @@ describe('Privileges tests: privileges.test.js', () => {
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

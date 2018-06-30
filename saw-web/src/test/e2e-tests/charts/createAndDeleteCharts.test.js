@@ -66,7 +66,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

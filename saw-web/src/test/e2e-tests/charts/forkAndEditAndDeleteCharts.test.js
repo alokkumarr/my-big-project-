@@ -73,7 +73,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

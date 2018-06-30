@@ -2,6 +2,7 @@ const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
+var browserstack = require('browserstack-local');
 
 /**
  * Note about intervals:
@@ -79,13 +80,15 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: 'http://hub-cloud.browserstack.com/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
-  directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
-    browserName: 'chrome',
+    'browserstack.user': 'saw22',
+    'browserstack.key': 'kmQmdoqpTu8jsgYHHSR3',
+    'browserstack.local': true,
+    'browserName': 'chrome',
     shardTestFiles: true,
     maxInstances: 4,
     chromeOptions: {
@@ -93,7 +96,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+       // '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -119,17 +122,18 @@ exports.config = {
      * working on fixing the rest.
      */
     root: [
-      //webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
       //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
     ],
     charts: [
       //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       //webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
     ],
     pivots: [
-      //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
     ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js')
@@ -140,15 +144,15 @@ exports.config = {
      */
     root: [
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
+      //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
     ],
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'), // TCs linked
+     // webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
+     // webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
+     // webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
+     // webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
     ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
@@ -159,6 +163,19 @@ exports.config = {
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
+  },
+   // Code to start browserstack local before start of test
+   beforeLaunch: function(){
+    console.log("Connecting local");
+    return new Promise(function(resolve, reject){
+      exports.bs_local = new browserstack.Local();
+      exports.bs_local.start({'key': exports.config.capabilities['browserstack.key'] }, function(error) {
+        if (error) return reject(error);
+        console.log('Connected. Now testing...');
+
+        resolve();
+      });
+    });
   },
   onCleanUp: function (results) {
     retry.onCleanUp(results);
@@ -202,6 +219,9 @@ exports.config = {
     }, pageResolveTimeout);
   },
   afterLaunch: function() {
+    return new Promise(function(resolve, reject){
+      exports.bs_local.stop(resolve);
+    });
     return retry.afterLaunch(maxRetryForFailedTests);
   }
 };

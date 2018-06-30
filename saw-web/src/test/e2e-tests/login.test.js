@@ -33,7 +33,7 @@ describe('Login Tests: login.test.js', () => {
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(userDataProvider, function (data, description) {
