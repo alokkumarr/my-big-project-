@@ -310,7 +310,7 @@ export class ChartService {
   }
 
   parseNode(node, dataObj, nodeFieldMap, level) {
-    if (node.key) {
+    if (!isUndefined(node.key)) {
       dataObj[nodeFieldMap[level - 2]] = node.key;
     }
 
