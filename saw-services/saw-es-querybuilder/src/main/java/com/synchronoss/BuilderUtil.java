@@ -127,7 +127,7 @@ public class BuilderUtil
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
         String chart = System.getProperty("schema.report");
-        if (chart == null){throw new NullPointerException("schema.chart property is not set.");}
+        if (chart == null){throw new NullPointerException("schema.report property is not set.");}
         final JsonNode data = JsonLoader.fromString(json);
         final JsonNode schema = JsonLoader.fromFile(new File(chart));
         ProcessingReport report = validator.validate(schema, data);

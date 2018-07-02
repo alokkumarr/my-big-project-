@@ -41,6 +41,8 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   @Autowired
   private StorageConnectorService storageConnectorService;
 
+  private int size;
+
   @Override
   public StorageProxy execute(StorageProxy proxy) throws Exception {
     logger.trace("Validating Schema is started"); 
@@ -215,7 +217,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                               case "aggregate" :  
                                 Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");
                                 String aggregateQuery = proxy.getQuery();
-                                int size =0;
+                                setSize(0);
                                 proxy.setPageSize(0);
                                 proxy.setPageNum(0);
                                 if(aggregateQuery.contains("size")){
@@ -227,25 +229,31 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                       String fromSize_1_Num=m.group(2);
                                       
                                       if (fromSize_1.equals("size")){
-                                        size = Integer.parseInt(fromSize_1_Num);
+                                        setSize(Integer.parseInt(fromSize_1_Num));
                                         }
                                       else{
-                                        size = 0;
+                                        setSize(0);
                                   } // parsing of size & from
                                   }
-                                  if (size==0){
                                     SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
                                     if (proxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
                                         logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
-                                            proxy.setAggregationData(sncrPivotResponse.getAggregations());
+                                            if (sncrPivotResponse.getAggregations()!=null) {
+                                            proxy.setAggregationData(sncrPivotResponse.getAggregations());}
+                                            // This else block is for special case to handle if the same request expects both aggregate & search i.e. ANALYZE module
+                                            else {
+                                              List<Hit<?>> hits = sncrPivotResponse.getHits().getHits();
+                                              List<Object> data = new ArrayList<>();
+                                                 for (Hit<?> hit : hits){
+                                                 data.add(hit.getSource());
+                                                }
+                                                proxy.setData(data);
+                                            }
                                             }
                                     else {
                                       proxy.setStatusMessage("Aggregate action's does not support flattening of data yet.");
                                     }
-                                  } // end of size==0 if block
-                                  else {
-                                    proxy.setStatusMessage("Aggregate action's size cannot be greater than zero.");
-                                  } // end of size==0 else block 
+                                 
                            } // end of aggregate size block 
                                 else{
                                   proxy.setStatusMessage("Please provide size parameter in query.");
@@ -286,6 +294,14 @@ public class StorageProxyServiceImpl implements StorageProxyService {
       response = StorageProxyUtils.prepareResponse(proxy, "provided JSON input is not valid.");
     }
     return response;
+  }
+
+  public int getSize() {
+    return size;
+  }
+
+  public void setSize(int size) {
+    this.size = size;
   }
   
 }
