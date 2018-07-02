@@ -2,6 +2,8 @@ const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
+var HtmlReporter = require('protractor-beautiful-reporter');
+
 
 /**
  * Note about intervals:
@@ -169,6 +171,10 @@ exports.config = {
     token = generate.token(browser.baseUrl);
     //console.log("aToken: " + token);
     generate.usersRolesPrivilegesCategories(token);
+    // Add a screenshot reporter and store screenshots to `/target/screenshots`:
+    jasmine.getEnv().addReporter(new HtmlReporter({
+      baseDirectory: 'target/screenshots'
+    }).getJasmine2Reporter());
 
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
