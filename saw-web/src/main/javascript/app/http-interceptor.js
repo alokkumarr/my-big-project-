@@ -26,7 +26,7 @@ export function interceptor($httpProvider) {
           toastMessage.error('Tap to view details', msg, {
             onclick: () => {
               toastMessage.clear();
-              ErrorDetailDialogService.openErrorDetailDialog(error)
+              ErrorDetailDialogService.openErrorDetailDialog(error);
             }
           });
         });
