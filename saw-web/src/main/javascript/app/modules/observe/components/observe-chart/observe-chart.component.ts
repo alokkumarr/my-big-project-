@@ -79,7 +79,7 @@ export class ObserveChartComponent {
       ? false
       : this.analysis.isStockChart;
     this.subscribeToRequester();
-    this.toggleToGrid = true;
+    this.toggleToGrid = false;
   }
 
   ngOnDestroy() {
@@ -165,7 +165,6 @@ export class ObserveChartComponent {
 
   reloadChart(settings, gridData, labels) {
     const changes = this.getChangeConfig(settings, gridData, labels);
-    console.log(changes);
     this.chartUpdater.next(changes);
   }
 
