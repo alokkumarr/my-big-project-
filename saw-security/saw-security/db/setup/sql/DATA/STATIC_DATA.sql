@@ -125,3 +125,8 @@ insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(4,123456785432,'Incident density by States',1,now(),'admin');
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(5,123456785421,'Cable Orders',1,now(),'admin');
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(5,123456785433,'Service Requests',1,now(),'admin');
+
+INSERT INTO CONFIG_VAL (`CONFIG_VAL_SYS_ID`, `CONFIG_VAL_CODE`, `CONFIG_VAL_DESC`, `CONFIG_VAL_OBJ_TYPE`,
+`CONFIG_VAL_OBJ_GROUP`, `ACTIVE_STATUS_IND`, `CREATED_DATE` , CREATED_BY )
+VALUES ('1', 'es-analysis-auto-refresh', 'Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page',
+'CUSTOMER', 'SYNCHRONOSS', '1', now(), 'Saw-Admin' );

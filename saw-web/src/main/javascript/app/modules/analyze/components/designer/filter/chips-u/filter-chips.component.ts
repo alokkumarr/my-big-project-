@@ -9,7 +9,7 @@ import {
   Filter,
   Artifact,
   ArtifactColumn
-} from '../../../types';
+} from '../../types';
 
 const template = require('./filter-chips.component.html');
 require('./filter-chips.component.scss');

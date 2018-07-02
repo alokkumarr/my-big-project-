@@ -38,6 +38,11 @@ public class Ticket implements Serializable {
 	private String roleType;
 	private Long createdTime;	
 	private List<DSKDetails> dataSecurityKey;
+
+    /**
+     * CustomConfig provides feature for additional configurable properties for the SAW.
+     */
+	private List<String> CustomConfig;
 	private String error;
 	private String custID;
 	private String custCode;
@@ -114,8 +119,23 @@ public class Ticket implements Serializable {
 		this.dataSecurityKey = dataSecurityKey;
 	}
 
+    /**
+     * Gets CustomConfig
+     *
+     * @return value of CustomConfig
+     */
+    public List<String> getCustomConfig() {
+        return CustomConfig;
+    }
 
-	public String getDefaultProdID() {
+    /**
+     * Sets CustomConfig
+     */
+    public void setCustomConfig(List<String> customConfig) {
+        CustomConfig = customConfig;
+    }
+
+    public String getDefaultProdID() {
 		return defaultProdID;
 	}
 

@@ -24,8 +24,10 @@ export function interceptor($httpProvider) {
         $translate(generalErrorMsgKey).then(generalErrorMsg => {
           const msg = ErrorDetailService.getTitle(error, generalErrorMsg);
           toastMessage.error('Tap to view details', msg, {
-            tapToDismiss: true,
-            onTap: () => ErrorDetailDialogService.openErrorDetailDialog(error)
+            onclick: () => {
+              toastMessage.clear();
+              ErrorDetailDialogService.openErrorDetailDialog(error)
+            }
           });
         });
 

@@ -5,7 +5,8 @@ export const AnalyzeExecutedListComponent = {
   template,
   bindings: {
     analysis: '<',
-    analyses: '<'
+    analyses: '<',
+    onSelect: '&'
   },
   controller: class AnalyzeExecutedListController {
     constructor(AnalyzeService, $state, $window, dxDataGridService) {
@@ -61,11 +62,7 @@ export const AnalyzeExecutedListComponent = {
     }
 
     goToExecution(executedAnalysis) {
-      this._$state.go('analyze.executedDetail', {
-        executionId: executedAnalysis.id,
-        analysisId: this.analysis.id,
-        analysis: this.analysis
-      });
+      this.onSelect({executionId: executedAnalysis.id});
     }
   }
 };

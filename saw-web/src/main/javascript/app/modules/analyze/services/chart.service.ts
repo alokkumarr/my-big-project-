@@ -6,7 +6,6 @@ import * as clone from 'lodash/clone';
 import * as sum from 'lodash/sum';
 import * as map from 'lodash/map';
 import * as round from 'lodash/round';
-import * as flatMap from 'lodash/flatMap';
 import * as assign from 'lodash/assign';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
@@ -14,7 +13,6 @@ import * as filter from 'lodash/filter';
 import * as indexOf from 'lodash/indexOf';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as fpOmit from 'lodash/fp/omit';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
@@ -287,6 +285,7 @@ export class ChartService {
     }
   }
 
+<<<<<<< HEAD
   /** the mapping between the tree level, and the columName of the field
    * Example:
    * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
@@ -334,6 +333,8 @@ export class ChartService {
     return assign(dataFields, dataObj);
   }
 
+=======
+>>>>>>> c944d30dd39a1b461d27bb82f73fd19d23e23bbc
   splitToSeriesAndCategories(parsedData, fields, { sorts }, type) {
     let series = [];
     const categories = {};
