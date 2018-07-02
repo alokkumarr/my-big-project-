@@ -8,6 +8,9 @@
 # Start from SIP base image
 FROM sip-base:${project.version}
 
+# If YARN is enabled, set to true
+ARG yarn_enabled
+
 # Workaround: MapR configuration gives the error
 # "/opt/mapr/server/manageSSLKeys.sh: line 146: openssl: command not
 # found", so install OpenSSL for it
@@ -20,6 +23,24 @@ RUN touch /etc/sysconfig/network
 
 # Install MapR packages
 RUN yum -y -q install mapr-core mapr-cldb mapr-zookeeper mapr-webserver
+
+# Install YARN, if enabled
+RUN if $yarn_enabled; then \
+    yum -y -q install mapr-resourcemanager mapr-nodemanager; \
+  fi
+# Note: The SAW Transport Service fast executor is kept running
+# continuously and allocates three YARN containers which takes up
+# three virtual CPU cores.  The YARN default number of cores available
+# is only four, which can prevent the regular executor from running.
+# To work around this, increase the default number of cores to eight
+# by adding the following to the YARN configuration at
+# "/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/yarn-site.xml":
+#
+# <property>
+#   <name>yarn.nodemanager.resource.cpu-vcores</name>
+#   <value>8</value>
+# </property>
+
 # Workaround: MapR packages enable mapr-warden and mapr-zookeeper by
 # default, causing them to start up before MapR has been configured.
 # So disable them here and let the MapR configure script enable them
