@@ -69,6 +69,9 @@ type ReportGridField = {
 
 const DEFAULT_PAGE_SIZE = 25;
 const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
+
+let self; // needed to access component context from dx callbacks
+
 @Component({
   selector: 'report-grid-upgraded',
   template
@@ -80,6 +83,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Input() query: string;
+  @Input() allowSorting: boolean;
   @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
@@ -165,6 +169,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   };
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
+    self = this;
     this.onLoadPanelShowing = ({ component }) => {
       const instance = this.dataGrid.instance;
       if (instance) {
@@ -241,7 +246,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   customizeColumns(columns) {
     forEach(columns, (col: ReportGridField) => {
-      col.allowSorting = false;
+      col.allowSorting = Boolean(self.allowSorting);
       col.alignment = 'left';
     });
   }
