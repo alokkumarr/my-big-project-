@@ -324,6 +324,7 @@ module.exports = {
     filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
     selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
   },
+  listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 
   // OLD test elements
   analysisElems: {

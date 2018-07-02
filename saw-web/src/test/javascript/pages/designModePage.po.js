@@ -22,7 +22,7 @@ module.exports = {
     string: {
       operator: element(by.xpath('//mat-select[@placeholder="Operator"]')),
       operatorDropDownItem: operator => element(by.css(`mat-option[e2e="filter-string-option-${operator}"]`)),
-      input: element(by.xpath(`(//input[contains(@id,"mat-input-")])[position()=3]`)),
+      input: element(by.xpath(`(//input[contains(@id,"mat-input-")])[position()=last()]`)),
       isInIsNotInInput: element(by.xpath(`//input[@e2e="designer-filter-string-input"]`)),
     },
     number: {

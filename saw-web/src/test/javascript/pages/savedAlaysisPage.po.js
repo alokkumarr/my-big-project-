@@ -10,8 +10,8 @@ module.exports = {
   listView: {
     analysisByName: name => element(by.xpath[`//a[text()='${name}']`]),
     actionMenu: element(by.css[`[e2e="actions-menu-toggle"]`]),
-    
-  },  
+  }, 
+  analysisAction: name => element(by.xpath(`(//a[text()="${name}"]/following::button[@e2e='actions-menu-toggle'])[position()=1]`)),
   chartTypes: {
     column: element(by.xpath('//*[contains(@class,"highcharts-column-series")]'))
   },
