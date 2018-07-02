@@ -14,6 +14,12 @@
     <ng-container *ngIf="item.analysis">
       <observe-chart *ngIf="item.analysis.type === 'chart'" class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
         [analysis]="item.analysis" [enableChartDownload]="enableChartDownload" [updater]="item.updater"></observe-chart>
+
+      <observe-report *ngIf="['report', 'esReport'].includes(item.analysis.type)" class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
+        [analysis]="item.analysis" [updater]="item.updater"></observe-report>
+
+      <observe-pivot *ngIf="item.analysis.type === 'pivot'" class="analysis-container" [item]="item" (onRefresh)="refreshTile($event)"
+        [analysis]="item.analysis" [updater]="item.updater"></observe-pivot>
     </ng-container>
 
     <ng-container *ngIf="item.kpi">
