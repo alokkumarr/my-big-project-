@@ -1,4 +1,5 @@
 import * as get from 'lodash/get';
+import * as clone from 'lodash/clone';
 import * as values from 'lodash/values';
 import * as orderBy from 'lodash/orderBy';
 import * as map from 'lodash/map';
@@ -84,7 +85,7 @@ export const AnalyzeChartDetailComponent = {
       let changes = this._ChartService.dataToChangeConfig(
         this.analysis.chartType,
         this.settings,
-        this.filteredData,
+        [...map(this.filteredData, clone)],
         {labels: this.labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts}
       );
 

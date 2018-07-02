@@ -6,8 +6,12 @@ import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObje
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SAWElasticSearchQueryBuilder {
+
+  public static final Logger logger = LoggerFactory.getLogger(SAWElasticSearchQueryBuilder.class);
 
   /**
    * Initialize elastic search query result size

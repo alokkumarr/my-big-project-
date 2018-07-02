@@ -33,6 +33,7 @@ yarn.lock
 /target/*
 /target
 *~
+/protractorFailuresReport/
 
 #System Files
 .DS_Store

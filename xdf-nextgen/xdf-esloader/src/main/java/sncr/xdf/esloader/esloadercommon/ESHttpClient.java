@@ -1,5 +1,6 @@
 package sncr.xdf.esloader.esloadercommon;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -123,6 +124,7 @@ public class ESHttpClient {
         String fullUrl = host + url;
         try {
             ClientResource cr = new ClientResource(fullUrl);
+            logger.debug("Full URL = " + fullUrl + ". Data = " + body);
             if(authentication != null) cr.setChallengeResponse(authentication);
             cr.post(body);
             return cr.getStatus().isSuccess();
@@ -234,8 +236,11 @@ public class ESHttpClient {
     public void  esIndexSafeDelete(String ... idx) throws Exception{
         for(String s : idx){
             // Check if index participates in any alias
-            if(esIndexAliasParticipation( s) == 0){
+            int aliasParticipation = esIndexAliasParticipation(s);
+            logger.debug("Alias Participation = " + aliasParticipation);
+            if(aliasParticipation == 0){
                 // This index is not attached to any alias - delete it
+                logger.debug("Safe deleting index " + s);
                 esIndexDelete(s);
             }
         }
@@ -311,17 +316,33 @@ public class ESHttpClient {
         return retval;
     }
 
-    public  boolean esIndexRemoveAlias(String alias, String ... index)throws Exception {
-        String actions = "{ \"actions\" : [";
-        String sequence = null;
-        for(String s : index) {
-            if(sequence != null)
-                sequence  += ", {\"remove\" : {\"index\" : \"" + s + "\" , \"alias\" : \"" + alias + "\"}}";
-            else
-                sequence  = "{\"remove\" : {\"index\" : \"" + s + "\" , \"alias\" : \"" + alias + "\"}}";
-        }
-        actions = actions + sequence + "]}";
+    public  boolean esIndexRemoveAlias(String alias, String ... indices)throws Exception {
+        String actions = generateActionObject(alias, indices);
+
+        logger.debug("Actions = " + actions);
         return post("/_aliases" , actions );
+    }
+
+    public String generateActionObject(String alias, String ...indices) {
+        JsonObject actionsObject = new JsonObject();
+
+        JsonArray actionsArray = new JsonArray();
+
+        for (String index : indices) {
+            JsonObject actionItem = new JsonObject();
+
+            JsonObject aliasObject = new JsonObject();
+            aliasObject.addProperty("index", index);
+            aliasObject.addProperty("alias", alias);
+
+            actionItem.add("remove", aliasObject);
+
+            actionsArray.add(actionItem);
+        }
+
+        actionsObject.add("actions", actionsArray);
+
+        return actionsObject.toString();
     }
 
 //    public static void main(String[] a) throws Exception {
