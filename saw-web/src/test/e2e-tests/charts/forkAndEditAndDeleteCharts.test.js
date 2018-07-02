@@ -87,9 +87,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
 
         login.loginAs(data.user);
        
-        homePage.mainMenuExpandBtn.click();
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-        homePage.mainMenuCollapseBtn.click();
 
         //Change to Card View.
         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);

@@ -86,11 +86,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         new AnalysisHelper().createChart(host, token,name,description, type);
 
         login.loginAs(data.user);
-       
-        homePage.mainMenuExpandBtn.click();
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-        homePage.mainMenuCollapseBtn.click();
-
         //Change to Card View.
         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
         commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);

@@ -71,10 +71,8 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     it('should verify preview for ' + description, () => {
       let chartTyp = data.chartType.split(":")[1];
       login.loginAs(data.user);
-      homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-      homePage.mainMenuCollapseBtn.click();
-
+      
       let chartName = `e2e ${description} ${(new Date()).toString()}`;
       let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 

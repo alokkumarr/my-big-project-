@@ -412,11 +412,11 @@ describe('Privileges tests: privileges.test.js', () => {
       commonFunctions.waitFor.elementToBeVisible(homePage.collapsedCategoryUpdated(categoryName));
       commonFunctions.waitFor.elementToBeClickable(homePage.collapsedCategoryUpdated(categoryName));
       homePage.collapsedCategoryUpdated(categoryName).click();
-      browser.sleep(200);
+      browser.sleep(500);
       commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
       commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
       homePage.subCategory(data.subCategory).click();
-      browser.sleep(200);
+      browser.sleep(500);
       const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
       expect(doesDataNeedRefreshing).toBeTruthy();
       homePage.mainMenuCollapseBtn.click();
