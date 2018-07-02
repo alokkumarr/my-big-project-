@@ -237,7 +237,7 @@ export class ObserveChartComponent {
     set(
       payload,
       'sqlBuilder.sorts',
-      this.sortService.mapFrontend2BackendSort(this.sorts)
+      this.sorts
     );
     set(
       payload,
