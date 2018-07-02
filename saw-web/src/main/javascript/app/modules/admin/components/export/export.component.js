@@ -65,30 +65,30 @@ export const AnalysisExportComponent = {
         this.list = this.getMetricIds(metricNames);
         const id = get(this._JwtService.getTokenObj(), 'ticket.custCode');
         const contentsObject = {
-          keys: [{
-            customerCode: id,
-            module: 'ANALYZE'
-          }],
+          keys: [],
           action: 'export'
         };
+        this.list.forEach(selectedSemanticid => {
+          const keyObject = {
+            customerCode: id,
+            module: 'ANALYZE',
+            semanticId: selectedSemanticid
+          }
+          contentsObject.keys.push(keyObject);
+        });
         const body = {
           contents: contentsObject
         };
         this._exportService.getAnalysisByMetricIds(body).then(analysis => {
-          this.analysisTableList = [];
           if (analysis.data.contents.analyze.length > 0) {
             analysis.data.contents.analyze.forEach(element => {
-              if (element.categoryId !== null && element.name !== null) {
-                this.list.forEach(id => {
-                  if (id === element.semanticId) {
-                    this.analysisTableObject = {
-                      selection: false,
-                      analysis: {}
-                    };
-                    this.analysisTableObject.analysis = element;
-                    this.analysisTableList.push(this.analysisTableObject);
-                  }
-                });
+              if (!isUndefined(element.categoryId) && !isUndefined(element.name)) {
+                this.analysisTableObject = {
+                  selection: false,
+                  analysis: {}
+                };
+                this.analysisTableObject.analysis = element;
+                this.analysisTableList.push(this.analysisTableObject);
               }
               this.updater.next({analysisList: this.analysisTableList});
             });

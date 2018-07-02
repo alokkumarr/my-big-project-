@@ -13,12 +13,6 @@
                 <label for="input-file-id" class="md-button md-raised upload-button"
                 translate="IMPORT_BROWSE"></label>
     </div>
-    <import-file-list-view
-    file-list = "$ctrl.fileTableList"
-    updater = "$ctrl.fileListupdater"
-    onAction = ""
-    ></import-file-list-view>
-    
     <md-input-container>
         <label translate="IMPORT_SELECT_CAT"></label>
         <md-select 
@@ -34,6 +28,12 @@
             </md-optgroup>
         </md-select>
     </md-input-container>
+    <import-file-list-view
+    file-list = "$ctrl.fileTableList"
+    updater = "$ctrl.fileListupdater"
+    onAction = ""
+    ></import-file-list-view>
+    
     <import-list-view
         id="import-grid-dir"
         analysis-list="$ctrl.analysisTableList"
