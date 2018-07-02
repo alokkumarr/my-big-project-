@@ -75,6 +75,10 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.executeSQLNoDataLoad()
           analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.regularExecution.toString)
         }
+        case ExecutionType.publish => {
+          analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.publish.toString)
+        }
       }
       analysisNodeExecution.setFinishTime
       finishTS = analysisNodeExecution.finishedTS
@@ -213,7 +217,6 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     resultsStream
   }
 
-
   /**
     * Returns the rows count of execution result
     *
@@ -324,11 +327,13 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
 }
 
 
-object ExecutionType extends Enumeration{
+object ExecutionType extends Enumeration {
 
   type ExecutionType = Value
   val onetime = Value(0, "onetime")
   val scheduled = Value(1, "scheduled")
   val preview = Value(2, "preview")
   val regularExecution= Value(3, "regularExecution")
+  val publish = Value(4, "publish")
+
 }
