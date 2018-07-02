@@ -41,6 +41,8 @@ import { ChartService } from '../../../services/chart.service';
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport'];
+
 @Component({
   selector: 'designer-container',
   template
@@ -336,7 +338,8 @@ export class DesignerContainerComponent {
         });
       break;
     case 'filter':
-      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, (this.analysis || this.analysisStarter).type === 'chart')
+      const supportsGlobalFilters = GLOBAL_FILTER_SUPPORTED.includes((this.analysis || this.analysisStarter).type);
+      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, supportsGlobalFilters)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.filters = result.filters;
