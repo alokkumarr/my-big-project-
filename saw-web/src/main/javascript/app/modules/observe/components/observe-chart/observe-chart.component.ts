@@ -43,6 +43,7 @@ export class ObserveChartComponent {
   @Input() item: any;
   @Input() enableChartDownload: boolean;
   @Input('updater') requester: BehaviorSubject<Array<any>>;
+  @Input() ViewMode: boolean;
   @Output() onRefresh = new EventEmitter<any>();
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
@@ -78,7 +79,7 @@ export class ObserveChartComponent {
       ? false
       : this.analysis.isStockChart;
     this.subscribeToRequester();
-    this.toggleToGrid = false;
+    this.toggleToGrid = true;
   }
 
   ngOnDestroy() {
@@ -164,6 +165,7 @@ export class ObserveChartComponent {
 
   reloadChart(settings, gridData, labels) {
     const changes = this.getChangeConfig(settings, gridData, labels);
+    console.log(changes);
     this.chartUpdater.next(changes);
   }
 
@@ -207,7 +209,7 @@ export class ObserveChartComponent {
     forEach(this.analysis.artifacts[0].columns, column => {
       if(axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
-        value = column.type === 'date' ? moment(value).format(column.dateFormat) : value;
+        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : column.dateFormat ) : value;
         if(column.aggregate === 'percentage' || column.aggregate === 'avg') {
           value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
         }
