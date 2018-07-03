@@ -29,3 +29,6 @@ elastic-xpack :
           cluster-active: true
           clsuter-username: elastic
           cluster-password: xuw3dUraHapret
+metastore:
+    base:  hdfs:///main/        
+         

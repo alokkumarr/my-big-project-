@@ -40,6 +40,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   
   @Autowired
   private StorageConnectorService storageConnectorService;
+  
+  @Autowired
+  private StorageProxyMetaDataService storageProxyMetaDataService;
+  
 
   private int size;
 
@@ -287,6 +291,23 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               // TODO: Execute Query or perform create, delete, update operation & Prepare response based on the specification (either JSON or Tabular)  
               // TODO: Convert data either into tabular or JSON
           
+          case  "METADATA":
+                     String actionMetadata = proxy.getAction().value();
+                     if (actionMetadata.equals(Action.CREATE.value()) || actionMetadata.equals(Action.SEARCH.value()) || actionMetadata.equals(Action.UPDATE.value())){
+                       switch (actionMetadata) {
+                         case "create" : proxy= storageProxyMetaDataService.createEntryInMetaData(proxy); break;
+                         case "search" : proxy= storageProxyMetaDataService.readEntryFromMetaData(proxy);
+                                         // TODO: Search by name or ID
+                                         // TODO: Get the query and then by type execute the query
+                                         // TODO: Add the data to the data[] and make it as a part of response
+                                         break;
+                         case "update" : proxy= storageProxyMetaDataService.updateEntryFromMetaData(proxy);
+                         break;
+                       }
+                     }
+                     else {
+                       proxy.setStatusMessage("This "+actionMetadata+" is not yet supported by StorageType :" + storageType);
+                     }
         } // end of switch statement
     response = StorageProxyUtils.prepareResponse(proxy, proxy!=null? proxy.getStatusMessage():"data is retrieved.");
     } // end of schema validation if block

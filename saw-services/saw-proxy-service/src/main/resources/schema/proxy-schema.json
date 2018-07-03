@@ -12,7 +12,8 @@
             "enum":[
                "ES",
                "DL",
-               "RDMS"
+               "RDMS",
+               "METADATA"
             ]
          },
          "action":{
@@ -30,6 +31,7 @@
                "update",
                "aggregate",
                "pivot"
+               
             ]
          },
          "query":{
@@ -38,6 +40,13 @@
             "title":"It holds the query",
             "description":"An explanation about the purpose of this instance."
          },
+         "name":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/name",
+            "type":"string",
+            "title":"It holds the name",
+            "description":"An explanation about the purpose of this instance."
+         },
+         
          "entityId":{
             "id":"http://synchronoss.com/proxy.json/items/properties/entityId",
             "type":"string",

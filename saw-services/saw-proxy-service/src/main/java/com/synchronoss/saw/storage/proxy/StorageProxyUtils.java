@@ -24,8 +24,12 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
+import sncr.bda.store.generic.schema.Action;
+import sncr.bda.store.generic.schema.Category;
+import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 
 @Component
 public class StorageProxyUtils {
@@ -138,6 +142,30 @@ public class StorageProxyUtils {
         headers.addAll(map.keySet());
     }
     return headers;
-}  
+}
   
+  public static void checkMandatoryFields (StorageProxy node) {
+    Preconditions.checkArgument(node!=null, "Request body is empty");
+    Preconditions.checkArgument(node.getStorage()!=null, "storage cannot be null");
+    Preconditions.checkArgument(node.getName()!=null, "name cannot be null");
+    Preconditions.checkArgument(node.getProductCode()!=null, "project code cannot be null");
+    Preconditions.checkArgument(node.getRequestBy()!=null, "requested By cannot be null");
+  }
+  
+  public static List<MetaDataStoreStructure> node2JSONObject(StorageProxy node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if (node != null) {
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null) {
+      metaDataStoreStructure.setId(Id);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return listOfMetadata;
+  }
+
 }
