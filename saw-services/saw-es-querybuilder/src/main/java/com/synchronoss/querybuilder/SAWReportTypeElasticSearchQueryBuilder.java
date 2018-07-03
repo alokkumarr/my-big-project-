@@ -99,7 +99,9 @@ public class SAWReportTypeElasticSearchQueryBuilder {
 
             for (com.synchronoss.querybuilder.model.report.Filter item : filters)
             {
-                if (!item.getIsRuntimeFilter().value()){
+                if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
+                    && !item.getIsGloblFilter().value()){
+
                     if (item.getType().value().equals(Filter.Type.DATE.value()) || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
                         if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
                         {
@@ -177,7 +179,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                 });
             } else {
                 builder.forEach(item -> {
-                    boolQueryBuilder.should(item);
+                  boolQueryBuilder.should(item);
                 });
             }
             searchSourceBuilder.query(boolQueryBuilder);

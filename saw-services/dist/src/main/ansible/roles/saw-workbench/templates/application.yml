@@ -1,6 +1,8 @@
 info:
   component: Synchronoss Workbench Service
 spring:
+  main:
+    banner-mode: 'off'
   application:
     name: saw-workbench-service
   http:
@@ -9,6 +11,7 @@ spring:
       max-file-size: 25MB
 logging:
   level:
+    org.springframework: WARN
     com.synchronoss.saw.workbench: INFO
 server:
   address: localhost

@@ -314,6 +314,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-workbench</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-workbench-service</name>
@@ -344,6 +345,12 @@
 									<file>src/main/system/saw-workbench-proxy.socket</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>
