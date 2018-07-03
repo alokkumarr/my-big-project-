@@ -5,6 +5,7 @@ import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
+import * as isFinite from 'lodash/isFinite';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -153,9 +154,9 @@ export class DesignerFilterDialogComponent implements OnInit {
   isNumberFilterValid({operator, value, otherValue}: FilterModel) {
     switch (operator) {
     case 'BTW':
-      return Boolean(value && otherValue);
+      return Boolean(isFinite(value) && isFinite(otherValue));
     default:
-      return Boolean(value)
+      return Boolean(isFinite(value))
     }
   }
 
