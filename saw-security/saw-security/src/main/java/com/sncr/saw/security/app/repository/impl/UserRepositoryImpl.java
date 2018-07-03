@@ -172,8 +172,7 @@ public class UserRepositoryImpl implements UserRepository {
 		// change the pass
 		// update pass history
 		String encNewPass = Ccode.cencode(newPass).trim();
-		String sql = "SELECT U.USER_SYS_ID FROM USERS U, CONTACT_INFO C, USER_CONTACT UC WHERE  U.USER_SYS_ID = UC.USER_SYS_ID "
-				+ "AND UC.CONTACT_INFO_SYS_ID=C.CONTACT_INFO_SYS_ID AND U.USER_ID = ?";
+		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -1188,15 +1187,14 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public String getUserEmailId(String userId) {
 		String message = null;
-		String sql = "select ci.email from USERS u, USER_CONTACT uc, CONTACT_INFO ci " + " where u.user_id=?"
-				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+		String sql = "select u.email from USERS u where u.user_id=? and u.ACTIVE_STATUS_IND = '1'";
 
 		try {
-			return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, userId);
-				}
-			}, new UserRepositoryImpl.EmailExtractor());
+			// return email from database
+			String email = (String) jdbcTemplate.queryForObject(
+					sql, new Object[] { userId }, String.class);
+			return email;
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;
