@@ -57,7 +57,7 @@ saw_elasticsearch_port=9200,9200
 saw_elasticsearch_username=username
 saw_elasticsearch_password=password
 saw_elasticsearch_data_store_limit=10000
-saw_elasticsearch_cluster_name=SNCR-VELBDA-elasticsearch
+saw_elasticsearch_cluster_name=clustername
 saw_elasticsearch_xpack=true
 
 
