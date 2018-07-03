@@ -5,6 +5,7 @@
   <mat-menu #menu="matMenu">
     <button *ngFor="let action of actions; trackBy: index"
             (click)="action.fn()"
+            [disabled]="actionsToDisable[action.value]"
             [style.color]="action.color"
             [attr.e2e]="'actions-menu-selector-' + action.value"
             mat-menu-item
