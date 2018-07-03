@@ -182,6 +182,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.11</artifactId>
+      <version>2.1.0</version>
+      <scope>provided</scope>
+    </dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-sql_2.11</artifactId>
@@ -308,6 +314,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-workbench</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-workbench-service</name>
@@ -338,6 +345,12 @@
 									<file>src/main/system/saw-workbench-proxy.socket</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

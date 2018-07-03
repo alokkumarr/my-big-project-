@@ -1,5 +1,7 @@
 @import "themes/base/colors";
 
+$back-button-size: 32px;
+
 designer-header {
   background-color: white;
 
@@ -9,6 +11,14 @@ designer-header {
     button {
       line-height: 32px;
     }
+  }
+
+  .back-button-icon.mat-icon {
+    color: $primary-grey-g4;
+    font-size: $back-button-size;
+    line-height: $back-button-size;
+    width: $back-button-size;
+    height: $back-button-size;
   }
 
   .header__name {

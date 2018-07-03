@@ -173,6 +173,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-gateway</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-gateway-service</name>
@@ -191,6 +192,12 @@
 									<file>src/main/system/saw-gateway.service</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

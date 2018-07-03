@@ -95,7 +95,11 @@ public class ElasticSearchLoader {
 
         // In case of partitioned data, each partition will be loaded separately
         // TBD: load separate partitions into separate ES indexes representing partitions
+
+        logger.trace("Getting location list for object " + objectName);
+
         Map<String, String> locationList = getLocationList(objectName, essm);
+        logger.debug("Location List = " + locationList);
 
         // Check if all indexes exists and try to create them (based on configuration)
         // And add them to exception list for future use
