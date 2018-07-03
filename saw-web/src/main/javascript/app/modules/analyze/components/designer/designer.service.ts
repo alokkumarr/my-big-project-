@@ -4,16 +4,11 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpMap from 'lodash/fp/map';
-import * as map from 'lodash/map';
-import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
-import * as concat from 'lodash/concat';
-import * as flatMap from 'lodash/flatMap';
 import * as take from 'lodash/take';
 import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as fpOmit from 'lodash/fp/omit';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -24,7 +19,6 @@ import {
   ArtifactColumns,
   ArtifactColumnPivot,
   ArtifactColumnChart,
-  SqlBuilder,
   SqlBuilderPivot,
   SqlBuilderEsReport,
   SqlBuilderChart
@@ -450,76 +444,5 @@ export class DesignerService {
     return {
       dataFields: filter(artifactColumns, 'checked')
     };
-  }
-
-  parseData(data, sqlBuilder) {
-    const nodeFieldMap = this.getNodeFieldMap(sqlBuilder);
-
-    return this.parseNode(data, {}, nodeFieldMap, 0);
-  }
-
-  /** Map the tree level to the columnName of the field
-   * Example:
-   * row_field_1: 0 -> SOURCE_OS
-   * row_field_2: 1 -> SOURCE_MANUFACTURER
-   * column_field_1: 2 -> TARGET_OS
-   */
-  getNodeFieldMap(sqlBuilder) {
-    const rowFieldMap = map(sqlBuilder.rowFields, 'columnName');
-    const columnFieldMap = map(sqlBuilder.columnFields, 'columnName');
-
-    return concat(rowFieldMap, columnFieldMap);
-  }
-
-  parseNode(node, dataObj, nodeFieldMap, level) {
-    if (node.key) {
-      const columnName = this.getColumnName(nodeFieldMap, level);
-      dataObj[columnName] = node.key_as_string || node.key;
-    }
-
-    const nodeName = this.getChildNodeName(node);
-    if (nodeName && node[nodeName]) {
-      const data = flatMap(node[nodeName].buckets, bucket =>
-        this.parseNode(bucket, dataObj, nodeFieldMap, level + 1)
-      );
-      return data;
-    }
-    const datum = this.parseLeaf(node, dataObj);
-
-    return datum;
-  }
-
-  parseLeaf(node, dataObj) {
-    const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key', 'key_as_string']),
-      fpMapValues('value')
-    )(node);
-
-    return {
-      ...dataFields,
-      ...dataObj
-    };
-  }
-
-  getColumnName(fieldMap, level) {
-    // take out the .keyword form the columnName
-    // if there is one
-    const columnName = fieldMap[level - 1];
-    const split = columnName.split('.');
-    if (split[1]) {
-      return split[0];
-    }
-    return columnName;
-  }
-
-  getChildNodeName(node) {
-    const nodeKeys = keys(node);
-    const childNodeName = find(nodeKeys, key => {
-      const isRow = key.indexOf('row_level') > -1;
-      const isColumn = key.indexOf('column_level') > -1;
-      return isRow || isColumn;
-    });
-
-    return childNodeName;
   }
 }

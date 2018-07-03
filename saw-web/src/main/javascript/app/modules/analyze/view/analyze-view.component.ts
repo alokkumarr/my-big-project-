@@ -3,7 +3,6 @@ import { Transition, StateService } from '@uirouter/angular';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
-import * as filter from 'lodash/filter';
 import * as findIndex from 'lodash/findIndex';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { JwtService } from '../../../../login/services/jwt.service';
@@ -90,7 +89,9 @@ export class AnalyzeViewComponent implements OnInit {
       this.spliceAnalyses(event.analysis, false);
       break;
     case 'execute':
-      this.goToAnalysis(event.analysis);
+      if (event.analysis) {
+        this.goToAnalysis(event.analysis);
+      }
       break;
     case 'publish':
       this.afterPublish(event.analysis);
@@ -109,14 +110,13 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
-    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
+    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis, awaitingExecution: true});
   }
 
   afterPublish(analysis) {
     this.getCronJobs();
     /* Update the new analysis in the current list */
     const index = findIndex(this.analyses, ({id}) => id === analysis.id);
-    this.analyses.splice(index, 1, analysis);
     this._state.go('analyze.view', {id: analysis.categoryId});
   }
 
