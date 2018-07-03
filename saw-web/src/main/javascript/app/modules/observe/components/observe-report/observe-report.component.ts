@@ -28,6 +28,7 @@ export class ObserveReportComponent implements OnInit, OnDestroy {
   @Output() onRefresh = new EventEmitter();
 
   data: Array<any> = [];
+  executionId: string;
 
   listeners: Array<Subscription> = [];
 
@@ -46,8 +47,17 @@ export class ObserveReportComponent implements OnInit, OnDestroy {
   }
 
   loadData(options = {}) {
-    return this.analyzeService
-      .previewExecution(this.analysis, options)
-      .then(({ data, count }) => ({ data, totalCount: count }));
+    if (this.executionId) {
+      return this.analyzeService
+        .getExecutionData(this.analysis.id, this.executionId, options)
+        .then(({ data, count }) => ({ data, totalCount: count }));
+    } else {
+      return this.analyzeService
+        .previewExecution(this.analysis, options)
+        .then(({ data, executionId, count }) => {
+          this.executionId = executionId;
+          return { data, totalCount: count };
+        });
+    }
   }
 }
