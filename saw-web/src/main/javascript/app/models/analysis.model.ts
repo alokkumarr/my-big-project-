@@ -55,4 +55,5 @@ export interface AnalysisChart extends Analysis {
   labelOptions?: LabelOptions;
   xAxis?: Axis;
   yAxis?: Axis;
+  isStockChart?: boolean;
 }
