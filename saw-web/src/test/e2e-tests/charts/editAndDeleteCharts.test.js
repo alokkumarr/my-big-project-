@@ -31,7 +31,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const sizeByName = 'Float';
 
   let host;
-  let token; 
+  let token;
   const dataProvider = {
     // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602 ---disbaled in the UI
     // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678 ---disbaled in the UI
@@ -55,7 +55,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
-    
+
   });
 
   beforeEach(function (done) {
@@ -83,7 +83,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
         let type = data.chartType.split(":")[1];
         //Create new analysis.
-        new AnalysisHelper().createChart(host, token,name,description, type);
+        new AnalysisHelper().createPivotChart(host, token,name,description, type);
 
         login.loginAs(data.user);
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
@@ -93,14 +93,14 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         analyzePage.analysisElems.cardView.click();
         //Open the created analysis.
         const createdAnalysis = analyzePage.main.getCardTitle(name);
-        
+
         commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
         commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
         createdAnalysis.click();
-        
+
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         savedAlaysisPage.editBtn.click();
-        
+
         const designer = analyzePage.designerDialog;
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
@@ -158,7 +158,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         commonFunctions.waitFor.textToBePresent(savedAlaysisPage.analysisViewPageElements.title, updatedName);
         expect(savedAlaysisPage.analysisViewPageElements.title.getText()).toBe(updatedName);
         expect(savedAlaysisPage.analysisViewPageElements.description.getText()).toBe(updatedDescription);
-        
+
         //Delete created chart
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
         savedAlaysisPage.actionsMenuBtn.click();

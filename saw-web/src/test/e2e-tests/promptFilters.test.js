@@ -15,6 +15,7 @@ const dataSets = require('../javascript/data/datasets');
 const designModePage = require('../javascript/pages/designModePage.po.js');
 let AnalysisHelper = require('../javascript/api/AnalysisHelper');
 let ApiUtils = require('../javascript/api/APiUtils');
+const Constants = require('../javascript/api/Constants');
 const globalVariables = require('../javascript/helpers/globalVariables');
 const utils = require('../javascript/helpers/utils');
 const commonElementsPage = require('../javascript/pages/commonElementsPage.po');
@@ -27,10 +28,10 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
 
   let analysisId;
   let host;
-  let token; 
+  let token;
   const chartDataProvider = {
     // DATES
-    'Date data type filter as admin': { 
+    'Date data type filter as admin': {
       user: 'admin',
       fieldType: 'date',
       value: 'This Week',
@@ -43,7 +44,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       fieldName: 'Date'
     },
     //NUMBERS
-    'Number data type filter as admin': { 
+    'Number data type filter as admin': {
       user: 'admin',
       fieldType: 'number',
       operator: 'Equal to',
@@ -56,9 +57,9 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       operator: 'Equal to',
       value: 99999.33,
       fieldName: 'Double'
-    }, 
+    },
     //STRING
-    'String data type filter as admin': { 
+    'String data type filter as admin': {
       user: 'admin',
       fieldType: 'string',
       operator: 'Equals',
@@ -78,7 +79,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
-    
+
   });
 
   beforeEach(function (done) {
@@ -90,7 +91,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      new AnalysisHelper().delete(host, token, protractorConf.config.customerCode, analysisId);
+      new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -104,9 +105,10 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       let chartType = 'chart:column';
       let type = chartType.split(":")[1];
 
-      let name = chartType+' ' + globalVariables.e2eId+'-'+currentTime;
+      let name = Constants.CHART+' ' + globalVariables.e2eId+'-'+currentTime;
       let description ='Description:'+chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
-      applyFilters(user, name, description, type, data.fieldName);
+
+      applyFilters(user, name, description, Constants.CHART, type, data.fieldName);
       //From analysis detail/view page
       verifyPromptFromDetailPage(data)
       //verifyPromptFromListView and by executing from action menu
@@ -120,11 +122,73 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
     });
 });
 
+using(chartDataProvider, function (data, description) {
+  it('should able to apply prompt filter for pivot: ' + description, () => {
+
+    let currentTime = new Date().getTime();
+    let user = data.user;
+    let name = Constants.PIVOT+' ' + globalVariables.e2eId+'-'+currentTime;
+    let description ='Description:'+Constants.PIVOT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
+
+    applyFilters(user, name, description, Constants.PIVOT, null, data.fieldName);
+    //From analysis detail/view page
+    verifyPromptFromDetailPage(data)
+    //verifyPromptFromListView and by executing from action menu
+    verifyPromptFromListView(name, data, true)
+    //verifyPromptFromListView and by clicking on analysis
+    verifyPromptFromListView(name, data, false)
+    //verifyPromptFromCardView and by executing from action menu
+    verifyPromptFromCardView(name, data, true)
+    //verifyPromptFromCardView and by clicking on analysis
+    verifyPromptFromCardView(name, data, false)
+  });
+});
+
+using(chartDataProvider, function (data, description) {
+  it('should able to apply prompt filter for esReport: ' + description, () => {
+
+    let currentTime = new Date().getTime();
+    let user = data.user;
+    let name = Constants.ES_REPORT+' ' + globalVariables.e2eId+'-'+currentTime;
+    let description ='Description:'+Constants.ES_REPORT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
+
+    applyFilters(user, name, description, Constants.ES_REPORT, null, data.fieldName);
+    //From analysis detail/view page
+    verifyPromptFromDetailPage(data)
+    //verifyPromptFromListView and by executing from action menu
+    verifyPromptFromListView(name, data, true)
+    //verifyPromptFromListView and by clicking on analysis
+    verifyPromptFromListView(name, data, false)
+    //verifyPromptFromCardView and by executing from action menu
+    verifyPromptFromCardView(name, data, true)
+    //verifyPromptFromCardView and by clicking on analysis
+    verifyPromptFromCardView(name, data, false)
+  });
+});
+
+using(chartDataProvider, function (data, description) {
+  it('should able to apply prompt filter for report: ' + description, () => {
+
+    let currentTime = new Date().getTime();
+    let user = data.user;
+    let name = Constants.REPORT+' ' + globalVariables.e2eId+'-'+currentTime;
+    let description ='Description:'+Constants.REPORT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
+
+    applyFilters(user, name, description, Constants.REPORT, null, data.fieldName);
+    //From analysis detail/view page
+    verifyPromptFromDetailPage(data)
+    //verifyPromptFromListView and by executing from action menu
+    verifyPromptFromListView(name, data, true)
+    //verifyPromptFromCardView and by executing from action menu
+    verifyPromptFromCardView(name, data, true)
+  });
+});
+
 /**
- * 
- * @param {*} name 
- * @param {*} data 
- * @param {*} execute 
+ *
+ * @param {*} name
+ * @param {*} data
+ * @param {*} execute
  */
 const verifyPromptFromListView = (name, data, execute)=> {
 
@@ -142,20 +206,20 @@ const verifyPromptFromListView = (name, data, execute)=> {
     commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
     commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
     savedAlaysisPage.executeMenuOption.click();
-    
+
   } else {
     //Open the created analysis.
-    const analysisName = analyzePage.listViewItem(name);       
+    const analysisName = analyzePage.listViewItem(name);
     commonFunctions.waitFor.elementToBeVisible(analysisName);
     commonFunctions.waitFor.elementToBeClickable(analysisName);
     analysisName.click();
-  }  
+  }
   verifyFilters(data);
 };
 /**
- * 
- * @param {*} data 
- * @param {*} execute 
+ *
+ * @param {*} data
+ * @param {*} execute
  */
 const verifyPromptFromCardView = (name, data, execute)=> {
  //From analysis card page
@@ -175,16 +239,16 @@ const verifyPromptFromCardView = (name, data, execute)=> {
 
  } else {
    //Open the created analysis.
-   const analysisName = analyzePage.main.getCardTitle(name);       
+   const analysisName = analyzePage.main.getCardTitle(name);
    commonFunctions.waitFor.elementToBeVisible(analysisName);
    commonFunctions.waitFor.elementToBeClickable(analysisName);
    analysisName.click();
- }  
+ }
  verifyFilters(data);
 };
 /**
- * 
- * @param {*} data 
+ *
+ * @param {*} data
  */
 const verifyPromptFromDetailPage = (data)=> {
   //Execute the analysis from detail/view page and verify it asks for prompt filter
@@ -197,8 +261,8 @@ const verifyPromptFromDetailPage = (data)=> {
   verifyFilters(data);
 };
 /**
- * 
- * @param {*} data 
+ *
+ * @param {*} data
  */
 const verifyFilters = (data) => {
 
@@ -210,10 +274,10 @@ const verifyFilters = (data) => {
   setFilterValue(data.fieldType, data.operator, data.value);
 }
 /**
- * 
- * @param {*} fieldType 
- * @param {*} operator 
- * @param {*} value1 
+ *
+ * @param {*} fieldType
+ * @param {*} operator
+ * @param {*} value1
  */
 const setFilterValue = (fieldType, operator, value1) => {
     // Scenario for dates
@@ -256,8 +320,8 @@ const setFilterValue = (fieldType, operator, value1) => {
     commonElementsPage.ifErrorPrintTextAndFailTest();
   };
 /**
- * 
- * @param {*} filters 
+ *
+ * @param {*} filters
  */
   const validateSelectedFilters = (filters) => {
 
@@ -268,16 +332,16 @@ const setFilterValue = (fieldType, operator, value1) => {
     });
   };
 /**
- * 
- * @param {*} user 
- * @param {*} name 
- * @param {*} description 
- * @param {*} type 
- * @param {*} fieldName 
+ *
+ * @param {*} user
+ * @param {*} name
+ * @param {*} description
+ * @param {*} type
+ * @param {*} fieldName
  */
-const applyFilters = (user, name, description, type, fieldName) => {
+const applyFilters = (user, name, description, analysisType, subType, fieldName) => {
    //Create new analysis.
-   new AnalysisHelper().createChart(host, token,name,description, type);
+   new AnalysisHelper().createNewAnalysis(host, token,name,description, analysisType, subType);
    login.loginAs(user);
    homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
    //Change to Card View.
@@ -285,7 +349,7 @@ const applyFilters = (user, name, description, type, fieldName) => {
    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
    analyzePage.analysisElems.cardView.click();
    //Open the created analysis.
-   const createdAnalysis = analyzePage.main.getCardTitle(name);       
+   const createdAnalysis = analyzePage.main.getCardTitle(name);
    commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
    commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
    createdAnalysis.click();
@@ -300,8 +364,13 @@ const applyFilters = (user, name, description, type, fieldName) => {
    const filterAC = filters.getFilterAutocomplete(0);
    commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
    chartDesigner.filterBtn.click();
-   commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('sample'));
-   designModePage.filterWindow.addFilter('sample').click();
+   if (analysisType === Constants.REPORT) {
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('SALES'));
+    designModePage.filterWindow.addFilter('SALES').click();
+   } else {
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('sample'));
+    designModePage.filterWindow.addFilter('sample').click();
+   }
    filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
    commonFunctions.waitFor.elementToBeVisible(filters.prompt);
    commonFunctions.waitFor.elementToBeClickable(filters.prompt);

@@ -31,7 +31,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
   const sizeByName = 'Float';
 
   let host;
-  let token; 
+  let token;
   const dataProvider = {
     // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602 ---disbaled in the UI
     // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678 ---disbaled in the UI
@@ -55,7 +55,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
-    
+
   });
 
   beforeEach(function (done) {
@@ -83,10 +83,10 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
         let type = data.chartType.split(":")[1];
         //Create new analysis.
-        new AnalysisHelper().createChart(host, token,name,description, type);
+        new AnalysisHelper().createPivotChart(host, token,name,description, type);
 
         login.loginAs(data.user);
-       
+
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
 
         //Change to Card View.
@@ -95,14 +95,14 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         analyzePage.analysisElems.cardView.click();
         //Open the created analysis.
         const createdAnalysis = analyzePage.main.getCardTitle(name);
-        
+
         commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
         commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
         createdAnalysis.click();
-        
+
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.forkBtn);
         savedAlaysisPage.forkBtn.click();
-        
+
         const designer = analyzePage.designerDialog;
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
@@ -161,7 +161,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         analyzePage.main.getCardTypeByName(forkedName).then(actualChartType =>
         expect(actualChartType).toEqual(data.chartType,
           "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
-        
+
           const forkedAnalysis = analyzePage.main.getCardTitle(forkedName);
         //Change to Card View
         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
