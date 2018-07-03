@@ -286,6 +286,12 @@
 									<file>src/main/system/saw-semantic-proxy.socket</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

@@ -1190,11 +1190,11 @@ public class UserRepositoryImpl implements UserRepository {
 		String sql = "select u.email from USERS u where u.user_id=? and u.ACTIVE_STATUS_IND = '1'";
 
 		try {
-			// return email from database
-			String email = (String) jdbcTemplate.queryForObject(
-					sql, new Object[] { userId }, String.class);
-			return email;
-
+            return jdbcTemplate.query(sql, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                    preparedStatement.setString(1, userId);
+                }
+            }, new UserRepositoryImpl.EmailExtractor());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;

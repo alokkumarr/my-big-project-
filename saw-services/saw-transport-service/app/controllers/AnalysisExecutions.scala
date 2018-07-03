@@ -163,7 +163,7 @@ class AnalysisExecutions extends BaseController {
 
   def execute(analysisId: String): Result = {
     handle((json, ticket) => {
-      analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)
+      analysisController.executeAnalysis(analysisId, "scheduled", null, null, null)._1
     })
   }
 

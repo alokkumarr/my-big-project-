@@ -262,6 +262,12 @@
 									<file>src/main/resources/ftp-details.json</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

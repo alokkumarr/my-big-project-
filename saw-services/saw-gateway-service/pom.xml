@@ -192,6 +192,12 @@
 									<file>src/main/system/saw-gateway.service</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>
