@@ -42,7 +42,7 @@ create-dashboard {
           right: 0;
         }
 
-        & > .analysis-container {
+        & > observe-chart.analysis-container {
           display: block;
           width: 100%;
           height: 100%;
