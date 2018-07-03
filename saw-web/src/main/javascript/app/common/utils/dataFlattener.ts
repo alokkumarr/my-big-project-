@@ -9,6 +9,7 @@ import * as orderBy from 'lodash/orderBy';
 import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
+import * as isUndefined from 'lodash/isUndefined';
 
 
 export function flattenPivotData(data, sqlBuilder) {
@@ -120,7 +121,7 @@ export function flattenChartData(data, sqlBuilder) {
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
-  if (node.key) {
+  if (!isUndefined(node.key)) {
     dataObj[nodeFieldMap[level - 2]] = node.key;
   }
 

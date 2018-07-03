@@ -285,56 +285,6 @@ export class ChartService {
     }
   }
 
-<<<<<<< HEAD
-  /** the mapping between the tree level, and the columName of the field
-   * Example:
-   * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
-   * string_field_2: 1 -> SOURCE_MANUFACTURER
-   */
-  getNodeFieldMap(nodeFields) {
-    return map(nodeFields, 'columnName');
-  }
-
-  /** parse the tree structure data and return a flattened array:
-   * [{
-   *   x: ..,
-   *   y: ..,
-   *   g: ..,
-   *   z: ..
-   * }, ..]
-   */
-  parseData(data, sqlBuilder) {
-    const nodeFieldMap = this.getNodeFieldMap(sqlBuilder.nodeFields);
-    return this.parseNode(data, {}, nodeFieldMap, 1);
-  }
-
-  parseNode(node, dataObj, nodeFieldMap, level) {
-    if (!isUndefined(node.key)) {
-      dataObj[nodeFieldMap[level - 2]] = node.key;
-    }
-
-    const childNode = node[`node_field_${level}`];
-    if (childNode) {
-      const data = flatMap(childNode.buckets, bucket =>
-        this.parseNode(bucket, dataObj, nodeFieldMap, level + 1)
-      );
-      return data;
-    }
-    const datum = this.parseLeaf(node, dataObj);
-    return datum;
-  }
-
-  parseLeaf(node, dataObj) {
-    const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key', 'key_as_string']),
-      fpMapValues('value')
-    )(node);
-
-    return assign(dataFields, dataObj);
-  }
-
-=======
->>>>>>> c944d30dd39a1b461d27bb82f73fd19d23e23bbc
   splitToSeriesAndCategories(parsedData, fields, { sorts }, type) {
     let series = [];
     const categories = {};
