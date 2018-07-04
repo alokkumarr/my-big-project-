@@ -44,6 +44,7 @@ export class ExecutedChartViewComponent {
   ) { }
 
   initChartOptions(analysis) {
+    this.toggleToGrid = false;
     const { LEGEND_POSITIONING, LAYOUT_POSITIONS } = this._chartService;
     const legend = {
       align: get(analysis, 'legend.align', 'right'),
@@ -70,9 +71,9 @@ export class ExecutedChartViewComponent {
       if(axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
         value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : column.dateFormat ) : value;
-        if(column.aggregate === 'percentage' || column.aggregate === 'avg') {
+        if((value) && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
           value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
-        }    
+        }
       }
     })
     return {aliasName, value};
