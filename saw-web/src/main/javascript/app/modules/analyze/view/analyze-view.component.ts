@@ -11,6 +11,7 @@ import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalyzeViewActionEvent } from './types';
+import { ExecuteService } from '../services/execute.service';
 
 const template = require('./analyze-view.component.html');
 require('./analyze-view.component.scss');
@@ -59,7 +60,8 @@ export class AnalyzeViewComponent implements OnInit {
     private _jwt: JwtService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
-    public _dialog: MatDialog
+    public _dialog: MatDialog,
+    private _executeService: ExecuteService
   ) { }
 
   ngOnInit() {
@@ -83,7 +85,13 @@ export class AnalyzeViewComponent implements OnInit {
       this.loadAnalyses();
       break;
     case 'edit':
-      this.spliceAnalyses(event.analysis, true);
+      const { analysis, requestExecution } = event;
+      if (analysis) {
+        this.spliceAnalyses(analysis, true);
+      }
+      if (requestExecution) {
+        this._executeService.executeAnalysis(analysis);
+      }
       break;
     case 'delete':
       this.spliceAnalyses(event.analysis, false);
@@ -116,7 +124,6 @@ export class AnalyzeViewComponent implements OnInit {
   afterPublish(analysis) {
     this.getCronJobs();
     /* Update the new analysis in the current list */
-    const index = findIndex(this.analyses, ({id}) => id === analysis.id);
     this._state.go('analyze.view', {id: analysis.categoryId});
   }
 

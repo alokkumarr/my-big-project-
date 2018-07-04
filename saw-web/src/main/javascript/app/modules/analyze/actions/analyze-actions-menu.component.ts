@@ -17,7 +17,7 @@ const template = require('./analyze-actions-menu.component.html');
 })
 
 export class AnalyzeActionsMenuComponent {
-  @Output() afterEdit: EventEmitter<Analysis> = new EventEmitter();
+  @Output() afterEdit: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Output() afterExport: EventEmitter<null> = new EventEmitter();
   @Output() afterExecute: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
@@ -84,11 +84,7 @@ export class AnalyzeActionsMenuComponent {
   edit() {
     this._analyzeActionsService.edit(this.analysis).then((result: DesignerSaveEvent) => {
       if (result) {
-        const {isSaveSuccessful, analysis} = result;
-        if (!isSaveSuccessful) {
-          return isSaveSuccessful;
-        }
-        this.afterEdit.emit(analysis);
+        this.afterEdit.emit(result);
       }
     });
   }

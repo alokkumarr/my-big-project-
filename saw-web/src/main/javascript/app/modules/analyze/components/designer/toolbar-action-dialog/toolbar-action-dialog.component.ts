@@ -79,14 +79,13 @@ export class ToolbarActionDialogComponent {
         if (response.type === 'report') {
           (this.data.analysis as AnalysisReport).query = response.query;
         }
-      })
-      .finally(() => {
-        this.showProgressBar = false;
         const result: IToolbarActionResult = {
-          isSaveSuccessful: true,
           analysis: this.data.analysis
         };
         this.dialogRef.close(result);
+      })
+      .finally(() => {
+        this.showProgressBar = false;
       });
   }
 }
