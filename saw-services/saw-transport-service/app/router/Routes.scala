@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/pman0003/Codebase/bda/resolveConflict/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Tue Mar 27 17:30:28 IST 2018
+// @SOURCE:sip/saw-services/saw-transport-service/conf/routes
+// @DATE:Wed Jul 04 14:27:39 IST 2018
 
 package router
 
@@ -81,7 +81,7 @@ class Routes(
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.process"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/results""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
-    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data""", """controllers.AnalysisExecutions.getExecutionData(analysisId:String, executionId:String, page:Int ?= 1, pageSize:Int ?= 10, analysisType:String ?= "report")"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data""", """controllers.AnalysisExecutions.getExecutionData(analysisId:String, executionId:String, page:Int ?= 1, pageSize:Int ?= 10, analysisType:String ?= "report", executionType:String ?= null )"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.execute(analysisId:String)"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """semantic""", """controllers.Semantic.handleRequest"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """ObjectSearch""", """controllers.MCT.handleTagRequest(LCID:String, query:Option[String])"""),
@@ -273,12 +273,12 @@ class Routes(
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/"), DynamicPart("analysisId", """[^/]+""",true), StaticPart("/executions/"), DynamicPart("executionId", """[^/]+""",true), StaticPart("/data")))
   )
   private[this] lazy val controllers_AnalysisExecutions_getExecutionData10_invoker = createInvoker(
-    AnalysisExecutions_7.getExecutionData(fakeValue[String], fakeValue[String], fakeValue[Int], fakeValue[Int], fakeValue[String]),
+    AnalysisExecutions_7.getExecutionData(fakeValue[String], fakeValue[String], fakeValue[Int], fakeValue[Int], fakeValue[String], fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.AnalysisExecutions",
       "getExecutionData",
-      Seq(classOf[String], classOf[String], classOf[Int], classOf[Int], classOf[String]),
+      Seq(classOf[String], classOf[String], classOf[Int], classOf[Int], classOf[String], classOf[String]),
       "GET",
       """""",
       this.prefix + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data"""
@@ -469,8 +469,8 @@ class Routes(
   
     // @LINE:24
     case controllers_AnalysisExecutions_getExecutionData10_route(params) =>
-      call(params.fromPath[String]("analysisId", None), params.fromPath[String]("executionId", None), params.fromQuery[Int]("page", Some(1)), params.fromQuery[Int]("pageSize", Some(10)), params.fromQuery[String]("analysisType", Some("report"))) { (analysisId, executionId, page, pageSize, analysisType) =>
-        controllers_AnalysisExecutions_getExecutionData10_invoker.call(AnalysisExecutions_7.getExecutionData(analysisId, executionId, page, pageSize, analysisType))
+      call(params.fromPath[String]("analysisId", None), params.fromPath[String]("executionId", None), params.fromQuery[Int]("page", Some(1)), params.fromQuery[Int]("pageSize", Some(10)), params.fromQuery[String]("analysisType", Some("report")), params.fromQuery[String]("executionType", Some(null ))) { (analysisId, executionId, page, pageSize, analysisType, executionType) =>
+        controllers_AnalysisExecutions_getExecutionData10_invoker.call(AnalysisExecutions_7.getExecutionData(analysisId, executionId, page, pageSize, analysisType, executionType))
       }
   
     // @LINE:26
