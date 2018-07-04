@@ -1,6 +1,5 @@
 [Unit]
 Description=SAW container logger
-Before=saw-deploy.service
 
 [Service]
 ExecStart=/usr/bin/bash -c "journalctl -f > /proc/1/fd/1"

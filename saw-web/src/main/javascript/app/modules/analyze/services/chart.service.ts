@@ -36,6 +36,9 @@ import * as isUndefined from 'lodash/isUndefined';
 
 import * as Highcharts from 'highcharts/highcharts';
 
+import { flattenChartData } from '../../../common/utils/dataFlattener';
+
+
 import {
   NUMBER_TYPES,
   FLOAT_TYPES,
@@ -1102,6 +1105,10 @@ export class ChartService {
     });
 
     return changes;
+  }
+
+  parseData(data, sqlBuilder) {
+    return flattenChartData(data, sqlBuilder);
   }
 
   filterNumberTypes(attributes) {

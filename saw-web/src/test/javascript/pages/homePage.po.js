@@ -18,10 +18,10 @@ module.exports = {
     return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
   },
   expandedCategoryUpdated: categoryName => {
-    return element(by.xpath(`//span[contains(text(),"${categoryName}")]/parent::*/parent::*/parent::mat-expansion-panel-header[contains(@class,"mat-expanded")]`));
+    return element(by.xpath(`//span[contains(text(),"${categoryName}")]/parent::*`));
   },
   collapsedCategoryUpdated: categoryName => {
-    return element(by.xpath(`//span[contains(text(),"${categoryName}")]/parent::*/parent::*/parent::mat-expansion-panel-header[not(contains(@class,"mat-expanded"))]`));
+    return element(by.xpath(`//span[contains(text(),"${categoryName}")]/parent::*`));
   },
   collapsedCategory: categoryName => {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
@@ -68,8 +68,8 @@ const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) =
   module.exports.category(defaultCategory).click();
 
   //Navigate to Category/Sub-category
- // const collapsedCategory = module.exports.category(categoryName);
- // const subCategory = module.exports.subCategory(subCategoryName);
+  // const collapsedCategory = module.exports.category(categoryName);
+  // const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
   module.exports.category(categoryName).click();
   commonFunctions.waitFor.elementToBeClickable(module.exports.subCategory(subCategoryName));
