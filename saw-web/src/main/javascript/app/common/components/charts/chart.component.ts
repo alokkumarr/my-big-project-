@@ -60,11 +60,6 @@ export class ChartComponent {
   ngOnInit() {
     //set the appropriate config based on chart type
     this.cType = this.isStockChart ? 'highStock' : this.options.chart.type;
-    if (this.enableExport) {
-      chartOptions.exporting = {
-        enabled: true
-      }
-    }
     this.config = defaultsDeep(
       this.config,
       this.options,
@@ -74,6 +69,11 @@ export class ChartComponent {
         chartOptions
       )
     );
+    if (this.enableExport) {
+      this.config.exporting = {
+        enabled: true
+      }
+    }
 
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
