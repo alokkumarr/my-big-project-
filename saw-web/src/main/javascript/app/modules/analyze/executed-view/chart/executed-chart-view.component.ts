@@ -26,6 +26,7 @@ export class ExecutedChartViewComponent {
     this.initChartOptions(analysis);
   };
   @Input('data') set setData(data: any[]) {
+    this.toggleToGrid = false;
     const updates = this.getChartUpdates(data, this.analysis);
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
