@@ -45,6 +45,9 @@ public interface WithSparkContext {
         ctx.sparkSession.udf().register("ToDateFromNum",
             new ToDateFromNum(), DataTypes.DateType);
 
+        ctx.sparkSession.udf().register("ToDateFromString",
+            new ToDateFromString(), DataTypes.DateType);
+
         ctx.sparkSession.udf().register("ToTimestampFromStringAsString",
             new ToTimestampFromStringAsString(), DataTypes.StringType);
 
