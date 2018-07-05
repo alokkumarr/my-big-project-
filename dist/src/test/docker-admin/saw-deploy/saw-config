@@ -46,7 +46,7 @@ saw_elasticsearch_username=
 saw_elasticsearch_password=
 saw_elasticsearch_data_store_limit=10000
 saw_elasticsearch_cluster_name=elasticsearch
-saw_elasticsearch_xpack=
+saw_elasticsearch_xpack=false
 
 #
 # Path by project
