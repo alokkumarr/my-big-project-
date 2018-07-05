@@ -29,7 +29,7 @@ class AnalysisExecutions extends BaseController {
         }
         val id = Bytes.toString(result.getRowKey)
         (id, (content \ "execution_finish_ts").extractOpt[Long],(content \ "exec-msg").extractOpt[String],
-          (content \ "executionType").extractOpt[String])
+          (content \ "executionType").extractOpt[String] ,(content \ "type").extractOpt[String] )
       }).sortBy(result =>result._2).reverse
       var count = 0
       val execHistory = SAWServiceConfig.executionHistory
@@ -38,8 +38,14 @@ class AnalysisExecutions extends BaseController {
       val junkExecution = new Array[String](junkSize)
       val executions = sortedExecutions.filter(result =>{
         count = count+1
-        if(count<=execHistory) true
-        else { junkExecution(count-execHistory) = result._1
+        if(count<=execHistory && !excludeOneTimeExecution(result._4.get,result._5.get)) true
+        else {
+          if (count < execHistory || (junkExecution.size>=count+1 )) {
+            junkExecution(count-1) = result._1
+          }
+          else {
+            junkExecution(count - execHistory) = result._1
+          }
           false }
       }).map(result => {
         var executionType = ""
@@ -178,5 +184,26 @@ class AnalysisExecutions extends BaseController {
     })
   }
 
-
+  /**
+    * For ES-report history are getting saved for all execution types to achieve the
+    * pagination for one time execution, method will exclude the all the one time execution
+    * for es-report.
+    * @param result
+    * @return
+    */
+  private  def excludeOneTimeExecution(result : (String, String)) : Boolean = {
+      if (result._1 !=None && result._2!=None && result._2.equalsIgnoreCase("esReport"))
+        {
+           val valid =  result._1 match {
+            case "oneTime" => true
+            case "preview" => true
+            case "scheduled" => false
+            case "regularExecution" => true
+            case "publish" => false
+            case obj => throw new RuntimeException("Unknown execution type: " + obj)
+          }
+          return valid
+        }
+        true
+      }
 }
