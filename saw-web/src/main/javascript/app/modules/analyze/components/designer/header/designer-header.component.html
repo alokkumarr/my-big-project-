@@ -3,8 +3,8 @@
      fxLayoutAlign="space-between"
      class="header__container">
   <div fxLayout="row" fxLayoutAlign="start center">
-    <button mat-button (click)="onBack.emit()">
-      <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+    <button mat-icon-button (click)="onBack.emit()" style="margin-right: 10px;">
+      <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
     </button>
     <div fxLayout="row"
          fxLayoutAlign="start" fxLayoutGap="10px"

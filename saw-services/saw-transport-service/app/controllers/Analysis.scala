@@ -26,9 +26,10 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
-import scala.collection.JavaConverters._
 
+import scala.collection.JavaConverters._
 import executor.ReportExecutorQueue
+import org.json4s
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.engine.{Fields, MDObjectStruct, MetadataDictionary}
 import sncr.saw.common.config.SAWServiceConfig
@@ -250,7 +251,7 @@ class Analysis extends BaseController {
 
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
           val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
-          contentsAnalyze(("data", data) ~ ("totalRows", totalRows))
+          contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))
         })
 
       }
@@ -381,7 +382,7 @@ class Analysis extends BaseController {
 
   def setResult(r: String): Unit = result = r
 
-  def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue = null, dataSecurityKeyStr: String): JValue = {
+  def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue = null, dataSecurityKeyStr: String): (json4s.JValue, String) = {
     var json: String = "";
     var typeInfo: String = "";
     var analysisJSON: JObject = null;
@@ -434,13 +435,14 @@ class Analysis extends BaseController {
 
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       m_log.trace("pivot dataset: {}", myArray)
       /* skip the resultNode creation for preview/onetime execution result node */
 
       if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
         || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
 
-        var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+
         // The below block is for execution result to store
         if (data != null) {
           var nodeExists = false
@@ -497,7 +499,7 @@ class Analysis extends BaseController {
         }
       }
 
-      return myArray
+      return (myArray ,analysisResultNodeID)
     }
 
     if (typeInfo.equals("esReport")) {
@@ -578,7 +580,7 @@ class Analysis extends BaseController {
         }
       }
 
-      return getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray)
+      return (getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray),analysisResultNodeID)
     }
     if (typeInfo.equals("chart")) {
       var data: String = null
@@ -593,11 +595,12 @@ class Analysis extends BaseController {
       }
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       /* skip the resultNode creation for preview/onetime execution result node */
 
     if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
         || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
-        var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+
         // The below block is for execution result to store
         if (data != null) {
           var nodeExists = false
@@ -653,7 +656,7 @@ class Analysis extends BaseController {
         }
       }
       m_log.trace("chart dataset: {}", myArray)
-      return myArray
+      return (myArray,analysisResultNodeID)
     }
     else {
       // This is the part of report type starts here
@@ -743,7 +746,7 @@ class Analysis extends BaseController {
         m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
         m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
         m_log.trace("Spark SQL executor result: {}", pretty(render(data)))
-        data
+        (data,analysisResultId)
       })
     }
   }

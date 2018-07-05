@@ -18,7 +18,10 @@ import * as isUndefined from 'lodash/isUndefined';
 import { Subject } from 'rxjs/Subject';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-import { ArtifactColumnPivot, Sort, Format } from '../../../models';
+import {
+  ArtifactColumnPivot,
+  Sort
+} from '../../../models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,

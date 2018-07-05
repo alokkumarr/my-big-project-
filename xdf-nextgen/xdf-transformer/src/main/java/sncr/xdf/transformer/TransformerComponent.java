@@ -111,12 +111,14 @@ public class TransformerComponent extends Component implements WithMovableResult
             if (ou != null && ou.size() > 0){
 
                 StructType st = createSchema(ou);
+                logger.debug("Transformation engine = " + engine);
 
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
                     JexlExecutorWithSchema jexlExecutorWithSchema  =
                             new JexlExecutorWithSchema(ctx.sparkSession, script, st,
                                     tempLocation,ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs);
+                    logger.trace("Executing jexl transformation");
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
@@ -134,10 +136,11 @@ public class TransformerComponent extends Component implements WithMovableResult
                     for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
                     logger.debug(m);
 
-                     JaninoExecutor janinoExecutor =
-                         new JaninoExecutor(ctx.sparkSession, script, st,
+                    JaninoExecutor janinoExecutor =
+                        new JaninoExecutor(ctx.sparkSession, script, st,
                                  tempLocation,ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs, odi);
-                    janinoExecutor.execute(dsMap);
+                    logger.trace("Executing janino transformation");
+                     janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);

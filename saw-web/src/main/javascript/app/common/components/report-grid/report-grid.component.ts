@@ -18,6 +18,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
+import * as isEmpty from 'lodash/isEmpty';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import DataSource from 'devextreme/data/data_source';
 import { DateFormatDialogComponent } from '../date-format-dialog';
@@ -83,7 +84,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Input() query: string;
-  @Input() allowSorting: boolean;
   @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
@@ -111,6 +111,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
     }
+
+    if (isEmpty(this.columns)) {
+      this.columns = null;
+    }
   }
   @Input('queryColumns')
   set setQueryColumns(queryColumns) {
@@ -128,8 +132,26 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     this.data = data;
   }
   @Input('dataLoader')
-  dataLoader: (options: {}) => Promise<{ data: any[]; totalCount: number }>;
+  set setDataLoader(
+    dataLoader: (options: {}) => Promise<{ data: any[]; totalCount: number }>
+  ) {
+    // setup pagination for paginated data
+    if (isFunction(dataLoader)) {
+      this.dataLoader = dataLoader;
+      this.data = new DataSource({
+        load: options => this.dataLoader(options)
+      });
+      this.remoteOperations = { paging: true };
+      this.paging = { pageSize: this.pageSize };
+    } else {
+      throw new Error('Data loader requires a Function');
+    }
+  }
   @Input() isEditable: boolean = false;
+
+  public dataLoader: (
+    options: {}
+  ) => Promise<{ data: any[]; totalCount: number }>;
 
   public sorts: {};
   public artifacts: Artifact[];
@@ -163,10 +185,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     showPageSizeSelector: true
   };
   public loadPanel;
-  public summary = {
-    calculateCustomSummary: () =>
-      `Showing 10 out of 10000 rows. Click on 'Preview' to see more.`
-  };
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
     self = this;
@@ -183,18 +201,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         this.pageSize = instance.pageSize();
       }
     };
+    this.customizeColumns = this.customizeColumns.bind(this);
   }
 
   ngOnInit() {
-    // setup pagination for paginated data
-    if (isFunction(this.dataLoader)) {
-      this.data = new DataSource({
-        load: options => this.dataLoader(options)
-      });
-      this.remoteOperations = { paging: true };
-      this.paging = { pageSize: this.pageSize };
-    }
-
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
@@ -205,7 +215,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         enabled: true,
         mode: 'select'
       };
-      this.allowColumnReordering = false;
 
       // paging is used in situations where the grid is not editable
       this.loadPanel = {
@@ -246,7 +255,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   customizeColumns(columns) {
     forEach(columns, (col: ReportGridField) => {
-      col.allowSorting = Boolean(self.allowSorting);
+      col.allowSorting = !this.isEditable;
       col.alignment = 'left';
     });
   }
@@ -285,7 +294,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     if (!this.isEditable || !this.columns) {
-      event.items = [];
       return;
     }
     event.items = [
