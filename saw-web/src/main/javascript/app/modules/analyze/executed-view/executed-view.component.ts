@@ -14,12 +14,18 @@ import {
 } from '../services/execute.service';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
-import { flattenPivotData, flattenChartData } from '../../../common/utils/dataFlattener';
+import {
+  flattenPivotData,
+  flattenChartData
+} from '../../../common/utils/dataFlattener';
 import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
-import { JwtService } from '../../../../login/services/jwt.service';
+import {
+  JwtService,
+  CUSTOM_JWT_CONFIG
+} from '../../../../login/services/jwt.service';
 
 const template = require('./executed-view.component.html');
 require('./executed-view.component.scss');
@@ -28,14 +34,13 @@ require('./executed-view.component.scss');
   selector: 'executed-view',
   template
 })
-
 export class ExecutedViewComponent implements OnInit {
-
   _executionId: string;
   analysis: Analysis;
   analyses: Analysis[];
   data: any[];
   dataLoader: Function;
+  canAutoRefresh: boolean;
   canUserPublish = false;
   canUserFork = false;
   canUserEdit = false;
@@ -63,22 +68,45 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    const { analysis, analysisId, executionId, awaitingExecution, loadLastExecution } = this._transition.params();
+    const {
+      analysis,
+      analysisId,
+      executionId,
+      awaitingExecution,
+      loadLastExecution
+    } = this._transition.params();
+
+    this.canAutoRefresh = this._jwt.hasCustomConfig(
+      CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
+    );
 
     this.executionId = executionId;
     if (analysis) {
       this.analysis = analysis;
       this.setPrivileges(analysis);
 
-      this.executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId);
+      this.executeIfNotWaiting(
+        analysis,
+        awaitingExecution,
+        loadLastExecution,
+        executionId
+      );
     } else {
       this.loadAnalysisById(analysisId).then(analysis => {
         this.setPrivileges(analysis);
 
-        this.executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId);
+        this.executeIfNotWaiting(
+          analysis,
+          awaitingExecution,
+          loadLastExecution,
+          executionId
+        );
       });
     }
-    this.executionsSub = this._executeService.subscribe(analysisId, this.onExecutionsEvent);
+    this.executionsSub = this._executeService.subscribe(
+      analysisId,
+      this.onExecutionsEvent
+    );
   }
 
   ngOnDestroy() {
@@ -87,13 +115,28 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
-  executeIfNotWaiting(analysis, awaitingExecution, loadLastExecution, executionId) {
+  executeIfNotWaiting(
+    analysis,
+    awaitingExecution,
+    loadLastExecution,
+    executionId
+  ) {
     if (!awaitingExecution) {
       const isDataLakeReport = analysis.type === 'report';
-      if (executionId || loadLastExecution || isDataLakeReport) {
-        this.loadExecutedAnalysesAndExecutionData(analysis.id, executionId, analysis.type, null);
+      if (
+        executionId ||
+        loadLastExecution ||
+        isDataLakeReport ||
+        !this.canAutoRefresh
+      ) {
+        this.loadExecutedAnalysesAndExecutionData(
+          analysis.id,
+          executionId,
+          analysis.type,
+          null
+        );
       } else {
-        this.executeAnalysis(analysis)
+        this.executeAnalysis(analysis);
       }
     }
   }
@@ -104,8 +147,8 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
-  onExecutionEvent({state, response}) {
-
+  onExecutionEvent({ state, response }) {
+    /* prettier-ignore */
     switch (state) {
     case EXECUTION_STATES.SUCCESS:
       this.onExecutionSuccess(response);
@@ -123,48 +166,81 @@ export class ExecutedViewComponent implements OnInit {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = this.analysis.type === 'report';
     if (isDataLakeReport && thereIsDataLoaded) {
-      this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
-        timeOut: 0,
-        extendedTimeOut: 0,
-        closeButton: true,
-        onclick: this.gotoLastPublished(this.analysis)
-      });
+      this._toastMessage.success(
+        'Tap this message to reload data.',
+        'Execution finished',
+        {
+          timeOut: 0,
+          extendedTimeOut: 0,
+          closeButton: true,
+          onclick: this.gotoLastPublished(this.analysis)
+        }
+      );
     } else {
-      this.loadExecutedAnalysesAndExecutionData(this.analysis.id, null, this.analysis.type, response);
+      this.loadExecutedAnalysesAndExecutionData(
+        this.analysis.id,
+        null,
+        this.analysis.type,
+        response
+      );
     }
   }
 
   onExecutionError() {
-    this.loadExecutedAnalysesAndExecutionData(this.analysis.id, null, this.analysis.type, null);
+    this.loadExecutedAnalysesAndExecutionData(
+      this.analysis.id,
+      null,
+      this.analysis.type,
+      null
+    );
   }
 
-  gotoLastPublished (analysis) {
+  gotoLastPublished(analysis) {
     return () => {
       this._toastMessage.clear();
-      this._state.go('analyze.executedDetail', {
-        analysisId: analysis.id,
-        analysis: analysis,
-        executionId: null,
-        awaitingExecution: false,
-        loadLastExecution: true
-      }, {reload: true});
-    }
-  };
+      this._state.go(
+        'analyze.executedDetail',
+        {
+          analysisId: analysis.id,
+          analysis: analysis,
+          executionId: null,
+          awaitingExecution: false,
+          loadLastExecution: true
+        },
+        { reload: true }
+      );
+    };
+  }
 
   executeAnalysis(analysis) {
     this._analyzeActionsService.execute(analysis).then(executionStarted => {
       // this.afterExecuteLaunched(analysis);
       if (!executionStarted && !this.analyses) {
         // at least load the executed analyses if none are loaded
-        this.loadExecutedAnalysesAndExecutionData(analysis.id, null, analysis.type, null);
+        this.loadExecutedAnalysesAndExecutionData(
+          analysis.id,
+          null,
+          analysis.type,
+          null
+        );
       }
     });
   }
 
-  loadExecutedAnalysesAndExecutionData(analysisId, executionId, analysisType, executeResponse) {
+  loadExecutedAnalysesAndExecutionData(
+    analysisId,
+    executionId,
+    analysisType,
+    executeResponse
+  ) {
     if (executionId) {
       this.loadExecutedAnalyses(analysisId);
-      this.loadDataOrSetDataLoader(analysisId, executionId, analysisType, executeResponse);
+      this.loadDataOrSetDataLoader(
+        analysisId,
+        executionId,
+        analysisType,
+        executeResponse
+      );
     } else {
       // get the last execution id and load the data for that analysis
       this.loadExecutedAnalyses(analysisId).then(analyses => {
@@ -184,31 +260,42 @@ export class ExecutedViewComponent implements OnInit {
 
   loadExecutedAnalyses(analysisId) {
     this._headerProgressService.show();
-    return this._analyzeService.getPublishedAnalysesByAnalysisId(analysisId)
-      .then(analyses => {
-        this.analyses = analyses;
-        this._headerProgressService.hide();
-        return analyses;
-      }, err => {
-        this._headerProgressService.hide();
-        throw err;
-      });
+    return this._analyzeService
+      .getPublishedAnalysesByAnalysisId(analysisId)
+      .then(
+        analyses => {
+          this.analyses = analyses;
+          this._headerProgressService.hide();
+          return analyses;
+        },
+        err => {
+          this._headerProgressService.hide();
+          throw err;
+        }
+      );
   }
 
   loadAnalysisById(analysisId) {
     this._headerProgressService.show();
-    return this._analyzeService.readAnalysis(analysisId)
-      .then(analysis => {
+    return this._analyzeService.readAnalysis(analysisId).then(
+      analysis => {
         this.analysis = analysis;
         this._headerProgressService.hide();
         return analysis;
-      }, err => {
+      },
+      err => {
         this._headerProgressService.hide();
         throw err;
-      });
+      }
+    );
   }
 
-  loadDataOrSetDataLoader(analysisId, executionId, analysisType, executeResponse = null) {
+  loadDataOrSetDataLoader(
+    analysisId,
+    executionId,
+    analysisType,
+    executeResponse = null
+  ) {
     // report type data will be loaded by the report grid, because of the paging mechanism
     const isReportType = ['report', 'esReport'].includes(analysisType);
     if (isReportType) {
@@ -225,26 +312,39 @@ export class ExecutedViewComponent implements OnInit {
               totalCount: executeResponse.count
             });
           }
-          return this.loadExecutionData(analysisId, executionId, analysisType, options);
-        }
+          return this.loadExecutionData(
+            analysisId,
+            executionId,
+            analysisType,
+            options
+          );
+        };
       } else {
         this.dataLoader = options => {
-          return this.loadExecutionData(analysisId, executionId, analysisType, options);
-        }
+          return this.loadExecutionData(
+            analysisId,
+            executionId,
+            analysisType,
+            options
+          );
+        };
       }
     } else {
       if (executeResponse) {
         this.data = this.flattenData(executeResponse.data, this.analysis);
       } else {
-        this.loadExecutionData(analysisId, executionId, analysisType).then(({data}) => {
-          this.data = this.flattenData(data, this.analysis);
-        });
+        this.loadExecutionData(analysisId, executionId, analysisType).then(
+          ({ data }) => {
+            this.data = this.flattenData(data, this.analysis);
+          }
+        );
       }
     }
   }
 
   flattenData(data, analysis) {
-    switch(analysis.type) {
+    /* prettier-ignore */
+    switch (analysis.type) {
     case 'pivot':
       return flattenPivotData(data, analysis.sqlBuilder);
     case 'chart':
@@ -258,14 +358,18 @@ export class ExecutedViewComponent implements OnInit {
     this._headerProgressService.show();
     options.analysisType = analysisType;
 
-    return this._analyzeService.getExecutionData(analysisId, executionId, options)
-      .then(({data, count}) => {
-        this._headerProgressService.hide();
-        return {data, totalCount: count};
-      }, err => {
-        this._headerProgressService.hide();
-        throw err;
-      });
+    return this._analyzeService
+      .getExecutionData(analysisId, executionId, options)
+      .then(
+        ({ data, count }) => {
+          this._headerProgressService.hide();
+          return { data, totalCount: count };
+        },
+        err => {
+          this._headerProgressService.hide();
+          throw err;
+        }
+      );
   }
 
   setPrivileges({ categoryId, userId }: Analysis) {
@@ -285,7 +389,7 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   goBackToMainPage(analysis) {
-    this._state.go('analyze.view', {id: get(analysis, 'categoryId')});
+    this._state.go('analyze.view', { id: get(analysis, 'categoryId') });
   }
 
   edit() {
@@ -293,7 +397,7 @@ export class ExecutedViewComponent implements OnInit {
       if (!result) {
         return;
       }
-      const {isSaveSuccessful, analysis} = result;
+      const { isSaveSuccessful, analysis } = result;
       if (isSaveSuccessful) {
         this.analysis = analysis;
       }
@@ -313,15 +417,16 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   exportData() {
+    /* prettier-ignore */
     switch (this.analysis.type) {
     case 'pivot':
-    // export from front end
+      // export from front end
       this.pivotUpdater$.next({
         export: true
       });
       break;
     case 'chart':
-      this.chartUpdater$.next({export: true});
+      this.chartUpdater$.next({ export: true });
       break;
     default:
       this._analyzeExportService.export(this.analysis, this.executionId);
