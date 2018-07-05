@@ -202,8 +202,8 @@ export class ObserveChartComponent {
     forEach(this.analysis.artifacts[0].columns, column => {
       if(axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
-        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : column.dateFormat ) : value;
-        if(column.aggregate === 'percentage' || column.aggregate === 'avg') {
+        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : (column.dateFormat === 'MMMM d YYYY, h:mm:ss a' ? 'MMMM DD YYYY, h:mm:ss a' : column.dateFormat) ) : value;
+        if((value) &&  (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
           value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
         }
         value = value === 'Undefined' ? '' : value;
@@ -232,7 +232,9 @@ export class ObserveChartComponent {
 //       this.chartToggleData = this.trimKeyword(parsedData);
 // =======
       const parsedData = flattenChartData(data, payload.sqlBuilder);
-      this.chartToggleData = this.trimKeyword(parsedData);
+      if (this.ViewMode) {
+        this.chartToggleData = this.trimKeyword(parsedData);  
+      }
       return parsedData || [];
     });
   }

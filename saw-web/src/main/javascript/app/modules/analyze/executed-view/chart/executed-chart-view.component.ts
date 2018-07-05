@@ -71,7 +71,7 @@ export class ExecutedChartViewComponent {
     forEach(this.analysis.artifacts[0].columns, column => {
       if(axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
-        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : column.dateFormat ) : value;
+        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : (column.dateFormat === 'MMMM d YYYY, h:mm:ss a' ? 'MMMM DD YYYY, h:mm:ss a' : column.dateFormat) ) : value;
         if((value) && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
           value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
         }
