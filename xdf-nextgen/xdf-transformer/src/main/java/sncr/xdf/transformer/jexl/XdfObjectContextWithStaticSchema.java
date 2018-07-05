@@ -5,7 +5,6 @@ package sncr.xdf.transformer.jexl;
  */
 
 import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.ObjectContext;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
@@ -13,10 +12,6 @@ import org.apache.spark.sql.types.*;
 import scala.Tuple2;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
-
-import static sncr.xdf.transformer.TransformerComponent.*;
 
 public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
 
@@ -35,7 +30,11 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
                 if (!schema.fields()[i].dataType().sameType(record.schema().fields()[fInx].dataType())) {
                     throw new Exception("Explicit data type conversion is required " +
                             "if output schema is given. Do not use existing field " +
-                            "name in output schema with different data type");
+                            "name in output schema with different data type"
+                    + "\nSchema Field = " + schema.fields()[i]
+                    + "\nRecord Field = " + record.schema().fields()[fInx]
+                    + "\nSchema Field Type = " + schema.fields()[i].dataType()
+                    + "\nRecord Field Type = " + record.schema().fields()[fInx].dataType());
                 }
                 if (this.record.get(fInx) != null) {
                     Object value = getValue(fieldNames[i], fInx);
@@ -197,6 +196,7 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
     public static Row createNewRow2(StructType schema, Row existingRow, int errorCode, String message, Long rowCounter) throws Exception {
 
         //Create arrays to hold row values and row schema
+        logger.trace("Creating new row for " + existingRow);
 
         StructType existing_schema = existingRow.schema();
 
@@ -210,7 +210,15 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
             fieldArray[i] = schema.apply(i);
             fieldNames[i] = schema.fieldNames()[i];
             int fInxExt = findField(existing_schema.fieldNames(), fieldNames[i]);
+
+            logger.debug("Field Name = " + fieldNames[i]);
+
+            logger.debug("Schema Field = " + schema.fields()[i] + " Type = " + schema.fields()[i]
+                .dataType());
+
             if (fInxExt >= 0) {
+                logger.debug("Existing row Field = " + existingRow.schema().fields()[fInxExt]
+                    .dataType());
                 if (existingRow.get(fInxExt) != null) {
                     if (!schema.fields()[i].dataType().sameType(existingRow.schema().fields()[fInxExt].dataType())) {
                         throw new Exception("Explicit data type conversion is required " +
