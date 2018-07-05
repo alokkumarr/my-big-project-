@@ -30,6 +30,7 @@ import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
+import sncr.bda.store.generic.schema.Query;
 
 @Component
 public class StorageProxyUtils {
@@ -144,12 +145,13 @@ public class StorageProxyUtils {
     return headers;
 }
   
-  public static void checkMandatoryFields (StorageProxy node) {
-    Preconditions.checkArgument(node!=null, "Request body is empty");
-    Preconditions.checkArgument(node.getStorage()!=null, "storage cannot be null");
-    Preconditions.checkArgument(node.getName()!=null, "name cannot be null");
-    Preconditions.checkArgument(node.getProductCode()!=null, "project code cannot be null");
-    Preconditions.checkArgument(node.getRequestBy()!=null, "requested By cannot be null");
+  public static void checkMandatoryFields(StorageProxy node) {
+    Preconditions.checkArgument(node != null, "Request body is empty");
+    Preconditions.checkArgument(node.getStorage() != null, "storage cannot be null");
+    Preconditions.checkArgument(node.getProductCode() != null, "project code cannot be null");
+    Preconditions.checkArgument(node.getModuleName() != null, "module name cannot be null");
+    Preconditions.checkArgument(node.getRequestBy() != null, "requested By cannot be null");
+    Preconditions.checkArgument(node.getContent() != null, "content cannot be null");
   }
   
   public static List<MetaDataStoreStructure> node2JSONObject(StorageProxy node, String basePath, String Id, Action action, Category category) throws JsonProcessingException {
@@ -166,6 +168,25 @@ public class StorageProxyUtils {
     List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
     listOfMetadata.add(metaDataStoreStructure);
     return listOfMetadata;
+  }
+  public static String node2JSONString(StorageProxy node, String basePath, String Id, Action action, Category category,  Query query) throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if (node != null) {
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null) {
+      metaDataStoreStructure.setId(Id);
+    }
+    if (query!=null){
+      metaDataStoreStructure.setQuery(query);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return objectMapper.writeValueAsString(listOfMetadata);
   }
 
 }

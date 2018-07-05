@@ -5,7 +5,7 @@ spring:
     name: saw-storage-proxy-service
 logging:
   level:
-    com.synchronoss.saw.storage.proxy: INFO
+    com.synchronoss.saw.storage.proxy: trace
 server:
   address: localhost
   port: 9800

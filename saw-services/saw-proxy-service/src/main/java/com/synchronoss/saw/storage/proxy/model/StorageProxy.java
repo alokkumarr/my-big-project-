@@ -53,6 +53,9 @@ public class StorageProxy {
      * An explanation about the purpose of this instance.
      * 
      */
+    @JsonProperty("_id")
+    private String _id;
+
     @JsonProperty("query")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String query;
@@ -71,6 +74,11 @@ public class StorageProxy {
     @JsonProperty("name")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String name;
+    
+    @JsonProperty("content")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String content;
+
     /**
      * It holds the query
      * <p>
@@ -235,6 +243,28 @@ public class StorageProxy {
     public StorageProxy.Storage getStorage() {
         return storage;
     }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * (Required)
+     * 
+     */
+    @JsonProperty("_id")    
+    public String get_id() {
+      return _id;
+    }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * (Required)
+     * 
+     */
+    @JsonProperty("_id") 
+    public void set_id(String _id) {
+      this._id = _id;
+    }
 
     /**
      * The Storage Schema
@@ -358,7 +388,16 @@ public class StorageProxy {
     public int getPageSize() {
         return pageSize;
     }
-
+    
+    
+    @JsonProperty("content")
+    public String getContent() {
+      return content;
+    }
+    @JsonProperty("content")    
+    public void setContent(String content) {
+      this.content = content;
+    }
     /**
      * It holds the query
      * <p>
@@ -681,6 +720,8 @@ public class StorageProxy {
         CREATE("create"),
         DELETE("delete"),
         UPDATE("update"),
+        READ("read"),
+        EXECUTE("execute"),
         AGGREGATE("aggregate"),
         PIVOT("pivot");
         private final String value;

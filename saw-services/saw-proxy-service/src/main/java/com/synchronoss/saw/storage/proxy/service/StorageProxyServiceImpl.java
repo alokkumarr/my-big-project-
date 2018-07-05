@@ -293,16 +293,13 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           
           case  "METADATA":
                      String actionMetadata = proxy.getAction().value();
-                     if (actionMetadata.equals(Action.CREATE.value()) || actionMetadata.equals(Action.SEARCH.value()) || actionMetadata.equals(Action.UPDATE.value())){
+                     if (actionMetadata.equals(Action.CREATE.value()) || actionMetadata.equals(Action.READ.value()) || actionMetadata.equals(Action.UPDATE.value()) 
+                         || actionMetadata.equals(Action.DELETE.value())){
                        switch (actionMetadata) {
                          case "create" : proxy= storageProxyMetaDataService.createEntryInMetaData(proxy); break;
-                         case "search" : proxy= storageProxyMetaDataService.readEntryFromMetaData(proxy);
-                                         // TODO: Search by name or ID
-                                         // TODO: Get the query and then by type execute the query
-                                         // TODO: Add the data to the data[] and make it as a part of response
-                                         break;
-                         case "update" : proxy= storageProxyMetaDataService.updateEntryFromMetaData(proxy);
-                         break;
+                         case "update" : proxy= storageProxyMetaDataService.updateEntryFromMetaData(proxy);break;
+                         case "delete" : proxy= storageProxyMetaDataService.deleteEntryFromMetaData(proxy);break;
+                         case "read" :   proxy= storageProxyMetaDataService.readEntryFromMetaData(proxy);break;
                        }
                      }
                      else {
