@@ -49,7 +49,11 @@ export class ObserveReportComponent implements OnInit, OnDestroy {
   loadData(options = {}) {
     if (this.executionId) {
       return this.analyzeService
-        .getExecutionData(this.analysis.id, this.executionId, options)
+        .getExecutionData(this.analysis.id, this.executionId, {
+          ...options,
+          executionType: 'onetime',
+          analysisType: this.analysis.type
+        })
         .then(({ data, count }) => ({ data, totalCount: count }));
     } else {
       return this.analyzeService

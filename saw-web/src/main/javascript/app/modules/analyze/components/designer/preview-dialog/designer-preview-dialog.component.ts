@@ -48,7 +48,7 @@ export class DesignerPreviewDialogComponent {
           return this._designerService.getDataForExecution(
             this.analysis.id,
             execId,
-            options
+            {...options, analysisType: this.analysis.type, executionType: 'onetime'}
           )
             .then(({data, count}) => ({data, totalCount: count}));
         } else {

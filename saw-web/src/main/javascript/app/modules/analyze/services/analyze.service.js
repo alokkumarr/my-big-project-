@@ -124,7 +124,7 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
     return this._$http.get(
-      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`
+      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${options.executionType ? '&executionType=' + options.executionType : ''}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
       const count = fpGet(`data.totalRows`, resp) || data.length;

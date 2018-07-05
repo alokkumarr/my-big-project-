@@ -35,6 +35,7 @@ export class ExecutedViewComponent implements OnInit {
   _executionId: string;
   analysis: Analysis;
   analyses: Analysis[];
+  executionSuccess: boolean;
   data: any[];
   dataLoader: Function;
   canUserPublish = false;
@@ -152,6 +153,7 @@ export class ExecutedViewComponent implements OnInit {
   onExecutionSuccess(response) {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = this.analysis.type === 'report';
+    this.executionSuccess = true;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',
@@ -174,6 +176,7 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   onExecutionError() {
+    this.executionSuccess = false;
     this.loadExecutedAnalysesAndExecutionData(
       this.analysis.id,
       null,
@@ -304,7 +307,9 @@ export class ExecutedViewComponent implements OnInit {
             analysisId,
             executionId,
             analysisType,
-            options
+            this.executionSuccess
+              ? { ...options, executionType: 'onetime' }
+              : options
           );
         };
       } else {
@@ -313,7 +318,9 @@ export class ExecutedViewComponent implements OnInit {
             analysisId,
             executionId,
             analysisType,
-            options
+            this.executionSuccess
+              ? { ...options, executionType: 'onetime' }
+              : options
           );
         };
       }
