@@ -205,6 +205,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    if (this.dimensionChanged) {
+      this.listeners.push(this.subscribeForRepaint());
+    }
+
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
