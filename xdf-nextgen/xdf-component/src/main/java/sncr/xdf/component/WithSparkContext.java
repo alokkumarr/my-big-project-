@@ -6,6 +6,7 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.spark.SparkOps;
+import sncr.xdf.udf.NowAsString;
 import sncr.xdf.udf.ToTimestampFromStringAsString;
 
 import java.util.List;
@@ -28,8 +29,17 @@ public interface WithSparkContext {
         }
         //ctx = new JavaSparkContext(sparkConf);
         ctx.sparkSession = SparkSession.builder().config(ctx.sparkConf).getOrCreate();
+
+        registerUdfs(ctx);
+    }
+
+    default void registerUdfs(Context ctx) {
+        ctx.sparkSession.udf().register("NowAsString", new NowAsString(), DataTypes.StringType);
+
         ctx.sparkSession.udf().register("ToTimestampFromStringAsString",
             new ToTimestampFromStringAsString(), DataTypes.StringType);
+
+
     }
 
     class WithSparkContextAux {
