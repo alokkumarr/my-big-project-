@@ -123,8 +123,11 @@ export function flattenChartData(data, sqlBuilder) {
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
   if (!isUndefined(node.key)) {
     dataObj[nodeFieldMap[level - 2]] = node.key;
+    if (!node.key) {
+      dataObj[nodeFieldMap[level - 2]] = 'Undefined';
+    }
   }
-
+  //dataObj[nodeFieldMap[level - 2]] = !isUndefined(node.key) ? node.key
   const childNode = node[`node_field_${level}`];
   if (childNode) {
     const data = flatMap(childNode.buckets, bucket =>

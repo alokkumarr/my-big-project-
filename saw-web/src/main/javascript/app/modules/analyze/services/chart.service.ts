@@ -1034,7 +1034,7 @@ export class ChartService {
 
       const groupString = fields.g
         ? `<tr><th>Group:</th><td>${
-            point ? point.g || '' : '{point.g}'
+            point ? point.g || point.name : '{point.g}'
           }</td></tr>`
         : '';
 

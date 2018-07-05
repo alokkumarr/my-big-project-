@@ -206,6 +206,7 @@ export class ObserveChartComponent {
         if(column.aggregate === 'percentage' || column.aggregate === 'avg') {
           value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
         }
+        value = value === 'Undefined' ? '' : value;
       }
     })
     return {aliasName, value};
