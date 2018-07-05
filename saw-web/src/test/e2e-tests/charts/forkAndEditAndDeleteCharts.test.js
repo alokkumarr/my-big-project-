@@ -16,6 +16,7 @@ const designModePage = require('../../javascript/pages/designModePage.po.js');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
 let ApiUtils = require('../../javascript/api/APiUtils');
 const globalVariables = require('../../javascript/helpers/globalVariables');
+const Constants = require('../../javascript/api/Constants');
 
 describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -29,7 +30,8 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
   const groupName = 'Date';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
-
+  let analysisId;
+  let forkedAnalysisId;
   let host;
   let token;
   const dataProvider = {
@@ -67,23 +69,27 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
 
   afterEach(function (done) {
     setTimeout(function () {
+      new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
+      new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, forkedAnalysisId);
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
     it('should fork, edit and delete ' + description, () => {
         let currentTime = new Date().getTime();
+        let user = data.user;
+        let type = data.chartType.split(":")[1];
         let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
-        let type = data.chartType.split(":")[1];
+
         //Create new analysis.
-        new AnalysisHelper().createPivotChart(host, token,name,description, type);
+        new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
 
         login.loginAs(data.user);
 
@@ -99,7 +105,10 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
         commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
         createdAnalysis.click();
-
+        //get analysis id from current url
+        browser.getCurrentUrl().then(url => {
+          analysisId = commonFunctions.getAnalysisIdFromUrl(url);
+        });  
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.forkBtn);
         savedAlaysisPage.forkBtn.click();
 
@@ -171,19 +180,15 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         commonFunctions.waitFor.elementToBeVisible(forkedAnalysis);
         commonFunctions.waitFor.elementToBeClickable(forkedAnalysis);
         forkedAnalysis.click();
-
+        //get analysis id from current url
+        browser.getCurrentUrl().then(url => {
+          forkedAnalysisId = commonFunctions.getAnalysisIdFromUrl(url);
+        });
         //Verify updated details.
-        expect(savedAlaysisPage.analysisViewPageElements.title.getText()).toBe(forkedName);
-        expect(savedAlaysisPage.analysisViewPageElements.description.getText()).toBe(forkedDescription);
-        //Delete created chart
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
-        savedAlaysisPage.actionsMenuBtn.click();
-        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.deleteMenuOption);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.deleteMenuOption);
-        savedAlaysisPage.deleteMenuOption.click();
-        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.deleteConfirmButton);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.deleteConfirmButton);
-        savedAlaysisPage.deleteConfirmButton.click();
+        expect(savedAlaysisPage.analysisViewPageElements.text(forkedName).getText()).toBe(forkedName);
+        expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
+
+    
     });
   });
 });

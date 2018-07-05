@@ -94,7 +94,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 4,
+    maxInstances: 6,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -154,6 +154,8 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'), // TCs linked
+    ],
+    chartEditFork: [
       webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
     ],
@@ -167,7 +169,7 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
     ],
     debug: [
-      webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
   },
   onCleanUp: function (results) {
