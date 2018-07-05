@@ -27,10 +27,10 @@ export class ExecutedChartViewComponent {
   };
   @Input('data') set setData(data: any[]) {
     this.toggleToGrid = false;
-    const updates = this.getChartUpdates(data, this.analysis);
+    this.updates = this.getChartUpdates(data, this.analysis);
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
-      this.updater.next(updates);
+      this.updater.next(this.updates);
     });
   };
 
@@ -93,6 +93,12 @@ export class ExecutedChartViewComponent {
     return trimData;
   }
 
+  viewToggle(value) {
+    if (!value) {
+      this.updater.next(this.updates);
+    }
+    this.toggleToGrid = value;
+  }
   getChartUpdates(data, analysis) {
     const settings = this._chartService.fillSettings(analysis.artifacts, analysis);
     const sorts = analysis.sqlBuilder.sorts;

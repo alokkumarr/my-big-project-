@@ -23,7 +23,7 @@
       <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[25,50,75,100]"></dxo-pager>
     </dx-data-grid>
   </div>
-  <div *ngIf="!toggleToGrid" [ngClass]="{'active':toggleToGrid === false}">
+  <div [ngClass]="{'active':toggleToGrid === false}">
     <chart
     [updater]="chartUpdater"
     [options]="chartOptions"
