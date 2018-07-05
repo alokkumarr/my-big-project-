@@ -284,7 +284,7 @@ public class SecurityController {
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
 		} else if (newPass.length() < 8) {
-			message = "New password should be minimum of 8 charactar.";
+			message = "New password should be minimum of 8 character.";
 		} else if (oldPass.equals(newPass)) {
 			message = "Old password and new password should not be same.";
 		} else if (loginId.equals(newPass)) {
@@ -293,12 +293,12 @@ public class SecurityController {
 		Pattern pCaps = Pattern.compile("[A-Z]");
 		Matcher m = pCaps.matcher(newPass);
 		if (!m.find()) {
-			message = "Password should contain atleast 1 uppercase charactar.";
+			message = "Password should contain atleast 1 uppercase character.";
 		}
 		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 		m = pSpeChar.matcher(newPass);
 		if (!m.find()) {
-			message = "Password should contain atleast 1 special charactar.";
+			message = "Password should contain atleast 1 special character.";
 		}
 		if (message == null) {
 			try {

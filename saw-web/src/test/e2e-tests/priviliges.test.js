@@ -1,5 +1,5 @@
 /*
-  Created by Alex
+ Created by Alex
  */
 
 const loginPage = require('../javascript/pages/loginPage.po.js');
@@ -11,8 +11,9 @@ const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const categories = require('../javascript/data/categories');
+const subCategories = require('../javascript/data/subCategories');
 const utils = require('../javascript/helpers/utils');
-let descriptionText;
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -21,11 +22,13 @@ let descriptionText;
 //TODO add case for making multiple privileges inactive
 //TODO add case for adding new privilege
 describe('Privileges tests: privileges.test.js', () => {
-  const dataProvider =  {
+  const categoryName = categories.privileges.name;
+
+  const dataProvider = {
     //TODO change user hardcode name to users object
-    'All privileges for user': {
+    'All privileges for user': { // SAWQA-4834
       user: 'userOne',
-      subCategory: "All DO NOT TOUCH",
+      subCategory: subCategories.all.name,
       cardOptions: true,
       viewOptions: true,
       create: true,
@@ -36,9 +39,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privilege for user': {
+    'Create privilege for user': { // SAWQA-4835
       user: 'userOne',
-      subCategory: "Create DO NOT TOUCH",
+      subCategory: subCategories.create.name,
       cardOptions: false,
       viewOptions: false,
       create: true,
@@ -49,9 +52,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Edit privilege for user': {
+    'Edit privilege for user': {  // SAWQA-4836
       user: 'userOne',
-      subCategory: "Edit DO NOT TOUCH",
+      subCategory: subCategories.edit.name,
       cardOptions: true,
       viewOptions: false,
       create: false,
@@ -62,9 +65,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Fork privilege for user': {
+    'Fork privilege for user': { // SAWQA-4837
       user: 'userOne',
-      subCategory: "Fork DO NOT TOUCH",
+      subCategory: subCategories.fork.name,
       cardOptions: false,
       viewOptions: false,
       create: false,
@@ -75,9 +78,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Publish privilege for user': {
+    'Publish privilege for user': { // SAWQA-4838
       user: 'userOne',
-      subCategory: "Publish DO NOT TOUCH",
+      subCategory: subCategories.publish.name,
       cardOptions: true,
       viewOptions: false,
       create: false,
@@ -88,9 +91,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Execute privilege for user': {
+    'Execute privilege for user': { // SAWQA-4839
       user: 'userOne',
-      subCategory: "Execute DO NOT TOUCH",
+      subCategory: subCategories.execute.name,
       cardOptions: true,
       viewOptions: true,
       create: false,
@@ -101,9 +104,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Export privilege for user': {
+    'Export privilege for user': { // SAWQA-4840
       user: 'userOne',
-      subCategory: "Export DO NOT TOUCH",
+      subCategory: subCategories.export.name,
       cardOptions: false,
       viewOptions: true,
       create: false,
@@ -114,9 +117,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: false
     },
-    'Delete privilege for user': {
+    'Delete privilege for user': { // SAWQA-4841
       user: 'userOne',
-      subCategory: "Delete DO NOT TOUCH",
+      subCategory: subCategories.delete.name,
       cardOptions: true,
       viewOptions: true,
       create: false,
@@ -127,9 +130,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: true
     },
-    'View privilege for user': {
+    'View privilege for user': { // SAWQA-4842
       user: 'userOne',
-      subCategory: "View DO NOT TOUCH",
+      subCategory: subCategories.view.name,
       cardOptions: false,
       viewOptions: false,
       create: false,
@@ -140,9 +143,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Multiple privileges for user': {
+    'Multiple privileges for user': { // SAWQA-4843
       user: 'userOne',
-      subCategory: "Multiple DO NOT TOUCH",
+      subCategory: subCategories.multiple.name,
       cardOptions: true,
       viewOptions: false,
       create: true,
@@ -153,9 +156,9 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'All privileges for admin': {
+    'All privileges for admin': { // SAWQA-4844
       user: 'admin',
-      subCategory: "All DO NOT TOUCH",
+      subCategory: subCategories.all.name,
       cardOptions: true,
       viewOptions: true,
       create: true,
@@ -166,123 +169,123 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privilege for admin': {
-      user: 'admin',
-      subCategory: "Create DO NOT TOUCH",
-      cardOptions: false,
-      viewOptions: false,
-      create: true,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Edit privilege for admin': {
-      user: 'admin',
-      subCategory: "Edit DO NOT TOUCH",
-      cardOptions: true,
-      viewOptions: false,
-      create: false,
-      edit: true,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Fork privilege for admin': {
-      user: 'admin',
-      subCategory: "Fork DO NOT TOUCH",
-      cardOptions: false,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: true,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Publish privilege for admin': {
-      user: 'admin',
-      subCategory: "Publish DO NOT TOUCH",
-      cardOptions: true,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: true,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Execute privilege for admin': {
-      user: 'admin',
-      subCategory: "Execute DO NOT TOUCH",
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: true,
-      export: false,
-      delete: false
-    },
-    'Export privilege for admin': {
-      user: 'admin',
-      subCategory: "Export DO NOT TOUCH",
-      cardOptions: false,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: true,
-      delete: false
-    },
-    'Delete privilege for admin': {
-      user: 'admin',
-      subCategory: "Delete DO NOT TOUCH",
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: true
-    },
-    'View privilege for admin': {
-      user: 'admin',
-      subCategory: "View DO NOT TOUCH",
-      cardOptions: false,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Multiple privileges for admin': {
-      user: 'admin',
-      subCategory: "Multiple DO NOT TOUCH",
-      cardOptions: true,
-      viewOptions: false,
-      create: true,
-      edit: false,
-      fork: true,
-      publish: true,
-      execute: false,
-      export: false,
-      delete: false
-    },
+    // 'Create privilege for admin': { // SAWQA-4845
+    //   user: 'admin',
+    //   subCategory: subCategories.create.name,
+    //   cardOptions: false,
+    //   viewOptions: false,
+    //   create: true,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Edit privilege for admin': {  // SAWQA-4846
+    //   user: 'admin',
+    //   subCategory: subCategories.edit.name,
+    //   cardOptions: true,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: true,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Fork privilege for admin': {  // SAWQA-4847
+    //   user: 'admin',
+    //   subCategory: subCategories.fork.name,
+    //   cardOptions: false,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: false,
+    //   fork: true,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Publish privilege for admin': { // SAWQA-4848
+    //   user: 'admin',
+    //   subCategory: subCategories.publish.name,
+    //   cardOptions: true,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: true,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Execute privilege for admin': { // SAWQA-4849
+    //   user: 'admin',
+    //   subCategory: subCategories.execute.name,
+    //   cardOptions: true,
+    //   viewOptions: true,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: true,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Export privilege for admin': { // SAWQA-4850
+    //   user: 'admin',
+    //   subCategory: subCategories.export.name,
+    //   cardOptions: false,
+    //   viewOptions: true,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: true,
+    //   delete: false
+    // },
+    // 'Delete privilege for admin': { // SAWQA-4851
+    //   user: 'admin',
+    //   subCategory: subCategories.delete.name,
+    //   cardOptions: true,
+    //   viewOptions: true,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: true
+    // },
+    // 'View privilege for admin': { // SAWQA-4852
+    //   user: 'admin',
+    //   subCategory: subCategories.view.name,
+    //   cardOptions: false,
+    //   viewOptions: false,
+    //   create: false,
+    //   edit: false,
+    //   fork: false,
+    //   publish: false,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // },
+    // 'Multiple privileges for admin': { // SAWQA-4853
+    //   user: 'admin',
+    //   subCategory: subCategories.multiple.name,
+    //   cardOptions: true,
+    //   viewOptions: false,
+    //   create: true,
+    //   edit: false,
+    //   fork: true,
+    //   publish: true,
+    //   execute: false,
+    //   export: false,
+    //   delete: false
+    // }
   };
 
   beforeAll(function () {
@@ -309,6 +312,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
+      
         loginPage.loginAs(data.user);
         navigateToDefaultSubCategory();
 
@@ -405,9 +409,14 @@ describe('Privileges tests: privileges.test.js', () => {
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
       homePage.mainMenuExpandBtn.click();
+      commonFunctions.waitFor.elementToBeVisible(homePage.collapsedCategoryUpdated(categoryName));
+      commonFunctions.waitFor.elementToBeClickable(homePage.collapsedCategoryUpdated(categoryName));
+      homePage.collapsedCategoryUpdated(categoryName).click();
+      browser.sleep(200);
       commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
       commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
       homePage.subCategory(data.subCategory).click();
+      browser.sleep(200);
       const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
       expect(doesDataNeedRefreshing).toBeTruthy();
       homePage.mainMenuCollapseBtn.click();

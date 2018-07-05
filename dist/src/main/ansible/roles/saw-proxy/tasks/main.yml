@@ -23,5 +23,10 @@
   template: src=nginx.conf dest=/etc/nginx
 - name: Install NGINX SAW proxy configuration
   template: src=saw-proxy.conf dest=/etc/nginx/default.d
+- name: Add MIME type for proxy auto-config files
+  lineinfile:
+    path: /etc/nginx/mime.types
+    line: '    application/x-ns-proxy-autoconfig     pac;'
+    insertafter: '^ *application/'
 - name: Enable and start NGINX service
   systemd: name=nginx enabled=true state=started

@@ -4,17 +4,19 @@ const homePage = require('../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
 const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const dataSets = require('../javascript/data/datasets');
+const designModePage = require('../javascript/pages/designModePage.po.js');
 
 describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
   const reportDescription = 'e2e report description';
   const tables = [{
-    name: 'MCT_DN_SESSION_SUMMARY',
+    name: 'SALES',
     fields: [
-      'Available (MB)',
-      'Source OS',
-      'Source Model'
+      'Integer',
+      'String',
+      'Date'
     ]
   }/*, {
     name: 'MCT_CONTENT_SUMMARY',
@@ -28,8 +30,8 @@ describe('Create report type analysis: createReport.test.js', () => {
     tableB: tables[1].name,
     fieldB: 'Session Id'
   };*/
-  const filterValue = 'ANDROID';
-  const metricName = 'MCT TMO Session DL';
+  const filterValue = 'String';
+  const metricName = dataSets.report;
   const analysisType = 'table:report';
 
   beforeAll(function () {
@@ -58,7 +60,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     commonFunctions.logOutByClearingLocalStorage();
   });
 
-  it('Should apply filter to Report', () => {
+  it('Should apply filter to Report', () => { // SAWQA-4146
     loginPage.loginAs('admin');
 
     // Switch to Card View
@@ -109,8 +111,11 @@ describe('Create report type analysis: createReport.test.js', () => {
     const fieldName = tables[0].fields[0];
 
     commonFunctions.waitFor.elementToBeClickable(reportDesigner.filterBtn);
+    reportDesigner.filterBtn.click();
 
-    reportDesigner.filterBtn.click()
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter(tables[0].name));
+    designModePage.filterWindow.addFilter(tables[0].name).click();
+
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys("123");
     commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);

@@ -67,7 +67,7 @@ public class WorkbenchExecutionController {
       @RequestHeader("Authorization") String authToken)
       throws JsonProcessingException, Exception {
     log.debug("Create dataset: project = {}", project);
-    log.info("Auth token = {}", authToken);
+    log.debug("Auth token = {}", authToken);
     if (authToken.startsWith("Bearer")) {
       authToken = authToken.substring("Bearer ".length());
     }

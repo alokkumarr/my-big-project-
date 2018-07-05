@@ -145,11 +145,11 @@
                     },
                     "value":{
                       "id":"/properties/filters/model/properties/value",
-                      "type":"integer"
+                      "type":"number"
                     },
                     "otherValue":{
                       "id":"/properties/filters/model/properties/otherValue",
-                      "type":"integer"
+                      "type":"number"
                     },
                     "stringValue":{
                       "id":"/properties/filters/model/properties/stringValue",

@@ -106,11 +106,11 @@
                     },
                     "value":{
                       "id":"/properties/filters/model/properties/value",
-                      "type":"integer"
+                      "type":"number"
                     },
                     "otherValue":{
                       "id":"/properties/filters/model/properties/otherValue",
-                      "type":"integer"
+                      "type":"number"
                     },
                     "gte":{
                       "id":"/properties/filters/model/properties/gte",
