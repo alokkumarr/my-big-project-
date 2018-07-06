@@ -10,6 +10,14 @@ import {
   Artifact,
   ArtifactColumn
 } from '../../types';
+import {
+  NUMBER_TYPES,
+  DATE_TYPES,
+  CUSTOM_DATE_PRESET_VALUE,
+  BETWEEN_NUMBER_FILTER_OPERATOR,
+  STRING_FILTER_OPERATORS_OBJ,
+  NUMBER_FILTER_OPERATORS_OBJ
+} from '../../../../consts';
 
 const template = require('./filter-chips.component.html');
 require('./filter-chips.component.scss');
@@ -38,14 +46,39 @@ export class FilterChipsComponent {
 
   public nameMap;
 
-  getDisplayName(filter) {
-    return filter.column ?
-      filter.column.alias || filter.column.displayName :
-      this.nameMap[filter.tableName][filter.columnName];
+  getDisplayName(filter: Filter) {
+    return this.nameMap[filter.tableName][filter.columnName];
   }
 
   onRemove(index) {
     this.remove.emit(index);
+  }
+
+  getFilterValue(filter: Filter) {
+    const { type } = filter;
+    if (!filter.model) {
+      if (filter.isRuntimeFilter) {
+        return 'Runtime'
+      }
+      return '';
+    }
+
+    const { modelValues, value, operator, otherValue, preset, lte, gte } = filter.model;
+
+    if (type === 'string') {
+      return `${STRING_FILTER_OPERATORS_OBJ[operator].label} ${modelValues.join(', ')}`;
+    } else if (NUMBER_TYPES.includes(type)) {
+      if (operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value) {
+        return `${NUMBER_FILTER_OPERATORS_OBJ[operator].label} ${value}`;
+      }
+      return `${otherValue} ${operator} ${value}`;
+
+    } else if (DATE_TYPES.includes(type)) {
+      if (preset === CUSTOM_DATE_PRESET_VALUE) {
+        return `${lte} -> ${gte}`;
+      }
+      return preset;
+    }
   }
 
   onRemoveAll() {

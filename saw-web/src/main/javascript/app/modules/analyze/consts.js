@@ -327,3 +327,69 @@ export const DATE_PRESETS = [{
   keyword: 'CUSTOM',
   label: 'Custom'
 }];
+
+export const BETWEEN_NUMBER_FILTER_OPERATOR = {
+  value: 'BTW',
+  label: 'Between'
+};
+
+export const NUMBER_FILTER_OPERATORS = [{
+  value: 'GT',
+  label: 'Greater than'
+}, {
+  value: 'LT',
+  label: 'Less than'
+}, {
+  value: 'GTE',
+  label: 'Greater than or equal to'
+}, {
+  value: 'LTE',
+  label: 'Less than or equal to'
+}, {
+  value: 'EQ',
+  label: 'Equal to'
+}, {
+  value: 'NEQ',
+  label: 'Not equal to'
+}, BETWEEN_NUMBER_FILTER_OPERATOR
+];
+
+export const NUMBER_FILTER_OPERATORS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(NUMBER_FILTER_OPERATORS);
+
+export const PLURAL_STRING_FILTERS = [{
+  value: 'ISIN',
+  label: 'Is in'
+}, {
+  value: 'ISNOTIN',
+  label: 'Is not in'
+}];
+
+export const SINGULAR_STRING_FILTERS = [{
+  value: 'EQ',
+  label: 'Equals'
+}, {
+  value: 'NEQ',
+  label: 'Not equal'
+}, {
+  value: 'CONTAINS',
+  label: 'Contains'
+}, {
+  value: 'SW',
+  label: 'Starts with'
+}, {
+  value: 'EW',
+  label: 'Ends with'
+}];
+
+export const STRING_FILTER_OPERATORS = [
+  ...SINGULAR_STRING_FILTERS,
+  ...PLURAL_STRING_FILTERS
+];
+
+export const STRING_FILTER_OPERATORS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(STRING_FILTER_OPERATORS);
