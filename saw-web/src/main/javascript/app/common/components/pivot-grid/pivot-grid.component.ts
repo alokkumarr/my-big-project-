@@ -302,15 +302,15 @@ export class PivotGridComponent {
     switch (dateInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
-      return moment.utc(value);
+      return moment(value);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
-      const formattedValue = moment.utc(value).format(formatToApply);
+      const formattedValue = moment(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
     case 'month':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
-      return moment.utc(value).format(formatToApply);
+      return moment(value).format(formatToApply);
     case 'year':
     default:
       return value;
