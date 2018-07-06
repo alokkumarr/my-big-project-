@@ -27,6 +27,7 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as concat from 'lodash/concat';
 
+import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 const template = require('./observe-chart.component.html');
 
 @Component({
@@ -191,10 +192,12 @@ export class ObserveChartComponent {
 
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
-    return this.analyzeService.getDataBySettings(payload).then(({ data }) => {
-      const parsedData = flattenChartData(data, payload.sqlBuilder);
-      return parsedData || [];
-    });
+    return this.analyzeService
+      .getDataBySettings(payload, EXECUTION_MODES.LIVE)
+      .then(({ data }) => {
+        const parsedData = flattenChartData(data, payload.sqlBuilder);
+        return parsedData || [];
+      });
   }
 
   generatePayload(source) {
@@ -234,11 +237,7 @@ export class ObserveChartComponent {
     set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
     delete payload.supports;
-    set(
-      payload,
-      'sqlBuilder.sorts',
-      this.sorts
-    );
+    set(payload, 'sqlBuilder.sorts', this.sorts);
     set(
       payload,
       'sqlBuilder.booleanCriteria',

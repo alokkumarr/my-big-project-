@@ -35,7 +35,7 @@ export class ExecuteService {
     this.execs$ = new ReplaySubject<IExecuteEventEmitter>(bufferSize);
   }
 
-  executeAnalysis(analysis) {
+  executeAnalysis(analysis, mode = EXECUTION_MODES.LIVE) {
     const id = analysis.id;
     const exec$ = new BehaviorSubject<IExecuteEvent>({
       state: EXECUTION_STATES.EXECUTING
@@ -45,21 +45,19 @@ export class ExecuteService {
       subject: exec$
     });
 
-    this._analyzeService
-      .applyAnalysis(analysis, EXECUTION_MODES.LIVE, { take: 25 })
-      .then(
-        response => {
-          exec$.next({
-            state: EXECUTION_STATES.SUCCESS,
-            response
-          });
-          exec$.complete();
-        },
-        () => {
-          exec$.next({ state: EXECUTION_STATES.ERROR });
-          exec$.complete();
-        }
-      );
+    this._analyzeService.applyAnalysis(analysis, mode, { take: 25 }).then(
+      response => {
+        exec$.next({
+          state: EXECUTION_STATES.SUCCESS,
+          response
+        });
+        exec$.complete();
+      },
+      () => {
+        exec$.next({ state: EXECUTION_STATES.ERROR });
+        exec$.complete();
+      }
+    );
   }
 
   subscribe(analysisId: string, callback: (IExecuteEvent) => void) {
