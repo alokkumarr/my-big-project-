@@ -8,6 +8,7 @@
        fxLayoutAlign="start"
   >
     <mat-form-field>
+      <span *ngIf="!filter.isOptional && isInRuntimeMode" class="mandatory-asterisk">*</span>
       <input type="text" placeholder="Column" matInput
              #autoInput
              e2e="filter-autocomplete-input"
@@ -28,7 +29,6 @@
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
-    <span *ngIf="!filter.isOptional" style="color: red;">*</span>
 
     <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : (!filter.isRuntimeFilter && !filter.isGlobalFilter)" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
