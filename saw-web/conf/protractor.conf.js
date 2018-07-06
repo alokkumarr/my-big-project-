@@ -153,7 +153,7 @@ exports.config = {
     charts: [
       webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'), // TCs linked
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
     ],
     chartEditFork: [
       webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),

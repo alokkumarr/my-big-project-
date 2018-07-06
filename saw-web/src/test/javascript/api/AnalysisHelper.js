@@ -147,7 +147,6 @@ class AnalysisHelper {
       } else {
         throw new Error('Invalid analysis type: '+ analysisType);
       }
-       
       //Update                      
        apiCall.post(url + 'services/analysis', updatePayload, token);
        //execute

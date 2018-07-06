@@ -364,38 +364,94 @@ describe('Privileges tests: privileges.test.js', () => {
           .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
 
         // Validate buttons in view mode of analysis
-        expect(executedAnalysis.editBtn.isDisplayed()).toBe(data.edit,
-          "Edit privilege expected to be " + data.edit + " in view mode, but was " + !data.edit);
-        expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
-          "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
-        expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
-          "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+        element(executedAnalysis.editBtn.isPresent().then(function(isPresent) {
+          if (isPresent) {
+            expect(executedAnalysis.editBtn.isDisplayed()).toBe(data.edit,
+              "Edit privilege expected to be " + data.edit + " in view mode, but was " + !data.edit);
+          } else {
+            expect(isPresent).toBe(data.edit,
+              "Edit privilege expected to be " + data.edit + " in view mode, but was " + !data.edit);
+          }
+        }));
+
+        element(executedAnalysis.forkBtn.isPresent().then(function(isPresent) {
+          if(isPresent) {
+            expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
+              "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
+          } else {
+            expect(isPresent).toBe(data.fork,
+              "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
+          }
+        }));
+
+       element(executedAnalysis.publishBtn.isPresent().then(function(isPresent) {
+         if(isPresent) {
+          expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
+            "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+         } else {
+          expect(isPresent).toBe(data.publish,
+            "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+         }
+
+       }));
+        
 
         // Validate menu in analysis
-        element(executedAnalysis.actionsMenuBtn.isDisplayed().then(function (isVisible) {
-          expect(isVisible).toBe(data.viewOptions,
-            "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
+        element(executedAnalysis.actionsMenuBtn.isPresent().then(function (isPresent) {
+          if(isPresent) {
+            expect(executedAnalysis.actionsMenuBtn.isDisplayed()).toBe(data.viewOptions,
+              "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
+          } else {
+            expect(isPresent).toBe(data.viewOptions,
+              "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
+          }
+  
         }));
 
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
-          executedAnalysis.actionsMenuBtn.click();
-
-          element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
-            expect(isVisible).toBe(data.execute,
-              "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
+          element(executedAnalysis.actionsMenuBtn.isPresent().then(function (isPresent) {
+            if(isPresent) {
+              expect(executedAnalysis.actionsMenuBtn.isDisplayed()).toBe(data.viewOptions,
+                "actionsMenuBtn button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
+                commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
+                executedAnalysis.actionsMenuBtn.click();
+            } else {
+              expect(isPresent).toBe(data.execute,
+                "actionsMenuBtn button expected to be " + data.execute + " in view mode, but was " + !data.execute);
+            }
           }));
 
-          element(executedAnalysis.exportMenuOption.isPresent().then(function (isVisible) {
-            expect(isVisible).toBe(data.export,
-              "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
+          element(executedAnalysis.executeMenuOption.isPresent().then(function (isPresent) {
+            if(isPresent) {
+              expect(executedAnalysis.executeMenuOption.isDisplayed()).toBe(data.execute,
+                "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
+            } else {
+              expect(isPresent).toBe(data.execute,
+                "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
+            }
           }));
 
-          element(executedAnalysis.deleteMenuOption.isPresent().then(function (isVisible) {
-            expect(isVisible).toBe(data.delete,
-              "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
+          element(executedAnalysis.exportMenuOption.isPresent().then(function (isPresent) {
+            if(isPresent) {
+              expect(executedAnalysis.exportMenuOption.isDisplayed()).toBe(data.export,
+                "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
+            } else {
+              expect(isPresent).toBe(data.export,
+                "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
+            }
+          }));
+
+          element(executedAnalysis.deleteMenuOption.isPresent().then(function (isPresent) {
+            if(isPresent) {
+              expect(executedAnalysis.deleteMenuOption.isDisplayed()).toBe(data.delete,
+                "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
+            } else {
+              expect(isPresent).toBe(data.delete,
+                "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
+            }
+   
           }));
         }
       }

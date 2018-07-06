@@ -816,7 +816,7 @@ class RequestModel {
                 ],
                 '_number_of_elements': 0
               },
-              'createdTimestamp': customerCode,
+              'createdTimestamp': currentTimeStamp,
               'userId': userId,
               'userFullName':loginId,
               'sqlBuilder': {

@@ -195,6 +195,9 @@ const verifyPromptFromListView = (name, data, execute)=> {
   //From analysis listview page
   analyzePage.navigateToHome();
   homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
+  // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.backButton);
+  // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
+  // savedAlaysisPage.backButton.click();
   //Change to Card View.
   commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.listView);
   commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.listView);
@@ -225,6 +228,9 @@ const verifyPromptFromCardView = (name, data, execute)=> {
  //From analysis card page
  analyzePage.navigateToHome();
  homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
+//  commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.backButton);
+//  commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
+//  savedAlaysisPage.backButton.click();
  //Change to Card View.
  commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
  commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
