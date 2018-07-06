@@ -2,7 +2,7 @@
   <mat-expansion-panel *ngIf="!hasChildren()" class="menu-panel-header sidenav-mainmenu" [expanded]="expanded">
     <mat-expansion-panel-header class="sidenav-mainmenu" *ngIf="!hasChildren()">
       <mat-panel-title class="sidenav-mainmenu">
-          <span [innerHtml]="metadata.name"></span>
+        <span [innerHtml]="metadata.name"></span>
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div *ngIf="!hasChildren()">
@@ -12,6 +12,7 @@
     </div>
   </mat-expansion-panel>
   <div class="no-children" *ngIf="hasChildren()">
-    <a [class.activeButton]="checkActiveMenu(metadata.url)" class="child-item" [attr.href]="metadata.url" [class.active]="active">{{metadata.name}}</a>
+    <a [class.activeButton]="checkActiveMenu(metadata.url)" class="child-item" [attr.href]="metadata.url" (click)="closeSideNav()"
+      [class.active]="active">{{metadata.name}}</a>
   </div>
 </mat-accordion>
