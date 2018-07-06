@@ -46,7 +46,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   @NotNull
   private Boolean active = false;
 
-  @Value("${elastic-xpack.clsuter-username}")
+  @Value("${elastic-xpack.cluster-username}")
   private String username;
 
   @Value("${elastic-xpack.cluster-password}")

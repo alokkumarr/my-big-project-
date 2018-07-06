@@ -27,5 +27,5 @@ elastic-search:
            transport-ports: 9200,9200,9200
 elastic-xpack :
           cluster-active: true
-          clsuter-username: elastic
+          cluster-username: elastic
           cluster-password: xuw3dUraHapret
