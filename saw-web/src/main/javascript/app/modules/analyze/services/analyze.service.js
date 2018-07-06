@@ -124,7 +124,7 @@ export class AnalyzeService {
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
     return this._$http.get(
-      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`
+      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${options.executionType ? '&executionType=' + options.executionType : ''}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
       const count = fpGet(`data.totalRows`, resp) || data.length;
@@ -157,9 +157,9 @@ export class AnalyzeService {
       this._executions[model.id] = deferred.promise;
 
       this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      this.applyAnalysis(model).then(({data, count}) => {
+      this.applyAnalysis(model).then(({data, executionId, count}) => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
-        deferred.resolve({data, count});
+        deferred.resolve({data, executionId, count});
       }, err => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);
@@ -286,13 +286,14 @@ export class AnalyzeService {
     return this._$http.post(`${this.url}/analysis`, payload).then(resp => {
       return {
         data: fpGet(`data.contents.analyze.[0].data`, resp),
+        executionId: fpGet(`data.contents.analyze.[0].executionId`, resp),
         count: fpGet(`data.contents.analyze.[0].totalRows`, resp)
       };
     });
   }
 
   getDataBySettings(analysis) {
-    return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
+    return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, executionId, count}) => {
       // forEach(analysis.artifacts[0].columns, column => {
       //   column.columnName = this.getColumnName(column.columnName);
       // });
@@ -307,7 +308,7 @@ export class AnalyzeService {
       //     data[key] = value;
       //   });
       // });
-      return {analysis, data, count};
+      return {analysis, data, executionId, count};
     });
   }
 
