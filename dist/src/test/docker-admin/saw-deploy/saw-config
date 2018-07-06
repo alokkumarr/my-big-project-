@@ -61,6 +61,12 @@ saw_workbench_preview_limit=100
 saw_workbench_livy_uri=http://sip-mapr:8998/
 saw_workbench_metadata=hdfs:///main/
 
+#Default configuration is set preview limit is 10000, if it not set in config file.
+saw_preview_rows_limit=10000
+# Publish row limit is optional parameter and only get considered if it has been
+# set greater than 0 values if it not set then no limit will be applied for publishing the report.
+saw_publish_rows_limit=10000
+
 # FTP JSON config
 # ##########################################
 #
