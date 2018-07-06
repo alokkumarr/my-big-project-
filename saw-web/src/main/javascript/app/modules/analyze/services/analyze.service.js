@@ -10,9 +10,10 @@ import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-const EXECUTION_MODES = {
+export const EXECUTION_MODES = {
   PREVIEW: 'preview',
-  LIVE: 'live'
+  LIVE: 'regularExecution',
+  PUBLISH: 'publish'
 };
 
 const EXECUTION_STATES = {
@@ -144,7 +145,7 @@ export class AnalyzeService {
     return this.applyAnalysis(model, EXECUTION_MODES.PREVIEW, options);
   }
 
-  executeAnalysis(model) {
+  executeAnalysis(model, executionType = EXECUTION_MODES.LIVE) {
     const deferred = this._$q.defer();
 
     if (this.isExecuting(model.id)) {
@@ -157,7 +158,7 @@ export class AnalyzeService {
       this._executions[model.id] = deferred.promise;
 
       this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      this.applyAnalysis(model).then(({data, count}) => {
+      this.applyAnalysis(model, executionType).then(({data, count}) => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
         deferred.resolve({data, count});
       }, err => {
@@ -169,23 +170,18 @@ export class AnalyzeService {
     return deferred.promise;
   }
 
-  publishAnalysis(model, execute = false) {
-    if (model.schedule.scheduleState === 'new') {
-      this._$http.post(`${this.url}/scheduler/schedule`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
+  changeSchedule(analysis) {
+    const schedule = analysis.schedule;
+    const scheduleState = schedule.scheduleState;
+    switch (scheduleState) {
+    case 'new':
+      return this._$http.post(`${this.url}/scheduler/schedule`, schedule);
+    case 'exist':
+      return this._$http.post(`${this.url}/scheduler/update`, schedule);
+    case 'delete':
+      return this._$http.post(`${this.url}/scheduler/delete`, schedule);
+    default:
     }
-    if (model.schedule.scheduleState === 'exist') {
-      this._$http.post(`${this.url}/scheduler/update`, model.schedule).then(fpGet(`data.contents.analyze.[0]`));
-    }
-    if (model.schedule.scheduleState === 'delete') {
-      this._$http.post(`${this.url}/scheduler/delete`, model.schedule);
-    }
-
-    return this.updateAnalysis(model).then(analysis => {
-      if (execute) {
-        this.executeAnalysis(model);
-      }
-      return analysis;
-    });
   }
 
   getCronDetails(requestBody) {
@@ -268,13 +264,8 @@ export class AnalyzeService {
 
   applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options = {}) {
     delete model.isScheduled;
-    if (mode === EXECUTION_MODES.PREVIEW) {
-      model.executionType = EXECUTION_MODES.PREVIEW;
-    } else if (mode === EXECUTION_MODES.LIVE) {
-      model.executionType = 'regularExecution';
-    } else {
-      delete model.executionType;
-    }
+
+    model.executionType = mode;
 
     options.skip = options.skip || 0;
     options.take = options.take || 10;
@@ -296,8 +287,8 @@ export class AnalyzeService {
     });
   }
 
-  getDataBySettings(analysis) {
-    return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
+  getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW) {
+    return this.applyAnalysis(analysis, mode).then(({data, count}) => {
       // forEach(analysis.artifacts[0].columns, column => {
       //   column.columnName = this.getColumnName(column.columnName);
       // });

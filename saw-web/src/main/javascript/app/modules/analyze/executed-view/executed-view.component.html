@@ -1,0 +1,118 @@
+<div fxLayout="column">
+  <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
+    <div fxLayout="row">
+      <button (click)="goBackToMainPage(analysis)" mat-icon-button style="margin-right: 10px;">
+        <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
+      </button>
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <div>
+          <span *ngIf="analysis" class="analysis__title">{{analysis.name}}</span>
+          <label *ngIf="isExecuting" class="execution-tag" i18n>Executing</label>
+        </div>
+        <div *ngIf="analysis" class="analysis__subheader">{{analysis.metrics}}</div>
+      </div>
+    </div>
+
+    <div>
+        <button *ngIf="canUserEdit"
+            mat-button
+            e2e="action-edit-btn"
+            (click)="edit()">
+          <span i18n>Edit</span>
+        </button>
+        <button *ngIf="canUserFork"
+                    mat-button
+                    e2e="action-fork-btn"
+                    (click)="fork()">
+          <span i18n>Fork & Edit</span>
+        </button>
+
+        <analyze-actions-menu-u *ngIf="analysis"
+                                [analysis]="analysis"
+                                exclude="publish-fork-edit"
+                                [actionsToDisable]="isExecuting ? 'execute' : ''"
+                                (afterDelete)="afterDelete(analysis)"
+                                (afterExport)="exportData()"
+        ></analyze-actions-menu-u>
+
+        <button *ngIf="canUserPublish"
+                mat-raised-button
+                color="primary"
+                e2e="action-publish-btn"
+                (click)="publish()">
+          <span i18n>Publish</span>
+        </button>
+      </div>
+  </mat-toolbar>
+  <mat-card>
+    <filter-chips-u *ngIf="analysis && !(analysis.type === 'report' && analysis.edit)"
+                    [filters]="analysis.sqlBuilder.filters"
+                    [readonly]="true"
+                    [artifacts]="analysis.artifacts">
+    </filter-chips-u>
+
+    <div *ngIf="analyses && !analyses.length">
+      <div class="prompt-execution-container" fxLayout="column" fxLayoutAlign="center center">
+        <span i18n>This analysis hasn't been been executed yet. Execute it now?</span>
+          <button mat-raised-button color="primary" [disabled]="!analysis" (click)="executeAnalysis(analysis)" i18n>
+            Execute
+          </button>
+      </div>
+    </div>
+
+    <div *ngIf="analysis && analyses && analyses.length" [ngSwitch]="analysis.type">
+      <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
+                            [analysis]="analysis"
+                            [dataLoader]="dataLoader"
+      ></executed-report-view>
+      <executed-pivot-view *ngSwitchCase="'pivot'"
+                           [analysis]="analysis"
+                           [data]="data"
+                           [updater]="pivotUpdater$"
+      ></executed-pivot-view>
+      <executed-chart-view *ngSwitchCase="'chart'"
+                           [analysis]="analysis"
+                           [data]="data"
+                           [updater]="chartUpdater$"
+      ></executed-chart-view>
+    </div>
+  </mat-card>
+
+  <mat-card *ngIf="analysis" style="padding: 5px;">
+    <mat-card-title>
+      <span class="mat-card-title" i18n>
+        Analysis Details
+      </span>
+    </mat-card-title>
+    <mat-card-content style="padding-left: 5px;">
+      <div>
+        <strong *ngIf="analysis.userFullName">Created By:</strong>
+        {{analysis.userFullName | changeCase:'title'}}
+      </div>
+      <div>
+        <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
+        {{analysis.scheduleHuman}}
+      </div>
+      <div class="analysis-detail-description">
+        <strong *ngIf="analysis.description">Description</strong>
+        <p>{{analysis.description}}</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <span class="previous-list-title" i18n>Previous Versions</span>
+      </mat-expansion-panel-header>
+
+      <mat-divider></mat-divider>
+
+      <executed-list *ngIf="analysis && analyses && analyses.length"
+                     style="padding-top: 20px;"
+                     [analyses]="analyses"
+                     [analysis]="analysis"
+      ></executed-list>
+    </mat-expansion-panel>
+  </mat-card>
+</div>

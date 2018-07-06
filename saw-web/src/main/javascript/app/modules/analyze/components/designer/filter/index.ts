@@ -11,6 +11,7 @@ import { DesignerFilterRowComponent } from './row';
 import { DesignerStringFilterComponent } from './string';
 import { DesignerDateFilterComponent } from './date';
 import { DesignerNumberFilterComponent } from './number';
+import { FilterChipsComponent } from './chips-u';
 export {
   DesignerFilterDialogComponent,
   DesignerFilterDialogData,
@@ -22,14 +23,16 @@ const COMPONENTS = [
   DesignerStringFilterComponent,
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent,
-  DesignerFilterDialogComponent
+  DesignerFilterDialogComponent,
+  FilterChipsComponent
 ];
 @NgModule({
   imports: [CommonModuleTs],
   entryComponents: COMPONENTS,
   declarations: COMPONENTS,
   exports: [
-    DesignerFilterDialogComponent
+    DesignerFilterDialogComponent,
+    FilterChipsComponent
   ]
 })
 export class AnalyzeFilterModule {}
