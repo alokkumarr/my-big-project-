@@ -29,6 +29,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
   let analysisId;
   let host;
   let token;
+  //Note: Commented test for other user because it took 1hr 6 min to execute all tests
   const chartDataProvider = {
     // DATES
     'Date data type filter as admin': {
@@ -37,12 +38,12 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       value: 'This Week',
       fieldName: 'Date'
     },
-    'Date data type filter': {
-      user: 'userOne',
-      fieldType: 'date',
-      value: 'This Week',
-      fieldName: 'Date'
-    },
+    // 'Date data type filter': {
+    //   user: 'userOne',
+    //   fieldType: 'date',
+    //   value: 'This Week',
+    //   fieldName: 'Date'
+    // },
     //NUMBERS
     'Number data type filter as admin': {
       user: 'admin',
@@ -51,13 +52,13 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       value: 99999.33,
       fieldName: 'Double'
     },
-    'Number data type filter': {
-      user: 'userOne',
-      fieldType: 'number',
-      operator: 'Equal to',
-      value: 99999.33,
-      fieldName: 'Double'
-    },
+    // 'Number data type filter': {
+    //   user: 'userOne',
+    //   fieldType: 'number',
+    //   operator: 'Equal to',
+    //   value: 99999.33,
+    //   fieldName: 'Double'
+    // },
     //STRING
     'String data type filter as admin': {
       user: 'admin',
@@ -66,13 +67,13 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       value: 'string 450',
       fieldName: 'String'
     },
-    'String data type filter': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'Equals',
-      value: 'string 450',
-      fieldName: 'String'
-    }
+    // 'String data type filter': {
+    //   user: 'userOne',
+    //   fieldType: 'string',
+    //   operator: 'Equals',
+    //   value: 'string 450',
+    //   fieldName: 'String'
+    // }
   };
 
   beforeAll(function () {
