@@ -204,6 +204,6 @@ class AnalysisExecutions extends BaseController {
           }
           return valid
         }
-        true
+        false
       }
 }
