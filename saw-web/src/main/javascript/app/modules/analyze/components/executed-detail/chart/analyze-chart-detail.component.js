@@ -141,7 +141,7 @@ export const AnalyzeChartDetailComponent = {
         showColumnHeaders: true,
         showColumnLines: false,
         showRowLines: false,
-        showBorders: false;
+        showBorders: false,
         rowAlternationEnabled: true,
         hoverStateEnabled: true,
         wordWrapEnabled: false,
