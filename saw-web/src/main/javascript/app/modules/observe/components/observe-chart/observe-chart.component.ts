@@ -12,6 +12,7 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
+import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
@@ -26,9 +27,7 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as concat from 'lodash/concat';
 
-import { NUMBER_TYPES } from '../../../analyze/consts';
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
-
 const template = require('./observe-chart.component.html');
 
 @Component({
@@ -106,12 +105,7 @@ export class ObserveChartComponent {
     const sortFields = this.sortService.getArtifactColumns2SortFieldMapper()(
       this.analysis.artifacts[0].columns
     );
-    this.sorts = this.analysis.sqlBuilder.sorts
-      ? this.sortService.mapBackend2FrontendSort(
-          this.analysis.sqlBuilder.sorts,
-          sortFields
-        )
-      : [];
+    this.sorts = this.analysis.sqlBuilder.sorts;
 
     this.filters = map(
       get(this.analysis, 'sqlBuilder.filters', []),
@@ -170,7 +164,7 @@ export class ObserveChartComponent {
     if (!isEmpty(this.sorts)) {
       gridData = orderBy(
         gridData,
-        map(this.sorts, 'field.dataField'),
+        map(this.sorts, 'columnName'),
         map(this.sorts, 'order')
       );
     }
@@ -201,10 +195,7 @@ export class ObserveChartComponent {
     return this.analyzeService
       .getDataBySettings(payload, EXECUTION_MODES.LIVE)
       .then(({ data }) => {
-        const parsedData = this.chartService.parseData(
-          data,
-          payload.sqlBuilder
-        );
+        const parsedData = flattenChartData(data, payload.sqlBuilder);
         return parsedData || [];
       });
   }
@@ -246,11 +237,7 @@ export class ObserveChartComponent {
     set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
     delete payload.supports;
-    set(
-      payload,
-      'sqlBuilder.sorts',
-      this.sortService.mapFrontend2BackendSort(this.sorts)
-    );
+    set(payload, 'sqlBuilder.sorts', this.sorts);
     set(
       payload,
       'sqlBuilder.booleanCriteria',

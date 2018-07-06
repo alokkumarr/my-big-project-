@@ -4,7 +4,10 @@ import * as isEmpty from 'lodash/isEmpty';
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../cron';
-import { AnalyzeService } from '../../services/analyze.service';
+import {
+  ExecuteService,
+  EXECUTION_STATES
+} from '../../services/execute.service';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../../login/services/jwt.service';
 
@@ -34,16 +37,24 @@ export class AnalyzeListViewComponent {
   public config: any;
   public canUserFork = false;
   public analyses: Analysis[];
+  public executions = {};
+  public executingState = EXECUTION_STATES.EXECUTING;
 
   constructor(
     private _dxDataGridService: dxDataGridService,
-    private _analyzeService: AnalyzeService,
     private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService
+    private _jwt: JwtService,
+    private _executeService: ExecuteService
   ) { }
 
   ngOnInit() {
     this.config = this.getGridConfig();
+    this.onExecutionEvent = this.onExecutionEvent.bind(this);
+    this._executeService.subscribeToAllExecuting(this.onExecutionEvent);
+  }
+
+  onExecutionEvent(e) {
+    this.executions = e;
   }
 
   afterDelete(analysis) {
@@ -83,10 +94,6 @@ export class AnalyzeListViewComponent {
         action: 'fork'
       });
     });
-  }
-
-  showExecutingFlag(analysisId) {
-    return analysisId && this._analyzeService.isExecuting(analysisId);
   }
 
   getRowType(rowData) {

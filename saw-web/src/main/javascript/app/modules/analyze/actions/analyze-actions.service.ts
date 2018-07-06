@@ -1,14 +1,14 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as clone from 'lodash/clone';
-import * as deepClone from 'lodash/cloneDeep';
-import * as defaultsDeep from 'lodash/defaultsDeep';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
 import { FilterService } from '../services/filter.service';
+import { ExecuteService } from '../services/execute.service';
+import { PublishService } from '../services/publish.service';
 import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish';
 
@@ -19,6 +19,8 @@ export class AnalyzeActionsService {
   constructor(
     private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
+    private _executeService: ExecuteService,
+    private _publishService: PublishService,
     private _analyzeDialogService: AnalyzeDialogService,
     private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
@@ -26,14 +28,12 @@ export class AnalyzeActionsService {
   ) {}
 
   execute(analysis, mode = EXECUTION_MODES.LIVE) {
-    return this._filterService
-      .getRuntimeFilterValues(analysis)
-      .then(analysis => {
-        if (analysis) {
-          this._analyzeService.executeAnalysis(analysis, mode);
-          return analysis;
-        }
-      });
+    return this._filterService.getRuntimeFilterValues(analysis).then(model => {
+      if (model) {
+        this._executeService.executeAnalysis(model, mode);
+        return model;
+      }
+    });
   }
 
   fork(analysis) {
@@ -105,7 +105,7 @@ export class AnalyzeActionsService {
           if (analysis) {
             const execute = true;
             this._headerProgress.show();
-            this._analyzeService.publishAnalysis(analysis, execute).then(
+            this._publishService.publishAnalysis(analysis, execute).then(
               updatedAnalysis => {
                 this._headerProgress.hide();
                 this._toastMessage.info(
@@ -137,6 +137,14 @@ export class AnalyzeActionsService {
         this._headerProgress.hide();
         this._toastMessage.error(err.message || 'Analysis not deleted.');
       }
+    );
+  }
+
+  exportAnalysis(analysisId, executionId, analysisType) {
+    return this._analyzeService.getExportData(
+      analysisId,
+      executionId,
+      analysisType
     );
   }
 }
