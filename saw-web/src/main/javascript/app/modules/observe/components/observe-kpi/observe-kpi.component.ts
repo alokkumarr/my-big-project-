@@ -10,7 +10,6 @@ import * as trim from 'lodash/trim';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isFinite from 'lodash/isFinite';
 import * as moment from 'moment';
-
 import { Observable } from 'rxjs/Observable';
 
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
