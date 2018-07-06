@@ -1,4 +1,4 @@
-import { Component, Input, Inject, Injectable } from '@angular/core';
+import { Component, Input, Inject } from '@angular/core';
 import * as get from 'lodash/get';
 import { ComponentHandler } from './../../utils/componentHandler';
 
@@ -10,7 +10,6 @@ require('./sidenav.component.scss');
   template
 })
 
-@Injectable()
 export class SidenavComponent { 
 
   @Input() menu: [];
