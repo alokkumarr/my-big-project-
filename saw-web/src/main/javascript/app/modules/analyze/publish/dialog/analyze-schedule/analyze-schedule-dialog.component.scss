@@ -1,6 +1,6 @@
 @import "themes/base/colors";
 
-analyze-publish-dialog {
+analyze-schedule-dialog {
   display: block;
   padding: 10px;
   color: $primary-grey-g4;
@@ -40,7 +40,7 @@ analyze-publish-dialog {
     }
 
     .schedule-container {
-      padding: 0 30px;
+      margin: 10px;
     }
 
     .days-of-week-checkboxes {
@@ -106,5 +106,9 @@ analyze-publish-dialog {
   .dialog__actions {
     padding-top: 10px;
     border-top: 1px solid $primary-grey-g2;
+
+    .form-buttons button {
+      margin-right: 10px;
+    }
   }
 }

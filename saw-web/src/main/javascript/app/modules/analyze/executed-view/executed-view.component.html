@@ -29,19 +29,11 @@
 
         <analyze-actions-menu-u *ngIf="analysis"
                                 [analysis]="analysis"
-                                exclude="publish-fork-edit"
+                                exclude="fork-edit"
                                 [actionsToDisable]="isExecuting ? 'execute' : ''"
                                 (afterDelete)="afterDelete(analysis)"
                                 (afterExport)="exportData()"
         ></analyze-actions-menu-u>
-
-        <button *ngIf="canUserPublish"
-                mat-raised-button
-                color="primary"
-                e2e="action-publish-btn"
-                (click)="publish()">
-          <span i18n>Publish</span>
-        </button>
       </div>
   </mat-toolbar>
   <mat-card>

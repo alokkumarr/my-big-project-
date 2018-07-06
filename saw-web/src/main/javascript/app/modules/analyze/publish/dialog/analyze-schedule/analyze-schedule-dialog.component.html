@@ -1,34 +1,18 @@
 <header class="dialog__header">
-  <strong i18n>Publish Analysis</strong>
+  <strong i18n>Schedule Analysis</strong>
 </header>
 <div class="dialog__content"
      fxLayout="column">
 
     <div class="ars-content" layout-padding>
-      <div class="form-container" layout="column">
-        <label class="field-label" i18n>Publish to</label>
-        <div style="max-width: 200px;">
-          <mat-select placeholder="Select a Category"
-                      class="publish-select"
-                      (selectionChange)="onCategorySelected($event.value)"
-                      [value]="data.analysis.categoryId">
-            <mat-optgroup *ngFor="let category of categories" [label]="category.name">
-              <mat-option *ngFor="let subCategory of category.children"
-                          [value]="subCategory.id"
-              >{{ subCategory.name }}</mat-option>
-            </mat-optgroup>
-          </mat-select>
-        </div>
-      </div>
-
-      <div class="form-container" layout="column">
+      <!-- <div class="form-container" layout="column">
         <mat-checkbox [(ngModel)]="hasSchedule">
           <span i18n>Scheduled</span>
         </mat-checkbox>
-      </div>
+      </div> -->
 
-      <div *ngIf="hasSchedule" class="schedule-container" fxLayout="column">
-        <cron-job-schedular *ngIf="hasSchedule" [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
+      <div class="schedule-container" fxLayout="column">
+        <cron-job-schedular *ngIf="loadCron" [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
 
         <div class="form-container" fxLayout="column">
           <label i18n>Publish to Email</label>
@@ -74,11 +58,17 @@
 </div>
 <div class="dialog__actions">
   <div fxLayout="row"
-       fxLayoutAlign="start center">
+       fxLayoutAlign="start center" class="form-buttons">
     <button (click)="publish()"
             mat-raised-button color="primary" i18n>
-      Publish
+      Schedule
     </button>
+
+    <button (click)="removeSchedule()"
+            mat-raised-button color="primary" [disabled]="!hasSchedule" i18n>
+      Remove Schedule
+    </button>
+
     <button mat-button i18n (click)="close()">Cancel</button>
   </div>
 </div>

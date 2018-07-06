@@ -126,8 +126,8 @@ export class AnalyzeActionsMenuComponent {
 
   publish(type) {
     const analysis = clone(this.analysis);
-    analysis.publishType = 'schedule';
-    this._analyzeActionsService.publish(analysis).then(analysis => {
+    console.log(analysis);
+    this._analyzeActionsService.publish(analysis,type).then(analysis => {
       this.afterPublish.emit(analysis);
     });
   }
