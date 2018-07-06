@@ -109,6 +109,10 @@ export class DesignerFilterDialogComponent implements OnInit {
     return artifact.artifactName;
   }
 
+  onBooleanCriteriaChange(booleanCriteria) {
+    this.data.booleanCriteria = booleanCriteria;
+  }
+
   ok() {
     let result: DesignerFilterDialogResult = {
       filters: filter(this.filters, 'columnName'),

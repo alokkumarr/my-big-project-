@@ -6,6 +6,7 @@ import { downgradeComponent, downgradeInjectable } from '@angular/upgrade/static
 import * as angular from 'angular';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AnalyzeViewModule } from './view';
+import { ExecutedViewModule } from './executed-view';
 import { AnalyzeActionsModule } from './actions';
 
 import { MaterialModule } from '../../material.module';
@@ -99,7 +100,6 @@ import {
 } from './components/designer';
 
 import { AnalyzeFilterModule } from './components/designer/filter';
-import {FilterChipsComponent as FilterChipsUpgraded} from './components/filter/chips-u';
 
 import { CronJobSchedularComponent } from './publish/cron-job-schedular';
 import { CronDatePickerComponent } from './publish/cron-date-picker';
@@ -157,9 +157,6 @@ angular
   .component('numberFilter', NumberFilterComponent)
   .component('dateFilter', DateFilterComponent)
   .component('filterChips', FilterChipsComponent)
-  .directive('filterChipsU', downgradeComponent({
-    component: FilterChipsUpgraded
-  }) as angular.IDirectiveFactory)
   .component('analyzeFilterRow', AnalyzeFilterRowComponent)
   .component('analyzeFilterModal', AnalyzeFilterModalComponent)
   .component('analyzeDescriptionDialog', AnalyzeDescriptionDialogComponent)
@@ -186,7 +183,7 @@ angular
     UChartModule,
     BrowserModule,
     AnalyzeViewModule,
-    AnalyzeViewModule,
+    ExecutedViewModule,
     AnalyzeActionsModule,
     AnalyzeFilterModule,
     AnalyzePublishDialogModule
@@ -216,8 +213,7 @@ angular
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout,
-    FilterChipsUpgraded
+    MultiTableDesignerLayout
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -243,8 +239,7 @@ angular
     DesignerSaveComponent,
     DesignerPreviewDialogComponent,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout,
-    FilterChipsUpgraded
+    MultiTableDesignerLayout
   ],
   providers: [
     $mdDialogProvider,

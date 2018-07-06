@@ -86,3 +86,9 @@ saw_export_chunk_size=10000
 
 [saw-security]
 sip-saw1
+
+[saw-security:vars]
+#
+# Outgoing email configuration
+#
+saw_security_email_host=outgoing.sncrcorp.net
