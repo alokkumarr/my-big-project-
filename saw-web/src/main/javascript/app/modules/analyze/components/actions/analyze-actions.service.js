@@ -7,6 +7,8 @@ import {AnalyseTypes} from '../../consts';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/toPromise';
 
+import {EXECUTION_MODES} from '../../services/analyze.service';
+
 export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, AnalyzeService, toastMessage, $log, $injector) {
   'ngInject';
 
@@ -20,10 +22,10 @@ export function AnalyzeActionsService($mdDialog, $eventEmitter, $rootScope, Anal
     deleteAnalysis
   };
 
-  function execute(analysis) {
+  function execute(analysis, mode = EXECUTION_MODES.LIVE) {
     return $injector.get('FilterService').getRuntimeFilterValues(analysis).then(model => {
       if (model) {
-        AnalyzeService.executeAnalysis(model);
+        AnalyzeService.executeAnalysis(model, mode);
       }
       return model;
     });

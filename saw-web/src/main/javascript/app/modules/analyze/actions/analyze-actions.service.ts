@@ -12,6 +12,8 @@ import { FilterService } from '../services/filter.service';
 import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish';
 
+import { EXECUTION_MODES } from '../services/analyze.service';
+
 @Injectable()
 export class AnalyzeActionsService {
   constructor(
@@ -23,13 +25,15 @@ export class AnalyzeActionsService {
     public dialog: MatDialog
   ) {}
 
-  execute(analysis) {
-    return this._filterService.getRuntimeFilterValues(analysis).then(analysis => {
-      if (analysis) {
-        this._analyzeService.executeAnalysis(analysis);
-        return analysis;
-      }
-    });
+  execute(analysis, mode = EXECUTION_MODES.LIVE) {
+    return this._filterService
+      .getRuntimeFilterValues(analysis)
+      .then(analysis => {
+        if (analysis) {
+          this._analyzeService.executeAnalysis(analysis, mode);
+          return analysis;
+        }
+      });
   }
 
   fork(analysis) {
