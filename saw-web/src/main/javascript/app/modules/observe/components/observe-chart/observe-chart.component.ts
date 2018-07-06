@@ -27,6 +27,7 @@ import * as remove from 'lodash/remove';
 import * as concat from 'lodash/concat';
 
 import { NUMBER_TYPES } from '../../../analyze/consts';
+import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 
 const template = require('./observe-chart.component.html');
 
@@ -197,10 +198,15 @@ export class ObserveChartComponent {
 
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
-    return this.analyzeService.getDataBySettings(payload).then(({ data }) => {
-      const parsedData = this.chartService.parseData(data, payload.sqlBuilder);
-      return parsedData || [];
-    });
+    return this.analyzeService
+      .getDataBySettings(payload, EXECUTION_MODES.LIVE)
+      .then(({ data }) => {
+        const parsedData = this.chartService.parseData(
+          data,
+          payload.sqlBuilder
+        );
+        return parsedData || [];
+      });
   }
 
   generatePayload(source) {
