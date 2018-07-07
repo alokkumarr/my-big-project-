@@ -232,8 +232,8 @@
 									<file>src/main/system/saw-storage-proxy.service</file>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-storage-proxy-service/conf/proxy-scehma.json</name>
-									<file>src/main/resources/schema/proxy-scehma.json</file>
+									<name>/opt/bda/saw-storage-proxy-service/conf/proxy-schema.json</name>
+									<file>src/main/resources/schema/proxy-schema.json</file>
 								</entry>
 								<entry>
 									<name>/opt/bda/saw-storage-proxy-service/conf/application.yml</name>
