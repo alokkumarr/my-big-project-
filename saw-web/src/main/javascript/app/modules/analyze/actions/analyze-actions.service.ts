@@ -94,70 +94,70 @@ export class AnalyzeActionsService {
 
   openPublishModal(analysis, type) {
     switch (type) {
-      case 'publish':
-        return new Promise<Analysis>((resolve, reject) => {
-          this.dialog
-            .open(AnalyzePublishDialogComponent, {
-              width: 'auto',
-              height: 'auto',
-              data: { analysis }
-            } as MatDialogConfig)
-            .afterClosed()
-            .subscribe(analysis => {
-              if (analysis) {
-                const execute = true;
-                this._headerProgress.show();
-                this._publishService.publishAnalysis(analysis, execute).then(
-                  updatedAnalysis => {
-                    this._headerProgress.hide();
-                    this._toastMessage.info(
-                      execute
-                        ? 'Analysis has been updated.'
-                        : 'Analysis schedule changes have been updated.'
-                    );
-                    resolve(updatedAnalysis);
-                  },
-                  () => {
-                    this._headerProgress.hide();
-                    reject();
-                  }
-                );
-              }
-            });
-        });
+    case 'publish':
+      return new Promise<Analysis>((resolve, reject) => {
+        this.dialog
+          .open(AnalyzePublishDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            data: { analysis }
+          } as MatDialogConfig)
+          .afterClosed()
+          .subscribe(analysis => {
+            if (analysis) {
+              const execute = true;
+              this._headerProgress.show();
+              this._publishService.publishAnalysis(analysis, execute).then(
+                updatedAnalysis => {
+                  this._headerProgress.hide();
+                  this._toastMessage.info(
+                    execute
+                      ? 'Analysis has been updated.'
+                      : 'Analysis schedule changes have been updated.'
+                  );
+                  resolve(updatedAnalysis);
+                },
+                () => {
+                  this._headerProgress.hide();
+                  reject();
+                }
+              );
+            }
+          });
+      });
       break;
 
-      case 'schedule':
-        return new Promise<Analysis>((resolve, reject) => {
-          this.dialog
-            .open(AnalyzeScheduleDialogComponent, {
-              width: 'auto',
-              height: 'auto',
-              data: { analysis }
-            } as MatDialogConfig)
-            .afterClosed()
-            .subscribe(analysis => {
-              if (analysis) {
-                const execute = true;
-                this._headerProgress.show();
-                this._publishService.publishAnalysis(analysis, execute).then(
-                  updatedAnalysis => {
-                    this._headerProgress.hide();
-                    this._toastMessage.info(
-                      execute
-                        ? 'Analysis has been updated.'
-                        : 'Analysis schedule changes have been updated.'
-                    );
-                    resolve(updatedAnalysis);
-                  },
-                  () => {
-                    this._headerProgress.hide();
-                    reject();
-                  }
-                );
-              }
-            });
-        });
+    case 'schedule':
+      return new Promise<Analysis>((resolve, reject) => {
+        this.dialog
+          .open(AnalyzeScheduleDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            data: { analysis }
+          } as MatDialogConfig)
+          .afterClosed()
+          .subscribe(analysis => {
+            if (analysis) {
+              const execute = true;
+              this._headerProgress.show();
+              this._publishService.publishAnalysis(analysis, execute).then(
+                updatedAnalysis => {
+                  this._headerProgress.hide();
+                  this._toastMessage.info(
+                    execute
+                      ? 'Analysis has been updated.'
+                      : 'Analysis schedule changes have been updated.'
+                  );
+                  resolve(updatedAnalysis);
+                },
+                () => {
+                  this._headerProgress.hide();
+                  reject();
+                }
+              );
+            }
+          });
+      });
       break;
     }
   }

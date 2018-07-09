@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
+import * as first from 'lodash/first';
 
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../../login/services/jwt.service';
@@ -36,7 +37,6 @@ export class AnalyzePublishDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.data);
     this.token = this._jwt.getTokenObj();
     this._analyzeService.getCategories(PRIVILEGES.PUBLISH)
       .then(response => {

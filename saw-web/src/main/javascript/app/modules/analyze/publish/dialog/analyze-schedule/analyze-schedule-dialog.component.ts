@@ -176,7 +176,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   removeSchedule() {
-    console.log("removeSchedule");
     const analysis = this.data.analysis;
     this.scheduleState = 'delete';
     analysis.schedule = {
@@ -225,7 +224,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   triggerSchedule() {
-    console.log("removeSchedule");
     this._dialogRef.close(this.data.analysis);
   }
 

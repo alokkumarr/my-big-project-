@@ -39,63 +39,6 @@ analyze-publish-dialog {
       }
     }
 
-    .schedule-container {
-      margin: 20px;
-    }
-
-    .days-of-week-checkboxes {
-      padding-top: 6px;
-    }
-
-    .end-criteria-radio {
-      line-height: 32px;
-    }
-
-    mat-chips input {
-      width: 250px;
-      font-size: 14px;
-      padding: 10px;
-      margin: -2px;
-    }
-
-    .errorTextMsg {
-      color: $secondary-red;
-    }
-
-    .errorMsg {
-      color: $primary-white;
-      background-color: $secondary-orange;
-      border-radius: 14px;
-      float: left;
-      height: 26px;
-      width: 24px;
-      text-align: center;
-      font-size: larger;
-      margin-top: 3px;
-      margin-right: 2px;
-    }
-
-    .schedule-container .form-container .publish-form {
-      span.clear {
-        margin: 10px;
-        top: 10px;
-        color: #0096D5;
-        cursor: pointer;
-      }
-
-      mat-select {
-        float: left;
-      }
-    }
-
-    .ftp-select-box {
-      width: 275px;
-    }
-
-    .ftp-select {
-      left: 459px !important;
-    }
-
     mat-select.publish-select {
       border: 1px solid $primary-grey-g1;
       padding: 8px;
