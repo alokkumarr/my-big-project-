@@ -20,7 +20,7 @@ require('./observe-report.component.scss');
   selector: 'observe-report',
   template
 })
-export class ObserveReportComponent implements OnInit, OnDestroy {
+export class ObserveReportComponent implements OnDestroy {
   @Input() item: GridsterItem;
   @Input() analysis: AnalysisReport;
   @Input() updater: BehaviorSubject<any>;
@@ -36,32 +36,32 @@ export class ObserveReportComponent implements OnInit, OnDestroy {
 
   constructor(private analyzeService: AnalyzeService) {}
 
-  ngOnInit() {
-    this.analyzeService.previewExecution(this.analysis).then(({ data }) => {
-      this.data = data;
-    });
-  }
-
   ngOnDestroy() {
     this.listeners.forEach(sub => sub.unsubscribe());
   }
 
   loadData(options = {}) {
-    if (this.executionId) {
-      return this.analyzeService
-        .getExecutionData(this.analysis.id, this.executionId, {
-          ...options,
-          executionType: 'onetime',
-          analysisType: this.analysis.type
-        })
-        .then(({ data, count }) => ({ data, totalCount: count }));
+    if ((this.analysis as any)._executeTile) {
+      if (this.executionId) {
+        return this.analyzeService
+          .getExecutionData(this.analysis.id, this.executionId, {
+            ...options,
+            executionType: 'onetime',
+            analysisType: this.analysis.type
+          })
+          .then(({ data, count }) => ({ data, totalCount: count }));
+      } else {
+        return this.analyzeService
+          .previewExecution(this.analysis, options)
+          .then(({ data, executionId, count }) => {
+            this.executionId = executionId;
+            return { data, totalCount: count };
+          });
+      }
     } else {
-      return this.analyzeService
-        .previewExecution(this.analysis, options)
-        .then(({ data, executionId, count }) => {
-          this.executionId = executionId;
-          return { data, totalCount: count };
-        });
+      return new Promise(resolve => {
+        resolve({ data: [], totalCount: 0 });
+      });
     }
   }
 }

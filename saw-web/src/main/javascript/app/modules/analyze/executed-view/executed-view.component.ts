@@ -22,7 +22,10 @@ import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-gr
 import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
-import { JwtService } from '../../../../login/services/jwt.service';
+import {
+  JwtService,
+  CUSTOM_JWT_CONFIG
+} from '../../../../login/services/jwt.service';
 
 const template = require('./executed-view.component.html');
 require('./executed-view.component.scss');
@@ -38,6 +41,7 @@ export class ExecutedViewComponent implements OnInit {
   executionSuccess: boolean;
   data: any[];
   dataLoader: Function;
+  canAutoRefresh: boolean;
   canUserPublish = false;
   canUserFork = false;
   canUserEdit = false;
@@ -72,6 +76,10 @@ export class ExecutedViewComponent implements OnInit {
       awaitingExecution,
       loadLastExecution
     } = this._transition.params();
+
+    this.canAutoRefresh = this._jwt.hasCustomConfig(
+      CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
+    );
 
     this.executionId = executionId;
     if (analysis) {
@@ -116,7 +124,12 @@ export class ExecutedViewComponent implements OnInit {
   ) {
     if (!awaitingExecution) {
       const isDataLakeReport = analysis.type === 'report';
-      if (executionId || loadLastExecution || isDataLakeReport) {
+      if (
+        executionId ||
+        loadLastExecution ||
+        isDataLakeReport ||
+        !this.canAutoRefresh
+      ) {
         this.loadExecutedAnalysesAndExecutionData(
           analysis.id,
           executionId,

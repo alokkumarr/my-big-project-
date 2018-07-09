@@ -31,7 +31,7 @@ export class AnalyzeActionsService {
     return this._filterService.getRuntimeFilterValues(analysis).then(model => {
       if (model) {
         this._executeService.executeAnalysis(model, mode);
-        return model;
+        return analysis;
       }
     });
   }

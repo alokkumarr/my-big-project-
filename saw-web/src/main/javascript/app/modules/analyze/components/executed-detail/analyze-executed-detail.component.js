@@ -14,6 +14,8 @@ import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 
+import {CUSTOM_JWT_CONFIG} from '../../../../../login/services/jwt.service';
+
 import {Events} from '../../consts';
 
 import * as template from './analyze-executed-detail.component.html';
@@ -29,6 +31,8 @@ export const AnalyzeExecutedDetailComponent = {
       'ngInject';
       super($injector);
 
+      this._JwtService = JwtService;
+      this._shouldAutoRefresh = JwtService.hasCustomConfig(CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH);
       this._isAutoExecution = false;
       this._AnalyzeService = AnalyzeService;
       this._$translate = $translate;
@@ -41,7 +45,6 @@ export const AnalyzeExecutedDetailComponent = {
       this._$q = $q;
       this._toastMessage = toastMessage;
       this._$window = $window;
-      this._JwtService = JwtService;
       this._executionId = $state.params.executionId;
       this._executionWatcher = null;
       this._executionToast = null;
@@ -87,7 +90,7 @@ export const AnalyzeExecutedDetailComponent = {
       this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
 
       let job;
-      if (this.isExecuting || this.analysis.type === 'report' || this._executionId) {
+      if (this.isExecuting || this.analysis.type === 'report' || this._executionId || !this._shouldAutoRefresh) {
         job = resolved.promise;
         this._isAutoExecution = this.isExecuting;
       } else {
