@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
@@ -23,11 +18,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import { Subject } from 'rxjs/Subject';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-import {
-  ArtifactColumnPivot,
-  Sort,
-  Format
-} from '../../../models';
+import { ArtifactColumnPivot, Sort, Format } from '../../../models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
@@ -260,7 +251,9 @@ export class PivotGridComponent {
   }
 
   getFormatter(format) {
-    return value => moment(value).format(format);
+    // Pivot grid auto converts given moment to local dates. It's important to
+    // re-convert it to the zone we used to provide dates to normalise it.
+    return value => moment.utc(value).format(format);
   }
 
   preProcessData(data) {
@@ -302,15 +295,15 @@ export class PivotGridComponent {
     switch (dateInterval) {
     case 'day':
       formatToApply = this.getMomentFormat(format);
-      return moment(value);
+      return moment.utc(value);
     case 'quarter':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
-      const formattedValue = moment(value).format(formatToApply);
+      const formattedValue = moment.utc(value).format(formatToApply);
       const parts = split(formattedValue, '-');
       return `${parts[0]}-Q${parts[1]}`;
     case 'month':
       formatToApply = DATE_INTERVALS_OBJ[dateInterval].momentFormat;
-      return moment(value).format(formatToApply);
+      return moment.utc(value).format(formatToApply);
     case 'year':
     default:
       return value;
@@ -329,7 +322,7 @@ export class PivotGridComponent {
 
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
-          const percent = (cloned.aggregate == 'percentage' ? true : false);
+          const percent = cloned.aggregate == 'percentage' ? true : false;
 
           if (!isUndefined(artifactColumn.format)) {
             artifactColumn.format.percentage = percent;
