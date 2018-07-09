@@ -145,7 +145,7 @@ export const AnalyzeChartDetailComponent = {
         rowAlternationEnabled: true,
         hoverStateEnabled: true,
         wordWrapEnabled: false,
-        customizeColumns: this.customizeColumns();
+        customizeColumns: this.customizeColumns(),
         gridWidth: '100%',
         paging: {
           pageSize: DEFAULT_PAGE_SIZE  
