@@ -16,7 +16,12 @@ require('./filter-chips.component.scss');
 
 @Component({
   selector: 'filter-chips-u',
-  template
+  template,
+  styles: [`
+    :host {
+      display: block;
+    }
+  `]
 })
 export class FilterChipsComponent {
   @Output() remove: EventEmitter<number>= new EventEmitter();

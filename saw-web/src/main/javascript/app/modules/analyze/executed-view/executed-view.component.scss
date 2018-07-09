@@ -5,6 +5,10 @@ $back-button-size: 32px;
 executed-view {
   width: 100%;
 
+  filter-chips-u {
+    padding: 10px 0 10px 10px;
+  }
+
   .back-button-icon.mat-icon {
     font-size: $back-button-size;
     line-height: $back-button-size;
