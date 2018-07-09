@@ -6,7 +6,6 @@ import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
-import { FilterService } from '../services/filter.service';
 import { ExecuteService } from '../services/execute.service';
 import { PublishService } from '../services/publish.service';
 import { Analysis } from '../types';
@@ -17,7 +16,6 @@ import { EXECUTION_MODES } from '../services/analyze.service';
 @Injectable()
 export class AnalyzeActionsService {
   constructor(
-    private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
     private _executeService: ExecuteService,
     private _publishService: PublishService,
@@ -28,12 +26,7 @@ export class AnalyzeActionsService {
   ) {}
 
   execute(analysis, mode = EXECUTION_MODES.LIVE) {
-    return this._filterService.getRuntimeFilterValues(analysis).then(model => {
-      if (model) {
-        this._executeService.executeAnalysis(model, mode);
-        return model;
-      }
-    });
+    return this._executeService.executeAnalysis(analysis, mode);
   }
 
   fork(analysis) {
