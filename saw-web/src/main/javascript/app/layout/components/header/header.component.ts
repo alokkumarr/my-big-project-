@@ -1,4 +1,4 @@
-import { Injectable, Component, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Inject, ChangeDetectorRef } from '@angular/core';
 import * as get from 'lodash/get';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
@@ -11,7 +11,6 @@ require('./header.component.scss');
   template
 })
 
-@Injectable()
 export class LayoutHeaderComponent {
   constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any, private cdRef:ChangeDetectorRef) { }
 

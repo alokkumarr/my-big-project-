@@ -1,5 +1,6 @@
 import * as get from 'lodash/get';
 import * as has from 'lodash/has';
+import * as isArray from 'lodash/isArray';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
@@ -16,6 +17,12 @@ const PRIVILEGE_INDEX = {
   EXPORT: 6,
   DELETE: 7,
   ALL: 8
+};
+
+/* Jwt token can have custom config values to drive
+ * behaviors in app. */
+export const CUSTOM_JWT_CONFIG = {
+  ES_ANALYSIS_AUTO_REFRESH: 'es-analysis-auto-refresh'
 };
 
 export class JwtService {
@@ -45,6 +52,21 @@ export class JwtService {
     );
 
     return get(analyzeModule, 'prodModFeature', []) || [];
+  }
+
+  /**
+   * hasCustomConfig
+   * Checks whether the current access token has
+   * a particular custom configuration enabled or not.
+   *
+   * @param configName
+   * @returns {undefined}
+   */
+  hasCustomConfig(configName) {
+    const customConfig = get(this.getTokenObj(), 'ticket.customConfig') || [];
+    return isArray(customConfig) ?
+      customConfig.includes(configName) :
+      false;
   }
 
   getAccessToken() {
