@@ -7,7 +7,7 @@ if (__PRODUCTION__) {
 } else {
   // Note: To run against a local Docker environment, use localhost
   // apiUrl = 'http://localhost';
-  apiUrl = 'https://saw-bda-cert-vaste.sncrcorp.net';
+  apiUrl = 'http://saw-rd601.ana.dev.vaste.sncrcorp.net/';
 }
 /* eslint-enable */
 apiUrl = apiUrl + '/saw';
