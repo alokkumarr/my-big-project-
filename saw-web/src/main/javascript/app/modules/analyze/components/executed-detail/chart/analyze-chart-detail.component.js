@@ -7,7 +7,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as flatMap from 'lodash/flatMap';
 import * as forEach from 'lodash/forEach';
-import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './analyze-chart-detail.component.html';
 
@@ -148,7 +147,7 @@ export const AnalyzeChartDetailComponent = {
         customizeColumns: this.customizeColumns(),
         gridWidth: '100%',
         paging: {
-          pageSize: DEFAULT_PAGE_SIZE  
+          pageSize: DEFAULT_PAGE_SIZE
         },
         pager: {
           showNavigationButtons: true,
@@ -157,12 +156,12 @@ export const AnalyzeChartDetailComponent = {
         },
         dataSource: this.trimKeyword(gridData)
 
-      }
+      };
       /* eslint-disable no-unused-expressions */
     }
 
     customizeColumns(columns) {
-      forEach(columns, (col) => {
+      forEach(columns, col => {
         col.allowSorting = false;
         col.alignment = 'left';
       });
@@ -174,29 +173,31 @@ export const AnalyzeChartDetailComponent = {
       });
     }
 
-    isFloat(n){
+    isFloat(n) {
       return Number(n) === n && n % 1 !== 0;
     }
 
     fetchColumnData(axisName, value) {
       let aliasName = axisName;
       forEach(this.columns, column => {
-        if(axisName === column.name) {
+        if (axisName === column.name) {
           aliasName = column.aliasName || column.displayName;
         }
-        if(axisName === column.name && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
+        if (axisName === column.name && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
           value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
         }
-      })
+      });
       return {aliasName, value};
     }
 
     trimKeyword(data) {
-      let trimData = data.map(row => {
-        let obj = {};
-        for(var key in row) {
-          let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
-          obj[trimKey.aliasName] = trimKey.value;
+      const trimData = data.map(row => {
+        const obj = {};
+        for (const key in row) {
+          if (key) {
+            const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+            obj[trimKey.aliasName] = trimKey.value;
+          }
         }
         return obj;
       });
