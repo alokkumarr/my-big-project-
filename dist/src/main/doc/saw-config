@@ -38,6 +38,11 @@ saw_zookeeper_quorum=localhost
 saw_metadata_path=/main/metadata
 saw_report_executor_path=/main
 saw_observe_metastore=hdfs:///main
+#Default configuration is set preview limit is 10000, if it not set in config file.
+#saw_preview_rows_limit=10000
+# Publish row limit is optional parameter and only get considered if it has been
+# set greater than 0 values if it not set then no limit will be applied for publishing the report.
+#saw_publish_rows_limit=10000
 
 #
 # Transport Service Executor configuration

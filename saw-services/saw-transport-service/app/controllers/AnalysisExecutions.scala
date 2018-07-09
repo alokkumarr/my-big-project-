@@ -38,7 +38,7 @@ class AnalysisExecutions extends BaseController {
       val junkExecution = new Array[String](junkSize)
       val executions = sortedExecutions.filter(result =>{
         count = count+1
-        if(count<=execHistory && !excludeOneTimeExecution(result._4.get,result._5.get)) true
+        if(count<=execHistory && !(result._4!=None && result._5!=None && excludeOneTimeExecution(result._4.get,result._5.get))) true
         else {
           if (count < execHistory || (junkExecution.size>=count+1 )) {
             junkExecution(count-1) = result._1

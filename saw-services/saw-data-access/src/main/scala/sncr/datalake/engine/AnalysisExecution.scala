@@ -74,11 +74,17 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
-          analysisNodeExecution.executeSQLNoDataLoad()
+          if (DLConfiguration.publishRowLimit>0)
+          analysisNodeExecution.executeSQLWithLimit(DLConfiguration.publishRowLimit)
+          else
+            analysisNodeExecution.executeSQLNoDataLoad()
           analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.publish => {
-          analysisNodeExecution.executeSQLNoDataLoad()
+          if (DLConfiguration.publishRowLimit>0)
+            analysisNodeExecution.executeSQLWithLimit(DLConfiguration.publishRowLimit)
+          else
+            analysisNodeExecution.executeSQLNoDataLoad()
           analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.publish.toString)
         }
       }
