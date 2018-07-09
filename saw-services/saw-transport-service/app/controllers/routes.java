@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/pman0003/Codebase/bda/resolveConflict/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Tue Mar 27 17:30:28 IST 2018
+// @SOURCE:sip/saw-services/saw-transport-service/conf/routes
+// @DATE:Wed Jul 04 14:27:39 IST 2018
 
 package controllers;
 

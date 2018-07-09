@@ -14,6 +14,8 @@ import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 
 
+import { EXECUTION_MODES } from '../services/analyze.service';
+
 @Injectable()
 export class AnalyzeActionsService {
   constructor(
@@ -27,10 +29,10 @@ export class AnalyzeActionsService {
     public dialog: MatDialog
   ) {}
 
-  execute(analysis) {
+  execute(analysis, mode = EXECUTION_MODES.LIVE) {
     return this._filterService.getRuntimeFilterValues(analysis).then(model => {
       if (model) {
-        this._executeService.executeAnalysis(model);
+        this._executeService.executeAnalysis(model, mode);
         return model;
       }
     });
@@ -178,6 +180,10 @@ export class AnalyzeActionsService {
   }
 
   exportAnalysis(analysisId, executionId, analysisType) {
-    return this._analyzeService.getExportData(analysisId, executionId, analysisType);
+    return this._analyzeService.getExportData(
+      analysisId,
+      executionId,
+      analysisType
+    );
   }
 }

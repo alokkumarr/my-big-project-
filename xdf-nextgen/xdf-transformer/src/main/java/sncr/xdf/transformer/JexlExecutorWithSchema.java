@@ -3,18 +3,15 @@ package sncr.xdf.transformer;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.broadcast.Broadcast;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
-import sncr.xdf.ngcomponent.AbstractComponent;
 
 import java.util.List;
 import java.util.Map;
 
-import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 
 
 /**
@@ -28,6 +25,7 @@ public class JexlExecutorWithSchema extends Executor{
                                        Map<String, Map<String, Object>> inputs,
                                        Map<String, Map<String, Object>> outputs) {
         super(ctx, script, st, tLoc, thr, inputs, outputs);
+        logger.trace("Inside JexlExecutorWithSchema");
     }
 
 /*
@@ -40,6 +38,7 @@ public class JexlExecutorWithSchema extends Executor{
             JavaRDD dataRdd,
             Map<String, Broadcast<List<Row>>> referenceData,
             Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor) {
+        logger.trace("Transforming data");
         JavaRDD rdd = dataRdd.map(
                 new TransformWithSchema(
                         script,
@@ -53,6 +52,7 @@ public class JexlExecutorWithSchema extends Executor{
     }
 
     public void execute(Map<String, Dataset> dsMap) throws Exception {
+        logger.trace("Executing Jexl transformation");
         Dataset ds = dsMap.get(inDataSet);
         prepareRefData(dsMap);
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
@@ -60,7 +60,7 @@ public class JexlExecutorWithSchema extends Executor{
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         //df.schema().prettyJson();
-        logger.trace("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
+        logger.info("Transformation completed: " + c + " Schema: " + df.schema().prettyJson());
         createFinalDS(df.cache());
     }
 
