@@ -1,0 +1,13 @@
+[Unit]
+Description=Apache Spark Worker
+After=default.target
+
+[Service]
+User=mapr
+Type=forking
+ExecStart=/opt/mapr/spark/spark-2.2.1/sbin/start-slaves.sh
+ExecStop=/opt/mapr/spark/spark-2.2.1/sbin/stop-slaves.sh
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -17,9 +17,9 @@
         <maven.assembly.version>2.5.5</maven.assembly.version>
         <project.basedir>.</project.basedir>
         <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
-        <mapr.client>5.2.0.39122-mapr</mapr.client>
+        <mapr.client>6.0.1-mapr</mapr.client>
         <maprdb.version>1.1.1-mapr-1602</maprdb.version>
-        <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+        <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
         <common.lang>2.6</common.lang>
     </properties>
     <dependencies>

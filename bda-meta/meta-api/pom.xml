@@ -14,7 +14,7 @@
     <dependency>
       <groupId>com.mapr.db</groupId>
       <artifactId>maprdb</artifactId>
-      <version>5.2.0-mapr</version>
+      <version>6.0.1-mapr</version>
       <scope>${s-value}</scope>
     </dependency>
     <dependency>
