@@ -17,9 +17,9 @@ and its modules in an environment.
 Before starting an installation of SAW ensure the following has been
 provided in the environment:
 
-. Install and configure a MapR version 5.2 cluster in the environment
+. Install and configure a MapR version 6.0 cluster in the environment
 
-. Install and configure Apache Spark version 2.1 from the MapR
+. Install and configure Apache Spark version 2.2 from the MapR
   Ecosystem Pack on the MapR cluster
 
 . Install and configure Apache Livy from the MapR Ecosystem Pack on
