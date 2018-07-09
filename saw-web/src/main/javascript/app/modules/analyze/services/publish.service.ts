@@ -10,8 +10,11 @@ export class PublishService {
     private _executeService: ExecuteService
   ) {}
 
-  publishAnalysis(model, execute = false) {
-    this._analyzeService.changeSchedule(model);
+  publishAnalysis(model, execute = false, type) {
+    console.log(model, execute);
+    if (type === 'schedule') {
+      this._analyzeService.changeSchedule(model);  
+    }
 
     return this._analyzeService.updateAnalysis(model).then(analysis => {
       if (execute) {
