@@ -14,6 +14,9 @@ import {
   DATE_FORMATS,
   DATE_FORMATS_OBJ,
   DEFAULT_DATE_FORMAT,
+  CHART_DATE_FORMATS,
+  CHART_DATE_FORMATS_OBJ,
+  CHART_DEFAULT_DATE_FORMAT,
   AGGREGATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
@@ -30,6 +33,9 @@ export {
   DATE_FORMATS,
   DATE_FORMATS_OBJ,
   DEFAULT_DATE_FORMAT,
+  CHART_DATE_FORMATS,
+  CHART_DATE_FORMATS_OBJ,
+  CHART_DEFAULT_DATE_FORMAT,
   AGGREGATE_TYPES,
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
@@ -213,12 +219,14 @@ export const ANALYSIS_METHODS = [
       {
         label: 'Time series chart',
         icon: {font: 'icon-timeseries-chart'},
-        type: 'chart:tsspline'
+        type: 'chart:tsspline',
+        typeOnBackEnd: 'chart:tsline'
       },
       {
         label: 'Time series multi pane',
         icon: {font: 'icon-Candlestick-icon'},
-        type: 'chart:tsPane'
+        type: 'chart:tsPane',
+        typeOnBackEnd: 'chart:tsareaspline'
       }
     ]
   }

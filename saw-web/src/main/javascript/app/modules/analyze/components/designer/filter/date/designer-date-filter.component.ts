@@ -1,16 +1,9 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
-import {FormControl} from '@angular/forms';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import * as moment from 'moment';
-import {MAT_DATE_FORMATS} from '@angular/material/core';
-import {
-  FilterModel
-} from '../../types';
-import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../../consts';
+import { MAT_DATE_FORMATS } from '@angular/material/core';
+import { FilterModel } from '../../types';
+import { CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS } from '../../../../consts';
 
 const template = require('./designer-date-filter.component.html');
 
@@ -28,20 +21,26 @@ export const MY_FORMATS = {
   }
 };
 
+export const isValid = (model: FilterModel): boolean => {
+  model = model || {};
+  return model.preset === CUSTOM_DATE_PRESET_VALUE
+    ? Boolean(model.lte && model.gte)
+    : Boolean(model.preset);
+};
+
 @Component({
   selector: 'designer-date-filter',
   template,
-  providers: [
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS}
-  ]
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }]
 })
 export class DesignerDateFilterComponent {
-  @Output() public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
+  @Output()
+  public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
   @Input() public filterModel: FilterModel;
 
-  lteFC = new FormControl({value: null, disabled: true});
-  gteFC = new FormControl({value: null, disabled: true});
-  datePreset = new FormControl({value: null, disabled: false})
+  lteFC = new FormControl({ value: null, disabled: true });
+  gteFC = new FormControl({ value: null, disabled: true });
+  datePreset = new FormControl({ value: null, disabled: false });
   showDateFields = false;
   presets = DATE_PRESETS;
 
@@ -53,7 +52,7 @@ export class DesignerDateFilterComponent {
         gte: moment(this.filterModel.gte),
         lte: moment(this.filterModel.lte),
         preset: this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE
-      }
+      };
       this.lteFC.setValue(this.tempModel.lte);
       this.gteFC.setValue(this.tempModel.gte);
     } else {
@@ -83,11 +82,14 @@ export class DesignerDateFilterComponent {
     this.filterModelChange.emit(this.getFormattedModel(this.tempModel));
   }
 
-  getFormattedModel({lte, gte, preset}) {
+  getFormattedModel({ lte, gte, preset }) {
+    /* prettier-ignore */
     return {
-      lte: lte ? lte.format(DATE_FORMAT) : null,
-      gte: gte ? gte.format(DATE_FORMAT) : null,
-      preset
-    }
+      preset,
+      ...(preset === CUSTOM_DATE_PRESET_VALUE ? {
+        lte: lte ? lte.format(DATE_FORMAT) : null,
+        gte: gte ? gte.format(DATE_FORMAT) : null
+      } : {})
+    };
   }
 }

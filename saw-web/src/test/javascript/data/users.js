@@ -1,21 +1,35 @@
-const webpackHelper = require('../../../../conf/webpack.helper');
+const roles = require('./roles');
+const globalVariables = require('../helpers/globalVariables');
 
 const users = {
+  // initial admin user on docker instance
+  masterAdmin: {
+    loginId: 'sawadmin@synchronoss.com', // local docker implementation
+    roleName: 'ADMIN',
+    status: 'ACTIVE',
+    firstName: 'at',
+    lastName: 'admin',
+    password: 'Sawsyncnewuser1!',
+    userId: 1
+  },
   admin: {
-    loginId: webpackHelper.distRun() ? "sawadmin@synchronoss.com" : "at.admin",
-    role: "AT Role Admin DO NOT TOUCH",
-    status: "ACTIVE",
-    firstname: "at",
-    lastName: "admin"
+    loginId: 'at.admin.' + globalVariables.e2eId,
+    roleName: roles.admin.roleName,
+    status: 'ACTIVE',
+    firstName: 'at',
+    lastName: 'admin'
   },
   userOne: {
-    loginId: webpackHelper.distRun() ? "sawadmin@synchronoss.com" : "at.userOne",
-    role: "AT Role User One DO NOT TOUCH"
+    loginId: 'at.userOne.' + globalVariables.e2eId,
+    roleName: roles.userOne.roleName,
+    status: 'ACTIVE',
+    firstName: 'at',
+    lastName: 'user'
   },
   // Password and email is common to all users, recorded under anyUser
   anyUser: {
-    password: webpackHelper.distRun() ? "Sawsyncnewuser1!" : "Password1!",
-    email: "alexander.krivorotko@moduscreate.com"
+    password: 'Password1!',
+    email: 'e2e@email.com'
   }
 };
 

@@ -172,8 +172,7 @@ public class UserRepositoryImpl implements UserRepository {
 		// change the pass
 		// update pass history
 		String encNewPass = Ccode.cencode(newPass).trim();
-		String sql = "SELECT U.USER_SYS_ID FROM USERS U, CONTACT_INFO C, USER_CONTACT UC WHERE  U.USER_SYS_ID = UC.USER_SYS_ID "
-				+ "AND UC.CONTACT_INFO_SYS_ID=C.CONTACT_INFO_SYS_ID AND U.USER_ID = ?";
+		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -468,6 +467,9 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.PrepareTicketExtractor());
 
+           List<String> customConfig = prepareCustomConfig(ticketDetails.getCustCode());
+           ticketDetails.setCustomConfig(customConfig);
+
 			// Cust - Prod
 			String sql3 = "SELECT DISTINCT P.PRODUCT_NAME,P.PRODUCT_DESC,P.PRODUCT_CODE,P.PRODUCT_SYS_ID,PV.PRIVILEGE_CODE FROM CUSTOMER_PRODUCTS CP JOIN PRODUCTS P "
 					+ " ON(CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID) JOIN `PRIVILEGES` PV ON(CP.CUST_PROD_SYS_ID=PV.CUST_PROD_SYS_ID) "
@@ -634,6 +636,9 @@ public class UserRepositoryImpl implements UserRepository {
 					dskList.add(dskDetails);
 				}
 				ticketDetails.setDataSKey(dskList);
+
+
+
 				/**
 				 * String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE,
 				 * P.PRIVILEGE_NAME, P.PRIVILEGE_DESC, CPMF.FEATURE_NAME FROM
@@ -806,6 +811,29 @@ public class UserRepositoryImpl implements UserRepository {
 					e);
 		}
 	}
+
+    /**
+     * Prepare the custom configurations applicable for the customer.
+     * @param customerCode
+     * @return
+     */
+	private List<String> prepareCustomConfig(String customerCode)
+    {
+        String sql = "SELECT CONFIG_VAL_CODE  FROM CONFIG_VAL CV , CUSTOMERs C WHERE " +
+            "CV.CONFIG_VAL_OBJ_GROUP = ? AND CV.CONFIG_VAL_OBJ_GROUP=C.CUSTOMER_CODE AND " +
+            "CV.ACTIVE_STATUS_IND=1 AND UPPER(CV.CONFIG_VAL_OBJ_TYPE) = 'CUSTOMER'";
+        List<String> customConfig = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+        public void setValues(PreparedStatement preparedStatement) throws SQLException {
+            preparedStatement.setString(1, customerCode);
+        }
+    }, resultSet -> {
+        List<String> config = new ArrayList<>();
+        while(resultSet.next())
+            config.add(resultSet.getString("CONFIG_VAL_CODE"));
+        return config;
+    });
+        return customConfig;
+    }
 
 	private class  DSKValuesExtractor implements ResultSetExtractor<Map <String , List<String>>>{
 		Map<String , List<String>> dskValues = new HashMap<>();
@@ -1159,15 +1187,14 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public String getUserEmailId(String userId) {
 		String message = null;
-		String sql = "select ci.email from USERS u, USER_CONTACT uc, CONTACT_INFO ci " + " where u.user_id=?"
-				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+		String sql = "select u.email from USERS u where u.user_id=? and u.ACTIVE_STATUS_IND = '1'";
 
 		try {
-			return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, userId);
-				}
-			}, new UserRepositoryImpl.EmailExtractor());
+            return jdbcTemplate.query(sql, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                    preparedStatement.setString(1, userId);
+                }
+            }, new UserRepositoryImpl.EmailExtractor());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;
@@ -3121,4 +3148,6 @@ public class UserRepositoryImpl implements UserRepository {
 
 		return valid;
 	}
+
+
 }

@@ -70,7 +70,15 @@ public class WorkbenchExecuteJob implements Job<Integer> {
             throw new RuntimeException(
                 "XDF returned non-zero status: " + rc);
         }
-        log.info("Finished execute job");
-        return null;
+      };
+    } else {
+      throw new IllegalArgumentException("Unknown component: " + component);
     }
+    int status = Component.startComponent(xdfComponent, root, config, project, batch);
+    if (status != 0) {
+      throw new RuntimeException("XDF returned non-zero status: " + status);
+    }
+    log.info("Finished execute job");
+    return null;
+  }
 }

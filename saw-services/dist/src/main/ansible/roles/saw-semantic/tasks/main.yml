@@ -1,0 +1,13 @@
+- name: Copy SAW Semantic Service package
+  copy: src="{{ item }}" dest=/tmp/saw-semantic.rpm
+  with_fileglob: ["../rpms/saw-semantic-*.rpm"]
+- name: Install SAW Semantic Service package
+  yum: name=/tmp/saw-semantic.rpm state=present
+  notify:
+    - restart saw-semantic
+- name: Install SAW Semantic Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-semantic-service/conf
+  notify:
+    - restart saw-semantic
+- name: Enable SAW Semantic Service
+  systemd: name=saw-semantic-proxy.socket enabled=true state=started

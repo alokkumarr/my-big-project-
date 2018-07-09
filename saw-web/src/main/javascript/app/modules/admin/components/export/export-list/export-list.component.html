@@ -1,0 +1,35 @@
+<md-card>
+  <md-card-header layout="row" layout-align="end start">
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline" translate="LIST_VIEW_EXPORT"></span>        
+      </md-card-title-text>
+    </md-card-title>
+  </md-card-header>     
+  <md-card-content layout="row">
+    <div id="user-grid" dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">     
+      <div data-options="dxTemplate: { name: 'selectionCellTemplate' }">
+        <md-card-actions layout="row" layout-align="center center">
+          <md-checkbox ng-click="$ctrl.editRow(report, report.value)" ng-model="report.value"></md-checkbox>
+        </md-card-actions>
+      </div> 
+      <div data-options="dxTemplate: { name: 'analysisNameCellTemplate' }" >
+        <span ng-bind-html="report.value"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'analysisTypeCellTemplate' }" >
+        <span ng-bind-html="report.value"></span>   
+      </div>
+      <div data-options="dxTemplate: { name: 'metricNameCellTemplate' }" >
+        <span ng-bind-html="report.value"></span>
+      </div>            
+    </div>
+  </md-card-content>
+  <div class="layout-row">
+            <md-button class="md-raised md-primary button-pull-right" 
+            ng-click="$ctrl.doExport($ctrl.analysisList)"
+            ng-disabled="$ctrl.validation()"
+            style="margin-top: 10px;"
+		        translate="EXPORT_BUTTON"> </md-button>
+          </div>
+</md-card>
+      

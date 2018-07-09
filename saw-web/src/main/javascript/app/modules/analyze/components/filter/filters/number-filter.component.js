@@ -38,7 +38,7 @@ export const OPERATORS = {
   BETWEEN: {
     value: 'BTW',
     shortName: 'BTW',
-    hint: 'BETWEEN'
+    hint: 'Between'
   }
 };
 

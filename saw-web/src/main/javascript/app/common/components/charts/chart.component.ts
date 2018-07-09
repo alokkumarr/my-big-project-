@@ -9,17 +9,26 @@ import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
+import * as isUndefined from 'lodash/isUndefined';
+import * as find from 'lodash/find';
+
 import {
   globalChartOptions,
   chartOptions,
-  stockChartOptions
+  stockChartOptions,
+  bulletChartOptions
 } from './default-chart-options';
-import * as isUndefined from 'lodash/isUndefined';
 
 export const UPDATE_PATHS = {
   SERIES: 'series.0',
   X_AXIS: 'xAxis'
 };
+
+export const CHART_SETTINGS_OBJ = [
+  { type: 'default', config: chartOptions },
+  { type: 'highStock', config: stockChartOptions },
+  { type: 'bullet', config: bulletChartOptions }
+];
 
 @Component({
   selector: 'chart',
@@ -36,37 +45,31 @@ export class ChartComponent {
   private highstocks: any = Highstock;
   private chart: any = null;
   private config: any = {};
-  private stockConfig: any = {};
   private subscription: any;
   private clonedConfig: any = {};
+  private cType: string;
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);
   }
 
   ngAfterViewInit() {
-    this.config = defaultsDeep(this.config, this.options, chartOptions);
-    this.stockConfig = defaultsDeep(
-      this.stockConfig,
-      this.options,
-      stockChartOptions
-    );
     this.enableExport && this.enableExporting(this.config);
-    this.enableExport && this.enableExporting(this.stockConfig);
-    if (this.isStockChart) {
-      this.chart = this.highstocks.stockChart(
-        this.container.nativeElement,
-        this.stockConfig
-      );
-    } else {
-      this.chart = this.highcharts.chart(
-        this.container.nativeElement,
-        this.config
-      );
-    }
   }
 
   ngOnInit() {
+    //set the appropriate config based on chart type
+    this.cType = this.isStockChart ? 'highStock' : this.options.chart.type;
+    this.config = defaultsDeep(
+      this.config,
+      this.options,
+      get(
+        find(CHART_SETTINGS_OBJ, ['type', this.cType]),
+        'config',
+        chartOptions
+      )
+    );
+
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
       this.subscription = this.updater.subscribe({

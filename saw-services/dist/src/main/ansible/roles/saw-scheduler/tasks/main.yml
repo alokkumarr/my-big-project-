@@ -1,6 +1,8 @@
-- name: Install SAW Scheduler package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Scheduler Service package
+  copy: src="{{ item }}" dest=/tmp/saw-scheduler.rpm
   with_fileglob: ["../rpms/saw-scheduler-*.rpm"]
+- name: Install SAW Scheduler package
+  yum: name=/tmp/saw-scheduler.rpm state=present
   notify:
     - restart saw-scheduler
 - name: Install SAW scheduler Service configuration file

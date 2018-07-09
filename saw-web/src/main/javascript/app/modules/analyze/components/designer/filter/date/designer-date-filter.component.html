@@ -11,7 +11,7 @@
   </mat-form-field>
 
   <div fxLayout="row" fxLayoutAlign="space-between center" *ngIf="showDateFields">
-    <mat-form-field e2e="filter-to-datepicker">
+    <mat-form-field e2e="filter-date-from">
       <input matInput
             (dateChange)="modelChange($event.value, 'gte')"
             [matDatepicker]="gte"
@@ -25,7 +25,7 @@
                       disabled="false">
       </mat-datepicker>
     </mat-form-field>
-    <mat-form-field e2e="filter-from-datepicker">
+    <mat-form-field e2e="filter-date-to">
       <input matInput
             (dateChange)="modelChange($event.value, 'lte')"
             [matDatepicker]="lte"

@@ -1,46 +1,60 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
-import {
-  FilterModel
-} from '../../types';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { FilterModel } from '../../types';
+
+import * as isFinite from 'lodash/isFinite';
+import * as unset from 'lodash/unset';
 
 const template = require('./designer-number-filter.component.html');
 require('./designer-number-filter.component.scss');
 
-export const OPERATORS = [{
-  value: 'GT',
-  label: 'Greater than'
-}, {
-  value: 'LT',
-  label: 'Less than'
-}, {
-  value: 'GTE',
-  label: 'Greater than or equal to'
-}, {
-  value: 'LTE',
-  label: 'Less than or equal to'
-}, {
-  value: 'EQ',
-  label: 'Equal to'
-}, {
-  value: 'NEQ',
-  label: 'Not equal to'
-}, {
-  value: 'BTW',
-  label: 'Between'
-}
+export const OPERATORS = [
+  {
+    value: 'GT',
+    label: 'Greater than'
+  },
+  {
+    value: 'LT',
+    label: 'Less than'
+  },
+  {
+    value: 'GTE',
+    label: 'Greater than or equal to'
+  },
+  {
+    value: 'LTE',
+    label: 'Less than or equal to'
+  },
+  {
+    value: 'EQ',
+    label: 'Equal to'
+  },
+  {
+    value: 'NEQ',
+    label: 'Not equal to'
+  },
+  {
+    value: 'BTW',
+    label: 'Between'
+  }
 ];
+
+export const isValid = (model: FilterModel) => {
+  model = model || {};
+
+  return (
+    model.operator &&
+    isFinite(model.value) &&
+    (model.operator !== 'BTW' ? true : isFinite(model.otherValue))
+  );
+};
 
 @Component({
   selector: 'designer-number-filter',
   template
 })
 export class DesignerNumberFilterComponent {
-  @Output() public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
+  @Output()
+  public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
   @Input() public filterModel: FilterModel;
 
   public OPERATORS = OPERATORS;
@@ -66,13 +80,27 @@ export class DesignerNumberFilterComponent {
   }
 
   onValueChange(value) {
-    this.filterModel.value = parseFloat(value);
-    this.onFilterModelChange();
+    if (value === '') {
+      unset(this.filterModel, 'value');
+      this.onFilterModelChange();
+    }
+    const parsed = parseFloat(value);
+    if (isFinite(parsed)) {
+      this.filterModel.value = parsed;
+      this.onFilterModelChange();
+    }
   }
 
   onOtherValueChange(value) {
-    this.filterModel.otherValue = parseFloat(value);
-    this.onFilterModelChange();
+    if (value === '') {
+      unset(this.filterModel, 'otherValue');
+      this.onFilterModelChange();
+    }
+    const parsed = parseFloat(value);
+    if (isFinite(parsed)) {
+      this.filterModel.otherValue = parsed;
+      this.onFilterModelChange();
+    }
   }
 
   onOperatorChange(operator) {

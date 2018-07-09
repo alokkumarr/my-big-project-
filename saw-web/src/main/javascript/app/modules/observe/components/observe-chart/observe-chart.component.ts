@@ -1,4 +1,10 @@
-import { Component, Input, Output, EventEmitter, ViewChild} from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
@@ -6,6 +12,7 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
+import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
@@ -20,13 +27,12 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as concat from 'lodash/concat';
 
-import { NUMBER_TYPES } from '../../../analyze/consts';
-
 const template = require('./observe-chart.component.html');
 
 @Component({
   selector: 'observe-chart',
-  template
+  template,
+  providers: [ChartService]
 })
 export class ObserveChartComponent {
   @Input() analysis: any;
@@ -39,7 +45,7 @@ export class ObserveChartComponent {
   private chartUpdater = new BehaviorSubject([]);
   private requesterSubscription: Subscription;
   public legend: any;
-  public chartOptions: any;;
+  public chartOptions: any;
   public settings: any;
   public labels: any;
   public gridData: Array<any>;
@@ -47,17 +53,23 @@ export class ObserveChartComponent {
   public filters: Array<any>;
   public isStockChart: boolean;
 
-  constructor(public chartService: ChartService,
+  constructor(
+    public chartService: ChartService,
     public analyzeService: AnalyzeService,
     public sortService: SortService,
     public filterService: FilterService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.legend = this.chartService.initLegend(this.analysis);
 
-    this.chartOptions = this.chartService.getChartConfigFor(this.analysis.chartType, { legend: this.legend });
-    this.isStockChart = isUndefined(this.analysis.isStockChart) ? false : this.analysis.isStockChart;
+    this.chartOptions = this.chartService.getChartConfigFor(
+      this.analysis.chartType,
+      { legend: this.legend }
+    );
+    this.isStockChart = isUndefined(this.analysis.isStockChart)
+      ? false
+      : this.analysis.isStockChart;
     this.subscribeToRequester();
   }
 
@@ -70,7 +82,11 @@ export class ObserveChartComponent {
      changes coming from parent before passing them on. */
   subscribeToRequester() {
     this.requesterSubscription = this.requester.subscribe(data => {
-      let changes = this.getChangeConfig(this.settings, this.gridData, this.labels);
+      let changes = this.getChangeConfig(
+        this.settings,
+        this.gridData,
+        this.labels
+      );
       changes = changes.concat(data);
       this.chartUpdater.next(changes);
     });
@@ -81,13 +97,14 @@ export class ObserveChartComponent {
   }
 
   initChart() {
-    this.labels = {x: null, y: null, tempX: null, tempY: null};
+    this.labels = { x: null, y: null, tempX: null, tempY: null };
     this.labels.tempX = this.labels.x = get(this.analysis, 'xAxis.title', null);
     this.labels.tempY = this.labels.y = get(this.analysis, 'yAxis.title', null);
 
-    const sortFields = this.sortService.getArtifactColumns2SortFieldMapper()(this.analysis.artifacts[0].columns);
-    this.sorts = this.analysis.sqlBuilder.sorts ?
-      this.sortService.mapBackend2FrontendSort(this.analysis.sqlBuilder.sorts, sortFields) : [];
+    const sortFields = this.sortService.getArtifactColumns2SortFieldMapper()(
+      this.analysis.artifacts[0].columns
+    );
+    this.sorts = this.analysis.sqlBuilder.sorts;
 
     this.filters = map(
       get(this.analysis, 'sqlBuilder.filters', []),
@@ -99,22 +116,37 @@ export class ObserveChartComponent {
       layout: get(this.analysis, 'legend.layout')
     };
 
-    this.settings = this.chartService.fillSettings(this.analysis.artifacts, this.analysis);
+    this.settings = this.chartService.fillSettings(
+      this.analysis.artifacts,
+      this.analysis
+    );
     this.chartService.updateAnalysisModel(this.analysis);
 
-    this.onRefreshData().then(data => {
-      this.gridData = data;
-      this.reloadChart(this.settings, this.gridData, this.labels);
-      this.item && this.onRefresh.emit(this.item);
-    });
+    if (isUndefined(this.analysis._executeTile) || this.analysis._executeTile) {
+      this.onRefreshData().then(data => {
+        this.gridData = data;
+        this.reloadChart(this.settings, this.gridData, this.labels);
+        this.item && this.onRefresh.emit(this.item);
+      });
+    }
   }
 
   isNodeField(field) {
-    return field && (!NUMBER_TYPES.includes(field.type) || field.checked === 'x');
+    const nodeFieldAreas = ['x', 'g'];
+    return (
+      field &&
+      (nodeFieldAreas.includes(field.checked) ||
+        nodeFieldAreas.includes(field.area))
+    );
   }
 
   isDataField(field) {
-    return field && NUMBER_TYPES.includes(field.type) && field.checked !== 'x';
+    const nodeFieldAreas = ['y', 'z'];
+    return (
+      field &&
+      (nodeFieldAreas.includes(field.checked) ||
+        nodeFieldAreas.includes(field.area))
+    );
   }
 
   reloadChart(settings, gridData, labels) {
@@ -131,7 +163,7 @@ export class ObserveChartComponent {
     if (!isEmpty(this.sorts)) {
       gridData = orderBy(
         gridData,
-        map(this.sorts, 'field.dataField'),
+        map(this.sorts, 'columnName'),
         map(this.sorts, 'order')
       );
     }
@@ -145,8 +177,8 @@ export class ObserveChartComponent {
 
     changes = changes.concat(this.getLegend());
     changes = changes.concat([
-      {path: 'title.text', data: this.analysis.name},
-      {path: 'title.y', data: -10}
+      { path: 'title.text', data: this.analysis.name },
+      { path: 'title.y', data: -10 }
     ]);
 
     changes.push({
@@ -160,7 +192,7 @@ export class ObserveChartComponent {
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
     return this.analyzeService.getDataBySettings(payload).then(({ data }) => {
-      const parsedData = this.chartService.parseData(data, payload.sqlBuilder);
+      const parsedData = flattenChartData(data, payload.sqlBuilder);
       return parsedData || [];
     });
   }
@@ -168,24 +200,27 @@ export class ObserveChartComponent {
   generatePayload(source) {
     const payload = clone(source);
 
-    set(payload, 'sqlBuilder.filters', map(
-      this.filters,
-      this.filterService.frontend2BackendFilter()
-    ));
+    set(
+      payload,
+      'sqlBuilder.filters',
+      map(this.filters, this.filterService.frontend2BackendFilter())
+    );
 
+    const g = find(this.settings.groupBy, g => (g.area || g.checked) === 'g');
+    const x = find(this.settings.xaxis, x => (x.area || x.checked) === 'x');
+    const y = filter(this.settings.yaxis, y => (y.area || y.checked) === 'y');
+    const z = find(this.settings.zaxis, z => (z.area || z.checked) === 'z');
 
-    const g = find(this.settings.groupBy, g => g.checked === 'g');
-    const x = find(this.settings.xaxis, x => x.checked === 'x');
-    const y = filter(this.settings.yaxis, y => y.checked === 'y');
-    const z = find(this.settings.zaxis, z => z.checked === 'z');
-
-    const allFields = [g, x, ...y, z];
+    const allFields = [x, g, ...y, z];
 
     let nodeFields = filter(allFields, this.isNodeField);
     const dataFields = filter(allFields, this.isDataField);
 
     if (payload.chartType === 'scatter') {
-      const xFields = remove(dataFields, ({ checked }) => checked === 'x');
+      const xFields = remove(
+        dataFields,
+        ({ checked, area }) => (area || checked) === 'x'
+      );
       nodeFields = concat(xFields, nodeFields);
     }
 
@@ -199,8 +234,16 @@ export class ObserveChartComponent {
     set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
     delete payload.supports;
-    set(payload, 'sqlBuilder.sorts', this.sortService.mapFrontend2BackendSort(this.sorts));
-    set(payload, 'sqlBuilder.booleanCriteria', this.analysis.sqlBuilder.booleanCriteria);
+    set(
+      payload,
+      'sqlBuilder.sorts',
+      this.sorts
+    );
+    set(
+      payload,
+      'sqlBuilder.booleanCriteria',
+      this.analysis.sqlBuilder.booleanCriteria
+    );
     set(payload, 'xAxis', { title: this.labels.x });
     set(payload, 'yAxis', { title: this.labels.y });
     set(payload, 'legend', {
@@ -219,7 +262,7 @@ export class ObserveChartComponent {
       return [];
     }
 
-    return ([
+    return [
       {
         path: 'legend.align',
         data: align.align
@@ -232,6 +275,6 @@ export class ObserveChartComponent {
         path: 'legend.layout',
         data: layout.layout
       }
-    ]);
+    ];
   }
 }

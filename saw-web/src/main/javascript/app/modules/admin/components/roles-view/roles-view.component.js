@@ -1,3 +1,4 @@
+import * as isUndefined from 'lodash/isUndefined';
 import * as template from './roles-view.component.html';
 import style from './roles-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
@@ -11,11 +12,12 @@ const SEARCH_CONFIG = [
   {keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc'}
 ];
 
+let self;
 export const RolesViewComponent = {
   template,
   styles: [style],
   controller: class RolesViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, RolesManagementService, $window, $rootScope, LocalSearchService) {
+    constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, RolesManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -52,10 +54,14 @@ export const RolesViewComponent = {
         this._$rootScope.showProgress = false;
       });
       this.roleTypes = [];
+      this._$timeout = $timeout;
+      self = this;
     }
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-      leftSideNav.update(AdminMenuData, 'ADMIN');
+      this._$timeout(() => {
+        const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+        leftSideNav.update(AdminMenuData, 'ADMIN');
+      });
     }
     openNewRoleModal() {
       this._$rootScope.showProgress = true;
@@ -183,7 +189,10 @@ export const RolesViewComponent = {
       return false;
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
+      if (!isUndefined(value)) {
+        this.states.searchTerm = value;
+      }
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
 

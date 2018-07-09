@@ -8,12 +8,12 @@ import sncr.xdf.component.WithSparkContext;
  */
 public class ESReaderComponent extends Component implements WithSparkContext {
     @Override
-    protected int Execute() {
+    protected int execute() {
         return 0;
     }
 
     @Override
-    protected int Archive() {
+    protected int archive() {
         return 0;
     }
 

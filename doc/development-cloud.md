@@ -8,36 +8,38 @@ cloud:
 2. Rename it to `docker-machine` (or `docker-machine.exe` on Windows)
    and put it on your `PATH`
 
-3. Configure the following environment variables on your computer:
-
-        SAW_AWS_REGION=us
-        SAW_AWS_ACCESS_KEY_ID=AKIAIMXBE56B6CRN6GKA
-        SAW_AWS_SECRET_ACCESS_KEY=<secret>
-        SAW_AWS_USERNAME=<user0001>
-
-4. Note: The `SAW_AWS_REGION` variable must be set to either `us` (for
-   the U.S.)  or `in` (for India).  Ask a SAW team member for the
-   secret access key value.  The `SAW_AWS_USERNAME` variable must be
-   set to your Synchronoss Active Directory username.
-
-5. Run the following commands to build and deploy SAW to the remote
+3. Run the following commands to build and deploy SAW to the remote
    Docker Machine host:
 
         $ mvn package
         $ mvn -Ddocker-start=cloud
+        
+   Running docker machine in yarn mode.
+   
+        $ mvn package
+        $ mvn -Ddocker-start=cloud -Dsaw.yarn.enabled=true
 
-6. Get the SAW start page URL by running the following command:
+4. Run the following command to get the name of your Docker Machine:
 
-        $ docker-machine ssh user-$SAW_AWS_USERNAME saw-url
+        $ docker-machine ls
 
-7. Navigate to the SAW start page URL in your browser
+5. Get the SIP start page URL by running the following command:
 
-Note: The first run will take longer to complete, up to 20 minutes.
-Subsequent runs using the same remote machine will be faster and take
-only a couple of minutes.  Also please note that remote machines are
-automatically shut down after a couple of hours, to reduce costs.
-Contents of the machine are preserved and it can be started up again
-if needed.
+        $ docker-machine ssh <name> sip-url
+
+6. Navigate to the SIP start page in your browser using the URL
+   address retrieved in the previous step
+
+Note: The first run will take longer to complete.  Subsequent runs
+using the same remote machine will be faster and take only a couple of
+minutes.  Also please note that remote machines are automatically shut
+down after a couple of hours, to reduce costs.  Contents of the
+machine are preserved and it can be started up again if needed with
+the command `docker-machine start <name>`.
+
+Note: Deployment might be faster if you deploy to a cloud region that
+is physically closer to you.  For example, to deploy to the India
+cloud region, add `-Dsip.cloud.region=in` to the deploy command.
 
 [Docker Machine]: https://github.com/docker/machine/releases/
 
@@ -46,7 +48,7 @@ if needed.
 To log in to the remote Docker Machine host, execute the following
 command:
 
-        $ docker-machine ssh user-$SAW_AWS_USERNAME
+        $ docker-machine ssh <name>
 
 # Automatic shutdown of remote Docker Machine host
 
@@ -57,14 +59,6 @@ automatically be started up again when executing a Docker Machine
 command the next time.  This speeds up subsequent SAW deploys because
 the remote host will already have been provisioned and has the Docker
 build cache ready.
-
-If you want to remove a stopped Docker Machine host completely,
-execute the following command:
-
-        $ docker-machine rm user-$SAW_AWS_USERNAME
-
-The remote host will automatically be recreated the next time SAW is
-deployed using Docker Machine.
 
 # Troubleshooting
 
@@ -87,22 +81,22 @@ to the AWS console and delete that key pair.  Then retry deploying.
 If you don't have access to the AWS console yourself, ask a team
 member for help.
 
-## Invalid certificats
+## Invalid certificates
 
 If a Docker Machine was previously stopped and later on is started
 again, it might get a new IP address from AWS.  In this case you will
 get an invalid certificate error.  To regenerate certificates, execute
 the following command:
 
-        $ docker-machine regenerate-certs user-$SAW_AWS_USERNAME
+        $ docker-machine regenerate-certs <name>
 
 Then retry deploying again.
 
 ## Starting from scratch
 
 If everything else fails or you get a difficult to troubleshoot error,
-execute `docker-machine rm user-$SAW_AWS_USERNAME` to delete the
-Docker Machine host and start again from scratch.
+execute `docker-machine rm <name>` to delete the Docker Machine host
+and start again from scratch.
 
 # Deploying from the continuous integration server
 

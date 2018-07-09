@@ -1,3 +1,4 @@
+import * as isUndefined from 'lodash/isUndefined';
 import * as template from './users-view.component.html';
 import style from './users-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
@@ -13,11 +14,12 @@ const SEARCH_CONFIG = [
   {keyword: 'STATUS', fieldName: 'activeStatusInd'}
 ];
 
+let self;
 export const UsersViewComponent = {
   template,
   styles: [style],
   controller: class UsersViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope, LocalSearchService) {
+    constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -57,11 +59,14 @@ export const UsersViewComponent = {
         this._$rootScope.showProgress = false;
       });
       this.custCode = this.resp.ticket.custCode;
+      this._$timeout = $timeout;
+      self = this;
     }
     $onInit() {
-      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-      leftSideNav.update(AdminMenuData, 'ADMIN');
-      leftSideNav.openSidenavManually();
+      this._$timeout(() => {
+        const leftSideNav = self.$componentHandler.get('left-side-nav')[0];
+        leftSideNav.update(AdminMenuData, 'ADMIN');
+      });
     }
     openNewUserModal() {
       this._$rootScope.showProgress = true;
@@ -190,7 +195,10 @@ export const UsersViewComponent = {
       return false;
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
+      if (!isUndefined(value)) {
+        this.states.searchTerm = value;
+      }
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
 

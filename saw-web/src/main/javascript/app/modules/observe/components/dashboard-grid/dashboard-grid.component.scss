@@ -15,18 +15,37 @@ dashboard-grid {
     width: auto;
 
     gridster-item {
-      & > .tile-actions {
+      .backdrop {
+        width: 100%;
+        height: 42px;
+        background: rgba(0, 0, 0, 0.4);
         position: absolute;
-        top: 0;
+        display: flex;
+        visibility: hidden;
+        opacity: 0;
+        align-items: center;
         z-index: 1;
-        right: 0;
+
+        & > .tile-actions {
+          display: flex;
+          justify-content: flex-end;
+          width: 100%;
+
+          button {
+            color: white;
+          }
+        }
       }
 
-      &.cell-kpi > .tile-actions > button {
-        color: white;
+      &:hover {
+        .backdrop {
+          visibility: visible;
+          opacity: 1;
+          transition: visibility 500ms, opacity 500ms;
+        }
       }
 
-      & > .analysis-container {
+      & > observe-chart.analysis-container {
         display: block;
         width: 100%;
         height: 100%;

@@ -21,9 +21,11 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
 import * as flatMap from 'lodash/flatMap';
+import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
 
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
@@ -81,6 +83,7 @@ export class DashboardGridComponent
 
     this.columns = this.getMinColumns();
     this.options = {
+      disableWindowResize: true,
       gridType: 'scrollVertical',
       minCols: this.columns,
       maxCols: 100,
@@ -98,6 +101,7 @@ export class DashboardGridComponent
     };
 
     this.enableChartDownload = this.isViewMode();
+    this.filters.initialise();
   }
 
   ngAfterViewInit() {
@@ -117,7 +121,7 @@ export class DashboardGridComponent
   }
 
   getMinColumns() {
-    if (this.mode === DASHBOARD_MODES.CREATE) return 8;
+    if (this.mode === DASHBOARD_MODES.CREATE) return 64;
 
     const savedMinCols = get(this.model, 'options.0.minCols');
     return savedMinCols ? savedMinCols : 4;
@@ -135,13 +139,13 @@ export class DashboardGridComponent
           }, 500);
         }
       );
-
-      this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
-        data => {
-          this.onApplyGlobalFilters(data);
-        }
-      );
     }
+
+    this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
+      data => {
+        this.onApplyGlobalFilters(data);
+      }
+    );
   }
 
   isViewMode() {
@@ -169,10 +173,13 @@ export class DashboardGridComponent
       changed: true,
       dashboard: this.prepareDashboard()
     });
+    if (item.analysis) {
+      this.onAnalysisRemove();
+    }
   }
 
   editTile(item: GridsterItem) {
-    if (!item.kpi) return;
+    if (!item.kpi && !item.bullet) return;
 
     this.dashboardService.onEditItem.next(item);
   }
@@ -189,7 +196,7 @@ export class DashboardGridComponent
     if (item.kpi) {
       item.dimensions = dimensions;
       return;
-    }
+    } 
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
@@ -201,15 +208,29 @@ export class DashboardGridComponent
   }
 
   addGlobalFilters(analysis) {
-    if (this.mode === DASHBOARD_MODES.VIEW) {
-      const columns = flatMap(analysis.artifacts, table => table.columns);
+    const columns = flatMap(analysis.artifacts, table => table.columns);
 
-      const filters = get(analysis, 'sqlBuilder.filters', []);
+    const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(
-        filter(
-          map(filters, flt => ({
-            ...flt,
+    this.filters.addFilter(
+      filter(
+        map(filters, flt => {
+          /* Find if a global filter already exists in dashboard with same attributes */
+          const existingFilter = find(
+            get(this.model, 'filters') || [],
+            dashFilt =>
+              dashFilt.semanticId === analysis.semanticId &&
+              dashFilt.tableName === flt.tableName &&
+              dashFilt.columnName === flt.columnName &&
+              flt.isGlobalFilter
+          );
+
+          if (existingFilter) {
+            existingFilter.isGlobalFilter = true;
+          }
+
+          return {
+            ...(existingFilter || flt),
             ...{
               semanticId: analysis.semanticId,
               metricName: analysis.metricName,
@@ -220,11 +241,11 @@ export class DashboardGridComponent
                 flt.tableName
               )
             }
-          })),
-          f => f.isGlobalFilter
-        )
-      );
-    }
+          };
+        }),
+        f => f.isGlobalFilter
+      )
+    );
   }
 
   /**
@@ -239,7 +260,7 @@ export class DashboardGridComponent
   onApplyGlobalFilters(filterGroup) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
-      if (tile.type !== 'analysis') return;
+      if (this.tileType(tile) !== 'analysis') return;
 
       const gFilters = filterGroup[tile.analysis.semanticId] || [];
 
@@ -260,7 +281,11 @@ export class DashboardGridComponent
       );
 
       const sqlBuilder = { ...tile.origAnalysis.sqlBuilder, ...{ filters } };
-      tile.analysis = { ...tile.origAnalysis, ...{ sqlBuilder } };
+      tile.analysis = {
+        ...tile.origAnalysis,
+        ...{ sqlBuilder },
+        _executeTile: true
+      };
 
       this.dashboard.splice(id, 1, { ...tile });
     });
@@ -271,9 +296,27 @@ export class DashboardGridComponent
       return;
     }
 
+    let length = get(this.model, 'tiles', []).length;
+
+    const tileLoaded = () => {
+      if (--length > 0) {
+        return;
+      }
+
+      /* All tiles have been initialised with data. Apply global filters
+       * if necessary */
+      setTimeout(() => {
+        this.onApplyGlobalFilters(this.filters.globalFilters);
+      }, 500);
+    };
+
     forEach(get(this.model, 'tiles', []), tile => {
-      if (tile.kpi) {
+      if (tile.bullet) {
+        tile.updater = new BehaviorSubject({});
+      }
+      if (tile.kpi || tile.bullet) {
         this.dashboard.push(tile);
+        tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         setTimeout(() => {
           this.refreshTile(tile);
@@ -283,15 +326,44 @@ export class DashboardGridComponent
 
       this.analyze.readAnalysis(tile.id).then(data => {
         tile.analysis = data;
-        tile.origAnalysis = data;
-        this.addGlobalFilters(data);
-        tile.updater = new BehaviorSubject({});
-        this.dashboard.push(tile);
+        this.addAnalysisTile(tile);
+        tileLoaded();
         this.getDashboard.emit({ changed: true, dashboard: this.model });
         this.refreshTile(tile);
       });
     });
+
     this.initialised = true;
+  }
+
+  addAnalysisTile(tile, executeTile = false) {
+    if (!tile.analysis) {
+      return;
+    }
+
+    tile.analysis = { ...tile.analysis, _executeTile: executeTile };
+    tile.origAnalysis = tile.analysis;
+    this.addGlobalFilters(tile.analysis);
+    tile.updater = tile.updater || new BehaviorSubject({});
+    this.dashboard.push(tile);
+  }
+
+  onAnalysisRemove() {
+    const analysisTiles = filter(this.dashboard, tile => tile.analysis);
+    const globalFilters = filter(
+      flatMap(analysisTiles, tile =>
+        map(
+          get(tile.origAnalysis || tile.analysis, 'sqlBuilder.filters') || [],
+          f => {
+            f.semanticId = tile.analysis.semanticId;
+            return f;
+          }
+        )
+      ),
+      f => f.isGlobalFilter
+    );
+
+    this.filters.removeInvalidFilters(globalFilters);
   }
 
   /* Enables 2 way communication. The parent can request dashboard or send updates
@@ -302,7 +374,11 @@ export class DashboardGridComponent
         /* prettier-ignore */
         switch (req.action) {
         case 'add':
-          this.dashboard.push(req.data);
+          if (req.data && req.data.analysis) {
+            this.addAnalysisTile(req.data, true);
+          } else {
+            this.dashboard.push(req.data);
+          }
           this.getDashboard.emit({
             changed: true,
             dashboard: this.prepareDashboard()
@@ -336,6 +412,8 @@ export class DashboardGridComponent
       return 'analysis';
     } else if (tile.kpi) {
       return 'kpi';
+    } else if (tile.bullet) {
+      return 'bullet';
     }
 
     return 'custom';
@@ -359,9 +437,10 @@ export class DashboardGridComponent
         y: tile.y,
         cols: tile.cols,
         rows: tile.rows,
-        kpi: tile.kpi
+        kpi: tile.kpi,
+        bullet: tile.bullet
       })),
-      filters: [],
+      filters: flatMap(values(this.filters.globalFilters)),
       options: [
         {
           minCols:

@@ -6,13 +6,18 @@ import {
 } from '@angular/core';
 import {
   ArtifactColumn,
+  ArtifactColumnChart,
   AnalysisType,
   DesignerChangeEvent
-}  from '../../types';
+} from '../../types';
 import {
   TYPE_ICONS_OBJ,
   AGGREGATE_TYPES,
-  AGGREGATE_TYPES_OBJ
+  AGGREGATE_TYPES_OBJ,
+  COMBO_TYPES,
+  COMBO_TYPES_OBJ,
+  TSCOMBO_TYPES,
+  TSCOMBO_TYPES_OBJ
 } from '../../../../consts';
 
 const template = require('./expandable-field.component.html');
@@ -27,10 +32,25 @@ export class ExpandableFieldComponent {
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
 
+  TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
+  AGGREGATE_TYPES = AGGREGATE_TYPES;
+  AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public isExpanded = false;
-  public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
-  public AGGREGATE_TYPES = AGGREGATE_TYPES;
-  public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
+  comboTypes = COMBO_TYPES;
+  comboTypesObj = COMBO_TYPES_OBJ;
+
+  getComboIcon(comboType) {
+    // Since there are some old analyses taht are wrongly using the TSCOMBO_TYPES,
+    // we have to add this hack
+    // when selects another comboType, it will be properly selected from COMBO_TYPES
+    // There is no real reason to use TSCOMBO_TYPES
+    if (COMBO_TYPES.map(({value}) => value).includes(comboType)) {
+      return COMBO_TYPES_OBJ[comboType].icon;
+    } else if (TSCOMBO_TYPES.map(({value}) => value).includes(comboType)) {
+      return TSCOMBO_TYPES_OBJ[comboType].icon;
+    }
+    return '';
+  }
 
   toggleExpansion() {
     this.isExpanded = !this.isExpanded;
@@ -38,6 +58,11 @@ export class ExpandableFieldComponent {
 
   onAggregateChange(value) {
     this.artifactColumn.aggregate = value;
-    this.change.emit({subject: 'aggregate', column: this.artifactColumn});
+    this.change.emit({ subject: 'aggregate', column: this.artifactColumn });
+  }
+
+  onComboTypeChange(comboType) {
+    (this.artifactColumn as ArtifactColumnChart).comboType = comboType;
+    this.change.emit({ subject: 'comboType', column: this.artifactColumn });
   }
 }

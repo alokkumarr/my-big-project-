@@ -8,6 +8,7 @@ INSERT INTO schema_version VALUES ('1', '1', '<< Flyway Baseline >>', 'BASELINE'
 INSERT INTO schema_version VALUES ('2', '2', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('3', '3', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('4', '4', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('5', '5', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
 INSERT INTO `PRODUCTS` (`PRODUCT_SYS_ID`,`PRODUCT_NAME`,`PRODUCT_CODE`,`PRODUCT_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (1,'MCT Insights','MCTI000001','MCT Insights',1,'2017-05-23 06:51:34','admin','','','','');
 INSERT INTO `PRODUCTS` (`PRODUCT_SYS_ID`,`PRODUCT_NAME`,`PRODUCT_CODE`,`PRODUCT_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (2,'SnT Insighjts','SNT0000001','SnT Insighjts',1,'2017-05-23 06:51:42','admin','','','','');
@@ -125,3 +126,8 @@ insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(4,123456785432,'Incident density by States',1,now(),'admin');
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(5,123456785421,'Cable Orders',1,now(),'admin');
 insert into analysis(`CUST_PROD_MOD_FEATURE_SYS_ID`,`ANALYSIS_ID`,`ANALYSIS_NAME`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`) values(5,123456785433,'Service Requests',1,now(),'admin');
+
+INSERT INTO CONFIG_VAL (`CONFIG_VAL_SYS_ID`, `CONFIG_VAL_CODE`, `CONFIG_VAL_DESC`, `CONFIG_VAL_OBJ_TYPE`,
+`CONFIG_VAL_OBJ_GROUP`, `ACTIVE_STATUS_IND`, `CREATED_DATE` , CREATED_BY )
+VALUES ('1', 'es-analysis-auto-refresh', 'Make Charts,Pivots and ES Reports Execute each time when land on View Analysis Page',
+'CUSTOMER', 'SYNCHRONOSS', '1', now(), 'Saw-Admin' );

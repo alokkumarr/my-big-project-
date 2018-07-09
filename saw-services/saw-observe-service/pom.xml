@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.4.RELEASE</version>
+		<version>2.0.2.RELEASE</version>
 		<relativePath />
 	</parent>
 
@@ -95,12 +95,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.synchronoss.saw</groupId>
-			<artifactId>saw-json-store-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
 			<artifactId>wiremock</artifactId>
 			<version>2.7.1</version>
@@ -136,7 +130,12 @@
 			<artifactId>SDNotify</artifactId>
 			<version>1.1</version>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>meta-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -153,6 +152,34 @@
 					<showWarnings>true</showWarnings>
 				</configuration>
 			</plugin>
+ 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.0.0</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>8.8</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<configuration>
+							<configLocation>${project.basedir}/../../src/main/resources/checkstyle.xml</configLocation>
+							<includeTestSourceDirectory>true</includeTestSourceDirectory>
+							<violationSeverity>warning</violationSeverity>
+							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
+								make also these files conform to checkstyle rules and remove the exclusions -->
+							<excludes>**/model/**,**/store/*,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAW*,**/*Utils*, **/*Test*</excludes>
+						</configuration>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
@@ -191,6 +218,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-observe</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-observe-service</name>
@@ -221,6 +249,12 @@
 									<file>src/main/resources/application.yml</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

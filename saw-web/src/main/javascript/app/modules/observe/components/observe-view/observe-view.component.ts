@@ -17,7 +17,8 @@ const template = require('./observe-view.component.html');
 
 @Component({
   selector: 'observe-view',
-  template
+  template,
+  providers: [GlobalFilterService]
 })
 export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
@@ -48,7 +49,6 @@ export class ObserveViewComponent implements OnInit {
   ngOnInit() {
     if (this.dashboardId) {
       this.loadDashboard();
-      this.filters.initialise();
     }
   }
 
@@ -98,7 +98,7 @@ export class ObserveViewComponent implements OnInit {
         dashboard: this.dashboard,
         mode: 'edit'
       },
-      maxWidth: '100%'
+      maxWidth: '1600px'
     });
   }
 
@@ -108,7 +108,7 @@ export class ObserveViewComponent implements OnInit {
       data: {
         mode: 'create'
       },
-      maxWidth: '100%'
+      maxWidth: '1600px'
     });
   }
 

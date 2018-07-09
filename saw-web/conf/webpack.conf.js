@@ -46,7 +46,7 @@ module.exports = function (env) {
 
     output: {
       path: webpackHelper.root(BUILD_DIR),
-      filename: 'js/[name].bundle.js',
+      filename: 'js/[name].bundle.[hash].js',
       sourceMapFilename: isDevelopment ? '[file].map' : ''
     },
 
@@ -171,7 +171,7 @@ module.exports = function (env) {
       new StyleLintPlugin({
         configFile: webpackHelper.root('.stylelintrc')
       }),
-      new ExtractTextPlugin('css/[name].css')
+      new ExtractTextPlugin('css/[name].[hash].css')
       // new BundleAnalyzerPlugin({
       //   generateStatsFile: true
       // })

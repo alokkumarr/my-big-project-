@@ -46,6 +46,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -99,8 +100,12 @@ public class GatewayController {
    * @throws ServletException 
    * @throws FileUploadException 
  */
-@RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS, PUT})
+  @CrossOrigin(origins = "*")
+@RequestMapping(value = "/{path:^(?!actuator).*$}/**", method = {GET, POST, DELETE, OPTIONS, PUT})
   @ResponseBody
+  /* Note: Spring Boot Actuator paths are excluded from proxying above
+   * to allow downstream health check requests to pass without an
+   * authentication token */
   public ResponseEntity<?> proxyRequest(HttpServletRequest request, HttpServletResponse response,
       @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles) throws  IOException, URISyntaxException, ServletException, FileUploadException {
   HttpUriRequest proxiedRequest = null;
@@ -124,12 +129,12 @@ public class GatewayController {
     	HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     	RestTemplate restTemplate = new RestTemplate();
     	String url = apiGatewayOtherProperties+"/auth/validateToken";
-    	logger.info("security server URL {}", url);
+    	logger.debug("security server URL {}", url);
     	try {
         ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
             requestEntity, Valid.class);
-        logger.info(securityResponse.getStatusCode().getReasonPhrase());
-        logger.info(securityResponse.toString());
+        logger.debug(securityResponse.getStatusCode().getReasonPhrase());
+        logger.debug(securityResponse.toString());
         Valid validate =(Valid) securityResponse.getBody();
           
     	  if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
@@ -168,7 +173,7 @@ public class GatewayController {
             HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
             RestTemplate uploadrestTemplate = new RestTemplate();
             uploadResponseEntity = uploadrestTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
-            logger.info("uploadResponseEntity {} ", uploadResponseEntity.toString());
+            logger.debug("uploadResponseEntity {} ", uploadResponseEntity.toString());
             } catch (Exception e) {
             logger.error("Exception thrown during file upload ", e);
           }
@@ -191,7 +196,7 @@ public class GatewayController {
     else {
     	responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
-    logger.info("Response {}", responseEntity.getStatusCode());
+    logger.debug("Response {}", responseEntity.getStatusCode());
     return responseEntity;
   }
 

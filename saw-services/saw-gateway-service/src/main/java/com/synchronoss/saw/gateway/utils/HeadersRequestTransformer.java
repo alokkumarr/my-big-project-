@@ -24,7 +24,7 @@ public class HeadersRequestTransformer extends ProxyRequestTransformer {
       String headerValue = request.getHeader(headerName);
       if (headerName.equals("authorization")) {
     	requestBuilder.addHeader(headerName, headerValue);
-        logger.info("HeaderValue",headerValue);
+        logger.debug("HeaderValue",headerValue);
       }
     }
     return requestBuilder;

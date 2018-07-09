@@ -77,7 +77,7 @@ public class JobServiceImpl implements JobService{
 		JobDetail jobDetail = JobUtil.createJob(jobClass, false, context, job, groupKey);
 
         logger.debug("creating trigger for key :"+jobKey + " at date :"+job.getJobScheduleTime());
-		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+		Trigger cronTriggerBean = JobUtil.createCronTrigger(triggerKey, job.getJobScheduleTime(),job.getEndDate(), job.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
 
 		try {
 			Scheduler scheduler = schedulerFactoryBean.getScheduler();
@@ -137,6 +137,7 @@ public class JobServiceImpl implements JobService{
         logger.debug("Parameters received for updating cron job : jobKey :"+jobKey + ", date: "+schedulerJobDetail.getJobScheduleTime());
 		try {
 			Trigger newTrigger = JobUtil.createCronTrigger(jobName, schedulerJobDetail.getJobScheduleTime(),
+					schedulerJobDetail.getEndDate(),
 					schedulerJobDetail.getCronExpression(), SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             jobDetail.getJobDataMap().replace(JobUtil.JOB_DATA_MAP_ID,schedulerJobDetail);
@@ -323,7 +324,8 @@ public class JobServiceImpl implements JobService{
 						JobDetail jobDetail = scheduler.getJobDetail(jobKey);
 						SchedulerJobDetail job = (SchedulerJobDetail) jobDetail.getJobDataMap().get(JobUtil.JOB_DATA_MAP_ID);
 						if (job.getCategoryID().equalsIgnoreCase(categoryID)  &&
-                            !(job.getCronExpression() == null || job.getCronExpression().trim().equals(""))) {
+                            !(job.getCronExpression() == null || job.getCronExpression().trim().equals(""))
+                            && isActiveSchedule(job.getJobScheduleTime(),job.getEndDate())) {
 							//get job's trigger
 							List<Trigger> triggers = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
 							Date scheduleTime = triggers.get(0).getStartTime();
@@ -494,5 +496,27 @@ public class JobServiceImpl implements JobService{
 		}
 		return false;
 	}
+
+    /**
+     *
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    private static boolean isActiveSchedule(Date startDate, Date endDate)
+    {
+        Date date = new Date();
+        if (endDate!=null) {
+            if (startDate.compareTo(date) <= 0 && endDate.compareTo(date) >= 0)
+                return true;
+            else
+                return false;
+        }
+        else {
+            // In case their are no end date the then schedule will be always
+            //active.
+            return true;
+        }
+    }
 }
 

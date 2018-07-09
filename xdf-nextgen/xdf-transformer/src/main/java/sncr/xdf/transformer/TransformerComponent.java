@@ -44,8 +44,8 @@ public class TransformerComponent extends Component implements WithMovableResult
     public static void main(String[] args){
         TransformerComponent component = new TransformerComponent();
         try {
-           if (component.collectCMDParameters(args) == 0) {
-                int r = component.Run();
+           if (component.collectCommandLineParameters(args) == 0) {
+                int r = component.run();
                 System.exit(r);
            }
         } catch (Exception e){
@@ -63,7 +63,7 @@ public class TransformerComponent extends Component implements WithMovableResult
     }
 
     @Override
-    protected int Execute(){
+    protected int execute(){
         try {
              tempLocation = generateTempLocation(new WithDataSetService.DataSetServiceAux(ctx, md),  null, null);
 
@@ -111,12 +111,14 @@ public class TransformerComponent extends Component implements WithMovableResult
             if (ou != null && ou.size() > 0){
 
                 StructType st = createSchema(ou);
+                logger.debug("Transformation engine = " + engine);
 
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
                     JexlExecutorWithSchema jexlExecutorWithSchema  =
                             new JexlExecutorWithSchema(ctx.sparkSession, script, st,
                                     tempLocation,ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs);
+                    logger.trace("Executing jexl transformation");
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
 
@@ -134,10 +136,11 @@ public class TransformerComponent extends Component implements WithMovableResult
                     for (int i = 0; i < odi.length ; i++) m += " " + odi[i];
                     logger.debug(m);
 
-                     JaninoExecutor janinoExecutor =
-                         new JaninoExecutor(ctx.sparkSession, script, st,
+                    JaninoExecutor janinoExecutor =
+                        new JaninoExecutor(ctx.sparkSession, script, st,
                                  tempLocation,ctx.componentConfiguration.getTransformer().getThreshold(), inputs, outputs, odi);
-                    janinoExecutor.execute(dsMap);
+                    logger.trace("Executing janino transformation");
+                     janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);
@@ -224,12 +227,12 @@ public class TransformerComponent extends Component implements WithMovableResult
         return dt;
     }
 
-    protected int Archive(){
+    protected int archive(){
         return 0;
     }
 
     @Override
-    protected int Move(){
+    protected int move(){
 
         List<Map<String, Object>> dss = new ArrayList<>();
         dss.add(outputs.get(RequiredNamedParameters.Output.toString()));
@@ -246,7 +249,7 @@ public class TransformerComponent extends Component implements WithMovableResult
             resultDataDesc.add(desc);
             logger.debug(String.format("DataSet %s will be moved to %s", name, dest));
         }
-        return super.Move();
+        return super.move();
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {

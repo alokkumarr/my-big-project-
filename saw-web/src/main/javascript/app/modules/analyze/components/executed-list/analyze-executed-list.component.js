@@ -5,7 +5,8 @@ export const AnalyzeExecutedListComponent = {
   template,
   bindings: {
     analysis: '<',
-    analyses: '<'
+    analyses: '<',
+    onSelect: '&'
   },
   controller: class AnalyzeExecutedListController {
     constructor(AnalyzeService, $state, $window, dxDataGridService) {
@@ -20,21 +21,27 @@ export const AnalyzeExecutedListComponent = {
         alignment: 'left',
         width: '40%'
       }, {
+        caption: 'TYPE',
+        dataField: 'executionType',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      }, {
         caption: 'DATE',
         dataField: 'finished',
         dataType: 'date',
         calculateCellValue: rowData => {
-          return (moment(rowData.finished).utcOffset(new Date().getTimezoneOffset()).format('YYYY/MM/DD'));
+          return moment.utc(rowData.finished).local().format('YYYY/MM/DD h:mm A');
         },
         allowSorting: true,
         alignment: 'left',
-        width: '30%'
+        width: '20%'
       }, {
         caption: 'STATUS',
         dataField: 'status',
         allowSorting: true,
         alignment: 'left',
-        width: '30%'
+        width: '20%'
       }];
       this.gridConfig = dxDataGridService.mergeWithDefaultConfig({
         onRowClick: row => {
@@ -55,11 +62,7 @@ export const AnalyzeExecutedListComponent = {
     }
 
     goToExecution(executedAnalysis) {
-      this._$state.go('analyze.executedDetail', {
-        executionId: executedAnalysis.id,
-        analysisId: this.analysis.id,
-        analysis: this.analysis
-      });
+      this.onSelect({executionId: executedAnalysis.id});
     }
   }
 };

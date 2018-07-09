@@ -1,13 +1,18 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as defaults from 'lodash/defaults';
 import * as upperCase from 'lodash/upperCase';
 import * as isEmpty from 'lodash/isEmpty';
 import * as round from 'lodash/round';
+import * as trim from 'lodash/trim';
+import * as isUndefined from 'lodash/isUndefined';
+import * as isFinite from 'lodash/isFinite';
+import * as moment from 'moment';
 import { Observable } from 'rxjs/Observable';
 
-import { DATE_PRESETS_OBJ } from '../../consts';
+import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -22,6 +27,8 @@ require('./observe-kpi.component.scss');
 export class ObserveKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
   _executedKPI: any;
+  primaryChange: number;
+  bgColor: string;
 
   /* Used to dynamically adjust font-size based on tile height */
   fontMultipliers = {
@@ -33,6 +40,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   secondaryResult: Array<{ name: string; value: string | number }> = [];
   kpiFilterSubscription: Subscription;
+  filterLabel: string;
 
   constructor(
     private observe: ObserveService,
@@ -59,7 +67,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   @Input()
   set dimensions(data) {
     if (data && data.height > 0) {
-      this.fontMultipliers.primary = data.height / 100;
+      this.fontMultipliers.primary = data.height / 160;
       this.fontMultipliers.secondary = Math.min(2, data.height / 100);
     }
   }
@@ -81,18 +89,35 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
     return this.executeKPI(kpi);
   }
 
-  get filterLabel() {
+  getFilterLabel() {
     if (!this._executedKPI && !this._kpi) return '';
 
     const preset = get(
       this._executedKPI || this._kpi,
       'filters.0.model.preset'
     );
-    return get(this.datePresetObj, `${preset}.label`);
+    const filter = get(this.datePresetObj, `${preset}.label`);
+    if (filter === 'Custom') {
+      const gte = moment(
+        get(this._executedKPI || this._kpi, 'filters.0.model.gte'),
+        'YYYY-MM-DD HH:mm:ss'
+      ).format('YYYY/MM/DD');
+      const lte = moment(
+        get(this._executedKPI || this._kpi, 'filters.0.model.lte'),
+        'YYYY-MM-DD HH:mm:ss'
+      ).format('YYYY/MM/DD');
+      return `${gte} - ${lte}`;
+    } else {
+      return filter;
+    }
   }
 
   executeKPI(kpi) {
     this._executedKPI = kpi;
+    this.filterLabel = this.getFilterLabel();
+    this.bgColor = isUndefined(kpi.kpiBgColor)
+      ? '#0f61c8'
+      : get(find(KPI_BG_COLORS, ['label', kpi.kpiBgColor]), 'value');
     const dataFieldName = get(kpi, 'dataFields.0.name');
     const [primaryAggregate, ...secondaryAggregates] = get(
       kpi,
@@ -124,13 +149,14 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       .subscribe(({ primary, secondary }) => {
         const currentParsed = parseFloat(primary.current) || 0;
         const priorParsed = parseFloat(primary.prior);
-        const change =
-          round((currentParsed - priorParsed) * 100 / priorParsed, 2) || 0;
-
+        let change =
+          round(((currentParsed - priorParsed) * 100) / priorParsed) || 0;
+        change = isFinite(change) ? change : 0;
+        this.primaryChange = change;
         this.primaryResult = {
           current: round(currentParsed, 2),
           prior: priorParsed,
-          change: change >= 0 ? `+${change}` : `${change}`
+          change: trim(change, '-')
         };
 
         this.secondaryResult = secondary;

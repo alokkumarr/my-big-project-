@@ -11,7 +11,7 @@ spring:
     banner-mode: 'off'
 logging:
   level:
-    com.synchronoss.saw.gateway: INFO
+    com.synchronoss.saw.gateway: TRACE
 server:
   address: localhost
   port: 9100
@@ -37,7 +37,7 @@ semantic:
         host: http://localhost:9200
 security:
     service:
-        host: http://localhost:9000
+        host: http://10.48.22.231/security
 export:
     service:
         host: http://localhost:9400
@@ -53,7 +53,9 @@ workbench:
 proxy:
     service:
         host: http://localhost:9800
-
+datapod:
+    service:
+        host: http://localhost:9900
 api:
   gateway:
         endpoints:
@@ -114,3 +116,9 @@ api:
         -   location: ${proxy.service.host}
             method: POST
             path: '[/]proxy.*'
+        -   location: ${datapod.service.host}
+            method: POST
+            path: '[/]internal/semantic.*'
+        -   location: ${datapod.service.host}
+            method: GET
+            path: '[/]internal/semantic.*'

@@ -21,24 +21,19 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService,
-      toastMessage, $rootScope, localStorageService, FilterService, LocalSearchService) {
+    constructor($injector, AnalyzeService, $state, JwtService,
+      toastMessage, $rootScope, localStorageService, LocalSearchService) {
       'ngInject';
       super($injector);
 
-      this._$compile = $compile;
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
-      this._$mdDialog = $mdDialog;
       this._localStorageService = localStorageService;
       this._LocalSearchService = LocalSearchService;
-      this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
-      this._JwtService = JwtService;
       this._analysisCache = [];
-      this.resp = this._JwtService.getTokenObj();
-
+      this.analyses = null;
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
@@ -48,18 +43,21 @@ export const AnalyzeViewComponent = {
         reportView: [this.LIST_VIEW, this.CARD_VIEW].indexOf(savedView) >= 0 ?
           savedView : this.LIST_VIEW,
         analysisType: 'all',
-        searchTerm: ''
+        searchTerm: '',
+        searchTermValue: ''
       };
       this.updater = new Subject();
       this.canUserCreate = false;
       this.loadCards = false;
+      this._JwtService = JwtService;
+      this.resp = this._JwtService.getTokenObj();
     }
 
     $onInit() {
+      this.analyses = null;
       this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
         this.loadAnalyses();
       });
-
       this.loadCategory();
       this.loadAnalyses();
       this.canUserCreate = this._JwtService.hasPrivilege('CREATE', {
@@ -122,19 +120,20 @@ export const AnalyzeViewComponent = {
       }).then(analyses => {
         this._analysisCache = analyses;
         this.analyses = analyses;
-        this.updater.next({analyses});
+        this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
         this._$rootScope.showProgress = false;
       }).catch(() => {
         this._$rootScope.showProgress = false;
       });
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
+      this.states.searchTerm = value;
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
       this._LocalSearchService.doSearch(searchCriteria, this._analysisCache, SEARCH_CONFIG).then(data => {
         this.analyses = data;
-        this.updater.next({analyses: this.analyses});
+        this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
       }, err => {
         this._toastMessage.error(err.message);
       });
@@ -161,7 +160,7 @@ export const AnalyzeViewComponent = {
       remove(this.analyses, report => {
         return report.id === analysis.id;
       });
-      this.updater.next({analyses: this.analyses});
+      this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
     }
 
     /* ACTIONS */
@@ -191,7 +190,7 @@ export const AnalyzeViewComponent = {
         return id === analysis.id;
       });
       this.analyses.splice(analysisId, 1, analysis);
-      this.updater.next({analyses: this.analyses});
+      this.updater.next({analysisType: this.states.analysisType, analyses: this.analyses});
       this._$state.go('analyze.view', {id: analysis.categoryId});
     }
 

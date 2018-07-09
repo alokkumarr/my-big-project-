@@ -38,8 +38,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
   });
 
   afterAll(() => {
-    browser.executeScript('window.sessionStorage.clear();');
-  browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   Using(UserLists, function (data, description) {

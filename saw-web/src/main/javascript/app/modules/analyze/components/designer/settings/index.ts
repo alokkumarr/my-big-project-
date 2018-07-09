@@ -4,13 +4,21 @@ import { DesignerSettingsGroupComponent } from './group';
 import { DesignerSettingsQueryComponent } from './query';
 import {
   ExpandableFieldComponent,
-  ExpandDetailPivotComponent
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent
 } from './expandable-field';
+import {
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent
+} from './aux-settings';
 export {
   DesignerSettingsSingleTableComponent,
   DesignerSettingsMultiTableComponent,
   DesignerSettingsQueryComponent,
   DesignerSettingsGroupComponent,
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent,
   ExpandableFieldComponent,
-  ExpandDetailPivotComponent
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent
 };

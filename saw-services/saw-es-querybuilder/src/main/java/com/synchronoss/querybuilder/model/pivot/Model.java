@@ -35,9 +35,9 @@ public class Model {
     @JsonProperty("preset")
     private Model.Preset preset;
     @JsonProperty("value")
-    private Integer value;
+    private Double value;
     @JsonProperty("otherValue")
-    private Integer otherValue;
+    private Double otherValue;
     @JsonProperty("gte")
     private String gte;
     @JsonProperty("lte")
@@ -78,22 +78,22 @@ public class Model {
       this.preset = preset;
     }
     @JsonProperty("value")
-    public Integer getValue() {
+    public Double getValue() {
         return value;
     }
 
     @JsonProperty("value")
-    public void setValue(Integer value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 
     @JsonProperty("otherValue")
-    public Integer getOtherValue() {
+    public Double getOtherValue() {
         return otherValue;
     }
 
     @JsonProperty("otherValue")
-    public void setOtherValue(Integer otherValue) {
+    public void setOtherValue(Double otherValue) {
         this.otherValue = otherValue;
     }
 

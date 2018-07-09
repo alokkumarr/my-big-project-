@@ -5,6 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
+import { CountoModule } from 'angular2-counto';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
@@ -17,10 +18,9 @@ import {
 } from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
-  chartServiceProvider,
-  sortServiceProvider,
-  filterServiceProvider
+  sortServiceProvider
 } from '../analyze/services/ajs-analyze-providers';
+import { FilterService } from '../analyze/services/filter.service';
 import {
   menuServiceProvider,
   componentHandlerProvider,
@@ -34,12 +34,15 @@ import { AddTokenInterceptor } from './services/add-token.interceptor';
 import { HandleErrorInterceptor } from './services/handle-error.interceptor';
 import { RefreshTokenInterceptor } from './services/refresh-token.interceptor';
 
-import { ChartComponent } from '../../common/components/charts/chart.component';
+import { UChartModule } from '../../common/components/charts';
 
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { ObserveReportComponent } from './components/observe-report/observe-report.component';
+import { ObservePivotComponent } from './components/observe-pivot/observe-pivot.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
+import { ObserveKPIBulletComponent } from './components/observe-kpi-bullet/observe-kpi-bullet.component';
 import { KPIFilter } from './components/kpi-filter/kpi-filter.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
 import { EditWidgetModule } from './components/edit-widget/edit-widget.module';
@@ -53,9 +56,8 @@ import {
   GlobalNumberFilterComponent,
   GlobalStringFilterComponent
 } from './components/global-filter';
-import { GlobalFilterService } from './services/global-filter.service';
 import { DashboardService } from './services/dashboard.service';
-import { CommonModule } from '../../common';
+import { CommonModule, CommonModuleTs } from '../../common';
 
 export const ObserveModule = 'ObserveModule';
 
@@ -74,11 +76,13 @@ const components = [
   GlobalStringFilterComponent,
   CreateDashboardComponent,
   ObserveChartComponent,
+  ObserveReportComponent,
+  ObservePivotComponent,
   ObserveKPIComponent,
+  ObserveKPIBulletComponent,
   KPIFilter,
   SaveDashboardComponent,
-  ConfirmDialogComponent,
-  ChartComponent
+  ConfirmDialogComponent
 ];
 
 @NgModule({
@@ -90,8 +94,11 @@ const components = [
     GridsterModule,
     HttpClientModule,
     UIRouterUpgradeModule,
+    CommonModuleTs,
     AddWidgetModule,
-    EditWidgetModule
+    EditWidgetModule,
+    UChartModule,
+    CountoModule
   ],
   declarations: components,
   entryComponents: components,
@@ -107,7 +114,6 @@ const components = [
       useClass: RefreshTokenInterceptor,
       multi: true
     },
-    GlobalFilterService,
     DashboardService,
     ObserveService,
     jwtServiceProvider,
@@ -118,9 +124,8 @@ const components = [
     headerProgressProvider,
     toastProvider,
     sidenavProvider,
-    chartServiceProvider,
     sortServiceProvider,
-    filterServiceProvider
+    FilterService
   ]
 })
 export class ObserveUpgradeModule {}

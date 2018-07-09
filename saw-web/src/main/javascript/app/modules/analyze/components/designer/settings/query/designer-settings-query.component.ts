@@ -5,6 +5,7 @@ import {
   EventEmitter,
   Inject
 } from '@angular/core';
+import * as isUndefined from 'lodash/isUndefined';
 import { AnalyzeDialogService } from '../../../../services/analyze-dialog.service';
 import {
   Artifact,
@@ -29,9 +30,15 @@ export class DesignerSettingsQueryComponent {
     private _analyzeDialogService: AnalyzeDialogService
   ) {}
 
+  ngOnInit() {
+    if (isUndefined(this.analysis.queryManual)) {
+      this.analysis.queryManual = this.analysis.query;
+    }
+  }
+
   onQueryChange(query) {
-    this.change.emit(query);
     this.analysis.queryManual = query;
+    this.change.emit(query);
   }
 
   doSubmit() {

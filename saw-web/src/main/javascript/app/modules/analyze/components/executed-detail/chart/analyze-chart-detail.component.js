@@ -1,4 +1,5 @@
 import * as get from 'lodash/get';
+import * as clone from 'lodash/clone';
 import * as values from 'lodash/values';
 import * as orderBy from 'lodash/orderBy';
 import * as map from 'lodash/map';
@@ -14,10 +15,10 @@ export const AnalyzeChartDetailComponent = {
     requester: '<'
   },
   controller: class AnalyzeChartDetailController {
-    constructor(ChartService, FilterService, $timeout, SortService) {
+    constructor(FilterService, $timeout, SortService, $injector) {
       'ngInject';
 
-      this._ChartService = ChartService;
+      this._$injector = $injector;
       this._FilterService = FilterService;
       this._SortService = SortService;
       this._$timeout = $timeout;
@@ -29,6 +30,7 @@ export const AnalyzeChartDetailComponent = {
     }
 
     $onInit() {
+      this._ChartService = this._$injector.get('ChartService');
       this.initAnalysis();
       this.subscription = this.requester.subscribe(options => this.request(options));
 
@@ -83,7 +85,7 @@ export const AnalyzeChartDetailComponent = {
       let changes = this._ChartService.dataToChangeConfig(
         this.analysis.chartType,
         this.settings,
-        this.filteredData,
+        [...map(this.filteredData, clone)],
         {labels: this.labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts}
       );
 

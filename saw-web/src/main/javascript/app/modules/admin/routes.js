@@ -18,6 +18,14 @@ export function routesConfig($stateProvider) {
       name: 'categories',
       url: '/categories',
       component: 'categoriesView'
+    }, {
+      name: 'export',
+      url: '/export',
+      component: 'exportComponent'
+    }, {
+      name: 'import',
+      url: '/import',
+      component: 'importComponent'
     }
   ];
 

@@ -1,7 +1,7 @@
 <button mat-icon-button
         [matMenuTriggerFor]="aggregatemenu"
         class="aggregate-chooser__btn">
-  <mat-icon [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"></mat-icon>
+  <mat-icon [style.width.px]="40" [fontIcon]="aggregate ? AGGREGATE_TYPES_OBJ[aggregate].icon : 'icon-more'"></mat-icon>
 </button>
 <mat-menu #aggregatemenu="matMenu">
   <button mat-menu-item

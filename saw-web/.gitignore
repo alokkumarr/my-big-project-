@@ -30,7 +30,10 @@ npm-debug.log*
 testem.log
 /typings
 yarn.lock
+/target/*
+/target
 *~
+/protractorFailuresReport/
 
 #System Files
 .DS_Store

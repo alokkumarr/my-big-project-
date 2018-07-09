@@ -5,6 +5,7 @@ import cronstrue from 'cronstrue';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 import * as isEmpty from 'lodash/isEmpty';
+import {Events} from '../../../consts';
 
 let self;
 export const AnalyzeCardComponent = {
@@ -18,7 +19,7 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($timeout, $mdDialog, AnalyzeService, $log, AnalyzeActionsService, JwtService) {
+    constructor($timeout, $mdDialog, AnalyzeService, $log, AnalyzeActionsService, JwtService, $eventEmitter) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
@@ -26,6 +27,7 @@ export const AnalyzeCardComponent = {
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$log = $log;
       this._JwtService = JwtService;
+      this._$eventEmitter = $eventEmitter;
 
       this.canUserFork = false;
       this.cronReadbleMsg = 'No Schedule Set';
@@ -61,6 +63,9 @@ export const AnalyzeCardComponent = {
     }
 
     extractMinute(CronUTC) {
+      if (CronUTC.match(/\d+ 0\/\d+ \* 1\/1 \* \? \*/)) {
+        return CronUTC;
+      }
       const splitArray = CronUTC.split(' ');
       const date = new Date();
       date.setUTCHours(moment().format('HH'), splitArray[1]);
@@ -84,7 +89,12 @@ export const AnalyzeCardComponent = {
     }
 
     fork() {
-      this._AnalyzeActionsService.fork(this.model);
+      this._AnalyzeActionsService.fork(this.model).then(result => {
+        if (!result.isSaveSuccessful) {
+          return result;
+        }
+        this._$eventEmitter.emit(Events.AnalysesRefresh);
+      });
     }
 
     onSuccessfulDeletion(analysis) {

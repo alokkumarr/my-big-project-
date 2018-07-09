@@ -1,10 +1,32 @@
+# Workaround: Stop NGINX to ensure port 80 in not bound when upgrading
+# SIP and installing HAProxy for the first time.  The new NGINX
+# configuration moves it to a different port.
+- name: Stop NGINX service
+  systemd: name=nginx state=stopped
+- name: Install HAProxy package
+  yum: name=haproxy state=present
+- name: Install HAProxy configuration
+  template: src=haproxy.cfg dest=/etc/haproxy
+- name: Enable and start HAProxy service
+  systemd: name=haproxy enabled=true state=started
 - name: Install EPEL release package (for NGINX)
   yum:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: present
+  register: result
+  until: 'result.rc == 0'
+  retries: 5
+  delay: 10
 - name: Install NGINX package
   yum: name=nginx state=present
+- name: Install NGINX configuration
+  template: src=nginx.conf dest=/etc/nginx
 - name: Install NGINX SAW proxy configuration
   template: src=saw-proxy.conf dest=/etc/nginx/default.d
+- name: Add MIME type for proxy auto-config files
+  lineinfile:
+    path: /etc/nginx/mime.types
+    line: '    application/x-ns-proxy-autoconfig     pac;'
+    insertafter: '^ *application/'
 - name: Enable and start NGINX service
   systemd: name=nginx enabled=true state=started
