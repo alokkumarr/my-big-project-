@@ -162,7 +162,7 @@ export const AnalyzeChartDetailComponent = {
     }
 
     customizeColumns(columns) {
-      forEach(columns, (col: ReportGridField) => {
+      forEach(columns, (col) => {
         col.allowSorting = false;
         col.alignment = 'left';
       });
