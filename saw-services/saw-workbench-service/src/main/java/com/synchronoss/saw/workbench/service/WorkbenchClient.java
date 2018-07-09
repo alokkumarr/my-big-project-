@@ -1,13 +1,12 @@
 package com.synchronoss.saw.workbench.service;
 
-import java.io.File;
-
-import java.net.URI;
-
 import com.cloudera.livy.Job;
 import com.cloudera.livy.JobHandle;
 import com.cloudera.livy.LivyClient;
 import com.cloudera.livy.LivyClientBuilder;
+
+import java.io.File;
+import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

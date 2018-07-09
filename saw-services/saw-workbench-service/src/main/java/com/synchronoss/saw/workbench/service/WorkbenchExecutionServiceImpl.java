@@ -1,103 +1,62 @@
 package com.synchronoss.saw.workbench.service;
 
-import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import com.mapr.db.Admin;
 import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
-
+import java.util.UUID;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 import org.ojai.Document;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 
 @Service
-public class WorkbenchExecutionServiceImpl
-    implements WorkbenchExecutionService {
-    private final Logger log = LoggerFactory.getLogger(getClass().getName());
-    private final ObjectMapper mapper = new ObjectMapper();
+public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
+  private final Logger log = LoggerFactory.getLogger(getClass().getName());
+  private final ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${workbench.project-key}")
-    @NotNull
-    private String project;
+  @Value("${workbench.project-key}")
+  @NotNull
+  private String project;
 
-    @Value("${workbench.project-root}")
-    @NotNull
-    private String root;
+  @Value("${workbench.project-root}")
+  @NotNull
+  private String root;
 
-    @Value("${workbench.livy-uri}")
-    @NotNull
-    private String livyUri;
+  @Value("${workbench.livy-uri}")
+  @NotNull
+  private String livyUri;
 
-    @Value("${workbench.preview-limit}")
-    @NotNull
-    private Integer previewLimit;
+  @Value("${workbench.preview-limit}")
+  @NotNull
+  private Integer previewLimit;
 
-    @Value("${workbench.project-root}/previews")
-    @NotNull
-    private String previewsTablePath;
+  @Value("${workbench.project-root}/previews")
+  @NotNull
+  private String previewsTablePath;
 
-    /**
-     * Cached Workbench Livy client to be kept around for next
-     * operation to reduce startup time.
-     */
-    private WorkbenchClient cachedClient;
+  /**
+   * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
+   */
+  private WorkbenchClient cachedClient;
 
-    @PostConstruct
-    private void init() throws Exception {
-        /* Initialize the previews MapR-DB table */
-        try (Admin admin = MapRDB.newAdmin()) {
-            if (!admin.tableExists(previewsTablePath)) {
-                log.info("Creating previews table: {}", previewsTablePath);
-                TableDescriptor table =
-                    MapRDB.newTableDescriptor(previewsTablePath);
-                FamilyDescriptor family =
-                    MapRDB.newDefaultFamilyDescriptor().setTTL(3600);
-                table.addFamily(family);
-                admin.createTable(table).close();
-            }
-        }
-        /* Cache a Workbench Livy client to reduce startup time for
-         * first operation */
-        cacheWorkbenchClient();
-    }
-
-    /**
-     * Get Workbench Livy client to be used for Livy jobs
-     */
-    private WorkbenchClient getWorkbenchClient() throws Exception {
-        /* Synchronize access to the cached client to ensure that the
-         * current client is handed out only to a single caller and
-         * that a new client is put into place before the next
-         * caller */
-        synchronized (cachedClient) {
-            try {
-                if (cachedClient == null) {
-                    log.debug("Create Workbench Livy client on demand");
-                    cacheWorkbenchClient();
-                }
-                return cachedClient;
-            } finally {
-                /* Create a new Workbench Livy client for the next
-                 * operation */
-                cacheWorkbenchClient();
-            }
-        }
+  @PostConstruct
+  private void init() throws Exception {
+    /* Workaround: If the "/apps/spark" directory does not exist in
+     * the data lake, Apache Livy will fail with a file not found
+     * error.  So create the "/apps/spark" directory here.  */
+    String appsSparkPath = "/apps/spark";
+    if (!HFileOperations.exists(appsSparkPath)) {
+      HFileOperations.createDir(appsSparkPath);
     }
     /* Initialize the previews MapR-DB table */
     try (Admin admin = MapRDB.newAdmin()) {
@@ -112,48 +71,24 @@ public class WorkbenchExecutionServiceImpl
     /*
      * Cache a Workbench Livy client to reduce startup time for first operation
      */
-    @Override
-    public ObjectNode execute(
-        String project, String name, String component, String config)
-        throws Exception {
-
-        log.info("Execute dataset transformation");
-
-        WorkbenchClient client = getWorkbenchClient();
-        XDFContextProvider ngCtx =
-            new XDFContextProvider(root, project, component, config);
-//        createDatasetDirectory(name);
-
-        WorkbenchExecuteJob  workbenchExecuteJob =
-            new WorkbenchExecuteJob(ngCtx.getNGContext());
-        List<String> ids = ngCtx.getDataSetIDs();
-
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseRoot = mapper.createObjectNode();
-        responseRoot.put("id", ids.get(0));
-
-        client.submit(workbenchExecuteJob);
-
-        return responseRoot;
+    try {
+      cacheWorkbenchClient();
+    } catch (Exception e) {
+      /* If Apache Livy is not installed in the environment, fail
+       * gracefully by letting the Workbench Service still start up.
+       * If Apache Livy is later installed, the Workbench Service will
+       * be able to recover by reattempting to create the client.  */
+      log.warn("Unable to create Workbench client upon startup", e);
     }
+  }
 
-    private void createDatasetDirectory(String name) throws Exception {
-        String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
-        if (!HFileOperations.exists(path)) {
-            HFileOperations.createDir(path);
-        }
-    }
-
-    @Value("${metastore.base}")
-    @NotNull
-    private String metastoreBase;
-
-    /**
-     * Preview the output of a executing a transformation component on
-     * a dataset
-     *
-     * Also used for simply viewing the contents of an existing
-     * dataset.
+  /**
+   * Get Workbench Livy client to be used for Livy jobs.
+   */
+  private WorkbenchClient getWorkbenchClient() throws Exception {
+    /*
+     * Synchronize access to the cached client to ensure that the current client is handed out only
+     * to a single caller and that a new client is put into place before the next caller
      */
     synchronized (cachedClient) {
       try {

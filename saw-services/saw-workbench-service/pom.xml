@@ -23,7 +23,7 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
-    <jjwt.version>0.7.0</jjwt.version>
+    	<jjwt.version>0.7.0</jjwt.version>
 		<metadata.api>${revision}</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
  	</properties>
@@ -135,7 +135,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.7</version>
 		</dependency>
 
 
@@ -170,27 +169,27 @@
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
-<<<<<<< HEAD
 			<artifactId>xdf-ext</artifactId>
-			<version>1.0.8</version>
-=======
-			<artifactId>xdf</artifactId>
 			<version>${revision}</version>
->>>>>>> 53c1d602d774426d163b6ce26b9ddc41eb43921f
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
+		</dependency>
+		<dependency>
+					<groupId>com.synchronoss.bda</groupId>
+					<artifactId>xdf</artifactId>
+					<version>${revision}</version>
+					<exclusions>
+						<exclusion>
+							<groupId>org.slf4j</groupId>
+							<artifactId>slf4j-log4j12</artifactId>
+						</exclusion>
+					</exclusions>
 		</dependency>
     <dependency>
-<<<<<<< HEAD
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-component</artifactId>
-      <version>1.0.8</version>
+      <version>${revision}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -198,10 +197,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-sql</artifactId>
-      <version>1.0.8</version>
+      <version>${revision}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -212,7 +212,7 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-parser</artifactId>
-      <version>1.0.8</version>
+      <version>${revision}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -223,19 +223,19 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-transformer</artifactId>
-      <version>1.0.8</version>
+      <version>${revision}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-log4j12</artifactId>
         </exclusion>
       </exclusions>
-=======
+		</dependency>
+		<dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.11</artifactId>
       <version>2.1.0</version>
       <scope>provided</scope>
->>>>>>> master
     </dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
@@ -254,14 +254,11 @@
 			<artifactId>livy-client-http</artifactId>
 			<version>0.3.0</version>
 		</dependency>
-<<<<<<< HEAD
-=======
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
       <version>${jjwt.version}</version>
     </dependency>
->>>>>>> master
   </dependencies>
 	<build>
 		<plugins>
@@ -299,7 +296,7 @@
 							<violationSeverity>warning</violationSeverity>
 							<!-- Exclude files that were added before Checkstyle was enabled.  Gradually
 								make also these files conform to checkstyle rules and remove the exclusions -->
-							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*</excludes>
+							<excludes>**/model/**,**/exceptions/*,**/ApplicationProperties*,**/*Config*,**/JSONFlattener*,**/SAWWork*,**/XDF*</excludes>
 						</configuration>
 						<goals>
 							<goal>check</goal>
