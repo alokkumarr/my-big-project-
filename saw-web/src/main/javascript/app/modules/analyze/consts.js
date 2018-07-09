@@ -219,12 +219,14 @@ export const ANALYSIS_METHODS = [
       {
         label: 'Time series chart',
         icon: {font: 'icon-timeseries-chart'},
-        type: 'chart:tsspline'
+        type: 'chart:tsspline',
+        typeOnBackEnd: 'chart:tsline'
       },
       {
         label: 'Time series multi pane',
         icon: {font: 'icon-Candlestick-icon'},
-        type: 'chart:tsPane'
+        type: 'chart:tsPane',
+        typeOnBackEnd: 'chart:tsareaspline'
       }
     ]
   }

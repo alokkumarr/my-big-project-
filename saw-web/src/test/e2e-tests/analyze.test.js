@@ -13,8 +13,8 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
   const userDataProvider = {
-    'admin': {user: users.admin.loginId},
-    'user': {user: users.userOne.loginId},
+    'admin': {user: users.admin.loginId}, // SAWQA-76
+    'user': {user: users.userOne.loginId}, // SAWQA-4833
   };
 
   beforeAll(function () {

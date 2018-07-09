@@ -1,6 +1,8 @@
-- name: Install SAW Observe Service package
-  yum: name="{{ item }}" state=present
+- name: Copy SAW Observe Service package
+  copy: src="{{ item }}" dest=/tmp/saw-observe.rpm
   with_fileglob: ["../rpms/saw-observe-*.rpm"]
+- name: Install SAW Observe Service package
+  yum: name=/tmp/saw-observe.rpm state=present
   notify:
     - restart saw-observe
 - name: Install SAW Observe Service configuration file

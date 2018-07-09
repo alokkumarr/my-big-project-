@@ -1,8 +1,10 @@
 package sncr.xdf.component;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.internal.LinkedTreeMap;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
@@ -328,34 +330,50 @@ public interface WithDataSetService {
         {
             Map<String, Map<String, Object>> resMap = new HashMap();
             for( Output output: this.ctx.componentConfiguration.getOutputs()){
-                Map<String, Object> res_output = new HashMap<>();
+                Map<String, Object> resOutput = new HashMap<>();
                 String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
                 String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
                 String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
-                //
+
+                String description = (output.getDescription() != null) ? output.getDescription() : "";
+
                 String sampling = DLDataSetOperations.SIMPLE_SAMPLING;
 
-                StringBuilder sb = new StringBuilder(dl.getRoot());
-                sb.append(Path.SEPARATOR + this.ctx.applicationID)
+                StringBuilder physicalLocationBuffer = new StringBuilder(dl.getRoot());
+                physicalLocationBuffer.append(Path.SEPARATOR + this.ctx.applicationID)
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE)
                         .append(Path.SEPARATOR + catalog)
                         .append(Path.SEPARATOR + output.getDataSet())
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
-                logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
-                res_output.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-                res_output.put(DataSetProperties.Name.name(), output.getDataSet());
+                logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), physicalLocationBuffer.toString()));
+                resOutput.put(DataSetProperties.PhysicalLocation.name(), physicalLocationBuffer
+                    .toString());
+                resOutput.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
-                res_output.put(DataSetProperties.Type.name(), output.getDstype().toString() );
-                res_output.put(DataSetProperties.Catalog.name(), catalog);
-                res_output.put(DataSetProperties.Format.name(), format);
-                res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
-                res_output.put(DataSetProperties.Mode.name(), mode);
+                resOutput.put(DataSetProperties.Type.name(), output.getDstype().toString() );
+                resOutput.put(DataSetProperties.Catalog.name(), catalog);
+                resOutput.put(DataSetProperties.Format.name(), format);
+                resOutput.put(DataSetProperties.NumberOfFiles.name(), nof);
+                resOutput.put(DataSetProperties.Mode.name(), mode);
+                resOutput.put(DataSetProperties.Description.name(), description);
+
+                //Extract User Information
+                Object userDataObject = output.getUserdata();
+                logger.error("UserDataobject = " + userDataObject);
+                JsonObject userData = null;
+                if (userDataObject != null) {
+                    userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
+                    if (userData != null) {
+                        resOutput.put(DataSetProperties.UserData.name(), userData);
+                    }
+                }
 
                 //TODO::Fix BDA Meta
-                res_output.put("sample", sampling);
+                //TODO: Need to change this to DatasetProperty
+                resOutput.put("sample", sampling);
 
 
                 //TODO:: Do we really need it??
@@ -364,29 +382,31 @@ public interface WithDataSetService {
 
                 String m = "Configured keys: [" + kl.size()+ "]";
                 for (String s : kl) m += s + " ";
-                logger.trace( m);
+                logger.trace(m);
 
 
-                res_output.put(DataSetProperties.PartitionKeys.name(), kl);
+                resOutput.put(DataSetProperties.PartitionKeys.name(), kl);
 
 
                 boolean exists = false;
                 try {
-                    exists = HFileOperations.exists(sb.toString());
+                    exists = HFileOperations.exists(physicalLocationBuffer.toString());
                 } catch (Exception e) {
                     logger.warn("Could not check output data object: " + output.getDataSet());
                 }
-                res_output.put(DataSetProperties.Exists.name(), exists);
+                resOutput.put(DataSetProperties.Exists.name(), exists);
 
                 switch (ktype) {
                     case parameter:
                         if (output.getName() != null)
-                            resMap.put(output.getName(), res_output); break;
+                            resMap.put(output.getName(), resOutput); break;
                     case dataset:
                         if (output.getDataSet() != null)
-                            resMap.put(output.getDataSet(), res_output); break;
+                            resMap.put(output.getDataSet(), resOutput); break;
                 }
             }
+
+            logger.error("Output dataset map" + resMap);
             return resMap;
         }
 

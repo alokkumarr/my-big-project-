@@ -18,10 +18,15 @@ create-dashboard {
     flex-grow: 1;
     max-height: 100%;
     height: 100%;
+    padding: 0 20px 0 0;
 
     chart {
       max-width: 100%;
       max-height: 100%;
+    }
+
+    .mat-drawer-backdrop.mat-drawer-shown {
+      background-color: rgba(0, 0, 0, 0.2);
     }
 
     gridster.dashboard-gridster {
@@ -37,7 +42,7 @@ create-dashboard {
           right: 0;
         }
 
-        & > .analysis-container {
+        & > observe-chart.analysis-container {
           display: block;
           width: 100%;
           height: 100%;

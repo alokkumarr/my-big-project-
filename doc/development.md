@@ -75,15 +75,25 @@ that will subsequently be available in the image build cache.  After
 the command has completed the SAW start page can be accessed
 at [http://localhost/](http://localhost/).
 
-To follow logs in a running SAW container, execute the following
+To list running containers, execute the following command:
+
+        $ docker ps
+        
+All SIP containers are named according to the pattern `sip-*`, for
+example `sip-admin`, `sip-saw1` and so on.  (The `sip-saw` containers
+have a numeric suffix, because there can be multiple of them in high
+availability configurations.)
+
+To follow logs in a running SIP container, execute the following
+command, using the container name obtained with the `docker ps`
 command:
 
-        $ docker exec saw journalctl -f
+        $ docker exec <container> journalctl -f
 
-To enter a shell inside the main SAW container, execute the following
+To enter a shell inside a SIP container, execute the following
 command:
 
-        $ docker exec -it saw bash
+        $ docker exec -it <container> bash
 
 While inside the container, the following commands can be used as
 starting points to investigate installed SAW services and packages:
@@ -93,15 +103,15 @@ starting points to investigate installed SAW services and packages:
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
-The SAW containers can be stopped using the following command:
+The SIP containers can be stopped using the following command:
 
-        $ docker stop saw saw-mapr
+        $ docker stop $(docker ps -q -f name=sip)
 
 In case containers have been left behind and prevent running new SAW
 containers, existing containers can be removed by executing the
 following command:
 
-        $ docker rm -f saw saw-mapr
+        $ docker rm -f $(docker ps -q -f name=sip)
 
 [cloud]: development-cloud.md
 
@@ -141,7 +151,7 @@ data.
 To edit the sample report metric and data in a running container,
 execute the following commands:
 
-        $ docker exec -it saw bash
+        $ docker exec -it sip-admin bash
         $ cd /root/saw-metrics/sample-spark
         $ vi data.ndjson
         $ vi semantic.json
@@ -167,7 +177,7 @@ reader] source code it is possible to derive the mapping.
 To edit the sample pivot/chart metric and data in a running container,
 execute the following commands:
 
-        $ docker exec -it saw bash
+        $ docker exec -it sip-admin bash
         $ cd /root/saw-metrics/sample-elasticsearch
         $ vi data-*.json
         $ vi semantic.json
@@ -230,6 +240,33 @@ environment using the related [Bamboo deployment project].
 
 [Bamboo build plan]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
 [Bamboo deployment project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/deployments
+
+## Setting up an environment for automatic deployment
+
+To set up a environment for automatic deployment as part of continuous
+integration:
+
+1. Provision the environment according to the requirements in the
+   "Installing and Configuring" section of the [SIP Operations Guide]
+   
+2. Create a `sip` user on nodes of the environment, to be used for
+   executing the deployment.  Add `sip ALL=(ALL) NOPASSWD:ALL` to
+   `/etc/sudoers.d/sip`, to ensure the deployment has needed
+   privileges.  Also set up passwordless authentication for the `sip`
+   user by running `ssh-keygen` to generate a keypair without a
+   passphrase and copying the public key at `.ssh/id_rsa.pub` to the
+   list of authorized keys at `.ssh/authorized_keys`.
+
+3. Go to the [Bamboo deployment project], add the new environment (use
+   an existing environment as a template by cloning it) and update the
+   password of the `sip` user in required places
+
+4. Update the SIP environment configuration (embedded in the shell
+   script of the last task), to ensure parameters have values that
+   correspond to the new environment, for example hostnames matching
+   the environment
+
+[SIP Operations Guide]: ../dist/src/main/asciidoc/sip-operations/index.adoc
 
 # Making a release
 

@@ -25,14 +25,16 @@ require('./designer-filter-row.component.scss');
 export class DesignerFilterRowComponent {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
+  @Output() public filterModelChange: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumn[];
   @Input() public filter: Filter;
+  @Input() public isInRuntimeMode: boolean;
   @Input() public supportsGlobalFilters: boolean;
 
   @ViewChild('auto', { read: ViewContainerRef })
   _autoComplete: ViewContainerRef;
   public TYPE_MAP = TYPE_MAP;
-  formControl: FormControl = new FormControl();
+  formControl: FormControl;
   filteredColumns: Observable<ArtifactColumn[]>;
 
   constructor() {
@@ -40,16 +42,17 @@ export class DesignerFilterRowComponent {
   }
 
   ngOnInit() {
-    const target = find(
-      this.artifactColumns,
-      ({ columnName }) => columnName === this.filter.columnName
-    );
-    this.formControl.setValue(target);
-    this.filteredColumns = this.formControl.valueChanges.pipe(
-      startWith<string | ArtifactColumn>(''),
-      map(value => (typeof value === 'string' ? value : value.displayName)),
-      map(name => (name ? this.nameFilter(name) : this.artifactColumns.slice()))
-    );
+    const target = find(this.artifactColumns, ({columnName}) => columnName === this.filter.columnName);
+    this.formControl = new FormControl({
+      value: target,
+      disabled: this.isInRuntimeMode
+    });
+    this.filteredColumns = this.formControl.valueChanges
+      .pipe(
+        startWith<string | ArtifactColumn>(''),
+        map(value => typeof value === 'string' ? value : value.displayName),
+        map(name => name ? this.nameFilter(name) : this.artifactColumns.slice())
+      );
   }
 
   clearInput() {
@@ -85,6 +88,7 @@ export class DesignerFilterRowComponent {
 
   onFilterModelChange(filterModel: FilterModel) {
     this.filter.model = filterModel;
+    this.filterModelChange.emit();
   }
 
   onGlobalCheckboxToggle(filter: Filter, checked: boolean) {
@@ -93,11 +97,18 @@ export class DesignerFilterRowComponent {
     if (checked) {
       delete filter.model;
     }
+    this.filterModelChange.emit();
   }
 
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {
     filter.isRuntimeFilter = checked;
     delete filter.model;
+    this.filterModelChange.emit();
+  }
+
+  onOptionalCheckboxToggle(filter: Filter, checked: boolean) {
+    filter.isOptional = checked;
+    this.filterModelChange.emit();
   }
 
   remove() {

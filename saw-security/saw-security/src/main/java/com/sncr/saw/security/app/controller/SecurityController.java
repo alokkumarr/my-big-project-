@@ -3,6 +3,8 @@
  */
 package com.sncr.saw.security.app.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
@@ -80,6 +82,8 @@ public class SecurityController {
 
 	@Autowired
 	SSORequestHandler ssoRequestHandler;
+
+	private final ObjectMapper mapper = new ObjectMapper();
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -280,7 +284,7 @@ public class SecurityController {
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
 		} else if (newPass.length() < 8) {
-			message = "New password should be minimum of 8 charactar.";
+			message = "New password should be minimum of 8 character.";
 		} else if (oldPass.equals(newPass)) {
 			message = "Old password and new password should not be same.";
 		} else if (loginId.equals(newPass)) {
@@ -289,12 +293,12 @@ public class SecurityController {
 		Pattern pCaps = Pattern.compile("[A-Z]");
 		Matcher m = pCaps.matcher(newPass);
 		if (!m.find()) {
-			message = "Password should contain atleast 1 uppercase charactar.";
+			message = "Password should contain atleast 1 uppercase character.";
 		}
 		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 		m = pSpeChar.matcher(newPass);
 		if (!m.find()) {
-			message = "Password should contain atleast 1 special charactar.";
+			message = "Password should contain atleast 1 special character.";
 		}
 		if (message == null) {
 			try {
@@ -1431,6 +1435,18 @@ public class SecurityController {
 			return catList;
 		}
 		return catList;
+	}
+
+	/**
+	 * Return response indicating the status of the health of the
+	 * service.  Used by load balancer to route requests to healthy
+	 * instances of the service to provide high availability.
+	 */
+	@RequestMapping("/actuator/health")
+	public ObjectNode health() {
+		ObjectNode root = mapper.createObjectNode();
+		root.put("status", "UP");
+		return root;
 	}
 
 	/**

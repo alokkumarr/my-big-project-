@@ -11,290 +11,291 @@ const protractorConf = require('../../../../conf/protractor.conf');
 const using = require('jasmine-data-provider');
 const designModePage = require('../../javascript/pages/designModePage.po.js');
 const Filter = require('../../javascript/data/filter');
+const dataSets = require('../../javascript/data/datasets');
 
 describe('Check whether filters throw an error on pivots: pivotFilters.test.js', () => {
-  const metricName = 'MCT TMO Session ES';
+  const metricName = dataSets.pivotChart;
   const analysisType = 'table:pivot';
-  const dateFieldName = 'Transfer Date';
-  const numberFieldName = 'Transfer Count';
-  const stringFieldName = 'Session Status';
+  const dateFieldName = 'Date';
+  const numberFieldName = 'Integer';
+  const stringFieldName = 'String';
 
   const dataProvider = {
     // DATES
-    /*'Date, This Week, Group Interval: not specified, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'This Week'
-     },
-     'Date, MTD (Month to Date), Group Interval: Year, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Year',
-     preset: 'MTD (Month to Date)'
-     },
-     'Date, YTD (Year to Date), Group Interval: Quarter, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Quarter',
-     preset: 'YTD (Year to Date)'
-     },
-     'Date, Last Week, Group Interval: Month, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Month',
-     preset: 'Last Week'
-     },
-     'Date, Last 2 Weeks, Group Interval: Date, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Date',
-     preset: 'Last 2 Weeks'
-     },
-     'Date, Last Month, Group Interval: not specified, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last Month'
-     },
-     'Date, Last Quarter, Group Interval: not specified, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last Quarter'
-     },
-     'Date, Last 3 Months, Group Interval: not specified, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last 3 Months'
-     },
-     'Date, Last 6 Months, Group Interval: not specified, as admin': {
-     user: 'admin',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last 6 Months'
-     },
-     'Date, This Week, Group Interval: not specified, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'This Week'
-     },
-     'Date, MTD (Month to Date), Group Interval: Year, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Year',
-     preset: 'MTD (Month to Date)'
-     },
-     'Date, YTD (Year to Date), Group Interval: Quarter, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Quarter',
-     preset: 'YTD (Year to Date)'
-     },
-     'Date, Last Week, Group Interval: Month, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Month',
-     preset: 'Last Week'
-     },
-     'Date, Last 2 Weeks, Group Interval: Date, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: true,
-     groupInterval: 'Date',
-     preset: 'Last 2 Weeks'
-     },
-     'Date, Last Month, Group Interval: not specified, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last Month'
-     },
-     'Date, Last Quarter, Group Interval: not specified, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last Quarter'
-     },
-     'Date, Last 3 Months, Group Interval: not specified, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last 3 Months'
-     },
-     'Date, Last 6 Months, Group Interval: not specified, as user': {
-     user: 'userOne',
-     fieldType: 'date',
-     groupIntervalSpecified: false,
-     preset: 'Last 6 Months'
-     }*/
+    'Date, This Week, Group Interval: not specified, as admin': { // SAW-3473
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'This Week'
+    },
+    'Date, MTD (Month to Date), Group Interval: Year, as admin': { // SAW-3474
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Year',
+      preset: 'MTD (Month to Date)'
+    },
+    'Date, YTD (Year to Date), Group Interval: Quarter, as admin': { // SAW-3475
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Quarter',
+      preset: 'YTD (Year to Date)'
+    },
+    'Date, Last Week, Group Interval: Month, as admin': { // SAW-3476
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Month',
+      preset: 'Last Week'
+    },
+    'Date, Last 2 Weeks, Group Interval: Date, as admin': { // SAW-3477
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Date',
+      preset: 'Last 2 Weeks'
+    },
+    'Date, Last Month, Group Interval: not specified, as admin': { // SAW-3478
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last Month'
+    },
+    'Date, Last Quarter, Group Interval: not specified, as admin': { // SAW-3479
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last Quarter'
+    },
+    'Date, Last 3 Months, Group Interval: not specified, as admin': { // SAW-3480
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last 3 Months'
+    },
+    'Date, Last 6 Months, Group Interval: not specified, as admin': { // SAW-3481
+      user: 'admin',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last 6 Months'
+    },
+    'Date, This Week, Group Interval: not specified, as user': { // SAW-3473
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'This Week'
+    },
+    'Date, MTD (Month to Date), Group Interval: Year, as user': { // SAW-3474
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Year',
+      preset: 'MTD (Month to Date)'
+    },
+    'Date, YTD (Year to Date), Group Interval: Quarter, as user': { // SAW-3475
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Quarter',
+      preset: 'YTD (Year to Date)'
+    },
+    'Date, Last Week, Group Interval: Month, as user': { // SAW-3476
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Month',
+      preset: 'Last Week'
+    },
+    'Date, Last 2 Weeks, Group Interval: Date, as user': { // SAW-3477
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: true,
+      groupInterval: 'Date',
+      preset: 'Last 2 Weeks'
+    },
+    'Date, Last Month, Group Interval: not specified, as user': { // SAW-3478
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last Month'
+    },
+    'Date, Last Quarter, Group Interval: not specified, as user': { // SAW-3479
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last Quarter'
+    },
+    'Date, Last 3 Months, Group Interval: not specified, as user': { // SAW-3480
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last 3 Months'
+    },
+    'Date, Last 6 Months, Group Interval: not specified, as user': { // SAW-3481
+      user: 'userOne',
+      fieldType: 'date',
+      groupIntervalSpecified: false,
+      preset: 'Last 6 Months'
+    },
 
     // STRINGS
-    /*'String, EQUALS, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'EQUALS',
-     value: 10
-     },
-     'String, NOT_EQUAL, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'NOT_EQUAL',
-     value: 10
-     },
-     'String, IS_IN, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'IS_IN',
-     value: 10
-     },
-     'String, IS_NOT_IN, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'IS_NOT_IN',
-     value: 10
-     },
-     'String, CONTAINS, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'CONTAINS',
-     value: 10
-     },
-     'String, STARTS_WITH, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'STARTS_WITH',
-     value: 10
-     },
-     'String, ENDS_WITH, as admin': {
-     user: 'admin',
-     fieldType: 'string',
-     operator: 'ENDS_WITH',
-     value: 10
-     },
-     'String, EQUALS, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'EQUALS',
-     value: 10
-     },
-     'String, NOT_EQUAL, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'NOT_EQUAL',
-     value: 10
-     },
-     'String, IS_IN, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'IS_IN',
-     value: 10
-     },
-     'String, IS_NOT_IN, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'IS_NOT_IN',
-     value: 10
-     },
-     'String, CONTAINS, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'CONTAINS',
-     value: 10
-     },
-     'String, STARTS_WITH, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'STARTS_WITH',
-     value: 10
-     },
-     'String, ENDS_WITH, as user': {
-     user: 'userOne',
-     fieldType: 'string',
-     operator: 'ENDS_WITH',
-     value: 10
-     },*/
+    'String, Equals, as admin': { // SAW-3461
+      user: 'admin',
+      fieldType: 'string',
+      operator: 'Equals',
+      value: 10
+    },
+    'String, Not equal, as admin': { // SAW-3462
+      user: 'admin',
+      fieldType: 'string',
+      operator: 'Not equal',
+      value: 10
+    },
+      'String, Is in, as admin': { // SAW-3463
+        user: 'admin',
+        fieldType: 'string',
+        operator: 'Is in',
+        value: 10
+      },
+      'String, Is not in, as admin': { // SAW-3464
+        user: 'admin',
+        fieldType: 'string',
+        operator: 'Is not in',
+        value: 10
+      },
+      'String, Contains, as admin': { // SAW-3465
+        user: 'admin',
+        fieldType: 'string',
+        operator: 'Contains',
+        value: 10
+      },
+      'String, Starts with, as admin': { // SAW-3466
+        user: 'admin',
+        fieldType: 'string',
+        operator: 'Starts with',
+        value: 10
+      },
+      'String, Ends with, as admin': { // SAW-3467
+        user: 'admin',
+        fieldType: 'string',
+        operator: 'Ends with',
+        value: 10
+      },
+      'String, Equals, as user': { // SAW-3461
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Equals',
+        value: 10
+      },
+      'String, Not equal, as user': { // SAW-3462
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Not equal',
+        value: 10
+      },
+      'String, Is in, as user': { // SAW-3463
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Is in',
+        value: 10
+      },
+      'String, Is not in, as user': { // SAW-3464
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Is not in',
+        value: 10
+      },
+      'String, Contains, as user': { // SAW-3465
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Contains',
+        value: 10
+      },
+      'String, Starts with, as user': { // SAW-3466
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Starts with',
+        value: 10
+      },
+      'String, Ends with, as user': { // SAW-3467
+        user: 'userOne',
+        fieldType: 'string',
+        operator: 'Ends with',
+        value: 10
+      },
 
-    // NUMBERS
-    'Number, Greater than, Aggregate function: Average, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: "AVG",
-      operator: 'Greater than',
-      value: 10
-    },
-    'Number, Less than, Aggregate function: Minimum, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: "MIN",
-      operator: 'Less than',
-      value: 10
-    },
-    'Number, Greater than or equal to, Aggregate function: Maximum, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: "MAX",
-      operator: 'Greater than or equal to',
-      value: 10
-    },
-    'Number, Less than or equal to, Aggregate function: Count, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: "Count",
-      operator: 'Less than or equal to',
-      value: 10
-    },
-    'Number, Greater than, Aggregate function: default, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: false,
-      operator: 'Greater than',
-      value: 10
-    },
-    'Number, Less than, Aggregate function: default, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: false,
-      operator: 'Less than',
-      value: 10
-    },
-    'Number, Greater than ot equal to, Aggregate function: default, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: false,
-      operator: 'Greater than or equal to',
-      value: 10
-    },
-    'Number, Less than or equal to, Aggregate function: default, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: false,
-      operator: 'Less than or equal to',
-      value: 10
-    },
-    'Number, Equal to, Aggregate function: default, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: false,
-      operator: 'Equal to',
-      value: 10
-    },
-    'Number, Not equal to, Aggregate function: default, as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      aggregateFunction: false,
-      operator: 'Not equal to',
-      value: 10
-    }
+      // NUMBERS
+      'Number, Greater than, Aggregate function: Average, as admin': { // SAW-3507
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: "AVG",
+        operator: 'Greater than',
+        value: 10
+      },
+      'Number, Less than, Aggregate function: Minimum, as admin': { // SAW-3508
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: "MIN",
+        operator: 'Less than',
+        value: 10
+      },
+      'Number, Greater than or equal to, Aggregate function: Maximum, as admin': { // SAW-3509
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: "MAX",
+        operator: 'Greater than or equal to',
+        value: 10
+      },
+      'Number, Less than or equal to, Aggregate function: Count, as admin': { // SAW-3510
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: "Count",
+        operator: 'Less than or equal to',
+        value: 10
+      },
+      'Number, Greater than, Aggregate function: default, as admin': { // SAW-3511
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: false,
+        operator: 'Greater than',
+        value: 10
+      },
+      'Number, Less than, Aggregate function: default, as admin': { // SAW-3512
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: false,
+        operator: 'Less than',
+        value: 10
+      },
+      'Number, Greater than ot equal to, Aggregate function: default, as admin': { // SAW-3513
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: false,
+        operator: 'Greater than or equal to',
+        value: 10
+      },
+      'Number, Less than or equal to, Aggregate function: default, as admin': { // SAW-3514
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: false,
+        operator: 'Less than or equal to',
+        value: 10
+      },
+      'Number, Equal to, Aggregate function: default, as admin': { // SAW-3515
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: false,
+        operator: 'Equal to',
+        value: 10
+      },
+      'Number, Not equal to, Aggregate function: default, as admin': { // SAW-3516
+        user: 'admin',
+        fieldType: 'number',
+        aggregateFunction: false,
+        operator: 'Not equal to',
+        value: 10
+      }
 
     //TODO add between operator for number as admin
     //TODO add custom date for admin
@@ -328,21 +329,25 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
     it('Should add filter to pivot:  ' + description, () => {
       loginPage.loginAs(data.user);
-      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.cardViewButton);
+      commonFunctions.waitFor.elementToBeVisible(homePage.cardViewButton);
+      commonFunctions.waitFor.elementToBeClickable(homePage.cardViewButton);
+      homePage.cardViewButton.click();
 
       // Create Pivot
       homePage.createAnalysis(metricName, analysisType);
 
       // Add fields (string, date, number)
+      commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(dateFieldName));
       designModePage.pivot.addFieldButton(dateFieldName).click();
+      commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(numberFieldName));
       designModePage.pivot.addFieldButton(numberFieldName).click();
+      commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.addFieldButton(stringFieldName));
       designModePage.pivot.addFieldButton(stringFieldName).click();
 
       // Create filter object. Specify type and preset/operator
@@ -364,52 +369,76 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
       }
 
 
+
       // Scenario for group intervals
       if (data.groupIntervalSpecified) {
+        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName));
         designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName).click();
+        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDown);
         designModePage.pivot.groupIntervalDropDown.click();
+        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDownElement(data.groupInterval));
         designModePage.pivot.groupIntervalDropDownElement(data.groupInterval).click();
       }
 
       // Scenario for aggregate functions
       if (data.aggregateFunction) {
-        commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.aggregateFunctionButton("Sum"));
+        commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionButton("Sum"));
+        designModePage.aggregateFunctionButton("Sum").click();
         // Have to add sleep for elements to be rendered. They appear in DOM faster than they can be actually clicked
-        browser.sleep(1000);
-        commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+        commonFunctions.waitFor.elementToBeVisible(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+        commonFunctions.waitFor.elementToBeClickable(designModePage.aggregateFunctionMenuItem(data.aggregateFunction));
+        designModePage.aggregateFunctionMenuItem(data.aggregateFunction).click();
       }
 
       // Add filter
       const filterWindow = designModePage.filterWindow;
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.filterBtn);
-      browser.sleep(1000); // headless mode makes fake click on columnDropDown without wait
-      commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.columnDropDown);
-      commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.columnNameDropDownItem(filter.columnName));
+      commonFunctions.waitFor.elementToBeVisible(designModePage.filterBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.filterBtn);
+      designModePage.filterBtn.click();
+      commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.addFilter('sample'));
+      designModePage.filterWindow.addFilter('sample').click();
+      commonFunctions.waitFor.elementToBeClickable(filterWindow.columnDropDown);
+      filterWindow.columnDropDown.click();
+      commonFunctions.waitFor.elementToBeClickable(filterWindow.columnNameDropDownItem(filter.columnName));
+      filterWindow.columnNameDropDownItem(filter.columnName).click();
 
       // Scenario for dates
       if (data.fieldType === 'date') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.date.presetDropDown);
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.date.presetDropDownItem(data.preset));
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.date.presetDropDown);
+        filterWindow.date.presetDropDown.click();
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.date.presetDropDownItem(data.preset));
+        filterWindow.date.presetDropDownItem(data.preset).click();
       }
 
       // Scenario for numbers
       if (data.fieldType === 'number') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.operator);
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.operatorDropDownItem(data.operator));
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.number.input);
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.number.operator);
+        filterWindow.number.operator.click();
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.number.operatorDropDownItem(data.operator));
+        filterWindow.number.operatorDropDownItem(data.operator).click();
+        commonFunctions.waitFor.elementToBeVisible(filterWindow.number.input);
+        filterWindow.number.input.click();
         filterWindow.number.input.clear().sendKeys(data.value);
       }
 
       // Scenario for strings
       if (data.fieldType === 'string') {
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.operator);
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.operatorDropDownItem(data.operator));
-        // TODO rewrite since there is layout error
-        commonFunctions.waitFor.elementToBeClickableAndClick(filterWindow.string.input);
-        filterWindow.string.input.clear().sendKeys(data.value);
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.string.operator);
+        filterWindow.string.operator.click();
+        commonFunctions.waitFor.elementToBeClickable(filterWindow.string.operatorDropDownItem(data.operator));
+        filterWindow.string.operatorDropDownItem(data.operator).click();
+        // Select diffrent input for Is in and Is not in operator TODO: we should be consistent
+        if (data.operator === 'Is in' || data.operator === 'Is not in') {
+          commonFunctions.waitFor.elementToBeVisible(filterWindow.string.isInIsNotInInput);
+          filterWindow.string.isInIsNotInInput.clear().sendKeys(data.value);
+        } else {
+          commonFunctions.waitFor.elementToBeVisible(filterWindow.string.input);
+          filterWindow.string.input.clear().sendKeys(data.value);
+        }        
       }
 
-      commonFunctions.waitFor.elementToBeClickableAndClick(designModePage.applyFiltersBtn);
+      commonFunctions.waitFor.elementToBeClickable(designModePage.applyFiltersBtn);
+      designModePage.applyFiltersBtn.click();
       commonElementsPage.ifErrorPrintTextAndFailTest();
     });
   });

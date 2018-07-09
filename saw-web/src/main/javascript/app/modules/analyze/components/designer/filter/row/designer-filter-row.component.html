@@ -1,17 +1,23 @@
 <div fxLayout="row"
      fxLayoutAlign="space-between center"
-     [ngSwitch]="TYPE_MAP[filter.type]">
+>
   <div fxLayout="row wrap"
        fxFlex="grow"
+       [ngSwitch]="TYPE_MAP[filter.type]"
        class="filter__data__space"
-       fxLayoutAlign="start">
+       fxLayoutAlign="start"
+  >
     <mat-form-field>
+      <span *ngIf="!filter.isOptional && isInRuntimeMode" class="mandatory-asterisk">*</span>
       <input type="text" placeholder="Column" matInput
              #autoInput
              e2e="filter-autocomplete-input"
              [matAutocomplete]="auto"
              [formControl]="formControl"/>
-      <button mat-button *ngIf="autoInput.value" matSuffix mat-icon-button (click)="clearInput()">
+      <button *ngIf="autoInput.value && !isInRuntimeMode"
+              (click)="clearInput()"
+              matSuffix mat-icon-button mat-button
+      >
         <mat-icon fontIcon="icon-close"></mat-icon>
       </button>
       <mat-autocomplete #auto="matAutocomplete"
@@ -24,7 +30,7 @@
       </mat-autocomplete>
     </mat-form-field>
 
-    <div *ngIf="!filter.isRuntimeFilter && !filter.isGlobalFilter" style="margin-left: 10px;">
+    <div *ngIf="isInRuntimeMode ? filter.isRuntimeFilter : (!filter.isRuntimeFilter && !filter.isGlobalFilter)" style="margin-left: 10px;">
       <designer-string-filter *ngSwitchCase="'string'"
                               (filterModelChange)="onFilterModelChange($event)"
                               [filterModel]="filter.model">
@@ -44,18 +50,27 @@
        class="filter__action__space"
        fxLayoutAlign="space-between center">
     <mat-checkbox [checked]="filter.isGlobalFilter"
-                  *ngIf="supportsGlobalFilters"
+                  *ngIf="!isInRuntimeMode && supportsGlobalFilters"
                   (change)="onGlobalCheckboxToggle(filter, $event.checked)"
                   i18n>
       Global
     </mat-checkbox>
-    <mat-checkbox [checked]="filter.isRuntimeFilter"
+    <mat-checkbox *ngIf="!isInRuntimeMode"
+                  [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
                   i18n>
       Prompt
     </mat-checkbox>
+    <mat-checkbox *ngIf="!isInRuntimeMode && filter.isRuntimeFilter"
+                  [checked]="filter.isOptional"
+                  (change)="onOptionalCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Optional
+    </mat-checkbox>
 
-    <button mat-icon-button (click)="remove()">
+    <button *ngIf="!isInRuntimeMode"
+            mat-icon-button (click)="remove()"
+    >
       <mat-icon fontIcon="icon-close"
                 class="filter__remove-button__icon">
       </mat-icon>

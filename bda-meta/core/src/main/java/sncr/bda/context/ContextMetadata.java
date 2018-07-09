@@ -25,8 +25,8 @@ public class ContextMetadata implements Serializable {
     static final SimpleDateFormat format = new SimpleDateFormat(DATE_FMT);
     public String finishedTs;
     public final String applicationID;
-    public final String user = "A_user";
     public final String transformationName = "A_transformation";
+    public String user = "A_user";
     public String batchID;
     public String startTs;
     public String componentName;

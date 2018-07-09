@@ -55,6 +55,7 @@ public abstract class Executor {
                           int thr,
                           Map<String, Map<String, Object>> inputs,
                           Map<String, Map<String, Object>> outputs){
+        logger.trace("Inside Executor");
         this.script = script;
         session_ctx = ctx;
         threshold = thr;
@@ -113,6 +114,7 @@ public abstract class Executor {
 
     protected void prepareRefData(Map<String, Dataset> dsMap){
 
+        logger.trace("Preparing reference data");
         if (refDataSets != null && refDataSets.size() > 0) {
             for (String refDataSetName: refDataSets) {
                 logger.debug("Load reference data: " + refDataSetName);

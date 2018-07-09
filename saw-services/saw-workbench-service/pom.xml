@@ -23,8 +23,10 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
+    <jjwt.version>0.7.0</jjwt.version>
 		<metadata.api>${revision}</metadata.api>
 		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+    <jjwt.version>0.7.0</jjwt.version>
 	</properties>
 
 	<dependencies>
@@ -180,6 +182,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.11</artifactId>
+      <version>2.1.0</version>
+      <scope>provided</scope>
+    </dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-sql_2.11</artifactId>
@@ -197,7 +205,12 @@
 			<artifactId>livy-client-http</artifactId>
 			<version>0.3.0</version>
 		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>${jjwt.version}</version>
+    </dependency>
+  </dependencies>
 	<build>
 		<plugins>
 			<plugin>
@@ -301,6 +314,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-workbench</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-workbench-service</name>
@@ -331,6 +345,12 @@
 									<file>src/main/system/saw-workbench-proxy.socket</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

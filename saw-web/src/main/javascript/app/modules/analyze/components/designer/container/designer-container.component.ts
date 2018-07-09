@@ -7,8 +7,8 @@ import * as isNumber from 'lodash/isNumber';
 import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
-import * as orderBy from 'lodash/orderBy';
 import * as map from 'lodash/map';
+import { flattenPivotData, flattenChartData } from '../../../../../common/utils/dataFlattener';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -20,38 +20,28 @@ import {
   SqlBuilderReport,
   SqlBuilderPivot,
   SqlBuilderChart,
-  ArtifactColumns,
   Artifact,
   DesignerToolbarAciton,
   Sort,
   Filter,
   IToolbarActionResult,
   DesignerChangeEvent,
-  ArtifactColumn,
-  Format,
   DesignerSaveEvent,
   AnalysisReport
 } from '../types';
 import {
+  DesignerStates,
   FLOAT_TYPES,
   DEFAULT_PRECISION,
-  DATE_TYPES,
-  NUMBER_TYPES
-} from '../../../consts';
+  DATE_TYPES
+} from '../consts';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
 import { ChartService } from '../../../services/chart.service';
 
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
-export enum DesignerStates {
-  WAITING_FOR_COLUMNS,
-  NO_SELECTION,
-  SELECTION_WAITING_FOR_DATA,
-  SELECTION_WITH_NO_DATA,
-  SELECTION_WITH_DATA,
-  SELECTION_OUT_OF_SYNCH_WITH_DATA
-}
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport'];
 
 @Component({
   selector: 'designer-container',
@@ -71,6 +61,7 @@ export class DesignerContainerComponent {
   public dataCount: number;
   public auxSettings: any = {};
   public sorts: Sort[] = [];
+  public sortFlag = [];
   public filters: Filter[] = [];
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
@@ -214,6 +205,26 @@ export class DesignerContainerComponent {
     return artifacts;
   }
 
+  checkNodeForSorts() {
+    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+    const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
+    forEach(sqlBuilder.nodeFields, node => {
+      let identical = false;
+      forEach(this.sorts || [], sort => {
+        const hasSort = this.sorts.some(
+          sort => node.columnName === sort.columnName
+        );
+        if (!hasSort) {
+          this.sorts.push({
+            order: 'asc',
+            columnName: node.columnName,
+            type: node.type
+          });
+        }
+      });
+    });
+  }
+
   addDefaultSorts() {
     if ((this.analysisStarter || this.analysis).type !== 'chart') return;
 
@@ -276,7 +287,7 @@ export class DesignerContainerComponent {
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
-          this.data = this.parseData(response.data, this.analysis);
+          this.data = this.flattenData(response.data, this.analysis);
         }
       },
       err => {
@@ -286,30 +297,19 @@ export class DesignerContainerComponent {
     );
   }
 
-  parseData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return this._designerService.parseData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, analysis.sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
     case 'chart':
-      let chartData = this._chartService.parseData(
+      return flattenChartData(
         data,
         analysis.sqlBuilder
       );
-
-      /* Order chart data manually. Backend doesn't sort chart data. */
-      if (!isEmpty(this.sorts)) {
-        chartData = orderBy(
-          chartData,
-          map(this.sorts, 'columnName'),
-          map(this.sorts, 'order')
-        );
-      }
-
-      return chartData;
     }
   }
 
@@ -327,7 +327,8 @@ export class DesignerContainerComponent {
         });
       break;
     case 'filter':
-      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, (this.analysis || this.analysisStarter).type === 'chart')
+      const supportsGlobalFilters = GLOBAL_FILTER_SUPPORTED.includes((this.analysis || this.analysisStarter).type);
+      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, supportsGlobalFilters)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.filters = result.filters;
@@ -387,6 +388,9 @@ export class DesignerContainerComponent {
 
   toggleDesignerQueryModes() {
     this.isInQueryMode = !this.isInQueryMode;
+    if (!this.isInQueryMode) {
+      delete (this.analysis as AnalysisReport).queryManual;
+    }
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -448,7 +452,7 @@ export class DesignerContainerComponent {
       }
       return isDataEmpty;
     case 'chart':
-      const parsedData = this._chartService.parseData(data, sqlBuilder);
+      const parsedData = flattenChartData(data, sqlBuilder);
       return isEmpty(parsedData);
     // TODO verify if the object returned is empty
     case 'report':
@@ -543,6 +547,7 @@ export class DesignerContainerComponent {
     case 'selectedFields':
       this.cleanSorts();
       this.addDefaultSorts();
+      this.checkNodeForSorts();
       this.areMinRequirmentsMet = this.canRequestData();
       this.requestDataIfPossible();
       break;
@@ -629,7 +634,7 @@ export class DesignerContainerComponent {
   canRequestReport(artifacts) {
     if (this.analysis.edit) {
       return Boolean((<AnalysisReport>this.analysis).queryManual);
-    };
+    }
 
     let atLeastOneIsChecked = false;
     forEach(artifacts, artifact => {
@@ -647,6 +652,15 @@ export class DesignerContainerComponent {
   }
 
   updateAnalysis() {
+    const { edit, type, artifacts } = this.analysis;
+    if (type === 'report' && edit) {
+      // reset checked fields, sorts, and filters for query mode report analysis
+      this.filters = [];
+      this.sorts = [];
+      forEach(artifacts, artifact => {
+        forEach(artifact.column, col => col.checked = false);
+      });
+    }
     this.analysis.sqlBuilder = this.getSqlBuilder();
   }
 

@@ -13,7 +13,7 @@ import {
   Analysis,
   Filter
 } from '../../types';
-import { DesignerStates } from '../../container';
+import { DesignerStates } from '../../consts';
 
 const template = require('./multi-table-designer-layout.component.html');
 require('./multi-table-designer-layout.component.scss');

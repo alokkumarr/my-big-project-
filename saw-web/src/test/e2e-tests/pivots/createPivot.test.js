@@ -38,11 +38,10 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
   });
 
   afterAll(function () {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
-  it('Should apply filter to Pivot', () => {
+  it('Should apply filter to Pivot', () => { // SAW-3894
     loginPage.loginAs('admin');
     commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 

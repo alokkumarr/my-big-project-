@@ -5,7 +5,6 @@ file. */
 
 import { AnalyzeService } from './analyze.service';
 import { SortService } from './sort.service';
-import { FilterService } from './filter.service';
 
 /* Analyze service adapter */
 export function analyzeServiceFactory(i: any) {
@@ -27,15 +26,4 @@ export const sortServiceProvider = {
   provide: SortService,
   useFactory: sortServiceFactory,
   deps: ['$injector']
-};
-
-/* Filter service adapter */
-export function filterServiceFactory(i: any) {
-  return i.get('FilterService');
 }
-
-export const filterServiceProvider = {
-  provide: FilterService,
-  useFactory: filterServiceFactory,
-  deps: ['$injector']
-};

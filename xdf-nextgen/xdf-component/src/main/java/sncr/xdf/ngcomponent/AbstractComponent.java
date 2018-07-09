@@ -38,7 +38,7 @@ import java.util.Map;
  * or using base classes:
  * - Read data from a source (???)
  * - Write data (DLBatchWriter)
- * - Move data from temp location to permanent location: WithMovableResult
+ * - move data from temp location to permanent location: WithMovableResult
  * - Read and write result from/to metadata
  * - Support Spark context
  * and so on.
@@ -535,7 +535,7 @@ public abstract class AbstractComponent implements WithContext {
                 String ale_id = services.als.createAuditLog(ngctx, ale);
                 ctx.mdOutputDSMap.forEach((id, ds) -> {
                     try {
-                        //TODO:: Move it after merge to appropriate place
+                        //TODO:: move it after merge to appropriate place
                         //ctx.transformationID = transformationID;
                         ngctx.ale_id = ale_id;
                         ngctx.status = status;
@@ -544,9 +544,13 @@ public abstract class AbstractComponent implements WithContext {
                         String dsname = id.substring(id.indexOf(MetadataStore.delimiter) + MetadataStore.delimiter.length());
                         Map<String, Object> outDS = ngctx.outputDataSets.get(dsname);
                         JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
-
                         logger.trace("Extracted schema: " + schema.toString());
-                        services.md.updateDS(id, ngctx, ds, schema);
+
+                        // Set record count
+                        long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
+                        logger.trace("Extracted record count " + recordCount);
+
+                        services.md.updateDS(id, ngctx, ds, schema, recordCount);
 
                     } catch (Exception e) {
                         error = "Could not update DS/ write AuditLog entry to DS, id = " + id;

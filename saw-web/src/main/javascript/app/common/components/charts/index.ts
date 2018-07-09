@@ -12,6 +12,7 @@ require('highcharts/modules/offline-exporting')(Highcharts);
 require('highcharts/modules/drag-panes')(Highstock);
 require('highcharts/modules/exporting')(Highstock);
 require('highcharts/modules/offline-exporting')(Highstock);
+require('highcharts/modules/bullet')(Highcharts);
 
 import { ChartComponent } from './chart.component';
 import { businessTransactionVolumeService } from './business-transaction-volume.service';

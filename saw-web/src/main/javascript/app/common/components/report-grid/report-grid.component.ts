@@ -2,6 +2,8 @@ import {
   Component,
   Input,
   Output,
+  OnInit,
+  OnDestroy,
   EventEmitter,
   ViewChild,
   ElementRef
@@ -16,12 +18,16 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as split from 'lodash/split';
 import * as isFunction from 'lodash/isFunction';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import * as isEmpty from 'lodash/isEmpty';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import DataSource from 'devextreme/data/data_source';
 import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
+import { AGGREGATE_TYPES_OBJ, DATE_FORMATS_OBJ } from '../../consts.js';
+import { Subscription } from 'rxjs/Subscription';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import {
   ArtifactColumnReport,
   Artifact,
@@ -44,7 +50,7 @@ require('./report-grid.component.scss');
 type ReportGridSort = {
   order: 'asc' | 'desc';
   index: number;
-}
+};
 
 type ReportGridField = {
   caption: string;
@@ -60,32 +66,42 @@ type ReportGridField = {
   sortOrder?: 'asc' | 'desc';
   sortIndex?: number;
   changeColumnProp: Function;
-}
+};
 
 const DEFAULT_PAGE_SIZE = 25;
 const LOAD_PANEL_POSITION_SELECTOR = '.report-dx-grid';
+
+let self; // needed to access component context from dx callbacks
+
 @Component({
   selector: 'report-grid-upgraded',
   template
 })
-
-export class ReportGridComponent {
+export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
+  private listeners: Array<Subscription> = [];
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Input() query: string;
-  @Input('sorts') set setSorts(sorts: Sort[]) {
-    this.sorts = reduce(sorts, (acc, sort, index) => {
-      const reportGirdSort: ReportGridSort = {
-        order: sort.order,
-        index
-      }
-      acc[sort.columnName] = reportGirdSort;
-      return acc;
-    }, {});
-  };
-  @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
+  @Input() dimensionChanged: BehaviorSubject<any>;
+  @Input('sorts')
+  set setSorts(sorts: Sort[]) {
+    this.sorts = reduce(
+      sorts,
+      (acc, sort, index) => {
+        const reportGirdSort: ReportGridSort = {
+          order: sort.order,
+          index
+        };
+        acc[sort.columnName] = reportGirdSort;
+        return acc;
+      },
+      {}
+    );
+  }
+  @Input('artifacts')
+  set setArtifactColumns(artifacts: Artifact[]) {
     if (!artifacts) {
       return;
     }
@@ -95,22 +111,47 @@ export class ReportGridComponent {
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
     }
-  };
-  @Input('queryColumns') set setQueryColumns(queryColumns) {
+
+    if (isEmpty(this.columns)) {
+      this.columns = null;
+    }
+  }
+  @Input('queryColumns')
+  set setQueryColumns(queryColumns) {
     // TODO merge with SAW - 2002 for queryColumns
     // for query mode
     this.columns = this.queryColumns2Columns(queryColumns);
   }
-  @Input('data') set setData(data: any[]) {
+  @Input('data')
+  set setData(data: any[]) {
     if (data || data.length < 7) {
       this.gridHeight = 'auto';
     } else {
       this.gridHeight = '100%';
     }
     this.data = data;
-  };
-  @Input('dataLoader') dataLoader: (options: {}) => Promise<{data: any[], totalCount: number}>;
+  }
+  @Input('dataLoader')
+  set setDataLoader(
+    dataLoader: (options: {}) => Promise<{ data: any[]; totalCount: number }>
+  ) {
+    // setup pagination for paginated data
+    if (isFunction(dataLoader)) {
+      this.dataLoader = dataLoader;
+      this.data = new DataSource({
+        load: options => this.dataLoader(options)
+      });
+      this.remoteOperations = { paging: true };
+      this.paging = { pageSize: this.pageSize };
+    } else {
+      throw new Error('Data loader requires a Function');
+    }
+  }
   @Input() isEditable: boolean = false;
+
+  public dataLoader: (
+    options: {}
+  ) => Promise<{ data: any[]; totalCount: number }>;
 
   public sorts: {};
   public artifacts: Artifact[];
@@ -131,8 +172,8 @@ export class ReportGridComponent {
   public rowAlternationEnabled = true;
   public hoverStateEnabled = true;
   public wordWrapEnabled = false;
-  public scrolling = {mode: 'Virtual'};
-  public sorting = {mode: 'multiple'};
+  public scrolling = { mode: 'Virtual' };
+  public sorting = { mode: 'multiple' };
   public columnChooser;
   public gridWidth = '100%';
   public gridHeight: '100%' | 'auto' = '100%';
@@ -144,30 +185,28 @@ export class ReportGridComponent {
     showPageSizeSelector: true
   };
   public loadPanel;
-  public summary = {calculateCustomSummary: () => `Showing 10 out of 10000 rows. Click on 'Preview' to see more.`};
 
-  constructor(
-    private _dialog: MatDialog,
-    private _elemRef: ElementRef
-  ) {
-    this.onLoadPanelShowing = ({component}) => {
+  constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
+    self = this;
+    this.onLoadPanelShowing = ({ component }) => {
       const instance = this.dataGrid.instance;
       if (instance) {
-        const elem = this.pageSize > DEFAULT_PAGE_SIZE ? window : this._elemRef.nativeElement.querySelector(LOAD_PANEL_POSITION_SELECTOR);
+        const elem =
+          this.pageSize > DEFAULT_PAGE_SIZE
+            ? window
+            : this._elemRef.nativeElement.querySelector(
+                LOAD_PANEL_POSITION_SELECTOR
+              );
         component.option('position.of', elem);
         this.pageSize = instance.pageSize();
       }
     };
+    this.customizeColumns = this.customizeColumns.bind(this);
   }
 
   ngOnInit() {
-    // setup pagination for paginated data
-    if (isFunction(this.dataLoader)) {
-      this.data = new DataSource({
-        load: options => this.dataLoader(options)
-      });
-      this.remoteOperations = {paging: true};
-      this.paging = {pageSize: this.pageSize}
+    if (this.dimensionChanged) {
+      this.listeners.push(this.subscribeForRepaint());
     }
 
     // disable editing if needed
@@ -176,13 +215,14 @@ export class ReportGridComponent {
         enabled: true,
         mode: 'select'
       };
-      this.allowColumnReordering = false;
 
       // paging is used in situations where the grid is not editable
       this.loadPanel = {
         onShowing: this.onLoadPanelShowing,
         position: {
-          of: this._elemRef.nativeElement.querySelector(LOAD_PANEL_POSITION_SELECTOR),
+          of: this._elemRef.nativeElement.querySelector(
+            LOAD_PANEL_POSITION_SELECTOR
+          ),
           at: 'center',
           my: 'center'
         }
@@ -190,7 +230,11 @@ export class ReportGridComponent {
     }
   }
 
-  onContentReady({component}) {
+  ngOnDestroy() {
+    this.listeners.forEach(sub => sub.unsubscribe());
+  }
+
+  onContentReady({ component }) {
     if (this.isEditable) {
       this.updateVisibleIndices(component);
     } else {
@@ -201,9 +245,17 @@ export class ReportGridComponent {
     }
   }
 
+  subscribeForRepaint() {
+    return this.dimensionChanged.subscribe(() => {
+      this.dataGrid &&
+        this.dataGrid.instance &&
+        this.dataGrid.instance.repaint();
+    });
+  }
+
   customizeColumns(columns) {
     forEach(columns, (col: ReportGridField) => {
-      col.allowSorting = false;
+      col.allowSorting = !this.isEditable;
       col.alignment = 'left';
     });
   }
@@ -221,7 +273,7 @@ export class ReportGridComponent {
         isVisibleIndexChanged = true;
       }
       if (isVisibleIndexChanged) {
-        this.change.emit({subject: 'visibleIndex'});
+        this.change.emit({ subject: 'visibleIndex' });
       }
     });
   }
@@ -242,23 +294,28 @@ export class ReportGridComponent {
       return;
     }
     if (!this.isEditable || !this.columns) {
-      event.items = [];
       return;
     }
-    event.items = [{
-      text: 'Rename',
-      icon: 'grid-menu-item icon-edit',
-      onItemClick: () => {
-        this.renameColumn(column);
+    event.items = [
+      {
+        text: 'Rename',
+        icon: 'grid-menu-item icon-edit',
+        onItemClick: () => {
+          this.renameColumn(column);
+        }
+      },
+      {
+        text: `Remove ${column.caption}`,
+        icon: 'grid-menu-item icon-eye-disabled',
+        onItemClick: () => {
+          this.removeColumn(column);
+        }
       }
-    }, {
-      text: `Remove ${column.caption}`,
-      icon: 'grid-menu-item icon-eye-disabled',
-      onItemClick: () => {
-        this.removeColumn(column);
-      }
-    }];
-    if (NUMBER_TYPES.includes(column.type) || DATE_TYPES.includes(column.type)) {
+    ];
+    if (
+      NUMBER_TYPES.includes(column.type) ||
+      DATE_TYPES.includes(column.type)
+    ) {
       event.items.unshift({
         text: 'Format Data',
         icon: 'grid-menu-item icon-filter',
@@ -269,7 +326,7 @@ export class ReportGridComponent {
     }
   }
 
-  removeColumn({changeColumnProp, payload}: ReportGridField) {
+  removeColumn({ changeColumnProp, payload }: ReportGridField) {
     changeColumnProp('checked', false);
     this.change.emit({
       subject: 'removeColumn',
@@ -277,18 +334,18 @@ export class ReportGridComponent {
     });
   }
 
-  renameColumn({payload, changeColumnProp}: ReportGridField) {
+  renameColumn({ payload, changeColumnProp }: ReportGridField) {
     this.getNewDataThroughDialog(
       AliasRenameDialogComponent,
       { alias: payload.aliasName || '' },
       alias => {
         changeColumnProp('aliasName', alias);
-        this.change.emit({subject: 'aliasName'});
+        this.change.emit({ subject: 'aliasName' });
       }
     );
   }
 
-  formatColumn({type, changeColumnProp, payload}: ReportGridField) {
+  formatColumn({ type, changeColumnProp, payload }: ReportGridField) {
     let component;
     if (NUMBER_TYPES.includes(type)) {
       component = DataFormatDialogComponent;
@@ -298,24 +355,27 @@ export class ReportGridComponent {
 
     this.getNewDataThroughDialog(
       component,
-      {format: payload.format, type},
+      { format: payload.format, type },
       format => {
         changeColumnProp('format', format);
-        this.change.emit({subject: 'format'});
+        this.change.emit({ subject: 'format' });
       }
     );
   }
 
   getNewDataThroughDialog(component, currentData, actionFn: Function) {
-    this._dialog.open(component, {
-      width: 'auto',
-      height: 'auto',
-      data: currentData
-    } as MatDialogConfig).afterClosed().subscribe(newValue => {
-      if (!isUndefined(newValue)) {
-        actionFn(newValue);
-      }
-    });
+    this._dialog
+      .open(component, {
+        width: 'auto',
+        height: 'auto',
+        data: currentData
+      } as MatDialogConfig)
+      .afterClosed()
+      .subscribe(newValue => {
+        if (!isUndefined(newValue)) {
+          actionFn(newValue);
+        }
+      });
   }
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
@@ -323,14 +383,28 @@ export class ReportGridComponent {
       fpFlatMap((artifact: Artifact) => artifact.columns),
       fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
-        const isNumberType = NUMBER_TYPES.includes(column.type);
-        const preprocessedFormat = this.preprocessFormatIfNeeded(column.format, column.type, column.aggregate);
-        const format = isNumberType ? {formatter: getFormatter(preprocessedFormat)} : column.format;
+        let isNumberType = NUMBER_TYPES.includes(column.type);
+
+        const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
+        let type = column.type;
+        if (aggregate && ['count'].includes(aggregate.value)) {
+          type = aggregate.type || column.type;
+          isNumberType = true;
+        }
+
+        const preprocessedFormat = this.preprocessFormatIfNeeded(
+          column.format,
+          type,
+          column.aggregate
+        );
+        const format = isNumberType
+          ? { formatter: getFormatter(preprocessedFormat) }
+          : column.format;
         const field: ReportGridField = {
           caption: column.aliasName || column.displayName,
           dataField: this.getDataField(column),
-          dataType: isNumberType? 'number' : column.type,
-          type: column.type,
+          dataType: isNumberType ? 'number' : type,
+          type,
           visibleIndex: column.visibleIndex,
           visible: isUndefined(column.visible) ? true : column.visible,
           payload: column,
@@ -339,6 +413,14 @@ export class ReportGridComponent {
             column[prop] = value;
           },
           ...this.getSortingPart(column)
+        };
+
+        if (
+          DATE_TYPES.includes(column.type) &&
+          isUndefined(column.format) &&
+          !aggregate
+        ) {
+          field.format = 'yyyy-MM-dd';
         }
         return field;
       })
@@ -348,10 +430,10 @@ export class ReportGridComponent {
   preprocessFormatIfNeeded(format, type, aggregate) {
     const isPercentage = aggregate === 'percentage';
     const isAVG = aggregate === 'avg';
-    if ((!isPercentage && !isAVG) ||
-      !NUMBER_TYPES.includes(type)) {
+    if ((!isPercentage && !isAVG) || !NUMBER_TYPES.includes(type)) {
       return format;
     }
+
     return {
       ...format,
       precision: DEFAULT_PRECISION,
@@ -364,7 +446,7 @@ export class ReportGridComponent {
     return parts[0];
   }
 
-  queryColumns2Columns(queryColumns): ReportGridField[]  {
+  queryColumns2Columns(queryColumns): ReportGridField[] {
     return [];
   }
 
@@ -374,7 +456,7 @@ export class ReportGridComponent {
       return {
         sortIndex: sort.index,
         sortOrder: sort.order
-      }
+      };
     }
     return {};
   }

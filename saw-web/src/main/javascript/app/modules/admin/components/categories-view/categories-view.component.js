@@ -1,4 +1,5 @@
 import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './categories-view.component.html';
 import style from './categories-view.component.scss';
@@ -135,7 +136,10 @@ export const CategoriesViewComponent = {
       return false;
     }
 
-    applySearchFilter() {
+    applySearchFilter(value) {
+      if (!isUndefined(value)) {
+        this.states.searchTerm = value;
+      }
       const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
       this.states.searchTermValue = searchCriteria.trimmedTerm;
 

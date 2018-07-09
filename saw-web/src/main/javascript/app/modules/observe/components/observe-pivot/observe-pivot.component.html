@@ -1,0 +1,7 @@
+<h1 class="pivot-title" [textContent]="analysis.name"></h1>
+<pivot-grid [artifactColumns]="artifactColumns"
+            [data]="data"
+            [sorts]="analysis.sqlBuilder.sorts"
+            [updater]="updater"
+            mode="designer">
+</pivot-grid>

@@ -39,6 +39,7 @@ export interface Analysis {
   edit?: boolean;
   outputFile?: OutputFile;
   groupByColumns?: any[];
+  crondetails?: any;
   // groupByColumns should be deprecated
 }
 
@@ -54,4 +55,5 @@ export interface AnalysisChart extends Analysis {
   labelOptions?: LabelOptions;
   xAxis?: Axis;
   yAxis?: Axis;
+  isStockChart?: boolean;
 }

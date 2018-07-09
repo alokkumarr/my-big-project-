@@ -14,6 +14,8 @@ import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 
+import {CUSTOM_JWT_CONFIG} from '../../../../../login/services/jwt.service';
+
 import {Events} from '../../consts';
 
 import * as template from './analyze-executed-detail.component.html';
@@ -24,11 +26,14 @@ export const AnalyzeExecutedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
-    constructor($injector, $eventEmitter, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
-      $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
+    constructor($injector, $eventEmitter, AnalyzeService, $state, $rootScope, JwtService, fileService,
+      $window, toastMessage, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
 
+      this._JwtService = JwtService;
+      this._shouldAutoRefresh = JwtService.hasCustomConfig(CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH);
+      this._isAutoExecution = false;
       this._AnalyzeService = AnalyzeService;
       this._$translate = $translate;
       this._fileService = fileService;
@@ -38,11 +43,8 @@ export const AnalyzeExecutedDetailComponent = {
       this._$eventEmitter = $eventEmitter;
       this._$scope = $scope;
       this._$q = $q;
-      this._FilterService = FilterService;
       this._toastMessage = toastMessage;
-      this._$window = $window; // used for going back from the template
-      this._$mdDialog = $mdDialog;
-      this._JwtService = JwtService;
+      this._$window = $window;
       this._executionId = $state.params.executionId;
       this._executionWatcher = null;
       this._executionToast = null;
@@ -53,6 +55,10 @@ export const AnalyzeExecutedDetailComponent = {
       this.isExecuting = false;
 
       this.requester = new BehaviorSubject({});
+    }
+
+    back() {
+      this._$window.history.back();
     }
 
     $onInit() {
@@ -69,23 +75,41 @@ export const AnalyzeExecutedDetailComponent = {
 
       if (analysis) {
         this.analysis = analysis;
-        this.watchAnalysisExecution();
-        this.setPrivileges();
-        if (!this.analysis.schedule) {
-          this.isPublished = false;
-        }
-        this.loadExecutedAnalyses(analysisId);
+        this.executeAndInit();
       } else {
         this.loadAnalysisById(analysisId).then(() => {
-          this.watchAnalysisExecution();
-          this.loadExecutedAnalyses(analysisId);
+          this.executeAndInit();
         });
       }
     }
 
-    watchAnalysisExecution() {
+    executeAndInit() {
+      const resolved = this._$q.defer();
+      resolved.resolve();
+
       this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
 
+      let job;
+      if (this.isExecuting || this.analysis.type === 'report' || this._executionId || !this._shouldAutoRefresh) {
+        job = resolved.promise;
+        this._isAutoExecution = this.isExecuting;
+      } else {
+        job = this.executeAnalysis();
+      }
+
+      job.then(() => {
+        this.watchAnalysisExecution();
+        this._isAutoExecution = this.isExecuting;
+        this.setPrivileges();
+        if (!this.analysis.schedule) {
+          this.isPublished = false;
+        }
+        this.loadExecutedAnalyses(this.analysis.id);
+      });
+    }
+
+    watchAnalysisExecution() {
+      this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
       this._executionWatcher = this._$scope.$watch(
         () => this._AnalyzeService.isExecuting(this.analysis.id),
         (newVal, prevVal) => {
@@ -112,29 +136,35 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     refreshData() {
+      if (this._isAutoExecution) {
+        this._isAutoExecution = false;
+        return;
+      }
       const gotoLastPublished = () => {
-        this._$state.go('analyze.executedDetail', {
-          analysisId: this.analysis.id,
-          analysis: this.analysis,
-          executionId: null
-        }, {reload: true});
+        this.analyses = null;
+        this._executionId = null;
+        this.loadExecutedAnalyses(this.analysis.id);
       };
 
       if (this._executionToast) {
         this._toastMessage.clear(this._executionToast);
       }
 
-      this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
-        timeOut: 0,
-        extendedTimeOut: 0,
-        closeButton: true,
-        tapToDismiss: true,
-        onTap: gotoLastPublished.bind(this)
-      });
+      if (this.analysis.type === 'report') {
+        this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
+          timeOut: 0,
+          extendedTimeOut: 0,
+          closeButton: true,
+          tapToDismiss: true,
+          onTap: gotoLastPublished.bind(this)
+        });
+      } else {
+        gotoLastPublished();
+      }
     }
 
     executeAnalysis() {
-      this._AnalyzeActionsService.execute(this.analysis);
+      return this._AnalyzeActionsService.execute(this.analysis);
     }
 
     setPrivileges() {
@@ -148,6 +178,12 @@ export const AnalyzeExecutedDetailComponent = {
         subCategoryId: this.analysis.categoryId,
         creatorId: this.analysis.userId
       });
+    }
+
+    gotoExecution(executionId) {
+      this.analyses = null;
+      this._executionId = executionId;
+      this.loadExecutedAnalyses(this.analysis.id);
     }
 
     getCheckedFieldsForExport(analysis, data) {
@@ -233,13 +269,16 @@ export const AnalyzeExecutedDetailComponent = {
       return replace(csv, firstRow, displayNames);
     }
 
-    loadExecutionData(updateRequester = false) {
+    loadExecutionData(updateRequester = false, loadFromCurrentExecution = false) {
       return (options = {}) => {
         if (this._executionId) {
           this._$rootScope.showProgress = true;
           options.analysisType = this.analysis.type;
 
-          return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
+          const job = this.isExecuting || loadFromCurrentExecution ?
+            this._AnalyzeService.executionFor(this.analysis.id) :
+            this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options);
+          return job
             .then(({data, count}) => {
               this._$rootScope.showProgress = false;
               if (updateRequester) {
@@ -261,10 +300,6 @@ export const AnalyzeExecutedDetailComponent = {
         .then(analysis => {
           this.analysis = analysis;
           this._$rootScope.showProgress = false;
-          this.setPrivileges();
-          if (!this.analysis.schedule) {
-            this.isPublished = false;
-          }
         }, err => {
           this._$rootScope.showProgress = false;
           throw err;
@@ -273,27 +308,37 @@ export const AnalyzeExecutedDetailComponent = {
 
     /* If data for a particular execution is not requested,
        load data from the most recent execution */
-    loadLastPublishedAnalysis() {
+    loadLastPublishedAnalysis(loadFromCurrentExecution = false) {
       if (!this._executionId) {
         this._executionId = get(this.analyses, '[0].id', null);
       }
 
       if (!['report', 'esReport'].includes(this.analysis.type)) {
-        this.loadExecutionData(true)();
+        this.loadExecutionData(true, loadFromCurrentExecution)();
       }
     }
 
     loadExecutedAnalyses(analysisId) {
       this._$rootScope.showProgress = true;
-      this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
-        .then(analyses => {
-          this.analyses = analyses;
-          this._$rootScope.showProgress = false;
-          this.loadLastPublishedAnalysis();
-        }, err => {
-          this._$rootScope.showProgress = false;
-          throw err;
+      const loadMethod = loadFromCurrentExecution => {
+        this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
+          .then(analyses => {
+            this.analyses = analyses;
+            this._$rootScope.showProgress = false;
+            this.loadLastPublishedAnalysis(loadFromCurrentExecution);
+          }, err => {
+            this._$rootScope.showProgress = false;
+            throw err;
+          });
+      };
+
+      if (this.isExecuting) {
+        this._AnalyzeService.executionFor(analysisId).then(() => {
+          loadMethod(true);
         });
+      } else {
+        loadMethod(false);
+      }
     }
 
     fork() {
@@ -308,7 +353,6 @@ export const AnalyzeExecutedDetailComponent = {
         const {isSaveSuccessful, analysis} = result;
         if (isSaveSuccessful) {
           this.analysis = analysis;
-          this.refreshData();
         }
       });
     }

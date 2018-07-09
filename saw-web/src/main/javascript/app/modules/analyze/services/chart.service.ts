@@ -6,7 +6,6 @@ import * as clone from 'lodash/clone';
 import * as sum from 'lodash/sum';
 import * as map from 'lodash/map';
 import * as round from 'lodash/round';
-import * as flatMap from 'lodash/flatMap';
 import * as assign from 'lodash/assign';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
@@ -14,7 +13,6 @@ import * as filter from 'lodash/filter';
 import * as indexOf from 'lodash/indexOf';
 import * as isEmpty from 'lodash/isEmpty';
 import * as fpPipe from 'lodash/fp/pipe';
-import * as fpOmit from 'lodash/fp/omit';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
@@ -37,6 +35,9 @@ import * as replace from 'lodash/replace';
 import * as isUndefined from 'lodash/isUndefined';
 
 import * as Highcharts from 'highcharts/highcharts';
+
+import { flattenChartData } from '../../../common/utils/dataFlattener';
+
 
 import {
   NUMBER_TYPES,
@@ -287,53 +288,6 @@ export class ChartService {
     }
   }
 
-  /** the mapping between the tree level, and the columName of the field
-   * Example:
-   * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
-   * string_field_2: 1 -> SOURCE_MANUFACTURER
-   */
-  getNodeFieldMap(nodeFields) {
-    return map(nodeFields, 'columnName');
-  }
-
-  /** parse the tree structure data and return a flattened array:
-   * [{
-   *   x: ..,
-   *   y: ..,
-   *   g: ..,
-   *   z: ..
-   * }, ..]
-   */
-  parseData(data, sqlBuilder) {
-    const nodeFieldMap = this.getNodeFieldMap(sqlBuilder.nodeFields);
-    return this.parseNode(data, {}, nodeFieldMap, 1);
-  }
-
-  parseNode(node, dataObj, nodeFieldMap, level) {
-    if (node.key) {
-      dataObj[nodeFieldMap[level - 2]] = node.key;
-    }
-
-    const childNode = node[`node_field_${level}`];
-    if (childNode) {
-      const data = flatMap(childNode.buckets, bucket =>
-        this.parseNode(bucket, dataObj, nodeFieldMap, level + 1)
-      );
-      return data;
-    }
-    const datum = this.parseLeaf(node, dataObj);
-    return datum;
-  }
-
-  parseLeaf(node, dataObj) {
-    const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key', 'key_as_string']),
-      fpMapValues('value')
-    )(node);
-
-    return assign(dataFields, dataObj);
-  }
-
   splitToSeriesAndCategories(parsedData, fields, { sorts }, type) {
     let series = [];
     const categories = {};
@@ -434,12 +388,12 @@ export class ChartService {
   splinifyChartType(type) {
     /* prettier-ignore */
     switch (type) {
-    case 'line':
-      return 'spline';
     case 'area':
+    case 'tsareaspline':
       return 'areaspline';
+    case 'line':
     case 'tsspline':
-      return 'spline';
+    case 'tsline':
     case 'tsPane':
       return 'spline';
     default:
@@ -1151,6 +1105,10 @@ export class ChartService {
     });
 
     return changes;
+  }
+
+  parseData(data, sqlBuilder) {
+    return flattenChartData(data, sqlBuilder);
   }
 
   filterNumberTypes(attributes) {

@@ -51,6 +51,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
   @PostConstruct
   private void init() throws Exception {
+    /* Workaround: If the "/apps/spark" directory does not exist in
+     * the data lake, Apache Livy will fail with a file not found
+     * error.  So create the "/apps/spark" directory here.  */
+    String appsSparkPath = "/apps/spark";
+    if (!HFileOperations.exists(appsSparkPath)) {
+      HFileOperations.createDir(appsSparkPath);
+    }
     /* Initialize the previews MapR-DB table */
     try (Admin admin = MapRDB.newAdmin()) {
       if (!admin.tableExists(previewsTablePath)) {
@@ -64,7 +71,15 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     /*
      * Cache a Workbench Livy client to reduce startup time for first operation
      */
-    cacheWorkbenchClient();
+    try {
+      cacheWorkbenchClient();
+    } catch (Exception e) {
+      /* If Apache Livy is not installed in the environment, fail
+       * gracefully by letting the Workbench Service still start up.
+       * If Apache Livy is later installed, the Workbench Service will
+       * be able to recover by reattempting to create the client.  */
+      log.warn("Unable to create Workbench client upon startup", e);
+    }
   }
 
   /**
@@ -96,20 +111,37 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     cachedClient = new WorkbenchClient(livyUri);
   }
 
+
+  //  /**
+  //   * execute a transformation component on a dataset to create a new
+  //   * dataset
+  //   */
+
   /**
-   * Execute a transformation component on a dataset to create a new dataset.
+   * Runs the given component using XDF hooks.
+   * @param project Project ID
+   * @param name Name of the dataset
+   * @param component Component name
+   * @param config Conponent configuration
+   * @return Object Node
+   * @throws Exception Incase of failures
    */
   @Override
-  public ObjectNode execute(String project, String name, String component, String config)
-      throws Exception {
+  public ObjectNode execute(
+      String project, String name, String component, String config) throws Exception {
     log.info("Executing dataset transformation");
+    log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(name);
-    client.submit(new WorkbenchExecuteJob(root, project, component, config));
+    client.submit(new WorkbenchExecuteJob(
+                root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
     return root;
   }
 
+  /**
+   * Execute a transformation component on a dataset to create a new dataset.
+   */
   private void createDatasetDirectory(String name) throws Exception {
     String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
     if (!HFileOperations.exists(path)) {

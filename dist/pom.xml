@@ -21,21 +21,13 @@
     <!-- AWS secret key -->
     <sip.cloud.key>AKIAIMXBE56B6CRN6GKA</sip.cloud.key>
     <sip.cloud.key.secret>${env.SIP_CLOUD_KEY_SECRET}</sip.cloud.key.secret>
+    <!-- Time to allow base container to boot up, in milliseconds -->
+    <sip.docker.wait.time>60000</sip.docker.wait.time>
     <!-- Enable Docker Machine configuration by default -->
     <saw.docker.skip.machine>false</saw.docker.skip.machine>
     <!-- SAW Docker environment ports -->
     <saw.docker.port>80</saw.docker.port>
-    <saw.mapr.web.port>18443</saw.mapr.web.port>
-    <saw.mapr.cldb.port>17222</saw.mapr.cldb.port>
-    <saw.mapr.yarn.rm.port>18030</saw.mapr.yarn.rm.port>
-    <saw.mapr.yarn.nm.port>18031</saw.mapr.yarn.nm.port>
-    <saw.yarn.resource.port>18088</saw.yarn.resource.port>
-    <saw.yarn.node.port>18042</saw.yarn.node.port>
-    <saw.spark.master.port>18080</saw.spark.master.port>
-    <saw.spark.worker.port>18081</saw.spark.worker.port>
-    <saw.livy.port>18998</saw.livy.port>
-    <saw.kibana.port>15601</saw.kibana.port>
-    <saw.journal.port>19531</saw.journal.port>
+    <saw.squid.port>3128</saw.squid.port>
     <saw.yarn.enabled>false</saw.yarn.enabled>
   </properties>
   <dependencies>
@@ -246,7 +238,7 @@
           </buildArgs>
           <!-- Configure Docker Machine -->
           <machine>
-            <name>user-${sip.cloud.name}</name>
+            <name>sip-${sip.cloud.name}</name>
             <autoCreate>true</autoCreate>
             <regenerateCertsAfterStart>true</regenerateCertsAfterStart>
             <createOptions>
@@ -254,13 +246,15 @@
               <amazonec2-region>${sip.cloud.aws.region}</amazonec2-region>
               <amazonec2-access-key>${sip.cloud.key}</amazonec2-access-key>
               <amazonec2-secret-key>${sip.cloud.key.secret}</amazonec2-secret-key>
-              <amazonec2-instance-type>t2.xlarge</amazonec2-instance-type>
-              <amazonec2-root-size>32</amazonec2-root-size>
+              <amazonec2-instance-type>t2.2xlarge</amazonec2-instance-type>
+              <amazonec2-root-size>64</amazonec2-root-size>
               <!-- Use CentOS 7 image, see
                    https://wiki.centos.org/Cloud/AWS for AMI IDs -->
               <amazonec2-ami>${sip.cloud.aws.ami}</amazonec2-ami>
               <amazonec2-ssh-user>centos</amazonec2-ssh-user>
               <amazonec2-userdata>${project.basedir}/src/test/cloud/cloud-config.yaml</amazonec2-userdata>
+              <!-- Set IAM instance profile to get AWS Route 53 permissions -->
+              <amazonec2-iam-instance-profile>UserEnvironment</amazonec2-iam-instance-profile>
               <amazonec2-monitoring/>
               <!--
                   Workaround: Docker Machine defaults to devicemapper,
@@ -275,10 +269,19 @@
           </machine>
           <images>
             <image>
-              <name>saw:${project.version}</name>
-              <alias>saw</alias>
+              <name>sip-base:${project.version}</name>
               <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
+                <dockerFileDir>${project.basedir}/src/test/docker-base</dockerFileDir>
+              </build>
+              <run>
+                <skip>true</skip>
+              </run>
+            </image>
+            <image>
+              <name>sip-admin:${project.version}</name>
+              <alias>sip-admin</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-admin</dockerFileDir>
                 <assembly>
                   <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                           xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
@@ -300,14 +303,11 @@
                 </assembly>
               </build>
               <run>
+                <hostname>sip-admin</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
                 </network>
-                <ports>
-                  <port>+saw.docker.ip:saw.docker.port:80</port>
-                  <port>+saw.docker.ip:saw.journal.port:19531</port>
-                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <!-- Restart containers when Docker engine comes up
@@ -337,28 +337,112 @@
               </run>
             </image>
             <image>
-              <name>saw-mapr:${project.version}</name>
-              <alias>saw-mapr</alias>
+              <name>sip-proxy:${project.version}</name>
+              <alias>sip-proxy</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-proxy</dockerFileDir>
+              </build>
+              <run>
+                <hostname>sip-proxy</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <ports>
+                  <port>+saw.docker.ip:saw.docker.port:80</port>
+                  <port>+saw.docker.ip:saw.squid.port:3128</port>
+                </ports>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-base:${project.version}</name>
+              <!-- Note: The node has a suffix "1", because additional
+                   SAW nodes might be added for high availability
+                   configurations -->
+              <alias>sip-saw1</alias>
+              <run>
+                <hostname>sip-saw1</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-base:${project.version}</name>
+              <alias>sip-saw2</alias>
+              <run>
+                <hostname>sip-saw2</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <!-- Development environments are for now by default
+                     only single SAW node environments, at least until
+                     everyone has moved to cloud deployments with more
+                     memory.  So skip running the second SAW container
+                     by default. -->
+                <skip>true</skip>
+                <wait>
+                  <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-elastic:${project.version}</name>
+              <alias>sip-elastic</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-elastic</dockerFileDir>
+              </build>
+              <run>
+                <hostname>sip-elastic</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>sip-mapr:${project.version}</name>
+              <alias>sip-mapr</alias>
               <build>
                 <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
               </build>
               <run>
+                <hostname>sip-mapr</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
-                  <alias>saw-mapr</alias>
                 </network>
-                <ports>
-                  <port>+saw.docker.ip:saw.mapr.web.port:8443</port>
-                  <port>+saw.docker.ip:saw.mapr.cldb.port:7222</port>
-                  <port>+saw.docker.ip:saw.yarn.resource.port:8088</port>
-                  <port>+saw.docker.ip:saw.yarn.node.port:8042</port>
-                  <port>+saw.docker.ip:saw.mapr.yarn.rm.port:8030</port>
-                  <port>+saw.docker.ip:saw.mapr.yarn.nm.port:8031</port>
-                  <port>+saw.docker.ip:saw.spark.master.port:8080</port>
-                  <port>+saw.docker.ip:saw.spark.worker.port:8081</port>
-                  <port>+saw.docker.ip:saw.livy.port:8998</port>
-                </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
                 <wait>
@@ -433,7 +517,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/web/</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/</arguments>
             </configuration>
           </execution>
         </executions>

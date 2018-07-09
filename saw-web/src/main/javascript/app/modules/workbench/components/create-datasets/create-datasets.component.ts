@@ -121,6 +121,7 @@ export class CreateDatasetsComponent implements OnInit {
   triggerParser() {
     const payload = {
       'name': this.nameFormGroup.value.nameControl,
+      'description': this.nameFormGroup.value.descControl,
       'component': 'parser',
       'configuration':
       {
@@ -133,7 +134,7 @@ export class CreateDatasetsComponent implements OnInit {
         'headerSize': this.fieldsConf.headerSize
       }
     };
-    // this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
+    this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
     this.workBench.triggerParser(payload).subscribe(data => {
       this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 9000 });
     });
