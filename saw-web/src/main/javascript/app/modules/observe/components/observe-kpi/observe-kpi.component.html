@@ -3,7 +3,7 @@
     <div class="kpi-title" [textContent]="_kpi.name"></div>
     <div class="val-change">
       <mat-icon *ngIf="primaryChange < 0" fontIcon="icon-arrow-down-circle"></mat-icon>
-      <mat-icon *ngIf="primaryChange > 0" fontIcon="icon-arrow-up-circle"></mat-icon>
+      <mat-icon *ngIf="primaryChange >= 0" fontIcon="icon-arrow-up-circle"></mat-icon>
       <div counto [step]="5" [duration]="2" [countFrom]="0" [countTo]="primaryResult.change" (countoChange)="countToChange = $event">{{countToChange | number : '1.0-0'}}%</div>
     </div>
   </div>

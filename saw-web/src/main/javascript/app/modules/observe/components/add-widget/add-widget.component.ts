@@ -34,6 +34,7 @@ export class AddWidgetComponent implements OnInit {
     kpi?: any;
   } = {};
   widgets = Widget;
+  selectedStepIndex: number; // Just used as a condition to reset the form in widget-kpi
 
   @Input() container: MatSidenav;
   @Output() onWidgetAction = new EventEmitter();
@@ -46,6 +47,7 @@ export class AddWidgetComponent implements OnInit {
   onSelectWidgetType(data: WidgetType) {
     this.model.type = data;
     this.widgetStepper.next();
+    this.selectedStepIndex = this.widgetStepper.selectedIndex;
   }
 
   onSelectCategory(data) {
@@ -53,6 +55,7 @@ export class AddWidgetComponent implements OnInit {
     delete this.model.metric;
     delete this.model.kpi;
     this.widgetStepper.next();
+    this.selectedStepIndex = this.widgetStepper.selectedIndex;
   }
 
   onSelectMetric({ metric, kpi }) {
@@ -60,6 +63,7 @@ export class AddWidgetComponent implements OnInit {
     this.model.metric = clone(metric);
     this.model.kpi = clone(kpi);
     this.widgetStepper.next();
+    this.selectedStepIndex = this.widgetStepper.selectedIndex;
   }
 
   onAnalysisAction({ action, analysis }) {
@@ -76,6 +80,9 @@ export class AddWidgetComponent implements OnInit {
       widget: this.model.type.id === 3 ? 'BULLET' : 'KPI',
       action: WIDGET_ACTIONS.ADD,
       data: kpi
+    });
+    setTimeout(() => {
+      this.selectedStepIndex = this.widgetStepper.selectedIndex;
     });
   }
 }
