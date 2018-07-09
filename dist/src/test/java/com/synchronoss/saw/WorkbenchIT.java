@@ -242,7 +242,7 @@ public class WorkbenchIT extends BaseIT {
         /* Dataset is in SUCCESS state, so return */
     }
     /* Dataset is in SUCCESS state, so return */
-  }
+  
 
     /**
      * Get the status of a dataset in the Workbench Service.

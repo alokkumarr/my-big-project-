@@ -178,10 +178,12 @@
           <compilerArgument>-Xlint:all</compilerArgument>
         </configuration>
       </plugin>
+<!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
+ -->      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
