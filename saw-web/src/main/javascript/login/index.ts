@@ -54,14 +54,20 @@ angular
   .service('JwtService', JwtService)
   .service('UserService', UserService)
   .component('layoutContent', LayoutContentComponent)
-  .component('passwordChangeComponent', PasswordChangeComponent)
-  .component('passwordPreResetComponent', PasswordPreResetComponent)
-  .component('passwordResetComponent', PasswordResetComponent)
   .directive('layoutFooter', downgradeComponent({
     component: LayoutFooterComponent
   }) as angular.IDirectiveFactory)
   .directive('loginComponent', downgradeComponent({
     component: LoginComponent
+  }) as angular.IDirectiveFactory)
+  .directive('passwordChangeComponent', downgradeComponent({
+    component: PasswordChangeComponent
+  }) as angular.IDirectiveFactory)
+  .directive('passwordPreResetComponent', downgradeComponent({
+    component: PasswordPreResetComponent
+  }) as angular.IDirectiveFactory)
+  .directive('passwordResetComponent', downgradeComponent({
+    component: PasswordResetComponent
   }) as angular.IDirectiveFactory);
 
 @NgModule({
@@ -73,8 +79,8 @@ angular
     MaterialModule,
     FlexLayoutModule
   ],
-  declarations: [LoginComponent, LayoutFooterComponent],
-  entryComponents: [LoginComponent, LayoutFooterComponent],
+  declarations: [LoginComponent, PasswordChangeComponent, PasswordPreResetComponent, PasswordResetComponent, LayoutFooterComponent],
+  entryComponents: [LoginComponent, PasswordChangeComponent, PasswordPreResetComponent, PasswordResetComponent, LayoutFooterComponent],
   providers: [jwtServiceProvider, userServiceProvider]
 })
 export class NewLoginModule {

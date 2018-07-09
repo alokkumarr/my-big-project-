@@ -2,8 +2,6 @@ const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
-var HtmlReporter = require('protractor-beautiful-reporter');
-
 
 /**
  * Note about intervals:
@@ -69,6 +67,12 @@ const protractorPath = 'target/protractor-reports';
  * Amount of attempts to retry doing action on element
  */
 const tempts = 10;
+
+/**
+ * All tests are running for customer
+ */
+const customerCode = 'SYNCHRONOSS';
+
 let token;
 
 exports.timeouts = {
@@ -81,15 +85,16 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  //seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
+  customerCode:customerCode,
   directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
-    //shardTestFiles: true,
-    //maxInstances: 4,
+    shardTestFiles: true,
+    maxInstances: 1,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -121,26 +126,6 @@ exports.config = {
      * working on fixing the rest.
      */
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
-    ],
-    charts: [
-      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
-    ],
-    pivots: [
-      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
-    ],
-    authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
-    ]
-  } : {
-    /**
-     * Suites for test run invoked from Protractor directly on local saw-web front-end development server
-     */
-    root: [
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
@@ -148,12 +133,44 @@ exports.config = {
     charts: [
       webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js'), // TCs linked
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
+    ],
+    chartEditFork: [
       webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
     ],
+    filters: [
+      webpackHelper.root(testDir + '/e2e-tests/promptFilters.test.js') // TCs linked //Takes lot of time to execute
+    ],
     pivots: [
       webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
+    ],
+    authentication: [
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
+    ]
+  } : {
+    /**
+     * Suites for test run invoked from Protractor directly on local saw-web front-end development server
+     */
+    root: [
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
+      //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
+      //webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
+    ],
+    charts: [
+      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
+      //webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
+      //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
+    ],
+    chartEditFork: [
+      //webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
+      //webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
+    ],
+    filters: [
+      //webpackHelper.root(testDir + '/e2e-tests/promptFilters.test.js') // TCs linked //Takes lot of time to execute
+    ],
+    pivots: [
+      //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
     ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
@@ -171,10 +188,6 @@ exports.config = {
     token = generate.token(browser.baseUrl);
     //console.log("aToken: " + token);
     generate.usersRolesPrivilegesCategories(token);
-    // Add a screenshot reporter and store screenshots to `/target/screenshots`:
-    jasmine.getEnv().addReporter(new HtmlReporter({
-      baseDirectory: 'target/screenshots'
-    }).getJasmine2Reporter());
 
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,

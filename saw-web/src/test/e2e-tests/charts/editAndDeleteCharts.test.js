@@ -16,6 +16,7 @@ const designModePage = require('../../javascript/pages/designModePage.po.js');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
 let ApiUtils = require('../../javascript/api/APiUtils');
 const globalVariables = require('../../javascript/helpers/globalVariables');
+const Constants = require('../../javascript/api/Constants');
 
 describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -29,9 +30,9 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const groupName = 'Date';
   const metricName = dataSets.pivotChart;
   const sizeByName = 'Float';
-
+  let analysisId;
   let host;
-  let token; 
+  let token;
   const dataProvider = {
     // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602 ---disbaled in the UI
     // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678 ---disbaled in the UI
@@ -55,7 +56,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
-    
+
   });
 
   beforeEach(function (done) {
@@ -67,6 +68,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -78,33 +80,36 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should edit and delete ' + description, () => {
+
         let currentTime = new Date().getTime();
+        let user = data.user;
+        let type = data.chartType.split(":")[1];
+  
         let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
-        let type = data.chartType.split(":")[1];
+
         //Create new analysis.
-        new AnalysisHelper().createChart(host, token,name,description, type);
+        new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
 
         login.loginAs(data.user);
-       
-        homePage.mainMenuExpandBtn.click();
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-        homePage.mainMenuCollapseBtn.click();
-
         //Change to Card View.
         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
         commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
         analyzePage.analysisElems.cardView.click();
         //Open the created analysis.
         const createdAnalysis = analyzePage.main.getCardTitle(name);
-        
+
         commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
         commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
         createdAnalysis.click();
-        
+        //get analysis id from current url
+        browser.getCurrentUrl().then(url => {
+          analysisId = commonFunctions.getAnalysisIdFromUrl(url);
+        });        
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         savedAlaysisPage.editBtn.click();
-        
+
         const designer = analyzePage.designerDialog;
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
@@ -159,19 +164,9 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
 
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         //Verify updated details.
-        commonFunctions.waitFor.textToBePresent(savedAlaysisPage.analysisViewPageElements.title, updatedName);
-        expect(savedAlaysisPage.analysisViewPageElements.title.getText()).toBe(updatedName);
-        expect(savedAlaysisPage.analysisViewPageElements.description.getText()).toBe(updatedDescription);
-        
-        //Delete created chart
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
-        savedAlaysisPage.actionsMenuBtn.click();
-        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.deleteMenuOption);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.deleteMenuOption);
-        savedAlaysisPage.deleteMenuOption.click();
-        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.deleteConfirmButton);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.deleteConfirmButton);
-        savedAlaysisPage.deleteConfirmButton.click();
+        commonFunctions.waitFor.textToBePresent(savedAlaysisPage.analysisViewPageElements.text(updatedName).getText(), updatedName);
+        expect(savedAlaysisPage.analysisViewPageElements.text(updatedName).getText()).toBe(updatedName);
+        expect(savedAlaysisPage.analysisViewPageElements.text(updatedDescription).getText()).toBe(updatedDescription);
     });
   });
 });

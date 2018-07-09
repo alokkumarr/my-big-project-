@@ -1,5 +1,4 @@
 const commonFunctions = require('../helpers/commonFunctions.js');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const users = require('../data/users.js');
 
 module.exports = {
@@ -15,8 +14,7 @@ module.exports = {
 
   // Wait after login is provided to prevent elements manipulation when page is not ready yet
   userLogin(user, password) {
-    console.log('user---->'+user);
-    console.log('base url---->'+protractorConf.config.baseUrl);
+    console.log('user---->'+user)
     const userElem = this.loginElements.userNameField;
     const passwordElem = this.loginElements.passwordField;
     const loginElem = this.loginElements.loginBtn;

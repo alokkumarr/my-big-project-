@@ -7,8 +7,8 @@ import * as isNumber from 'lodash/isNumber';
 import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
-import * as orderBy from 'lodash/orderBy';
 import * as map from 'lodash/map';
+import { flattenPivotData, flattenChartData } from '../../../../../common/utils/dataFlattener';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -40,6 +40,8 @@ import { ChartService } from '../../../services/chart.service';
 
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
+
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport'];
 
 @Component({
   selector: 'designer-container',
@@ -285,7 +287,7 @@ export class DesignerContainerComponent {
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
-          this.data = this.parseData(response.data, this.analysis);
+          this.data = this.flattenData(response.data, this.analysis);
         }
       },
       err => {
@@ -295,30 +297,19 @@ export class DesignerContainerComponent {
     );
   }
 
-  parseData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return this._designerService.parseData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, analysis.sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
     case 'chart':
-      let chartData = this._chartService.parseData(
+      return flattenChartData(
         data,
         analysis.sqlBuilder
       );
-
-      /* Order chart data manually. Backend doesn't sort chart data. */
-      if (!isEmpty(this.sorts)) {
-        chartData = orderBy(
-          chartData,
-          map(this.sorts, 'columnName'),
-          map(this.sorts, 'order')
-        );
-      }
-
-      return chartData;
     }
   }
 
@@ -336,7 +327,8 @@ export class DesignerContainerComponent {
         });
       break;
     case 'filter':
-      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, (this.analysis || this.analysisStarter).type === 'chart')
+      const supportsGlobalFilters = GLOBAL_FILTER_SUPPORTED.includes((this.analysis || this.analysisStarter).type);
+      this._analyzeDialogService.openFilterDialog(this.filters, this.artifacts, this.booleanCriteria, supportsGlobalFilters)
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.filters = result.filters;
@@ -460,7 +452,7 @@ export class DesignerContainerComponent {
       }
       return isDataEmpty;
     case 'chart':
-      const parsedData = this._chartService.parseData(data, sqlBuilder);
+      const parsedData = flattenChartData(data, sqlBuilder);
       return isEmpty(parsedData);
     // TODO verify if the object returned is empty
     case 'report':
@@ -660,6 +652,15 @@ export class DesignerContainerComponent {
   }
 
   updateAnalysis() {
+    const { edit, type, artifacts } = this.analysis;
+    if (type === 'report' && edit) {
+      // reset checked fields, sorts, and filters for query mode report analysis
+      this.filters = [];
+      this.sorts = [];
+      forEach(artifacts, artifact => {
+        forEach(artifact.column, col => col.checked = false);
+      });
+    }
     this.analysis.sqlBuilder = this.getSqlBuilder();
   }
 

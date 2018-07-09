@@ -79,6 +79,10 @@ module.exports = {
     stream.write(new Buffer(data, 'base64'));
     stream.end();
   },
+  getAnalysisIdFromUrl(url){
+    let ulrParts = url.split("analyze/analysis/")[1];
+    return ulrParts.split("/")[0];
+  }
 };
 
 function click(element, i) {

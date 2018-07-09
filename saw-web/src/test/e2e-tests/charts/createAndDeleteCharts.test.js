@@ -72,9 +72,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   using(dataProvider, function (data, description) {
     it('should create and delete ' + description, () => {
       login.loginAs(data.user);
-      homePage.mainMenuExpandBtn.click();
+      
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-      homePage.mainMenuCollapseBtn.click();
 
       let chartName = `e2e ${description} ${(new Date()).toString()}`;
       let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;

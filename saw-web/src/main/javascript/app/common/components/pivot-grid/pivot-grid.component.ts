@@ -18,7 +18,10 @@ import * as isUndefined from 'lodash/isUndefined';
 import { Subject } from 'rxjs/Subject';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-import { ArtifactColumnPivot, Sort, Format } from '../../../models';
+import {
+  ArtifactColumnPivot,
+  Sort
+} from '../../../models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
@@ -108,9 +111,10 @@ export class PivotGridComponent {
       // if it's not repainted it appears smaller
       this._gridInstance.repaint();
       if (this.updater) {
-        this._subscription = this.updater.subscribe(updates =>
-          this.update(updates)
-        );
+        this._subscription = this.updater.subscribe(updates => {
+          this._gridInstance.repaint();
+          return this.update(updates);
+        });
       }
     }, 500);
   }

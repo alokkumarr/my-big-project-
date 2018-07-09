@@ -210,6 +210,7 @@ const selectFields = (name) => {
 };
 
 module.exports = {
+  navigateToHome,
   newDialog: {
     getMetricRadioButtonElementByName: name => element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
     getMetricSelectedRadioButtonElementByName: name => element(by.css(`mat-radio-button.mat-radio-checked[e2e="metric-name-${name}"]`)),
@@ -274,6 +275,7 @@ module.exports = {
     getAppliedFilter: getAppliedFilterUpgraded,
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
+    prompt: element(by.xpath(`//span[contains(text(),'Prompt')]/parent::*`)),
   },
   appliedFiltersDetails: {
     filterText:element(by.xpath('//span[@class="filter-counter"]')),
@@ -318,6 +320,11 @@ module.exports = {
     cancelBtn: element(by.css('button[translate="CANCEL"]')),
     selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
+  prompt:{
+    filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
+    selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
+  },
+  listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 
   // OLD test elements
   analysisElems: {
