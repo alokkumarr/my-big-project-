@@ -11,7 +11,7 @@ export enum EXECUTION_STATES {
 }
 
 export interface IExecuteEvent {
-  response?: { data: any[]; count: number };
+  response?: { data: any[]; executionId: String; count: number };
   state: EXECUTION_STATES;
 }
 
