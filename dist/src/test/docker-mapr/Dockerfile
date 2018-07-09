@@ -52,10 +52,17 @@ COPY sip-mapr-configure /root/
 COPY sip-mapr-configure.service /etc/systemd/system/
 RUN systemctl enable sip-mapr-configure
 
+# Note: Installing Apache Spark in standalone mode is disabled by
+# default for now, while there are developers still deploying using
+# local Docker with memory constraints.  Instead local Spark contexts
+# are used (see the development `saw-config`).  When all developers
+# have moved to cloud environments, enable Apache Spark in standalone
+# mode again.
+#
 # Install Apache Spark in standalone mode
-RUN yum -y -q install mapr-spark-master
-COPY mapr-spark-worker.service /etc/systemd/system/
-RUN systemctl enable mapr-spark-worker
+#RUN yum -y -q install mapr-spark-master
+#COPY mapr-spark-worker.service /etc/systemd/system/
+#RUN systemctl enable mapr-spark-worker
 
 ENV spark_home=/opt/mapr/spark/spark-2.2.1
 RUN echo "export SPARK_MASTER_HOST=sip-mapr" >> $spark_home/conf/spark-env.sh
@@ -68,7 +75,7 @@ RUN sed -i -e 's/^export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=2g/'
 RUN yum -y -q install mapr-livy
 ENV livy_home=/opt/mapr/livy/livy-0.3.0
 ENV livy_conf=$livy_home/conf/livy.conf
-RUN echo "livy.spark.master = spark://sip-mapr:7077" > $livy_conf
+RUN echo "livy.spark.master = local[*]" > $livy_conf
 # Workaround: The Workbench JAR exceeds the default maximum upload
 # file size of Livy, so increase it.
 RUN echo "livy.file.upload.max.size = 500000000" >> $livy_conf
