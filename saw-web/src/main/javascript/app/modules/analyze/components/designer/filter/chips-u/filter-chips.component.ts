@@ -62,8 +62,15 @@ export class FilterChipsComponent {
   getFilterValue(filter: Filter) {
     const { type } = filter;
     if (!filter.model) {
-      if (filter.isRuntimeFilter) {
-        return 'Runtime'
+      const { isRuntimeFilter, isGlobalFilter } = filter;
+      if (isRuntimeFilter && isGlobalFilter) {
+        return 'Runtime & Global';
+      }
+      if (isRuntimeFilter) {
+        return 'Runtime';
+      }
+      if (isGlobalFilter) {
+        return 'Global';
       }
       return '';
     }
@@ -71,12 +78,14 @@ export class FilterChipsComponent {
     const { modelValues, value, operator, otherValue, preset, lte, gte } = filter.model;
 
     if (type === 'string') {
-      return `${STRING_FILTER_OPERATORS_OBJ[operator].label} ${modelValues.join(', ')}`;
+      const operatoLabel = STRING_FILTER_OPERATORS_OBJ[operator].label;
+      return `${operatoLabel} ${modelValues.join(', ')}`;
     } else if (NUMBER_TYPES.includes(type)) {
+      const operatoLabel = NUMBER_FILTER_OPERATORS_OBJ[operator].label;
       if (operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value) {
-        return `${NUMBER_FILTER_OPERATORS_OBJ[operator].label} ${value}`;
+        return `${operatoLabel} ${value}`;
       }
-      return `${otherValue} ${operator} ${value}`;
+      return `${otherValue} ${operatoLabel} ${value}`;
 
     } else if (DATE_TYPES.includes(type)) {
       if (preset === CUSTOM_DATE_PRESET_VALUE) {
