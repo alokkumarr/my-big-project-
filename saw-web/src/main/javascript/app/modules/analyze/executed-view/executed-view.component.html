@@ -51,7 +51,7 @@
                     [artifacts]="analysis.artifacts">
     </filter-chips-u>
 
-    <div *ngIf="analyses && !analyses.length && !executionSuccess">
+    <div *ngIf="analyses && !analyses.length && !onetimeExecution">
       <div class="prompt-execution-container" fxLayout="column" fxLayoutAlign="center center">
         <span i18n>This analysis hasn't been been executed yet. Execute it now?</span>
           <button mat-raised-button color="primary" [disabled]="!analysis" (click)="executeAnalysis(analysis)" i18n>
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div *ngIf="analysis && analyses && (analyses.length || executionSuccess)" [ngSwitch]="analysis.type">
+    <div *ngIf="analysis && analyses && (analyses.length || onetimeExecution)" [ngSwitch]="analysis.type">
       <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                             [analysis]="analysis"
                             [dataLoader]="dataLoader"
