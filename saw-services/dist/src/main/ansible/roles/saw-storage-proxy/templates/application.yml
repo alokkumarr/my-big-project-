@@ -29,3 +29,6 @@ elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           cluster-username: {{ saw_elasticsearch_username | default('') }}
           cluster-password: {{ saw_elasticsearch_password | default('') }}
+
+metastore:
+    base:  {{ saw_workbench_metadata | default('hdfs:///main/') }}
