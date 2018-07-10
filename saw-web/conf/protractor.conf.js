@@ -2,6 +2,7 @@ const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
+var browserstack = require('browserstack-local');
 
 /**
  * Note about intervals:
@@ -85,30 +86,36 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  //seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: 'http://hub-cloud.browserstack.com/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
-  directConnect: true,
+  //directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
-    browserName: 'chrome',
-    shardTestFiles: true,
-    maxInstances: 1,
-    chromeOptions: {
-      args: [
-        'disable-extensions',
-        'disable-web-security',
-        '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
-        '--disable-gpu',
-        '--window-size=2880,1800'
-      ]
-    },
-    'moz:firefoxOptions': {
-      args: ['--headless']
-    }
+    'browserstack.user': 'saw22',
+    'browserstack.key': 'kmQmdoqpTu8jsgYHHSR3',
+    'browserstack.local': true,
+    'browserName': 'chrome'
   },
+  // capabilities: {
+  //   browserName: 'chrome',
+  //   shardTestFiles: true,
+  //   maxInstances: 1,
+  //   chromeOptions: {
+  //     args: [
+  //       'disable-extensions',
+  //       'disable-web-security',
+  //       '--start-fullscreen', // enable for Mac OS
+  //       '--headless', // start on background
+  //       '--disable-gpu',
+  //       '--window-size=2880,1800'
+  //     ]
+  //   },
+  //   'moz:firefoxOptions': {
+  //     args: ['--headless']
+  //   }
+  // },
   jasmineNodeOpts: {
     defaultTimeoutInterval: defaultTimeoutInterval,
     isVerbose: true,
@@ -220,7 +227,23 @@ exports.config = {
       });
     }, pageResolveTimeout);
   },
+ // Code to start browserstack local before start of test
+  beforeLaunch: function(){
+    //console.log("Connecting local");
+    return new Promise(function(resolve, reject){
+      exports.bs_local = new browserstack.Local();
+      exports.bs_local.start({'key': exports.config.capabilities['browserstack.key'] }, function(error) {
+        if (error) return reject(error);
+        //console.log('Connected. Now testing...');
+
+        resolve();
+      });
+    });
+  },
   afterLaunch: function() {
+    return new Promise(function(resolve, reject){
+      exports.bs_local.stop(resolve);
+    });
     return retry.afterLaunch(maxRetryForFailedTests);
   }
 };
