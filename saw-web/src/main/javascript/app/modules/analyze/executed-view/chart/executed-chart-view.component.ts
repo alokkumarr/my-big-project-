@@ -5,11 +5,15 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as values from 'lodash/values';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
+import * as forEach from 'lodash/forEach';
+import * as moment from 'moment';
 
 import { ChartService } from '../../services/chart.service';
 import { AnalysisChart, Sort } from '../../types';
 
 const template = require('./executed-chart-view.component.html');
+
+const DEFAULT_PAGE_SIZE = 25;
 
 @Component({
   selector: 'executed-chart-view',
@@ -22,22 +26,26 @@ export class ExecutedChartViewComponent {
     this.initChartOptions(analysis);
   };
   @Input('data') set setData(data: any[]) {
-    const updates = this.getChartUpdates(data, this.analysis);
+    this.toggleToGrid = false;
+    this.updates = this.getChartUpdates(data, this.analysis);
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
-      this.updater.next(updates);
+      this.updater.next(this.updates);
     });
   };
 
   analysis: AnalysisChart;
   isStockChart: boolean;
   chartOptions: Object;
+  toggleToGrid: false;
+  chartToggleData: any;
 
   constructor(
     private _chartService: ChartService
   ) { }
 
   initChartOptions(analysis) {
+    this.toggleToGrid = false;
     const { LEGEND_POSITIONING, LAYOUT_POSITIONS } = this._chartService;
     const legend = {
       align: get(analysis, 'legend.align', 'right'),
@@ -54,6 +62,43 @@ export class ExecutedChartViewComponent {
     this.isStockChart = analysis.isStockChart;
   }
 
+  isFloat(n){
+    return Number(n) === n && n % 1 !== 0;
+  }
+
+  fetchColumnData(axisName, value) {
+    let aliasName = axisName;
+    forEach(this.analysis.artifacts[0].columns, column => {
+      if(axisName === column.name) {
+        aliasName = column.aliasName || column.displayName;
+        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : (column.dateFormat === 'MMMM d YYYY, h:mm:ss a' ? 'MMMM DD YYYY, h:mm:ss a' : column.dateFormat) ) : value;
+        if((value) && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
+          value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+        }
+        value = value === 'Undefined' ? '' : value;
+      }
+    })
+    return {aliasName, value};
+  }
+
+  trimKeyword(data) {
+    let trimData = data.map(row => {
+      let obj = {};
+      for(var key in row) {
+        let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+        obj[trimKey.aliasName] = trimKey.value;
+      }
+      return obj;
+    });
+    return trimData;
+  }
+
+  viewToggle(value) {
+    if (!value) {
+      this.updater.next(this.updates);
+    }
+    this.toggleToGrid = value;
+  }
   getChartUpdates(data, analysis) {
     const settings = this._chartService.fillSettings(analysis.artifacts, analysis);
     const sorts = analysis.sqlBuilder.sorts;
@@ -69,6 +114,8 @@ export class ExecutedChartViewComponent {
         map(sorts, 'order')
       );
     }
+
+    this.chartToggleData = this.trimKeyword(data);
 
     return [
       ...this._chartService.dataToChangeConfig(

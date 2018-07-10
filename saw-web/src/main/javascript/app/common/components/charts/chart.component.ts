@@ -69,6 +69,11 @@ export class ChartComponent {
         chartOptions
       )
     );
+    if (this.enableExport) {
+      this.config.exporting = {
+        enabled: true
+      }
+    }
 
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
