@@ -1,21 +1,25 @@
 package com.synchronoss.querybuilder.chart;
 
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.nio.entity.NStringEntity;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +35,7 @@ public class ChartQueryBuilderTest {
   private  EmbeddedElastic embeddedElastic = null;
   private  URL esSettingsResource = null;
   private  URL  chartMappingResource = null;
-  private  Client client = null;
+  private  RestClient client = null;
   private  final String INDEX_NAME = "mbt_index_today";
   private final String  TYPE_NAME = "mbt_record"; 
   private final String CLUSTER_NAME = "test_cluster";
@@ -49,22 +53,30 @@ public class ChartQueryBuilderTest {
     System.setProperty("schema.chart", schemaResource.getPath());
    
     embeddedElastic = EmbeddedElastic.builder()
-        .withElasticVersion("5.4.0")
+        .withElasticVersion("6.2.0")
         .withSetting(PopularProperties.TRANSPORT_TCP_PORT, 9350)
+        .withSetting(PopularProperties.HTTP_PORT, 9351)
         .withSetting(PopularProperties.CLUSTER_NAME, CLUSTER_NAME)
         .withIndex(INDEX_NAME, IndexSettings.builder()
         .withType(TYPE_NAME, mappingStream)
          .withSettings(settingStream)
         .build()).withStartTimeout(1, TimeUnit.MINUTES)
-        .build().start();    
-    Settings settings = Settings.builder().put("cluster.name", CLUSTER_NAME).build();
-    client = new PreBuiltTransportClient(settings)
-        .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9350));
+        .build().start();
+    client = RestClient.builder(new HttpHost("localhost", 9351, "http"))
+        .setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
+            @Override
+            public RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder requestConfigBuilder) {
+                return requestConfigBuilder.setConnectTimeout(5000)
+                        .setSocketTimeout(60000);
+            }
+        })
+        .setMaxRetryTimeoutMillis(60000)
+        .build();
   }
   
   
   @After
-  public void resourceReleased() {
+  public void resourceReleased() throws IOException {
     try{
     if (client !=null) {
       client.close();
@@ -79,7 +91,7 @@ public class ChartQueryBuilderTest {
   }
   
   @Test
-  public void queryWithDataFields() {
+  public void queryWithDataFields() throws UnsupportedOperationException, IOException {
     ClassLoader classLoader = getClass().getClassLoader();
     URL inputFile = classLoader.getResource("queries/chart_type_data_3_datafields.json");
     InputStream inputStream;
@@ -91,13 +103,17 @@ public class ChartQueryBuilderTest {
       assertThat(e.getMessage(), is("IOException"));    
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3).query()).execute().actionGet();
-    Assert.assertTrue(response.status().equals(RestStatus.OK));
+    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3);
+    String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
+    HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
+    Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+    HttpEntity entity = response.getEntity();
+    Assert.assertTrue(entity.getContent()!=null);
+    
   }
   
   @Test
-  public void queryWithDataFieldsAndFilter()
+  public void queryWithDataFieldsAndFilter() throws IOException
   {
     ClassLoader classLoader = getClass().getClassLoader();
     URL inputFile = classLoader.getResource("queries/chart_type_data_3_datafields_filters.json");
@@ -110,13 +126,16 @@ public class ChartQueryBuilderTest {
       assertThat(e.getMessage(), is("IOException"));    
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3).query()).execute().actionGet();
-    Assert.assertTrue(response.status().equals(RestStatus.OK));
-  }
+    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3);
+    String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
+    HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
+    Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+    HttpEntity entity = response.getEntity();
+    Assert.assertTrue(entity.getContent()!=null);
+   }
 
   @Test
-  public void queryWithDataFieldsFiltersAndSorts()
+  public void queryWithDataFieldsFiltersAndSorts() throws IOException
   {
     ClassLoader classLoader = getClass().getClassLoader();
     URL inputFile = classLoader.getResource("queries/chart_type_data_3_datafields_filters_sorts.json");
@@ -129,13 +148,16 @@ public class ChartQueryBuilderTest {
       assertThat(e.getMessage(), is("IOException"));    
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3).query()).execute().actionGet();
-    Assert.assertTrue(response.status().equals(RestStatus.OK));
-  }
+    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,3);
+    String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
+    HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
+    Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+    HttpEntity entity = response.getEntity();
+    Assert.assertTrue(entity.getContent()!=null);
+    }
   
   @Test
-  public void queryWithDataFieldsFiltersAndSortsWithDataSecurityKey()
+  public void queryWithDataFieldsFiltersAndSortsWithDataSecurityKey() throws IOException
   {
     ClassLoader classLoader = getClass().getClassLoader();
     URL inputFile = classLoader.getResource("queries/chart_type_data_3_datafields_filters_sorts.json");
@@ -149,9 +171,12 @@ public class ChartQueryBuilderTest {
       assertThat(e.getMessage(), is("IOException"));    
     }
     SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
-    SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
-    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,dataSecurityKey,3).query()).execute().actionGet();
-    Assert.assertTrue(response.status().equals(RestStatus.OK));
+    SearchSourceBuilder query = sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,dataSecurityKey,3);
+    String endpoint = INDEX_NAME + "/" + TYPE_NAME + "/" + "_search?size=0";
+    HttpEntity requestPaylod = new NStringEntity(query.toString(), ContentType.APPLICATION_JSON);
+    Response response = client.performRequest(HttpPost.METHOD_NAME, endpoint, emptyMap(), requestPaylod);
+    HttpEntity entity = response.getEntity();
+    Assert.assertTrue(entity.getContent()!=null);
   }
   
 

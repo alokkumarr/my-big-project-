@@ -1,5 +1,5 @@
 #
-# Testing container image for SIP deploy node.
+# SIP testing image for administration node.
 #
 # SIP installation is triggered from the deploy node using the deploy
 # command provided with the SIP package.  The deployment automation
@@ -8,13 +8,13 @@
 #
 
 # Start from SIP base image
-FROM sip-base:${project.version}
+FROM sip-base-maprclient:${project.version}
 
 # Install Ansible from EPEL repository
-RUN yum -y -q --nogpgcheck install ansible rsync
+RUN yum -y -q install ansible rsync
 
 # Workaround: See https://github.com/ansible/ansible/issues/12208
-RUN yum -y -q --nogpgcheck install openssh-clients
+RUN yum -y -q install openssh-clients
 
 # Add oneshot service to start application deployment at startup
 COPY saw-deploy/saw-deploy /root/
@@ -38,11 +38,8 @@ RUN systemctl enable saw-workbench-samples
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-*/sample-*/load*
 
-RUN groupadd mapr -g 5000
-RUN useradd mapr -u 500 -g mapr
-
 # Add systemd journal gateway for browsing logs
-RUN yum -y -q --nogpgcheck install systemd-journal-gateway
+RUN yum -y -q install systemd-journal-gateway
 RUN systemctl enable systemd-journal-gatewayd.socket
 # Workaround: Installing the systemd journal gateway causes the
 # services below to fail, so mask them.  Remove when fixed in newer

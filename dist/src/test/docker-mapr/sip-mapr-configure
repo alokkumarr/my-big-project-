@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# Configure MapR container for SIP
+#
+# Do configuring in service, instead of Dockerfile, because the MapR
+# services apparently need to be running while doing the
+# configuration.
+#
+set -eu
+
+marker=/etc/sip-mapr-configure-marker
+
+host=sip-mapr
+disk=/opt/mapr/disk
+
+if [ ! -e $marker ]; then
+    echo "Configuring MapR for SIP"
+
+    # Note: Ensure the disk size is large enough (for example 5G is
+    # too little) to ensure that MapR-FS can start up
+    fallocate -l 20G $disk
+    /opt/mapr/server/configure.sh -C $host -Z $host -D $disk -N sip
+
+    # Set replication to 1 for single-node cluster
+    default=cldb.volumes.default
+    replication="{ $default.replication: 1, $default.min.replication: 1 }"
+    # Loop retrying until MapR is ready to accept configuration
+    # updates
+    while ! maprcli config save -values "$replication" > /dev/null; do
+        sleep 5
+    done
+
+    # Create marker file to ensure configuration is only run once
+    touch $marker
+fi

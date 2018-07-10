@@ -76,3 +76,23 @@ executed-view {
     }
   }
 }
+
+.chart-data-grid .dx-datagrid .dx-datagrid-rowsview .dx-datagrid-content table tbody tr.dx-data-row td {
+  text-align: left !important;
+}
+
+.chart-data-grid .dx-datagrid .dx-datagrid-headers .dx-datagrid-content table tbody tr.dx-header-row td {
+  text-align: left !important;
+}
+
+.toggle-icons {
+  text-align: right;
+  height: 25px;
+  margin-right: 5%;
+  font-size: 15px;
+}
+
+.mat-icon.active {
+  color: #1A89D4;
+}
+

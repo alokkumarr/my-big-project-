@@ -1,0 +1,14 @@
+[Unit]
+Description=SIP MapR Configure
+After=default.target
+
+[Service]
+Type=oneshot
+# Use RemainAfterExit so that services configured with
+# After=sip-mapr-configure.service will get activated
+RemainAfterExit=yes
+ExecStart=/root/sip-mapr-configure
+SyslogIdentifier=sip-mapr-configure
+
+[Install]
+WantedBy=default.target
