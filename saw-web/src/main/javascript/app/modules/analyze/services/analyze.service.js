@@ -158,9 +158,9 @@ export class AnalyzeService {
       this._executions[model.id] = deferred.promise;
 
       this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      this.applyAnalysis(model, executionType).then(({data, executionId, count}) => {
+      this.applyAnalysis(model, executionType).then(({data, executionId, executionType, count}) => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
-        deferred.resolve({data, executionId, count});
+        deferred.resolve({data, executionId, executionType, count});
       }, err => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);
@@ -283,13 +283,14 @@ export class AnalyzeService {
       return {
         data: fpGet(`data.contents.analyze.[0].data`, resp),
         executionId: fpGet(`data.contents.analyze.[0].executionId`, resp),
+        executionType: mode,
         count: fpGet(`data.contents.analyze.[0].totalRows`, resp)
       };
     });
   }
 
   getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW) {
-    return this.applyAnalysis(analysis, mode).then(({data, executionId, count}) => {
+    return this.applyAnalysis(analysis, mode).then(({data, executionId, executionType, count}) => {
       // forEach(analysis.artifacts[0].columns, column => {
       //   column.columnName = this.getColumnName(column.columnName);
       // });
@@ -304,7 +305,7 @@ export class AnalyzeService {
       //     data[key] = value;
       //   });
       // });
-      return {analysis, data, executionId, count};
+      return {analysis, data, executionId, executionType, count};
     });
   }
 
