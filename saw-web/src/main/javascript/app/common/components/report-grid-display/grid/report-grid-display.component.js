@@ -99,7 +99,6 @@ export const ReportGridDisplayComponent = {
                   this._gridInstance.option('columns', cols);
                 }, 200);
               }
-
               return {data, totalCount: count};
             });
         }

@@ -1,14 +1,8 @@
-import {
-  Component,
-  Input
-} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import {Subject} from 'rxjs/Subject';
+import { Subject } from 'rxjs/Subject';
 
-import {
-  Artifact,
-  ArtifactColumnPivot
-} from '../types';
+import { Artifact, ArtifactColumnPivot } from '../types';
 import { DesignerStates } from '../consts';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 
@@ -20,11 +14,12 @@ require('./designer-pivot.component.scss');
   template
 })
 export class DesignerPivotComponent {
-  @Input('artifacts') set setArtifactColumns(artifacts: Artifact[]) {
+  @Input('artifacts')
+  set setArtifactColumns(artifacts: Artifact[]) {
     if (!isEmpty(artifacts)) {
-      this.artifactColumns = [...artifacts[0].columns];
+      this.artifactColumns = [...artifacts[0].columns] as ArtifactColumnPivot[];
     }
-  };
+  }
   @Input() data;
   @Input() sorts: any[];
   @Input() designerState: DesignerStates;
@@ -33,5 +28,4 @@ export class DesignerPivotComponent {
 
   public updater: Subject<IPivotGridUpdate> = new Subject();
   public DesignerStates = DesignerStates;
-
 }

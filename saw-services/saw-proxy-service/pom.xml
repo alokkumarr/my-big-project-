@@ -23,9 +23,9 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
-		<es.version>5.4.0</es.version>
 		<metadata.api>${revision}</metadata.api>
-		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+		<mapr.db.version>6.0.1-mapr</mapr.db.version>
+		<es.version>6.3.0</es.version>
 	</properties>
 
 	<dependencies>
@@ -120,7 +120,7 @@
 
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
-			<artifactId>rest</artifactId>
+			<artifactId>elasticsearch-rest-client</artifactId>
 			<version>${es.version}</version>
 		</dependency>
 		<dependency>
@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>pl.allegro.tech</groupId>
 			<artifactId>embedded-elasticsearch</artifactId>
-			<version>2.4.2</version>
+			<version>2.5.1</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -164,7 +164,7 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>meta-api</artifactId>
@@ -175,7 +175,7 @@
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
 		</dependency>
-		
+
 	</dependencies>
 	<build>
 		<plugins>

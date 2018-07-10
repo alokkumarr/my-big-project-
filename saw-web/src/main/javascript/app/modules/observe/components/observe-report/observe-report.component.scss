@@ -1,0 +1,28 @@
+$header-padding-top: 12px;
+$header-padding-bottom: 12px;
+$header-font-size: 18px;
+$report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} - #{$header-font-size});
+
+observe-report {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .report-title {
+    margin: 0;
+    padding: $header-padding-top 0 $header-padding-bottom;
+    text-align: center;
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: $header-font-size;
+  }
+
+  report-grid-upgraded {
+    display: block;
+    height: $report-height;
+  }
+
+  .dx-datagrid-header-panel {
+    height: 37px;
+  }
+}

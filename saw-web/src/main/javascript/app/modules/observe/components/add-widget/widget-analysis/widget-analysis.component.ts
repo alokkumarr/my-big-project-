@@ -20,7 +20,7 @@ import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
-const ALLOWED_ANALYSIS_TYPES = ['chart'];
+const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport' /*, 'pivot' */];
 
 @Component({
   selector: 'widget-analysis',
@@ -55,12 +55,16 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   }
 
   loadIcons() {
-    const chartTypes = find(
-      ANALYSIS_METHODS,
-      method => method.label === 'CHARTS'
-    );
-    forEach(chartTypes.children, chart => {
-      this.icons[chart.type.split(':')[1]] = chart.icon.font;
+    forEach(ANALYSIS_METHODS, method => {
+      forEach(method.children, analysisType => {
+        if (analysisType.supportedTypes && analysisType.supportedTypes.length) {
+          forEach(analysisType.supportedTypes, supType => {
+            this.icons[supType.split(':')[1]] = analysisType.icon.font;
+          });
+        } else {
+          this.icons[analysisType.type.split(':')[1]] = analysisType.icon.font;
+        }
+      });
     });
   }
 

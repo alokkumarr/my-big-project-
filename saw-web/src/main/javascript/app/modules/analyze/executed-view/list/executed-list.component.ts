@@ -35,7 +35,9 @@ export class ExecutedListComponent {
     this._state.go('analyze.executedDetail', {
       executionId: executedAnalysis.id,
       analysisId: this.analysis.id,
-      analysis: this.analysis
+      analysis: this.analysis,
+      awaitingExecution: false,
+      loadLastExecution: false
     });
   }
 
