@@ -8,14 +8,14 @@
        fxLayoutAlign="start"
   >
     <mat-form-field>
+      <span *ngIf="!filter.isOptional && isInRuntimeMode" class="mandatory-asterisk">*</span>
       <input type="text" placeholder="Column" matInput
              #autoInput
              e2e="filter-autocomplete-input"
              [matAutocomplete]="auto"
              [formControl]="formControl"/>
-      <button *ngIf="autoInput.value"
+      <button *ngIf="autoInput.value && !isInRuntimeMode"
               (click)="clearInput()"
-              [disabled]="isInRuntimeMode"
               matSuffix mat-icon-button mat-button
       >
         <mat-icon fontIcon="icon-close"></mat-icon>
@@ -60,6 +60,12 @@
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
                   i18n>
       Prompt
+    </mat-checkbox>
+    <mat-checkbox *ngIf="!isInRuntimeMode && filter.isRuntimeFilter"
+                  [checked]="filter.isOptional"
+                  (change)="onOptionalCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Optional
     </mat-checkbox>
 
     <button *ngIf="!isInRuntimeMode"

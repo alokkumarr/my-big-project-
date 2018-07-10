@@ -1,5 +1,5 @@
 #
-# Testing container image for Elasticsearch.
+# SIP testing image for Elasticsearch.
 #
 # Provides Elasticsearch for testing environments.
 #

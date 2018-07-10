@@ -1,4 +1,5 @@
-import { Component, Input, Inject, Injectable } from '@angular/core';
+import { Component, Input, Inject, ViewChild } from '@angular/core';
+
 import * as get from 'lodash/get';
 import { ComponentHandler } from './../../utils/componentHandler';
 
@@ -10,13 +11,13 @@ require('./sidenav.component.scss');
   template
 })
 
-@Injectable()
 export class SidenavComponent { 
 
   @Input() menu: [];
   @Input() id: any;
 
   constructor(@Inject('$componentHandler') private chp: ComponentHandler) { }
+  @ViewChild('sidenav') public sidenav;
 
   public unregister: any;
   public _moduleName: string;
@@ -38,6 +39,10 @@ export class SidenavComponent {
   update(data, moduleName = '') {
     this._moduleName = moduleName;
     this.menu = data;
+  }
+
+  toggleNav() {
+    this.sidenav.toggle();
   }
 }
 
