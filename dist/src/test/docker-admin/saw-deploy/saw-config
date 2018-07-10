@@ -27,6 +27,7 @@ saw_metadata_path=/main/metadata/
 saw_report_executor_path=/main/
 saw_execution_history=2
 saw_observe_metastore=hdfs:///main/
+
 #
 # Transport Service Executor configuration
 #
