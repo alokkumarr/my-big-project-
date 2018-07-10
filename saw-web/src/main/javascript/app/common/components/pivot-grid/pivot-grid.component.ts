@@ -111,9 +111,10 @@ export class PivotGridComponent {
       // if it's not repainted it appears smaller
       this._gridInstance.repaint();
       if (this.updater) {
-        this._subscription = this.updater.subscribe(updates =>
-          this.update(updates)
-        );
+        this._subscription = this.updater.subscribe(updates => {
+          this._gridInstance.repaint();
+          return this.update(updates);
+        });
       }
     }, 500);
   }

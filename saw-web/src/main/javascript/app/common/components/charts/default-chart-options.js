@@ -7,6 +7,11 @@ export const globalChartOptions = {
   },
   global: {
     timezoneOffset: 0
+  },
+  chart: {
+    style: {
+      fontFamily: 'Source Sans Pro'
+    }
   }
 };
 
