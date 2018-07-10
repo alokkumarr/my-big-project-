@@ -32,21 +32,28 @@ class AnalysisExecutions extends BaseController {
           (content \ "executionType").extractOpt[String] ,(content \ "type").extractOpt[String] )
       }).sortBy(result =>result._2).reverse
       var count = 0
+      var esReportHistoryCount =0;
       val execHistory = SAWServiceConfig.executionHistory
       var junkSize = if(sortedExecutions.size < execHistory)
         1 else (sortedExecutions.size+1-execHistory)
       val junkExecution = new Array[String](junkSize)
       val executions = sortedExecutions.filter(result =>{
         count = count+1
-        if(count<=execHistory && !(result._4!=None && result._5!=None && excludeOneTimeExecution(result._4.get,result._5.get))) true
+        if(count<=execHistory && !(result._5!=None && result._5.get.equalsIgnoreCase("esReport"))) true
         else {
-          if (count < execHistory || (junkExecution.size>=count+1 )) {
-            junkExecution(count-1) = result._1
+          if (!(result._5 != None && result._5.get.equalsIgnoreCase("esReport"))) {
+            junkExecution(count - execHistory) = result._1
+            false
           }
           else {
-            junkExecution(count - execHistory) = result._1
+            if (esReportHistoryCount<=execHistory)
+              {
+                esReportHistoryCount+=1
+                !excludeOneTimeExecution(result._4.get,result._5.get)
+              }
+            else false
           }
-          false }
+        }
       }).map(result => {
         var executionType = ""
         if(result._4!= None && result._4.get.equalsIgnoreCase(
