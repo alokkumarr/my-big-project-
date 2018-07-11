@@ -212,7 +212,7 @@ exports.config = {
     });
 
     jasmine.getEnv().addReporter(new JSONReporter({
-      file: 'jasmine-results.json', // by default it writes to jasmine.json
+      file: 'target/jasmine-results.json', // by default it writes to jasmine.json
       beautify: true,
       indentationLevel: 4 // used if beautify === true
     }));
@@ -230,11 +230,11 @@ exports.config = {
   beforeLaunch: function () {
     //clean up any residual/leftover from a previous run. Ensure we have clean
     //files for both locking and merging.
-    if (fs.existsSync('jasmine-results.json.lock')) {
-      fs.unlinkSync('jasmine-results.json.lock');
+    if (fs.existsSync('target/jasmine-results.json.lock')) {
+      fs.unlinkSync('target/jasmine-results.json.lock');
     }
-    if (fs.existsSync('jasmine-results.json')) {
-      fs.unlink('jasmine-results.json');
+    if (fs.existsSync('target/jasmine-results.json')) {
+      fs.unlink('target/jasmine-results.json');
     }
   },
   afterLaunch: function() {
