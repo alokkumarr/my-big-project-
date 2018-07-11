@@ -22,7 +22,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
   "requestedTime",
   "productCode",
   "moduleName",
-  "resultFormat"
+  "resultFormat",
+  "aggregationData"
 })
 public class StorageProxy {
 
@@ -176,6 +177,17 @@ public class StorageProxy {
     @JsonProperty("moduleName")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String moduleName;
+    /**
+     * The Modulename Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * (Required)
+     * 
+     */
+    @JsonProperty("aggregationData")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private Object aggregationData;
+
     @JsonProperty("dataSecurityKey")
     private List<Object> dataSecurityKey = null;
     /**
@@ -622,6 +634,17 @@ public class StorageProxy {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+    
+    @JsonProperty("aggregationData")
+    public Object getAggregationData() {
+      return aggregationData;
+    }
+    @JsonProperty("aggregationData")
+    public void setAggregationData(Object aggregationData) {
+      this.aggregationData = aggregationData;
+    }
+
+
 
     public enum Action {
 
@@ -632,7 +655,7 @@ public class StorageProxy {
         DELETE("delete"),
         UPDATE("update"),
         AGGREGATE("aggregate"),
-        SNCRPIVOT("sncrpivot");
+        PIVOT("pivot");
         private final String value;
         private final static Map<String, StorageProxy.Action> CONSTANTS = new HashMap<String, StorageProxy.Action>();
 

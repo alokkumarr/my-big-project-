@@ -14,7 +14,10 @@ import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
 
 
-import { EXECUTION_MODES } from '../services/analyze.service';
+import {
+  EXECUTION_MODES,
+  EXECUTION_DATA_MODES
+} from '../services/analyze.service';
 
 @Injectable()
 export class AnalyzeActionsService {
@@ -180,11 +183,17 @@ export class AnalyzeActionsService {
     );
   }
 
-  exportAnalysis(analysisId, executionId, analysisType) {
+  exportAnalysis(
+    analysisId,
+    executionId,
+    analysisType,
+    executionType = EXECUTION_DATA_MODES.NORMAL
+  ) {
     return this._analyzeService.getExportData(
       analysisId,
       executionId,
-      analysisType
+      analysisType,
+      executionType
     );
   }
 }

@@ -11,7 +11,6 @@
   </md-card-title>
 
   <md-card-content>
-
     <div layout="column" layout-align="space-between start">
       <filter-chips-u [filters]="$ctrl.analysis.sqlBuilder.filters"
                       [readonly]="true"
@@ -19,14 +18,33 @@
       </filter-chips-u>
     </div>
 
-    <div layout="column" layout-align="space-between center">
-      <chart [updater]="$ctrl.chartUpdater"
-             [options]="$ctrl.chartOptions"
-             [is-stock-chart]="$ctrl.isStockChart"
-             [enable-export]="true"
-             e2e="{{'chart-type:' + $ctrl.analysis.chartType}}">
-      </chart>
-    </div>
+    <div class="toggle-icons">
+      <mat-icon class="mat-icon material-icons icon-report" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid" ng-class="{'active':$ctrl.toggleToGrid === true}">
+        <md-tooltip>
+          <span>Toggle to Grid</span>
+        </md-tooltip>
+      </mat-icon>
 
+      <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" ng-click="$ctrl.toggleToGrid = !$ctrl.toggleToGrid" ng-class="{'active':$ctrl.toggleToGrid === false}">
+        <md-tooltip>Toggle to Chart</md-tooltip>
+      </mat-icon>  
+    </div>
+    
+    <div ng-if="!$ctrl.toggleToGrid">
+      <div layout="column" layout-align="space-between center" ng-if="!$ctrl.toggleToGrid">
+        <chart [updater]="$ctrl.chartUpdater"
+               [options]="$ctrl.chartOptions"
+               [is-stock-chart]="$ctrl.isStockChart"
+               [enable-export]="true"
+               e2e="{{'chart-type:' + $ctrl.analysis.chartType}}">
+        </chart>
+      </div>  
+    </div>
+    
+    <div ng-if="$ctrl.toggleToGrid">
+      <div layout="column" layout-align="space-between center">
+        <div class="chart-data-grid" dx-data-grid="$ctrl.loadGridData"></div>
+      </div>
+    </div>
   </md-card-content>
 </md-card>

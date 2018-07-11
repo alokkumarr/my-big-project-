@@ -1,0 +1,11 @@
+[Unit]
+Description=SIP MapR logger: %I
+After=default.target
+
+[Service]
+ExecStart=/usr/bin/tail -f --retry %I
+SyslogIdentifier=sip-mapr-logger@%I
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

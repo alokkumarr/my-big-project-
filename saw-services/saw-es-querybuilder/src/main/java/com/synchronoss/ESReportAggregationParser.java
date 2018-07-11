@@ -41,6 +41,7 @@ public class ESReportAggregationParser {
     private List<Object> jsonNodeParser(JsonNode jsonNode, Map dataObj, List<Object> flatStructure
                                         , int level)
     {
+      logger.trace("jsonNodeParser starts here :" + jsonNode );
         JsonNode childNode = jsonNode;
         if (childNode.get(KEY)!=null)
         {
@@ -74,6 +75,7 @@ public class ESReportAggregationParser {
             else
                 dataObj.put(columnName,childNode.get(KEY).textValue());
         }
+        
         String childNodeName =  childNodeName(childNode);
 
         if (childNodeName!=null
@@ -107,6 +109,7 @@ public class ESReportAggregationParser {
             }
             flatStructure.add(flatValues);
         }
+        logger.trace("jsonNodeParser ends flatStructure here :" + flatStructure );
         return flatStructure;
     }
 
@@ -117,13 +120,13 @@ public class ESReportAggregationParser {
      */
     public List<Object> parseData(JsonNode jsonNode)
     {
-        logger.debug(this.getClass().getName() + " parseData starts here");
+        logger.trace(this.getClass().getName() + " parseData starts here");
       //  JsonNode jsonNode1 = jsonNode.get(DATA);
         prepareGroupByFields(dataFields);
         Map<String,String> dataObj= new LinkedHashMap<>();
         List<Object> flatStructure = new ArrayList<>();
         flatStructure = jsonNodeParser(jsonNode,dataObj,flatStructure,0);
-        logger.debug(this.getClass().getName() + " parseData ends here");
+        logger.trace(this.getClass().getName() + " parseData ends here");
         return flatStructure;
     }
 
@@ -175,7 +178,8 @@ public class ESReportAggregationParser {
             if (dataField.getAggregate()==null)
                 groupByFields[fieldCount++]=dataField.getColumnName();
         }
-        logger.debug(this.getClass().getName() + " prepareGroupByFields ends");
+        logger.trace("groupByFields :" + groupByFields);
+        logger.trace(this.getClass().getName() + " prepareGroupByFields ends");
     }
 
 

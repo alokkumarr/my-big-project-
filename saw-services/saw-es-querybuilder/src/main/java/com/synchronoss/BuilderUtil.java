@@ -126,10 +126,10 @@ public class BuilderUtil
         String json = "{ \"sqlBuilder\" :" + sqlNode.toString() + "}";
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
-        String chart = System.getProperty("schema.report");
-        if (chart == null){throw new NullPointerException("schema.chart property is not set.");}
+        String reportSchema = System.getProperty("schema.report");
+        if (reportSchema == null){throw new NullPointerException("schema.report property is not set.");}
         final JsonNode data = JsonLoader.fromString(json);
-        final JsonNode schema = JsonLoader.fromFile(new File(chart));
+        final JsonNode schema = JsonLoader.fromFile(new File(reportSchema));
         ProcessingReport report = validator.validate(schema, data);
         if (report.isSuccess() == false) {
             throw new ProcessingException(report.toString());

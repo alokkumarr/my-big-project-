@@ -5,7 +5,11 @@ import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { AnalyzeService } from '../services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES,
+  EXECUTION_DATA_MODES
+} from '../services/analyze.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
 import {
   ExecuteService,
@@ -38,7 +42,7 @@ export class ExecutedViewComponent implements OnInit {
   _executionId: string;
   analysis: Analysis;
   analyses: Analysis[];
-  executionSuccess: boolean;
+  onetimeExecution: boolean;
   data: any[];
   dataLoader: Function;
   canAutoRefresh: boolean;
@@ -166,7 +170,7 @@ export class ExecutedViewComponent implements OnInit {
   onExecutionSuccess(response) {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = this.analysis.type === 'report';
-    this.executionSuccess = true;
+    this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',
@@ -175,7 +179,13 @@ export class ExecutedViewComponent implements OnInit {
           timeOut: 0,
           extendedTimeOut: 0,
           closeButton: true,
-          onclick: this.gotoLastPublished(this.analysis, response)
+          onclick: () =>
+            this.loadExecutedAnalysesAndExecutionData(
+              this.analysis.id,
+              response.executionId,
+              this.analysis.type,
+              response
+            )
         }
       );
     } else {
@@ -189,7 +199,7 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   onExecutionError() {
-    this.executionSuccess = false;
+    this.onetimeExecution = false;
     this.loadExecutedAnalysesAndExecutionData(
       this.analysis.id,
       null,
@@ -320,8 +330,8 @@ export class ExecutedViewComponent implements OnInit {
             analysisId,
             executionId,
             analysisType,
-            this.executionSuccess
-              ? { ...options, executionType: 'onetime' }
+            this.onetimeExecution
+              ? { ...options, executionType: EXECUTION_DATA_MODES.ONETIME }
               : options
           );
         };
@@ -331,8 +341,8 @@ export class ExecutedViewComponent implements OnInit {
             analysisId,
             executionId,
             analysisType,
-            this.executionSuccess
-              ? { ...options, executionType: 'onetime' }
+            this.onetimeExecution
+              ? { ...options, executionType: EXECUTION_DATA_MODES.ONETIME }
               : options
           );
         };
@@ -433,7 +443,7 @@ export class ExecutedViewComponent implements OnInit {
       this.chartUpdater$.next({ export: true });
       break;
     default:
-      this._analyzeExportService.export(this.analysis, this.executionId);
+      this._analyzeExportService.export(this.analysis, this.executionId, this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL);
     }
   }
 }
