@@ -31,6 +31,7 @@ object MetadataStoreSchema {
   def init(admin: Admin) {
     val OldTableHome = "/main/metadata"
     if (HFileOperations.exists(OldTableHome)) {
+      log.info("Moving tables from old location: {}", OldTableHome)
       HFileOperations.rename(OldTableHome, TableHome)
     }
     HFileOperations.createDirectory(TableHome)
