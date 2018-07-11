@@ -1,15 +1,16 @@
+var appRoot = require('app-root-path');
 const element = require('protractor');
 const path = require('path');
-const LoginPage = require('../javascript/pages/loginPage.po');
-const AnalyzePage = require('../javascript/pages/analyzePage.po');
-const WorkbenchPage = require('../javascript/pages/workbenchPage.po');
+const LoginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po');
+const AnalyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po');
+const WorkbenchPage = require(appRoot + '/src/test/javascript/pages/workbenchPage.po');
 // const WorkBenchService = require('../../main/javascript/app/modules/workbench/services/workbench.service');
 const CONFIG =  require('../../../../saw-web/conf/protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
 const Using = require('jasmine-data-provider');
-const users = require('../javascript/data/users.js');
+const users = require(appRoot + '/src/test/javascript/data/users.js');
 const Protractor = require('protractor');
-const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
 
 const ec = Protractor.ExpectedConditions;
 describe('Workbench Tests : workbench.test.js',  () => {

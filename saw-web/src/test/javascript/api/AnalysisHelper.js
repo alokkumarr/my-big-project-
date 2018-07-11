@@ -1,14 +1,15 @@
 'use strict';
-const apiCall = require('../../javascript/helpers/apiCall');
-const users = require('../../javascript/data/users');
-const roles = require('../../javascript/data/roles');
-const categories = require('../../javascript/data/categories');
-const subCategories = require('../../javascript/data/subCategories');
-const privileges = require('../../javascript/data/privileges');
+var appRoot = require('app-root-path');
+const apiCall = require(appRoot + '/src/test/javascript/helpers/apiCall');
+const users = require(appRoot + '/src/test/javascript/data/users');
+const roles = require(appRoot + '/src/test/javascript/data/roles');
+const categories = require(appRoot + '/src/test/javascript/data/categories');
+const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
+const privileges = require(appRoot + '/src/test/javascript/data/privileges');
 const request = require('sync-request');
-const globalVariables = require('../../javascript/helpers/globalVariables');
-const dataSets = require('../../javascript/data/datasets');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
+const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
 const urlParser = require('url');
 //const url = 'http://localhost/'; // API base url
 const activeStatusInd = 1; // shared for all users
@@ -18,8 +19,8 @@ const customerCode = 'SYNCHRONOSS'; // shared for all users
 const productId = 1; // shared for all users
 const moduleId = 1; // shared for all users
 let url = '';
-let RequestModel = require('./RequestModel');
-const Constants = require('./Constants');
+let RequestModel = require(appRoot + '/src/test/javascript/api/RequestModel');
+const Constants = require(appRoot + '/src/test/javascript/api/Constants');
 
 class AnalysisHelper {
 

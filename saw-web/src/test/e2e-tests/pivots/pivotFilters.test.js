@@ -1,17 +1,17 @@
 /*
  Created by Alex
  */
-
-const loginPage = require('../../javascript/pages/loginPage.po.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const commonElementsPage = require('../../javascript/pages/commonElementsPage.po');
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const homePage = require('../../javascript/pages/homePage.po');
-const protractorConf = require('../../../../conf/protractor.conf');
+var appRoot = require('app-root-path');
+const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const commonElementsPage = require(appRoot + '/src/test/javascript/pages/commonElementsPage.po');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
 const using = require('jasmine-data-provider');
-const designModePage = require('../../javascript/pages/designModePage.po.js');
-const Filter = require('../../javascript/data/filter');
-const dataSets = require('../../javascript/data/datasets');
+const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po.js');
+const Filter = require(appRoot + '/src/test/javascript/data/filter');
+const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
 
 describe('Check whether filters throw an error on pivots: pivotFilters.test.js', () => {
   const metricName = dataSets.pivotChart;

@@ -1,22 +1,22 @@
 /*
  Created by Anudeep
  */
-
-const login = require('../../javascript/pages/loginPage.po.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const homePage = require('../../javascript/pages/homePage.po');
-const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+var appRoot = require('app-root-path');
+const login = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po');
+const savedAlaysisPage = require(appRoot + '/src/test/javascript/pages/savedAlaysisPage.po');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
 const using = require('jasmine-data-provider');
-const categories = require('../../javascript/data/categories');
-const subCategories = require('../../javascript/data/subCategories');
-const dataSets = require('../../javascript/data/datasets');
-const designModePage = require('../../javascript/pages/designModePage.po.js');
-let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
-let ApiUtils = require('../../javascript/api/APiUtils');
-const globalVariables = require('../../javascript/helpers/globalVariables');
-const Constants = require('../../javascript/api/Constants');
+const categories = require(appRoot + '/src/test/javascript/data/categories');
+const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
+const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
+const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po.js');
+let AnalysisHelper = require(appRoot + '/src/test/javascript/api/AnalysisHelper');
+let ApiUtils = require(appRoot + '/src/test/javascript/api/APiUtils');
+const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
+const Constants = require(appRoot + '/src/test/javascript/api/Constants');
 
 describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;

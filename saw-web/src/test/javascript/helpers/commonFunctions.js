@@ -1,6 +1,7 @@
+var appRoot = require('app-root-path');
 const protractor = require('protractor');
 const EC = protractor.ExpectedConditions;
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
 var fs = require('fs');
@@ -35,8 +36,8 @@ module.exports = {
     },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {
-      return browser.driver.wait(() => {
-        return browser.driver.getCurrentUrl().then(url => {
+      return browser.wait(() => {
+        return browser.getCurrentUrl().then(url => {
           return pageName.test(url);
         });
       }, fluentWait);

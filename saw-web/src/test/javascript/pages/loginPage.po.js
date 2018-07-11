@@ -1,5 +1,6 @@
-const commonFunctions = require('../helpers/commonFunctions.js');
-const users = require('../data/users.js');
+var appRoot = require('app-root-path');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+const users = require(appRoot + '/src/test/javascript/data/users.js');
 
 module.exports = {
   loginElements: {

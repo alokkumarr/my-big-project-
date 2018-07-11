@@ -1,18 +1,18 @@
 /*
   Created by Alex
  */
-
-const login = require('../../javascript/pages/loginPage.po');
-const analyzePage = require('../../javascript/pages/analyzePage.po');
-const designModePage = require('../../javascript/pages/designModePage.po');
-const previewPage = require('../../javascript/pages/previewPage.po');
-const commonFunctions = require('../../javascript/helpers/commonFunctions');
-const homePage = require('../../javascript/pages/homePage.po');
+var appRoot = require('app-root-path');
+const login = require(appRoot + '/src/test/javascript/pages/loginPage.po');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po');
+const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po');
+const previewPage = require(appRoot + '/src/test/javascript/pages/previewPage.po');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
+const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
-const categories = require('../../javascript/data/categories');
-const subCategories = require('../../javascript/data/subCategories');
-const dataSets = require('../../javascript/data/datasets');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
+const categories = require(appRoot + '/src/test/javascript/data/categories');
+const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
+const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;

@@ -1,8 +1,9 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
-const commonFunctions = require('../helpers/commonFunctions.js');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
-const webpackHelper = require('../../../../conf/webpack.helper');
-const designModePage = require('./designModePage.po');
+var appRoot = require('app-root-path');
+const {doMdSelectOption, getMdSelectOptions} = require(appRoot + '/src/test/javascript/helpers/utils');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
+const webpackHelper = require(appRoot + '/conf/webpack.helper');
+const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po');
 /* const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 }); */

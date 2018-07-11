@@ -1,4 +1,5 @@
-const globalVariables = require('../helpers/globalVariables');
+var appRoot = require('app-root-path');
+const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
 
 const description = 'Category created for e2e testing'; // same for all categories
 const nullValue = 'NULL';

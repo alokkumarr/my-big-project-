@@ -1,19 +1,19 @@
 /*
  Created by Alex
  */
-
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const homePage = require('../javascript/pages/homePage.po.js');
-const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
+var appRoot = require('app-root-path');
+const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po.js');
+const executedAnalysis = require(appRoot + '/src/test/javascript/pages/savedAlaysisPage.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
-const commonFunctions = require('../javascript/helpers/commonFunctions');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../../saw-web/conf/protractor.conf');
-const categories = require('../javascript/data/categories');
-const subCategories = require('../javascript/data/subCategories');
-const utils = require('../javascript/helpers/utils');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
+const categories = require(appRoot + '/src/test/javascript/data/categories');
+const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
+const utils = require(appRoot + '/src/test/javascript/helpers/utils');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges

@@ -1,10 +1,12 @@
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const header = require('../javascript/pages/components/header.co.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const users = require('../javascript/data/users.js');
+var appRoot = require('app-root-path');
+const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
+const header = require(appRoot + '/src/test/javascript/pages/components/header.co.js');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const users = require(appRoot + '/src/test/javascript/data/users.js');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../../saw-web/conf/protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+var fs = require('fs');
 
 describe('Login Tests: login.test.js', () => {
 

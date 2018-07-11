@@ -1,7 +1,8 @@
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+var appRoot = require('app-root-path');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
 const EC = protractor.ExpectedConditions;
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
-const analyzePage = require('../../javascript/pages/analyzePage.po');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po');
 
 module.exports = {
   mainMenuExpandBtn: element(by.css('mat-icon[e2e="main-menu-expand-btn"]')),

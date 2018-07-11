@@ -1,10 +1,11 @@
-const loginPage = require('../../javascript/pages/loginPage.po.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const homePage = require('../../javascript/pages/homePage.po.js');
+var appRoot = require('app-root-path');
+const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po.js');
 const protractor = require('protractor');
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const {hasClass} = require('../../javascript/helpers/utils');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+const {hasClass} = require(appRoot + '/src/test/javascript/helpers/utils');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
 
 describe('Create pivot type analysis: createPivot.test.js', () => {
   const pivotDesigner = analyzePage.designerDialog.pivot;

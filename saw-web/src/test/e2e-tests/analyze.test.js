@@ -1,14 +1,14 @@
 /*
   Created by Alex
  */
-
-const loginPage = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const users = require('../javascript/data/users.js');
+var appRoot = require('app-root-path');
+const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
+const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const users = require(appRoot + '/src/test/javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
-const protractorConf = require('../../../../saw-web/conf/protractor.conf');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const protractorConf = require(appRoot + '/conf/protractor.conf');
+const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 

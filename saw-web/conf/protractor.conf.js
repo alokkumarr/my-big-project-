@@ -5,7 +5,7 @@ var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var HtmlReporter = require('protractor-beautiful-reporter');
-
+var appRoot = require('app-root-path');
 /**
  * Note about intervals:
  * Defined to be dependent on environment where tests are executed. Running against distribution package in CI requires
@@ -92,7 +92,9 @@ exports.config = {
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
-  directConnect: true,
+  useAllAngular2AppRoots: true,
+ // specs: [appRoot + '/src/test/e2e-tests/login.test.js'],
+  //directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -168,8 +170,7 @@ exports.config = {
     // pivots: [
     //   webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
     // ],
-    authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
+    authentication: [appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
     ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
@@ -192,7 +193,8 @@ exports.config = {
     }));
 
     jasmine.getEnv().addReporter(new HtmlReporter({
-      baseDirectory: 'target/screenshots'
+      baseDirectory: 'target/screenshots',
+      preserveDirectory: false
     }).getJasmine2Reporter());
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
@@ -221,8 +223,8 @@ exports.config = {
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
-    return browser.driver.wait(() => {
-      return browser.driver.getCurrentUrl().then(url => {
+    return browser.wait(() => {
+      return browser.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
     }, pageResolveTimeout);
