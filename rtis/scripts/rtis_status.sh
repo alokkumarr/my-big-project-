@@ -45,7 +45,7 @@ UNKNOWN=3
 
 rc=$UNKNOWN
 #
-#$ curl -sS rtfe101:9100/sr
+#$ curl -sS rtfe101:9950/sr
 # {"service":"FrontEnd-Server","status":"Stale"}
 # {"service":"FrontEnd-Server","status":"Alive"}
 
