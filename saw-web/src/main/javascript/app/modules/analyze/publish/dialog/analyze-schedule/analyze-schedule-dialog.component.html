@@ -64,12 +64,9 @@
       Schedule
     </button>
 
-    <button (click)="removeSchedule()"
-            mat-raised-button color="primary" [disabled]="!hasSchedule" i18n>
-      Remove Schedule
-    </button>
-
     <button mat-button i18n (click)="close()">Cancel</button>
+
+    <button mat-button i18n class="remove-schedule" [disabled]="!hasSchedule" (click)="close()">Remove Schedule</button>
   </div>
 </div>
 
