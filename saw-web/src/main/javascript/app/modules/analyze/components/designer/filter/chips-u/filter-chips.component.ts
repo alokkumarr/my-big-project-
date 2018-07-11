@@ -62,16 +62,6 @@ export class FilterChipsComponent {
   getFilterValue(filter: Filter) {
     const { type } = filter;
     if (!filter.model) {
-      const { isRuntimeFilter, isGlobalFilter } = filter;
-      if (isRuntimeFilter && isGlobalFilter) {
-        return 'Runtime & Global';
-      }
-      if (isRuntimeFilter) {
-        return 'Runtime';
-      }
-      if (isGlobalFilter) {
-        return 'Global';
-      }
       return '';
     }
 
