@@ -74,7 +74,7 @@ public class StorageProxyMetaDataServiceImpl implements StorageProxyMetaDataServ
     StorageProxy nodeRetrieved = null;
     try {
       List<MetaDataStoreStructure> structure = StorageProxyUtils.node2JSONObject(storageProxy, basePath,
-          storageProxy.getEntityId(), Action.read, Category.Semantic);
+          storageProxy.getEntityId(), Action.read, Category.StorageProxy);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -100,7 +100,7 @@ public class StorageProxyMetaDataServiceImpl implements StorageProxyMetaDataServ
     storageProxy.setRequestedTime(new SimpleDateFormat(dateFormat).format(new Date()));
     try {
       List<MetaDataStoreStructure> structure = StorageProxyUtils.node2JSONObject(storageProxy, basePath,
-          storageProxy.getEntityId(), Action.update, Category.Semantic);
+          storageProxy.getEntityId(), Action.update, Category.StorageProxy);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -121,7 +121,7 @@ public class StorageProxyMetaDataServiceImpl implements StorageProxyMetaDataServ
     StorageProxy responseObject = new StorageProxy();
     try {
       List<MetaDataStoreStructure> structure = StorageProxyUtils.node2JSONObject(storageProxy, basePath,
-          storageProxy.getEntityId(), Action.delete, Category.Semantic);
+          storageProxy.getEntityId(), Action.delete, Category.StorageProxy);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
@@ -159,7 +159,7 @@ public class StorageProxyMetaDataServiceImpl implements StorageProxyMetaDataServ
       }
       query.setFilter(filters);
       String searchQuery = StorageProxyUtils.node2JSONString(node, basePath, node.get_id(),
-          Action.search, Category.Semantic, query);
+          Action.search, Category.StorageProxy, query);
       logger.debug("Search Query to get the semantic :" + searchQuery);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(searchQuery);
       requestMetaDataStore.process();

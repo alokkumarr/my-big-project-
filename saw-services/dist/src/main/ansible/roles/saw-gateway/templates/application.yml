@@ -115,7 +115,7 @@ api:
             path: '[/]internal/workbench.*'
         -   location: ${proxy.service.host}
             method: POST
-            path: '[/]proxy.*'
+            path: '[/]internal/proxy.*'
         -   location: ${datapod.service.host}
             method: POST
             path: '[/]internal/semantic.*'

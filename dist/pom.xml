@@ -22,7 +22,7 @@
     <sip.cloud.key>AKIAIMXBE56B6CRN6GKA</sip.cloud.key>
     <sip.cloud.key.secret>${env.SIP_CLOUD_KEY_SECRET}</sip.cloud.key.secret>
     <!-- Time to allow base container to boot up, in milliseconds -->
-    <sip.docker.wait.time>120000</sip.docker.wait.time>
+    <sip.docker.wait.time>1200000</sip.docker.wait.time>
     <!-- Time to allow the admin container to boot up and deploy, in
          milliseconds.  Longer than the base image timeout because the
          deploy takes many minutes. -->
