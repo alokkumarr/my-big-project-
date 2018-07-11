@@ -2,6 +2,9 @@ const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
+var JSONReporter = require('jasmine-bamboo-reporter');
+var fs = require('fs');
+var HtmlReporter = require('protractor-beautiful-reporter');
 
 /**
  * Note about intervals:
@@ -85,7 +88,7 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  //seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
@@ -145,26 +148,26 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
-    root: [
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
-    ],
-    charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
-    ],
-    chartEditFork: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
-    ],
-    filters: [
-      webpackHelper.root(testDir + '/e2e-tests/promptFilters.test.js') // TCs linked //Takes lot of time to execute
-    ],
-    pivots: [
-      webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
-    ],
+    // root: [
+    //   webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
+    //   webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
+    //   webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
+    // ],
+    // charts: [
+    //   webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
+    //   webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
+    //   webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
+    // ],
+    // chartEditFork: [
+    //   webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
+    //   webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
+    // ],
+    // filters: [
+    //   webpackHelper.root(testDir + '/e2e-tests/promptFilters.test.js') // TCs linked //Takes lot of time to execute
+    // ],
+    // pivots: [
+    //   webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
+    // ],
     authentication: [
       webpackHelper.root(testDir + '/e2e-tests/login.test.js') // TCs linked
     ],
@@ -188,6 +191,10 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
+    jasmine.getEnv().addReporter(new HtmlReporter({
+      baseDirectory: 'target/screenshots'
+    }).getJasmine2Reporter());
+
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
     browser.manage().timeouts().implicitlyWait(implicitlyWait);
 
@@ -203,6 +210,13 @@ exports.config = {
       //   output/junitresults-example2.xml
       consolidateAll: true
     });
+
+    jasmine.getEnv().addReporter(new JSONReporter({
+      file: 'jasmine-results.json', // by default it writes to jasmine.json
+      beautify: true,
+      indentationLevel: 4 // used if beautify === true
+    }));
+
     jasmine.getEnv().addReporter(junitReporter);
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
@@ -212,6 +226,16 @@ exports.config = {
         return /login/.test(url);
       });
     }, pageResolveTimeout);
+  },
+  beforeLaunch: function () {
+    //clean up any residual/leftover from a previous run. Ensure we have clean
+    //files for both locking and merging.
+    if (fs.existsSync('jasmine-results.json.lock')) {
+      fs.unlinkSync('jasmine-results.json.lock');
+    }
+    if (fs.existsSync('jasmine-results.json')) {
+      fs.unlink('jasmine-results.json');
+    }
   },
   afterLaunch: function() {
     return retry.afterLaunch(maxRetryForFailedTests);
