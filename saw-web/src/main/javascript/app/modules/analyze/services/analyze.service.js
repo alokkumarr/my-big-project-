@@ -16,6 +16,13 @@ export const EXECUTION_MODES = {
   PUBLISH: 'publish'
 };
 
+export const EXECUTION_DATA_MODES = {
+  /* When fetching data for execution by execution id,
+   * we need to provide the correct param if the execution wasn't saved in history */
+  ONETIME: 'onetime',
+  NORMAL: 'normal'
+};
+
 const EXECUTION_STATES = {
   SUCCESS: 'success',
   ERROR: 'error',
@@ -87,8 +94,9 @@ export class AnalyzeService {
     return reqParams;
   }
 
-  getExportData(analysisId, executionId, analysisType) {
-    return this._$http.get(`${this.url}/exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}`)
+  getExportData(analysisId, executionId, analysisType, executionType = EXECUTION_DATA_MODES.NORMAL) {
+    const onetimeExecution = executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
+    return this._$http.get(`${this.url}/exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`)
       .then(fpGet('data.data'));
   }
 
@@ -124,8 +132,9 @@ export class AnalyzeService {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
+    const onetimeExecution = options.executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
     return this._$http.get(
-      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${options.executionType ? '&executionType=' + options.executionType : ''}`
+      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
       const count = fpGet(`data.totalRows`, resp) || data.length;

@@ -5,7 +5,11 @@ import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES,
+  EXECUTION_DATA_MODES
+} from '../services/analyze.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
 import {
   ExecuteService,
@@ -327,7 +331,7 @@ export class ExecutedViewComponent implements OnInit {
             executionId,
             analysisType,
             this.onetimeExecution
-              ? { ...options, executionType: 'onetime' }
+              ? { ...options, executionType: EXECUTION_DATA_MODES.ONETIME }
               : options
           );
         };
@@ -338,7 +342,7 @@ export class ExecutedViewComponent implements OnInit {
             executionId,
             analysisType,
             this.onetimeExecution
-              ? { ...options, executionType: 'onetime' }
+              ? { ...options, executionType: EXECUTION_DATA_MODES.ONETIME }
               : options
           );
         };
@@ -443,7 +447,7 @@ export class ExecutedViewComponent implements OnInit {
       this.chartUpdater$.next({ export: true });
       break;
     default:
-      this._analyzeExportService.export(this.analysis, this.executionId);
+      this._analyzeExportService.export(this.analysis, this.executionId, this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL);
     }
   }
 }
