@@ -13,8 +13,7 @@ sip-saw1
 
 [saw-services:vars]
 #
-# SIP variable data path.  Used to store databases, state files and
-# other files that should be persisted.
+# SIP
 #
 sip_var_path=/var/sip
 

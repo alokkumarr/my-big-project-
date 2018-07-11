@@ -17,6 +17,12 @@ localhost
 
 [saw-services:vars]
 #
+# SIP variable data path.  Used to store databases, state files and
+# other files that should be persisted.
+#
+sip_var_path=/var/sip
+
+#
 # MapR configuration
 #
 # If the MapR cluster "mapr" user ID differs from the expected default
