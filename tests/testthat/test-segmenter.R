@@ -82,29 +82,33 @@ test_that("Segmenter Evaluate Model", {
 })
 
 
-test_that("Segmenter Selects Best Model", {
+test_that("Segmenter set final model options work as expected", {
 
-  s1 <- new_segmenter(df = df, name = "test") %>%
-    add_holdout_samples(splits = c(.8, .2)) %>%
+
+  s1 <- new_segmenter(df = df, name = "test_multi_model") %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
-              k = 3) %>%
+              desc = "model1-ml_kmeans ") %>%
     add_model(pipe = NULL,
-              method = "ml_kmeans",
-              k = 4) %>%
+              method = "ml_bisecting_kmeans",
+              desc = "model2-ml_bisecting_kmeans") %>%
+    add_model(pipe = NULL,
+              method = "ml_gaussian_mixture",
+              desc = "model4-ml_kmeans2") %>%
     train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+    evaluate_models()
 
-  expect_subset("spark_ml", class(s1$final_model))
-  expect_subset(
-    s1$final_model$id,
-    s1$evaluate %>%
-      top_n(1, silhouette) %>%
-      pull(model)
-  )
+  s1_best <- set_final_model(s1, method = "best", refit = TRUE)
+  s1_man <- set_final_model(s1, method = "manual", id = s1$models[[1]]$id, refit = TRUE)
+
+  expect_subset("spark_ml", class(s1_best$final_model))
+  expect_equal(get_evalutions(s1_best) %>%
+                 top_n(1, silhouette) %>%
+                 pull(model),
+               s1_best$final_model$id)
+
+  expect_equal(s1_man$final_model$id, s1$models[[1]]$id)
 })
-
 
 
 test_that("Segmenter Predicts New Data", {

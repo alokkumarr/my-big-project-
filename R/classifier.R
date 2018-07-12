@@ -42,8 +42,6 @@ new_classifier <- function(df,
 }
 
 
-
-
 #' Classifier Predict Method
 #'
 #' Method makes predictions using classifier object's final model

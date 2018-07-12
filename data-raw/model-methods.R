@@ -76,7 +76,7 @@ classify_methods <- data.frame(
     "ml_decision_tree_classifier",
     "ml_gbt_classifier",
     "ml_random_forest_classifier",
-    "ml_multilayer_perceptron"
+    "ml_multilayer_perceptron_classifier"
   ),
   name = c(
     "Spark ML Logistic Regression Classifier",
