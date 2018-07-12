@@ -11,7 +11,7 @@ import { GridsterItem } from 'angular-gridster2';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
-import { DesignerService } from '../../../analyze/components/designer/designer.service';
+import { flattenPivotData } from '../../../../common/utils/dataFlattener';
 
 const template = require('./observe-pivot.component.html');
 require('./observe-pivot.component.scss');
@@ -29,18 +29,12 @@ export class ObservePivotComponent implements OnInit, OnDestroy {
   @Output() onRefresh = new EventEmitter();
   @Input() updater: BehaviorSubject<any>;
 
-  constructor(
-    private analyzeService: AnalyzeService,
-    private designerService: DesignerService
-  ) {}
+  constructor(private analyzeService: AnalyzeService) {}
 
   ngOnInit() {
     this.artifactColumns = [...this.analysis.artifacts[0].columns];
     this.analyzeService.previewExecution(this.analysis).then(({ data }) => {
-      this.data = this.designerService.parseData(
-        data,
-        this.analysis.sqlBuilder
-      );
+      this.data = flattenPivotData(data, this.analysis.sqlBuilder);
     });
   }
   ngOnDestroy() {}
