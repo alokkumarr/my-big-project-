@@ -5,8 +5,36 @@
 # containers.
 #
 
-# Use CentOS systemd image
-FROM centos/systemd
+# Use CentOS base image.  Note: The version should follow the CentOS
+# version requirement stated in the SIP Operations Guide, which in
+# turn depends on the MapR Operating System Support Matrix.
+FROM centos:7.4.1708
+
+# Workaround: Package installations (like mapr-core which depends on
+# initscript) can force a CentOS upgrades, which go beyond the CentOS
+# versions supported by MapR.  So use the CentOS Vault repositories to
+# fix the version to the release chosen above.
+RUN echo "7.4.1708" > /etc/yum/vars/releasever
+RUN rm /etc/yum.repos.d/*.repo
+COPY centos.repo /etc/yum.repos.d
+
+# Workaround: Preferably the "centos/systemd" Docker base image would
+# be used, but it does not have exact version tags which are needed to
+# lock down the image to the CentOS version required by SIP.  So use
+# the "centos" base image which does have exact version tags, and
+# replicate the steps of "centos/systemd" here instead.
+ENV container docker
+RUN (cd /lib/systemd/system/sysinit.target.wants/; \
+for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+rm -f /lib/systemd/system/multi-user.target.wants/*;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+VOLUME ["/sys/fs/cgroup"]
+CMD ["/usr/sbin/init"]
 
 # Enable installing documentation for packages
 RUN sed -i -e '/^tsflags=nodocs$/d' /etc/yum.conf
