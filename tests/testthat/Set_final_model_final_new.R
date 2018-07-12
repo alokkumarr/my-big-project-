@@ -1,6 +1,7 @@
 
 
-# Pipeline Uint Tests -----------------------------------------------------
+
+# Set_final_model Uint Tests -----------------------------------------------------
 
 library(testthat)
 library(checkmate)
@@ -8,7 +9,7 @@ library(a2modeler)
 library(sparklyr)
 library(dplyr)
 
-context("pipeline class unit tests")
+context("Set_final_model- function unit tests")
 
 n <- 100
 x <- 1:n
@@ -348,6 +349,7 @@ test_that("The trained model is the one with max Silhouette", {
 #val_3 <- grepl("added",id_val_3)
 #val_4 <- grepl("added",id_val_4)
 #val_5 <- grepl("added",id_val_5)
+
 
 #test_that("Test that last 3 models are-added", {
 # expect_equal(val_3,TRUE)
