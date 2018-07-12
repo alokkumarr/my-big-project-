@@ -76,9 +76,9 @@ test_that("Validation only holdout sampling test case", {
 test_that("Multiple Model test case", {
 
   f3 <- new_forecaster(df = dat1,
-                   target = "y",
-                   index_var = "index",
-                   name = "test") %>%
+                       target = "y",
+                       index_var = "index",
+                       name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
