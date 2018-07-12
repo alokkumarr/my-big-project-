@@ -286,7 +286,7 @@ train_models.modeler <- function(obj, ids = NULL) {
   status <- get_models_status(obj)
   if (!is.null(ids))
     status <- status[names(status) %in% ids]
-  ids <- names(status == "added")
+  ids <- names(status[status == "added"])
   indicies <- get_indicies(obj)
 
   for (id in ids) {
