@@ -14,6 +14,7 @@ public enum Category {
   PortalDataset("PortalDataset"),
   Project("Project"),
   AuditLog("AuditLog"),
+  StorageProxy("StorageProxy"),
   Semantic("Semantic");  
 private final String value;
 private final static Map<String, Category> CONSTANTS = new HashMap<String, Category>();

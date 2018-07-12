@@ -23,6 +23,7 @@ import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.SemanticDataSetStore;
+import sncr.bda.metastore.StorageProxyMetaDataStore;
 import sncr.bda.metastore.TransformationStore;
 import sncr.bda.metastore.exception.MetaStoreEntityException;
 import sncr.bda.metastore.exception.MetaStoreSearchNotFoundException;
@@ -242,6 +243,10 @@ public class MetaDataStoreRequestAPI {
                           ProjectAdmin pls = new ProjectAdmin(xdfRoot);
                           searchResult = pls.search(maprDBCondition);
                           break;
+            case StorageProxy :
+                          StorageProxyMetaDataStore spmds = new StorageProxyMetaDataStore(xdfRoot);
+                          searchResult = spmds.search(maprDBCondition);
+                          break;
             case DataPod: 
                           logger.warn("Not implemented yet");
                           break;
@@ -358,7 +363,17 @@ public class MetaDataStoreRequestAPI {
                             default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
                         }
                         break;
-           
+            case StorageProxy:
+                        StorageProxyMetaDataStore spmds = new StorageProxyMetaDataStore(xdfRoot);
+                        switch (action){
+                            case create: spmds.create(id, src); break;
+                            case delete: spmds.delete(id); break;
+                            case update: spmds.update(id, src); break;
+                            case read: result = spmds.read(id); break;
+                            case search : doSearch(); break;
+                            default:logger.warn("Action is not supported"); throw new MetaStoreEntityException("Action is not supported");
+                        }
+                        break;
             case DataPod: logger.warn("Not implemented yet"); break;
             
             case DataSegment: logger.warn("Not implemented yet");break;

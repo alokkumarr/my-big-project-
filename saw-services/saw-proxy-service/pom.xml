@@ -23,6 +23,8 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
+		<metadata.api>${revision}</metadata.api>
+		<mapr.db.version>6.0.1-mapr</mapr.db.version>
 		<es.version>6.3.0</es.version>
 	</properties>
 
@@ -162,6 +164,18 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>meta-api</artifactId>
+			<version>${metadata.api}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mapr.db</groupId>
+			<artifactId>maprdb</artifactId>
+			<version>${mapr.db.version}</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

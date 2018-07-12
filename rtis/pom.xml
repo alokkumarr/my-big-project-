@@ -45,8 +45,8 @@
         <play2.version>2.5.2</play2.version>
         <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
         <!--play2.scala.version>2.11.6</play2.scala.version-->
-        <kafka.mapr.client>0.9.0.0-mapr-1607</kafka.mapr.client>
-        <mapr.client>5.1.0.37689-mapr</mapr.client>
+        <kafka.mapr.client>1.0.1-mapr-1803</kafka.mapr.client>
+        <mapr.client>6.0.1-mapr</mapr.client>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
         <io.netty.version>4.0.36.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
