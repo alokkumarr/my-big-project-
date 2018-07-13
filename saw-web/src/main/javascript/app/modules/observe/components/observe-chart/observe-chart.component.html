@@ -1,5 +1,5 @@
-<div style="overflow:scroll;">
-  <div class="toggle-icons" style="height: 20px;margin-right: 0;" *ngIf="ViewMode">
+<div [ngClass]="{'scroll-widget':toggleToGrid === true}">
+  <div class="toggle-icons" style="height: 20px;margin-right: 12px;" *ngIf="ViewMode">
     <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active':toggleToGrid === true}" matTooltip="Toggle to Grid">
     </mat-icon>
 
@@ -23,7 +23,7 @@
       <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[25,50,75,100]"></dxo-pager>
     </dx-data-grid>
   </div>
-  <div [ngClass]="{'active':toggleToGrid === false}">
+  <div *ngIf="!toggleToGrid">
     <chart
     [updater]="chartUpdater"
     [options]="chartOptions"
