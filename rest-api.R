@@ -5,9 +5,8 @@
 #'
 #' @param login master login character
 #' @param password password character
-#' @param url url to post request to SAW security service
-#' @param content_type content type for headers
-#' @param charset character set
+#' @param url url to post request to SAW security
+#' @param headers list of header arguments to add to request
 #'
 #' @return aToken string
 #' @export
@@ -45,14 +44,12 @@ sip_authenticate <- function(login,
 #'
 #' Returns all datasets in Workbench Metastore
 #'
-#' @param token
-#' @param url
-#' @param headers
+#' @param token valid SIP token. Result of sip_authenticate function
+#' @param url url path to get request from saw services
+#' @param headers list of header arguments to add to request
 #'
-#' @return
+#' @return list of datasets paths
 #' @export
-#'
-#' @examples
 sip_get_datasets <- function(token,
                              url = "https://saw-bda-cert-vaste.sncrcorp.net/saw/services/internal/workbench/projects/workbench/datasets",
                              headers = list('Accept' = "application/json, text/plain, */*")){
