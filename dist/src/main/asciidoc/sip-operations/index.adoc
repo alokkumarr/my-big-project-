@@ -30,14 +30,14 @@ provided in the environment:
 
 . Provision a mail relay host
 
-. Provision a host to deploy from (the deploy host), running CentOS 7
-  as the operating system.  This host will be used to run the deploy
-  command and store the environment configuration.  The deploy host is
-  typically common to the entire environment.
+. Provision a host to deploy from (the deploy host), running CentOS
+  7.4 as the operating system.  This host will be used to run the
+  deploy command and store the environment configuration.  The deploy
+  host is typically common to the entire environment.
 
-. Provision a host for running SAW (the target host), with 32 GB of
-  memory and CentOS 7 as the operating system.  The host should be
-  dedicated to SAW and not run other applications.
+. Provision a host for running SIP (the target host), with 32 GB of
+  memory and CentOS 7.4 as the operating system.  The host should be
+  dedicated to SIP and not run other applications.
 
 . Install and configure MapR client on the SAW target host.
 

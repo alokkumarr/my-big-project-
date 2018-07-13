@@ -5,7 +5,7 @@ spring:
     name: saw-storage-proxy-service
 logging:
   level:
-    com.synchronoss.saw.storage.proxy: INFO
+    com.synchronoss.saw.storage.proxy: trace
 server:
   address: localhost
   port: 9800
@@ -29,3 +29,6 @@ elastic-xpack :
           cluster-active: true
           cluster-username: elastic
           cluster-password: xuw3dUraHapret
+metastore:
+    base:  hdfs:///main/        
+         

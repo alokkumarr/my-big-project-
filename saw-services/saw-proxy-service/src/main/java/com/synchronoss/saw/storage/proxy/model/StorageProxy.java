@@ -53,6 +53,9 @@ public class StorageProxy {
      * An explanation about the purpose of this instance.
      * 
      */
+    @JsonProperty("_id")
+    private String _id;
+
     @JsonProperty("query")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String query;
@@ -62,6 +65,28 @@ public class StorageProxy {
      * An explanation about the purpose of this instance.
      * 
      */
+    /**
+     * It holds the name
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("name")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String name;
+    
+    @JsonProperty("content")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String content;
+
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+
+    
     @JsonProperty("entityId")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String entityId;
@@ -218,6 +243,28 @@ public class StorageProxy {
     public StorageProxy.Storage getStorage() {
         return storage;
     }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * (Required)
+     * 
+     */
+    @JsonProperty("_id")    
+    public String get_id() {
+      return _id;
+    }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * (Required)
+     * 
+     */
+    @JsonProperty("_id") 
+    public void set_id(String _id) {
+      this._id = _id;
+    }
 
     /**
      * The Storage Schema
@@ -276,6 +323,16 @@ public class StorageProxy {
     public void setQuery(String query) {
         this.query = query;
     }
+    
+    
+    @JsonProperty("name")
+    public String getName() {
+      return name;
+    }
+    @JsonProperty("name")
+    public void setName(String name) {
+      this.name = name;
+    }
 
     /**
      * It holds the query
@@ -331,7 +388,16 @@ public class StorageProxy {
     public int getPageSize() {
         return pageSize;
     }
-
+    
+    
+    @JsonProperty("content")
+    public String getContent() {
+      return content;
+    }
+    @JsonProperty("content")    
+    public void setContent(String content) {
+      this.content = content;
+    }
     /**
      * It holds the query
      * <p>
@@ -654,6 +720,8 @@ public class StorageProxy {
         CREATE("create"),
         DELETE("delete"),
         UPDATE("update"),
+        READ("read"),
+        EXECUTE("execute"),
         AGGREGATE("aggregate"),
         PIVOT("pivot");
         private final String value;
@@ -734,7 +802,8 @@ public class StorageProxy {
 
         ES("ES"),
         DL("DL"),
-        RDMS("RDMS");
+        RDMS("RDMS"),
+        METADATA("METADATA");
         private final String value;
         private final static Map<String, StorageProxy.Storage> CONSTANTS = new HashMap<String, StorageProxy.Storage>();
 

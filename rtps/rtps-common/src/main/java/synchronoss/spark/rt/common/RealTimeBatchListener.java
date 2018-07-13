@@ -49,6 +49,11 @@ public class RealTimeBatchListener implements StreamingListener {
     }
 
     @Override
+    public void onStreamingStarted(StreamingListenerStreamingStarted streamingStarted) {
+        logger.info("Streaming started " + streamingStarted);
+    }
+
+    @Override
     public void onBatchStarted(StreamingListenerBatchStarted batchStarted) {
     }
 
