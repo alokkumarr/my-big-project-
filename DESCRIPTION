@@ -12,6 +12,7 @@ Imports:
     sparklyr (>= 0.8.0),
     magrittr,
     checkmate (>= 1.8.2),
-    jsonlite
+    jsonlite,
+    httr
 Suggests: 
      testthat
