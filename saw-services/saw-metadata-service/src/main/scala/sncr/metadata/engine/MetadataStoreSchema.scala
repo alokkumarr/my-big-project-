@@ -29,6 +29,11 @@ object MetadataStoreSchema {
    * every startup of the application.
    */
   def init(admin: Admin) {
+    val OldTableHome = "/main/metadata"
+    if (HFileOperations.exists(OldTableHome)) {
+      log.info("Moving tables from old location: {}", OldTableHome)
+      HFileOperations.rename(OldTableHome, TableHome)
+    }
     HFileOperations.createDirectory(TableHome)
     /* Create UI artifact table */
     initTable(admin, "ui_metadata", "_system", "_source", "_search")

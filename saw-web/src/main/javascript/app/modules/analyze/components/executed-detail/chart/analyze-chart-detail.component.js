@@ -5,8 +5,12 @@ import * as orderBy from 'lodash/orderBy';
 import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import * as flatMap from 'lodash/flatMap';
+import * as forEach from 'lodash/forEach';
 
 import * as template from './analyze-chart-detail.component.html';
+
+const DEFAULT_PAGE_SIZE = 25;
 
 export const AnalyzeChartDetailComponent = {
   template,
@@ -37,6 +41,8 @@ export const AnalyzeChartDetailComponent = {
       this._$timeout(() => {
         this.updateChart();
       });
+
+      this.toggleToGrid = false;
     }
 
     initAnalysis() {
@@ -59,6 +65,8 @@ export const AnalyzeChartDetailComponent = {
       };
       this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {chart: this.chart, legend: this.legend});
       this.isStockChart = this.analysis.isStockChart;
+
+      this.columns = this.analysis.edit ? null : this._getColumns(this.analysis);
     }
 
     $onDestroy() {
@@ -71,6 +79,24 @@ export const AnalyzeChartDetailComponent = {
       }
 
       this.initAnalysis();
+    }
+
+    _getColumns(analysis) {
+      const columns = flatMap(analysis.artifacts, table => {
+        return table.columns;
+      });
+
+      /* Add aggregate to columns. Helps in calculating conditional
+       * formatting based on aggregates */
+      forEach(get(analysis, 'sqlBuilder.dataFields') || [], aggregates => {
+        forEach(columns, column => {
+          if (aggregates.columnName === column.columnName) {
+            column.aggregate = aggregates.aggregate;
+          }
+          column.reportType = analysis.type;
+        });
+      });
+      return columns;
     }
 
     updateChart() {
@@ -93,7 +119,6 @@ export const AnalyzeChartDetailComponent = {
         {path: 'title.text', data: this.analysis.name},
         {path: 'chart.inverted', data: this.analysis.isInverted}
       ]);
-
       this.chartUpdater.next(changes);
     }
 
@@ -102,16 +127,81 @@ export const AnalyzeChartDetailComponent = {
       if (!data) {
         return;
       }
-
       this.filteredData = this._ChartService.parseData(data, this.analysis.sqlBuilder);
+      const gridData = this.filteredData;
       this.updateChart();
+
+      this.loadGridData = {
+        columnMinWidth: 150,
+        columnAutoWidth: false,
+        columnResizingMode: 'widget',
+        allowColumnReordering: true,
+        allowColumnResizing: true,
+        showColumnHeaders: true,
+        showColumnLines: false,
+        showRowLines: false,
+        showBorders: false,
+        rowAlternationEnabled: true,
+        hoverStateEnabled: true,
+        wordWrapEnabled: false,
+        customizeColumns: this.customizeColumns(),
+        gridWidth: '100%',
+        paging: {
+          pageSize: DEFAULT_PAGE_SIZE
+        },
+        pager: {
+          showNavigationButtons: true,
+          allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
+          showPageSizeSelector: true
+        },
+        dataSource: this.trimKeyword(gridData)
+
+      };
       /* eslint-disable no-unused-expressions */
+    }
+
+    customizeColumns(columns) {
+      forEach(columns, col => {
+        col.allowSorting = false;
+        col.alignment = 'left';
+      });
     }
 
     onExport() {
       this.chartUpdater.next({
         export: true
       });
+    }
+
+    isFloat(n) {
+      return Number(n) === n && n % 1 !== 0;
+    }
+
+    fetchColumnData(axisName, value) {
+      let aliasName = axisName;
+      forEach(this.columns, column => {
+        if (axisName === column.name) {
+          aliasName = column.aliasName || column.displayName;
+        }
+        if (axisName === column.name && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
+          value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+        }
+      });
+      return {aliasName, value};
+    }
+
+    trimKeyword(data) {
+      const trimData = data.map(row => {
+        const obj = {};
+        for (const key in row) {
+          if (key) {
+            const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+            obj[trimKey.aliasName] = trimKey.value;
+          }
+        }
+        return obj;
+      });
+      return trimData;
     }
   }
 };

@@ -19,7 +19,9 @@ export function routesConfig($stateProvider) {
       component: ExecutedViewComponent,
       params: {
         analysis: null,
-        loadLastExecution: false
+        awaitingExecution: false,
+        loadLastExecution: false,
+        executionId: null
       }
     }
   ];

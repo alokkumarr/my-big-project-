@@ -3,20 +3,18 @@ package com.synchronoss.querybuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.globalfilter.Filter;
+import com.synchronoss.querybuilder.model.globalfilter.Filter.Order;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilters;
@@ -88,8 +86,8 @@ public class GlobalFilterDataQueryBuilder {
         List<AggregationBuilder> aggregationBuilderList = new ArrayList<>();
         AggregationBuilder aggregationBuilder = null;
         AggregationBuilder aggregationBuilder1 = null;
-        Terms.Order sortOrder =
-                (filter.getOrder()!=null && filter.getOrder().equals(SortOrder.ASC.name())) ? Terms.Order.term(true) : Terms.Order.term(false);
+        BucketOrder sortOrder =
+                (filter.getOrder()!=null && filter.getOrder().equals(Order.ASC.name())) ? BucketOrder.key(true) : BucketOrder.key(false);
             switch(filter.getType())
             {
                 case INT:

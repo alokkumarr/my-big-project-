@@ -21,8 +21,10 @@
     <!-- AWS secret key -->
     <sip.cloud.key>AKIAIMXBE56B6CRN6GKA</sip.cloud.key>
     <sip.cloud.key.secret>${env.SIP_CLOUD_KEY_SECRET}</sip.cloud.key.secret>
-    <!-- Time to allow base container to boot up, in milliseconds -->
-    <sip.docker.wait.time>60000</sip.docker.wait.time>
+    <!-- Time to allow containers to boot up, in milliseconds.  Needs
+         to account especially for the time the admin node takes to
+         complete the SIP deployment.  -->
+    <sip.docker.wait.time>1200000</sip.docker.wait.time>
     <!-- Enable Docker Machine configuration by default -->
     <saw.docker.skip.machine>false</saw.docker.skip.machine>
     <!-- SAW Docker environment ports -->
@@ -278,6 +280,24 @@
               </run>
             </image>
             <image>
+              <name>sip-base-maprclient:${project.version}</name>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-base-maprclient</dockerFileDir>
+              </build>
+              <run>
+                <skip>true</skip>
+              </run>
+            </image>
+            <image>
+              <name>sip-app:${project.version}</name>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-app</dockerFileDir>
+              </build>
+              <run>
+                <skip>true</skip>
+              </run>
+            </image>
+            <image>
               <name>sip-admin:${project.version}</name>
               <alias>sip-admin</alias>
               <build>
@@ -327,12 +347,8 @@
                   </bind>
                 </volumes>
                 <wait>
-                  <!-- Wait until the container health check reports
-                       that systemd services are up and running -->
                   <healthy>true</healthy>
-                  <!-- Increase timeout to allow application
-                       deployment to finish -->
-                  <time>1200000</time>
+                  <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
             </image>
@@ -363,7 +379,7 @@
               </run>
             </image>
             <image>
-              <name>sip-base:${project.version}</name>
+              <name>sip-app:${project.version}</name>
               <!-- Note: The node has a suffix "1", because additional
                    SAW nodes might be added for high availability
                    configurations -->
@@ -385,7 +401,7 @@
               </run>
             </image>
             <image>
-              <name>sip-base:${project.version}</name>
+              <name>sip-app:${project.version}</name>
               <alias>sip-saw2</alias>
               <run>
                 <hostname>sip-saw2</hostname>
@@ -446,11 +462,8 @@
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
                 <wait>
-                  <!-- Wait until the container health check reports
-                       that MapR is up and running -->
                   <healthy>true</healthy>
-                  <!-- Increase timeout to allow MapR to start -->
-                  <time>1200000</time>
+                  <time>${sip.docker.wait.time}</time>
                 </wait>
               </run>
             </image>

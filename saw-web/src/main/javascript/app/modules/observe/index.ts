@@ -10,6 +10,12 @@ import { CountoModule } from 'angular2-counto';
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
 
+import {
+  DxDataGridModule,
+  DxDataGridComponent,
+  DxTemplateModule
+} from 'devextreme-angular';
+
 import { MaterialModule } from '../../material.module';
 
 import {
@@ -98,10 +104,17 @@ const components = [
     AddWidgetModule,
     EditWidgetModule,
     UChartModule,
-    CountoModule
+    CountoModule,
+    DxDataGridModule,
+    DxTemplateModule
   ],
   declarations: components,
   entryComponents: components,
+  exports: [
+    DxDataGridModule,
+    DxDataGridComponent,
+    DxTemplateModule
+  ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
     {

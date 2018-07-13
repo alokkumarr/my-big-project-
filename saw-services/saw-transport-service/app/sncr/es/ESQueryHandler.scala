@@ -5,7 +5,7 @@ import java.util.concurrent.{ExecutionException, Future, TimeUnit}
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
-import org.apache.http.HttpResponse
+import org.apache.http.{Header, HttpResponse}
 import org.apache.http.client.HttpResponseException
 import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.client.utils.URIBuilder
@@ -82,6 +82,8 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
           m_log debug s"Add clean query to request: $query2"
           val request: HttpPost = new HttpPost(req_builder.build())
           request.setEntity(new StringEntity(query2))
+          request.setHeader("Content-type","application/json");
+          m_log debug s"Request going to execute: $request"
           httpClient.execute(request, null)
         }
 

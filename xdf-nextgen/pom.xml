@@ -24,7 +24,7 @@
     <!-- Versions  -->
     <jdk.version>1.8</jdk.version>
     <scala.version>2.11</scala.version>
-    <spark-version>2.1.0</spark-version>
+    <spark-version>2.2.1</spark-version>
     <parquet.version>1.8.2</parquet.version>
     <junit.version>4.6</junit.version>
     <date4j.version>1.5.1</date4j.version>
@@ -52,8 +52,8 @@
     <joda.version>2.9.4</joda.version>
     <snappy.version>1.0.4.1</snappy.version>
     <commons-collections.version>3.2.1</commons-collections.version>
-    <mapr.core.version>5.2.0</mapr.core.version>
-    <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+    <mapr.core.version>6.0.1</mapr.core.version>
+    <mapr.hadoop.client.version>2.7.0-mapr-1803</mapr.hadoop.client.version>
     <gson.version>2.2.4</gson.version>
     <!-- XDF package -->
     <!-- RPM properties -->

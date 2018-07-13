@@ -5,6 +5,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
 import * as reduce from 'lodash/fp/reduce';
 import * as filter from 'lodash/fp/filter';
+import * as fpPipe from 'lodash/fp/pipe';
 import * as isEmpty from 'lodash/isEmpty';
 import * as isNumber from 'lodash/isNumber';
 import * as values from 'lodash/values';
@@ -240,9 +241,18 @@ export class FilterService {
         if (!result) {
           return resolve();
         }
-        analysis.sqlBuilder.filters = result.filters.concat(
-          filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
-        );
+        const nonRuntimeFilters = filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters);
+        analysis.sqlBuilder.filters = fpPipe(
+          // block optional runtime filters that have no model
+          filter(({isRuntimeFilter, isOptional, model}) => !(isRuntimeFilter && isOptional && !model)),
+          runtimeFilters => [
+            ...runtimeFilters,
+            ...nonRuntimeFilters
+          ]
+        )(result.filters);
+        // analysis.sqlBuilder.filters = result.filters.concat(
+        //   filter(f => !(f.isRuntimeFilter || f.isGlobalFilter), analysis.sqlBuilder.filters)
+        // );
 
         resolve(analysis);
       });
