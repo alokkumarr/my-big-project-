@@ -103,6 +103,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Input('artifacts')
   set setArtifactColumns(artifacts: Artifact[]) {
     if (!artifacts) {
+      this.artifacts = null;
+      this.columns = null;
       return;
     }
     this.artifacts = artifacts;
