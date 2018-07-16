@@ -13,7 +13,7 @@ import * as get from 'lodash/get';
 import * as truncate from 'lodash/truncate';
 const ERROR_TITLE_LENGTH = 30;
 
-import { ToastService } from '../../../common/services/toastMessage.service';
+import { ToastService } from '../services/toastMessage.service';
 
 @Injectable()
 export class HandleErrorInterceptor implements HttpInterceptor {

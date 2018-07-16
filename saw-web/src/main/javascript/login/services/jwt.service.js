@@ -4,6 +4,7 @@ import * as isArray from 'lodash/isArray';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
+import AppConfig from '../../../../../appConfig';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 
@@ -26,22 +27,17 @@ export const CUSTOM_JWT_CONFIG = {
 };
 
 export class JwtService {
-  constructor($window, AppConfig) {
-    'ngInject';
-
-    this._$window = $window;
-    this._AppConfig = AppConfig;
-
+  constructor() {
     this._refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
   }
 
   set(accessToken, refreshToken) {
-    this._$window.localStorage[this._AppConfig.login.jwtKey] = accessToken;
-    this._$window.localStorage[this._refreshTokenKey] = refreshToken;
+    window.localStorage[AppConfig.login.jwtKey] = accessToken;
+    window.localStorage[this._refreshTokenKey] = refreshToken;
   }
 
   get() {
-    return this._$window.localStorage[this._AppConfig.login.jwtKey];
+    return window.localStorage[AppConfig.login.jwtKey];
   }
 
   getCategories(moduleName = 'ANALYZE') {
@@ -74,7 +70,7 @@ export class JwtService {
   }
 
   getRefreshToken() {
-    return this._$window.localStorage[this._refreshTokenKey];
+    return window.localStorage[this._refreshTokenKey];
   }
 
   validity() {
@@ -82,8 +78,8 @@ export class JwtService {
   }
 
   destroy() {
-    this._$window.localStorage.removeItem(this._AppConfig.login.jwtKey);
-    this._$window.localStorage.removeItem(this._refreshTokenKey);
+    window.localStorage.removeItem(AppConfig.login.jwtKey);
+    window.localStorage.removeItem(this._refreshTokenKey);
   }
 
   parseJWT(jwt) {
@@ -92,7 +88,7 @@ export class JwtService {
     }
     const base64Url = jwt.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
-    return angular.fromJson(this._$window.atob(base64));
+    return angular.fromJson(window.atob(base64));
   }
 
   /* Returs the parsed json object from the jwt token */

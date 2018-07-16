@@ -36,9 +36,11 @@ import {
 } from '../../common/services/ajs-common-providers';
 import { ObserveService } from './services/observe.service';
 
-import { AddTokenInterceptor } from './services/add-token.interceptor';
-import { HandleErrorInterceptor } from './services/handle-error.interceptor';
-import { RefreshTokenInterceptor } from './services/refresh-token.interceptor';
+import {
+  AddTokenInterceptor,
+  HandleErrorInterceptor,
+  RefreshTokenInterceptor
+} from '../../common/interceptor';
 
 import { UChartModule } from '../../common/components/charts';
 

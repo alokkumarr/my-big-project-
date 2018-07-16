@@ -1,4 +1,10 @@
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import {
+  AddTokenInterceptor,
+  HandleErrorInterceptor,
+  RefreshTokenInterceptor
+} from './interceptor';
 import '@uirouter/angular-hybrid';
 import * as angular from 'angular';
 import 'angular-local-storage';
@@ -139,7 +145,8 @@ angular
     DndModule,
     DxPivotGridModule,
     DxDataGridModule,
-    CommonPipesModule
+    CommonPipesModule,
+    HttpClientModule
   ],
   declarations: [
     PivotGridComponent,
@@ -229,6 +236,17 @@ angular
     SearchBoxComponent
   ],
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HandleErrorInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RefreshTokenInterceptor,
+      multi: true
+    },
     ErrorDetailService,
     ErrorDetailDialogService,
     toastProvider,
