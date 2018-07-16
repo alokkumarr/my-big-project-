@@ -595,7 +595,7 @@ export class DesignerContainerComponent {
       break;
     case 'chartTitle':
       if (!event.data) return;
-      (<any>this.analysis).chartTitle = event.data.title;
+      this.analysis.chartTitle = event.data.title;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
