@@ -39,7 +39,7 @@ sip_package_install <- function(packages,
     }
 
     if(update) {
-      install.packages(pck, lib = lib_path, dependencies = dependecies, repos = repo)
+      try(install.packages(pck, lib = lib_path, dependencies = dependecies, repos = repo), TRUE)
     }
   }
 }
