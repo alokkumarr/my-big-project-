@@ -5,6 +5,7 @@ import java.util.concurrent.{ExecutionException, TimeoutException}
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue}
 import exceptions.{ErrorCodes, RTException}
+import org.apache.commons.lang.exception.ExceptionUtils
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsObject, Json}
 
@@ -281,7 +282,10 @@ abstract class EventHandler {
      }
 
       f onSuccess{ case _ => m_log trace "Sent message successfully to queue: " + eventSender.queue }
-      f onFailure{ case _ => m_log error "Could not sent message to queue: " + eventSender.queue }
+      f onFailure{
+        case ex => m_log error "Could not send message to queue: " + eventSender.queue +
+        " " + ex.getMessage; m_log.debug(ExceptionUtils.getStackTrace(ex))
+      }
 
   }
 

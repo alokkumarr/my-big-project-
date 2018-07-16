@@ -198,7 +198,7 @@ public class SemanticServiceImpl implements SemanticService {
         filters.add(filterMetricName);
       }
       Filter filterProjectCode = new Filter();
-      if (node.getMetricName() != null) {
+      if (node.getProjectCode() != null) {
         filterProjectCode.setFieldPath("projectCode");
         filterProjectCode.setCondition(Condition.EQ);
         filterProjectCode.setValue(node.getProjectCode());

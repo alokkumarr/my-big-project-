@@ -40,6 +40,10 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   
   @Autowired
   private StorageConnectorService storageConnectorService;
+  
+  @Autowired
+  private StorageProxyMetaDataService storageProxyMetaDataService;
+  
 
   private int size;
 
@@ -287,6 +291,20 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               // TODO: Execute Query or perform create, delete, update operation & Prepare response based on the specification (either JSON or Tabular)  
               // TODO: Convert data either into tabular or JSON
           
+          case  "METADATA":
+                     String actionMetadata = proxy.getAction().value();
+                     if (actionMetadata.equals(Action.CREATE.value()) || actionMetadata.equals(Action.READ.value()) || actionMetadata.equals(Action.UPDATE.value()) 
+                         || actionMetadata.equals(Action.DELETE.value())){
+                       switch (actionMetadata) {
+                         case "create" : proxy= storageProxyMetaDataService.createEntryInMetaData(proxy); break;
+                         case "update" : proxy= storageProxyMetaDataService.updateEntryFromMetaData(proxy);break;
+                         case "delete" : proxy= storageProxyMetaDataService.deleteEntryFromMetaData(proxy);break;
+                         case "read" :   proxy= storageProxyMetaDataService.readEntryFromMetaData(proxy);break;
+                       }
+                     }
+                     else {
+                       proxy.setStatusMessage("This "+actionMetadata+" is not yet supported by StorageType :" + storageType);
+                     }
         } // end of switch statement
     response = StorageProxyUtils.prepareResponse(proxy, proxy!=null? proxy.getStatusMessage():"data is retrieved.");
     } // end of schema validation if block

@@ -17,7 +17,7 @@ rtis_env=${app_home}/conf/rtis.env
 {
     echo "BDA_HOME=/opt/bda"
     echo "RTIS_HOME=/opt/bda/rtis"
-    echo "RTIS_PORT=9100"
+    echo "RTIS_PORT=9950"
     echo "declare -r RTIS_USER=rtis-user"
     echo "declare -r RTIS_CURRENT_HOME=${app_home}"
 } >$rtis_env

@@ -40,7 +40,8 @@ class LogMessageHandler(val cid: String, logType: String ) {
       }
 
     f onSuccess{ case _ => m_log trace ("Sent message successfully to queue: {}", myLogMessageSender.queue) }
-    f onFailure{ case _ => m_log error ("Could not sent message to queue: {}", myLogMessageSender.queue) }
+    f onFailure{ case _ => m_log error ("Could not send message to queue: {}", myLogMessageSender
+      .queue) }
 
   }
 
