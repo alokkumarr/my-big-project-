@@ -24,12 +24,15 @@ const INVERTING_OPTIONS = [
 export class DesignerSettingsAuxChartComponent implements OnInit {
   @Input() chartType: string;
   @Input() isInverted: boolean;
+  @Input() chartTitle: string;
 
   @Output() change = new EventEmitter();
 
   showLegendOpts: boolean;
   showLabelOpts: boolean = true;
   showInversion: boolean;
+
+  EditMode: false;
 
   @Input() labelOptions: { enabled: boolean; value: string };
 
@@ -97,6 +100,16 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
           align: this.legend.align,
           layout: this.legend.layout
         }
+      }
+    });
+  }
+
+  onTitleChange() {
+    this.EditMode = false;
+    this.change.emit({
+      subject: 'chartTitle',
+      data: {
+        title: this.chartTitle
       }
     });
   }

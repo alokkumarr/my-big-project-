@@ -10,6 +10,7 @@
                          [auxSettings]="auxSettings"
                          [analysisType]="analysisType"
                          [analysisSubtype]="analysisSubtype"
+                         [chartTitle]="chartTitle"
                          (change)="change.emit($event)"></designer-settings-aux>
 
   <ng-container [ngSwitch]="analysisType">
