@@ -19,7 +19,7 @@ doc <- "Usage: sip-r-package-install.R [options] [-h]
 
 # Pre-requistes - requires R prerequisite packages installed
 required_packages <- c('docopt', 'jsonlite', 'devtools')
-installed_packages <- rownames(installed.packages(lib_path))
+installed_packages <- rownames(installed.packages())
 
 for(p in required_packages){
   if(! p %in% installed_packages){
@@ -43,6 +43,7 @@ for(pck in names(r_packages)) {
   devtools::install_version(package = pck,
                             version = r_packages[[pck]],
                             repos = repo,
+                            lib = r_lib_path,
                             dependencies = .dependencies)
   cat(format(Sys.time(), "%c"), "-", pck, "install completed\n\n")
 }
