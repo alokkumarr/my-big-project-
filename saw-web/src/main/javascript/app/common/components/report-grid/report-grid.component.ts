@@ -144,7 +144,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         load: options => this.dataLoader(options)
       });
       this.remoteOperations = { paging: true };
-      this.paging = { pageSize: this.pageSize };
+      /* Reset pager after a new dataLoader is set */
+      this.paging = { pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
     } else {
       throw new Error('Data loader requires a Function');
     }
