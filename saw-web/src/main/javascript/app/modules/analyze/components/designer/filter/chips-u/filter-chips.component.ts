@@ -79,7 +79,7 @@ export class FilterChipsComponent {
 
     } else if (DATE_TYPES.includes(type)) {
       if (preset === CUSTOM_DATE_PRESET_VALUE) {
-        return `: From ${lte} To ${gte}`;
+        return `: From ${gte} To ${lte}`;
       }
       return `: ${preset}`;
     }
