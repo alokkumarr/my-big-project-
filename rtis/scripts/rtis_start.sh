@@ -8,6 +8,9 @@ declare RTIS_PORT
 
 source /etc/bda/rtis.env || exit
 
+# Set HADOOP_HOME
+export HADOOP_HOME=/opt/mapr/hadoop/hadoop-2.7.0
+
 declare -r THIS_FILE_PATH="$0"
 declare -r THIS_FILE_NAME="${THIS_FILE_PATH##*/}"
 declare -r THIS_FILE_DIR="$( /usr/bin/dirname $THIS_FILE_PATH )"
@@ -211,5 +214,5 @@ exit
 # $ JAVA_OPTS=-Dconfig.file=$CFG_FNM this-script-command
 
 ## To check service:
-# curl -qsS http://localhost:9100/sr
+# curl -qsS http://localhost:9950/sr
 #

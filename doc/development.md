@@ -152,7 +152,7 @@ To edit the sample report metric and data in a running container,
 execute the following commands:
 
         $ docker exec -it sip-admin bash
-        $ cd /root/saw-metrics/sample-spark
+        $ cd /root/saw-analyze-samples/sample-spark
         $ vi data.ndjson
         $ vi semantic.json
         $ ./load-metric
@@ -178,7 +178,7 @@ To edit the sample pivot/chart metric and data in a running container,
 execute the following commands:
 
         $ docker exec -it sip-admin bash
-        $ cd /root/saw-metrics/sample-elasticsearch
+        $ cd /root/saw-analyze-samples/sample-elasticsearch
         $ vi data-*.json
         $ vi semantic.json
         $ ./load-metric

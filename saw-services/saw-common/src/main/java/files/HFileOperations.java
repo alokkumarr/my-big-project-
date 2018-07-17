@@ -118,6 +118,18 @@ public class HFileOperations {
         fs.mkdirs(path);
     }
 
+    public static void rename(String src, String dest) throws IOException {
+        Configuration conf = new Configuration();
+        FileSystem fs = getFileSystem(new Path(src), conf);
+        fs.rename(new Path(src), new Path(dest));
+    }
+
+    public static boolean exists(String path) throws IOException {
+        Configuration conf = new Configuration();
+        FileSystem fs = getFileSystem(new Path(path), conf);
+        return fs.exists(new Path(path));
+    }
+
     public static String[] listJarFiles(String directoryLocation, final String fileExtension) {
         String[] jarFiles = null;
         File jars = new File(directoryLocation);

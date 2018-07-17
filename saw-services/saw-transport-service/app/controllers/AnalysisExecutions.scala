@@ -46,9 +46,9 @@ class AnalysisExecutions extends BaseController {
             false
           }
           else {
-            if (esReportHistoryCount<=execHistory)
+            if (esReportHistoryCount<execHistory)
               {
-                esReportHistoryCount+=1
+                if(!excludeOneTimeExecution(result._4.get,result._5.get)) esReportHistoryCount+=1
                 !excludeOneTimeExecution(result._4.get,result._5.get)
               }
             else false
@@ -202,7 +202,7 @@ class AnalysisExecutions extends BaseController {
       if (result._1 !=None && result._2!=None && result._2.equalsIgnoreCase("esReport"))
         {
            val valid =  result._1 match {
-            case "oneTime" => true
+            case "onetime" => true
             case "preview" => true
             case "scheduled" => false
             case "regularExecution" => true

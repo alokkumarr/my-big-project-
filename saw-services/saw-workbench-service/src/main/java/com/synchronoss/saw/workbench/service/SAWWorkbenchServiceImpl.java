@@ -73,7 +73,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   private String tmpDir = null;
   private DLMetadata mdt = null;
   private DataSetStore mdtStore =null;
-  private String prefix = "maprfs";
+  private String prefix = "/";
 
   
   @PostConstruct

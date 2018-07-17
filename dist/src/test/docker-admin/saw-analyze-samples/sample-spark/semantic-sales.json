@@ -24,7 +24,7 @@
         ]
       },
       "dl-locations": [
-        "/saw-metrics/sample-spark/data-sales.ndjson"
+        "/var/sip/services/saw-analyze-samples/sample-spark/data-sales.ndjson"
       ]
     }
   }
