@@ -98,8 +98,15 @@ test_that("Segmenter set final model options work as expected", {
     train_models() %>%
     evaluate_models()
 
-  s1_best <- set_final_model(s1, method = "best", refit = TRUE)
-  s1_man <- set_final_model(s1, method = "manual", id = s1$models[[1]]$id, refit = TRUE)
+  s1_best <- set_final_model(s1,
+                             method = "best",
+                             reevaluate = FALSE,
+                             refit = TRUE)
+  s1_man <- set_final_model(s1,
+                            method = "manual",
+                            id = s1$models[[1]]$id,
+                            reevaluate = FALSE,
+                            refit = TRUE)
 
   expect_subset("spark_ml", class(s1_best$final_model))
   expect_equal(get_evalutions(s1_best) %>%

@@ -72,11 +72,13 @@ test_that("Regressor Predicts New Data consistent with Method", {
 
 
   r2 <- ml_linear_regression(df, formula = "mpg~.")
-  p2 <- predict(r2, newdata = df)
+  p2 <- sparklyr::sdf_predict(df, r2)
 
   expect_class(p1, "predictions")
   expect_equal(p1$predictions %>%
                  collect() %>%
                  pull(predicted),
-               as.numeric(p2))
+               p2 %>%
+                 collect() %>%
+                 pull(prediction))
 })
