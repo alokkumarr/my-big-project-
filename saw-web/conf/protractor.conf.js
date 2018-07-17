@@ -1,11 +1,12 @@
-const webpackHelper = require('./webpack.helper');
+var appRoot = require('app-root-path');
+const webpackHelper = require(appRoot + '/conf/webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-const generate = require('../src/test/javascript/data/generateTestData');
+const generate = require(appRoot + '/src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var HtmlReporter = require('protractor-beautiful-reporter');
-var appRoot = require('app-root-path');
+
 /**
  * Note about intervals:
  * Defined to be dependent on environment where tests are executed. Running against distribution package in CI requires
@@ -150,27 +151,28 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
-    // root: [
-    //   webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'), // TCs linked
-    //   webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'), // TCs linked
-    //   webpackHelper.root(testDir + '/e2e-tests/createReport.test.js') // TCs linked
-    // ],
-    // charts: [
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'), // TCs linked
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'), // TCs linked
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js') // TCs linked
-    // ],
-    // chartEditFork: [
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/editAndDeleteCharts.test.js'),
-    //   webpackHelper.root(testDir + '/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js')
-    // ],
-    // filters: [
-    //   webpackHelper.root(testDir + '/e2e-tests/promptFilters.test.js') // TCs linked //Takes lot of time to execute
-    // ],
-    // pivots: [
-    //   webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js') // TCs linked
-    // ],
-    authentication: [appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    root: [
+      appRoot + '/src/test/e2e-tests/priviliges.test.js',
+      appRoot + '/src/test/e2e-tests/analyze.test.js',
+      appRoot + '/src/test/e2e-tests/createReport.test.js'
+    ],
+    charts: [
+      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    ],
+    chartEditFork: [
+      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    ],
+    filters: [
+      appRoot + '/src/test/e2e-tests/promptFilters.test.js'
+    ],
+    pivots: [
+      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    ],
+    authentication: [
+      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
     ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
