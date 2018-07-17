@@ -141,7 +141,7 @@ export class ExecutedViewComponent implements OnInit {
           null
         );
       } else {
-        this.executeAnalysis(analysis);
+        this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
       }
     }
   }
@@ -225,8 +225,8 @@ export class ExecutedViewComponent implements OnInit {
     };
   }
 
-  executeAnalysis(analysis) {
-    this._analyzeActionsService.execute(analysis).then(executionStarted => {
+  executeAnalysis(analysis, mode) {
+    this._analyzeActionsService.execute(analysis, mode).then(executionStarted => {
       // this.afterExecuteLaunched(analysis);
       if (!executionStarted && !this.analyses) {
         // at least load the executed analyses if none are loaded
@@ -420,7 +420,7 @@ export class ExecutedViewComponent implements OnInit {
         this.analysis = analysis;
       }
       if (requestExecution) {
-        this.executeAnalysis(analysis);
+        this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
       }
     });
   }

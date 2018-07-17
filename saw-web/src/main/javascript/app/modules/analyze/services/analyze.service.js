@@ -262,6 +262,7 @@ export class AnalyzeService {
 
   updateAnalysis(model) {
     delete model.isScheduled;
+    delete model.executionType;
     const payload = this.getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
@@ -325,12 +326,6 @@ export class AnalyzeService {
   saveReport(model) {
     model.saved = true;
     const updatePromise = this.updateAnalysis(model);
-
-    updatePromise.then(analysis => {
-      return this.applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(({data}) => {
-        return {analysis, data};
-      });
-    });
     return updatePromise;
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
@@ -6,7 +6,7 @@ import * as isUndefined from 'lodash/isUndefined';
 import * as findIndex from 'lodash/findIndex';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { JwtService } from '../../../../login/services/jwt.service';
-import { AnalyzeService } from '../services/analyze.service';
+import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { AnalyzeNewDialogComponent } from './new-dialog';
@@ -90,7 +90,7 @@ export class AnalyzeViewComponent implements OnInit {
         this.spliceAnalyses(analysis, true);
       }
       if (requestExecution) {
-        this._executeService.executeAnalysis(analysis);
+        this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
       }
       break;
     case 'delete':

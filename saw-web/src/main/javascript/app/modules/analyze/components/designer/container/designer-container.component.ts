@@ -369,6 +369,7 @@ export class DesignerContainerComponent {
             analysis: result.analysis
           });
           this.isInDraftMode = false;
+          this.requestDataIfPossible();
         }
       });
       break;
