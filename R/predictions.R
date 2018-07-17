@@ -11,7 +11,7 @@ new_predictions <- function(predictions,
   checkmate::assert_character(id)
   checkmate::assert_character(desc)
   checkmate::assert_choice(type,
-                           c("forecaster", "segmenter", "regresser", "classifier"))
+                           c("forecaster", "segmenter", "regressor", "classifier"))
 
   structure(
     list(

@@ -58,6 +58,7 @@ test_that("Classifier Selects Best Model", {
   expect_subset(
     c1$final_model$id,
     c1$evaluate %>%
+      filter(sample == "validation") %>%
       top_n(1, auc) %>%
       pull(model)
   )

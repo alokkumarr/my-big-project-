@@ -47,7 +47,7 @@ fitted.ml_decision_tree_classification_model <- function(obj) {
 predict.spark_ml <- function(obj, data, ...) {
   checkmate::assert_class(data, "tbl_spark")
   sparklyr::sdf_predict(data, obj$fit, ...) %>%
-    select(index, predicted = prediction, features)
+    select(index, predicted = prediction)
 }
 
 
@@ -112,13 +112,13 @@ evaluate.spark_ml_clustering <- function(mobj, measure) {
 #' @export
 evaluate.spark_ml_classification <- function(mobj, measure) {
 
-
-  mobj$evaluate <- purrr::map(mobj$performance,
-                              ~ purrr::map(., ~ inner_join(., mobj$pipe$output %>%
-                                                             select_at(
-                                                               c(mobj$target, mobj$index_var)
-                                                             ),
-                                                           by = mobj$index_var))) %>%
+  mobj$evaluate <- purrr::map(
+    mobj$performance,
+    ~ purrr::map(., ~ inner_join(., mobj$pipe$output %>%
+                                   select_at(
+                                     c(mobj$target, mobj$index_var)
+                                   ),
+                                 by = mobj$index_var))) %>%
     purrr::map_df(.,
                   ~ purrr::map_df(
                     .,
@@ -135,6 +135,33 @@ evaluate.spark_ml_classification <- function(mobj, measure) {
   mobj
 }
 
+
+#' Evaluate Method for Spark-ML Regression Object
+#' @rdname evaluate
+#' @export
+evaluate.ml_model_regression <- function(mobj, measure) {
+
+  mobj$evaluate <- purrr::map(
+    mobj$performance,
+    ~ purrr::map(., ~ inner_join(.,
+                                 mobj$pipe$output %>%
+                                   select_at(c(mobj$target, mobj$index_var)),
+                                 by = mobj$index_var))) %>%
+    purrr::map_df(.,
+                  ~ purrr::map_df(
+                    .,
+                    match.fun(measure$method),
+                    predicted = "predicted",
+                    actual = mobj$target
+                  ),
+                  .id = "indicie") %>%
+    tidyr::gather(key = "sample", value = "value", -indicie) %>%
+    dplyr::rename_(.dots = setNames("value", measure$method)) %>%
+    dplyr::mutate(model = mobj$id) %>%
+    dplyr::select_at(c("model", "sample", "indicie", measure$method))
+
+  mobj
+}
 
 
 #' Summary Method for Spark-ML Object
