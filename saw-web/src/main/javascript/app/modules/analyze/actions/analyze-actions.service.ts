@@ -110,7 +110,6 @@ export class AnalyzeActionsService {
           .afterClosed()
           .subscribe(analysis => {
             if (analysis) {
-              console.log(analysis);
               const execute = true;
               this._headerProgress.show();
               this._publishService.publishAnalysis(analysis, execute, type).then(

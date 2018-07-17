@@ -11,7 +11,6 @@ export class PublishService {
   ) {}
 
   publishAnalysis(model, execute = false, type) {
-    console.log(model, execute, type);
     if (type === 'schedule') {
       this._analyzeService.changeSchedule(model);  
     }
