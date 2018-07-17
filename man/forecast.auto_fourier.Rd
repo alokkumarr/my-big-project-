@@ -4,7 +4,7 @@
 \alias{forecast.auto_fourier}
 \title{Forecast Auto Fourier Arima model for univariate time series}
 \usage{
-forecast.auto_fourier(object, h = 10, xreg = NULL, frequency,
+\method{forecast}{auto_fourier}(object, h = 10, xreg = NULL, frequency,
   level = c(80, 95), ...)
 }
 \arguments{
