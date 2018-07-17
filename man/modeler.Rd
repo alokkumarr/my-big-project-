@@ -11,9 +11,9 @@ modeler(df, target, type, name = NULL, id = NULL, version = NULL,
 \item{df}{dataframe with target variable and any potential predictors}
 
 \item{target}{target variable for supervised use cases such as forecaster,
-regresser, and classifier}
+regressor, and classifier}
 
-\item{type}{type of use case (forecaster, regresser, classifier, and
+\item{type}{type of use case (forecaster, regressor, classifier, and
 segmenter)}
 
 \item{name}{optional name for use case. Default is to append target with type}
@@ -37,9 +37,10 @@ modeler object
 \description{
 Function to create a valid modeler object to support model building use
 cases. Modeler is the base class from which the other more specific use cases
-like forecaster, regresser, segmenter, etc... inherit form
+like forecaster, regressor, segmenter, etc... inherit form
 }
 \seealso{
 Other use cases: \code{\link{new_classifier}},
-  \code{\link{new_forecaster}}, \code{\link{new_segmenter}}
+  \code{\link{new_forecaster}},
+  \code{\link{new_regressor}}, \code{\link{new_segmenter}}
 }

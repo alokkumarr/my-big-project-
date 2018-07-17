@@ -37,18 +37,36 @@ fitted.spark_ml <- function(obj) {
 #' @export
 fitted.ml_decision_tree_classification_model <- function(obj) {
   sparklyr::sdf_predict(mobj$fit, mobj$pipe$output) %>%
-    dplyr::select(index, predicted = prediction, features)
+    dplyr::select(index, predicted = prediction)
 }
 
 
-#' Predict Method for Spark-ML Object
+
+#' Predict Method for Spark-ML Clustering Object
 #' @rdname predict
 #' @export
-predict.spark_ml <- function(obj, data, ...) {
+predict.spark_ml_clustering <- function(obj, data, ...) {
   checkmate::assert_class(data, "tbl_spark")
   sparklyr::sdf_predict(data, obj$fit, ...) %>%
     select(index, predicted = prediction, features)
 }
+
+
+#' Predict Method for Spark-ML Classification Object
+#' @rdname predict
+#' @export
+predict.spark_ml_classification <- function(obj, data, ...) {
+  checkmate::assert_class(data, "tbl_spark")
+  sparklyr::sdf_predict(data, obj$fit, ...) %>%
+    select(index, predicted = prediction)
+}
+
+
+#' Predict Method for Spark-ML Regression Object
+#' @rdname predict
+#' @export
+predict.ml_model_regression <- predict.spark_ml_classification
+
 
 
 #' Train Method for Spark-ML Object
@@ -112,13 +130,13 @@ evaluate.spark_ml_clustering <- function(mobj, measure) {
 #' @export
 evaluate.spark_ml_classification <- function(mobj, measure) {
 
-
-  mobj$evaluate <- purrr::map(mobj$performance,
-                              ~ purrr::map(., ~ inner_join(., mobj$pipe$output %>%
-                                                             select_at(
-                                                               c(mobj$target, mobj$index_var)
-                                                             ),
-                                                           by = mobj$index_var))) %>%
+  mobj$evaluate <- purrr::map(
+    mobj$performance,
+    ~ purrr::map(., ~ inner_join(., mobj$pipe$output %>%
+                                   select_at(
+                                     c(mobj$target, mobj$index_var)
+                                   ),
+                                 by = mobj$index_var))) %>%
     purrr::map_df(.,
                   ~ purrr::map_df(
                     .,
@@ -135,6 +153,11 @@ evaluate.spark_ml_classification <- function(mobj, measure) {
   mobj
 }
 
+
+#' Evaluate Method for Spark-ML Regression Object
+#' @rdname evaluate
+#' @export
+evaluate.ml_model_regression <- evaluate.spark_ml_classification
 
 
 #' Summary Method for Spark-ML Object

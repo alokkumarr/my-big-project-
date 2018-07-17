@@ -12,7 +12,7 @@ new_classifier(df, target, name = NULL, id = NULL, version = NULL,
 \item{df}{dataframe with target variable and any potential predictors}
 
 \item{target}{target variable for supervised use cases such as forecaster,
-regresser, and classifier}
+regressor, and classifier}
 
 \item{name}{optional name for use case. Default is to append target with type}
 
@@ -34,5 +34,6 @@ Creates a classifier object which inherits from modeler class
 }
 \seealso{
 Other use cases: \code{\link{modeler}},
-  \code{\link{new_forecaster}}, \code{\link{new_segmenter}}
+  \code{\link{new_forecaster}},
+  \code{\link{new_regressor}}, \code{\link{new_segmenter}}
 }

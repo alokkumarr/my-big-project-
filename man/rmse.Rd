@@ -14,4 +14,12 @@ rmse(...)
 }
 \description{
 Generic rmse function
+
+rmse.tbl_spark <- function(x, predicted, actual){
+  checkmate::assert_choice(predicted, colnames(x))
+  checkmate::assert_choice(actual, colnames(x))
+  x %>%
+    dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
+    dplyr::collect()
+}
 }

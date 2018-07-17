@@ -32,7 +32,7 @@ measure <- function(id,
   checkmate::assert_character(method)
   checkmate::assert_list(method_args)
   checkmate::assert_subset(properties,
-                           c("modeler","forecaster", "regresser", "classifier", "segmenter"))
+                           c("modeler","forecaster", "regressor", "classifier", "segmenter"))
   checkmate::assert_character(name)
   checkmate::assert_flag(minimize)
 
@@ -122,8 +122,8 @@ match_measure_method <- function(obj) {
 }
 
 
-# Measures----------------------------------------------------------------
 
+# RMSE --------------------------------------------------------------------
 
 
 #' @export RMSE
@@ -134,7 +134,7 @@ RMSE <- measure(id = "RMSE",
                 minimize = TRUE,
                 best = 0,
                 worst = Inf,
-                properties = c("modeler", "regresser","forecaster"),
+                properties = c("modeler", "regressor","forecaster"),
                 name = "Root mean squared error",
                 note = "The RMSE is aggregated as sqrt(mean((predicted - actual)^2))")
 
@@ -155,17 +155,32 @@ rmse.data.frame <- function(x, predicted, actual){
 }
 
 
-#' @importFrom magrittr %>%
+
+#' rmse.tbl_spark <- function(x, predicted, actual){
+#'   checkmate::assert_choice(predicted, colnames(x))
+#'   checkmate::assert_choice(actual, colnames(x))
+#'   x %>%
+#'     dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
+#'     dplyr::collect()
+#' }
+
+
 #' @export
 #' @rdname rmse
-rmse.tbl_spark <- function(x, predicted, actual){
+rmse.tbl_spark <- function(x, predicted, actual) {
   checkmate::assert_choice(predicted, colnames(x))
   checkmate::assert_choice(actual, colnames(x))
-  x %>%
-    dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
-    dplyr::collect()
+
+  sparklyr::ml_regression_evaluator(
+    x,
+    label_col = actual,
+    prediction_col = predicted,
+    metric_name = "rmse"
+  )
 }
 
+
+# MAPE --------------------------------------------------------------------
 
 
 #' @export MAPE
@@ -176,7 +191,7 @@ MAPE <- measure(id = "MAPE",
                 minimize = TRUE,
                 best = 0,
                 worst = Inf,
-                properties = c("modeler", "regresser", "forecaster"),
+                properties = c("modeler", "regressor", "forecaster"),
                 name = "Mean Absolute Percentage Error",
                 note = "The MAPE is defined as abs(actual - predicted) / actual")
 
@@ -210,6 +225,12 @@ mape.tbl_spark <- function(x, predicted, actual){
 }
 
 
+
+
+# Slihouette --------------------------------------------------------------
+
+
+
 #' @export Silhouette
 #' @rdname measures
 Silhouette <- measure(id = "Silhouette",
@@ -236,6 +257,10 @@ silhouette.tbl_spark <- function(x, predicted = "predicted") {
 
   sparklyr::ml_clustering_evaluator(x, prediction_col = predicted)
 }
+
+
+
+# AUC ---------------------------------------------------------------------
 
 
 #' @export AUC

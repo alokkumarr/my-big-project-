@@ -58,6 +58,7 @@ test_that("Classifier Selects Best Model", {
   expect_subset(
     c1$final_model$id,
     c1$evaluate %>%
+      filter(sample == "validation") %>%
       top_n(1, auc) %>%
       pull(model)
   )
@@ -157,8 +158,15 @@ test_that("Classifier set final model options work as expected", {
     train_models() %>%
     evaluate_models()
 
-  c1_best <- set_final_model(c1, method = "best", refit = TRUE)
-  c1_man <- set_final_model(c1, method = "manual", id = c1$models[[1]]$id, refit = TRUE)
+  c1_best <- set_final_model(c1,
+                             method = "best",
+                             reevaluate = FALSE,
+                             refit = TRUE)
+  c1_man <- set_final_model(c1,
+                            method = "manual",
+                            id = c1$models[[1]]$id,
+                            reevaluate = FALSE,
+                            refit = TRUE)
 
   expect_subset("spark_ml", class(c1_best$final_model))
   expect_equal(get_evalutions(c1_best) %>%
@@ -181,14 +189,14 @@ test_that("Classifier train model works on additional models", {
               method = "ml_logistic_regression") %>%
     train_models() %>%
     evaluate_models() %>%
-    set_final_model(., method = "best", refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
 
   c2 <- c1 %>%
     add_model(pipe = NULL,
               method = "ml_decision_tree_classifier") %>%
     train_models() %>%
     evaluate_models() %>%
-    set_final_model(., method = "best", refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
 
   expect_equal(c1$models[[1]]$fit$coefficients,
                c2$models[[1]]$fit$coefficients)
