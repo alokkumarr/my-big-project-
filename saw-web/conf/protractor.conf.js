@@ -25,19 +25,19 @@ const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 30000;
  */
 
 const implicitlyWait = webpackHelper.distRun() ? 600000 : 20000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 30000; // = 30 sec; Sometimes element will not
+const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 1200000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 600000 : 20000;
+const fluentWait = webpackHelper.distRun() ? 600000 : 20000;//20000
 
 /**
  * Default time to wait in ms before a test fails
  * Fixes error: jasmine default timeout interval
  */
-const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 20000;
+const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 600000;//20000
 // = 30 | 5 min. Sometimes test can execute for a long time
 const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 600000;
 
