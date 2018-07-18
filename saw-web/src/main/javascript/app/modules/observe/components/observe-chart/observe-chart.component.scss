@@ -1,0 +1,17 @@
+.toggle-grid dx-data-grid .dx-datagrid {
+  .dx-datagrid-rowsview .dx-datagrid-content table tbody tr td {
+    text-align: left !important;
+  }
+
+  .dx-datagrid-headers .dx-datagrid-content table tbody tr td {
+    text-align: left !important;
+  }
+
+  .dx-datagrid-pager {
+    padding-top: 2px !important;
+  }
+}
+
+.scroll-widget {
+  overflow: scroll;
+}

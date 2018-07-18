@@ -4,7 +4,7 @@ play.crypto.secret="changeme"
 play.crypto.secret=${?APPLICATION_SECRET}
 
 # Port must be passed to play as CMD parameter, THERE IS NO DEFAULT VALUE
-http.port=9100
+http.port=9950
 
 play.i18n.langs = [ "en" ]
 play.modules.enabled += "play.modules.swagger.SwaggerModule"
@@ -47,6 +47,26 @@ mapping = [
 ####
     
 ]
+
+genericlog = {
+   mapping = [
+   ### Sample configuration
+   ###{
+   ###    customer = c
+   ###    logtype = l
+   ###    topic = data
+   ###    queue = bda/data/streams/rta-pc_bt
+   ###    class = mapr.streaming.LogMessageHandler
+   ###    bootstrap.servers = "localhost:9092"
+   ###    batch.size = 16384
+   ###    key.serializer = org.apache.kafka.common.serialization.StringSerializer
+   ###    value.serializer = org.apache.kafka.common.serialization.StringSerializer
+   ###    block.on.buffer.full = true
+   ###    timeout.ms = 30000
+   ###    heartbeat.ms = 1000
+   ###}
+    ]
+}
 
 stream.file.location=/var/bda/rtis/run/stream.${http.port}.dump
 

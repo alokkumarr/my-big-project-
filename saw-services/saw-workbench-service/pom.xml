@@ -25,8 +25,9 @@
 		<json-core>1.2.5</json-core>
     	<jjwt.version>0.7.0</jjwt.version>
 		<metadata.api>${revision}</metadata.api>
-		<mapr.db.version>5.2.0-mapr</mapr.db.version>
- 	</properties>
+		<mapr.db.version>6.0.1-mapr</mapr.db.version>
+    <jjwt.version>0.7.0</jjwt.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -234,13 +235,13 @@
 		<dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.11</artifactId>
-      <version>2.1.0</version>
+      <version>2.2.1</version>
       <scope>provided</scope>
     </dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-sql_2.11</artifactId>
-			<version>2.1.0</version>
+			<version>2.2.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -258,6 +259,12 @@
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
       <version>${jjwt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-client</artifactId>
+      <version>2.7.0-mapr-1803</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 	<build>

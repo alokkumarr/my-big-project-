@@ -78,6 +78,16 @@
          },
          "fielddata":true
       },
+      "SOURCE_MANUFACTURER":{
+         "type":"text",
+         "fields":{
+            "raw":{
+               "type":"keyword"
+            }
+         },
+         "fielddata":true
+      },
+      
       "END_CLIENT_COUNTRY":{
          "type":"text",
          "fields":{

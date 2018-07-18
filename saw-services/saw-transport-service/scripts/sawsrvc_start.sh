@@ -132,7 +132,7 @@ declare lib_classpath=$(
     $lib_dir
   )
 
-for j in `ls /opt/mapr/spark/spark-2.1.0/jars/*.jar`; do
+for j in `ls /opt/mapr/spark/spark-2.2.1/jars/*.jar`; do
  lib_classpath=${lib_classpath}:"${j}"
 done
 lib_classpath=${lib_classpath}:$(mapr classpath)
@@ -150,7 +150,7 @@ declare -r java_args=$( echo \
     -Dpidfile.path=$pidfile_path \
     -Duser.dir=${user_dir} \
     -Daggr.es.size=1000 \
-    -Durl=http://$(hostname -f):9201/ \
+    -Durl=http://localhost:9800/ \
     -Djava.library.path=/opt/mapr/lib \
     -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
     -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \

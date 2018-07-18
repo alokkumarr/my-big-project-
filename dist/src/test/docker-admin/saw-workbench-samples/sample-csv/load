@@ -8,8 +8,7 @@ dir=$(dirname $0)
 
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
-hadoop_mkdir="hadoop fs -mkdir -p"
-datalake_raw=/main/raw
+datalake_raw=/var/sip/raw
 
 wait_maprfs() {
     # The MapR container might still be starting up, so wait until MapR-FS
@@ -45,4 +44,3 @@ wait_maprfs
 init_datalake
 load_data
 create_project_dirs
-
