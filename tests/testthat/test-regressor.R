@@ -82,3 +82,29 @@ test_that("Regressor Predicts New Data consistent with Method", {
                  collect() %>%
                  pull(prediction))
 })
+
+
+test_that("Regressor Works with add_model_grid", {
+
+  enet_parm <- c(0, .5, 1)
+  lambda <- c(.1, .01, .001)
+
+  r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
+    add_default_samples() %>%
+    add_model_grid(pipe = NULL,
+                   method = "ml_linear_regression",
+                   elastic_net_param = enet_parm,
+                   reg_param = lambda) %>%
+    train_models() %>%
+    evaluate_models() %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  param_grid <- expand.grid(elastic_net_param = enet_parm, reg_param = lambda)
+  expect_equal(length(r1$models), nrow(param_grid))
+  for(i in 1:nrow(param_grid)){
+    expect_equal(r1$models[[i]]$method_args[[1]], param_grid[i,1])
+    expect_equal(r1$models[[i]]$method_args[[2]], param_grid[i,2])
+    expect_equal(r1$models[[i]]$fit$model$param_map$elastic_net_param, param_grid$elastic_net_param[i])
+    expect_equal(r1$models[[i]]$fit$model$param_map$reg_param, param_grid$reg_param[i])
+  }
+})

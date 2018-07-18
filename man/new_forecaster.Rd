@@ -2,6 +2,7 @@
 % Please edit documentation in R/forecaster.R
 \name{new_forecaster}
 \alias{new_forecaster}
+\alias{forecaster}
 \title{Forecaster Constructer Function}
 \usage{
 new_forecaster(df, target, index_var, unit = NULL, frequency = NULL,
@@ -20,8 +21,8 @@ either sequential numeric, date or datetime.}
 \item{frequency}{seasonaly frequency of target. Default is NULL - no
 seasonality}
 
-\item{prediction_conf_levels}{prediction confidence levels. Default is 80 &
-95% CIs}
+\item{prediction_conf_levels}{prediction confidence levels. Default is 80 and
+95 percent CIs}
 
 \item{name}{optional name for use case. Default is to append target with type}
 

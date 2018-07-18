@@ -220,7 +220,7 @@ mape.tbl_spark <- function(x, predicted, actual){
   checkmate::assert_choice(predicted, colnames(x))
   checkmate::assert_choice(actual, colnames(x))
   x %>%
-    dplyr::summarise_at(actual, funs(mape = mean(abs((. - !!rlang::sym(predicted))/ .)))) %>%
+    dplyr::summarise_at(actual, dplyr::funs(mape = mean(abs((. - !!rlang::sym(predicted))/ .)))) %>%
     dplyr::collect()
 }
 

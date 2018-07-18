@@ -48,6 +48,9 @@ The function creates train and validation pairs
 }
 \examples{
 
-# Data.frame example
-add_time_slice_samples(mtcars, number = 5, amount = .5)
+# Basic Time Slice example
+add_time_slice_samples(1:20, width = 15, horizon = 1)
+
+# Time Slice with Skip
+ add_time_slice_samples(1:20, width = 15, horizon = 1, skip = 1)
 }

@@ -18,6 +18,7 @@ Imports:
     zoo,
     checkmate (>= 1.8.2),
     purrr,
+    forecast,
 Suggests: 
      lubridate,
      testthat

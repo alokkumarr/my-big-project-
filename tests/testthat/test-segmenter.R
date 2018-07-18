@@ -136,3 +136,27 @@ test_that("Segmenter Predicts New Data", {
 
   expect_class(p1, "predictions")
 })
+
+
+test_that("Segmenter with add_model_grid", {
+
+  .k <- 3:5
+  s1 <- new_segmenter(df = df, name = "test") %>%
+    add_default_samples() %>%
+    add_model_grid(pipe = NULL,
+                   method = "ml_kmeans",
+                   k = .k) %>%
+    train_models() %>%
+    evaluate_models() %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+
+  expect_equal(length(s1$models), length(.k))
+  expect_equal(s1$models[[1]]$method_args[[1]], .k[1])
+  expect_equal(s1$models[[1]]$fit$summary$k, .k[1])
+  expect_equal(s1$models[[2]]$method_args[[1]], .k[2])
+  expect_equal(s1$models[[2]]$fit$summary$k, .k[2])
+  expect_equal(s1$models[[3]]$method_args[[1]], .k[3])
+  expect_equal(s1$models[[3]]$fit$summary$k, .k[3])
+})
+
+
