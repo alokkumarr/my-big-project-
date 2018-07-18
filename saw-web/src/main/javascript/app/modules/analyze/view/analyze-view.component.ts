@@ -151,13 +151,16 @@ export class AnalyzeViewComponent implements OnInit {
           metrics,
           id: this.analysisId
         }
-      } as MatDialogConfig).afterClosed().subscribe(
-        isSavedSuccessfully => {
-          if (isSavedSuccessfully) {
-            this.loadAnalyses()
-          }
+      } as MatDialogConfig).afterClosed().subscribe(event => {
+        const { analysis, requestExecution } = event;
+        if (analysis) {
+          this.loadAnalyses().then(() => {
+            if (requestExecution) {
+              this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+            }
+          });
         }
-      );
+      });
     }).catch(() => {
       this._headerProgress.hide();
     });
