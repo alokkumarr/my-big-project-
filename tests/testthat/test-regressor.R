@@ -58,19 +58,18 @@ test_that("Regressor Selects Best Model", {
 })
 
 
+r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
+  add_default_samples() %>%
+  add_model(pipe = NULL,
+            method = "ml_linear_regression") %>%
+  train_models() %>%
+  evaluate_models() %>%
+  set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+
 test_that("Regressor Predicts New Data consistent with Method", {
 
-  r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
-    add_default_samples() %>%
-    add_model(pipe = NULL,
-              method = "ml_linear_regression") %>%
-    train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
   p1 <- predict(r1, data = df)
-
-
   r2 <- ml_linear_regression(df, formula = "mpg~.")
   p2 <- sparklyr::sdf_predict(df, r2)
 
@@ -82,3 +81,15 @@ test_that("Regressor Predicts New Data consistent with Method", {
                  collect() %>%
                  pull(prediction))
 })
+
+
+test_that("Prediction Schema Check Works as expected", {
+
+  expect_error(
+    df %>%
+      select(am, mpg) %>%
+      predict(r1, data = .))
+
+
+})
+

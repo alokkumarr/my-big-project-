@@ -58,6 +58,12 @@ predict.classifier <- function(obj,
   data <- data %>%
     dplyr::mutate(index = 1) %>%
     dplyr::mutate(index = row_number(index))
+
+  schema_check <- all.equal(get_schema(data), obj$schema)
+  if(schema_check[1] != TRUE) {
+    stop(paste("New Data shema check failed:\n", schema_check))
+  }
+
   final_model$pipe <- execute(data, final_model$pipe)
   preds <- predict(final_model, data = final_model$pipe$output, ...)
 

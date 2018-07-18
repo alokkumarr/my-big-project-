@@ -8,6 +8,7 @@
 #' @import sparklyr
 #' @import forecast
 new_modeler <- function(df,
+                        schema,
                         target,
                         type,
                         name,
@@ -23,7 +24,7 @@ new_modeler <- function(df,
                         final_model,
                         ...){
 
-
+  checkmate::assert_list(schema)
   checkmate::assert_character(target, null.ok = TRUE)
   checkmate::assert_character(type)
   checkmate::assert_character(name)
@@ -48,6 +49,7 @@ new_modeler <- function(df,
       scientist = scientist,
       created_on = Sys.time(),
       data = df,
+      schema = schema,
       target = target,
       dir = dir,
       samples = samples,
@@ -128,10 +130,12 @@ modeler <- function(df,
   measure <- list()
   evaluate <- data.frame()
   final_model <- NULL
+  schema <- get_schema(df)
 
   valid_modeler(
     new_modeler(
       df = df,
+      schema = schema,
       target = target,
       type = type,
       name = name,
@@ -278,6 +282,59 @@ train_models <- function(obj, ...) {
 }
 
 
+#' Evalutate Models Generic Function
+#'
+#' Evaluate the accuracy of all trained models.
+#'
+#' Function applies the measure function associated with modeler object to all
+#' model sample predictions.
+#'
+#' @export
+#' @return updated modeler object
+evaluate_models <- function(obj, ...) {
+  UseMethod("evaluate_models")
+}
+
+
+#' Set Final Model Generic
+#'
+#' Function to select the final model. See method argument for options
+#'
+#' @param obj forecaster object
+#' @param method selection method. Choices are 'manual' which requires a valid
+#'   id or 'best' method which selects the best model based on the measure
+#' @param id optional model id input required for manual method
+#' @param reevaluate logical option to re-evaluate the final model. Requires a
+#'   test holdout sample
+#' @param refit logical option to re-fit final model on entire training dataset
+#' @export
+set_final_model <- function(obj, method, id, reevaluate, refit) {
+  UseMethod("set_final_model")
+}
+
+
+#' Get Target Dataframe Generic Method
+#'
+#' Function to return modeler target
+get_target_df <- function(obj, target) {
+  UseMethod("get_target_df")
+}
+
+
+#' Tidy Model Performance Generic
+#'
+#' Function to extract model performance on all samples. Converts output to
+#' data.frame
+tidy_performance <- function(obj) {
+  UseMethod("tidy_performance")
+}
+
+
+
+
+# Modeler Class Methods ---------------------------------------------------
+
+
 #' @rdname train_models
 #' @export
 train_models.modeler <- function(obj, ids = NULL) {
@@ -297,57 +354,6 @@ train_models.modeler <- function(obj, ids = NULL) {
     obj$models[[id]] <- model
   }
   obj
-}
-
-
-#' Evalutate Models Generic Function
-#'
-#' Evaluate the accuracy of all trained models.
-#'
-#' Function applies the measure function associated with modeler object to all
-#' model sample predictions.
-#'
-#' @export
-#' @return updated modeler object
-evaluate_models <- function(obj, ...) {
-  UseMethod("evaluate_models")
-}
-
-
-#' @rdname evaluate_models
-#' @export
-evaluate_models.modeler <- function(obj, ids = NULL) {
-  checkmate::assert_character(ids, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(ids))
-    status <- status[names(status) %in% ids]
-  ids <- names(status == "trained")
-
-  for (id in ids) {
-    model <- get_models(obj, id = id)[[1]]
-    model <- evaluate(model, obj$measure)
-    obj$models[[id]] <- model
-    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
-  }
-  obj
-}
-
-
-#' Set Final Model Generic
-#'
-#' Function to select the final model. See method argument for options
-#'
-#' @param obj forecaster object
-#' @param method selection method. Choices are 'manual' which requires a valid
-#'   id or 'best' method which selects the best model based on the measure
-#' @param id optional model id input required for manual method
-#' @param reevaluate logical option to re-evaluate the final model. Requires a
-#'   test holdout sample
-#' @param refit logical option to re-fit final model on entire training dataset
-#' @export
-set_final_model <- function(obj, method, id, reevaluate, refit) {
-  UseMethod("set_final_model")
 }
 
 
@@ -403,35 +409,23 @@ set_final_model.modeler <- function(obj,
 }
 
 
+#' @rdname evaluate_models
+#' @export
+evaluate_models.modeler <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
 
-#' Get Target Dataframe Generic Method
-#'
-#' Function to return modeler target
-get_target_df <- function(obj, target) {
-  UseMethod("get_target_df")
-}
+  status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% ids]
+  ids <- names(status == "trained")
 
-
-#' Tidy Model Performance Generic
-#'
-#' Function to extract model performance on all samples. Converts output to
-#' data.frame
-tidy_performance <- function(obj) {
-  UseMethod("tidy_performance")
-}
-
-
-
-
-# Modeler Class Methods ---------------------------------------------------
-
-
-#' Get Target data.frame Method
-#'
-#'@export
-get_target_df.data.frame <- function(df, target) {
- checkmate::assert_subset(target, colnames(df))
-  df[, target, drop=FALSE]
+  for (id in ids) {
+    model <- get_models(obj, id = id)[[1]]
+    model <- evaluate(model, obj$measure)
+    obj$models[[id]] <- model
+    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
+  }
+  obj
 }
 
 
@@ -474,4 +468,46 @@ print.modeler <- summary.modeler <- function(obj) {
   cat("method:", obj$final_model$method, "\n")
   cat("method args:", unlist(obj$final_model$method_args), "\n")
   cat("desc:", obj$final_model$desc, "\n")
+}
+
+
+
+# Helper Functions --------------------------------------------------------
+
+
+#' Get Target data.frame Method
+#'
+#'@export
+get_target_df.data.frame <- function(df, target) {
+  checkmate::assert_subset(target, colnames(df))
+  df[, target, drop=FALSE]
+}
+
+
+#' Get Dataset Schema
+#'
+#' Returns named list of column types. Names refer to column names
+#'
+#' @param df dataset
+#'
+#' @return named list of column types
+#' @export
+#'
+#' @examples
+#' get_schema(mtcars)
+get_schema <- function(df){
+  UseMethod("get_schema")
+}
+
+
+#' @rdname get_schema
+#' @export
+get_schema.data.frame <- function(df) {
+  purrr::map(df, class)
+}
+
+#' @rdname get_schema
+#' @export
+get_schema.tbl_spark <- function(df) {
+  purrr::map(sparklyr::sdf_schema(df), "type")
 }
