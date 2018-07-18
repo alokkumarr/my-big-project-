@@ -113,27 +113,10 @@ public class ESHttpClient {
 
             if(authentication != null) cr.setChallengeResponse(authentication);
 
-
+            // Specify Content-Type is application/json
             StringRepresentation jsonData = new StringRepresentation(body);
             jsonData.setMediaType(MediaType.APPLICATION_JSON);
-//            cr.accept(MediaType.APPLICATION_JSON);
-//
-//            cr.getRequestAttributes().put("Content-Type", "application/json; charset=UTF-8");
-//            cr.getRequestAttributes().put("Accept", "application/json");
-//
-//            cr.getResponseAttributes().put("Content-Type", "application/json; charset=UTF-8");
-//            cr.getResponseAttributes().put("Accept", "application/json");
-//            cr.getResponseAttributes().put(HeaderConstants.HEADER_ACCEPT_CHARSET, "UTF-8");
-//            cr.getResponseAttributes().put(HeaderConstants.HEADER_ACCEPT_ENCODING, "gzip");
 
-//            cr.head(MediaType.APPLICATION_JSON);
-//            logger.debug("Client Request = " + cr.getRequest());
-//            logger.debug("Client Resource Headers = " + cr.getRequestAttributes());
-//            logger.debug("Request Headers = " + cr.getRequestAttributes()
-//                .get(HeaderConstants.HEADER_ACCEPT_CHARSET));
-//            logger.debug("Response Headers = " + cr.getResponseAttributes()
-//                .get(HeaderConstants.HEADER_ACCEPT));
-//            logger.debug("Head = " + cr.head());
             cr.put(jsonData);
             if(!cr.getStatus().isSuccess()){
                 logger.error(cr.getStatus().getDescription());
@@ -154,9 +137,12 @@ public class ESHttpClient {
         try {
             ClientResource cr = new ClientResource(fullUrl);
             logger.debug("Full URL = " + fullUrl + ". Data = " + body);
+
+            if(authentication != null) cr.setChallengeResponse(authentication);
+
+            // Specify Content-Type is application/json
             StringRepresentation jsonData = new StringRepresentation(body);
             jsonData.setMediaType(MediaType.APPLICATION_JSON);
-            if(authentication != null) cr.setChallengeResponse(authentication);
             cr.post(jsonData);
             return cr.getStatus().isSuccess();
         } catch (Exception e) {
