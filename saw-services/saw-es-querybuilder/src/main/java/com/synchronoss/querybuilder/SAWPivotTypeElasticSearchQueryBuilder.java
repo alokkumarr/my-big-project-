@@ -114,7 +114,8 @@ public String getJsonString() {
 
     for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) 
     {
-      if (!item.getIsRuntimeFilter().value()){
+      if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
+          && !item.getIsGloblFilter().value()){
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
           if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
           {
