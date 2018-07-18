@@ -53,7 +53,7 @@ export const chartOptions = {
   },
   title: {
     text: '',
-    y:5
+    y: 5
   },
   lang: {
     noData: 'No data to display'
