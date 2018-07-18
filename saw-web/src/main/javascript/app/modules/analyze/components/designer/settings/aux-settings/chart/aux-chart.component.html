@@ -19,8 +19,8 @@
   <div class="chart-title">
     <label class="chart-designer-title" *ngIf="!EditMode">{{chartTitle}}</label>
     <mat-icon *ngIf="!EditMode" class="mat-icon material-icons icon-edit-solid" fonticon="icon-filter" (click)="EditMode = true"></mat-icon>
-    <mat-form-field *ngIf="EditMode">
-      <input style="width: 90%;padding-bottom: 8px;" matInput type="text" [(ngModel)]="chartTitle" maxlength="100"/>
+    <mat-form-field *ngIf="EditMode" style="margin-bottom: 2px;">
+      <input style="width: 84%;padding-bottom: 8px;" matInput type="text" [(ngModel)]="chartTitle" maxlength="100"/>
       <button mat-button color="primary" class="mat-raised-button mat-primary chart-title-button" (click)="onTitleChange()">Apply</button>
     </mat-form-field>
   </div>
