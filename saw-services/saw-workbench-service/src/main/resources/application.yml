@@ -9,7 +9,8 @@ spring:
       max-file-size: 25MB
 logging:
   level:
-    com.synchronoss.saw.workbench: INFO
+    com.synchronoss.saw.workbench: TRACE
+    sncr.bda: TRACE
 server:
   address: localhost
   port: 9701

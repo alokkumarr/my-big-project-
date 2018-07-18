@@ -35,20 +35,22 @@ import sncr.xdf.component.Component;
 @RestController
 @RequestMapping("/internal/workbench/projects/")
 public class WorkbenchExecutionController {
+
   private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-  @Value("${workbench.project-root}")
-  @NotNull
-  private String defaultProjectRoot;
 
-  @Value("${workbench.project-path}")
-  @NotNull
-  private String defaultProjectPath;
+    @Value("${workbench.project-root}")
+    @NotNull
+    private String defaultProjectRoot;
 
-  @Autowired
-  private WorkbenchExecutionService workbenchExecutionService;
+    @Value("${workbench.project-path}")
+    @NotNull
+    private String defaultProjectPath;
 
-  /**
+    @Autowired
+    private WorkbenchExecutionService workbenchExecutionService;
+
+    /**
    * Create dataset function.
    * @param project Project ID
    * @param body Body Parameters

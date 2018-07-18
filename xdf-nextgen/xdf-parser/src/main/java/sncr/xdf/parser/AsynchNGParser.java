@@ -93,7 +93,7 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
 
         schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false);
         tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
-        logger.info(tsFormats);
+        logger.trace(tsFormats.toString());
 
         internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true);
 
@@ -111,7 +111,7 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
         outputNOF =  (Integer) ds.getValue().get(DataSetProperties.NumberOfFiles.name());
         pkeys = (List<String>) ds.getValue().get(DataSetProperties.PartitionKeys.name());
 
-        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
+        logger.trace("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
         FileSystem fs = HFileOperations.getFileSystem();
 
@@ -186,8 +186,8 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
     }
 
     private int parseSingleFile(Path file, Path destDir){
-        logger.info("Parsing " + file + " to " + destDir);
-        logger.info("Header size : " + headerSize);
+        logger.trace("Parsing " + file + " to " + destDir);
+        logger.trace("Header size : " + headerSize);
 
         JavaRDD<Row> rdd = reader.readToRDD(file.toString(), headerSize)
                 .map(new ConvertToRow(  schema,
@@ -203,14 +203,14 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
 
         Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
         // TODO: Filter out all rejected records
-//        logger.debug ( "Created rdd:  " + rdd.rdd().count());
-        logger.debug ( "Created df:  " + df.count() + " schema: " + df.schema().prettyJson());
+//        logger.warn ( "Created rdd:  " + rdd.rdd().count());
+        logger.warn ( "Created df:  " + df.count() + " schema: " + df.schema().prettyJson());
 
             scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
         Column cond = df.col("__REJ_FLAG").isNull().or(df.col("__REJ_FLAG").equalTo(0));
         Dataset<Row> filteredDataset = df.select(scalaList).where(cond);
-        logger.debug ( "Filtered df:  " + filteredDataset.count());
+        logger.warn ( "Filtered df:  " + filteredDataset.count());
         int rc = commitDataSetFromDSMap(ngctx, filteredDataset, outputDataSetName, destDir.toString(), "append");
         return rc;
     }
@@ -243,7 +243,7 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
             if (field.getType().equals(CsvInspectorRowProcessor.T_DATETIME) &&
             field.getFormat() != null && !field.getFormat().isEmpty()){
                 retval.add(field.getFormat());
-                logger.info("Found date field " + field.getName() + " format: " + field.getFormat());
+                logger.trace("Found date field " + field.getName() + " format: " + field.getFormat());
             } else {
                 retval.add("");
             }
@@ -323,11 +323,11 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
         ngCtxSvc = new NGContextServices(pcs, xdfDataRootSys, cfg, appId, "parser", batchId);
         ngCtxSvc.initContext();
         ngCtxSvc.registerOutputDataSet();
-        logger.debug("Output datasets:");
+        logger.warn("Output datasets:");
         ngCtxSvc.getNgctx().registeredOutputDSIds.forEach( id ->
-            logger.debug(id)
+            logger.warn(id)
         );
-        logger.debug(ngCtxSvc.getNgctx().toString());
+        logger.warn(ngCtxSvc.getNgctx().toString());
         AsynchNGParser component = new AsynchNGParser(ngCtxSvc.getNgctx());
         if (!component.initComponent(null))
             System.exit(-1);

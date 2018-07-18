@@ -1,6 +1,7 @@
 package sncr.xdf.sql.ng;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sncr.bda.CliHandler;
 import sncr.bda.ConfigLoader;
 import sncr.bda.base.MetadataBase;
@@ -29,7 +30,7 @@ import java.util.Map;
 //TODO:: Refactor AsynchNGSQLComponent and NGSQLComponent: eliminate duplicate
 public class AsynchNGSQLComponent extends AsynchAbstractComponent implements WithDLBatchWriter, WithSpark, WithDataSet, WithProjectScope {
 
-    private static final Logger logger = Logger.getLogger(AsynchNGSQLComponent.class);
+    private static final Logger logger = LoggerFactory.getLogger(AsynchNGSQLComponent.class);
     // Set name
     {
         componentName = "sql";
@@ -50,11 +51,11 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
                     ngctx.batchID,
                     ngctx.componentName,
                     null, null);
-
+        logger.warn("tempDir : " +tempDir);
         executor.start(tempDir);
     } catch (Exception e) {
         error = "SQL Executor runtime exception: " + e.getMessage();
-        logger.error(e);
+        logger.error(e.toString());
         return -1;
     }
         return 0;
@@ -65,6 +66,7 @@ public class AsynchNGSQLComponent extends AsynchAbstractComponent implements Wit
     }
 
     protected ComponentConfiguration validateConfig(String config) throws Exception {
+      logger.warn("validateConfig : " + config);
         return analyzeAndValidate(config);
     }
 
