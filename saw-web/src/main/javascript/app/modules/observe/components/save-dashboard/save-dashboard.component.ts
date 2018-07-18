@@ -1,9 +1,11 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
+import { requireIf } from '../../validators/required-if.validator';
+import { Subscription } from 'rxjs/Subscription';
 
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
@@ -15,15 +17,36 @@ import * as clone from 'lodash/clone';
 const template = require('./save-dashboard.component.html');
 require('./save-dashboard.component.scss');
 
+export const REFRESH_INTERVALS = [
+  {
+    label: '1 minute',
+    seconds: 60
+  },
+  {
+    label: '2 minutes',
+    seconds: 120
+  },
+  {
+    label: '5 minutes',
+    seconds: 300
+  },
+  {
+    label: '10 minutes',
+    seconds: 600
+  }
+];
+
 @Component({
   selector: 'save-dashboard',
   template
 })
-export class SaveDashboardComponent implements OnInit {
+export class SaveDashboardComponent implements OnInit, OnDestroy {
   private dashboardForm: FormGroup;
   private dashboard: any;
   public categories = [];
+  private refreshIntervals = REFRESH_INTERVALS;
   public showProgress = false;
+  private listeners: Array<Subscription> = [];
 
   constructor(
     private dialogRef: MatDialogRef<SaveDashboardComponent>,
@@ -40,8 +63,32 @@ export class SaveDashboardComponent implements OnInit {
     this.dashboardForm = this.fb.group({
       name: ['', Validators.required],
       description: [''],
-      categoryId: ['', Validators.required]
+      categoryId: ['', Validators.required],
+      autoRefreshEnabled: [false, Validators.required],
+      refreshIntervalSeconds: [
+        null,
+        requireIf('autoRefreshEnabled', val => Boolean(val))
+      ]
     });
+
+    this.disableIntervalConditionally();
+  }
+
+  disableIntervalConditionally() {
+    const sub = this.dashboardForm
+      .get('autoRefreshEnabled')
+      .valueChanges.subscribe(val => {
+        const action = val ? 'enable' : 'disable';
+        const control = this.dashboardForm.get('refreshIntervalSeconds');
+        control.setValue(val ? this.refreshIntervals[0].seconds : null);
+        control[action]();
+      });
+
+    this.listeners.push(sub);
+  }
+
+  ngOnDestroy() {
+    this.listeners.forEach(sub => sub.unsubscribe());
   }
 
   async ngOnInit() {
@@ -50,7 +97,9 @@ export class SaveDashboardComponent implements OnInit {
     this.dashboardForm.patchValue({
       name: this.dashboard.name,
       description: this.dashboard.description,
-      categoryId: this.dashboard.categoryId
+      categoryId: this.dashboard.categoryId,
+      autoRefreshEnabled: Boolean(this.dashboard.autoRefreshEnabled),
+      refreshIntervalSeconds: this.dashboard.refreshIntervalSeconds
     });
 
     await this.loadCategories();

@@ -24,6 +24,17 @@
         </mat-option>
       </mat-optgroup>
     </mat-select>
+
+    <mat-checkbox name="dashboardAutoRefresh" formControlName="autoRefreshEnabled">Refresh Automatically</mat-checkbox>
+
+    <mat-form-field>
+      <mat-select placeholder="Refresh Interval"
+                  formControlName="refreshIntervalSeconds">
+        <mat-option *ngFor="let intvl of refreshIntervals" [value]="intvl.seconds">
+          {{intvl.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </form>
 </div>
 <div mat-dialog-actions>
