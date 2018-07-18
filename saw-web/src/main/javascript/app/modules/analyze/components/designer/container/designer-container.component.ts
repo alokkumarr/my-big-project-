@@ -368,8 +368,8 @@ export class DesignerContainerComponent {
             requestExecution: false,
             analysis: result.analysis
           });
-          this.isInDraftMode = false;
           this.requestDataIfPossible();
+          this.isInDraftMode = false;
         }
       });
       break;
