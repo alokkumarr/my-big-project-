@@ -29,5 +29,5 @@ the forecast function
 \examples{
 library(forecast)
 fit <- auto_fourier(austres, frequency = 4)
-forecast(fit, h=12, frequency=12)
+forecast(fit, h=12, frequency=4)
 }

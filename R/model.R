@@ -348,11 +348,11 @@ evaluate.model <- function(mobj, measure) {
 
   mobj$evaluate <- purrr::map_df(mobj$performance,
                                  ~purrr::map_df(.,
-                                                bind_rows,
+                                                dplyr::bind_rows,
                                                 .id = "sample"),
                                  .id="indicie") %>%
     dplyr::inner_join(mobj$pipe$output %>%
-                        select_at(c(mobj$target, mobj$index_var)),
+                        dplyr::select_at(c(mobj$target, mobj$index_var)),
                       by = mobj$index_var) %>%
     dplyr::mutate(model = mobj$id) %>%
     dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
@@ -408,7 +408,7 @@ tidy_performance <- function(obj) {
 get_target.model <- function(obj) {
 
   obj$pipe$output %>%
-    select_at(obj$target) %>%
-    mutate(index = 1:n())
+    dplyr::select_at(obj$target) %>%
+    dplyr::mutate(index = 1:dplyr::n())
 
 }

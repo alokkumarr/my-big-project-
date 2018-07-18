@@ -23,7 +23,7 @@ new_segmenter <- function(df,
 
   df <- df %>%
     dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
+    dplyr::mutate(index = dplyr::row_number(index))
   mobj <- modeler(df,
                   target = NULL,
                   type = "segmenter",
@@ -59,7 +59,7 @@ predict.segmenter <- function(obj,
   }
   data <- data %>%
     dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
+    dplyr::mutate(index = dplyr::row_number(index))
   final_model$pipe <- execute(data, final_model$pipe)
   preds <- predict(final_model, data = final_model$pipe$output, ...)
 

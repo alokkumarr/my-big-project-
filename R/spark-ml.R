@@ -48,7 +48,7 @@ fitted.ml_decision_tree_classification_model <- function(obj) {
 predict.spark_ml_clustering <- function(obj, data, ...) {
   checkmate::assert_class(data, "tbl_spark")
   sparklyr::sdf_predict(data, obj$fit, ...) %>%
-    select(index, predicted = prediction, features)
+    dplyr::select(index, predicted = prediction, features)
 }
 
 
@@ -58,7 +58,7 @@ predict.spark_ml_clustering <- function(obj, data, ...) {
 predict.spark_ml_classification <- function(obj, data, ...) {
   checkmate::assert_class(data, "tbl_spark")
   sparklyr::sdf_predict(data, obj$fit, ...) %>%
-    select(index, predicted = prediction)
+    dplyr::select(index, predicted = prediction)
 }
 
 

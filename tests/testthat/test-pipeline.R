@@ -63,7 +63,7 @@ test_that("Test that Flow and execute output matches", {
 
 # Flush method validation -------------------------------------------------
 
-clean_pipe_constructer <- flush(s1)
+clean_pipe_constructer <- clean(s1)
 
 test_that("Post clean up the output should be NULL", {
   expect_equal(clean_pipe_constructer$output, NULL)
@@ -98,14 +98,16 @@ test_that("Test that Flow and execute output matches", {
 
 # Flush method validation -------------------------------------------------
 
-clean_pipe_constructer_id <- flush(s1_id)
+clean_pipe_constructer_id <- clean(s1_id)
 
 test_that("Post clean up the output should be NULL", {
   expect_equal(clean_pipe_constructer_id$output, NULL)
 })
 
 
-# Test-3:Pipeliner function-R Dataframe-flow,execute and flush methods test----------------------------------------------
+
+# Test-3: Pipeliner function-R Dataframe-flow,execute and clean me --------
+
 
 pipe_1 <- pipeline(
   expr = function(df) {
@@ -132,14 +134,14 @@ test_that("Test that Flow and execute output matches", {
 
 # Flush method validation -------------------------------------------------
 
-clean_pipe <- flush(pipe_1)
+clean_pipe <- clean(pipe_1)
 
 test_that("Post clean up the output should be NULL", {
   expect_equal(clean_pipe$output, NULL)
 })
 
 
-# Test-4-Create a "modeler" to test-execute,flush and flow with pipeline -------
+# Test-4-Create a "modeler" to test-execute,clean and flow with pipeline -------
 
 add_mod <-
   new_segmenter(df = dat_y, name = "test") %>%
@@ -178,7 +180,7 @@ test_that("Test that Flow and execute output matches", {
 
 # Flush method validation -------------------------------------------------
 
-clean_pipe <- flush(pipe_test)
+clean_pipe <- clean(pipe_test)
 
 test_that("Post clean up the output should be NULL", {
   expect_equal(clean_pipe$output, NULL)
@@ -213,7 +215,7 @@ test_that("Test that Flow and execute output matches", {
 
 # Flush method validation -------------------------------------------------
 
-clean_pipe_sprk <- flush(pipe_sprk)
+clean_pipe_sprk <- clean(pipe_sprk)
 
 test_that("Post clean up the output should be NULL", {
   expect_equal(clean_pipe_sprk$output, NULL)
@@ -221,7 +223,7 @@ test_that("Post clean up the output should be NULL", {
 
 
 
-# Test-6: Modeler Object creation  and test flow,execute and flush methods---------------------------------------------
+# Test-6: Modeler Object creation  and test flow,execute and clean methods---------------------------------------------
 
 mobj <- modeler(
   df = df,
@@ -256,7 +258,7 @@ test_that("Test that Flow and execute output matches", {
 
 # Flush method validation -------------------------------------------------
 
-clean_pipe_modeler <- flush(pipe_modeler)
+clean_pipe_modeler <- clean(pipe_modeler)
 
 test_that("Post clean up the output should be NULL", {
   expect_equal(clean_pipe_modeler$output, NULL)
