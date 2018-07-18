@@ -24,7 +24,7 @@ new_regressor <- function(df,
 
   df <- df %>%
     dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = dplyr::row_number(index))
+    dplyr::mutate(index = row_number(index))
   mobj <- modeler(df,
                   target = target,
                   type = "regressor",
@@ -57,7 +57,7 @@ predict.regressor <- function(obj,
   }
   data <- data %>%
     dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = dplyr::row_number(index))
+    dplyr::mutate(index = row_number(index))
   final_model$pipe <- execute(data, final_model$pipe)
   preds <- predict(final_model, data = final_model$pipe$output, ...)
 

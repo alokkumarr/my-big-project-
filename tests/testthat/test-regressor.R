@@ -37,7 +37,7 @@ test_that("Regressor Selects Best Model", {
   test_pipe <- pipeline(expr = function(x){select(x, index, mpg, wt, hp)})
 
   r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
-    add_holdout_samples(splits = c(.8, .2)) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = test_pipe,
               method = "ml_linear_regression") %>%
     add_model(pipe = test_pipe,
@@ -51,9 +51,9 @@ test_that("Regressor Selects Best Model", {
   expect_subset(
     r1$final_model$id,
     r1$evaluate %>%
-      filter(sample == "validation") %>%
-      top_n(1, -rmse) %>%
-      pull(model)
+      dplyr::filter(sample == "validation") %>%
+      dplyr::top_n(1, -rmse) %>%
+      dplyr::pull(model)
   )
 })
 
@@ -76,11 +76,11 @@ test_that("Regressor Predicts New Data consistent with Method", {
 
   expect_class(p1, "predictions")
   expect_equal(p1$predictions %>%
-                 collect() %>%
-                 pull(predicted),
+                 dplyr::collect() %>%
+                 dplyr::pull(predicted),
                p2 %>%
-                 collect() %>%
-                 pull(prediction))
+                 dplyr::collect() %>%
+                 dplyr::pull(prediction))
 })
 
 
