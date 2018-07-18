@@ -4,13 +4,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONTokener;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.MediaType;
+import org.restlet.engine.header.HeaderConstants;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,8 +110,31 @@ public class ESHttpClient {
         String fullUrl = host + url;
         try {
             ClientResource cr = new ClientResource(fullUrl);
+
             if(authentication != null) cr.setChallengeResponse(authentication);
-            cr.put(body);
+
+
+            StringRepresentation jsonData = new StringRepresentation(body);
+            jsonData.setMediaType(MediaType.APPLICATION_JSON);
+//            cr.accept(MediaType.APPLICATION_JSON);
+//
+//            cr.getRequestAttributes().put("Content-Type", "application/json; charset=UTF-8");
+//            cr.getRequestAttributes().put("Accept", "application/json");
+//
+//            cr.getResponseAttributes().put("Content-Type", "application/json; charset=UTF-8");
+//            cr.getResponseAttributes().put("Accept", "application/json");
+//            cr.getResponseAttributes().put(HeaderConstants.HEADER_ACCEPT_CHARSET, "UTF-8");
+//            cr.getResponseAttributes().put(HeaderConstants.HEADER_ACCEPT_ENCODING, "gzip");
+
+//            cr.head(MediaType.APPLICATION_JSON);
+//            logger.debug("Client Request = " + cr.getRequest());
+//            logger.debug("Client Resource Headers = " + cr.getRequestAttributes());
+//            logger.debug("Request Headers = " + cr.getRequestAttributes()
+//                .get(HeaderConstants.HEADER_ACCEPT_CHARSET));
+//            logger.debug("Response Headers = " + cr.getResponseAttributes()
+//                .get(HeaderConstants.HEADER_ACCEPT));
+//            logger.debug("Head = " + cr.head());
+            cr.put(jsonData);
             if(!cr.getStatus().isSuccess()){
                 logger.error(cr.getStatus().getDescription());
                 return false;
@@ -115,6 +143,7 @@ public class ESHttpClient {
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
+            logger.debug(ExceptionUtils.getStackTrace(e));
         }
         return false;
     }
@@ -125,11 +154,14 @@ public class ESHttpClient {
         try {
             ClientResource cr = new ClientResource(fullUrl);
             logger.debug("Full URL = " + fullUrl + ". Data = " + body);
+            StringRepresentation jsonData = new StringRepresentation(body);
+            jsonData.setMediaType(MediaType.APPLICATION_JSON);
             if(authentication != null) cr.setChallengeResponse(authentication);
-            cr.post(body);
+            cr.post(jsonData);
             return cr.getStatus().isSuccess();
         } catch (Exception e) {
             logger.error(e.getMessage());
+            logger.debug(ExceptionUtils.getStackTrace(e));
         }
         return false;
     }
@@ -197,10 +229,10 @@ public class ESHttpClient {
     }
 
     // Check if index type exists
-    // Only supported in ES 5.x
+    // Only supported in ES 5.x and above
     public  boolean esTypeExists(String idx, String type) throws Exception  {
         String clusterVersion = esClusterVersion();
-        if(clusterVersion.startsWith("5.")) {
+        if(clusterVersion.startsWith("6.")) {
             return head("/" + idx + "/_mapping/" + type);
         } else {
             throw new Exception("TypeExists operation is not supported for Elastic Search cluster version " + clusterVersion);
