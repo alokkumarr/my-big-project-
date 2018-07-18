@@ -8,7 +8,10 @@ import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
-import { flattenPivotData, flattenChartData } from '../../../../../common/utils/dataFlattener';
+import {
+  flattenPivotData,
+  flattenChartData
+} from '../../../../../common/utils/dataFlattener';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -41,7 +44,7 @@ import { ChartService } from '../../../services/chart.service';
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
-const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport'];
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'designer-container',
@@ -658,7 +661,7 @@ export class DesignerContainerComponent {
       this.filters = [];
       this.sorts = [];
       forEach(artifacts, artifact => {
-        forEach(artifact.column, col => col.checked = false);
+        forEach(artifact.column, col => (col.checked = false));
       });
     }
     this.analysis.sqlBuilder = this.getSqlBuilder();
