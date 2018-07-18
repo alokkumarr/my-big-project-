@@ -127,6 +127,71 @@ model <- function(pipe,
 
 
 
+#' Add Model Grid to Modeler Object function
+#'
+#' Function to add grid of multiple models to modeler object. Vectors of
+#' parameter values can be provided to this function and grid of models added to
+#' modeler object
+#'
+#' Function creates a new model object from inputs and then appends to modeler
+#' models list
+#'
+#' @param obj modeler object
+#' @inheritParams model
+#' @export
+#' @return modeler object with model added
+add_model_grid <-function(obj,
+                          pipe = NULL,
+                          method,
+                          ...,
+                          desc = NULL,
+                          path = NULL) {
+  checkmate::assert_class(obj, "modeler")
+
+  type_methods <- model_methods %>%
+    dplyr::filter(type == obj$type) %>%
+    dplyr::pull(method) %>%
+    as.character()
+  checkmate::assert_choice(method, type_methods)
+
+  if(is.null(pipe))
+    pipe <- pipeline()
+
+  # Args
+  args <- expand.grid(list(...))
+
+  if(nrow(args) > 0) {
+
+    for(i in 1:nrow(args)) {
+      arg_list <- as.list(args[i,])
+      model_desc <- paste(desc, paste(paste(names(arg_list), arg_list, sep="="), collapse="; "), sep=": ")
+      model_args <- c(list(pipe = pipe,
+                           target = obj$target,
+                           method = method,
+                           desc = model_desc,
+                           path = path),
+                      arg_list)
+      m <- do.call("model", model_args)
+      m$status <- "added"
+      obj$models[[m$id]] <- m
+    }
+  }else{
+    m <- model(pipe = pipe,
+               target = obj$target,
+               method = method,
+               desc = desc,
+               path = path)
+    m$status <- "added"
+    obj$models[[m$id]] <- m
+  }
+
+  obj
+}
+
+
+
+
+
 #' Add Model to Modeler Object function
 #'
 #' Function to add model to modeler object. More than one model can be added to
@@ -166,6 +231,7 @@ add_model <-function(obj,
   obj$models[[m$id]] <- m
   obj
 }
+
 
 
 #' Add Multiple Models to Modeler Object function
@@ -282,11 +348,11 @@ evaluate.model <- function(mobj, measure) {
 
   mobj$evaluate <- purrr::map_df(mobj$performance,
                                  ~purrr::map_df(.,
-                                                bind_rows,
+                                                dplyr::bind_rows,
                                                 .id = "sample"),
                                  .id="indicie") %>%
     dplyr::inner_join(mobj$pipe$output %>%
-                        select_at(c(mobj$target, mobj$index_var)),
+                        dplyr::select_at(c(mobj$target, mobj$index_var)),
                       by = mobj$index_var) %>%
     dplyr::mutate(model = mobj$id) %>%
     dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
@@ -342,7 +408,7 @@ tidy_performance <- function(obj) {
 get_target.model <- function(obj) {
 
   obj$pipe$output %>%
-    select_at(obj$target) %>%
-    mutate(index = 1:n())
+    dplyr::select_at(obj$target) %>%
+    dplyr::mutate(index = 1:dplyr::n())
 
 }

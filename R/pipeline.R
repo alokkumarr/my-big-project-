@@ -190,9 +190,9 @@ test.data.frame <- function(x, pipe, n = 100){
 
 
 
-#' Pipeline Flush function
+#' Pipeline Clean function
 #'
-#' Flush function removes any stored output data from a pipeline
+#' Clean function removes any stored output data from a pipeline
 #'
 #' Function useful for cleaning up and reducing size of modeler object
 #'
@@ -204,10 +204,10 @@ test.data.frame <- function(x, pipe, n = 100){
 #'
 #' pipe <- pipeline(expr = function(e) mean(e$mpg))
 #' pipe <- execute(mtcars, pipe)
-#' clean_pipe <- flush(pipe)
+#' clean_pipe <- clean(pipe)
 #' clean_pipe$output
-flush <- function(pipe) {
-  checkmate::check_class(pipe, "pipeline")
+clean <- function(pipe) {
+  checkmate::assert_class(pipe, "pipeline")
   pipe$output <- NULL
   pipe
 }
@@ -215,16 +215,16 @@ flush <- function(pipe) {
 
 #' Flush Pipelines function
 #'
-#' Function to flush pipelines for one or more models in modeler object
+#' Function to clean pipelines for one or more models in modeler object
 #'
 #' @param obj modeler object
-#' @param ids one or more model ids. default is null which flushes all pipes
+#' @param ids one or more model ids. default is null which cleans all pipes
 #'
 #' @return updated modeler object
 #' @export
-flush_pipes <- function(obj, ids = NULL) {
-  checkmate::check_class(obj, "modeler")
-  check_character(ids, null.ok = TRUE)
+clean_pipes <- function(obj, ids = NULL) {
+  checkmate::assert_class(obj, "modeler")
+  checkmate::assert_character(ids, null.ok = TRUE)
 
   if(is.null(ids)) {
     ids <- get_models(obj)
@@ -232,7 +232,7 @@ flush_pipes <- function(obj, ids = NULL) {
 
   for(id in ids) {
     model <- get_models(obj, ids = id)[[1]]
-    model$pipe <- flush(model$pipe)
+    model$pipe <- clean(model$pipe)
     obj$models[[id]] <- model
   }
 

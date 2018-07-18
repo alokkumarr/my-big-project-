@@ -10,9 +10,10 @@
 #'   for date index variable.
 #' @param frequency seasonaly frequency of target. Default is NULL - no
 #'   seasonality
-#' @param prediction_conf_levels prediction confidence levels. Default is 80 &
-#'   95% CIs
+#' @param prediction_conf_levels prediction confidence levels. Default is 80 and
+#'   95 percent CIs
 #' @family use cases
+#' @aliases forecaster
 #' @export
 new_forecaster <- function(df,
                            target,

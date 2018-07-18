@@ -85,7 +85,7 @@ auto_fourier <- function(y,
 #' @examples
 #' library(forecast)
 #' fit <- auto_fourier(austres, frequency = 4)
-#' forecast(fit, h=12, frequency=12)
+#' forecast(fit, h=12, frequency=4)
 forecast.auto_fourier <- function(object,
                                   h = 10,
                                   xreg = NULL,

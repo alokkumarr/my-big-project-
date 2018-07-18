@@ -37,7 +37,7 @@ test_that("Regressor Selects Best Model", {
   test_pipe <- pipeline(expr = function(x){select(x, index, mpg, wt, hp)})
 
   r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
-    add_holdout_samples(splits = c(.8, .2)) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = test_pipe,
               method = "ml_linear_regression") %>%
     add_model(pipe = test_pipe,
@@ -51,9 +51,9 @@ test_that("Regressor Selects Best Model", {
   expect_subset(
     r1$final_model$id,
     r1$evaluate %>%
-      filter(sample == "validation") %>%
-      top_n(1, -rmse) %>%
-      pull(model)
+      dplyr::filter(sample == "validation") %>%
+      dplyr::top_n(1, -rmse) %>%
+      dplyr::pull(model)
   )
 })
 
@@ -75,11 +75,37 @@ test_that("Regressor Predicts New Data consistent with Method", {
 
   expect_class(p1, "predictions")
   expect_equal(p1$predictions %>%
-                 collect() %>%
-                 pull(predicted),
+                 dplyr::collect() %>%
+                 dplyr::pull(predicted),
                p2 %>%
-                 collect() %>%
-                 pull(prediction))
+                 dplyr::collect() %>%
+                 dplyr::pull(prediction))
+})
+
+
+test_that("Regressor Works with add_model_grid", {
+
+  enet_parm <- c(0, .5, 1)
+  lambda <- c(.1, .01, .001)
+
+  r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
+    add_default_samples() %>%
+    add_model_grid(pipe = NULL,
+                   method = "ml_linear_regression",
+                   elastic_net_param = enet_parm,
+                   reg_param = lambda) %>%
+    train_models() %>%
+    evaluate_models() %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  param_grid <- expand.grid(elastic_net_param = enet_parm, reg_param = lambda)
+  expect_equal(length(r1$models), nrow(param_grid))
+  for(i in 1:nrow(param_grid)){
+    expect_equal(r1$models[[i]]$method_args[[1]], param_grid[i,1])
+    expect_equal(r1$models[[i]]$method_args[[2]], param_grid[i,2])
+    expect_equal(r1$models[[i]]$fit$model$param_map$elastic_net_param, param_grid$elastic_net_param[i])
+    expect_equal(r1$models[[i]]$fit$model$param_map$reg_param, param_grid$reg_param[i])
+  }
 })
 
 
