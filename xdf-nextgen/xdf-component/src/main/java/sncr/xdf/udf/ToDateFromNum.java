@@ -10,12 +10,12 @@ import java.time.format.DateTimeFormatter;
 /**
  * Created by skbm0001 on 7/05/2018.
  */
-public class ToDateFromNum implements UDF1<Long, Date>, Serializable
+public class ToDateFromNum implements UDF1<Integer, Date>, Serializable
 {
     @Override
-    public java.sql.Date call(java.lang.Long i) throws Exception {
+    public java.sql.Date call(java.lang.Integer date) throws Exception {
         DateTimeFormatter frm = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate t = LocalDate.parse(String.valueOf(i), frm);
+        LocalDate t = LocalDate.parse(String.valueOf(date), frm);
         return Date.valueOf(t);
     }
 

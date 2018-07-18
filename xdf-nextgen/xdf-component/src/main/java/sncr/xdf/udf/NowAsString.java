@@ -12,8 +12,8 @@ import java.time.format.DateTimeFormatter;
 public class NowAsString implements UDF1<String, String>, Serializable {
 
     @Override
-    public String call(String f1) throws Exception {
-        DateTimeFormatter dfrm = DateTimeFormatter.ofPattern(f1);
+    public String call(String value) throws Exception {
+        DateTimeFormatter dfrm = DateTimeFormatter.ofPattern(value);
         LocalDateTime ldt = LocalDateTime.now();
         return ldt.format(dfrm);
     }

@@ -9,12 +9,12 @@ import java.time.format.DateTimeFormatter;
 /**
  * Created by skbm0001 on 7/05/2018.
  */
-public class ToTimestampFromNumAsString implements UDF2<Long, Long, String>, Serializable {
+public class ToTimestampFromNumAsString implements UDF2<Integer, Integer, String>, Serializable {
 
     @Override
-    public String call(Long i1, Long i2) throws Exception {
+    public String call(Integer date, Integer time) throws Exception {
         DateTimeFormatter dfrm = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
-        LocalDateTime ldt = LocalDateTime.parse((i1 + " " + i2), dfrm);
+        LocalDateTime ldt = LocalDateTime.parse((date + " " + time), dfrm);
         return ldt.toString();
     }
 }

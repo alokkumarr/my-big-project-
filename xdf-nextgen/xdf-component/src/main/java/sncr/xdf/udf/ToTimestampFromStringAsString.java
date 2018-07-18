@@ -12,9 +12,9 @@ import java.time.format.DateTimeFormatter;
 public class ToTimestampFromStringAsString implements UDF2<String, String, String>, Serializable {
 
     @Override
-    public String call(String s1, String s2) throws Exception {
+    public String call(String date, String time) throws Exception {
         DateTimeFormatter dfrm = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
-        LocalDateTime ldt = LocalDateTime.parse((s1 + " " + s2), dfrm);
+        LocalDateTime ldt = LocalDateTime.parse((date + " " + time), dfrm);
         return ldt.toString();
     }
 }
