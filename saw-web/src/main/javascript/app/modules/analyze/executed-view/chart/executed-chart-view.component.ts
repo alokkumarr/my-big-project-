@@ -125,7 +125,7 @@ export class ExecutedChartViewComponent {
         orderedData || data,
         {labels, labelOptions: analysis.labelOptions, sorts}
       ),
-      {path: 'title.text', data: analysis.chartTitle},
+      {path: 'title.text', data: analysis.chartTitle || analysis.name},
       {path: 'title.exportFilename', data: analysis.name},
       {path: 'chart.inverted', data: analysis.isInverted}
     ];
