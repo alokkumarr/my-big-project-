@@ -45,6 +45,11 @@ predict.forecast_model <- function(obj,
       warning("number of data rows doesn't match forecast periods")
     }
 
+    schema_check <- all.equal(get_schema(data), obj$schema)
+    if(schema_check[1] != TRUE) {
+      stop(paste("New Data shema check failed:\n", schema_check))
+    }
+
     x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
     if (length(x_vars) > 0) {
       xreg <- data[, x_vars, drop = FALSE]
