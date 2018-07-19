@@ -235,7 +235,7 @@ get_evalutions <- function(obj) {
   if (nrow(obj$evaluate) == 0) {
     obj$evaluate
   } else {
-    inner_join(mdls, obj$evaluate, by = "model")
+    dplyr::inner_join(mdls, obj$evaluate, by = "model")
   }
 }
 
@@ -258,7 +258,7 @@ get_best_model <- function(obj) {
     dplyr::arrange_at(obj$measure$method,
                       .funs = ifelse(obj$measure$minimize, identity, dplyr::desc)) %>%
     head(1) %>%
-    pull(model)
+    dplyr::pull(model)
   get_models(obj, ids = id)[[1]]
 }
 
@@ -420,7 +420,7 @@ evaluate_models.modeler <- function(obj, ids = NULL) {
   ids <- names(status == "trained")
 
   for (id in ids) {
-    model <- get_models(obj, id = id)[[1]]
+    model <- get_models(obj, ids = id)[[1]]
     model <- evaluate(model, obj$measure)
     obj$models[[id]] <- model
     obj$evaluate <- rbind(obj$evaluate, model$evaluate)

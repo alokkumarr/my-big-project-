@@ -245,6 +245,7 @@ forecaster.data.frame <- function(df,
 }
 
 
+#' @importFrom a2munge melter
 #' @export
 #' @rdname forecaster
 forecaster.tbl_spark <- function(df,
@@ -296,6 +297,7 @@ forecaster.tbl_spark <- function(df,
       variable_name = "measure",
       value_name = "y"
     ) %>%
+    dplyr::mutate_at("measure", as.character) %>%
     sparklyr::spark_apply(.,
                           function(e, l) {
                             library(forecast)

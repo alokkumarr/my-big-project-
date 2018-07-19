@@ -327,7 +327,8 @@ test_that("Spark Forecaster test case", {
                      pipe = NULL,
                      models = list(
                        list(method = "auto.arima", method_args = list()),
-                       list(method = "ets", method_args = list())))
+                       list(method = "ets", method_args = list()))
+                     )
 
   spk_f1 <- forecaster(dat3_tbl,
                        index_var = "index",
@@ -338,7 +339,8 @@ test_that("Spark Forecaster test case", {
                        pipe = NULL,
                        models = list(
                          list(method = "auto.arima", method_args = list()),
-                         list(method = "ets", method_args = list())))
+                         list(method = "ets", method_args = list()))
+                       )
 
   expect_equal(
     spk_f1 %>%

@@ -39,7 +39,7 @@ index.numeric <- index.integer <- function(x, unit = NULL) {
 #' @rdname index
 #' @export
 index.Date <- function(x, unit = "days") {
-  checkmate::assert_choice(unit, c("days", "weeks", "months", "years"))
+  checkmate::assert_choice(unit, c("days", "weeks", "years"))
   #checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
   if ((periods %% 1) != 0) {
@@ -101,10 +101,11 @@ extend.index <- function(obj, length_out) {
 }
 
 
+#' @importFrom lubridate seconds minutes hours days weeks years
 #' @rdname extend
 #' @export
 extend.time_index <- function(obj, length_out) {
-  obj$end + match.fun(obj$unit)(seq(
+  obj$end + get(obj$unit, asNamespace("lubridate"))(seq(
     from = 1,
     length.out = length_out,
     by = obj$periods
