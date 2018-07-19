@@ -298,8 +298,8 @@ export class AnalyzeService {
     });
   }
 
-  getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW) {
-    return this.applyAnalysis(analysis, mode).then(({data, executionId, executionType, count}) => {
+  getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW, options = {}) {
+    return this.applyAnalysis(analysis, mode, options).then(({data, executionId, executionType, count}) => {
       // forEach(analysis.artifacts[0].columns, column => {
       //   column.columnName = this.getColumnName(column.columnName);
       // });

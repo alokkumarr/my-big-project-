@@ -11,7 +11,10 @@ import { AnalysisReport } from '../../../analyze/types';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES
+} from '../../../analyze/services/analyze.service';
 
 const template = require('./observe-report.component.html');
 require('./observe-report.component.scss');
@@ -52,7 +55,7 @@ export class ObserveReportComponent implements OnDestroy {
           .then(({ data, count }) => ({ data, totalCount: count }));
       } else {
         return this.analyzeService
-          .previewExecution(this.analysis, options)
+          .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, options)
           .then(({ data, executionId, count }) => {
             this.executionId = executionId;
             return { data, totalCount: count };
