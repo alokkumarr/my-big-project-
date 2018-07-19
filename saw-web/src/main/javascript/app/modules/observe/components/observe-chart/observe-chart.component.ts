@@ -185,7 +185,7 @@ export class ObserveChartComponent {
 
     changes = changes.concat(this.getLegend());
     changes = changes.concat([
-      { path: 'title.text', data: this.analysis.name },
+      { path: 'title.text', data: this.analysis.chartTitle || this.analysis.name },
       { path: 'title.y', data: -10 }
     ]);
 
@@ -193,7 +193,6 @@ export class ObserveChartComponent {
       path: 'chart.inverted',
       data: get(this.analysis, 'isInverted', false)
     });
-
     return changes;
   }
 
