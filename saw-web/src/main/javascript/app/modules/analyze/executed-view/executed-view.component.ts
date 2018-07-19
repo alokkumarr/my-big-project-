@@ -426,10 +426,6 @@ export class ExecutedViewComponent implements OnInit {
     this._analyzeActionsService.fork(this.analysis);
   }
 
-  publish() {
-    this._analyzeActionsService.publish(this.analysis);
-  }
-
   afterDelete(analysis) {
     this.goBackToMainPage(analysis);
   }

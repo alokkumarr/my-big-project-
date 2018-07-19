@@ -11,7 +11,6 @@ export function generateSchedule(cronJobs, id) {
         // there is no time stamp in hourly cron hence converting to utc and local is not required.
         const localMinuteCron = extractMinute(cron.jobDetails.cronExpression);
         scheduleHuman = cronstrue.toString(localMinuteCron);
-
       } else {
         const localCron = convertToLocal(cron.jobDetails.cronExpression);
         scheduleHuman = cronstrue.toString(localCron);
@@ -27,7 +26,11 @@ function extractMinute(CronUTC) {
   date.setUTCHours(moment().format('HH'), splitArray[1]);
   const UtcTime = moment.utc(date).local().format('mm').split(' ');
   splitArray[1] = UtcTime[0];
-  return splitArray.join(' ');
+  if (UtcTime[0] === 'Invalid') {
+    return CronUTC;
+  } else {
+    return splitArray.join(' ');  
+  }
 }
 
 function convertToLocal(CronUTC) {
