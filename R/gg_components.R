@@ -19,8 +19,6 @@
 #' @seealso ggplot2::facet_grid \url{http://ggplot2.tidyverse.org/reference/facet_grid.html}
 #' @seealso ggplot2::facet_wrap \url{http://ggplot2.tidyverse.org/reference/facet_wrap.html}
 #'
-#' @export
-#'
 #' @examples
 #' ggplot(mtcars, aes(x=mpg)) +
 #' geom_histogram() +
@@ -63,8 +61,6 @@ gg_facet <- function(facet_formula = NULL, ...) {
 #' @param ... takes additional arguments to coord function specified
 #' @seealso ggplot2 coordinate fucntions
 #'   \url{http://ggplot2.tidyverse.org/reference/#section-coordinate-systems}
-#'
-#' @export
 #'
 #' @examples
 #' ggplot(mtcars, aes(x=mpg)) +
@@ -110,7 +106,6 @@ gg_coord <- function(coord = NULL, ...) {
 #' @seealso geom_label \url{http://ggplot2.tidyverse.org/reference/geom_text.html}
 #'
 #' @return returns either a geom_label or geom_blank object
-#' @export
 #'
 gg_label <- function(label = NULL, y = NULL, ...) {
   checkmate::assert_string(label, null.ok = TRUE)
@@ -163,7 +158,6 @@ gg_label <- function(label = NULL, y = NULL, ...) {
 #' @return returns a list of 2 lists. First returned list is the updated
 #'   arguments to pass to the aes function. the second list is the updated list
 #'   of arguments to pass to the geom function
-#' @export
 #' 
 get_geom_params <- function(names,
                             fill = NULL,
@@ -216,7 +210,6 @@ get_geom_params <- function(names,
 #' @param caption chart caption. expects a string
 #'
 #' @return ggplot2 label object
-#' @export
 gg_titles <- function(title,
                       subtitle ,
                       x_axis_title,
@@ -254,7 +247,6 @@ gg_titles <- function(title,
 #' @seealso \code{\link[forcats]{fct_reorder}}
 #'
 #' @return list with sort params arguments and updated x axis title
-#' @export
 #' @importFrom forcats fct_infreq 
 #' @importFrom forcats fct_reorder
 gg_sort <- function(sort,
@@ -301,8 +293,6 @@ gg_sort <- function(sort,
 #' @seealso \url{http://ggplot2.tidyverse.org/reference/geom_point.html}
 #'
 #' @return ggplot geom_point layer object
-#' @export
-#'
 gg_point <- function(points = F, ...) {
   checkmate::assert_flag(points)
   if (points) {
@@ -324,9 +314,7 @@ gg_point <- function(points = F, ...) {
 #' @seealso \url{http://ggplot2.tidyverse.org/reference/geom_smooth.html}
 #'
 #' @return ggplot geom_smooth layer object
-#' @export
 #' @importFrom ggplot2 geom_smooth geom_blank
-#'
 gg_smooth <- function(smooth = F, ...) {
   checkmate::assert_flag(smooth)
   if (smooth) {
@@ -338,16 +326,14 @@ gg_smooth <- function(smooth = F, ...) {
 
 
 #' GGPlot Line Component
-#'
+#' 
 #' Wrapper function for adding geom_line layer by way of stat_summary
-#'
+#' 
 #' @param line TRUE/FALSE. Default is TRUE. Option to add geom_line layer
 #' @inheritDotParams ggplot2::stat_summary
 #' @seealso \url{http://ggplot2.tidyverse.org/reference/geom_point.html}
-#'
-#' @return either a
-#' @export
-#'
+#' 
+#' @return either a ggplot geom_line layer object or NULL
 gg_line <- function(line = TRUE,
                     fun = "mean",
                     geom = "line",
