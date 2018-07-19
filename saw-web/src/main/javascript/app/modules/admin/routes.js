@@ -11,6 +11,10 @@ export function routesConfig($stateProvider) {
       name: 'admin',
       url: '/admin',
       redirectTo: 'admin.user'
+    // }, {
+    //   name: 'admin.user',
+    //   url: '/user',
+    //   component: 'usersView'
     }, {
       name: 'admin.user',
       url: '/user',

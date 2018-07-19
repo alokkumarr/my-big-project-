@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import {dxDataGridService} from '../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-list-view.component.html');
@@ -15,6 +15,8 @@ export class AdminListViewComponent {
   @Input() columns: any[];
   @Input() section: 'user' | 'role' | 'privilege' | 'categories';
   @Input() highlightTerm: string;
+  @Output() editRow: EventEmitter<any> = new EventEmitter();
+  @Output() deleteRow: EventEmitter<any> = new EventEmitter();
 
   config: any;
 
@@ -23,18 +25,7 @@ export class AdminListViewComponent {
   ) { }
 
   ngOnInit() {
-    console.log('data', this.data);
-    console.log('columns', this.columns);
-    console.log('section', this.section);
     this.config = this.getConfig();
-  }
-
-  openDeleteModal(row) {
-    console.log('del', row);
-  }
-
-  openEditModal(row) {
-    console.log('row', row);
   }
 
   getConfig() {

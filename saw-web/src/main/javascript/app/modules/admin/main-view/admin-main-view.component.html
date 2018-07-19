@@ -1,6 +1,6 @@
 <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
   <div fxLayout="row" fxFlex="40">
-    <div class="category-title" e2e="category-title">{{section | changeCase:'title'}} Management</div>
+    <div class="admin-title" e2e="category-title">{{section | changeCase:'title'}} Management</div>
     <search-box placeholder="Search"
                 [value]="filterObj.searchTerm"
                 (searchTermChange)="applySearchFilter($event)"
@@ -8,11 +8,11 @@
     </search-box>
   </div>
 
-  <div fxLayout="row" fxLayoutAlign="start center" fxFlex="40">
-    Customer: {{customer}}
+  <div fxLayout="row" class="customer-name" fxLayoutAlign="start center" fxFlex="40">
+    Customer: {{ticket.custCode}}
   </div>
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
-    <button (click)="openNewModal()"
+    <button (click)="createUser()"
             mat-raised-button
             color="primary">
       + <span i18n>{{section | uppercase}}</span>
@@ -20,7 +20,9 @@
   </div>
 </mat-toolbar>
 <div *ngIf="data; else loading">
-  <admin-list-view [data]="filteredData"
+  <admin-list-view (editRow)="editRow($event)"
+                   (deleteRow)="deleteRow($event)"
+                   [data]="filteredData"
                    [columns]="columns"
                    [section]="section"
                    [highlightTerm]="filterObj.searchTermValue">

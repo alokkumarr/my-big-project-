@@ -4,7 +4,10 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModuleTs } from '../../common';
 import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';
-import {UserService} from './user';
+import {
+  UserEditDialogComponent,
+  UserService
+} from './user';
 import {JwtService} from '../../../login/services/jwt.service';
 import {dxDataGridService} from '../../common/services/dxDataGrid.service';
 import {
@@ -100,7 +103,8 @@ angular.module(OldAdminModule, [
 
 const COMPONENTS = [
   AdminMainViewComponent,
-  AdminListViewComponent
+  AdminListViewComponent,
+  UserEditDialogComponent
 ];
 @NgModule({
   imports: [

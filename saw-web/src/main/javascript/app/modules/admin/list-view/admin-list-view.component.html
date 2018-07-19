@@ -40,12 +40,12 @@
   <div *dxTemplate="let cell of 'actionCellTemplate'">
     <div fxLayout="row" fxLayoutAlign="center center" class="list-action__container">
       <button mat-icon-button
-              (click)="openEditModal(cell.data)"
+              (click)="editRow.emit(cell.data)"
               matTooltip="Edit User">
         <mat-icon fontIcon="icon-edit"></mat-icon>
       </button>
       <button mat-icon-button
-              (click)="openDeleteModal(cell.data)"
+              (click)="deleteRow.emit(cell.data)"
               matTooltip="Delte User">
         <mat-icon fontIcon="icon-trash"></mat-icon>
       </button>
