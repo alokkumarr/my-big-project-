@@ -22,8 +22,6 @@ evaluate(mobj, measure)
 \item{mobj}{model object}
 
 \item{measure}{measure object}
-
-\item{target_df}{dataframe with target and index variables}
 }
 \value{
 returns evaluted model object

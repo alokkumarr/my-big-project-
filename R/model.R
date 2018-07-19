@@ -306,8 +306,11 @@ append_model <- function(obj, model) {
 #'
 #' Fit model to single data sample
 #'
+#' @param mobj Model object to fit
+#' @param data data to fit model object on
+#' @param ... additional arguments to pass through
 #' @export
-fit <- function(...){
+fit <- function(mobj, data, ...){
   UseMethod("fit")
 }
 
@@ -331,7 +334,6 @@ train <- function(...) {
 #' Function to evaluate the predictive performance of a model
 #'
 #' @param mobj model object
-#' @param target_df dataframe with target and index variables
 #' @param measure measure object
 #'
 #' @return returns evaluted model object
@@ -373,35 +375,40 @@ evaluate.model <- function(mobj, measure) {
 
 #' Return a Model Fit
 #'
+#' @param mobj model object
+#' @param ... additional arguments to pass through
 #' @export
-get_fit <- function(x, ...) {
-  UseMethod("get_fit", x)
+get_fit <- function(mobj, ...) {
+  UseMethod("get_fit", mobj)
 }
 
 #' Return the Model Coefficients
 #'
+#' @inheritParams get_fit
 #' @export
-get_coefs <- function(x, ...) {
-  UseMethod("get_coefs", x)
+get_coefs <- function(mobj, ...) {
+  UseMethod("get_coefs", mobj)
 }
 
 #' Get Model Forecasts
 #'
+#' @inheritParams get_fit
 #' @export
-get_forecasts <- function(x, ...) {
-  UseMethod("get_forecasts", x)
+get_forecasts <- function(mobj, ...) {
+  UseMethod("get_forecasts", mobj)
 }
 
 
 #' Return Tidy Dataset of Model Performance
 #'
 #' @export
-tidy_performance <- function(obj) {
-  UseMethod("tidy_performance")
+tidy_performance <- function(mobj) {
+  UseMethod("tidy_performance", mobj)
 }
 
 
 # Class Methods -----------------------------------------------------------
+
 
 #' @export
 #' @rdname get_target

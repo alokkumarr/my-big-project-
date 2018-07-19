@@ -182,7 +182,7 @@ auto_forecaster <- function(df,
 
 
 
-#' @inheritParams auto_forecasts
+#' @inheritParams auto_forecaster
 #' @param group_vars optional column name of grouping variables. splits data and
 #'   applies auto_forecaster to each group
 #' @param measure_vars colname names of variables to forecast

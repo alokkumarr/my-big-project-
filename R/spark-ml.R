@@ -1,7 +1,7 @@
 
 # Spark ML Class Methods --------------------------------------------------
 
-#' Spark ML fit method
+
 #' @rdname fit
 #' @export
 fit.spark_ml <- function(mobj, data) {
@@ -20,14 +20,18 @@ fit.spark_ml <- function(mobj, data) {
 
 
 #' Fitted Method for Spark-ML Object
+#'
+#' Extracts fitted values from train step
+#'
+#' @param mobj model object
 #' @rdname fitted
 #' @export
-fitted.spark_ml <- function(obj) {
-  if(! is.null(obj$fit$model$summary)){
-    obj$fit$model$summary$predictions %>%
+fitted.spark_ml <- function(mobj) {
+  if(! is.null(mobj$fit$model$summary)){
+    mobj$fit$model$summary$predictions %>%
       dplyr::select(index, predicted = prediction, features)
   }else{
-    predict(obj, obj$pipe$output)
+    predict(mobj, mobj$pipe$output)
   }
 }
 
@@ -35,7 +39,7 @@ fitted.spark_ml <- function(obj) {
 #' Fitted Method for Spark-ML Decision Tree Classification Model
 #' @rdname fitted
 #' @export
-fitted.ml_decision_tree_classification_model <- function(obj) {
+fitted.ml_decision_tree_classification_model <- function(mobj) {
   sparklyr::sdf_predict(mobj$fit, mobj$pipe$output) %>%
     dplyr::select(index, predicted = prediction)
 }
@@ -45,9 +49,9 @@ fitted.ml_decision_tree_classification_model <- function(obj) {
 #' Predict Method for Spark-ML Clustering Object
 #' @rdname predict
 #' @export
-predict.spark_ml_clustering <- function(obj, data, ...) {
+predict.spark_ml_clustering <- function(mobj, data, ...) {
   checkmate::assert_class(data, "tbl_spark")
-  sparklyr::sdf_predict(data, obj$fit, ...) %>%
+  sparklyr::sdf_predict(data, mobj$fit, ...) %>%
     dplyr::select(index, predicted = prediction, features)
 }
 
@@ -55,9 +59,9 @@ predict.spark_ml_clustering <- function(obj, data, ...) {
 #' Predict Method for Spark-ML Classification Object
 #' @rdname predict
 #' @export
-predict.spark_ml_classification <- function(obj, data, ...) {
+predict.spark_ml_classification <- function(mobj, data, ...) {
   checkmate::assert_class(data, "tbl_spark")
-  sparklyr::sdf_predict(data, obj$fit, ...) %>%
+  sparklyr::sdf_predict(data, mobj$fit, ...) %>%
     dplyr::select(index, predicted = prediction)
 }
 

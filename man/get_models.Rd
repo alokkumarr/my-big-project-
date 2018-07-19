@@ -9,9 +9,9 @@ get_models(obj, ids = NULL, status = NULL)
 \arguments{
 \item{obj}{modeler object}
 
-\item{status}{model status code. accepts "created", "added", "trained", "evaluated", or "selected"}
+\item{ids}{one or more model id characters}
 
-\item{id}{one or more model id characters}
+\item{status}{model status code. accepts "created", "added", "trained", "evaluated", or "selected"}
 }
 \value{
 list of model objects

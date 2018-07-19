@@ -28,6 +28,9 @@ new_pipeline <- function(expr,
 #' Creates a pipeline object. The expression is set by default as the identity
 #' function. This returns the
 #'
+#' @param expr pipeline function. default is identity function
+#' @param desc optional description input
+#'
 #' @export
 pipeline <- function(expr = identity,
                      desc = NULL) {

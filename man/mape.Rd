@@ -6,11 +6,18 @@
 \alias{mape.tbl_spark}
 \title{Generic mape function}
 \usage{
-mape(...)
+mape(x, predicted, actual)
 
 \method{mape}{data.frame}(x, predicted, actual)
 
 \method{mape}{tbl_spark}(x, predicted, actual)
+}
+\arguments{
+\item{x}{dataframe object}
+
+\item{predicted}{column name of predicted values}
+
+\item{actual}{column name of actual values}
 }
 \description{
 Generic mape function

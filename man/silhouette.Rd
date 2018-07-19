@@ -5,9 +5,14 @@
 \alias{silhouette.tbl_spark}
 \title{Generic silhouette function}
 \usage{
-silhouette(...)
+silhouette(x, predicted)
 
 \method{silhouette}{tbl_spark}(x, predicted = "predicted")
+}
+\arguments{
+\item{x}{dataframe object}
+
+\item{predicted}{column name of predicted values}
 }
 \description{
 Generic silhouette function

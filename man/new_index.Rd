@@ -6,6 +6,22 @@
 \usage{
 new_index(unit, periods, start, end)
 }
+\arguments{
+\item{unit}{index unit. can by time base units such as days, weeks or years
+or numerical unit such as 1}
+
+\item{periods}{number of units per period}
+
+\item{start}{index starting value}
+
+\item{end}{index ending value}
+}
+\value{
+index class
+}
 \description{
-Index Class Constructer
+Creates new index object for sequential data management
+}
+\details{
+Used by Forecaster to create forward looking indicies
 }

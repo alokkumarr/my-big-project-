@@ -74,10 +74,14 @@ auto_fourier <- function(y,
 #' auto_fourier_model adds harmonic regressors to the auto_arima function from
 #' the forecast function
 #'
-#' @inheritParams forecast::auto.arima
-#' @param x Optional a vector or matrix of extrenal regressors. Must correspond
-#'   to forecast period and be the same length as the forecast
+#' @param object auto_fourier object forecast model
+#' @param xreg Optional a vector or matrix of extrenal regressors. Must
+#'   correspond to forecast period and be the same length as the forecast
+#' @param h forecast horizon length
 #' @param frequency seasonal frequency of y - univarite time series
+#' @param level vector of numerical confidence levels. Ex - 80 is a 80 percent
+#'   confidence level
+#' @param ... additional arguments to pass to forecast function
 #'
 #' @return An object of class 'forecast'
 #' @export

@@ -24,11 +24,11 @@
 
 \method{predict}{segmenter}(obj, data = NULL, desc = "", ...)
 
-\method{predict}{spark_ml_clustering}(obj, data, ...)
+\method{predict}{spark_ml_clustering}(mobj, data, ...)
 
-\method{predict}{spark_ml_classification}(obj, data, ...)
+\method{predict}{spark_ml_classification}(mobj, data, ...)
 
-\method{predict}{ml_model_regression}(obj, data, ...)
+\method{predict}{ml_model_regression}(mobj, data, ...)
 }
 \description{
 Method makes predictions using classifier object's final model
