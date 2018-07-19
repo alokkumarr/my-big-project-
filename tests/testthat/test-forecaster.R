@@ -356,3 +356,22 @@ test_that("Spark Forecaster test case", {
 
 })
 
+
+test_that("Schema Check works as expected", {
+
+  dat2 <- data.frame(dat1, x1 = rnorm(n), x2 = rnorm(n))
+
+  f12 <- new_forecaster(df = dat2,
+                       target = "y",
+                       index_var = "index",
+                       name = "test") %>%
+    add_model(pipe = pipeline(), method = "auto.arima") %>%
+    train_models(.) %>%
+    evaluate_models(.) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  expect_error(predict(f12, periods = 10, data = data.frame(x1=rnorm(10))))
+
+  p12 <- predict(f12, periods = 10, data = data.frame(x1=rnorm(10), x2=rnom(10)))
+  expect_class(p12, "predictions")
+})
