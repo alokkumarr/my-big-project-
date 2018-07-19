@@ -22,6 +22,15 @@ new_classifier <- function(df,
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
 
+  # Target Check
+  target_dims <- df %>%
+    dplyr::distinct_(target) %>%
+    sparklyr::sdf_nrow()
+
+  if(target_dims != 2) {
+    stop(paste("target not a binary distribution.\n  Has", target_dims, "unique values"))
+  }
+
   df <- df %>%
     dplyr::mutate(index = 1) %>%
     dplyr::mutate(index = row_number(index))
