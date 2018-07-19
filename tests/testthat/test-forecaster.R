@@ -372,6 +372,6 @@ test_that("Schema Check works as expected", {
 
   expect_error(predict(f12, periods = 10, data = data.frame(x1=rnorm(10))))
 
-  p12 <- predict(f12, periods = 10, data = data.frame(x1=rnorm(10), x2=rnom(10)))
+  p12 <- predict(f12, periods = 10, data = data.frame(x1=rnorm(10), x2=rnorm(10)))
   expect_class(p12, "predictions")
 })

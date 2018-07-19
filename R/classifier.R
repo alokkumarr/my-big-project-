@@ -59,6 +59,7 @@ predict.classifier <- function(obj,
     dplyr::mutate(index = 1) %>%
     dplyr::mutate(index = row_number(index))
 
+  schema <- obj$schema[! names(obj$schema) %in% c(obj$target)]
   schema_check <- all.equal(get_schema(data), obj$schema)
   if(schema_check[1] != TRUE) {
     stop(paste("New Data shema check failed:\n", schema_check))

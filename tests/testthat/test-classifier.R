@@ -88,6 +88,7 @@ test_that("Classifier Predicts New Data", {
 
 # Advanced Tests ----------------------------------------------------------
 
+
 test_that("Classifer with Multiple Methods and CV", {
 
   test_pipe <- pipeline(expr = function(x) {

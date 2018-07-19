@@ -75,6 +75,15 @@ predict.forecaster <- function(obj,
   if (is.null(final_model)) {
     stop("Final model not set")
   }
+
+  if(! is.null(data)) {
+    schema <- obj$schema[! names(obj$schema) %in% c(obj$target, obj$index_var)]
+    schema_check <- all.equal(get_schema(data), schema)
+    if(schema_check[1] != TRUE) {
+      stop(paste("New Data shema check failed:\n", schema_check))
+    }
+  }
+
   final_model$pipe <- execute(data, final_model$pipe)
   preds <- predict(final_model, periods, data = final_model$pipe$output, level)
   index_out <- extend(obj$index, length_out = periods)
