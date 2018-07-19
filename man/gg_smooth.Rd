@@ -12,47 +12,53 @@ arguments}
 
 \item{...}{Arguments passed on to \code{ggplot2::geom_smooth}
 \describe{
-  \item{mapping}{Set of aesthetic mappings created by \code{\link{aes}} or
-\code{\link{aes_}}. If specified and \code{inherit.aes = TRUE} (the
+  \item{mapping}{Set of aesthetic mappings created by \code{\link[=aes]{aes()}} or
+\code{\link[=aes_]{aes_()}}. If specified and \code{inherit.aes = TRUE} (the
 default), it is combined with the default mapping at the top level of the
 plot. You must supply \code{mapping} if there is no plot mapping.}
   \item{data}{The data to be displayed in this layer. There are three
-   options:
+options:
 
-   If \code{NULL}, the default, the data is inherited from the plot
-   data as specified in the call to \code{\link{ggplot}}.
+If \code{NULL}, the default, the data is inherited from the plot
+data as specified in the call to \code{\link[=ggplot]{ggplot()}}.
 
-   A \code{data.frame}, or other object, will override the plot
-   data. All objects will be fortified to produce a data frame. See
-   \code{\link{fortify}} for which variables will be created.
+A \code{data.frame}, or other object, will override the plot
+data. All objects will be fortified to produce a data frame. See
+\code{\link[=fortify]{fortify()}} for which variables will be created.
 
-   A \code{function} will be called with a single argument,
-   the plot data. The return value must be a \code{data.frame.}, and
-   will be used as the layer data.}
+A \code{function} will be called with a single argument,
+the plot data. The return value must be a \code{data.frame.}, and
+will be used as the layer data.}
   \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
-  \item{method}{smoothing method (function) to use, eg. "lm", "glm",
-  "gam", "loess", "rlm".
+  \item{method}{Smoothing method (function) to use, eg. \code{lm}, \code{glm},
+\code{gam}, \code{loess}, \code{MASS::rlm}.
 
-  For \code{method = "auto"} the smoothing method is chosen based on the
-  size of the largest group (across all panels). \code{\link{loess}} is
-  used for than 1,000 observations; otherwise \code{\link[mgcv]{gam}} is
-  used with \code{formula = y ~ s(x, bs = "cs")}. Somewhat anecdotally,
-  \code{loess} gives a better appearance, but is O(n^2) in memory, so does
-  not work for larger datasets.}
-  \item{formula}{formula to use in smoothing function, eg. \code{y ~ x},
+For \code{method = "auto"} the smoothing method is chosen based on the
+size of the largest group (across all panels). \code{\link[=loess]{loess()}} is
+used for less than 1,000 observations; otherwise \code{\link[mgcv:gam]{mgcv::gam()}} is
+used with \code{formula = y ~ s(x, bs = "cs")}. Somewhat anecdotally,
+\code{loess} gives a better appearance, but is O(n^2) in memory, so does
+not work for larger datasets.
+
+If you have fewer than 1,000 observations but want to use the same \code{gam}
+model that \code{method = "auto"} would use then set
+\code{method = "gam", formula = y ~ s(x, bs = "cs")}.}
+  \item{formula}{Formula to use in smoothing function, eg. \code{y ~ x},
 \code{y ~ poly(x, 2)}, \code{y ~ log(x)}}
-  \item{se}{display confidence interval around smooth? (TRUE by default, see
-level to control}
+  \item{se}{Display confidence interval around smooth? (TRUE by default, see
+level to control.)}
   \item{na.rm}{If \code{FALSE}, the default, missing values are removed with
 a warning. If \code{TRUE}, missing values are silently removed.}
   \item{show.legend}{logical. Should this layer be included in the legends?
 \code{NA}, the default, includes if any aesthetics are mapped.
-\code{FALSE} never includes, and \code{TRUE} always includes.}
+\code{FALSE} never includes, and \code{TRUE} always includes.
+It can also be a named logical vector to finely select the aesthetics to
+display.}
   \item{inherit.aes}{If \code{FALSE}, overrides the default aesthetics,
 rather than combining with them. This is most useful for helper functions
 that define both data and aesthetics and shouldn't inherit behaviour from
-the default plot specification, e.g. \code{\link{borders}}.}
+the default plot specification, e.g. \code{\link[=borders]{borders()}}.}
   \item{stat}{Use to override the default connection between
 \code{geom_smooth} and \code{stat_smooth}.}
 }}

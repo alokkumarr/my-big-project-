@@ -64,7 +64,7 @@ palette}
 
   \code{\link{gg_scatter_chart}} \code{\link{gg_interval_chart}}}
 
-\item{...}{other arguments passed on to \code{\link{layer}}. These are
+\item{...}{Other arguments passed on to \code{\link[=layer]{layer()}}. These are
 often aesthetics, used to set an aesthetic to a fixed value, like
 \code{color = "red"} or \code{size = 3}. They may also be parameters
 to the paired geom/stat.}
