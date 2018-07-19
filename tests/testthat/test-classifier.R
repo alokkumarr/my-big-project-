@@ -29,6 +29,8 @@ test_that("Classifier Constructer", {
 
   c1 <- new_classifier(df = df, target = "am", name = "test")
   expect_class(c1, "classifier")
+
+  expect_error(new_classifier(df = df, target = "mpg", name = "test"))
 })
 
 
