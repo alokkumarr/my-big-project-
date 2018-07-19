@@ -12,5 +12,9 @@ filter-chips-u {
 
   mat-chip-list {
     padding: 0 0 0 20px;
+
+    .mat-chip-list-wrapper > .mat-chip {
+      margin-bottom: 5px;
+    }
   }
 }
