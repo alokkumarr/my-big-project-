@@ -52,16 +52,14 @@ segment_methods <- data.frame(
   method =  c(
     "ml_kmeans",
     "ml_bisecting_kmeans",
-    "ml_lda",
     "ml_gaussian_mixture"
   ),
   name = c(
     "Spark ML K-Means",
     "Spark ML Bisecting K-Means",
-    "Spark ML Latent Dirichlet Allocation",
     "Spark ML Gaussian Mixture clustering"
   ),
-  class = c(rep("spark_ml", 4), rep("spark_ml_clustering", 4)),
+  class = c(rep("spark_ml", 3), rep("spark_ml_clustering", 3)),
   package = "sparklyr"
 )
 
