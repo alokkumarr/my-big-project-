@@ -29,6 +29,7 @@ export class DesignerSettingsGroupComponent {
 
   public dndSortableContainerObj = {};
   public allowDropFn;
+  public fieldCount;
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
 
@@ -49,6 +50,8 @@ export class DesignerSettingsGroupComponent {
       this.groupAdapter,
       this.groupAdapters
     );
+    this.fieldCount = this.artifactColumns.length;
+    console.log(this.fieldCount);
   }
 
   onRemoveField(artifactColumn: ArtifactColumn) {
