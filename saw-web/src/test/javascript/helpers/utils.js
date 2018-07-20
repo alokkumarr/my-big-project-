@@ -1,5 +1,4 @@
-var appRoot = require('app-root-path');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
+const commonFunctions = require('../../javascript/helpers/commonFunctions');
 
 /**
  * Check if an element has class

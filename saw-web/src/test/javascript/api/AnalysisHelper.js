@@ -1,15 +1,14 @@
 'use strict';
-var appRoot = require('app-root-path');
-const apiCall = require(appRoot + '/src/test/javascript/helpers/apiCall');
-const users = require(appRoot + '/src/test/javascript/data/users');
-const roles = require(appRoot + '/src/test/javascript/data/roles');
-const categories = require(appRoot + '/src/test/javascript/data/categories');
-const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
-const privileges = require(appRoot + '/src/test/javascript/data/privileges');
+const apiCall = require('../../javascript/helpers/apiCall');
+const users = require('../../javascript/data/users');
+const roles = require('../../javascript/data/roles');
+const categories = require('../../javascript/data/categories');
+const subCategories = require('../../javascript/data/subCategories');
+const privileges = require('../../javascript/data/privileges');
 const request = require('sync-request');
-const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
-const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
+const globalVariables = require('../../javascript/helpers/globalVariables');
+const dataSets = require('../../javascript/data/datasets');
+const protractorConf = require('../../../../conf/protractor.conf');
 const urlParser = require('url');
 //const url = 'http://localhost/'; // API base url
 const activeStatusInd = 1; // shared for all users
@@ -19,12 +18,12 @@ const customerCode = 'SYNCHRONOSS'; // shared for all users
 const productId = 1; // shared for all users
 const moduleId = 1; // shared for all users
 let url = '';
-let RequestModel = require(appRoot + '/src/test/javascript/api/RequestModel');
-const Constants = require(appRoot + '/src/test/javascript/api/Constants');
+let RequestModel = require('../../javascript/api/RequestModel');
+const Constants = require('../../javascript/api/Constants');
 
 class AnalysisHelper {
 
-    //analysisType chart 
+    //analysisType chart
     createPivotChart(url, token,name, description, type) {
         let semanticId = this.getSemanticId(url,dataSets.pivotChart, token); // Get semanticId (dataset ID)
         return this.generateChart(url,semanticId, dataSets.pivotChart, users.masterAdmin, subCategories.createAnalysis, token,name, description, type);
@@ -51,12 +50,12 @@ class AnalysisHelper {
       return apiCall.post(host + 'services/analysis', deletePayload, token);
     }
     /**
-     * 
-     * @param {*} url 
-     * @param {*} token 
-     * @param {*} name 
-     * @param {*} description 
-     * @param {*} analysisType 
+     *
+     * @param {*} url
+     * @param {*} token
+     * @param {*} name
+     * @param {*} description
+     * @param {*} analysisType
      */
     createNewAnalysis(url, token, name, description, analysisType, subType) {
 
@@ -92,28 +91,28 @@ class AnalysisHelper {
     //analysisType = esReport
     createEsReport(url, token,name, description, analysisType, subType) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName); 
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
     }
 
      //analysisType = chart
      createChart(url, token,name, description, analysisType, subType) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName); 
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
     }
     //analysisType = pivot
     createPivot(url, token,name, description, analysisType, subType) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName); 
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
     }
     //analysisType = report
     createReport(url, token,name, description, analysisType, subType) {
       let dataSetName = dataSets.report;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName); 
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
     }
 
     createAnalysis(url, token,name, description, analysisType, subType, dataSetName) {
        // Get semanticId (dataset ID)
-       let semanticId = this.getSemanticId(url,dataSetName, token); 
+       let semanticId = this.getSemanticId(url,dataSetName, token);
        // Create
        const createPayload = new RequestModel().getAnalysisCreatePayload(semanticId, analysisType, customerCode);
        // Get ID
@@ -122,12 +121,12 @@ class AnalysisHelper {
        let currentTimeStamp = new Date().getTime();
        let user = users.masterAdmin;
        let subCategory = subCategories.createAnalysis;
-       let updatePayload; 
+       let updatePayload;
        let executePayload;
-       
+
        if(analysisType === Constants.ES_REPORT) {
         updatePayload = new RequestModel().getEsReportBody(customerCode,id,'update',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType); 
+                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
         executePayload = new RequestModel().getEsReportBody(customerCode,id,'execute',
                                 dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
        } else if (analysisType === Constants.CHART) {
@@ -148,14 +147,14 @@ class AnalysisHelper {
       } else {
         throw new Error('Invalid analysis type: '+ analysisType);
       }
-      //Update                      
+      //Update
        apiCall.post(url + 'services/analysis', updatePayload, token);
        //execute
        let response = apiCall.post(url + 'services/analysis', executePayload, token);
        return response;
     }
 
-    
+
     getToken(url) {
         const payload = {'masterLoginId': users.masterAdmin.loginId, 'password': users.masterAdmin.password};
         return 'Bearer '.concat(JSON.parse(request('POST', url + 'security/doAuthenticate',

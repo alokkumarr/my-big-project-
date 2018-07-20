@@ -1,7 +1,7 @@
 var appRoot = require('app-root-path');
-const webpackHelper = require(appRoot + '/conf/webpack.helper');
+const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-const generate = require(appRoot + '/src/test/javascript/data/generateTestData');
+const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
@@ -144,7 +144,7 @@ exports.config = {
       //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
     ],
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
     ]
   } : {
     /**

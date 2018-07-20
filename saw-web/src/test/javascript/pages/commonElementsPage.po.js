@@ -1,6 +1,5 @@
-var appRoot = require('app-root-path');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
+const protractorConf = require('../../../../conf/protractor.conf');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 
 module.exports = {
   errorToast: element(by.xpath("//*[@class='toast toast-error']")),

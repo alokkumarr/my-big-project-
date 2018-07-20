@@ -1,16 +1,13 @@
-var appRoot = require('app-root-path');
 const element = require('protractor');
 const path = require('path');
-const LoginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po');
-const AnalyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po');
-const WorkbenchPage = require(appRoot + '/src/test/javascript/pages/workbenchPage.po');
-// const WorkBenchService = require('../../main/javascript/app/modules/workbench/services/workbench.service');
-const CONFIG =  require('../../../../saw-web/conf/protractor.conf');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
+const LoginPage = require('../javascript/pages/loginPage.po');
+const AnalyzePage = require('../javascript/pages/analyzePage.po');
+const WorkbenchPage = require('../javascript/pages/workbenchPage.po');
+const commonFunctions = require('../javascript/helpers/commonFunctions');
 const Using = require('jasmine-data-provider');
-const users = require(appRoot + '/src/test/javascript/data/users.js');
+const users = require('../javascript/data/users.js');
 const Protractor = require('protractor');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
+const protractorConf = require('../../../conf/protractor.conf');
 
 const ec = Protractor.ExpectedConditions;
 describe('Workbench Tests : workbench.test.js',  () => {
@@ -23,7 +20,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
       browser.waitForAngular();
     expect(browser.getCurrentUrl()).toContain('/login');
     done();
-    }, CONFIG.timeouts.pageResolveTimeout);
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach((done) => {
@@ -31,7 +28,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
     browser.waitForAngular();
     AnalyzePage.main.doAccountAction('logout');
     done();
-    }, CONFIG.timeouts.pageResolveTimeout);
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   beforeAll(() => {
@@ -49,43 +46,43 @@ describe('Workbench Tests : workbench.test.js',  () => {
       LoginPage.userLogin(data.user, users.anyUser.password);
       WorkbenchPage.validateCardViewMode();
     });
-  
+
     it('should display data sets view by default by ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
       WorkbenchPage.validateSetViewMode();
     });
-  
+
     it('should refresh portal ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.refreshBtn);
     });
-  
+
     it('should display portal in list view when list is selected ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.listView);
     });
-  
+
     it('should display portal in card view when card is selected ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.cardView);
     });
-  
+
     it('should display portal in sets when data sets is selected ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.setsView);
     });
-  
+
     it('should display portal in pods when data pods is selected ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.workbenchElems.podsView);
     });
-  
+
     it('should add new dataset ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
@@ -105,7 +102,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
       const absolutePath = path.resolve(__dirname, fileToUpload);
       // console.log('Absolut Path : ', absolutePath);
       WorkbenchPage.uploadFile(absolutePath, elem);
-  
+
       browser.sleep(500);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.firstWindowStepperFwd);
       const fieldSeparator = WorkbenchPage.workbenchElems.fieldSeparatorElement;
@@ -113,19 +110,19 @@ describe('Workbench Tests : workbench.test.js',  () => {
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.secondWindowStepperFwd);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.rawPreviewData);
       browser.sleep(500);
-  
+
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.thirdWindowStepperFwd);
-  
+
       const dataSetName = WorkbenchPage.workbenchElems.dataSetName;
       const datasetNameTxt = 'DS_1'
       dataSetName.clear().sendKeys(datasetNameTxt);
-  
+
       const dataSetDesc = WorkbenchPage.workbenchElems.dataSetDescription;
       dataSetName.clear().sendKeys('Description for ' + datasetNameTxt);
-  
+
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.dataSetActionElement.fourthWindowStepperAdd);
     });
-  
+
     it('should preview a file from data grid', function() {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
@@ -134,7 +131,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
       browser.sleep(1000);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.fileElements.closeRawPreviewFile);
     });
-  
+
     it('should execute sql  ' + description, function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
@@ -144,14 +141,14 @@ describe('Workbench Tests : workbench.test.js',  () => {
       commonFunctions.waitFor.elementToBeEnabledAndVisible(menuAction);
       commonFunctions.waitFor.elementToBeClickableAndClick(menuAction);
     });
-  
+
     it('should upload a file', function() {
       const fileToUpload = 'demo/demo_file.txt';
       const elem = WorkbenchPage.workbenchElems.fileUploadElem
       const absolutePath = path.resolve(__dirname, fileToUpload);
       WorkbenchPage.uploadFile(absolutePath, elem);
     });
-  
+
     it('should display the status of data set in card view mode', function(){
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);
@@ -159,7 +156,7 @@ describe('Workbench Tests : workbench.test.js',  () => {
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.detailedDataSet.cardViewDataSetElem);
       commonFunctions.waitFor.elementToBeClickableAndClick(WorkbenchPage.detailedDataSet.dataSetDetailPreview);
     });
-  
+
     it('should display the status of data set in list view mode', function(){
       expect(browser.getCurrentUrl()).toContain('/login');
       LoginPage.userLogin(data.user, users.anyUser.password);

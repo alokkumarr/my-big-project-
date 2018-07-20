@@ -1,7 +1,6 @@
-var appRoot = require('app-root-path');
-const header = require(appRoot + '/src/test/javascript/pages/components/header.co.js');
-const sidenav = require(appRoot + '/src/test/javascript/pages/components/sidenav.co.js');
-const analyze = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
+const header = require('../../javascript/pages/components/header.co.js');
+const sidenav = require('../../javascript/pages/components/sidenav.co.js');
+const analyze = require('../../javascript/pages/analyzePage.po.js');
 
 // Obsolete. Do not delete. Use some in future
 describe('Analyses Tests', () => {

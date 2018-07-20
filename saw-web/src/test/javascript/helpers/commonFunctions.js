@@ -1,7 +1,6 @@
-var appRoot = require('app-root-path');
 const protractor = require('protractor');
 const EC = protractor.ExpectedConditions;
-const protractorConf = require(appRoot + '/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
 var fs = require('fs');

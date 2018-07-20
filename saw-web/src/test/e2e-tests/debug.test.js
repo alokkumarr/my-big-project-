@@ -1,5 +1,4 @@
-var appRoot = require('app-root-path');
-const login = require(appRoot + '/src/test/javascript/pages/loginPage.po');
+const login = require('../javascript/pages/loginPage.po');
 
 describe('Generate data tests', function () {
 

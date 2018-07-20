@@ -1,18 +1,14 @@
-/*
-  Created by Alex
- */
-var appRoot = require('app-root-path');
-const login = require(appRoot + '/src/test/javascript/pages/loginPage.po');
-const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po');
-const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po');
-const previewPage = require(appRoot + '/src/test/javascript/pages/previewPage.po');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
-const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po');
+const login = require('../../javascript/pages/loginPage.po');
+const analyzePage = require('../../javascript/pages/analyzePage.po');
+const designModePage = require('../../javascript/pages/designModePage.po');
+const previewPage = require('../../javascript/pages/previewPage.po');
+const commonFunctions = require('../../javascript/helpers/commonFunctions');
+const homePage = require('../../javascript/pages/homePage.po');
 const using = require('jasmine-data-provider');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
-const categories = require(appRoot + '/src/test/javascript/data/categories');
-const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
-const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
+const protractorConf = require('../../../../conf/protractor.conf');
+const categories = require('../../javascript/data/categories');
+const subCategories = require('../../javascript/data/subCategories');
+const dataSets = require('../../javascript/data/datasets');
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -72,7 +68,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       let chartTyp = data.chartType.split(":")[1];
       login.loginAs(data.user);
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-      
+
       let chartName = `e2e ${description} ${(new Date()).toString()}`;
       let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
@@ -82,7 +78,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       //Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-    
+
       // Dimension section.
       commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
       designModePage.chart.addFieldButton(xAxisName).click();
@@ -104,7 +100,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       if (data.chartType === 'chart:combo') {
         commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
         designModePage.chart.addFieldButton(yAxisName2).click();
-      }  
+      }
 
       // Navigate to Preview
       commonFunctions.waitFor.elementToBeClickable(designModePage.previewBtn);

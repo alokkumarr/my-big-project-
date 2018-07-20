@@ -1,9 +1,8 @@
-var appRoot = require('app-root-path');
-const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require(appRoot + '/src/test/javascript/helpers/utils');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
-const webpackHelper = require(appRoot + '/conf/webpack.helper');
-const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po');
+const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../../javascript/helpers/utils');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const protractorConf = require('../../../../conf/protractor.conf');
+const webpackHelper = require('../../../../conf/webpack.helper');
+const designModePage = require('../../javascript/pages/designModePage.po');
 const getCards = name => element.all(by.css('mat-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });

@@ -1,12 +1,11 @@
-var appRoot = require('app-root-path');
-const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
-const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
-const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po.js');
+const loginPage = require('../javascript/pages/loginPage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
+const homePage = require('../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
-const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
-const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po.js');
+const protractorConf = require('../../../conf/protractor.conf');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const dataSets = require('../javascript/data/datasets');
+const designModePage = require('../javascript/pages/designModePage.po.js');
 
 describe('Create report type analysis: createReport.test.js', () => {
   const reportDesigner = analyzePage.designerDialog.report;

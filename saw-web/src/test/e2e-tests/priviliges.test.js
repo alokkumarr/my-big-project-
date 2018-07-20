@@ -1,19 +1,15 @@
-/*
- Created by Alex
- */
-var appRoot = require('app-root-path');
-const loginPage = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
-const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
-const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po.js');
-const executedAnalysis = require(appRoot + '/src/test/javascript/pages/savedAlaysisPage.po');
+const loginPage = require('../javascript/pages/loginPage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
+const homePage = require('../javascript/pages/homePage.po.js');
+const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions');
+const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
-const categories = require(appRoot + '/src/test/javascript/data/categories');
-const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
-const utils = require(appRoot + '/src/test/javascript/helpers/utils');
+const protractorConf = require('../../../conf/protractor.conf');
+const categories = require('../javascript/data/categories');
+const subCategories = require('../javascript/data/subCategories');
+const utils = require('../javascript/helpers/utils');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -312,7 +308,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
-      
+
         loginPage.loginAs(data.user);
         navigateToDefaultSubCategory();
 
@@ -397,7 +393,7 @@ describe('Privileges tests: privileges.test.js', () => {
          }
 
        }));
-        
+
 
         // Validate menu in analysis
         element(executedAnalysis.actionsMenuBtn.isPresent().then(function (isPresent) {
@@ -408,7 +404,7 @@ describe('Privileges tests: privileges.test.js', () => {
             expect(isPresent).toBe(data.viewOptions,
               "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
           }
-  
+
         }));
 
         // Validate menu items under menu button
@@ -454,7 +450,7 @@ describe('Privileges tests: privileges.test.js', () => {
               expect(isPresent).toBe(data.delete,
                 "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
             }
-   
+
           }));
         }
       }

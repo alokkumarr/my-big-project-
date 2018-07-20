@@ -1,13 +1,12 @@
-var appRoot = require('app-root-path');
-const login = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
-const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
-const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po.js');
-const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po.js');
+const login = require('../../javascript/pages/loginPage.po.js');
+const analyzePage = require('../../javascript/pages/analyzePage.po.js');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
+const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
-const utils = require(appRoot + '/src/test/javascript/helpers/utils');
-const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
+const protractorConf = require('../../../../conf/protractor.conf');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const utils = require('../../javascript/helpers/utils');
+const dataSets = require('../../javascript/data/datasets');
 
 describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;

@@ -1,6 +1,5 @@
-var appRoot = require('app-root-path');
-const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
-const roles = require(appRoot + '/src/test/javascript/data/roles');
+const globalVariables = require('../../javascript/helpers/globalVariables');
+const roles = require('../../javascript/data/roles');
 
 const users = {
   // initial admin user on docker instance

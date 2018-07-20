@@ -1,23 +1,19 @@
-/*
- Created by Anudeep
- */
-var appRoot = require('app-root-path');
-const login = require(appRoot + '/src/test/javascript/pages/loginPage.po.js');
-const analyzePage = require(appRoot + '/src/test/javascript/pages/analyzePage.po.js');
-const commonFunctions = require(appRoot + '/src/test/javascript/helpers/commonFunctions.js');
-const homePage = require(appRoot + '/src/test/javascript/pages/homePage.po');
-const savedAlaysisPage = require(appRoot + '/src/test/javascript/pages/savedAlaysisPage.po');
-const protractorConf = require(appRoot + '/conf/protractor.conf');
+const login = require('../../javascript/pages/loginPage.po.js');
+const analyzePage = require('../../javascript/pages/analyzePage.po.js');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const homePage = require('../../javascript/pages/homePage.po');
+const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
+const protractorConf = require('../../../../conf/protractor.conf');
 const using = require('jasmine-data-provider');
-const categories = require(appRoot + '/src/test/javascript/data/categories');
-const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
-const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
-const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po.js');
-let AnalysisHelper = require(appRoot + '/src/test/javascript/api/AnalysisHelper');
-let ApiUtils = require(appRoot + '/src/test/javascript/api/APiUtils');
-const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
-const Constants = require(appRoot + '/src/test/javascript/api/Constants');
-const utils = require(appRoot + '/src/test/javascript/helpers/utils');
+const categories = require('../../javascript/data/categories');
+const subCategories = require('../../javascript/data/subCategories');
+const dataSets = require('../../javascript/data/datasets');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
+let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
+let ApiUtils = require('../../javascript/api/APiUtils');
+const globalVariables = require('../../javascript/helpers/globalVariables');
+const Constants = require('../../javascript/api/Constants');
+const utils = require('../../javascript/helpers/utils');
 
 describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -85,7 +81,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         let currentTime = new Date().getTime();
         let user = data.user;
         let type = data.chartType.split(":")[1];
-  
+
         let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
 
@@ -114,7 +110,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         //get analysis id from current url
         browser.getCurrentUrl().then(url => {
           analysisId = commonFunctions.getAnalysisIdFromUrl(url);
-        });        
+        });
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         savedAlaysisPage.editBtn.click();
 
