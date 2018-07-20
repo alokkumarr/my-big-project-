@@ -13,5 +13,9 @@ save-dashboard {
     mat-select {
       width: 50%;
     }
+
+    mat-checkbox[name="dashboardAutoRefresh"] {
+      margin-right: 10px;
+    }
   }
 }

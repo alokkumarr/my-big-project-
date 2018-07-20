@@ -32,7 +32,7 @@
     </div>
 
     <div class="page-content">
-      <dashboard-grid [model]="dashboard" mode="view" *ngIf="dashboard"></dashboard-grid>
+      <dashboard-grid [model]="dashboard" [requester]="requester" mode="view" *ngIf="dashboard"></dashboard-grid>
       <span *ngIf="!dashboard">No dashboards available.</span>
     </div>
   </mat-sidenav-content>

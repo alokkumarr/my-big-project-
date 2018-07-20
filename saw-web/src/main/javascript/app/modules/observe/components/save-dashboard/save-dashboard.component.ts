@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Dashboard } from '../../models/dashboard.interface';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
@@ -18,6 +19,10 @@ const template = require('./save-dashboard.component.html');
 require('./save-dashboard.component.scss');
 
 export const REFRESH_INTERVALS = [
+  {
+    label: '15 seconds',
+    seconds: 15
+  },
   {
     label: '1 minute',
     seconds: 60
@@ -42,7 +47,7 @@ export const REFRESH_INTERVALS = [
 })
 export class SaveDashboardComponent implements OnInit, OnDestroy {
   private dashboardForm: FormGroup;
-  private dashboard: any;
+  private dashboard: Dashboard;
   public categories = [];
   private refreshIntervals = REFRESH_INTERVALS;
   public showProgress = false;
