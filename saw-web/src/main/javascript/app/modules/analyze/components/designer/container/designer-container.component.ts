@@ -69,6 +69,7 @@ export class DesignerContainerComponent {
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
+  public chartTitle = '';
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -174,6 +175,8 @@ export class DesignerContainerComponent {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
         (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
       }
+      this.chartTitle = this.analysis.chartTitle || this.analysis.name;
+
       this.auxSettings = {
         ...this.auxSettings,
         ...(this.analysis.type === 'chart' ? {
@@ -590,6 +593,12 @@ export class DesignerContainerComponent {
     case 'inversion':
       if (!event.data) return;
       (<any>this.analysis).isInverted = event.data.isInverted;
+      this.auxSettings = { ...this.auxSettings, ...event.data };
+      this.artifacts = [...this.artifacts];
+      break;
+    case 'chartTitle':
+      if (!event.data) return;
+      this.analysis.chartTitle = event.data.title;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
