@@ -215,7 +215,7 @@ public class ESHttpClient {
     }
 
     // Check if index type exists
-    // Only supported in ES 5.x and above
+    // Only supported in ES 6.x
     public  boolean esTypeExists(String idx, String type) throws Exception  {
         String clusterVersion = esClusterVersion();
         if(clusterVersion.startsWith("6.")) {
