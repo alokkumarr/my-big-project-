@@ -20,8 +20,5 @@ or numerical unit such as 1}
 index class
 }
 \description{
-Creates new index object for sequential data management
-}
-\details{
-Used by Forecaster to create forward looking indicies
+Index Class Constructer
 }

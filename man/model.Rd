@@ -10,6 +10,8 @@ model(pipe, target, method, ..., desc = NULL, path = NULL)
 \item{pipe}{pipeline object. default is empty pipeline which applies no
 data transformations}
 
+\item{target}{column name of target variable. string input}
+
 \item{method}{string input of model method}
 
 \item{...}{additional arguments to pass to model method}

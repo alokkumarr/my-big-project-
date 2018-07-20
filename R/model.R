@@ -89,6 +89,7 @@ valid_model <- function(x) {
 #'
 #' @param pipe pipeline object. default is empty pipeline which applies no
 #'   data transformations
+#' @param target column name of target variable. string input
 #' @param method string input of model method
 #' @param ... additional arguments to pass to model method
 #' @param desc optional model description
