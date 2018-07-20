@@ -426,7 +426,29 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   fork() {
-    this._analyzeActionsService.fork(this.analysis);
+    this._analyzeActionsService.fork(this.analysis).then(result => {
+      if (!result) {
+        return;
+      }
+      const {requestExecution, analysis} = result;
+      if (analysis) {
+        this.analysis = analysis;
+      }
+      if (requestExecution) {
+        this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+        this.gotoForkedAnalysis(analysis);
+      }
+    });
+  }
+
+  gotoForkedAnalysis(analysis) {
+    this._state.go('analyze.executedDetail', {
+      analysisId: analysis.id,
+      analysis: analysis,
+      executionId: null,
+      awaitingExecution: true,
+      loadLastExecution: false
+    });
   }
 
   publish() {

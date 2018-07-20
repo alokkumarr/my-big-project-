@@ -96,12 +96,11 @@ export class AnalyzeCardComponent implements OnInit {
   }
 
   fork(analysis) {
-    this._analyzeActionsService.fork(analysis).then(status => {
-      if (!status) {
-        return;
-      }
+    this._analyzeActionsService.fork(analysis).then(({analysis, requestExecution}: DesignerSaveEvent) => {
       this.action.emit({
-        action: 'fork'
+        action: 'fork',
+        analysis,
+        requestExecution
       });
     });
   }

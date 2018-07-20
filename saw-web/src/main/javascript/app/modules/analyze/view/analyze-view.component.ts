@@ -81,10 +81,18 @@ export class AnalyzeViewComponent implements OnInit {
 
   onAction(event: AnalyzeViewActionEvent) {
     switch(event.action) {
-    case 'fork':
-      this.loadAnalyses();
+    case 'fork': {
+      const { analysis, requestExecution } = event;
+      if (analysis) {
+        this.loadAnalyses().then(() => {
+          if (requestExecution) {
+            this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+          }
+        });
+      }
       break;
-    case 'edit':
+    }
+    case 'edit': {
       const { analysis, requestExecution } = event;
       if (analysis) {
         this.spliceAnalyses(analysis, true);
@@ -93,6 +101,7 @@ export class AnalyzeViewComponent implements OnInit {
         this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
       }
       break;
+    }
     case 'delete':
       this.spliceAnalyses(event.analysis, false);
       break;

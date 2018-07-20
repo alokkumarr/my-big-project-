@@ -90,11 +90,10 @@ export class AnalyzeActionsMenuComponent {
   }
 
   fork() {
-    this._analyzeActionsService.fork(this.analysis).then(status => {
-      if (!status) {
-        return status;
+    this._analyzeActionsService.fork(this.analysis).then((result: DesignerSaveEvent) => {
+      if (result) {
+        this.afterEdit.emit(result);
       }
-      this.afterEdit.emit();
     });
   }
 
