@@ -3,15 +3,18 @@
 \name{get_target.model}
 \alias{get_target.model}
 \alias{get_target}
+\alias{get_target.modeler}
 \title{Get Target Data function}
 \usage{
-get_target.model(obj)
+\method{get_target}{model}(obj)
 
 get_target(obj)
+
+\method{get_target}{modeler}(obj)
 }
 \arguments{
-\item{obj}{modeler object}
+\item{obj}{object to extract target from}
 }
 \description{
-Returns modeler target data. Calls get_target_df generic
+Returns modeler target data
 }

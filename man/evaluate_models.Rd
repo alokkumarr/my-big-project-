@@ -3,11 +3,17 @@
 \name{evaluate_models}
 \alias{evaluate_models}
 \alias{evaluate_models.modeler}
-\title{Evalutate Models Generic Function}
+\title{Evaluate Models Generic Function}
 \usage{
-evaluate_models(obj, ...)
+evaluate_models(obj, ids, ...)
 
 \method{evaluate_models}{modeler}(obj, ids = NULL)
+}
+\arguments{
+\item{obj}{modeler object}
+
+\item{ids}{optional input for model id. default is NULL and all trained
+models evaluated}
 }
 \value{
 updated modeler object

@@ -126,6 +126,8 @@ match_measure_method <- function(obj) {
 # RMSE --------------------------------------------------------------------
 
 
+#' Root Mean Squared Error Measure Object
+#'
 #' @export RMSE
 #' @rdname measures
 RMSE <- measure(id = "RMSE",
@@ -140,8 +142,15 @@ RMSE <- measure(id = "RMSE",
 
 
 #' Generic rmse function
+#'
+#' Function that calculates root mean squared error
+#'
+#' @param x dataframe object
+#' @param predicted column name of predicted values
+#' @param actual column name of actual values
+#'
 #' @export
-rmse <- function(...){
+rmse <- function(x, predicted, actual){
   UseMethod("rmse")
 }
 
@@ -153,16 +162,6 @@ rmse.data.frame <- function(x, predicted, actual){
   checkmate::assert_choice(actual, colnames(x))
   c("rmse" = sqrt(mean((x[[predicted]] - x[[actual]])^2)))
 }
-
-
-
-#' rmse.tbl_spark <- function(x, predicted, actual){
-#'   checkmate::assert_choice(predicted, colnames(x))
-#'   checkmate::assert_choice(actual, colnames(x))
-#'   x %>%
-#'     dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
-#'     dplyr::collect()
-#' }
 
 
 #' @export
@@ -180,9 +179,22 @@ rmse.tbl_spark <- function(x, predicted, actual) {
 }
 
 
+
+#' rmse.tbl_spark <- function(x, predicted, actual){
+#'   checkmate::assert_choice(predicted, colnames(x))
+#'   checkmate::assert_choice(actual, colnames(x))
+#'   x %>%
+#'     dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
+#'     dplyr::collect()
+#' }
+
+
+
 # MAPE --------------------------------------------------------------------
 
 
+#' Mean Absolute Percentage Error Measure Object
+#'
 #' @export MAPE
 #' @rdname measures
 MAPE <- measure(id = "MAPE",
@@ -198,8 +210,10 @@ MAPE <- measure(id = "MAPE",
 
 
 #' Generic mape function
+#'
+#' @inheritParams rmse
 #' @export
-mape <- function(...){
+mape <- function(x, predicted, actual){
   UseMethod("mape")
 }
 
@@ -213,7 +227,6 @@ mape.data.frame <- function(x, predicted, actual){
 }
 
 
-#' @importFrom magrittr %>%
 #' @export
 #' @rdname mape
 mape.tbl_spark <- function(x, predicted, actual){
@@ -230,7 +243,8 @@ mape.tbl_spark <- function(x, predicted, actual){
 # Slihouette --------------------------------------------------------------
 
 
-
+#' Silhouette Measure Object
+#'
 #' @export Silhouette
 #' @rdname measures
 Silhouette <- measure(id = "Silhouette",
@@ -244,8 +258,10 @@ Silhouette <- measure(id = "Silhouette",
                       note = "The metric computes the Silhouette measure using the squared Euclidean distance. The Silhouette is a measure for the validation of the consistency within clusters")
 
 #' Generic silhouette function
+#'
+#' @inheritParams rmse
 #' @export
-silhouette <- function(...){
+silhouette <- function(x, predicted){
   UseMethod("silhouette")
 }
 
@@ -262,7 +278,8 @@ silhouette.tbl_spark <- function(x, predicted = "predicted") {
 
 # AUC ---------------------------------------------------------------------
 
-
+#' Area Under the Curve Measure Object
+#'
 #' @export AUC
 #' @rdname measures
 AUC <- measure(id = "AUC",
@@ -277,8 +294,10 @@ AUC <- measure(id = "AUC",
 
 
 #' Generic auc function
+#'
+#' @inheritParams rmse
 #' @export
-auc <- function(...) {
+auc <- function(x, predicted, actual) {
   UseMethod("auc")
 }
 

@@ -6,7 +6,7 @@
 #' @inheritParams modeler
 #' @param index_var column name of index variable. index variable should be
 #'   either sequential numeric, date or datetime.
-#' @param units index variable unit for date or datetime variables. ex - days
+#' @param unit index variable unit for date or datetime variables. ex - days
 #'   for date index variable.
 #' @param frequency seasonaly frequency of target. Default is NULL - no
 #'   seasonality
@@ -182,7 +182,7 @@ auto_forecaster <- function(df,
 
 
 
-#' @inheritParams auto_forecasts
+#' @inheritParams auto_forecaster
 #' @param group_vars optional column name of grouping variables. splits data and
 #'   applies auto_forecaster to each group
 #' @param measure_vars colname names of variables to forecast

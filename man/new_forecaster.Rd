@@ -18,6 +18,9 @@ regressor, and classifier}
 \item{index_var}{column name of index variable. index variable should be
 either sequential numeric, date or datetime.}
 
+\item{unit}{index variable unit for date or datetime variables. ex - days
+for date index variable.}
+
 \item{frequency}{seasonaly frequency of target. Default is NULL - no
 seasonality}
 
@@ -38,9 +41,6 @@ system user}
 \item{dir}{optional directory path for saving reports, data and models}
 
 \item{...}{any addtional parameters}
-
-\item{units}{index variable unit for date or datetime variables. ex - days
-for date index variable.}
 }
 \description{
 Creates a forecaster object which inherits from modeler class

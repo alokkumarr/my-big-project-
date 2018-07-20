@@ -1,5 +1,14 @@
 
 #' Index Class Constructer
+#'
+#' @param unit index unit. can by time base units such as days, weeks or years
+#'   or numerical unit such as 1
+#' @param periods number of units per period
+#' @param start index starting value
+#' @param end index ending value
+#'
+#' @return index class
+#' @export
 new_index <- function(unit, periods, start, end) {
   structure(list(
     unit = unit,
@@ -10,7 +19,12 @@ new_index <- function(unit, periods, start, end) {
   class = "index")
 }
 
-
+#' Index Creation Function
+#'
+#' Creates new index object for sequential data management
+#'
+#' Used by Forecaster to create forward looking indicies
+#'
 #' @export
 index <- function(x, unit) {
   UseMethod("index")

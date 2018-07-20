@@ -5,12 +5,14 @@
 \alias{get_forecasts}
 \title{Get Forecasts from forecast object}
 \usage{
-\method{get_forecasts}{forecast}(fobj)
+\method{get_forecasts}{forecast}(mobj)
 
-get_forecasts(x, ...)
+get_forecasts(mobj, ...)
 }
 \arguments{
-\item{fobj}{forecast object}
+\item{mobj}{model object}
+
+\item{...}{additional arguments to pass through}
 }
 \value{
 data.frame with forecats from forecast model

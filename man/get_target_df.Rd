@@ -2,10 +2,19 @@
 % Please edit documentation in R/modeler.R
 \name{get_target_df}
 \alias{get_target_df}
+\alias{get_target_df.data.frame}
 \title{Get Target Dataframe Generic Method}
 \usage{
-get_target_df(obj, target)
+get_target_df(df, target)
+
+\method{get_target_df}{data.frame}(df, target)
+}
+\arguments{
+\item{df}{dataframe with target variable and any potential predictors}
+
+\item{target}{target variable for supervised use cases such as forecaster,
+regressor, and classifier}
 }
 \description{
-Function to return modeler target
+Returns modeler target data
 }

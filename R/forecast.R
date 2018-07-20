@@ -2,34 +2,39 @@
 # Forecast Model Class Methods --------------------------------------------
 
 
+
+
 #' @rdname fit
 #' @export
-fit.forecast_model <- function(obj, data, ...) {
+fit.forecast_model <- function(mobj, data, ...) {
   checkmate::assert_data_frame(data)
 
-  y <- as.numeric(data[[obj$target]])
-  x_vars <- setdiff(colnames(data), c(obj$target, obj$index_var))
+  y <- as.numeric(data[[mobj$target]])
+  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
   if (length(x_vars) > 0) {
     xreg <- data[, x_vars, drop = FALSE]
   } else{
     xreg <- NULL
   }
 
-  args <- modifyList(obj$method_args, list(y = y, xreg = xreg))
-  fun <- get(obj$method, asNamespace(obj$package))
+  args <- modifyList(mobj$method_args, list(y = y, xreg = xreg))
+  fun <- get(mobj$method, asNamespace(mobj$package))
   m <- do.call(fun, args)
-  obj$fit <- m
-  obj$last_updated <- Sys.time()
-  obj$status <- "trained"
-  obj
+  mobj$fit <- m
+  mobj$last_updated <- Sys.time()
+  mobj$status <- "trained"
+  mobj
 }
 
 
 #' Forecast Model Fitted Method
+#'
+#' Extracts fitted values from train step
+#'
 #' @rdname fitted
 #' @export
-fitted.forecast_model <- function(obj) {
-  as.numeric(fitted(obj$fit))
+fitted.forecast_model <- function(mobj) {
+  as.numeric(fitted(mobj$fit))
 }
 
 
@@ -87,13 +92,12 @@ print.forecast_model <- function(mobj){
 
 #' Get Forecasts from forecast object
 #'
-#' @param fobj forecast object
 #' @rdname get_forecasts
 #' @export
 #' @return data.frame with forecats from forecast model
-get_forecasts.forecast <- function(fobj){
+get_forecasts.forecast <- function(mobj){
 
-  df <- as.data.frame(fobj)
+  df <- as.data.frame(mobj)
   cns <- tolower(colnames(df))
   cns <- gsub("lo", "lower", cns)
   cns <- gsub("hi", "upper", cns)
@@ -106,10 +110,10 @@ get_forecasts.forecast <- function(fobj){
 
 #' Convert Forecast object to data.frame
 #'
-#' @param fobj forecast object
+#' @param mobj forecast model object
 #' @rdname as_data_frame
 #' @export
-as_data_frame.forecast <- function(fobj){
+as_data_frame.forecast <- function(mobj){
 
   df <- as.data.frame(fobj)
   cns <- tolower(colnames(df))
@@ -126,7 +130,6 @@ as_data_frame.forecast <- function(fobj){
 
 #' Get Coefficients from Forecast Model Object
 #'
-#' @param mobj forecast model object as a result of fit function
 #' @rdname get_coefs
 #' @export
 get_coefs.forecast_model <- function(mobj){

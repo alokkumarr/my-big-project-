@@ -8,15 +8,19 @@
   level = c(80, 95), ...)
 }
 \arguments{
-\item{xreg}{Optionally, a vector or matrix of external regressors, which
-must have the same number of rows as \code{y}.}
+\item{object}{auto_fourier object forecast model}
+
+\item{h}{forecast horizon length}
+
+\item{xreg}{Optional a vector or matrix of extrenal regressors. Must
+correspond to forecast period and be the same length as the forecast}
 
 \item{frequency}{seasonal frequency of y - univarite time series}
 
-\item{...}{Additional arguments to be passed to \code{\link[stats]{arima}}.}
+\item{level}{vector of numerical confidence levels. Ex - 80 is a 80 percent
+confidence level}
 
-\item{x}{Optional a vector or matrix of extrenal regressors. Must correspond
-to forecast period and be the same length as the forecast}
+\item{...}{additional arguments to pass to forecast function}
 }
 \value{
 An object of class 'forecast'

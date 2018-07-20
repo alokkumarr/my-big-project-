@@ -6,6 +6,11 @@
 \usage{
 pipeline(expr = identity, desc = NULL)
 }
+\arguments{
+\item{expr}{pipeline function. default is identity function}
+
+\item{desc}{optional description input}
+}
 \description{
 Creates a pipeline object. The expression is set by default as the identity
 function. This returns the

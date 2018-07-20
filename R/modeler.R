@@ -181,7 +181,7 @@ get_models_status <- function(obj, id = NULL){
 #' Function to access all modeler models. Subsettable by either id or status
 #'
 #' @param obj modeler object
-#' @param id one or more model id characters
+#' @param ids one or more model id characters
 #' @param status model status code. accepts "created", "added", "trained", "evaluated", or "selected"
 #'
 #' @return list of model objects
@@ -203,19 +203,6 @@ get_models <- function(obj, ids = NULL, status = NULL) {
   models
 }
 
-
-#' Get Target Data function
-#'
-#' Returns modeler target data. Calls get_target_df generic
-#'
-#' @param obj modeler object
-#' @export
-get_target <- function(obj) {
-  checkmate::assert_subset("modeler", class(obj))
-  #get_target_df(obj$data, obj$target)
-  obj$data %>%
-    dplyr::select_at(c(obj$index_var, obj$target))
-}
 
 
 #' Get Model Evaluation Summary
@@ -282,16 +269,20 @@ train_models <- function(obj, ...) {
 }
 
 
-#' Evalutate Models Generic Function
+#' Evaluate Models Generic Function
 #'
 #' Evaluate the accuracy of all trained models.
 #'
 #' Function applies the measure function associated with modeler object to all
 #' model sample predictions.
 #'
+#' @param obj modeler object
+#' @param ids optional input for model id. default is NULL and all trained
+#'   models evaluated
+#'
 #' @export
 #' @return updated modeler object
-evaluate_models <- function(obj, ...) {
+evaluate_models <- function(obj, ids, ...) {
   UseMethod("evaluate_models")
 }
 
@@ -315,8 +306,11 @@ set_final_model <- function(obj, method, id, reevaluate, refit) {
 
 #' Get Target Dataframe Generic Method
 #'
-#' Function to return modeler target
-get_target_df <- function(obj, target) {
+#' Returns modeler target data
+#'
+#' @inheritParams modeler
+#' @export
+get_target_df <- function(df, target) {
   UseMethod("get_target_df")
 }
 
@@ -330,6 +324,32 @@ tidy_performance <- function(obj) {
 }
 
 
+#' Get Target Data function
+#'
+#' Returns modeler target data
+#'
+#' @param obj object to extract target from
+#' @export
+get_target <- function(obj) {
+  UseMethod("get_target", obj)
+}
+
+
+
+#' Get Dataset Schema
+#'
+#' Returns named list of column types. Names refer to column names
+#'
+#' @param df dataset
+#'
+#' @return named list of column types
+#' @export
+#'
+#' @examples
+#' get_schema(mtcars)
+get_schema <- function(df){
+  UseMethod("get_schema")
+}
 
 
 # Modeler Class Methods ---------------------------------------------------
@@ -471,32 +491,25 @@ print.modeler <- summary.modeler <- function(obj) {
 }
 
 
+#' @rdname get_target
+#' @export
+get_target.modeler <- function(obj) {
+  checkmate::assert_subset("modeler", class(obj))
+  #get_target_df(obj$data, obj$target)
+  obj$data %>%
+    dplyr::select_at(c(obj$index_var, obj$target))
+}
+
 
 # Helper Functions --------------------------------------------------------
 
 
-#' Get Target data.frame Method
-#'
-#'@export
+
+#' @rdname get_target_df
+#' @export
 get_target_df.data.frame <- function(df, target) {
   checkmate::assert_subset(target, colnames(df))
   df[, target, drop=FALSE]
-}
-
-
-#' Get Dataset Schema
-#'
-#' Returns named list of column types. Names refer to column names
-#'
-#' @param df dataset
-#'
-#' @return named list of column types
-#' @export
-#'
-#' @examples
-#' get_schema(mtcars)
-get_schema <- function(df){
-  UseMethod("get_schema")
 }
 
 

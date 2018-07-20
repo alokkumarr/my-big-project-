@@ -5,9 +5,16 @@
 \alias{auc.tbl_spark}
 \title{Generic auc function}
 \usage{
-auc(...)
+auc(x, predicted, actual)
 
 \method{auc}{tbl_spark}(x, predicted, actual)
+}
+\arguments{
+\item{x}{dataframe object}
+
+\item{predicted}{column name of predicted values}
+
+\item{actual}{column name of actual values}
 }
 \description{
 Generic auc function

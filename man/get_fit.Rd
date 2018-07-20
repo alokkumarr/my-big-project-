@@ -4,7 +4,12 @@
 \alias{get_fit}
 \title{Return a Model Fit}
 \usage{
-get_fit(x, ...)
+get_fit(mobj, ...)
+}
+\arguments{
+\item{mobj}{model object}
+
+\item{...}{additional arguments to pass through}
 }
 \description{
 Return a Model Fit

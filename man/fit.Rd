@@ -6,14 +6,19 @@
 \alias{fit.spark_ml}
 \title{Fit Model Generic}
 \usage{
-\method{fit}{forecast_model}(obj, data, ...)
+\method{fit}{forecast_model}(mobj, data, ...)
 
-fit(...)
+fit(mobj, data, ...)
 
 \method{fit}{spark_ml}(mobj, data)
 }
+\arguments{
+\item{mobj}{Model object to fit}
+
+\item{data}{data to fit model object on}
+
+\item{...}{additional arguments to pass through}
+}
 \description{
 Fit model to single data sample
-
-Spark ML fit method
 }

@@ -7,10 +7,12 @@
 \usage{
 \method{get_coefs}{forecast_model}(mobj)
 
-get_coefs(x, ...)
+get_coefs(mobj, ...)
 }
 \arguments{
-\item{mobj}{forecast model object as a result of fit function}
+\item{mobj}{model object}
+
+\item{...}{additional arguments to pass through}
 }
 \description{
 Get Coefficients from Forecast Model Object

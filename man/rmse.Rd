@@ -6,20 +6,19 @@
 \alias{rmse.tbl_spark}
 \title{Generic rmse function}
 \usage{
-rmse(...)
+rmse(x, predicted, actual)
 
 \method{rmse}{data.frame}(x, predicted, actual)
 
 \method{rmse}{tbl_spark}(x, predicted, actual)
 }
-\description{
-Generic rmse function
+\arguments{
+\item{x}{dataframe object}
 
-rmse.tbl_spark <- function(x, predicted, actual){
-  checkmate::assert_choice(predicted, colnames(x))
-  checkmate::assert_choice(actual, colnames(x))
-  x %>%
-    dplyr::summarise_at(predicted, funs(rmse = sqrt(mean((. - !!rlang::sym(actual))^2)))) %>%
-    dplyr::collect()
+\item{predicted}{column name of predicted values}
+
+\item{actual}{column name of actual values}
 }
+\description{
+Function that calculates root mean squared error
 }

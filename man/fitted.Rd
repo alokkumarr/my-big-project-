@@ -6,16 +6,19 @@
 \alias{fitted.ml_decision_tree_classification_model}
 \title{Forecast Model Fitted Method}
 \usage{
-\method{fitted}{forecast_model}(obj)
+\method{fitted}{forecast_model}(mobj)
 
-\method{fitted}{spark_ml}(obj)
+\method{fitted}{spark_ml}(mobj)
 
-\method{fitted}{ml_decision_tree_classification_model}(obj)
+\method{fitted}{ml_decision_tree_classification_model}(mobj)
+}
+\arguments{
+\item{mobj}{model object}
 }
 \description{
-Forecast Model Fitted Method
+Extracts fitted values from train step
 
-Fitted Method for Spark-ML Object
+Extracts fitted values from train step
 
 Fitted Method for Spark-ML Decision Tree Classification Model
 }
