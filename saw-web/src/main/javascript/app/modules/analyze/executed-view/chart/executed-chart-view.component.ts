@@ -99,6 +99,7 @@ export class ExecutedChartViewComponent {
     }
     this.toggleToGrid = value;
   }
+
   getChartUpdates(data, analysis) {
     const settings = this._chartService.fillSettings(analysis.artifacts, analysis);
     const sorts = analysis.sqlBuilder.sorts;
@@ -124,7 +125,8 @@ export class ExecutedChartViewComponent {
         orderedData || data,
         {labels, labelOptions: analysis.labelOptions, sorts}
       ),
-      {path: 'title.text', data: analysis.name},
+      {path: 'title.text', data: analysis.chartTitle || analysis.name},
+      {path: 'title.exportFilename', data: analysis.name},
       {path: 'chart.inverted', data: analysis.isInverted}
     ];
   }

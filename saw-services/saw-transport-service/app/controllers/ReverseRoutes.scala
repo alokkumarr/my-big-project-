@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/pman0003/Codebase/bda/resolveConflict/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Tue Mar 27 17:30:28 IST 2018
+// @SOURCE: sip/saw-services/saw-transport-service/conf/routes
+// @DATE:Wed Jul 04 14:27:39 IST 2018
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -182,9 +182,9 @@ package controllers {
     }
   
     // @LINE:24
-    def getExecutionData(analysisId:String, executionId:String, page:Int = 1, pageSize:Int = 10, analysisType:String = "report"): Call = {
+    def getExecutionData(analysisId:String, executionId:String, page:Int = 1, pageSize:Int = 10, analysisType:String = "report", executionType:String = null ): Call = {
       import ReverseRouteContext.empty
-      Call("GET", _prefix + { _defaultPrefix } + "analysis/" + implicitly[PathBindable[String]].unbind("analysisId", dynamicString(analysisId)) + "/executions/" + implicitly[PathBindable[String]].unbind("executionId", dynamicString(executionId)) + "/data" + queryString(List(if(page == 1) None else Some(implicitly[QueryStringBindable[Int]].unbind("page", page)), if(pageSize == 10) None else Some(implicitly[QueryStringBindable[Int]].unbind("pageSize", pageSize)), if(analysisType == "report") None else Some(implicitly[QueryStringBindable[String]].unbind("analysisType", analysisType)))))
+      Call("GET", _prefix + { _defaultPrefix } + "analysis/" + implicitly[PathBindable[String]].unbind("analysisId", dynamicString(analysisId)) + "/executions/" + implicitly[PathBindable[String]].unbind("executionId", dynamicString(executionId)) + "/data" + queryString(List(if(page == 1) None else Some(implicitly[QueryStringBindable[Int]].unbind("page", page)), if(pageSize == 10) None else Some(implicitly[QueryStringBindable[Int]].unbind("pageSize", pageSize)), if(analysisType == "report") None else Some(implicitly[QueryStringBindable[String]].unbind("analysisType", analysisType)), if(executionType == null ) None else Some(implicitly[QueryStringBindable[String]].unbind("executionType", executionType)))))
     }
   
   }

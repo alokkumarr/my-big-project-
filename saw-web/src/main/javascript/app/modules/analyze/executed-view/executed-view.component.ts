@@ -5,7 +5,11 @@ import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { AnalyzeService } from '../services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES,
+  EXECUTION_DATA_MODES
+} from '../services/analyze.service';
 import { AnalyzeExportService } from '../services/analyze-export.service';
 import {
   ExecuteService,
@@ -38,6 +42,7 @@ export class ExecutedViewComponent implements OnInit {
   _executionId: string;
   analysis: Analysis;
   analyses: Analysis[];
+  onetimeExecution: boolean;
   data: any[];
   dataLoader: Function;
   canAutoRefresh: boolean;
@@ -165,6 +170,7 @@ export class ExecutedViewComponent implements OnInit {
   onExecutionSuccess(response) {
     const thereIsDataLoaded = this.data || this.dataLoader;
     const isDataLakeReport = this.analysis.type === 'report';
+    this.onetimeExecution = response.executionType !== EXECUTION_MODES.PUBLISH;
     if (isDataLakeReport && thereIsDataLoaded) {
       this._toastMessage.success(
         'Tap this message to reload data.',
@@ -173,13 +179,19 @@ export class ExecutedViewComponent implements OnInit {
           timeOut: 0,
           extendedTimeOut: 0,
           closeButton: true,
-          onclick: this.gotoLastPublished(this.analysis)
+          onclick: () =>
+            this.loadExecutedAnalysesAndExecutionData(
+              this.analysis.id,
+              response.executionId,
+              this.analysis.type,
+              response
+            )
         }
       );
     } else {
       this.loadExecutedAnalysesAndExecutionData(
         this.analysis.id,
-        null,
+        response.executionId,
         this.analysis.type,
         response
       );
@@ -187,6 +199,7 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   onExecutionError() {
+    this.onetimeExecution = false;
     this.loadExecutedAnalysesAndExecutionData(
       this.analysis.id,
       null,
@@ -195,7 +208,7 @@ export class ExecutedViewComponent implements OnInit {
     );
   }
 
-  gotoLastPublished(analysis) {
+  gotoLastPublished(analysis, { executionId }) {
     return () => {
       this._toastMessage.clear();
       this._state.go(
@@ -203,7 +216,7 @@ export class ExecutedViewComponent implements OnInit {
         {
           analysisId: analysis.id,
           analysis: analysis,
-          executionId: null,
+          executionId,
           awaitingExecution: false,
           loadLastExecution: true
         },
@@ -234,6 +247,7 @@ export class ExecutedViewComponent implements OnInit {
     executeResponse
   ) {
     if (executionId) {
+      this.executionId = executionId;
       this.loadExecutedAnalyses(analysisId);
       this.loadDataOrSetDataLoader(
         analysisId,
@@ -316,7 +330,9 @@ export class ExecutedViewComponent implements OnInit {
             analysisId,
             executionId,
             analysisType,
-            options
+            this.onetimeExecution
+              ? { ...options, executionType: EXECUTION_DATA_MODES.ONETIME }
+              : options
           );
         };
       } else {
@@ -325,7 +341,9 @@ export class ExecutedViewComponent implements OnInit {
             analysisId,
             executionId,
             analysisType,
-            options
+            this.onetimeExecution
+              ? { ...options, executionType: EXECUTION_DATA_MODES.ONETIME }
+              : options
           );
         };
       }
@@ -408,10 +426,6 @@ export class ExecutedViewComponent implements OnInit {
     this._analyzeActionsService.fork(this.analysis);
   }
 
-  publish() {
-    this._analyzeActionsService.publish(this.analysis);
-  }
-
   afterDelete(analysis) {
     this.goBackToMainPage(analysis);
   }
@@ -429,7 +443,7 @@ export class ExecutedViewComponent implements OnInit {
       this.chartUpdater$.next({ export: true });
       break;
     default:
-      this._analyzeExportService.export(this.analysis, this.executionId);
+      this._analyzeExportService.export(this.analysis, this.executionId, this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL);
     }
   }
 }

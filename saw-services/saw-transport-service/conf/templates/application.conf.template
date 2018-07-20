@@ -69,7 +69,7 @@ spark = {
     wait-time = 5
 
     inline-data-store-limit-bytes = 268435456
-    inline-data-store-limit-rows = 10
+    preview-rows-limit = 10
     output-location = "${:spark.sql.output:}" # "/mapr/bda_lab_batch/data/bda/RAP/dout"
     semantic-layer-tmp-location = "${:spark.sql.temp:}" # "/mapr/bda_lab_batch/data/bda/RAP/temp"
 

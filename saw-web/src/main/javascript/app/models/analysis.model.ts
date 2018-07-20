@@ -40,6 +40,7 @@ export interface Analysis {
   outputFile?: OutputFile;
   groupByColumns?: any[];
   crondetails?: any;
+  chartTitle: string;
   // groupByColumns should be deprecated
 }
 
