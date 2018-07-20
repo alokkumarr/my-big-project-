@@ -451,10 +451,6 @@ export class ExecutedViewComponent implements OnInit {
     });
   }
 
-  publish() {
-    this._analyzeActionsService.publish(this.analysis);
-  }
-
   afterDelete(analysis) {
     this.goBackToMainPage(analysis);
   }
