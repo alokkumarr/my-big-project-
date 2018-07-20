@@ -15,7 +15,7 @@ module.exports = {
   chartTypes: {
     column: element(by.xpath('//*[contains(@class,"highcharts-column-series")]'))
   },
-  backButton: element(by.xpath('//*[contains(@class,"back-button")]')),
+  backButton: element(by.xpath('(//*[contains(@class,"back-button")])[position()=last()]')),
   analysisViewPageElements:{
     text: value => element(by.xpath(`//*[text()="${value}"]`)),
     title: element(by.binding('$ctrl.analysis.name')),

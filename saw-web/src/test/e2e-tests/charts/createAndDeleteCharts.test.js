@@ -13,6 +13,7 @@ const categories = require(appRoot + '/src/test/javascript/data/categories');
 const subCategories = require(appRoot + '/src/test/javascript/data/subCategories');
 const dataSets = require(appRoot + '/src/test/javascript/data/datasets');
 const designModePage = require(appRoot + '/src/test/javascript/pages/designModePage.po.js');
+const utils = require(appRoot + '/src/test/javascript/helpers/utils');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -66,7 +67,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   });
 
   afterAll(function () {
-    //commonFunctions.logOutByClearingLocalStorage();
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -124,15 +125,24 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
       //Change to Card View
-      commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
-      commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-      analyzePage.analysisElems.cardView.click();
+      element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+        if(isPresent) {
+          console.log('Already in card view..')
+        } else {
+          console.log('Not in card view..')
+          commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+          commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+          analyzePage.analysisElems.cardView.click();
+        }
+      }));
+     
       //Verify if created appeared in list
       commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
       commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
       createdAnalysis.click();
       commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
       savedAlaysisPage.backButton.click();
+      commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
       /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
         .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
       //Verify chart type on home page

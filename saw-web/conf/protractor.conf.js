@@ -18,14 +18,14 @@ var HtmlReporter = require('protractor-beautiful-reporter');
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 30000;
+const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 600000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
  */
 
 const implicitlyWait = webpackHelper.distRun() ? 600000 : 20000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 1200000;//30000 // = 30 sec; Sometimes element will not
+const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 30000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
@@ -39,13 +39,13 @@ const fluentWait = webpackHelper.distRun() ? 600000 : 20000;//20000
  */
 const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 600000;//20000
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 600000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 3600000 : 3600000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 600000;
+const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
 /**
  * number of failed retry, 3 times in bamboo and 2 times in local
  */
@@ -94,13 +94,12 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
- // specs: [appRoot + '/src/test/e2e-tests/login.test.js'],
   //directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 1,
+    maxInstances: 4,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -132,7 +131,7 @@ exports.config = {
      * working on fixing the rest.
      */
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
       //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
       //webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
     ],
@@ -180,8 +179,10 @@ exports.config = {
   },
   onCleanUp: function (results) {
     retry.onCleanUp(results);
+    //console.log("Finished at : "+ new Date())
   },
   onPrepare() {
+    //console.log("Started at : "+ new Date())
     retry.onPrepare();
     // Gerenate test data
     token = generate.token(browser.baseUrl);

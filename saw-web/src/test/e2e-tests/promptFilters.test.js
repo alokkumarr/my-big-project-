@@ -94,8 +94,12 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
     setTimeout(function () {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
+  });
+  afterAll(function () {
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(chartDataProvider, function (data, description) {
@@ -199,10 +203,18 @@ const verifyPromptFromListView = (name, data, execute)=> {
   // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.backButton);
   // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
   // savedAlaysisPage.backButton.click();
-  //Change to Card View.
-  commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.listView);
-  commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.listView);
-  analyzePage.analysisElems.listView.click();
+  //Change to list View.
+  element(utils.hasClass(homePage.listViewInput, 'mat-radio-checked').then(function(isPresent) {
+    if(isPresent) {
+      console.log('Already in list view..')
+    } else {
+      console.log('Not in list view..')
+      commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.listView);
+      commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.listView);
+      analyzePage.analysisElems.listView.click();
+    }
+  }));
+
   if(execute) {
     commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.analysisAction(name));
     commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.analysisAction(name));
@@ -233,9 +245,17 @@ const verifyPromptFromCardView = (name, data, execute)=> {
 //  commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
 //  savedAlaysisPage.backButton.click();
  //Change to Card View.
- commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
- commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
- analyzePage.analysisElems.cardView.click();
+ element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+  if(isPresent) {
+    console.log('Already in card view..')
+  } else {
+    console.log('Not in card view..')
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+    analyzePage.analysisElems.cardView.click();
+  }
+}));
+
  if(execute) {
    commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.analysisAction(name));
    commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.analysisAction(name));

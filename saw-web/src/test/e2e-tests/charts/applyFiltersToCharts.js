@@ -37,7 +37,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   });
 
   afterAll(function () {
-    //commonFunctions.logOutByClearingLocalStorage();
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to column chart', () => { // SAWQA-174

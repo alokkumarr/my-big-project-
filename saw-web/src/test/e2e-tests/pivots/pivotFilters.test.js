@@ -327,7 +327,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
   });
 
   afterAll(function () {
-    //commonFunctions.logOutByClearingLocalStorage();
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

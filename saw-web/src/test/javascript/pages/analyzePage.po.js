@@ -107,6 +107,7 @@ const filtersBtnUpgraded = element(by.css('button[e2e="open-filter-modal"]'));
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
 
 const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
+const getAllAnalysis = name => element(by.xpath(`//a[@e2e="analysis-name" and contains(text(),"${name}")]`));
 const geFilterRowUpgraded = index => element.all(by.css('designer-filter-row')).get(index);
 
 const getFilterAutocomplete = index => getFilterRow(index)
@@ -290,6 +291,7 @@ module.exports = {
     getAnalysisChartType
   },
   main: {
+    getAllAnalysis,
     actionMenuOptions : element(by.xpath('//div[contains(@class,"mat-menu-panel")]')),
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
@@ -332,7 +334,7 @@ module.exports = {
   // OLD test elements
   analysisElems: {
     listView: element(by.css('[e2e="analyze-list-view"]')),
-    cardView: element(by.css('[e2e="analyze-card-view"]')),
+    cardView: element(by.css('[ng-reflect-font-icon="icon-card-view"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
     addAnalysisBtn: element(by.css('[e2e="open-new-analysis-modal"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),

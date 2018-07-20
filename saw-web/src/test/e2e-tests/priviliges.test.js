@@ -307,7 +307,7 @@ describe('Privileges tests: privileges.test.js', () => {
   });
 
   afterAll(function () {
-    //commonFunctions.logOutByClearingLocalStorage();
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -323,6 +323,7 @@ describe('Privileges tests: privileges.test.js', () => {
         }));
 
         // Go to Card View
+        commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
         commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
         analyzePage.analysisElems.cardView.click();
 
@@ -349,12 +350,14 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
+          commonFunctions.waitFor.elementToBeVisible(element(by.css('[class="cdk-overlay-container"]')));
           commonFunctions.waitFor.elementToBeClickable(element(by.css('[class="cdk-overlay-container"]')));
           element(by.css('[class="cdk-overlay-container"]')).click();
           commonFunctions.waitFor.elementToBeNotVisible(analyzePage.main.actionMenuOptions);
           expect(analyzePage.main.actionMenuOptions.isPresent()).toBe(false);
         }
         // Go to executed analysis page
+        commonFunctions.waitFor.elementToBeVisible(analyzePage.main.firstCardTitle);
         commonFunctions.waitFor.elementToBeClickable(analyzePage.main.firstCardTitle);
         analyzePage.main.firstCardTitle.click();
 
@@ -475,7 +478,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.sleep(500);
       const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
       expect(doesDataNeedRefreshing).toBeTruthy();
-      homePage.mainMenuCollapseBtn.click();
+      //homePage.mainMenuCollapseBtn.click();
 
     };
   });

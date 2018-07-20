@@ -17,6 +17,7 @@ let AnalysisHelper = require(appRoot + '/src/test/javascript/api/AnalysisHelper'
 let ApiUtils = require(appRoot + '/src/test/javascript/api/APiUtils');
 const globalVariables = require(appRoot + '/src/test/javascript/helpers/globalVariables');
 const Constants = require(appRoot + '/src/test/javascript/api/Constants');
+const utils = require(appRoot + '/src/test/javascript/helpers/utils');
 
 describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -77,7 +78,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
   });
 
   afterAll(function () {
-    //commonFunctions.logOutByClearingLocalStorage();
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
@@ -96,9 +97,16 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
 
         //Change to Card View.
-        commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
-        commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-        analyzePage.analysisElems.cardView.click();
+        element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+          if(isPresent) {
+            console.log('Already in card view..')
+          } else {
+            console.log('Not in card view..')
+            commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+            commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+            analyzePage.analysisElems.cardView.click();
+          }
+        }));
         //Open the created analysis.
         const createdAnalysis = analyzePage.main.getCardTitle(name);
 
