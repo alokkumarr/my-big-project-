@@ -31,8 +31,10 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   let host;
   let token;
   const dataProvider = {
-    // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602 ---disbaled in the UI
-    // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678 ---disbaled in the UI
+    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602
+    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678
+    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
+    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}, //SAWQA-4680
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, //SAWQA-323
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, //SAWQA-4475
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, //SAWQA-569
@@ -41,15 +43,14 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
     'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, //SAWQA-4478
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
-    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348 ---disbaled in the UI
-    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676 ---disbaled in the UI
+    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
-    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
-    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
-    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'} //SAWQA-4680
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'} //SAWQA-4679
   };
 
   beforeAll(function () {
+    console.log('Started edit and delte chart tests..');
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
@@ -73,22 +74,22 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
 
   afterAll(function () {
     commonFunctions.logOutByClearingLocalStorage();
+    console.log('Completed edit and delte chart tests..');
   });
 
   using(dataProvider, function (data, description) {
     it('should edit and delete ' + description, () => {
-
         let currentTime = new Date().getTime();
         let user = data.user;
         let type = data.chartType.split(":")[1];
 
         let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
         let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
-
-        //Create new analysis.
+        
+        //Create new analysis. 
         new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
-
-        login.loginAs(data.user);
+        login.loginAs(data.user); 
+        browser.sleep(500);
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
         //Change to Card View.
         element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
@@ -113,11 +114,14 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         });
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         savedAlaysisPage.editBtn.click();
-
+        browser.waitForAngular();
+        browser.sleep(2000);
         const designer = analyzePage.designerDialog;
+        
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
             for (var i = 0; i < deleteElements.length; ++i) {
+                commonFunctions.waitFor.elementToBeVisible(deleteElements[i]);
                 commonFunctions.waitFor.elementToBeClickable(deleteElements[i]);
                 deleteElements[i].click();
             }
@@ -152,6 +156,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
 
         //Save
         const save = analyzePage.saveDialog;
+        commonFunctions.waitFor.elementToBePresent(designer.saveBtn);
         commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
         designer.saveBtn.click();
         let updatedName = name +' updated';
@@ -165,7 +170,8 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
         save.selectCategoryToSave(subCategoryName).click();
         commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
         save.saveBtn.click();
-
+        
+        commonFunctions.waitFor.elementToBeNotVisible(analyzePage.designerDialog.chart.filterBtn);
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.editBtn);
         //Verify updated details.
         commonFunctions.waitFor.textToBePresent(savedAlaysisPage.analysisViewPageElements.text(updatedName).getText(), updatedName);

@@ -32,8 +32,8 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
   let host;
   let token;
   const dataProvider = {
-    // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602 ---disbaled in the UI
-    // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678 ---disbaled in the UI
+    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602
+    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, //SAWQA-323
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, //SAWQA-4475
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, //SAWQA-569
@@ -42,8 +42,8 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
     'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, //SAWQA-4478
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
-    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348 ---disbaled in the UI
-    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676 ---disbaled in the UI
+    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
@@ -89,7 +89,7 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         new AnalysisHelper().createNewAnalysis(host, token, name, description, Constants.CHART, type);
 
         login.loginAs(data.user);
-
+        browser.sleep(500);
         homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
 
         //Change to Card View.
@@ -113,13 +113,16 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         browser.getCurrentUrl().then(url => {
           analysisId = commonFunctions.getAnalysisIdFromUrl(url);
         });
+        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.forkBtn);
         commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.forkBtn);
         savedAlaysisPage.forkBtn.click();
-
+        browser.waitForAngular();
+        browser.sleep(2000);
         const designer = analyzePage.designerDialog;
         //Clear all fields.
         designModePage.filterWindow.deleteFields.then(function(deleteElements) {
             for (var i = 0; i < deleteElements.length; ++i) {
+                commonFunctions.waitFor.elementToBeVisible(deleteElements[i]);
                 commonFunctions.waitFor.elementToBeClickable(deleteElements[i]);
                 deleteElements[i].click();
             }
@@ -151,8 +154,10 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, metrics, "yaxis"));
         commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, dimension, "xaxis"));
         commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy(type));
+       
         //Save
         const save = analyzePage.saveDialog;
+        commonFunctions.waitFor.elementToBeVisible(designer.saveBtn);
         commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
         designer.saveBtn.click();
         let forkedName = name +' forked';
@@ -164,12 +169,30 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         save.selectedCategoryUpdated.click();
         commonFunctions.waitFor.elementToBeClickable(save.selectCategoryToSave(subCategoryName));
         save.selectCategoryToSave(subCategoryName).click();
+        
+        commonFunctions.waitFor.elementToBeVisible(save.saveBtn);
         commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
         save.saveBtn.click();
+        browser.waitForAngular();
+        browser.sleep(1000);
+        commonFunctions.waitFor.elementToBeNotVisible(analyzePage.designerDialog.chart.filterBtn);
+        browser.ignoreSynchronization = false;
+        analyzePage.navigateToHome();
+        browser.ignoreSynchronization = true;
+        browser.sleep(500);
+        homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory); 
 
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.forkBtn);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
-        savedAlaysisPage.backButton.click();
+        element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+          if(isPresent) {
+            //console.log('Already in card view..')
+          } else {
+            //console.log('Not in card view..')
+            commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+            commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+            analyzePage.analysisElems.cardView.click();
+          }
+        }));
+
         //Verify chart type on home page
         analyzePage.main.getCardTypeByName(forkedName).then(actualChartType =>
         expect(actualChartType).toEqual(data.chartType,
@@ -191,8 +214,6 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
         //Verify updated details.
         expect(savedAlaysisPage.analysisViewPageElements.text(forkedName).getText()).toBe(forkedName);
         expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
-
-
     });
   });
 });

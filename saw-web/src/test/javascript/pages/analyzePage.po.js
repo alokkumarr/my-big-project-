@@ -327,6 +327,8 @@ module.exports = {
   prompt:{
     filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
     selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
+    cancleFilterPrompt: element(by.css(`button[e2e="designer-dialog-cancel"]`))
+    
   },
   listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 

@@ -49,7 +49,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
 /**
  * number of failed retry, 3 times in bamboo and 2 times in local
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 2;
+const maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 3;
 
 /**
  * Waits ms after page is loaded

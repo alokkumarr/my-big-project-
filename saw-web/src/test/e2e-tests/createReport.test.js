@@ -30,7 +30,8 @@ describe('Create report type analysis: createReport.test.js', () => {
     tableB: tables[1].name,
     fieldB: 'Session Id'
   };*/
-  const filterValue = 'String';
+  const filterOperator = 'Equal to';
+  const filterValue = '123';
   const metricName = dataSets.report;
   const analysisType = 'table:report';
 
@@ -107,7 +108,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Should apply filters
     const filters = analyzePage.filtersDialogUpgraded;
     const filterAC = filters.getFilterAutocomplete(0);
-    const stringFilterInput = filters.getNumberFilterInput(0);
+    const filterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
 
     commonFunctions.waitFor.elementToBeVisible(reportDesigner.filterBtn);
@@ -118,13 +119,20 @@ describe('Create report type analysis: createReport.test.js', () => {
     designModePage.filterWindow.addFilter(tables[0].name).click();
 
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
-    stringFilterInput.sendKeys("123");
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.number.operator);
+    designModePage.filterWindow.number.operator.click();
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.number.operatorDropDownItem(filterOperator));
+    designModePage.filterWindow.number.operatorDropDownItem(filterOperator).click();
+    filterInput.clear();
+    filterInput.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
     filters.applyBtn.click();
+    browser.waitForAngular();
     browser.sleep(3000);
     // TODO: below code is not working in headless mode something is wrong with chrome. will test again and enable it.
     // commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[@class="dx-datagrid" or contains(@class,"non-ideal-state__container ")]')));
     // Verify the applied filters
+    let filterDisplayed = fieldName+': '+filterOperator+' '+filterValue;//This is new change to app
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     commonFunctions.waitFor.elementToBeVisible(appliedFilter);

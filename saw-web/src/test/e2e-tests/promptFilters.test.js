@@ -194,7 +194,10 @@ using(chartDataProvider, function (data, description) {
 const verifyPromptFromListView = (name, data, execute)=> {
 
   //From analysis listview page
+   //From analysis card page
+  browser.ignoreSynchronization = false;
   analyzePage.navigateToHome();
+  browser.ignoreSynchronization = true;
   homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
   // commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.backButton);
   // commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
@@ -202,9 +205,9 @@ const verifyPromptFromListView = (name, data, execute)=> {
   //Change to list View.
   element(utils.hasClass(homePage.listViewInput, 'mat-radio-checked').then(function(isPresent) {
     if(isPresent) {
-      console.log('Already in list view..')
+      //console.log('Already in list view..')
     } else {
-      console.log('Not in list view..')
+      //console.log('Not in list view..')
       commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.listView);
       commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.listView);
       analyzePage.analysisElems.listView.click();
@@ -235,7 +238,9 @@ const verifyPromptFromListView = (name, data, execute)=> {
  */
 const verifyPromptFromCardView = (name, data, execute)=> {
  //From analysis card page
+ browser.ignoreSynchronization = false;
  analyzePage.navigateToHome();
+ browser.ignoreSynchronization = true;
  homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
 //  commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.backButton);
 //  commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
@@ -243,9 +248,9 @@ const verifyPromptFromCardView = (name, data, execute)=> {
  //Change to Card View.
  element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
   if(isPresent) {
-    console.log('Already in card view..')
+    //console.log('Already in card view..')
   } else {
-    console.log('Not in card view..')
+    //console.log('Not in card view..')
     commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
     commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
     analyzePage.analysisElems.cardView.click();
@@ -275,26 +280,68 @@ const verifyPromptFromCardView = (name, data, execute)=> {
  */
 const verifyPromptFromDetailPage = (data)=> {
   //Execute the analysis from detail/view page and verify it asks for prompt filter
-  commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
-  commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
-  savedAlaysisPage.actionsMenuBtn.click();
-  commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
-  commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
-  savedAlaysisPage.executeMenuOption.click();
-  verifyFilters(data);
+  browser.waitForAngular();
+  browser.sleep(5000);//This is required
+  element(savedAlaysisPage.actionsMenuBtn.isDisplayed().then(function(displayed){
+    if (displayed) {
+      commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
+      commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
+      savedAlaysisPage.actionsMenuBtn.click();
+      commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
+      commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
+      savedAlaysisPage.executeMenuOption.click();
+      verifyFilters(data);
+    } else {
+      console.log('Action menu is not displayed hence going to category page and coming to detail page..');
+      //From analysis card page
+      browser.ignoreSynchronization = false;
+      analyzePage.navigateToHome();
+      browser.ignoreSynchronization = true;
+      homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
+      element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+        if(!isPresent) {
+          commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+          commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+          analyzePage.analysisElems.cardView.click();
+        }
+        //Open the created analysis.
+        const analysisName = analyzePage.main.getCardTitle(name);
+        commonFunctions.waitFor.elementToBeVisible(analysisName);
+        commonFunctions.waitFor.elementToBeClickable(analysisName);
+        analysisName.click();
+
+        commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.filterDialog);
+        expect(analyzePage.prompt.filterDialog.isDisplayed()).toBeTruthy();
+        commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.cancleFilterPrompt);
+        commonFunctions.waitFor.elementToBeClickable(analyzePage.prompt.cancleFilterPrompt);
+        analyzePage.prompt.cancleFilterPrompt.click();
+
+        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
+        savedAlaysisPage.actionsMenuBtn.click();
+
+        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
+        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
+        savedAlaysisPage.executeMenuOption.click();
+
+        verifyFilters(data);
+      }));
+    }
+  }));
 };
 /**
  *
  * @param {*} data
  */
 const verifyFilters = (data) => {
-
+  //console.log('started verifyFilters')
   //Verify filter dailog
   commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.filterDialog);
   expect(analyzePage.prompt.filterDialog.isDisplayed()).toBeTruthy();
   expect(analyzePage.prompt.selectedField.getAttribute("value")).toEqual(data.fieldName);
   //apply fileters and execute
   setFilterValue(data.fieldType, data.operator, data.value);
+  //console.log('completed verifyFilters')
 }
 /**
  *
@@ -303,6 +350,7 @@ const verifyFilters = (data) => {
  * @param {*} value1
  */
 const setFilterValue = (fieldType, operator, value1) => {
+  //console.log('started setFilterValue')
     // Scenario for dates
     const filterWindow = designModePage.filterWindow;
     if (fieldType === 'date') {
@@ -341,18 +389,21 @@ const setFilterValue = (fieldType, operator, value1) => {
     commonFunctions.waitFor.elementToBeClickable(designModePage.applyFiltersBtn);
     designModePage.applyFiltersBtn.click();
     commonElementsPage.ifErrorPrintTextAndFailTest();
+
+    //console.log('completed setFilterValue')
   };
 /**
  *
  * @param {*} filters
  */
   const validateSelectedFilters = (filters) => {
-
+    //console.log('started validateSelectedFilters')
     analyzePage.appliedFiltersDetails.selectedFilters.map(function(elm) {
       return elm.getText();
     }).then(function(displayedFilters) {
       expect(utils.arrayContainsArray(displayedFilters, filters)).toBeTruthy();
     });
+    //console.log('completed validateSelectedFilters')
   };
 /**
  *
@@ -363,6 +414,7 @@ const setFilterValue = (fieldType, operator, value1) => {
  * @param {*} fieldName
  */
 const applyFilters = (user, name, description, analysisType, subType, fieldName) => {
+  //console.log('started applyFilters')
    //Create new analysis.
    new AnalysisHelper().createNewAnalysis(host, token,name,description, analysisType, subType);
    login.loginAs(user);
@@ -414,7 +466,6 @@ const applyFilters = (user, name, description, analysisType, subType, fieldName)
    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
    save.saveBtn.click();
-
+   //console.log('completed applyFilters')
   };
-
 });

@@ -82,6 +82,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const filters = analyzePage.filtersDialogUpgraded;
     const filterAC = filters.getFilterAutocomplete(0);
     const fieldName = yAxisName;
+    const operator = 'Equal to'
     commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
     chartDesigner.filterBtn.click();
 
@@ -89,16 +90,22 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     designModePage.filterWindow.addFilter('sample').click();
 
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.number.operator);
+    designModePage.filterWindow.number.operator.click();
+    commonFunctions.waitFor.elementToBeClickable(designModePage.filterWindow.number.operatorDropDownItem(operator));
+    designModePage.filterWindow.number.operatorDropDownItem(operator).click();
+    designModePage.filterWindow.numberInputUpgraded.clear();
     designModePage.filterWindow.numberInputUpgraded.sendKeys(filterValue);
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
     commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
     filters.applyBtn.click();
-
+    
     //TODO: Need to check that filters applied or not.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterText);
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterClear);
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.selectedFiltersText);
-    validateSelectedFilters([fieldName]);
+    let filterDisplayed = fieldName+': '+operator+' '+filterValue;//This is new change to app
+    validateSelectedFilters([filterDisplayed]);
 
   });
 

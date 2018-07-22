@@ -31,6 +31,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: true,
       fork: true,
       publish: true,
+      schedule: true,
       execute: true,
       export: true,
       delete: true
@@ -44,6 +45,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: false,
       fork: false,
       publish: false,
+      schedule: false,
       execute: false,
       export: false,
       delete: false
@@ -57,6 +59,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: true,
       fork: false,
       publish: false,
+      schedule: false,
       execute: false,
       export: false,
       delete: false
@@ -70,6 +73,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: false,
       fork: true,
       publish: false,
+      schedule: false,
       execute: false,
       export: false,
       delete: false
@@ -78,11 +82,12 @@ describe('Privileges tests: privileges.test.js', () => {
       user: 'userOne',
       subCategory: subCategories.publish.name,
       cardOptions: true,
-      viewOptions: false,
+      viewOptions: true,
       create: false,
       edit: false,
       fork: false,
       publish: true,
+      schedule: true,
       execute: false,
       export: false,
       delete: false
@@ -96,6 +101,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: false,
       fork: false,
       publish: false,
+      schedule: false,
       execute: true,
       export: false,
       delete: false
@@ -109,6 +115,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: false,
       fork: false,
       publish: false,
+      schedule: false,
       execute: false,
       export: true,
       delete: false
@@ -122,6 +129,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: false,
       fork: false,
       publish: false,
+      schedule: false,
       execute: false,
       export: false,
       delete: true
@@ -135,6 +143,7 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: false,
       fork: false,
       publish: false,
+      schedule: false,
       execute: false,
       export: false,
       delete: false
@@ -143,11 +152,12 @@ describe('Privileges tests: privileges.test.js', () => {
       user: 'userOne',
       subCategory: subCategories.multiple.name,
       cardOptions: true,
-      viewOptions: false,
+      viewOptions: true,
       create: true,
       edit: false,
       fork: true,
       publish: true,
+      schedule: true,
       execute: false,
       export: false,
       delete: false
@@ -161,10 +171,13 @@ describe('Privileges tests: privileges.test.js', () => {
       edit: true,
       fork: true,
       publish: true,
+      schedule: true,
       execute: true,
       export: true,
       delete: true
     },
+
+    //Failing due to product bugs.
     // 'Create privilege for admin': { // SAWQA-4845
     //   user: 'admin',
     //   subCategory: subCategories.create.name,
@@ -322,6 +335,7 @@ describe('Privileges tests: privileges.test.js', () => {
         commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
         commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
         analyzePage.analysisElems.cardView.click();
+        browser.sleep(1000);
 
         element(analyzePage.analysisElems.cardMenuButton.isPresent().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
@@ -339,6 +353,10 @@ describe('Privileges tests: privileges.test.js', () => {
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
+            //Currently element id is same for both publish and schedule //TODO: need to change this to  schedule  
+            expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.schedule,
+              "Schedule button expected to be " + data.schedule + " on Analyze Page, but was " + !data.schedule);
+
             expect(isOptionPresent(analysisOptions, 'execute')).toBe(data.execute,
               "Execute button expected to be " + data.execute + " on Analyze Page, but was " + !data.execute);
             expect(isOptionPresent(analysisOptions, 'delete')).toBe(data.delete,
@@ -382,17 +400,18 @@ describe('Privileges tests: privileges.test.js', () => {
               "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
           }
         }));
+      
+      //This is not applicable after new change... when we introduced schedule button
+      //  element(executedAnalysis.publishBtn.isPresent().then(function(isPresent) {
+      //    if(isPresent) {
+      //     expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
+      //       "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+      //    } else {
+      //     expect(isPresent).toBe(data.publish,
+      //       "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+      //    }
 
-       element(executedAnalysis.publishBtn.isPresent().then(function(isPresent) {
-         if(isPresent) {
-          expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
-            "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
-         } else {
-          expect(isPresent).toBe(data.publish,
-            "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
-         }
-
-       }));
+      //  }));
 
 
         // Validate menu in analysis
@@ -416,9 +435,30 @@ describe('Privileges tests: privileges.test.js', () => {
                 "actionsMenuBtn button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
                 commonFunctions.waitFor.elementToBeClickable(executedAnalysis.actionsMenuBtn);
                 executedAnalysis.actionsMenuBtn.click();
+                browser.sleep(1000);
             } else {
               expect(isPresent).toBe(data.execute,
                 "actionsMenuBtn button expected to be " + data.execute + " in view mode, but was " + !data.execute);
+            }
+          }));
+
+          element(executedAnalysis.publishMenuOption.isPresent().then(function (isPresent) {
+            if(isPresent) {
+              expect(executedAnalysis.publishMenuOption.isDisplayed()).toBe(data.publish,
+                "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+            } else {
+              expect(isPresent).toBe(data.publish,
+                "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
+            }
+          }));
+          //Currently element id is same for both publish and schedule //TODO: need to change this to  schedule  
+          element(executedAnalysis.scheduleMenuOption.isPresent().then(function (isPresent) {
+            if(isPresent) {
+              expect(executedAnalysis.scheduleMenuOption.isDisplayed()).toBe(data.schedule,
+                "Schedule button expected to be " + data.schedule + " in view mode, but was " + !data.schedule);
+            } else {
+              expect(isPresent).toBe(data.schedule,
+                "Schedule button expected to be " + data.schedule + " in view mode, but was " + !data.schedule);
             }
           }));
 
