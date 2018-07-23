@@ -336,16 +336,13 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     return dataSetsJSON;
   }
 
-  public DataSet getDataSet(String projectId, String dataSet) throws Exception {
-    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSet);
+  public DataSet getDataSet(String projectId, String dataSetName) throws Exception {
+    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSetName);
 
-    String dataSetId = projectId + "::" + dataSet;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-
-    JsonElement dataset = mdtStore.read(dataSetId);
-
+    JsonElement dataset = mdtStore.read(dataSetName);
     return objectMapper.readValue(dataset.toString(), DataSet.class);
   }
   

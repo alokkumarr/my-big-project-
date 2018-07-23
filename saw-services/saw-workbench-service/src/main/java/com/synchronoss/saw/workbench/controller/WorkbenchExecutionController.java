@@ -1,26 +1,15 @@
 package com.synchronoss.saw.workbench.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-
 import java.util.Base64;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
-
+import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,7 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.synchronoss.saw.workbench.model.DataSet;
+import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.Component;
 
@@ -96,6 +93,7 @@ public class WorkbenchExecutionController {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode xdfConfig = mapper.createObjectNode();
     ObjectNode xdfComponentConfig = xdfConfig.putObject(component);
+    
     if (component.equals("parser")) {
       String rawDirectory = defaultProjectRoot + defaultProjectPath;
       String file = config.path("file").asText();
@@ -107,7 +105,15 @@ public class WorkbenchExecutionController {
       String encoded = Base64.getEncoder()
           .encodeToString(script.getBytes("utf-8"));
       xdfComponentConfig.put("script", encoded);
-    } else {
+    } 
+    if (component.equalsIgnoreCase("rscript")) {
+      xdfComponentConfig.put("scriptLocation", "inline");
+      String script = config.path("script").asText();
+      String encoded = Base64.getEncoder()
+          .encodeToString(script.getBytes("utf-8"));
+      xdfComponentConfig.put("script", encoded);
+    }
+    else {
       throw new RuntimeException("Unknown component: " + component);
     }
     /* Build inputs */
@@ -116,6 +122,7 @@ public class WorkbenchExecutionController {
       ObjectNode xdfInput = xdfInputs.addObject();
       xdfInput.put("dataSet", input);
     }
+    
     /* Build outputs */
     ArrayNode xdfOutputs = xdfConfig.putArray("outputs");
     ObjectNode xdfOutput = xdfOutputs.addObject();
@@ -129,13 +136,33 @@ public class WorkbenchExecutionController {
 
     xdfOutput.set(DataSetProperties.UserData.toString(), userData);
     /* Invoke XDF component */
+    log.info("xdfConfig.toString() :" + xdfConfig.toString());
+    log.info("project :"+ project);
+    log.info("component : "+ component);
+    log.info("name : "+ name);
     return workbenchExecutionService.execute(
       project, name, component, xdfConfig.toString());
   }
 
   /**
+   * This method is temporary solution to integrate with XDF-META Store 
+   * @param project Project ID
+   * @param body Body Parameters
+   * @return Returns a preview
+   * @throws JsonProcessingException When not able to get the preview
+   * @throws Exception General Exception
+   */
+  @RequestMapping(
+      value = "{project}/datasets/create", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK) 
+  public DataSet createRGeneratedDataSet(@PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet,
+      @RequestHeader("Authorization") String authToken) throws JSONException, Exception {
+    
+    return null;
+  } 
+  /**
    * Preview dataset function.
-   *
    * @param project Project ID
    * @param body Body Parameters
    * @return Returns a preview
