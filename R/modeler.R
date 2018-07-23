@@ -262,12 +262,13 @@ get_best_model <- function(obj) {
 #' @param lighten logical flag to lighten the memory footprint of modeler
 #'   objects by removing all fit and pipeline output from trained models. Note
 #'   the final model fit and pipeline are not impacted
-#' @inheritDotParams saveRDS
+#' @inheritDotParams saveRDS -object -file
 #'
 #' @export
 deploy <- function(obj, path, lighten = FALSE, ...) {
   checkmate::assert_class(obj, "modeler")
   checkmate::assert_directory(dirname(path))
+  checkmate::assert_character(path, pattern = ".rds")
   checkmate::assert_flag(lighten)
 
   if(lighten) {
