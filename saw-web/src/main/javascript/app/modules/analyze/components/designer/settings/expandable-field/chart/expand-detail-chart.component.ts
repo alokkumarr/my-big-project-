@@ -30,6 +30,7 @@ export class ExpandDetailChartComponent {
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnChart;
+  @Input() public fieldCount: any;
 
   public DATE_INTERVALS = DATE_INTERVALS;
   public DATE_FORMATS_OBJ = CHART_DATE_FORMATS_OBJ;
@@ -43,6 +44,7 @@ export class ExpandDetailChartComponent {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
+    console.log(this.fieldCount);
     this.isDataField = ['y', 'z'].includes(this.artifactColumn.area);
     this.hasDateInterval = DATE_TYPES.includes(type);
     this.changeSample();
