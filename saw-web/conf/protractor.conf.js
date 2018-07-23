@@ -18,7 +18,7 @@ var HtmlReporter = require('protractor-beautiful-reporter');
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 600000;
+const pageLoadTimeout = webpackHelper.distRun() ? 1200000 : 600000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
