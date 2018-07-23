@@ -16,6 +16,7 @@ new_segmenter <- function(df,
                           version = NULL,
                           desc = NULL,
                           scientist = NULL,
+                          save_fits = TRUE,
                           dir = NULL,
                           ...){
   checkmate::assert_subset("tbl_spark", class(df))
@@ -32,6 +33,7 @@ new_segmenter <- function(df,
                   version,
                   desc,
                   scientist,
+                  save_fits,
                   dir)
   mobj$index_var <- "index"
   mobj$index <- 1:sdf_nrow(df)

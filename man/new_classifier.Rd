@@ -6,7 +6,7 @@
 \title{Classifier Constructer Function}
 \usage{
 new_classifier(df, target, name = NULL, id = NULL, version = NULL,
-  desc = NULL, scientist = NULL, dir = NULL, ...)
+  desc = NULL, scientist = NULL, save_fits = TRUE, dir = NULL, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}
@@ -24,6 +24,9 @@ regressor, and classifier}
 
 \item{scientist}{optional input for scientist building model. defaults to
 system user}
+
+\item{save_fits}{logical flag to save model fits in modeler object. note -
+does not apply to final model}
 
 \item{dir}{optional directory path for saving reports, data and models}
 

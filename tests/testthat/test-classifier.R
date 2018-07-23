@@ -91,14 +91,14 @@ test_that("Classifier Predicts New Data", {
 # Advanced Tests ----------------------------------------------------------
 
 
-test_that("Classifer with Multiple Methods and CV", {
+test_that("Classifer with Multiple Methods, CV sampling, without saving fits", {
 
   test_pipe <- pipeline(expr = function(x) {
     x %>%
       select(index, am, mpg, cyl, wt, hp, vs)
   })
 
-  c1 <- new_classifier(df = df, target = "am", name = "test") %>%
+  c1 <- new_classifier(df = df, target = "am", name = "test", save_fits = FALSE) %>%
     add_cross_validation_samples(folds = 2) %>%
     add_model(pipe = test_pipe,
               method = "ml_multilayer_perceptron_classifier",

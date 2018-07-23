@@ -4,7 +4,7 @@
 \alias{valid_modeler}
 \title{Modeler Validation function}
 \usage{
-valid_modeler(x)
+valid_modeler(obj)
 }
 \description{
 Modeler Validation function

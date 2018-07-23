@@ -17,6 +17,7 @@ new_modeler <- function(df,
                         desc,
                         scientist,
                         dir,
+                        save_fits,
                         samples,
                         models,
                         measure,
@@ -33,6 +34,7 @@ new_modeler <- function(df,
   checkmate::assert_character(desc)
   checkmate::assert_character(scientist)
   checkmate::test_path_for_output(dir)
+  checkmate::assert_flag(save_fits)
   checkmate::assert_class(samples, "samples")
   checkmate::assert_list(models)
   checkmate::assert_list(measure)
@@ -52,6 +54,7 @@ new_modeler <- function(df,
       schema = schema,
       target = target,
       dir = dir,
+      save_fits = save_fits,
       samples = samples,
       models = models,
       measure = measure,
@@ -64,9 +67,9 @@ new_modeler <- function(df,
 
 
 #' Modeler Validation function
-valid_modeler <- function(x){
+valid_modeler <- function(obj){
 
-  if (! x$type %in% c("forecaster", "segmenter", "regressor", "classifier")) {
+  if (! obj$type %in% c("forecaster", "segmenter", "regressor", "classifier")) {
     stop("modeler type supplied not supported. Please use one of following: ",
          "\n* forecaster",
          "\n* segmenter",
@@ -74,11 +77,11 @@ valid_modeler <- function(x){
          "\n* classifier")
   }
 
-  if(! any(class(x$data) %in% c("data.frame", "tbl_spark"))){
+  if(! any(class(obj$data) %in% c("data.frame", "tbl_spark"))){
     stop("df input class not supported. modeler supports only data.frame and tbl_spark objects")
   }
 
-  x
+  obj
 }
 
 
@@ -99,6 +102,8 @@ valid_modeler <- function(x){
 #' @param desc optional description of the use case.
 #' @param scientist optional input for scientist building model. defaults to
 #'   system user
+#' @param save_fits logical flag to save model fits in modeler object. note -
+#'   does not apply to final model
 #' @param dir optional directory path for saving reports, data and models
 #' @param ... any addtional parameters
 #'
@@ -116,6 +121,7 @@ modeler <- function(df,
                     version = NULL,
                     desc = NULL,
                     scientist = NULL,
+                    save_fits = TRUE,
                     dir = NULL,
                     ...){
 
@@ -144,6 +150,7 @@ modeler <- function(df,
       desc = desc,
       scientist = scientist,
       dir = dir,
+      save_fits = save_fits,
       samples = default_samples,
       models = empty_models,
       measure = measure,
@@ -403,7 +410,28 @@ train_models.modeler <- function(obj, ids = NULL) {
     model$pipe <- execute(obj$data, model$pipe)
     model$index_var <- obj$index_var
     model <- train(model, indicies, level = obj$conf_levels)
+    if(! obj$save_fits) model$fit <- NULL
     obj$models[[id]] <- model
+  }
+  obj
+}
+
+
+#' @rdname evaluate_models
+#' @export
+evaluate_models.modeler <- function(obj, ids = NULL) {
+  checkmate::assert_character(ids, null.ok = TRUE)
+
+  status <- get_models_status(obj)
+  if (!is.null(ids))
+    status <- status[names(status) %in% ids]
+  ids <- names(status == "trained")
+
+  for (id in ids) {
+    model <- get_models(obj, ids = id)[[1]]
+    model <- evaluate(model, obj$measure)
+    obj$models[[id]] <- model
+    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
   }
   obj
 }
@@ -424,6 +452,10 @@ set_final_model.modeler <- function(obj,
     checkmate::assert_choice(id, names(get_models(obj)))
   if (method == "manual" & is.null(id))
     stop("final model not selected: id not provided for manual method")
+  if( (!obj$save_fits) & (!refit)) {
+    message("model fits not saved. refit required and set to TRUE")
+    refit <- TRUE
+  }
 
   if (method == "best") {
     model <- get_best_model(obj)
@@ -457,26 +489,6 @@ set_final_model.modeler <- function(obj,
     obj$final_model <- model
   }
 
-  obj
-}
-
-
-#' @rdname evaluate_models
-#' @export
-evaluate_models.modeler <- function(obj, ids = NULL) {
-  checkmate::assert_character(ids, null.ok = TRUE)
-
-  status <- get_models_status(obj)
-  if (!is.null(ids))
-    status <- status[names(status) %in% ids]
-  ids <- names(status == "trained")
-
-  for (id in ids) {
-    model <- get_models(obj, ids = id)[[1]]
-    model <- evaluate(model, obj$measure)
-    obj$models[[id]] <- model
-    obj$evaluate <- rbind(obj$evaluate, model$evaluate)
-  }
   obj
 }
 
