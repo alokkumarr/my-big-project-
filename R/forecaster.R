@@ -26,6 +26,7 @@ new_forecaster <- function(df,
                            version = NULL,
                            desc = NULL,
                            scientist = NULL,
+                           save_fits = TRUE,
                            dir = NULL,
                            ...){
 
@@ -43,6 +44,7 @@ new_forecaster <- function(df,
                   version,
                   desc,
                   scientist,
+                  save_fits,
                   dir)
   mobj$index_var <- index_var
   mobj$index <- index(df[[index_var]], unit = unit)
