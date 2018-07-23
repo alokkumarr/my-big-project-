@@ -57,9 +57,14 @@ import { CommonDirectiveModule } from './directives';
 // import from login module
 import { AuthServiceFactory } from '../../login/services/auth.service';
 import { PivotGridComponent } from './components/pivot-grid/pivot-grid.component';
-import { AccordionMenuLinkComponent } from './components/accordionMenu/accordionMenuLink.component';
-import { AccordionMenuComponent } from './components/accordionMenu/accordionMenu.component';
-import { SidenavComponent } from './components/sidenav/sidenav.component';
+import {
+  AccordionMenuComponent,
+  AccordionMenuLinkComponent
+} from './components/accordionMenu';
+import {
+  SidenavComponent,
+  SidenavMenuService
+} from './components/sidenav';
 import { ErrorDetailComponent } from './components/error-detail';
 import { DataFormatDialogComponent } from './components/data-format-dialog';
 import { ConfirmDialogComponent } from './components/confirm-dialog';
@@ -247,6 +252,7 @@ angular
       useClass: RefreshTokenInterceptor,
       multi: true
     },
+    SidenavMenuService,
     ErrorDetailService,
     ErrorDetailDialogService,
     toastProvider,

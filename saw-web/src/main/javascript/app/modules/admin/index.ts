@@ -15,6 +15,7 @@ import {
   HandleErrorInterceptor,
   RefreshTokenInterceptor
 } from '../../common/interceptor';
+import { SidenavMenuService } from '../../common/components/sidenav';
 import { ToastService } from '../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../common/services/local-search.service';
 
@@ -124,6 +125,7 @@ const COMPONENTS = [
       useClass: RefreshTokenInterceptor,
       multi: true
     },
+    SidenavMenuService,
     UserService,
     JwtService,
     dxDataGridService,

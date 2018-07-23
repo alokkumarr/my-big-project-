@@ -9,7 +9,9 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
+import { SidenavMenuService } from '../../../common/components/sidenav';
 import { ConfirmDialogData } from '../../../common/types';
+import { AdminMenuData } from '../consts';
 
 const template = require('./admin-main-view.component.html');
 require('./admin-main-view.component.scss');
@@ -55,7 +57,8 @@ export class AdminMainViewComponent {
     private _jwtService: JwtService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private _sidenav: SidenavMenuService
   ) { }
 
   ngOnInit() {
@@ -67,6 +70,8 @@ export class AdminMainViewComponent {
     this.data$.subscribe(data => {
       this.setData(data);
     });
+
+    this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
   }
 
   applySearchFilter(value) {
