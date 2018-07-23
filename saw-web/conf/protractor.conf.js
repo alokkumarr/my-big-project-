@@ -94,7 +94,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  //directConnect: true,
+  directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',

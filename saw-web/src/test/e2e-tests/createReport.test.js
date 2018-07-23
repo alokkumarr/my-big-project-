@@ -71,7 +71,7 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Create Report
     homePage.createAnalysis(metricName, analysisType);
 
-    browser.waitForAngularEnabled(false);
+    //browser.waitForAngularEnabled(false);
     /*element(by.xpath(`//md-checkbox/div/span[text()='Source OS']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
     element(by.xpath(`//md-checkbox/div/span[text()='Available (MB)']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
     element(by.xpath(`//md-checkbox/div/span[text()='Source Model']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
