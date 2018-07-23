@@ -31,6 +31,7 @@ export class ExpandableFieldComponent {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumn;
   @Input() public analysisType: AnalysisType;
+  @Input() public fieldCount: any;
 
   TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   AGGREGATE_TYPES = AGGREGATE_TYPES;

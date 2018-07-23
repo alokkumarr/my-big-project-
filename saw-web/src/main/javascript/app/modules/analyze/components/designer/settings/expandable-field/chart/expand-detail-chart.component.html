@@ -1,4 +1,15 @@
 <div fxLayout="column">
+  <div style="margin-top:5px;" class="value-limits" *ngIf="artifactColumn.area === 'y' && fieldCount < 2">
+    <mat-radio-group style="width:50%;">
+      <mat-radio-button value="1">Top</mat-radio-button>
+      <mat-radio-button value="2">Bottom</mat-radio-button>
+    </mat-radio-group>
+    <mat-form-field style="width:50%;margin-left: 8%;">
+        <input matInput
+              type="number"
+              placeholder="Integer Value"/>
+      </mat-form-field>
+  </div>
   <mat-form-field fxFlex>
       <input matInput type="text"
              placeholder="Alias"
