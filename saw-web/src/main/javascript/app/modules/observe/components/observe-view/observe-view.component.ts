@@ -33,6 +33,8 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   private dashboard: Dashboard;
   public requester = new BehaviorSubject({});
   private listeners: Array<Subscription> = [];
+  private hasAutoRefresh: boolean = false;
+  private shouldAutoRefresh: boolean = true;
   private privileges = {
     create: false,
     delete: false,
@@ -75,12 +77,25 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     this.dashboardService.unsetAutoRefresh(this.dashboard.entityId);
   }
 
+  modifyAutoRefresh({ checked }) {
+    if (checked) {
+      this.startAutoRefresh();
+      this.refreshDashboard();
+    } else {
+      this.stopAutoRefresh();
+    }
+  }
+
   startAutoRefresh() {
     if (!this.dashboard.autoRefreshEnabled) {
+      this.hasAutoRefresh = false;
+      this.shouldAutoRefresh = false;
       this.dashboardService.unsetAutoRefresh(this.dashboard.entityId);
       return;
     }
 
+    this.hasAutoRefresh = true;
+    this.shouldAutoRefresh = true;
     this.dashboardService.setAutoRefresh(this.dashboard);
     const autoRefreshListener = this.dashboardService
       .getAutoRefreshSubject(this.dashboard.entityId)

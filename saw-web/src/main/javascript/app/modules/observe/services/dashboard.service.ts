@@ -15,13 +15,16 @@ export class DashboardService {
   public onFilterKPI = new Subject(); // used for communication between kpi filter and individual KPI fields
 
   private autoRefreshListeners: {
-    [key: string]: Subject<{ dashboardId: string }>;
+    [key: string]: {
+      sub: Subject<{ dashboardId: string }>;
+      interval: Subscription;
+    };
   } = {};
 
   constructor() {}
 
   getAutoRefreshSubject(dashboardId: string): Subject<{ dashboardId: string }> {
-    return this.autoRefreshListeners[dashboardId];
+    return this.autoRefreshListeners[dashboardId].sub;
   }
   /**
    * setAutoRefresh
@@ -31,10 +34,7 @@ export class DashboardService {
    * @returns {undefined}
    */
   setAutoRefresh(dashboard: Dashboard) {
-    if (this.autoRefreshListeners[dashboard.entityId]) {
-      this.autoRefreshListeners[dashboard.entityId].unsubscribe();
-      delete this.autoRefreshListeners[dashboard.entityId];
-    }
+    this.unsetAutoRefresh(dashboard.entityId);
 
     if (dashboard.autoRefreshEnabled) {
       const observable = Observable.interval(
@@ -43,14 +43,19 @@ export class DashboardService {
         dashboardId: dashboard.entityId
       }));
       const sub: Subject<{ dashboardId: string }> = new Subject();
-      observable.subscribe(sub);
-      this.autoRefreshListeners[dashboard.entityId] = sub;
+
+      /* We save both - the interval subscription and subject to clean them up correctly */
+      this.autoRefreshListeners[dashboard.entityId] = {
+        interval: observable.subscribe(sub),
+        sub
+      };
     }
   }
 
   unsetAutoRefresh(dashboardId: string) {
     if (this.autoRefreshListeners[dashboardId]) {
-      this.autoRefreshListeners[dashboardId].unsubscribe();
+      this.autoRefreshListeners[dashboardId].sub.unsubscribe();
+      this.autoRefreshListeners[dashboardId].interval.unsubscribe();
       delete this.autoRefreshListeners[dashboardId];
     }
   }
