@@ -287,6 +287,14 @@ export class DashboardGridComponent
     });
   }
 
+  refreshKPIs() {
+    this.dashboard.forEach((tile, id) => {
+      if (this.tileType(tile) === 'analysis') return;
+
+      this.dashboard.splice(id, 1, { ...tile });
+    });
+  }
+
   initialiseDashboard() {
     if (!this.model || this.initialised) {
       return;
@@ -346,6 +354,7 @@ export class DashboardGridComponent
 
   refreshDashboard() {
     this.onApplyGlobalFilters(this.filters.globalFilters);
+    this.refreshKPIs();
   }
 
   onAnalysisRemove() {

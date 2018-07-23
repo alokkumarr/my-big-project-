@@ -10,6 +10,8 @@
     <div class="page-header-toolbar">
       <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
       <div class="page-header-actions">
+        <kpi-filter *ngIf="hasKPIs"></kpi-filter>
+
         <mat-slide-toggle
             *ngIf="dashboard && hasAutoRefresh"
             color="primary"
@@ -17,7 +19,6 @@
             (change)="modifyAutoRefresh($event)">
           Auto Refresh
         </mat-slide-toggle>
-        <kpi-filter *ngIf="hasKPIs"></kpi-filter>
 
         <button mat-button
         *ngIf="dashboard && !hasAutoRefresh"

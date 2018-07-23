@@ -45,6 +45,10 @@ observe-page {
       button {
         height: 36px;
       }
+
+      mat-slide-toggle {
+        margin-left: 10px;
+      }
     }
   }
 
