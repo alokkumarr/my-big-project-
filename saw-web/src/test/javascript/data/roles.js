@@ -1,4 +1,4 @@
-const globalVariables = require('../helpers/globalVariables');
+const globalVariables = require('../../javascript/helpers/globalVariables');
 
 const roles = {
   admin: {
