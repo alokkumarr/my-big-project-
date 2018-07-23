@@ -212,24 +212,33 @@ public class QueryBuilderUtil {
 	 * @param nodeName
 	 * @return
 	 */
-	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
+	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName,
+                                                             DataField.LimitType type, Integer size)
 	{
 		AggregationBuilder aggregationBuilder = null;
-		
+		boolean bucketOrder = false;
+
+		if (type==DataField.LimitType.BOTTOM)
+		    bucketOrder=true;
+
 		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
 		  nodeField = setGroupIntervalChart(nodeField);
   		  if (nodeField.getGroupInterval()!=null){
               aggregationBuilder = AggregationBuilders.
                       dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
-                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(false));
+                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(bucketOrder));
               }
             else {
               aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                  .format(nodeField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+                  .format(nodeField.getDateFormat()).order(BucketOrder.key(bucketOrder)).size(size);
             }
 		}
 		else{
-			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).size(BuilderUtil.SIZE);
+		    if (type==null)
+			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).size(size);
+		    else
+		        aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).
+                    order(BucketOrder.key(bucketOrder)).size(size);
 		}
 		return aggregationBuilder;
 	}	
