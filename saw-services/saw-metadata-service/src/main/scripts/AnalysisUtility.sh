@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # Script to start local RTIS service on given port
 source /etc/saw/service.env || exit 1
+echo "In semantic ID migration sh file"
+marker=/etc/bda/saw-analysis-semantic-id-migration
+if [ -f $marker ]; then
+    echo "semantic ID migration has already been run, so not running again"
+    exit
+fi
+touch $marker
 
 declare -r app_mainclass="sncr.metadata.AnalysisUtility"
 declare -r lib_dir=$SAW_SERVICE_HOME/lib
@@ -27,7 +34,7 @@ cmd="java -Dlog.dir=${log_dir} -Dhadoop.home.dir=${HADOOP_HOME} -classpath $app_
 
 echo $cmd
 
-$cmd
+su - mapr -c "${cmd}"
 
 
 

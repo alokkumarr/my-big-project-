@@ -37,7 +37,9 @@
     <import-list-view
         id="import-grid-dir"
         analysis-list="$ctrl.analysisTableList"
+        importFlag = "$ctrl.importCount"
         updater="$ctrl.updater"
+        import-flag-updater = "$ctrl.importCountUpdater"
         on-action="$ctrl.onListAction(type, model)">
     </import-list-view>
     <analysis-list-view

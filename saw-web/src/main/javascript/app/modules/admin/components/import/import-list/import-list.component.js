@@ -5,7 +5,9 @@ export const ImportListViewComponent = {
   template,
   bindings: {
     analysisList: '<',
+    importFlag: '<',
     updater: '<',
+    importFlagUpdater: '<',
     onAction: '&'
   },
   controller: class ImportListViewController {
@@ -20,6 +22,7 @@ export const ImportListViewComponent = {
     $onInit() {
       this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
+      this.importFlagUpdaterSubscribtion = this.importFlagUpdater.subscribe(update => this.onimportFlagUpdater(update));
     }
 
     $onChanges(changedObj) {
@@ -36,6 +39,10 @@ export const ImportListViewComponent = {
       /* eslint-disable */
       analysisList && this.reloadDataGrid(analysisList);
       /* eslint-enable */
+    }
+
+    onimportFlagUpdater({flag}){
+      this.importFlag = flag;
     }
 
     reloadDataGrid(analysisList) {
@@ -88,16 +95,21 @@ export const ImportListViewComponent = {
       });
     }
     displayError(error) {
-      const confirm = this._$mdDialog.confirm()
-        .title('Error')
-        .textContent(angular.toJson(error.data))
+      const alert = this._$mdDialog.alert()
+        .title('ERROR :')
+        .textContent(angular.toJson(error.data || error))
         .ok('Ok');
-      this._$mdDialog.show(confirm).then(() => {
-      });
+      this._$mdDialog.show(alert);
     }
 
     validation() {
       if (this.analysisList.length > 0) {
+        return false;
+      }
+      return true;
+    }
+    importValidation() {
+      if (this.analysisList.length > 0 && this.importFlag === 0) {
         return false;
       }
       return true;
@@ -145,6 +157,7 @@ export const ImportListViewComponent = {
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
+        wordWrapEnabled: true,
         scrolling: {
           scrollingEnabled: false
         },

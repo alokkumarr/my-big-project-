@@ -13,7 +13,7 @@ export const AnalysisExportComponent = {
   styles: [style],
   controller: class AnalysisExportComponent extends AbstractComponentController {
     constructor($timeout, $componentHandler, $injector, $compile, $state, $mdDialog, $filter,
-      $mdToast, JwtService, $window, $rootScope, ExportService) {
+      $mdToast, JwtService, $window, $rootScope, ExportService, CategoriesManagementService) {
       'ngInject';
       super($injector);
       this.$componentHandler = $componentHandler;
@@ -21,6 +21,7 @@ export const AnalysisExportComponent = {
       this._$filter = $filter;
       this._$rootScope = $rootScope;
       this._JwtService = JwtService;
+      this._CategoriesManagementService = CategoriesManagementService;
       this.updater = new Subject();
       this._$timeout = $timeout;
       self = this;
@@ -33,13 +34,33 @@ export const AnalysisExportComponent = {
       });
       this.metrics = [];
       this.analysisTableList = [];
+      this.categoriesMap = [];
       this.getMetricList();
+      this.getAllCategories();
     }
 
     getMetricList() {
       this._$rootScope.showProgress = true;
       this._exportService.getMetricList().then(metrics => {
         this.metrics = metrics;
+        this._$rootScope.showProgress = false;
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
+      });
+    }
+
+    getAllCategories() {
+      this._$rootScope.showProgress = true;
+      const id = get(this._JwtService.getTokenObj(), 'ticket.custID');
+      this._CategoriesManagementService.getActiveCategoriesList(id).then(response => {
+        this.categoriesMap = response.categories.reduce(function(map, tag) {
+          if (tag.moduleName === 'ANALYZE') {
+            tag.subCategories.forEach(subCategory => {
+              map[subCategory.subCategoryId] = subCategory.subCategoryName;
+            });
+          }
+          return map;
+        }, {});
         this._$rootScope.showProgress = false;
       }).catch(() => {
         this._$rootScope.showProgress = false;
@@ -85,8 +106,10 @@ export const AnalysisExportComponent = {
               if (!isUndefined(element.categoryId) && !isUndefined(element.name)) {
                 this.analysisTableObject = {
                   selection: false,
-                  analysis: {}
+                  analysis: {},
+                  categoryName: ''
                 };
+                this.analysisTableObject.categoryName = this.categoriesMap[element.categoryId];
                 this.analysisTableObject.analysis = element;
                 this.analysisTableList.push(this.analysisTableObject);
               }
