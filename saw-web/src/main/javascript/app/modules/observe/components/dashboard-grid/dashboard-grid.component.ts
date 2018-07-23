@@ -288,11 +288,9 @@ export class DashboardGridComponent
   }
 
   refreshKPIs() {
-    this.dashboard.forEach((tile, id) => {
-      if (this.tileType(tile) === 'analysis') return;
-
-      this.dashboard.splice(id, 1, { ...tile });
-    });
+    this.dashboardService.onFilterKPI.next(
+      this.dashboardService.onFilterKPI.getValue() || { preset: '' }
+    );
   }
 
   initialiseDashboard() {
