@@ -10,7 +10,10 @@ import { GridsterItem } from 'angular-gridster2';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES
+} from '../../../analyze/services/analyze.service';
 import { flattenPivotData } from '../../../../common/utils/dataFlattener';
 
 const template = require('./observe-pivot.component.html');
@@ -33,9 +36,12 @@ export class ObservePivotComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.artifactColumns = [...this.analysis.artifacts[0].columns];
-    this.analyzeService.previewExecution(this.analysis).then(({ data }) => {
-      this.data = flattenPivotData(data, this.analysis.sqlBuilder);
-    });
+    if (this.analysis._executeTile === false) return;
+    this.analyzeService
+      .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, {})
+      .then(({ data }) => {
+        this.data = flattenPivotData(data, this.analysis.sqlBuilder);
+      });
   }
   ngOnDestroy() {}
 }
