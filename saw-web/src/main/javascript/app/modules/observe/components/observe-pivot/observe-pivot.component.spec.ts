@@ -10,7 +10,7 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 /* Stubs */
 const AnalyzeServiceStub: Partial<AnalyzeService> = {
-  previewExecution: () => {
+  getDataBySettings: () => {
     return new Promise(res => res({ data: {} }));
   }
 };
