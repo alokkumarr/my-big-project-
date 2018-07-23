@@ -5,7 +5,7 @@
 \title{New Modeler Object Constructer function}
 \usage{
 new_modeler(df, schema, target, type, name, id, version, desc, scientist, dir,
-  samples, models, measure, evaluate, final_model, ...)
+  save_fits, samples, models, measure, evaluate, final_model, ...)
 }
 \description{
 New Modeler Object Constructer function

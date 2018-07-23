@@ -115,7 +115,19 @@ test_that("Prediction Schema Check Works as expected", {
     df %>%
       select(am, mpg) %>%
       predict(r1, data = .))
-
-
 })
 
+
+test_that("Save Model Fits option works as expected", {
+
+  r2 <- new_regressor(df = df, target = "mpg", name = "test", save_fits = FALSE) %>%
+    add_default_samples() %>%
+    add_model(pipe = NULL,
+              method = "ml_linear_regression") %>%
+    train_models() %>%
+    evaluate_models() %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+
+  expect_lt(as.numeric(object.size(r2)), as.numeric(object.size(r1)))
+  expect_null(r2$models[[1]]$fit)
+})
