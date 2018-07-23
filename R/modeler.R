@@ -235,6 +235,7 @@ get_evalutions <- function(obj) {
 #' @export
 #' @return returns best model
 get_best_model <- function(obj) {
+  checkmate::assert_class(obj, "modeler")
 
   evals <- get_evalutions(obj)
   smpl <- ifelse("validation" %in% evals$sample, "validation", "train")
@@ -247,6 +248,36 @@ get_best_model <- function(obj) {
     head(1) %>%
     dplyr::pull(model)
   get_models(obj, ids = id)[[1]]
+}
+
+
+
+#' Deploy Modeler Object
+#'
+#' Save Modeler object to file that can be restored later. Deploy uses
+#' \code{\link{saveRDS}} function to serialize the R object
+#'
+#' @param obj modeler object to save
+#' @param path file path to save to. Extension should be .rds
+#' @param lighten logical flag to lighten the memory footprint of modeler
+#'   objects by removing all fit and pipeline output from trained models. Note
+#'   the final model fit and pipeline are not impacted
+#' @inheritDotParams saveRDS
+#'
+#' @export
+deploy <- function(obj, path, lighten = FALSE, ...) {
+  checkmate::assert_class(obj, "modeler")
+  checkmate::assert_directory(dirname(path))
+  checkmate::assert_flag(lighten)
+
+  if(lighten) {
+    for(i in seq_along(obj$models)) {
+      obj$models[[i]]$fit <- NULL
+      obj$models[[i]]$pipe <- clean(obj$models[[i]]$pipe)
+    }
+  }
+
+  saveRDS(object = obj, file = path, ...)
 }
 
 

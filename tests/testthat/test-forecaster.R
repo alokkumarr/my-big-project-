@@ -375,3 +375,37 @@ test_that("Schema Check works as expected", {
   p12 <- predict(f12, periods = 10, data = data.frame(x1=rnorm(10), x2=rnorm(10)))
   expect_class(p12, "predictions")
 })
+
+
+
+
+test_that("Deploy Function works as expected", {
+
+  f12 <- new_forecaster(df = dat1,
+                       target = "y",
+                       index_var = "index",
+                       name = "test") %>%
+    add_holdout_samples(splits = c(.6, .2, .2)) %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "ets") %>%
+    train_models(.) %>%
+    evaluate_models(.) %>%
+    set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
+
+  temp_path <- paste(tempdir(), "test.rds", sep="/")
+  deploy(f12, path = temp_path)
+  expect_file_exists(temp_path)
+
+  f13 <- readRDS(temp_path)
+  expect_equal(f12$created_on, f13$created_on)
+  expect_equal(f12$name, f13$name)
+  expect_equal(f12$final_model$id, f13$final_model$id)
+
+  deploy(f12, path = temp_path, lighten = TRUE)
+  f13 <- readRDS(temp_path)
+  expect_null(f13$models[[1]]$fit)
+  expect_null(f13$models[[2]]$fit)
+
+  p13 <- predict(f13, periods = 7)
+  expect_class(p13, "predictions")
+})

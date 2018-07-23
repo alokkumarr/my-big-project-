@@ -19,6 +19,7 @@ new_index <- function(unit, periods, start, end) {
   class = "index")
 }
 
+
 #' Index Creation Function
 #'
 #' Creates new index object for sequential data management
