@@ -1,8 +1,8 @@
 <div fxLayout="row" fxLayoutAlign="start center">
-  <mat-icon class="menu-icon-btn" fontIcon="icon-menu" (click)="sidenav.toggle()" e2e="main-menu-expand-btn"></mat-icon>
-  <mat-sidenav-container class="md-whiteframe-4dp" hasBackdrop="false">
-    <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container sidebar-header md-whiteframe-4dp, md-whiteframe-z2"
-      [ngClass]="{'sidenav-closed': !sidenav.opened}">
+  <mat-icon *ngIf="!sidenav.opened" class="menu-icon-btn" fontIcon="icon-menu" (click)="sidenav.toggle()" e2e="main-menu-expand-btn"></mat-icon>
+  <mat-sidenav-container  hasBackdrop="false">
+    <mat-sidenav #sidenav fxFlex="100%" mode="side" class="sidenav-container sidebar-header"
+      [ngClass]="{'sidenav-closedd': !sidenav.opened}">
       <div fxLayout="row" fxLayoutAlign="center center" class="menu-logo">
         <div fxFlex class="company-logo-white"></div>
       </div>
