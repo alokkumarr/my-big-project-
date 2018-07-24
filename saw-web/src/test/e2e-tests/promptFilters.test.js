@@ -63,13 +63,13 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
       value: 'string 450',
       fieldName: 'String'
     },
-    // 'String data type filter': {
-    //   user: 'userOne',
-    //   fieldType: 'string',
-    //   operator: 'Equals',
-    //   value: 'string 450',
-    //   fieldName: 'String'
-    // }
+    'String data type filter': {
+      user: 'userOne',
+      fieldType: 'string',
+      operator: 'Equals',
+      value: 'string 450',
+      fieldName: 'String'
+    }
   };
 
   beforeAll(function () {
@@ -98,7 +98,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
     commonFunctions.logOutByClearingLocalStorage();
   });
 
-  using(chartDataProvider, function (data, description) {
+using(chartDataProvider, function (data, description) {
     it('should able to apply prompt filter for charts: ' + description, () => {
 
       let currentTime = new Date().getTime();
@@ -111,7 +111,7 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
 
       applyFilters(user, name, description, Constants.CHART, type, data.fieldName);
       //From analysis detail/view page
-      verifyPromptFromDetailPage(data)
+      verifyPromptFromDetailPage(name,data)
       //verifyPromptFromListView and by executing from action menu
       verifyPromptFromListView(name, data, true)
       //verifyPromptFromListView and by clicking on analysis
@@ -133,7 +133,7 @@ using(chartDataProvider, function (data, description) {
 
     applyFilters(user, name, description, Constants.PIVOT, null, data.fieldName);
     //From analysis detail/view page
-    verifyPromptFromDetailPage(data)
+    verifyPromptFromDetailPage(name, data)
     //verifyPromptFromListView and by executing from action menu
     verifyPromptFromListView(name, data, true)
     //verifyPromptFromListView and by clicking on analysis
@@ -155,7 +155,7 @@ using(chartDataProvider, function (data, description) {
 
     applyFilters(user, name, description, Constants.ES_REPORT, null, data.fieldName);
     //From analysis detail/view page
-    verifyPromptFromDetailPage(data)
+    verifyPromptFromDetailPage(name, data)
     //verifyPromptFromListView and by executing from action menu
     verifyPromptFromListView(name, data, true)
     //verifyPromptFromListView and by clicking on analysis
@@ -177,7 +177,7 @@ using(chartDataProvider, function (data, description) {
 
     applyFilters(user, name, description, Constants.REPORT, null, data.fieldName);
     //From analysis detail/view page
-    verifyPromptFromDetailPage(data)
+    verifyPromptFromDetailPage(name, data)
     //verifyPromptFromListView and by executing from action menu
     verifyPromptFromListView(name, data, true)
     //verifyPromptFromCardView and by executing from action menu
@@ -278,56 +278,44 @@ const verifyPromptFromCardView = (name, data, execute)=> {
  *
  * @param {*} data
  */
-const verifyPromptFromDetailPage = (data)=> {
+const verifyPromptFromDetailPage = (name, data)=> {
   //Execute the analysis from detail/view page and verify it asks for prompt filter
   browser.waitForAngular();
   browser.sleep(5000);//This is required
-  element(savedAlaysisPage.actionsMenuBtn.isDisplayed().then(function(displayed){
-    if (displayed) {
-      commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
-      commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
-      savedAlaysisPage.actionsMenuBtn.click();
-      commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
-      commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
-      savedAlaysisPage.executeMenuOption.click();
-      verifyFilters(data);
-    } else {
-      console.log('Action menu is not displayed hence going to category page and coming to detail page..');
-      //From analysis card page
-      browser.ignoreSynchronization = false;
-      analyzePage.navigateToHome();
-      browser.ignoreSynchronization = true;
-      homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-      element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
-        if(!isPresent) {
-          commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
-          commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-          analyzePage.analysisElems.cardView.click();
-        }
-        //Open the created analysis.
-        const analysisName = analyzePage.main.getCardTitle(name);
-        commonFunctions.waitFor.elementToBeVisible(analysisName);
-        commonFunctions.waitFor.elementToBeClickable(analysisName);
-        analysisName.click();
+   //From analysis card page
+   browser.ignoreSynchronization = false;
+   analyzePage.navigateToHome();
+   browser.ignoreSynchronization = true;
+   homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
+   element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+     if(!isPresent) {
+       commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+       commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+       analyzePage.analysisElems.cardView.click();
+     }
+     //Open the created analysis.
+     const analysisName = analyzePage.main.getCardTitle(name);
+     commonFunctions.waitFor.elementToBeVisible(analysisName);
+     commonFunctions.waitFor.elementToBeClickable(analysisName);
+     analysisName.click();
+     browser.sleep(2000);
+     commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.filterDialog);
+     expect(analyzePage.prompt.filterDialog.isDisplayed()).toBeTruthy();
+     commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.cancleFilterPrompt);
+     commonFunctions.waitFor.elementToBeClickable(analyzePage.prompt.cancleFilterPrompt);
+     
+     analyzePage.prompt.cancleFilterPrompt.click();
 
-        commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.filterDialog);
-        expect(analyzePage.prompt.filterDialog.isDisplayed()).toBeTruthy();
-        commonFunctions.waitFor.elementToBeVisible(analyzePage.prompt.cancleFilterPrompt);
-        commonFunctions.waitFor.elementToBeClickable(analyzePage.prompt.cancleFilterPrompt);
-        analyzePage.prompt.cancleFilterPrompt.click();
+     commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
+     commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
+     savedAlaysisPage.actionsMenuBtn.click();
 
-        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.actionsMenuBtn);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.actionsMenuBtn);
-        savedAlaysisPage.actionsMenuBtn.click();
+     commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
+     commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
+     savedAlaysisPage.executeMenuOption.click();
 
-        commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.executeMenuOption);
-        commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.executeMenuOption);
-        savedAlaysisPage.executeMenuOption.click();
-
-        verifyFilters(data);
-      }));
-    }
-  }));
+     verifyFilters(data);
+   }));
 };
 /**
  *
@@ -461,8 +449,8 @@ const applyFilters = (user, name, description, analysisType, subType, fieldName)
     //Save
    const save = analyzePage.saveDialog;
    const designer = analyzePage.designerDialog;
-   commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-   designer.saveBtn.click();
+   commonFunctions.waitFor.elementToBeClickable(designer.saveOnlyBtn);
+   designer.saveOnlyBtn.click();
    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
    save.saveBtn.click();
