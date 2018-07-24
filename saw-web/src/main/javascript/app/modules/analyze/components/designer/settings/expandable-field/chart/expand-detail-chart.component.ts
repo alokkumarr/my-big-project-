@@ -39,12 +39,15 @@ export class ExpandDetailChartComponent {
   public numberSample: string;
   public dateSample: string;
   public isFloat: boolean;
+  public limitType;
+  public limitValue;
 
   constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-    console.log(this.fieldCount);
+    this.limitType = this.artifactColumn.limitType;
+    this.limitValue = this.artifactColumn.limitValue;
     this.isDataField = ['y', 'z'].includes(this.artifactColumn.area);
     this.hasDateInterval = DATE_TYPES.includes(type);
     this.changeSample();
@@ -98,5 +101,11 @@ export class ExpandDetailChartComponent {
     if (format) {
       this.dateSample = moment.utc().format(format);
     }
+  }
+
+  onLimitDataChange() {
+    this.artifactColumn.limitValue = this.limitValue;
+    this.artifactColumn.limitType = this.limitType;
+    this.change.emit({ subject: 'fetchLimit' });
   }
 }

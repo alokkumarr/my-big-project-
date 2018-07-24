@@ -599,6 +599,12 @@ export class DesignerContainerComponent {
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
+    case 'fetchLimit':
+      console.log("inside");
+      this.analysis.sqlBuilder = this.getSqlBuilder();
+      console.log(this.analysis);
+      this.requestDataIfPossible();
+      break;
     }
   }
 
