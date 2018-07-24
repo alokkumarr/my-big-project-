@@ -107,7 +107,6 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   refreshDashboard() {
-    console.log(`refreshing at ${new Date()}`);
     this.requester.next({ action: 'refresh' });
   }
 

@@ -24,7 +24,9 @@ export class DashboardService {
   constructor() {}
 
   getAutoRefreshSubject(dashboardId: string): Subject<{ dashboardId: string }> {
-    return this.autoRefreshListeners[dashboardId].sub;
+    return this.autoRefreshListeners[dashboardId]
+      ? this.autoRefreshListeners[dashboardId].sub
+      : null;
   }
   /**
    * setAutoRefresh
