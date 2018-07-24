@@ -362,7 +362,7 @@ public interface WithDataSetService {
 
                 //Extract User Information
                 Object userDataObject = output.getUserdata();
-                logger.error("UserDataobject = " + userDataObject);
+                logger.debug("UserDataobject = " + userDataObject);
                 JsonObject userData = null;
                 if (userDataObject != null) {
                     userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
