@@ -51,6 +51,7 @@ export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
+
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   public isInDraftMode: boolean = false;
@@ -67,6 +68,7 @@ export class DesignerContainerComponent {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
+  public fieldCount:number;
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -276,6 +278,7 @@ export class DesignerContainerComponent {
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
+    this.fieldCount = this.analysis.sqlBuilder.dataFields.length;
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -600,9 +603,7 @@ export class DesignerContainerComponent {
       this.artifacts = [...this.artifacts];
       break;
     case 'fetchLimit':
-      console.log("inside");
       this.analysis.sqlBuilder = this.getSqlBuilder();
-      console.log(this.analysis);
       this.requestDataIfPossible();
       break;
     }
