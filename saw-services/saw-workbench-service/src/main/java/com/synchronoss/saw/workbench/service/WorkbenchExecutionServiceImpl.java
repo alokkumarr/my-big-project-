@@ -1,13 +1,5 @@
 package com.synchronoss.saw.workbench.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mapr.db.Admin;
-import com.mapr.db.FamilyDescriptor;
-import com.mapr.db.MapRDB;
-import com.mapr.db.Table;
-import com.mapr.db.TableDescriptor;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -16,6 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mapr.db.Admin;
+import com.mapr.db.FamilyDescriptor;
+import com.mapr.db.MapRDB;
+import com.mapr.db.Table;
+import com.mapr.db.TableDescriptor;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 
@@ -40,10 +40,11 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private Integer previewLimit;
 
-  @Value("${workbench.project-root}/previews")
+  @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
-
+    
+  
   /**
    * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
    */
@@ -80,6 +81,9 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
        * be able to recover by reattempting to create the client.  */
       log.warn("Unable to create Workbench client upon startup", e);
     }
+    
+    
+    
   }
 
   /**
@@ -211,4 +215,5 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     JsonNode json = mapper.readTree(doc.toString());
     return (ObjectNode) json;
   }
+
 }

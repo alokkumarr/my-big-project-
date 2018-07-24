@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench.controller;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
 import javax.validation.constraints.NotNull;
@@ -17,11 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 import io.jsonwebtoken.Claims;
@@ -41,8 +47,8 @@ public class WorkbenchExecutionController {
   @Value("${workbench.project-path}")
   @NotNull
   private String defaultProjectPath;
-
-  @Autowired
+  
+   @Autowired
   private WorkbenchExecutionService workbenchExecutionService;
 
   /**
@@ -145,23 +151,6 @@ public class WorkbenchExecutionController {
   }
 
   /**
-   * This method is temporary solution to integrate with XDF-META Store 
-   * @param project Project ID
-   * @param body Body Parameters
-   * @return Returns a preview
-   * @throws JsonProcessingException When not able to get the preview
-   * @throws Exception General Exception
-   */
-  @RequestMapping(
-      value = "{project}/datasets/create", method = RequestMethod.POST,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK) 
-  public DataSet createRGeneratedDataSet(@PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet,
-      @RequestHeader("Authorization") String authToken) throws JSONException, Exception {
-    
-    return null;
-  } 
-  /**
    * Preview dataset function.
    * @param project Project ID
    * @param body Body Parameters
@@ -213,4 +202,20 @@ public class WorkbenchExecutionController {
   private static class NotFoundException extends RuntimeException {
     private static final long serialVersionUID = 412355610432444770L;
   }
+  
+  public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException {
+    String jsonData = "{\"userData\":{\"description\":\"Input dataset to test Transformer component\",\"component\":\"rComponent\"},\"system\":{\"name\":\"tc235_output_temp\"},\"asInput\":[\"tc228-B180716T114436.171::sql::-121219350\"],\"asOfNow\":{\"status\":\"SUCCESS\",\"started\":\"20180718-064501\",\"finished\":\"20180718-064506\"},\"recordCount\":100}";
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    DataSet dataSet = objectMapper.readValue(jsonData, DataSet.class);
+    JsonNode node  = objectMapper.readTree(jsonData);
+    ObjectNode o = (ObjectNode) node.get("system");
+    Preconditions.checkNotNull(node.get("userData").get("component"));
+    ObjectNode Id = (ObjectNode) node;
+    Id.put("_id", "xxxxx");
+    System.out.println(node);
+    //System.out.println(objectMapper.writeValueAsString(Id)); 
+  }
+
 }
