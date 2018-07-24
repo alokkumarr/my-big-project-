@@ -49,6 +49,14 @@ export class DesignerService {
     return this._analyzeService.previewExecution(analysis, options);
   }
 
+  getDataForExecution(analysisId, executionId, options) {
+    return this._analyzeService.getExecutionData(
+      analysisId,
+      executionId,
+      options
+    );
+  }
+
   getCategories(privilege) {
     return this._analyzeService.getCategories(privilege);
   }

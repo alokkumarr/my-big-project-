@@ -8,6 +8,7 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { Analysis } from '../types';
 import { AnalyzeActionsService } from './analyze-actions.service';
 import { DesignerSaveEvent } from '../components/designer/types';
+import * as clone from 'lodash/clone';
 
 const template = require('./analyze-actions-menu.component.html');
 
@@ -22,6 +23,7 @@ export class AnalyzeActionsMenuComponent {
   @Output() afterExecute: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
+  @Output() afterSchedule: EventEmitter<Analysis> = new EventEmitter();
   @Input() analysis: Analysis;
   @Input() exclude: string;
   @Input('actionsToDisable') set disabledActions(actionsToDisable: string) {
@@ -50,7 +52,11 @@ export class AnalyzeActionsMenuComponent {
   }, {
     label: 'Publish',
     value: 'publish',
-    fn: this.publish.bind(this)
+    fn: this.publish.bind(this, 'publish')
+  }, {
+    label: 'Schedule',
+    value: 'publish',
+    fn: this.publish.bind(this, 'schedule')
   }, {
     label: 'Export',
     value: 'export',
@@ -118,8 +124,10 @@ export class AnalyzeActionsMenuComponent {
     });
   }
 
-  publish() {
-    this._analyzeActionsService.publish(this.analysis).then(analysis => {
+  publish(type) {
+    const analysis = clone(this.analysis);
+    this._analyzeActionsService.publish(analysis,type).then(analysis => {
+      this.analysis = analysis;
       this.afterPublish.emit(analysis);
     });
   }

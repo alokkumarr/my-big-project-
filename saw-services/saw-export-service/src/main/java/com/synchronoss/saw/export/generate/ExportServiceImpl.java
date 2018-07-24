@@ -115,12 +115,16 @@ public class ExportServiceImpl implements ExportService{
   @Override
   @Async
   public ListenableFuture<ResponseEntity<DataResponse>> dataToBeExportedAsync(String executionId,
-      HttpServletRequest request, String analysisId, String analysisType) {
+                                                                               HttpServletRequest request, String analysisId, String analysisType, String executionType) {
     // During report extraction time, this parameter will not be passed.
     // Hence we should use uiExportSize configuration parameter.
     String sizOfExport;
-    sizOfExport = ((sizOfExport = request.getParameter("pageSize"))!=null) ? sizOfExport : uiExportSize;
-    String url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType;
+    String url;
+      sizOfExport = ((sizOfExport = request.getParameter("pageSize"))!=null) ? sizOfExport : uiExportSize;
+    if (executionType!=null && !executionType.isEmpty() && executionType.equalsIgnoreCase("onetime"))
+       url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType+"&executionType=onetime";
+    else
+        url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+sizOfExport+"&analysisType=" + analysisType;
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,

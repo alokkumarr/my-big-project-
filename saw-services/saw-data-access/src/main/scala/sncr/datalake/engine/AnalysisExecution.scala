@@ -14,8 +14,10 @@ import sncr.metadata.engine.ProcessingResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
-import scala.collection.JavaConverters._
 
+import org.apache.hadoop.fs.FileStatus
+
+import scala.collection.JavaConverters._
 import sncr.datalake.DLConfiguration
 
 import scala.concurrent.Future
@@ -72,8 +74,18 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.createAnalysisResultForOneTime(id)
         }
         case ExecutionType.regularExecution => {
-          analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.regularExecution.toString)
+          if (DLConfiguration.publishRowLimit>0)
+          analysisNodeExecution.executeSQLWithLimit(DLConfiguration.publishRowLimit)
+          else
+            analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResultForOneTime(id)
+        }
+        case ExecutionType.publish => {
+          if (DLConfiguration.publishRowLimit>0)
+            analysisNodeExecution.executeSQLWithLimit(DLConfiguration.publishRowLimit)
+          else
+            analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(id, null, ExecutionType.publish.toString)
         }
       }
       analysisNodeExecution.setFinishTime
@@ -213,63 +225,78 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     resultsStream
   }
 
-
   /**
     * Returns the rows count of execution result
     *
     * @return List<Map<…>> data structure
     */
-  def getRowCount(id: String) : Long = {
+  def getRowCount(id: String, outputLocation: String= null ) : Long = {
 
-    val resultNode = AnalysisResult(null, id)
     var rowCount :Long= 0;
+     if (outputLocation!=null && !outputLocation.isEmpty) {
+       val files = try {
+         /* Get list of all files in the execution result directory */
+         HFileOperations.getFilesStatus(outputLocation)
+       } catch {
+         case e: Throwable => {
+           m_log.debug("Exception while getting result files: {}", e)
+           return rowCount
+         }
+       }
+       getCount(files)
+     }
+     else {
+       val resultNode = AnalysisResult(null, id)
+       if (!resultNode.getObjectDescriptors.contains("dataLocation") && outputLocation == null) {
+         m_log.debug("Data location property not found: {}", id)
+         return rowCount
+       }
 
-    if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
-      m_log.debug("Data location property not found: {}", id)
-      return rowCount
-    }
-
-    resultNode.getObject("dataLocation") match {
-      case Some(dir: String) => {
-        val files = try {
-          /* Get list of all files in the execution result directory */
-          HFileOperations.getFilesStatus(dir)
-        } catch {
-          case e: Throwable => {
-            m_log.debug("Exception while getting result files: {}", e)
-            return rowCount
-          }
-        }
-        /* Filter out the recordCount file which contain the rows count */
-        files.filter(_.getPath.getName.endsWith("recordCount")).foreach(file => {
-          m_log.debug("Filtered file: " + file.getPath.getName)
-          val is = HFileOperations.readFileToInputStream(file.getPath.toString)
-          // stream of all the "string" values for one file.
-          val reader = new BufferedReader(new InputStreamReader(is))
-          reader.lines.iterator.asScala.foreach({
-            parse(_) match {
-              case obj: JObject => {
-                /* Convert the parsed JSON to the data type expected by the*/
-                val rowMap = obj.extract[Map[String, Any]]
-                rowMap.keys.foreach(key => {
-                  if (key.equalsIgnoreCase("recordCount")) {
-                    rowMap.get(key) match {
-                      case Some(count) =>
-                        rowCount = count.asInstanceOf[BigInt].toLong
-                    }
-                  }
-                })
-              }
-          }})})
+       resultNode.getObject("dataLocation") match {
+         case Some(dir: String) => {
+           val files = try {
+             /* Get list of all files in the execution result directory */
+             HFileOperations.getFilesStatus(dir)
+           } catch {
+             case e: Throwable => {
+               m_log.debug("Exception while getting result files: {}", e)
+               return rowCount
+             }
+           }
+           getCount(files)
+         }
+         case obj => {
+           m_log.debug("Data location not found for results: {}", id)
+         }
            rowCount
+       }
+     }
+        def getCount(files :Array[FileStatus])  : Long = {
+         /* Filter out the recordCount file which contain the rows count */
+          files.filter(_.getPath.getName.endsWith("recordCount")).foreach(file => {
+            m_log.debug("Filtered file: " + file.getPath.getName)
+            val is = HFileOperations.readFileToInputStream(file.getPath.toString)
+            // stream of all the "string" values for one file.
+            val reader = new BufferedReader(new InputStreamReader(is))
+            reader.lines.iterator.asScala.foreach({
+              parse(_) match {
+                case obj: JObject => {
+                  /* Convert the parsed JSON to the data type expected by the*/
+                  val rowMap = obj.extract[Map[String, Any]]
+                  rowMap.keys.foreach(key => {
+                    if (key.equalsIgnoreCase("recordCount")) {
+                      rowMap.get(key) match {
+                        case Some(count) =>
+                          rowCount = count.asInstanceOf[BigInt].toLong
+                      }
+                    }
+                  })
+                }
+              }})})
+          rowCount
         }
-      case obj => {
-        m_log.debug("Data location not found for results: {}", id)
-      }
-    rowCount
+      rowCount
     }
-  }
-
   /**
     * Returns the rows of the query execution result
     *
@@ -324,11 +351,13 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
 }
 
 
-object ExecutionType extends Enumeration{
+object ExecutionType extends Enumeration {
 
   type ExecutionType = Value
   val onetime = Value(0, "onetime")
   val scheduled = Value(1, "scheduled")
   val preview = Value(2, "preview")
   val regularExecution= Value(3, "regularExecution")
+  val publish = Value(4, "publish")
+
 }
