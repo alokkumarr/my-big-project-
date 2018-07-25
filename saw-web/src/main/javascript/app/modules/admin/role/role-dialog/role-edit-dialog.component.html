@@ -1,0 +1,66 @@
+<h2 mat-dialog-title [ngSwitch]="data.mode">
+  <ng-container *ngSwitchCase="'create'" i18n>
+      New Role
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Edit Role
+    </ng-container>
+</h2>
+<mat-divider></mat-divider>
+<mat-dialog-content>
+
+  <form [formGroup]="formGroup">
+    <mat-form-field>
+      <input matInput required type="text" formControlName="roleName" placeholder="Role name"/>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput type="text" formControlName="roleDesc" placeholder="Description"/>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-select required placeholder="Status" formControlName="activeStatusInd">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-select required placeholder="Role Type" formControlName="roleType">
+        <mat-option *ngFor="let roleType of data.formDeps.roleTypes$ | async" [value]="roleType.roleName">
+          {{roleType.roleName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="data.mode === 'create'">
+      Create default privileges for My Analyses Category
+      <mat-checkbox formControlName="myAnalysis"
+                    matTooltip="Automatically create default privileges to the My Analyses category for any user assigned to this Role. At least one privilege per Role is needed for application access."
+      ></mat-checkbox>
+    </div>
+  </form>
+
+</mat-dialog-content>
+<mat-divider></mat-divider>
+<div fxLayout="row" fxLayoutAlign="space-between center" class="dialog-actions">
+  <button (click)="create()"
+          [disabled]="!formIsValid"
+          e2e="create-analysis-btn"
+          color="primary"
+          [ngSwitch]="data.mode"
+          mat-raised-button
+  >
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Create Role
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Save
+    </ng-container>
+  </button>
+  <button (click)="_dialogRef.close()"
+          mat-button
+          mat-dialog-close i18n
+  >Cancel</button>
+</div>

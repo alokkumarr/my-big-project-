@@ -1,9 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { UserService } from '../user.service';
-import { ToastService } from '../../../../common/services/toastMessage.service';
 
 const template = require('./user-edit-dialog.component.html');
 require('./user-edit-dialog.component.scss');
@@ -18,7 +17,7 @@ const dummyPassword = '*********';
 })
 export class UserEditDialogComponent {
 
-  userGroup: FormGroup;
+  formGroup: FormGroup;
   formIsValid = false;
   statuses = [{
     id: 1,
@@ -33,68 +32,69 @@ export class UserEditDialogComponent {
   constructor(
     private _userService: UserService,
     private _fb: FormBuilder,
-    private _toastMessage: ToastService,
     private _dialogRef: MatDialogRef<UserEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
-      user: any,
-      roles$: any[],
+      model: any,
+      formDeps: {
+        roles$: any[]
+      },
       mode: 'edit' | 'create'
     }
   ) {
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
     }
-    this.createForm(this.data.user);
+    this.createForm(this.data.model);
   }
 
-  createUser() {
-    const formValues = this.userGroup.getRawValue();
+  create() {
+    const formValues = this.formGroup.getRawValue();
     // if the password wasn't changed, set it to null
     if (this.data.mode === 'edit' && formValues.password === dummyPassword) {
       formValues.password = null;
     }
-    const user = {
-      ...this.data.user,
+    const model = {
+      ...this.data.model,
       ...formValues
     };
 
     let actionPromise;
     switch (this.data.mode) {
     case 'edit':
-      actionPromise = this._userService.updateUser(user);
+      actionPromise = this._userService.update(model);
       break;
     case 'create':
-      actionPromise = this._userService.saveUser(user);
+      actionPromise = this._userService.save(model);
       break;
     }
 
     actionPromise && actionPromise.then(
-      users => {
-        if (users) {
-          this._dialogRef.close(users);
+      rows => {
+        if (rows) {
+          this._dialogRef.close(rows);
         }
       }
-  );
+    );
   }
 
   onPasswordFocus(event) {
     if (this.data.mode === 'edit' && event.target.value === dummyPassword) {
       const password = '';
-      this.userGroup.patchValue({password});
+      this.formGroup.patchValue({password});
     }
   }
 
   onPasswordBlur(event) {
     if (this.data.mode === 'edit' && event.target.value === '') {
       const password = dummyPassword;
-      this.userGroup.patchValue({password});
+      this.formGroup.patchValue({password});
     }
   }
 
-  createForm(user) {
+  createForm(model) {
     const mode = this.data.mode;
     if (mode === 'edit') {
-      user.activeStatusInd = user.activeStatusInd === 'Active' ? 1 : 0;
+      model.activeStatusInd = model.activeStatusInd === 'Active' ? 1 : 0;
     }
     const {
       roleId = '',
@@ -104,7 +104,7 @@ export class UserEditDialogComponent {
       lastName = '',
       middleName = '',
       email = ''
-    } = user;
+    } = model;
 
     const firstNameControl = this._fb.control(firstName, [
       Validators.required,
@@ -122,7 +122,7 @@ export class UserEditDialogComponent {
       Validators.required
     );
 
-    this.userGroup = this._fb.group({
+    this.formGroup = this._fb.group({
       roleId: [roleId, Validators.required],
       middleName: middleName,
       firstName: firstNameControl,
@@ -142,11 +142,11 @@ export class UserEditDialogComponent {
       lastNameControl.valueChanges
     ).subscribe(([first, last]) => {
       const masterLoginId = `${first}.${last}`;
-      this.userGroup.patchValue({masterLoginId});
+      this.formGroup.patchValue({masterLoginId});
     });
 
     // enable disable the create user/ save button
-    this.userGroup.statusChanges.subscribe(change => {
+    this.formGroup.statusChanges.subscribe(change => {
       if (change === 'VALID') {
         this.formIsValid = true;
       } else {

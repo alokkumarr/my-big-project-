@@ -9,10 +9,10 @@
 <mat-divider></mat-divider>
 <mat-dialog-content>
 
-  <form [formGroup]="userGroup">
+  <form [formGroup]="formGroup">
     <mat-form-field>
       <mat-select required placeholder="Role" formControlName="roleId">
-        <mat-option *ngFor="let role of data.roles$ | async" [value]="role.roleId">
+        <mat-option *ngFor="let role of data.formDeps.roles$ | async" [value]="role.roleId">
           {{role.roleName}}
         </mat-option>
       </mat-select>
@@ -57,7 +57,7 @@
 </mat-dialog-content>
 <mat-divider></mat-divider>
 <div fxLayout="row" fxLayoutAlign="space-between center" class="dialog-actions">
-  <button (click)="createUser()"
+  <button (click)="create()"
           [disabled]="!formIsValid"
           e2e="create-analysis-btn"
           color="primary"
