@@ -105,7 +105,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        //'--headless', // start on background
+        '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -160,29 +160,29 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
-    // root: [
-    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
-    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
-    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
-    // ],
-    // charts: [
-    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    // ],
-    // chartEditFork: [
-    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    // ],
+    root: [
+      appRoot + '/src/test/e2e-tests/priviliges.test.js',
+      appRoot + '/src/test/e2e-tests/analyze.test.js',
+      appRoot + '/src/test/e2e-tests/createReport.test.js'
+    ],
+    charts: [
+      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    ],
+    chartEditFork: [
+      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    ],
     filters: [
       appRoot + '/src/test/e2e-tests/promptFilters.test.js'
     ],
-    // pivots: [
-    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    // ],
-    // authentication: [
-    //   appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    // ],
+    pivots: [
+      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    ],
+    authentication: [
+      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
