@@ -13,7 +13,7 @@ require('./sidenav.component.scss');
 
 export class SidenavComponent { 
 
-  @Input() menu: [];
+  @Input() menu: any;
   @Input() id: any;
 
   constructor(@Inject('$componentHandler') private chp: ComponentHandler) { }
@@ -29,7 +29,7 @@ export class SidenavComponent {
 
   getMenuHeader() {
     return {
-      analyze: 'Analyses',
+      analyze: 'Analysis',
       observe: 'Dashboards',
       admin: 'Manage',
       workbench: 'WORKBENCH'
