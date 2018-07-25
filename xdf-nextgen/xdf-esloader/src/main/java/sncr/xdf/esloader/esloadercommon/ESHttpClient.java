@@ -266,7 +266,7 @@ public class ESHttpClient {
 
     // Returns number of aliases for given index
     public  int esIndexAliasParticipation(String idx) throws Exception{
-        String aliases = get("/" + idx + "/_aliases");
+        String aliases = get("/" + idx + "/_alias");
         if(aliases == null) {
             return -1;
         }
