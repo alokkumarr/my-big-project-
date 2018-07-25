@@ -130,26 +130,26 @@ exports.config = {
      * working tests (working reliably without flakiness) incrementally one by one in continuous integration, while
      * working on fixing the rest.
      */
-    root: [
-      appRoot + '/src/test/e2e-tests/priviliges.test.js',
-      appRoot + '/src/test/e2e-tests/analyze.test.js',
-      appRoot + '/src/test/e2e-tests/createReport.test.js'
-    ],
-    charts: [
-      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    ],
-    chartEditFork: [
-      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    ],
-    filters: [
-      appRoot + '/src/test/e2e-tests/promptFilters.test.js'
-    ],
-    pivots: [
-      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    ],
+    // root: [
+    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
+    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
+    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
+    // ],
+    // charts: [
+    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    // ],
+    // chartEditFork: [
+    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    // ],
+    // filters: [
+    //   appRoot + '/src/test/e2e-tests/promptFilters.test.js'
+    // ],
+    // pivots: [
+    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    // ],
     authentication: [
       appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
     ],
