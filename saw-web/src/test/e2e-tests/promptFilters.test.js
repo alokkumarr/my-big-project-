@@ -98,74 +98,74 @@ describe('Prompt filter tests: promptFilters.test.js', () => {
     commonFunctions.logOutByClearingLocalStorage();
   });
 
-using(chartDataProvider, function (data, description) {
-    it('should able to apply prompt filter for charts: ' + description, () => {
+// using(chartDataProvider, function (data, description) {
+//     it('should able to apply prompt filter for charts: ' + description, () => {
 
-      let currentTime = new Date().getTime();
-      let user = data.user;
-      let chartType = 'chart:column';
-      let type = chartType.split(":")[1];
+//       let currentTime = new Date().getTime();
+//       let user = data.user;
+//       let chartType = 'chart:column';
+//       let type = chartType.split(":")[1];
 
-      let name = Constants.CHART+' ' + globalVariables.e2eId+'-'+currentTime;
-      let description ='Description:'+chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
+//       let name = Constants.CHART+' ' + globalVariables.e2eId+'-'+currentTime;
+//       let description ='Description:'+chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
 
-      applyFilters(user, name, description, Constants.CHART, type, data.fieldName);
-      //From analysis detail/view page
-      verifyPromptFromDetailPage(name,data)
-      //verifyPromptFromListView and by executing from action menu
-      verifyPromptFromListView(name, data, true)
-      //verifyPromptFromListView and by clicking on analysis
-      verifyPromptFromListView(name, data, false)
-      //verifyPromptFromCardView and by executing from action menu
-      verifyPromptFromCardView(name, data, true)
-      //verifyPromptFromCardView and by clicking on analysis
-      verifyPromptFromCardView(name, data, false)
-    });
-});
+//       applyFilters(user, name, description, Constants.CHART, type, data.fieldName);
+//       //From analysis detail/view page
+//       verifyPromptFromDetailPage(name,data)
+//       //verifyPromptFromListView and by executing from action menu
+//       verifyPromptFromListView(name, data, true)
+//       //verifyPromptFromListView and by clicking on analysis
+//       verifyPromptFromListView(name, data, false)
+//       //verifyPromptFromCardView and by executing from action menu
+//       verifyPromptFromCardView(name, data, true)
+//       //verifyPromptFromCardView and by clicking on analysis
+//       verifyPromptFromCardView(name, data, false)
+//     });
+// });
 
-using(chartDataProvider, function (data, description) {
-  it('should able to apply prompt filter for pivot: ' + description, () => {
+// using(chartDataProvider, function (data, description) {
+//   it('should able to apply prompt filter for pivot: ' + description, () => {
 
-    let currentTime = new Date().getTime();
-    let user = data.user;
-    let name = Constants.PIVOT+' ' + globalVariables.e2eId+'-'+currentTime;
-    let description ='Description:'+Constants.PIVOT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
+//     let currentTime = new Date().getTime();
+//     let user = data.user;
+//     let name = Constants.PIVOT+' ' + globalVariables.e2eId+'-'+currentTime;
+//     let description ='Description:'+Constants.PIVOT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
 
-    applyFilters(user, name, description, Constants.PIVOT, null, data.fieldName);
-    //From analysis detail/view page
-    verifyPromptFromDetailPage(name, data)
-    //verifyPromptFromListView and by executing from action menu
-    verifyPromptFromListView(name, data, true)
-    //verifyPromptFromListView and by clicking on analysis
-    verifyPromptFromListView(name, data, false)
-    //verifyPromptFromCardView and by executing from action menu
-    verifyPromptFromCardView(name, data, true)
-    //verifyPromptFromCardView and by clicking on analysis
-    verifyPromptFromCardView(name, data, false)
-  });
-});
+//     applyFilters(user, name, description, Constants.PIVOT, null, data.fieldName);
+//     //From analysis detail/view page
+//     verifyPromptFromDetailPage(name, data)
+//     //verifyPromptFromListView and by executing from action menu
+//     verifyPromptFromListView(name, data, true)
+//     //verifyPromptFromListView and by clicking on analysis
+//     verifyPromptFromListView(name, data, false)
+//     //verifyPromptFromCardView and by executing from action menu
+//     verifyPromptFromCardView(name, data, true)
+//     //verifyPromptFromCardView and by clicking on analysis
+//     verifyPromptFromCardView(name, data, false)
+//   });
+// });
 
-using(chartDataProvider, function (data, description) {
-  it('should able to apply prompt filter for esReport: ' + description, () => {
+// using(chartDataProvider, function (data, description) {
+//   it('should able to apply prompt filter for esReport: ' + description, () => {
 
-    let currentTime = new Date().getTime();
-    let user = data.user;
-    let name = Constants.ES_REPORT+' ' + globalVariables.e2eId+'-'+currentTime;
-    let description ='Description:'+Constants.ES_REPORT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
+//     let currentTime = new Date().getTime();
+//     let user = data.user;
+//     let name = Constants.ES_REPORT+' ' + globalVariables.e2eId+'-'+currentTime;
+//     let description ='Description:'+Constants.ES_REPORT+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
 
-    applyFilters(user, name, description, Constants.ES_REPORT, null, data.fieldName);
-    //From analysis detail/view page
-    verifyPromptFromDetailPage(name, data)
-    //verifyPromptFromListView and by executing from action menu
-    verifyPromptFromListView(name, data, true)
-    //verifyPromptFromListView and by clicking on analysis
-    verifyPromptFromListView(name, data, false)
-    //verifyPromptFromCardView and by executing from action menu
-    verifyPromptFromCardView(name, data, true)
-    //verifyPromptFromCardView and by clicking on analysis
-    verifyPromptFromCardView(name, data, false)
-  });
-});
+//     applyFilters(user, name, description, Constants.ES_REPORT, null, data.fieldName);
+//     //From analysis detail/view page
+//     verifyPromptFromDetailPage(name, data)
+//     //verifyPromptFromListView and by executing from action menu
+//     verifyPromptFromListView(name, data, true)
+//     //verifyPromptFromListView and by clicking on analysis
+//     verifyPromptFromListView(name, data, false)
+//     //verifyPromptFromCardView and by executing from action menu
+//     verifyPromptFromCardView(name, data, true)
+//     //verifyPromptFromCardView and by clicking on analysis
+//     verifyPromptFromCardView(name, data, false)
+//   });
+// });
 
 using(chartDataProvider, function (data, description) {
   it('should able to apply prompt filter for report: ' + description, () => {
