@@ -280,9 +280,10 @@ export class DesignerContainerComponent {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
     forEach(this.analysis.sqlBuilder.dataFields, field=> {
-      this.fieldCount = field.checked === 'y' ? this.fieldCount ++ : this.fieldCount;
+      if (field.checked === 'y') {
+        this.fieldCount++;
+      }
     })
-    
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
