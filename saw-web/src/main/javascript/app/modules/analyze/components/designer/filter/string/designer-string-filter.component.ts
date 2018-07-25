@@ -6,44 +6,13 @@ import * as compact from 'lodash/compact';
 import {
   FilterModel
 } from '../../types';
+import { STRING_FILTER_OPERATORS } from '../../../../consts';
 
 const template = require('./designer-string-filter.component.html');
 
 const SEMICOLON = 186;
 
-export const OPERATORS = [
-  {
-    value: 'EQ',
-    label: 'Equals'
-  },
-  {
-    value: 'NEQ',
-    label: 'Not equal'
-  },
-  {
-    value: 'ISIN',
-    label: 'Is in'
-  },
-  {
-    value: 'ISNOTIN',
-    label: 'Is not in'
-  },
-  {
-    value: 'CONTAINS',
-    label: 'Contains'
-  },
-  {
-    value: 'SW',
-    label: 'Starts with'
-  },
-  {
-    value: 'EW',
-    label: 'Ends with'
-  }
-];
-
-export const isValid = (model: FilterModel) => {
-  model = model || {};
+export const isValid = (model: FilterModel = {}) => {
   return (
     model.operator &&
     model.modelValues &&
@@ -61,7 +30,7 @@ export class DesignerStringFilterComponent {
   @Input() public filterModel: FilterModel;
 
   public separatorKeysCodes = [ENTER, COMMA, SEMICOLON];
-  public OPERATORS = OPERATORS;
+  public OPERATORS = STRING_FILTER_OPERATORS;
   public tempValue = '';
 
   init() {

@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { ChartService } from '../../../../../services/chart.service';
+import * as isEmpty from 'lodash/isEmpty';
 
 const template = require('./aux-chart.component.html');
 require('./aux-chart.component.scss');
@@ -24,12 +25,15 @@ const INVERTING_OPTIONS = [
 export class DesignerSettingsAuxChartComponent implements OnInit {
   @Input() chartType: string;
   @Input() isInverted: boolean;
+  @Input() chartTitle: string;
 
   @Output() change = new EventEmitter();
 
   showLegendOpts: boolean;
   showLabelOpts: boolean = true;
   showInversion: boolean;
+
+  EditMode: false;
 
   @Input() labelOptions: { enabled: boolean; value: string };
 
@@ -99,5 +103,17 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
         }
       }
     });
+  }
+
+  onTitleChange() {
+    if(!isEmpty(this.chartTitle)) {
+      this.EditMode = false;
+      this.change.emit({
+        subject: 'chartTitle',
+        data: {
+          title: this.chartTitle
+        }
+      });  
+    }
   }
 }

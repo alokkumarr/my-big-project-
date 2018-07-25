@@ -362,7 +362,8 @@ public interface WithDataSetService {
 
                 //Extract User Information
                 Object userDataObject = output.getUserdata();
-                logger.info("UserDataobject = " + userDataObject);
+                logger.debug("UserDataobject = " + userDataObject);
+
                 JsonObject userData = null;
                 if (userDataObject != null) {
                     userData =  new Gson().toJsonTree((LinkedTreeMap)userDataObject).getAsJsonObject();
@@ -406,7 +407,7 @@ public interface WithDataSetService {
                 }
             }
 
-            logger.error("Output dataset map" + resMap);
+            logger.debug("Output dataset map" + resMap);
             return resMap;
         }
 

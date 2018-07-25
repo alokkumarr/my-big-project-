@@ -1,4 +1,4 @@
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 
 module.exports = {
