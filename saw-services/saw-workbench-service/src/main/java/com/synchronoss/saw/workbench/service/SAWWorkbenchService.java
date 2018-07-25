@@ -20,6 +20,6 @@ public interface SAWWorkbenchService {
   public Project readSubDirectoriesByProjectId(Project project) throws Exception;
   public List<DataSet> listOfDataSet(Project project) throws Exception;
   public DataSet getDataSet(String projectId, String datasetId) throws Exception;
-  public DataSet createDataSet(DataSet dataSet, String userName, String proj) throws Exception;
+  public DataSet createDataSet(DataSet dataSet, String proj) throws Exception;
 
 }

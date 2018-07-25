@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
@@ -33,7 +32,6 @@ import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.SAWWorkBenchUtils;
-import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
@@ -108,7 +106,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
 
     
-    HFileOperations.createDir(defaultProjectRoot + "/metadata");
+    HFileOperations.createDir(defaultProjectRoot + "/services/metadata");
     for (String table : METADATA_TABLES) {
         createMetadataTable(table);
     }
@@ -356,10 +354,11 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   }
   
   @Override
-  public DataSet createDataSet(DataSet dataSet, String userName, String project) throws Exception {
-    logger.trace("createDataSet starts here : {} ", dataSet.toString());
+  public DataSet createDataSet(DataSet dataSet,  String project) throws Exception {
+    logger.trace("createDataSet starts here :  "+ dataSet.toString());
     String id = UUID.randomUUID().toString() + delimiter + "rComponent" + delimiter
         + System.currentTimeMillis();
+    MetaDataStoreRequestAPI requestMetaDataStore =null;
     String category = Category.DataSet.name();
     String format = "parquet";
     String catalog = MetadataBase.DEFAULT_CATALOG;
@@ -373,17 +372,17 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
     Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("component"), "userData.component cannot be null");
+    Preconditions.checkNotNull(rootNode.get("userData").get("createdBy"), "userData.createdBy cannot be null");
     Preconditions.checkNotNull(rootNode.get("system").get("name"), "system.name cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"), "asOfNow.status cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"), "asOfNow.started cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"), "asOfNow.finished cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"), "asOfNow.batchId cannot be null");
-    ObjectNode transformations = JsonNodeFactory.instance.objectNode();
-    transformations.put("asOutput", id);
-    transformations.putPOJO("transformations", transformations);
+    rootNode.putObject("transformation");
+    ObjectNode transformationNode = (ObjectNode)rootNode.get("transformation");
+    transformationNode.put("asOutput", id);
     Preconditions.checkNotNull(rootNode.get("userData"), "userData cannot be null");
     ObjectNode userDataNode = (ObjectNode)rootNode.get("userData");
-    userDataNode.put("createdBy", userName);
     userDataNode.put("category", category);
     userDataNode.put("component", dataSet.getComponent());
     Preconditions.checkNotNull(rootNode.get("system"), "system cannot be null");
@@ -396,15 +395,21 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,
           id, Action.create, Category.DataSet);
       logger.trace("Before invoking request to MaprDB JSON store :{}", objectMapper.writeValueAsString(structure));
-      MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
+      requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
+      List<MetaDataStoreStructure> structureRead = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,
+          id, Action.read, Category.DataSet);
+      requestMetaDataStore = new MetaDataStoreRequestAPI(structureRead);
+      requestMetaDataStore.process();
+      String jsonStringFromStore = requestMetaDataStore.getResult().toString();
+      ObjectMapper mapper = new ObjectMapper();
+      dataSet = mapper.readValue(jsonStringFromStore, DataSet.class);
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Problem on the storage while creating an entity", ex);
-      
     }
-    logger.trace("createEntryInMetaData ends here:{}", dataSet);
+    logger.trace("createEntryInMetaData ends here: "+ objectMapper.writeValueAsString(dataSet));
     return dataSet;
   }
 

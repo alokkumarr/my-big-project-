@@ -334,16 +334,9 @@ public class SAWWorkBenchInternalAddRAWDataController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
   public DataSet createRGeneratedDataSet(
-      @PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet,
-      @RequestHeader("Authorization") String authToken) throws JSONException, Exception {
+      @PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet) throws JSONException, Exception {
     logger.trace("createRGeneratedDataSet starts here : ", dataSet.toString());
-    Claims ssoToken = Jwts.parser().setSigningKey("sncrsaw2")
-        .parseClaimsJws(authToken).getBody();
-    @SuppressWarnings("unchecked")
-    Map<String, Object> ticket =
-        ((Map<String, Object>) ssoToken.get("ticket"));
-    String userName = (String) ticket.get("userFullName");
-    DataSet returnData = sawWorkbenchService.createDataSet(dataSet, userName, project);
+    DataSet returnData = sawWorkbenchService.createDataSet(dataSet, project);
     logger.trace("createRGeneratedDataSet ends here : ", returnData.toString());
     return returnData;
   }
