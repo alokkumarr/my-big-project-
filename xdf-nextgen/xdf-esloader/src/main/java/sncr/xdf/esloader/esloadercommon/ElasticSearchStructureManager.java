@@ -91,7 +91,7 @@ public class ElasticSearchStructureManager {
             if(indexAndType != null) {
                 String indexName = getIndex(indexAndType);
                 String typeName = getType(indexAndType);
-                logger.info("Trying to creating index :" + indexName);
+                logger.info("Trying to creating index: " + indexName);
 
                 // First check if index exists
                 // Second make sure appropriate mapping is also exists
