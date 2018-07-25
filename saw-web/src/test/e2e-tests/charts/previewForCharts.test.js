@@ -1,7 +1,3 @@
-/*
-  Created by Alex
- */
-
 const login = require('../../javascript/pages/loginPage.po');
 const analyzePage = require('../../javascript/pages/analyzePage.po');
 const designModePage = require('../../javascript/pages/designModePage.po');
@@ -9,7 +5,7 @@ const previewPage = require('../../javascript/pages/previewPage.po');
 const commonFunctions = require('../../javascript/helpers/commonFunctions');
 const homePage = require('../../javascript/pages/homePage.po');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
 const dataSets = require('../../javascript/data/datasets');
@@ -71,9 +67,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
     it('should verify preview for ' + description, () => {
       let chartTyp = data.chartType.split(":")[1];
       login.loginAs(data.user);
-      homePage.mainMenuExpandBtn.click();
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-      homePage.mainMenuCollapseBtn.click();
 
       let chartName = `e2e ${description} ${(new Date()).toString()}`;
       let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
@@ -84,7 +78,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       //Select fields
       // Wait for field input box.
       commonFunctions.waitFor.elementToBeVisible(analyzePage.designerDialog.chart.fieldSearchInput);
-    
+
       // Dimension section.
       commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(xAxisName));
       designModePage.chart.addFieldButton(xAxisName).click();
@@ -106,7 +100,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       if (data.chartType === 'chart:combo') {
         commonFunctions.waitFor.elementToBeClickable(designModePage.chart.addFieldButton(yAxisName2));
         designModePage.chart.addFieldButton(yAxisName2).click();
-      }  
+      }
 
       // Navigate to Preview
       commonFunctions.waitFor.elementToBeClickable(designModePage.previewBtn);

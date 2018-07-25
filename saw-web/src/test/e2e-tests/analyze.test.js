@@ -1,13 +1,10 @@
-/*
-  Created by Alex
- */
-
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
-const protractorConf = require('../../../../saw-web/conf/protractor.conf');
+const protractorConf = require('../../../conf/protractor.conf');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
@@ -23,7 +20,6 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -31,10 +27,12 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
+  });
+  afterAll(function () {
+    commonFunctions.logOutByClearingLocalStorage();
   });
 
     using(userDataProvider, function (data, description) {

@@ -1,5 +1,5 @@
-const commonFunctions = require('../helpers/commonFunctions.js');
-const users = require('../data/users.js');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const users = require('../../javascript/data/users.js');
 
 module.exports = {
   loginElements: {
@@ -14,7 +14,7 @@ module.exports = {
 
   // Wait after login is provided to prevent elements manipulation when page is not ready yet
   userLogin(user, password) {
-    //console.log('user---->'+user)
+    console.log('user---->'+user)
     const userElem = this.loginElements.userNameField;
     const passwordElem = this.loginElements.passwordField;
     const loginElem = this.loginElements.loginBtn;
