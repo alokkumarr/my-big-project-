@@ -45,7 +45,7 @@
 
     <div class="page-content">
       <dashboard-grid [model]="dashboard" [requester]="requester" mode="view" *ngIf="dashboard"></dashboard-grid>
-      <span *ngIf="!dashboard">No dashboards available.</span>
+      <span class="no-dashboard-notice" *ngIf="!dashboard">No dashboards available.</span>
     </div>
   </mat-sidenav-content>
 
