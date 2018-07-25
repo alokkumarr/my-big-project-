@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -399,7 +400,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       requestMetaDataStore.process();
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity.", ex);
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Problem on the storage while creating an entity", ex);
+      
     }
     logger.trace("createEntryInMetaData ends here:{}", dataSet);
     return dataSet;

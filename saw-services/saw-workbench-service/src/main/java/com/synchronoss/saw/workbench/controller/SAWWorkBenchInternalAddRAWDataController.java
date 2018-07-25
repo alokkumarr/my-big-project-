@@ -332,7 +332,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
    */
   @RequestMapping(value = "{project}/datasets/create", method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseStatus(HttpStatus.CREATED)
   public DataSet createRGeneratedDataSet(
       @PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet,
       @RequestHeader("Authorization") String authToken) throws JSONException, Exception {
