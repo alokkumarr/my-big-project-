@@ -260,7 +260,8 @@ module.exports = {
       gridExpandBtn: element(by.css('button[e2e="report-expand-btn"]')),
       refreshBtn
     },
-    saveBtn: element(by.css('button[e2e="designer-save-btn"]'))
+    saveBtn: element(by.css('button[e2e="designer-save-btn"]')),
+    saveOnlyBtn: element(by.css('button[e2e="designer-save-only-btn"]'))
   },
   filtersDialog: {
     getFilterAutocomplete,
