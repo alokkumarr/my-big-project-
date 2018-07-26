@@ -373,12 +373,13 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("component"), "userData.component cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("createdBy"), "userData.createdBy cannot be null");
-    Preconditions.checkNotNull(rootNode.get("userData").get("script"), "userData.createdBy cannot be null");
+    Preconditions.checkNotNull(rootNode.get("userData").get("script"), "userData.script cannot be null");
     Preconditions.checkNotNull(rootNode.get("system").get("name"), "system.name cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"), "asOfNow.status cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"), "asOfNow.started cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"), "asOfNow.finished cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"), "asOfNow.batchId cannot be null");
+    Preconditions.checkNotNull(rootNode.get("transformations"), "transformations cannot be null");
     Preconditions.checkNotNull(rootNode.get("transformations").get("asOutputLocation"), "transformations.asOutputLocation cannot be null");
     ObjectNode transformationNode = (ObjectNode)rootNode.get("transformations");
     transformationNode.put("asOutput", id);
