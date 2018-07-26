@@ -139,9 +139,9 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(name);
-    log.info("createDatasetDirectory name = " + name);
-    log.info("createDatasetDirectory root = " + root);
-    log.info("createDatasetDirectory component = " + component);
+    log.info("execute name = " + name);
+    log.info("execute root = " + root);
+    log.info("execute component = " + component);
     client.submit(new WorkbenchExecuteJob(
                 root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
@@ -153,7 +153,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    * Execute a transformation component on a dataset to create a new dataset.
    */
   private void createDatasetDirectory(String name) throws Exception {
-
+    
     String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
         + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
@@ -210,7 +210,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   }
 
   private String getDatasetLocation(String project, String name) {
-    return root + "/" + project + "/dl/fs/data/" + name + "/data";
+    
+    String path = root + Path.SEPARATOR  + "services" + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
+        + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
+        + MetadataBase.PREDEF_DATA_DIR;
+    log.info("getDatasetLocation for preview path = " + path);
+    return path;
   }
 
   @Override
