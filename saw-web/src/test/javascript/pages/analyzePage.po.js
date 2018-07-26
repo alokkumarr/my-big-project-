@@ -1,8 +1,8 @@
-const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../helpers/utils');
-const commonFunctions = require('../helpers/commonFunctions.js');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../../javascript/helpers/utils');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const protractorConf = require('../../../../conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
-const designModePage = require('./designModePage.po');
+const designModePage = require('../../javascript/pages/designModePage.po');
 const getCards = name => element.all(by.css('mat-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
@@ -106,6 +106,7 @@ const filtersBtnUpgraded = element(by.css('button[e2e="open-filter-modal"]'));
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
 
 const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
+const getAllAnalysis = name => element(by.xpath(`//a[@e2e="analysis-name" and contains(text(),"${name}")]`));
 const geFilterRowUpgraded = index => element.all(by.css('designer-filter-row')).get(index);
 
 const getFilterAutocomplete = index => getFilterRow(index)
@@ -180,14 +181,16 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 };
 
 const doAccountAction = action => {
+  browser.ignoreSynchronization = false
   navigateToHome();
+  browser.ignoreSynchronization = true
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
     btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
-  return browser.driver.wait(() => {
-    return browser.driver.getCurrentUrl().then(url => {
+  return browser.wait(() => {
+    return browser.getCurrentUrl().then(url => {
       return /login/.test(url);
     });
   }, protractorConf.timeouts.fluentWait);
@@ -195,8 +198,8 @@ const doAccountAction = action => {
 
 function navigateToHome() {
   browser.get(browser.baseUrl);
-  return browser.driver.wait(() => {
-    return browser.driver.getCurrentUrl().then(url => {
+  return browser.wait(() => {
+    return browser.getCurrentUrl().then(url => {
       return /analyze/.test(url);
     });
   }, protractorConf.timeouts.fluentWait);
@@ -210,6 +213,7 @@ const selectFields = (name) => {
 };
 
 module.exports = {
+  navigateToHome,
   newDialog: {
     getMetricRadioButtonElementByName: name => element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
     getMetricSelectedRadioButtonElementByName: name => element(by.css(`mat-radio-button.mat-radio-checked[e2e="metric-name-${name}"]`)),
@@ -256,7 +260,8 @@ module.exports = {
       gridExpandBtn: element(by.css('button[e2e="report-expand-btn"]')),
       refreshBtn
     },
-    saveBtn: element(by.css('button[e2e="designer-save-btn"]'))
+    saveBtn: element(by.css('button[e2e="designer-save-btn"]')),
+    saveOnlyBtn: element(by.css('button[e2e="designer-save-only-btn"]'))
   },
   filtersDialog: {
     getFilterAutocomplete,
@@ -274,6 +279,7 @@ module.exports = {
     getAppliedFilter: getAppliedFilterUpgraded,
     chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
+    prompt: element(by.xpath(`//span[contains(text(),'Prompt')]/parent::*`)),
   },
   appliedFiltersDetails: {
     filterText:element(by.xpath('//span[@class="filter-counter"]')),
@@ -285,6 +291,7 @@ module.exports = {
     getAnalysisChartType
   },
   main: {
+    getAllAnalysis,
     actionMenuOptions : element(by.xpath('//div[contains(@class,"mat-menu-panel")]')),
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
@@ -318,11 +325,18 @@ module.exports = {
     cancelBtn: element(by.css('button[translate="CANCEL"]')),
     selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
+  prompt:{
+    filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
+    selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
+    cancleFilterPrompt: element(by.css(`button[e2e="designer-dialog-cancel"]`))
+    
+  },
+  listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 
   // OLD test elements
   analysisElems: {
     listView: element(by.css('[e2e="analyze-list-view"]')),
-    cardView: element(by.css('[e2e="analyze-card-view"]')),
+    cardView: element(by.css('[ng-reflect-font-icon="icon-card-view"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
     addAnalysisBtn: element(by.css('[e2e="open-new-analysis-modal"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),

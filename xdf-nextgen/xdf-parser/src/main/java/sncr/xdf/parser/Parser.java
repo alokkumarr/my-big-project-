@@ -19,6 +19,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.conf.Field;
+import sncr.bda.conf.Output;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.adapters.writers.DLBatchWriter;
@@ -53,6 +54,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private String outputDataSetName;
     private String outputDataSetLocation;
     private String outputFormat;
+    private String outputDataSetMode;
 
     private String rejectedDatasetName;
     private String rejectedDatasetLocation;
@@ -122,6 +124,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         logger.debug("Output dataset details = " + outputDataset);
         outputDataSetName = outputDataset.get(DataSetProperties.Name.name()).toString();
         outputDataSetLocation = outputDataset.get(DataSetProperties.PhysicalLocation.name()).toString();
+
+        outputDataSetMode = outputDataset.get(DataSetProperties.Mode.name()).toString();
+        logger.debug("Output dataset mode = " + outputDataSetMode);
+
         outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
         outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
         pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
@@ -160,8 +166,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         //System.exit(0);
 
         try {
-            FileStatus[] test = fs.globStatus(new Path(sourcePath));
-            logger.debug("Test " + test + " Size = " + test.length);
             if(headerSize >= 1) {
                 logger.debug("Header present");
                 FileStatus[] files = fs.globStatus(new Path(sourcePath));
@@ -173,10 +177,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                     // ... and query content
                     files = fs.globStatus(new Path(sourcePath));
                 }
-                retval = parseFiles(files,  DLDataSetOperations.MODE_APPEND);
+                retval = parseFiles(files,  outputDataSetMode);
             } else {
                 logger.debug("No Header");
-                retval = parse(DLDataSetOperations.MODE_APPEND);
+                retval = parse(outputDataSetMode);
             }
 
             //Write rejected data
@@ -268,7 +272,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
 
-//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
+//                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, outputDataSetMode, DLDataSetOperations.FORMAT_PARQUET, null));
                     resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
 
                 }

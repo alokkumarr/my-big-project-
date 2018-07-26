@@ -11,7 +11,10 @@ import { AnalysisReport } from '../../../analyze/types';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES
+} from '../../../analyze/services/analyze.service';
 
 const template = require('./observe-report.component.html');
 require('./observe-report.component.scss');
@@ -28,6 +31,7 @@ export class ObserveReportComponent implements OnDestroy {
   @Output() onRefresh = new EventEmitter();
 
   data: Array<any> = [];
+  executionId: string;
 
   listeners: Array<Subscription> = [];
 
@@ -41,9 +45,22 @@ export class ObserveReportComponent implements OnDestroy {
 
   loadData(options = {}) {
     if ((this.analysis as any)._executeTile) {
-      return this.analyzeService
-        .previewExecution(this.analysis, options)
-        .then(({ data, count }) => ({ data, totalCount: count }));
+      if (this.executionId) {
+        return this.analyzeService
+          .getExecutionData(this.analysis.id, this.executionId, {
+            ...options,
+            executionType: 'onetime',
+            analysisType: this.analysis.type
+          })
+          .then(({ data, count }) => ({ data, totalCount: count }));
+      } else {
+        return this.analyzeService
+          .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, options)
+          .then(({ data, executionId, count }) => {
+            this.executionId = executionId;
+            return { data, totalCount: count };
+          });
+      }
     } else {
       return new Promise(resolve => {
         resolve({ data: [], totalCount: 0 });

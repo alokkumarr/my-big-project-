@@ -103,6 +103,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Input('artifacts')
   set setArtifactColumns(artifacts: Artifact[]) {
     if (!artifacts) {
+      this.artifacts = null;
+      this.columns = null;
       return;
     }
     this.artifacts = artifacts;
@@ -142,7 +144,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         load: options => this.dataLoader(options)
       });
       this.remoteOperations = { paging: true };
-      this.paging = { pageSize: this.pageSize };
+      /* Reset pager after a new dataLoader is set */
+      this.paging = { pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
     } else {
       throw new Error('Data loader requires a Function');
     }
@@ -273,7 +276,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         isVisibleIndexChanged = true;
       }
       if (isVisibleIndexChanged) {
-        this.change.emit({ subject: 'visibleIndex' });
+        // disabled this event so that refreshing data does not fire this event and triggers draft mode
+        // TODO find a better way to trigger this, and not on onContentReady
+        // currently devextreme has no event for when the columns of the grid get reordered
+        // so the onContentReady event was used for that
+        // this.change.emit({ subject: 'visibleIndex' });
       }
     });
   }

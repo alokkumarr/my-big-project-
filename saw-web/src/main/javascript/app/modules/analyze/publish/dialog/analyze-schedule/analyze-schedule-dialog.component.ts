@@ -10,23 +10,23 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as moment from 'moment';
 
-import { AnalyzeService } from '../../services/analyze.service';
-import { JwtService } from '../../../../../login/services/jwt.service';
-import {HeaderProgressService} from '../../../../common/services/header-progress.service';
-import { Analysis } from '../../types';
-import {PRIVILEGES} from '../../consts';
+import { AnalyzeService } from '../../../services/analyze.service';
+import { JwtService } from '../../../../../../login/services/jwt.service';
+import {HeaderProgressService} from '../../../../../common/services/header-progress.service';
+import { Analysis } from '../../../types';
+import {PRIVILEGES} from '../../../consts';
 
-const template = require('./analyze-publish-dialog.component.html');
-require('./analyze-publish-dialog.component.scss');
+const template = require('./analyze-schedule-dialog.component.html');
+require('./analyze-schedule-dialog.component.scss');
 
 const SEMICOLON = 186;
 
 @Component({
-  selector: 'analyze-publish-dialog',
+  selector: 'analyze-schedule-dialog',
   template
 })
 
-export class AnalyzePublishDialogComponent implements OnInit {
+export class AnalyzeScheduleDialogComponent implements OnInit {
 
   categories: any[] = [];
   dateFormat = 'mm/dd/yyyy';
@@ -65,10 +65,11 @@ export class AnalyzePublishDialogComponent implements OnInit {
   scheduleState: 'new' | 'exist' | 'delete';
   token: any;
   errorFlagMsg = false;
+  loadCron = false;
   emailValidateFlag = false;
 
   constructor(
-    private _dialogRef: MatDialogRef<AnalyzePublishDialogComponent>,
+    private _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       analysis: Analysis;
@@ -116,21 +117,23 @@ export class AnalyzePublishDialogComponent implements OnInit {
       groupName: this.token.ticket.custCode
     };
     this._analyzeService.getCronDetails(requestCron).then(response => {
+      this.loadCron = true;
       if (response.statusCode === 200) {
         this.loadCronLayout = true;
         this._headerProgress.hide();
         const jobDetails = response.data.jobDetails;
-        const {
-          cronExpression,
-          activeTab,
-          activeRadio,
-          jobScheduleTime,
-          endDate,
-          analysisID,
-          emailList,
-          ftp
-        } = jobDetails;
+
         if (jobDetails) {
+          const {
+            cronExpression,
+            activeTab,
+            activeRadio,
+            jobScheduleTime,
+            endDate,
+            analysisID,
+            emailList,
+            ftp
+          } = jobDetails;
           this.crondetails = {
             cronexp: cronExpression,
             startDate: jobScheduleTime,
@@ -143,14 +146,14 @@ export class AnalyzePublishDialogComponent implements OnInit {
           }
           this.emails = emailList;
           this.hasSchedule = true;
+          if (type !== 'chart') {
+            this.ftp = ftp;
+          }
+          this.emails = emailList;
+          this.hasSchedule = true;
         }
-        if (type !== 'chart') {
-          this.ftp = ftp;
-        }
-        this.emails = emailList;
-        this.hasSchedule = true;
       }
-    }).catch(() => {
+    }, () => {
       this.loadCronLayout = true;
       this._headerProgress.hide();
     });
@@ -173,18 +176,21 @@ export class AnalyzePublishDialogComponent implements OnInit {
     return Math.random().toString(36).substring(7);
   }
 
+  removeSchedule() {
+    const analysis = this.data.analysis;
+    this.scheduleState = 'delete';
+    analysis.schedule = {
+      categoryId: analysis.categoryId,
+      groupName: this.token.ticket.custCode,
+      jobName: analysis.id,
+      scheduleState: this.scheduleState
+    };
+    this.triggerSchedule();
+  }
+
   publish() {
     const analysis = this.data.analysis;
-    if (this.hasSchedule === false) {
-      this.scheduleState = 'delete';
-      analysis.schedule = {
-        categoryId: analysis.categoryId,
-        groupName: this.token.ticket.custCode,
-        jobName: analysis.id,
-        scheduleState: this.scheduleState
-      };
-      this.triggerSchedule();
-    } else if (this.validateForm()) {
+    if (this.validateForm()) {
       let cronJobName = analysis.id;
       const crondetails = this.crondetails;
       if (crondetails.activeTab === 'immediate') {

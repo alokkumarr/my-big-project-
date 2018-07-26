@@ -13,6 +13,11 @@ sip-saw1
 
 [saw-services:vars]
 #
+# SIP
+#
+sip_var_path=/var/sip
+
+#
 # Spark configuration
 #
 saw_spark_master_url=local[*]
@@ -23,10 +28,7 @@ saw_spark_master_url=local[*]
 #saw_spark_yarn_zips=/opt/saw/service/spark.zip
 #saw_spark_yarn_resource_manager=sip-mapr
 saw_zookeeper_quorum=sip-mapr
-saw_metadata_path=/main/metadata/
-saw_report_executor_path=/main/
 saw_execution_history=2
-saw_observe_metastore=hdfs:///main/
 
 #
 # Transport Service Executor configuration
@@ -58,10 +60,14 @@ saw_elasticsearch_xpack=false
 #
 saw_workbench_project_key=workbench
 saw_workbench_project_path=/raw
-saw_workbench_project_root=maprfs:///main
 saw_workbench_preview_limit=100
 saw_workbench_livy_uri=http://sip-mapr:8998/
-saw_workbench_metadata=hdfs:///main/
+
+#Default configuration is set preview limit is 10000, if it not set in config file.
+saw_preview_rows_limit=10000
+# Publish row limit is optional parameter and only get considered if it has been
+# set greater than 0 values if it not set then no limit will be applied for publishing the report.
+saw_publish_rows_limit=10000
 
 # FTP JSON config
 # ##########################################

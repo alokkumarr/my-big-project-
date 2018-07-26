@@ -17,6 +17,12 @@ localhost
 
 [saw-services:vars]
 #
+# SIP variable data path.  Used to store databases, state files and
+# other files that should be persisted.
+#
+sip_var_path=/var/sip
+
+#
 # MapR configuration
 #
 # If the MapR cluster "mapr" user ID differs from the expected default
@@ -35,9 +41,12 @@ saw_spark_master_url=spark://localhost:7077
 #saw_spark_yarn_zips=/opt/saw/service/spark.zip
 #saw_spark_yarn_resource_manager=sip-mapr
 saw_zookeeper_quorum=localhost
-saw_metadata_path=/main/metadata
-saw_report_executor_path=/main
-saw_observe_metastore=hdfs:///main
+
+#Default configuration is set preview limit is 10000, if it not set in config file.
+#saw_preview_rows_limit=10000
+# Publish row limit is optional parameter and only get considered if it has been
+# set greater than 0 values if it not set then no limit will be applied for publishing the report.
+#saw_publish_rows_limit=10000
 
 #
 # Transport Service Executor configuration

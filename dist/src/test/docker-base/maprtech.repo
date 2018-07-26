@@ -3,6 +3,7 @@ name=MapR Technologies
 baseurl=http://package.mapr.com/releases/v6.0.1/redhat/
 enabled=1
 gpgcheck=1
+gpgkey=http://package.mapr.com/releases/pub/maprgpg.key
 protect=1
 
 [maprecosystem]
@@ -10,4 +11,5 @@ name=MapR Technologies
 baseurl=http://package.mapr.com/releases/MEP/MEP-5.0.0/redhat
 enabled=1
 gpgcheck=1
+gpgkey=http://package.mapr.com/releases/pub/maprgpg.key
 protect=1

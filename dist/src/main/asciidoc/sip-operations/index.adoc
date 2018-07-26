@@ -28,16 +28,23 @@ provided in the environment:
 
 . Provision a MapR user in the MapR cluster (with user ID 500)
 
+. Optionally create a MapR volume to hold the SIP data (at the
+  location specified by the `sip_var_path` variable in the SIP
+  environment configuration, which defaults to `/var/sip`).  Creating
+  a MapR volume enables making snapshots of SIP data, for backup and
+  restore purposes.  If a dedicated volume is not created, the SIP
+  data can be saved as part of a root volume snapshot.
+
 . Provision a mail relay host
 
-. Provision a host to deploy from (the deploy host), running CentOS 7
-  as the operating system.  This host will be used to run the deploy
-  command and store the environment configuration.  The deploy host is
-  typically common to the entire environment.
+. Provision a host to deploy from (the deploy host), running CentOS
+  7.4 as the operating system.  This host will be used to run the
+  deploy command and store the environment configuration.  The deploy
+  host is typically common to the entire environment.
 
-. Provision a host for running SAW (the target host), with 32 GB of
-  memory and CentOS 7 as the operating system.  The host should be
-  dedicated to SAW and not run other applications.
+. Provision a host for running SIP (the target host), with 32 GB of
+  memory and CentOS 7.4 as the operating system.  The host should be
+  dedicated to SIP and not run other applications.
 
 . Install and configure MapR client on the SAW target host.
 
@@ -140,6 +147,17 @@ this parameter can be set lower value.
 
      saw_export_chunk_size=10000
 
+==== Upgrading to SIP 3.0
+
+Please note that the SIP data stored by previous versions in MapR-FS
+is consolidated under a single directory as part of upgrading to SIP
+3.0 (at the location specified by the `sip_var_path` variable in the
+SIP environment configuration, which defaults to `/var/sip`).  After
+this the SIP data can be saved using a MapR volume snapshot, for
+backup and restore purposes.  If no dedicated volume has been
+configured for SIP data, it can still be saved as part of a root
+volume snapshot which does not require any additional setup steps.
+
 === Interfaces
 
 The SAW Web module and supporting services are exposed on port 80 of
@@ -237,6 +255,26 @@ using the following commands:
 Where `<saw-service>` is one of the SAW systemd services (for example
 `saw-gateway`), which can be listed using the `sudo systemctl
 list-units saw-\*` command shown in the previous section.
+
+=== Location of SIP data in MapR-FS
+
+SIP data is stored under a single specific directory in MapR-FS.  The
+location of this directory is configured using the `sip_var_path`
+variable in the SIP environment configuration (the `saw-config` file)
+and its default value is `/var/sip`.
+
+By knowing where the SIP data is located, it is possible to configure
+MapR volumes that can be used to snapshot SIP data, for backup and
+restore purposes.  Even if no dedicated MapR volume has been
+configured for SIP, the data can still be snapshotted as part of the
+root volume.  Please refer to MapR documentation for instructions on
+creating volume snapshots.
+
+NOTE: SIP data (both plain files and MapR-DB tables) can be moved
+between MapR-FS locations using the standard filesystem tools, as long
+as it is within the same volume.  Moving SIP data across MapR volumes
+requires using the MapR-DB CopyTable tool.  Please refer to MapR
+documentation for instructions on using that.
 
 === High availability and restoring failed nodes
 

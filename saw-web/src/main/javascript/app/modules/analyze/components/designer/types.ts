@@ -113,6 +113,6 @@ export type DesignerChangeEvent = {
 };
 
 export type DesignerSaveEvent = {
-  isSaveSuccessful: boolean,
+  requestExecution: boolean,
   analysis: Analysis
 }
