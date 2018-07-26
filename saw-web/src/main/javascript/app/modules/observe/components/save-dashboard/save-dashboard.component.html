@@ -17,13 +17,15 @@
       </textarea>
     </mat-form-field>
 
-    <mat-select required name="dashboardCat" placeholder="Category" formControlName="categoryId">
-      <mat-optgroup *ngFor="let category of categories" [label]="category.name">
-        <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
-          {{ subCategory.name }}
-        </mat-option>
-      </mat-optgroup>
-    </mat-select>
+    <mat-form-field class="full-form-field">
+      <mat-select required name="dashboardCat" placeholder="Category" formControlName="categoryId">
+        <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+          <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
+            {{ subCategory.name }}
+          </mat-option>
+        </mat-optgroup>
+      </mat-select>
+    </mat-form-field>
 
     <mat-checkbox name="dashboardAutoRefresh" formControlName="autoRefreshEnabled">Refresh Automatically</mat-checkbox>
 
