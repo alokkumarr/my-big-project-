@@ -20,19 +20,20 @@ function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
   commonFunctions.waitFor.elementToBeVisible(parentElem.element(by.css(btnSelector)));
   commonFunctions.waitFor.elementToBeClickable(parentElem.element(by.css(btnSelector)));
   parentElem.element(by.css(btnSelector)).click();
-
+  browser.sleep(500);
   commonFunctions.waitFor.elementToBePresent(element(by.xpath('//div[contains(@class,"mat-menu-content")]')));
   commonFunctions.waitFor.elementToBeVisible(element(by.xpath('//div[contains(@class,"mat-menu-content")]')));
   parentElem.element(by.css(btnSelector)).getAttribute('aria-owns').then(id => {
     if (id) {
       commonFunctions.waitFor.elementToBeClickable(element(by.id(id)).element(by.css(optionSelector)));
       element(by.id(id)).element(by.css(optionSelector)).click();
-
+      browser.sleep(500);
     } else {
       const menu = parentElem.element(by.css(`${btnSelector} + mat-menu`));
       menu.getAttribute('class').then(className => {
         commonFunctions.waitFor.elementToBeClickable(element(by.css(`div.${className}`)).element(by.css(optionSelector)));
         element(by.css(`div.${className}`)).element(by.css(optionSelector)).click();
+        browser.sleep(500);
       });
     }
   });

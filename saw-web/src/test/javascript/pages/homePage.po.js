@@ -1,6 +1,6 @@
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const EC = protractor.ExpectedConditions;
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 const analyzePage = require('../../javascript/pages/analyzePage.po');
 
 module.exports = {
@@ -10,6 +10,8 @@ module.exports = {
   adminMenuOption: element(by.css('a[e2e="account-settings-selector-admin"]')),
   changePasswordMenuOption: element(by.css('button[e2e="account-settings-selector-change-password"]')),
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
+  cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
+  listViewInput: element(by.css('[e2e="analyze-list-view"]')),
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
     return element(by.xpath(`//*[text() = "${analysisName}"]`));
@@ -43,18 +45,25 @@ module.exports = {
  * @subCategoryName - desirable category to expand
  */
 const navigateToSubCategoryUpdated = (categoryName, subCategoryName, defaultCategory) => {
+
+  module.exports.mainMenuExpandBtn.click();
+  browser.sleep(500);
   //Collapse default category
   commonFunctions.waitFor.elementToBeClickable(module.exports.expandedCategoryUpdated(defaultCategory));
   module.exports.expandedCategoryUpdated(defaultCategory).click();
+  browser.sleep(500);
   commonFunctions.waitFor.elementToBePresent(module.exports.category(categoryName));
   commonFunctions.waitFor.elementToBeVisible(module.exports.category(categoryName));
   //Navigate to Category/Sub-category, expand category
   commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
   module.exports.category(categoryName).click();
-
+  browser.sleep(500);
   const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(subCategory);
   subCategory.click();
+  browser.sleep(1000);
+  // module.exports.mainMenuCollapseBtn.click();
+  // browser.sleep(500);
 };
 /*
  * Navigates to specific category where analysis creation should happen

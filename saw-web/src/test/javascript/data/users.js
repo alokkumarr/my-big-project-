@@ -1,5 +1,5 @@
-const roles = require('./roles');
-const globalVariables = require('../helpers/globalVariables');
+const globalVariables = require('../../javascript/helpers/globalVariables');
+const roles = require('../../javascript/data/roles');
 
 const users = {
   // initial admin user on docker instance

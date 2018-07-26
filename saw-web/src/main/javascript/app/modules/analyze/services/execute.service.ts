@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
+import { FilterService } from '../services/filter.service';
 
 export enum EXECUTION_STATES {
   SUCCESS,
@@ -30,12 +31,24 @@ export class ExecuteService {
   executingAnalyses: any;
   execs$: ReplaySubject<IExecuteEventEmitter>;
 
-  constructor(private _analyzeService: AnalyzeService) {
+  constructor(
+    private _analyzeService: AnalyzeService,
+    private _filterService: FilterService
+  ) {
     const bufferSize = 10;
     this.execs$ = new ReplaySubject<IExecuteEventEmitter>(bufferSize);
   }
 
   executeAnalysis(analysis, mode = EXECUTION_MODES.LIVE) {
+    return this._filterService.getRuntimeFilterValues(analysis).then(model => {
+      if (model) {
+        this.doExecute(model, mode);
+        return model;
+      }
+    });
+  }
+
+  doExecute(analysis, mode = EXECUTION_MODES.LIVE) {
     const id = analysis.id;
     const exec$ = new BehaviorSubject<IExecuteEvent>({
       state: EXECUTION_STATES.EXECUTING

@@ -4,7 +4,7 @@ const homePage = require('../../javascript/pages/homePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../../javascript/helpers/utils');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 
 describe('Create pivot type analysis: createPivot.test.js', () => {
   const pivotDesigner = analyzePage.designerDialog.pivot;
@@ -23,7 +23,6 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -31,7 +30,6 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -43,7 +41,9 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
 
   it('Should apply filter to Pivot', () => { // SAW-3894
     loginPage.loginAs('admin');
-    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+    analyzePage.analysisElems.cardView.click();
 
     // Create Pivot
     homePage.createAnalysis(metricName, analysisType);
@@ -54,10 +54,15 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     const stringFilterInput = filters.getStringFilterInput(0);
     const fieldName = columnField;
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.filterBtn);
+    commonFunctions.waitFor.elementToBeVisible(pivotDesigner.filterBtn);
+    commonFunctions.waitFor.elementToBeClickable(pivotDesigner.filterBtn);
+    pivotDesigner.filterBtn.click();
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    commonFunctions.waitFor.elementToBeClickableAndClick(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeVisible(filters.applyBtn);
+    commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
+    filters.applyBtn.click();
+
     const filterName = filters.getAppliedFilter(fieldName);
 
     commonFunctions.waitFor.elementToBePresent(filterName);
@@ -66,30 +71,42 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     // Should select row, column and data fields and refresh data
     const refreshBtn = pivotDesigner.refreshBtn;
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.getPivotFieldCheckbox(dataField));
+    commonFunctions.waitFor.elementToBeVisible(pivotDesigner.getPivotFieldCheckbox(dataField));
+    commonFunctions.waitFor.elementToBeClickable(pivotDesigner.getPivotFieldCheckbox(dataField));
+    pivotDesigner.getPivotFieldCheckbox(dataField).click();
     pivotDesigner.doSelectPivotArea(dataField, 'data');
     pivotDesigner.doSelectPivotAggregate(dataField, 'sum');
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.getPivotFieldCheckbox(columnField));
+    commonFunctions.waitFor.elementToBeVisible(pivotDesigner.getPivotFieldCheckbox(columnField));
+    commonFunctions.waitFor.elementToBeClickable(pivotDesigner.getPivotFieldCheckbox(columnField));
+    pivotDesigner.getPivotFieldCheckbox(columnField).click();
     pivotDesigner.doSelectPivotArea(columnField, 'column');
 
-    commonFunctions.waitFor.elementToBeClickableAndClick(pivotDesigner.getPivotFieldCheckbox(rowField));
+    commonFunctions.waitFor.elementToBeVisible(pivotDesigner.getPivotFieldCheckbox(rowField));
+    commonFunctions.waitFor.elementToBeClickable(pivotDesigner.getPivotFieldCheckbox(rowField));
+    pivotDesigner.getPivotFieldCheckbox(rowField).click();
     pivotDesigner.doSelectPivotArea(rowField, 'row');
 
     const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
-    commonFunctions.waitFor.elementToBeClickableAndClick(refreshBtn);
+    commonFunctions.waitFor.elementToBeVisible(refreshBtn);
+    commonFunctions.waitFor.elementToBeClickable(refreshBtn);
+    refreshBtn.click();
 
     //Save report
     const save = analyzePage.saveDialog;
     const designer = analyzePage.designerDialog;
-    commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
+    commonFunctions.waitFor.elementToBeVisible(designer.saveBtn);
+    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+    designer.saveBtn.click();
 
     expect(designer.saveDialog).toBeTruthy();
 
     save.nameInput.clear().sendKeys(pivotName);
     save.descriptionInput.clear().sendKeys(pivotDescription);
-    commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
+    commonFunctions.waitFor.elementToBeVisible(save.saveBtn);
+    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
+    save.saveBtn.click();
     commonFunctions.waitFor.elementToBePresent(analyzePage.main.getCardTitle(pivotName))
       .then(() => expect(analyzePage.main.getCardTitle(pivotName).isPresent()).toBe(true));
 
@@ -98,7 +115,9 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
     main.getAnalysisCards(pivotName).count()
       .then(count => {
         main.doAnalysisAction(pivotName, 'delete');
-        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
+        commonFunctions.waitFor.elementToBeVisible(main.confirmDeleteBtn);
+        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
+        main.confirmDeleteBtn.click();
         expect(main.getAnalysisCards(pivotName).count()).toBe(count - 1);
       });
   });

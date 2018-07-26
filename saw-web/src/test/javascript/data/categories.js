@@ -1,4 +1,4 @@
-const globalVariables = require('../helpers/globalVariables');
+const globalVariables = require('../../javascript/helpers/globalVariables');
 
 const description = 'Category created for e2e testing'; // same for all categories
 const nullValue = 'NULL';

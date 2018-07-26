@@ -7,6 +7,7 @@ import {
   IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../../services/execute.service';
+import { DesignerSaveEvent } from '../../components/designer/types';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../../login/services/jwt.service';
 
@@ -86,20 +87,20 @@ export class AnalyzeCardComponent implements OnInit {
     });
   }
 
-  afterEdit(analysis) {
+  afterEdit({analysis, requestExecution}: DesignerSaveEvent) {
     this.action.emit({
       action: 'edit',
-      analysis
+      analysis,
+      requestExecution
     });
   }
 
   fork(analysis) {
-    this._analyzeActionsService.fork(analysis).then(status => {
-      if (!status) {
-        return;
-      }
+    this._analyzeActionsService.fork(analysis).then(({analysis, requestExecution}: DesignerSaveEvent) => {
       this.action.emit({
-        action: 'fork'
+        action: 'fork',
+        analysis,
+        requestExecution
       });
     });
   }
