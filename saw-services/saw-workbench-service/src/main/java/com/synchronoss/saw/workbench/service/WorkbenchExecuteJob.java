@@ -65,6 +65,9 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     } else {
       throw new IllegalArgumentException("Unknown component: " + component);
     }
+    log.info(" Component.startComponent xdfComponent = " + xdfComponent);
+    log.info(" Component.startComponent root = " + root);
+    log.info(" Component.startComponent config = " + config);
     int status = Component.startComponent(xdfComponent, root, config, project, batch);
     if (status != 0) {
       throw new RuntimeException("XDF returned non-zero status: " + status);

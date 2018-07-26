@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
 import sncr.bda.CliHandler;
@@ -294,7 +295,7 @@ public abstract class Component {
     }
 
     logger.debug("Getting project metadata");
-    ProjectStore prjStore = new ProjectStore(xdfDataRootSys);
+    ProjectStore prjStore = new ProjectStore(xdfDataRootSys); // maprfs:///var/sip ideally it should be maprfs:///var/sip/services/metadata
     JsonElement prj = prjStore.readProjectData(appId);
     logger.debug("Project metadata for " + appId + " is " + prj);
 
@@ -458,7 +459,7 @@ public abstract class Component {
     logger.error("Configuration: " + config);
 
     try {
-      if (self.init(config, app, batch, dataLakeRoot) == 0) {
+      if (self.init(config, app, batch, dataLakeRoot + Path.SEPARATOR + "services") == 0) {
         return self.run();
       } else {
         logger.error("Could not initialize component");

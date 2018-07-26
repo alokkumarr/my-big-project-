@@ -3,6 +3,7 @@ package com.synchronoss.saw.workbench.service;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.Path;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 
@@ -133,13 +135,17 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Override
   public ObjectNode execute(
       String project, String name, String component, String config) throws Exception {
-    log.info("Executing dataset transformation");
+    log.info("Executing dataset transformation starts here ");
     log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(name);
+    log.info("createDatasetDirectory name = " + name);
+    log.info("createDatasetDirectory root = " + root);
+    log.info("createDatasetDirectory component = " + component);
     client.submit(new WorkbenchExecuteJob(
                 root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
+    log.info("Executing dataset transformation ends here ");
     return root;
   }
 
@@ -147,7 +153,12 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    * Execute a transformation component on a dataset to create a new dataset.
    */
   private void createDatasetDirectory(String name) throws Exception {
-    String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
+
+    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
+        + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
+        + MetadataBase.PREDEF_DATA_DIR;
+    log.info("createDatasetDirectory path = " + path);
     if (!HFileOperations.exists(path)) {
       HFileOperations.createDir(path);
     }
