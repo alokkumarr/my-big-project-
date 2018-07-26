@@ -22,7 +22,7 @@ export class RoleService implements IAdminDataService {
 
   save(user) {
     const options = {
-      toast: { successMsg: 'User is successfully added' }
+      toast: { successMsg: 'Role is successfully added' }
     };
     return this._adminService.request<RolesResponse>('roles/add', user, options)
       .map(resp => resp.valid ? resp.roles : null)
@@ -31,7 +31,7 @@ export class RoleService implements IAdminDataService {
 
   remove(user) {
     const options = {
-      toast: { successMsg: 'User is successfully deleted' }
+      toast: { successMsg: 'Role is successfully deleted' }
     };
     return this._adminService.request<RolesResponse>('roles/delete', user, options)
       .map(resp => resp.valid ? resp.roles : null)
@@ -40,7 +40,7 @@ export class RoleService implements IAdminDataService {
 
   update(user) {
     const options = {
-      toast: { successMsg: 'User is successfully Updated' }
+      toast: { successMsg: 'Role is successfully Updated' }
     };
     return this._adminService.request<RolesResponse>('roles/edit', user, options)
       .map(resp => resp.valid ? resp.roles : null)

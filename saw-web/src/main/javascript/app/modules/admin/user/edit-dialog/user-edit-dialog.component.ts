@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { UserService } from '../user.service';
+import { BaseDialogComponent } from '../../../../common/base-dialog';
 
 const template = require('./user-edit-dialog.component.html');
 require('./user-edit-dialog.component.scss');
@@ -15,7 +16,7 @@ const dummyPassword = '*********';
   selector: 'user-edit-dialog',
   template
 })
-export class UserEditDialogComponent {
+export class UserEditDialogComponent extends BaseDialogComponent {
 
   formGroup: FormGroup;
   formIsValid = false;
@@ -41,6 +42,7 @@ export class UserEditDialogComponent {
       mode: 'edit' | 'create'
     }
   ) {
+    super();
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
     }

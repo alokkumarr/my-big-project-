@@ -1,0 +1,32 @@
+@import "themes/base/colors";
+
+.base-dialog {
+  display: block;
+  padding: 10px;
+  color: $primary-grey-g4;
+
+  .base-dialog__header {
+    padding: 10px;
+    border-bottom: 1px solid $primary-grey-g2;
+
+    strong {
+      font-size: 20px;
+    }
+  }
+
+  .base-dialog__content {
+    padding: 0 10px;
+    overflow-y: auto;
+
+    mat-select {
+      border: 1px solid $primary-grey-g1;
+      padding: 8px;
+      border-radius: 2px;
+    }
+  }
+
+  .base-dialog__actions {
+    padding-top: 10px;
+    border-top: 1px solid $primary-grey-g2;
+  }
+}

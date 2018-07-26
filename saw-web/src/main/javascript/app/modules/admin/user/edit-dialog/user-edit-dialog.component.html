@@ -1,22 +1,21 @@
-<h2 mat-dialog-title [ngSwitch]="data.mode">
-  <ng-container *ngSwitchCase="'create'" i18n>
-      New User
-    </ng-container>
-    <ng-container *ngSwitchCase="'edit'" i18n>
-      Edit User
-    </ng-container>
-</h2>
-<mat-divider></mat-divider>
-<mat-dialog-content>
+<header class="base-dialog__header">
+  <strong [ngSwitch]="data.mode">
+    <ng-container *ngSwitchCase="'create'" i18n>
+        New User
+      </ng-container>
+      <ng-container *ngSwitchCase="'edit'" i18n>
+        Edit User
+      </ng-container>
+  </strong>
+</header>
+<div class="base-dialog__content">
+  <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="start center">
 
-  <form [formGroup]="formGroup">
-    <mat-form-field>
-      <mat-select required placeholder="Role" formControlName="roleId">
-        <mat-option *ngFor="let role of data.formDeps.roles$ | async" [value]="role.roleId">
-          {{role.roleName}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <mat-select required placeholder="Role" formControlName="roleId">
+      <mat-option *ngFor="let role of data.formDeps.roles$ | async" [value]="role.roleId">
+        {{role.roleName}}
+      </mat-option>
+    </mat-select>
 
     <mat-form-field>
       <input matInput required type="text" formControlName="firstName" placeholder="First name"/>
@@ -44,19 +43,16 @@
       <input matInput required type="email" formControlName="email" placeholder="Email"/>
     </mat-form-field>
 
-    <mat-form-field>
-      <mat-select required placeholder="Status" formControlName="activeStatusInd">
-        <mat-option *ngFor="let status of statuses" [value]="status.id">
-          {{status.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <mat-select required placeholder="Status" formControlName="activeStatusInd">
+      <mat-option *ngFor="let status of statuses" [value]="status.id">
+        {{status.name}}
+      </mat-option>
+    </mat-select>
 
   </form>
+</div>
 
-</mat-dialog-content>
-<mat-divider></mat-divider>
-<div fxLayout="row" fxLayoutAlign="space-between center" class="dialog-actions">
+<div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
   <button (click)="create()"
           [disabled]="!formIsValid"
           e2e="create-analysis-btn"
@@ -71,8 +67,7 @@
       Save
     </ng-container>
   </button>
-  <button (click)="_dialogRef.close()"
-          mat-button
+  <button mat-button
           mat-dialog-close i18n
   >Cancel</button>
 </div>

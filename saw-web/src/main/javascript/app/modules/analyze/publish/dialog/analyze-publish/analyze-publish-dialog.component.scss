@@ -1,19 +1,6 @@
 @import "themes/base/colors";
 
 analyze-publish-dialog {
-  display: block;
-  padding: 10px;
-  color: $primary-grey-g4;
-
-  .dialog__header {
-    padding: 10px;
-    border-bottom: 1px solid $primary-grey-g2;
-
-    strong {
-      font-size: 20px;
-    }
-  }
-
   .dialog__content {
     width: 700px;
     padding: 0 10px;
@@ -38,16 +25,5 @@ analyze-publish-dialog {
         margin: 0;
       }
     }
-
-    mat-select.publish-select {
-      border: 1px solid $primary-grey-g1;
-      padding: 8px;
-      border-radius: 2px;
-    }
-  }
-
-  .dialog__actions {
-    padding-top: 10px;
-    border-top: 1px solid $primary-grey-g2;
   }
 }

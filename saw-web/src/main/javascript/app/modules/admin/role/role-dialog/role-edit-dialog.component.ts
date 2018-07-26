@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RoleService } from '../role.service';
+import { BaseDialogComponent } from '../../../../common/base-dialog';
 
 const template = require('./role-edit-dialog.component.html');
 require('./role-edit-dialog.component.scss');
@@ -12,7 +13,7 @@ const namePattern = /^[a-zA-Z]*$/;
   selector: 'role-edit-dialog',
   template
 })
-export class RoleEditDialogComponent {
+export class RoleEditDialogComponent extends BaseDialogComponent {
 
   formGroup: FormGroup;
   formIsValid = false;
@@ -38,6 +39,7 @@ export class RoleEditDialogComponent {
       mode: 'edit' | 'create'
     }
   ) {
+    super();
     if (this.data.mode === 'edit') {
       this.formIsValid = true;
     }
