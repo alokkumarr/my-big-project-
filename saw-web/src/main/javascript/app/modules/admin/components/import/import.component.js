@@ -215,7 +215,7 @@ export const AnalysisImportComponent = {
         });
         return;
       }
-      if (this.importCount != 0) {
+      if (this.importCount !== 0) {
         this._$mdToast.show({
           template: '<md-toast><span>select analysis to import.</md-toast>',
           position: 'top left',

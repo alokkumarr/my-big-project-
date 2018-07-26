@@ -53,7 +53,7 @@ export const AnalysisExportComponent = {
       this._$rootScope.showProgress = true;
       const id = get(this._JwtService.getTokenObj(), 'ticket.custID');
       this._CategoriesManagementService.getActiveCategoriesList(id).then(response => {
-        this.categoriesMap = response.categories.reduce(function(map, tag) {
+        this.categoriesMap = response.categories.reduce((map, tag) => {
           if (tag.moduleName === 'ANALYZE') {
             tag.subCategories.forEach(subCategory => {
               map[subCategory.subCategoryId] = subCategory.subCategoryName;
@@ -94,7 +94,7 @@ export const AnalysisExportComponent = {
             customerCode: id,
             module: 'ANALYZE',
             semanticId: selectedSemanticid
-          }
+          };
           contentsObject.keys.push(keyObject);
         });
         const body = {

@@ -41,7 +41,7 @@ export const ImportListViewComponent = {
       /* eslint-enable */
     }
 
-    onimportFlagUpdater({flag}){
+    onimportFlagUpdater({flag}) {
       this.importFlag = flag;
     }
 
