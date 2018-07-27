@@ -130,7 +130,8 @@ export class UserService {
     const ResetPasswordDetails = {
       masterLoginId: credentials.username,
       newPassword: credentials.newPwd,
-      cnfNewPassword: credentials.confNewPwd
+      cnfNewPassword: credentials.confNewPwd,
+      rfc: credentials.rhcToken
     };
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
     return this._$http.post(this._AppConfig.login.url + route, ResetPasswordDetails)
