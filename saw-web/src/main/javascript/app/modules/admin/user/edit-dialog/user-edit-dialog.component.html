@@ -10,7 +10,7 @@
 <mat-dialog-content>
 
   <form [formGroup]="userGroup">
-    <mat-form-field>
+    <mat-form-field class="select-form-field">
       <mat-select required placeholder="Role" formControlName="roleId">
         <mat-option *ngFor="let role of data.roles$ | async" [value]="role.roleId">
           {{role.roleName}}
@@ -44,7 +44,7 @@
       <input matInput required type="email" formControlName="email" placeholder="Email"/>
     </mat-form-field>
 
-    <mat-form-field>
+    <mat-form-field class="select-form-field">
       <mat-select required placeholder="Status" formControlName="activeStatusInd">
         <mat-option *ngFor="let status of statuses" [value]="status.id">
           {{status.name}}
