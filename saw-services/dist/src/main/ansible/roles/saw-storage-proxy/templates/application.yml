@@ -31,4 +31,4 @@ elastic-xpack :
           cluster-password: {{ saw_elasticsearch_password | default('') }}
 
 metastore:
-    base:  {{ saw_workbench_metadata | default('hdfs:///main/') }}
+    base:  {{ 'maprfs://' + sip_var_path + '/services/' | default('maprfs:///var/sip/services/') }}
