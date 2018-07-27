@@ -193,11 +193,8 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(1, userSysId);
 				}
 			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
-			// Validate the hash key with userID before proceeding.
-			  ResetValid resetValid = validateResetPasswordDtls(rhc);
 
-			if (message != null && message.equals("valid") &&
-                loginId.equalsIgnoreCase(resetValid.getMasterLoginID()) ) {
+			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
 				sql = "INSERT INTO PASSWORD_HISTORY (PASSWORD_HISTORY_SYS_ID,USER_SYS_ID,PASSWORD,DATE_OF_CHANGE)"
@@ -225,13 +222,11 @@ public class UserRepositoryImpl implements UserRepository {
 				 + "AND RS.VALID=1";
 				  jdbcTemplate.update(sql,new PreparedStatementSetter() {
                       public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                          preparedStatement.setString(1, loginId);
+                           preparedStatement.setString(1, loginId);
                       }
                   });
 			}
-			if (!(resetValid.getValid() ||
-                (resetValid.getMasterLoginID().equalsIgnoreCase(loginId))))
-                message= "Reset link is not valid or expired ";
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;

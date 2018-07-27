@@ -13,7 +13,7 @@ public class ChangePasswordDetails {
 	private String oldPassword;
 	private String newPassword;
 	private String cnfNewPassword;
-    private String randomHashKey;
+    private String rfc;
 	
 	
 	/**
@@ -70,14 +70,14 @@ public class ChangePasswordDetails {
      *
      * @return value of randomHashKey
      */
-    public String getRandomHashKey() {
-        return randomHashKey;
+    public String getRfc() {
+        return rfc;
     }
 
     /**
      * Sets randomHashKey
      */
-    public void setRandomHashKey(String randomHashKey) {
-        this.randomHashKey = randomHashKey;
+    public void setRfc(String rfc) {
+        this.rfc = rfc;
     }
 }

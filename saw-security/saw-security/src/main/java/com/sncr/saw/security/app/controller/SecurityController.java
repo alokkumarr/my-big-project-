@@ -414,7 +414,7 @@ public class SecurityController {
 		String newPass = changePasswordDetails.getNewPassword();
 		String cnfNewPass = changePasswordDetails.getCnfNewPassword();
 		String loginId = changePasswordDetails.getMasterLoginId();
-		String rhc = changePasswordDetails.getRandomHashKey();
+		String rhc = changePasswordDetails.getRfc();
 
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
@@ -435,6 +435,16 @@ public class SecurityController {
 		if (!m.find()) {
 			message = "Password should contain atleast 1 special character.";
 		}
+        // Validate the hash key with userID before proceeding.
+        ResetValid resetValid =  userRepository.validateResetPasswordDtls(rhc);
+		System.out.println(resetValid.getValid());
+        System.out.println(resetValid.getError());
+        System.out.println(resetValid.getMasterLoginID());
+        System.out.println(resetValid.getValidityReason());
+        if (!(resetValid.getValid() || (resetValid.getMasterLoginID()!=null &&
+            resetValid.getMasterLoginID().equalsIgnoreCase(loginId))))
+            message= "Reset link is not valid or expired ";
+
 		try {
 			if (message == null) {
 				message = userRepository.rstchangePassword(loginId, newPass,rhc);
