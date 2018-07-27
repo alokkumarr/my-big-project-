@@ -198,6 +198,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         if(isPercentage)
         {
             SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
+            preSearchSourceBuilder.size(0);
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",
