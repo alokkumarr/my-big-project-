@@ -225,7 +225,7 @@ public class UserRepositoryImpl implements UserRepository {
 				 + "AND RS.VALID=1";
 				  jdbcTemplate.update(sql,new PreparedStatementSetter() {
                       public void setValues(PreparedStatement preparedStatement) throws SQLException {
-                          preparedStatement.setString(1, userSysId);
+                          preparedStatement.setString(1, loginId);
                       }
                   });
 			}
