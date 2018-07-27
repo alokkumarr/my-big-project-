@@ -3,8 +3,8 @@
      fxLayoutAlign="space-between"
      class="header__container">
   <div fxLayout="row" fxLayoutAlign="start center">
-    <button mat-button (click)="onBack.emit()">
-      <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+    <button mat-icon-button (click)="onBack.emit()" style="margin-right: 10px;">
+      <mat-icon class="back-button-icon" fontIcon="icon-arrow-left"></mat-icon>
     </button>
     <div fxLayout="row"
          fxLayoutAlign="start" fxLayoutGap="10px"
@@ -78,12 +78,18 @@
       <ng-container i18n>Filter</ng-container>
     </button>
 
+    <button mat-button
+            [disabled]="!areMinRequirmentsMet"
+            e2e="designer-save-only-btn"
+            (click)="requestAction.emit('save')">
+      <ng-container i18n>Save</ng-container>
+    </button>
     <button mat-raised-button
             [disabled]="!areMinRequirmentsMet"
             e2e="designer-save-btn"
             color="primary"
-            (click)="requestAction.emit('save')">
-      <ng-container i18n>Save</ng-container>
+            (click)="requestAction.emit('saveAndClose')">
+      <ng-container i18n>Save & Close</ng-container>
     </button>
   </div>
 </div>

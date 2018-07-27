@@ -1,10 +1,11 @@
 <ng-container *ngIf="actions.length && actions.length > 0">
   <button mat-icon-button [matMenuTriggerFor]="menu" e2e="actions-menu-toggle">
-    <mat-icon fontIcon="icon-more"></mat-icon>
+    <mat-icon style="margin-left: 20px;" fontIcon="icon-more"></mat-icon>
   </button>
   <mat-menu #menu="matMenu">
     <button *ngFor="let action of actions; trackBy: index"
             (click)="action.fn()"
+            [disabled]="actionsToDisable[action.value]"
             [style.color]="action.color"
             [attr.e2e]="'actions-menu-selector-' + action.value"
             mat-menu-item

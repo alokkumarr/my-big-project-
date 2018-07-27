@@ -2,7 +2,10 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Analysis, ArtifactColumns } from '../types';
 import { DesignerService } from '../designer.service';
-import { ChartService } from '../../../services/chart.service';
+import {
+  flattenPivotData,
+  flattenChartData
+} from '../../../../../common/utils/dataFlattener';
 import { DesignerStates } from '../consts';
 
 import * as isEmpty from 'lodash/isEmpty';
@@ -29,8 +32,7 @@ export class DesignerPreviewDialogComponent {
   constructor(
     private _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { analysis: Analysis },
-    private _designerService: DesignerService,
-    private _chartService: ChartService
+    private _designerService: DesignerService
   ) {
     this.analysis = data.analysis;
     /* prettier-ignore */
@@ -40,10 +42,24 @@ export class DesignerPreviewDialogComponent {
       break;
     case 'report':
     case 'esReport':
-      this.dataLoader = (options = {}) =>
-        this._designerService
-          .getDataForAnalysisPreview(this.analysis, options)
-          .then(({ data, count }) => ({ data: data, totalCount: count }));
+      let execId: string;
+      this.dataLoader = (options = {}) => {
+        if (execId) {
+          return this._designerService.getDataForExecution(
+            this.analysis.id,
+            execId,
+            {...options, analysisType: this.analysis.type, executionType: 'onetime'}
+          )
+            .then(({data, count}) => ({data, totalCount: count}));
+        } else {
+          return this._designerService
+            .getDataForAnalysisPreview(this.analysis, options)
+            .then(({ data, executionId, count }) => {
+              execId = executionId
+              return { data: data, totalCount: count };
+            });
+        }
+      }
       break;
     }
   }
@@ -56,22 +72,22 @@ export class DesignerPreviewDialogComponent {
     case 'chart':
       this._designerService.getDataForAnalysisPreview(analysis, {})
         .then(data => {
-          this.previewData = this.parseData(data.data, analysis);
+          this.previewData = this.flattenData(data.data, analysis);
         });
       break;
     }
   }
 
-  parseData(data, analysis: Analysis) {
+  flattenData(data, analysis: Analysis) {
     /* prettier-ignore */
     switch (analysis.type) {
     case 'pivot':
-      return this._designerService.parseData(data, analysis.sqlBuilder);
+      return flattenPivotData(data, analysis.sqlBuilder);
     case 'report':
     case 'esReport':
       return data;
     case 'chart':
-      let chartData = this._chartService.parseData(
+      let chartData = flattenChartData(
         data,
         analysis.sqlBuilder
       );

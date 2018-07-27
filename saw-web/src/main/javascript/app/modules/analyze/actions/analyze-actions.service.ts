@@ -1,35 +1,37 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as clone from 'lodash/clone';
-import * as deepClone from 'lodash/cloneDeep';
-import * as defaultsDeep from 'lodash/defaultsDeep';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
 import { AnalyzeService } from '../services/analyze.service';
-import { FilterService } from '../services/filter.service';
+import { ExecuteService } from '../services/execute.service';
+import { PublishService } from '../services/publish.service';
 import { Analysis } from '../types';
-import { AnalyzePublishDialogComponent } from '../publish';
+import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
+import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
+
+
+import {
+  EXECUTION_MODES,
+  EXECUTION_DATA_MODES
+} from '../services/analyze.service';
 
 @Injectable()
 export class AnalyzeActionsService {
   constructor(
-    private _filterService: FilterService,
     private _analyzeService: AnalyzeService,
+    private _executeService: ExecuteService,
+    private _publishService: PublishService,
     private _analyzeDialogService: AnalyzeDialogService,
     private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
     public dialog: MatDialog
   ) {}
 
-  execute(analysis) {
-    return this._filterService.getRuntimeFilterValues(analysis).then(analysis => {
-      if (analysis) {
-        this._analyzeService.executeAnalysis(analysis);
-        return analysis;
-      }
-    });
+  execute(analysis, mode = EXECUTION_MODES.LIVE) {
+    return this._executeService.executeAnalysis(analysis, mode);
   }
 
   fork(analysis) {
@@ -42,8 +44,8 @@ export class AnalyzeActionsService {
     return this.openEditModal(clone(analysis), 'edit');
   }
 
-  publish(analysis) {
-    return this.openPublishModal(clone(analysis));
+  publish(analysis,type) {
+    return this.openPublishModal(clone(analysis), type);
   }
 
   delete(analysis) {
@@ -88,37 +90,74 @@ export class AnalyzeActionsService {
     }
   }
 
-  openPublishModal(analysis) {
-    return new Promise<Analysis>((resolve, reject) => {
-      this.dialog
-        .open(AnalyzePublishDialogComponent, {
-          width: 'auto',
-          height: 'auto',
-          data: { analysis }
-        } as MatDialogConfig)
-        .afterClosed()
-        .subscribe(analysis => {
-          if (analysis) {
-            const execute = true;
-            this._headerProgress.show();
-            this._analyzeService.publishAnalysis(analysis, execute).then(
-              updatedAnalysis => {
-                this._headerProgress.hide();
-                this._toastMessage.info(
-                  execute
-                    ? 'Analysis has been updated.'
-                    : 'Analysis schedule changes have been updated.'
-                );
-                resolve(updatedAnalysis);
-              },
-              () => {
-                this._headerProgress.hide();
-                reject();
-              }
-            );
-          }
-        });
-    });
+  openPublishModal(analysis, type) {
+    switch (type) {
+    case 'publish':
+      return new Promise<Analysis>((resolve, reject) => {
+        this.dialog
+          .open(AnalyzePublishDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            data: { analysis }
+          } as MatDialogConfig)
+          .afterClosed()
+          .subscribe(analysis => {
+            if (analysis) {
+              const execute = true;
+              this._headerProgress.show();
+              this._publishService.publishAnalysis(analysis, execute, type).then(
+                updatedAnalysis => {
+                  this._headerProgress.hide();
+                  this._toastMessage.info(
+                    execute
+                      ? 'Analysis has been updated.'
+                      : 'Analysis schedule changes have been updated.'
+                  );
+                  resolve(updatedAnalysis);
+                },
+                () => {
+                  this._headerProgress.hide();
+                  reject();
+                }
+              );
+            }
+          });
+      });
+      break;
+
+    case 'schedule':
+      return new Promise<Analysis>((resolve, reject) => {
+        this.dialog
+          .open(AnalyzeScheduleDialogComponent, {
+            width: 'auto',
+            height: 'auto',
+            data: { analysis }
+          } as MatDialogConfig)
+          .afterClosed()
+          .subscribe(analysis => {
+            if (analysis) {
+              const execute = false;
+              this._headerProgress.show();
+              this._publishService.publishAnalysis(analysis, execute, type).then(
+                updatedAnalysis => {
+                  this._headerProgress.hide();
+                  this._toastMessage.info(
+                    execute
+                      ? 'Analysis has been updated.'
+                      : 'Analysis schedule changes have been updated.'
+                  );
+                  resolve(updatedAnalysis);
+                },
+                () => {
+                  this._headerProgress.hide();
+                  reject();
+                }
+              );
+            }
+          });
+      });
+      break;
+    }
   }
 
   removeAnalysis(analysis) {
@@ -133,6 +172,20 @@ export class AnalyzeActionsService {
         this._headerProgress.hide();
         this._toastMessage.error(err.message || 'Analysis not deleted.');
       }
+    );
+  }
+
+  exportAnalysis(
+    analysisId,
+    executionId,
+    analysisType,
+    executionType = EXECUTION_DATA_MODES.NORMAL
+  ) {
+    return this._analyzeService.getExportData(
+      analysisId,
+      executionId,
+      analysisType,
+      executionType
     );
   }
 }

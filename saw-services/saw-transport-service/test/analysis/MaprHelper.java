@@ -20,26 +20,26 @@ public class MaprHelper {
              * classpath" and parsing the output to ensure changes are
              * picked up */
             addPath("/opt/mapr/conf");
-            addPath("/opt/mapr/lib/maprbuildversion-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/maprfs-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/maprfs-diagnostic-tools-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/maprdb-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/maprdb-5.2.0-mapr-tests.jar");
-            addPath("/opt/mapr/lib/maprdb-mapreduce-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/maprdb-mapreduce-5.2.0-mapr-tests.jar");
-            addPath("/opt/mapr/lib/maprdb-shell-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/mapr-hbase-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/mapr-hbase-5.2.0-mapr-tests.jar");
-            addPath("/opt/mapr/lib/mapr-java-utils-5.2.0-mapr-tests.jar");
-            addPath("/opt/mapr/lib/mapr-streams-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/mapr-streams-5.2.0-mapr-tests.jar");
-            addPath("/opt/mapr/lib/mapr-tools-5.2.0-mapr.jar");
-            addPath("/opt/mapr/lib/mapr-tools-5.2.0-mapr-tests.jar");
+            addPath("/opt/mapr/lib/maprbuildversion-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/maprfs-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/maprfs-diagnostic-tools-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/maprdb-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/maprdb-6.0.1-mapr-tests.jar");
+            addPath("/opt/mapr/lib/maprdb-mapreduce-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/maprdb-mapreduce-6.0.1-mapr-tests.jar");
+            addPath("/opt/mapr/lib/maprdb-shell-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/mapr-hbase-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/mapr-hbase-6.0.1-mapr-tests.jar");
+            addPath("/opt/mapr/lib/mapr-java-utils-6.0.1-mapr-tests.jar");
+            addPath("/opt/mapr/lib/mapr-streams-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/mapr-streams-6.0.1-mapr-tests.jar");
+            addPath("/opt/mapr/lib/mapr-tools-6.0.1-mapr.jar");
+            addPath("/opt/mapr/lib/mapr-tools-6.0.1-mapr-tests.jar");
             addPath("/opt/mapr/lib/slf4j-api-1.7.12.jar");
             /* Disable log4j provider to avoid multiple bindings */
             //addPath("/opt/mapr/lib/slf4j-log4j12-1.7.12.jar");
             addPath("/opt/mapr/lib/log4j-1.2.17.jar");
-            addPath("/opt/mapr/lib/central-logging-5.2.0-mapr.jar");
+            addPath("/opt/mapr/lib/central-logging-6.0.1-mapr.jar");
             addPath("/opt/mapr/lib/antlr4-runtime-4.5.jar");
             addPath("/opt/mapr/lib/guava-14.0.1.jar");
             addPath("/opt/mapr/lib/jackson-annotations-2.7.2.jar");

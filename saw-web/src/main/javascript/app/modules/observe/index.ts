@@ -5,10 +5,16 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
-import { CountoModule }  from 'angular2-counto';
+import { CountoModule } from 'angular2-counto';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
+
+import {
+  DxDataGridModule,
+  DxDataGridComponent,
+  DxTemplateModule
+} from 'devextreme-angular';
 
 import { MaterialModule } from '../../material.module';
 
@@ -39,6 +45,8 @@ import { UChartModule } from '../../common/components/charts';
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { ObserveReportComponent } from './components/observe-report/observe-report.component';
+import { ObservePivotComponent } from './components/observe-pivot/observe-pivot.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
 import { ObserveKPIBulletComponent } from './components/observe-kpi-bullet/observe-kpi-bullet.component';
 import { KPIFilter } from './components/kpi-filter/kpi-filter.component';
@@ -55,7 +63,7 @@ import {
   GlobalStringFilterComponent
 } from './components/global-filter';
 import { DashboardService } from './services/dashboard.service';
-import { CommonModule } from '../../common';
+import { CommonModule, CommonModuleTs } from '../../common';
 
 export const ObserveModule = 'ObserveModule';
 
@@ -74,6 +82,8 @@ const components = [
   GlobalStringFilterComponent,
   CreateDashboardComponent,
   ObserveChartComponent,
+  ObserveReportComponent,
+  ObservePivotComponent,
   ObserveKPIComponent,
   ObserveKPIBulletComponent,
   KPIFilter,
@@ -90,13 +100,21 @@ const components = [
     GridsterModule,
     HttpClientModule,
     UIRouterUpgradeModule,
+    CommonModuleTs,
     AddWidgetModule,
     EditWidgetModule,
     UChartModule,
-    CountoModule
+    CountoModule,
+    DxDataGridModule,
+    DxTemplateModule
   ],
   declarations: components,
   entryComponents: components,
+  exports: [
+    DxDataGridModule,
+    DxDataGridComponent,
+    DxTemplateModule
+  ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
     {

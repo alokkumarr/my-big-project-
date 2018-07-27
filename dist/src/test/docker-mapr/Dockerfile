@@ -1,95 +1,103 @@
-# Use project standard operating system
-FROM maprtech/mapr-1base:5.2.0
+#
+# SIP testing MapR cluster container
+#
+# Single-node MapR cluster that provides Apache Spark and other MapR
+# and ecosystem services for SIP development.
+#
+
+# Start from SIP base image
+FROM sip-base:${project.version}
+
+# If YARN is enabled, set to true
 ARG yarn_enabled
 
-# Enable installing documentation for packages
-RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
+# Workaround: MapR configuration gives the error
+# "/opt/mapr/server/manageSSLKeys.sh: line 146: openssl: command not
+# found", so install OpenSSL for it
+RUN yum -y -q install openssl
 
-# Install system utilities
-# Workaround: Docker image builds occasionally fail with a "failure:
-# smem-1.4-1.el6.noarch.rpm from epel: [Errno 256] No more mirrors to
-# try" error.  Possibly the MapR base image has outdated Yum mirror
-# information.  So disable installing these packages by default for
-# now, as they are anyway optional.
-#RUN yum -y -q --nogpgcheck install lsof smem
-RUN yum -y -q --nogpgcheck install sudo
+# Workaround: MapR services result in the error "network.service:
+# control process exited, code=exited status=6", so create the
+# "/etc/sysconfig/network" file to silence that
+RUN touch /etc/sysconfig/network
 
-#
-# Install YARN
-#
-# Note: A local Spark context is used to conserve memory in
-# development mode.  Uncomment below to install YARN for testing.
-#RUN yum -y -q install mapr-resourcemanager mapr-nodemanager
+# Install MapR packages
+RUN yum -y -q install mapr-core mapr-cldb mapr-zookeeper mapr-webserver
 
-#
-# Install Spark
-#
-# Note: A local Spark context is used to conserve memory in
-# development mode, so no need to install the Spark standalone
-# cluster.  However, steps to install are included below and can be
-# uncommented if needed for testing.
-#
-# Workaround: Replace default MapR Ecosystem Pack repository with
-# newer to get Spark 2.1
-RUN sed -i -e 's,ecosystem-5.x,MEP/MEP-3.0.1,' \
-    /etc/yum.repos.d/mapr_ecosystem.repo
-# Workaround: Installing mapr-spark gives RPM checksum error if patch
-# repository is enabled, so disable it for now and rebuild Yum cache
-RUN rm /etc/yum.repos.d/mapr_patch.repo && yum clean all
-#RUN yum -y -q --nogpgcheck install mapr-spark-master mapr-spark
-#RUN ln -s /opt/mapr/spark/spark-* /opt/mapr/spark/spark-current
-# Workaround: Replace default container hostname with localhost
-#RUN sed -i -e 's,72ba20be3774,localhost,' \
-#   /opt/mapr/spark/spark-current/conf/spark-defaults.conf \
-#   /opt/mapr/spark/spark-current/conf/spark-env.sh
-# Configure Spark slaves
-#RUN echo localhost > /opt/mapr/spark/spark-current/conf/slaves
-# Workaround: The default configuration binds to localhost by default,
-# so remove those lines to bind to all interfaces and allow access
-# from other containers
-#RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
-#    -e 's/export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=1g/' \
-#   /opt/mapr/spark/spark-current/conf/spark-env.sh
+# Workaround: Local environments have limited memory available, so
+# reduce memory usage of MapR CLDB to 256 MB.  Can be removed when all
+# developers have moved to cloud environments.
+ENV warden_conf=/opt/mapr/conf/warden.conf
+RUN sed -i -e 's/^\(service.command.cldb.heapsize.max\)=.*$/\1=256/' \
+  $warden_conf
 
+# Install YARN, if enabled
+RUN if $yarn_enabled; then \
+    yum -y -q install mapr-resourcemanager mapr-nodemanager; \
+  fi
+# Note: The SAW Transport Service fast executor is kept running
+# continuously and allocates three YARN containers which takes up
+# three virtual CPU cores.  The YARN default number of cores available
+# is only four, which can prevent the regular executor from running.
+# To work around this, increase the default number of cores to eight
+# by adding the following to the YARN configuration at
+# "/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop/yarn-site.xml":
 #
-# Install Livy
-#
-# Workaround: Installing mapr-spark gives RPM checksum error if patch
-# repository is enabled, so disable it for now and rebuild Yum cache
+# <property>
+#   <name>yarn.nodemanager.resource.cpu-vcores</name>
+#   <value>8</value>
+# </property>
 
-RUN yum -y -q install mapr-hue-livy
-RUN echo "livy.spark.master = local[*]" \
-    >> /opt/mapr/hue-livy/hue-livy-3.12.0/conf/livy.conf
-RUN sed -i -e '/^spark.master$/d' \
-    /opt/mapr/hue-livy/hue-livy-3.12.0/conf/spark-blacklist.conf
-# Workaround: Livy won't start due to root owning the logs directory,
-# so change the owner to the "mapr" user
-RUN chown mapr:mapr /opt/mapr/hue-livy/hue-livy-3.12.0/logs
+# Workaround: MapR packages enable mapr-warden and mapr-zookeeper by
+# default, causing them to start up before MapR has been configured.
+# So disable them here and let the MapR configure script enable them
+# again as part of configuring.
+RUN systemctl disable mapr-warden mapr-zookeeper
+
+# Configure MapR using configure script
+COPY sip-mapr-configure /root/
+COPY sip-mapr-configure.service /etc/systemd/system/
+RUN systemctl enable sip-mapr-configure
+
+# Note: Installing Apache Spark in standalone mode is disabled by
+# default for now, while there are developers still deploying using
+# local Docker with memory constraints.  Instead local Spark contexts
+# are used (see the development `saw-config`).  When all developers
+# have moved to cloud environments, enable Apache Spark in standalone
+# mode again.
+#
+# Install Apache Spark in standalone mode
+#RUN yum -y -q install mapr-spark-master
+#COPY mapr-spark-worker.service /etc/systemd/system/
+#RUN systemctl enable mapr-spark-worker
+#
+#ENV spark_home=/opt/mapr/spark/spark-2.2.1
+#RUN echo "export SPARK_MASTER_HOST=sip-mapr" >> $spark_home/conf/spark-env.sh
+#RUN echo "export SPARK_MASTER_IP=sip-mapr" >> $spark_home/conf/spark-env.sh
+#RUN echo 'export SPARK_DIST_CLASSPATH=$MAPR_SPARK_CLASSPATH:$(hadoop classpath)' >> $spark_home/conf/spark-env.sh
+#RUN sed -i -e 's/^export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=2g/' \
+#    $spark_home/conf/spark-env.sh
+
+# Install Apache Livy
+RUN yum -y -q install mapr-livy
+ENV livy_home=/opt/mapr/livy/livy-0.3.0
+ENV livy_conf=$livy_home/conf/livy.conf
+RUN echo "livy.spark.master = local[*]" > $livy_conf
 # Workaround: The Workbench JAR exceeds the default maximum upload
 # file size of Livy, so increase it.
-RUN echo "livy.file.upload.max.size = 500000000" \
-    >> /opt/mapr/hue-livy/hue-livy-3.12.0/conf/livy.conf
+RUN echo "livy.file.upload.max.size = 500000000" >> $livy_conf
 
-# Add MapR container initialization script
-COPY saw-mapr-init /root/
-RUN sed -i -e "s,while true,/root/saw-mapr-init ${yarn_enabled}\nwhile true," \
-    /usr/bin/init-script
-# Workaround: Set execute bit for Windows users
-RUN chmod a+x /root/saw-mapr-init
+RUN echo 'export CLASSPATH=$(mapr classpath):$(hadoop classpath):$(yarn classpath)' \
+  >> $livy_home/conf/livy-env.sh.template
+# Workaround: The MapR "yarn classpath" command gives an error about
+# the "which" not being found, so install it here
+RUN yum -y -q install which
 
-# Try reducing MapR container startup time
-RUN sed -i -e 's/^sleep 60/sleep 30/' /usr/bin/init-script
-
-# set mapr-node hostname to sip-mapr same as container name and cluster name
-RUN sed -i -e 's/demo.mapr.io/sip-mapr/g' /usr/bin/init-script
-
-# Workaround: Bamboo builds fail with no space left error, so reduce
-# loopack disk size.  Additionally put on volume, which has more space
-# than root filesystem.  Note: The volume directive is inserted into
-# the Dockerfile from the Bamboo plan, to avoid creating dangling
-# volumes in other environments which do not need the workaround.
-RUN sed -i -e 's/20G/10G/' -e '2imkdir -p /mapr-data' \
-    -e 's,/opt/mapr/docker.disk,/mapr-data/docker.disk,g' /usr/bin/init-script
-
-# Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD test -e /saw-mapr-init-done
+# Workaround: MapR does not log into the systemd journal.  So install
+# MapR log forwrding as a workaround, so that all logs are aggregated
+# into a single place.
+COPY sip-mapr-logger@.service /etc/systemd/system/
+RUN systemctl enable \
+  sip-mapr-logger@$(systemd-escape /opt/mapr/logs/warden.log) \
+  sip-mapr-logger@$(systemd-escape /opt/mapr/logs/cldb.log) \
+  sip-mapr-logger@$(systemd-escape $livy_home/logs/livy-mapr-server.out)

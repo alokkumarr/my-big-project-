@@ -70,7 +70,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   }
 
   stopPolling() {
-    this.timerSubscription.unsubscribe();
+    this.timerSubscription && this.timerSubscription.unsubscribe();
     this.poll = false;
   }
 

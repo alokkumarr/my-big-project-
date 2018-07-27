@@ -1,17 +1,17 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
-import * as filter from 'lodash/filter';
 import * as findIndex from 'lodash/findIndex';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { JwtService } from '../../../../login/services/jwt.service';
-import { AnalyzeService } from '../services/analyze.service';
+import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalyzeViewActionEvent } from './types';
+import { ExecuteService } from '../services/execute.service';
 
 const template = require('./analyze-view.component.html');
 require('./analyze-view.component.scss');
@@ -60,7 +60,8 @@ export class AnalyzeViewComponent implements OnInit {
     private _jwt: JwtService,
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
-    public _dialog: MatDialog
+    public _dialog: MatDialog,
+    private _executeService: ExecuteService
   ) { }
 
   ngOnInit() {
@@ -80,17 +81,34 @@ export class AnalyzeViewComponent implements OnInit {
 
   onAction(event: AnalyzeViewActionEvent) {
     switch(event.action) {
-    case 'fork':
-      this.loadAnalyses();
+    case 'fork': {
+      const { analysis, requestExecution } = event;
+      if (analysis) {
+        this.loadAnalyses().then(() => {
+          if (requestExecution) {
+            this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+          }
+        });
+      }
       break;
-    case 'edit':
-      this.spliceAnalyses(event.analysis, true);
+    }
+    case 'edit': {
+      const { analysis, requestExecution } = event;
+      if (analysis) {
+        this.spliceAnalyses(analysis, true);
+      }
+      if (requestExecution) {
+        this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+      }
       break;
+    }
     case 'delete':
       this.spliceAnalyses(event.analysis, false);
       break;
     case 'execute':
-      this.goToAnalysis(event.analysis);
+      if (event.analysis) {
+        this.goToAnalysis(event.analysis);
+      }
       break;
     case 'publish':
       this.afterPublish(event.analysis);
@@ -109,14 +127,12 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
-    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
+    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis, awaitingExecution: true});
   }
 
   afterPublish(analysis) {
     this.getCronJobs();
     /* Update the new analysis in the current list */
-    const index = findIndex(this.analyses, ({id}) => id === analysis.id);
-    this.analyses.splice(index, 1, analysis);
     this._state.go('analyze.view', {id: analysis.categoryId});
   }
 
@@ -144,13 +160,16 @@ export class AnalyzeViewComponent implements OnInit {
           metrics,
           id: this.analysisId
         }
-      } as MatDialogConfig).afterClosed().subscribe(
-        isSavedSuccessfully => {
-          if (isSavedSuccessfully) {
-            this.loadAnalyses()
-          }
+      } as MatDialogConfig).afterClosed().subscribe(event => {
+        const { analysis, requestExecution } = event;
+        if (analysis) {
+          this.loadAnalyses().then(() => {
+            if (requestExecution) {
+              this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+            }
+          });
         }
-      );
+      });
     }).catch(() => {
       this._headerProgress.hide();
     });

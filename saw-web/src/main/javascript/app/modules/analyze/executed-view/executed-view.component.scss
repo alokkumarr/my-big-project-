@@ -1,0 +1,98 @@
+@import "themes/base/colors";
+
+$back-button-size: 32px;
+
+executed-view {
+  width: 100%;
+
+  filter-chips-u {
+    padding: 10px 0 10px 10px;
+  }
+
+  .back-button-icon.mat-icon {
+    font-size: $back-button-size;
+    line-height: $back-button-size;
+    width: $back-button-size;
+    height: $back-button-size;
+  }
+
+  .prompt-execution-container {
+    padding: 50px;
+    text-align: center;
+    font-size: 14px;
+
+    button {
+      margin-top: 15px;
+    }
+  }
+
+  .mat-card {
+    color: $primary-grey-g4;
+    padding: 0;
+    margin: 10px;
+  }
+
+  .mat-toolbar {
+    background-color: transparent;
+    color: $primary-grey-g4;
+
+    .analysis__title {
+      font-size: 24px;
+    }
+
+    .analysis__subheader {
+      font-size: 16px;
+    }
+  }
+
+  .execution-tag {
+    padding: 0 2px;
+    font-size: 11px;
+    text-transform: uppercase;
+    background-color: $secondary-orange;
+    color: $primary-white;
+    vertical-align: top;
+  }
+
+  .mat-card-title {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    color: $primary-grey-g4;
+  }
+
+  .previous-list-title {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    color: $primary-grey-g4;
+  }
+
+  .analysis-detail-description {
+    margin: 1em 0;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.chart-data-grid .dx-datagrid .dx-datagrid-rowsview .dx-datagrid-content table tbody tr.dx-data-row td {
+  text-align: left !important;
+}
+
+.chart-data-grid .dx-datagrid .dx-datagrid-headers .dx-datagrid-content table tbody tr.dx-header-row td {
+  text-align: left !important;
+}
+
+.toggle-icons {
+  text-align: right;
+  height: 25px;
+  margin-right: 5%;
+  font-size: 15px;
+}
+
+.mat-icon.active {
+  color: $primary-blue-b2;
+}
+

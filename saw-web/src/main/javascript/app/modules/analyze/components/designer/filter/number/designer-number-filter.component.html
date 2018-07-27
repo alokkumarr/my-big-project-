@@ -1,5 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-form-field *ngIf="filterModel.operator === 'BTW'">
+  <mat-form-field *ngIf="filterModel.operator === BETWEEN_NUMBER_FILTER_OPERATOR.value">
     <input matInput type="number"
             (input)="onOtherValueChange($event.target.value)"
             [value]="filterModel.otherValue"/>

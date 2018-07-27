@@ -20,12 +20,15 @@ application:
         max-pool-size: 50
         queue-capacity: 10000
 schema:
-    file: /opt/bda/saw-proxy-service/conf/proxy-schema.json
+    file: /opt/bda/saw-storage-proxy-service/conf/proxy-schema.json
 elastic-search:
-           cluster-name: SNCR-VELBDA-elasticsearch
-           transport-hosts: elasticsearch01.bda.poc.velocity-va.sncrcorp.net,elasticsearch02.bda.poc.velocity-va.sncrcorp.net,elasticsearch03.bda.poc.velocity-va.sncrcorp.net
-           transport-ports: 9200,9200,9200
+           cluster-name: {{ saw_elasticsearch_cluster_name }}
+           transport-hosts: {{ saw_elasticsearch_host }}
+           transport-ports: {{ saw_elasticsearch_port }}
 elastic-xpack :
-          cluster-active: true
-          clsuter-username: elastic
-          cluster-password: xuw3dUraHapret
+          cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
+          cluster-username: {{ saw_elasticsearch_username | default('') }}
+          cluster-password: {{ saw_elasticsearch_password | default('') }}
+
+metastore:
+    base:  {{ 'maprfs://' + sip_var_path + '/services/' | default('maprfs:///var/sip/services/') }}

@@ -1,21 +1,19 @@
+import * as toastr from 'toastr';
+
 /**
  * Just a simple wrapper around the angular-toastr library
  * */
 export class ToastService {
-  constructor(toastr) {
-    this._toastr = toastr;
-  }
-
   success(msg, title, options) {
-    return this._toastr.success(msg, title, options);
+    return toastr.success(msg, title, options);
   }
 
   info(msg, title, options) {
-    return this._toastr.info(msg, title, options);
+    return toastr.info(msg, title, options);
   }
 
   warn(msg, title, options) {
-    return this._toastr.warning(msg, title, options);
+    return toastr.warning(msg, title, options);
   }
 
   /* For testing purposes
@@ -29,10 +27,10 @@ export class ToastService {
    } */
 
   error(msg, title, options) {
-    return this._toastr.error(msg, title, options);
+    return toastr.error(msg, title, options);
   }
 
   clear(toast) {
-    return this._toastr.clear(toast);
+    return toastr.clear(toast);
   }
 }

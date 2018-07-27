@@ -1,0 +1,120 @@
+@import "themes/base/colors";
+
+.remove-schedule {
+  color: red !important;
+  margin-left: 51% !important;
+  margin-right: 0 !important;
+}
+
+analyze-schedule-dialog {
+  display: block;
+  padding: 10px;
+  color: $primary-grey-g4;
+
+  .dialog__header {
+    padding: 10px;
+    border-bottom: 1px solid $primary-grey-g2;
+
+    strong {
+      font-size: 20px;
+    }
+  }
+
+  .dialog__content {
+    width: 700px;
+    padding: 0 10px;
+    min-width: 500px;
+    max-height: 500px;
+    overflow-y: auto;
+
+    .label-inline-with-select {
+      text-align: center;
+      line-height: 38px;
+    }
+
+    .form-container {
+      padding-top: 16px;
+
+      label {
+        font-weight: bold;
+        padding-bottom: 10px;
+      }
+
+      mat-input-container {
+        margin: 0;
+      }
+    }
+
+    .schedule-container {
+      margin: 10px;
+    }
+
+    .days-of-week-checkboxes {
+      padding-top: 6px;
+    }
+
+    .end-criteria-radio {
+      line-height: 32px;
+    }
+
+    mat-chips input {
+      width: 250px;
+      font-size: 14px;
+      padding: 10px;
+      margin: -2px;
+    }
+
+    .errorTextMsg {
+      color: $secondary-red;
+    }
+
+    .errorMsg {
+      color: $primary-white;
+      background-color: $secondary-orange;
+      border-radius: 14px;
+      float: left;
+      height: 26px;
+      width: 24px;
+      text-align: center;
+      font-size: larger;
+      margin-top: 3px;
+      margin-right: 2px;
+    }
+
+    .schedule-container .form-container .publish-form {
+      span.clear {
+        margin: 10px;
+        top: 10px;
+        color: #0096D5;
+        cursor: pointer;
+      }
+
+      mat-select {
+        float: left;
+      }
+    }
+
+    .ftp-select-box {
+      width: 275px;
+    }
+
+    .ftp-select {
+      left: 459px !important;
+    }
+
+    mat-select.publish-select {
+      border: 1px solid $primary-grey-g1;
+      padding: 8px;
+      border-radius: 2px;
+    }
+  }
+
+  .dialog__actions {
+    padding-top: 10px;
+    border-top: 1px solid $primary-grey-g2;
+
+    .form-buttons button {
+      margin-right: 10px;
+    }
+  }
+}
