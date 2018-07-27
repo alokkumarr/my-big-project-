@@ -99,7 +99,7 @@ dat6 <- rbind(
                                                      list(order = c(1,0,0), ar = 0.7),
                                                      rand.gen = function(n, ...) rt(n, df = 1)))),
              country = "USA", state = "AR")
-  )
+)
 
 
 # functional approach
@@ -461,10 +461,10 @@ test_that("Detecter with Multiple Group vars", {
   expect_true(
     all(
       r_detect_multi_Group %>%
-      group_by(country, state) %>%
-      summarise(anom_avg = mean(anomaly)) %>%
-      ungroup() %>%
-      pull(anom_avg) <= .max_anoms
+        group_by(country, state) %>%
+        summarise(anom_avg = mean(anomaly)) %>%
+        ungroup() %>%
+        pull(anom_avg) <= .max_anoms
     )
   )
 
