@@ -437,10 +437,6 @@ public class SecurityController {
 		}
         // Validate the hash key with userID before proceeding.
         ResetValid resetValid =  userRepository.validateResetPasswordDtls(rhc);
-		System.out.println(resetValid.getValid());
-        System.out.println(resetValid.getError());
-        System.out.println(resetValid.getMasterLoginID());
-        System.out.println(resetValid.getValidityReason());
         if (!(resetValid.getValid() || (resetValid.getMasterLoginID()!=null &&
             resetValid.getMasterLoginID().equalsIgnoreCase(loginId))))
             message= "Reset link is not valid or expired ";
