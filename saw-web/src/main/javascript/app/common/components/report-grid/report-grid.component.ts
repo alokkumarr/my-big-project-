@@ -183,7 +183,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public gridHeight: '100%' | 'auto' = '100%';
   public remoteOperations;
   public paging;
-  public enablecolumnChooser: true;
   public pager = {
     showNavigationButtons: true,
     allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
