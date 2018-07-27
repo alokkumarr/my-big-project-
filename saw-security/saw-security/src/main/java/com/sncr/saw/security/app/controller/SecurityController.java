@@ -414,6 +414,7 @@ public class SecurityController {
 		String newPass = changePasswordDetails.getNewPassword();
 		String cnfNewPass = changePasswordDetails.getCnfNewPassword();
 		String loginId = changePasswordDetails.getMasterLoginId();
+		String rhc = changePasswordDetails.getRandomHashKey();
 
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
@@ -436,7 +437,7 @@ public class SecurityController {
 		}
 		try {
 			if (message == null) {
-				message = userRepository.rstchangePassword(loginId, newPass);
+				message = userRepository.rstchangePassword(loginId, newPass,rhc);
 				if (message == null) {
 					message = "Password Successfully Changed.";
 					valid.setValid(true);

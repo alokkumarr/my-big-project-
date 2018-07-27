@@ -166,7 +166,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public String rstchangePassword(String loginId, String newPass) {
+	public String rstchangePassword(String loginId, String newPass, String rhc) {
 		String message = null;
 		// if new pass is != last 5 in pass history
 		// change the pass
@@ -193,7 +193,11 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(1, userSysId);
 				}
 			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
-			if (message != null && message.equals("valid")) {
+			// Validate the hash key with userID before proceeding.
+			  ResetValid resetValid = validateResetPasswordDtls(rhc);
+
+			if (message != null && message.equals("valid") &&
+                loginId.equalsIgnoreCase(resetValid.getMasterLoginID()) ) {
 				String sysId = System.currentTimeMillis() + "";
 
 				sql = "INSERT INTO PASSWORD_HISTORY (PASSWORD_HISTORY_SYS_ID,USER_SYS_ID,PASSWORD,DATE_OF_CHANGE)"
@@ -216,12 +220,18 @@ public class UserRepositoryImpl implements UserRepository {
 					}
 				});
 				message = null;
-				/*
-				 * sql =
-				 * "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID='"
-				 * + loginId + "' AND RS.VALID=1"; jdbcTemplate.update(sql);
-				 */
+				  sql =
+				 "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? "
+				 + "AND RS.VALID=1";
+				  jdbcTemplate.update(sql,new PreparedStatementSetter() {
+                      public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                          preparedStatement.setString(1, userSysId);
+                      }
+                  });
 			}
+			if (!(resetValid.getValid() ||
+                (resetValid.getMasterLoginID().equalsIgnoreCase(loginId))))
+                message= "Reset link is not valid or expired ";
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;

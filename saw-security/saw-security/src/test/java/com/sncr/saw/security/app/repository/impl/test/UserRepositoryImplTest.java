@@ -315,9 +315,10 @@ public class UserRepositoryImplTest {
 		String masterLoginId = "SAWADMIN@Synchronoss.com";
 		String newPassword = "Sawsyncnewuser2!";
 		String valid = "Valid";
-		
-		when(userRepositoryDAO.rstchangePassword(masterLoginId, newPassword)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
-		String isValid = userRepositoryDAO.rstchangePassword(masterLoginId, newPassword);
+        String randomHash = "vnXS2paowBBL2ATl68qeHQyoPCM3kyaMco6IYbCRwaZRSVpP19qrwTNHrmS3FG2eViy4CcggXFTifJEVl9o7qh.i.BP3Nb6F5eun03BucEExuzIDevg4yaWMhnaEFuWVC.Dy1xHn9opMBWy79KDiRm3MKgSP9wFA";
+
+        when(userRepositoryDAO.rstchangePassword(masterLoginId, newPassword,randomHash)).thenReturn(valid); // Stubbing the methods of mocked userRepo with mocked data.
+		String isValid = userRepositoryDAO.rstchangePassword(masterLoginId, newPassword,randomHash);
 		assertEquals(isValid, valid);
 	}
 	
