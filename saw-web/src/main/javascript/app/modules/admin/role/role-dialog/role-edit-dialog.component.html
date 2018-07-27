@@ -1,11 +1,11 @@
 <header class="base-dialog__header">
   <strong [ngSwitch]="data.mode">
     <ng-container *ngSwitchCase="'create'" i18n>
-        New Role
-      </ng-container>
-      <ng-container *ngSwitchCase="'edit'" i18n>
-        Edit Role
-      </ng-container>
+      Add New Role
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Edit Role
+    </ng-container>
   </strong>
 </header>
 <div class="base-dialog__content">
