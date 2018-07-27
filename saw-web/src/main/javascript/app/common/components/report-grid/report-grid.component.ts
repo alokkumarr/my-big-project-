@@ -151,6 +151,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     }
   }
   @Input() isEditable: boolean = false;
+  @Input() columnHeaders;
 
   public dataLoader: (
     options: {}
@@ -182,6 +183,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public gridHeight: '100%' | 'auto' = '100%';
   public remoteOperations;
   public paging;
+  public enablecolumnChooser: true;
   public pager = {
     showNavigationButtons: true,
     allowedPageSizes: [DEFAULT_PAGE_SIZE, 50, 75, 100],
@@ -211,11 +213,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
-
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
-        enabled: true,
+        enabled: isUndefined(this.columnHeaders) ? true : this.columnHeaders,
         mode: 'select'
       };
 
