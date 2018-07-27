@@ -1,10 +1,10 @@
-<div mat-dialog-title>
-  <span>
+<div mat-dialog-title class="dialog__header">
+  <strong>
     Save Dashboard
-  </span>
+  </strong>
   <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
 </div>
-<div mat-dialog-content>
+<div mat-dialog-content class="dialog__content">
   <form class="save-dashboard-form">
     <mat-form-field class="full-form-field">
       <input matInput name="dashboardName" placeholder="Dashboard Name"
@@ -17,16 +17,18 @@
       </textarea>
     </mat-form-field>
 
-    <mat-select required name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
-      <mat-optgroup *ngFor="let category of categories" [label]="category.name">
-        <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
-          {{ subCategory.name }}
-        </mat-option>
-      </mat-optgroup>
-    </mat-select>
+    <mat-form-field class="full-form-field">
+      <mat-select required name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
+        <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+          <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
+            {{ subCategory.name }}
+          </mat-option>
+        </mat-optgroup>
+      </mat-select>
+    </mat-form-field>
   </form>
 </div>
-<div mat-dialog-actions>
+<div mat-dialog-actions class="dialog__actions">
   <button mat-raised-button color="primary" (click)="saveDashboard()"
     [disabled]="!isValid(dashboard)">
     Save
