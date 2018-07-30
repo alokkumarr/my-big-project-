@@ -234,11 +234,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
                 logger.debug("Total files = " + files.length);
 
+                int archiveCounter = 0;
+
                 for(FileStatus status: files) {
                     logger.debug("Archiving " +  status.getPath() + " to " + archivePath);
 
-                    archiveSingleFile(status.getPath(), archivePath);
+                    if (archiveSingleFile(status.getPath(), archivePath)) {
+                        archiveCounter++;
+                    }
                 }
+
+                logger.info("Total files archived = " + archiveCounter);
             }
         } catch (IOException e) {
             logger.error("Archival failed");
@@ -253,11 +259,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
         IOException {
-        boolean status = true;
-
-        ctx.fs.rename(sourceFilePath, archiveLocation);
-
-        return status;
+        return ctx.fs.rename(sourceFilePath, archiveLocation);
     }
 
     @Override
