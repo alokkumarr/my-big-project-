@@ -5,20 +5,20 @@
   <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
 </div>
 <div mat-dialog-content class="dialog__content">
-  <form class="save-dashboard-form">
+  <form [formGroup]="dashboardForm" class="save-dashboard-form">
     <mat-form-field class="full-form-field">
       <input matInput name="dashboardName" placeholder="Dashboard Name"
-        [(ngModel)]="dashboard.name" required />
+        formControlName="name" />
     </mat-form-field>
     <mat-form-field class="full-form-field">
       <textarea matInput matTextareaAutosize [matAutosizeMaxRows]="6"
         name="dashboardDesc" placeholder="Description"
-        [(ngModel)]="dashboard.description">
+        formControlName="description">
       </textarea>
     </mat-form-field>
 
     <mat-form-field class="full-form-field">
-      <mat-select required name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
+      <mat-select name="dashboardCat" placeholder="Category" formControlName="categoryId">
         <mat-optgroup *ngFor="let category of categories" [label]="category.name">
           <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
             {{ subCategory.name }}
@@ -26,11 +26,22 @@
         </mat-optgroup>
       </mat-select>
     </mat-form-field>
+
+    <mat-checkbox name="dashboardAutoRefresh" formControlName="autoRefreshEnabled">Refresh Automatically</mat-checkbox>
+
+    <mat-form-field>
+      <mat-select placeholder="Refresh Interval"
+                  formControlName="refreshIntervalSeconds">
+        <mat-option *ngFor="let intvl of refreshIntervals" [value]="intvl.seconds">
+          {{intvl.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </form>
 </div>
 <div mat-dialog-actions class="dialog__actions">
   <button mat-raised-button color="primary" (click)="saveDashboard()"
-    [disabled]="!isValid(dashboard)">
+    [disabled]="dashboardForm.invalid">
     Save
   </button>
   <button mat-button color="primary" (click)="closeDashboard()">
