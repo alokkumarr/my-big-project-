@@ -4,13 +4,12 @@
     (openedChange)="filterSidenavStateChange($event)"
     [opened]="false"
     position="end">
-    <global-filter (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
+    <global-filter [showKPIFilter]="hasKPIs" (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="page-header-toolbar">
       <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
       <div class="page-header-actions">
-        <kpi-filter *ngIf="hasKPIs"></kpi-filter>
 
         <button mat-button
         color="warn"

@@ -3,5 +3,9 @@ kpi-filter {
     .mat-input-wrapper {
       height: 42px;
     }
+
+    mat-form-field {
+      width: 100%;
+    }
   }
 }

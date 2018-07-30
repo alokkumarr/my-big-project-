@@ -2,6 +2,7 @@ import {
   Component,
   AfterViewInit,
   OnDestroy,
+  Input,
   Output,
   EventEmitter
 } from '@angular/core';
@@ -24,7 +25,7 @@ require('./global-filter.component.scss');
 })
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();
-
+  @Input() showKPIFilter: boolean;
   private globalFilters = [];
   private filterChangeSubscription: Subscription;
 
