@@ -5,7 +5,7 @@
     "protractor": "p() { ../saw-web/node_modules/protractor/bin/protractor $* ../saw-web/conf/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p"
   },
   "devDependencies": {
-    "protractor": "5.2.0",
+    "protractor": "5.2.2",
     "jasmine-reporters": "2.3.0"
   }
 }
