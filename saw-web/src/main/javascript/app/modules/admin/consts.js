@@ -65,15 +65,38 @@ export const UsersTableHeader = [{
 }];
 
 export const RolesTableHeader = [{
-  name: 'All'
+  caption: 'ROLE NAME',
+  dataField: 'roleName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'linkCellTemplate',
+  cssClass: 'branded-column-name'
 }, {
-  name: 'ROLE NAME'
+  caption: 'ROLE TYPE',
+  dataField: 'roleType',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'ROLE TYPE'
+  caption: 'ROLE DESCRIPTION',
+  dataField: 'roleDesc',
+  allowSorting: true,
+  alignment: 'left',
+  width: '35%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'ROLE DESCRIPTION'
+  caption: 'STATUS',
+  dataField: 'activeStatusInd',
+  allowSorting: true,
+  alignment: 'left',
+  width: '13%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'STATUS'
+  caption: '',
+  width: '2%',
+  cellTemplate: 'actionCellTemplate'
 }];
 
 export const PrivilegesTableHeader = [{
