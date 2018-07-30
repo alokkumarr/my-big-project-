@@ -1,25 +1,9 @@
 @import "themes/base/colors";
 
 analyze-publish-dialog {
-  display: block;
-  padding: 10px;
-  color: $primary-grey-g4;
-
-  .dialog__header {
-    padding: 10px;
-    border-bottom: 1px solid $primary-grey-g2;
-
-    strong {
-      font-size: 20px;
-    }
-  }
-
   .dialog__content {
     width: 700px;
-    padding: 0 10px;
-    min-width: 500px;
     max-height: 500px;
-    overflow-y: auto;
 
     .label-inline-with-select {
       text-align: center;
@@ -38,10 +22,5 @@ analyze-publish-dialog {
         margin: 0;
       }
     }
-  }
-
-  .dialog__actions {
-    padding-top: 10px;
-    border-top: 1px solid $primary-grey-g2;
   }
 }

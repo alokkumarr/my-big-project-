@@ -23,6 +23,8 @@
 # setting before starting the socket activation proxy.  Can be removed
 # as no longer needed after the next SAW release.
 - meta: flush_handlers
+- name: Run SAW migration of Semantic id
+  command: sh /opt/saw/service/bin/AnalysisUtility.sh
 - name: Enable SAW Transport Service
   systemd: name=saw-transport-proxy.socket enabled=true state=started
 - name: Enable SAW Transport Service Executor (regular)

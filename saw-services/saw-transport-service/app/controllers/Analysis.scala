@@ -205,7 +205,15 @@ class Analysis extends BaseController {
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
         m_log.debug("search key" + keys);
-        json merge contentsAnalyze(searchAnalysisJson(keys))
+        var allAnalysisList: List[JObject] = List()
+        for {
+              JArray(objList) <- (json \ "contents" \ "keys")
+                 JObject(obj) <- objList
+              } {
+                 val analysisList = searchAnalysisJson(obj)
+                 allAnalysisList = allAnalysisList ++ analysisList
+              }
+        json merge contentsAnalyze(allAnalysisList)
       }
       case "execute" => {
 
