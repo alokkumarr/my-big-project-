@@ -6,6 +6,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
 
 import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class GlobalFilterService {
@@ -13,7 +14,7 @@ export class GlobalFilterService {
   private updatedFilters = [];
   public onFilterChange = new Subject();
   public onSidenavStateChange = new Subject();
-  public onApplyKPIFilter = new Subject();
+  public onApplyKPIFilter = new BehaviorSubject({ preset: '' });
   public onApplyFilter = new Subject();
   public onClearAllFilters = new Subject();
 

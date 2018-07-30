@@ -1,6 +1,6 @@
 import { Component, Input, Inject, ViewChild } from '@angular/core';
 
-import * as get from 'lodash/get';
+import { SidenavMenuService } from'./sidenav-menu.service';
 import { ComponentHandler } from './../../utils/componentHandler';
 
 const template = require('./sidenav.component.html');
@@ -11,20 +11,24 @@ require('./sidenav.component.scss');
   template
 })
 
-export class SidenavComponent { 
+export class SidenavComponent {
 
   @Input() menu: any;
   @Input() id: any;
 
-  constructor(@Inject('$componentHandler') private chp: ComponentHandler) { }
+  constructor(
+    private _sidenav: SidenavMenuService,
+    @Inject('$componentHandler') private chp: ComponentHandler
+  ) { }
   @ViewChild('sidenav') public sidenav;
 
   public unregister: any;
   public _moduleName: string;
-  
+
   ngOnInit() {
-  	this.unregister = this.chp.register(this.id, this);
+    this.unregister = this.chp.register(this.id, this);
     this._moduleName = '';
+    this._sidenav.subscribe(({menu, module}) => this.update(menu, module));
   }
 
   getMenuHeader() {

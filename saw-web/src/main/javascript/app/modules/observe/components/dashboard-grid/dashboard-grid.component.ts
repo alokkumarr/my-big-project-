@@ -66,9 +66,7 @@ export class DashboardGridComponent
   public columns = 16;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
-  private sidenavEventSubscription: Subscription;
-  private globalFiltersSubscription: Subscription;
-  private requesterSubscription: Subscription;
+  private listeners: Array<Subscription> = [];
   public initialised = false;
 
   constructor(
@@ -113,11 +111,7 @@ export class DashboardGridComponent
   }
 
   ngOnDestroy() {
-    this.requesterSubscription && this.requesterSubscription.unsubscribe();
-    this.sidenavEventSubscription &&
-      this.sidenavEventSubscription.unsubscribe();
-    this.globalFiltersSubscription &&
-      this.globalFiltersSubscription.unsubscribe();
+    this.listeners.forEach(l => l.unsubscribe());
   }
 
   getMinColumns() {
@@ -129,7 +123,7 @@ export class DashboardGridComponent
 
   onGridInit() {
     if (this.mode === DASHBOARD_MODES.VIEW) {
-      this.sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(
+      const sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(
         val => {
           setTimeout(_ => {
             this.gridster.resize();
@@ -139,13 +133,15 @@ export class DashboardGridComponent
           }, 500);
         }
       );
+      this.listeners.push(sidenavEventSubscription);
     }
 
-    this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
+    const globalFiltersSubscription = this.filters.onApplyFilter.subscribe(
       data => {
         this.onApplyGlobalFilters(data);
       }
     );
+    this.listeners.push(globalFiltersSubscription);
   }
 
   isViewMode() {
@@ -291,6 +287,12 @@ export class DashboardGridComponent
     });
   }
 
+  refreshKPIs() {
+    this.filters.onApplyKPIFilter.next(
+      this.filters.onApplyKPIFilter.getValue() || { preset: '' }
+    );
+  }
+
   initialiseDashboard() {
     if (!this.model || this.initialised) {
       return;
@@ -348,6 +350,11 @@ export class DashboardGridComponent
     this.dashboard.push(tile);
   }
 
+  refreshDashboard() {
+    this.onApplyGlobalFilters(this.filters.globalFilters);
+    this.refreshKPIs();
+  }
+
   onAnalysisRemove() {
     const analysisTiles = filter(this.dashboard, tile => tile.analysis);
     const globalFilters = filter(
@@ -370,40 +377,47 @@ export class DashboardGridComponent
      with this */
   subscribeToRequester() {
     if (this.requester) {
-      this.requesterSubscription = this.requester.subscribe((req: any = {}) => {
-        /* prettier-ignore */
-        switch (req.action) {
-        case 'add':
-          if (req.data && req.data.analysis) {
-            this.addAnalysisTile(req.data, true);
-          } else {
-            this.dashboard.push(req.data);
+      const requesterSubscription = this.requester.subscribe(
+        (req: any = {}) => {
+          /* prettier-ignore */
+          switch (req.action) {
+          case 'add':
+            if (req.data && req.data.analysis) {
+              this.addAnalysisTile(req.data, true);
+            } else {
+              this.dashboard.push(req.data);
+            }
+            this.getDashboard.emit({
+              changed: true,
+              dashboard: this.prepareDashboard()
+            });
+            break;
+
+          case 'remove':
+            const tiles = filter(
+              this.dashboard,
+              tile => get(tile, 'analysis.id') === get(req, 'data.id')
+            );
+            forEach(tiles, this.removeTile.bind(this));
+            break;
+
+          case 'get':
+            this.getDashboard.emit({
+              save: true,
+              dashboard: this.prepareDashboard()
+            });
+            break;
+
+          case 'refresh':
+            this.refreshDashboard();
+            break;
+
+          default:
+            this.getDashboard.emit({ dashboard: this.prepareDashboard() });
           }
-          this.getDashboard.emit({
-            changed: true,
-            dashboard: this.prepareDashboard()
-          });
-          break;
-
-        case 'remove':
-          const tiles = filter(
-            this.dashboard,
-            tile => get(tile, 'analysis.id') === get(req, 'data.id')
-          );
-          forEach(tiles, this.removeTile.bind(this));
-          break;
-
-        case 'get':
-          this.getDashboard.emit({
-            save: true,
-            dashboard: this.prepareDashboard()
-          });
-          break;
-
-        default:
-          this.getDashboard.emit({ dashboard: this.prepareDashboard() });
         }
-      });
+      );
+      this.listeners.push(requesterSubscription);
     }
   }
 
@@ -424,6 +438,8 @@ export class DashboardGridComponent
     return {
       entityId: get(this.model, 'entityId', ''),
       categoryId: get(this.model, 'categoryId', ''),
+      autoRefreshEnabled: get(this.model, 'autoRefreshEnabled', false),
+      refreshIntervalSeconds: get(this.model, 'refreshIntervalSeconds'),
       name: get(this.model, 'name', ''),
       description: get(this.model, 'description', ''),
       createdBy: get(this.model, 'createdBy', ''),

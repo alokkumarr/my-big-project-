@@ -4,11 +4,6 @@ import * as trim from 'lodash/trim';
 import * as split from 'lodash/split';
 
 export class LocalSearchService {
-  constructor($q) {
-    'ngInject';
-    this._$q = $q;
-  }
-
   /* @searchTerm looks something like column:value
      Column is optional
      If value is enclosed within quotes like column:"value",
@@ -34,45 +29,47 @@ export class LocalSearchService {
        accessor: (optional) use for getting properties that are nested or require some modification
     */
   doSearch(searchCriteria, data = [], fieldConfig = []) {
-    if (!searchCriteria.trimmedTerm) {
-      return this._$q.resolve(data);
-    }
-
-    const term = searchCriteria.trimmedTerm.toUpperCase();
-
-    const matchIn = item => {
-      if (angular.isArray(item)) {
-        return some(item, val => (val || '').toUpperCase().indexOf(term) !== -1);
+    return new Promise((resolve, reject) => {
+      if (!searchCriteria.trimmedTerm) {
+        return resolve(data);
       }
-      return (item || '').toUpperCase().indexOf(term) !== -1;
-    };
 
-    const matchFull = item => {
-      if (angular.isArray(item)) {
-        return some(item, val => (val || '').toUpperCase() === term);
+      const term = searchCriteria.trimmedTerm.toUpperCase();
+
+      const matchIn = item => {
+        if (angular.isArray(item)) {
+          return some(item, val => (val || '').toUpperCase().indexOf(term) !== -1);
+        }
+        return (item || '').toUpperCase().indexOf(term) !== -1;
+      };
+
+      const matchFull = item => {
+        if (angular.isArray(item)) {
+          return some(item, val => (val || '').toUpperCase() === term);
+        }
+        return (item || '').toUpperCase() === term;
+      };
+
+      const searchConfig = searchCriteria.field ?
+        filter(fieldConfig, config => config.keyword.toUpperCase() === searchCriteria.field.toUpperCase()) :
+        fieldConfig;
+
+      if (!searchConfig || searchConfig.length === 0) {
+        return reject(new Error(`"${searchCriteria.field}" column does not exist.`));
       }
-      return (item || '').toUpperCase() === term;
-    };
 
-    const searchConfig = searchCriteria.field ?
-      filter(fieldConfig, config => config.keyword.toUpperCase() === searchCriteria.field.toUpperCase()) :
-      fieldConfig;
-
-    if (!searchConfig || searchConfig.length === 0) {
-      return this._$q.reject(new Error(`"${searchCriteria.field}" column does not exist.`));
-    }
-
-    const result = filter(data, row => {
-      return some(searchConfig, config => {
-        const rowValue = angular.isFunction(config.accessor) ?
-          config.accessor(row[config.fieldName]) :
-          row[config.fieldName];
-        return searchCriteria.exact ?
-          matchFull(rowValue) :
-          matchIn(rowValue);
+      const result = filter(data, row => {
+        return some(searchConfig, config => {
+          const rowValue = angular.isFunction(config.accessor) ?
+            config.accessor(row[config.fieldName]) :
+            row[config.fieldName];
+          return searchCriteria.exact ?
+            matchFull(rowValue) :
+            matchIn(rowValue);
+        });
       });
-    });
 
-    return this._$q.resolve(result);
+      return resolve(result);
+    });
   }
 }
