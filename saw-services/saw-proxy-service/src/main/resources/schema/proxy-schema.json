@@ -32,7 +32,8 @@
                "read",
                "execute",
                "aggregate",
-               "pivot"
+               "pivot",
+               "cat"
                
             ]
          },

@@ -1,26 +1,26 @@
 package com.synchronoss.saw.storage.proxy.service;
 
 import static java.util.Collections.emptyMap;
-
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.validation.constraints.NotNull;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.RequestLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -180,6 +179,28 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     logger.trace("Count Response", countResponse.toString());
     return countResponse;
   }
+  
+  
+  @Override
+  public Object catCluster(StorageProxy proxyDetails) throws Exception {
+    Response response = null;
+    RestClient client = null;
+    String endpoint = "_cat" + "/" + "indices";
+    try{
+        client = prepareRESTESConnection();
+        response = client.performRequest(HttpGet.METHOD_NAME, endpoint, emptyMap());
+        client.close();
+    }
+    finally{
+      if (client !=null){
+        client.close();
+      }
+    }
+    //logger.trace("Count Response", countResponse.toString());
+
+    return null;
+  }
+
 
   private HttpHost[] prepareHostAddresses(String[] hosts, String[] ports) {
     Preconditions.checkArgument(hosts.length == ports.length, "number of hosts is not equal to number of ports been provided");
@@ -230,7 +251,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
  
   
   public static void main(String[] args) throws IOException {
-    //withOutXPACK();
+    withOutXPACK();
     String query = "{\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\",\"from\":1,\"size\":1,}}}}}}";
     System.out.println(query.contains("size"));
     System.out.println(query.contains("from"));
@@ -251,7 +272,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
    }
    private static void withOutXPACK()throws IOException
    {
-     RestClient restClient = RestClient.builder(new HttpHost("elasticsearch02.bda.poc.velocity-va.sncrcorp.net", 9200, "http"))
+     RestClient restClient = RestClient.builder(new HttpHost("es-rd601.ana.dev.vaste.sncrcorp.net", 9200, "http"))
          .setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
              @Override
              public RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder requestConfigBuilder) {
@@ -262,23 +283,27 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
          .setMaxRetryTimeoutMillis(60000)
          .build();
      
-     final HttpEntity payload = new  NStringEntity("{\"size\":1,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\"}}}}}}",ContentType.APPLICATION_JSON);
+     //final HttpEntity payload = new  NStringEntity("{\"size\":1,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\"}}}}}}",ContentType.APPLICATION_JSON);
      //final HttpEntity payload = new  NStringEntity("",ContentType.APPLICATION_JSON);
      //final HttpEntity payload = new  NStringEntity("{\"city\":\"Baltimore\"}",ContentType.APPLICATION_JSON);
-     final Response response = restClient.performRequest(HttpPost.METHOD_NAME, "/mct_tmo_session/session/_search", emptyMap(), payload);
+    // final Response response = restClient.performRequest(HttpPost.METHOD_NAME, "/mct_tmo_session/session/_search", emptyMap(), payload);
     
+     final Response response = restClient.performRequest(HttpGet.METHOD_NAME, "/mct_tmo_session/_mappings/");
+     
      //Response response = restClient.performRequest(HttpDelete.METHOD_NAME, "lower/lowerCase/AWEQIWg3jV2L1EGZ4Mac", emptyMap());
      ObjectMapper objectMapper = new ObjectMapper();
      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 
      HttpEntity entity = response.getEntity();
-     SearchESResponse<?> searchResponse = objectMapper.readValue(entity.getContent(), SearchESResponse.class);
+     String data = EntityUtils.toString(entity);
+     System.out.println(data);
+     //createAndDeleteESResponse = objectMapper.readValue(entity.getContent(), CreateAndDeleteESResponse.class);
+
+     //SearchESResponse<?> searchResponse = objectMapper.readValue(entity.getContent(), SearchESResponse.class);
      //CreateAndDeleteESResponse createResponse = objectMapper.readValue(entity.getContent(), CreateAndDeleteESResponse.class);
      //System.out.println(createResponse.toString());
      //System.out.println(createResponse.getShards().toString() + ":" + createResponse.getResult());
-     System.out.println(searchResponse.getHits().getHits().get(0).getSource());
-     
      String query = "{\"from\":5,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\",\"size\":1}}}}}}";
      System.out.println(query.contains("size"));
      System.out.println(query.contains("from"));
@@ -318,7 +343,9 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
        System.out.print("("+word1.toString()+")"+"("+int1.toString()+")"+"("+word2.toString()+")"+"("+int2.toString()+")"+"\n");  }
      restClient.close();
      }
-   
+
+
+  
   
  
   

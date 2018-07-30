@@ -8,4 +8,5 @@ public interface StorageConnectorService {
   public Object deleteDocumentById(String id, StorageProxy proxyDetails)throws Exception;
   public Object createDocument(String query, StorageProxy proxyDetails)throws Exception;
   public Object countDocument(String query, StorageProxy proxyDetails)throws Exception;
+  public Object catCluster(StorageProxy proxyDetails)throws Exception;
 }
