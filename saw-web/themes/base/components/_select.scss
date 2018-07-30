@@ -1,9 +1,10 @@
 @import "themes/base/colors";
 
-mat-select {
+mat-select.mat-select {
   border: 1px solid $primary-grey-g1;
   padding: 8px;
   border-radius: 2px;
+  width: calc(100% - 18px);
 }
 
 .select-form-field {
