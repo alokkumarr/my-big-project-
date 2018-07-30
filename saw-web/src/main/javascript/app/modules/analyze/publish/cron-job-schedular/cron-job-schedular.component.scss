@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 cron-job-schedular {
   border: 1px solid #CCC;
 
@@ -73,13 +75,13 @@ cron-job-schedular {
 }
 
 .owl-dt-calendar-table .owl-dt-calendar-cell-selected {
-  background-color: #1A89D4;
+  background-color: $primary-blue-b2;
 }
 
 .owl-dt-control-button-content {
-  color: #1A89D4 !important;
+  color: $primary-blue-b2 !important;
 }
 
 .owl-dt-container-info .owl-dt-container-info-active {
-  color: #1A89D4 !important;
+  color: $primary-blue-b2 !important;
 }

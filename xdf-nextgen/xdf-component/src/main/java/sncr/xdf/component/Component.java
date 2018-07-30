@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 
 import sncr.bda.CliHandler;
@@ -277,7 +278,7 @@ public abstract class Component {
       throws Exception {
 
     logger.trace("Configuration dump: \n" + config);
-
+    String metaDataLocation = xdfDataRootSys  + Path.SEPARATOR + "services";
     ComponentConfiguration cfg = null;
     try {
       cfg = validateConfig(config);
@@ -292,9 +293,9 @@ public abstract class Component {
       logger.error(error);
       return -1;
     }
-
+    
     logger.debug("Getting project metadata");
-    ProjectStore prjStore = new ProjectStore(xdfDataRootSys);
+    ProjectStore prjStore = new ProjectStore(metaDataLocation); // maprfs:///var/sip ideally it should be maprfs:///var/sip/services/metadata
     JsonElement prj = prjStore.readProjectData(appId);
     logger.debug("Project metadata for " + appId + " is " + prj);
 
@@ -344,8 +345,8 @@ public abstract class Component {
     }
 
     try {
-      md = new DLDataSetService(xdfDataRootSys);
-      transformationMd = new TransformationService(xdfDataRootSys);
+      md = new DLDataSetService(metaDataLocation);
+      transformationMd = new TransformationService(metaDataLocation);
       //            dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
       als = new AuditLogService(md.getRoot());
     } catch (Exception e) {

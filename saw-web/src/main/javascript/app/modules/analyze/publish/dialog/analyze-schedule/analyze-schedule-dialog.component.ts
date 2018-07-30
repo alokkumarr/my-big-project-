@@ -122,17 +122,18 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         this.loadCronLayout = true;
         this._headerProgress.hide();
         const jobDetails = response.data.jobDetails;
-        const {
-          cronExpression,
-          activeTab,
-          activeRadio,
-          jobScheduleTime,
-          endDate,
-          analysisID,
-          emailList,
-          ftp
-        } = jobDetails;
+
         if (jobDetails) {
+          const {
+            cronExpression,
+            activeTab,
+            activeRadio,
+            jobScheduleTime,
+            endDate,
+            analysisID,
+            emailList,
+            ftp
+          } = jobDetails;
           this.crondetails = {
             cronexp: cronExpression,
             startDate: jobScheduleTime,
@@ -145,14 +146,14 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
           }
           this.emails = emailList;
           this.hasSchedule = true;
+          if (type !== 'chart') {
+            this.ftp = ftp;
+          }
+          this.emails = emailList;
+          this.hasSchedule = true;
         }
-        if (type !== 'chart') {
-          this.ftp = ftp;
-        }
-        this.emails = emailList;
-        this.hasSchedule = true;
       }
-    }).catch(() => {
+    }, () => {
       this.loadCronLayout = true;
       this._headerProgress.hide();
     });

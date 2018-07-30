@@ -1,4 +1,4 @@
-[elasticsearch-5.x]
+[elasticsearch-6.x]
 name=Elasticsearch repository for 6.x packages
 baseurl=https://artifacts.elastic.co/packages/6.x/yum
 gpgcheck=1

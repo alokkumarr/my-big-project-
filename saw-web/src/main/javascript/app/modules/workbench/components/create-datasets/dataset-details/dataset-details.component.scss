@@ -79,7 +79,7 @@ dataset-details {
   .list-items {
     background-color: white;
     border-radius: 0 3px 3px;
-    border: #1A89D4 0.5px dotted;
+    border: $primary-blue-b2 0.5px dotted;
 
     &:hover {
       box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
@@ -89,6 +89,6 @@ dataset-details {
 
   .preview-icon {
     font-size: 18px;
-    color: #1A89D4;
+    color: $primary-blue-b2;
   }
 }

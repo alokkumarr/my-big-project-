@@ -1,47 +1,102 @@
 export const AdminMenuData = [{
   id: '',
   name: 'User',
-  url: '#!/admin'
+  url: '#!/admin/user'
 }, {
   id: '',
   name: 'Role',
-  url: '#!/role'
+  url: '#!/admin/role'
 }, {
   id: '',
   name: 'Privilege',
-  url: '#!/privilege'
+  url: '#!/admin/privilege'
 }, {
   id: '',
   name: 'Category',
-  url: '#!/categories'
+  url: '#!/admin/categories'
 }];
 
 export const UsersTableHeader = [{
-  name: 'All'
+  caption: 'LOGIN ID',
+  dataField: 'masterLoginId',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'LOGIN ID'
+  caption: 'ROLE',
+  dataField: 'roleName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '10%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'ROLE'
+  caption: 'FIRST NAME',
+  dataField: 'firstName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '18%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'FIRST NAME'
+  caption: 'LAST NAME',
+  dataField: 'lastName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '18%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'LAST NAME'
+  caption: 'EMAIL',
+  dataField: 'email',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'EMAIL'
+  caption: 'STATUS',
+  dataField: 'activeStatusInd',
+  allowSorting: true,
+  alignment: 'left',
+  width: '8%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'STATUS'
+  caption: '',
+  width: '6%',
+  cellTemplate: 'actionCellTemplate'
 }];
 
 export const RolesTableHeader = [{
-  name: 'All'
+  caption: 'ROLE NAME',
+  dataField: 'roleName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'linkCellTemplate',
+  cssClass: 'branded-column-name'
 }, {
-  name: 'ROLE NAME'
+  caption: 'ROLE TYPE',
+  dataField: 'roleType',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'ROLE TYPE'
+  caption: 'ROLE DESCRIPTION',
+  dataField: 'roleDesc',
+  allowSorting: true,
+  alignment: 'left',
+  width: '35%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'ROLE DESCRIPTION'
+  caption: 'STATUS',
+  dataField: 'activeStatusInd',
+  allowSorting: true,
+  alignment: 'left',
+  width: '13%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'STATUS'
+  caption: '',
+  width: '2%',
+  cellTemplate: 'actionCellTemplate'
 }];
 
 export const PrivilegesTableHeader = [{

@@ -1,26 +1,23 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as find from 'lodash/find';
-import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
 
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../../login/services/jwt.service';
-import {HeaderProgressService} from '../../../../../common/services/header-progress.service';
+import { BaseDialogComponent } from '../../../../../common/base-dialog/base-dialog.component';
 import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
 const template = require('./analyze-publish-dialog.component.html');
 require('./analyze-publish-dialog.component.scss');
 
-const SEMICOLON = 186;
-
 @Component({
   selector: 'analyze-publish-dialog',
   template
 })
 
-export class AnalyzePublishDialogComponent implements OnInit {
+export class AnalyzePublishDialogComponent extends BaseDialogComponent implements OnInit {
 
   categories: any[] = [];
   token: any;
@@ -32,9 +29,10 @@ export class AnalyzePublishDialogComponent implements OnInit {
       analysis: Analysis;
     },
     private _analyzeService: AnalyzeService,
-    private _jwt: JwtService,
-    private _headerProgress: HeaderProgressService
-  ) {}
+    private _jwt: JwtService
+  ) {
+    super();
+  }
 
   ngOnInit() {
     this.token = this._jwt.getTokenObj();
@@ -61,7 +59,6 @@ export class AnalyzePublishDialogComponent implements OnInit {
   }
 
   publish() {
-    const analysis = this.data.analysis;
     this._dialogRef.close(this.data.analysis);
   }
 

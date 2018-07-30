@@ -40,7 +40,8 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     log.info("Starting execute job");
     String batch = "batch-" + Instant.now().toEpochMilli();
     Component xdfComponent;
-    if (component.equals("parser")) {
+    log.info("component.equals(\"parser\") : " + component.trim().equals("parser"));
+    if (component.trim().equals("parser")) {
       xdfComponent = new Parser() {
         @Override
         public void initSpark(Context ctx) {
@@ -51,7 +52,7 @@ public class WorkbenchExecuteJob implements Job<Integer> {
           }
         }
       };
-    } else if (component.equals("sql")) {
+    } else if (component.trim().equals("sql")) {
       xdfComponent = new TempSqlComponent() {
         @Override
         public void initSpark(Context ctx) {
@@ -65,6 +66,8 @@ public class WorkbenchExecuteJob implements Job<Integer> {
     } else {
       throw new IllegalArgumentException("Unknown component: " + component);
     }
+    log.info(" Component.startComponent root = " + root);
+    log.info(" Component.startComponent config = " + config);
     int status = Component.startComponent(xdfComponent, root, config, project, batch);
     if (status != 0) {
       throw new RuntimeException("XDF returned non-zero status: " + status);

@@ -7,12 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
 import javax.servlet.ServletException;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.QueryParam;
-
-import com.google.gson.JsonElement;
+import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +19,13 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
@@ -38,7 +35,8 @@ import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
-import sncr.bda.metastore.DataSetStore;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 /**
  * @author spau0004
@@ -321,6 +319,28 @@ public class SAWWorkBenchInternalAddRAWDataController {
 
       return dataset;
   }
+  
+  /**
+   * This method is temporary solution to integrate with XDF-META Store with RComponent.<br>
+   * It has to be replaced with r_xdf-ngComponent wrapped around with xdf ngComponent class<br>
+   * It will create any auditLogEntry for this execution. Because RComponent is not part of component hierarchy
+   * @param project Project ID
+   * @param body Body Parameters
+   * @return Returns a preview
+   * @throws JsonProcessingException When not able to get the preview
+   * @throws Exception General Exception
+   */
+  @RequestMapping(value = "{project}/datasets/create", method = RequestMethod.POST,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.CREATED)
+  public DataSet createRGeneratedDataSet(
+      @PathVariable(name = "project", required = true) String project, @RequestBody DataSet dataSet) throws JSONException, Exception {
+    logger.trace("createRGeneratedDataSet starts here : ", dataSet.toString());
+    DataSet returnData = sawWorkbenchService.createDataSet(dataSet, project);
+    logger.trace("createRGeneratedDataSet ends here : ", returnData.toString());
+    return returnData;
+  }
+  
 }
   
   
