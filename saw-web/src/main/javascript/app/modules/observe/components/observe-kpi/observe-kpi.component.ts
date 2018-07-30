@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
-import { DashboardService } from '../../services/dashboard.service';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs/Subscription';
 
 const template = require('./observe-kpi.component.html');
@@ -44,11 +44,11 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   constructor(
     private observe: ObserveService,
-    private dashboardService: DashboardService
+    private globalFilterService: GlobalFilterService
   ) {}
 
   ngOnInit() {
-    this.kpiFilterSubscription = this.dashboardService.onFilterKPI.subscribe(
+    this.kpiFilterSubscription = this.globalFilterService.onApplyKPIFilter.subscribe(
       this.onFilterKPI.bind(this)
     );
   }
@@ -150,7 +150,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         const currentParsed = parseFloat(primary.current) || 0;
         const priorParsed = parseFloat(primary.prior);
         let change =
-          round(((currentParsed - priorParsed) * 100) / priorParsed) || 0;
+          round((currentParsed - priorParsed) * 100 / priorParsed) || 0;
         change = isFinite(change) ? change : 0;
         this.primaryChange = change;
         this.primaryResult = {

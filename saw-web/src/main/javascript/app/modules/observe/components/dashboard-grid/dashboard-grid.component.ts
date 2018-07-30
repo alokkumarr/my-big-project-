@@ -196,7 +196,7 @@ export class DashboardGridComponent
     if (item.kpi) {
       item.dimensions = dimensions;
       return;
-    } 
+    }
     item.updater.next([
       { path: 'chart.height', data: dimensions.height },
       { path: 'chart.width', data: dimensions.width }
@@ -257,7 +257,7 @@ export class DashboardGridComponent
    * @param {any} filterGroup Filters grouped by semantic id
    * @memberof DashboardGridComponent
    */
-  onApplyGlobalFilters(filterGroup) {
+  onApplyGlobalFilters(filterGroup = {}) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
       if (this.tileType(tile) !== 'analysis') return;

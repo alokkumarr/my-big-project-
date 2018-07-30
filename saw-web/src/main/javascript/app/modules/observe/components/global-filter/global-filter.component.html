@@ -16,7 +16,7 @@
       <mat-panel-description>Applies to all the KPIs in this dashboard</mat-panel-description>
     </mat-expansion-panel-header>
 
-    <kpi-filter></kpi-filter>
+    <kpi-filter (onModelChange)="onKPIFilterUpdate($event)"></kpi-filter>
   </mat-expansion-panel>
 
   <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">

@@ -123,13 +123,14 @@ export class ObserveViewComponent implements OnInit {
    * @returns {void}
    * @memberof ObserveViewComponent
    */
-  onApplyGlobalFilter(globalFilters): void {
-    if (!globalFilters) {
+  onApplyGlobalFilter(data): void {
+    if (!data) {
       this.sidenav.close();
       return;
     }
 
-    this.filters.onApplyFilter.next(globalFilters);
+    this.filters.onApplyFilter.next(data.analysisFilters);
+    this.filters.onApplyKPIFilter.next(data.kpiFilters);
     this.sidenav.close();
   }
 
