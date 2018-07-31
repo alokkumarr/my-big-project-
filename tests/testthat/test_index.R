@@ -136,4 +136,42 @@ test_that("Index for Posixt class", {
   expect_equal(date_in_ext, seq_etx)
 })
 
+#Test6:Create Index for POSIXt-Minutes class ------------------------------------------
+day_minutes <-
+  Sys.Date() + lubridate::minutes(seq(
+    from = 1,
+    length.out = 6,
+    by = 2
+  ))
+
+date_min_ind <- index(day_minutes, unit = "minutes",periods=2)
+
+Min_in_ext <- extend(date_min_ind,3)
+
+seq_min_etx <- seq(as_datetime(date_min_ind$end)+2*60, as_datetime(date_min_ind$end)+6*60, by = 2*60)
+
+test_that("Index for Posixt class", {
+  expect_class(date_ind, "index")
+  expect_equal(Min_in_ext, seq_min_etx)
+})
+
+#Test7:Create Index for POSIXt-secords class ------------------------------------------
+day_seconds <-
+  Sys.Date() + lubridate::seconds(seq(
+    from = 1,
+    length.out = 6,
+    by = 3
+  ))
+
+date_sec_ind <- index(day_seconds, unit = "seconds",periods=3)
+
+Sec_in_ext <- extend(date_sec_ind,3)
+
+seq_sec_etx <- seq(as_datetime(date_sec_ind$end)+3, as_datetime(date_sec_ind$end)+9, by = 3)
+
+test_that("Index for Posixt class", {
+  expect_class(date_sec_ind, "index")
+  expect_equal(Sec_in_ext, seq_sec_etx)
+})
+
 
