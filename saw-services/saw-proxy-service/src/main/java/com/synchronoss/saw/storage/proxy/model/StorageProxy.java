@@ -724,7 +724,8 @@ public class StorageProxy {
         EXECUTE("execute"),
         AGGREGATE("aggregate"),
         PIVOT("pivot"),
-        CAT("cat");
+        CAT("_cat"),
+        MAPPING("_mappings");
         private final String value;
         private final static Map<String, StorageProxy.Action> CONSTANTS = new HashMap<String, StorageProxy.Action>();
 
