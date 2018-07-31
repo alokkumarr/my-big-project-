@@ -27,7 +27,7 @@ new_index <- function(unit, periods, start, end) {
 #' Used by Forecaster to create forward looking indicies
 #'
 #' @export
-index <- function(x, unit) {
+index <- function(x, unit,periods) {
   UseMethod("index")
 }
 
@@ -53,10 +53,12 @@ index.numeric <- index.integer <- function(x, unit = NULL) {
 
 #' @rdname index
 #' @export
-index.Date <- function(x, unit = "days") {
-  checkmate::assert_choice(unit, c("days", "weeks", "years"))
+index.Date <- function(x, unit="days") {
+  checkmate::assert_choice(unit, c("days","weeks","years"))
   #checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
+  if (unit=="days")
+  {
   if ((periods %% 1) != 0) {
     stop("index not regular")
   }
@@ -70,12 +72,51 @@ index.Date <- function(x, unit = "days") {
     ,
     class = c("time_index", "index")
   )
+  }
+  else if(unit=="weeks")
+  {if ((periods %% 1) != 0) {
+    stop("index not regular")
+  }
+    periods <- round(periods / 7)
+    structure(
+      new_index(
+        unit = unit,
+        periods = periods,
+        start = min(x),
+        end = max(x)
+      )
+      ,
+      class = c("time_index", "index")
+    )
+  }
+  else if(unit=="years")
+    if ((periods %% 1 >= 0 && periods %% 1 <= 1)) {
+
+      periods <- round(periods / 365)
+
+      structure(
+        new_index(
+          unit = unit,
+          periods = periods,
+          start = min(x),
+          end = max(x)
+        )
+        ,
+        class = c("time_index", "index")
+      )
+
+    }
+  else
+  {
+    stop("index not regular")
+  }
+
 }
 
 
 #' @rdname index
 #' @export
-index.POSIXct <- index.POSIXt <- function(x, unit = "hours") {
+index.POSIXct <- function(x, unit = "hours",periods) {
   checkmate::assert_choice(unit, c("seconds", "minutes", "hours", "days"))
   checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
@@ -94,6 +135,10 @@ index.POSIXct <- index.POSIXt <- function(x, unit = "hours") {
   )
 }
 
+#' @rdname index
+#' @export
+index.POSIXt <- index.POSIXct
+
 
 #' Extend an Index
 #'
@@ -110,7 +155,7 @@ extend <- function(obj, length_out) {
 #' @rdname extend
 #' @export
 extend.index <- function(obj, length_out) {
-  seq(from = obj$end + 1,
+  seq(from = obj$end + obj$unit,
       length.out = length_out,
       by = obj$unit)
 }
@@ -121,7 +166,7 @@ extend.index <- function(obj, length_out) {
 #' @export
 extend.time_index <- function(obj, length_out) {
   obj$end + get(obj$unit, asNamespace("lubridate"))(seq(
-    from = 1,
+    from = obj$periods,
     length.out = length_out,
     by = obj$periods
   ))
