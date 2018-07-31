@@ -43,11 +43,13 @@
       <input matInput required type="email" formControlName="email" placeholder="Email"/>
     </mat-form-field>
 
-    <mat-select required placeholder="Status" formControlName="activeStatusInd">
-      <mat-option *ngFor="let status of statuses" [value]="status.id">
-        {{status.name}}
-      </mat-option>
-    </mat-select>
+    <mat-form-field class="select-form-field">
+      <mat-select required placeholder="Status" formControlName="activeStatusInd">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
   </form>
 </div>
