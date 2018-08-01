@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
-#Please check with Anudeep Patel(Anudeep.Singh@synchronoss.com) before making anychanges to this file
+#Please check with sip-team-a automation team before making any changes to this file
+# ########### Uses of this file ######
+# This shell script is used by maven build cycle and it gets invoked by dist/pom.xml
+# When below code(dist/pom.xml) gets executed then it runs npm command i.e. 'npm run e2e-full-suite -- --baseUrl=some_url'
+#          <execution>
+#            <id>npm-run-protractor</id>
+#            <phase>integration-test</phase>
+#            <goals>
+#              <goal>npm</goal>
+#            </goals>
+#            <configuration>
+#              <arguments>run e2e-full-suite -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/</arguments>
+#            </configuration>
+#          </execution>
+# and then 'e2e-full-suite' script get executed from dist/package.json which interanlly triggers this shell script.  
+#
 echo "current working dir"
 pwd
 echo "moving to saw-web working dir"
