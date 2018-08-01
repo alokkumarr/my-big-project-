@@ -151,6 +151,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     }
   }
   @Input() isEditable: boolean = false;
+  @Input() columnHeaders;
 
   public dataLoader: (
     options: {}
@@ -211,11 +212,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
-
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
-        enabled: true,
+        enabled: isUndefined(this.columnHeaders) ? true : this.columnHeaders,
         mode: 'select'
       };
 
