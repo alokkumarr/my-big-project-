@@ -94,7 +94,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                                 proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
                                                 proxy.setData(deleteData);
                                                 break;
-                                  case "_cat" : 
+                                 case "catIndices" : 
                                               List<ClusterIndexResponse> clusterIndexResponses = storageConnectorService.catClusterIndices(proxy);
                                               List<Object> listOfIndices = new ArrayList<>();
                                               for(ClusterIndexResponse clusterIndexResponse : clusterIndexResponses) {
@@ -104,7 +104,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                               proxy.setData(listOfIndices);
                                               break;
                                               
-                                case "_mappings" : 
+                                case "mappings" : 
                                              List<StoreField> mappingIndexResponse = storageConnectorService.getMappingbyIndex(proxy);
                                              List<Object> mappinglist = new ArrayList<>();
                                              for(StoreField storeField : mappingIndexResponse) {
