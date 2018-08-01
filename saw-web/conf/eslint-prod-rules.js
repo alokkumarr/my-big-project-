@@ -23,6 +23,7 @@ module.exports = {
   },
   rules: {
     'angular/no-service-method': 0,
+    'angular/window-service': 0,
     'angular/on-watch': 0,
     'no-negated-condition': 0,
     'quote-props': [1, 'as-needed'],

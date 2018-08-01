@@ -1,5 +1,6 @@
 package com.synchronoss.saw.workbench.service;
 
+import static org.assertj.core.api.Assertions.in;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
@@ -375,6 +377,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     Preconditions.checkNotNull(rootNode.get("userData").get("createdBy"), "userData.createdBy cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("script"), "userData.script cannot be null");
     Preconditions.checkNotNull(rootNode.get("system").get("name"), "system.name cannot be null");
+    Preconditions.checkNotNull(rootNode.get("system").get("inputFormat"), "system.inputFormat cannot be null");
+    Preconditions.checkNotNull(rootNode.get("system").get("inputPath"), "system.inputPath cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"), "asOfNow.status cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"), "asOfNow.started cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"), "asOfNow.finished cannot be null");
@@ -391,8 +395,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     Preconditions.checkNotNull(rootNode.get("system"), "system cannot be null");
     ObjectNode systemNode = (ObjectNode)rootNode.get("system");
     systemNode.put("project", project);
-    systemNode.put("format", format);
+    systemNode.put("outputFormat", format);
+    systemNode.put("inputFormat", rootNode.get("system").get("inputFormat").toString());
+    ArrayNode  inputPath = objectMapper.createArrayNode();
+    inputPath.addAll((ArrayNode)rootNode.get("system").get("inputPath"));
     systemNode.put("catalog", catalog);
+    systemNode.putArray("inputPath").addAll(inputPath);
     DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class) ;
     try {
       List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,

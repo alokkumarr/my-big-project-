@@ -15,6 +15,7 @@ import { Observable } from 'rxjs/Observable';
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { DashboardService } from '../../services/dashboard.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { Subscription } from 'rxjs/Subscription';
 
 const template = require('./observe-kpi.component.html');
@@ -44,7 +45,8 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   constructor(
     private observe: ObserveService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
@@ -124,6 +126,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
       'dataFields.0.aggregate',
       []
     );
+    this.progressService.show();
     this.observe
       .executeKPI(kpi)
       /* Parse kpi execution results into primary and secondary aggregation results */
@@ -146,20 +149,26 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         return { primary, secondary };
       })
       /* Parse and calculate percentage change for primary aggregations */
-      .subscribe(({ primary, secondary }) => {
-        const currentParsed = parseFloat(primary.current) || 0;
-        const priorParsed = parseFloat(primary.prior);
-        let change =
-          round(((currentParsed - priorParsed) * 100) / priorParsed) || 0;
-        change = isFinite(change) ? change : 0;
-        this.primaryChange = change;
-        this.primaryResult = {
-          current: round(currentParsed, 2),
-          prior: priorParsed,
-          change: trim(change, '-')
-        };
+      .subscribe(
+        ({ primary, secondary }) => {
+          this.progressService.hide();
+          const currentParsed = parseFloat(primary.current) || 0;
+          const priorParsed = parseFloat(primary.prior);
+          let change =
+            round((currentParsed - priorParsed) * 100 / priorParsed) || 0;
+          change = isFinite(change) ? change : 0;
+          this.primaryChange = change;
+          this.primaryResult = {
+            current: round(currentParsed, 2),
+            prior: priorParsed,
+            change: trim(change, '-')
+          };
 
-        this.secondaryResult = secondary;
-      });
+          this.secondaryResult = secondary;
+        },
+        () => {
+          this.progressService.hide();
+        }
+      );
   }
 }

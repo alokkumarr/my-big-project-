@@ -28,7 +28,7 @@ import { ObserveModule, ObserveUpgradeModule } from './modules/observe';
 import { CommonModuleTs } from './common';
 import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
 import { AlertsModule } from './modules/alerts';
-import { AdminModule } from './modules/admin';
+import { OldAdminModule, AdminModule } from './modules/admin';
 import { WorkbenchModule, WorkbenchUpgradeModule } from './modules/workbench';
 
 import { LayoutContentComponent } from './layout';
@@ -51,7 +51,8 @@ declare global {
     ObserveUpgradeModule,
     FlexLayoutModule,
     WorkbenchUpgradeModule,
-    MaterialModule
+    MaterialModule,
+    AdminModule
   ],
   exports: [FlexLayoutModule],
   providers: [
@@ -87,7 +88,7 @@ angular
     ObserveModule,
     AnalyzeModule,
     AlertsModule,
-    AdminModule,
+    OldAdminModule,
     WorkbenchModule
   ])
   .config(routesConfig)

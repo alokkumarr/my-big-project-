@@ -1,0 +1,14 @@
+
+@import "themes/base/colors";
+
+user-edit-dialog {
+  max-width: 500px;
+
+  .base-dialog__content {
+    padding: 10px 50px !important;
+
+    .mat-form-field {
+      width: 100%;
+    }
+  }
+}
