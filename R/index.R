@@ -29,7 +29,7 @@ new_index <- function(unit, periods, start, end) {
 #' Used by Forecaster to create forward looking indicies
 #'
 #' @export
-index <- function(periods, x, unit) {
+index <- function(x, unit) {
   UseMethod("index")
 }
 
