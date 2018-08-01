@@ -16,7 +16,7 @@ export const AdminMenuData = [{
   url: '#!/admin/categories'
 }, {
   id: '',
-  name: 'Analysis Utility',
+  name: 'Package Utility',
   children: [{
     id: '',
     name: 'Export',
