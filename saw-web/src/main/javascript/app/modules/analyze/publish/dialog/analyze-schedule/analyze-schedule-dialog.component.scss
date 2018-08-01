@@ -11,9 +11,14 @@ analyze-schedule-dialog {
   padding: 10px;
   color: $primary-grey-g4;
 
+  header {
+    padding: 0 0 10px;
+    border-bottom: 1px solid #999;
+  }
+
   .dialog__content {
     width: 700px;
-    max-height: 500px;
+    max-height: 550px;
 
     .label-inline-with-select {
       text-align: center;
@@ -91,7 +96,10 @@ analyze-schedule-dialog {
     }
   }
 
-  .dialog__actions {
+  .base-dialog__actions {
+    padding: 10px 1px 10px 0;
+    border-top: 1px solid #999;
+
     .form-buttons button {
       margin-right: 10px;
     }
