@@ -12,6 +12,7 @@ import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
@@ -65,7 +66,8 @@ export class ObserveChartComponent {
     public chartService: ChartService,
     public analyzeService: AnalyzeService,
     public sortService: SortService,
-    public filterService: FilterService
+    public filterService: FilterService,
+    public progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
@@ -186,7 +188,10 @@ export class ObserveChartComponent {
 
     changes = changes.concat(this.getLegend());
     changes = changes.concat([
-      { path: 'title.text', data: this.analysis.chartTitle || this.analysis.name },
+      {
+        path: 'title.text',
+        data: this.analysis.chartTitle || this.analysis.name
+      },
       { path: 'title.y', data: -10 }
     ]);
 
@@ -241,15 +246,23 @@ export class ObserveChartComponent {
 
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
+    this.progressService.show();
     return this.analyzeService
       .getDataBySettings(payload, EXECUTION_MODES.LIVE)
-      .then(({ data }) => {
-        const parsedData = flattenChartData(data, payload.sqlBuilder);
-        if (this.ViewMode) {
-          this.chartToggleData = this.trimKeyword(parsedData);
+      .then(
+        ({ data }) => {
+          this.progressService.hide();
+          const parsedData = flattenChartData(data, payload.sqlBuilder);
+          if (this.ViewMode) {
+            this.chartToggleData = this.trimKeyword(parsedData);
+          }
+          return parsedData || [];
+        },
+        err => {
+          this.progressService.hide();
+          throw err;
         }
-        return parsedData || [];
-      });
+      );
   }
 
   generatePayload(source) {

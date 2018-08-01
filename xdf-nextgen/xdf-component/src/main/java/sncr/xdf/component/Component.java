@@ -278,7 +278,7 @@ public abstract class Component {
       throws Exception {
 
     logger.trace("Configuration dump: \n" + config);
-    String metaDataLocation = xdfDataRootSys  + Path.SEPARATOR + "services";
+    String metaDataLocation = xdfDataRootSys;
     ComponentConfiguration cfg = null;
     try {
       cfg = validateConfig(config);

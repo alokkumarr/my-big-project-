@@ -8,7 +8,7 @@
 
   <div *ngIf="hasDateInterval"
        fxLayout="column">
-    <mat-form-field >
+    <mat-form-field class="select-form-field">
       <mat-select placeholder="Group interval"
                   (selectionChange)="onDateIntervalChange($event.value)"
                   [value]="artifactColumn.dateInterval">

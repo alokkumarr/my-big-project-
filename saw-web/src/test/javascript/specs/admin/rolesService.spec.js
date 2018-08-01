@@ -1,11 +1,11 @@
-import {AdminModule} from '../../../../main/javascript/app/modules/admin';
+import {OldAdminModule} from '../../../../main/javascript/app/modules/admin';
 import {customerId} from './rolesData';
 
 describe('RolesManagementService', () => {
   let RolesManagementService;
 
   beforeEach(() => {
-    angular.mock.module(AdminModule);
+    angular.mock.module(OldAdminModule);
     angular.mock.inject($injector => {
       RolesManagementService = $injector.get('RolesManagementService');
     });

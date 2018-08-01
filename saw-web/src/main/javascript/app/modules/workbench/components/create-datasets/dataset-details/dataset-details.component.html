@@ -18,13 +18,13 @@
     <mat-card-content class="form-div">
       <form #datasetDetails novalidate [formGroup]="detailsFormGroup" autocomplete="off">
         <section class="input-section">
-          <mat-form-field class="margin20">
+          <mat-form-field class="margin20 select-form-field">
             <mat-select placeholder="Data format type?" [(value)]="previewConfig.delimiterType">
               <mat-option value="delimited">Delimited</mat-option>
               <mat-option value="parquet" disabled>Parquet</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field class="margin20">
+          <mat-form-field class="margin20 select-form-field ">
             <mat-select placeholder="Header row present?" [(value)]="previewConfig.header">
               <mat-option value="yes">Yes</mat-option>
               <mat-option value="no">No</mat-option>
@@ -55,7 +55,7 @@
               <strong>required</strong>
             </mat-error>
           </mat-form-field>
-          <mat-form-field class="margin20">
+          <mat-form-field class="margin20 select-form-field">
             <mat-select placeholder="Line Seperator" [(value)]="lineSeperator">
               <mat-option value="lineFeed">Line Feed (\n)</mat-option>
               <mat-option value="carriageReturn">Carriage Return (\r)</mat-option>

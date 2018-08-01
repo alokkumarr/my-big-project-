@@ -11,6 +11,10 @@ designer-settings-aux-chart {
       margin-right: 40px;
     }
   }
+
+  mat-select {
+    width: unset !important;
+  }
 }
 
 button.chart-title-button {
