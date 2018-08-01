@@ -77,12 +77,12 @@ sip_get_datasets <- function(project_id,
 #'
 #' GET request to saw/services/internal/workbench/projects/{project_id}/datasets/{dataset_id}
 #'
-#' @param dataset_name dataset name
+#' @param dataset_id dataset id
 #' @inheritParams sip_get_datasets
 #'
 #' @return list with dataset details
 #' @export
-sip_get_dataset_details <- function(dataset_name,
+sip_get_dataset_details <- function(dataset_id,
                                     project_id,
                                     hostname,
                                     token){
@@ -98,7 +98,7 @@ sip_get_dataset_details <- function(dataset_name,
   # URL
   url <- paste0(hostname,
                 "/saw/services/internal/workbench/projects/", project_id,
-                "/datasets/", paste(project_id, dataset_name, sep = "::"))
+                "/datasets/", dataset_id)
 
   # GET request
   response <- httr::GET(url, config = headers)
@@ -112,68 +112,92 @@ sip_get_dataset_details <- function(dataset_name,
 #'
 #' Adds a dataset record to the SIP Metastore
 #'
-#' POST request to /saw/services/internal/workbench/projects/{project_id}/datasets/create
+#' POST request to
+#' /saw/services/internal/workbench/projects/{project_id}/datasets/create
 #'
 #'
-#' @param dataset_name name of dataset to add
-#' @param dataset_path file path to saved dataset
-#' @param dataset_format format of dataset. accepts parquet, JSON, csv and rds
-#' @param row_count dataset record count. Default is NULL
-#' @param component name of component used to create dataset
-#' @param desc description of dataset
+#' @param output_path output dataset file path
+#' @param output_format output dataset format. accepts parquet, JSON, csv and
+#'   rds
+#' @param row_count ouput dataset record count. Default is NULL
+#' @param component component name used to create dataset. Default is RComponent
+#' @param script path to executable R script
+#' @param desc description of dataset. Default is empty string
+#' @param created_by user name. Default is system user name
 #' @param project_id project id string
-#' @param batch_id batch id string
-#' @param input_datasets_id string vector of input datasets
-#' @param started string with starting time. Format should be YYYYMMDD-HHMMSS
+#' @param batch_id batch id string. Default is empty string
+#' @param input_paths vector of input datasets paths. Default is empty string
+#' @param input_ids vector of input dataset ids. Default is empty string
+#' @param input_names vectore of input dataset names. Default is empty string
+#' @param started string with starting time. Format should be YYYYMMDD-HHMMSS.
+#'   Default is NULL which inserts current time
 #' @param finished string with starting time. Format should be YYYYMMDD-HHMMSS
-#' @param status component status. default is 'SUCCESS'
+#' @param status component status. default is 'SUCCESS'. Default is NULL which inserts current time
 #' @param hostname  hostname only of saw security location. No pathing required
+#' @param token valid SIP token. Result of sip_authenticate function
 #'
 #' @return POST response content
 #' @export
-sip_add_dataset <- function(dataset_name,
-                            dataset_path,
-                            dataset_format,
-                            row_count = NULL,
-                            component,
-                            desc,
+sip_add_dataset <- function(output_path,
+                            output_format,
+                            output_rows = NULL,
+                            component = 'RComponent',
+                            script,
+                            desc = "",
+                            created_by = NULL,
                             project_id,
-                            batch_id,
-                            input_datasets_id,
-                            started,
-                            finished,
+                            batch_id = "",
+                            input_paths = "",
+                            input_formats = "",
+                            input_ids = "",
+                            input_names = "",
+                            started = NULL,
+                            finished = NULL,
                             status = "SUCCESS",
-                            hostname) {
-  checkmate::assert_string(dataset_name)
-  checkmate::assert_string(dataset_path)
-  checkmate::assert_choice(dataset_format, c("parquet", "csv", "json", "rds"))
-  checkmate::assert_number(row_count, null.ok = TRUE)
+                            hostname,
+                            token) {
+  checkmate::assert_string(output_path)
+  checkmate::assert_choice(output_format, c("parquet", "csv", "json", "rds"))
+  checkmate::assert_number(output_rows, null.ok = TRUE)
   checkmate::assert_string(component)
   checkmate::assert_string(desc)
+  checkmate::assert_string(created_by, null.ok = TRUE)
   checkmate::assert_string(project_id)
   checkmate::assert_string(batch_id)
-  checkmate::assert_character(input_datasets_id)
-  checkmate::assert_string(started, pattern = "^[0-9]{8}([\\w-])([0-9]{6}$)")
-  checkmate::assert_string(finished, pattern = "^[0-9]{8}([\\w-])([0-9]{6}$)")
+  checkmate::assert_string(input_names)
+  checkmate::assert_character(input_paths)
+  checkmate::assert_character(input_ids)
+  checkmate::assert_string(started, pattern = "^[0-9]{8}([\\w-])([0-9]{6}$)", null.ok = TRUE)
+  checkmate::assert_string(finished, pattern = "^[0-9]{8}([\\w-])([0-9]{6}$)", null.ok = TRUE)
   checkmate::assert_string(status)
   checkmate::assert_string(hostname)
+  checkmate::assert_character(token)
+
+  if(is.null(created_by)) created_by <- as.character(Sys.info()["user"])
+  if(is.null(started)) started <- format(Sys.time(),  "%Y%m%d-%I%M%S")
+  if(is.null(finished)) finished <- format(Sys.time(),  "%Y%m%d-%I%M%S")
 
   # Headers
-  headers <- httr::add_headers('Content-Type' = "application/json;charset=UTF-8")
+  headers <- httr::add_headers('Authorization' = paste("Bearer", token),
+                               'Content-Type' = "application/json;charset=UTF-8")
 
   # Body
-  payload <- list(userData = list(description = desc,
-                                  component = component),
-                  system   = list(path = dataset_path,
-                                  name = dataset_name,
-                                  format = dataset_format),
-                  asInput  = input_datasets_id,
-                  asOfNow  = list(status = status,
-                                  started = started,
-                                  finished = finished,
-                                  batchId = batch_id),
-                  recordCount = row_count) %>%
-    jsonlite::toJSON(., auto_unbox = TRUE)
+  payload <- list(userData = list(description = unbox(desc),
+                                  component = unbox(component),
+                                  createdBy = unbox(created_by),
+                                  script = unbox(script)),
+                  system   = list(inputPath = input_paths,
+                                  name = unbox(input_names),
+                                  inputFormat = unbox(input_formats),
+                                  outputFormat = unbox(output_format)),
+                  asInput  = list(unbox(input_ids)),
+                  transformations = list(asOutputLocation = unbox(output_path)),
+                  asOfNow  = list(status = unbox(status),
+                                  started = unbox(started),
+                                  finished = unbox(finished),
+                                  batchId = unbox(batch_id)),
+                  recordCount = unbox(output_rows))
+  payload <- jsonlite::toJSON(payload, auto_unbox = FALSE)
 
   # URL
   url <- paste0(hostname, "/saw/services/internal/workbench/projects/", project_id, "/datasets/create")
