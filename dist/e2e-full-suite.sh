@@ -33,3 +33,5 @@ echo "starting protractor test"
 echo "running protractor tests node_modules/protractor/bin/protractor conf/protractor.conf.js "$url""
 node_modules/protractor/bin/protractor conf/protractor.conf.js "$url"
 #node_modules/protractor/bin/protractor conf/protractor.conf.js --baseUrl="http://54.159.35.28/saw/web/"
+#generate report
+node_modules/allure-commandline/bin/allure generate target/allure-results --clean -o target/allure-report || true
