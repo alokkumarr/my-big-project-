@@ -1,5 +1,6 @@
 
 
+
 #' Index Class Constructer
 #'
 #' @param unit index unit. can by time base units such as days, weeks or years
@@ -51,7 +52,12 @@ index.numeric <- function(x, unit = NULL) {
     stop("index not regular")
   }
 
-  structure_fun(unit=unit,periods=NULL,x=x,class=c("numeric_index", "index"))
+  structure_fun(
+    unit = unit,
+    periods = NULL,
+    x = x,
+    class = c("numeric_index", "index")
+  )
 }
 
 #' @rdname index
@@ -71,7 +77,12 @@ index.Date <- function(x, unit = "days") {
       stop("index not regular")
     }
 
-    structure_fun(unit=unit,periods=periods,x=x,class=c("time_index", "index"))
+    structure_fun(
+      unit = unit,
+      periods = periods,
+      x = x,
+      class = c("time_index", "index")
+    )
   }
   else if (unit == "weeks")
   {
@@ -80,13 +91,23 @@ index.Date <- function(x, unit = "days") {
     }
     periods <- round(periods / 7)
 
-    structure_fun(unit=unit,periods=periods,x=x,class=c("time_index", "index"))
+    structure_fun(
+      unit = unit,
+      periods = periods,
+      x = x,
+      class = c("time_index", "index")
+    )
   }
   else if (unit == "years")
     if ((periods %% 1 >= 0 && periods %% 1 <= 1)) {
       periods <- round(periods / 365)
 
-    structure_fun(unit=unit,periods=periods,x=x,class=c("time_index", "index"))
+      structure_fun(
+        unit = unit,
+        periods = periods,
+        x = x,
+        class = c("time_index", "index")
+      )
     }
   else
   {
@@ -105,7 +126,12 @@ index.POSIXct <- function(x, unit = "hours") {
   if ((periods %% 1) != 0) {
     stop("index not regular")
   }
-  structure_fun(unit=unit,periods=periods,x=x,class=c("time_index", "index"))
+  structure_fun(
+    unit = unit,
+    periods = periods,
+    x = x,
+    class = c("time_index", "index")
+  )
 }
 
 #' @rdname index
