@@ -79,6 +79,9 @@ indexer.data.frame <- function(df,
 
 
 
+
+
+
 #' @rdname indexer
 #' @export
 indexer.tbl_spark <- function(df,
