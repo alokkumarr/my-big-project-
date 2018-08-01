@@ -4,10 +4,15 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModuleTs } from '../../common';
 import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';
+import { AdminService } from './main-view/admin.service';
+import { RoleService } from './role/role.service';
 import {
   UserEditDialogComponent,
   UserService
 } from './user';
+import {
+  RoleEditDialogComponent
+} from './role';
 import {JwtService} from '../../../login/services/jwt.service';
 import {dxDataGridService} from '../../common/services/dxDataGrid.service';
 import {
@@ -105,7 +110,8 @@ angular.module(OldAdminModule, [
 const COMPONENTS = [
   AdminMainViewComponent,
   AdminListViewComponent,
-  UserEditDialogComponent
+  UserEditDialogComponent,
+  RoleEditDialogComponent
 ];
 @NgModule({
   imports: [
@@ -126,11 +132,13 @@ const COMPONENTS = [
       multi: true
     },
     SidenavMenuService,
+    AdminService,
     UserService,
     JwtService,
     dxDataGridService,
     LocalSearchService,
-    ToastService
+    ToastService,
+    RoleService
   ],
   exports: [
     AdminMainViewComponent

@@ -20,7 +20,7 @@
       Show as Currency
     </mat-slide-toggle>
 
-    <mat-form-field *ngIf="format.currency">
+    <mat-form-field class="select-form-field" *ngIf="format.currency">
       <mat-select placeholder="Currency Code"
                   (selectionChange)="onCurrencyCodeChange($event.value)"
                   [value]="format.currency">

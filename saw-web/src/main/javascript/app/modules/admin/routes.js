@@ -1,6 +1,7 @@
 import {AdminMainViewComponent} from './main-view';
 import {
-  UsersTableHeader
+  UsersTableHeader,
+  RolesTableHeader
 } from './consts';
 
 export function routesConfig($stateProvider) {
@@ -11,10 +12,6 @@ export function routesConfig($stateProvider) {
       name: 'admin',
       url: '/admin',
       redirectTo: 'admin.user'
-    // }, {
-    //   name: 'admin.user',
-    //   url: '/user',
-    //   component: 'usersView'
     }, {
       name: 'admin.user',
       url: '/user',
@@ -29,7 +26,14 @@ export function routesConfig($stateProvider) {
     }, {
       name: 'admin.role',
       url: '/role',
-      component: 'rolesView'
+      component: AdminMainViewComponent,
+      resolve: [{
+        token: 'columns',
+        resolveFn: () => RolesTableHeader
+      }, {
+        token: 'section',
+        resolveFn: () => 'role'
+      }]
     }, {
       name: 'admin.privilege',
       url: '/privilege?role',

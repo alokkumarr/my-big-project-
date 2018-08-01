@@ -7,6 +7,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { MaterialModule } from '../../../../material.module';
 import { ObservePivotComponent } from './observe-pivot.component';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
 /* Stubs */
 const AnalyzeServiceStub: Partial<AnalyzeService> = {
@@ -18,6 +19,12 @@ const AnalyzeServiceStub: Partial<AnalyzeService> = {
 const analysisStub = {
   artifacts: [{ columns: [] }],
   sqlBuilder: { sorts: [], filters: [], dataFields: [], nodeFields: [] }
+};
+
+const HeaderProgressServiceStub: Partial<HeaderProgressService> = {
+  show: () => false,
+  hide: () => false,
+  get: () => false
 };
 
 @Component({
@@ -35,7 +42,10 @@ describe('Observe Pivot Component', () => {
     TestBed.configureTestingModule({
       imports: [],
       declarations: [ObservePivotComponent, PivotGridStub],
-      providers: [{ provide: AnalyzeService, useValue: AnalyzeServiceStub }]
+      providers: [
+        { provide: AnalyzeService, useValue: AnalyzeServiceStub },
+        { provide: HeaderProgressService, useValue: HeaderProgressServiceStub }
+      ]
     })
       .compileComponents()
       .then(() => {

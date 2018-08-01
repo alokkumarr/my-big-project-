@@ -2,19 +2,13 @@
 @import "themes/base/colors";
 
 user-edit-dialog {
-  z-index: 80;
-  display: block;
   max-width: 500px;
 
-  .mat-dialog-content {
-    padding: 0 50px;
+  .base-dialog__content {
+    padding: 10px 50px !important;
 
-    mat-form-field {
+    .mat-form-field {
       width: 100%;
     }
-  }
-
-  .dialog-actions {
-    padding: 10px 0;
   }
 }

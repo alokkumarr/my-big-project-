@@ -17,6 +17,7 @@ export class AdminListViewComponent {
   @Input() highlightTerm: string;
   @Output() editRow: EventEmitter<any> = new EventEmitter();
   @Output() deleteRow: EventEmitter<any> = new EventEmitter();
+  @Output() rowClick: EventEmitter<any> = new EventEmitter();
 
   config: any;
 
@@ -26,6 +27,10 @@ export class AdminListViewComponent {
 
   ngOnInit() {
     this.config = this.getConfig();
+  }
+
+  getLinkTooltip() {
+    return 'View Privileges';
   }
 
   getConfig() {
