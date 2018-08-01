@@ -6,12 +6,13 @@
 \alias{writer.data.frame}
 \title{DataFrame Writer Function}
 \usage{
-writer(df, path, dfs_mount, type, mode, partition_by, temp_folder_name)
+writer(df, path, dfs_mount, type, mode, partitions, partition_by,
+  temp_folder_name)
 
 \method{writer}{tbl_spark}(df, path, dfs_mount = "", type, mode = NULL,
   partitions = NULL, partition_by = NULL, temp_folder_name = "tmp", ...)
 
-\method{writer}{data.frame}(df, path, mode = NULL, ...)
+\method{writer}{data.frame}(df, path, type, mode = NULL, ...)
 }
 \arguments{
 \item{df}{DataFrame}

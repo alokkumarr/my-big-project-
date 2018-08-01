@@ -65,10 +65,10 @@ test_that("partition_by feature works as expected", {
   writer(mtcars_tbl, path = .path, type = "parquet", partition_by = "am")
   expect_directory_exists(paste0(tmp, "/am=1.0"))
   expect_directory_exists(paste0(tmp, "/am=0.0"))
-  expect_file_exists(paste0(tmp, "/am=0.0/mtcars-am=0.0.parquet"))
-  expect_file_exists(paste0(tmp, "/am=1.0/mtcars-am=1.0.parquet"))
+  expect_file_exists(paste0(tmp, "/am=0.0/mtcars-am=0.0-part-00000.parquet"))
+  expect_file_exists(paste0(tmp, "/am=1.0/mtcars-am=1.0-part-00000.parquet"))
 
-  writer(mtcars_tbl, path = .path, partition_by = "am", mode = "append")
+  writer(mtcars_tbl, path = .path, type = "parquet", partition_by = "am", mode = "append")
 
   expect_equal(length(dir(paste0(tmp,"/am=0.0"))), 2)
   expect_equal(length(dir(paste0(tmp, "/am=1.0"))), 2)
