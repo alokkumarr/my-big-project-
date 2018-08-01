@@ -4,8 +4,8 @@
 \alias{reader}
 \title{Spark Reader Function}
 \usage{
-reader(sc, name, path, dfs_protocol = NULL, type = NULL, repartition = 0,
-  memory = TRUE, overwrite = TRUE, ...)
+reader(sc, name, path, type, repartition = 0, memory = TRUE,
+  overwrite = TRUE, ...)
 }
 \arguments{
 \item{sc}{A spark_connection.}
@@ -13,14 +13,10 @@ reader(sc, name, path, dfs_protocol = NULL, type = NULL, repartition = 0,
 \item{name}{The name to assign to the newly generated table}
 
 \item{path}{The path to the file. If data is distributed, supply the dfs
-protocol seperately with dfs_protocol input}
+protocol}
 
-\item{dfs_protocol}{optional dfs protocol for accessing files on cluster.
-default is NULL for local file paths}
-
-\item{type}{optional file type path. Default is NULL. If provided, only files
-of type provided will be read. Can be used to wildcard file types in
-combination to a directory only path input}
+\item{type}{required file type. Specifiecs the sub reader function. Accepts
+csv, parquet, json, jdbc, source, table and text}
 
 \item{repartition}{The number of partitions used to distribute the generated
 table. Use 0 (the default) to avoid partitioning.}

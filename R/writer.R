@@ -15,20 +15,23 @@
 #'destination directory
 #'
 #'
-#'@param data Spark DataFrame
-#'@param folder directory to the write files to (directory only).
-#'@param file file name. file type inferred by extension provided. invokes
-#'  specific writer function
+#'@param df DataFrame
+#'@param path file path to write file to. Should include protocol if distributed
+#'  path
+#'@param dfs_mount dfs mount file path. applicable for distributed files only
+#'@param type file type. type specifies the spark writer function. Only
+#'  applicable for spark writer method
 #'@param mode Specifies the behavior when data or table already exists.
-#'  Supported values include: 'error', 'append', 'overwrite' and 'ignore'. Notice
-#'  that 'overwrite' will also change the column structure. default is NULL
+#'  Supported values include: 'error', 'append', 'overwrite' and 'ignore'.
+#'  Notice that 'overwrite' will also change the column structure. default is
+#'  NULL
 #'@param partition_by Partitions the output by the given columns on the file
 #'  system
 #'@param temp_folder_name name of temp folder
 #'@param ... optional arguments passed to write function
 #'
 #'@export
-writer <- function(df, path, mode, partition_by, temp_folder_name) {
+writer <- function(df, path,  dfs_mount, type, mode, partitions, partition_by, temp_folder_name) {
   UseMethod("writer")
 }
 
@@ -38,70 +41,92 @@ writer <- function(df, path, mode, partition_by, temp_folder_name) {
 #' @rdname writer
 writer.tbl_spark <- function(df,
                              path,
+                             dfs_mount = "",
+                             type,
                              mode = NULL,
+                             partitions = NULL,
                              partition_by = NULL,
                              temp_folder_name = "tmp",
                              ...) {
   checkmate::assert_character(path)
-  checkmate::assert_character(temp_folder_name)
+  checkmate::assert_character(dfs_mount)
+  checkmate::assert_choice(type, c("csv", "parquet", "json", "jdbc", "source", "table", "text"))
   checkmate::assert_choice(mode, c('error', 'append', 'overwrite', 'ignore'), null.ok = TRUE)
+  checkmate::assert_number(partitions, lower = 0, null.ok = TRUE)
   checkmate::assert_subset(partition_by, colnames(df), empty.ok = TRUE)
+  checkmate::assert_character(temp_folder_name)
 
-  if( grepl("hdfs://|s3a://|file://", path)) {
-    protocol <- paste0(strsplit(path, "//")[[1]][1],  "//")
-    path <- gsub(protocol, "", path)
-  } else {
-    protocol <- ""
-  }
-  type <- tools::file_ext(path)
-  name <- gsub(paste0(".", type), "", basename(path))
-  base_dir <- dirname(path)
-  root_dir <- dirname(base_dir)
-  file_tmp_folder <- paste(base_dir, temp_folder_name, sep = "/")
   overwrite <- ifelse(!is.null(mode), ifelse(mode == "overwrite", T, F), F)
   append <- ifelse(!is.null(mode), ifelse(mode == "append", T, F), F)
 
+  if(!is.null(partitions)) {
+    df <- sparklyr::sdf_repartition(df, partitions = partitions, partition_by = NULL)
+  }
+
+  if( grepl("hdfs://|s3a://|file://", path)) {
+    protocol <- paste0(strsplit(path, "//")[[1]][1],  "//")
+    file_path <- paste0(dfs_mount, gsub(protocol, "", path))
+  } else {
+    protocol <- ""
+    file_path <- path
+    dfs_mount <- ""
+  }
+
+  name <- gsub(tools::file_ext(path), "", basename(path))
+  name <- gsub("\\.", "", name)
+  base_dir <- dirname(file_path)
+  root_dir <- dirname(base_dir)
   checkmate::assert_directory(root_dir, access = "w")
-  checkmate::assert_choice(type, c("csv", "parquet", "json", "jdbc", "source", "table", "text"))
+  file_tmp_folder <- paste(base_dir, temp_folder_name, sep = "/")
+  file_tmp_path <- gsub(dfs_mount, "", file_tmp_folder)
+
   if(checkmate::check_directory_exists(file_tmp_folder) == TRUE) {
     stop("temp folder exists")
   }
 
   spark_write_fun <- match.fun(paste("spark_write", type, sep = "_"))
   spark_write_fun(x = df,
-                  path = paste0(protocol, file_tmp_folder),
+                  path = file_tmp_path,
                   mode = mode,
                   partition_by = partition_by,
                   ...)
 
+  # Check to see if directory has sub-directory from partition_by
   if (sum(grepl(type, dir(file_tmp_folder))) == 0) {
     sub_folders <- dir(file_tmp_folder)
     for (sb in sub_folders) {
       files <- dir(paste(file_tmp_folder, sb, sep = "/"))
       n_files <- length(files)
       if (n_files > 0) {
+
+        # Create sub-directory in base
         dir.create(paste(base_dir, sb, sep = "/"))
         for (i in seq_along(files)) {
-          isep <- ifelse(n_files == 1, "", paste0("-", i))
-          if (grepl(paste0("\\.", type), files[i])) {
+          .f <- files[i]
+          # Check if file is type file (others are just meta files)
+          if (grepl(paste0("\\.", type), .f)) {
+
             sub_folder <- paste0(base_dir, "/", sb, "/")
+            part <- regmatches(.f, regexpr("^[a-z]{4}([\\w-])([0-9]{5})", .f))
             new_file <- paste0(sub_folder,
-                               paste0(name, "-", sb, isep),
+                               paste(name, sb, part, sep="-"),
                                paste(".", type, sep = ""))
 
+            # Check to see if file existings and in append mode. If so, update
+            # part name to be 1+ the existing max
             if(file.exists(new_file) & append){
               all_files <- dir(sub_folder)[grepl(name, dir(sub_folder))]
-              all_imax <- suppressWarnings(as.numeric(
-                gsub(paste(c(type, name, "\\-",  "\\_", "\\."), collapse="|"), "", all_files)))
-              all_imax <- ifelse(is.na(all_imax), 0, all_imax)
-              isep <- paste0("-", all_imax+1)
+              all_parts <- regmatches(all_files, regexpr("([0-9]{5})", all_files))
+              max_part <- max(as.numeric(all_parts)) + 1
+              new_part <- paste0("part-",
+                                 paste(rep(0, 5-nchar(as.character(max_part))), collapse = ""), max_part)
               new_file <- paste0(sub_folder,
-                                 paste0(name, "-", sb, isep),
+                                 paste(name, sb, new_part, sep="-"),
                                  paste(".", type, sep = ""))
             }
 
             file.copy(
-              from = paste(file_tmp_folder, sb, files[i], sep = "/"),
+              from = paste(file_tmp_folder, sb, .f, sep = "/"),
               to = new_file,
               overwrite = overwrite
             )
@@ -114,24 +139,28 @@ writer.tbl_spark <- function(df,
     n_files <- length(files)
     if (n_files > 0) {
       for (i in seq_along(files)) {
-        imax <- suppressWarnings(as.numeric(
-          gsub(paste(c(type, name, "\\-",  "\\_", "\\."), collapse="|"), "", files)))
-        imax <- ifelse(is.na(imax), 0, imax)
-        isep <- ifelse(sum(grepl(type, files)) == 1, "", paste0("-", imax+1))
-        if (grepl(paste0("\\.", type), files[i])) {
-          new_file <- paste0(base_dir, "/", paste0(name, isep), paste(".", type, sep = ""))
+        .f <- files[i]
+        # Check if file is type file (others are just meta files)
+        if (grepl(paste0("\\.", type), .f)) {
+
+          # Get part name & create new file path
+          part <- regmatches(.f, regexpr("^[a-z]{4}([\\w-])([0-9]{5})", .f))
+          new_file <- paste0(base_dir, "/", paste(name, part, sep="-"), paste(".", type, sep = ""))
+
+          # Check to see if file existings and in append mode. If so, update
+          # part name to be 1+ the existing max
           if(file.exists(new_file) & append){
             all_files <- dir(base_dir)[grepl(name, dir(base_dir))]
-            all_imax <- suppressWarnings(as.numeric(
-              gsub(paste(c(type, name, "\\-",  "\\_", "\\."), collapse="|"), "", all_files)))
-            all_imax <- ifelse(is.na(all_imax), 0, all_imax)
-            isep <- paste0("-", all_imax+1)
-            new_file <- paste0(base_dir, "/", paste0(name, isep), paste(".", type, sep = ""))
+            all_parts <- regmatches(all_files, regexpr("([0-9]{5})", all_files))
+            max_part <- max(as.numeric(all_parts)) + 1
+            new_part <- paste0("part-",
+                               paste(rep(0, 5-nchar(as.character(max_part))), collapse = ""), max_part)
+            new_file <- paste0(base_dir, "/", paste(name, new_part, sep="-"), paste(".", type, sep = ""))
           }
 
           file.copy(
             from = paste(file_tmp_folder, files[i], sep = "/"),
-            to = new_file ,
+            to = new_file,
             overwrite = overwrite
           )
         }
@@ -143,25 +172,23 @@ writer.tbl_spark <- function(df,
 
 
 
-
-
 #' @export
 #' @rdname writer
 writer.data.frame <- function(df,
                               path,
+                              type,
                               mode = NULL,
                               ...) {
   checkmate::assert_character(path)
+  checkmate::assert_choice(type, c("csv", "txt"))
   checkmate::assert_choice(mode, c('error', 'append', 'overwrite', 'ignore'), null.ok = TRUE)
 
-  type <- tools::file_ext(path)
-  name <- gsub(paste0(".", type), "", basename(path))
+  name <- gsub(tools::file_ext(path), "", basename(path))
+  name <- gsub("\\.", "", name)
   base_dir <- dirname(path)
   append <- ifelse(!is.null(mode), ifelse(mode == "append", T, F), F)
   col_names <- ifelse(append, FALSE, TRUE)
-
   checkmate::assert_directory(base_dir, access = "w")
-  checkmate::assert_choice(type, c("csv", "txt"))
 
   suppressWarnings(
     write.table(df, file = path, append = append, col.names = col_names, ...)
