@@ -1,6 +1,7 @@
 
 
 
+
 #' Index Class Constructer
 #'
 #' @param unit index unit. can by time base units such as days, weeks or years
@@ -33,17 +34,6 @@ index <- function(x, unit) {
   UseMethod("index")
 }
 
-structure_fun <- function(periods, x, unit, class)
-{
-  structure(new_index(
-    unit = unit,
-    periods = periods,
-    start = min(x),
-    end = max(x)
-  ),
-  class = class)
-}
-
 #' @rdname index
 #' @export
 index.numeric <- function(x, unit = NULL) {
@@ -52,10 +42,13 @@ index.numeric <- function(x, unit = NULL) {
     stop("index not regular")
   }
 
-  structure_fun(
-    unit = unit,
-    periods = NULL,
-    x = x,
+  structure(
+    new_index(
+      unit = unit,
+      periods = NULL,
+      start = min(x),
+      end = max(x)
+    ),
     class = c("numeric_index", "index")
   )
 }
@@ -76,43 +69,35 @@ index.Date <- function(x, unit = "days") {
     if ((periods %% 1) != 0) {
       stop("index not regular")
     }
-
-    structure_fun(
-      unit = unit,
-      periods = periods,
-      x = x,
-      class = c("time_index", "index")
-    )
+    periods <- periods
   }
+
   else if (unit == "weeks")
   {
     if ((periods %% 1) != 0) {
       stop("index not regular")
     }
     periods <- round(periods / 7)
-
-    structure_fun(
-      unit = unit,
-      periods = periods,
-      x = x,
-      class = c("time_index", "index")
-    )
   }
   else if (unit == "years")
-    if ((periods %% 1 >= 0 && periods %% 1 <= 1)) {
-      periods <- round(periods / 365)
-
-      structure_fun(
-        unit = unit,
-        periods = periods,
-        x = x,
-        class = c("time_index", "index")
-      )
-    }
-  else
   {
-    stop("index not regular")
+    if ((periods %% 1 <= 0 && periods %% 1 >= 1)) {
+      stop("index not regular")
+    }
+    periods <- round(periods / 365)
   }
+
+  structure(
+    new_index(
+      unit = unit,
+      periods = periods,
+      start = min(x),
+      end = max(x)
+    )
+    ,
+    class = c("time_index", "index")
+  )
+
 
 }
 
@@ -126,10 +111,14 @@ index.POSIXct <- function(x, unit = "hours") {
   if ((periods %% 1) != 0) {
     stop("index not regular")
   }
-  structure_fun(
-    unit = unit,
-    periods = periods,
-    x = x,
+  structure(
+    new_index(
+      unit = unit,
+      periods = periods,
+      start = min(x),
+      end = max(x)
+    )
+    ,
     class = c("time_index", "index")
   )
 }
