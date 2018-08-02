@@ -407,13 +407,15 @@ public abstract class Component {
                     // Set record count
                     long recordCount = (long) outDataset.getOrDefault(DataSetProperties.RecordCount.name(),
                         (long) 0);
+                    long size = (long) outDataset.getOrDefault(DataSetProperties.size.name(),
+                        (long) 0);
                     logger.trace("Extracted record count " + recordCount);
 
                     //Extract schema
                     JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
                     if (schema != null) {
                         logger.trace("Extracted schema: " + schema.toString());
-                        md.updateDS(id, ctx, ds, schema, recordCount);
+                        md.updateDS(id, ctx, ds, schema, recordCount, size);
                     }
                 } catch (Exception e) {
                     error = "Could not update DS/ write AuditLog entry to DS, id = " + id;

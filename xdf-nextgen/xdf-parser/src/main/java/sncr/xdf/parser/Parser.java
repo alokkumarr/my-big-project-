@@ -185,7 +185,10 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 logger.debug("No Header");
                 retval = parse(outputDataSetMode);
             }
-
+            // get the size of the created of data set
+            Path outputLocation = new Path(outputDataSetLocation);
+            long size = fs.getContentSummary(outputLocation).getSpaceConsumed();
+            outputDataset.put(DataSetProperties.size.name(), size);
             //Write rejected data
             if (this.rejectedDataCollector != null) {
                 logger.debug("Writing rejected data in the end");
