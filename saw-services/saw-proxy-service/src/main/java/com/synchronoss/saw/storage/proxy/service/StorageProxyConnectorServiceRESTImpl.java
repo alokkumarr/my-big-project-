@@ -1,13 +1,15 @@
 package com.synchronoss.saw.storage.proxy.service;
 
 import static java.util.Collections.emptyMap;
-
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.validation.constraints.NotNull;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -15,12 +17,14 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -28,14 +32,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
+import com.synchronoss.saw.storage.proxy.model.StoreField;
+import com.synchronoss.saw.storage.proxy.model.response.ClusterIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
+import com.synchronoss.saw.storage.proxy.model.response.MappingIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
 
 @Service
@@ -75,7 +86,8 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     Response response = null;
     RestClient client = null;
     SearchESResponse<?> searchResponse = null;
-    String endpoint = proxyDetails.getIndexName() + "/" + proxyDetails.getObjectType() + "/" + SEARCH;
+    String endpoint = proxyDetails.getObjectType()!=null? proxyDetails.getIndexName() + "/" + proxyDetails.getObjectType() + "/" + SEARCH : 
+      proxyDetails.getIndexName()  + "/" + SEARCH;
     try{
         HttpEntity requestPaylod = new NStringEntity(query, ContentType.APPLICATION_JSON);
         client = prepareRESTESConnection();
@@ -180,6 +192,93 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     logger.trace("Count Response", countResponse.toString());
     return countResponse;
   }
+  
+  
+  @Override
+  public List<ClusterIndexResponse> catClusterIndices(StorageProxy proxyDetails) throws Exception {
+    Response response = null;
+    RestClient client = null;
+    List<ClusterIndexResponse> catClusterIndexResponse = null;
+    String endpoint = "_cat" + "/" + "indices?format=json&pretty";
+    try{
+        client = prepareRESTESConnection();
+        response = client.performRequest(HttpGet.METHOD_NAME, endpoint);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        HttpEntity entity = response.getEntity();
+        catClusterIndexResponse = objectMapper.readValue(entity.getContent(), new TypeReference<List<ClusterIndexResponse>>(){});;
+    }
+    finally{
+      if (client !=null){
+        client.close();
+      }
+    }
+    logger.trace("Cluster Index Response", catClusterIndexResponse.toString());
+    return catClusterIndexResponse;
+  }
+  
+  @Override
+  public List<StoreField> getMappingbyIndex(StorageProxy proxyDetails) throws Exception {
+    Response response = null;
+    RestClient client = null;
+    List<StoreField> storeFields =new ArrayList<>();
+    ArrayNode bucketNode = null;
+    final String AGGREGATION_NAME = "typeAgg";
+    final String BUCKETS = "buckets";
+    final String PROPERTIES = "properties";
+    final String KEY = "key";
+    
+    Preconditions.checkNotNull(proxyDetails.getIndexName(), "Index Name cannot be null");
+    String endpoint = proxyDetails.getIndexName() + "/" + "_mappings";
+    try{
+        client = prepareRESTESConnection();
+        response = client.performRequest(HttpGet.METHOD_NAME, endpoint);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        HttpEntity entity = response.getEntity();
+        JsonNode mappingNode  = objectMapper.readTree(entity.getContent());
+        logger.trace("mappingNode: " + objectMapper.writeValueAsString(mappingNode));
+        // The below query to figure the type name dynamically for ES 6.x
+        String typeAggregationQuery= "{\"aggs\":{\"typeAgg\":{\"terms\":{\"field\":\"_type\",\"size\":1}}},\"size\":0}";
+        SearchESResponse<?> typeAggregationResult = searchDocuments(typeAggregationQuery, proxyDetails);
+        ObjectNode rootNode = (ObjectNode) mappingNode;
+        logger.trace("rootNode: " + objectMapper.writeValueAsString(rootNode));
+        ObjectNode mappingDataNode = (ObjectNode)rootNode.get(proxyDetails.getIndexName()).get("mappings");
+        logger.trace("mappingDataNode: " + objectMapper.writeValueAsString(mappingDataNode));
+        if (typeAggregationResult.getAggregations()!=null) {
+          JsonNode aggregationNode  = objectMapper.readTree(objectMapper.writeValueAsString(typeAggregationResult.getAggregations()));
+          logger.trace("aggregationNode: " + objectMapper.writeValueAsString(aggregationNode));
+          bucketNode = (ArrayNode) aggregationNode.get(AGGREGATION_NAME).get(BUCKETS);
+          logger.trace("bucketNode: " + objectMapper.writeValueAsString(bucketNode));
+          // As per as ES.6.x, there will be no more than 1 type per index
+          String typeName = bucketNode.get(0).get(KEY).asText();
+          ObjectNode typeNode  = (ObjectNode) mappingDataNode.get(typeName).get(PROPERTIES);
+          logger.trace("typeNode: " + objectMapper.writeValueAsString(typeNode));
+          Map<?,?> objectDefination = new HashMap<String, String>();
+          objectDefination = objectMapper.readValue(objectMapper.writeValueAsBytes(typeNode), HashMap.class);
+          Iterator<?> itr =   objectDefination.keySet().iterator();
+          while (itr.hasNext()) {
+            String attributeName = itr.next().toString();
+            logger.trace("attributeName : " + attributeName);
+            logger.trace("attributeValue :" + objectDefination.get(attributeName).toString());
+            StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
+            storeField.setColumnName(attributeName);
+            storeFields.add(storeField);
+          }
+        }
+    }
+    finally{
+      if (client !=null){
+        client.close();
+      }
+    }
+    logger.trace("Cluster Index Response", storeFields.toString());
+    return storeFields;
+  }
+
+
 
   private HttpHost[] prepareHostAddresses(String[] hosts, String[] ports) {
     Preconditions.checkArgument(hosts.length == ports.length, "number of hosts is not equal to number of ports been provided");
@@ -231,7 +330,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
   
   public static void main(String[] args) throws IOException {
     //withOutXPACK();
-    String query = "{\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\",\"from\":1,\"size\":1,}}}}}}";
+/*    String query = "{\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\",\"from\":1,\"size\":1,}}}}}}";
     System.out.println(query.contains("size"));
     System.out.println(query.contains("from"));
     
@@ -246,12 +345,55 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         String word2=m.group(3);
         String int2=m.group(4);
         System.out.print("("+word1.toString()+")"+"("+int1.toString()+")"+"("+word2.toString()+")"+"("+int2.toString()+")"+"\n");
-    }
+    }*/
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+  
+  String mappingString = "{\"mct_tmo_session\":{\"mappings\":{\"session\":{\"dynamic\":\"strict\",\"properties\":{\"APP_KEY\":{\"type\":\"text\",\"fields\":{\"keyword\":{\"type\":\"keyword\"}}},\"AVAILABLE_BYTES\":{\"type\":\"double\"}}}}}}"; 
+  String result ="{\"took\":7,\"timed_out\":false,\"_shards\":{\"total\":5,\"successful\":5,\"skipped\":0,\"failed\":0},\"hits\":{\"total\":538335,\"max_score\":0,\"hits\":[]},\"aggregations\":{\"typeAgg\":{\"doc_count_error_upper_bound\":0,\"sum_other_doc_count\":0,\"buckets\":[{\"key\":\"session\",\"doc_count\":538335}]}}}";
+  
+  JsonNode mappingNode  = objectMapper.readTree(mappingString);
+  ObjectNode rootNode = (ObjectNode) mappingNode;
+  ObjectNode mappingDataNode = (ObjectNode)rootNode.get("mct_tmo_session").get("mappings");
+
+  System.out.println(mappingDataNode);
+  
+  JsonNode aggregationNode  = objectMapper.readTree(result);
+  ArrayNode bucketNode = (ArrayNode) aggregationNode.get("aggregations").get("typeAgg").get("buckets");
+  List<String> typesOfIndex = new ArrayList<String>();
+  for (JsonNode node : bucketNode) {
+   typesOfIndex.add(node.get("key").asText());
+  }
+  System.out.println(typesOfIndex);
+
+  ObjectNode typeNode = null;
+  for (String typeName : typesOfIndex) {
+     typeNode  = (ObjectNode)mappingDataNode.get(typeName).get("properties");
+     System.out.println(typeNode);
+  }
+  
+  Map<?,?> objectDefination = new HashMap<String, String>();
+  objectDefination = objectMapper.readValue(objectMapper.writeValueAsBytes(typeNode), HashMap.class);
+  
+  Iterator<?> itr =   objectDefination.keySet().iterator();
+  
+  while (itr.hasNext()) {
+    String attributeName = itr.next().toString();
+    System.out.println(attributeName);
+    System.out.println(objectDefination.get(attributeName));
+    StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
+    storeField.setColumnName(attributeName);
+    System.out.println(storeField.toString()); 
+  }
+  
+  
+ 
     
    }
    private static void withOutXPACK()throws IOException
    {
-     RestClient restClient = RestClient.builder(new HttpHost("elasticsearch02.bda.poc.velocity-va.sncrcorp.net", 9200, "http"))
+     RestClient restClient = RestClient.builder(new HttpHost("es-rd601.ana.dev.vaste.sncrcorp.net", 9200, "http"))
          .setRequestConfigCallback(new RestClientBuilder.RequestConfigCallback() {
              @Override
              public RequestConfig.Builder customizeRequestConfig(RequestConfig.Builder requestConfigBuilder) {
@@ -262,23 +404,27 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
          .setMaxRetryTimeoutMillis(60000)
          .build();
      
-     final HttpEntity payload = new  NStringEntity("{\"size\":1,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\"}}}}}}",ContentType.APPLICATION_JSON);
+     //final HttpEntity payload = new  NStringEntity("{\"size\":1,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\"}}}}}}",ContentType.APPLICATION_JSON);
      //final HttpEntity payload = new  NStringEntity("",ContentType.APPLICATION_JSON);
      //final HttpEntity payload = new  NStringEntity("{\"city\":\"Baltimore\"}",ContentType.APPLICATION_JSON);
-     final Response response = restClient.performRequest(HttpPost.METHOD_NAME, "/mct_tmo_session/session/_search", emptyMap(), payload);
+    // final Response response = restClient.performRequest(HttpPost.METHOD_NAME, "/mct_tmo_session/session/_search", emptyMap(), payload);
     
+     final Response response = restClient.performRequest(HttpGet.METHOD_NAME, "/mct_tmo_session/_mappings/");
+     
      //Response response = restClient.performRequest(HttpDelete.METHOD_NAME, "lower/lowerCase/AWEQIWg3jV2L1EGZ4Mac", emptyMap());
      ObjectMapper objectMapper = new ObjectMapper();
      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 
      HttpEntity entity = response.getEntity();
-     SearchESResponse<?> searchResponse = objectMapper.readValue(entity.getContent(), SearchESResponse.class);
+     String data = EntityUtils.toString(entity);
+     System.out.println(data);
+     //createAndDeleteESResponse = objectMapper.readValue(entity.getContent(), CreateAndDeleteESResponse.class);
+
+     //SearchESResponse<?> searchResponse = objectMapper.readValue(entity.getContent(), SearchESResponse.class);
      //CreateAndDeleteESResponse createResponse = objectMapper.readValue(entity.getContent(), CreateAndDeleteESResponse.class);
      //System.out.println(createResponse.toString());
      //System.out.println(createResponse.getShards().toString() + ":" + createResponse.getResult());
-     System.out.println(searchResponse.getHits().getHits().get(0).getSource());
-     
      String query = "{\"from\":5,\"query\":{\"bool\":{\"must\":[{\"match\":{\"SOURCE_OS.keyword\":{\"query\":\"android\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}},{\"match\":{\"TARGET_MANUFACTURER.keyword\":{\"query\":\"motorola\",\"operator\":\"AND\",\"analyzer\":\"standard\",\"prefix_length\":0,\"max_expansions\":50,\"fuzzy_transpositions\":false,\"lenient\":false,\"zero_terms_query\":\"ALL\",\"boost\":1.0}}}],\"disable_coord\":false,\"adjust_pure_negative\":true,\"boost\":1.0}},\"sort\":[{\"TRANSFER_DATE\":{\"order\":\"asc\"}}],\"aggregations\":{\"node_field_1\":{\"date_histogram\":{\"field\":\"TRANSFER_DATE\",\"format\":\"MMM YYYY\",\"interval\":\"1M\",\"offset\":0,\"order\":{\"_key\":\"desc\"},\"keyed\":false,\"min_doc_count\":0},\"aggregations\":{\"AVAILABLE_ITEMS\":{\"sum\":{\"field\":\"AVAILABLE_ITEMS\",\"size\":1}}}}}}";
      System.out.println(query.contains("size"));
      System.out.println(query.contains("from"));
@@ -318,7 +464,11 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
        System.out.print("("+word1.toString()+")"+"("+int1.toString()+")"+"("+word2.toString()+")"+"("+int2.toString()+")"+"\n");  }
      restClient.close();
      }
-   
+
+
+
+
+  
   
  
   

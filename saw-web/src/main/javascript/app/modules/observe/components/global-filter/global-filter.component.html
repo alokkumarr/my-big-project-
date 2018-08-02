@@ -2,13 +2,23 @@
   <button mat-button (click)="onCancel()">Cancel</button>
   <button mat-raised-button
     color="primary"
-    [disabled]="globalFilters.length <= 0"
+    [disabled]="globalFilters.length <= 0 && !showKPIFilter"
     (click)="onApply()">
     Apply Filters
   </button>
 </div>
 
 <div class="filter-content">
+  <mat-expansion-panel expanded="true" *ngIf="showKPIFilter">
+    <mat-expansion-panel-header>
+      <mat-panel-title>KPI Filter</mat-panel-title>
+
+      <mat-panel-description>Applies to all the KPIs in this dashboard</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <kpi-filter (onModelChange)="onKPIFilterUpdate($event)"></kpi-filter>
+  </mat-expansion-panel>
+
   <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
     <mat-expansion-panel-header>
       <mat-panel-title [textContent]="gFilter.displayName"></mat-panel-title>
