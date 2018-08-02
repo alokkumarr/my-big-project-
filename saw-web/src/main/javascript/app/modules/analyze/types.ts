@@ -90,6 +90,7 @@ export interface IToolbarActionResult {
   filters?: Filter[];
   booleanCriteria?: string;
   analysis?: Analysis;
+  action?: string;
 }
 
 export interface IAnalysisMethod {

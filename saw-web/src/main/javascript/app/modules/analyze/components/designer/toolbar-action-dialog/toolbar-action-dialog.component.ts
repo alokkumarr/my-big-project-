@@ -69,7 +69,7 @@ export class ToolbarActionDialogComponent {
     this.dialogRef.close(result);
   }
 
-  save() {
+  save(action) {
     this.showProgressBar = true;
     this._designerService
       .saveAnalysis(this.data.analysis)
@@ -80,7 +80,8 @@ export class ToolbarActionDialogComponent {
           (this.data.analysis as AnalysisReport).query = response.query;
         }
         const result: IToolbarActionResult = {
-          analysis: this.data.analysis
+          analysis: this.data.analysis,
+          action
         };
         this.dialogRef.close(result);
       })
