@@ -253,7 +253,7 @@ export class DashboardGridComponent
    * @param {any} filterGroup Filters grouped by semantic id
    * @memberof DashboardGridComponent
    */
-  onApplyGlobalFilters(filterGroup) {
+  onApplyGlobalFilters(filterGroup = {}) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
       if (this.tileType(tile) !== 'analysis') return;
@@ -288,8 +288,8 @@ export class DashboardGridComponent
   }
 
   refreshKPIs() {
-    this.dashboardService.onFilterKPI.next(
-      this.dashboardService.onFilterKPI.getValue() || { preset: '' }
+    this.filters.onApplyKPIFilter.next(
+      this.filters.onApplyKPIFilter.getValue() || { preset: '' }
     );
   }
 

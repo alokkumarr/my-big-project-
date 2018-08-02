@@ -243,7 +243,7 @@ export const AnalysisImportComponent = {
         this.updateOldAnalysis(analysis);
         this._$rootScope.showProgress = false;
       }).catch(error => {
-        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false, true);
+        this.updateLogs(analysis.name, analysis.metricName, analysis.type, 'Error While Importing', error, 'red', false, true);
         this._$rootScope.showProgress = false;
       });
     }
@@ -251,16 +251,17 @@ export const AnalysisImportComponent = {
       this._$rootScope.showProgress = true;
       analysis.categoryId = this.categoryId;
       this._ImportService.updateAnalysis(analysis).then(savedAnalysis => {
-        this.updateLogs(savedAnalysis.name, 'Successfully Imported', '', 'green', true, false);
+        this.updateLogs(savedAnalysis.name, savedAnalysis.metricName, savedAnalysis.type, 'Successfully Imported', '', 'green', true, false);
         this._$rootScope.showProgress = false;
       }).catch(error => {
-        this.updateLogs(analysis.name, 'Error While Importing', error, 'red', false, true);
+        this.updateLogs(analysis.name, analysis.metricName, analysis.type, 'Error While Importing', error, 'red', false, true);
         this._$rootScope.showProgress = false;
       });
     }
-    updateLogs(analysisName, logShortMsg, logLongMsg, logColor, importFlag, errorFlag) {
+    updateLogs(analysisName, metricName, type, logShortMsg, logLongMsg, logColor, importFlag, errorFlag) {
       this.analysisTableList.forEach(analysisObject => {
-        if (analysisObject.analysis.name === analysisName) {
+        if (analysisObject.analysis.name === analysisName && analysisObject.analysis.metricName === metricName &&
+          analysisObject.analysis.type === type) {
           analysisObject.log = logShortMsg;
           analysisObject.errorMsg = logLongMsg;
           analysisObject.errorInd = errorFlag;

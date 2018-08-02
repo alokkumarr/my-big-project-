@@ -213,7 +213,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
   private String getDatasetLocation(String project, String name) {
     
-    String path = root + Path.SEPARATOR  + "services" + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
         + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
         + MetadataBase.PREDEF_DATA_DIR;

@@ -25,6 +25,10 @@ import sncr.bda.datasets.conf.DataSetProperties;
 public abstract class MetadataStore extends MetadataBase  implements DocumentConverter{
 
     private static final Logger logger = Logger.getLogger(MetadataStore.class);
+    // TODO: The below path i.e. /services has been added to support backward compatibility
+    // at the service & xdf-ngComponent layer. In addition to that, if we configure the /service at the xd-ngcomponent config file
+    // xdf-component will create the parquet file under /service hierarchy like /service/dl/fs/data/dataset_name/data
+    // TODO: In future release we have to remove this dependency from here.
     protected static final String METASTORE = "services/metadata";
 
     public static final String delimiter = "::";
