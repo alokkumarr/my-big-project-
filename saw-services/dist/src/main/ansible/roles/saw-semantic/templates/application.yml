@@ -24,4 +24,4 @@ application:
         max-pool-size: 50
         queue-capacity: 10000
 metastore:
-    base:  {{ 'maprfs://'+ sip_var_path + '/services/' | default('maprfs:///var/sip/services/') }}
+    base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}

@@ -1,6 +1,5 @@
 package com.synchronoss.saw.workbench.service;
 
-import static org.assertj.core.api.Assertions.in;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -108,12 +107,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
 
     
-    HFileOperations.createDir(defaultProjectRoot + "/services");
+    HFileOperations.createDir(defaultProjectRoot);
     for (String table : METADATA_TABLES) {
         createMetadataTable(table);
     }
     
-    ProjectStore ps = new ProjectStore(defaultProjectRoot + "/services");
+    ProjectStore ps = new ProjectStore(defaultProjectRoot);
     try {
         ps.readProjectData(defaultProjectId);
     } catch (Exception e) {
