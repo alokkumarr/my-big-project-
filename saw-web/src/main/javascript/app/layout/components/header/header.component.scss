@@ -6,6 +6,11 @@ layout-header header {
     background-color: transparent;
     border-bottom: 1px solid #D1D3D3;
 
+    &.app-toolbar {
+      display: flex;
+      flex-direction: column;
+    }
+
     .lh-toolbar {
       height: 70px;
       max-height: 70px;
@@ -77,8 +82,4 @@ header .company-logo {
 .mat-icon-help {
   color: #5C6670;
   font-size: 20px;
-}
-
-header .mat-toolbar mat-progress-bar {
-  margin-top: 30px;
 }
