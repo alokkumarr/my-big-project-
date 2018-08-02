@@ -192,7 +192,6 @@ public class DLDataSetService {
         dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(ds_type));
         dl.add(DataSetProperties.Format.toString(), new JsonPrimitive((String) o.get(DataSetProperties.Format.name())));
         dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive((String) o.get(DataSetProperties.PhysicalLocation.name())));
-        dl.add(DataSetProperties.size.toString(), new JsonPrimitive((String) o.get(DataSetProperties.size.name())));
         dl.add(DataSetProperties.Name.toString(), new JsonPrimitive((String) o.get(DataSetProperties.Name.name())));
         dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive(catalog));
         dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((Integer) o.get(DataSetProperties.NumberOfFiles.name())));
