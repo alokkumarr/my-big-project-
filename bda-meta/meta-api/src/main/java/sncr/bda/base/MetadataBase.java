@@ -23,6 +23,7 @@ public abstract class MetadataBase {
 
     public static final String PREDEF_DATA_SOURCE = "fs";
     public static final String PREDEF_TEMP_DIR = "temp";
+    public static final String PREDEF_ARCHIVE_DIR = "archive";
     public static final String PREDEF_DATA_DIR = "data";
     public static final String PREDEF_DL_DIR = "dl";
     public static final String PREDEF_SYSTEM_DIR = "system";

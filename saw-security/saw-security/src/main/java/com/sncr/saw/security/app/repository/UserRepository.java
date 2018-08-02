@@ -27,8 +27,8 @@ public interface UserRepository {
 	void invalidateTicket(String ticketId, String validityMessage);	
 	String updateUserPass(String masterLoginId, String newPassEncrp);
 	Ticket getTicketDetails(String ticketId);
-	String changePassword(String loginId, String newPass, String oldPass);
-	String rstchangePassword(String loginId, String newPass);
+    String rstchangePassword(String loginId, String newPass, String rhc);
+    String changePassword(String loginId, String newPass, String oldPass);
 	String getUserEmailId(String userId);
 	void insertResetPasswordDtls(String userId, String randomHash,
 			Long createdTime, long validUpto);
