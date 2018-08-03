@@ -1,20 +1,20 @@
-const login = require('../javascript/pages/loginPage.po.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const commonFunctions = require('../javascript/helpers/commonFunctions.js');
-const homePage = require('../javascript/pages/homePage.po');
-const savedAlaysisPage = require('../javascript/pages/savedAlaysisPage.po');
-const protractorConf = require('../../../conf/protractor.conf');
+const login = require('../../javascript/pages/loginPage.po.js');
+const analyzePage = require('../../javascript/pages/analyzePage.po.js');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const homePage = require('../../javascript/pages/homePage.po');
+const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
+const protractorConf = require('../../../../conf/protractor.conf');
 const using = require('jasmine-data-provider');
-const categories = require('../javascript/data/categories');
-const subCategories = require('../javascript/data/subCategories');
-const dataSets = require('../javascript/data/datasets');
-const designModePage = require('../javascript/pages/designModePage.po.js');
-let AnalysisHelper = require('../javascript/api/AnalysisHelper');
-let ApiUtils = require('../javascript/api/APiUtils');
-const Constants = require('../javascript/api/Constants');
-const globalVariables = require('../javascript/helpers/globalVariables');
-const utils = require('../javascript/helpers/utils');
-const commonElementsPage = require('../javascript/pages/commonElementsPage.po');
+const categories = require('../../javascript/data/categories');
+const subCategories = require('../../javascript/data/subCategories');
+const dataSets = require('../../javascript/data/datasets');
+const designModePage = require('../../javascript/pages/designModePage.po.js');
+let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
+let ApiUtils = require('../../javascript/api/APiUtils');
+const Constants = require('../../javascript/api/Constants');
+const globalVariables = require('../../javascript/helpers/globalVariables');
+const utils = require('../../javascript/helpers/utils');
+const commonElementsPage = require('../../javascript/pages/commonElementsPage.po');
 
 describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -34,12 +34,12 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
       value: 'This Week',
       fieldName: 'Date'
     },
-    // 'Date data type filter': {
-    //   user: 'userOne',
-    //   fieldType: 'date',
-    //   value: 'This Week',
-    //   fieldName: 'Date'
-    // },
+    'Date data type filter': {
+      user: 'userOne',
+      fieldType: 'date',
+      value: 'This Week',
+      fieldName: 'Date'
+    },
     //NUMBERS
     'Number data type filter as admin': {
       user: 'admin',
@@ -48,13 +48,13 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
       value: 99999.33,
       fieldName: 'Double'
     },
-    // 'Number data type filter': {
-    //   user: 'userOne',
-    //   fieldType: 'number',
-    //   operator: 'Equal to',
-    //   value: 99999.33,
-    //   fieldName: 'Double'
-    // },
+    'Number data type filter': {
+      user: 'userOne',
+      fieldType: 'number',
+      operator: 'Equal to',
+      value: 99999.33,
+      fieldName: 'Double'
+    },
     //STRING
     'String data type filter as admin': {
       user: 'admin',
@@ -387,8 +387,8 @@ const applyFilters = (user, name, description, analysisType, subType, fieldName)
     //Save
    const save = analyzePage.saveDialog;
    const designer = analyzePage.designerDialog;
-   commonFunctions.waitFor.elementToBeClickable(designer.saveOnlyBtn);
-   designer.saveOnlyBtn.click();
+   commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+   designer.saveBtn.click();
    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
    save.saveBtn.click();

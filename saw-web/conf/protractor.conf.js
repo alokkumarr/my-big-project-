@@ -49,7 +49,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
 /**
  * number of failed retry, 3 times in bamboo and 2 times in local
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 3;
+const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -99,7 +99,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 4,
+    maxInstances: 10,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -160,29 +160,32 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
-    root: [
-      appRoot + '/src/test/e2e-tests/priviliges.test.js',
-      appRoot + '/src/test/e2e-tests/analyze.test.js',
-      appRoot + '/src/test/e2e-tests/createReport.test.js'
+    // root: [
+    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
+    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
+    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
+    // ],
+    // charts: [
+    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    // ],
+    // chartEditFork: [
+    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    // ],
+    promptFilters: [
+      appRoot + '/src/test/e2e-tests/promptFilter/chartPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/esReportPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/pivotPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js',
     ],
-    charts: [
-      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    ],
-    chartEditFork: [
-      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    ],
-    filters: [
-      appRoot + '/src/test/e2e-tests/promptFilters.test.js'
-    ],
-    pivots: [
-      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    ],
-    authentication: [
-      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    ],
+    // pivots: [
+    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    // ],
+    // authentication: [
+    //   appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    // ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
