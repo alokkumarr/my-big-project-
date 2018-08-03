@@ -5,6 +5,7 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import * as filter from 'lodash/filter';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
+import { DEFAULT_ANALYSIS_NAME } from '../consts'
 
 const template = require('./toolbar-action-dialog.component.html');
 require('./toolbar-action-dialog.component.scss');
@@ -31,6 +32,10 @@ export class ToolbarActionDialogComponent {
     }
   }
 
+  validateSaving() {
+    let validateState = this.data.analysis.name.replace(/\s/g, '').length === 0 ? true : false;
+    return validateState;
+  }
   onBack() {
     this.dialogRef.close();
   }
