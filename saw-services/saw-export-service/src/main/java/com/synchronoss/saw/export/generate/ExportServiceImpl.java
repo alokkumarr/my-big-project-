@@ -164,8 +164,8 @@ public class ExportServiceImpl implements ExportService{
       recipients = String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
       ftp = String.valueOf(((LinkedHashMap) dispatchBean).get("ftp"));
       jobGroup = String.valueOf(((LinkedHashMap) dispatchBean).get("jobGroup"));
-
-      if(recipients!=null && !recipients.equals("")) {
+      if(recipients!=null && !recipients.equals("") && recipients.contains("@")) {
+          logger.trace("Recipients: " +recipients);
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +emailExportSize+"&analysisType="+ analysisType;
         ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
@@ -238,7 +238,9 @@ public class ExportServiceImpl implements ExportService{
         long limitPerPage = Long.parseLong(exportChunkSize);
         long page = 0; // just to keep hold of last not processed data in for loop
 
-        double noOfPages = Double.parseDouble(ftpExportSize)/limitPerPage;
+        double noOfPages = Math.ceil(Double.parseDouble(ftpExportSize)/limitPerPage);
+        boolean flag =true;
+          long totalRowCount =0;
 
         for (int i = 1; i < noOfPages; i+=1) {
           // get data in pages and keep storing it to file
@@ -253,12 +255,22 @@ public class ExportServiceImpl implements ExportService{
           // we directly get response and start processing this.
           ResponseEntity<DataResponse> entity = restTemplate.exchange(url, HttpMethod.GET,
               requestEntity, DataResponse.class);
-
+            totalRowCount  = entity.getBody().getTotalRows();
+            if (totalRowCount <= Double.parseDouble(ftpExportSize) && flag) {
+                noOfPages = Math.ceil(totalRowCount / limitPerPage);
+                flag =false;
+            }
           streamResponseToFile(exportBean, limitPerPage, entity);
 
         }
         // final rows to process
-        long leftOutRows = Long.parseLong(ftpExportSize) - page * limitPerPage;
+          long leftOutRows =0 ;
+          if (totalRowCount <= Double.parseDouble(ftpExportSize)) {
+              leftOutRows = totalRowCount - page * limitPerPage;
+          }else {
+              leftOutRows = Long.parseLong(ftpExportSize) - page * limitPerPage;
+          }
+
         // if limits are set in such a way that no of pages becomes zero, then there's just one page to process for entire data.
         // process the remaining page
         page+=1;
