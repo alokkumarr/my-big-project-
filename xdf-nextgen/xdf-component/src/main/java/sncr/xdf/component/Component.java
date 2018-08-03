@@ -407,13 +407,24 @@ public abstract class Component {
                     // Set record count
                     long recordCount = (long) outDataset.getOrDefault(DataSetProperties.RecordCount.name(),
                         (long) 0);
+                  // get the size of the created of data set
+                  Path outputLocation = null;
+                  if (outDataset.get(DataSetProperties.PhysicalLocation.name()).toString() != null
+                      && !outDataset.get(DataSetProperties.PhysicalLocation.name()).toString().trim()
+                          .equals("")) {
+                    outputLocation =
+                        new Path(outDataset.get(DataSetProperties.PhysicalLocation.name()).toString());
+                  }
+                  long size = outputLocation != null ? ctx.fs.getContentSummary(outputLocation).getSpaceConsumed()
+                          : 0;
                     logger.trace("Extracted record count " + recordCount);
+                    logger.trace("Extracted size " + size);
 
                     //Extract schema
                     JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
                     if (schema != null) {
                         logger.trace("Extracted schema: " + schema.toString());
-                        md.updateDS(id, ctx, ds, schema, recordCount);
+                        md.updateDS(id, ctx, ds, schema, recordCount, size);
                     }
                 } catch (Exception e) {
                     error = "Could not update DS/ write AuditLog entry to DS, id = " + id;

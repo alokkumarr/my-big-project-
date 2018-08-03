@@ -17,4 +17,9 @@ public interface WorkbenchExecutionService {
    * Get dataset preview data by preview ID.
    */
   ObjectNode getPreview(String previewId) throws Exception;
+  /**
+   * Get dataset preview data by preview ID.
+   */
+  String generatePath(String project, String name) throws Exception;
+  
 }

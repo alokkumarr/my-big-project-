@@ -20,6 +20,7 @@ import com.mapr.db.TableDescriptor;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.component.WithDataSetService;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -152,7 +153,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   /**
    * Execute a transformation component on a dataset to create a new dataset.
    */
-  private void createDatasetDirectory(String name) throws Exception {
+  private String createDatasetDirectory(String name) throws Exception {
     
     String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
@@ -162,6 +163,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     if (!HFileOperations.exists(path)) {
       HFileOperations.createDir(path);
     }
+    return path;
   }
 
   @Value("${metastore.base}")
@@ -231,6 +233,14 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     }
     JsonNode json = mapper.readTree(doc.toString());
     return (ObjectNode) json;
+  }
+
+  @Override
+  public String generatePath(String project, String name) throws Exception {
+    log.trace("generate data system path for starts here :" + project + " : " + name);
+    String location = createDatasetDirectory(name);
+    log.trace("generate data system path for starts here " + location);
+    return location;
   }
 
 }

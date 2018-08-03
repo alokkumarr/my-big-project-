@@ -185,7 +185,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 logger.debug("No Header");
                 retval = parse(outputDataSetMode);
             }
-
             //Write rejected data
             if (this.rejectedDataCollector != null) {
                 logger.debug("Writing rejected data in the end");
