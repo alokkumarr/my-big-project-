@@ -42,6 +42,7 @@ import { SqlScriptComponent } from './components/sql-executor/query/sql-script.c
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
+import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
 
 import { CommonModule } from '../../common';
 
@@ -70,7 +71,8 @@ const components = [
   SqlpreviewGridPageComponent,
   DetailsDialogComponent,
   CreatefolderDialogComponent,
-  DatasetDetailViewComponent
+  DatasetDetailViewComponent,
+  CreateSemanticComponent
 ];
 
 @NgModule({

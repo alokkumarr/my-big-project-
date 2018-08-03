@@ -1,0 +1,32 @@
+@import 'themes/base/colors';
+
+create-semantic {
+  width: 100%;
+  height: calc(100% - 3px);
+  background-color: $background-color;
+  padding: 0 3px 3px;
+  overflow: auto;
+
+  .container {
+    height: 100%;
+  }
+
+  .header {
+    color: rgba(0, 0, 0, 0.54);
+    background: rgba(0, 0, 0, 0.03);
+    padding: 8px 0;
+    height: 50px;
+    font-size: 18px;
+    font-weight: 500;
+    border: 2px solid white;
+
+    .mat-icon {
+      font-size: 26px;
+    }
+  }
+
+  .body {
+    background-color: #FFF;
+    height: calc(100% - 50px);
+  }
+}
