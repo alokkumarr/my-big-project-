@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { DATE_PRESETS_OBJ, KPI_BG_COLORS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
-import { DashboardService } from '../../services/dashboard.service';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -45,12 +45,12 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   constructor(
     private observe: ObserveService,
-    private dashboardService: DashboardService,
+    private globalFilterService: GlobalFilterService,
     private progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
-    this.kpiFilterSubscription = this.dashboardService.onFilterKPI.subscribe(
+    this.kpiFilterSubscription = this.globalFilterService.onApplyKPIFilter.subscribe(
       this.onFilterKPI.bind(this)
     );
   }

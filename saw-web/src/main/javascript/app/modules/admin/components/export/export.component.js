@@ -103,7 +103,7 @@ export const AnalysisExportComponent = {
         this._exportService.getAnalysisByMetricIds(body).then(analysis => {
           if (analysis.data.contents.analyze.length > 0) {
             analysis.data.contents.analyze.forEach(element => {
-              if (!isUndefined(element.categoryId) && !isUndefined(element.name)) {
+              if (!isUndefined(element.categoryId) && !isUndefined(element.name) && element.name !== '') {
                 this.analysisTableObject = {
                   selection: false,
                   analysis: {},
@@ -150,8 +150,9 @@ export const AnalysisExportComponent = {
           }
         });
         zip.generateAsync({type: 'blob'}).then(content => {
-          const custCode = get(this._JwtService.getTokenObj(), 'ticket.custCode');
-          FileSaver.saveAs(content, `${custCode}.zip`);
+          let zipFileName = this.getFileName('');
+          zipFileName = zipFileName.replace('_', '');
+          FileSaver.saveAs(content, `${zipFileName}.zip`);
         });
       }
     }
