@@ -407,10 +407,18 @@ public abstract class Component {
                     // Set record count
                     long recordCount = (long) outDataset.getOrDefault(DataSetProperties.RecordCount.name(),
                         (long) 0);
-                    // get the size of the created of data set
-                    Path outputLocation = new Path(outDataset.get(DataSetProperties.PhysicalLocation.name()).toString());
-                    long size = ctx.fs.getContentSummary(outputLocation).getSpaceConsumed();
+                  // get the size of the created of data set
+                  Path outputLocation = null;
+                  if (outDataset.get(DataSetProperties.PhysicalLocation.name()).toString() != null
+                      && !outDataset.get(DataSetProperties.PhysicalLocation.name()).toString().trim()
+                          .equals("")) {
+                    outputLocation =
+                        new Path(outDataset.get(DataSetProperties.PhysicalLocation.name()).toString());
+                  }
+                  long size = outputLocation != null ? ctx.fs.getContentSummary(outputLocation).getSpaceConsumed()
+                          : 0;
                     logger.trace("Extracted record count " + recordCount);
+                    logger.trace("Extracted size " + size);
 
                     //Extract schema
                     JsonElement schema = (JsonElement) outDataset.get(DataSetProperties.Schema.name());
