@@ -5,7 +5,6 @@
         <div class="status-icon" matTooltip="{{sets.asOfNow.status}}" [ngSwitch]="sets.asOfNow.status">
           <mat-icon *ngSwitchCase="'FAILED'" style="color: #AB0E27;" fontIcon="icon-warning"></mat-icon>
           <mat-icon *ngSwitchCase="'SUCCESS'" style="color: #73B421;" fontIcon="icon-exchange"></mat-icon>
-          <!-- <img *ngSwitchCase="'SUCCESS'" src="../../../../../../../../../assets/svg/happy.svg" height="24" width="24" /> -->
           <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
         </div>
         <a class="dataset-name" e2e="data-set-card" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name"></a>
@@ -29,9 +28,8 @@
             <span [innerHTML]="sets.system.createdBy"></span>
           </div>
           <div fxFlex="65
-                    " fxLayout="column" fxLayoutAlign="center end">Last updated by:
+                    " fxLayout="column" fxLayoutAlign="center end">Last updated:
             <div fxLayout="row" style="align-items: baseline;">
-              <!-- <span [innerHTML]="sets.system.user"></span> @ -->
               <span> {{sets.system.modifiedTime * 1000 | date: 'short'}}</span>
             </div>
           </div>

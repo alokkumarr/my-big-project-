@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="header" fxLayout="row" fxLayoutAlign="center center">
+        <button mat-button class="bck-btn">
+            <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
+        </button>
+        <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+            <span>Create Datapod </span>
+        </div>
+    </div>
+    <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
+        <mat-card fxFlex="30">
+            <mat-card-header>
+                <mat-card-subtitle>Available Datasets</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <dx-data-grid fxFlex [dataSource]="availableDS" [rowAlternationEnabled]="true" [height]="'98%'" [width]="'100%'" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
+                    [showBorders]="false">
+                    <dxi-column caption="Dataset Name" dataField="system.name"></dxi-column>
+                    <dxi-column caption="Location" dataField="system.format"></dxi-column>
+                    <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+                    <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                    <dxo-header-filter [visible]="true"></dxo-header-filter>
+                </dx-data-grid>
+            </mat-card-content>
+        </mat-card>
+        <mat-card fxFlex="70">
+            <mat-card-header>
+                <mat-card-subtitle>Selected Dataset/s Schema</mat-card-subtitle>
+            </mat-card-header>
+        </mat-card>
+    </div>
+</div>
