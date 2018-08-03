@@ -33,4 +33,4 @@ workbench:
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
 metastore:
-    base: "{{ 'maprfs://'+ sip_var_path + '/services/' | default('maprfs:///var/sip/services/') }}"
+    base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"
