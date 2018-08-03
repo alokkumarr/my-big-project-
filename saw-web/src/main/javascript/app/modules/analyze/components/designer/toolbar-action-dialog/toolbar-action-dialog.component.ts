@@ -32,6 +32,10 @@ export class ToolbarActionDialogComponent {
     }
   }
 
+  validateSaving() {
+    let validateState = this.data.analysis.name.replace(/\s/g, '').length === 0 ? true : false;
+    return validateState;
+  }
   onBack() {
     this.dialogRef.close();
   }
@@ -72,7 +76,6 @@ export class ToolbarActionDialogComponent {
 
   save() {
     this.showProgressBar = true;
-    this.data.analysis.name = this.data.analysis.name.replace(/\s/g, '').length === 0 ? DEFAULT_ANALYSIS_NAME : this.data.analysis.name;
     this._designerService
       .saveAnalysis(this.data.analysis)
       .then(response => {
