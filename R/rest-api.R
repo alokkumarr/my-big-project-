@@ -12,6 +12,7 @@
 #'
 #' @return aToken authentication string
 #' @export
+#' @import httr
 sip_authenticate <- function(login,
                              password,
                              hostname){

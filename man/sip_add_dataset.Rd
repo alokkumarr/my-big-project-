@@ -4,36 +4,48 @@
 \alias{sip_add_dataset}
 \title{SIP Metastore Add Dataset}
 \usage{
-sip_add_dataset(dataset_name, dataset_path, dataset_format, row_count = NULL,
-  component, desc, project_id, batch_id, input_datasets_id, started, finished,
-  status = "SUCCESS", hostname)
+sip_add_dataset(output_path, output_format, output_rows = NULL,
+  component = "RComponent", script, desc = "", created_by = NULL,
+  project_id, batch_id = "", input_paths = "", input_formats = "",
+  input_ids = "", input_names = "", started = NULL, finished = NULL,
+  status = "SUCCESS", hostname, token)
 }
 \arguments{
-\item{dataset_name}{name of dataset to add}
+\item{output_path}{output dataset file path}
 
-\item{dataset_path}{file path to saved dataset}
+\item{output_format}{output dataset format. accepts parquet, JSON, csv and
+rds}
 
-\item{dataset_format}{format of dataset. accepts parquet, JSON, csv and rds}
+\item{component}{component name used to create dataset. Default is RComponent}
 
-\item{row_count}{dataset record count. Default is NULL}
+\item{script}{path to executable R script}
 
-\item{component}{name of component used to create dataset}
+\item{desc}{description of dataset. Default is empty string}
 
-\item{desc}{description of dataset}
+\item{created_by}{user name. Default is system user name}
 
 \item{project_id}{project id string}
 
-\item{batch_id}{batch id string}
+\item{batch_id}{batch id string. Default is empty string}
 
-\item{input_datasets_id}{string vector of input datasets}
+\item{input_paths}{vector of input datasets paths. Default is empty string}
 
-\item{started}{string with starting time. Format should be YYYYMMDD-HHMMSS}
+\item{input_ids}{vector of input dataset ids. Default is empty string}
+
+\item{input_names}{vectore of input dataset names. Default is empty string}
+
+\item{started}{string with starting time. Format should be YYYYMMDD-HHMMSS.
+Default is NULL which inserts current time}
 
 \item{finished}{string with starting time. Format should be YYYYMMDD-HHMMSS}
 
-\item{status}{component status. default is 'SUCCESS'}
+\item{status}{component status. default is 'SUCCESS'. Default is NULL which inserts current time}
 
 \item{hostname}{hostname only of saw security location. No pathing required}
+
+\item{token}{valid SIP token. Result of sip_authenticate function}
+
+\item{row_count}{ouput dataset record count. Default is NULL}
 }
 \value{
 POST response content
@@ -42,5 +54,6 @@ POST response content
 Adds a dataset record to the SIP Metastore
 }
 \details{
-POST request to /saw/services/internal/workbench/projects/{project_id}/datasets/create
+POST request to
+/saw/services/internal/workbench/projects/{project_id}/datasets/create
 }

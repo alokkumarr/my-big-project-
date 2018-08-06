@@ -4,10 +4,10 @@
 \alias{sip_get_dataset_details}
 \title{SIP Metastore Get Dataset Details}
 \usage{
-sip_get_dataset_details(dataset_name, project_id, hostname, token)
+sip_get_dataset_details(dataset_id, project_id, hostname, token)
 }
 \arguments{
-\item{dataset_name}{dataset name}
+\item{dataset_id}{dataset id}
 
 \item{project_id}{id of project to retrieve datasets from}
 
