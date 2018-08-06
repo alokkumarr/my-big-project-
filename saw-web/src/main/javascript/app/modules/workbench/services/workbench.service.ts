@@ -170,7 +170,7 @@ export class WorkbenchService {
    * @memberof WorkbenchService
    */
   setDataToLS(key, value) {
-    localStorage.setItem('dsMetadata', JSON.stringify(value));
+    localStorage.setItem(key, JSON.stringify(value));
   }
 
   getDataFromLS(key) {

@@ -1,0 +1,27 @@
+<div class="container">
+    <div class="header" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+        <button mat-button class="bck-btn">
+            <mat-icon fontIcon="icon-arrow-left" (click)="showDSList()"></mat-icon>
+        </button>
+        <div fxFlex>Create Datapod </div>
+        <button mat-raised-button color="primary" [disabled]="!isValid" i18n (click)="createDatapod()">
+            <span>Create</span>
+        </button>
+    </div>
+    <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
+        <mat-card fxFlex="30">
+            <mat-card-content>
+
+            </mat-card-content>
+        </mat-card>
+        <mat-card fxFlex>
+            <mat-card-content>
+                <mat-tab-group>
+                    <mat-tab *ngFor="let ds of selectedDS; let index = index" [label]="ds?.system?.name">
+                        Contents for {{ds}} tab
+                    </mat-tab>
+                </mat-tab-group>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

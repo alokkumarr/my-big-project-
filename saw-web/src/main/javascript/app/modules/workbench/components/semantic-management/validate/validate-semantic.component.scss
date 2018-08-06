@@ -1,10 +1,9 @@
 @import 'themes/base/colors';
 
-create-semantic {
+validate-semantic {
   width: 100%;
-  height: calc(100% - 3px);
+  height: 100%;
   background-color: $background-color;
-  padding: 0 3px 3px;
   overflow: auto;
 
   .container {
@@ -33,20 +32,12 @@ create-semantic {
   .body {
     background-color: #FFF;
     height: calc(100% - 50px);
-    max-height: calc(100% - 50px) !important;
 
     mat-card {
       padding: 0;
-      height: 100%;
 
       .mat-card-content {
-        height: 100%;
-        max-height: 100%;
-        overflow: auto;
-
-        #schemaGrid {
-          margin: 9px 30px;
-        }
+        height: calc(100%);
       }
     }
   }
