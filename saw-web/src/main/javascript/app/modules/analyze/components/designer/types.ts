@@ -107,12 +107,13 @@ export type DesignerChangeEvent = {
     | 'removeColumn'
     | 'visibleIndex'
     | 'submitQuery'
+    | 'chartTitle'
     | 'changeQuery';
   column?: ArtifactColumn;
   data?: any;
 };
 
 export type DesignerSaveEvent = {
-  requestExecution: boolean,
-  analysis: Analysis
-}
+  requestExecution: boolean;
+  analysis: Analysis;
+};

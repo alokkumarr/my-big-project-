@@ -59,6 +59,15 @@ export const ImportListViewComponent = {
           analysis.overrideInd = false;
         }
       });
+      this.selectAllAnalysisCount = 0;
+      this.analysisList.forEach(analysis => {
+        if (analysis.selection) {
+          this.selectAllAnalysisCount++;
+        }
+      });
+      if (this.selectAllAnalysisCount === 0) {
+        this.selectAllAnalysis = false;
+      }
     }
     overrideAnalysis(row) {
       this.analysisList.forEach(analysis => {
@@ -103,7 +112,15 @@ export const ImportListViewComponent = {
     }
 
     validation() {
+      let errorCount = 0;
       if (this.analysisList.length > 0) {
+        this.analysisList.forEach(analysis => {
+          if (analysis.errorInd) {
+            errorCount++;
+          }
+        });
+      }
+      if (errorCount !== 0) {
         return false;
       }
       return true;

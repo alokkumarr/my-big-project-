@@ -356,25 +356,17 @@ export class DesignerContainerComponent {
           }
         });
       break;
-    case 'saveAndClose':
-      this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
-        if (result) {
-          this.onSave.emit({
-            requestExecution: true,
-            analysis: result.analysis
-          });
-          this.isInDraftMode = false;
-        }
-      });
-      break;
     case 'save':
       this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
         if (result) {
+          const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
-            requestExecution: false,
+            requestExecution: shouldClose,
             analysis: result.analysis
           });
-          this.requestDataIfPossible();
+          if (!shouldClose) {
+            this.requestDataIfPossible();
+          }
           this.isInDraftMode = false;
         }
       });
@@ -391,12 +383,15 @@ export class DesignerContainerComponent {
   openSaveDialogIfNeeded(): Promise<any> {
     return new Promise(resolve => {
       if (this.isInQueryMode && !this.analysis.edit) {
-        this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
-          if (result) {
-            this.changeToQueryModePermanently();
-            resolve(this.openSaveDialog());
-          }
-        });
+        this._analyzeDialogService
+          .openQueryConfirmationDialog()
+          .afterClosed()
+          .subscribe(result => {
+            if (result) {
+              this.changeToQueryModePermanently();
+              resolve(this.openSaveDialog());
+            }
+          });
       } else {
         resolve(this.openSaveDialog());
       }
@@ -406,7 +401,8 @@ export class DesignerContainerComponent {
   openSaveDialog(): Promise<any> {
     return this._analyzeDialogService
       .openSaveDialog(this.analysis)
-      .afterClosed().toPromise();
+      .afterClosed()
+      .toPromise();
   }
 
   toggleDesignerQueryModes() {
