@@ -53,17 +53,17 @@ class AnalysisExecutions extends BaseController {
               {
                 if(!excludeOneTimeExecution(result._4.get,result._5.get)) esReportHistoryCount+=1
                 else {
-                  // Set the execution result TTL 5 minute for oneTime execution since execution completed.
+                  // Set the execution result TTL 60 minute for oneTime execution since execution completed.
                   // Applicable only for es-report since we are storing all the execution type to support
                   // pagination.
-                  if ((currentTime- (10*60*1000)) >= result._2.get)
+                  if ((currentTime- (60*60*1000)) >= result._2.get)
                   junkExecution += result._1
                 }
                 !excludeOneTimeExecution(result._4.get,result._5.get)
               }
             else {
-              // Set the execution result TTL 5 minute for oneTime execution since execution completed.
-              if ((currentTime- (10*60*1000)) >= result._2.get)
+              // Set the execution result TTL 60 minute for oneTime execution since execution completed.
+              if ((currentTime- (60*60*1000)) >= result._2.get)
               junkExecution += result._1
               false
             }
