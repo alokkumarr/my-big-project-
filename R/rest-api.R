@@ -86,7 +86,7 @@ sip_get_dataset_details <- function(dataset_id,
                                     project_id,
                                     hostname,
                                     token){
-  checkmate::assert_character(dataset_name)
+  checkmate::assert_character(dataset_id)
   checkmate::assert_character(project_id)
   checkmate::assert_character(hostname)
   checkmate::assert_character(token)
