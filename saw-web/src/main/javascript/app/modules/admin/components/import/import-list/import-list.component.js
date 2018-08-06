@@ -112,15 +112,15 @@ export const ImportListViewComponent = {
     }
 
     validation() {
-      this.errorCount = 0;
+      let errorCount = 0;
       if (this.analysisList.length > 0) {
         this.analysisList.forEach(analysis => {
           if (analysis.errorInd) {
-            this.errorCount++;
+            errorCount++;
           }
         });
       }
-      if (this.errorCount !== 0) {
+      if (errorCount !== 0) {
         return false;
       }
       return true;
