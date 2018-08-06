@@ -160,32 +160,32 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
-    // root: [
-    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
-    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
-    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
-    // ],
-    // charts: [
-    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    // ],
-    // chartEditFork: [
-    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    // ],
+    root: [
+      appRoot + '/src/test/e2e-tests/priviliges.test.js',
+      appRoot + '/src/test/e2e-tests/analyze.test.js',
+      appRoot + '/src/test/e2e-tests/createReport.test.js'
+    ],
+    charts: [
+      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    ],
+    chartEditFork: [
+      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    ],
     promptFilters: [
       appRoot + '/src/test/e2e-tests/promptFilter/chartPromptFilters.test.js',
       appRoot + '/src/test/e2e-tests/promptFilter/esReportPromptFilters.test.js',
       appRoot + '/src/test/e2e-tests/promptFilter/pivotPromptFilters.test.js',
       appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js',
     ],
-    // pivots: [
-    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    // ],
-    // authentication: [
-    //   appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    // ],
+    pivots: [
+      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    ],
+    authentication: [
+      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
@@ -249,7 +249,7 @@ exports.config = {
         done();
       })
     });
-    
+
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
