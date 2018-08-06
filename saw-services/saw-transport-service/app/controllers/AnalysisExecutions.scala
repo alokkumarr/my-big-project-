@@ -14,6 +14,7 @@ import sncr.metadata.engine.MDObjectStruct
 import sncr.saw.common.config.SAWServiceConfig
 
 import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.io.File
 
 class AnalysisExecutions extends BaseController {
@@ -34,24 +35,38 @@ class AnalysisExecutions extends BaseController {
       var count = 0
       var esReportHistoryCount =0;
       val execHistory = SAWServiceConfig.executionHistory
-      var junkSize = if(sortedExecutions.size < execHistory)
-        1 else (sortedExecutions.size+1-execHistory)
-      val junkExecution = new Array[String](junkSize)
+      val junkExecution = scala.collection.mutable.Buffer[String]()
+      var analysisType :String = null
       val executions = sortedExecutions.filter(result =>{
         count = count+1
+        if (analysisType==null && result._5!=None)
+          analysisType =result._5.get
+        val currentTime = System.currentTimeMillis
         if(count<=execHistory && !(result._5!=None && result._5.get.equalsIgnoreCase("esReport"))) true
         else {
           if (!(result._5 != None && result._5.get.equalsIgnoreCase("esReport"))) {
-            junkExecution(count - execHistory) = result._1
+            junkExecution += result._1
             false
           }
           else {
             if (esReportHistoryCount<execHistory)
               {
                 if(!excludeOneTimeExecution(result._4.get,result._5.get)) esReportHistoryCount+=1
+                else {
+                  // Set the execution result TTL 5 minute for oneTime execution since execution completed.
+                  // Applicable only for es-report since we are storing all the execution type to support
+                  // pagination.
+                  if ((currentTime- (10*60*1000)) >= result._2.get)
+                  junkExecution += result._1
+                }
                 !excludeOneTimeExecution(result._4.get,result._5.get)
               }
-            else false
+            else {
+              // Set the execution result TTL 5 minute for oneTime execution since execution completed.
+              if ((currentTime- (10*60*1000)) >= result._2.get)
+              junkExecution += result._1
+              false
+            }
           }
         }
       }).map(result => {
@@ -66,6 +81,15 @@ class AnalysisExecutions extends BaseController {
           ("status", result._3)  ~
           ("executionType",executionType)
       })
+
+      // Run the execution result cleanup as async execution,
+      // So, actual response will not be blocked by cleanp activity
+      implicit val ec = ExecutionContext.global
+      Future {
+        analysis.deleteByID(junkExecution)
+        if (analysisType.equalsIgnoreCase("report"))
+        analysis.dataLakeCleanUp(junkExecution)
+      }
 
       /* Note: Keep "results" property for API backwards compatibility */
       ("executions", executions) ~ ("results", executions): JValue
