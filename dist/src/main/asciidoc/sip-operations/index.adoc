@@ -216,6 +216,20 @@ Execute the following steps to install RTPS:
 
         rpm -ivh bda-rtps-*.rpm
 
+   RTPS will get installed and symbolic link will get created for location
+   in `/dfs/opt/bda/rtps-current`
+
+==== Upgrading
+
+To upgrade an existing installation, follow the same steps as for
+installing an entirely new environment.  The deploy command will
+detect an already existing installation and upgrade it.
+
+NOTE: Downgrading to an older RTPS version is not supported.  If
+needed, take a backup of the entire environment before upgrading that
+can be used to restore the environment to a state that is supported by
+older RTPS versions.
+
 === RTIS
 
 ==== Installing
@@ -240,7 +254,20 @@ Execute the following steps to install RTIS:
 
         rpm -ivh bda-rtis-*.rpm
 
+    RTIS will get installed in location `/opt/bda/rtis/`
+
 .  Run /opt/bda/rtis-*/sbin/rtis_runner.sh & to start RTIS.
+
+==== Upgrading
+
+To upgrade an existing installation, follow the same steps as for
+installing an entirely new environment.  The deploy command will
+detect an already existing installation and upgrade it.
+
+NOTE: Downgrading to an older RTIS version is not supported.  If
+needed, take a backup of the entire environment before upgrading that
+can be used to restore the environment to a state that is supported by
+older RTIS versions.
 
 == Monitoring
 
@@ -374,6 +401,19 @@ using the following commands:
 
 Please note that clearing the queues affects all users of the system
 and report execution types.
+
+=== Clearing the onetime execution result for data lake
+
+Saw execution result for data lake analysis can be cleaned-up if output location
+contains large amount of onetime(preview) execution results.
+
+ $ ssh <mapr-host>
+ $ hadoop fs -rm -r <output-location>/preview-*
+
+Note: <output-location> can be found in saw-host, saw-transport service conf file
+in location /opt/saw/service/conf/application.conf properties name
+`output-location`. Please do not delete anything which doesn't contains
+preview in directory name.
 
 === Automatically generated credentials
 
