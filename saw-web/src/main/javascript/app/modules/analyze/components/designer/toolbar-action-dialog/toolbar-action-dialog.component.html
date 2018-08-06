@@ -41,11 +41,17 @@
           Save Description
         </button>
         <button *ngSwitchCase="'save'"
-                (click)="save()"
+                (click)="save('saveAndClose')"
                 e2e="save-dialog-save-analysis"
-                mat-raised-button color="primary" 
                 [disabled]="validateSaving()"
-                i18n>
+                mat-raised-button color="primary" i18n>
+          Save & Close
+        </button>
+        <button *ngSwitchCase="'save'"
+                (click)="save('save')"
+                e2e="save-dialog-save-analysis"
+                [disabled]="validateSaving()"
+                mat-button i18n>
           Save
         </button>
     </div>

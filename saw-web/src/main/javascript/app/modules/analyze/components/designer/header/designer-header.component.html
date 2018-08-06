@@ -78,18 +78,12 @@
       <ng-container i18n>Filter</ng-container>
     </button>
 
-    <button mat-button
-            [disabled]="!areMinRequirmentsMet"
-            e2e="designer-save-only-btn"
-            (click)="requestAction.emit('save')">
-      <ng-container i18n>Save</ng-container>
-    </button>
     <button mat-raised-button
             [disabled]="!areMinRequirmentsMet"
             e2e="designer-save-btn"
             color="primary"
-            (click)="requestAction.emit('saveAndClose')">
-      <ng-container i18n>Save & Close</ng-container>
+            (click)="requestAction.emit('save')">
+      <ng-container i18n>Save</ng-container>
     </button>
   </div>
 </div>
