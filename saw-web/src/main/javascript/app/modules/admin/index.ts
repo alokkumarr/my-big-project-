@@ -54,7 +54,6 @@ import {AnalysisExportComponent} from './components/export/export.component';
 import {AnalysisImportComponent} from './components/import/import.component';
 import {ExportListViewComponent} from './components/export/export-list/export-list.component';
 import {ImportListViewComponent} from './components/import/import-list/import-list.component';
-import {AnalysisListViewComponent} from './components/import/analysis-list/analysis-list.component';
 import {ImportFileListViewComponent} from './components/import/import-file-list/import-file-list.component';
 
 import {ExportService} from './services/export.service';
@@ -103,7 +102,6 @@ angular.module(OldAdminModule, [
   .component('importComponent', AnalysisImportComponent)
   .component('exportListView', ExportListViewComponent)
   .component('importListView', ImportListViewComponent)
-  .component('analysisListView', AnalysisListViewComponent)
   .component('importFileListView', ImportFileListViewComponent);
 
 
