@@ -17,8 +17,12 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   }
 }
 
-.scroll-widget {
-  overflow: scroll;
+observe-chart.analysis-container .grid-view {
+  height: $report-height;
+
+  .toggle-grid {
+    height: 100%;
+  }
 }
 
 .chart.report-title {

@@ -1,19 +1,20 @@
-<div [ngClass]="{'scroll-widget':toggleToGrid === true}">
+<div [ngClass]="{'grid-view': toggleToGrid === true, 'chart-view': !toggleToGrid}">
   <div class="toggle-icons" *ngIf="ViewMode">
     <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="toggleToGrid = true" [ngClass]="{'active':toggleToGrid === true}" matTooltip="Toggle to Grid">
     </mat-icon>
 
     <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" (click)="toggleToGrid = false" [ngClass]="{'active':toggleToGrid === false}" matTooltip="Toggle to Chart">
-    </mat-icon>  
+    </mat-icon>
   </div>
   <h1 class="chart report-title" [textContent]="analysis.chartTitle || analysis.name"></h1>
   <div class="toggle-grid" *ngIf="toggleToGrid">
     <dx-data-grid #dataGrid [columnMinWidth]="150"
           [columnResizingMode]="widget"
-          [allowColumnReordering]="true" 
+          [allowColumnReordering]="true"
           [allowColumnResizing]= "true"
           [showColumnHeaders]= "true"
           [showColumnLines]= "false"
+          [height]="'100%'"
           [showRowLines]= "false"
           [showBorders]= "false"
           [rowAlternationEnabled]= "true"
