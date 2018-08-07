@@ -95,6 +95,7 @@ object DLConfiguration {
     setIfPathExists(sparkConf,"spark.hadoop.yarn.resourcemanager.hostname",cfg,"yarn.resourcemanager.hostname")
     setIfPathExists(sparkConf,"spark.yarn.jars",cfg,"yarn.spark.jars")
     setIfPathExists(sparkConf,"spark.yarn.archive",cfg,"yarn.spark.zips")
+    setIfPathExists(sparkConf,"spark.executor.instances",cfg,getPathByExecutor("executor.instances", executor))
     setIfPathExists(sparkConf, "spark.driver.port", cfg, "driver.port")
     setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host")
     setIfPathExists(sparkConf, "spark.driver.bindAddress", cfg, "driver.bindAddress")

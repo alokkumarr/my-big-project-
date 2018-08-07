@@ -21,6 +21,8 @@ import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
+import com.synchronoss.saw.storage.proxy.model.StoreField;
+import com.synchronoss.saw.storage.proxy.model.response.ClusterIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
@@ -60,10 +62,11 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           case "ES" :  
             String action = proxy.getAction().value();         
             if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) 
-                || action.equals(Action.PIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value()) || action.equals(Action.AGGREGATE.value())){
+                || action.equals(Action.PIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value()) || action.equals(Action.AGGREGATE.value())
+                || action.equals(Action.CAT.value()) || action.equals(Action.MAPPING.value())){
                         
                         
-                          if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value())){
+                          if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.CAT.value()) || action.equals(Action.MAPPING.value())){
                                 Preconditions.checkArgument(!(proxy.getResultFormat().value().equals(ResultFormat.TABULAR.value())), "The result format for above operations cannot be in tabular format");
                                 proxy.setResultFormat(ResultFormat.JSON);
                                 switch (action) {
@@ -91,6 +94,26 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                                 proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
                                                 proxy.setData(deleteData);
                                                 break;
+                                 case "catIndices" : 
+                                              List<ClusterIndexResponse> clusterIndexResponses = storageConnectorService.catClusterIndices(proxy);
+                                              List<Object> listOfIndices = new ArrayList<>();
+                                              for(ClusterIndexResponse clusterIndexResponse : clusterIndexResponses) {
+                                                listOfIndices.add(clusterIndexResponse.getIndex());
+                                              }
+                                              proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                              proxy.setData(listOfIndices);
+                                              break;
+                                              
+                                case "mappings" : 
+                                             List<StoreField> mappingIndexResponse = storageConnectorService.getMappingbyIndex(proxy);
+                                             List<Object> mappinglist = new ArrayList<>();
+                                             for(StoreField storeField : mappingIndexResponse) {
+                                               mappinglist.add(storeField);
+                                             }
+                                             mappinglist.add(mappingIndexResponse);
+                                             proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                             proxy.setData(mappinglist);
+                                             break;
                                 } 
                           }// Action only to support JSON format
                           else {

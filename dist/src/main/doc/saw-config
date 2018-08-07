@@ -55,6 +55,8 @@ saw_zookeeper_quorum=localhost
 #saw_executor_memory_fast=2G
 #saw_executor_cores_regular=8
 #saw_executor_cores_fast=2
+#saw_spark_executor_instances_regular=2
+#saw_spark_executor_instances_fast=1
 saw_executor_result_wait_time=300
 
 #

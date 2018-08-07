@@ -186,7 +186,7 @@ public interface WithDataSetService {
                 String location = dataLakeRoot + Path.SEPARATOR + projectId + Path.SEPARATOR + dlDir
                         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR + catalog
                         + Path.SEPARATOR + datasetName + Path.SEPARATOR + dataDir;
-
+                
                 DataSetServiceAux.logger.debug("Dataset location = " + location);
 
                 //TODO:: Fix BDA Meta
@@ -284,15 +284,28 @@ public interface WithDataSetService {
 
 
     default String  generateTempLocation(DataSetServiceAux aux, String tempDS, String tempCatalog) {
-        StringBuilder sb = new StringBuilder(aux.dl.getRoot());
-        sb.append(Path.SEPARATOR + aux.ctx.applicationID)
+        StringBuilder tempLocationBuilder = new StringBuilder(aux.dl.getRoot());
+        tempLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
                 .append(Path.SEPARATOR + ((tempDS == null || tempDS.isEmpty())? MetadataBase.PREDEF_SYSTEM_DIR :tempDS))
                 .append(Path.SEPARATOR + ((tempCatalog == null || tempCatalog.isEmpty())? MetadataBase.PREDEF_TEMP_DIR :tempCatalog))
                 .append(Path.SEPARATOR + aux.ctx.batchID)
                 .append(Path.SEPARATOR + aux.ctx.componentName);
 
-        DataSetServiceAux.logger.debug(String.format("Generated temp location: %s", sb.toString()));
-        return sb.toString();
+        DataSetServiceAux.logger.debug(String.format("Generated temp location: %s",
+            tempLocationBuilder.toString()));
+        return tempLocationBuilder.toString();
+    }
+
+    default String generateArchiveLocation(DataSetServiceAux aux) {
+        StringBuilder archiveLocationBuilder = new StringBuilder(aux.dl.getRoot());
+
+        archiveLocationBuilder.append(Path.SEPARATOR + aux.ctx.applicationID)
+            .append(Path.SEPARATOR + MetadataBase.PREDEF_SYSTEM_DIR)
+            .append(Path.SEPARATOR + MetadataBase.PREDEF_ARCHIVE_DIR)
+            .append(Path.SEPARATOR + aux.ctx.batchID)
+            .append(Path.SEPARATOR + aux.ctx.componentName);
+
+        return archiveLocationBuilder.toString();
     }
 
     default String  ngGenerateTempLocation(DataSetServiceAux aux, String tempDS, String tempCatalog) {

@@ -452,8 +452,8 @@ const applyFilters = (user, name, description, analysisType, subType, fieldName)
     //Save
    const save = analyzePage.saveDialog;
    const designer = analyzePage.designerDialog;
-   commonFunctions.waitFor.elementToBeClickable(designer.saveOnlyBtn);
-   designer.saveOnlyBtn.click();
+   commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+   designer.saveBtn.click();
    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
    commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
    save.saveBtn.click();

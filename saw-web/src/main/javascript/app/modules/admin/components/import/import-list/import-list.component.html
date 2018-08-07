@@ -9,7 +9,7 @@
   <md-card-content layout="row">
     <div id="user-grid" dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">     
       <div data-options="dxTemplate: { name: 'selectionCellTemplate' }">
-        <md-card-actions layout="row" layout-align="center center">
+        <md-card-actions layout="row" layout-align="start center">
             <md-checkbox ng-if="report.data.noMetricInd" ng-click="$ctrl.editRow(report, report.value)" 
             ng-disabled="report.data.noMetricInd"
             ng-model="report.value"></md-checkbox>

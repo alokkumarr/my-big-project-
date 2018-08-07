@@ -1,6 +1,5 @@
 package com.synchronoss.saw.workbench.service;
 
-import static org.assertj.core.api.Assertions.in;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -108,12 +107,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
 
     
-    HFileOperations.createDir(defaultProjectRoot + "/services");
+    HFileOperations.createDir(defaultProjectRoot);
     for (String table : METADATA_TABLES) {
         createMetadataTable(table);
     }
     
-    ProjectStore ps = new ProjectStore(defaultProjectRoot + "/services");
+    ProjectStore ps = new ProjectStore(defaultProjectRoot);
     try {
         ps.readProjectData(defaultProjectId);
     } catch (Exception e) {
@@ -373,6 +372,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
     Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
+    Preconditions.checkNotNull(rootNode.get("physicalLocation"), "physicalLocation cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("component"), "userData.component cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("createdBy"), "userData.createdBy cannot be null");
     Preconditions.checkNotNull(rootNode.get("userData").get("script"), "userData.script cannot be null");
@@ -383,9 +383,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"), "asOfNow.started cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"), "asOfNow.finished cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"), "asOfNow.batchId cannot be null");
-    Preconditions.checkNotNull(rootNode.get("transformations"), "transformations cannot be null");
-    Preconditions.checkNotNull(rootNode.get("transformations").get("asOutputLocation"), "transformations.asOutputLocation cannot be null");
-    ObjectNode transformationNode = (ObjectNode)rootNode.get("transformations");
+    ObjectNode transformationNode = rootNode.putObject("transformations");
     transformationNode.put("asOutput", id);
     Preconditions.checkNotNull(rootNode.get("userData"), "userData cannot be null");
     ObjectNode userDataNode = (ObjectNode)rootNode.get("userData");

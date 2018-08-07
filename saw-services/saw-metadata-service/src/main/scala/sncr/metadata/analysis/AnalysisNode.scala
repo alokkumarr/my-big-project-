@@ -226,8 +226,22 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
     )
   }
 
-
-
+  def deleteAnalysisResults(executionIds: scala.collection.mutable.Buffer[String]): Unit = {
+    val id = Bytes.toString(rowKey)
+    executionIds.foreach(rowId => {
+      val analysisResult = new AnalysisResult(id)
+        try {
+          val ar = AnalysisResult(id, rowId)
+          ar.deleteObjects
+          ar.delete
+          m_log debug s"Removed analysis result for node $id, result ID: ${rowId} ]"
+        }
+        catch {
+          case x: Throwable => m_log.error(s"Could not remove data object [Row ID : $rowId ]", x)
+        }
+      }
+      )
+  }
 }
 
 object AnalysisNode{

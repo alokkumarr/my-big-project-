@@ -40,4 +40,8 @@ import-component {
     color: $primary-white;
     background-color: $primary-blue-b2;
   }
+
+  .remove-pointer {
+    cursor: text !important;
+  }
 }

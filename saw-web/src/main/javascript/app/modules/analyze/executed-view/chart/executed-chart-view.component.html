@@ -1,10 +1,14 @@
-<div class="toggle-icons" style="height: 20px;margin-right: 48px;">
+<div style="width:84%;float: left;">
+  <h1 style="padding:0;" class="chart report-title" [textContent]="analysis.chartTitle || analysis.name"></h1>
+</div>
+<div class="toggle-icons" style="height: 48px;margin-right: 48px;">
   <mat-icon class="mat-icon material-icons icon-report" role="img" (click)="viewToggle(true)" [ngClass]="{'active':toggleToGrid === true}" matTooltip="Toggle to Grid">
   </mat-icon>
 
   <mat-icon class="mat-icon material-icons icon-vert-bar-chart" role="img" (click)="viewToggle(false)" [ngClass]="{'active':toggleToGrid === false}" matTooltip="Toggle to Chart">
   </mat-icon>
 </div>
+
 <div class="chart-data-grid" *ngIf="toggleToGrid">
   <dx-data-grid #dataGrid [columnMinWidth]="150"
       [columnResizingMode]="widget"

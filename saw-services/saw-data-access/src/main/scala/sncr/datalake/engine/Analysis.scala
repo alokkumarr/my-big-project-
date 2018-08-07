@@ -123,6 +123,25 @@ class Analysis(val analysisId : String) {
 
   def delete : Unit = an.deleteAnalysisResults()
 
+  /**
+    * Delete the data from maprDB for provided executionId.
+    * @param executionIDList
+    */
+  def deleteByID(executionIDList : scala.collection.mutable.Buffer[String]): Unit =
+    an.deleteAnalysisResults(executionIDList)
+
+  /**
+    * Delete the data from DataLake for provided executionId.
+    * @param executionIDList
+    */
+  def dataLakeCleanUp(executionIDList : scala.collection.mutable.Buffer[String]): Unit ={
+      val initOutputLocation = SAWServiceConfig.spark_conf.getString ("sql-executor.output-location")
+      executionIDList.foreach(execId => {
+        val outputLocation = initOutputLocation + "-" + execId
+        HFileOperations.deleteFile(outputLocation)
+      })
+  }
+
   def getExecution(id: String ) : AnalysisExecution =
   {
       val analysisExecution = new AnalysisExecution(an, ExecutionType.onetime)
