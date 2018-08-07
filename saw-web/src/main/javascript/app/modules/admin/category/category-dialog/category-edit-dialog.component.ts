@@ -148,7 +148,7 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       moduleId: moduleIdControl,
       categoryId: categoryIdControl,
       categoryName: [categoryName, [Validators.required, Validators.pattern(namePattern)]],
-      categoryDesc: [categoryDesc, Validators.required],
+      categoryDesc: categoryDesc,
       activeStatusInd: [activeStatusInd, Validators.required]
     });
 
@@ -217,7 +217,7 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
     const selectedControl = this._fb.control(selected);
     const categoryControl = this._fb.group({
       subCategoryName: [selected.subCategoryName, [Validators.required, Validators.pattern(namePattern)]],
-      subCategoryDesc: [selected.subCategoryDesc, Validators.required],
+      subCategoryDesc: selected.subCategoryDesc,
       activestatusInd: [selected.activestatusInd, Validators.required]
     });
 

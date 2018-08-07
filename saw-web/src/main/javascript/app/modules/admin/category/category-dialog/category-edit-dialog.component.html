@@ -1,7 +1,7 @@
 <header class="base-dialog__header">
   <strong [ngSwitch]="data.mode">
     <ng-container *ngSwitchCase="'create'" i18n>
-      Add New Category
+      Add New Category or Sub-Category
     </ng-container>
     <ng-container *ngSwitchCase="'edit'" i18n>
       Edit Category
@@ -9,57 +9,58 @@
   </strong>
 </header>
 <div class="base-dialog__content" fxLayout="column" fxLayoutAlign="center center">
-  <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="center start" class="category-form">
+  <div class="category-form">
+    <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="center start">
 
-    <mat-button-toggle-group *ngIf="data.mode === 'create'"
-                             formControlName="subCategoryInd"
-                             style="margin-bottom: 10px;">
-      <mat-button-toggle color="primary" [value]="false">Category</mat-button-toggle>
-      <mat-button-toggle color="primary" [value]="true">Sub-Category</mat-button-toggle>
-    </mat-button-toggle-group>
+      <mat-button-toggle-group *ngIf="data.mode === 'create'"
+                               formControlName="subCategoryInd"
+                               style="margin-bottom: 10px;">
+        <mat-button-toggle color="primary" [value]="false">Category</mat-button-toggle>
+        <mat-button-toggle color="primary" [value]="true">Sub-Category</mat-button-toggle>
+      </mat-button-toggle-group>
 
-    <mat-select class="form-field" required placeholder="Product" formControlName="productId">
-      <mat-option *ngFor="let product of products$ | async" [value]="product.productId">
-        {{product.productName}}
-      </mat-option>
-    </mat-select>
+      <mat-select class="form-field" required placeholder="Product" formControlName="productId">
+        <mat-option *ngFor="let product of products$ | async" [value]="product.productId">
+          {{product.productName}}
+        </mat-option>
+      </mat-select>
 
-    <mat-select class="form-field" required placeholder="Module" formControlName="moduleId">
-      <mat-option *ngFor="let module of modules$ | async" [value]="module.moduleId">
-        {{module.moduleName}}
-      </mat-option>
-    </mat-select>
+      <mat-select class="form-field" required placeholder="Module" formControlName="moduleId">
+        <mat-option *ngFor="let module of modules$ | async" [value]="module.moduleId">
+          {{module.moduleName}}
+        </mat-option>
+      </mat-select>
 
-    <mat-select *ngIf="formGroup.controls.subCategoryInd.value" class="form-field" required placeholder="Category" formControlName="categoryId">
-      <mat-option *ngFor="let category of categories$ | async" [value]="category.categoryId">
-        {{category.categoryName}}
-      </mat-option>
-    </mat-select>
+      <mat-select *ngIf="formGroup.controls.subCategoryInd.value" class="form-field" required placeholder="Category" formControlName="categoryId">
+        <mat-option *ngFor="let category of categories$ | async" [value]="category.categoryId">
+          {{category.categoryName}}
+        </mat-option>
+      </mat-select>
 
-    <mat-form-field>
-      <input matInput required type="text" formControlName="categoryName" [placeholder]="formGroup.controls.subCategoryInd.value ? 'Sub-Category Name' : 'Category Name'" />
-    </mat-form-field>
+      <mat-form-field>
+        <input matInput required type="text" formControlName="categoryName" [placeholder]="formGroup.controls.subCategoryInd.value ? 'Sub-Category Name' : 'Category Name'" />
+      </mat-form-field>
 
-    <mat-form-field>
-      <input matInput required type="text" formControlName="categoryDesc" placeholder="Description" />
-    </mat-form-field>
+      <mat-form-field>
+        <input matInput required type="text" formControlName="categoryDesc" placeholder="Description" />
+      </mat-form-field>
 
-    <mat-select class="form-field" required placeholder="Status" formControlName="activeStatusInd">
-      <mat-option *ngFor="let status of statuses" [value]="status.id">
-        {{status.name}}
-      </mat-option>
-    </mat-select>
+      <mat-select class="form-field" required placeholder="Status" formControlName="activeStatusInd">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
 
-  </form>
+    </form>
+  </div>
 
-  <div *ngIf="isInWideMode">
-    <div style="margin: 10px 0 0 0;">
+  <div *ngIf="isInWideMode" class="sub-categories-form">
+    <div style="margin: 0 0 10px 0;">
       <strong i18n>Select one of the sub-categories to edit</strong>
     </div>
     <form [formGroup]="subCategoryFormGroup"
           fxLayout="row"
           fxLayoutAlign="space-between start"
-          class="sub-categories-form"
     >
       <mat-radio-group formControlName="selectedSubCategory"
       >

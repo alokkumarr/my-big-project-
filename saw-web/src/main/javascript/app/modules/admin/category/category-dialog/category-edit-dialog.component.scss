@@ -9,6 +9,10 @@ category-edit-dialog {
     width: 700px;
   }
 
+  strong {
+    font-weight: 600;
+  }
+
   .base-dialog__content {
     padding: 10px 50px !important;
 
@@ -17,7 +21,8 @@ category-edit-dialog {
     }
 
     .category-form {
-      width: 500px;
+      width: 620px;
+      max-width: 620px;
     }
 
     .sub-categories-form {
@@ -46,6 +51,8 @@ category-edit-dialog {
       min-height: 60px;
 
       .mat-radio-button {
+        margin-top: 5px;
+        margin-bottom: 5px;
         max-width: 190px;
 
         .mat-radio-label-content {
