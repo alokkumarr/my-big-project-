@@ -1,0 +1,59 @@
+
+@import "themes/base/colors";
+
+category-edit-dialog {
+  max-width: 500px;
+
+  &.wide {
+    max-width: 700px;
+    width: 700px;
+  }
+
+  .base-dialog__content {
+    padding: 10px 50px !important;
+
+    .mat-button-toggle.mat-button-toggle-checked {
+      background-color: $grid-header-bg-color;
+    }
+
+    .category-form {
+      width: 500px;
+    }
+
+    .sub-categories-form {
+      margin-top: 20px;
+      width: 620px;
+    }
+
+    .sub-categories-list {
+      overflow-y: auto;
+      max-height: 200px;
+    }
+
+    .mat-form-field {
+      width: 100%;
+    }
+
+    .form-field {
+      margin-bottom: 5px;
+    }
+
+    .mat-radio-group {
+      margin-right: 5px;
+      min-width: 210px;
+      overflow-y: auto;
+      max-height: 160px;
+      min-height: 60px;
+
+      .mat-radio-button {
+        max-width: 190px;
+
+        .mat-radio-label-content {
+          word-break: break-all;
+          width: 160px;
+          white-space: normal;
+        }
+      }
+    }
+  }
+}
