@@ -12,12 +12,11 @@
             <span>VALIDATE</span>
         </button>
     </div>
-    <div class="body" fxLayout="row" fxLayoutAlign="center stretch">
-        <mat-card fxFlex>
+    <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
+        <mat-card fxFlex="25">
             <mat-card-content>
                 <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDS" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
-                    [showBorders]="false" [showColumnLines]="true" [masterDetail]="{ enabled: true, template: 'schemaGird' }"
-                    (onRowExpanding)="onDSExpanding($event)" [hoverStateEnabled]="true" (onSelectionChanged)="onDSSelectionChanged($event)">
+                    [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDSSelectionChanged($event)">
                     <dxo-selection selectAllMode="allMode" showCheckBoxesMode="always" [mode]="selectionMode"></dxo-selection>
                     <dxi-column caption="Dataset Name" dataField="system.name"></dxi-column>
                     <dxi-column caption="Created By" dataField="system.createdBy"></dxi-column>
@@ -27,8 +26,18 @@
                     <div *dxTemplate="let data of 'timeTemplate'">
                         <span> {{data.value * 1000 | date: 'short'}}</span>
                     </div>
-                    <div *dxTemplate="let details of 'schemaGird'">
-                        <dx-data-grid id="schemaGrid" [dataSource]="details.data?.schema?.fields" [showBorders]="true" [height]="'300px'">
+                </dx-data-grid>
+            </mat-card-content>
+        </mat-card>
+        <mat-card fxFlex>
+            <mat-card-content fxLayout="row" fxLayoutAlign="center stretch">
+                <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!selectedDSData.length">
+                    <span>Select Dataset/s from left pane to view schema</span>
+                </div>
+                <mat-tab-group fxFlex *ngIf="selectedDSData.length" dynamicHeight="false" [selectedIndex]="selectedDSData.length">
+                    <mat-tab *ngFor="let ds of selectedDSData; let index = index" [label]="ds?.system?.name">
+                        <dx-data-grid [dataSource]="ds.schema?.fields" [showBorders]="true" [height]="'100%'" [width]="'100%'" [rowAlternationEnabled]="true"
+                            [showColumnLines]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">
                             <dxi-column caption="No" [width]="50" cellTemplate="NoTemplate"></dxi-column>
                             <dxi-column caption="Field Name" dataField="name"></dxi-column>
                             <dxi-column caption="Data Type" dataField="type"></dxi-column>
@@ -39,8 +48,8 @@
                                 <span> {{data.rowIndex + 1}}</span>
                             </div>
                         </dx-data-grid>
-                    </div>
-                </dx-data-grid>
+                    </mat-tab>
+                </mat-tab-group>
             </mat-card-content>
         </mat-card>
     </div>

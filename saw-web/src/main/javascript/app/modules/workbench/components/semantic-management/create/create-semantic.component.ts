@@ -58,6 +58,7 @@ export class CreateSemanticComponent implements OnInit {
     }
     this.dataGrid.instance.clearSelection();
     this.isSelected = false;
+    this.selectedDSData = [];
   }
 
   onDSSelectionChanged(event) {

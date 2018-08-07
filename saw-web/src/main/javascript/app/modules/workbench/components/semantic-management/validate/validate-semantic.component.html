@@ -4,21 +4,30 @@
             <mat-icon fontIcon="icon-arrow-left" (click)="showDSList()"></mat-icon>
         </button>
         <div fxFlex>Create Datapod </div>
+        <span fxFlex>Selected Dataset/s</span>
         <button mat-raised-button color="primary" [disabled]="!isValid" i18n (click)="createDatapod()">
             <span>Create</span>
         </button>
     </div>
     <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
-        <mat-card fxFlex="30">
-            <mat-card-content>
-
-            </mat-card-content>
-        </mat-card>
         <mat-card fxFlex>
             <mat-card-content>
-                <mat-tab-group>
+                <mat-tab-group fxFlex>
                     <mat-tab *ngFor="let ds of selectedDS; let index = index" [label]="ds?.system?.name">
-                        Contents for {{ds}} tab
+                        <dx-data-grid [dataSource]="ds.schema?.fields" [showBorders]="true" [height]="'100%'" [width]="'100%'" [rowAlternationEnabled]="true" [showColumnLines]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">
+                            <dxo-editing mode="cell" [allowUpdating]="true">
+                            </dxo-editing>
+                            <dxi-column caption="Include" dataField="include" dataType="boolean"></dxi-column>
+                            <dxi-column caption="Display Name" dataField="displayName"></dxi-column>
+                            <dxi-column caption="Column Name" dataField="columnName"></dxi-column>
+                            <dxi-column caption="Data Type" dataField="type"></dxi-column>
+                            <dxi-column caption="Filter Eligible" dataField="filterEligible" dataType="boolean"></dxi-column>
+                            <dxi-column caption="Filter Eligible" dataField="filterEligible" dataType="boolean"></dxi-column>
+                            <dxi-column caption="KPI Eligible" dataField="kpiEligible" dataType="boolean"></dxi-column>
+                            <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+                            <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                            <dxo-header-filter [visible]="false"></dxo-header-filter>
+                        </dx-data-grid>
                     </mat-tab>
                 </mat-tab-group>
             </mat-card-content>

@@ -48,4 +48,86 @@ export const PARSER_CONFIG = {
   // }]
 };
 
-export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'isDirectory': true, 'path': 'root' }];
+export const STAGING_TREE = [
+  { name: 'Staging', size: 0, isDirectory: true, path: 'root' }
+];
+
+export const SEMANTIC_TEMPLATE = {
+  action: {
+    'base-relation': [
+      {
+        id: 'replace_baseID',
+        'node-category': 'DataObject'
+      }
+    ],
+    content: {
+      artifacts: [
+        {
+          artifactName: '',
+          columns: []
+        }
+      ],
+      checked: false,
+      customerCode: 'SYNCHRONOSS',
+      dataSecurityKey: '',
+      disabled: false,
+      esRepository: {
+        indexName: '',
+        storageType: 'ES',
+        type: ''
+      },
+      id: '',
+      metric: '',
+      metricName: '',
+      module: 'ANALYZE',
+      supports: [
+        {
+          category: 'table',
+          children: [],
+          label: 'tables'
+        },
+        {
+          category: 'charts',
+          children: [],
+          label: 'charts'
+        }
+      ],
+      type: 'semantic'
+    },
+    verb: 'create'
+  },
+  'node-category': 'SemanticNode'
+};
+export const DATA_NODE_TEMPLATE = {
+  action: {
+    'dl-locations': [],
+    content: {
+      description: '',
+      displayName: '',
+      name: '',
+      partitionType: '',
+      product: '',
+      storageType: 'ES',
+      type: 'ES'
+    },
+    schema: {
+      fields: [],
+      type: 'struct'
+    },
+    verb: 'create'
+  },
+  'node-category': 'DataObject'
+};
+
+export const TYPE_CONVERSION = {
+  text: 'string',
+  string: 'string',
+  double: 'double',
+  integer: 'integer',
+  date: 'date',
+  float: 'float',
+  keyword: 'string',
+  long: 'long',
+  decimal: 'double',
+  timestamp: 'date'
+};

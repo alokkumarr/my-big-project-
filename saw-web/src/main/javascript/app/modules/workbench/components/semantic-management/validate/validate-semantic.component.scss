@@ -2,8 +2,9 @@
 
 validate-semantic {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 3px);
   background-color: $background-color;
+  padding: 0 3px 3px;
   overflow: auto;
 
   .container {
@@ -32,12 +33,20 @@ validate-semantic {
   .body {
     background-color: #FFF;
     height: calc(100% - 50px);
+    max-height: calc(100% - 50px) !important;
 
     mat-card {
       padding: 0;
+      height: 100%;
 
       .mat-card-content {
-        height: calc(100%);
+        height: 100%;
+        max-height: 100%;
+        overflow: auto;
+
+        .mat-tab-group {
+          height: 100%;
+        }
       }
     }
   }

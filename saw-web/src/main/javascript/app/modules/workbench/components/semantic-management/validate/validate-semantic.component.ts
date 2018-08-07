@@ -4,9 +4,11 @@ import { DxDataGridComponent } from 'devextreme-angular';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { WorkbenchService } from '../../../services/workbench.service';
+import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 
-import * as filter from 'lodash/filter';
-import * as cloneDeep from 'lodash/cloneDeep';
+import * as forIn from 'lodash/forIn';
+import * as map from 'lodash/map';
+import * as toLower from 'lodash/toLower';
 
 const template = require('./validate-semantic.component.html');
 require('./validate-semantic.component.scss');
@@ -24,7 +26,9 @@ export class ValidateSemanticComponent implements OnDestroy {
     private workBench: WorkbenchService,
     private headerProgress: HeaderProgressService
   ) {
-    this.selectedDS = this.workBench.getDataFromLS('selectedDS');
+    this.selectedDS = this.injectFieldProperties(
+      this.workBench.getDataFromLS('selectedDS')
+    );
   }
 
   @ViewChild('dsGrid') dataGrid: DxDataGridComponent;
@@ -37,5 +41,26 @@ export class ValidateSemanticComponent implements OnDestroy {
 
   showDSList() {
     this.router.stateService.go('workbench.createSemantic');
+  }
+
+  injectFieldProperties(dsData) {
+    forIn(dsData, value => {
+      value.schema.fields = map(value.schema.fields, value => {
+        return {
+          aliasName: value.name,
+          columnName: value.name,
+          displayName: value.name,
+          filterEligible: true,
+          joinEligible: false,
+          kpiEligible: false,
+          include: true,
+          name: value.name,
+          table: value.name,
+          type: TYPE_CONVERSION[toLower(value.type)]
+        };
+      });
+    });
+
+    return dsData;
   }
 }
