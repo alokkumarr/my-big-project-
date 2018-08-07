@@ -8,13 +8,11 @@ const Constants = require('../api/Constants');
 const utils = require('./utils');
 const commonElementsPage = require('../pages/commonElementsPage.po');
 let analysisId;
-const chartDesigner = analyzePage.designerDialog.chart;
 
 class PromptFilterFunctions {
 
   verifyPromptFromListView(categoryName, subCategoryName, defaultCategory, name, data, execute) {
    try {
-     console.log('verifyPromptFromListView');
      let _self = this;
      //From analysis listview page
      //From analysis card page
@@ -58,7 +56,6 @@ class PromptFilterFunctions {
   verifyPromptFromCardView(categoryName, subCategoryName, defaultCategory, name, data, execute) {
 
     try {
-      console.log('verifyPromptFromCardView---');
       let _self = this;
       //From analysis card page
       browser.ignoreSynchronization = false;
@@ -102,7 +99,6 @@ class PromptFilterFunctions {
 
   verifyPromptFromDetailPage(categoryName, subCategoryName, defaultCategory, name, data, analysisType = null) {
     try {
-      console.log('verifyPromptFromDetailPage');
       let _self = this;
       //Execute the analysis from detail/view page and verify it asks for prompt filter
       browser.waitForAngular();
@@ -245,6 +241,8 @@ class PromptFilterFunctions {
       //apply filters
       const filters = analyzePage.filtersDialogUpgraded;
       const filterAC = filters.getFilterAutocomplete(0);
+      
+      const chartDesigner = analyzePage.designerDialog.chart;
       commonFunctions.waitFor.elementToBeClickable(chartDesigner.filterBtn);
       chartDesigner.filterBtn.click();
       if (analysisType === Constants.REPORT) {
