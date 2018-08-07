@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 md-select-menu {
   &.#{$theme-cls} {
     max-width: 240px;
@@ -18,7 +20,7 @@ md-select-menu {
 
       md-option:not([disabled]):hover,
       md-option:not([disabled]):focus {
-        background-color: #1A89D4;
+        background-color: $primary-blue-b2;
         color: #FFFFFF;
       }
     }

@@ -104,10 +104,12 @@
   "SELECTED_METRIC_EXPORT":"Selected Metrics",
 
   "IMPORT_CAT_ANALYSIS_LIST_VIEW":"Analysis from selected Category",
-  "IMPORT_FILE_ANALYSIS_LIST_VIEW":"Import Files Details",
+  "IMPORT_FILE_ANALYSIS_LIST_VIEW":"Selected Package Files Details",
+  "PACKAGE_SELECT_FILE":"Select Package File to Import",
   "IMPORT_ANALYSIS_LIST_VIEW":"Import Analysis Table",
   "IMPORT_BUTTON":"Import",
   "IMPORT_LABEL":"Import Analysis",
   "IMPORT_BROWSE":"Browse",
-  "IMPORT_SELECT_CAT":"Select a Category"
+  "IMPORT_SELECT_CAT":"Select a Category",
+  "IMPORT_BUTTON_EXPORT_LOG":"Export Error Logs"
 }

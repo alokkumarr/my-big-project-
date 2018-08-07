@@ -22,11 +22,11 @@ application:
 schema:
    file: /Users/spau0004/code/SIP/saw-services/saw-proxy-service/src/main/resources/schema/proxy-schema.json
 elastic-search:
-           cluster-name: SNCR-VELBDA-elasticsearch
-           transport-hosts: elasticsearch01.bda.poc.velocity-va.sncrcorp.net,elasticsearch02.bda.poc.velocity-va.sncrcorp.net,elasticsearch03.bda.poc.velocity-va.sncrcorp.net
-           transport-ports: 9200,9200,9200
+           cluster-name: sip-rd-es
+           transport-hosts: es-rd601.ana.dev.vaste.sncrcorp.net
+           transport-ports: 9200
 elastic-xpack :
-          cluster-active: true
+          cluster-active: false
           cluster-username: elastic
           cluster-password: xuw3dUraHapret
 metastore:

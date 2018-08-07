@@ -50,11 +50,3 @@ md-toolbar.#{$theme-cls}.app-toolbar:not(.md-menu-toolbar) {
 md-toolbar.#{$theme-cls}.secondary-toolbar:not(.md-menu-toolbar) {
   background-color: transparent;
 }
-
-.symmetra-logo {
-  background-image: url($symmetra-logo-path);
-  height: 25px;
-  width: 24px;
-  background-size: 25px 24px;
-  margin-right: 10px;
-}

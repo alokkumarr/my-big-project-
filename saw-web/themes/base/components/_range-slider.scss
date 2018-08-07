@@ -1,5 +1,7 @@
+@import "themes/base/colors";
+
 $range-slider-bg: #E2E6EB;
-$range-slider-highlight: #1A89D4;
+$range-slider-highlight: $primary-blue-b2;
 
 .range-slider-container {
   position:relative;
@@ -79,7 +81,7 @@ md-slider:not([md-discrete]):not([disabled]).md-active .md-thumb:after {
 }
 
 md-slider.md-triton-theme .md-track-ticks {
-  color: #1A89D4;
+  color: $primary-blue-b2;
   border-radius: 3px;
 }
 
@@ -87,7 +89,7 @@ md-slider.md-triton-theme.md-min[md-discrete] .md-thumb:after,
 md-slider.md-triton-theme.md-min .md-thumb:after,
 md-slider.md-triton-theme.md-max .md-thumb:after,
 md-slider.md-triton-theme .md-thumb:after {
-  background-color: #1A89D4;
+  background-color: $primary-blue-b2;
   border: 2px solid #FFFFFF;
   box-shadow: 0 2px 4px 0 rgba(156,165,173,0.7);
 }
@@ -128,10 +130,10 @@ md-slider .md-sign:after {
 
 md-slider.md-triton-theme.md-active .md-sign,
 md-slider.md-triton-theme.md-min[md-discrete] .md-sign {
-  background-color: #1A89D4;
+  background-color: $primary-blue-b2;
 }
 
 md-slider.md-triton-theme.md-min[md-discrete] .md-sign:after,
 md-slider.md-triton-theme .md-sign:after {
-  border-top-color: #1A89D4;
+  border-top-color: $primary-blue-b2;
 }

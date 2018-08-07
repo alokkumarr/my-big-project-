@@ -137,7 +137,7 @@ public class StorageProxyController {
    * @throws JsonProcessingException 
    */
   
-  @RequestMapping(value = "/internal/proxy/storage/", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "/internal/proxy/storage", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public StorageProxy retrieveStorageDataSync(@RequestBody StorageProxy requestBody) throws JsonProcessingException {
     logger.debug("Request Body:{}", requestBody);

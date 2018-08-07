@@ -6,11 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-
-import com.google.gson.JsonElement;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
@@ -20,25 +18,34 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
+import com.google.gson.JsonElement;
 import com.mapr.db.MapRDB;
 import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
+import com.synchronoss.saw.workbench.SAWWorkBenchUtils;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
-
+import sncr.bda.base.MetadataBase;
+import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
 import sncr.bda.services.DLMetadata;
+import sncr.bda.store.generic.schema.Action;
+import sncr.bda.store.generic.schema.Category;
+import sncr.bda.store.generic.schema.MetaDataStoreStructure;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -73,7 +80,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   private String tmpDir = null;
   private DLMetadata mdt = null;
   private DataSetStore mdtStore =null;
-  private String prefix = "/";
+  private String prefix = "maprfs";
+  private String delimiter = "::";
 
   
   @PostConstruct
@@ -99,7 +107,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
 
     
-    HFileOperations.createDir(defaultProjectRoot + "/metadata");
+    HFileOperations.createDir(defaultProjectRoot);
     for (String table : METADATA_TABLES) {
         createMetadataTable(table);
     }
@@ -120,7 +128,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   }
 
   private void createMetadataTable(String table) {
-    String path = defaultProjectRoot + "/metadata/" + table;
+    String path = defaultProjectRoot + "/services/metadata/" + table;
     if(!MapRDB.tableExists(path)) {
         logger.info("Creating metadata table: {}" + path);
         MapRDB.createTable(path);
@@ -336,19 +344,83 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     return dataSetsJSON;
   }
 
-  public DataSet getDataSet(String projectId, String dataSet) throws Exception {
-    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSet);
+  public DataSet getDataSet(String projectId, String dataSetId) throws Exception {
+    logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSetId);
 
-    String dataSetId = projectId + "::" + dataSet;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-
     JsonElement dataset = mdtStore.read(dataSetId);
-
     return objectMapper.readValue(dataset.toString(), DataSet.class);
   }
   
+  @Override
+  public DataSet createDataSet(DataSet dataSet,  String project) throws Exception {
+    logger.trace("createDataSet starts here :  "+ dataSet.toString());
+    String id = UUID.randomUUID().toString() + delimiter + "rComponent" + delimiter
+        + System.currentTimeMillis();
+    MetaDataStoreRequestAPI requestMetaDataStore =null;
+    String category = Category.DataSet.name();
+    String format = "parquet";
+    String catalog = MetadataBase.DEFAULT_CATALOG;
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode node  = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+    ObjectNode rootNode = (ObjectNode) node;
+    rootNode.put("_id", id);
+    Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
+    Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
+    Preconditions.checkNotNull(rootNode.get("physicalLocation"), "physicalLocation cannot be null");
+    Preconditions.checkNotNull(rootNode.get("userData").get("component"), "userData.component cannot be null");
+    Preconditions.checkNotNull(rootNode.get("userData").get("createdBy"), "userData.createdBy cannot be null");
+    Preconditions.checkNotNull(rootNode.get("userData").get("script"), "userData.script cannot be null");
+    Preconditions.checkNotNull(rootNode.get("system").get("name"), "system.name cannot be null");
+    Preconditions.checkNotNull(rootNode.get("system").get("inputFormat"), "system.inputFormat cannot be null");
+    Preconditions.checkNotNull(rootNode.get("system").get("inputPath"), "system.inputPath cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"), "asOfNow.status cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"), "asOfNow.started cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"), "asOfNow.finished cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"), "asOfNow.batchId cannot be null");
+    ObjectNode transformationNode = rootNode.putObject("transformations");
+    transformationNode.put("asOutput", id);
+    Preconditions.checkNotNull(rootNode.get("userData"), "userData cannot be null");
+    ObjectNode userDataNode = (ObjectNode)rootNode.get("userData");
+    userDataNode.put("category", category);
+    userDataNode.put("component", dataSet.getComponent());
+    userDataNode.put("scriptLocation", rootNode.get("userData").get("script").toString());
+    Preconditions.checkNotNull(rootNode.get("system"), "system cannot be null");
+    ObjectNode systemNode = (ObjectNode)rootNode.get("system");
+    systemNode.put("project", project);
+    systemNode.put("outputFormat", format);
+    systemNode.put("inputFormat", rootNode.get("system").get("inputFormat").toString());
+    ArrayNode  inputPath = objectMapper.createArrayNode();
+    inputPath.addAll((ArrayNode)rootNode.get("system").get("inputPath"));
+    systemNode.put("catalog", catalog);
+    systemNode.putArray("inputPath").addAll(inputPath);
+    DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class) ;
+    try {
+      List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,
+          id, Action.create, Category.DataSet);
+      logger.trace("Before invoking request to MaprDB JSON store :{}", objectMapper.writeValueAsString(structure));
+      requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
+      requestMetaDataStore.process();
+      List<MetaDataStoreStructure> structureRead = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,
+          id, Action.read, Category.DataSet);
+      requestMetaDataStore = new MetaDataStoreRequestAPI(structureRead);
+      requestMetaDataStore.process();
+      String jsonStringFromStore = requestMetaDataStore.getResult().toString();
+      ObjectMapper mapper = new ObjectMapper();
+      dataSet = mapper.readValue(jsonStringFromStore, DataSet.class);
+    } catch (Exception ex) {
+      logger.error("Problem on the storage while creating an entity", ex);
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Problem on the storage while creating an entity", ex);
+    }
+    logger.trace("createEntryInMetaData ends here: "+ objectMapper.writeValueAsString(dataSet));
+    return dataSet;
+  }
 
   public static void main(String[] args) throws JsonProcessingException, IOException {
     String json = "{\"name\":\"normal.csv\",\"size\":254743,\"d\":false,\"cat\":\"root\"}";

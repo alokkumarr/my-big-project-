@@ -5,13 +5,16 @@ export const ImportListViewComponent = {
   template,
   bindings: {
     analysisList: '<',
+    importFlag: '<',
     updater: '<',
+    importFlagUpdater: '<',
     onAction: '&'
   },
   controller: class ImportListViewController {
-    constructor(dxDataGridService) {
+    constructor(dxDataGridService, $mdDialog) {
       'ngInject';
       this._dxDataGridService = dxDataGridService;
+      this._$mdDialog = $mdDialog;
       this._gridListInstance = null;
       this.selectAllAnalysis = false;
     }
@@ -19,6 +22,7 @@ export const ImportListViewComponent = {
     $onInit() {
       this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
+      this.importFlagUpdaterSubscribtion = this.importFlagUpdater.subscribe(update => this.onimportFlagUpdater(update));
     }
 
     $onChanges(changedObj) {
@@ -37,6 +41,10 @@ export const ImportListViewComponent = {
       /* eslint-enable */
     }
 
+    onimportFlagUpdater({flag}) {
+      this.importFlag = flag;
+    }
+
     reloadDataGrid(analysisList) {
       if (this._gridListInstance !== null) {
         this._gridListInstance.option('dataSource', analysisList);
@@ -51,6 +59,15 @@ export const ImportListViewComponent = {
           analysis.overrideInd = false;
         }
       });
+      this.selectAllAnalysisCount = 0;
+      this.analysisList.forEach(analysis => {
+        if (analysis.selection) {
+          this.selectAllAnalysisCount++;
+        }
+      });
+      if (this.selectAllAnalysisCount === 0) {
+        this.selectAllAnalysis = false;
+      }
     }
     overrideAnalysis(row) {
       this.analysisList.forEach(analysis => {
@@ -80,8 +97,36 @@ export const ImportListViewComponent = {
         model: analysisList
       });
     }
+    doLogExport(analysisList) {
+      this.onAction({
+        type: 'exportLog',
+        model: analysisList
+      });
+    }
+    displayError(error) {
+      const alert = this._$mdDialog.alert()
+        .title('ERROR :')
+        .textContent(angular.toJson(error.data || error))
+        .ok('Ok');
+      this._$mdDialog.show(alert);
+    }
+
     validation() {
+      let errorCount = 0;
       if (this.analysisList.length > 0) {
+        this.analysisList.forEach(analysis => {
+          if (analysis.errorInd) {
+            errorCount++;
+          }
+        });
+      }
+      if (errorCount !== 0) {
+        return false;
+      }
+      return true;
+    }
+    importValidation() {
+      if (this.analysisList.length > 0 && this.importFlag === 0) {
         return false;
       }
       return true;
@@ -92,7 +137,7 @@ export const ImportListViewComponent = {
         caption: 'Select All to Import',
         dataField: 'selection',
         allowSorting: false,
-        alignment: 'center',
+        alignment: 'left',
         width: '10%',
         headerCellTemplate: '<md-checkbox ng-click="$ctrl.selectAll($ctrl.selectAllAnalysis)" ng-model="$ctrl.selectAllAnalysis">Select All to Import</md-checkbox>',
         cellTemplate: 'selectionCellTemplate'
@@ -129,6 +174,7 @@ export const ImportListViewComponent = {
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
+        wordWrapEnabled: true,
         scrolling: {
           scrollingEnabled: false
         },

@@ -94,15 +94,22 @@ export const ExportListViewComponent = {
         dataField: 'analysis.type',
         allowSorting: true,
         alignment: 'left',
-        width: '16%',
+        width: '10%',
         cellTemplate: 'analysisTypeCellTemplate'
       }, {
         caption: 'Metric Name',
         dataField: 'analysis.metricName',
         allowSorting: true,
         alignment: 'left',
-        width: '34%',
+        width: '25%',
         cellTemplate: 'metricNameCellTemplate'
+      }, {
+        caption: 'Sub-Category Name',
+        dataField: 'categoryName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '15%',
+        cellTemplate: 'categoryNameCellTemplate'
       }];
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),

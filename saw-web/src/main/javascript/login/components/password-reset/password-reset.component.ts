@@ -17,6 +17,7 @@ export class PasswordResetComponent {
   private username;
   private confNewPwd;
   private newPwd;
+  private rhcToken;
 
   ngOnInit() {
     if (window.location.href.indexOf('/resetPassword?rhc') !== -1) {
@@ -25,6 +26,7 @@ export class PasswordResetComponent {
       const rData = {
         rhc
       };
+      this.rhcToken = rhc;
       this._UserService.verify(rData).then(res => {
         if (res.data.valid) {
           this.username = res.data.masterLoginID;

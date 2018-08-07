@@ -11,21 +11,14 @@ analyze-schedule-dialog {
   padding: 10px;
   color: $primary-grey-g4;
 
-  .dialog__header {
-    padding: 10px;
-    border-bottom: 1px solid $primary-grey-g2;
-
-    strong {
-      font-size: 20px;
-    }
+  header {
+    padding: 0 0 10px;
+    border-bottom: 1px solid #999;
   }
 
   .dialog__content {
     width: 700px;
-    padding: 0 10px;
-    min-width: 500px;
-    max-height: 500px;
-    overflow-y: auto;
+    max-height: 550px;
 
     .label-inline-with-select {
       text-align: center;
@@ -101,17 +94,11 @@ analyze-schedule-dialog {
     .ftp-select {
       left: 459px !important;
     }
-
-    mat-select.publish-select {
-      border: 1px solid $primary-grey-g1;
-      padding: 8px;
-      border-radius: 2px;
-    }
   }
 
-  .dialog__actions {
-    padding-top: 10px;
-    border-top: 1px solid $primary-grey-g2;
+  .base-dialog__actions {
+    padding: 10px 1px 10px 0;
+    border-top: 1px solid #999;
 
     .form-buttons button {
       margin-right: 10px;

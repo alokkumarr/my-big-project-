@@ -37,10 +37,10 @@ cd $workingDir
 mvn clean package
 
 # Upgrade Tests start here ....
-docker cp $(find dist/target -name saw*.tgz) saw:/tmp
-docker exec saw tar -xvzf /tmp/$(ls dist/target|grep .tgz)
-docker exec saw chmod a+x /saw/saw-deploy
-docker cp dist/src/test/docker/saw-deploy/saw-config saw:/saw
-docker exec saw /saw/saw-deploy /saw/saw-config 
+docker cp $(find dist/target -name saw*.tgz) sip-admin:/tmp
+docker exec sip-admin tar -xvzf /tmp/$(ls dist/target|grep .tgz)
+docker exec sip-admin chmod a+x /saw/saw-deploy
+docker cp dist/src/test/docker-admin/saw-deploy/saw-config sip-admin:/saw
+docker exec sip-admin /saw/saw-deploy /saw/saw-config
 
 

@@ -85,6 +85,7 @@ export class PivotGridComponent {
   public artifactColumns: ArtifactColumnPivot[];
   public pivotGridOptions: any;
   rowHeaderLayout = 'tree';
+  height = '100%';
   allowSortingBySummary = false;
   showBorders = true;
   allowSorting = false;
