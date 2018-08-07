@@ -95,8 +95,8 @@ export class PivotGridComponent {
   // field-panel
   visible = true;
   showColumnFields = true;
-  showRowFields = true;
-  showDataFields = true;
+  showRowFields = false;
+  showDataFields = false;
   showFilterFields = false;
   allowFieldDragging = false;
   private _gridInstance: any;
