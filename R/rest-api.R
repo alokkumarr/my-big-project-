@@ -183,21 +183,21 @@ sip_add_dataset <- function(output_path,
                                'Content-Type' = "application/json;charset=UTF-8")
 
   # Body
-  payload <- list(userData = list(description = unbox(desc),
-                                  component = unbox(component),
-                                  createdBy = unbox(created_by),
-                                  script = unbox(script)),
+  payload <- list(userData = list(description = jsonlite::unbox(desc),
+                                  component = jsonlite::unbox(component),
+                                  createdBy = jsonlite::unbox(created_by),
+                                  script = jsonlite::unbox(script)),
                   system   = list(inputPath = input_paths,
-                                  name = unbox(input_names),
-                                  inputFormat = unbox(input_formats),
-                                  outputFormat = unbox(output_format)),
-                  asInput  = list(unbox(input_ids)),
-                  transformations = list(asOutputLocation = unbox(output_path)),
-                  asOfNow  = list(status = unbox(status),
-                                  started = unbox(started),
-                                  finished = unbox(finished),
-                                  batchId = unbox(batch_id)),
-                  recordCount = unbox(output_rows))
+                                  name = jsonlite::unbox(input_names),
+                                  inputFormat = jsonlite::unbox(input_formats),
+                                  outputFormat = jsonlite::unbox(output_format)),
+                  asInput  = list(jsonlite::unbox(input_ids)),
+                  transformations = list(asOutputLocation = jsonlite::unbox(output_path)),
+                  asOfNow  = list(status = jsonlite::unbox(status),
+                                  started = jsonlite::unbox(started),
+                                  finished = jsonlite::unbox(finished),
+                                  batchId = jsonlite::unbox(batch_id)),
+                  recordCount = jsonlite::unbox(output_rows))
   payload <- jsonlite::toJSON(payload, auto_unbox = FALSE)
 
   # URL
@@ -207,5 +207,44 @@ sip_add_dataset <- function(output_path,
   response <- httr::POST(url, config = headers, body = payload)
 
   # Return response
+  httr::content(response)
+}
+
+
+
+
+#' SIP Metastore get Data File Path
+#'
+#' Function to call SIP Rest API to generate valid file path for dataset
+#'
+#' API handles the project
+#'
+#' @param name dataset name
+#' @inheritParams sip_get_dataset_details
+#'
+#' @return dataset physical file path location string
+#' @export
+sip_get_datapath <- function(name,
+                             project_id,
+                             hostname,
+                             token) {
+  checkmate::assert_character(name)
+  checkmate::assert_character(project_id)
+  checkmate::assert_string(hostname)
+  checkmate::assert_character(token)
+
+  # Headers
+  headers <- httr::add_headers('Authorization' = paste("Bearer", token),
+                               'Content-Type' = "application/json;charset=UTF-8")
+
+  # URL
+  url <- paste0(hostname,
+                "/saw/services/internal/workbench/projects/", project_id,
+                "/", name, "/datapath")
+
+  # Request
+  response <- httr::GET(url, config = headers)
+
+  # Response
   httr::content(response)
 }
