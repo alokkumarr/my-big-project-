@@ -178,7 +178,7 @@ exports.config = {
       appRoot + '/src/test/e2e-tests/promptFilter/chartPromptFilters.test.js',
       appRoot + '/src/test/e2e-tests/promptFilter/esReportPromptFilters.test.js',
       appRoot + '/src/test/e2e-tests/promptFilter/pivotPromptFilters.test.js',
-      appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js'
     ],
     pivots: [
       appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
