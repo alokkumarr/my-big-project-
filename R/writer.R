@@ -41,7 +41,7 @@ writer <- function(df, path,  dfs_mount, type, mode, partitions, partition_by, t
 #' @rdname writer
 writer.tbl_spark <- function(df,
                              path,
-                             dfs_mount = "",
+                             dfs_mount = "/dfs",
                              type,
                              mode = NULL,
                              partitions = NULL,
