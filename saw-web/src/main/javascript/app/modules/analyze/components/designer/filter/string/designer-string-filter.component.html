@@ -1,15 +1,16 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-select placeholder="Operator"
-              style="max-width: 170px; margin-top: 3px;"
-              e2e="filter-string-select"
-              (selectionChange)="onPresetSelected($event.value)"
-              [value]="filterModel.operator">
-    <mat-option *ngFor="let OPERATOR of OPERATORS"
-                [value]="OPERATOR.value"
-                [attr.e2e]="'filter-string-option-' + OPERATOR.label">
-      {{ OPERATOR.label }}
-    </mat-option>
-  </mat-select>
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Operator</mat-label>
+    <mat-select e2e="filter-string-select"
+                (selectionChange)="onPresetSelected($event.value)"
+                [value]="filterModel.operator">
+      <mat-option *ngFor="let OPERATOR of OPERATORS"
+                  [value]="OPERATOR.value"
+                  [attr.e2e]="'filter-string-option-' + OPERATOR.label">
+        {{ OPERATOR.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
   <mat-form-field *ngIf="filterModel.operator === 'EQ' || filterModel.operator === 'NEQ' || filterModel.operator === 'CONTAINS' || filterModel.operator === 'SW' || filterModel.operator === 'EW'">
     <input matInput (input)="onValueChange($event.target.value)"
             [value]="tempValue"/>

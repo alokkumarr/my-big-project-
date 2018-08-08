@@ -17,12 +17,6 @@
   .base-dialog__content {
     padding: 0 10px;
     overflow-y: auto;
-
-    mat-select {
-      border: 1px solid $primary-grey-g1;
-      padding: 8px;
-      border-radius: 2px;
-    }
   }
 
   .base-dialog__actions {

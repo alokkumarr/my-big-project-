@@ -1,18 +1,38 @@
 @import "themes/base/colors";
 
-mat-select.mat-select {
-  border: 1px solid $primary-grey-g1;
-  padding: 8px;
-  border-radius: 2px;
-  width: calc(100% - 18px);
-}
+// mat-select.mat-select {
+//   border: 1px solid $primary-grey-g1;
+//   padding: 8px;
+//   border-radius: 2px;
+//   width: calc(100% - 18px);
+// }
 
-.select-form-field {
-  .mat-input-underline.mat-form-field-underline {
-    display: none;
+// .select-form-field {
+//   .mat-input-underline.mat-form-field-underline {
+//     display: none;
+//   }
+
+//   label.mat-form-field-label.mat-input-placeholder.mat-form-field-placeholder {
+//     padding: 8px;
+//   }
+// }
+
+.select-form-field[appearance="outline"] {
+  margin-bottom: 10px;
+
+  .mat-select-arrow-wrapper {
+    transform: translateY(10%);
   }
 
-  label.mat-form-field-label.mat-input-placeholder.mat-form-field-placeholder {
-    padding: 8px;
+  .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+
+  .mat-form-field-infix {
+    padding: 0.3em 0 0.8em;
+  }
+
+  .mat-form-field-label.mat-empty.mat-form-field-empty {
+    top: 1.34375em;
   }
 }
