@@ -154,6 +154,8 @@ public class SQLScriptDescriptor {
 
             stmts = CCJSqlParserUtil.parseStatements(script);
 
+            logger.debug("SQL Statements = " + stmts);
+
             // We have array of statements - check the table names
             // Since same table names will be mentioned multiple times in multiple
             // statements we have to support "grand" list and maintain precedence of the flags
@@ -163,7 +165,8 @@ public class SQLScriptDescriptor {
             for(Statement stmt : stmts.getStatements()) {
                 i++;
                 List<TableDescriptor> tables = p.getTableList(stmt, i);
-                logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: " + ((tables != null)?tables.size():"no tables"));
+                logger.trace("Statement #" + i + " ==> " +  stmt.toString() + " table list size: "
+                    + ((tables != null) ? tables.size() + " " +  tables : "no tables"));
                 TableDescriptor targetTable = null;
                 for(TableDescriptor td : tables){
                     logger.trace("Try table: " + td.toString());

@@ -415,8 +415,14 @@ public abstract class Component {
                     outputLocation =
                         new Path(outDataset.get(DataSetProperties.PhysicalLocation.name()).toString());
                   }
-                  long size = outputLocation != null ? ctx.fs.getContentSummary(outputLocation).getSpaceConsumed()
-                          : 0;
+
+                  long size = 0;
+
+                  // Check if output location exists
+                  if (outputLocation != null && ctx.fs.exists(outputLocation)) {
+                      size = ctx.fs.getContentSummary(outputLocation).getSpaceConsumed();
+                  }
+
                     logger.trace("Extracted record count " + recordCount);
                     logger.trace("Extracted size " + size);
 
