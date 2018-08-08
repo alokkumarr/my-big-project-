@@ -6,6 +6,8 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.bda.conf.Input;
+import sncr.bda.conf.Output;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
 import sncr.bda.conf.Parameter;
@@ -310,6 +312,15 @@ public class SQLScriptDescriptor {
         for (String tn : scriptWideTableMap.keySet()) {
             TableDescriptor td = scriptWideTableMap.get(tn);
             if (td.isTargetTable == td.isInDropStatement) continue;
+            if (td.isTargetTable && td.isTempTable) {
+                td.format = Input.Format.PARQUET.toString();
+                td.mode = Output.Mode.REPLACE.toString();
+                td.numberOfFiles = 1;
+
+                continue;
+            }
+
+            logger.debug("TD = " + td + ". Is temp table " + td.isTempTable);
 
             logger.trace("Resolving out table: " + tn);
 
