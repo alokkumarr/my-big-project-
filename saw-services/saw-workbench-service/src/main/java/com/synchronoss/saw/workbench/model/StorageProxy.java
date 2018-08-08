@@ -1,5 +1,5 @@
 
-package com.synchronoss.saw.storage.proxy.model;
+package com.synchronoss.saw.workbench.model;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +85,25 @@ public class StorageProxy {
      * An explanation about the purpose of this instance.
      * 
      */
+    @JsonProperty("size")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String size;
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+
+    @JsonProperty("count")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String count;
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
 
     
     @JsonProperty("entityId")
@@ -105,28 +124,6 @@ public class StorageProxy {
      * An explanation about the purpose of this instance.
      * 
      */
-
-    @JsonProperty("size")
-    @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private String size;
-    /**
-     * It holds the query
-     * <p>
-     * An explanation about the purpose of this instance.
-     * 
-     */
-
-    @JsonProperty("count")
-    @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private String count;
-    /**
-     * It holds the query
-     * <p>
-     * An explanation about the purpose of this instance.
-     * 
-     */
-   
-    
     @JsonProperty("pageSize")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private int pageSize;
@@ -249,8 +246,6 @@ public class StorageProxy {
     private StorageProxy.ResultFormat resultFormat = StorageProxy.ResultFormat.fromValue("json");
     @JsonProperty("data")
     private List<Object> data = null;
-    @JsonProperty("sqlBuilder")
-    private SqlBuilder sqlBuilder;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -703,16 +698,6 @@ public class StorageProxy {
         this.data = data;
     }
 
-    @JsonProperty("sqlBuilder")
-    public SqlBuilder getSqlBuilder() {
-        return sqlBuilder;
-    }
-
-    @JsonProperty("sqlBuilder")
-    public void setSqlBuilder(SqlBuilder sqlBuilder) {
-        this.sqlBuilder = sqlBuilder;
-    }
-
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -731,22 +716,25 @@ public class StorageProxy {
     public void setAggregationData(Object aggregationData) {
       this.aggregationData = aggregationData;
     }
+
+
     @JsonProperty("size")
     public String getSize() {
       return size;
     }
-    @JsonProperty("size")
+    @JsonProperty("size")   
     public void setSize(String size) {
       this.size = size;
     }
-    @JsonProperty("count")
+    @JsonProperty("count")    
     public String getCount() {
       return count;
     }
-    @JsonProperty("count")
+    @JsonProperty("count")    
     public void setCount(String count) {
       this.count = count;
     }
+
 
 
     public enum Action {
