@@ -14,3 +14,4 @@ export enum DesignerStates {
   SELECTION_WITH_DATA,
   SELECTION_OUT_OF_SYNCH_WITH_DATA
 }
+

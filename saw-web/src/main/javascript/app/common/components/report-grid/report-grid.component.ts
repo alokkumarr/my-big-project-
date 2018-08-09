@@ -151,6 +151,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     }
   }
   @Input() isEditable: boolean = false;
+  @Input() columnHeaders;
 
   public dataLoader: (
     options: {}
@@ -211,11 +212,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
-
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
-        enabled: true,
+        enabled: isUndefined(this.columnHeaders) ? true : this.columnHeaders,
         mode: 'select'
       };
 
@@ -276,7 +276,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         isVisibleIndexChanged = true;
       }
       if (isVisibleIndexChanged) {
-        this.change.emit({ subject: 'visibleIndex' });
+        // disabled this event so that refreshing data does not fire this event and triggers draft mode
+        // TODO find a better way to trigger this, and not on onContentReady
+        // currently devextreme has no event for when the columns of the grid get reordered
+        // so the onContentReady event was used for that
+        // this.change.emit({ subject: 'visibleIndex' });
       }
     });
   }

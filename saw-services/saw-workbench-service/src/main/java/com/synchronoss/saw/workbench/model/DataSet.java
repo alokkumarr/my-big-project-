@@ -37,6 +37,9 @@ public class DataSet {
     @JsonProperty("transformations")
     private Object transformations = null;
 
+    @JsonProperty("component")
+    private String component = null;
+
     @JsonProperty("asInput")
     private List<Object> asInput = null;
    
@@ -99,6 +102,14 @@ public class DataSet {
     @JsonProperty("transformations")
     public void setTransformations(Object transformations) {
       this.transformations = transformations;
+    }
+    @JsonProperty("component")
+    public String getComponent() {
+      return component;
+    }
+    @JsonProperty("component")
+    public void setComponent(String component) {
+      this.component = component;
     }
     @JsonProperty("asOfNow")
     public Object getAsOfNow() {

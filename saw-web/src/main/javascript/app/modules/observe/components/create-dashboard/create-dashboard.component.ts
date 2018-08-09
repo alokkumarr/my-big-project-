@@ -112,13 +112,14 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     }
   }
 
-  onApplyGlobalFilter(globalFilters): void {
-    if (!globalFilters) {
+  onApplyGlobalFilter(data): void {
+    if (!data) {
       this.widgetSidenav.close();
       return;
     }
 
-    this.globalFilterService.onApplyFilter.next(globalFilters);
+    this.globalFilterService.onApplyFilter.next(data.analysisFilters);
+    this.globalFilterService.onApplyKPIFilter.next(data.kpiFilters);
     this.widgetSidenav.close();
   }
 

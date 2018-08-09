@@ -1,4 +1,10 @@
-import { Component, OnDestroy, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -14,7 +20,7 @@ import {
   DATE_FORMAT
 } from '../../consts';
 
-import { DashboardService } from '../../services/dashboard.service';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import 'rxjs/add/operator/debounceTime';
@@ -22,25 +28,87 @@ import 'rxjs/add/operator/debounceTime';
 const template = require('./kpi-filter.component.html');
 require('./kpi-filter.component.scss');
 
+interface KPIFilterType {
+  preset: string;
+  lte?: string;
+  gte?: string;
+}
+
 @Component({
   selector: 'kpi-filter',
   template
 })
-export class KPIFilter implements OnDestroy {
+export class KPIFilter implements OnInit, OnDestroy {
   kpiFilterForm: FormGroup;
+  filterCache: KPIFilterType = {
+    preset: '',
+    gte: moment().format(DATE_FORMAT.YYYY_MM_DD),
+    lte: moment().format(DATE_FORMAT.YYYY_MM_DD)
+  };
+
   dateFilters = DATE_PRESETS;
   datePresetSubscription: Subscription;
+  listeners: Array<Subscription> = [];
   showDateFields: boolean = false;
+  @Output() onModelChange = new EventEmitter();
 
   constructor(
     private fb: FormBuilder,
-    private dashboardService: DashboardService
+    private globalFilterService: GlobalFilterService
   ) {
     this.createForm();
   }
 
+  ngOnInit() {
+    const clearFiltersListener = this.globalFilterService.onClearAllFilters.subscribe(
+      () => {
+        this.loadDefaults();
+        this.cacheFilters();
+      }
+    );
+
+    const applyFiltersListener = this.globalFilterService.onApplyFilter.subscribe(
+      () => {
+        this.cacheFilters();
+      }
+    );
+
+    const closeFiltersListener = this.globalFilterService.onSidenavStateChange.subscribe(
+      state => {
+        if (!state) {
+          this.loadDefaults(true); // load cached filter data since last apply
+        }
+      }
+    );
+  }
+
   ngOnDestroy() {
-    this.datePresetSubscription && this.datePresetSubscription.unsubscribe();
+    this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  cacheFilters() {
+    this.filterCache = this.getFilterModel();
+  }
+
+  loadDefaults(fromCache = false) {
+    if (fromCache && !this.filterCache) {
+      return;
+    }
+
+    /* prettier-ignore */
+    this.kpiFilterForm.setValue(
+      fromCache ? {
+        preset: this.filterCache.preset,
+        gte: moment(this.filterCache.gte, DATE_FORMAT.YYYY_MM_DD),
+        lte: moment(this.filterCache.lte, DATE_FORMAT.YYYY_MM_DD)
+      } : {
+        preset: '',
+        gte: moment(),
+        lte: moment()
+      }
+    );
+
+    this.onModelChange.emit(this.getFilterModel());
   }
 
   createForm() {
@@ -57,18 +125,23 @@ export class KPIFilter implements OnDestroy {
     });
 
     /* Only show date inputs if custom filter is selected */
-    this.datePresetSubscription = this.kpiFilterForm
+    const datePresetSubscription = this.kpiFilterForm
       .get('preset')
       .valueChanges.subscribe(data => {
         this.kpiFilterForm.get('lte').updateValueAndValidity();
         this.kpiFilterForm.get('gte').updateValueAndValidity();
         this.showDateFields = data === CUSTOM_DATE_PRESET_VALUE;
       });
+    this.listeners.push(datePresetSubscription);
 
-    this.kpiFilterForm.valueChanges.debounceTime(500).subscribe(data => {
-      this.kpiFilterForm.valid &&
-        this.dashboardService.onFilterKPI.next(this.getFilterModel());
-    });
+    const kpiFilterSubscription = this.kpiFilterForm.valueChanges
+      .debounceTime(500)
+      .subscribe(data => {
+        this.kpiFilterForm.valid &&
+          this.onModelChange.emit(this.getFilterModel());
+      });
+
+    this.listeners.push(kpiFilterSubscription);
   }
 
   /**
@@ -77,7 +150,7 @@ export class KPIFilter implements OnDestroy {
    *
    * @returns {undefined}
    */
-  getFilterModel() {
+  getFilterModel(): KPIFilterType {
     const model = {
       preset: this.kpiFilterForm.get('preset').value
     };

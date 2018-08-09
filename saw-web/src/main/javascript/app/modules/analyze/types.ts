@@ -70,6 +70,7 @@ export type DesignerToolbarAciton =
   | 'preview'
   | 'filter'
   | 'save'
+  | 'saveAndClose'
   | 'refresh'
   | 'modeToggle';
 export interface IToolbarActionData {
@@ -88,8 +89,8 @@ export interface IToolbarActionResult {
   description?: string;
   filters?: Filter[];
   booleanCriteria?: string;
-  isSaveSuccessful?: boolean;
   analysis?: Analysis;
+  action?: string;
 }
 
 export interface IAnalysisMethod {

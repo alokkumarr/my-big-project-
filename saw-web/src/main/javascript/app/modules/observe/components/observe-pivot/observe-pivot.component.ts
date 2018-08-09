@@ -10,6 +10,7 @@ import { GridsterItem } from 'angular-gridster2';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import {
   AnalyzeService,
   EXECUTION_MODES
@@ -32,16 +33,27 @@ export class ObservePivotComponent implements OnInit, OnDestroy {
   @Output() onRefresh = new EventEmitter();
   @Input() updater: BehaviorSubject<any>;
 
-  constructor(private analyzeService: AnalyzeService) {}
+  constructor(
+    private analyzeService: AnalyzeService,
+    private progressService: HeaderProgressService
+  ) {}
 
   ngOnInit() {
     this.artifactColumns = [...this.analysis.artifacts[0].columns];
     if (this.analysis._executeTile === false) return;
+    this.progressService.show();
     this.analyzeService
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, {})
-      .then(({ data }) => {
-        this.data = flattenPivotData(data, this.analysis.sqlBuilder);
-      });
+      .then(
+        ({ data }) => {
+          this.progressService.hide();
+          this.data = flattenPivotData(data, this.analysis.sqlBuilder);
+        },
+        err => {
+          this.progressService.hide();
+          throw err;
+        }
+      );
   }
   ngOnDestroy() {}
 }

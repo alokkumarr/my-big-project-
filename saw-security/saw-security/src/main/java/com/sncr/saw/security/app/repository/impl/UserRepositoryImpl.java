@@ -166,7 +166,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public String rstchangePassword(String loginId, String newPass) {
+	public String rstchangePassword(String loginId, String newPass, String rhc) {
 		String message = null;
 		// if new pass is != last 5 in pass history
 		// change the pass
@@ -193,6 +193,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(1, userSysId);
 				}
 			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
+
 			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
@@ -216,12 +217,16 @@ public class UserRepositoryImpl implements UserRepository {
 					}
 				});
 				message = null;
-				/*
-				 * sql =
-				 * "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID='"
-				 * + loginId + "' AND RS.VALID=1"; jdbcTemplate.update(sql);
-				 */
+				  sql =
+				 "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? "
+				 + "AND RS.VALID=1";
+				  jdbcTemplate.update(sql,new PreparedStatementSetter() {
+                      public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                           preparedStatement.setString(1, loginId);
+                      }
+                  });
 			}
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;

@@ -18,7 +18,7 @@ var HtmlReporter = require('protractor-beautiful-reporter');
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 600000;
+const pageLoadTimeout = webpackHelper.distRun() ? 1200000 : 600000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
@@ -130,21 +130,31 @@ exports.config = {
      * working tests (working reliably without flakiness) incrementally one by one in continuous integration, while
      * working on fixing the rest.
      */
-    root: [
-      //webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
-      //webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
-    ],
-    charts: [
-      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
-    ],
-    pivots: [
-      //webpackHelper.root(testDir + '/e2e-tests/pivots/pivotFilters.test.js')
-    ],
+    // root: [
+    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
+    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
+    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
+    // ],
+    // charts: [
+    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    // ],
+    // chartEditFork: [
+    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    // ],
+    // filters: [
+    //   appRoot + '/src/test/e2e-tests/promptFilters.test.js'
+    // ],
+    // pivots: [
+    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    // ],
     authentication: [
       appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    ],
+    debug: [
+      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
   } : {
     /**
@@ -223,6 +233,20 @@ exports.config = {
     }));
 
     jasmine.getEnv().addReporter(junitReporter);
+
+    var AllureReporter = require('jasmine-allure-reporter');
+    jasmine.getEnv().addReporter(new AllureReporter({
+      resultsDir: 'target/allure-results'
+    }));
+    jasmine.getEnv().afterEach(function(done){
+      browser.takeScreenshot().then(function (png) {
+        allure.createAttachment('Screenshot', function () {
+          return new Buffer(png, 'base64')
+        }, 'image/png')();
+        done();
+      })
+    });
+    
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);

@@ -141,7 +141,7 @@ export class ExecutedViewComponent implements OnInit {
           null
         );
       } else {
-        this.executeAnalysis(analysis);
+        this.executeAnalysis(analysis, EXECUTION_MODES.LIVE);
       }
     }
   }
@@ -225,8 +225,8 @@ export class ExecutedViewComponent implements OnInit {
     };
   }
 
-  executeAnalysis(analysis) {
-    this._analyzeActionsService.execute(analysis).then(executionStarted => {
+  executeAnalysis(analysis, mode) {
+    this._analyzeActionsService.execute(analysis, mode).then(executionStarted => {
       // this.afterExecuteLaunched(analysis);
       if (!executionStarted && !this.analyses) {
         // at least load the executed analyses if none are loaded
@@ -415,15 +415,40 @@ export class ExecutedViewComponent implements OnInit {
       if (!result) {
         return;
       }
-      const { isSaveSuccessful, analysis } = result;
-      if (isSaveSuccessful) {
+      const {requestExecution, analysis} = result;
+      if (analysis) {
         this.analysis = analysis;
+      }
+      if (requestExecution) {
+        this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
       }
     });
   }
 
   fork() {
-    this._analyzeActionsService.fork(this.analysis);
+    this._analyzeActionsService.fork(this.analysis).then(result => {
+      if (!result) {
+        return;
+      }
+      const {requestExecution, analysis} = result;
+      if (analysis) {
+        this.analysis = analysis;
+      }
+      if (requestExecution) {
+        this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
+        this.gotoForkedAnalysis(analysis);
+      }
+    });
+  }
+
+  gotoForkedAnalysis(analysis) {
+    this._state.go('analyze.executedDetail', {
+      analysisId: analysis.id,
+      analysis: analysis,
+      executionId: null,
+      awaitingExecution: true,
+      loadLastExecution: false
+    });
   }
 
   afterDelete(analysis) {

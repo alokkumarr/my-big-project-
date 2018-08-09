@@ -1,5 +1,14 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.util.UUID;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.Path;
+import org.ojai.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,16 +17,10 @@ import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
-import java.util.UUID;
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-import org.ojai.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.component.WithDataSetService;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -40,10 +43,11 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private Integer previewLimit;
 
-  @Value("${workbench.project-root}/previews")
+  @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
-
+    
+  
   /**
    * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
    */
@@ -80,6 +84,9 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
        * be able to recover by reattempting to create the client.  */
       log.warn("Unable to create Workbench client upon startup", e);
     }
+    
+    
+    
   }
 
   /**
@@ -129,24 +136,34 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Override
   public ObjectNode execute(
       String project, String name, String component, String config) throws Exception {
-    log.info("Executing dataset transformation");
+    log.info("Executing dataset transformation starts here ");
     log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(name);
+    log.info("execute name = " + name);
+    log.info("execute root = " + root);
+    log.info("execute component = " + component);
     client.submit(new WorkbenchExecuteJob(
                 root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
+    log.info("Executing dataset transformation ends here ");
     return root;
   }
 
   /**
    * Execute a transformation component on a dataset to create a new dataset.
    */
-  private void createDatasetDirectory(String name) throws Exception {
-    String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
+  private String createDatasetDirectory(String name) throws Exception {
+    
+    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
+        + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
+        + MetadataBase.PREDEF_DATA_DIR;
+    log.info("createDatasetDirectory path = " + path);
     if (!HFileOperations.exists(path)) {
       HFileOperations.createDir(path);
     }
+    return path;
   }
 
   @Value("${metastore.base}")
@@ -195,7 +212,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   }
 
   private String getDatasetLocation(String project, String name) {
-    return root + "/" + project + "/dl/fs/data/" + name + "/data";
+    
+    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
+        + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
+        + MetadataBase.PREDEF_DATA_DIR;
+    log.info("getDatasetLocation for preview path = " + path);
+    return path;
   }
 
   @Override
@@ -211,4 +234,13 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     JsonNode json = mapper.readTree(doc.toString());
     return (ObjectNode) json;
   }
+
+  @Override
+  public String generatePath(String project, String name) throws Exception {
+    log.trace("generate data system path for starts here :" + project + " : " + name);
+    String location = createDatasetDirectory(name);
+    log.trace("generate data system path for starts here " + location);
+    return location;
+  }
+
 }

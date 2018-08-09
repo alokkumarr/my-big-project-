@@ -15,7 +15,8 @@ import * as defaults from 'lodash/defaults';
 
 import { DATE_PRESETS_OBJ, BULLET_CHART_OPTIONS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
-import { DashboardService } from '../../services/dashboard.service';
+import { GlobalFilterService } from '../../services/global-filter.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 
 import { Observable } from 'rxjs/Observable';
@@ -54,11 +55,12 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
 
   constructor(
     private observe: ObserveService,
-    private dashboardService: DashboardService
+    private globalFilterService: GlobalFilterService,
+    private progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
-    this.kpiFilterSubscription = this.dashboardService.onFilterKPI.subscribe(
+    this.kpiFilterSubscription = this.globalFilterService.onApplyKPIFilter.subscribe(
       this.onFilterKPI.bind(this)
     );
     this.subscribeToRequester();
@@ -136,42 +138,49 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
     const kpiFilter = this.filterLabel();
     const primaryAggregate = get(kpi, 'dataFields.0.aggregate', []);
     const categories = get(kpi, 'dataFields.0.displayName', '');
-    this.observe.executeKPI(kpi).subscribe(res => {
-      const count: number = get(
-        res,
-        `data.current.${dataFieldName}._${primaryAggregate}`
-      );
-      const { plotBands, seriesData } = this.observe.buildPlotBandsForBullet(
-        this.item.bullet.bulletPalette,
-        this.item.bullet.measure1,
-        this.item.bullet.measure2,
-        toNumber(count),
-        this.item.bullet.target
-      );
-      changes.push(
-        {
-          path: 'title.text',
-          data: kpiTitle
-        },
-        {
-          path: 'subtitle.text',
-          data: kpiFilter
-        },
-        {
-          path: 'xAxis.categories',
-          data: [categories]
-        },
-        {
-          path: 'yAxis.plotBands',
-          data: plotBands
-        },
-        {
-          path: 'series[0].data',
-          data: seriesData
-        }
-      );
-      this.reloadChart(changes);
-      this.item && this.onRefresh.emit(this.item);
-    });
+    this.progressService.show();
+    this.observe.executeKPI(kpi).subscribe(
+      res => {
+        this.progressService.hide();
+        const count: number = get(
+          res,
+          `data.current.${dataFieldName}._${primaryAggregate}`
+        );
+        const { plotBands, seriesData } = this.observe.buildPlotBandsForBullet(
+          this.item.bullet.bulletPalette,
+          this.item.bullet.measure1,
+          this.item.bullet.measure2,
+          toNumber(count),
+          this.item.bullet.target
+        );
+        changes.push(
+          {
+            path: 'title.text',
+            data: kpiTitle
+          },
+          {
+            path: 'subtitle.text',
+            data: kpiFilter
+          },
+          {
+            path: 'xAxis.categories',
+            data: [categories]
+          },
+          {
+            path: 'yAxis.plotBands',
+            data: plotBands
+          },
+          {
+            path: 'series[0].data',
+            data: seriesData
+          }
+        );
+        this.reloadChart(changes);
+        this.item && this.onRefresh.emit(this.item);
+      },
+      () => {
+        this.progressService.hide();
+      }
+    );
   }
 }

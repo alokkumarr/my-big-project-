@@ -191,6 +191,7 @@ public class DLDataSetService {
         dl.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
         dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(ds_type));
         dl.add(DataSetProperties.Format.toString(), new JsonPrimitive((String) o.get(DataSetProperties.Format.name())));
+        dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive((String) o.get(DataSetProperties.PhysicalLocation.name())));
         dl.add(DataSetProperties.Name.toString(), new JsonPrimitive((String) o.get(DataSetProperties.Name.name())));
         dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive(catalog));
         dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive((Integer) o.get(DataSetProperties.NumberOfFiles.name())));
@@ -236,6 +237,35 @@ public class DLDataSetService {
         dsStore.update(id, ds);
         return ds;
     }
+
+    public JsonElement updateDS(String id, ContextMetadata ctx, JsonElement ds, JsonElement schema, long recordCount, long size) throws Exception {
+
+      if (schema == null || ds == null)
+          throw new IllegalArgumentException("Schema/DS descriptor must not be null");
+
+      JsonObject system = ds.getAsJsonObject().get(DataSetProperties.System.toString()).getAsJsonObject();
+
+      DateTime currentTime = new DateTime();
+      long modifiedTime = currentTime.getMillis() / 1000;
+      logger.debug("Dataset modified at = " + modifiedTime);
+
+      system.addProperty(DataSetProperties.ModifiedTime.toString(), modifiedTime);
+      ds.getAsJsonObject().add(DataSetProperties.System.toString(), system);
+
+      JsonObject status = dsStore.createStatusSection(ctx.status, ctx.startTs, ctx.finishedTs, ctx.ale_id, ctx.batchID);
+      JsonObject trans = new JsonObject();
+      trans.addProperty("asOutput", ctx.transformationID);
+      if (schema != null) {
+          ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
+      }
+      ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
+      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), size);
+      ds.getAsJsonObject().add("transformations", trans);
+      ds.getAsJsonObject().add("asOfNow", status);
+
+      dsStore.update(id, ds);
+      return ds;
+  }
 
 
     //TODO: talk about ID generation

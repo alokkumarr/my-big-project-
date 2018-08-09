@@ -365,16 +365,19 @@ export class DesignerContainerComponent {
         });
       break;
     case 'save':
-      if (this.isInQueryMode && !this.analysis.edit) {
-        this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
-          if (result) {
-            this.changeToQueryModePermanently();
-            this.openSaveDialog();
+      this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
+        if (result) {
+          const shouldClose = result.action === 'saveAndClose';
+          this.onSave.emit({
+            requestExecution: shouldClose,
+            analysis: result.analysis
+          });
+          if (!shouldClose) {
+            this.requestDataIfPossible();
           }
-        });
-      } else {
-        this.openSaveDialog();
-      }
+          this.isInDraftMode = false;
+        }
+      });
       break;
     case 'refresh':
       this.requestDataIfPossible();
@@ -385,19 +388,29 @@ export class DesignerContainerComponent {
     }
   }
 
-  openSaveDialog() {
-    this._analyzeDialogService
+  openSaveDialogIfNeeded(): Promise<any> {
+    return new Promise(resolve => {
+      if (this.isInQueryMode && !this.analysis.edit) {
+        this._analyzeDialogService
+          .openQueryConfirmationDialog()
+          .afterClosed()
+          .subscribe(result => {
+            if (result) {
+              this.changeToQueryModePermanently();
+              resolve(this.openSaveDialog());
+            }
+          });
+      } else {
+        resolve(this.openSaveDialog());
+      }
+    });
+  }
+
+  openSaveDialog(): Promise<any> {
+    return this._analyzeDialogService
       .openSaveDialog(this.analysis)
       .afterClosed()
-      .subscribe((result: IToolbarActionResult) => {
-        if (result) {
-          this.onSave.emit({
-            isSaveSuccessful: result.isSaveSuccessful,
-            analysis: result.analysis
-          });
-          this.isInDraftMode = false;
-        }
-      });
+      .toPromise();
   }
 
   toggleDesignerQueryModes() {

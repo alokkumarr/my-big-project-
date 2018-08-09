@@ -1,13 +1,20 @@
+@import 'themes/base/colors';
+
 layout-header header {
   mat-toolbar {
     padding: 0 !important;
     background-color: transparent;
     border-bottom: 1px solid #D1D3D3;
 
+    &.app-toolbar {
+      display: flex;
+      flex-direction: column;
+    }
+
     .lh-toolbar {
       height: 70px;
       max-height: 70px;
-      padding: 0 20px;
+      padding-right: 20px;
       background-color: white;
       width: 100%;
 
@@ -35,6 +42,21 @@ layout-header header {
     md-menu-bar {
       padding: 0;
     }
+
+    .active-module {
+      display: inline-block !important;
+      color: $primary-blue-b2;
+      pointer-events: none;
+    }
+
+    .mods {
+      display: none;
+    }
+
+    .mod-icon {
+      margin-top: 5px !important;
+      font-size: 20px !important;
+    }
   }
 }
 
@@ -52,7 +74,7 @@ layout-header header {
 }
 
 header .company-logo {
-  margin-left: 25px;
+  margin-left: 36px;
   height: 50px;
   width: 145px;
 }
@@ -60,8 +82,4 @@ header .company-logo {
 .mat-icon-help {
   color: #5C6670;
   font-size: 20px;
-}
-
-header .mat-toolbar mat-progress-bar {
-  margin-top: 30px;
 }

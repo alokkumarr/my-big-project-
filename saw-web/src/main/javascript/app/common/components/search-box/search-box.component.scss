@@ -65,6 +65,10 @@ search-box {
         background-color: #F6F8FB;
         border-color: #CECECE;
 
+        &::before {
+          line-height: 32px;
+        }
+
         &.icon-close {
           opacity: 1;
         }

@@ -18,8 +18,10 @@ import {mdButtonGroupComponent} from './md-button-group/md-button-group.componen
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
 import {AccordionMenuComponent} from './accordionMenu/accordionMenu.component'
-import {AccordionMenuLinkComponent} from './accordionMenu/accordionMenuLink.component'
-import {SidenavComponent} from './sidenav/sidenav.component';
+import {AccordionMenuLinkComponent} from './accordionMenu'
+import {
+  SidenavComponent
+} from './sidenav';
 import {PivotGridComponent} from './pivot-grid/pivot-grid.component';
 import {BinaryOptionComponent} from './binary-option/binary-option.component';
 import {ReportGridDisplayComponent} from './report-grid-display/grid/report-grid-display.component';

@@ -1,10 +1,11 @@
-<div fxLayout="column" style="width: 400px; padding: 0 50px;">
+<div fxLayout="column" style="width: 400px;">
   <mat-form-field>
     <input matInput
            (input)="onNameChange($event.target.value)"
            [value]="analysis.name"
            e2e="save-dialog-name"
-           placeholder="Name"/>
+           placeholder="Name"
+           required/>
   </mat-form-field>
   <mat-form-field>
     <textarea matInput
@@ -17,7 +18,7 @@
               matAutosizeMaxRows="10">
     </textarea>
   </mat-form-field>
-  <mat-form-field>
+  <mat-form-field class="select-form-field">
     <mat-select placeholder="Category"
                 (selectionChange)="onCategorySelected($event.value)"
                 e2e="save-dialog-selected-category"

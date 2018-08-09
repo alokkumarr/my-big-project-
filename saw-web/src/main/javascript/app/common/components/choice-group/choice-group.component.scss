@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 choice-group {
   .md-button {
     padding: 8px;
@@ -37,7 +39,7 @@ choice-group {
     }
 
     &.selected {
-      background-color: #1A89D4;
+      background-color: $primary-blue-b2;
       color: rgb(255, 255, 255);
 
       md-icon {

@@ -25,7 +25,7 @@ export class WorkbenchPageComponent {
     this.headerProgress.show();
     this.menu.getMenu('WORKBENCH')
       .then(data => {
-        this.menu.updateMenu({}, 'WORKBENCH');
+        this.menu.updateMenu(data, 'WORKBENCH');
       });
     /**
     * Temporary fix for routing of SQL component until the issue of editor initialization is figured out.
