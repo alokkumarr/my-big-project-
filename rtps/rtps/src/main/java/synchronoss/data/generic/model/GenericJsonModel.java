@@ -270,11 +270,26 @@ public class GenericJsonModel {
 
             String base64data = src.get("payload").getAsString();
             String decoded = new String(Base64.getDecoder().decode(base64data));
+
+            logger.debug("Payload = " + decoded);
             //System.out.println(base64data);
             //System.out.println(decoded);
 
             // Put mandatory fields into final document
-            dst = new JsonParser().parse(decoded).getAsJsonObject();
+            JsonElement decodedElement = new JsonParser().parse(decoded);
+
+            logger.debug("Decode element = " + decodedElement);
+
+            if (decodedElement.isJsonArray()) {
+                logger.debug("Data is an array");
+
+                dst = new JsonObject();
+                dst.add("payload", decodedElement);
+            } else {
+                dst = new JsonParser().parse(decoded).getAsJsonObject();
+            }
+
+            logger.debug("Parsed payload = " + dst);
             dst.addProperty("RECEIVED_TS", src.get("RECEIVED_TS").getAsString());
             dst.addProperty("EVENT_TYPE", src.get("EVENT_TYPE").getAsString());
             dst.addProperty("EVENT_ID", src.get("EVENT_ID").getAsString());
