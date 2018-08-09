@@ -92,7 +92,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @NotNull
   private String basePath;
 
-  @Value("${workbench.storage-url}")
+  @Value("${workbench.storage-uri}")
   @NotNull
   private String storageURL;
 
@@ -441,6 +441,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       String id = UUID.randomUUID().toString() + delimiter + "esData" + delimiter + System.currentTimeMillis();
       ObjectNode node = JsonNodeFactory.instance.objectNode();
       node.put("_id", id);
+      node.put("physicalLocation", perAliasResponse.getBody().getIndexRelativePath());
       ObjectNode system = node.putObject("system");
       system.put("name", name); 
       system.put("catalog", MetadataBase.DEFAULT_CATALOG);
@@ -454,11 +455,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       asOfNow.put("status", "SUCCESS");
       asOfNow.put("started", new SimpleDateFormat(dateFormat).format(new Date()));
       asOfNow.put("finished", new SimpleDateFormat(dateFormat).format(new Date()));
-      ArrayNode schema = node.putArray("schema");
-      System.out.println(objectMapper.writeValueAsString(data));
+      ObjectNode schema = node.putObject("schema");
+      ArrayNode fields = JsonNodeFactory.instance.arrayNode();
       for (Object obj : data) {
-        schema.addPOJO(obj);
+        fields.addPOJO(obj);
       } // end of internal for loop to read storeField
+      schema.putArray("fields").addAll(fields);
       esDataSet = objectMapper.readValue(objectMapper.writeValueAsString(node), DataSet.class); 
       esDataSet.setStorageType(StorageType.ES.name());
       esDataSet.setJoinEligible(false);
