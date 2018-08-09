@@ -1,9 +1,12 @@
 import * as angular from 'angular';
 
+import * as html2pdf from 'html2pdf.js';
 import 'angular-material/angular-material.css';
 
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
+
+window['html2pdf'] = html2pdf;
 
 import 'zone.js/dist/zone';
 import 'hammerjs';
@@ -13,9 +16,13 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { UrlService } from '@uirouter/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { UpgradeModule, downgradeModule, downgradeComponent } from '@angular/upgrade/static';
+import {
+  UpgradeModule,
+  downgradeModule,
+  downgradeComponent
+} from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import {MaterialModule} from './material.module';
+import { MaterialModule } from './material.module';
 
 import { routesConfig } from './routes';
 import { themeConfig } from './theme';
@@ -55,29 +62,36 @@ declare global {
     AdminModule
   ],
   exports: [FlexLayoutModule],
-  providers: [
-    {provide: LOCALE_ID, useValue: 'en'}
+  providers: [{ provide: LOCALE_ID, useValue: 'en' }],
+  declarations: [
+    ServiceBootstrapComponent,
+    LayoutHeaderComponent,
+    LayoutFooterComponent
   ],
-  declarations: [ServiceBootstrapComponent, LayoutHeaderComponent, LayoutFooterComponent],
-  entryComponents: [ServiceBootstrapComponent, LayoutHeaderComponent, LayoutFooterComponent]
+  entryComponents: [
+    ServiceBootstrapComponent,
+    LayoutHeaderComponent,
+    LayoutFooterComponent
+  ]
 })
 export class NewAppModule {
-  constructor() { }
-  ngDoBootstrap() {
-  }
+  constructor() {}
+  ngDoBootstrap() {}
 }
 
 const ng2BootstrapFn = (extraProviders: StaticProvider[]) => {
-  return platformBrowserDynamic(extraProviders).bootstrapModule(NewAppModule).then(platformRef => {
-    const injector: Injector = platformRef.injector;
+  return platformBrowserDynamic(extraProviders)
+    .bootstrapModule(NewAppModule)
+    .then(platformRef => {
+      const injector: Injector = platformRef.injector;
 
-    // Instruct UIRouter to listen to URL changes
-    const url: UrlService = injector.get(UrlService);
-    url.listen();
-    url.sync();
-    return platformRef;
-  });
-}
+      // Instruct UIRouter to listen to URL changes
+      const url: UrlService = injector.get(UrlService);
+      url.listen();
+      url.sync();
+      return platformRef;
+    });
+};
 
 // This AngularJS module represents the AngularJS pieces of the application.
 export const AppModule = 'app';
@@ -97,18 +111,15 @@ angular
   .config(config)
   .config(interceptor)
   .run(runConfig)
-  .directive(
-    'serviceBootstrap',
-    downgradeComponent({ component: ServiceBootstrapComponent }) as angular.IDirectiveFactory
-  )
-  .directive(
-    'layoutHeader',
-    downgradeComponent({component: LayoutHeaderComponent}) as angular.IDirectiveFactory
-  )
+  .directive('serviceBootstrap', downgradeComponent({
+    component: ServiceBootstrapComponent
+  }) as angular.IDirectiveFactory)
+  .directive('layoutHeader', downgradeComponent({
+    component: LayoutHeaderComponent
+  }) as angular.IDirectiveFactory)
   .component('layoutContent', LayoutContentComponent)
-  .directive(
-    'layoutFooter',
-    downgradeComponent({component: LayoutFooterComponent}) as angular.IDirectiveFactory
-  );
+  .directive('layoutFooter', downgradeComponent({
+    component: LayoutFooterComponent
+  }) as angular.IDirectiveFactory);
 
 angular.bootstrap(document, [AppModule]);
