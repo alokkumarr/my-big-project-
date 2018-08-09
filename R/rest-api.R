@@ -141,7 +141,7 @@ sip_get_dataset_details <- function(dataset_id,
 #' @export
 sip_add_dataset <- function(output_path,
                             output_format,
-                            output_rows = NULL,
+                            output_rows = 0,
                             component = 'RComponent',
                             script,
                             desc = "",
@@ -159,7 +159,7 @@ sip_add_dataset <- function(output_path,
                             token) {
   checkmate::assert_string(output_path)
   checkmate::assert_choice(output_format, c("parquet", "csv", "json", "rds"))
-  checkmate::assert_number(output_rows, null.ok = TRUE)
+  checkmate::assert_number(output_rows, lower = 0)
   checkmate::assert_string(component)
   checkmate::assert_string(desc)
   checkmate::assert_string(created_by, null.ok = TRUE)
@@ -192,12 +192,13 @@ sip_add_dataset <- function(output_path,
                                   inputFormat = jsonlite::unbox(input_formats),
                                   outputFormat = jsonlite::unbox(output_format)),
                   asInput  = list(jsonlite::unbox(input_ids)),
-                  transformations = list(asOutputLocation = jsonlite::unbox(output_path)),
+                  transformations = list(asOutputLocation = jsonlite::unbox(input_ids)),
                   asOfNow  = list(status = jsonlite::unbox(status),
                                   started = jsonlite::unbox(started),
                                   finished = jsonlite::unbox(finished),
                                   batchId = jsonlite::unbox(batch_id)),
-                  recordCount = jsonlite::unbox(output_rows))
+                  recordCount = jsonlite::unbox(output_rows),
+                  physicalLocation = jsonlite::unbox(output_path))
   payload <- jsonlite::toJSON(payload, auto_unbox = FALSE)
 
   # URL
