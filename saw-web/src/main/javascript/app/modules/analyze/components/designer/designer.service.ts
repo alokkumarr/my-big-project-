@@ -83,7 +83,7 @@ export class DesignerService {
     const areLessThenMaxFields = (
       artifactColumns: ArtifactColumns
     ): boolean => {
-      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+      return (artifactColumns[0].area === "data" ? true : artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA);
     };
 
     const canAcceptNumberType = (
