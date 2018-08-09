@@ -111,7 +111,8 @@ export class ExpandDetailChartComponent {
       return false;
     }
     if (this.limitValue === null || isUndefined(this.limitValue)) {
-      this.limitValue = this.limitType = null;
+      delete this.artifactColumn.limitValue;
+      delete this.artifactColumn.limitType;
     }
     this.artifactColumn.limitValue = this.limitValue;
     this.artifactColumn.limitType = this.limitType;
