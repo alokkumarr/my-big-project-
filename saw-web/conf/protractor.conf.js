@@ -49,7 +49,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
 /**
  * number of failed retry, 3 times in bamboo and 2 times in local
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 3;
+const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -99,7 +99,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 4,
+    maxInstances: 10,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -174,8 +174,11 @@ exports.config = {
       appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
       appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
     ],
-    filters: [
-      appRoot + '/src/test/e2e-tests/promptFilters.test.js'
+    promptFilters: [
+      appRoot + '/src/test/e2e-tests/promptFilter/chartPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/esReportPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/pivotPromptFilters.test.js',
+      appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js'
     ],
     pivots: [
       appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
@@ -246,7 +249,7 @@ exports.config = {
         done();
       })
     });
-    
+
 
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
