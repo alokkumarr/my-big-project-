@@ -22,8 +22,8 @@
 #'@param type file type. type specifies the spark writer function. Only
 #'  applicable for spark writer method
 #'@param mode Specifies the behavior when data or table already exists.
-#'  Supported values include: 'error', 'append', 'overwrite' and 'ignore'.
-#'  Notice that 'overwrite' will also change the column structure. default is
+#'  Supported values include: 'error', 'append', 'replace' and 'ignore'.
+#'  Notice that 'replace' will also change the column structure. default is
 #'  NULL
 #'@param partition_by Partitions the output by the given columns on the file
 #'  system
@@ -51,13 +51,28 @@ writer.tbl_spark <- function(df,
   checkmate::assert_character(path)
   checkmate::assert_character(dfs_mount)
   checkmate::assert_choice(type, c("csv", "parquet", "json", "jdbc", "source", "table", "text"))
-  checkmate::assert_choice(mode, c('error', 'append', 'overwrite', 'ignore'), null.ok = TRUE)
+  checkmate::assert_choice(mode, c('error', 'append', 'replace', 'ignore'), null.ok = TRUE)
   checkmate::assert_number(partitions, lower = 0, null.ok = TRUE)
   checkmate::assert_subset(partition_by, colnames(df), empty.ok = TRUE)
   checkmate::assert_character(temp_folder_name)
 
-  overwrite <- ifelse(!is.null(mode), ifelse(mode == "overwrite", T, F), F)
-  append <- ifelse(!is.null(mode), ifelse(mode == "append", T, F), F)
+  if(! is.null(mode)) {
+    if (mode == "replace") {
+      overwrite <- T
+      append <- F
+      mode <- "overwrite"
+    } else if (mode == "append") {
+      append <- T
+      overwrite <- F
+    } else {
+      overwrite <- F
+      append <- F
+    }
+  } else {
+    overwrite <- F
+    append <- F
+  }
+
 
   if(!is.null(partitions)) {
     df <- sparklyr::sdf_repartition(df, partitions = partitions, partition_by = NULL)
@@ -76,7 +91,7 @@ writer.tbl_spark <- function(df,
   name <- gsub("\\.", "", name)
   base_dir <- dirname(file_path)
   root_dir <- dirname(base_dir)
-  checkmate::assert_directory(root_dir, access = "w")
+  #checkmate::assert_directory(root_dir, access = "w")
   file_tmp_folder <- paste(base_dir, temp_folder_name, sep = "/")
   file_tmp_path <- gsub(dfs_mount, "", file_tmp_folder)
 
@@ -181,7 +196,7 @@ writer.data.frame <- function(df,
                               ...) {
   checkmate::assert_character(path)
   checkmate::assert_choice(type, c("csv", "txt"))
-  checkmate::assert_choice(mode, c('error', 'append', 'overwrite', 'ignore'), null.ok = TRUE)
+  checkmate::assert_choice(mode, c('error', 'append', 'replace', 'ignore'), null.ok = TRUE)
 
   name <- gsub(tools::file_ext(path), "", basename(path))
   name <- gsub("\\.", "", name)

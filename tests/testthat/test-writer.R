@@ -30,13 +30,13 @@ test_that("parquet file type with default value", {
 })
 
 
-test_that("overwrite feature works as expected", {
+test_that("replace feature works as expected", {
   .path <- paste0(tmp, "/mtcars.parquet")
   writer(mtcars_tbl, path = .path, type = "parquet")
   .file <- dir(tmp, full.names = TRUE)
   expect_file_exists( .file)
 
-  writer(mtcars_tbl, path = .path, type = "parquet", mode = "overwrite")
+  writer(mtcars_tbl, path = .path, type = "parquet", mode = "replace")
   .file <- dir(tmp, full.names = TRUE)
   expect_equal(length(dir(tmp)), 1)
   file.remove(.file)
