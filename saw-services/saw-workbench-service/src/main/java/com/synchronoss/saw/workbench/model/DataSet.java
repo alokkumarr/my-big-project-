@@ -31,6 +31,15 @@ public class DataSet {
     @JsonProperty("asOutput")
     private String asOutput;
 
+    @JsonProperty("joinEligible")
+    private boolean joinEligible;
+
+    @JsonProperty("storageType")
+    private String storageType;
+
+    @JsonProperty("size")
+    private Object size;
+    
     @JsonProperty("userData")
     private Object userData;
     
@@ -62,7 +71,30 @@ public class DataSet {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-
+    @JsonProperty("joinEligible")
+    public boolean isJoinEligible() {
+      return joinEligible;
+    }
+    @JsonProperty("joinEligible")    
+    public void setJoinEligible(boolean joinEligible) {
+      this.joinEligible = joinEligible;
+    }
+    @JsonProperty("storageType")    
+    public String getStorageType() {
+      return storageType;
+    }
+    @JsonProperty("storageType")    
+    public void setStorageType(String storageType) {
+      this.storageType = storageType;
+    }
+    @JsonProperty("size")    
+    public Object isSize() {
+      return size;
+    }
+    @JsonProperty("size")    
+    public void setSize(Object size) {
+      this.size = size;
+    }
     @JsonProperty("_id")
     public String getDataSetId() {
       return dataSetId;

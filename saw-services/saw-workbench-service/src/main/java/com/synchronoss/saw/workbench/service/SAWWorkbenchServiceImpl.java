@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
@@ -14,17 +16,26 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
@@ -33,10 +44,14 @@ import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.SAWWorkBenchUtils;
+import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.DataSet;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
 import com.synchronoss.saw.workbench.model.Project.ResultFormat;
+import com.synchronoss.saw.workbench.model.StorageProxy;
+import com.synchronoss.saw.workbench.model.StorageProxy.Storage;
+import com.synchronoss.saw.workbench.model.StorageType;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
@@ -77,11 +92,16 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @NotNull
   private String basePath;
 
+  @Value("${workbench.storage-url}")
+  @NotNull
+  private String storageURL;
+
   private String tmpDir = null;
   private DLMetadata mdt = null;
   private DataSetStore mdtStore =null;
   private String prefix = "maprfs";
   private String delimiter = "::";
+  private String dateFormat = "yyyy-mm-dd hh:mm:ss";
 
   
   @PostConstruct
@@ -336,17 +356,122 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     List<String> dataSetsString = mdtStore.getListOfDS(project.getProjectId(), null, null, null, null);
     List<DataSet> dataSetsJSON = new ArrayList<>();
+    DataSet dataSet = null;
     for (String item : dataSetsString){
       logger.trace("item from datasets store {} ", item);
-      dataSetsJSON.add(objectMapper.readValue(item, DataSet.class));
+      dataSet = objectMapper.readValue(item, DataSet.class);
+      dataSet.setJoinEligible(true);
+      dataSet.setStorageType(StorageType.DL.name());
+      dataSetsJSON.add(dataSet);
     }
+    dataSetsJSON.addAll(listOfDataSetAvailableInESStore(project));
     logger.trace("response structure {}", objectMapper.writeValueAsString(dataSetsJSON));
     return dataSetsJSON;
+  }
+  /**
+   * This method generates the structure aligned to meta data store structure
+   * @param project
+   * @return List<DataSet>
+   * @throws JsonParseException
+   * @throws JsonMappingException
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  private List<DataSet> listOfDataSetAvailableInESStore (Project project) throws JsonParseException, JsonMappingException, JsonProcessingException, IOException{
+    logger.trace("listOfDataSetFromESStore  starts here : ", project);
+    List <DataSet>  dataSets = new ArrayList<>();
+    String storageEndpoints = "/internal/proxy/storage";
+    String url = storageURL + storageEndpoints;
+    StorageProxy storageProxy = new StorageProxy();
+    storageProxy.setStorage(Storage.ES);
+    storageProxy.setRequestBy("workbenchAdmin@synchronoss.com");
+    storageProxy.setAction(com.synchronoss.saw.workbench.model.StorageProxy.Action.CATALIASES);
+    storageProxy.setRequestedTime(new SimpleDateFormat(dateFormat).format(new Date()));
+    storageProxy.setProductCode("WORKBENCH");
+    storageProxy.setModuleName("WORKBENCH");
+    storageProxy.setResultFormat(com.synchronoss.saw.workbench.model.StorageProxy.ResultFormat.JSON);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    String jsonInString = null;
+    try {
+      jsonInString = objectMapper.writeValueAsString(storageProxy);
+      logger.trace("jsonInString :" + jsonInString);
+    } catch (JsonProcessingException e) {
+        throw new ReadEntitySAWException("Exception occured while reading aliases from Elastic Search");
+    }
+    HttpHeaders  requestHeaders = new HttpHeaders();
+    requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+    HttpEntity<?> requestEntity = new HttpEntity<Object>(jsonInString,requestHeaders);
+    RestTemplate restTemplate = new RestTemplate();
+    logger.debug("storageURL server URL {}", url);
+    ResponseEntity<StorageProxy> aliasResponse = restTemplate.exchange(url, HttpMethod.POST,
+        requestEntity, StorageProxy.class);
+    Preconditions.checkNotNull(aliasResponse.getBody().getData()!=null, "Alias data set from saw storage as null");
+    List<Object> listOfAliases = aliasResponse.getBody().getData();
+    DataSet esDataSet = null;
+    String jsonInStringPerAlias = null;
+    ResponseEntity<StorageProxy> perAliasResponse = null;
+    HttpHeaders  requestHeadersPerAlias = null;
+    requestHeadersPerAlias = new HttpHeaders();
+    requestHeadersPerAlias.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+    StorageProxy proxyDataFromStorage = null;
+    for (Object aliaseName : listOfAliases) {
+      proxyDataFromStorage = new StorageProxy();
+      proxyDataFromStorage.setStorage(Storage.ES);
+      proxyDataFromStorage.setRequestBy("workbenchAdmin@synchronoss.com");
+      proxyDataFromStorage.setAction(com.synchronoss.saw.workbench.model.StorageProxy.Action.CATALIASES);
+      proxyDataFromStorage.setRequestedTime(new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(new Date()));
+      proxyDataFromStorage.setProductCode("WORKBENCH");
+      proxyDataFromStorage.setModuleName("WORKBENCH");
+      String name = (String) aliaseName;
+      System.out.println("aliaseName : " + name);
+      proxyDataFromStorage.setAction(com.synchronoss.saw.workbench.model.StorageProxy.Action.MAPPINGALIASES);
+      proxyDataFromStorage.setIndexName(name);
+      try {
+        jsonInStringPerAlias = objectMapper.writeValueAsString(proxyDataFromStorage);
+        logger.trace("jsonInStringPerAlias : " + jsonInStringPerAlias);
+      } catch (JsonProcessingException e) {
+          throw new ReadEntitySAWException("Exception occured while reading aliases from Elastic Search");
+      }
+      HttpEntity<?> requestEntityPerAlias = new HttpEntity<Object>(jsonInStringPerAlias,requestHeadersPerAlias);
+      perAliasResponse = restTemplate.exchange(url, HttpMethod.POST, requestEntityPerAlias, StorageProxy.class);
+      proxyDataFromStorage = perAliasResponse.getBody();
+      List<Object> data = proxyDataFromStorage.getData();
+      String id = UUID.randomUUID().toString() + delimiter + "esData" + delimiter + System.currentTimeMillis();
+      ObjectNode node = JsonNodeFactory.instance.objectNode();
+      node.put("_id", id);
+      ObjectNode system = node.putObject("system");
+      system.put("name", name); 
+      system.put("catalog", MetadataBase.DEFAULT_CATALOG);
+      system.put("project", "workbench");
+      system.put("format", "json");
+      ObjectNode userData = node.putObject("userData");
+      userData.put("description", "Data Structure for "+ name);
+      userData.put("component", "esData");
+      userData.put("createdBy", "workbenchAdmin@synchronoss.com");
+      ObjectNode asOfNow = node.putObject("asOfNow");
+      asOfNow.put("status", "SUCCESS");
+      asOfNow.put("started", new SimpleDateFormat(dateFormat).format(new Date()));
+      asOfNow.put("finished", new SimpleDateFormat(dateFormat).format(new Date()));
+      ArrayNode schema = node.putArray("schema");
+      System.out.println(objectMapper.writeValueAsString(data));
+      for (Object obj : data) {
+        schema.addPOJO(obj);
+      } // end of internal for loop to read storeField
+      esDataSet = objectMapper.readValue(objectMapper.writeValueAsString(node), DataSet.class); 
+      esDataSet.setStorageType(StorageType.ES.name());
+      esDataSet.setJoinEligible(false);
+      esDataSet.setRecordCount(Long.parseLong(perAliasResponse.getBody().getCount()));
+      esDataSet.setSize(perAliasResponse.getBody().getSize());
+      dataSets.add(esDataSet);
+    } // end of for loop
+    logger.trace("listOfDataSetFromESStore  ends here : ", dataSets);
+    return dataSets;
   }
 
   public DataSet getDataSet(String projectId, String dataSetId) throws Exception {
     logger.trace("Getting dataset properties for the project {} and dataset {}", projectId, dataSetId);
-
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -427,8 +552,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode node = objectMapper.readTree(json);
-    System.out.println(node);
+    JsonNode nodeJ = objectMapper.readTree(json);
+    System.out.println(nodeJ);
     System.out.println(System.getProperty("java.io.tmpdir"));
     System.out.println("data.csv".substring("data.csv".indexOf('.'), "data.csv".length()));
     System.out.println(FilenameUtils.getFullPathNoEndSeparator("/apps/sncr"));
@@ -438,8 +563,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     sets.add(objectMapper.readValue(row1, DataSet.class));
     sets.add(objectMapper.readValue(row2, DataSet.class));
     System.out.println(objectMapper.writeValueAsString(sets));
-    
-    
   }
 
 }
