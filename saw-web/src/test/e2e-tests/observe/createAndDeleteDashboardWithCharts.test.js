@@ -102,7 +102,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
         let dashboardDescription = 'AT Dashboard description ' + currentTime;
 
         dashboardId = dashboardFunctions.addNewDashBoardFromExistingAnalysis(dashboardName, dashboardDescription, analysisCategoryName, analysisSubCategoryName, subCategoryName, analysesDetails);
-        dashboardFunctions.verifyDashboard(dashboardName);
+        dashboardFunctions.verifyDashboard(dashboardName, name, true);
 
       } catch (e) {
         console.log(e);

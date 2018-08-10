@@ -180,14 +180,19 @@ class DashboardFunctions {
     }
   }
 
-  verifyDashboard(dashboardName, del = true) {
+  verifyDashboard(dashboardName, analysisName, del = true) {
 
     try {
       let _self = this;
+      // Verify dashboard name
       commonFunctions.waitFor.elementToBePresent(observePage.dashboard.dashboardTitle(dashboardName));
       commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.dashboardTitle(dashboardName));
       expect(observePage.dashboard.dashboardTitle(dashboardName).isDisplayed).toBeTruthy();
-
+      // Verify added analysis
+      commonFunctions.waitFor.elementToBePresent(observePage.dashboard.addedAnalysisByName(analysisName));
+      commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.addedAnalysisByName(analysisName));
+      expect(observePage.dashboard.addedAnalysisByName(analysisName).isDisplayed).toBeTruthy();
+      // Verify dashboard actions
       commonFunctions.waitFor.elementToBePresent(observePage.dashboard.dashboardAction('Refresh'));
       commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.dashboardAction('Refresh'));
       expect(observePage.dashboard.dashboardAction('Refresh').isDisplayed).toBeTruthy();

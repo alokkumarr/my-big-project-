@@ -19,9 +19,7 @@ module.exports = {
   dashboard:{
     dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
-    dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]'))
-
-
-
+    dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]')),
+    addedAnalysisByName : name => element(by.xpath(`//h1[text()="${name}"]`))
   }
 };
