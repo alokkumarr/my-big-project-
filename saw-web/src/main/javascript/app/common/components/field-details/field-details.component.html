@@ -1,5 +1,5 @@
 <div class="area-fields">
-  <mat-chip-list #chipList>
+  <mat-chip-list #chipList *ngIf="dataFields.length > 0">
     <fieldset>
       <legend>
         Data Fields
@@ -10,7 +10,7 @@
     </fieldset>
   </mat-chip-list>
 
-  <mat-chip-list #chipList>
+  <mat-chip-list #chipList *ngIf="rowFields.length > 0">
     <fieldset>
       <legend>
         Row Fields
@@ -21,7 +21,7 @@
     </fieldset>
   </mat-chip-list>
 
-  <mat-chip-list #chipList>
+  <mat-chip-list #chipList *ngIf="columnFields.length > 0">
     <fieldset>
       <legend>
         Column Fields
