@@ -2,6 +2,10 @@ import { Component, Inject, HostBinding } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpMap from 'lodash/fp/map';
+import * as fpOmit from 'lodash/fp/omit';
 import { CategoryService } from '../category.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
@@ -24,7 +28,7 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
   products$;
   modules$;
   categories$;
-  subCategories;
+  subCategories = [];
   subCategoryFlag = false;
   statuses = [{
     id: 1,
@@ -76,10 +80,14 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       }
       break;
     case 'edit':
+      const subCategories = fpPipe(
+        fpFilter('modifiedFlag'),
+        fpMap(fpOmit('modifiedFlag'))
+      )(this.subCategories);
       model = {
         ...this.data.model,
         ...formValues,
-        subCategories: this.subCategories
+        subCategories
       };
       break;
     }
@@ -120,9 +128,6 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
 
   createForm(formModel) {
     const mode = this.data.mode;
-    if (mode === 'edit') {
-      formModel.activeStatusInd = formModel.activeStatusInd === 'Active' ? 1 : 0;
-    }
     const {
       subCategoryInd = false,
       productId = '',
@@ -235,6 +240,7 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       target.subCategoryName = values.subCategoryName;
       target.subCategoryDesc = values.subCategoryDesc;
       target.activestatusInd = values.activestatusInd;
+      target.modifiedFlag = true;
     })
     categoryControl.statusChanges.subscribe(validity => {
       if (selectedControl.enabled) {

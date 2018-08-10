@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import * as cloneDeep from 'lodash/cloneDeep';
+import * as map from 'lodash/map';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import {
   UserEditDialogComponent,
@@ -27,13 +28,27 @@ import { AdminMenuData } from '../consts';
 const template = require('./admin-main-view.component.html');
 require('./admin-main-view.component.scss');
 
-const SEARCH_CONFIG = [
+const USER_SEARCH_CONFIG = [
   {keyword: 'LOGIN ID', fieldName: 'masterLoginId'},
   {keyword: 'ROLE', fieldName: 'roleName'},
   {keyword: 'FIRST NAME', fieldName: 'firstName'},
   {keyword: 'LAST NAME', fieldName: 'lastName'},
   {keyword: 'EMAIL', fieldName: 'email'},
   {keyword: 'STATUS', fieldName: 'activeStatusInd'}
+];
+
+const ROLE_SEARCH_CONFIG = [
+  {keyword: 'ROLE NAME', fieldName: 'roleName'},
+  {keyword: 'ROLE TYPE', fieldName: 'roleType'},
+  {keyword: 'STATUS', fieldName: 'activeStatusInd'},
+  {keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc'}
+];
+
+const CATEGORY_SEARCH_CONFIG = [
+  {keyword: 'PRODUCT', fieldName: 'productName'},
+  {keyword: 'MODULE', fieldName: 'moduleName'},
+  {keyword: 'CATEGORY', fieldName: 'categoryName'},
+  {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
 ];
 
 const deleteConfirmation = (section, identifier, identifierValue) => ({
@@ -91,11 +106,22 @@ export class AdminMainViewComponent {
     this.filterObj.searchTerm = value;
     const searchCriteria = this._localSearch.parseSearchTerm(this.filterObj.searchTerm);
     this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
-    this._localSearch.doSearch(searchCriteria, this.data, SEARCH_CONFIG).then(data => {
+    this._localSearch.doSearch(searchCriteria, this.data, this.getSearchConfig()).then(data => {
       this.filteredData = data;
     }, err => {
       this._toastMessage.error(err.message);
     });
+  }
+
+  getSearchConfig() {
+    switch(this.section) {
+    case 'user':
+      return USER_SEARCH_CONFIG;
+    case 'role':
+      return ROLE_SEARCH_CONFIG;
+    case 'category':
+      return CATEGORY_SEARCH_CONFIG;
+    }
   }
 
   onRowClick(row) {

@@ -3,7 +3,7 @@
     Delete Category
   </strong>
 </header>
-<div class="base-dialog__content" fxLayout="column" fxLayoutAlign="start start">
+<div class="base-dialog__content dialog__content" fxLayout="column" fxLayoutAlign="start start">
   <strong class="delete-message">Category Name: {{data.category.categoryName}}</strong>
 
   <div class="delete-message" *ngIf="data.category.subCategories.length > 0 && data.category.categoryName.toUpperCase() !== 'MY ANALYSIS'" i18n>
@@ -14,11 +14,11 @@
     This Category cannot be deleted.
   </div>
 
-  <div class="categories-list">
+  <div *ngIf="data.category.subCategories.length > 0" class="categories-list">
     <p>
       <strong>Sub-Categories</strong>
     </p>
-    <ul *ngIf="data.category.subCategories.length > 0" class="delete-message">
+    <ul>
       <li *ngFor="let subCategory of data.category.subCategories">
         <div fxLayout="row" fxLayoutAlign="space-between center">
           <label>{{subCategory.subCategoryName}}</label>
