@@ -14,15 +14,10 @@ category-edit-dialog {
   }
 
   .base-dialog__content {
-    padding: 10px 50px !important;
+    padding: 10px 40px !important;
 
     .mat-button-toggle.mat-button-toggle-checked {
       background-color: $grid-header-bg-color;
-    }
-
-    .category-form {
-      width: 620px;
-      max-width: 620px;
     }
 
     .sub-categories-form {

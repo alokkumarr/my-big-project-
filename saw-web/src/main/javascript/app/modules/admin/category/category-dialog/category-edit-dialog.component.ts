@@ -84,8 +84,6 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       break;
     }
 
-    console.log('onCreate', model);
-
     if (model.subCategoryInd) {
       this.categories$.then(categories => {
         const target = find(categories, ({categoryId}) => categoryId === model.categoryId);
@@ -134,8 +132,6 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       categoryDesc = '',
       activeStatusInd = 1
     } = formModel;
-
-    console.log('init', formModel);
 
     const productIdControl = this._fb.control(productId, Validators.required);
     const subCategoryIndControl = this._fb.control(subCategoryInd);

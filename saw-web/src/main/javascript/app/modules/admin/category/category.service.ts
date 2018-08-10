@@ -79,7 +79,6 @@ export class CategoryService implements IAdminDataService {
 
   getProducts(customerId) {
     return this._adminService.request<ProuctsResponse>('products/list', customerId)
-      .pipe(tap(resp => console.log('resp', resp)))
       .map(resp => resp.products)
       .toPromise();
   }
@@ -90,7 +89,6 @@ export class CategoryService implements IAdminDataService {
     moduleId: number
   }) {
     return this._adminService.request<ModulesResponse>('modules/list', params)
-      .pipe(tap(resp => console.log('resp', resp)))
       .map(resp => resp.modules)
       .toPromise();
   }
@@ -101,7 +99,6 @@ export class CategoryService implements IAdminDataService {
     moduleId: number
   };) {
     return this._adminService.request<CategoryResponse>('categories/parent/list', params)
-      .pipe(tap(resp => console.log('resp', resp)))
       .map(resp => resp.category)
       .toPromise();
   }
