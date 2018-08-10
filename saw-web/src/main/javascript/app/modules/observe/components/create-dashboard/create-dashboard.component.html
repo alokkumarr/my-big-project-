@@ -1,5 +1,5 @@
 <div mat-dialog-title>
-  <button mat-icon-button (click)="exitCreator()">
+  <button mat-icon-button e2e="dashboard-designer-exit-button" (click)="exitCreator()">
     <mat-icon fontIcon="icon-arrow-left"></mat-icon>
   </button>
   <span>
@@ -9,10 +9,10 @@
     <!-- <button mat-button>
       Description
     </button> -->
-    <button mat-button (click)="openFilters()" [disabled]="this.fillState === 'empty'">
+    <button e2e="dashboard-designer-filters-button" mat-button (click)="openFilters()" [disabled]="this.fillState === 'empty'">
       Filter
     </button>
-    <button mat-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
+    <button e2e="dashboard-designer-save-button" mat-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
       Save
     </button>
   </div>
@@ -32,7 +32,7 @@
 
       <span [@hideHelp]="fillState" class="empty-dashboard-image"></span>
       <strong [@hideHelp]="fillState" class="add-button-help">There's nothing here yet.</strong>
-      <button [@moveButton]="fillState" mat-raised-button color="primary" class="add-analysis" (click)="chooseAnalysis()">
+      <button e2e="dashboard-add-widget-button" [@moveButton]="fillState" mat-raised-button color="primary" class="add-analysis" (click)="chooseAnalysis()">
         <!-- <mat-icon fontIcon="icon-plus"></mat-icon> -->
         Add Widget
       </button>

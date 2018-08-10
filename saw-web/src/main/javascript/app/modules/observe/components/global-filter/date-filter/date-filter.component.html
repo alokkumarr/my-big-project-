@@ -1,5 +1,5 @@
 <mat-form-field e2e="filter-date-preset" class="select-form-field">
-  <mat-select placeholder="Select a preset"
+  <mat-select e2e="dasbhoard-global-filter-date-preset-select" placeholder="Select a preset"
     [value]="model.preset"
     (selectionChange)="onPresetChange($event)">
     <mat-option *ngFor="let preset of presets"
@@ -11,6 +11,7 @@
 
 <mat-form-field *ngIf="showDateFields">
   <input matInput
+    e2e="dasbhoard-global-filter-date-gte-input"
     [value]="model.gte"
     [matDatepicker]="frompicker"
     [max]="model.lte"
@@ -23,6 +24,7 @@
 
 <mat-form-field *ngIf="showDateFields">
   <input matInput
+    e2e="dasbhoard-global-filter-date-lte-input"
     [value]="model.lte"
     [min]="model.gte"
     [matDatepicker]="topicker"
