@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -55,6 +56,7 @@ import com.synchronoss.saw.workbench.model.StorageType;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.metastore.DataSetStore;
 import sncr.bda.metastore.ProjectStore;
 import sncr.bda.services.DLMetadata;
@@ -102,7 +104,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   private String prefix = "maprfs";
   private String delimiter = "::";
   private String dateFormat = "yyyy-mm-dd hh:mm:ss";
-
+  @Autowired
+  private WorkbenchExecutionService workbenchExecutionService;
   
   @PostConstruct
   private void init() throws Exception {
@@ -441,21 +444,21 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       String id = UUID.randomUUID().toString() + delimiter + "esData" + delimiter + System.currentTimeMillis();
       ObjectNode node = JsonNodeFactory.instance.objectNode();
       node.put("_id", id);
-      node.put("physicalLocation", perAliasResponse.getBody().getIndexRelativePath());
-      ObjectNode system = node.putObject("system");
-      system.put("name", name); 
-      system.put("catalog", MetadataBase.DEFAULT_CATALOG);
+      node.put(DataSetProperties.PhysicalLocation.toString(), perAliasResponse.getBody().getIndexRelativePath());
+      ObjectNode system = node.putObject(DataSetProperties.System.toString());
+      system.put(DataSetProperties.Name.toString(), name); 
+      system.put(DataSetProperties.Catalog.toString(), MetadataBase.DEFAULT_CATALOG);
       system.put("project", "workbench");
-      system.put("format", "json");
-      ObjectNode userData = node.putObject("userData");
-      userData.put("description", "Data Structure for "+ name);
+      system.put(DataSetProperties.Format.toString(), "json");
+      ObjectNode userData = node.putObject(DataSetProperties.UserData.toString());
+      userData.put(DataSetProperties.Description.toString(), "Data Structure for "+ name);
       userData.put("component", "esData");
-      userData.put("createdBy", "workbenchAdmin@synchronoss.com");
+      userData.put(DataSetProperties.createdBy.toString(), "workbenchAdmin@synchronoss.com");
       ObjectNode asOfNow = node.putObject("asOfNow");
-      asOfNow.put("status", "SUCCESS");
-      asOfNow.put("started", new SimpleDateFormat(dateFormat).format(new Date()));
-      asOfNow.put("finished", new SimpleDateFormat(dateFormat).format(new Date()));
-      ObjectNode schema = node.putObject("schema");
+      asOfNow.put(DataSetProperties.Status.toString(), "SUCCESS");
+      asOfNow.put(DataSetProperties.StartTS.toString(), new SimpleDateFormat(dateFormat).format(new Date()));
+      asOfNow.put(DataSetProperties.FinishTS.toString(), new SimpleDateFormat(dateFormat).format(new Date()));
+      ObjectNode schema = node.putObject(DataSetProperties.Schema.toString());
       ArrayNode fields = JsonNodeFactory.instance.arrayNode();
       for (Object obj : data) {
         fields.addPOJO(obj);
@@ -482,59 +485,81 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   }
   
   @Override
-  public DataSet createDataSet(DataSet dataSet,  String project) throws Exception {
-    logger.trace("createDataSet starts here :  "+ dataSet.toString());
+  public DataSet createDataSet(DataSet dataSet, String project) throws Exception {
+    logger.trace("createDataSet starts here :  " + dataSet.toString());
     String id = UUID.randomUUID().toString() + delimiter + "rComponent" + delimiter
         + System.currentTimeMillis();
-    MetaDataStoreRequestAPI requestMetaDataStore =null;
+    MetaDataStoreRequestAPI requestMetaDataStore = null;
     String category = Category.DataSet.name();
     String format = "parquet";
     String catalog = MetadataBase.DEFAULT_CATALOG;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode node  = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+    JsonNode node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
     ObjectNode rootNode = (ObjectNode) node;
     rootNode.put("_id", id);
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
     Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
-    Preconditions.checkNotNull(rootNode.get("physicalLocation"), "physicalLocation cannot be null");
-    Preconditions.checkNotNull(rootNode.get("userData").get("component"), "userData.component cannot be null");
-    Preconditions.checkNotNull(rootNode.get("userData").get("createdBy"), "userData.createdBy cannot be null");
-    Preconditions.checkNotNull(rootNode.get("userData").get("script"), "userData.script cannot be null");
-    Preconditions.checkNotNull(rootNode.get("system").get("name"), "system.name cannot be null");
-    Preconditions.checkNotNull(rootNode.get("system").get("inputFormat"), "system.inputFormat cannot be null");
-    Preconditions.checkNotNull(rootNode.get("system").get("inputPath"), "system.inputPath cannot be null");
-    Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"), "asOfNow.status cannot be null");
-    Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"), "asOfNow.started cannot be null");
-    Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"), "asOfNow.finished cannot be null");
-    Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"), "asOfNow.batchId cannot be null");
-    ObjectNode transformationNode = rootNode.putObject("transformations");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString()).get("component"),
+        "userData.component cannot be null");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString())
+        .get(DataSetProperties.createdBy.toString()), "userData.createdBy cannot be null");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString()).get("script"),
+        "userdata.script cannot be null");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()).get("name"),
+        "system.name cannot be null");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()).get("inputFormat"),
+        "system.inputFormat cannot be null");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()).get("inputPath"),
+        "system.inputPath cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"),
+        "asOfNow.status cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"),
+        "asOfNow.started cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("finished"),
+        "asOfNow.finished cannot be null");
+    Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"),
+        "asOfNow.batchId cannot be null");
+    ObjectNode transformationNode =
+        rootNode.putObject(DataSetProperties.Transformations.toString());
     transformationNode.put("asOutput", id);
-    Preconditions.checkNotNull(rootNode.get("userData"), "userData cannot be null");
-    ObjectNode userDataNode = (ObjectNode)rootNode.get("userData");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString()), "userData cannot be null");
+    ObjectNode userDataNode = (ObjectNode) rootNode.get(DataSetProperties.UserData.toString());
     userDataNode.put("category", category);
     userDataNode.put("component", dataSet.getComponent());
     userDataNode.put("scriptLocation", rootNode.get("userData").get("script").toString());
     Preconditions.checkNotNull(rootNode.get("system"), "system cannot be null");
-    ObjectNode systemNode = (ObjectNode)rootNode.get("system");
+    ObjectNode systemNode = (ObjectNode) rootNode.get("system");
     systemNode.put("project", project);
-    systemNode.put("outputFormat", format);
-    systemNode.put("inputFormat", rootNode.get("system").get("inputFormat").toString());
-    ArrayNode  inputPath = objectMapper.createArrayNode();
-    inputPath.addAll((ArrayNode)rootNode.get("system").get("inputPath"));
-    systemNode.put("catalog", catalog);
+    systemNode.put("outputFormat",
+        systemNode.get(DataSetProperties.Format.toString()) != null
+            ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
+            : format);
+    systemNode.put("inputFormat",
+        rootNode.get(DataSetProperties.System.toString()).get("inputFormat").toString());
+    systemNode.put(DataSetProperties.PhysicalLocation.toString(),
+        workbenchExecutionService.createDatasetDirectory(project,
+            rootNode.get(DataSetProperties.System.toString()).get("name").toString()));
+    ArrayNode inputPath = objectMapper.createArrayNode();
+    inputPath
+        .addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
+    systemNode.put(DataSetProperties.Catalog.toString(),
+        systemNode.get(DataSetProperties.Catalog.toString()) != null
+            ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
+            : catalog);
     systemNode.putArray("inputPath").addAll(inputPath);
-    DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class) ;
+    DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);
     try {
-      List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,
-          id, Action.create, Category.DataSet);
-      logger.trace("Before invoking request to MaprDB JSON store :{}", objectMapper.writeValueAsString(structure));
+      List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode,
+          basePath, id, Action.create, Category.DataSet);
+      logger.trace("Before invoking request to MaprDB JSON store :{}",
+          objectMapper.writeValueAsString(structure));
       requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      List<MetaDataStoreStructure> structureRead = SAWWorkBenchUtils.node2JSONObject(dataSetNode, basePath,
-          id, Action.read, Category.DataSet);
+      List<MetaDataStoreStructure> structureRead = SAWWorkBenchUtils.node2JSONObject(dataSetNode,
+          basePath, id, Action.read, Category.DataSet);
       requestMetaDataStore = new MetaDataStoreRequestAPI(structureRead);
       requestMetaDataStore.process();
       String jsonStringFromStore = requestMetaDataStore.getResult().toString();
@@ -542,10 +567,10 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       dataSet = mapper.readValue(jsonStringFromStore, DataSet.class);
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Problem on the storage while creating an entity", ex);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Problem on the storage while creating an entity", ex);
     }
-    logger.trace("createEntryInMetaData ends here: "+ objectMapper.writeValueAsString(dataSet));
+    logger.trace("createEntryInMetaData ends here: " + objectMapper.writeValueAsString(dataSet));
     return dataSet;
   }
 
@@ -565,6 +590,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     sets.add(objectMapper.readValue(row1, DataSet.class));
     sets.add(objectMapper.readValue(row2, DataSet.class));
     System.out.println(objectMapper.writeValueAsString(sets));
+    System.out.println(DataSetProperties.UserData.toString());
   }
 
 }
