@@ -93,6 +93,11 @@ const subCategories = {
     name: 'Create Analysis ' + globalVariables.e2eId,
     description: description,
     id: nullValue
+  },
+  observeSubCategory: {
+    name: 'AT Observe SubCat' + globalVariables.e2eId,
+    description: description,
+    id: nullValue
   }
 };
 

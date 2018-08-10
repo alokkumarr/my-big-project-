@@ -94,7 +94,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  directConnect: true,
+  //directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -105,7 +105,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+        //'--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -160,32 +160,35 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
-    root: [
-      appRoot + '/src/test/e2e-tests/priviliges.test.js',
-      appRoot + '/src/test/e2e-tests/analyze.test.js',
-      appRoot + '/src/test/e2e-tests/createReport.test.js'
+    // root: [
+    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
+    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
+    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
+    // ],
+    // charts: [
+    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
+    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
+    // ],
+    // chartEditFork: [
+    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
+    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
+    // ],
+    // promptFilters: [
+    //   appRoot + '/src/test/e2e-tests/promptFilter/chartPromptFilters.test.js',
+    //   appRoot + '/src/test/e2e-tests/promptFilter/esReportPromptFilters.test.js',
+    //   appRoot + '/src/test/e2e-tests/promptFilter/pivotPromptFilters.test.js',
+    //   appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js'
+    // ],
+    // pivots: [
+    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
+    // ],
+    observe: [
+      appRoot + '/src/test/e2e-tests/observe/createDashboard.test.js'
     ],
-    charts: [
-      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    ],
-    chartEditFork: [
-      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    ],
-    promptFilters: [
-      appRoot + '/src/test/e2e-tests/promptFilter/chartPromptFilters.test.js',
-      appRoot + '/src/test/e2e-tests/promptFilter/esReportPromptFilters.test.js',
-      appRoot + '/src/test/e2e-tests/promptFilter/pivotPromptFilters.test.js',
-      appRoot + '/src/test/e2e-tests/promptFilter/reportPromptFilters.test.js'
-    ],
-    pivots: [
-      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    ],
-    authentication: [
-      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    ],
+    // authentication: [
+    //   appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    // ],
     debug: [
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
@@ -197,7 +200,7 @@ exports.config = {
   onPrepare() {
     //console.log("Started at : "+ new Date())
     retry.onPrepare();
-    // Gerenate test data
+    // Generate test data
     token = generate.token(browser.baseUrl);
     //console.log("aToken: " + token);
     generate.usersRolesPrivilegesCategories(token);
