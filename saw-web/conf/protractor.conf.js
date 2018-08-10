@@ -183,14 +183,11 @@ exports.config = {
     pivots: [
       appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
     ],
+    authentication: [
+      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+    ],
     observe: [
       appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithCharts.test.js'
-    ],
-    // authentication: [
-    //   appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    // ],
-    debug: [
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
   },
   onCleanUp: function (results) {
