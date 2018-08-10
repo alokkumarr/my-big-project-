@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.DataField;
+import com.synchronoss.querybuilder.model.chart.NodeField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -44,7 +45,8 @@ class AxesFieldDataFieldsAvailable {
 			List<com.synchronoss.querybuilder.model.chart.DataField> dataFields,
 			SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder,
             DataField.LimitType limitType,Integer size) {
-		AggregationBuilder aggregation = addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(0), "node_field_1",limitType,size));
+		AggregationBuilder aggregation = addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(0),
+            "node_field_1",limitType,size,true));
 		if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
 			searchSourceBuilder.query(boolQueryBuilder).aggregation(aggregation);
 		} else {
@@ -59,12 +61,16 @@ class AxesFieldDataFieldsAvailable {
 			SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder,
             DataField.LimitType limitType,Integer size) {
 		if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
-			AggregationBuilder aggregation = QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(0), "node_field_1",limitType,size).
-				subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(1), "node_field_2",limitType,size)));
+			AggregationBuilder aggregation = QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(0),
+                "node_field_1",limitType,size, checkifXAxis(nodeFields.get(0))).
+				subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(1),
+                    "node_field_2",limitType,size, checkifXAxis(nodeFields.get(0)))));
 			searchSourceBuilder.query(boolQueryBuilder).aggregation(aggregation);
 		} else {
-			AggregationBuilder aggregation = QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(0), "node_field_1",limitType,size).
-					subAggregation(QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(1), "node_field_2",limitType,size));
+			AggregationBuilder aggregation = QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(0),
+                "node_field_1",limitType,size,  checkifXAxis(nodeFields.get(0))).
+					subAggregation(QueryBuilderUtil.aggregationBuilderChart(nodeFields.get(1),
+                        "node_field_2",limitType,size,  checkifXAxis(nodeFields.get(0))));
 			searchSourceBuilder.query(boolQueryBuilder).aggregation(aggregation);
 		}
 		return searchSourceBuilder;
@@ -76,9 +82,12 @@ class AxesFieldDataFieldsAvailable {
 			SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder,
             DataField.LimitType limitType,Integer size) {
 		if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
-		AggregationBuilder aggregation = QueryBuilderUtil.aggregationBuilderChart(axesfields.get(0), "node_field_1",limitType,size)
-				.subAggregation(QueryBuilderUtil.aggregationBuilderChart(axesfields.get(0), "node_field_2",limitType,size))
-						.subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderChart(axesfields.get(0), "node_field_3",limitType,size)));
+		AggregationBuilder aggregation = QueryBuilderUtil.aggregationBuilderChart(axesfields.get(0),
+            "node_field_1",limitType,size, checkifXAxis(axesfields.get(0)))
+				.subAggregation(QueryBuilderUtil.aggregationBuilderChart(axesfields.get(0),
+                    "node_field_2",limitType,size, checkifXAxis(axesfields.get(0))))
+						.subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderChart(axesfields.get(0),
+                            "node_field_3",limitType,size, checkifXAxis(axesfields.get(0)))));
 		searchSourceBuilder.query(boolQueryBuilder).aggregation(aggregation);
 		} else {
 			searchSourceBuilder.query(boolQueryBuilder);
@@ -93,5 +102,19 @@ class AxesFieldDataFieldsAvailable {
 		}
 		return aggregation;
 	}
+
+    /**
+     * Check if NodeField is x axis to validate the for size limit.
+     * x axis will not be limited if node Fields contains group by
+     * split by , size by etc .
+     * @param nodeField
+     * @return
+     */
+	private static boolean checkifXAxis(NodeField nodeField)
+    {
+        if (nodeField.getChecked()!=null && nodeField.getChecked().equalsIgnoreCase("x"))
+            return true;
+        return false;
+    }
 
 }
