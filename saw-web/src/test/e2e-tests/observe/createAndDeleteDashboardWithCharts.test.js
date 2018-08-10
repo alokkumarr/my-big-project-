@@ -12,7 +12,7 @@ const loginPage = require('../../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../../javascript/helpers/observe/DashboardFunctions');
 const ObserveHelper = require('../../javascript/api/ObserveHelper');
 
-describe('Create dashboard filter tests: createDashboard.test.js', () => {
+describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
   const categoryName = categories.observe.name;
   const subCategoryName = subCategories.observeSubCategory.name;
@@ -22,23 +22,25 @@ describe('Create dashboard filter tests: createDashboard.test.js', () => {
   let analysesDetails = [];
   let host;
   let token;
+  let dashboardId;
+
   const dataProvider = {
-    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
+    'Combo Chart by admin': { user: 'admin', chartType: 'chart:combo' },
     'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
-    // 'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
-    // 'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
-    // 'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
-    // 'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
-    // 'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
-    // 'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
-    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
-    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'},
-    // 'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-    // 'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
-    // 'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
-    // 'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
+    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
+    'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
+    'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
+    'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
+    'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
+    'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
+    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'},
+    'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
+    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
+    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
 
   beforeAll(function() {
@@ -61,6 +63,13 @@ describe('Create dashboard filter tests: createDashboard.test.js', () => {
       analysesDetails.forEach(function(currentAnalysis) {
         new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, currentAnalysis.analysisId);
       });
+      //reset the array
+      analysesDetails = [];
+
+      //delete dashboard if ui failed.
+      let oh = new ObserveHelper();
+      oh.deleteDashboard(host, token, dashboardId);
+
       analyzePage.main.doAccountAction('logout');
       commonFunctions.logOutByClearingLocalStorage();
       done();
@@ -71,25 +80,28 @@ describe('Create dashboard filter tests: createDashboard.test.js', () => {
   });
 
   using(dataProvider, function(data, description) {
-    it('should able to create dashboard with charts: ' + description, () => {
+    it('should able to create & delete dashboard with charts: ' + description, () => {
       try {
+
         let currentTime = new Date().getTime();
         let user = data.user;
         let type = Constants.CHART;
         let subType = data.chartType.split(':')[1];
 
-        let name = 'Analysis ' + globalVariables.e2eId + '-' + currentTime;
-        let description = 'Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
-        let dashboardName = "AT Dashboard"+currentTime;
-        let dashboardDescription = "AT Dashboard description "+currentTime;
         let dashboardFunctions = new DashboardFunctions();
 
-        let analysis = dashboardFunctions.addAnalysis(host, token, name, description, type, subType);
+        let name = 'AT ' + data.chartType + ' ' + globalVariables.e2eId + '-' + currentTime;
+        let description = 'AT Description:' + data.chartType + ' for e2e ' + globalVariables.e2eId + '-' + currentTime;
+        let analysis = dashboardFunctions.addAnalysisByApi(host, token, name, description, type, subType);
         analysesDetails.push(analysis);
+
         loginPage.loginAs(user);
 
         dashboardFunctions.goToObserve();
-        dashboardFunctions.addNewDashBoardFromExistingAnalysis(dashboardName, dashboardDescription, analysisCategoryName, analysisSubCategoryName, subCategoryName, analysesDetails);
+        let dashboardName = 'AT Dashboard Name' + currentTime;
+        let dashboardDescription = 'AT Dashboard description ' + currentTime;
+
+        dashboardId = dashboardFunctions.addNewDashBoardFromExistingAnalysis(dashboardName, dashboardDescription, analysisCategoryName, analysisSubCategoryName, subCategoryName, analysesDetails);
         dashboardFunctions.verifyDashboard(dashboardName);
 
       } catch (e) {

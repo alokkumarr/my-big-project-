@@ -2,22 +2,24 @@ const commonFunctions = require('../../../javascript/helpers/commonFunctions.js'
 const protractorConf = require('../../../../../conf/protractor.conf');
 
 module.exports = {
-  addDashboardButton: element(by.xpath('//span[contains(text(),"+ DASHBOARD")]/parent::button')),
-  addWidgetButton: element(by.xpath('//button[contains(@class,"add-analysis")]')),
-  existingAnalysisLink: element(by.xpath('//strong[text()="Existing Analysis"]')),
+  addDashboardButton: element(by.css('button[e2e="dashboard-new-dashboard-button"]')),
+  addWidgetButton: element(by.css('button[e2e="dashboard-add-widget-button"]')),
+  existingAnalysisLink: element(by.css('button[e2e="dashboard-add-widget-type-analysis"]')),
   category: name => element(by.xpath(`//span[contains(text(),"${name}")]`)),
   subCategory: name => element(by.xpath(`//span[contains(text(),"${name}")]`)),
   addAnalysisByName: name => element(by.xpath(`//strong[text()="${name}"]/parent::*/descendant::button`)),
-  saveButton: element(by.xpath('//span[contains(text(),"Save")]/parent::button')),
-  categorySelect: element(by.xpath('//mat-select[@name="dashboardCat"]')),
-  dashboardName: element(by.xpath('//input[@name="dashboardName"]')),
-  dashboardDesc: element(by.xpath('//textarea[@name="dashboardDesc"]')),
+  addAnalysisById: id => element(by.xpath(`//button[@e2e="dashboard-add-analysis-button-${id}"]`)),
+  removeAnalysisById: id => element(by.xpath(`//button[@e2e="dashboard-remove-analysis-button-${id}"]`)),
+  saveButton: element(by.css('button[e2e="dashboard-designer-save-button"]')),
+  categorySelect: element(by.css('[e2e="dashboard-save-category-select"]')),
+  dashboardName: element(by.css('input[e2e="dashboard-save-name-input"]')),
+  dashboardDesc: element(by.css('textarea[e2e="dashboard-save-description-input"]')),
   subCategorySelect: name => element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`)),
-  saveDialogBtn: element(by.xpath(`(//div[contains(@class,"mat-dialog-actions")]/descendant::button)[1]`)),
+  saveDialogBtn: element(by.css(`[e2e="dashboard-save-save-button"]`)),
   dashboard:{
     dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
-    dashboardAction: action => element(by.xpath(`//span[text()="${action}"]`)),
-    dashboardConfirmDeleteButton: element(by.xpath('//button[text()="Delete"]'))
+    dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
+    dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]'))
 
 
 

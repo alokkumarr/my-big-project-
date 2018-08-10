@@ -24,9 +24,14 @@ const Constants = require('../../javascript/api/Constants');
 class ObserveHelper {
 
   deleteDashboard(url, token, dashboardId) {
-    let apiUrl = url + 'services/observe/dashboards/'+dashboardId;
-    console.log('apiUrl---'+apiUrl);
-    return apiCall.delete(apiUrl, token);
+
+    try {
+      let apiUrl = url + 'services/observe/dashboards/'+dashboardId;
+      return apiCall.delete(apiUrl, token);
+    }catch (e) {
+      console.log(e);
+    }
+
   }
 }
 
