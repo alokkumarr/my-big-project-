@@ -7,6 +7,8 @@
 sip_get_datapath(name, project_id, hostname, token)
 }
 \arguments{
+\item{name}{dataset name}
+
 \item{project_id}{id of project to retrieve datasets from}
 
 \item{hostname}{hostname only of saw security location. No pathing required

@@ -35,7 +35,7 @@ dest_dir <- args[2]
 
 # Get all zip files in source directory
 all_files <- dir(source_dir)
-zip_files <- all_files[tools::ext(all_files) == "zip"]
+zip_files <- all_files[tools::ext_files(all_files) == "zip"]
 
 for(zf in zip_files) {
   cat(format(Sys.time(), "%c"), "-", zf, "install starting -------------------- \n\n")

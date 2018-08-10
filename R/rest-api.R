@@ -120,6 +120,8 @@ sip_get_dataset_details <- function(dataset_id,
 #' @param output_path output dataset file path
 #' @param output_format output dataset format. accepts parquet, JSON, csv and
 #'   rds
+#' @param output_schema output dataset sechema. Should be a list with name and
+#'   type elements. list should not be named
 #' @param row_count ouput dataset record count. Default is NULL
 #' @param component component name used to create dataset. Default is RComponent
 #' @param script path to executable R script
@@ -133,7 +135,8 @@ sip_get_dataset_details <- function(dataset_id,
 #' @param started string with starting time. Format should be YYYYMMDD-HHMMSS.
 #'   Default is NULL which inserts current time
 #' @param finished string with starting time. Format should be YYYYMMDD-HHMMSS
-#' @param status component status. default is 'SUCCESS'. Default is NULL which inserts current time
+#' @param status component status. default is 'SUCCESS'. Default is NULL which
+#'   inserts current time
 #' @param hostname  hostname only of saw security location. No pathing required
 #' @param token valid SIP token. Result of sip_authenticate function
 #'
@@ -141,6 +144,7 @@ sip_get_dataset_details <- function(dataset_id,
 #' @export
 sip_add_dataset <- function(output_path,
                             output_format,
+                            output_schema,
                             output_rows = 0,
                             component = 'RComponent',
                             script,
@@ -159,6 +163,7 @@ sip_add_dataset <- function(output_path,
                             token) {
   checkmate::assert_string(output_path)
   checkmate::assert_choice(output_format, c("parquet", "csv", "json", "rds"))
+  checkmate::assert_list(output_schema, names = "unnamed")
   checkmate::assert_number(output_rows, lower = 0)
   checkmate::assert_string(component)
   checkmate::assert_string(desc)
@@ -177,6 +182,7 @@ sip_add_dataset <- function(output_path,
   if(is.null(created_by)) created_by <- as.character(Sys.info()["user"])
   if(is.null(started)) started <- format(Sys.time(),  "%Y%m%d-%I%M%S")
   if(is.null(finished)) finished <- format(Sys.time(),  "%Y%m%d-%I%M%S")
+  output_schema_ub <- purrr::map(output_schema, ~purrr::map(., jsonlite::unbox))
 
   # Headers
   headers <- httr::add_headers('Authorization' = paste("Bearer", token),
@@ -198,7 +204,8 @@ sip_add_dataset <- function(output_path,
                                   finished = jsonlite::unbox(finished),
                                   batchId = jsonlite::unbox(batch_id)),
                   recordCount = jsonlite::unbox(output_rows),
-                  physicalLocation = jsonlite::unbox(output_path))
+                  physicalLocation = jsonlite::unbox(output_path),
+                  schema = list(fields = output_schema_ub))
   payload <- jsonlite::toJSON(payload, auto_unbox = FALSE)
 
   # URL

@@ -4,7 +4,7 @@
 \alias{sip_add_dataset}
 \title{SIP Metastore Add Dataset}
 \usage{
-sip_add_dataset(output_path, output_format, output_rows = NULL,
+sip_add_dataset(output_path, output_format, output_schema, output_rows = 0,
   component = "RComponent", script, desc = "", created_by = NULL,
   project_id, batch_id = "", input_paths = "", input_formats = "",
   input_ids = "", input_names = "", started = NULL, finished = NULL,
@@ -15,6 +15,9 @@ sip_add_dataset(output_path, output_format, output_rows = NULL,
 
 \item{output_format}{output dataset format. accepts parquet, JSON, csv and
 rds}
+
+\item{output_schema}{output dataset sechema. Should be a list with name and
+type elements. list should not be named}
 
 \item{component}{component name used to create dataset. Default is RComponent}
 
@@ -39,7 +42,8 @@ Default is NULL which inserts current time}
 
 \item{finished}{string with starting time. Format should be YYYYMMDD-HHMMSS}
 
-\item{status}{component status. default is 'SUCCESS'. Default is NULL which inserts current time}
+\item{status}{component status. default is 'SUCCESS'. Default is NULL which
+inserts current time}
 
 \item{hostname}{hostname only of saw security location. No pathing required}
 
