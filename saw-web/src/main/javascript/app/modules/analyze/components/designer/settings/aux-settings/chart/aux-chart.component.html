@@ -8,7 +8,7 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-form-field class="select-form-field" appearance="outline">
+    <mat-form-field class="select-form-field" appearance="outline" style="margin-left: 10px;">
       <mat-label>Legend Layout</mat-label>
       <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (change)="onLegendChange()">
         <mat-option *ngFor="let layout of legend.options.layout" [value]="layout.name">
