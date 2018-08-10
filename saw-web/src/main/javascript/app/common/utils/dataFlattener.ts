@@ -12,6 +12,10 @@ import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 
+import {
+  DATE_TYPES
+} from '../../../modules/analyze/consts';
+
 
 export function flattenPivotData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapPivot(sqlBuilder);
@@ -101,10 +105,25 @@ function getNodeFieldMapChart(nodeFields) {
  *   z: ..
  * }, ..]
  */
+
+function parseLimitBeforeFlatten(data, level, sqlBuilder) {
+  forEach(data, cols=>{
+    level = level + 1;
+    if (!isUndefined(cols.buckets)) {
+      parseLimitBeforeFlatten(cols.buckets, level, sqlBuilder);
+    } else if (!isUndefined(cols['node_field_' + level])) {
+      console.log("inside else");
+      cols['node_field_' + level].buckets = (sqlBuilder.dataFields.length < 2 && !isUndefined(sqlBuilder.dataFields[0].limitType)) ? parseLimit(cols['node_field_' + level].buckets, sqlBuilder, false) : cols['node_field_' + level].buckets;
+    }
+  });
+  return data;
+}
+
 export function flattenChartData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
   const sorts = sqlBuilder.sorts;
-  data = (sqlBuilder.dataFields.length < 2 && !isUndefined(sqlBuilder.dataFields[0].limitType)) ? parseLimit(data, sqlBuilder, false) : data;
+
+  data = parseLimitBeforeFlatten(data, 0, sqlBuilder);
   return fpPipe(
     nestedData => parseNodeChart(data, {}, nodeFieldMap, 1, sqlBuilder),
     flattenedData => {
@@ -143,23 +162,21 @@ function parseLimit(data, sqlBuilder, flattenData) {
       }
     }
   });
-
-  //data = dateExistsInGroupBy ? parseUnflattenedData(data) : ((pasreLimitData && !dateExistsInGroupBy) ? sqlBuilder.dataFields[0].limitType === 'top' ? data.slice(0, sqlBuilder.dataFields[0].limitValue) : data.slice(Math.max(data.length - sqlBuilder.dataFields[0].limitValue, 1)) : data)
-
+  
   if (dateExistsInGroupBy && !flattenData) {
-    console.log("parse un flattneed data");
-    data = parseUnflattenedData(data);
+    console.log("Parse Unflatten data");
+    data = parseUnflattenedData(data, sqlBuilder);
   }
 
   if (pasreLimitData && !dateExistsInGroupBy && flattenData) {
-    console.log("front end parse");
-    data = sqlBuilder.dataFields[0].limitType === 'top' ? data.slice(0, sqlBuilder.dataFields[0].limitValue) : data.slice(Math.max(data.length - sqlBuilder.dataFields[0].limitValue, 1));
+    console.log("Parse flatten data");
+    data = sqlBuilder.dataFields[0].limitType === 'top' ? data.slice(0, sqlBuilder.dataFields[0].limitValue) : data.slice(Math.max(data.length - sqlBuilder.dataFields[0].limitValue, 0));
   }
   return data;
 }
 
-function parseUnflattenedData(data) {
-  console.log(data);
+function parseUnflattenedData(data, sqlBuilder) {
+  data = sqlBuilder.dataFields[0].limitType === 'top' ? data.slice(0, sqlBuilder.dataFields[0].limitValue) : data.slice(Math.max(data.length - sqlBuilder.dataFields[0].limitValue, 0));
   return data;
 }
 
