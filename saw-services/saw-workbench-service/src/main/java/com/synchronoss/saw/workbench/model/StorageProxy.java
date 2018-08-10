@@ -246,6 +246,26 @@ public class StorageProxy {
     private StorageProxy.ResultFormat resultFormat = StorageProxy.ResultFormat.fromValue("json");
     @JsonProperty("data")
     private List<Object> data = null;
+    /**
+     * It holds the indexRelativePath
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+
+    @JsonProperty("indexRelativePath")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String indexRelativePath;
+
+    @JsonProperty("indexRelativePath")
+    public String getIndexRelativePath() {
+      return indexRelativePath;
+    }
+    @JsonProperty("indexRelativePath")
+    public void setIndexRelativePath(String indexRelativePath) {
+      this.indexRelativePath = indexRelativePath;
+    }
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

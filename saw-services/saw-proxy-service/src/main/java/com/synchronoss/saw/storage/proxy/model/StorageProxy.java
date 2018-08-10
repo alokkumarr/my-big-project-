@@ -100,7 +100,7 @@ public class StorageProxy {
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private float pageNum;
     /**
-     * It holds the query
+     * It holds the size
      * <p>
      * An explanation about the purpose of this instance.
      * 
@@ -109,6 +109,17 @@ public class StorageProxy {
     @JsonProperty("size")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String size;
+    /**
+     * It holds the indexRelativePath
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+
+    @JsonProperty("indexRelativePath")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String indexRelativePath;
+
     /**
      * It holds the query
      * <p>
@@ -747,6 +758,16 @@ public class StorageProxy {
     public void setCount(String count) {
       this.count = count;
     }
+    @JsonProperty("indexRelativePath")    
+    public String getIndexRelativePath() {
+      return indexRelativePath;
+    }
+    @JsonProperty("indexRelativePath")    
+    public void setIndexRelativePath(String indexRelativePath) {
+      this.indexRelativePath = indexRelativePath;
+    }
+
+
 
 
     public enum Action {
