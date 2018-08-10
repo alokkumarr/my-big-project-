@@ -32,5 +32,6 @@ workbench:
         project-root: "{{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip') }}"
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
+        storage-uri: " {{ saw_storage_proxy_uri | default('http://localhost:9800') }}"
 metastore:
     base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"

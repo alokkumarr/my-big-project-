@@ -2,6 +2,7 @@ package com.synchronoss.saw.storage.proxy.service;
 
 import static java.util.Collections.emptyMap;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.Path;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -291,7 +293,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             logger.trace("attributeName : " + attributeName);
             logger.trace("attributeValue :" + objectDefination.get(attributeName).toString());
             StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
-            storeField.setColumnName(attributeName);
+            storeField.setName(attributeName);
             storeFields.add(storeField);
           }
         }
@@ -357,6 +359,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
         }
        proxyDetails.setCount(clusterIndexResponse.getDocsCount());
        proxyDetails.setSize(clusterIndexResponse.getPriStoreSize());
+       proxyDetails.setIndexRelativePath(Path.SEPARATOR + indexName);
         ObjectNode mappingDataNode = (ObjectNode)rootNode.get(indexName).get("mappings");
         logger.trace("mappingDataNode: " + objectMapper.writeValueAsString(mappingDataNode));
         if (typeAggregationResult.getAggregations()!=null) {
@@ -376,7 +379,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             logger.trace("attributeName : " + attributeName);
             logger.trace("attributeValue :" + objectDefination.get(attributeName).toString());
             StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
-            storeField.setColumnName(attributeName);
+            storeField.setName(attributeName);
             storeFields.add(storeField);
           } // end of while loop
         }
@@ -498,7 +501,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     System.out.println(attributeName);
     System.out.println(objectDefination.get(attributeName));
     StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
-    storeField.setColumnName(attributeName);
+    storeField.setName(attributeName);
     System.out.println(storeField.toString()); 
   }
   
