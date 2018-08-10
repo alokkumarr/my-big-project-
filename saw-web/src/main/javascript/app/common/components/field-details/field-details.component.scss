@@ -11,6 +11,10 @@ field-details {
       fieldset {
         border: 1px solid #D1D3D3;
         color: #0077BE;
+
+        mat-chip {
+          margin: 0 0 5px 8px;
+        }
       }
     }
   }

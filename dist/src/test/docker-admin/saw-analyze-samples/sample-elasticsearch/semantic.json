@@ -167,6 +167,54 @@
                 "kpiEligible": true,
                 "filterEligible": true
 
+              },
+              {
+                "name": "double1",
+                "type": "double",
+                "columnName": "double1",
+                "displayName": "Double1",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+
+              },
+              {
+                "name": "integer1",
+                "type": "integer",
+                "columnName": "integer1",
+                "displayName": "Integer1",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+
+              },
+              {
+                "name": "float1",
+                "type": "float",
+                "columnName": "float1",
+                "displayName": "float1",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+
+              },
+              {
+                "name": "long1",
+                "type": "long",
+                "columnName": "long1",
+                "displayName": "Long1",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "kpiEligible": true,
+                "filterEligible": true
+
               }
             ]
           }
