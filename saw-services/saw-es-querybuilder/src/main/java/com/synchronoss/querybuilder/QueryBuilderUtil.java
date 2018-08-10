@@ -27,8 +27,6 @@ import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import static com.synchronoss.AggregationConstants.*;
-import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.AVG;
-import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.SUM;
 
 
 public class QueryBuilderUtil {
@@ -210,13 +208,19 @@ public class QueryBuilderUtil {
 	 * This aggregation framework
 	 * @param nodeField
 	 * @param nodeName
-	 * @return
+	 * @param b
+     * @return
 	 */
-	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName,
-                                                             DataField.LimitType type, Integer size)
+	public static AggregationBuilder aggregationBuilderChart(NodeField nodeField, String nodeName,
+                                                             DataField.LimitType type, Integer size, boolean apply)
 	{
 		AggregationBuilder aggregationBuilder = null;
 		boolean bucketOrder = false;
+
+		// check if we need to apply top/Bottom size. If N/A then
+        // apply standard builder limit.
+		if(!apply)
+		    size = BuilderUtil.SIZE;
 
 		if (type==DataField.LimitType.BOTTOM)
 		    bucketOrder=true;
