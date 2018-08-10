@@ -1,0 +1,16 @@
+field-details {
+  display: grid;
+
+  .area-fields {
+    width: 100%;
+
+    mat-chip-list {
+      float: left;
+
+      fieldset {
+        border: 1px solid #D1D3D3;
+        color: #0077BE;
+      }
+    }
+  }
+}

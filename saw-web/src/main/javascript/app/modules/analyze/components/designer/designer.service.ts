@@ -83,7 +83,7 @@ export class DesignerService {
     const areLessThenMaxFields = (
       artifactColumns: ArtifactColumns
     ): boolean => {
-      return (artifactColumns[0].area === "data" ? true : artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA);
+      return (artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA);
     };
 
     const canAcceptNumberType = (
@@ -106,13 +106,19 @@ export class DesignerService {
       artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
+    const canAcceptData = (
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      _
+    ) => ({ type }: ArtifactColumnPivot) =>
+      NUMBER_TYPES.includes(type);
+
     const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
       {
         title: 'Data',
         type: 'pivot',
         marker: 'data',
         artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptNumberType,
+        canAcceptArtifactColumn: canAcceptData,
         transform(artifactColumn: ArtifactColumnPivot) {
           artifactColumn.area = 'data';
           artifactColumn.checked = true;
