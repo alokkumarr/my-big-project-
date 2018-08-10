@@ -45,13 +45,15 @@ export class CreateSemanticComponent implements OnInit {
     this.router.stateService.go('workbench.datasets');
   }
 
+  /**
+   * Only Datalake datasets are join eligible as of now. 
+   *
+   * @memberof CreateSemanticComponent
+   */
   joinEligibleToggled() {
     if (this.joinToggleValue) {
       this.selectionMode = 'multiple';
-      this.gridDataAvailableDS = filter(this.availableDS, [
-        'system.format',
-        'parquet'
-      ]);
+      this.gridDataAvailableDS = filter(this.availableDS, 'joinEligible');
     } else {
       this.selectionMode = 'single';
       this.gridDataAvailableDS = this.availableDS;
@@ -62,11 +64,12 @@ export class CreateSemanticComponent implements OnInit {
   }
 
   onDSSelectionChanged(event) {
-    if (event.currentSelectedRowKeys.length >= 1) {
+    if (event.selectedRowsData.length >= 1) {
       this.isSelected = true;
       this.selectedDSData = event.selectedRowsData;
     } else {
       this.isSelected = false;
+      this.selectedDSData = [];
     }
   }
 

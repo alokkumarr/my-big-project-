@@ -3,7 +3,7 @@ import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
-import { FlexLayoutModule } from '@angular/flex-layout'
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
@@ -25,7 +25,7 @@ import {
   dxDataGridProvider
 } from '../../common/services/ajs-common-providers';
 
-import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component'
+import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { DatasetsComponent } from './components/datasets-view/datasets-page.component';
 import { DatasetsGridPageComponent } from './components/datasets-view/grid/datasets-grid-page.component';
 import { DatasetsCardPageComponent } from './components/datasets-view/card/datasets-card-page.component';
@@ -44,14 +44,14 @@ import { DetailsDialogComponent } from './components/sql-executor/dataset-detail
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
 import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
 import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
+import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
 
 import { CommonModule } from '../../common';
 
 export const WorkbenchModule = 'WorkbenchModule';
 
-angular.module(WorkbenchModule, [
-  CommonModule
-])
+angular
+  .module(WorkbenchModule, [CommonModule])
   .config(routesConfig)
   .config(i18nConfig);
 
@@ -74,7 +74,8 @@ const components = [
   CreatefolderDialogComponent,
   DatasetDetailViewComponent,
   CreateSemanticComponent,
-  ValidateSemanticComponent
+  ValidateSemanticComponent,
+  SemanticDetailsDialogComponent
 ];
 
 @NgModule({
@@ -105,4 +106,4 @@ const components = [
     dxDataGridProvider
   ]
 })
-export class WorkbenchUpgradeModule { }  
+export class WorkbenchUpgradeModule {}

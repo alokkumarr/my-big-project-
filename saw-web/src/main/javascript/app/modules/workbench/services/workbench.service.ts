@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 import { UIRouter } from '@uirouter/angular';
+import { JwtService } from '../../../../login/services/jwt.service';
 
 import {
   SQLEXEC_SAMPLE,
@@ -27,40 +28,42 @@ export class WorkbenchService {
 
   constructor(
     private http: HttpClient,
-    private router: UIRouter) { }
+    private jwt: JwtService,
+    private router: UIRouter
+  ) {}
 
   /** GET datasets from the server */
   getDatasets(): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
-    return this.http.get(endpoint)
-      .pipe(
-        catchError(this.handleError('data', [])));
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', [])));
   }
 
   /** GET Staging area tree list */
   getStagingData(path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory`;
-    return this.http.post(endpoint, { path })
-      .pipe(
-        catchError(this.handleError('data', [])));
+    return this.http
+      .post(endpoint, { path })
+      .pipe(catchError(this.handleError('data', [])));
   }
 
   /** GET raw preview from the server */
   getRawPreviewData(path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/preview`;
-    return this.http.post(endpoint, { path })
-      .pipe(
-        catchError(this.handleError('data', [])));
+    return this.http
+      .post(endpoint, { path })
+      .pipe(catchError(this.handleError('data', [])));
   }
 
   /** GET parsed preview from the server */
   getParsedPreviewData(previewConfig): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/inspect`;
-    return this.http.post(endpoint, previewConfig)
-      .pipe(
-        catchError((e: any) => {
-          return Observable.of(e);
-        }));
+    return this.http.post(endpoint, previewConfig).pipe(
+      catchError((e: any) => {
+        return Observable.of(e);
+      })
+    );
   }
 
   /** File mask search */
@@ -102,7 +105,9 @@ export class WorkbenchService {
   }
 
   uploadFile(filesToUpload: FileList, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${userProject}/raw/directory/upload/files?path=${path}`;
+    const endpoint = `${
+      this.wbAPI
+    }/${userProject}/raw/directory/upload/files?path=${path}`;
 
     // const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files`;
     const formData: FormData = new FormData();
@@ -138,35 +143,36 @@ export class WorkbenchService {
 
   createFolder(path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/create`;
-    return this.http.post(endpoint, { path })
-      .pipe(
-        catchError(this.handleError('data', [])));
+    return this.http
+      .post(endpoint, { path })
+      .pipe(catchError(this.handleError('data', [])));
   }
   /**
    * Service to fetch meta data of a dataset
-   * 
-   * @param {string} projectName 
-   * @param {any} id 
-   * @returns {Observable<any>} 
+   *
+   * @param {string} projectName
+   * @param {any} id
+   * @returns {Observable<any>}
    * @memberof WorkbenchService
    */
   getDatasetDetails(id): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/${id}`;
-    return this.http.get(endpoint)
-      .pipe(
-        catchError(this.handleError('data', ARTIFACT_SAMPLE)));
+    return this.http
+      .get(endpoint)
+      .pipe(catchError(this.handleError('data', ARTIFACT_SAMPLE)));
   }
 
   triggerParser(payload) {
     const endpoint = `${this.wbAPI}/${userProject}/datasets`;
-    return this.http.post(endpoint, payload)
+    return this.http
+      .post(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
   /**
    * Following 3 functions
    * To store, retrive and remove data from localstorage
-   * 
-   * @param {any} metadata 
+   *
+   * @param {any} metadata
    * @memberof WorkbenchService
    */
   setDataToLS(key, value) {
@@ -191,7 +197,8 @@ export class WorkbenchService {
    */
   executeSqlQuery(query: string): Observable<any> {
     const endpoint = `${this.wbAPI}/execute`;
-    return this.http.post(endpoint, { query })
+    return this.http
+      .post(endpoint, { query })
       .pipe(catchError(this.handleError('data', SQLEXEC_SAMPLE)));
   }
 
@@ -202,17 +209,29 @@ export class WorkbenchService {
 
   triggerDatasetPreview(name: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/previews`;
-    return this.http.post(endpoint, { name })
+    return this.http
+      .post(endpoint, { name })
       .pipe(catchError(this.handleError('data', {})));
   }
 
   getDatasetPreviewData(id): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/previews/${id}`;
-    return this.http.get(endpoint)
-      .pipe(
-        catchError((e: any) => {
-          return Observable.of(e);
-        }));
+    return this.http.get(endpoint).pipe(
+      catchError((e: any) => {
+        return Observable.of(e);
+      })
+    );
+  }
+
+  createSemantic(payload) {
+    const endpoint = `${this.api}/internal/semantic/${userProject}/create`;
+    payload.customerCode = this.jwt.customerCode;
+    const userDetails = this.jwt.getTokenObj();
+    payload.username = userDetails.ticket.userFullName;
+    payload.projectCode = userProject;
+    return this.http
+      .post(endpoint, payload)
+      .pipe(catchError(this.handleError('data', {})));
   }
 
   /**
