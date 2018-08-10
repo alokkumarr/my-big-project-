@@ -7,10 +7,15 @@ import { AdminMainViewComponent } from './main-view';
 import { AdminService } from './main-view/admin.service';
 import { RoleService } from './role/role.service';
 import { PrivilegeService } from './privilege/privilege.service';
+import { CategoryService } from './category/category.service';
 import {
   UserEditDialogComponent,
   UserService
 } from './user';
+import {
+  CategoryEditDialogComponent,
+  CategoryDeleteDialogComponent
+} from './category';
 import {
   RoleEditDialogComponent
 } from './role';
@@ -110,7 +115,9 @@ const COMPONENTS = [
   AdminMainViewComponent,
   AdminListViewComponent,
   UserEditDialogComponent,
-  RoleEditDialogComponent
+  RoleEditDialogComponent,
+  CategoryEditDialogComponent,
+  CategoryDeleteDialogComponent
 ];
 @NgModule({
   imports: [
@@ -138,7 +145,8 @@ const COMPONENTS = [
     LocalSearchService,
     ToastService,
     RoleService,
-    PrivilegeService
+    PrivilegeService,
+    CategoryService
   ],
   exports: [
     AdminMainViewComponent

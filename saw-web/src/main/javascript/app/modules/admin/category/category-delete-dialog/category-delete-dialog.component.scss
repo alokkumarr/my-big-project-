@@ -1,0 +1,21 @@
+delete-edit-dialog {
+  .delete-message {
+    margin-top: 10px;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  .categories-list {
+    p {
+      margin-bottom: 0;
+    }
+
+    ul {
+      width: 350px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  }
+}

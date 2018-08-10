@@ -2,7 +2,8 @@ import {AdminMainViewComponent} from './main-view';
 import {
   UsersTableHeader,
   RolesTableHeader,
-  PrivilegesTableHeader
+  PrivilegesTableHeader,
+  CategoriesTableHeader
 } from './consts';
 
 export function routesConfig($stateProvider) {
@@ -36,6 +37,21 @@ export function routesConfig($stateProvider) {
         resolveFn: () => 'role'
       }]
     }, {
+      name: 'admin.categories',
+      url: '/categories',
+      component: AdminMainViewComponent,
+      resolve: [{
+        token: 'columns',
+        resolveFn: () => CategoriesTableHeader
+      }, {
+        token: 'section',
+        resolveFn: () => 'category'
+      }]
+    }, {
+    //   name: 'admin.categories',
+    //   url: '/categories',
+    //   component: 'categoriesView'
+    // }, {
       name: 'admin.privilege',
       url: '/privilege?role',
       component: AdminMainViewComponent,
@@ -50,10 +66,6 @@ export function routesConfig($stateProvider) {
     //   name: 'admin.privilege',
     //   url: '/privilege?role',
     //   component: 'privilegesView'
-    }, {
-      name: 'admin.categories',
-      url: '/categories',
-      component: 'categoriesView'
     }, {
       name: 'admin.export',
       url: '/export',
