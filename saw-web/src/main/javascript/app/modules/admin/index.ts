@@ -6,6 +6,7 @@ import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';
 import { AdminService } from './main-view/admin.service';
 import { RoleService } from './role/role.service';
+import { PrivilegeService } from './privilege/privilege.service';
 import {
   UserEditDialogComponent,
   UserService
@@ -136,7 +137,8 @@ const COMPONENTS = [
     dxDataGridService,
     LocalSearchService,
     ToastService,
-    RoleService
+    RoleService,
+    PrivilegeService
   ],
   exports: [
     AdminMainViewComponent
