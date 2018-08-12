@@ -6,12 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONTokener;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
-import org.restlet.engine.header.HeaderConstants;
-import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
@@ -41,7 +38,11 @@ public class ESHttpClient {
     }
 
     public ESHttpClient(ESConfig config) throws Exception {
-        this.host = config.getEsHost();
+        //TODO: Fix this
+        List<String> esNodes = config.getEsHosts();
+        String esHost = esNodes.get(0);
+
+        this.host = esHost;
 
         String user = config.getEsUser();
         String pwd = config.getEsPassword();

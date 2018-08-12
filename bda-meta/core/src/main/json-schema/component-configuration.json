@@ -318,8 +318,12 @@
           }
         },
         "esNodes": {
-          "description": "Comma separated list of host names or IP addresses",
-          "type": "string"
+          "description": "List of host names or IP addresses",
+          "type": "array",
+          "required": true,
+          "items": {
+            "type": "string"
+          }
         },
         "esClusterName": {
           "description": "Name of the ElasticSearch cluster. By default, the cluster name will be elasticsearch",
