@@ -31,6 +31,8 @@
     <saw.docker.port>80</saw.docker.port>
     <saw.squid.port>3128</saw.squid.port>
     <saw.yarn.enabled>false</saw.yarn.enabled>
+    <!-- SAW e2e test suite configutration supported values are smoke/sanity/regression/development-->
+    <saw.e2e.suite>smoke</saw.e2e.suite>
   </properties>
   <dependencies>
     <dependency>
@@ -535,6 +537,16 @@
             </goals>
             <configuration>
               <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/</arguments>
+            </configuration>
+          </execution>
+           <execution>
+            <id>npm-run-generate-report</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run generate-report</arguments>
             </configuration>
           </execution>
         </executions>

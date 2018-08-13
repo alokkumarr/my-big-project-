@@ -122,43 +122,26 @@ exports.config = {
     realtimeFailure: true,
     showColors: true
   },
-  suites: webpackHelper.distRun() ? {
+  suites: webpackHelper.getSuiteName() === 'smoke' ? {
     /**
-     * Suites for test run invoked from Maven which is used in Bamboo continuous integration.
-     * Note: In the long term there should just be a single set of suites used everywhere (for both continuous
-     * integration and local front-end development). However, for now use a separate suite that allows enabling known
-     * working tests (working reliably without flakiness) incrementally one by one in continuous integration, while
-     * working on fixing the rest.
+     * This suite will be run as part of main bamboo build plan.
      */
-    // root: [
-    //   appRoot + '/src/test/e2e-tests/priviliges.test.js',
-    //   appRoot + '/src/test/e2e-tests/analyze.test.js',
-    //   appRoot + '/src/test/e2e-tests/createReport.test.js'
-    // ],
-    // charts: [
-    //   appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-    //   appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-    //   appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    // ],
-    // chartEditFork: [
-    //   appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-    //   appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    // ],
-    // filters: [
-    //   appRoot + '/src/test/e2e-tests/promptFilters.test.js'
-    // ],
-    // pivots: [
-    //   appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    // ],
-    authentication: [
-      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    ],
-    debug: [
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
+    smoke: [
+      appRoot + '/src/test/e2e-tests/login.test.js'
     ]
-  } : {
+  } : webpackHelper.getSuiteName() === 'sanity' ? {
     /**
-     * Suites for test run invoked from Protractor directly on local saw-web front-end development server
+     * This suite will be triggered from QA Test bamboo plan frequently for sanity check
+     */
+    sanity: [
+      appRoot + '/src/test/e2e-tests/login.test.js',
+      appRoot + '/src/test/e2e-tests/createReport.test.js',
+      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+    ]
+
+  } : webpackHelper.getSuiteName() === 'regression' ? {
+    /**
+     * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
     root: [
       appRoot + '/src/test/e2e-tests/priviliges.test.js',
@@ -181,10 +164,15 @@ exports.config = {
       appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
     ],
     authentication: [
+      appRoot + '/src/test/e2e-tests/login.test.js'
+    ]
+      
+  }: {
+    /**
+     * This suite is for devlopment envirobment and always all dev tests will be executed.
+     */
+    development: [
       appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
-    ],
-    debug: [
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
     ]
   },
   onCleanUp: function (results) {
