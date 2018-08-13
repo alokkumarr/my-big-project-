@@ -9,13 +9,7 @@ import { catchError } from 'rxjs/operators';
 import { UIRouter } from '@uirouter/angular';
 import { JwtService } from '../../../../login/services/jwt.service';
 
-import {
-  SQLEXEC_SAMPLE,
-  TREE_VIEW_Data,
-  RAW_SAMPLE,
-  parser_preview,
-  ARTIFACT_SAMPLE
-} from '../sample-data';
+import { SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
 
 import APP_CONFIG from '../../../../../../../appConfig';
 
@@ -226,8 +220,7 @@ export class WorkbenchService {
   createSemantic(payload) {
     const endpoint = `${this.api}/internal/semantic/${userProject}/create`;
     payload.customerCode = this.jwt.customerCode;
-    const userDetails = this.jwt.getTokenObj();
-    payload.username = userDetails.ticket.userFullName;
+    payload.username = this.jwt.getUserName();
     payload.projectCode = userProject;
     return this.http
       .post(endpoint, payload)

@@ -25,6 +25,10 @@ import {
   dxDataGridProvider
 } from '../../common/services/ajs-common-providers';
 
+import {
+  jwtServiceProvider
+} from '../../../login/services/ajs-login-providers';
+
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { DatasetsComponent } from './components/datasets-view/datasets-page.component';
 import { DatasetsGridPageComponent } from './components/datasets-view/grid/datasets-grid-page.component';
@@ -103,7 +107,8 @@ const components = [
     toastProvider,
     sidenavProvider,
     localSearchProvider,
-    dxDataGridProvider
+    dxDataGridProvider,
+    jwtServiceProvider
   ]
 })
 export class WorkbenchUpgradeModule {}
