@@ -20,7 +20,6 @@ import com.mapr.db.TableDescriptor;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
-import sncr.xdf.component.WithDataSetService;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -139,7 +138,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     log.info("Executing dataset transformation starts here ");
     log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
-    createDatasetDirectory(name);
+    createDatasetDirectory(project,name);
     log.info("execute name = " + name);
     log.info("execute root = " + root);
     log.info("execute component = " + component);
@@ -153,8 +152,9 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   /**
    * Execute a transformation component on a dataset to create a new dataset.
    */
-  private String createDatasetDirectory(String name) throws Exception {
-    
+  @Override
+  public String createDatasetDirectory(String project, String name) throws Exception {
+    log.trace("generate data system path for starts here :" + project + " : " + name); 
     String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
         + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
@@ -163,6 +163,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     if (!HFileOperations.exists(path)) {
       HFileOperations.createDir(path);
     }
+    log.trace("generate data system path for starts here " + path);
     return path;
   }
 
@@ -189,7 +190,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     if (status == null || !status.equals("SUCCESS")) {
       throw new RuntimeException("Unhandled dataset status: " + status);
     }
-    String location = getDatasetLocation(project, name);
+    String location = createDatasetDirectory(project, name);
     /* Submit job to Livy for reading out preview data */
     WorkbenchClient client = getWorkbenchClient();
     String id = UUID.randomUUID().toString();
@@ -211,16 +212,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     preview.insert();
   }
 
-  private String getDatasetLocation(String project, String name) {
-    
-    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
-        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
-        + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
-        + MetadataBase.PREDEF_DATA_DIR;
-    log.info("getDatasetLocation for preview path = " + path);
-    return path;
-  }
-
   @Override
   public ObjectNode getPreview(String previewId) throws Exception {
     log.debug("Getting dataset transformation preview");
@@ -234,13 +225,4 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     JsonNode json = mapper.readTree(doc.toString());
     return (ObjectNode) json;
   }
-
-  @Override
-  public String generatePath(String project, String name) throws Exception {
-    log.trace("generate data system path for starts here :" + project + " : " + name);
-    String location = createDatasetDirectory(name);
-    log.trace("generate data system path for starts here " + location);
-    return location;
-  }
-
 }
