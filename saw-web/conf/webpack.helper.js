@@ -12,7 +12,7 @@ function distRun() {
  * This function reads the property of the suite and runs those set of tests
  */
 function getSuiteName() {
-
+  console.log('browser.params.saw.e2e.suite---->'+browser.params.saw.e2e.suite);
   if (browser.params.saw.e2e.suite !== null && browser.params.saw.e2e.suite.trim().length > 0) {
     //agressive check for unwanted values
     if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'sanity') {

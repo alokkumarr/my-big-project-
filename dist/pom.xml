@@ -536,7 +536,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/ --params.saw.e2e.suite=${saw.e2e.suite}</arguments>
             </configuration>
           </execution>
            <execution>
