@@ -8,35 +8,31 @@
 new_model <- function(pipe,
                       target,
                       method,
-                      method_args,
+                      param_grid,
                       desc,
-                      path,
-                      id,
+                      uid,
                       status,
-                      created_on,
-                      fit,
-                      performance) {
-  checkmate::assert_class(pipe, "pipeline")
+                      created_on
+) {
+  checkmate::assert_character(pipe)
   checkmate::assert_character(target, null.ok = TRUE)
   checkmate::assert_choice(method, choices = model_methods$method)
-  checkmate::assert_list(method_args)
+  checkmate::assert_data_frame(param_grid)
   checkmate::assert_character(desc)
-  checkmate::assert_path_for_output(path, overwrite = FALSE)
-  checkmate::assert_character(id)
-  checkmate::assert_choice(status,
-                           c("created", "added", "trained", "evaluated", "selected", "final"))
+  checkmate::assert_character(uid)
+  checkmate::assert_character(status)
   checkmate::assert_posixct(created_on)
-  checkmate::assert_list(fit, null.ok = TRUE)
-  checkmate::assert_list(performance, null.ok = TRUE)
-
+  
   .method <- method
   method_fun <- model_methods %>%
     dplyr::filter(method == .method) %>%
     dplyr::pull(package) %>%
     asNamespace() %>%
-    get(method, .)
-  checkmate::assert_function(method_fun, args = names(method_args))
-
+    get(.method, .)
+  method_args <- setdiff(colnames(param_grid), "uid")
+  if(length(method_args) == 0) method_args <- NULL
+  checkmate::assert_function(method_fun, args = method_args)
+  
   method_class <- model_methods %>%
     dplyr::filter(method == .method) %>%
     tidyr::unnest(class) %>%
@@ -45,38 +41,21 @@ new_model <- function(pipe,
   method_package <- model_methods %>%
     dplyr::filter(method == .method) %>%
     dplyr::pull(package)
-
+  
   structure(
     list(
       pipe = pipe,
       target = target,
       method = method,
-      method_args = method_args,
+      param_grid = param_grid,
       package = method_package,
       desc = desc,
-      path = path,
-      id = id,
+      uid = uid,
       created_on = created_on,
-      status = status,
-      fit = fit,
-      performance = performance
+      status = status
     ),
     class = c(method_class, "model")
   )
-}
-
-
-#' Model Class Validator
-valid_model <- function(x) {
-  if (!all(names(x$method_args) %in% names(formals(x$method)))) {
-    stop(
-      "Not all method args valid. Please check following arguments.\n",
-      paste(names(x$method_args)[!names(x$method_args) %in% names(formals(x$method))],
-            collapse = "\n")
-    )
-  }
-
-  x
 }
 
 
@@ -87,109 +66,35 @@ valid_model <- function(x) {
 #' Requires a pipeline object input, and a valid model method. Any method
 #' package dependencies need to be loaded prior to model call
 #'
-#' @param pipe pipeline object. default is empty pipeline which applies no
-#'   data transformations
+#' @param pipe_uid pipeline uid string
 #' @param target column name of target variable. string input
 #' @param method string input of model method
-#' @param ... additional arguments to pass to model method
+#' @param param_grid parameter grid for model tuning
 #' @param desc optional model description
-#' @param path optional file path to save model
+#' @param uid model uid
 #'
 #' @export
 model <- function(pipe,
                   target,
                   method,
-                  ...,
+                  param_grid,
                   desc = NULL,
-                  path = NULL) {
-  id <- sparklyr::random_string("model")
-  if (is.null(desc))
-    desc <- ""
-  if (is.null(path))
-    path <- "./"
-
-  valid_model(
-    new_model(
-      pipe = pipe,
-      target = target,
-      method = method,
-      method_args = list(...),
-      desc = desc,
-      path = path,
-      id = id,
-      status = "created",
-      created_on = Sys.time(),
-      fit = NULL,
-      performance = NULL
-    )
+                  uid = NULL) {
+  
+  if (is.null(desc)) desc <- ""
+  if (is.null(uid)) sparklyr::random_string("model")
+  
+  new_model(
+    pipe = pipe,
+    target = target,
+    method = method,
+    param_grid = param_grid,
+    desc = desc,
+    uid = uid,
+    status = "created",
+    created_on = Sys.time()
   )
 }
-
-
-
-
-#' Add Model Grid to Modeler Object function
-#'
-#' Function to add grid of multiple models to modeler object. Vectors of
-#' parameter values can be provided to this function and grid of models added to
-#' modeler object
-#'
-#' Function creates a new model object from inputs and then appends to modeler
-#' models list
-#'
-#' @param obj modeler object
-#' @inheritParams model
-#' @export
-#' @return modeler object with model added
-add_model_grid <-function(obj,
-                          pipe = NULL,
-                          method,
-                          ...,
-                          desc = NULL,
-                          path = NULL) {
-  checkmate::assert_class(obj, "modeler")
-
-  type_methods <- model_methods %>%
-    dplyr::filter(type == obj$type) %>%
-    dplyr::pull(method) %>%
-    as.character()
-  checkmate::assert_choice(method, type_methods)
-
-  if(is.null(pipe))
-    pipe <- pipeline()
-
-  # Args
-  args <- expand.grid(list(...))
-
-  if(nrow(args) > 0) {
-
-    for(i in 1:nrow(args)) {
-      arg_list <- as.list(args[i,])
-      model_desc <- paste(desc, paste(paste(names(arg_list), arg_list, sep="="), collapse="; "), sep=": ")
-      model_args <- c(list(pipe = pipe,
-                           target = obj$target,
-                           method = method,
-                           desc = model_desc,
-                           path = path),
-                      arg_list)
-      m <- do.call("model", model_args)
-      m$status <- "added"
-      obj$models[[m$id]] <- m
-    }
-  }else{
-    m <- model(pipe = pipe,
-               target = obj$target,
-               method = method,
-               desc = desc,
-               path = path)
-    m$status <- "added"
-    obj$models[[m$id]] <- m
-  }
-
-  obj
-}
-
-
 
 
 
@@ -210,91 +115,35 @@ add_model <-function(obj,
                      method,
                      ...,
                      desc = NULL,
-                     path = NULL) {
+                     uid = sparklyr::random_string("model")) {
   checkmate::assert_class(obj, "modeler")
-
+  
+  # Check Method
   type_methods <- model_methods %>%
     dplyr::filter(type == obj$type) %>%
     dplyr::pull(method) %>%
     as.character()
   checkmate::assert_choice(method, type_methods)
-
+  
+  # Define pipeline
   if(is.null(pipe))
     pipe <- pipeline()
-
-  m <- model(pipe = pipe,
+  
+  if(! pipe$uid %in% names(obj$pipelines))
+    obj$pipelines[[pipe$uid]] <- pipe
+  
+  # Get Parameter Grid
+  grid <- data.frame(expand.grid(list(...)))
+  
+  # Create model object
+  m <- model(pipe = pipe$uid,
              target = obj$target,
              method = method,
-             ...,
+             param_grid = grid,
              desc = desc,
-             path = path)
+             uid = uid)
   m$status <- "added"
-  obj$models[[m$id]] <- m
-  obj
-}
-
-
-
-#' Add Multiple Models to Modeler Object function
-#'
-#' Function to add model to modeler object. More than one model can be added to
-#' a modeler object.
-#'
-#' Function creates a new model object from inputs and then appends to modeler
-#' models list
-#'
-#' @param obj modeler object
-#' @param pipe pipeline object
-#' @param models list with models method and list of arguments in each element
-#'
-#' @export
-#' @return modeler object with models added
-add_models <- function(obj,
-                       pipe = NULL,
-                       models) {
-  checkmate::assert_class(obj, "modeler")
-  checkmate::assert_class(models, "list")
-
-  if(is.null(pipe))
-    pipe <- pipeline()
-
-  for(i in 1:length(models)) {
-
-    model_args <- modifyList(
-      list(pipe = pipe,
-           target = obj$target,
-           method = models[[i]]$method,
-           desc = NULL,
-           path = NULL),
-      models[[i]]$method_args)
-    m <- do.call("model", model_args)
-    m$status <- "added"
-    obj$models[[m$id]] <- m
-    obj
-  }
-
-  obj
-}
-
-
-#' Append Model to Modeler Object function
-#'
-#' Function to append a valid model to a modeler object.
-#'
-#' Function updates the model status and appends to modeler models list
-#'
-#' @param obj modeler object
-#' @param model model object
-#' @export
-#' @return modeler object with model added
-append_model <- function(obj, model) {
-  checkmate::assert_class(obj, "modeler")
-  checkmate::assert_class(model, "model")
-
-  model$target <- obj$target
-  model$status <- "added"
-  model$last_updated <- Sys.time()
-  obj$models[[model$id]] <- model
+  obj$models[[m$uid]] <- m
   obj
 }
 
@@ -303,73 +152,73 @@ append_model <- function(obj, model) {
 # Model Class Generics ----------------------------------------------------
 
 
-#' Fit Model Generic
+#' Train Model Generic Function
 #'
-#' Fit model to single data sample
+#' Train a model added to a modeler object.
 #'
-#' @param mobj Model object to fit
-#' @param data data to fit model object on
-#' @param ... additional arguments to pass through
-#' @export
-fit <- function(mobj, data, ...){
-  UseMethod("fit")
-}
-
-
-#' Train Model Generic
-#'
-#' Train single model to indicies provided
-#'
-#' Fits Model and makes predictions for any validation or test indicies
-#' provided. Adds fitted values and predictions to model's performance values
-#'
-#' @return updated model object
-#' @export
-train <- function(...) {
-  UseMethod("train")
-}
-
-
-#' Evaluate Model Generic
-#'
-#' Function to evaluate the predictive performance of a model
+#' Function fits model based on modeler samples, model pipeline, model method
+#' and param grid.
 #'
 #' @param mobj model object
-#' @param measure measure object
+#' @param ... additional arguments to pass on
 #'
-#' @return returns evaluted model object
 #' @export
-evaluate <- function(mobj, measure) {
-  UseMethod("evaluate")
+#' @return updated modeler object
+train_model <- function(mobj, ...) {
+  UseMethod("train_model")
 }
 
 
-#' @rdname evaluate
+#' Fit Model Generic Function
+#'
+#' Functions execues model method on its pipeline output for given param grid
+#' and sampling indicies
+#'
+#' Sub model fits are stored in sub-model list. sub-models given unique id. Each
+#' sub-model is fit on each training sample provided
+#'
+#' @param mobj model object
+#' @param ... additional arguments to pass to fit model function
 #' @export
-evaluate.model <- function(mobj, measure) {
-  checkmate::assert_class(measure, "measure")
+#' @return updated model object
+fit_model <- function(mobj, ...) {
+  UseMethod("fit_model")
+}
 
-  mobj$evaluate <- purrr::map_df(mobj$performance,
-                                 ~purrr::map_df(.,
-                                                dplyr::bind_rows,
-                                                .id = "sample"),
-                                 .id="indicie") %>%
-    dplyr::inner_join(mobj$pipe$output %>%
-                        dplyr::select_at(c(mobj$target, mobj$index_var)),
-                      by = mobj$index_var) %>%
-    dplyr::mutate(model = mobj$id) %>%
-    dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
-    dplyr::select_at(c("indicie", "sample", "model", mobj$index_var, mobj$target, "predicted")) %>%
-    dplyr::group_by(model, sample, indicie) %>%
-    dplyr::do(data.frame(
-      match.fun(measure$method)(.,
-                                actual = mobj$target,
-                                predicted = "predicted")
-    )) %>%
-    dplyr::ungroup() %>%
-    setNames(c("model", "sample", "indicie", measure$method))
 
-  mobj
+
+#' Apply Model Generic Fuction
+#'
+#' Function applies model to make predictions for all samples
+#'
+#' Fitted values extracted for training data and predictions made for validation
+#' or test samples. Predictions stored with sub-model
+#'
+#' @param mobj model object
+#' @param ... additional arguments to pass to fit function
+#'
+#' @export
+#' @return updated model object
+apply_model <- function(mobj, ...) {
+  UseMethod("apply_model")
+}
+
+
+#' Evaluate Model Generic Function
+#'
+#' Evaluate the accuracy of a fitted and applied model
+#'
+#' Function applies the measure function associated with modeler object to a
+#' model predictions
+#'
+#' @param mobj model object
+#' @param uids optional input for model uid. default is NULL and all trained
+#'   models evaluated
+#'
+#' @export
+#' @return updated modeler object
+evaluate_model <- function(mobj, ...) {
+  UseMethod("evaluate_model")
 }
 
 
@@ -382,6 +231,7 @@ evaluate.model <- function(mobj, measure) {
 get_fit <- function(mobj, ...) {
   UseMethod("get_fit", mobj)
 }
+
 
 #' Return the Model Coefficients
 #'
@@ -408,15 +258,48 @@ tidy_performance <- function(mobj) {
 }
 
 
+
 # Class Methods -----------------------------------------------------------
 
 
+#' @rdname train_model
 #' @export
-#' @rdname get_target
-get_target.model <- function(obj) {
-
-  obj$pipe$output %>%
-    dplyr::select_at(obj$target) %>%
-    dplyr::mutate(index = 1:dplyr::n())
-
+train_model.model <- function(mobj, data, samples, save_fits, execution_strategy) {
+  
+  mobj %>%
+    fit_model() %>%
+    apply_model() %>%
+    evaluate_model()
 }
+
+
+
+#' @rdname evaluate_model
+#' @export
+evaluate_model.model <- function(mobj, measure) {
+  checkmate::assert_class(measure, "measure")
+  
+  mobj$evaluate <- purrr::map_df(mobj$predictions,
+                                 ~purrr::map_df(.,
+                                                dplyr::bind_rows,
+                                                .id = "sample"),
+                                 .id="indicie") %>%
+    dplyr::inner_join(mobj$pipe$output %>%
+                        dplyr::select_at(c(mobj$target, mobj$index_var)),
+                      by = mobj$index_var) %>%
+    dplyr::mutate(model = mobj$uid) %>%
+    dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
+    dplyr::select_at(c("indicie", "sample", "model", mobj$index_var, mobj$target, "predicted")) %>%
+    dplyr::group_by(model, sample, indicie) %>%
+    dplyr::do(data.frame(
+      match.fun(measure$method)(.,
+                                actual = mobj$target,
+                                predicted = "predicted")
+    )) %>%
+    dplyr::ungroup() %>%
+    setNames(c("model", "sample", "indicie", measure$method))
+  
+  mobj
+}
+
+

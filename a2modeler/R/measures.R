@@ -315,3 +315,18 @@ auc.tbl_spark <- function(x, predicted, actual) {
     metric_name = "areaUnderROC"
   )
 }
+
+
+#' @export
+#' @rdname auc
+auc.spark_connection <- function(x, predicted = "predicted", actual = "label") {
+  checkmate::assert_character(predicted)
+  checkmate::assert_character(actual)
+  
+  sparklyr::ml_binary_classification_evaluator(
+    x,
+    label_col = actual,
+    prediction_col = predicted,
+    metric_name = "areaUnderROC"
+  )
+}

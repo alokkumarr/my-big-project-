@@ -59,7 +59,7 @@ segment_methods <- data.frame(
     "Spark ML Bisecting K-Means",
     "Spark ML Gaussian Mixture clustering"
   ),
-  class = c(rep("spark_ml", 3), rep("spark_ml_clustering", 3)),
+  class = c(rep("spark_model", 3), rep("spark_model_clustering", 3)),
   package = "sparklyr"
 )
 
@@ -85,7 +85,7 @@ classify_methods <- data.frame(
     "Spark ML Random Forest Classifier",
     "Spark ML Multilayer Perceptron Classifier"
   ),
-  class = c(rep("spark_ml", 6), rep("spark_ml_classification", 6)),
+  class = c(rep("spark_model", 6), rep("spark_model_classification", 6)),
   package = "sparklyr"
 )
 
@@ -112,7 +112,7 @@ regressor_methods <- data.frame(
     "Spark ML Random ForestRegressor",
     "Spark ML Multilayer Perceptron Regressor"
   ),
-  class = c(rep("spark_ml", 7), rep("ml_model_regression", 7)),
+  class = c(rep("spark_model", 7), rep("spark_model_regression", 7)),
   package = "sparklyr"
 )
 

@@ -17,15 +17,14 @@ new_regressor <- function(df,
                           version = NULL,
                           desc = NULL,
                           scientist = NULL,
-                          save_fits = TRUE,
+                          execution_strategy = "sequential",
+                          refit = TRUE,
+                          save_submodels = TRUE,
                           dir = NULL,
                           ...){
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
-
-  df <- df %>%
-    dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
+  
   mobj <- modeler(df,
                   target = target,
                   type = "regressor",
@@ -34,10 +33,10 @@ new_regressor <- function(df,
                   version,
                   desc,
                   scientist,
-                  save_fits,
+                  execution_strategy,
+                  refit,
+                  save_submodels,
                   dir)
-  mobj$index_var <- "index"
-  mobj$index <- 1:sdf_nrow(df)
   mobj <- structure(mobj, class = c("regressor", class(mobj)))
   mobj <- set_measure(mobj, RMSE)
   mobj
@@ -57,25 +56,25 @@ predict.regressor <- function(obj,
   if (is.null(final_model)) {
     stop("Final model not set")
   }
-
+  
   data <- data %>%
     dplyr::mutate(index = 1) %>%
     dplyr::mutate(index = row_number(index))
-
+  
   schema <- obj$schema[! names(obj$schema) %in% c(obj$target)]
   schema_check <- all.equal(get_schema(data), obj$schema)
   if(schema_check[1] != TRUE) {
     stop(paste("New Data shema check failed:\n", schema_check))
   }
-
+  
   final_model$pipe <- execute(data, final_model$pipe)
   preds <- predict(final_model, data = final_model$pipe$output, ...)
-
+  
   new_predictions(
     predictions = preds,
     model = final_model,
     type = "regressor",
-    id = sparklyr::random_string(prefix = "pred"),
+    uid = sparklyr::random_string(prefix = "pred"),
     desc = desc
   )
 }

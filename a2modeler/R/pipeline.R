@@ -3,17 +3,20 @@
 new_pipeline <- function(expr,
                          output,
                          desc,
+                         uid,
                          created_on,
                          runtime) {
   checkmate::assert_function(expr)
   checkmate::assert_character(desc)
+  checkmate::assert_character(uid)
   checkmate::assert_posixct(created_on)
-
+  
   structure(
     list(
       expr = expr,
       output = output,
       desc = desc,
+      uid = uid,
       created_on  = created_on,
       runtime = runtime
     ),
@@ -30,10 +33,12 @@ new_pipeline <- function(expr,
 #'
 #' @param expr pipeline function. default is identity function
 #' @param desc optional description input
+#' @param uid A character string used to uniquely identify the pipeline
 #'
 #' @export
 pipeline <- function(expr = identity,
-                     desc = NULL) {
+                     desc = NULL,
+                     uid = sparklyr::random_string("pipe")) {
   if (is.null(desc))
     desc <- ""
   a1 <- Sys.time()
@@ -41,22 +46,24 @@ pipeline <- function(expr = identity,
     expr,
     output = NULL,
     desc,
+    uid,
     created_on = a1,
     runtime = NULL
   )
-
+  
 }
 
 
 #' @rdname print
 #' @export
 print.pipeline <- function(pipe) {
-  cat("Pipeline Description:\n", pipe$desc, "\n")
+  cat("Pipeline:", pipe$uid, "---------------- \n\n")
+  cat("Description:\n", pipe$desc, "\n\n")
   cat("Expression:\n")
   print(pipe$expr)
   cat("\nCreated at:", as.character(pipe$created_on), "\n")
   cat("Runtime:", ifelse(is.null(pipe$runtime),
-                         "< not run yet > \n",
+                         "< not run yet > \n\n",
                          paste(round(pipe$runtime, 2), "seconds\n\n")))
   cat("Sample Output:\n")
   print(head(pipe$output))
@@ -228,16 +235,16 @@ clean <- function(pipe) {
 clean_pipes <- function(obj, ids = NULL) {
   checkmate::assert_class(obj, "modeler")
   checkmate::assert_character(ids, null.ok = TRUE)
-
+  
   if(is.null(ids)) {
     ids <- get_models(obj)
   }
-
+  
   for(id in ids) {
     model <- get_models(obj, ids = id)[[1]]
     model$pipe <- clean(model$pipe)
     obj$models[[id]] <- model
   }
-
+  
   obj
 }

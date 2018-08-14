@@ -36,7 +36,7 @@ test_that("Classifier Constructer", {
 
 test_that("Classifier Selects Best Model", {
 
-  test_pipe <- pipeline(expr = function(x){select(x, index, am, mpg)})
+  test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
 
   c1 <- new_classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
@@ -45,7 +45,6 @@ test_that("Classifier Selects Best Model", {
     add_model(pipe = test_pipe,
               method = "ml_decision_tree_classifier") %>%
     train_models() %>%
-    evaluate_models() %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   expect_subset("spark_ml", class(c1$final_model))
