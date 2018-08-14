@@ -70,7 +70,7 @@ public class ElasticSearchLoader {
     public static Map<String, String> generateESParamMap(ESConfig config) {
         Map<String, String> configMap = new HashMap<>();
 
-        //TODO: Fix this
+        //TODO: Should be fixed as part of high-availability story
         List<String> esNodes = config.getEsHosts();
         String esHost = esNodes.get(0);
 

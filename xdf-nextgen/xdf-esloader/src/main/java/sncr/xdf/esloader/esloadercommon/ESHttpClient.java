@@ -38,7 +38,7 @@ public class ESHttpClient {
     }
 
     public ESHttpClient(ESConfig config) throws Exception {
-        //TODO: Fix this
+        //TODO: Should be fixed as part of high-availability story
         List<String> esNodes = config.getEsHosts();
         String esHost = esNodes.get(0);
 
