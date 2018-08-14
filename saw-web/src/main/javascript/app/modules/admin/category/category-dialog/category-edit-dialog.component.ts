@@ -234,14 +234,17 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
         subCategoryDesc,
         activestatusInd
       });
-    })
+    });
+
     categoryControl.valueChanges.subscribe(values => {
       const target = find(subCategories, cat => cat === selectedControl.value);
       target.subCategoryName = values.subCategoryName;
       target.subCategoryDesc = values.subCategoryDesc;
       target.activestatusInd = values.activestatusInd;
       target.modifiedFlag = true;
-    })
+      selectedControl.disable();
+    });
+
     categoryControl.statusChanges.subscribe(validity => {
       if (selectedControl.enabled) {
         if (validity === 'INVALID') {

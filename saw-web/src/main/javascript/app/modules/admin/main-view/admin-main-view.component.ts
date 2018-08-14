@@ -301,6 +301,7 @@ export class AdminMainViewComponent {
     return this._dialog.open(CategoryDeleteDialogComponent, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data
     } as MatDialogConfig);
   }
