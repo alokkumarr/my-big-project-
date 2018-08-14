@@ -11,26 +11,26 @@ function distRun() {
 /**
  * This function reads the property of the suite and runs those set of tests
  */
-function getSuiteName() {
-  if (browser.params.saw.e2e.suite !== null && browser.params.saw.e2e.suite.trim().length > 0) {
-    //agressive check for unwanted values
-    if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'sanity') {
-      return 'sanity';
-    } else if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'regression') {
-      return 'regression';
-    } else {
-      // if some junk values are provided then run smoke suite
-      return 'smoke';
-    }
-  } else {
-    /** 
-     by default value is set to smoke to eventually above condition will never false.
-     Above condition will be false only in case of running e2e tests from saw-web folder
-     Hence it means that user is either developing something or want to run all for some local test 
-    */
-    return 'development';
-  }
-}
+// function getSuiteNameOld() {
+//   if (browser.params.saw.e2e.suite !== null && browser.params.saw.e2e.suite.trim().length > 0) {
+//     //agressive check for unwanted values
+//     if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'sanity') {
+//       return 'sanity';
+//     } else if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'regression') {
+//       return 'regression';
+//     } else {
+//       // if some junk values are provided then run smoke suite
+//       return 'smoke';
+//     }
+//   } else {
+//     /** 
+//      by default value is set to smoke to eventually above condition will never false.
+//      Above condition will be false only in case of running e2e tests from saw-web folder
+//      Hence it means that user is either developing something or want to run all for some local test 
+//     */
+//     return 'development';
+//   }
+// }
 
 module.exports = {
   root: (...args) => {
@@ -45,7 +45,26 @@ module.exports = {
     };
   },
   distRun: distRun,
-  getSuiteName: getSuiteName,
+  getSuiteName: () => {
+    if (browser.params.saw.e2e.suite !== null && browser.params.saw.e2e.suite.trim().length > 0) {
+      //agressive check for unwanted values
+      if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'sanity') {
+        return 'sanity';
+      } else if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'regression') {
+        return 'regression';
+      } else {
+        // if some junk values are provided then run smoke suite
+        return 'smoke';
+      }
+    } else {
+      /** 
+       by default value is set to smoke to eventually above condition will never false.
+       Above condition will be false only in case of running e2e tests from saw-web folder
+       Hence it means that user is either developing something or want to run all for some local test 
+      */
+      return 'development';
+    }
+  },
   sawWebUrl: () => {
     if (distRun()) {
       var host = browser.params.saw.docker.host;
