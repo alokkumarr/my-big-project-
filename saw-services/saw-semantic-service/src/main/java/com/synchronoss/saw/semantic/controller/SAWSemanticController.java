@@ -213,7 +213,6 @@ public class SAWSemanticController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
   public BackCompatibleStructure searchSemanticWithOutArtifacts(
-      @PathVariable(name = "projectId", required = true) String projectId,
       @RequestParam Map<String, String> queryMap) throws JSONMissingSAWException {
     BackCompatibleStructure responseObjectFuture = null;
     ObjectMapper objectMapper = new ObjectMapper();
