@@ -101,6 +101,11 @@ export class ValidateSemanticComponent implements OnDestroy {
           projectCode: '',
           metricName: '',
           artifacts: [],
+          esRepository: {
+            indexName: '',
+            storageType: '',
+            type: ''
+          },
           supports: [
             {
               category: 'table',
@@ -117,6 +122,11 @@ export class ValidateSemanticComponent implements OnDestroy {
         payload.metricName = name;
 
         forIn(this.selectedDS, ds => {
+          if (ds.storageType === 'ES') {
+            payload.esRepository.indexName = ds.system.name;
+            payload.esRepository.storageType = 'ES';
+            payload.esRepository.type = 'session';
+          }
           payload.artifacts.push({
             artifactName: ds.system.name,
             columns: filter(ds.schema.fields, 'include')
