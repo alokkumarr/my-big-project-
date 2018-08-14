@@ -1,0 +1,17 @@
+<table style="width: 840px;" ng-if="(subCategories$ | async).length > 0">
+  <tr>
+    <th style="width: 155px; word-wrap: break-word;">
+      <span i18n>Sub-Categories</span>
+    </th>
+    <th style="width: 45px;">
+      <span i18n>Access</span>
+    </th>
+    <th style="width: 550px;">
+      <span i18n>Privileges</span>
+    </th>
+  </tr>
+  <tr *ngFor="let subCategory of (subCategories$ | async); let i = index"
+      [class.active]="subCategory.privilegeId === activePrivilegeId"
+      privilegeRow (categoryChange)="onCategoryChange(i, $event)" [subCategory]="subCategory">
+  </tr>
+</table>

@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { MatDialog, MatDialogConfig } from '@angular/material';
+import { Transition } from '@uirouter/angular';
 import {
   UserEditDialogComponent,
   UserService
@@ -10,11 +11,15 @@ import {
   RoleEditDialogComponent
 } from '../role';
 import {
+  PrivilegeEditDialogComponent
+} from '../privilege';
+import {
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
 } from '../category';
 import { RoleService } from '../role/role.service';
 import { CategoryService } from '../category/category.service';
+import { PrivilegeService } from '../privilege/privilege.service';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
@@ -51,7 +56,7 @@ export class AdminMainViewComponent {
 
   @Input() columns: any[];
   @Input() section: 'user' | 'role' | 'privilege' | 'category';
-  data$: Observable<any[]>;
+  data$: Promise<any[]>;
   roles$: any;
   data: any[];
   filteredData: any[];
@@ -64,6 +69,7 @@ export class AdminMainViewComponent {
   ticket: {custID: string, custCode: string};
 
   constructor(
+    private _privilegeService: PrivilegeService,
     private _categoryService: CategoryService,
     private _userService: UserService,
     private _roleService: RoleService,
@@ -72,7 +78,8 @@ export class AdminMainViewComponent {
     private _toastMessage: ToastService,
     private _dialog: MatDialog,
     private _sidenav: SidenavMenuService,
-    private _state: StateService
+    private _state: StateService,
+    private _transition: Transition
   ) { }
 
   ngOnInit() {
@@ -80,11 +87,19 @@ export class AdminMainViewComponent {
     this.ticket = token.ticket;
     const customerId = this.ticket.custID;
     this.data$ = this.getListData(customerId);
-    this.data$.subscribe(data => {
+    this.data$.then(data => {
+      if (this.section === 'privilege') {
+        const { role } = this._transition.params();
+        if (role) {
+          this.filterObj.searchTerm = role;
+        }
+      }
       this.setData(data);
     });
 
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+
+
   }
 
   applySearchFilter(value) {
@@ -127,6 +142,8 @@ export class AdminMainViewComponent {
       return this._roleService;
     case 'category':
       return this._categoryService;
+    case 'privilege':
+      return this._privilegeService;
     default:
       break;
     }
@@ -140,6 +157,8 @@ export class AdminMainViewComponent {
     case 'role':
       return {roleTypes$: this._roleService.getRoleTypes(customerId)};
     case 'category':
+      return {customerId};
+    case 'privilege':
       return {customerId};
     default:
       break;
@@ -189,6 +208,9 @@ export class AdminMainViewComponent {
       return deleteConfirmation('role', 'Role Name', row.roleName);
     case 'category':
       return deleteConfirmation('category', 'Category Name', row.categoryName);
+    case 'privilege':
+      const identifiervalue = `${row.productName} --> ${row.moduleName} --> ${row.categoryName} --> ${row.subCategoryName} --> ${row.roleName}.`;
+      return deleteConfirmation('privilege', 'Privilege Details', identifiervalue);
     }
   }
 
@@ -196,12 +218,12 @@ export class AdminMainViewComponent {
     switch(this.section) {
     case 'role':
       const custId = parseInt(this.ticket.custID, 10);
-      const userId = this.ticket.masterLoginId;
+      const { masterLoginId } = this.ticket;
       return {
         ...row,
         roleId: row.roleSysId,
         customerId: custId,
-        masterLoginId: userId
+        masterLoginId
       }
     default:
       return row;
@@ -226,26 +248,27 @@ export class AdminMainViewComponent {
   }
 
   getNewRow() {
+    const custId = parseInt(this.ticket.custID, 10);
+    const {custCode, masterLoginId} = this.ticket
     switch(this.section) {
     case 'user':
       return {
-        customerId: this.ticket.custID
+        customerId: custId
       };
     case 'role':
-      const custId = parseInt(this.ticket.custID, 10);
-      const custCode = this.ticket.custCode;
-      const userId = this.ticket.masterLoginId;
       return {
         custSysId: custId,
         customerCode: custCode,
-        masterLoginId: userId,
+        masterLoginId,
         myAnalysis: true
       }
     case 'category':
       return {
-        customerId: this.ticket.custID,
-        masterLoginId: this.ticket.masterLoginId
+        customerId: custId,
+        masterLoginId
       };
+    case 'privilege':
+      return {};
     }
   }
 
@@ -287,6 +310,8 @@ export class AdminMainViewComponent {
       return RoleEditDialogComponent;
     case 'category':
       return CategoryEditDialogComponent;
+    case 'privilege':
+      return PrivilegeEditDialogComponent;
     }
   }
 

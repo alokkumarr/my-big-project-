@@ -1,0 +1,65 @@
+<header class="base-dialog__header">
+  <strong [ngSwitch]="data.mode">
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Add New Privilege
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Edit Privilege
+    </ng-container>
+  </strong>
+</header>
+<div class="base-dialog__content">
+  <form [formGroup]="formGroup" fxLayout="column" fxLayoutAlign="center start">
+
+    <mat-select class="form-field" required placeholder="Product" formControlName="productId">
+      <mat-option *ngFor="let product of products$ | async" [value]="product.productId">
+        {{product.productName}}
+      </mat-option>
+    </mat-select>
+
+    <mat-select required placeholder="Role" formControlName="roleId">
+      <mat-option *ngFor="let role of roles$ | async" [value]="role.roleId">
+        {{role.roleName}}
+      </mat-option>
+    </mat-select>
+
+    <mat-select class="form-field" required placeholder="Module" formControlName="moduleId">
+      <mat-option *ngFor="let module of modules$ | async" [value]="module.moduleId">
+        {{module.moduleName}}
+      </mat-option>
+    </mat-select>
+
+    <mat-select class="form-field" required placeholder="Category" formControlName="categoryCode">
+      <mat-option *ngFor="let category of categories$ | async" [value]="category.categoryCode">
+        {{category.categoryName}}
+      </mat-option>
+    </mat-select>
+
+  </form>
+
+  <privilege-editor (privilegeChange)="onPrivilegeChange($event)"
+                    [subCategories]="subCategories$"
+                    [activePrivilegeId]="privilegeId">
+  </privilege-editor>
+
+</div>
+
+<div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
+  <button (click)="create()"
+          [disabled]="!formIsValid"
+          e2e="create-analysis-btn"
+          color="primary"
+          [ngSwitch]="data.mode"
+          mat-raised-button
+  >
+    <ng-container *ngSwitchCase="'create'" i18n>
+      Create Privilege
+    </ng-container>
+    <ng-container *ngSwitchCase="'edit'" i18n>
+      Save
+    </ng-container>
+  </button>
+  <button mat-button
+          mat-dialog-close i18n
+  >Cancel</button>
+</div>

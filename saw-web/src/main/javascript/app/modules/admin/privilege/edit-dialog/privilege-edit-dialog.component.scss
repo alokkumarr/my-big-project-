@@ -1,0 +1,19 @@
+
+@import "themes/base/colors";
+
+privilege-edit-dialog {
+  max-width: 890px;
+
+  .base-dialog__content {
+    padding: 10px 50px !important;
+    height: 230px;
+
+    .mat-form-field {
+      width: 100%;
+    }
+
+    .form-field {
+      margin-bottom: 5px;
+    }
+  }
+}

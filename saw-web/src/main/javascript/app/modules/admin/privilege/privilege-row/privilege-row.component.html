@@ -1,0 +1,27 @@
+<td align="left">
+  <div class="sub-caterory-label">{{subCategory.subCategoryName}}</div>
+</td>
+<td align="center">
+<mat-slide-toggle [checked]="privilegeCodeList[0]"
+                  (change)="onAccessClicked($event.checked)">
+</mat-slide-toggle>
+</td>
+<td align="center">
+<span *ngIf="privilegeCodeList[0]">
+    <span class="input-checkbox-container" flex>
+    <mat-checkbox type="checkbox"
+      (change)="onAllClicked($event.checked)"
+      [checked]="privilegeCodeList[8]" ></mat-checkbox>
+    <label class="label-padding" i18n>All</label>
+    </span>
+
+    <span class="input-checkbox-container" *ngFor="let privilegeName of PRIVILEGE_NAMES; let i = index">
+      <mat-checkbox type="checkbox"
+                    (change)="onPrivilegeClicked(i + 1, $event.checked)"
+                    [disabled]="privilegeCodeList[8]"
+                    [checked]="privilegeCodeList[i + 1]">
+      </mat-checkbox>
+      <label class="label-padding" i18n>{{privilegeName}}</label>
+    </span>
+</span>
+</td>

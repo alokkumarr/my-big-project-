@@ -48,10 +48,6 @@ export function routesConfig($stateProvider) {
         resolveFn: () => 'category'
       }]
     }, {
-    //   name: 'admin.categories',
-    //   url: '/categories',
-    //   component: 'categoriesView'
-    // }, {
       name: 'admin.privilege',
       url: '/privilege?role',
       component: AdminMainViewComponent,
@@ -62,11 +58,11 @@ export function routesConfig($stateProvider) {
         token: 'section',
         resolveFn: () => 'privilege'
       }]
-    // }, {
+    }, {
     //   name: 'admin.privilege',
     //   url: '/privilege?role',
     //   component: 'privilegesView'
-    }, {
+    // }, {
       name: 'admin.export',
       url: '/export',
       component: 'exportComponent'

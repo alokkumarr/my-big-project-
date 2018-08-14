@@ -28,7 +28,8 @@ export class CategoryService implements IAdminDataService {
 
   getList(customerId) {
     return this._adminService.request<CategoryResponse>('categories/fetch', customerId)
-      .map(resp => resp.categories);
+      .map(resp => resp.categories)
+      .toPromise();
   }
 
   save(user) {
@@ -97,7 +98,7 @@ export class CategoryService implements IAdminDataService {
     customerId: string,
     productId: number,
     moduleId: number
-  };) {
+  }) {
     return this._adminService.request<CategoryResponse>('categories/parent/list', params)
       .map(resp => resp.category)
       .toPromise();

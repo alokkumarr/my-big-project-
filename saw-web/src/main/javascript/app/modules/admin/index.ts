@@ -19,6 +19,11 @@ import {
 import {
   RoleEditDialogComponent
 } from './role';
+import {
+  PrivilegeEditDialogComponent,
+  PrivilegeEditorComponent,
+  PrivilegeRowComponent
+} from './privilege';
 import {JwtService} from '../../../login/services/jwt.service';
 import {dxDataGridService} from '../../common/services/dxDataGrid.service';
 import {
@@ -116,6 +121,9 @@ const COMPONENTS = [
   AdminListViewComponent,
   UserEditDialogComponent,
   RoleEditDialogComponent,
+  PrivilegeEditDialogComponent,
+  PrivilegeEditorComponent,
+  PrivilegeRowComponent,
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
 ];
