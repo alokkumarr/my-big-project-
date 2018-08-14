@@ -29,7 +29,9 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
   modules$;
   categories$;
   subCategories = [];
+  isSubCategoryModified = false;
   subCategoryFlag = false;
+  isNewSubCategorySelecting = false;
   statuses = [{
     id: 1,
     value: 'Active',
@@ -229,6 +231,7 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
 
     selectedControl.valueChanges.subscribe(value => {
       const { subCategoryName, subCategoryDesc, activestatusInd } = value;
+      this.isNewSubCategorySelecting = true;
       categoryControl.setValue({
         subCategoryName,
         subCategoryDesc,
@@ -237,23 +240,34 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
     });
 
     categoryControl.valueChanges.subscribe(values => {
+      if (this.isNewSubCategorySelecting) {
+        this.isNewSubCategorySelecting = false;
+        return;
+      }
       const target = find(subCategories, cat => cat === selectedControl.value);
       target.subCategoryName = values.subCategoryName;
       target.subCategoryDesc = values.subCategoryDesc;
       target.activestatusInd = values.activestatusInd;
       target.modifiedFlag = true;
-      selectedControl.disable();
+      if (!this.isSubCategoryModified) {
+        this.isSubCategoryModified = true;
+        selectedControl.disable();
+      }
     });
 
     categoryControl.statusChanges.subscribe(validity => {
       if (selectedControl.enabled) {
         if (validity === 'INVALID') {
-          selectedControl.disable();
+          if (!this.isSubCategoryModified) {
+            selectedControl.disable();
+          }
           this.subCaegoryFormIsValid = false;
         }
       } else {
         if (validity === 'VALID') {
-          selectedControl.enable();
+          if (!this.isSubCategoryModified) {
+            selectedControl.enable();
+          }
           this.subCaegoryFormIsValid = true;
         }
       }
