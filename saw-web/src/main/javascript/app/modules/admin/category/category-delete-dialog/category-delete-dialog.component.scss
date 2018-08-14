@@ -1,21 +1,28 @@
 delete-edit-dialog {
   .delete-message {
     margin-top: 10px;
+    width: 395px;
   }
 
   strong {
     font-weight: 600;
   }
 
-  .categories-list {
-    p {
-      margin-bottom: 0;
-    }
+  .dialog__content {
+    min-height: 60px;
+    min-width: 400px;
 
-    ul {
-      width: 350px;
-      max-height: 300px;
-      overflow-y: auto;
+    .categories-list {
+      p {
+        margin-bottom: 0;
+      }
+
+      ul {
+        margin: 0 0 10px;
+        width: 350px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
     }
   }
 }
