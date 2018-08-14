@@ -16,4 +16,10 @@
   .mat-form-field-label.mat-empty.mat-form-field-empty {
     top: 1.34375em;
   }
+
+  &.mat-focused.mat-form-field-should-float {
+    .mat-form-field-label.mat-empty.mat-form-field-empty {
+      top: 1.84375em;
+    }
+  }
 }

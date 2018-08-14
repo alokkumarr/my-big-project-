@@ -1,5 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-form-field class="select-form-field" appearance="outline"  style="margin-right: 10px;">
+  <mat-form-field class="select-form-field" appearance="outline">
     <mat-label>Operator</mat-label>
     <mat-select e2e="filter-string-select"
                 (selectionChange)="onPresetSelected($event.value)"
@@ -11,22 +11,22 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field *ngIf="filterModel.operator === 'EQ' || filterModel.operator === 'NEQ' || filterModel.operator === 'CONTAINS' || filterModel.operator === 'SW' || filterModel.operator === 'EW'">
+  <mat-form-field *ngIf="filterModel.operator === 'EQ' || filterModel.operator === 'NEQ' || filterModel.operator === 'CONTAINS' || filterModel.operator === 'SW' || filterModel.operator === 'EW'" >
     <input matInput (input)="onValueChange($event.target.value)"
             [value]="tempValue"/>
   </mat-form-field>
+  <mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'" style="margin-left: 10px;">
+    <mat-chip-list #chipList>
+      <mat-chip *ngFor="let value of filterModel.modelValues; let i = index; trackBy: index"
+               [removable]="true" (remove)="remove(i)">
+        {{value}}
+        <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+      </mat-chip>
+      <input [matChipInputFor]="chipList"
+             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+             matChipInputAddOnBlur="true"
+             (matChipInputTokenEnd)="add($event)"
+             e2e="designer-filter-string-input"/>
+    </mat-chip-list>
+  </mat-form-field>
 </div>
-<mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'">
-  <mat-chip-list #chipList>
-    <mat-chip *ngFor="let value of filterModel.modelValues; let i = index; trackBy: index"
-             [removable]="true" (remove)="remove(i)">
-      {{value}}
-      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
-    </mat-chip>
-    <input [matChipInputFor]="chipList"
-           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-           matChipInputAddOnBlur="true"
-           (matChipInputTokenEnd)="add($event)"
-           e2e="designer-filter-string-input"/>
-  </mat-chip-list>
-</mat-form-field>
