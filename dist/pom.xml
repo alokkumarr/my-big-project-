@@ -419,12 +419,6 @@
                 <restartPolicy>
                   <name>always</name>
                 </restartPolicy>
-                <!-- Development environments are for now by default
-                     only single SAW node environments, at least until
-                     everyone has moved to cloud deployments with more
-                     memory.  So skip running the second SAW container
-                     by default. -->
-                <skip>true</skip>
                 <wait>
                   <healthy>true</healthy>
                   <time>${sip.docker.wait.time}</time>
