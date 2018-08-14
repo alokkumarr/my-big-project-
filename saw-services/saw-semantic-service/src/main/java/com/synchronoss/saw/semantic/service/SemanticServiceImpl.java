@@ -228,6 +228,8 @@ public class SemanticServiceImpl implements SemanticService {
                 .getAsJsonObject(String.valueOf(j)).toString();
             SemanticNode semanticNode = mapper.readValue(jsonString, SemanticNode.class);
             logger.trace("Id: {}", semanticNode.get_id());
+            // This is extra field copy of _id field to support both backend & frontend
+            semanticNode.setId(semanticNode.get_id());
             semanticNode.setStatusMessage("Entity has retrieved successfully");
             semanticNodes.add(semanticNode);
           }
@@ -324,11 +326,13 @@ public class SemanticServiceImpl implements SemanticService {
 
             SemanticNode semanticNodeTemp = mapper.readValue(jsonString, SemanticNode.class);
             logger.trace("Id: {}", semanticNodeTemp.get_id());
+            // This is extra field copy of _id field to support both backend & frontend
+            semanticNodeTemp.setId(semanticNodeTemp.get_id());
             semanticNodeTemp.setStatusMessage("Entity has been retrieved successfully");
-            SemanticNode semanticNode = new SemanticNode();
-            org.springframework.beans.BeanUtils.copyProperties(semanticNodeTemp, semanticNode,
-                "dataSetId", "dataSecurityKey", "esRepository", "repository", "artifacts");
-            semanticNodes.add(semanticNode);
+            SemanticNode newSemanticNode = new SemanticNode();
+            org.springframework.beans.BeanUtils.copyProperties(semanticNodeTemp, newSemanticNode,
+                "dataSetId", "dataSecurityKey","artifacts");
+            semanticNodes.add(newSemanticNode);
           }
         }
         content.setContents(semanticNodes);

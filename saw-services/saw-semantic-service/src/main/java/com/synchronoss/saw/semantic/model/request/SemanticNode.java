@@ -22,6 +22,8 @@ public class SemanticNode {
   private String type;
   @JsonProperty("_id")
   private String _id;
+  @JsonProperty("id")
+  private String id;
   @JsonProperty("createdBy")
   private String createdBy;
   @JsonProperty("updatedBy")
@@ -165,6 +167,16 @@ public class SemanticNode {
   @JsonProperty("saved")
   public void setSaved(Boolean saved) {
     this.saved = saved;
+  }
+  
+  
+  @JsonProperty("artifacts")
+  public String getId() {
+    return id;
+  }
+  @JsonProperty("artifacts")
+  public void setId(String id) {
+    this.id = id;
   }
 
   /**
