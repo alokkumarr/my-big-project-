@@ -1,3 +1,14 @@
+# Workaround: High availability requires the Galera cluster, but
+# MariaDB 5 that comes by default with CentOS 7 does not include it.
+# So add the MariaDB package repository to make MariaDB 10 available,
+# which does include the Galera cluster.  Remove the MariaDB
+# repository CentOS defaults to MariaDB 10 or higher.
+- name: Install MariaDB package repository
+  yum_repository:
+    name: mariadb
+    description: MariaDB repository
+    baseurl: http://yum.mariadb.org/10.3/centos7-amd64
+    gpgcheck: no
 - name: Install MariaDB package
   yum: name=mariadb-server state=present
 - name: Install MariaDB configuration additions
