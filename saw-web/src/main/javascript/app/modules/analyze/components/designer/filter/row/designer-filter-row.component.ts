@@ -53,6 +53,10 @@ export class DesignerFilterRowComponent {
         map(value => typeof value === 'string' ? value : value.displayName),
         map(name => name ? this.nameFilter(name) : this.artifactColumns.slice())
       );
+
+    if (this.filter.isRuntimeFilter) {
+      delete this.filter.model;
+    }
   }
 
   clearInput() {
