@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "checked",
     "columnName",
     "dateFormat",
     "type",
@@ -24,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 })
 public class NodeField {
 
-    @JsonProperty("checked")
-    private String checked;
     /**
      * 
      * (Required)
@@ -37,6 +34,7 @@ public class NodeField {
     @JsonProperty("dateFormat")
     private String dateFormat;
 
+    
     /**
      * 
      * (Required)
@@ -52,24 +50,6 @@ public class NodeField {
     private NodeField.GroupInterval groupInterval;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    /**
-     * Gets checked
-     *
-     * @return value of checked
-     */
-    @JsonProperty("checked")
-    public String getChecked() {
-        return checked;
-    }
-
-    /**
-     * Sets checked
-     */
-    @JsonProperty("checked")
-    public void setChecked(String checked) {
-        this.checked = checked;
-    }
 
     /**
      * 
