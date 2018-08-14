@@ -17,7 +17,7 @@
       </textarea>
     </mat-form-field>
 
-    <mat-form-field class="select-form-field" appearance="outline">
+    <mat-form-field class="select-form-field" appearance="outline" style="width: 100%;">
       <mat-label>Category</mat-label>
       <mat-select name="dashboardCat" formControlName="categoryId">
         <mat-optgroup *ngFor="let category of categories" [label]="category.name">
@@ -28,6 +28,8 @@
       </mat-select>
     </mat-form-field>
 
+    <mat-checkbox name="dashboardAutoRefresh" formControlName="autoRefreshEnabled" style="margin-left: 10px;">Refresh Automatically</mat-checkbox>
+
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label>Refresh Interval</mat-label>
       <mat-select formControlName="refreshIntervalSeconds">
@@ -37,7 +39,6 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-checkbox name="dashboardAutoRefresh" formControlName="autoRefreshEnabled" style="margin-left: 10px;">Refresh Automatically</mat-checkbox>
   </form>
 </div>
 <div mat-dialog-actions class="dialog__actions">
