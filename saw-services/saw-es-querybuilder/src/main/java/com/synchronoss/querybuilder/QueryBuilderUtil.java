@@ -27,6 +27,8 @@ import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import static com.synchronoss.AggregationConstants.*;
+import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.AVG;
+import static com.synchronoss.querybuilder.model.kpi.DataField.Aggregate.SUM;
 
 
 public class QueryBuilderUtil {
@@ -208,41 +210,26 @@ public class QueryBuilderUtil {
 	 * This aggregation framework
 	 * @param nodeField
 	 * @param nodeName
-	 * @param b
-     * @return
+	 * @return
 	 */
-	public static AggregationBuilder aggregationBuilderChart(NodeField nodeField, String nodeName,
-                                                             DataField.LimitType type, Integer size, boolean apply)
+	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
 	{
 		AggregationBuilder aggregationBuilder = null;
-		boolean bucketOrder = false;
-
-		// check if we need to apply top/Bottom size. If N/A then
-        // apply standard builder limit.
-		if(!apply)
-		    size = BuilderUtil.SIZE;
-
-		if (type==DataField.LimitType.BOTTOM)
-		    bucketOrder=true;
-
+		
 		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
 		  nodeField = setGroupIntervalChart(nodeField);
   		  if (nodeField.getGroupInterval()!=null){
               aggregationBuilder = AggregationBuilders.
                       dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
-                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(bucketOrder));
+                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(BucketOrder.key(false));
               }
             else {
               aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                  .format(nodeField.getDateFormat()).order(BucketOrder.key(bucketOrder)).size(size);
+                  .format(nodeField.getDateFormat()).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
             }
 		}
 		else{
-		    if (type==null)
-			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).size(size);
-		    else
-		        aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).
-                    order(BucketOrder.key(bucketOrder)).size(size);
+			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).size(BuilderUtil.SIZE);
 		}
 		return aggregationBuilder;
 	}	
