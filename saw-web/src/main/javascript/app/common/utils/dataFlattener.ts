@@ -10,11 +10,6 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
-import * as forEach from 'lodash/forEach';
-
-import {
-  DATE_TYPES
-} from '../../../modules/analyze/consts';
 
 
 export function flattenPivotData(data, sqlBuilder) {
@@ -105,27 +100,12 @@ function getNodeFieldMapChart(nodeFields) {
  *   z: ..
  * }, ..]
  */
-
-function parseLimitBeforeFlatten(data, level, sqlBuilder) {
-  forEach(data, cols=>{
-    level = level + 1;
-    if (!isUndefined(cols.buckets)) {
-      parseLimitBeforeFlatten(cols.buckets, level, sqlBuilder);
-    } else if (!isUndefined(cols['node_field_' + level])) {
-      console.log("inside else");
-      cols['node_field_' + level].buckets = (sqlBuilder.dataFields.length < 2 && !isUndefined(sqlBuilder.dataFields[0].limitType)) ? parseLimit(cols['node_field_' + level].buckets, sqlBuilder, false) : cols['node_field_' + level].buckets;
-    }
-  });
-  return data;
-}
-
 export function flattenChartData(data, sqlBuilder) {
   const nodeFieldMap = getNodeFieldMapChart(sqlBuilder.nodeFields);
   const sorts = sqlBuilder.sorts;
 
-  data = parseLimitBeforeFlatten(data, 0, sqlBuilder);
   return fpPipe(
-    nestedData => parseNodeChart(data, {}, nodeFieldMap, 1, sqlBuilder),
+    nestedData => parseNodeChart(data, {}, nodeFieldMap, 1),
     flattenedData => {
       /* Order chart data manually. Backend doesn't sort chart data. */
       if (!isEmpty(sorts)) {
@@ -140,47 +120,7 @@ export function flattenChartData(data, sqlBuilder) {
   )(data);
 }
 
-function parseLimit(data, sqlBuilder, flattenData) {
-  let pasreLimitData = false;
-  let groupBy = false;
-  let dateExisitsInDimension = false;
-  let dateExistsInGroupBy = false;
-  forEach(sqlBuilder.nodeFields, field => {
-    if (field.checked === 'g' && field.type !== 'date') {
-      groupBy = true;
-      pasreLimitData = false;
-    } else if (field.checked === 'g' && field.type === 'date') {
-      dateExistsInGroupBy = true;
-    }
-  });
-
-  forEach(sqlBuilder.nodeFields, field => {
-    if (field.checked === 'x' && field.type === 'date') {
-      dateExisitsInDimension = true;
-      if (!groupBy) {
-        pasreLimitData = true;
-      }
-    }
-  });
-  
-  if (dateExistsInGroupBy && !flattenData) {
-    console.log("Parse Unflatten data");
-    data = parseUnflattenedData(data, sqlBuilder);
-  }
-
-  if (pasreLimitData && !dateExistsInGroupBy && flattenData) {
-    console.log("Parse flatten data");
-    data = sqlBuilder.dataFields[0].limitType === 'top' ? data.slice(0, sqlBuilder.dataFields[0].limitValue) : data.slice(Math.max(data.length - sqlBuilder.dataFields[0].limitValue, 0));
-  }
-  return data;
-}
-
-function parseUnflattenedData(data, sqlBuilder) {
-  data = sqlBuilder.dataFields[0].limitType === 'top' ? data.slice(0, sqlBuilder.dataFields[0].limitValue) : data.slice(Math.max(data.length - sqlBuilder.dataFields[0].limitValue, 0));
-  return data;
-}
-
-function parseNodeChart(node, dataObj, nodeFieldMap, level, sqlBuilder) {
+function parseNodeChart(node, dataObj, nodeFieldMap, level) {
   if (!isUndefined(node.key)) {
     dataObj[nodeFieldMap[level - 2]] = node.key;
     if (!node.key) {
@@ -190,10 +130,9 @@ function parseNodeChart(node, dataObj, nodeFieldMap, level, sqlBuilder) {
   //dataObj[nodeFieldMap[level - 2]] = !isUndefined(node.key) ? node.key
   const childNode = node[`node_field_${level}`];
   if (childNode) {
-    let data = flatMap(childNode.buckets, bucket =>
-      parseNodeChart(bucket, dataObj, nodeFieldMap, level + 1, sqlBuilder)
+    const data = flatMap(childNode.buckets, bucket =>
+      parseNodeChart(bucket, dataObj, nodeFieldMap, level + 1)
     );
-    let data = (sqlBuilder.dataFields.length < 2 && !isUndefined(sqlBuilder.dataFields[0].limitType)) ? parseLimit(data, sqlBuilder, true) : data;
     return data;
   }
   const datum = parseLeafChart(node, dataObj);
