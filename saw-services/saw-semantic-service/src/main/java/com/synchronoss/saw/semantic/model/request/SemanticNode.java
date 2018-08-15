@@ -170,11 +170,11 @@ public class SemanticNode {
   }
   
   
-  @JsonProperty("artifacts")
+  @JsonProperty("id")
   public String getId() {
     return id;
   }
-  @JsonProperty("artifacts")
+  @JsonProperty("id")
   public void setId(String id) {
     this.id = id;
   }
