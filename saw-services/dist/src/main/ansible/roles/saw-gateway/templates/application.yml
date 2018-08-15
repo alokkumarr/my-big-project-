@@ -5,8 +5,10 @@ spring:
     name: saw-gateway-service
   http:
     multipart:
+      enabled : true
       max-request-size: 25MB
       max-file-size: 25MB
+      file-size-threshold: 2KB
   main:
     banner-mode: 'off'
 logging:

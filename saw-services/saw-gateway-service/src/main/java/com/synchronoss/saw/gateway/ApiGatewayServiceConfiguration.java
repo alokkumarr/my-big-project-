@@ -1,6 +1,6 @@
 package com.synchronoss.saw.gateway;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -14,15 +14,14 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.util.Collections;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
 @EnableConfigurationProperties({ApiGatewayProperties.class})
-public class ApiGatewayServiceConfiguration extends WebMvcConfigurerAdapter {
+public class ApiGatewayServiceConfiguration implements WebMvcConfigurer {
 
   @Bean
   public RestTemplate restTemplate(HttpMessageConverters converters) {

@@ -112,6 +112,7 @@ public class GatewayController {
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
     String header = null;
+    logger.info("request info : "+ request);
     logger.trace("Accept {}",request.getHeader("Accept"));
     logger.trace("Authorization {}",request.getHeader("Authorization"));
     logger.trace("Content-type {}",request.getHeader("Content-type"));    
@@ -145,6 +146,7 @@ public class GatewayController {
               makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
           }
           else {
+            logger.info("Inside the file upload section....");
             if(uploadfiles!=null && uploadfiles.length==0){throw new FileUploadException("There are no files to upload");}
             String uploadURI = request.getRequestURI();
             if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
@@ -167,6 +169,8 @@ public class GatewayController {
                 files.add(requestfile);
                 map.put(fileName, requestfile.getPath());
               }
+            logger.info("Map contains :" + map);
+            logger.info("uploadURI :" + uploadURI);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", request.getHeader("Authorization"));

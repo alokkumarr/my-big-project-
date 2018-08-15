@@ -5,10 +5,12 @@ spring:
     banner-mode: 'off'
   application:
     name: saw-workbench-service
-  http:
+  servlet:
     multipart:
+      enabled : true
       max-request-size: 25MB
       max-file-size: 25MB
+      file-size-threshold: 2KB
 logging:
   level:
     org.springframework: WARN
