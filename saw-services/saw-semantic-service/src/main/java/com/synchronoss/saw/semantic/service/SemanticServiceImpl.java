@@ -68,7 +68,7 @@ public class SemanticServiceImpl implements SemanticService {
           mapper.writeValueAsString(structure));
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      responseNode.set_id(node.get_id());
+      responseNode.setId(node.get_id());
       responseNode.setCreatedAt(node.getCreatedAt());
       responseNode.setCreatedBy(node.getCreatedBy());
       responseNode.setSaved(true);
@@ -99,6 +99,7 @@ public class SemanticServiceImpl implements SemanticService {
       ObjectMapper mapper = new ObjectMapper();
       nodeRetrieved = mapper.readValue(jsonStringFromStore, SemanticNode.class);
       logger.trace("Id: {}", nodeRetrieved.get_id());
+      nodeRetrieved.setId(nodeRetrieved.get_id());
       nodeRetrieved.setStatusMessage("Entity has retrieved successfully");
     } catch (Exception ex) {
       throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
@@ -121,7 +122,7 @@ public class SemanticServiceImpl implements SemanticService {
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      responseNode.set_id(node.get_id());
+      responseNode.setId(node.get_id());
       responseNode.setUpdatedBy(node.getUpdatedBy());
       responseNode.setUpdatedAt(format.format(new Date()));
       responseNode.setSaved(true);
@@ -138,18 +139,18 @@ public class SemanticServiceImpl implements SemanticService {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("Deleting semantic from the store with an Id : {}", node.get_id());
     SemanticNode responseObject = new SemanticNode();
+    SemanticNode newSemanticNode= new SemanticNode();
     try {
       List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
           node.get_id(), Action.delete, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}", structure);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
-      responseObject.set_id(node.get_id());
-      responseObject.setStatusMessage("Entity has been deleted successfully.");
+      responseObject.setId(node.get_id());
     } catch (Exception ex) {
       throw new UpdateEntitySAWException("Problem on the storage while updating an entity", ex);
     }
-    return responseObject;
+    return newSemanticNode;
   }
 
   @Override
@@ -231,7 +232,10 @@ public class SemanticServiceImpl implements SemanticService {
             // This is extra field copy of _id field to support both backend & frontend
             semanticNode.setId(semanticNode.get_id());
             semanticNode.setStatusMessage("Entity has retrieved successfully");
-            semanticNodes.add(semanticNode);
+            SemanticNode newSemanticNode = new SemanticNode();
+            org.springframework.beans.BeanUtils.copyProperties(semanticNode, newSemanticNode,
+               "_id");
+            semanticNodes.add(newSemanticNode);
           }
         }
         responseNode.setSemanticNodes(semanticNodes);
@@ -331,7 +335,7 @@ public class SemanticServiceImpl implements SemanticService {
             semanticNodeTemp.setStatusMessage("Entity has been retrieved successfully");
             SemanticNode newSemanticNode = new SemanticNode();
             org.springframework.beans.BeanUtils.copyProperties(semanticNodeTemp, newSemanticNode,
-                "dataSetId", "dataSecurityKey","artifacts");
+                "dataSetId", "dataSecurityKey","artifacts","_id");
             semanticNodes.add(newSemanticNode);
           }
         }
