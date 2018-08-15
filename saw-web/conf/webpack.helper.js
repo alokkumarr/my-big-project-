@@ -8,29 +8,6 @@ const path = require('path');
 function distRun() {
   return process.env.PWD.endsWith('/dist');
 }
-/**
- * This function reads the property of the suite and runs those set of tests
- */
-// function getSuiteNameOld() {
-//   if (browser.params.saw.e2e.suite !== null && browser.params.saw.e2e.suite.trim().length > 0) {
-//     //agressive check for unwanted values
-//     if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'sanity') {
-//       return 'sanity';
-//     } else if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'regression') {
-//       return 'regression';
-//     } else {
-//       // if some junk values are provided then run smoke suite
-//       return 'smoke';
-//     }
-//   } else {
-//     /** 
-//      by default value is set to smoke to eventually above condition will never false.
-//      Above condition will be false only in case of running e2e tests from saw-web folder
-//      Hence it means that user is either developing something or want to run all for some local test 
-//     */
-//     return 'development';
-//   }
-// }
 
 module.exports = {
   root: (...args) => {
@@ -46,16 +23,17 @@ module.exports = {
   },
   distRun: distRun,
   getSuiteName: () => {
-    if (browser.params.saw.e2e.suite !== null && browser.params.saw.e2e.suite.trim().length > 0) {
+    let suite = process.argv[process.argv.length - 1];
+    if ((suite !== null || undefined ) && suite.trim().length > 0) {
       //agressive check for unwanted values
-      if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'sanity') {
+      if (suite.trim() === 'sanity') {
         return 'sanity';
-      } else if (browser.params.saw.e2e.suite.trim().toLocaleLowerCase() === 'regression') {
-        return 'regression';
+      } else if (suite.trim() === 'regression') {
+        return 'sanity';
       } else {
-        // if some junk values are provided then run smoke suite
-        return 'smoke';
+        
       }
+      return suite.trim().toLocaleLowerCase();
     } else {
       /** 
        by default value is set to smoke to eventually above condition will never false.
@@ -64,6 +42,7 @@ module.exports = {
       */
       return 'development';
     }
+
   },
   sawWebUrl: () => {
     if (distRun()) {
