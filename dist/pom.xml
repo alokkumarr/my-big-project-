@@ -541,7 +541,7 @@
           </execution>
            <execution>
             <id>npm-run-generate-report</id>
-            <phase>post-integration-test</phase>
+            <phase>pre-integration-test</phase>
             <goals>
               <goal>npm</goal>
             </goals>
