@@ -59,10 +59,6 @@ export function routesConfig($stateProvider) {
         resolveFn: () => 'privilege'
       }]
     }, {
-    //   name: 'admin.privilege',
-    //   url: '/privilege?role',
-    //   component: 'privilegesView'
-    // }, {
       name: 'admin.export',
       url: '/export',
       component: 'exportComponent'
