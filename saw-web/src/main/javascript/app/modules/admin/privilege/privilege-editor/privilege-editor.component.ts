@@ -8,7 +8,7 @@ const template = require('./privilege-editor.component.html');
 
 export class PrivilegeEditorComponent {
   @Output() privilegeChange: EventEmitter<{index: number, privilege: any}> = new EventEmitter();
-  @Input('subCategories') subCategories$;
+  @Input() subCategories;
   @Input() activePrivilegeId;
   constructor() { }
 

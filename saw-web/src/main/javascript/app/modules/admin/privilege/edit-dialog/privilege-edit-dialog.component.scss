@@ -2,11 +2,15 @@
 @import "themes/base/colors";
 
 privilege-edit-dialog {
-  max-width: 890px;
+  max-width: 500px;
+
+  &.wide {
+    max-width: 910px;
+  }
 
   .base-dialog__content {
     padding: 10px 50px !important;
-    height: 230px;
+    max-height: 450px;
 
     .mat-form-field {
       width: 100%;

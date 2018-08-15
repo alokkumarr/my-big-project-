@@ -37,8 +37,9 @@
 
   </form>
 
-  <privilege-editor (privilegeChange)="onPrivilegeChange($event)"
-                    [subCategories]="subCategories$"
+  <privilege-editor *ngIf="subCategories && subCategories.length > 0"
+                    (privilegeChange)="onPrivilegeChange($event)"
+                    [subCategories]="subCategories"
                     [activePrivilegeId]="privilegeId">
   </privilege-editor>
 

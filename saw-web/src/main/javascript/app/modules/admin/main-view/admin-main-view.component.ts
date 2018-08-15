@@ -56,6 +56,15 @@ const CATEGORY_SEARCH_CONFIG = [
   {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
 ];
 
+const PRIVILEGE_SEARCH_CONFIG = [
+  {keyword: 'PRODUCT', fieldName: 'productName'},
+  {keyword: 'MODULE', fieldName: 'moduleName'},
+  {keyword: 'CATEGORY', fieldName: 'categoryName'},
+  {keyword: 'ROLE', fieldName: 'roleName'},
+  {keyword: 'PRIVILEGE DESC', fieldName: 'privilegeDesc'},
+  {keyword: 'SUB CATEGORY', fieldName: 'subCategoryName'}
+];
+
 const deleteConfirmation = (section, identifier, identifierValue) => ({
   title: `Are you sure you want to delete this ${section}?`,
   content: `${identifier}: ${identifierValue}`,
@@ -136,6 +145,8 @@ export class AdminMainViewComponent {
       return ROLE_SEARCH_CONFIG;
     case 'category':
       return CATEGORY_SEARCH_CONFIG;
+    case 'privilege':
+      return PRIVILEGE_SEARCH_CONFIG;
     }
   }
 
@@ -294,7 +305,10 @@ export class AdminMainViewComponent {
         masterLoginId
       };
     case 'privilege':
-      return {};
+      return {
+        customerId: custId,
+        masterLoginId
+      };
     }
   }
 
