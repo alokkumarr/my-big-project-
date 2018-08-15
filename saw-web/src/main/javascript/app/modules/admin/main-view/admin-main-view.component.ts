@@ -109,13 +109,13 @@ export class AdminMainViewComponent {
   ngOnInit() {
     const token = this._jwtService.getTokenObj();
     this.ticket = token.ticket;
-    const customerId = this.ticket.custID;
+    const customerId = parseInt(this.ticket.custID, 10);
     this.data$ = this.getListData(customerId);
     this.data$.then(data => {
       if (this.section === 'privilege') {
         const { role } = this._transition.params();
         if (role) {
-          this.filterObj.searchTerm = role;
+          this.filterObj.searchTerm = `role:"${role}"`;
         }
       }
       this.setData(data);
@@ -185,8 +185,8 @@ export class AdminMainViewComponent {
   }
 
   getFormDeps() {
-    const customerId = this.ticket.custID;
-    const {masterLoginId } = this.ticket;
+    const customerId = parseInt(this.ticket.custID, 10);
+    const { masterLoginId } = this.ticket;
     switch (this.section) {
     case 'user':
       return {roles$: this._userService.getUserRoles(customerId)};
@@ -253,12 +253,12 @@ export class AdminMainViewComponent {
   modifyRowForDeletion(row) {
     switch(this.section) {
     case 'role':
-      const custId = parseInt(this.ticket.custID, 10);
+      const customerId = parseInt(this.ticket.custID, 10);
       const { masterLoginId } = this.ticket;
       return {
         ...row,
         roleId: row.roleSysId,
-        customerId: custId,
+        customerId,
         masterLoginId
       }
     default:
@@ -328,7 +328,7 @@ export class AdminMainViewComponent {
   }
 
   openCategoryDeletionDialog(category) {
-    const customerId = this.ticket.custID;
+    const customerId = parseInt(this.ticket.custID, 10);
     const masterLoginId = this.ticket.masterLoginId;
     const data = {
       category,

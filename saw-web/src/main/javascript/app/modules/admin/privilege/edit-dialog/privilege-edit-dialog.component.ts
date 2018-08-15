@@ -2,7 +2,6 @@ import { Component, Inject, HostBinding } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
-import * as isEmpty from 'lodash/isEmpty';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
@@ -15,7 +14,6 @@ require('./privilege-edit-dialog.component.scss');
 })
 export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
-  @HostBinding('class.wide') isInWideMode: boolean = false;
   formGroup: FormGroup;
   subCategoryFormGroup: FormGroup;
   formIsValid = false;
@@ -40,7 +38,6 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     const { customerId } = this.data.formDeps;
 
     if (this.data.mode === 'edit') {
-      this.isInWideMode = true;
       this.formIsValid = true;
       const { productId, moduleId, roleId, categoryCode } = this.data.model;
       this.modules$ = this.loadModules(productId);
@@ -191,9 +188,6 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     };
     return this._privilegeService.getSubCategories(categoryParams).then(subCategories => {
       this.subCategories = subCategories;
-      if (!this.isInWideMode && !isEmpty(subCategories)) {
-        this.isInWideMode = true;
-      }
     });
   }
 }
