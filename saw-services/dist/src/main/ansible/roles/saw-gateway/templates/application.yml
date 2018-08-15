@@ -3,7 +3,7 @@ info:
 spring:
   application:
     name: saw-gateway-service
-  http:
+  servlet:
     multipart:
       enabled : true
       max-request-size: 25MB
