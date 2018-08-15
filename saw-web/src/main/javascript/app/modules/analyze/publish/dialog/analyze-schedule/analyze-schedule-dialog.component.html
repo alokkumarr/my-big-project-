@@ -36,16 +36,18 @@
 
           <label i18n>Publish to FTP</label>
           <div class="publish-form" fxLayout="row" fxLayoutAlign="start center">
-            <mat-select [value]="ftp"
-                        (selectionChange)="onLocationSelected($event.value)"
-                        placeholder="Select FTP Location"
-                        md-container-class="ftp-select"
-                        class="publish-select ftp-select-box"
-                        multiple
-            >
-              <mat-option *ngFor="let location of locations" [value]="location">{{ location }}</mat-option>
-            </mat-select>
-            <span class="clear" (click)="ftp = [];">Clear</span>
+            <div>
+              <mat-form-field class="select-form-field" appearance="outline">
+                <mat-label>FTP Location</mat-label>
+                <mat-select [value]="ftp"
+                            (selectionChange)="onLocationSelected($event.value)"
+                            multiple
+                >
+                  <mat-option *ngFor="let location of locations" [value]="location">{{ location }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="clear" (click)="ftp = [];">Clear</div>
           </div>
         </div>
         <span *ngIf="emailValidateFlag" class="errorTextMsg" i18n>Invalid Email-Id Found: Please provide valid Email-Id's in list</span>
