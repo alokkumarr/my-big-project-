@@ -19,16 +19,15 @@ load_semantic() {
 }
 
 curl_json() {
-    curl -sS -X $1 -H "Content-Type: application/json" $2 -d @$3
+    curl -sS -X $1 -H "Content-Type: application/json" $2 --data-binary @$3
 }
 
 load_data() {
     local index_url="http://sip-elastic:8200/sample"
     echo "Loading sample Elasticsearch data"
     curl_json PUT "$index_url" $dir/index.json
-    for data in $dir/data-*.json; do
-        curl_json POST "$index_url/sample" $data > /dev/null
-    done
+    data=$dir/es-data.ndjson
+        curl_json POST "$index_url/sample/_bulk" $data > /dev/null
 }
 
 wait_maprfs

@@ -46,7 +46,7 @@
                   {{$chip}}
                 </span>
               </md-chip-template>
-            </md-chips> 
+            </md-chips>
           </md-input-container>
         </div>
         <div ng-if="$ctrl.model.type !== 'chart'" class="form-container" layout="column">
@@ -56,7 +56,7 @@
           </md-checkbox> -->
           <label translate="SET_DISPATCH_LABEL"></label>
           <div class="publish-form">
-            <md-select multiple ng-model="$ctrl.ftp" placeholder="Select FTP Location" class="ftp-select-box" md-container-class="ftp-select">
+            <md-select multiple ng-model="$ctrl.ftp" placeholder="Select FTP Location">
               <md-option ng-value="location" ng-repeat="location in $ctrl.locations">{{ location }}</md-option>
             </md-select>
             <span class="clear" ng-click="$ctrl.ftp = [];">Clear</span>

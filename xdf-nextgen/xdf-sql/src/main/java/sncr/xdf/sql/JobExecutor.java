@@ -145,6 +145,7 @@ public class JobExecutor {
             for( SQLDescriptor sqlDescriptor: report) {
                 //Remove temporary tables/objects
                 if (sqlDescriptor.isTemporaryTable) {
+                    //Don't add descriptor for temp table in the result
                     logger.debug("Do not process temporary table: " + sqlDescriptor.targetTableName);
                     if (HFileOperations.exists(sqlDescriptor.targetTransactionalLocation))
                         HFileOperations.deleteEnt(sqlDescriptor.targetTransactionalLocation);
