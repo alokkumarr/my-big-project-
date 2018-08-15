@@ -30,6 +30,7 @@ workbench:
         project-root: "/Users/spau0004"
         preview-limit: 10000
         livy-uri: http://localhost:8998
+        storage-url: http://localhost:9800
 
 metastore:
     base:  hdfs:///main/        

@@ -259,14 +259,26 @@ public class DLDataSetService {
           ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
       }
       ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
-      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), size);
+      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size,2));
       ds.getAsJsonObject().add("transformations", trans);
       ds.getAsJsonObject().add("asOfNow", status);
 
       dsStore.update(id, ds);
       return ds;
   }
-
+    
+    
+    private String format(double bytes, int digits) {
+      String[] dictionary = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+      int index = 0;
+      for (index = 0; index < dictionary.length; index++) {
+          if (bytes < 1024) {
+              break;
+          }
+          bytes = bytes / 1024;
+      }
+      return String.format("%." + digits + "f", bytes) + " " + dictionary[index];
+  }
 
     //TODO: talk about ID generation
     /**

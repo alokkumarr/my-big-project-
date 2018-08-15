@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 public class StoreField {
 
-  private String columnName;
+  private String name;
   @JsonProperty("type")
   private String type;
 
@@ -29,12 +29,12 @@ public class StoreField {
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 
-  public String getColumnName() {
-    return columnName;
+  public String getName() {
+    return name;
   }
 
-  public void setColumnName(String columnName) {
-    this.columnName = columnName;
+  public void setName(String name) {
+    this.name = name;
   }
 
   @JsonProperty("type")
