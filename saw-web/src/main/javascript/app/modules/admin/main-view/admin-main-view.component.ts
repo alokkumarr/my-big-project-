@@ -122,8 +122,6 @@ export class AdminMainViewComponent {
     });
 
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
-
-
   }
 
   applySearchFilter(value) {
@@ -188,6 +186,7 @@ export class AdminMainViewComponent {
 
   getFormDeps() {
     const customerId = this.ticket.custID;
+    const {masterLoginId } = this.ticket;
     switch (this.section) {
     case 'user':
       return {roles$: this._userService.getUserRoles(customerId)};
@@ -196,7 +195,7 @@ export class AdminMainViewComponent {
     case 'category':
       return {customerId};
     case 'privilege':
-      return {customerId};
+      return { customerId, masterLoginId };
     default:
       break;
     }
@@ -323,6 +322,7 @@ export class AdminMainViewComponent {
     return this._dialog.open(component, {
       width: 'auto',
       height: 'auto',
+      autoFocus: false,
       data
     } as MatDialogConfig);
   }

@@ -113,17 +113,17 @@ export class PrivilegeService implements IAdminDataService {
   }
 
   getSubCategories(params: {
-    customerId: number,
+    customerId: string,
     roleId: number,
     productId: number,
     moduleId: number,
     categoryCode: string
-  }, showToast: boolean) {
+  }) {
     return this._adminService.request<CategoryResponse>('subCategoriesWithPrivilege/list', params)
       .map(resp => resp.subCategories)
       .pipe(
         tap(subCategories => {
-          if (showToast && isEmpty(subCategories)) {
+          if (isEmpty(subCategories)) {
             this._toastMessage.error('There are no Sub-Categories with Privilege');
           }
         }

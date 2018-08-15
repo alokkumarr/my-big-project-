@@ -2,6 +2,7 @@ import { Component, Inject, HostBinding } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
@@ -22,9 +23,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   products$;
   roles$;
   modules$;
-  categories$;
   categories;
-  subCategories$;
   subCategories;
 
   constructor(
@@ -33,7 +32,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     private _dialogRef: MatDialogRef<PrivilegeEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       model: any,
-      formDeps: {customerId: string},
+      formDeps: {customerId: string, masterLoginId: string},
       mode: 'edit' | 'create'
     }
   ) {
@@ -45,8 +44,8 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       this.formIsValid = true;
       const { productId, moduleId, roleId, categoryCode } = this.data.model;
       this.modules$ = this.loadModules(productId);
-      this.categories$ = this.loadCategories(moduleId, customerId);
-      this.subCategories$ = this.loadSubCategories(moduleId, roleId, productId, categoryCode);
+      this.loadCategories(moduleId);
+      this.loadSubCategories(moduleId, roleId, productId, categoryCode);
     }
 
     this.products$ = this._privilegeService.getProducts(customerId);
@@ -65,6 +64,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
   create() {
     const formValues = this.formGroup.getRawValue();
+    const { customerId, masterLoginId } = this.data.formDeps;
 
     const targetCategory = find(this.categories, ({categoryCode}) => formValues.categoryCode === categoryCode);
     const { categoryType, categoryId } = targetCategory
@@ -73,9 +73,10 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       ...formValues,
       categoryId,
       categoryType,
-      subCategoriesPrivilege: this.categories
+      subCategoriesPrivilege: this.subCategories,
+      customerId,
+      masterLoginId
     };
-    console.log('savedModel: ', model);
     this.save(model);
   }
 
@@ -139,23 +140,17 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     roleIdControl.valueChanges.subscribe(roleId => {
       const { moduleId, productId, categoryCode } = this.formGroup.value;
-      this.modules$ = this.loadSubCategories(moduleId, roleId, productId, categoryCode);
-      this.modules$.then(subCategories => {
-        categoryCodeControl.enable();
-        return subCategories;
-      });
+      this.loadSubCategories(moduleId, roleId, productId, categoryCode)
+      categoryCodeControl.enable();
     });
 
     moduleIdControl.valueChanges.subscribe(moduleId => {
-      const { customerId } = this.data.formDeps;
-      this.categories$ = this.loadCategories(moduleId, customerId).then(categories => {
-        return categories;
-      });
+      this.loadCategories(moduleId);
     });
 
-    categoryCodeControl.valueChanges.subscribe(roleId => {
-      const { moduleId, productId, categoryCode } = this.formGroup.value;
-      this.modules$ = this.loadSubCategories(moduleId, roleId, productId, categoryCode);
+    categoryCodeControl.valueChanges.subscribe(categoryCode => {
+      const { moduleId, productId, roleId } = this.formGroup.value;
+      this.loadSubCategories(moduleId, roleId, productId, categoryCode);
     });
   }
 
@@ -169,7 +164,8 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     return this._privilegeService.getModules(moduleParams);
   }
 
-  loadCategories(moduleId, customerId) {
+  loadCategories(moduleId) {
+    const { customerId } = this.data.formDeps;
     const categoryParams = {
       customerId,
       productId: 0,
@@ -181,6 +177,10 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   }
 
   loadSubCategories(moduleId, roleId, productId, categoryCode) {
+
+    if (!(productId > 0 && roleId > 0 && moduleId > 0 && categoryCode !== '')) {
+      return;
+    }
     const { customerId } = this.data.formDeps;
     const categoryParams = {
       customerId,
@@ -191,6 +191,9 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     };
     return this._privilegeService.getSubCategories(categoryParams).then(subCategories => {
       this.subCategories = subCategories;
+      if (!this.isInWideMode && !isEmpty(subCategories)) {
+        this.isInWideMode = true;
+      }
     });
   }
 }

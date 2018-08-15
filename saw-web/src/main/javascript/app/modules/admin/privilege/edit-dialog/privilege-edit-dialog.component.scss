@@ -5,15 +5,20 @@ privilege-edit-dialog {
   max-width: 500px;
 
   &.wide {
-    max-width: 910px;
+    max-width: 860px;
+    width: 860px;
+
+    .base-dialog__content .mat-form-field {
+      width: 100%;
+    }
   }
 
   .base-dialog__content {
-    padding: 10px 50px !important;
+    padding: 10px !important;
     max-height: 450px;
 
     .mat-form-field {
-      width: 100%;
+      width: 385px;
     }
 
     .form-field {
