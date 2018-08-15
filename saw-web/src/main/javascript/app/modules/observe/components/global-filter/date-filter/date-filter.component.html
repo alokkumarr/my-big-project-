@@ -1,6 +1,6 @@
-<mat-form-field e2e="filter-date-preset" class="select-form-field">
-  <mat-select placeholder="Select a preset"
-    [value]="model.preset"
+<mat-form-field e2e="filter-date-preset" class="select-form-field" appearance="outline">
+  <mat-label>Preset</mat-label>
+  <mat-select [value]="model.preset"
     (selectionChange)="onPresetChange($event)">
     <mat-option *ngFor="let preset of presets"
       [value]="preset.value"
