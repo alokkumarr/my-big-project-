@@ -2,7 +2,7 @@ import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as isUndefined from 'lodash/isUndefined';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
@@ -99,16 +99,18 @@ export class WorkbenchService {
   }
 
   uploadFile(filesToUpload: FileList, path: string): Observable<any> {
-    const endpoint = `${
-      this.wbAPI
-    }/${userProject}/raw/directory/upload/files?path=${path}`;
+    const endpoint = `${this.wbAPI}/${userProject}/raw/directory/upload/files`;
+    let headers = new HttpHeaders();
+    headers.set('Content-Type', null);
+    headers.set('Accept', 'multipart/form-data');
 
-    // const endpoint = `${this.wbAPI}/${projectName}/directory/upload/files`;
+    let params = new HttpParams();
     const formData: FormData = new FormData();
     forEach(filesToUpload, file => {
-      formData.append('files', file);
+      formData.append('files', file, file.name);
     });
-    return this.http.post(endpoint, formData);
+    formData.append('path', path);
+    return this.http.post(endpoint, formData, { params, headers });
   }
 
   validateMaxSize(fileList: FileList) {
