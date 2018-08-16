@@ -43,8 +43,6 @@ new_segmenter <- function(df,
 
 
 
-
-
 #' Segmenter Predict Method
 #'
 #' Method makes predictions using segmenter object's final model
@@ -54,29 +52,48 @@ predict.segmenter <- function(obj,
                               data = NULL,
                               desc = "",
                               ...) {
-  final_model <- obj$final_model
-  if (is.null(final_model)) {
+  if (is.null(obj$final_model)) {
     stop("Final model not set")
-  }
-  data <- data %>%
-    dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
-  
-  schema_check <- all.equal(get_schema(data), obj$schema)
-  if(schema_check[1] != TRUE) {
-    stop(paste("New Data shema check failed:\n", schema_check))
+  } else {
+    final_model <- obj$final_model
   }
   
-  final_model$pipe <- execute(data, final_model$pipe)
-  preds <- predict(final_model, data = final_model$pipe$output, ...)
+  # Schema Check
+  schema_check <- purrr::flatten(obj$schema) %>%
+    tibble::as_tibble() %>%
+    tidyr::gather() %>%
+    left_join(
+      purrr::flatten(get_schema(data)) %>%
+        tibble::as_tibble() %>%
+        tidyr::gather(),
+      by = "key") %>% 
+    dplyr::filter(value.x != value.y | is.na(value.y))
   
-  new_predictions(
-    predictions = preds,
-    model = final_model,
-    type = "segmenter",
-    uid = sparklyr::random_string(prefix = "pred"),
-    desc = desc
-  )
+  if(nrow(schema_check) > 0) {
+    stop(paste("New Data schema check failed:",
+               "\n     columns missing:",
+               schema_check %>%
+                 dplyr::filter(is.na(value.y)) %>%
+                 dplyr::pull(key) %>% 
+                 paste(collapse = ", "),
+               "\n     columns with miss-matching type:",
+               schema_check %>%
+                 dplyr::filter(!is.na(value.y)) %>%
+                 dplyr::pull(key) %>% 
+                 paste(collapse = ", ")),
+         .call=FALSE)
+  }
+  
+  pipe <- obj$pipelines[[final_model$pipe]] %>% 
+    execute(data, .) 
+  predict(final_model, data = pipe$output, ...) %>% 
+    new_predictions(
+      predictions = .,
+      model = final_model,
+      type = "segmenter",
+      uid = sparklyr::random_string(prefix = "pred"),
+      desc = desc
+    )
 }
 
 

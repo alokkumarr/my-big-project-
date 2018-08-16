@@ -4,8 +4,7 @@
 \alias{new_model}
 \title{Model Class Constructer}
 \usage{
-new_model(pipe, target, method, method_args, desc, path, id, status, created_on,
-  fit, performance)
+new_model(pipe, target, method, param_grid, desc, uid, status, created_on)
 }
 \description{
 Model Class Constructer

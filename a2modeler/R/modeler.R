@@ -330,8 +330,10 @@ train_models <- function(obj, ...) {
 #' @param uid optional model uid input required for manual method
 #' @param reevaluate logical option to re-evaluate the final model. Requires a
 #'   test holdout sample
+#' @param refit logical option to re-fit the final model. Requires a test
+#'   holdout sample
 #' @export
-set_final_model <- function(obj, method, uid, reevaluate) {
+set_final_model <- function(obj, method, uid, reevaluate, refit) {
   UseMethod("set_final_model")
 }
 
@@ -417,7 +419,8 @@ train_models.modeler <- function(obj, uids = NULL) {
     # Check for holdout
     if (!is.null(obj$samples$test_holdout_prct)) {
       train_data <- train_data %>%
-        dplyr::mutate(index = 1, index = row_number(index)) %>%
+        dplyr::mutate(index = 1) %>% 
+        dplyr::mutate(index = row_number(index)) %>%
         dplyr::filter(!index %in% obj$samples$test_index) %>%
         dplyr::select(-index)
     }
@@ -436,7 +439,7 @@ train_models.modeler <- function(obj, uids = NULL) {
         dplyr::mutate(model_uid = uid,
                       pipeline_uid = obj$models[[uid]]$pipe,
                       method = obj$models[[uid]]$method) %>% 
-        dplyr::select(model_uid, pipeline_uid, method, submodel_uid, !!obj$measure$method, param_grid)
+        dplyr::select(model_uid, pipeline_uid, submodel_uid, sample, method, param_grid, !!obj$measure$method)
     )
   }
   
@@ -445,6 +448,68 @@ train_models.modeler <- function(obj, uids = NULL) {
 
 
 
+#' @rdname set_final_model
+#' @export
+set_final_model.modeler <- function(obj,
+                                    method,
+                                    uid = NULL,
+                                    reevaluate = TRUE,
+                                    refit = TRUE) {
+  checkmate::assert_choice(method, c("manual", "best"))
+  checkmate::assert_character(uid, null.ok = TRUE)
+  checkmate::assert_flag(reevaluate)
+  checkmate::assert_flag(refit)
+  
+  if (!is.null(uid))
+    checkmate::assert_choice(uid, names(obj$models))
+  if (method == "manual" & is.null(uid))
+    stop("final model not selected: uid not provided for manual method")
+  
+  if (method == "best") {
+    uid <- get_best_model(obj)$uid
+  }
+  
+  if (reevaluate) {
+    if (is.null(obj$samples$test_holdout_prct)) {
+      warning("Missing Test Holdout Sample. Final Model not re-evaluated.")
+    } else{
+      
+      # Evaluate Model
+      obj$models[[uid]] <- obj$pipelines[[obj$models[[uid]]$pipe]]$output %>%
+        dplyr::mutate(index = 1) %>% 
+        dplyr::mutate(index = row_number(index)) %>% 
+        dplyr::filter(index %in% obj$samples$test_index) %>%
+        dplyr::select(-index) %>% 
+        evaluate_model(mobj = obj$models[[uid]],
+                       data = .,
+                       measure = obj$measure)
+    }
+  }
+  
+  if (refit) {
+    if (is.null(obj$samples$test_holdout_prct)) {
+      warning("Missing Test Holdout Sample. Final Model does not need to be refit.")
+    } else{
+      # Retrain Data
+      refit_sample <- add_default_samples(1:10)
+      obj$final_model <- train_model(
+        mobj = obj$models[[uid]],
+        data = obj$pipelines[[obj$models[[uid]]$pipe]]$output,
+        measure = obj$measure,
+        samples = refit_sample,
+        save_submodels = FALSE,
+        execution_strategy = obj$execution_strategy
+      )
+    }
+  } else{
+    obj$final_model <- obj$models[[uid]]
+  }
+  
+  obj$final_model$status <- "final"
+  obj$final_model$last_updated <- Sys.time()
+  
+  obj
+}
 
 
 #' @export
@@ -471,7 +536,7 @@ print.modeler <- function(obj) {
   cat("\nmodels ----------------------------", "\n\n")
   print(get_models_status(obj))
   cat("\nperformance ----------------------------", "\n\n")
-  print(obj$performance)
+  print(obj$performance %>% dplyr::select(model_uid, submodel_uid, method, !!obj$measure$method))
   cat("\nfinal model ----------------------------", "\n")
   cat("method:", obj$final_model$method, "\n")
   cat("method args:", unlist(obj$final_model$method_args), "\n")

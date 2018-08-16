@@ -341,7 +341,7 @@ add_holdout_samples <- function(x, splits) {
 
 #' @rdname add_holdout_samples
 #' @export
-add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits){
+add_holdout_samples.numeric <- function(x, splits){
 
   checkmate::assert_numeric(splits, lower = 0, upper = 1, min.len = 2, max.len = 3)
   if(sum(splits) != 1){
@@ -374,6 +374,10 @@ add_holdout_samples.integer <- add_holdout_samples.numeric <- function(x, splits
     test_index = test_index
   )
 }
+
+#' @rdname add_holdout_samples
+#' @export
+add_holdout_samples.integer <- add_holdout_samples.numeric
 
 
 #' @rdname add_holdout_samples

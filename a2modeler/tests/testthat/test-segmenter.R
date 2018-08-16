@@ -55,10 +55,11 @@ test_that("Segmenter Add Sampling", {
 test_that("Segmenter Train Model", {
 
   s1 <- new_segmenter(df = df, name = "test") %>%
-    add_default_samples() %>%
+    add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
-              k = 3) %>%
+              k = 3,
+              uid = "kmeans") %>%
     train_models()
 
   expect_class(s1$models[[1]]$performance$train$train, "tbl_spark")

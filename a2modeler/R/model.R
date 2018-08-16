@@ -8,7 +8,8 @@
 new_model <- function(pipe,
                       target,
                       method,
-                      param_grid,
+                      method_args, 
+                      param_map,
                       desc,
                       uid,
                       status,
@@ -17,7 +18,8 @@ new_model <- function(pipe,
   checkmate::assert_character(pipe)
   checkmate::assert_character(target, null.ok = TRUE)
   checkmate::assert_choice(method, choices = model_methods$method)
-  checkmate::assert_data_frame(param_grid)
+  checkmate::assert_list(method_args, null.ok = TRUE)
+  checkmate::assert_list(param_map)
   checkmate::assert_character(desc)
   checkmate::assert_character(uid)
   checkmate::assert_character(status)
@@ -29,9 +31,9 @@ new_model <- function(pipe,
     dplyr::pull(package) %>%
     asNamespace() %>%
     get(.method, .)
-  method_args <- setdiff(colnames(param_grid), "uid")
-  if(length(method_args) == 0) method_args <- NULL
-  checkmate::assert_function(method_fun, args = method_args)
+  method_params <- setdiff(c(names(method_args), names(param_map)), "uid")
+  if(length(method_params) == 0) method_params <- NULL
+  checkmate::assert_function(method_fun, args = method_params)
   
   method_class <- model_methods %>%
     dplyr::filter(method == .method) %>%
@@ -47,7 +49,8 @@ new_model <- function(pipe,
       pipe = pipe,
       target = target,
       method = method,
-      param_grid = param_grid,
+      method_args = method_args,
+      param_map = param_map,
       package = method_package,
       desc = desc,
       uid = uid,
@@ -69,7 +72,8 @@ new_model <- function(pipe,
 #' @param pipe_uid pipeline uid string
 #' @param target column name of target variable. string input
 #' @param method string input of model method
-#' @param param_grid parameter grid for model tuning
+#' @param method_args required method arguments not in parameter grid
+#' @param param_map list of parameter values for model tuning
 #' @param desc optional model description
 #' @param uid model uid
 #'
@@ -77,7 +81,8 @@ new_model <- function(pipe,
 model <- function(pipe,
                   target,
                   method,
-                  param_grid,
+                  method_args,
+                  param_map,
                   desc = NULL,
                   uid = NULL) {
   
@@ -88,7 +93,8 @@ model <- function(pipe,
     pipe = pipe,
     target = target,
     method = method,
-    param_grid = param_grid,
+    method_args = method_args,
+    param_map = param_map,
     desc = desc,
     uid = uid,
     status = "created",
@@ -107,12 +113,14 @@ model <- function(pipe,
 #' models list
 #'
 #' @param obj modeler object
+#' @param param_map list of parameters values to be used in model tuning
 #' @inheritParams model
 #' @export
 #' @return modeler object with model added
 add_model <-function(obj,
                      pipe = NULL,
                      method,
+                     param_map = list(),
                      ...,
                      desc = NULL,
                      uid = sparklyr::random_string("model")) {
@@ -132,14 +140,12 @@ add_model <-function(obj,
   if(! pipe$uid %in% names(obj$pipelines))
     obj$pipelines[[pipe$uid]] <- pipe
   
-  # Get Parameter Grid
-  grid <- data.frame(expand.grid(list(...)))
-  
   # Create model object
   m <- model(pipe = pipe$uid,
              target = obj$target,
              method = method,
-             param_grid = grid,
+             method_args = list(...),
+             param_map = param_map,
              desc = desc,
              uid = uid)
   m$status <- "added"
@@ -260,46 +266,5 @@ tidy_performance <- function(mobj) {
 
 
 # Class Methods -----------------------------------------------------------
-
-
-#' @rdname train_model
-#' @export
-train_model.model <- function(mobj, data, samples, save_fits, execution_strategy) {
-  
-  mobj %>%
-    fit_model() %>%
-    apply_model() %>%
-    evaluate_model()
-}
-
-
-
-#' @rdname evaluate_model
-#' @export
-evaluate_model.model <- function(mobj, measure) {
-  checkmate::assert_class(measure, "measure")
-  
-  mobj$evaluate <- purrr::map_df(mobj$predictions,
-                                 ~purrr::map_df(.,
-                                                dplyr::bind_rows,
-                                                .id = "sample"),
-                                 .id="indicie") %>%
-    dplyr::inner_join(mobj$pipe$output %>%
-                        dplyr::select_at(c(mobj$target, mobj$index_var)),
-                      by = mobj$index_var) %>%
-    dplyr::mutate(model = mobj$uid) %>%
-    dplyr::mutate(predicted = ifelse(is.na(fitted), mean, fitted)) %>%
-    dplyr::select_at(c("indicie", "sample", "model", mobj$index_var, mobj$target, "predicted")) %>%
-    dplyr::group_by(model, sample, indicie) %>%
-    dplyr::do(data.frame(
-      match.fun(measure$method)(.,
-                                actual = mobj$target,
-                                predicted = "predicted")
-    )) %>%
-    dplyr::ungroup() %>%
-    setNames(c("model", "sample", "indicie", measure$method))
-  
-  mobj
-}
 
 

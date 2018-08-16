@@ -3,11 +3,16 @@
 \name{train_models}
 \alias{train_models}
 \alias{train_models.modeler}
-\title{Train Model Generic Function}
+\title{Train Models Generic Function}
 \usage{
 train_models(obj, ...)
 
-\method{train_models}{modeler}(obj, ids = NULL)
+\method{train_models}{modeler}(obj, uids = NULL)
+}
+\arguments{
+\item{obj}{modeler object}
+
+\item{...}{additional arguments to pass to train function}
 }
 \value{
 updated modeler object

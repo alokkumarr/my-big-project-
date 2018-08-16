@@ -61,99 +61,52 @@ predict.classifier <- function(obj,
                                data = NULL,
                                desc = "",
                                ...) {
-  final_model <- obj$final_model
-  if (is.null(final_model)) {
+   
+  if (is.null(obj$final_model)) {
     stop("Final model not set")
-  }
-  data <- data %>%
-    dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
-  
-  schema <- obj$schema[! names(obj$schema) %in% c(obj$target)]
-  schema_check <- all.equal(get_schema(data), obj$schema)
-  if(schema_check[1] != TRUE) {
-    stop(paste("New Data shema check failed:\n", schema_check))
+  } else {
+    final_model <- obj$final_model
   }
   
-  final_model$pipe <- execute(data, final_model$pipe)
-  preds <- predict(final_model, data = final_model$pipe$output, ...)
+  # Schema Check
+  schema_check <- purrr::flatten(obj$schema) %>%
+    tibble::as_tibble() %>%
+    tidyr::gather() %>%
+    left_join(
+      purrr::flatten(get_schema(data)) %>%
+        tibble::as_tibble() %>%
+        tidyr::gather(),
+      by = "key") %>% 
+    dplyr::filter(value.x != value.y | is.na(value.y))
   
-  new_predictions(
-    predictions = preds,
-    model = final_model,
-    type = "classifier",
-    uid = sparklyr::random_string(prefix = "pred"),
-    desc = desc
-  )
+  if(nrow(schema_check) > 0) {
+    stop(paste("New Data schema check failed:",
+               "\n     columns missing:",
+               schema_check %>%
+                 dplyr::filter(is.na(value.y)) %>%
+                 dplyr::pull(key) %>% 
+                 paste(collapse = ", "),
+               "\n     columns with miss-matching type:",
+               schema_check %>%
+                 dplyr::filter(!is.na(value.y)) %>%
+                 dplyr::pull(key) %>% 
+                 paste(collapse = ", ")),
+         .call=FALSE)
+  }
+  
+  pipe <- obj$pipelines[[final_model$pipe]] %>% 
+    execute(data, .) 
+  predict(final_model, data = pipe$output, ...) %>% 
+    new_predictions(
+      predictions = .,
+      model = final_model,
+      type = "classifier",
+      uid = sparklyr::random_string(prefix = "pred"),
+      desc = desc
+    )
 }
 
 
 
-#' @rdname set_final_model
-#' @export
-set_final_model.classifier <- function(obj,
-                                       method,
-                                       uid = NULL,
-                                       reevaluate = TRUE,
-                                       refit = TRUE) {
-  checkmate::assert_choice(method, c("manual", "best"))
-  checkmate::assert_character(uid, null.ok = TRUE)
-  checkmate::assert_flag(reevaluate)
-  checkmate::assert_flag(refit)
-  
-  if (!is.null(uid))
-    checkmate::assert_choice(uid, names(obj$models))
-  if (method == "manual" & is.null(uid))
-    stop("final model not selected: uid not provided for manual method")
-  
-  if (method == "best") {
-    uid <- get_best_model(obj)$uid
-  }
-  
-  if (reevaluate) {
-    if (is.null(obj$samples$test_holdout_prct)) {
-      warning("Missing Test Holdout Sample. Final Model not re-evaluated.")
-    } else{
-      
-      # Make Predictions on Test Data Set
-      test_predictions <- obj$pipelines[[obj$models[[uid]]$pipe]]$output %>%
-        dplyr::mutate(index = 1, index = row_number(index)) %>%
-        dplyr::filter(index %in% obj$samples$test_index) %>%
-        dplyr::select(-index) %>% 
-        sparklyr::ml_predict(obj$models[[uid]]$fit, .)
-      
-      performance <- obj2$models[[1]]$performance %>%
-        dplyr::filter(sample == "validation") %>%
-        dplyr::mutate(sample = "test", model = uid)
-      obj$performance <- rbind(obj$performance, performance)
-    }
-  }
-  obj$models[[uid]] <- model
-  model$status <- "selected"
-  model$last_updated <- Sys.time()
-  
-  if (refit) {
-    
-    # Retrain Data
-    obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
-                                     data = train_data,
-                                     measure = obj$measure,
-                                     samples = obj$samples,
-                                     save_submodels = obj$save_submodels,
-                                     execution_strategy = obj$execution_strategy)
-    
-    obj$final_model <- obj2$models[[1]]
-    obj$final_model$uid <- model$uid
-    obj$final_model$fit <- obj2$models[[1]]$fits$default
-  }else{
-    obj$final_model <- model
-    obj$final_model$fit <- model$fits[[1]]
-  }
-  
-  obj$final_model$fits <- NULL
-  obj$final_model$pipe <- obj$pipelines[[obj$final_model$pipe]]
-  obj$final_model$status <- "final"
-  obj$final_model$last_updated <- Sys.time()
-  
-  obj
-}
+
+

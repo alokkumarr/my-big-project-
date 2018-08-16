@@ -4,21 +4,17 @@
 \alias{add_model}
 \title{Add Model to Modeler Object function}
 \usage{
-add_model(obj, pipe = NULL, method, ..., desc = NULL, path = NULL)
+add_model(obj, pipe = NULL, method, ..., desc = NULL,
+  uid = sparklyr::random_string("model"))
 }
 \arguments{
 \item{obj}{modeler object}
 
-\item{pipe}{pipeline object. default is empty pipeline which applies no
-data transformations}
-
 \item{method}{string input of model method}
-
-\item{...}{additional arguments to pass to model method}
 
 \item{desc}{optional model description}
 
-\item{path}{optional file path to save model}
+\item{uid}{model uid}
 }
 \value{
 modeler object with model added
