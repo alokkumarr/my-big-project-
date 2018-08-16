@@ -218,10 +218,6 @@
           {
           "id": "/properties/sqlBuilder/properties/axesFields/items",
           "properties": {
-            "checked": {
-              "id": "/properties/sqlBuilder/properties/sort/items/properties/checked",
-              "type": "string"
-            },
             "columnName": {
               "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
               "type": "string"
