@@ -122,14 +122,13 @@ exports.config = {
     realtimeFailure: true,
     showColors: true
   },
-  suites: webpackHelper.getSuiteName() === 'smoke' ? {
+  suites: {
     /**
      * This suite will be run as part of main bamboo build plan.
      */
     smoke: [
       appRoot + '/src/test/e2e-tests/login.test.js'
-    ]
-  } : webpackHelper.getSuiteName() === 'sanity' ? {
+    ],
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for sanity check
      */
@@ -137,37 +136,28 @@ exports.config = {
       appRoot + '/src/test/e2e-tests/login.test.js',
       appRoot + '/src/test/e2e-tests/createReport.test.js',
       appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js'
-    ]
-
-  } : webpackHelper.getSuiteName() === 'regression' ? {
+    ],
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
-    root: [
+    regression: [
       appRoot + '/src/test/e2e-tests/priviliges.test.js',
       appRoot + '/src/test/e2e-tests/analyze.test.js',
-      appRoot + '/src/test/e2e-tests/createReport.test.js'
-    ],
-    charts: [
+      appRoot + '/src/test/e2e-tests/createReport.test.js',
+      // charts tests
       appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
       appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js'
-    ],
-    chartEditFork: [
+      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js',
+      // chartEditFork tests
       appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js'
-    ],
-    filters: [
-      appRoot + '/src/test/e2e-tests/promptFilters.test.js'
-    ],
-    pivots: [
-      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js'
-    ],
-    authentication: [
+      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js',
+      // filters tests
+      appRoot + '/src/test/e2e-tests/promptFilters.test.js',
+      // pivots tests
+      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js',
+      // login logout tests
       appRoot + '/src/test/e2e-tests/login.test.js'
-    ]
-      
-  }: {
+    ],
     /**
      * This suite is for devlopment envirobment and always all dev tests will be executed.
      */
