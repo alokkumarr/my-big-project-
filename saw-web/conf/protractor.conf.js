@@ -136,7 +136,7 @@ exports.config = {
     sanity: [
       appRoot + '/src/test/e2e-tests/login.test.js',
       appRoot + '/src/test/e2e-tests/createReport.test.js',
-      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
+      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js'
     ]
 
   } : webpackHelper.getSuiteName() === 'regression' ? {
