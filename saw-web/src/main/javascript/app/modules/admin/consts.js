@@ -1,7 +1,6 @@
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 import * as fpJoin from 'lodash/fp/join';
-import { map } from '../../../../../../node_modules/rxjs/operators';
 
 export const AdminMenuData = [{
   id: '',
@@ -159,7 +158,7 @@ export const CategoriesTableHeader = [{
   width: '52%',
   cellTemplate: 'highlightCellTemplate',
   calculateDisplayValue: data => {
-    const { subCategories } = data;
+    const {subCategories} = data;
 
     if (subCategories) {
       return fpPipe(
