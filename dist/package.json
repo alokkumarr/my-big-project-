@@ -9,5 +9,8 @@
     "allure-commandline": "2.7.0",
     "jasmine-reporters": "2.3.0",
     "protractor": "5.4.0"
+  },
+  "dependencies": {
+    "jasmine-allure-reporter": "^1.0.2"
   }
 }
