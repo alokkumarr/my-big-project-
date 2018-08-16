@@ -3,7 +3,7 @@
   "scripts": {
     "webdriver-manager": "node_modules/protractor/bin/webdriver-manager update",
     "protractor": "p() { node_modules/protractor/bin/protractor $* ../saw-web/conf/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p",
-    "generate-report": "node_modules/allure-commandline/bin/allure generate ../saw-web/target/allure-results --clean -o ../saw-web/target/allure-report || true"
+    "generate-report": "node_modules/allure-commandline/bin/allure generate ../saw-web/report/allure-results --clean -o ../saw-web/report/allure-report || true"
   },
   "devDependencies": {
     "allure-commandline": "2.7.0",
