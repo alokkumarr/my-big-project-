@@ -192,10 +192,8 @@ exports.config = {
   },
   onCleanUp: function (results) {
     retry.onCleanUp(results);
-    //console.log("Finished at : "+ new Date())
   },
   onPrepare() {
-    //console.log("Started at : "+ new Date())
     retry.onPrepare();
     // Generate test data
     token = generate.token(browser.baseUrl);
