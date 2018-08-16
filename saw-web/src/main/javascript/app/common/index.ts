@@ -57,6 +57,7 @@ import { CommonDirectiveModule } from './directives';
 // import from login module
 import { AuthServiceFactory } from '../../login/services/auth.service';
 import { PivotGridComponent } from './components/pivot-grid/pivot-grid.component';
+import { FieldDetailsComponent } from './components/field-details/field-details.component';
 import {
   AccordionMenuComponent,
   AccordionMenuLinkComponent
@@ -176,7 +177,8 @@ angular
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     ChoiceGroupComponent,
-    SearchBoxComponent
+    SearchBoxComponent,
+    FieldDetailsComponent
   ],
   entryComponents: [
     PivotGridComponent,
@@ -197,7 +199,8 @@ angular
     AliasRenameDialogComponent,
     AggregateChooserComponent,
     ChoiceGroupComponent,
-    SearchBoxComponent
+    SearchBoxComponent,
+    FieldDetailsComponent
   ],
   exports: [
     DndModule,

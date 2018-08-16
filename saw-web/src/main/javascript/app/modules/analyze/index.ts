@@ -66,6 +66,7 @@ import { AnalyzeChartComponent } from './components/chart/analyze-chart.componen
 import { AnalyzeChartSettingsComponent } from './components/chart/settings/analyze-chart-settings.component';
 import { AnalyzeChartPreviewComponent } from './components/chart/preview/analyze-chart-preview.component';
 import { AnalyzeActionsMenuComponent } from './components/actions/analyze-actions-menu.component';
+
 import { CommonModule } from '../../common';
 
 import { CommonModuleTs } from '../../common';
