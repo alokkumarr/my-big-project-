@@ -1,36 +1,41 @@
-<mat-form-field e2e="filter-date-preset" class="select-form-field">
-  <mat-select e2e="dasbhoard-global-filter-date-preset-select" placeholder="Select a preset"
-    [value]="model.preset"
-    (selectionChange)="onPresetChange($event)">
+<mat-form-field e2e="filter-date-preset"
+                class="select-form-field"
+                appearance="outline"
+>
+  <mat-label>Preset</mat-label>
+  <mat-select e2e="dasbhoard-global-filter-date-preset-select"
+              [value]="model.preset"
+              (selectionChange)="onPresetChange($event)"
+  >
     <mat-option *ngFor="let preset of presets"
-      [value]="preset.value"
-      [textContent]="preset.label">
+                [value]="preset.value"
+                [textContent]="preset.label">
     </mat-option>
   </mat-select>
 </mat-form-field>
 
 <mat-form-field *ngIf="showDateFields">
   <input matInput
-    e2e="dasbhoard-global-filter-date-gte-input"
-    [value]="model.gte"
-    [matDatepicker]="frompicker"
-    [max]="model.lte"
-    (dateInput)="onDateChange('gte', $event)"
-    (click)="frompicker.open()"
-    placeholder="From" />
+         e2e="dasbhoard-global-filter-date-gte-input"
+         [value]="model.gte"
+         [matDatepicker]="frompicker"
+         [max]="model.lte"
+         (dateInput)="onDateChange('gte', $event)"
+         (click)="frompicker.open()"
+         placeholder="From" />
   <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
   <mat-datepicker #frompicker disabled="false"></mat-datepicker>
 </mat-form-field>
 
 <mat-form-field *ngIf="showDateFields">
   <input matInput
-    e2e="dasbhoard-global-filter-date-lte-input"
-    [value]="model.lte"
-    [min]="model.gte"
-    [matDatepicker]="topicker"
-    (dateInput)="onDateChange('lte', $event)"
-    (click)="topicker.open()"
-    placeholder="To" />
+         e2e="dasbhoard-global-filter-date-lte-input"
+         [value]="model.lte"
+         [min]="model.gte"
+         [matDatepicker]="topicker"
+         (dateInput)="onDateChange('lte', $event)"
+         (click)="topicker.open()"
+        placeholder="To" />
   <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
   <mat-datepicker #topicker disabled="false"></mat-datepicker>
 </mat-form-field>

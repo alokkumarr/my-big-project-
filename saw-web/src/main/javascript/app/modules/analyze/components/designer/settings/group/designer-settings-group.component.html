@@ -15,6 +15,7 @@
                       [dndContainer]="groupAdapter"
                       (change)="fieldPropChange.emit($event)"
                       [artifactColumn]="artifactColumn"
+                      [fieldCount]="fieldCount"
                       [analysisType]="groupAdapter.type"
                       (removeRequest)="onRemoveField(artifactColumn)"
                       class="settings__list-item"

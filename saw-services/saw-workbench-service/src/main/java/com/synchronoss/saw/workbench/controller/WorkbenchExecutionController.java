@@ -198,7 +198,7 @@ public class WorkbenchExecutionController {
       throws JsonProcessingException, Exception {
     log.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
-    String body = workbenchExecutionService.generatePath(project, name);
+    String body = workbenchExecutionService.createDatasetDirectory(project, name);
     /*
      * If preview was not found, response to indicate that preview has not been created yet
      */

@@ -1,6 +1,11 @@
 <form [formGroup]="kpiForm" autocomplete="off">
   <mat-form-field>
-    <input e2e="dashboard-add-kpi-name-input" matInput placeholder="KPI Name" formControlName="name" maxlength="25" />
+    <input matInput
+          placeholder="KPI Name"
+          formControlName="name"
+          maxlength="25"
+          e2e="dashboard-add-kpi-name-input"
+    />
     <mat-error *ngIf="kpiName.errors?.required">
       Name is
       <strong>required</strong>.
@@ -11,16 +16,21 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field *ngIf="_metric" class="select-form-field">
-    <mat-select e2e="dashboard-add-kpi-date-column-select" placeholder="Select Date Field" formControlName="dateField">
+  <mat-form-field *ngIf="_metric"
+                  class="select-form-field"
+                  appearance="outline"
+  >
+    <mat-label>Date Field</mat-label>
+    <mat-select e2e="dashboard-add-kpi-date-column-select" formControlName="dateField">
       <mat-option *ngFor="let field of _metric.dateColumns" [value]="field.columnName">
         {{ field.displayName }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field class="select-form-field">
-    <mat-select e2e="dashboard-add-kpi-date-preset-select" placeholder="Filter" formControlName="filter">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Filter</mat-label>
+    <mat-select e2e="dashboard-add-kpi-date-preset-select" formControlName="filter">
       <mat-option *ngFor="let filt of dateFilters" [value]="filt.value">
         {{filt.label}}
       </mat-option>
@@ -49,10 +59,9 @@
     <mat-datepicker #topicker disabled="false"></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field class="select-form-field">
-    <mat-select e2e="dashboard-add-kpi-aggregation-select"
-                placeholder="Primary Aggregation"
-                formControlName="primAggregate">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Primary Aggregation</mat-label>
+    <mat-select e2e="dashboard-add-kpi-aggregation-select" formControlName="primAggregate">
       <mat-option *ngFor="let ag of aggregations" [value]="ag.value">
         {{ ag.name }}
       </mat-option>
@@ -111,13 +120,22 @@
                                [(ngModel)]="bandPaletteValue"
                                [value]="bandPaletteValue"
                                [ngModelOptions]="{standalone: true}">
-        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-rog" value="rog" class="rog">
+        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-rog"
+                           value="rog"
+                           class="rog"
+        >
           <span class="text">ROG</span>
         </mat-button-toggle>
-        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-greys" value="greys" class="grey">
+        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-greys"
+                           value="greys"
+                           class="grey"
+        >
           <span class="text">GREYS</span>
         </mat-button-toggle>
-        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-blues" value="blues" class="blues">
+        <mat-button-toggle e2e="dashboard-add-kpi-bullet-color-blues"
+                           value="blues"
+                           class="blues"
+        >
           <span class="text">BLUES</span>
         </mat-button-toggle>
       </mat-button-toggle-group>

@@ -75,20 +75,12 @@ analyze-schedule-dialog {
     }
 
     .schedule-container .form-container .publish-form {
-      span.clear {
+      div.clear {
         margin: 10px;
         top: 10px;
         color: #0096D5;
         cursor: pointer;
       }
-
-      mat-select {
-        float: left;
-      }
-    }
-
-    .ftp-select-box {
-      width: 275px;
     }
 
     .ftp-select {

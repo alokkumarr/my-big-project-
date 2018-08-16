@@ -132,6 +132,31 @@ public class QueryBuilderUtil {
  		return aggregationBuilder;
  	}
 
+    public static AggregationBuilder aggregationBuilderColumn(com.synchronoss.querybuilder.model.pivot.ColumnField columnField,
+                                                             String aggregationName)
+
+    {
+        AggregationBuilder aggregationBuilder = null;
+
+        if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) ||
+            columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
+            if (columnField.getGroupInterval()!=null){
+                aggregationBuilder = AggregationBuilders.
+                    dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
+                    dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(BucketOrder.key(false));
+            }
+            else {
+                aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
+                    .format(DATE_FORMAT).order(BucketOrder.key(false)).size(BuilderUtil.SIZE);
+            }
+        }
+        else {
+            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName()).size(BuilderUtil.SIZE);
+        }
+
+        return aggregationBuilder;
+    }
+
 	public static AggregationBuilder aggregationBuilderDataFieldReport(com.synchronoss.querybuilder.model.report.DataField data)
 	{
 		AggregationBuilder aggregationBuilder = null;
