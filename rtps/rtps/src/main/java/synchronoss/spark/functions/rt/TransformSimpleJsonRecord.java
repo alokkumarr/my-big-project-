@@ -25,6 +25,7 @@ public class TransformSimpleJsonRecord implements FlatMapFunction<Iterator<Consu
             if (src!= null && !src.isEmpty()) {
                 try {
                     // Create resulting record with all URL parameters
+                    logger.debug("Flattening " + src);
                     JsonObject flattenedRecord =  GenericJsonModel.flatten(src);
                     ret.add(flattenedRecord.toString());
                 } catch (Exception e) {

@@ -2,7 +2,10 @@ package com.synchronoss.saw.storage.proxy.service;
 
 import static java.util.Collections.emptyMap;
 import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,6 +13,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.Path;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -32,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -42,11 +45,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
+import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
+import com.synchronoss.saw.storage.proxy.model.StorageProxy.Storage;
 import com.synchronoss.saw.storage.proxy.model.StoreField;
+import com.synchronoss.saw.storage.proxy.model.response.ClusterAliasesResponse;
 import com.synchronoss.saw.storage.proxy.model.response.ClusterIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
-import com.synchronoss.saw.storage.proxy.model.response.MappingIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
 
 @Service
@@ -217,6 +222,30 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     logger.trace("Cluster Index Response", catClusterIndexResponse.toString());
     return catClusterIndexResponse;
   }
+
+  @Override
+  public List<ClusterAliasesResponse> catClusterAliases(StorageProxy proxyDetails) throws Exception {
+    Response response = null;
+    RestClient client = null;
+    List<ClusterAliasesResponse> catClusterIndexResponse = null;
+    String endpoint = "_cat" + "/" + "aliases?format=json&pretty";
+    try{
+        client = prepareRESTESConnection();
+        response = client.performRequest(HttpGet.METHOD_NAME, endpoint);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        HttpEntity entity = response.getEntity();
+        catClusterIndexResponse = objectMapper.readValue(entity.getContent(), new TypeReference<List<ClusterAliasesResponse>>(){});;
+    }
+    finally{
+      if (client !=null){
+        client.close();
+      }
+    }
+    logger.trace("Cluster Index Response", catClusterIndexResponse.toString());
+    return catClusterIndexResponse;
+  }
   
   @Override
   public List<StoreField> getMappingbyIndex(StorageProxy proxyDetails) throws Exception {
@@ -264,7 +293,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
             logger.trace("attributeName : " + attributeName);
             logger.trace("attributeValue :" + objectDefination.get(attributeName).toString());
             StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
-            storeField.setColumnName(attributeName);
+            storeField.setName(attributeName);
             storeFields.add(storeField);
           }
         }
@@ -278,7 +307,96 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     return storeFields;
   }
 
-
+  @Override
+  public StorageProxy getMappingbyAlias(StorageProxy proxyDetails) throws Exception {
+    Response response = null;
+    RestClient client = null;
+    List<StoreField> storeFields =new ArrayList<>();
+    ArrayNode bucketNode = null;
+    ArrayNode indexbucketNode = null;
+    final String TYPE_AGGREGATION_NAME = "typeAgg";
+    final String INDEX_AGGREGATION_NAME = "indexAgg";
+    final String BUCKETS = "buckets";
+    final String PROPERTIES = "properties";
+    final String KEY = "key";
+    StorageProxy  dataProxy = null;
+    Preconditions.checkNotNull(proxyDetails.getIndexName(), "Index Name cannot be null");
+    String endpoint = proxyDetails.getIndexName() + "/" + "_mappings";
+    ClusterIndexResponse  clusterIndexResponse = null;
+    try{
+        client = prepareRESTESConnection();
+        response = client.performRequest(HttpGet.METHOD_NAME, endpoint);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        HttpEntity entity = response.getEntity();
+        JsonNode mappingNode  = objectMapper.readTree(entity.getContent());
+        logger.trace("mappingNode: " + objectMapper.writeValueAsString(mappingNode));
+        // The below query to figure the type name dynamically for ES 6.x
+        String typeAggregationQuery= "{\"aggs\":{\"typeAgg\":{\"terms\":{\"field\":\"_type\",\"size\":1}}},\"size\":0}";
+        String indexAggregationQuery= "{\"aggs\":{\"indexAgg\":{\"terms\":{\"field\":\"_index\",\"size\":1}}},\"size\":0}";
+        SearchESResponse<?> typeAggregationResult = searchDocuments(typeAggregationQuery, proxyDetails);
+        SearchESResponse<?> indexAggregationResult = searchDocuments(indexAggregationQuery, proxyDetails);
+        String indexName = null;
+        ObjectNode rootNode = (ObjectNode) mappingNode;
+        logger.trace("rootNode: " + objectMapper.writeValueAsString(rootNode));
+        if (indexAggregationResult.getAggregations()!=null) {
+          JsonNode aggregationNode  = objectMapper.readTree(objectMapper.writeValueAsString(indexAggregationResult.getAggregations()));
+          logger.trace("aggregationNodeIndex: " + objectMapper.writeValueAsString(aggregationNode));
+          indexbucketNode = (ArrayNode) aggregationNode.get(INDEX_AGGREGATION_NAME).get(BUCKETS);;
+          logger.trace("indexBucketNode: " + objectMapper.writeValueAsString(indexbucketNode));
+          indexName = indexbucketNode.get(0).get(KEY).asText();
+          logger.trace("indexName: " + indexName);
+          dataProxy = new StorageProxy();
+          dataProxy.setStorage(Storage.ES);
+          dataProxy.setRequestBy("workbenchAdmin@synchronoss.com");
+          dataProxy.setRequestedTime(new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(new Date()));
+          dataProxy.setProductCode("WORKBENCH");
+          dataProxy.setModuleName("WORKBENCH");
+          dataProxy.setAction(Action.COUNT);
+          dataProxy.setIndexName(indexName);
+          clusterIndexResponse = catClusterIndices(dataProxy).get(0);
+        }
+       proxyDetails.setCount(clusterIndexResponse.getDocsCount());
+       proxyDetails.setSize(clusterIndexResponse.getPriStoreSize());
+       proxyDetails.setIndexRelativePath(Path.SEPARATOR + indexName);
+        ObjectNode mappingDataNode = (ObjectNode)rootNode.get(indexName).get("mappings");
+        logger.trace("mappingDataNode: " + objectMapper.writeValueAsString(mappingDataNode));
+        if (typeAggregationResult.getAggregations()!=null) {
+          JsonNode aggregationNode  = objectMapper.readTree(objectMapper.writeValueAsString(typeAggregationResult.getAggregations()));
+          logger.trace("aggregationNodeType: " + objectMapper.writeValueAsString(aggregationNode));
+          bucketNode = (ArrayNode) aggregationNode.get(TYPE_AGGREGATION_NAME).get(BUCKETS);
+          logger.trace("bucketNode: " + objectMapper.writeValueAsString(bucketNode));
+          // As per as ES.6.x, there will be no more than 1 type per index
+          String typeName = bucketNode.get(0).get(KEY).asText();
+          ObjectNode typeNode  = (ObjectNode) mappingDataNode.get(typeName).get(PROPERTIES);
+          logger.trace("typeNode: " + objectMapper.writeValueAsString(typeNode));
+          Map<?,?> objectDefination = new HashMap<String, String>();
+          objectDefination = objectMapper.readValue(objectMapper.writeValueAsBytes(typeNode), HashMap.class);
+          Iterator<?> itr =   objectDefination.keySet().iterator();
+          while (itr.hasNext()) {
+            String attributeName = itr.next().toString();
+            logger.trace("attributeName : " + attributeName);
+            logger.trace("attributeValue :" + objectDefination.get(attributeName).toString());
+            StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
+            storeField.setName(attributeName);
+            storeFields.add(storeField);
+          } // end of while loop
+        }
+    }
+    finally{
+      if (client !=null){
+        client.close();
+      }
+    }
+    logger.trace("Cluster Index Response", storeFields.toString());
+    List<Object> mappinglistAliases = new ArrayList<>();
+    for(StoreField storeField : storeFields) {
+      mappinglistAliases.add(storeField);
+    }
+    proxyDetails.setData(mappinglistAliases);
+    return proxyDetails;
+  }
 
   private HttpHost[] prepareHostAddresses(String[] hosts, String[] ports) {
     Preconditions.checkArgument(hosts.length == ports.length, "number of hosts is not equal to number of ports been provided");
@@ -383,7 +501,7 @@ public class StorageProxyConnectorServiceRESTImpl implements StorageConnectorSer
     System.out.println(attributeName);
     System.out.println(objectDefination.get(attributeName));
     StoreField storeField = objectMapper.readValue(objectMapper.writeValueAsString(objectDefination.get(attributeName)),StoreField.class);
-    storeField.setColumnName(attributeName);
+    storeField.setName(attributeName);
     System.out.println(storeField.toString()); 
   }
   

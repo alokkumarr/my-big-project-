@@ -44,6 +44,7 @@ public class DLBatchWriter {
 
 
     public void writeToTempLoc( Dataset<Row> DS, String tempLocation) throws Exception {
+        logger.debug("Writing to temp location " + tempLocation);
         write(DS, tempLocation, true);
     }
 
