@@ -49,6 +49,13 @@ public class DataField {
      */
     @JsonProperty("type")
     private DataField.Type type;
+
+    @JsonProperty("limitType")
+    private DataField.LimitType limitType;
+
+    @JsonProperty("limitValue")
+    private Integer limitValue;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -130,6 +137,38 @@ public class DataField {
     @JsonProperty("type")
     public void setType(DataField.Type type) {
         this.type = type;
+    }
+
+    /**
+     * Gets limitType
+     *
+     * @return value of limitType
+     */
+    public LimitType getLimitType() {
+        return limitType;
+    }
+
+    /**
+     * Sets limitType
+     */
+    public void setLimitType(LimitType limitType) {
+        this.limitType = limitType;
+    }
+
+    /**
+     * Gets limitValue
+     *
+     * @return value of limitValue
+     */
+    public Integer getLimitValue() {
+        return limitValue;
+    }
+
+    /**
+     * Sets limitValue
+     */
+    public void setLimitValue(Integer limitValue) {
+        this.limitValue = limitValue;
     }
 
     @JsonAnyGetter
@@ -220,6 +259,45 @@ public class DataField {
         @JsonCreator
         public static DataField.Type fromValue(String value) {
             DataField.Type constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
+
+    public enum LimitType {
+
+        TOP("top"),
+        BOTTOM("bottom");
+        private final String value;
+        private final static Map<String, DataField.LimitType> CONSTANTS = new HashMap<>();
+
+        static {
+            for (DataField.LimitType c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private LimitType(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static DataField.LimitType fromValue(String value) {
+            DataField.LimitType constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

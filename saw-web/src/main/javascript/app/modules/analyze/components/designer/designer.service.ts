@@ -429,7 +429,9 @@ export class DesignerService {
             tableName: artifactColumn.table,
             name: artifactColumn.columnName,
             type: artifactColumn.type,
-            // the name propertie is needed for the elastic search
+            limitValue: artifactColumn.limitValue,
+            limitType: artifactColumn.limitType
+            // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:

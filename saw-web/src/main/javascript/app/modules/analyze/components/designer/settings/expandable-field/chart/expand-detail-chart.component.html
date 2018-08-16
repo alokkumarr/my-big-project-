@@ -1,4 +1,15 @@
 <div fxLayout="column">
+  <div style="margin-top:5px;" class="value-limits" *ngIf="artifactColumn.area === 'y' && fieldCount < 2">
+    <mat-radio-group [(ngModel)]="limitType" style="width:50%;">
+      <mat-radio-button value="top">Top</mat-radio-button>
+      <mat-radio-button style="margin-left: 4%;" value="bottom">Bottom</mat-radio-button>
+    </mat-radio-group>
+    <br/>
+    <mat-form-field style="width:35%;">
+        <input matInput type="number" [(ngModel)]="limitValue" min="0" placeholder="Value"/>
+    </mat-form-field>
+    <button mat-button color="primary" class="mat-raised-button mat-primary chart-title-button" (click)="onLimitDataChange()" style="float: right;">Apply Limit</button>
+  </div>
   <mat-form-field fxFlex>
       <input matInput type="text"
              placeholder="Alias"
