@@ -53,8 +53,8 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 public class AnalyzeIT extends BaseIT {
   @Test(timeout=300000)
   public void testExecuteAnalysis() throws JsonProcessingException {
-    String metricId = listMetrics(token);
-    ObjectNode analysis = createAnalysis(token, metricId);
+    String metricId = listMetrics(token,"sample-elasticsearch");
+    ObjectNode analysis = createAnalysis(token, metricId,"pivot");
     String analysisId = analysis.get("id").asText();
     String analysisName = "Test (" + System.currentTimeMillis() + ")";
     saveAnalysis(token, analysisId, analysisName, analysis);
@@ -73,8 +73,8 @@ public class AnalyzeIT extends BaseIT {
     public void exportData() throws JsonProcessingException, IOException {
 
         // create and save analysis
-        String metricId = listMetrics(token);
-        ObjectNode analysis = createDLReportAnalysis(token, metricId);
+        String metricId = listMetrics(token,"sample-spark");
+        ObjectNode analysis = createAnalysis(token, metricId,"report");
         String analysisId = analysis.get("id").asText();
         String analysisName = "Test DL Report (" + System.currentTimeMillis() + ")";
         saveDLReportAnalysis(token, analysisId, analysisName, analysis);
@@ -87,7 +87,7 @@ public class AnalyzeIT extends BaseIT {
         createSchedule(json);
 
         // execute the analysis and retrieve results
-        executeAnalysis(token, analysisId);
+        executeDLAnalysis(token, analysisId);
         String executionId = listSingleExecution(token, analysisId);
         List<Map<String, String>> data = getExecution(
             token, analysisId, executionId);
@@ -155,37 +155,43 @@ public class AnalyzeIT extends BaseIT {
         assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
     }
 
-  private String listMetrics(String token) throws JsonProcessingException {
-    ObjectNode node = mapper.createObjectNode();
-    ObjectNode contents = node.putObject("contents");
-    contents.put("action", "search");
-    contents.put("context", "Semantic");
-    contents.put("select", "headers");
-    ArrayNode keys = contents.putArray("keys");
-    ObjectNode key = keys.addObject();
-    key.put("customerCode", "SYNCHRONOSS");
-    key.put("module", "ANALYZE");
-    String json = mapper.writeValueAsString(node);
-    String path = "contents[0]['ANALYZE'].find "
-                  + "{it.metric == 'sample-elasticsearch'}.id";
-    Response response = given(spec)
-                        .header("Authorization", "Bearer " + token)
-                        .filter(document("list-metrics",
-                                         preprocessResponse(prettyPrint())))
-                        .body(json)
-                        .when().post("/services/md")
-                        .then().assertThat().statusCode(200)
-                        .extract().response();
-    try {
-      String metricId = response.path(path);
-      if (metricId == null) {
-        return retryListMetrics(token);
-      }
-      return metricId;
-    } catch (IllegalArgumentException e) {
-      return retryListMetrics(token);
+    /**
+     * List and find the metric ID
+     * @param token
+     * @return
+     * @throws JsonProcessingException
+     */
+    private String listMetrics(String token,String metricName) throws JsonProcessingException {
+        ObjectNode node = mapper.createObjectNode();
+        ObjectNode contents = node.putObject("contents");
+        contents.put("action", "search");
+        contents.put("context", "Semantic");
+        contents.put("select", "headers");
+        ArrayNode keys = contents.putArray("keys");
+        ObjectNode key = keys.addObject();
+        key.put("customerCode", "SYNCHRONOSS");
+        key.put("module", "ANALYZE");
+        String json = mapper.writeValueAsString(node);
+        String path = "contents[0]['ANALYZE'].find "
+            + "{it.metric == '"+metricName+"'}.id";
+        Response response = given(spec)
+            .header("Authorization", "Bearer " + token)
+            .filter(document("list-metrics",
+                preprocessResponse(prettyPrint())))
+            .body(json)
+            .when().post("/services/md")
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        try {
+            String metricId = response.path(path);
+            if (metricId == null) {
+                return retryListMetrics(token);
+            }
+            return metricId;
+        } catch (IllegalArgumentException e) {
+            return retryListMetrics(token);
+        }
     }
-  }
 
   private String retryListMetrics(String token)
       throws JsonProcessingException {
@@ -195,10 +201,10 @@ public class AnalyzeIT extends BaseIT {
     try {
       Thread.sleep(5000);
     } catch (InterruptedException e) {}
-    return listMetrics(token);
+    return listMetrics(token,"sample-elasticsearch");
   }
 
-  private ObjectNode createAnalysis(String token, String metricId)
+  private ObjectNode createAnalysis(String token, String metricId, String analysisType)
       throws JsonProcessingException {
     ObjectNode node = mapper.createObjectNode();
     ObjectNode contents = node.putObject("contents");
@@ -208,7 +214,7 @@ public class AnalyzeIT extends BaseIT {
     key.put("customerCode", "SYNCHRONOSS");
     key.put("module", "ANALYZE");
     key.put("id", metricId);
-    key.put("analysisType", "pivot");
+    key.put("analysisType", analysisType);
     String json = mapper.writeValueAsString(node);
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
@@ -220,35 +226,13 @@ public class AnalyzeIT extends BaseIT {
     return (ObjectNode) root.get("contents").get("analyze").get(0);
   }
 
-  private ObjectNode createDLReportAnalysis(String token, String metricId)
-      throws JsonProcessingException {
-    ObjectNode node = mapper.createObjectNode();
-    ObjectNode contents = node.putObject("contents");
-    contents.put("action", "create");
-    ArrayNode keys = contents.putArray("keys");
-    ObjectNode key = keys.addObject();
-    key.put("customerCode", "SYNCHRONOSS");
-    key.put("module", "ANALYZE");
-    key.put("id", metricId);
-    key.put("analysisType", "report");
-    String json = mapper.writeValueAsString(node);
-    Response response = given(spec)
-        .header("Authorization", "Bearer " + token)
-        .body(json)
-        .when().post("/services/analysis")
-        .then().assertThat().statusCode(200)
-        .extract().response();
-    ObjectNode root = response.as(ObjectNode.class);
-    return (ObjectNode) root.get("contents").get("analyze").get(0);
-  }
-
   private void saveAnalysis(String token, String analysisId,
                             String analysisName, ObjectNode analysis)
       throws JsonProcessingException {
     analysis.put("saved", true);
     analysis.put("categoryId", 4);
     analysis.put("name", analysisName);
-    analysis.set("sqlBuilder", sqlBuilder());
+    analysis.set("sqlBuilder", sqlBuilderPivot());
     ArrayNode artifacts = (ArrayNode) analysis.get("artifacts");
     for (JsonNode artifactNode : artifacts) {
       ObjectNode artifact = (ObjectNode) artifactNode;
@@ -306,103 +290,32 @@ public class AnalyzeIT extends BaseIT {
     analysis.put("categoryId", 4);
     analysis.put("name", analysisName);
     analysis.set("sqlBuilder", sqlBuilderDLReport());
-    ArrayNode artifacts = analysis.putArray("artifacts");
-    // replace this logic with object node / array node in future
-    String artifactDefinition = ""
-        + "{\n"
-        + "            \\\"artifactName\\\": \\\"SALES\\\",\n"
-        + "            \\\"columns\\\": [\n"
-        + "              {\n"
-        + "                \\\"name\\\": \\\"string\\\",\n"
-        + "                \\\"type\\\": \\\"string\\\",\n"
-        + "                \\\"columnName\\\": \\\"string\\\",\n"
-        + "                \\\"displayName\\\": \\\"String\\\",\n"
-        + "                \\\"aliasName\\\": \\\"\\\",\n"
-        + "                \\\"table\\\": \\\"sales\\\",\n"
-        + "                \\\"joinEligible\\\": true,\n"
-        + "                \\\"filterEligible\\\": true,\n"
-        + "                \\\"checked\\\": true\n"
-        + "              },\n"
-        + "              {\n"
-        + "                \\\"name\\\": \\\"long\\\",\n"
-        + "                \\\"type\\\": \\\"long\\\",\n"
-        + "                \\\"columnName\\\": \\\"long\\\",\n"
-        + "                \\\"displayName\\\": \\\"Long\\\",\n"
-        + "                \\\"aliasName\\\": \\\"\\\",\n"
-        + "                \\\"table\\\": \\\"sample\\\",\n"
-        + "                \\\"joinEligible\\\": false,\n"
-        + "                \\\"filterEligible\\\": true,\n"
-        + "                \\\"checked\\\": true\n"
-        + "              },\n"
-        + "              {\n"
-        + "                \\\"name\\\": \\\"float\\\",\n"
-        + "                \\\"type\\\": \\\"float\\\",\n"
-        + "                \\\"columnName\\\": \\\"float\\\",\n"
-        + "                \\\"displayName\\\": \\\"Float\\\",\n"
-        + "                \\\"aliasName\\\": \\\"\\\",\n"
-        + "                \\\"table\\\": \\\"sales\\\",\n"
-        + "                \\\"joinEligible\\\": false,\n"
-        + "                \\\"filterEligible\\\": true,\n"
-        + "                \\\"checked\\\": true,\n"
-        + "                \\\"format\\\": {\n"
-        + "                  \\\"precision\\\": 2\n"
-        + "                }\n"
-        + "              },\n"
-        + "              {\n"
-        + "                \\\"name\\\": \\\"date\\\",\n"
-        + "                \\\"type\\\": \\\"date\\\",\n"
-        + "                \\\"columnName\\\": \\\"date\\\",\n"
-        + "                \\\"displayName\\\": \\\"Date\\\",\n"
-        + "                \\\"aliasName\\\": \\\"\\\",\n"
-        + "                \\\"table\\\": \\\"sales\\\",\n"
-        + "                \\\"joinEligible\\\": false,\n"
-        + "                \\\"filterEligible\\\": true,\n"
-        + "                \\\"checked\\\": true,\n"
-        + "                \\\"format\\\": \\\"yyyy-MM-dd\\\"\n"
-        + "              },\n"
-        + "              {\n"
-        + "                \\\"name\\\": \\\"integer\\\",\n"
-        + "                \\\"type\\\": \\\"integer\\\",\n"
-        + "                \\\"columnName\\\": \\\"integer\\\",\n"
-        + "                \\\"displayName\\\": \\\"Integer\\\",\n"
-        + "                \\\"aliasName\\\": \\\"\\\",\n"
-        + "                \\\"table\\\": \\\"sample\\\",\n"
-        + "                \\\"joinEligible\\\": false,\n"
-        + "                \\\"filterEligible\\\": true,\n"
-        + "                \\\"checked\\\": true\n"
-        + "              },\n"
-        + "              {\n"
-        + "                \\\"name\\\": \\\"double\\\",\n"
-        + "                \\\"type\\\": \\\"double\\\",\n"
-        + "                \\\"columnName\\\": \\\"double\\\",\n"
-        + "                \\\"displayName\\\": \\\"Double\\\",\n"
-        + "                \\\"aliasName\\\": \\\"\\\",\n"
-        + "                \\\"table\\\": \\\"sales\\\",\n"
-        + "                \\\"joinEligible\\\": false,\n"
-        + "                \\\"filterEligible\\\": true,\n"
-        + "                \\\"checked\\\": true,\n"
-        + "                \\\"format\\\": {\n"
-        + "                  \\\"precision\\\": 2\n"
-        + "                }\n"
-        + "              }";
-    artifacts.add(artifactDefinition);
-    ObjectNode node = mapper.createObjectNode();
-    ObjectNode contents = node.putObject("contents");
-    contents.put("action", "update");
-    ArrayNode keys = contents.putArray("keys");
-    ObjectNode key = keys.addObject();
-    key.put("id", analysisId);
-    ArrayNode analyze = contents.putArray("analyze");
-    analyze.add(analysis);
-    String json = mapper.writeValueAsString(node);
-    given(spec)
-        .header("Authorization", "Bearer " + token)
-        .body(json)
-        .when().post("/services/analysis")
-        .then().assertThat().statusCode(200);
+    ArrayNode artifacts = (ArrayNode) analysis.get("artifacts");
+      for (JsonNode artifactNode : artifacts) {
+          ObjectNode artifact = (ObjectNode) artifactNode;
+          ArrayNode columns = (ArrayNode) artifact.get("columns");
+          for (JsonNode columnNode : columns) {
+              ObjectNode column = (ObjectNode) columnNode;
+              column.put("checked", true);
+          }
+      }
+      ObjectNode node = mapper.createObjectNode();
+      ObjectNode contents = node.putObject("contents");
+      contents.put("action", "update");
+      ArrayNode keys = contents.putArray("keys");
+      ObjectNode key = keys.addObject();
+      key.put("id", analysisId);
+      ArrayNode analyze = contents.putArray("analyze");
+      analyze.add(analysis);
+      String json = mapper.writeValueAsString(node);
+      given(spec)
+          .header("Authorization", "Bearer " + token)
+          .body(json)
+          .when().post("/services/analysis")
+          .then().assertThat().statusCode(200);
   }
 
-  private ObjectNode sqlBuilder() {
+  private ObjectNode sqlBuilderPivot() {
     ObjectNode sqlBuilder = mapper.createObjectNode();
     sqlBuilder.put("booleanCriteria", "AND");
     sqlBuilder.putArray("filters");
@@ -430,7 +343,19 @@ public class AnalyzeIT extends BaseIT {
     sqlBuilder.put("booleanCriteria", "AND");
     sqlBuilder.putArray("filters");
     sqlBuilder.putArray("orderByColumns");
-    sqlBuilder.putArray("joins");
+    ArrayNode joins = sqlBuilder.putArray("joins");
+    ObjectNode join = joins.addObject();
+    join.put("type","inner");
+    ArrayNode criteria = join.putArray("criteria");
+    ObjectNode criteria1 = criteria.addObject();
+      criteria1.put("columnName","string");
+      criteria1.put("side","right");
+      criteria1.put("tableName","SALES");
+      ObjectNode criteria2 = criteria.addObject();
+      criteria2.put("columnName","string_2");
+      criteria2.put("side","left");
+      criteria2.put("tableName","PRODUCT");
+      sqlBuilder.putArray("orderByColumns");
     return sqlBuilder;
   }
 
@@ -470,6 +395,24 @@ public class AnalyzeIT extends BaseIT {
         .then().assertThat().statusCode(200)
         .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
   }
+
+    private void executeDLAnalysis(String token, String analysisId)
+        throws JsonProcessingException {
+        ObjectNode node = mapper.createObjectNode();
+        ObjectNode contents = node.putObject("contents");
+        contents.put("action", "execute");
+        ArrayNode keys = contents.putArray("keys");
+        ObjectNode key = keys.addObject();
+        key.put("id", analysisId);
+        String json = mapper.writeValueAsString(node);
+        String buckets = "contents.analyze[0]";
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(json)
+            .when().post("/services/analysis")
+            .then().assertThat().statusCode(200)
+            .body(buckets + ".totalRows", equalTo(200));
+    }
 
   private String listSingleExecution(String token, String analysisId) {
     Response response = request(token)
@@ -521,7 +464,7 @@ public class AnalyzeIT extends BaseIT {
     /* Use list metrics method, which waits for sample metrics to
      * be loaded before returning, to ensure sample metrics are
      * available before creating filters */
-    listMetrics(token);
+    listMetrics(token,"sample-elasticsearch");
     /* Proceed to creating filters */
     ObjectNode node = globalFilters();
     String json = mapper.writeValueAsString(node);
