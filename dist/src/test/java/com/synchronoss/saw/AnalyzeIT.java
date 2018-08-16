@@ -4,34 +4,23 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockftpserver.core.session.SessionKeys.USERNAME;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.net.ftp.FTPClient;
@@ -42,9 +31,6 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
-import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
-import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
 /**
  * Integration test that lists metrics, creates an analysis, saves it,
@@ -57,7 +43,7 @@ public class AnalyzeIT extends BaseIT {
     ObjectNode analysis = createAnalysis(token, metricId,"pivot");
     String analysisId = analysis.get("id").asText();
     String analysisName = "Test (" + System.currentTimeMillis() + ")";
-    saveAnalysis(token, analysisId, analysisName, analysis);
+    savePivotAnalysis(token, analysisId, analysisName, analysis);
     listAnalyses(token, analysisName);
     executeAnalysis(token, analysisId);
     String executionId = listSingleExecution(token, analysisId);
@@ -185,15 +171,15 @@ public class AnalyzeIT extends BaseIT {
         try {
             String metricId = response.path(path);
             if (metricId == null) {
-                return retryListMetrics(token);
+                return retryListMetrics(token,metricName);
             }
             return metricId;
         } catch (IllegalArgumentException e) {
-            return retryListMetrics(token);
+            return retryListMetrics(token,metricName);
         }
     }
 
-  private String retryListMetrics(String token)
+  private String retryListMetrics(String token, String metricName)
       throws JsonProcessingException {
     /* Path was not found, so wait and retry.  The sample metrics
      * are loaded asynchronously, so wait until the loading
@@ -201,7 +187,7 @@ public class AnalyzeIT extends BaseIT {
     try {
       Thread.sleep(5000);
     } catch (InterruptedException e) {}
-    return listMetrics(token,"sample-elasticsearch");
+    return listMetrics(token,metricName);
   }
 
   private ObjectNode createAnalysis(String token, String metricId, String analysisType)
@@ -226,7 +212,7 @@ public class AnalyzeIT extends BaseIT {
     return (ObjectNode) root.get("contents").get("analyze").get(0);
   }
 
-  private void saveAnalysis(String token, String analysisId,
+  private void savePivotAnalysis(String token, String analysisId,
                             String analysisName, ObjectNode analysis)
       throws JsonProcessingException {
     analysis.put("saved", true);
