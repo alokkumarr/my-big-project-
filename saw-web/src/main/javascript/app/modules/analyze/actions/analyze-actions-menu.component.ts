@@ -1,11 +1,14 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpReduce from 'lodash/fp/reduce';
 import * as isString from 'lodash/isString';
 import * as upperCase from 'lodash/upperCase';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { Analysis } from '../types';
 import { AnalyzeActionsService } from './analyze-actions.service';
 import { DesignerSaveEvent } from '../components/designer/types';
+import * as clone from 'lodash/clone';
 
 const template = require('./analyze-actions-menu.component.html');
 
@@ -15,13 +18,24 @@ const template = require('./analyze-actions-menu.component.html');
 })
 
 export class AnalyzeActionsMenuComponent {
-  @Output() afterEdit: EventEmitter<Analysis> = new EventEmitter();
+  @Output() afterEdit: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   @Output() afterExport: EventEmitter<null> = new EventEmitter();
   @Output() afterExecute: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterDelete: EventEmitter<Analysis> = new EventEmitter();
   @Output() afterPublish: EventEmitter<Analysis> = new EventEmitter();
+  @Output() afterSchedule: EventEmitter<Analysis> = new EventEmitter();
   @Input() analysis: Analysis;
   @Input() exclude: string;
+  @Input('actionsToDisable') set disabledActions(actionsToDisable: string) {
+    this.actionsToDisable = fpPipe(
+      actionsToDisableString => isString(actionsToDisableString) ? actionsToDisableString.split('-') : [],
+      fpReduce((acc, action) => {
+        acc[action] = true;
+        return acc;
+      }, {})
+    )(actionsToDisable);
+  };
+  public actionsToDisable = {};
 
   actions = [{
     label: 'Execute',
@@ -38,7 +52,11 @@ export class AnalyzeActionsMenuComponent {
   }, {
     label: 'Publish',
     value: 'publish',
-    fn: this.publish.bind(this)
+    fn: this.publish.bind(this, 'publish')
+  }, {
+    label: 'Schedule',
+    value: 'publish',
+    fn: this.publish.bind(this, 'schedule')
   }, {
     label: 'Export',
     value: 'export',
@@ -72,21 +90,16 @@ export class AnalyzeActionsMenuComponent {
   edit() {
     this._analyzeActionsService.edit(this.analysis).then((result: DesignerSaveEvent) => {
       if (result) {
-        const {isSaveSuccessful, analysis} = result;
-        if (!isSaveSuccessful) {
-          return isSaveSuccessful;
-        }
-        this.afterEdit.emit(analysis);
+        this.afterEdit.emit(result);
       }
     });
   }
 
   fork() {
-    this._analyzeActionsService.fork(this.analysis).then(status => {
-      if (!status) {
-        return status;
+    this._analyzeActionsService.fork(this.analysis).then((result: DesignerSaveEvent) => {
+      if (result) {
+        this.afterEdit.emit(result);
       }
-      this.afterEdit.emit();
     });
   }
 
@@ -106,8 +119,10 @@ export class AnalyzeActionsMenuComponent {
     });
   }
 
-  publish() {
-    this._analyzeActionsService.publish(this.analysis).then(analysis => {
+  publish(type) {
+    const analysis = clone(this.analysis);
+    this._analyzeActionsService.publish(analysis,type).then(analysis => {
+      this.analysis = analysis;
       this.afterPublish.emit(analysis);
     });
   }

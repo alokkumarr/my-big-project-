@@ -21,6 +21,9 @@ import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
+import com.synchronoss.saw.storage.proxy.model.StoreField;
+import com.synchronoss.saw.storage.proxy.model.response.ClusterAliasesResponse;
+import com.synchronoss.saw.storage.proxy.model.response.ClusterIndexResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
 import com.synchronoss.saw.storage.proxy.model.response.Hit;
@@ -36,9 +39,16 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   
   private String dateFormat="yyyy-mm-dd hh:mm:ss";
   private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
+  private String SIZE_REG_EX = ".*?(size).*?(\\d+)";
   
   @Autowired
   private StorageConnectorService storageConnectorService;
+  
+  //@Autowired
+  //private StorageProxyMetaDataService storageProxyMetaDataService;
+  
+
+  private int size;
 
   @Override
   public StorageProxy execute(StorageProxy proxy) throws Exception {
@@ -53,10 +63,12 @@ public class StorageProxyServiceImpl implements StorageProxyService {
           case "ES" :  
             String action = proxy.getAction().value();         
             if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) 
-                || action.equals(Action.SNCRPIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value())){
+                || action.equals(Action.PIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value()) || action.equals(Action.AGGREGATE.value())
+                || action.equals(Action.CATINDICES.value()) || action.equals(Action.MAPPINGALIASES.value()) || action.equals(Action.CATALIASES.value()) ){
                         
                         
-                          if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value())){
+                          if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.CATINDICES.value()) || action.equals(Action.MAPPINGALIASES.value())
+                              || action.equals(Action.CATALIASES.value())){
                                 Preconditions.checkArgument(!(proxy.getResultFormat().value().equals(ResultFormat.TABULAR.value())), "The result format for above operations cannot be in tabular format");
                                 proxy.setResultFormat(ResultFormat.JSON);
                                 switch (action) {
@@ -84,11 +96,44 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                                 proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
                                                 proxy.setData(deleteData);
                                                 break;
+                                 case "catIndices" : 
+                                              List<ClusterIndexResponse> clusterIndexResponses = storageConnectorService.catClusterIndices(proxy);
+                                              List<Object> listOfIndices = new ArrayList<>();
+                                              for(ClusterIndexResponse clusterIndexResponse : clusterIndexResponses) {
+                                                listOfIndices.add(clusterIndexResponse.getIndex());
+                                              }
+                                              proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                              proxy.setData(listOfIndices);
+                                              break;
+                                 case "catAliases" : 
+                                             List<ClusterAliasesResponse> clusterAliasesResponses = storageConnectorService.catClusterAliases(proxy);
+                                             List<Object> listOfAliases = new ArrayList<>();
+                                             for(ClusterAliasesResponse clusterAliasResponse : clusterAliasesResponses) {
+                                               listOfAliases.add(clusterAliasResponse.getAlias());
+                                             }
+                                             proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                             proxy.setData(listOfAliases);
+                                             break;
+                                case "mappingsIndices" : 
+                                             List<StoreField> mappingIndexResponse = storageConnectorService.getMappingbyIndex(proxy);
+                                             List<Object> mappinglist = new ArrayList<>();
+                                             for(StoreField storeField : mappingIndexResponse) {
+                                               mappinglist.add(storeField);
+                                             }
+                                             mappinglist.add(mappingIndexResponse);
+                                             proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                             proxy.setData(mappinglist);
+                                             break;
+                                case "mappingsAliases" : 
+                                            StorageProxy mappingAliasesResponse = storageConnectorService.getMappingbyAlias(proxy);
+                                            proxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
+                                            proxy.setData(mappingAliasesResponse.getData());
+                                            break;
                                 } 
                           }// Action only to support JSON format
                           else {
                             switch (action){
-                              case "sncrpivot" : 
+                              case "pivot" : 
                                                if (proxy.getSqlBuilder()!=null){
                                                  Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");  
                                                  String query = proxy.getQuery();
@@ -198,7 +243,7 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                               proxy.setData(data);
                                               }
                                               else {
-                                                proxy.setStatusMessage("There are no documents available with the provided");
+                                                proxy.setStatusMessage("There are no documents available with the provided query.");
                                               }
                                               } // end of check for the size 50000
                                               else {
@@ -206,15 +251,60 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                                               }
                                               }
                                               else{
-                                                proxy.setStatusMessage("Please provide size & from parameter in query.");
+                                                proxy.setStatusMessage("Please provide size or both parameter in query.");
                                                 proxy.setPageSize(0);
                                                 proxy.setPageNum(0);
                                               }
                                               break;
-                                          }
-                            // TODO: Execute Query or perform 'search' & 'sncrpivot' prepare response based on the specification (either JSON or Tabular) 
-                            // TODO: Convert data either into tabular or JSON
-                          }
+                              case "aggregate" :  
+                                Preconditions.checkArgument(proxy.getQuery()!=null, "Query cannot be null.");
+                                String aggregateQuery = proxy.getQuery();
+                                setSize(0);
+                                proxy.setPageSize(0);
+                                proxy.setPageNum(0);
+                                if(aggregateQuery.contains("size")){
+                                  Pattern p = Pattern.compile(SIZE_REG_EX, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                                  Matcher m = p.matcher(aggregateQuery);
+                                  if (m.find())
+                                  {
+                                      String fromSize_1=m.group(1).trim();
+                                      String fromSize_1_Num=m.group(2);
+                                      
+                                      if (fromSize_1.equals("size")){
+                                        setSize(Integer.parseInt(fromSize_1_Num));
+                                        }
+                                      else{
+                                        setSize(0);
+                                  } // parsing of size & from
+                                  }
+                                    SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(proxy.getQuery(), proxy);
+                                    if (proxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
+                                        logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
+                                            if (sncrPivotResponse.getAggregations()!=null) {
+                                            proxy.setAggregationData(sncrPivotResponse.getAggregations());}
+                                            // This else block is for special case to handle if the same request expects both aggregate & search i.e. ANALYZE module
+                                            else {
+                                              List<Hit<?>> hits = sncrPivotResponse.getHits().getHits();
+                                              List<Object> data = new ArrayList<>();
+                                                 for (Hit<?> hit : hits){
+                                                 data.add(hit.getSource());
+                                                }
+                                                proxy.setData(data);
+                                            }
+                                            }
+                                    else {
+                                      proxy.setStatusMessage("Aggregate action's does not support flattening of data yet.");
+                                    }
+                                 
+                           } // end of aggregate size block 
+                                else{
+                                  proxy.setStatusMessage("Please provide size parameter in query.");
+                                  proxy.setPageSize(0);
+                                  proxy.setPageNum(0);
+                           }      
+                          break; 
+                          } // end of action
+                        } // // end of action operation else block
             } // end of action operation  if block
             else {
               proxy.setStatusMessage("This "+action+" is not yet supported by StorageType :" + storageType);
@@ -239,13 +329,35 @@ public class StorageProxyServiceImpl implements StorageProxyService {
               // TODO: Execute Query or perform create, delete, update operation & Prepare response based on the specification (either JSON or Tabular)  
               // TODO: Convert data either into tabular or JSON
           
+         /* case  "METADATA":
+                     String actionMetadata = proxy.getAction().value();
+                     if (actionMetadata.equals(Action.CREATE.value()) || actionMetadata.equals(Action.READ.value()) || actionMetadata.equals(Action.UPDATE.value()) 
+                         || actionMetadata.equals(Action.DELETE.value())){
+                       switch (actionMetadata) {
+                         case "create" : proxy= storageProxyMetaDataService.createEntryInMetaData(proxy); break;
+                         case "update" : proxy= storageProxyMetaDataService.updateEntryFromMetaData(proxy);break;
+                         case "delete" : proxy= storageProxyMetaDataService.deleteEntryFromMetaData(proxy);break;
+                         case "read" :   proxy= storageProxyMetaDataService.readEntryFromMetaData(proxy);break;
+                       }
+                     }
+                     else {
+                       proxy.setStatusMessage("This "+actionMetadata+" is not yet supported by StorageType :" + storageType);
+                     } */
         } // end of switch statement
-    response = StorageProxyUtils.prepareResponse(proxy, "data is retrieved");
+    response = StorageProxyUtils.prepareResponse(proxy, proxy!=null? proxy.getStatusMessage():"data is retrieved.");
     } // end of schema validation if block
     else {
       response = StorageProxyUtils.prepareResponse(proxy, "provided JSON input is not valid.");
     }
     return response;
+  }
+
+  public int getSize() {
+    return size;
+  }
+
+  public void setSize(int size) {
+    this.size = size;
   }
   
 }

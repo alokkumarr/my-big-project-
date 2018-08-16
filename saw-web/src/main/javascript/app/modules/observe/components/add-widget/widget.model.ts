@@ -17,7 +17,7 @@ export const widgetTypes: Array<WidgetType> = [
   {
     name: 'Existing Analysis',
     id: Widget.ANALYSIS,
-    description: 'Add a chart to your dashboard',
+    description: 'Add an analysis to your dashboard',
     icon: 'analysis-widget'
   },
   {

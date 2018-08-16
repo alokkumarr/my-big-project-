@@ -76,7 +76,6 @@ public class SAWSemanticUtils {
     Preconditions.checkArgument(node.getUsername()!=null, "username cannot be null");
     Preconditions.checkArgument(node.getCustomerCode()!=null, "customer code cannot be null");
     Preconditions.checkArgument(node.getProjectCode()!=null, "project code cannot be null");
-    Preconditions.checkArgument(node.getSupports()!=null, "supports cannot be null");
     Preconditions.checkArgument(node.getArtifacts()!=null, "artifacts code cannot be null");
     Preconditions.checkArgument(node.getMetricName()!=null, "metric name code cannot be null");
   }

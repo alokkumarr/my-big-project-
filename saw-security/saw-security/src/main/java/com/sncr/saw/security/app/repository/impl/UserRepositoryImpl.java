@@ -166,14 +166,13 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public String rstchangePassword(String loginId, String newPass) {
+	public String rstchangePassword(String loginId, String newPass, String rhc) {
 		String message = null;
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
 		String encNewPass = Ccode.cencode(newPass).trim();
-		String sql = "SELECT U.USER_SYS_ID FROM USERS U, CONTACT_INFO C, USER_CONTACT UC WHERE  U.USER_SYS_ID = UC.USER_SYS_ID "
-				+ "AND UC.CONTACT_INFO_SYS_ID=C.CONTACT_INFO_SYS_ID AND U.USER_ID = ?";
+		String sql = "SELECT U.USER_SYS_ID FROM USERS U WHERE U.USER_ID = ? and U.ACTIVE_STATUS_IND = '1'";
 
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -194,6 +193,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(1, userSysId);
 				}
 			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
+
 			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
@@ -217,12 +217,16 @@ public class UserRepositoryImpl implements UserRepository {
 					}
 				});
 				message = null;
-				/*
-				 * sql =
-				 * "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID='"
-				 * + loginId + "' AND RS.VALID=1"; jdbcTemplate.update(sql);
-				 */
+				  sql =
+				 "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? "
+				 + "AND RS.VALID=1";
+				  jdbcTemplate.update(sql,new PreparedStatementSetter() {
+                      public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                           preparedStatement.setString(1, loginId);
+                      }
+                  });
 			}
+
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;
@@ -1188,15 +1192,14 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public String getUserEmailId(String userId) {
 		String message = null;
-		String sql = "select ci.email from USERS u, USER_CONTACT uc, CONTACT_INFO ci " + " where u.user_id=?"
-				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+		String sql = "select u.email from USERS u where u.user_id=? and u.ACTIVE_STATUS_IND = '1'";
 
 		try {
-			return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, userId);
-				}
-			}, new UserRepositoryImpl.EmailExtractor());
+            return jdbcTemplate.query(sql, new PreparedStatementSetter() {
+                public void setValues(PreparedStatement preparedStatement) throws SQLException {
+                    preparedStatement.setString(1, userId);
+                }
+            }, new UserRepositoryImpl.EmailExtractor());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;

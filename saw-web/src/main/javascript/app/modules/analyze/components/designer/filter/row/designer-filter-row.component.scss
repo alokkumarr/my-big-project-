@@ -11,5 +11,20 @@ designer-filter-row {
     mat-checkbox:first-child {
       margin-right: 10px;
     }
+
+    mat-checkbox:nth-child(2) {
+      margin-right: 10px;
+    }
+  }
+
+  mat-select {
+    margin-right: 5px;
+  }
+
+  .mandatory-asterisk {
+    color: red;
+    position: absolute;
+    top: 3px;
+    left: -4px;
   }
 }

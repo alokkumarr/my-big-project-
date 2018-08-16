@@ -69,6 +69,11 @@ export class ChartComponent {
         chartOptions
       )
     );
+    if (this.enableExport) {
+      this.config.exporting = {
+        enabled: true
+      }
+    }
 
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
@@ -103,7 +108,7 @@ export class ChartComponent {
    * @memberof ChartComponent
    */
   addExportConfig(config) {
-    set(config, 'exporting.filename', get(config, 'title.text') || 'chart');
+    set(config, 'exporting.filename', get(config, 'title.exportFilename') || 'chart');
     set(config, 'exporting.chartOptions', {
       legend: {
         navigation: {
@@ -238,7 +243,7 @@ export class ChartComponent {
   onExport() {
     this.chart.exportChartLocal({
       type: 'application/pdf',
-      filename: 'chart'
+      filename: this.config.title.exportFilename || 'chart'
     });
   }
 }

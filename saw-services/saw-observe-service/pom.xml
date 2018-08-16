@@ -123,7 +123,7 @@
 		<dependency>
 		  <groupId>com.mapr.db</groupId>
 		  <artifactId>maprdb</artifactId>
-		  <version>5.2.0-mapr</version>
+		  <version>6.0.1-mapr</version>
 		</dependency>
 		<dependency>
 			<groupId>info.faljse</groupId>
@@ -218,6 +218,7 @@
 						</goals>
 						<configuration>
 							<packageName>saw-observe</packageName>
+							<version>${revision.nodash}</version>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-observe-service</name>
@@ -248,6 +249,12 @@
 									<file>src/main/resources/application.yml</file>
 								</entry>
 							</entries>
+							<afterInstallation>
+							  <script>systemctl daemon-reload</script>
+							</afterInstallation>
+							<afterRemoval>
+							  <script>systemctl daemon-reload</script>
+							</afterRemoval>
 							<signature>
 								<skip>true</skip>
 							</signature>

@@ -1,27 +1,25 @@
 <header>
   <mat-toolbar class="app-toolbar">
-    <div class="lh-toolbar"
-         fxLayout="row" fxLayoutAlign="space-between center">
-      <div fxLayout="row" >
+    <div class="lh-toolbar" fxLayout="row" fxLayoutAlign="space-between center">
+      <div fxLayout="row">
+        <sidenav style="position: fixed" id="left-side-nav" class="left-side-nav" flex="none"></sidenav>
         <div class="company-logo"></div>
       </div>
 
       <div layout="row" class="lh-links">
-        <div *ngFor="let module of modules"
-              class="link"
-              uiSref="{{module.productModName.toLowerCase()}}"
-              uiSrefActive="m-active"
-              translate="{{module.productModName}}">{{module.productModName}}
+        <div *ngFor="let module of modules" class="link" uiSref="{{module.productModName.toLowerCase()}}" uiSrefActive="m-active"
+          translate="{{module.productModName}}">{{module.productModName}}
         </div>
       </div>
-      
-      <div fxLayout="row" >
-        <mat-icon fontIcon="icon-user-placeholder" class="md-icon-button" [matMenuTriggerFor]="menu" e2e="account-settings-menu-btn" matTooltip="{{UserDetails.ticket.userFullName | uppercase}}"></mat-icon>
+
+      <div fxLayout="row">
+        <mat-icon fontIcon="icon-user-placeholder" class="md-icon-button" [matMenuTriggerFor]="menu" e2e="account-settings-menu-btn"
+          matTooltip="{{UserDetails.ticket.userFullName | uppercase}}"></mat-icon>
         <mat-menu #menu="matMenu">
           <button mat-menu-item (click)="changePwd()" e2e="account-settings-selector-change-password">
             <ng-container i18n>Change Password</ng-container>
           </button>
-          <button mat-menu-item *ngIf="showAdmin"  uiSref="admin" e2e="account-settings-selector-admin">
+          <button mat-menu-item *ngIf="showAdmin" uiSref="admin" e2e="account-settings-selector-admin">
             <ng-container i18n>Admin</ng-container>
           </button>
           <mat-divider></mat-divider>
@@ -34,6 +32,6 @@
         </a>
       </div>
     </div>
-    <mat-progress-bar style="position: absolute;" *ngIf="showProgress" mode="indeterminate" value="40"></mat-progress-bar>
+    <mat-progress-bar *ngIf="showProgress" mode="indeterminate" value="40"></mat-progress-bar>
   </mat-toolbar>
 </header>

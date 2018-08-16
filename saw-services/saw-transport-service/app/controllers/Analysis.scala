@@ -26,9 +26,10 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
-import scala.collection.JavaConverters._
 
+import scala.collection.JavaConverters._
 import executor.ReportExecutorQueue
+import org.json4s
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.engine.{Fields, MDObjectStruct, MetadataDictionary}
 import sncr.saw.common.config.SAWServiceConfig
@@ -204,7 +205,15 @@ class Analysis extends BaseController {
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
         m_log.debug("search key" + keys);
-        json merge contentsAnalyze(searchAnalysisJson(keys))
+        var allAnalysisList: List[JObject] = List()
+        for {
+              JArray(objList) <- (json \ "contents" \ "keys")
+                 JObject(obj) <- objList
+              } {
+                 val analysisList = searchAnalysisJson(obj)
+                 allAnalysisList = allAnalysisList ++ analysisList
+              }
+        json merge contentsAnalyze(allAnalysisList)
       }
       case "execute" => {
 
@@ -229,7 +238,8 @@ class Analysis extends BaseController {
               if (typeInfo.equals("report")) {
                 /* Build query based on analysis supplied in request body */
                 val runtime = (executionType == ExecutionType.onetime.toString
-                  || executionType == ExecutionType.regularExecution.toString)
+                  || executionType == ExecutionType.regularExecution.toString
+                  || executionType == ExecutionType.publish.toString)
                 m_log.debug("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
@@ -244,13 +254,13 @@ class Analysis extends BaseController {
             case _ => {}
           }
           if (executionType==null || executionType.isEmpty){
-           // Consider the default Execution type as regularExecution for the backward compatibility.
-            executionType = "regularExecution"
+           // Consider the default Execution type as publish for the backward compatibility.
+            executionType = "publish"
           }
 
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
           val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
-          contentsAnalyze(("data", data) ~ ("totalRows", totalRows))
+          contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))
         })
 
       }
@@ -381,7 +391,7 @@ class Analysis extends BaseController {
 
   def setResult(r: String): Unit = result = r
 
-  def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue = null, dataSecurityKeyStr: String): JValue = {
+  def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue = null, dataSecurityKeyStr: String): (json4s.JValue, String) = {
     var json: String = "";
     var typeInfo: String = "";
     var analysisJSON: JObject = null;
@@ -434,13 +444,14 @@ class Analysis extends BaseController {
 
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       m_log.trace("pivot dataset: {}", myArray)
       /* skip the resultNode creation for preview/onetime execution result node */
 
       if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.regularExecution.toString))) {
 
-        var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
         // The below block is for execution result to store
         if (data != null) {
           var nodeExists = false
@@ -497,7 +508,7 @@ class Analysis extends BaseController {
         }
       }
 
-      return myArray
+      return (myArray ,analysisResultNodeID)
     }
 
     if (typeInfo.equals("esReport")) {
@@ -519,9 +530,9 @@ class Analysis extends BaseController {
       m_log.trace("esReport dataset: {}", myArray)
       var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       /* skip the resultNode creation for preview/onetime execution result node */
-      if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
 
+      /* To support the pagination for es-report, store all the result as history
+        to avoid re-execution for same report in case of pagination request. */
         // The below block is for execution result to store
         if (data != null) {
           var nodeExists = false
@@ -576,9 +587,8 @@ class Analysis extends BaseController {
         else {
           descriptorPrintable = descriptor
         }
-      }
 
-      return getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray)
+      return (getESReportData(analysisResultNodeID, start, limit, typeInfo, myArray),analysisResultNodeID)
     }
     if (typeInfo.equals("chart")) {
       var data: String = null
@@ -593,11 +603,13 @@ class Analysis extends BaseController {
       }
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       /* skip the resultNode creation for preview/onetime execution result node */
 
     if (!(executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-        || executionType.equalsIgnoreCase(ExecutionType.preview.toString))) {
-        var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+        || executionType.equalsIgnoreCase(ExecutionType.preview.toString)
+        || executionType.equalsIgnoreCase(ExecutionType.regularExecution.toString))) {
+
         // The below block is for execution result to store
         if (data != null) {
           var nodeExists = false
@@ -653,7 +665,7 @@ class Analysis extends BaseController {
         }
       }
       m_log.trace("chart dataset: {}", myArray)
-      return myArray
+      return (myArray,analysisResultNodeID)
     }
     else {
       // This is the part of report type starts here
@@ -679,6 +691,7 @@ class Analysis extends BaseController {
         case "onetime" => ExecutionType.onetime
         case "scheduled" => ExecutionType.scheduled
         case "regularExecution" => ExecutionType.regularExecution
+        case "publish" => ExecutionType.publish
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       val execution = analysis.executeAndWaitQueue(
@@ -688,6 +701,7 @@ class Analysis extends BaseController {
             case ExecutionType.onetime => executorFastQueue
             case ExecutionType.scheduled => executorRegularQueue
             case ExecutionType.regularExecution => executorRegularQueue
+            case ExecutionType.publish => executorRegularQueue
             case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
           executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
@@ -717,7 +731,8 @@ class Analysis extends BaseController {
             create resultNode, transport service will directly read data from data lake for */
 
         if (executionType.equalsIgnoreCase(ExecutionType.onetime.toString)
-            || executionType.equalsIgnoreCase(ExecutionType.preview.toString)) {
+            || executionType.equalsIgnoreCase(ExecutionType.preview.toString)
+            || executionType.equalsIgnoreCase(ExecutionType.regularExecution.toString)) {
             val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(DLConfiguration.commonLocation) +
               File.separator + "preview-" + execution.getId
             val resultStream = execution.loadOneTimeExecution(outputLocation, DLConfiguration.rowLimit)
@@ -743,7 +758,7 @@ class Analysis extends BaseController {
         m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
         m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
         m_log.trace("Spark SQL executor result: {}", pretty(render(data)))
-        data
+        (data,analysisResultId)
       })
     }
   }

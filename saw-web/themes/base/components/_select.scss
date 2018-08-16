@@ -1,0 +1,25 @@
+.select-form-field[appearance="outline"] {
+  margin-bottom: 10px;
+
+  .mat-select-arrow-wrapper {
+    transform: translateY(10%);
+  }
+
+  .mat-form-field-wrapper {
+    padding-bottom: 0;
+  }
+
+  .mat-form-field-infix {
+    padding: 0.3em 0 0.8em;
+  }
+
+  .mat-form-field-label.mat-empty.mat-form-field-empty {
+    top: 1.34375em;
+  }
+
+  &.mat-focused.mat-form-field-should-float {
+    .mat-form-field-label.mat-empty.mat-form-field-empty {
+      top: 1.84375em;
+    }
+  }
+}

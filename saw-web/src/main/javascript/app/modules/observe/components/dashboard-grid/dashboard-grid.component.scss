@@ -17,7 +17,7 @@ dashboard-grid {
     gridster-item {
       .backdrop {
         width: 100%;
-        height: 60px;
+        height: 42px;
         background: rgba(0, 0, 0, 0.4);
         position: absolute;
         display: flex;
@@ -45,12 +45,12 @@ dashboard-grid {
         }
       }
 
-      & > .analysis-container {
+      & > observe-chart.analysis-container {
         display: block;
         width: 100%;
         height: 100%;
 
-        & > * {
+        & > .chart-view {
           display: block;
           width: 100%;
           height: 100%;

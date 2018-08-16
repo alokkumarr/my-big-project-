@@ -1,3 +1,9 @@
+import {AdminMainViewComponent} from './main-view';
+import {
+  UsersTableHeader,
+  RolesTableHeader
+} from './consts';
+
 export function routesConfig($stateProvider) {
   'ngInject';
 
@@ -5,25 +11,43 @@ export function routesConfig($stateProvider) {
     {
       name: 'admin',
       url: '/admin',
-      component: 'usersView'
+      redirectTo: 'admin.user'
     }, {
-      name: 'role',
+      name: 'admin.user',
+      url: '/user',
+      component: AdminMainViewComponent,
+      resolve: [{
+        token: 'columns',
+        resolveFn: () => UsersTableHeader
+      }, {
+        token: 'section',
+        resolveFn: () => 'user'
+      }]
+    }, {
+      name: 'admin.role',
       url: '/role',
-      component: 'rolesView'
+      component: AdminMainViewComponent,
+      resolve: [{
+        token: 'columns',
+        resolveFn: () => RolesTableHeader
+      }, {
+        token: 'section',
+        resolveFn: () => 'role'
+      }]
     }, {
-      name: 'privilege',
+      name: 'admin.privilege',
       url: '/privilege?role',
       component: 'privilegesView'
     }, {
-      name: 'categories',
+      name: 'admin.categories',
       url: '/categories',
       component: 'categoriesView'
     }, {
-      name: 'export',
+      name: 'admin.export',
       url: '/export',
       component: 'exportComponent'
     }, {
-      name: 'import',
+      name: 'admin.import',
       url: '/import',
       component: 'importComponent'
     }

@@ -7,6 +7,7 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as get from 'lodash/get';
+import * as floor from 'lodash/floor';
 import * as moment from 'moment';
 
 import { Subscription } from 'rxjs/Subscription';
@@ -109,8 +110,8 @@ export class GlobalDateFilterComponent implements OnInit, OnDestroy {
       .getModelValues(this._filter)
       .subscribe((data: { _min: string; _max: string }) => {
         this.defaults = {
-          min: moment(parseInt(data._min)),
-          max: moment(parseInt(data._max))
+          min: moment(floor(parseFloat(data._min))),
+          max: moment(floor(parseFloat(data._max)))
         };
 
         this.loadDefaults(useCache);

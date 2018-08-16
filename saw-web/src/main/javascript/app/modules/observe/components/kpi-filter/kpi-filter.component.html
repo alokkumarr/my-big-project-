@@ -1,6 +1,7 @@
 <form [formGroup]="kpiFilterForm">
-  <mat-form-field>
-    <mat-select placeholder="Choose a preset" formControlName="preset">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Preset</mat-label>
+    <mat-select formControlName="preset">
       <mat-option>None</mat-option>
       <mat-option *ngFor="let filt of dateFilters" [value]="filt.value">
         {{filt.label}}

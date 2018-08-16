@@ -12,7 +12,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 metastore:
-    base: "{{ saw_observe_metastore | default('hdfs:///main/') }}"
+    base: "{{ sip_var_path | default('/var/sip') }}"
 
 logging:
   config: /opt/bda/saw-observe-service/conf/logback.xml

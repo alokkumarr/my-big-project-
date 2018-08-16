@@ -1,18 +1,15 @@
-/*
- Created by Alex
- */
-
 const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');
 const savedAlaysisPage = require('../../javascript/pages/savedAlaysisPage.po');
-const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 const using = require('jasmine-data-provider');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
 const dataSets = require('../../javascript/data/datasets');
 const designModePage = require('../../javascript/pages/designModePage.po.js');
+const utils = require('../../javascript/helpers/utils');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -29,8 +26,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const sizeByName = 'Float';
 
   const dataProvider = {
-    // 'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602 ---disbaled in the UI
-    // 'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678 ---disbaled in the UI
+    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'}, //SAWQA-1602
+    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'}, //SAWQA-4678
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'}, //SAWQA-323
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'}, //SAWQA-4475
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'}, //SAWQA-569
@@ -39,8 +36,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'}, //SAWQA-4478
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
-    // 'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348 ---disbaled in the UI
-    // 'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676 ---disbaled in the UI
+    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676 
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
@@ -72,9 +69,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   using(dataProvider, function (data, description) {
     it('should create and delete ' + description, () => {
       login.loginAs(data.user);
-      homePage.mainMenuExpandBtn.click();
+
       homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
-      homePage.mainMenuCollapseBtn.click();
 
       let chartName = `e2e ${description} ${(new Date()).toString()}`;
       let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
@@ -122,18 +118,29 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       save.selectCategoryToSave(subCategoryName).click();
       commonFunctions.waitFor.elementToBeClickable(save.saveBtn);
       save.saveBtn.click();
+      browser.sleep(1000);
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
       //Change to Card View
-      commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
-      commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-      analyzePage.analysisElems.cardView.click();
+      element(utils.hasClass(homePage.cardViewInput, 'mat-radio-checked').then(function(isPresent) {
+        if(isPresent) {
+          console.log('Already in card view..')
+        } else {
+          console.log('Not in card view..')
+          commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.cardView);
+          commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+          analyzePage.analysisElems.cardView.click();
+        }
+      }));
+
       //Verify if created appeared in list
       commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
       commonFunctions.waitFor.elementToBeClickable(createdAnalysis);
       createdAnalysis.click();
+      browser.sleep(1000);
       commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.backButton);
       savedAlaysisPage.backButton.click();
+      commonFunctions.waitFor.elementToBeVisible(createdAnalysis);
       /*commonFunctions.waitFor.elementToBePresent(createdAnalysis)
         .then(() => expect(createdAnalysis.isPresent()).toBe(true));*/
       //Verify chart type on home page

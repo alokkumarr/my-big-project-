@@ -5,6 +5,7 @@ import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as forEach from 'lodash/forEach';
+import * as isFinite from 'lodash/isFinite';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpFlatMap from 'lodash/fp/flatMap';
@@ -74,6 +75,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     const newFilter: Filter = {
       type: null,
       tableName,
+      isOptional: false,
       columnName: null,
       isRuntimeFilter: false,
       isGlobalFilter: false,
@@ -123,11 +125,14 @@ export class DesignerFilterDialogComponent implements OnInit {
 
   validateFilters(filters) {
     let areValid = true;
-    forEach(filters, ({type, model, isRuntimeFilter, isGlobalFilter}: Filter) => {
+    forEach(filters, ({type, model, isRuntimeFilter, isGlobalFilter, isOptional}: Filter) => {
       if (!isRuntimeFilter && isGlobalFilter) {
         areValid = true;
       } else if (!model) {
-        areValid = Boolean(this.data.isInRuntimeMode ? false : isRuntimeFilter);
+        areValid = Boolean(this.data.isInRuntimeMode ?
+          isOptional && isRuntimeFilter :
+          isRuntimeFilter
+        );
       } else if (type === 'string') {
         areValid = this.isStringFilterValid(model);
       } else if (NUMBER_TYPES.includes(type)) {
@@ -149,9 +154,9 @@ export class DesignerFilterDialogComponent implements OnInit {
   isNumberFilterValid({operator, value, otherValue}: FilterModel) {
     switch (operator) {
     case 'BTW':
-      return Boolean(value && otherValue);
+      return Boolean(isFinite(value) && isFinite(otherValue));
     default:
-      return Boolean(value)
+      return Boolean(isFinite(value))
     }
   }
 

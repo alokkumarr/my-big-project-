@@ -60,6 +60,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
     public String buildDataQuery(Integer size) throws IOException, ProcessingException {
         SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(getJsonString(), "sqlBuilder");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.from(0);
         searchSourceBuilder.size(size);
         if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
             throw new NullPointerException(
@@ -98,7 +99,9 @@ public class SAWReportTypeElasticSearchQueryBuilder {
 
             for (com.synchronoss.querybuilder.model.report.Filter item : filters)
             {
-                if (!item.getIsRuntimeFilter().value()){
+                if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
+                    && !item.getIsGloblFilter().value()){
+
                     if (item.getType().value().equals(Filter.Type.DATE.value()) || item.getType().value().equals(Filter.Type.TIMESTAMP.value())) {
                         if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
                         {
@@ -195,6 +198,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         if(isPercentage)
         {
             SearchSourceBuilder preSearchSourceBuilder = new SearchSourceBuilder();
+            preSearchSourceBuilder.size(0);
             preSearchSourceBuilder.query(boolQueryBuilder);
             QueryBuilderUtil.getAggregationBuilder(dataFields, preSearchSourceBuilder);
             String result = SAWElasticTransportService.executeReturnAsString(preSearchSourceBuilder.toString(),jsonString,"dummy",

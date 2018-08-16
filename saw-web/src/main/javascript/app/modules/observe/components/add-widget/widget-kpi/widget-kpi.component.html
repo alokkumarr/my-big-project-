@@ -11,16 +11,18 @@
     </mat-error>
   </mat-form-field>
 
-  <mat-form-field *ngIf="_metric">
-    <mat-select placeholder="Select Date Field" formControlName="dateField">
+  <mat-form-field *ngIf="_metric" class="select-form-field" appearance="outline">
+    <mat-label>Date Field</mat-label>
+    <mat-select formControlName="dateField">
       <mat-option *ngFor="let field of _metric.dateColumns" [value]="field.columnName">
         {{ field.displayName }}
       </mat-option>
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field>
-    <mat-select placeholder="Filter" formControlName="filter">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Filter</mat-label>
+    <mat-select formControlName="filter">
       <mat-option *ngFor="let filt of dateFilters" [value]="filt.value">
         {{filt.label}}
       </mat-option>
@@ -41,8 +43,9 @@
     <mat-datepicker #topicker disabled="false"></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field>
-    <mat-select placeholder="Primary Aggregation" formControlName="primAggregate">
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Primary Aggregation</mat-label>
+    <mat-select formControlName="primAggregate">
       <mat-option *ngFor="let ag of aggregations" [value]="ag.value">
         {{ ag.name }}
       </mat-option>

@@ -41,11 +41,12 @@ public class DataExportController {
     if (analysisType.equals("") || analysisType.isEmpty()) {
       analysisType = "report"; // by default assume that it's report
     }
+    String executionType = request.getParameter("executionType");
     logger.debug("executionId in export {}", executionId);
     logger.debug(request.getHeader("Authorization"));
     logger.debug(request.getHeader("Host"));
     ListenableFuture<ResponseEntity<DataResponse>> responseObjectFuture = null;
-    responseObjectFuture = exportService.dataToBeExportedAsync(executionId, request, analysisId, analysisType);
+    responseObjectFuture = exportService.dataToBeExportedAsync(executionId, request, analysisId, analysisType,executionType);
     return responseObjectFuture;
   }
 

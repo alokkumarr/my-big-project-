@@ -11,6 +11,7 @@ export class DesignerSettingsAuxComponent implements OnInit {
   @Input() analysisType: string;
   @Input() analysisSubtype: string;
   @Input() auxSettings: any;
+  @Input() chartTitle: string;
 
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 

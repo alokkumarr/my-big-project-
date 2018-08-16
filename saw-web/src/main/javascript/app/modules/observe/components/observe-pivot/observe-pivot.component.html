@@ -1,0 +1,8 @@
+<h1 class="pivot-title" [textContent]="analysis.name"></h1>
+<pivot-grid *ngIf="analysis._executeTile !== false"
+            [artifactColumns]="artifactColumns"
+            [data]="data"
+            [sorts]="analysis.sqlBuilder.sorts"
+            [updater]="updater"
+            mode="designer">
+</pivot-grid>

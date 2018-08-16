@@ -5,13 +5,16 @@ import {
   EventEmitter,
   ViewChild
 } from '@angular/core';
+import { DxDataGridComponent } from 'devextreme-angular';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
+import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
@@ -25,10 +28,11 @@ import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as concat from 'lodash/concat';
+import * as moment from 'moment';
 
-import { NUMBER_TYPES } from '../../../analyze/consts';
-
+import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 const template = require('./observe-chart.component.html');
+require('./observe-chart.component.scss');
 
 @Component({
   selector: 'observe-chart',
@@ -40,8 +44,10 @@ export class ObserveChartComponent {
   @Input() item: any;
   @Input() enableChartDownload: boolean;
   @Input('updater') requester: BehaviorSubject<Array<any>>;
+  @Input() ViewMode: boolean;
   @Output() onRefresh = new EventEmitter<any>();
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
+  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
   private chartUpdater = new BehaviorSubject([]);
   private requesterSubscription: Subscription;
@@ -53,12 +59,15 @@ export class ObserveChartComponent {
   public sorts: Array<any>;
   public filters: Array<any>;
   public isStockChart: boolean;
+  public chartToggleData: any;
+  public toggleToGrid: boolean;
 
   constructor(
     public chartService: ChartService,
     public analyzeService: AnalyzeService,
     public sortService: SortService,
-    public filterService: FilterService
+    public filterService: FilterService,
+    public progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
@@ -72,6 +81,7 @@ export class ObserveChartComponent {
       ? false
       : this.analysis.isStockChart;
     this.subscribeToRequester();
+    this.toggleToGrid = false;
   }
 
   ngOnDestroy() {
@@ -105,12 +115,7 @@ export class ObserveChartComponent {
     const sortFields = this.sortService.getArtifactColumns2SortFieldMapper()(
       this.analysis.artifacts[0].columns
     );
-    this.sorts = this.analysis.sqlBuilder.sorts
-      ? this.sortService.mapBackend2FrontendSort(
-          this.analysis.sqlBuilder.sorts,
-          sortFields
-        )
-      : [];
+    this.sorts = this.analysis.sqlBuilder.sorts;
 
     this.filters = map(
       get(this.analysis, 'sqlBuilder.filters', []),
@@ -169,7 +174,7 @@ export class ObserveChartComponent {
     if (!isEmpty(this.sorts)) {
       gridData = orderBy(
         gridData,
-        map(this.sorts, 'field.dataField'),
+        map(this.sorts, 'columnName'),
         map(this.sorts, 'order')
       );
     }
@@ -183,7 +188,6 @@ export class ObserveChartComponent {
 
     changes = changes.concat(this.getLegend());
     changes = changes.concat([
-      { path: 'title.text', data: this.analysis.name },
       { path: 'title.y', data: -10 }
     ]);
 
@@ -195,12 +199,67 @@ export class ObserveChartComponent {
     return changes;
   }
 
+  fetchColumnData(axisName, value) {
+    let aliasName = axisName;
+    forEach(this.analysis.artifacts[0].columns, column => {
+      if (axisName === column.name) {
+        aliasName = column.aliasName || column.displayName;
+        value =
+          column.type === 'date'
+            ? moment
+                .utc(value)
+                .format(
+                  column.dateFormat === 'MMM d YYYY'
+                    ? 'MMM DD YYYY'
+                    : column.dateFormat === 'MMMM d YYYY, h:mm:ss a'
+                      ? 'MMMM DD YYYY, h:mm:ss a'
+                      : column.dateFormat
+                )
+            : value;
+        if (
+          value &&
+          (column.aggregate === 'percentage' || column.aggregate === 'avg')
+        ) {
+          value =
+            value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+        }
+        value = value === 'Undefined' ? '' : value;
+      }
+    });
+    return { aliasName, value };
+  }
+
+  trimKeyword(data) {
+    let trimData = data.map(row => {
+      let obj = {};
+      for (let key in row) {
+        let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+        obj[trimKey.aliasName] = trimKey.value;
+      }
+      return obj;
+    });
+    return trimData;
+  }
+
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
-    return this.analyzeService.getDataBySettings(payload).then(({ data }) => {
-      const parsedData = this.chartService.parseData(data, payload.sqlBuilder);
-      return parsedData || [];
-    });
+    this.progressService.show();
+    return this.analyzeService
+      .getDataBySettings(payload, EXECUTION_MODES.LIVE)
+      .then(
+        ({ data }) => {
+          this.progressService.hide();
+          const parsedData = flattenChartData(data, payload.sqlBuilder);
+          if (this.ViewMode) {
+            this.chartToggleData = this.trimKeyword(parsedData);
+          }
+          return parsedData || [];
+        },
+        err => {
+          this.progressService.hide();
+          throw err;
+        }
+      );
   }
 
   generatePayload(source) {
@@ -240,11 +299,7 @@ export class ObserveChartComponent {
     set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
     delete payload.supports;
-    set(
-      payload,
-      'sqlBuilder.sorts',
-      this.sortService.mapFrontend2BackendSort(this.sorts)
-    );
+    set(payload, 'sqlBuilder.sorts', this.sorts);
     set(
       payload,
       'sqlBuilder.booleanCriteria',

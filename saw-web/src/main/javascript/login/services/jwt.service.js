@@ -1,8 +1,10 @@
 import * as get from 'lodash/get';
 import * as has from 'lodash/has';
+import * as isArray from 'lodash/isArray';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
+import AppConfig from '../../../../../appConfig';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 
@@ -18,23 +20,24 @@ const PRIVILEGE_INDEX = {
   ALL: 8
 };
 
+/* Jwt token can have custom config values to drive
+ * behaviors in app. */
+export const CUSTOM_JWT_CONFIG = {
+  ES_ANALYSIS_AUTO_REFRESH: 'es-analysis-auto-refresh'
+};
+
 export class JwtService {
-  constructor($window, AppConfig) {
-    'ngInject';
-
-    this._$window = $window;
-    this._AppConfig = AppConfig;
-
+  constructor() {
     this._refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
   }
 
   set(accessToken, refreshToken) {
-    this._$window.localStorage[this._AppConfig.login.jwtKey] = accessToken;
-    this._$window.localStorage[this._refreshTokenKey] = refreshToken;
+    window.localStorage[AppConfig.login.jwtKey] = accessToken;
+    window.localStorage[this._refreshTokenKey] = refreshToken;
   }
 
   get() {
-    return this._$window.localStorage[this._AppConfig.login.jwtKey];
+    return window.localStorage[AppConfig.login.jwtKey];
   }
 
   getCategories(moduleName = 'ANALYZE') {
@@ -47,12 +50,27 @@ export class JwtService {
     return get(analyzeModule, 'prodModFeature', []) || [];
   }
 
+  /**
+   * hasCustomConfig
+   * Checks whether the current access token has
+   * a particular custom configuration enabled or not.
+   *
+   * @param configName
+   * @returns {undefined}
+   */
+  hasCustomConfig(configName) {
+    const customConfig = get(this.getTokenObj(), 'ticket.customConfig') || [];
+    return isArray(customConfig) ?
+      customConfig.includes(configName) :
+      false;
+  }
+
   getAccessToken() {
     return this.get();
   }
 
   getRefreshToken() {
-    return this._$window.localStorage[this._refreshTokenKey];
+    return window.localStorage[this._refreshTokenKey];
   }
 
   validity() {
@@ -60,8 +78,8 @@ export class JwtService {
   }
 
   destroy() {
-    this._$window.localStorage.removeItem(this._AppConfig.login.jwtKey);
-    this._$window.localStorage.removeItem(this._refreshTokenKey);
+    window.localStorage.removeItem(AppConfig.login.jwtKey);
+    window.localStorage.removeItem(this._refreshTokenKey);
   }
 
   parseJWT(jwt) {
@@ -70,7 +88,7 @@ export class JwtService {
     }
     const base64Url = jwt.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
-    return angular.fromJson(this._$window.atob(base64));
+    return angular.fromJson(window.atob(base64));
   }
 
   /* Returs the parsed json object from the jwt token */

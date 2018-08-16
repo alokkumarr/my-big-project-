@@ -14,12 +14,12 @@ and its modules in an environment.
 
 === Prerequisites
 
-Before starting an installation of SAW ensure the following has been
+Before starting an installation of SIP ensure the following has been
 provided in the environment:
 
-. Install and configure a MapR version 5.2 cluster in the environment
+. Install and configure a MapR version 6.0 cluster in the environment
 
-. Install and configure Apache Spark version 2.1 from the MapR
+. Install and configure Apache Spark version 2.2 from the MapR
   Ecosystem Pack on the MapR cluster
 
 . Install and configure Apache Livy from the MapR Ecosystem Pack on
@@ -28,16 +28,23 @@ provided in the environment:
 
 . Provision a MapR user in the MapR cluster (with user ID 500)
 
+. Optionally create a MapR volume to hold the SIP data (at the
+  location specified by the `sip_var_path` variable in the SIP
+  environment configuration, which defaults to `/var/sip`).  Creating
+  a MapR volume enables making snapshots of SIP data, for backup and
+  restore purposes.  If a dedicated volume is not created, the SIP
+  data can be saved as part of a root volume snapshot.
+
 . Provision a mail relay host
 
-. Provision a host to deploy from (the deploy host), running CentOS 7
-  as the operating system.  This host will be used to run the deploy
-  command and store the environment configuration.  The deploy host is
-  typically common to the entire environment.
+. Provision a host to deploy from (the deploy host), running CentOS
+  7.4 as the operating system.  This host will be used to run the
+  deploy command and store the environment configuration.  The deploy
+  host is typically common to the entire environment.
 
-. Provision a host for running SAW (the target host), with 32 GB of
-  memory and CentOS 7 as the operating system.  The host should be
-  dedicated to SAW and not run other applications.
+. Provision a host for running SIP (the target host), with 32 GB of
+  memory and CentOS 7.4 as the operating system.  The host should be
+  dedicated to SIP and not run other applications.
 
 . Install and configure MapR client on the SAW target host.
 
@@ -50,7 +57,9 @@ packages and configuration on the target hosts.
 
 Currently SAW only supports deploying to a single target host.
 
-=== Configuring
+=== SAW
+
+==== Configuring
 
 Each SAW environment requires its own SAW environment configuration
 file.  A sample configuration is provided inside the SAW release
@@ -68,20 +77,7 @@ installations and upgrades.  It is recommended to put it under version
 control that is stored on the deploy host and backed up to another
 location.
 
-==== Running SAW on YARN.
-
-Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
-in version v2.6.0.
-To configure and run the saw-executor in yarn mode default configuration properties
-are provided in `saw-config` copy those properties change as per enviroment.
-
-To configuring additional properties for spark and yarn,set configuration as java
-option since SparkConf loads defaults from system properties(start with spark.*)
-and the classpath.'
-
-  Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
-
-=== Installing
+==== Installing
 
 Execute the following steps to install SAW:
 
@@ -102,7 +98,7 @@ smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
 
-=== Upgrading
+==== Upgrading
 
 To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
@@ -129,9 +125,11 @@ to the below SAW environment configuration (`saw-config`).
     saw_spark_master_url=yarn
     saw_spark_yarn_queue_regular=saw-regular
     saw_spark_yarn_queue_fast=saw-fast
-    saw_spark_yarn_jars=/opt/mapr/spark/spark-2.1.0/jars
+    saw_spark_yarn_jars=/opt/mapr/spark/spark-2.2.1/jars
     saw_spark_yarn_zips=/opt/saw/service/spark.zip
     # Zip file will be automatically get created if not exists in mention location.
+    # saw_spark_yarn_resource_manager is optional parameter if we want to explicitly
+    # define the resource manager for saw-executor if not configured in yarn-site.xml.
     saw_spark_yarn_resource_manager=sip-mapr
 
 Additional parameter added to control large file export from FTP/email dispatch.
@@ -140,7 +138,32 @@ this parameter can be set lower value.
 
      saw_export_chunk_size=10000
 
-=== Interfaces
+
+==== Running SAW on YARN.
+
+Support for running SAW-executors on YARN (Hadoop NextGen) was added to SAW
+in version v2.6.0.
+To configure and run the saw-executor in yarn mode default configuration properties
+are provided in `saw-config` copy those properties change as per enviroment.
+
+To configuring additional properties for spark and yarn,set configuration as java
+option since SparkConf loads defaults from system properties(start with spark.*)
+and the classpath.'
+
+  Ex: export _JAVA_OPTIONS='-Dspark.executor.instances=5'
+
+==== Upgrading to SIP 3.0
+
+Please note that the SIP data stored by previous versions in MapR-FS
+is consolidated under a single directory as part of upgrading to SIP
+3.0 (at the location specified by the `sip_var_path` variable in the
+SIP environment configuration, which defaults to `/var/sip`).  After
+this the SIP data can be saved using a MapR volume snapshot, for
+backup and restore purposes.  If no dedicated volume has been
+configured for SIP data, it can still be saved as part of a root
+volume snapshot which does not require any additional setup steps.
+
+==== Interfaces
 
 The SAW Web module and supporting services are exposed on port 80 of
 the SAW target host, i.e. `http://<saw-target-host>/`.  The SAW Web
@@ -161,6 +184,90 @@ File upload limit settings: Include the below properties in NGINX server
 config file to support larger files upload (more than 1MB)
 
        client_max_body_size 25m;
+
+=== XDF-NG
+
+==== Installing
+
+Execute the following steps to install XDF-NG:
+
+. Get the XDF release package (named `bda-xdf-nextgen-*.rpm`)
+
+. Create and prepare a xdf-ng vars configuration file in /etc/bda/xdf-nextgen.vars
+  location, as described below
+
+      dl.root:   hdfs:///data/bda
+      http.port: 15020
+      seeds:     2784
+
+.  execute the RPM package installation command as below to install the XDF-NG package
+
+        rpm -ivh bda-xdf-nextgen-*.rpm
+
+=== RTPS
+
+==== Installing
+
+Execute the following steps to install RTPS:
+
+. Get the RTPS release package (named `bda-rtps-*.rpm`)
+
+.  Execute the RPM package in one of the MAPR Node as below to install the RTPS package
+
+        rpm -ivh bda-rtps-*.rpm
+
+   RTPS will get installed and symbolic link will get created for location
+   in `/dfs/opt/bda/rtps-current`
+
+==== Upgrading
+
+To upgrade an existing installation, follow the same steps as for
+installing an entirely new environment.  The deploy command will
+detect an already existing installation and upgrade it.
+
+NOTE: Downgrading to an older RTPS version is not supported.  If
+needed, take a backup of the entire environment before upgrading that
+can be used to restore the environment to a state that is supported by
+older RTPS versions.
+
+=== RTIS
+
+==== Installing
+
+Execute the following steps to install RTIS:
+
+. Get the RTIS release package (named `bda-rtis-*.rpm`)
+
+. Create and prepare a RTIS vars configuration file in  /etc/bda/cluster.vars
+  location, as described below
+
+     app.key             =  sip-rtis
+     streams_1.topic     =  data
+     streams_1.queue     =  bda/data/streams/sip-rtis
+     streams_2.topic     =  data
+     streams_2.queue     =  bda/data/streams/sip-rtis
+     app.class           =  synchronoss.handlers.charter.smartcare.CharterEventHandler
+     key.serializer      =  org.apache.kafka.common.serialization.StringSerializer
+     value.serializer    =  org.apache.kafka.common.serialization.StringSerializer
+
+.  Execute the RPM package installation command as below to install the RTIS package
+
+        rpm -ivh bda-rtis-*.rpm
+
+    RTIS will get installed in location `/opt/bda/rtis/`
+
+.  Run /opt/bda/rtis-*/sbin/rtis_runner.sh & to start RTIS.
+
+==== Upgrading
+
+To upgrade an existing installation, follow the same steps as for
+installing an entirely new environment.  The deploy command will
+detect an already existing installation and upgrade it.
+
+NOTE: Downgrading to an older RTIS version is not supported.  If
+needed, take a backup of the entire environment before upgrading that
+can be used to restore the environment to a state that is supported by
+older RTIS versions.
 
 == Monitoring
 
@@ -238,6 +345,26 @@ Where `<saw-service>` is one of the SAW systemd services (for example
 `saw-gateway`), which can be listed using the `sudo systemctl
 list-units saw-\*` command shown in the previous section.
 
+=== Location of SIP data in MapR-FS
+
+SIP data is stored under a single specific directory in MapR-FS.  The
+location of this directory is configured using the `sip_var_path`
+variable in the SIP environment configuration (the `saw-config` file)
+and its default value is `/var/sip`.
+
+By knowing where the SIP data is located, it is possible to configure
+MapR volumes that can be used to snapshot SIP data, for backup and
+restore purposes.  Even if no dedicated MapR volume has been
+configured for SIP, the data can still be snapshotted as part of the
+root volume.  Please refer to MapR documentation for instructions on
+creating volume snapshots.
+
+NOTE: SIP data (both plain files and MapR-DB tables) can be moved
+between MapR-FS locations using the standard filesystem tools, as long
+as it is within the same volume.  Moving SIP data across MapR volumes
+requires using the MapR-DB CopyTable tool.  Please refer to MapR
+documentation for instructions on using that.
+
 === High availability and restoring failed nodes
 
 SIP provides high availability, so that if a single node in the
@@ -274,6 +401,19 @@ using the following commands:
 
 Please note that clearing the queues affects all users of the system
 and report execution types.
+
+=== Clearing the onetime execution result for data lake
+
+Saw execution result for data lake analysis can be cleaned-up if output location
+contains large amount of onetime(preview) execution results.
+
+ $ ssh <mapr-host>
+ $ hadoop fs -rm -r <output-location>/preview-*
+
+Note: <output-location> can be found in saw-host, saw-transport service conf file
+in location /opt/saw/service/conf/application.conf properties name
+`output-location`. Please do not delete anything which doesn't contains
+preview in directory name.
 
 === Automatically generated credentials
 

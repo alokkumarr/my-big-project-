@@ -25,6 +25,7 @@ const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
 })
 export class DesignerDialogComponent {
   analysis: Analysis;
+  savedAnalysis: Analysis;
   constructor(
     public dialogRef: MatDialogRef<DesignerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AnalysisDialogData,
@@ -37,19 +38,29 @@ export class DesignerDialogComponent {
     if (isInDraftMode) {
       this.warnUser().afterClosed().subscribe(shouldDiscard => {
         if (shouldDiscard) {
-          this.dialogRef.close();
+          this.dialogRef.close({
+            requestExecution: false,
+            analysis: this.savedAnalysis
+          });
         }
       });
     } else {
-      this.dialogRef.close();
+      this.dialogRef.close({
+        requestExecution: false,
+        analysis: this.savedAnalysis
+      });
     }
   }
 
-  onSave({isSaveSuccessful, analysis}: DesignerSaveEvent) {
-    this.dialogRef.close({
-      isSaveSuccessful,
-      analysis
-    });
+  onSave({analysis, requestExecution}: DesignerSaveEvent) {
+    if (requestExecution) {
+      this.dialogRef.close({
+        requestExecution,
+        analysis
+      });
+    } else {
+      this.savedAnalysis = cloneDeep(analysis);
+    }
   }
 
   warnUser() {

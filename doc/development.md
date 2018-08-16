@@ -152,7 +152,7 @@ To edit the sample report metric and data in a running container,
 execute the following commands:
 
         $ docker exec -it sip-admin bash
-        $ cd /root/saw-metrics/sample-spark
+        $ cd /root/saw-analyze-samples/sample-spark
         $ vi data.ndjson
         $ vi semantic.json
         $ ./load-metric
@@ -178,7 +178,7 @@ To edit the sample pivot/chart metric and data in a running container,
 execute the following commands:
 
         $ docker exec -it sip-admin bash
-        $ cd /root/saw-metrics/sample-elasticsearch
+        $ cd /root/saw-analyze-samples/sample-elasticsearch
         $ vi data-*.json
         $ vi semantic.json
         $ ./load-metric
@@ -252,7 +252,10 @@ integration:
 2. Create a `sip` user on nodes of the environment, to be used for
    executing the deployment.  Add `sip ALL=(ALL) NOPASSWD:ALL` to
    `/etc/sudoers.d/sip`, to ensure the deployment has needed
-   privileges.
+   privileges.  Also set up passwordless authentication for the `sip`
+   user by running `ssh-keygen` to generate a keypair without a
+   passphrase and copying the public key at `.ssh/id_rsa.pub` to the
+   list of authorized keys at `.ssh/authorized_keys`.
 
 3. Go to the [Bamboo deployment project], add the new environment (use
    an existing environment as a template by cloning it) and update the

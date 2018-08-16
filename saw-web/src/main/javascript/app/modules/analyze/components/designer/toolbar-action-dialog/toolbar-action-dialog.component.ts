@@ -5,6 +5,7 @@ import { IToolbarActionData, IToolbarActionResult } from '../types';
 import * as filter from 'lodash/filter';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
+import { DEFAULT_ANALYSIS_NAME } from '../consts';
 
 const template = require('./toolbar-action-dialog.component.html');
 require('./toolbar-action-dialog.component.scss');
@@ -29,6 +30,12 @@ export class ToolbarActionDialogComponent {
       this.data.sorts = cloneDeep(this.data.sorts);
       break;
     }
+  }
+
+  validateSaving() {
+    let validateState =
+      this.data.analysis.name.replace(/\s/g, '').length === 0 ? true : false;
+    return validateState;
   }
 
   onBack() {
@@ -69,7 +76,7 @@ export class ToolbarActionDialogComponent {
     this.dialogRef.close(result);
   }
 
-  save() {
+  save(action) {
     this.showProgressBar = true;
     this._designerService
       .saveAnalysis(this.data.analysis)
@@ -79,14 +86,14 @@ export class ToolbarActionDialogComponent {
         if (response.type === 'report') {
           (this.data.analysis as AnalysisReport).query = response.query;
         }
+        const result: IToolbarActionResult = {
+          analysis: this.data.analysis,
+          action
+        };
+        this.dialogRef.close(result);
       })
       .finally(() => {
         this.showProgressBar = false;
-        const result: IToolbarActionResult = {
-          isSaveSuccessful: true,
-          analysis: this.data.analysis
-        };
-        this.dialogRef.close(result);
       });
   }
 }
