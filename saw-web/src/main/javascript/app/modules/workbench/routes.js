@@ -5,6 +5,7 @@ import {SqlExecutorComponent} from './components/sql-executor/sql-executor.compo
 import {DatasetDetailViewComponent} from './components/dataset-detailedView/dataset-detail-view.component';
 import {CreateSemanticComponent} from './components/semantic-management/create/create-semantic.component';
 import {ValidateSemanticComponent} from './components/semantic-management/validate/validate-semantic.component';
+import {UpdateSemanticComponent} from './components/semantic-management/update/update-semantic.component';
 
 export function routesConfig($stateProvider) {
   'ngInject';
@@ -38,6 +39,10 @@ export function routesConfig($stateProvider) {
       name: 'workbench.validateSemantic',
       url: '/semantic/validate',
       component: ValidateSemanticComponent
+    }, {
+      name: 'workbench.updateSemantic',
+      url: '/semantic/update',
+      component: UpdateSemanticComponent
     }
   ];
 

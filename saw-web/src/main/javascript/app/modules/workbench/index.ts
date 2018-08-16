@@ -25,9 +25,7 @@ import {
   dxDataGridProvider
 } from '../../common/services/ajs-common-providers';
 
-import {
-  jwtServiceProvider
-} from '../../../login/services/ajs-login-providers';
+import { jwtServiceProvider } from '../../../login/services/ajs-login-providers';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { DatasetsComponent } from './components/datasets-view/datasets-page.component';
@@ -49,6 +47,7 @@ import { DatasetDetailViewComponent } from './components/dataset-detailedView/da
 import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
 import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
 import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
+import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
 
 import { CommonModule } from '../../common';
 
@@ -79,7 +78,8 @@ const components = [
   DatasetDetailViewComponent,
   CreateSemanticComponent,
   ValidateSemanticComponent,
-  SemanticDetailsDialogComponent
+  SemanticDetailsDialogComponent,
+  UpdateSemanticComponent
 ];
 
 @NgModule({

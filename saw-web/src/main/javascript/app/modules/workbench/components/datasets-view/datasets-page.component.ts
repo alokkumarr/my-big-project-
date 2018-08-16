@@ -34,7 +34,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   private contentHeight: number;
   private timer;
   private timerSubscription;
-  private poll: boolean = true;
+  private poll: boolean = false;
   private interval = 20000;
 
   constructor(
@@ -47,7 +47,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.startPolling();
+    this.getPageData();
   }
 
   ngOnDestroy() {

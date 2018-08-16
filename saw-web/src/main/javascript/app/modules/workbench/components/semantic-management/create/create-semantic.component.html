@@ -18,9 +18,9 @@
                 <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDS" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
                     [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDSSelectionChanged($event)">
                     <dxo-selection selectAllMode="allMode" showCheckBoxesMode="always" [mode]="selectionMode"></dxo-selection>
-                    <dxi-column caption="Dataset Name" dataField="system.name"></dxi-column>
-                    <dxi-column caption="Created By" dataField="system.createdBy"></dxi-column>
-                    <dxi-column caption="Updated Time" dataField="system.modifiedTime" dataType="date" cellTemplate="timeTemplate"></dxi-column>
+                    <dxi-column caption="Dataset Name" dataField="system?.name"></dxi-column>
+                    <dxi-column caption="Created By" dataField="system?.createdBy"></dxi-column>
+                    <dxi-column caption="Updated Time" dataField="system?.modifiedTime" dataType="date" cellTemplate="timeTemplate"></dxi-column>
                     <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
                     <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
                     <div *dxTemplate="let data of 'timeTemplate'">
@@ -31,10 +31,10 @@
         </mat-card>
         <mat-card fxFlex="75">
             <mat-card-content fxLayout="row" fxLayoutAlign="center stretch">
-                <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!selectedDSData.length">
+                <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!selectedDSData?.length">
                     <span>Select Dataset/s from left pane to view schema</span>
                 </div>
-                <mat-tab-group fxFlex *ngIf="selectedDSData.length" dynamicHeight="false" [selectedIndex]="selectedDSData.length">
+                <mat-tab-group fxFlex *ngIf="selectedDSData.length" dynamicHeight="false" [selectedIndex]="selectedDSData?.length">
                     <mat-tab *ngFor="let ds of selectedDSData; let index = index" [label]="ds?.system?.name">
                         <dx-data-grid [dataSource]="ds.schema?.fields" [showBorders]="true" [height]="'100%'" [width]="'100%'" [rowAlternationEnabled]="true"
                             [showColumnLines]="false" style="position:absolute;top:0;bottom:0;left:0;bottom:0;">

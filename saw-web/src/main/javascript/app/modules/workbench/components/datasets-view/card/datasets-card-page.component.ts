@@ -49,7 +49,7 @@ export class DatasetsCardPageComponent implements OnInit {
     }
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 3000);
+    }, 1000);
   }
 
   viewDetails(metadata) {

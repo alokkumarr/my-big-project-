@@ -137,7 +137,7 @@ export class DatasetsGridPageComponent implements OnInit {
     this.dataGrid.instance.refresh();
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 3000);
+    }, 1000);
   }
 
   viewDetails(metadata) {

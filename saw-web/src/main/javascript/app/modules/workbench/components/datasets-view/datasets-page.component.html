@@ -24,8 +24,8 @@
         </mat-button-toggle-group>
       </div>
       <span fxFlex></span>
-      <div class="action-buttons">
-          <mat-button-toggle checked="false" (click)="togglePoll()">Auto Refresh</mat-button-toggle>
+      <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
+          <mat-slide-toggle checked="false" (change)="togglePoll()">Auto Refresh</mat-slide-toggle>
         <!-- <button mat-button color="primary" (click)="getPageData()">
           <span>Refresh</span>
         </button> -->

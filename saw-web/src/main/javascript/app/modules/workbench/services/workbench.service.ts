@@ -230,6 +230,18 @@ export class WorkbenchService {
   }
 
   /**
+   * Gets list of all datapods avialble in semantic store for that particular project
+   *
+   * @returns
+   * @memberof WorkbenchService
+   */
+  getListOfDatapods() {
+    return this.http
+      .get(`${this.api}/internal/semantic/md?projectId=${userProject}`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
    * Handle Http operation that failed.
    * Let the app continue.
    * @param operation - name of the operation that failed

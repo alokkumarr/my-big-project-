@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="header" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+        <button mat-button class="bck-btn">
+            <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
+        </button>
+        <div fxFlex>Update Datapod </div>
+        <span fxFlex>Select Datapod to update</span>
+        <button mat-raised-button color="primary" [disabled]="!isSelected" i18n (click)="gotoValidate()">
+            <span>Update</span>
+        </button>
+    </div>
+    <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
+        <mat-card fxFlex="25">
+            <mat-card-content>
+                <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDP" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
+                    [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDPSelectionChanged($event)">
+                    <dxo-selection selectAllMode="allMode" showCheckBoxesMode="always" [mode]="selectionMode"></dxo-selection>
+                    <dxi-column caption="Datapod Name" dataField="metricName"></dxi-column>
+                    <dxi-column caption="Created By" dataField="createdBy"></dxi-column>
+                    <dxi-column caption="Updated Time" dataField="createdAt" dataType="date"></dxi-column>
+                    <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+                    <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                </dx-data-grid>
+            </mat-card-content>
+        </mat-card>
+        <mat-card fxFlex="75">
+            <mat-card-content fxLayout="row" fxLayoutAlign="center stretch">
+                <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!selectedDPData?.length">
+                    <span>Select Datapod from left pane to update</span>
+                </div>
+                <validate-semantic *ngIf="selectedDPData?.length"></validate-semantic>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
