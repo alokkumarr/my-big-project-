@@ -58,6 +58,10 @@ export function routesConfig($stateProvider) {
         token: 'section',
         resolveFn: () => 'privilege'
       }]
+    // }, {
+    //   name: 'admin.privilege',
+    //   url: '/privilege',
+    //   component: 'privilegesView'
     }, {
       name: 'admin.export',
       url: '/export',

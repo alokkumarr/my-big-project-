@@ -2,6 +2,11 @@ import { Component, Inject, HostBinding } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
+import * as map from 'lodash/map';
+import {
+  decimal2BoolArray,
+  getPrivilegeDescription
+} from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
@@ -70,11 +75,23 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       ...formValues,
       categoryId,
       categoryType,
-      subCategoriesPrivilege: this.subCategories,
+      subCategoriesPrivilege: this.getSubCategoriesPrivilege(this.subCategories),
       customerId,
       masterLoginId
     };
     this.save(model);
+  }
+
+  getSubCategoriesPrivilege(subCategories) {
+    return map(subCategories, ({ privilegeCode, subCategoryId, privilegeId }) => {
+      const privilegeDesc = getPrivilegeDescription(privilegeCode);
+      return {
+        privilegeCode,
+        privilegeDesc,
+        subCategoryId,
+        privilegeId
+      }
+    })
   }
 
   save(model) {
