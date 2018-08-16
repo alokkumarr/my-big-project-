@@ -247,6 +247,7 @@ get_coefs <- function(mobj, ...) {
   UseMethod("get_coefs", mobj)
 }
 
+
 #' Get Model Forecasts
 #'
 #' @inheritParams get_fit

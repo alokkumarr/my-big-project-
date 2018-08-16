@@ -629,37 +629,40 @@ time_slice <- function(x, width, horizon, skip, fixed_width) {
 
 #' @rdname time_slice
 #' @export
-time_slice.integer <-
-  time_slice.numeric <-  function(x,
-                                  width,
-                                  horizon,
-                                  skip = 0,
-                                  fixed_width = TRUE) {
-    n <- length(x)
-    checkmate::assert_numeric(x, any.missing = FALSE)
-    checkmate::assert_number(width, lower = 1, upper = n - 1)
-    checkmate::assert_number(horizon, lower = 1, upper = n - width)
-    checkmate::assert_number(skip, lower = 0, upper = n - 1)
-    checkmate::assert_flag(fixed_width)
-
-    stops <- seq(width, (n - horizon), by = skip + 1)
-
-    if (fixed_width) {
-      starts <- stops - width + 1
-    } else {
-      starts <- rep(1, length(stops)) # all start at 1
-    }
-
-    train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
-    validation <-
-      mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
-    labels <- paste("slice", gsub(" ", "0", format(stops)), sep = "")
-    names(train) <- labels
-    names(validation) <- labels
-
-    indicies <- list(train = train, validation = validation)
-    indicies
+time_slice.numeric <- function(x,
+                               width,
+                               horizon,
+                               skip = 0,
+                               fixed_width = TRUE) {
+  n <- length(x)
+  checkmate::assert_numeric(x, any.missing = FALSE)
+  checkmate::assert_number(width, lower = 1, upper = n - 1)
+  checkmate::assert_number(horizon, lower = 1, upper = n - width)
+  checkmate::assert_number(skip, lower = 0, upper = n - 1)
+  checkmate::assert_flag(fixed_width)
+  
+  stops <- seq(width, (n - horizon), by = skip + 1)
+  
+  if (fixed_width) {
+    starts <- stops - width + 1
+  } else {
+    starts <- rep(1, length(stops)) # all start at 1
   }
+  
+  train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
+  validation <-
+    mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
+  labels <- paste("slice", gsub(" ", "0", format(stops)), sep = "")
+  names(train) <- labels
+  names(validation) <- labels
+  
+  indicies <- list(train = train, validation = validation)
+  indicies
+}
+
+#' @rdname time_slice
+#' @export
+time_slice.integer <- time_slice.numeric
 
 
 #' @rdname time_slice

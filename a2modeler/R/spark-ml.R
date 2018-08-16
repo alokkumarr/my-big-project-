@@ -17,18 +17,6 @@ fitted.spark_model <- function(mobj, prediction_col = "predicted") {
 
 
 
-#' Predict Method for Spark-ML Clustering Object
-#' @rdname predict
-#' @export
-predict.spark_model_clustering <- function(mobj,
-                                           data,
-                                           target,
-                                           prediction_col = "predicted",
-                                           ...) {
-  checkmate::assert_class(data, "tbl_spark")
-  sparklyr::sdf_predict(data, mobj$fit, ...) %>%
-    dplyr::select(index, predicted = prediction, features)
-}
 
 
 #' Predict Method for Spark-ML Classification Object

@@ -30,11 +30,20 @@ train_model.spark_model <- function(mobj,
                                     samples,
                                     save_submodels,
                                     execution_strategy) {
+  
+  checkmate::assert_class(data, "tbl_spark")
+  checkmate::assert_class(measure, "measure")
+  checkmate::assert_class(samples, "samples")
+  checkmate::assert_logical(save_submodels)
+  checkmate::assert_choice(execution_strategy,
+                           c("sequential", "transparent", "multisession", "multicore",
+                             "multiprocess", "cluster", "remote"))
+  
   # Get Spark connection
   sc <- sparklyr::spark_connection(data)
   
   # Set method fun
-  method_fun <- get(mobj$method, asNamespace("sparklyr"))
+  method_fun <- get(mobj$method, asNamespace(mobj$package))
   
   
   # Perceptron Check
@@ -159,7 +168,8 @@ evaluate_model.spark_model <- function(mobj, data, measure, prediction_col = "pr
   measure_fun <- match.fun(measure$method)
   
   # Make Predictions 
-  predictions <- predict(mobj, data, prediction_col)
+  predictions <- predict(mobj, data, prediction_col) %>% 
+    sdf_bind_cols(data %>% select(!!mobj$target))
   
   # Calculate Performance
   performance <- predictions %>%

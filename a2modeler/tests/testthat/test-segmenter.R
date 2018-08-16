@@ -70,10 +70,11 @@ test_that("Segmenter Train Model", {
 test_that("Segmenter Evaluate Model", {
 
   s1 <- new_segmenter(df = df, name = "test") %>%
-    add_default_samples() %>%
+    add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
-              k = 3) %>%
+              k = 3,
+              uid = "kmeans") %>%
     train_models() %>%
     evaluate_models()
 
@@ -87,6 +88,7 @@ test_that("Segmenter set final model options work as expected", {
 
 
   s1 <- new_segmenter(df = df, name = "test_multi_model") %>%
+    add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
               desc = "model1-ml_kmeans ") %>%

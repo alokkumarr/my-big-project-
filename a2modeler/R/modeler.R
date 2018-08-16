@@ -338,12 +338,12 @@ set_final_model <- function(obj, method, uid, reevaluate, refit) {
 }
 
 
-#' Tidy Model Performance Generic
+#' Get Model Performance Generic
 #'
-#' Function to extract model performance on all samples. Converts output to
+#' Function to extract model performance on samples. Converts output to
 #' data.frame
-tidy_performance <- function(obj) {
-  UseMethod("tidy_performance")
+get_performance <- function(obj) {
+  UseMethod("get_performance")
 }
 
 
@@ -512,6 +512,9 @@ set_final_model.modeler <- function(obj,
 }
 
 
+
+
+
 #' @export
 print.modeler <- function(obj) {
   cat("---------------------------- \n")
@@ -536,7 +539,7 @@ print.modeler <- function(obj) {
   cat("\nmodels ----------------------------", "\n\n")
   print(get_models_status(obj))
   cat("\nperformance ----------------------------", "\n\n")
-  print(obj$performance %>% dplyr::select(model_uid, submodel_uid, method, !!obj$measure$method))
+  get_performance(obj)
   cat("\nfinal model ----------------------------", "\n")
   cat("method:", obj$final_model$method, "\n")
   cat("method args:", unlist(obj$final_model$method_args), "\n")
@@ -553,6 +556,18 @@ summary.modeler <- print.modeler
 get_target.modeler <- function(obj) {
   obj$data %>%
     dplyr::select_at(c(obj$index_var, obj$target))
+}
+
+
+#' @rdname get_performance
+#' @export
+get_performance <- function(obj){
+  if(nrow(obj$performance) == 0) {
+    print("no models trained yet")
+  }else{
+    print(obj$performance %>% 
+            dplyr::select(model_uid, submodel_uid, method, !!obj$measure$method))
+  }
 }
 
 
