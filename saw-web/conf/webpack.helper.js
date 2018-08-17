@@ -22,28 +22,6 @@ module.exports = {
     };
   },
   distRun: distRun,
-  getSuiteName: () => {
-    let suite = process.argv[process.argv.length - 1];
-    if ((suite !== null || undefined ) && suite.trim().length > 0) {
-      //agressive check for unwanted values
-      if (suite.trim() === 'sanity') {
-        return 'sanity';
-      } else if (suite.trim() === 'regression') {
-        return 'sanity';
-      } else {
-        
-      }
-      return suite.trim().toLocaleLowerCase();
-    } else {
-      /** 
-       by default value is set to smoke to eventually above condition will never false.
-       Above condition will be false only in case of running e2e tests from saw-web folder
-       Hence it means that user is either developing something or want to run all for some local test 
-      */
-      return 'development';
-    }
-
-  },
   sawWebUrl: () => {
     if (distRun()) {
       var host = browser.params.saw.docker.host;
