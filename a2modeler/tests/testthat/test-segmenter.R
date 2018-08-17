@@ -75,8 +75,7 @@ test_that("Segmenter Evaluate Model", {
               method = "ml_kmeans",
               k = 3,
               uid = "kmeans") %>%
-    train_models() %>%
-    evaluate_models()
+    train_models() 
 
   expect_subset("data.frame", class(s1$evaluate))
   expect_equal(nrow(s1$evaluate), 1)
@@ -98,8 +97,7 @@ test_that("Segmenter set final model options work as expected", {
     add_model(pipe = NULL,
               method = "ml_gaussian_mixture",
               desc = "model4-ml_kmeans2") %>%
-    train_models() %>%
-    evaluate_models()
+    train_models() 
 
   s1_best <- set_final_model(s1,
                              method = "best",
