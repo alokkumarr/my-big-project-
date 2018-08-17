@@ -60,7 +60,7 @@ const pageResolveTimeout = 1000;
  * Note: Prefix with "../saw-web" because end-to-end tests are invoked from "dist" when run against the
  * distribution package. The same path also works when run directly out of "saw-web".
  */
-const testDir = '../saw-web/src/test';
+const testBaseDir = appRoot + '/src/test/e2e-tests/';
 
 /**
  * Output path for the junit reports. Folder should be created in advance
@@ -89,12 +89,10 @@ exports.timeouts = {
 
 exports.config = {
   framework: 'jasmine2',
-  //seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  //directConnect: true,
   baseUrl: 'http://localhost:3000',
   capabilities: {
     browserName: 'chrome',
@@ -127,56 +125,53 @@ exports.config = {
      * This suite will be run as part of main bamboo build plan.
      */
     smoke: [
-      appRoot + '/src/test/e2e-tests/login.test.js'
+      testBaseDir + 'login.test.js'
     ],
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for sanity check
      */
     sanity: [
-      appRoot + '/src/test/e2e-tests/login.test.js',
-      appRoot + '/src/test/e2e-tests/createReport.test.js',
-      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js'
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'createReport.test.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js'
     ],
     /**
      * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
     regression: [
       // login logout tests
-      appRoot + '/src/test/e2e-tests/login.test.js',
-      appRoot + '/src/test/e2e-tests/priviliges.test.js',
-      appRoot + '/src/test/e2e-tests/analyze.test.js',
-      appRoot + '/src/test/e2e-tests/createReport.test.js',
+      testBaseDir + 'login.test.js',
+      testBaseDir + 'priviliges.test.js',
+      testBaseDir + 'analyze.test.js',
+      testBaseDir + 'createReport.test.js',
       // charts tests
-      appRoot + '/src/test/e2e-tests/charts/applyFiltersToCharts.js',
-      appRoot + '/src/test/e2e-tests/charts/createAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/previewForCharts.test.js',
+      testBaseDir + 'charts/applyFiltersToCharts.js',
+      testBaseDir + 'charts/createAndDeleteCharts.test.js',
+      testBaseDir + 'charts/previewForCharts.test.js',
       // chartEditFork tests
-      appRoot + '/src/test/e2e-tests/charts/editAndDeleteCharts.test.js',
-      appRoot + '/src/test/e2e-tests/charts/forkAndEditAndDeleteCharts.test.js',
+      testBaseDir + 'charts/editAndDeleteCharts.test.js',
+      testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js',
       // filters tests
-      appRoot + '/src/test/e2e-tests/promptFilters.test.js',
+      testBaseDir + 'promptFilters.test.js',
       // pivots tests
-      appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js',
+      testBaseDir + 'pivots/pivotFilters.test.js',
       // Observe module question
-      appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithCharts.test.js'
+      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js'
     ],
     /**
      * This suite is for devlopment envirobment and always all dev tests will be executed.
      */
     development: [
-      appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
+      testBaseDir + 'login.test.js' // TCs linked
     ]
   },
   onCleanUp: function (results) {
     retry.onCleanUp(results);
-    //console.log("Finished at : "+ new Date())
   },
   onPrepare() {
-    //console.log("Started at : "+ new Date())
     retry.onPrepare();
     // Gerenate test data
     token = generate.token(browser.baseUrl);
-    //console.log("aToken: " + token);
     generate.usersRolesPrivilegesCategories(token);
 
     jasmine.getEnv().addReporter(new SpecReporter({
