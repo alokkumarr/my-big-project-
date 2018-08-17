@@ -99,7 +99,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 4,
+    maxInstances: 10,
     chromeOptions: {
       args: [
         'disable-extensions',
