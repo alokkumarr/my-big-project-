@@ -293,6 +293,13 @@ export class DesignerContainerComponent {
         delete field.limitValue;
       }
     })
+
+    forEach(this.analysis.sqlBuilder.filters, filter=> {
+      if (filter.isRuntimeFilter) {
+        delete filter.model;
+      }
+    })
+
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
