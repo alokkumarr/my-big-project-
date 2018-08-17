@@ -39,6 +39,7 @@ public class ElasticSearchLoader {
     public final static String ES_PARAM_NODES = ES_PARAM_PREFIX + "nodes";
     public final static String ES_PARAM_USER = ES_PARAM_PREFIX + "net.http.auth.user";
     public final static String ES_PARAM_PASSWORD = ES_PARAM_PREFIX + "net.http.auth.pass";
+    public final static String ES_MAPPING_ID = ES_PARAM_PREFIX + "mapping.id";
     public final static String ES_PARAM_PORT = ES_PARAM_PREFIX + "port";
 
     private ESLoader esLoader;
@@ -60,6 +61,14 @@ public class ElasticSearchLoader {
         config.setEsClusterName(esClusterName);
 
         this.esConfig = generateESParamMap(config);
+
+        // If documentIDField is specified, configure that as document mapping id
+        if (esLoader.getDocumentIDField() != null) {
+            logger.debug("DocumentIDField = " + esLoader.getDocumentIDField());
+            this.esConfig.put(ES_MAPPING_ID, esLoader.getDocumentIDField());
+        }
+
+        logger.debug("ES Config = " + this.esConfig);
 
 
         this.esClient = new ESHttpClient(config);
