@@ -444,12 +444,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       String id = UUID.randomUUID().toString() + delimiter + "esData" + delimiter + System.currentTimeMillis();
       ObjectNode node = JsonNodeFactory.instance.objectNode();
       node.put("_id", id);
-      node.put(DataSetProperties.PhysicalLocation.toString(), perAliasResponse.getBody().getIndexRelativePath());
       ObjectNode system = node.putObject(DataSetProperties.System.toString());
       system.put(DataSetProperties.Name.toString(), name); 
       system.put(DataSetProperties.Catalog.toString(), MetadataBase.DEFAULT_CATALOG);
       system.put("project", "workbench");
       system.put(DataSetProperties.Format.toString(), "json");
+      system.put(DataSetProperties.PhysicalLocation.toString(), perAliasResponse.getBody().getIndexRelativePath());
       ObjectNode userData = node.putObject(DataSetProperties.UserData.toString());
       userData.put(DataSetProperties.Description.toString(), "Data Structure for "+ name);
       userData.put("component", "esData");
@@ -529,9 +529,9 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectNode userDataNode = (ObjectNode) rootNode.get(DataSetProperties.UserData.toString());
     userDataNode.put("category", category);
     userDataNode.put("component", dataSet.getComponent());
-    userDataNode.put("scriptLocation", rootNode.get("userData").get("script").toString());
-    Preconditions.checkNotNull(rootNode.get("system"), "system cannot be null");
-    ObjectNode systemNode = (ObjectNode) rootNode.get("system");
+    userDataNode.put("scriptLocation", rootNode.get(DataSetProperties.UserData.toString()).get("script").toString());
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()), "system cannot be null");
+    ObjectNode systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
     systemNode.put("project", project);
     systemNode.put("outputFormat",
         systemNode.get(DataSetProperties.Format.toString()) != null

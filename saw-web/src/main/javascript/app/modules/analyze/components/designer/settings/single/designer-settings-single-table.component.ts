@@ -45,6 +45,7 @@ export class DesignerSettingsSingleTableComponent {
   }
   @Input('analysisType') type: string;
   @Input('analysisSubtype') subType: string;
+  @Input() fieldCount: number;
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;

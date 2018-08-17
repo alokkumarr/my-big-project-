@@ -53,6 +53,7 @@ export interface IPivotGridUpdate {
 export class PivotGridComponent {
   @Input() updater: Subject<IPivotGridUpdate>;
   @Input() mode: string | 'designer';
+  @Input() showFieldDetails;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     if (sorts) {
@@ -84,6 +85,9 @@ export class PivotGridComponent {
   public _sorts: Array<Sort> = [];
   public artifactColumns: ArtifactColumnPivot[];
   public pivotGridOptions: any;
+  public dataFields: any[];
+  public columnFields: any[];
+  public rowFields: any[];
   rowHeaderLayout = 'tree';
   height = '100%';
   allowSortingBySummary = false;
@@ -94,9 +98,9 @@ export class PivotGridComponent {
   fieldChooser = { enabled: false };
   // field-panel
   visible = true;
-  showColumnFields = true;
-  showRowFields = true;
-  showDataFields = true;
+  showColumnFields = false;
+  showRowFields = false;
+  showDataFields = false;
   showFilterFields = false;
   allowFieldDragging = false;
   private _gridInstance: any;
@@ -114,7 +118,7 @@ export class PivotGridComponent {
           return this.update(updates);
         });
       }
-    }, 500);
+    }, 500); 
   }
 
   ngOnDestroy() {

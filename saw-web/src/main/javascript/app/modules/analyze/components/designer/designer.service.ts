@@ -83,7 +83,7 @@ export class DesignerService {
     const areLessThenMaxFields = (
       artifactColumns: ArtifactColumns
     ): boolean => {
-      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+      return (artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA);
     };
 
     const canAcceptNumberType = (
@@ -106,13 +106,19 @@ export class DesignerService {
       artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
+    const canAcceptData = (
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      _
+    ) => ({ type }: ArtifactColumnPivot) =>
+      NUMBER_TYPES.includes(type);
+
     const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
       {
         title: 'Data',
         type: 'pivot',
         marker: 'data',
         artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptNumberType,
+        canAcceptArtifactColumn: canAcceptData,
         transform(artifactColumn: ArtifactColumnPivot) {
           artifactColumn.area = 'data';
           artifactColumn.checked = true;
@@ -429,7 +435,9 @@ export class DesignerService {
             tableName: artifactColumn.table,
             name: artifactColumn.columnName,
             type: artifactColumn.type,
-            // the name propertie is needed for the elastic search
+            limitValue: artifactColumn.limitValue,
+            limitType: artifactColumn.limitType
+            // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:

@@ -186,18 +186,16 @@ exports.config = {
     authentication: [
       appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
     ],
-    debug: [
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js')
+    observe: [
+      appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithCharts.test.js'
     ]
   },
   onCleanUp: function (results) {
     retry.onCleanUp(results);
-    //console.log("Finished at : "+ new Date())
   },
   onPrepare() {
-    //console.log("Started at : "+ new Date())
     retry.onPrepare();
-    // Gerenate test data
+    // Generate test data
     token = generate.token(browser.baseUrl);
     //console.log("aToken: " + token);
     generate.usersRolesPrivilegesCategories(token);

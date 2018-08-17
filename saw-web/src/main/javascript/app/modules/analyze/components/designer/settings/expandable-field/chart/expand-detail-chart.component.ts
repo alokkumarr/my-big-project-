@@ -1,6 +1,7 @@
 declare const require: any;
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 import { ArtifactColumnChart, Format } from '../../../types';
 import {
   DATE_INTERVALS,
@@ -30,6 +31,7 @@ export class ExpandDetailChartComponent {
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnChart;
+  @Input() public fieldCount: any;
 
   public DATE_INTERVALS = DATE_INTERVALS;
   public DATE_FORMATS_OBJ = CHART_DATE_FORMATS_OBJ;
@@ -38,11 +40,16 @@ export class ExpandDetailChartComponent {
   public numberSample: string;
   public dateSample: string;
   public isFloat: boolean;
+  public limitType;
+  public limitValue;
 
   constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     const type = this.artifactColumn.type;
+    this.limitType = this.artifactColumn.limitValue === null ? '' : this.artifactColumn.limitType;
+    this.limitValue = this.artifactColumn.limitValue;
+
     this.isDataField = ['y', 'z'].includes(this.artifactColumn.area);
     this.hasDateInterval = DATE_TYPES.includes(type);
     this.changeSample();
@@ -96,5 +103,19 @@ export class ExpandDetailChartComponent {
     if (format) {
       this.dateSample = moment.utc().format(format);
     }
+  }
+
+  onLimitDataChange() {
+    this.limitValue = this.limitValue < 0 ? '' : this.limitValue;
+    if (this.limitValue < 0 || isUndefined(this.limitType) || this.limitType === null) {
+      return false;
+    }
+    if (this.limitValue === null || isUndefined(this.limitValue)) {
+      delete this.artifactColumn.limitValue;
+      delete this.artifactColumn.limitType;
+    }
+    this.artifactColumn.limitValue = this.limitValue;
+    this.artifactColumn.limitType = this.limitType;
+    this.change.emit({ subject: 'fetchLimit' });
   }
 }

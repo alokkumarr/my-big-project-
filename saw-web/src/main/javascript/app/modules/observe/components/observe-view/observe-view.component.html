@@ -14,31 +14,47 @@
         <mat-slide-toggle
             *ngIf="dashboard && hasAutoRefresh"
             color="primary"
+            e2e="dashboard-auto-refresh-toggle"
             [checked]="shouldAutoRefresh"
             (change)="modifyAutoRefresh($event)">
           Auto Refresh
         </mat-slide-toggle>
 
         <button mat-button
-        *ngIf="dashboard && !hasAutoRefresh"
-        (click)="refreshDashboard()">Refresh</button>
+                e2e="dashboard-manual-refresh-button"
+                *ngIf="dashboard && !hasAutoRefresh"
+                (click)="refreshDashboard()">
+          Refresh
+        </button>
 
         <button mat-button
-        color="warn"
-        *ngIf="dashboard && privileges.delete"
-        (click)="confirmDelete()">Delete</button>
+                color="warn"
+                e2e="dashboard-delete-dashboard-button"
+                *ngIf="dashboard && privileges.delete"
+                (click)="confirmDelete()">
+          Delete
+        </button>
 
         <button mat-button
-        *ngIf="dashboard && privileges.edit"
-        (click)="editDashboard()">Edit</button>
+                e2e="dashboard-edit-dashboard-button"
+                *ngIf="dashboard && privileges.edit"
+                (click)="editDashboard()">
+          Edit
+        </button>
 
         <button mat-button
-        *ngIf="dashboard"
-        (click)="filterSidenav.toggle()">Filter</button>
+                e2e="dashboard-open-global-filters-button"
+                *ngIf="dashboard"
+                (click)="filterSidenav.toggle()">
+          Filter
+        </button>
 
         <button mat-raised-button
-        color="primary"
-        (click)="createDashboard()">+ DASHBOARD</button>
+                e2e="dashboard-new-dashboard-button"
+                color="primary"
+                (click)="createDashboard()">
+          + DASHBOARD
+        </button>
       </div>
     </div>
 

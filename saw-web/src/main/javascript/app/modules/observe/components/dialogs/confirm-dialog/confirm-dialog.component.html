@@ -6,9 +6,11 @@
 </div>
 <div mat-dialog-actions style="flex-direction: row-reverse">
   <button mat-button [color]="actionColor"
-  (click)="confirm()"
-  [textContent]="actionButton"></button>
-  <button mat-button (click)="closeDashboard()">
+          e2e="dashboard-confirm-dialog-confirm"
+          (click)="confirm()"
+          [textContent]="actionButton"></button>
+  <button mat-button (click)="closeDashboard()"
+          e2e="dashboard-confirm-dialog-cancel">
     Cancel
   </button>
 </div>
