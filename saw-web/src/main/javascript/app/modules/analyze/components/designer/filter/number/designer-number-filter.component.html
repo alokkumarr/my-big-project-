@@ -4,9 +4,10 @@
             (input)="onOtherValueChange($event.target.value)"
             [value]="filterModel.otherValue"/>
   </mat-form-field>
-  <mat-form-field>
-    <mat-select placeholder="Operator"
-                e2e="filter-number-operator-select"
+
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Operator</mat-label>
+    <mat-select e2e="filter-number-operator-select"
                 (selectionChange)="onOperatorChange($event.value)"
                 [value]="filterModel.operator">
       <mat-option *ngFor="let operator of OPERATORS"
@@ -16,7 +17,7 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field>
+  <mat-form-field style="margin-left: 10px;">
     <input matInput type="number"
             e2e="designer-number-filter-input"
             (input)="onValueChange($event.target.value)"

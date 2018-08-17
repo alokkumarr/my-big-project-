@@ -8,16 +8,18 @@
       <div class="form-container" layout="column">
         <label class="field-label" i18n>Publish to</label>
         <div style="max-width: 200px;">
-          <mat-select placeholder="Select a Category"
-                      class="publish-select"
-                      (selectionChange)="onCategorySelected($event.value)"
-                      [value]="data.analysis.categoryId">
-            <mat-optgroup *ngFor="let category of categories" [label]="category.name">
-              <mat-option *ngFor="let subCategory of category.children"
-                          [value]="subCategory.id"
-              >{{ subCategory.name }}</mat-option>
-            </mat-optgroup>
-          </mat-select>
+          <mat-form-field class="select-form-field" appearance="outline">
+            <mat-label>Category</mat-label>
+            <mat-select class="publish-select"
+                        (selectionChange)="onCategorySelected($event.value)"
+                        [value]="data.analysis.categoryId">
+              <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+                <mat-option *ngFor="let subCategory of category.children"
+                            [value]="subCategory.id"
+                >{{ subCategory.name }}</mat-option>
+              </mat-optgroup>
+            </mat-select>
+          </mat-form-field>
         </div>
       </div>
     </div>

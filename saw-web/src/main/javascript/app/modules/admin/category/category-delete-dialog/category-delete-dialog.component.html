@@ -1,0 +1,43 @@
+<header class="base-dialog__header">
+  <strong i18n>
+    Delete Category
+  </strong>
+</header>
+<div class="base-dialog__content dialog__content" fxLayout="column" fxLayoutAlign="start start">
+  <strong class="delete-message">Category Name: {{data.category.categoryName}}</strong>
+
+  <div class="delete-message" *ngIf="data.category.subCategories.length > 0 && data.category.categoryName.toUpperCase() !== 'MY ANALYSIS'" i18n>
+      Please delete the below sub-categories before deleting the category.
+  </div>
+
+  <div class="delete-message" *ngIf="data.category.categoryName.toUpperCase() === 'MY ANALYSIS'" i18n>
+    This Category cannot be deleted.
+  </div>
+
+  <div *ngIf="data.category.subCategories.length > 0" class="categories-list">
+    <p>
+      <strong>Sub-Categories</strong>
+    </p>
+    <ul>
+      <li *ngFor="let subCategory of data.category.subCategories">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <label>{{subCategory.subCategoryName}}</label>
+          <button mat-icon-button (click)="deleteSubCategory(subCategory)" matTooltip="Delete Sub Category">
+            <mat-icon fontIcon="icon-trash"></mat-icon>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
+  <button (click)="deleteCategory()"
+          [disabled]="data.category.subCategories.length > 0 || data.category.categoryName.toUpperCase() == 'MY ANALYSIS'"
+          color="primary"
+          mat-raised-button
+          i18n>
+    Delete
+  </button>
+  <button mat-button mat-dialog-close i18n>Cancel</button>
+</div>

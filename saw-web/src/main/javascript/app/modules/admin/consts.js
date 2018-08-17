@@ -1,3 +1,7 @@
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as fpJoin from 'lodash/fp/join';
+
 export const AdminMenuData = [{
   id: '',
   name: 'User',
@@ -14,6 +18,18 @@ export const AdminMenuData = [{
   id: '',
   name: 'Category',
   url: '#!/admin/categories'
+}, {
+  id: '',
+  name: 'Package Utility',
+  children: [{
+    id: '',
+    name: 'Export',
+    url: '#!/admin/export'
+  }, {
+    id: '',
+    name: 'Import',
+    url: '#!/admin/import'
+  }]
 }];
 
 export const UsersTableHeader = [{
@@ -114,13 +130,46 @@ export const PrivilegesTableHeader = [{
 }];
 
 export const CategoriesTableHeader = [{
-  name: 'All'
+  caption: 'PRODUCT',
+  dataField: 'productName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '15%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'PRODUCT'
+  caption: 'MODULE',
+  dataField: 'moduleName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '15%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'MODULE'
+  caption: 'CATEGORY',
+  dataField: 'categoryName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '20%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'CATEGORY'
+  caption: 'SUB CATEGORIES',
+  dataField: 'subCategories',
+  allowSorting: true,
+  alignment: 'left',
+  width: '52%',
+  cellTemplate: 'highlightCellTemplate',
+  calculateDisplayValue: data => {
+    const {subCategories} = data;
+
+    if (subCategories) {
+      return fpPipe(
+        fpMap(({subCategoryName}) => subCategoryName),
+        fpJoin(', ')
+      )(subCategories);
+    }
+    return '';
+  }
 }, {
-  name: 'SUB CATEGORIES'
+  caption: '',
+  width: '8%',
+  cellTemplate: 'actionCellTemplate'
 }];

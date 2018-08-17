@@ -19,7 +19,7 @@
     </button>
   </div>
 </mat-toolbar>
-<div *ngIf="data; else loading">
+<div *ngIf="data" style="padding: 0 20px;">
   <admin-list-view (editRow)="editRow($event)"
                    (deleteRow)="deleteRow($event)"
                    (rowClick)="onRowClick($event)"
@@ -29,4 +29,3 @@
                    [highlightTerm]="filterObj.searchTermValue">
   </admin-list-view>
 </div>
-<ng-template #loading>Loading Data...</ng-template>

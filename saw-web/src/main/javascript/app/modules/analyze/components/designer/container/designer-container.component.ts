@@ -54,6 +54,7 @@ export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
+
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   public isInDraftMode: boolean = false;
@@ -70,6 +71,7 @@ export class DesignerContainerComponent {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
+  public fieldCount:number;
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -279,6 +281,25 @@ export class DesignerContainerComponent {
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
+    this.fieldCount = 0;
+
+    forEach(this.analysis.sqlBuilder.dataFields, field=> {
+      if (field.checked === 'y') {
+        this.fieldCount++;
+      }
+
+      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
+        delete field.limitType;
+        delete field.limitValue;
+      }
+    })
+
+    forEach(this.analysis.sqlBuilder.filters, filter=> {
+      if (filter.isRuntimeFilter) {
+        delete filter.model;
+      }
+    })
+
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -356,25 +377,17 @@ export class DesignerContainerComponent {
           }
         });
       break;
-    case 'saveAndClose':
-      this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
-        if (result) {
-          this.onSave.emit({
-            requestExecution: true,
-            analysis: result.analysis
-          });
-          this.isInDraftMode = false;
-        }
-      });
-      break;
     case 'save':
       this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
         if (result) {
+          const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
-            requestExecution: false,
+            requestExecution: shouldClose,
             analysis: result.analysis
           });
-          this.requestDataIfPossible();
+          if (!shouldClose) {
+            this.requestDataIfPossible();
+          }
           this.isInDraftMode = false;
         }
       });
@@ -391,12 +404,15 @@ export class DesignerContainerComponent {
   openSaveDialogIfNeeded(): Promise<any> {
     return new Promise(resolve => {
       if (this.isInQueryMode && !this.analysis.edit) {
-        this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
-          if (result) {
-            this.changeToQueryModePermanently();
-            resolve(this.openSaveDialog());
-          }
-        });
+        this._analyzeDialogService
+          .openQueryConfirmationDialog()
+          .afterClosed()
+          .subscribe(result => {
+            if (result) {
+              this.changeToQueryModePermanently();
+              resolve(this.openSaveDialog());
+            }
+          });
       } else {
         resolve(this.openSaveDialog());
       }
@@ -406,7 +422,8 @@ export class DesignerContainerComponent {
   openSaveDialog(): Promise<any> {
     return this._analyzeDialogService
       .openSaveDialog(this.analysis)
-      .afterClosed().toPromise();
+      .afterClosed()
+      .toPromise();
   }
 
   toggleDesignerQueryModes() {
@@ -618,6 +635,10 @@ export class DesignerContainerComponent {
       this.analysis.chartTitle = event.data.title;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
+      break;
+    case 'fetchLimit':
+      this.analysis.sqlBuilder = this.getSqlBuilder();
+      this.requestDataIfPossible();
       break;
     }
   }

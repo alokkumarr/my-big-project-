@@ -10,6 +10,7 @@ export interface WidgetType {
   id: Widget;
   description: string;
   disabled?: boolean;
+  label: string;
   icon: string;
 }
 
@@ -17,22 +18,25 @@ export const widgetTypes: Array<WidgetType> = [
   {
     name: 'Existing Analysis',
     id: Widget.ANALYSIS,
-    description: 'Add a chart to your dashboard',
-    icon: 'analysis-widget'
+    description: 'Add an analysis to your dashboard',
+    icon: 'analysis-widget',
+    label: 'analysis'
   },
   {
     name: 'Snapshot KPI',
     id: Widget.KPI,
     description: 'Capture a metric at any point in time',
     disabled: false,
-    icon: 'kpi-widget'
+    icon: 'kpi-widget',
+    label: 'kpi'
   },
   {
     name: 'Actual vs Target KPI',
     id: Widget.BULLET,
     description: 'Metric performance at any point in time',
     disabled: false,
-    icon: 'custom-widget'
+    icon: 'custom-widget',
+    label: 'bullet-kpi'
   } /*, {
   name: 'Custom Widget',
   id: Widget.CUSTOM,

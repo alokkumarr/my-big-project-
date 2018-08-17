@@ -15,7 +15,7 @@ import * as defaults from 'lodash/defaults';
 
 import { DATE_PRESETS_OBJ, BULLET_CHART_OPTIONS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
-import { DashboardService } from '../../services/dashboard.service';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 
@@ -55,12 +55,12 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
 
   constructor(
     private observe: ObserveService,
-    private dashboardService: DashboardService,
+    private globalFilterService: GlobalFilterService,
     private progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
-    this.kpiFilterSubscription = this.dashboardService.onFilterKPI.subscribe(
+    this.kpiFilterSubscription = this.globalFilterService.onApplyKPIFilter.subscribe(
       this.onFilterKPI.bind(this)
     );
     this.subscribeToRequester();

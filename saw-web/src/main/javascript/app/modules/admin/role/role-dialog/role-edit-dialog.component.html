@@ -19,17 +19,23 @@
       <input matInput type="text" formControlName="roleDesc" placeholder="Description"/>
     </mat-form-field>
 
-    <mat-select class="form-field" required placeholder="Status" formControlName="activeStatusInd">
-      <mat-option *ngFor="let status of statuses" [value]="status.id">
-        {{status.name}}
-      </mat-option>
-    </mat-select>
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label i18n>Status</mat-label>
+      <mat-select class="form-field" required formControlName="activeStatusInd">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-    <mat-select class="form-field" required placeholder="Role Type" formControlName="roleType">
-      <mat-option *ngFor="let roleType of data.formDeps.roleTypes$ | async" [value]="roleType.roleName">
-        {{roleType.roleName}}
-      </mat-option>
-    </mat-select>
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label i18n>Role Type</mat-label>
+      <mat-select class="form-field" required formControlName="roleType">
+        <mat-option *ngFor="let roleType of data.formDeps.roleTypes$ | async" [value]="roleType.roleName">
+          {{roleType.roleName}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <div *ngIf="data.mode === 'create'">
       Create default privileges for <strong>My Analyses</strong> Category

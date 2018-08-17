@@ -1,6 +1,8 @@
 <div fxLayout="column" fxLayoutAlign="space-between start">
-  <mat-form-field e2e="filter-date-preset">
-    <mat-select placeholder="Select a preset"
+
+  <mat-form-field class="select-form-field" appearance="outline">
+    <mat-label>Preset</mat-label>
+    <mat-select e2e="filter-date-preset"
       [formControl]="datePreset"
       (selectionChange)="onPresetChange($event)">
       <mat-option *ngFor="let preset of presets"

@@ -17,11 +17,15 @@
   .base-dialog__content {
     padding: 0 10px;
     overflow-y: auto;
+  }
 
-    mat-select {
-      border: 1px solid $primary-grey-g1;
-      padding: 8px;
-      border-radius: 2px;
+  .select-form-field[appearance="outline"] {
+    .mat-form-field-infix {
+      padding: 0.3em 0 0.5em;
+    }
+
+    .mat-select-arrow-wrapper {
+      transform: unset;
     }
   }
 

@@ -182,6 +182,32 @@ public class WorkbenchExecutionController {
     /* Otherwise return the preview contents */
     return body;
   }
+  /**
+   * This method is to preview the data.
+   * @param project is of type String.
+   * @param previewId is of type String.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/{name}/datapath", method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public String generatePath(@PathVariable(name = "project", required = true) String project,
+                            @PathVariable(name = "name", required = true) String name)
+      throws JsonProcessingException, Exception {
+    log.debug("Get dataset preview: project = {}", project);
+    /* Get previously created preview */
+    String body = workbenchExecutionService.createDatasetDirectory(project, name);
+    /*
+     * If preview was not found, response to indicate that preview has not been created yet
+     */
+    if (body == null) {
+      throw new NotFoundException();
+    }
+    /* Otherwise return the preview contents */
+    return body;
+  }
 
   @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Preview does not exist")
   private static class NotFoundException extends RuntimeException {

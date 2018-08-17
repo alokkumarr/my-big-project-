@@ -100,11 +100,44 @@ public class StorageProxy {
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private float pageNum;
     /**
+     * It holds the size
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+
+    @JsonProperty("size")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String size;
+    /**
+     * It holds the indexRelativePath
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+
+    @JsonProperty("indexRelativePath")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String indexRelativePath;
+
+    /**
      * It holds the query
      * <p>
      * An explanation about the purpose of this instance.
      * 
      */
+
+    @JsonProperty("count")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String count;
+    /**
+     * It holds the query
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+   
+    
     @JsonProperty("pageSize")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private int pageSize;
@@ -709,6 +742,31 @@ public class StorageProxy {
     public void setAggregationData(Object aggregationData) {
       this.aggregationData = aggregationData;
     }
+    @JsonProperty("size")
+    public String getSize() {
+      return size;
+    }
+    @JsonProperty("size")
+    public void setSize(String size) {
+      this.size = size;
+    }
+    @JsonProperty("count")
+    public String getCount() {
+      return count;
+    }
+    @JsonProperty("count")
+    public void setCount(String count) {
+      this.count = count;
+    }
+    @JsonProperty("indexRelativePath")    
+    public String getIndexRelativePath() {
+      return indexRelativePath;
+    }
+    @JsonProperty("indexRelativePath")    
+    public void setIndexRelativePath(String indexRelativePath) {
+      this.indexRelativePath = indexRelativePath;
+    }
+
 
 
 
@@ -723,7 +781,11 @@ public class StorageProxy {
         READ("read"),
         EXECUTE("execute"),
         AGGREGATE("aggregate"),
-        PIVOT("pivot");
+        PIVOT("pivot"),
+        CATINDICES("catIndices"),
+        CATALIASES("catAliases"),
+        MAPPINGINDICES("mappingsIndices"),
+        MAPPINGALIASES("mappingsAliases");
         private final String value;
         private final static Map<String, StorageProxy.Action> CONSTANTS = new HashMap<String, StorageProxy.Action>();
 

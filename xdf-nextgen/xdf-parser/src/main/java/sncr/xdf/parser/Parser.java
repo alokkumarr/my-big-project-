@@ -50,6 +50,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private int headerSize;
     private String sourcePath;
     private String tempDir;
+    private String archiveDir;
 
     private String outputDataSetName;
     private String outputDataSetLocation;
@@ -100,6 +101,8 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         sourcePath = ctx.componentConfiguration.getParser().getFile();
         headerSize = ctx.componentConfiguration.getParser().getHeaderSize();
         tempDir = generateTempLocation(new DataSetServiceAux(ctx, md), null, null);
+        archiveDir = generateArchiveLocation(new DataSetServiceAux(ctx, md));
+
         lineSeparator = ctx.componentConfiguration.getParser().getLineSeparator();
         delimiter = (ctx.componentConfiguration.getParser().getDelimiter() != null)? ctx.componentConfiguration.getParser().getDelimiter().charAt(0): ',';
         quoteChar = (ctx.componentConfiguration.getParser().getQuoteChar() != null)? ctx.componentConfiguration.getParser().getQuoteChar().charAt(0): '\'';
@@ -182,7 +185,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 logger.debug("No Header");
                 retval = parse(outputDataSetMode);
             }
-
             //Write rejected data
             if (this.rejectedDataCollector != null) {
                 logger.debug("Writing rejected data in the end");
@@ -218,7 +220,45 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     }
 
     protected int archive(){
-        return 0;
+        int result = 0;
+        logger.info("Archiving source data at " + sourcePath + " to " + archiveDir);
+
+        try {
+            FileStatus[] files = ctx.fs.globStatus(new Path(sourcePath));
+
+            if (files != null && files.length != 0) {
+                //Create archive directory
+                Path archivePath = new Path(archiveDir);
+                ctx.fs.mkdirs(archivePath);
+
+                logger.debug("Total files = " + files.length);
+
+                int archiveCounter = 0;
+
+                for(FileStatus status: files) {
+                    logger.debug("Archiving " +  status.getPath() + " to " + archivePath);
+
+                    if (archiveSingleFile(status.getPath(), archivePath)) {
+                        archiveCounter++;
+                    }
+                }
+
+                logger.info("Total files archived = " + archiveCounter);
+            }
+        } catch (IOException e) {
+            logger.error("Archival failed");
+
+            logger.error(ExceptionUtils.getStackTrace(e));
+
+            result = 1;
+        }
+
+        return result;
+    }
+
+    private boolean archiveSingleFile(Path sourceFilePath, Path archiveLocation) throws
+        IOException {
+        return ctx.fs.rename(sourceFilePath, archiveLocation);
     }
 
     @Override
@@ -235,8 +275,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<String> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, 1);
-
-        rdd.collect().forEach(System.out::println);
 
         JavaRDD<Row> parsedRdd = rdd.map(
             new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar,
@@ -335,7 +373,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                     .map(record ->
                         RowFactory.create(record.get(0), record.get(record.length() - 1)));
 
-                rejectedRdd.collect().forEach(System.out::println);
                 if (this.rejectedDataCollector == null) {
                     rejectedDataCollector = rejectedRdd;
                 } else {

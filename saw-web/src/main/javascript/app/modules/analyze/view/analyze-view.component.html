@@ -18,13 +18,14 @@
       </mat-radio-button>
     </mat-radio-group>
 
-    <mat-form-field class="select-type">
-      <mat-select (selectionChange)="onAnalysisTypeChange($event.value)" [value]="filterObj.analysisType">
+    <mat-form-field class="select-form-field" appearance="outline" style="max-width: 170px; font-size: 14px; margin: 0;">
+      <mat-select class="select-type" (selectionChange)="onAnalysisTypeChange($event.value)" [value]="filterObj.analysisType">
         <mat-option *ngFor="let type of analysisTypes" [value]="type.value">
           {{ type.label }}
         </mat-option>
       </mat-select>
-    </mat-form-field>
+      </mat-form-field>
+
   </div>
   <div fxLayout="row" fxLayoutAlign="end center" fxFlex="20">
     <button *ngIf="canUserCreate"

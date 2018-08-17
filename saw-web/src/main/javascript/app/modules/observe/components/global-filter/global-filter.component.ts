@@ -2,6 +2,7 @@ import {
   Component,
   AfterViewInit,
   OnDestroy,
+  Input,
   Output,
   EventEmitter
 } from '@angular/core';
@@ -24,14 +25,16 @@ require('./global-filter.component.scss');
 })
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();
-
+  @Input() showKPIFilter: boolean;
   private globalFilters = [];
+  private kpiFilter;
   private filterChangeSubscription: Subscription;
 
   constructor(private filters: GlobalFilterService) {}
 
   ngAfterViewInit() {
     this.globalFilters = [];
+    this.kpiFilter = {};
     this.filterChangeSubscription = this.filters.onFilterChange.subscribe(
       this.onFilterChange.bind(this)
     );
@@ -83,6 +86,10 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
     this.filters.updateFilter(data);
   }
 
+  onKPIFilterUpdate(data) {
+    this.kpiFilter = data;
+  }
+
   tableNameFor(f) {
     return f.tableName + (f.metricName ? ` (${f.metricName})` : '');
   }
@@ -96,7 +103,10 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   }
 
   onApply() {
-    this.onApplyFilter.emit(this.filters.globalFilters);
+    this.onApplyFilter.emit({
+      analysisFilters: this.filters.globalFilters,
+      kpiFilters: this.kpiFilter
+    });
   }
 
   onCancel() {
@@ -104,7 +114,7 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   }
 
   onClearFilters() {
-    this.onApplyFilter.emit({});
+    this.onApplyFilter.emit({ analysisFilters: {}, kpiFilters: {} });
     this.filters.onClearAllFilters.next(true);
   }
 }

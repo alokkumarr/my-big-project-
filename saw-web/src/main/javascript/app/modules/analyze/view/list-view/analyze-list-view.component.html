@@ -36,11 +36,8 @@
       </mat-chip>
     </div>
 
-    <div *dxTemplate="let cell of 'typeCellTemplate'">
-      <mat-chip class="tag-chip"
-                [innerHtml]="cell.text | highlight: searchTerm"
-      >
-      </mat-chip>
+    <div *dxTemplate="let cell of 'typeCellTemplate'"
+         [innerHtml]="cell.text | highlight: searchTerm">
     </div>
 
     <div *dxTemplate="let cell of 'highlightCellTemplate'"

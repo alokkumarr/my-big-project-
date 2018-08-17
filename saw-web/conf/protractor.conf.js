@@ -141,6 +141,8 @@ exports.config = {
      * This suite will be triggered from QA Test bamboo plan frequently for full regression as daily basis
      */
     regression: [
+      // login logout tests
+      appRoot + '/src/test/e2e-tests/login.test.js',
       appRoot + '/src/test/e2e-tests/priviliges.test.js',
       appRoot + '/src/test/e2e-tests/analyze.test.js',
       appRoot + '/src/test/e2e-tests/createReport.test.js',
@@ -155,8 +157,8 @@ exports.config = {
       appRoot + '/src/test/e2e-tests/promptFilters.test.js',
       // pivots tests
       appRoot + '/src/test/e2e-tests/pivots/pivotFilters.test.js',
-      // login logout tests
-      appRoot + '/src/test/e2e-tests/login.test.js'
+      // Observe module question
+      appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithCharts.test.js'
     ],
     /**
      * This suite is for devlopment envirobment and always all dev tests will be executed.

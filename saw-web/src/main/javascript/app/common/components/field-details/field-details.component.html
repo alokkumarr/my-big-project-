@@ -1,0 +1,34 @@
+<div class="area-fields">
+  <mat-chip-list *ngIf="dataFields.length > 0">
+    <fieldset>
+      <legend>
+        Data Fields
+      </legend>
+      <mat-chip *ngFor="let field of dataFields;">
+        {{field.caption}}
+      </mat-chip> 
+    </fieldset>
+  </mat-chip-list>
+
+  <mat-chip-list *ngIf="rowFields.length > 0">
+    <fieldset>
+      <legend>
+        Row Fields
+      </legend>
+      <mat-chip *ngFor="let field of rowFields;">
+        {{field.caption}}
+      </mat-chip> 
+    </fieldset>
+  </mat-chip-list>
+
+  <mat-chip-list *ngIf="columnFields.length > 0">
+    <fieldset>
+      <legend>
+        Column Fields
+      </legend>
+      <mat-chip *ngFor="let field of columnFields;">
+        {{field.caption}}
+      </mat-chip> 
+    </fieldset>
+  </mat-chip-list>
+</div>

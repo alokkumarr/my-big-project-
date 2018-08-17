@@ -20,10 +20,6 @@ require('./save-dashboard.component.scss');
 
 export const REFRESH_INTERVALS = [
   {
-    label: '15 seconds',
-    seconds: 15
-  },
-  {
     label: '1 minute',
     seconds: 60
   },
@@ -32,8 +28,32 @@ export const REFRESH_INTERVALS = [
     seconds: 120
   },
   {
+    label: '3 minutes',
+    seconds: 180
+  },
+  {
+    label: '4 minutes',
+    seconds: 240
+  },
+  {
     label: '5 minutes',
     seconds: 300
+  },
+  {
+    label: '6 minutes',
+    seconds: 360
+  },
+  {
+    label: '7 minutes',
+    seconds: 420
+  },
+  {
+    label: '8 minutes',
+    seconds: 480
+  },
+  {
+    label: '9 minutes',
+    seconds: 540
   },
   {
     label: '10 minutes',

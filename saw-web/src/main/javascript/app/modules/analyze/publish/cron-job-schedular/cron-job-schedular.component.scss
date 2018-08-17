@@ -4,6 +4,7 @@ cron-job-schedular {
   border: 1px solid #CCC;
 
   .dateDetails {
+    float: left;
     margin: 12px;
 
     label {
@@ -30,6 +31,10 @@ cron-job-schedular {
     padding: 5px;
   }
 
+  mat-select {
+    padding: 0;
+  }
+
   mat-radio-group.to-date {
     padding-left: 90px;
 
@@ -51,7 +56,7 @@ cron-job-schedular {
 
   .mat-select {
     position: relative !important;
-    width: 18% !important;
+    width: 100px !important;
     margin-left: 10px;
     border: 1px solid rgba(0, 0, 0, 0.12);
     margin-bottom: 10px;
@@ -66,6 +71,15 @@ cron-job-schedular {
   /* Style the tab content */
   .tabcontent {
     padding: 6px 12px;
+
+    div .daysOfWeek {
+      float: left;
+      margin: 5px 65px 0 -44px;
+    }
+
+    .week-datePicker {
+      float: left;
+    }
   }
 
   .checkbox {
