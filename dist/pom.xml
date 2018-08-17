@@ -541,7 +541,7 @@
           </execution>
            <execution>
             <id>npm-run-generate-report</id>
-            <phase>pre-integration-test</phase>
+            <phase>post-integration-test</phase>
             <goals>
               <goal>npm</goal>
             </goals>
@@ -551,7 +551,7 @@
           </execution>
           <execution>
             <id>npm-run-generate-report-dist</id>
-            <phase>pre-integration-test</phase>
+            <phase>post-integration-test</phase>
             <goals>
               <goal>npm</goal>
             </goals>
