@@ -282,17 +282,15 @@ export class DesignerContainerComponent {
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
-    if (this.analysis.sqlBuilder.dataFields.length > 1) {
-      forEach(this.analysis.sqlBuilder.dataFields, col=> {
-        if (col.limitType) {
-          delete col.limitType;
-          delete col.limitValue;
-        }
-      });
-    } 
+
     forEach(this.analysis.sqlBuilder.dataFields, field=> {
       if (field.checked === 'y') {
         this.fieldCount++;
+      }
+
+      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
+        delete field.limitType;
+        delete field.limitValue;
       }
     })
     this._designerService.getDataForAnalysis(this.analysis).then(
