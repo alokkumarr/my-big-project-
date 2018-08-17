@@ -155,7 +155,7 @@ exports.config = {
       testBaseDir + 'promptFilters.test.js',
       // pivots tests
       testBaseDir + 'pivots/pivotFilters.test.js',
-      // Observe module question
+      // Observe module test cases
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js'
     ],
     /**
