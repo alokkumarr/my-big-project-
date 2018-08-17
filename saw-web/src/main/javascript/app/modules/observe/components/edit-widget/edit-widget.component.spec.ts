@@ -20,8 +20,8 @@ configureTests();
 
 describe('Edit Widget', () => {
   let fixture: ComponentFixture<EditWidgetComponent>, el: HTMLElement;
-  beforeEach(done => {
-    TestBed.configureTestingModule({
+  beforeEach(() => {
+    return TestBed.configureTestingModule({
       imports: [MaterialModule, AddWidgetModule],
       declarations: [EditWidgetComponent],
       providers: [{ provide: ObserveService, useValue: ObserveServiceStub }]
@@ -33,7 +33,6 @@ describe('Edit Widget', () => {
         el = fixture.nativeElement;
 
         fixture.detectChanges();
-        done();
       });
   });
 
@@ -54,6 +53,8 @@ describe('Edit Widget', () => {
     fixture.detectChanges();
     fixture.whenStable().then(() => {
       expect(el.querySelector('widget-kpi')).to.not.be.null;
+      done();
+    }).catch(() => {
       done();
     });
   });

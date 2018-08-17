@@ -11,8 +11,8 @@ configureTests();
 
 describe('KPI Form Widget', () => {
   let fixture: ComponentFixture<WidgetKPIComponent>, el: HTMLElement;
-  beforeEach(done => {
-    TestBed.configureTestingModule({
+  beforeEach(() => {
+    return TestBed.configureTestingModule({
       imports: [MaterialModule, ReactiveFormsModule, FormsModule],
       declarations: [WidgetKPIComponent]
     })
@@ -23,7 +23,6 @@ describe('KPI Form Widget', () => {
         el = fixture.nativeElement;
 
         fixture.detectChanges();
-        done();
       });
   });
 
@@ -46,6 +45,8 @@ describe('KPI Form Widget', () => {
 
       expect(avgControl.disabled).to.be.true;
       done();
+    }).catch(() => {
+      done();
     });
   });
 
@@ -67,6 +68,8 @@ describe('KPI Form Widget', () => {
     fixture.whenStable().then(() => {
       expect(avgControl.disabled).to.be.true;
       expect(avgControl.value).to.be.false;
+      done();
+    }).catch(() => {
       done();
     });
   });
