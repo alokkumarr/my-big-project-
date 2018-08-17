@@ -549,6 +549,16 @@
               <arguments>run generate-report</arguments>
             </configuration>
           </execution>
+          <execution>
+            <id>npm-run-generate-report-dist</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run generate-report-dist</arguments>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

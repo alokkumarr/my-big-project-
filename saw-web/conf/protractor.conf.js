@@ -214,7 +214,7 @@ exports.config = {
 
     var AllureReporter = require('jasmine-allure-reporter');
     jasmine.getEnv().addReporter(new AllureReporter({
-      resultsDir: 'report/allure-results'
+      resultsDir: 'target/allure-results'
     }));
     jasmine.getEnv().afterEach(function(done){
       browser.takeScreenshot().then(function (png) {
