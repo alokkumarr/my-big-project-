@@ -97,7 +97,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 10,
+    maxInstances: 15,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -152,7 +152,10 @@ exports.config = {
       testBaseDir + 'charts/editAndDeleteCharts.test.js',
       testBaseDir + 'charts/forkAndEditAndDeleteCharts.test.js',
       // filters tests
-      testBaseDir + 'promptFilters.test.js',
+      testBaseDir + 'promptFilter/chartPromptFilters.test.js',
+      testBaseDir + 'promptFilter/esReportPromptFilters.test.js',
+      testBaseDir + 'promptFilter/pivotPromptFilters.test.js',
+      testBaseDir + 'promptFilter/reportPromptFilters.test.js',
       // pivots tests
       testBaseDir + 'pivots/pivotFilters.test.js',
       // Observe module test cases
