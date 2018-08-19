@@ -107,11 +107,13 @@ public class GatewayController {
    * to allow downstream health check requests to pass without an
    * authentication token */
   public ResponseEntity<?> proxyRequest(HttpServletRequest request, HttpServletResponse response,
-      @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles) throws  IOException, URISyntaxException, ServletException, FileUploadException {
+      @RequestParam(name ="files", required = false) MultipartFile[] uploadfiles,  @RequestParam(name ="path", required = false) String filePath) throws  IOException, URISyntaxException, ServletException, FileUploadException {
   HttpUriRequest proxiedRequest = null;
     HttpResponse proxiedResponse = null;
     ResponseEntity<String> responseEntity = null;
     String header = null;
+    logger.info("request info : "+ request);
+    logger.info("filePath info : "+ filePath);
     logger.trace("Accept {}",request.getHeader("Accept"));
     logger.trace("Authorization {}",request.getHeader("Authorization"));
     logger.trace("Content-type {}",request.getHeader("Content-type"));    
@@ -145,10 +147,12 @@ public class GatewayController {
               makeResponseHeaders(proxiedResponse),HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
           }
           else {
+            logger.trace("Inside the file upload section....");
             if(uploadfiles!=null && uploadfiles.length==0){throw new FileUploadException("There are no files to upload");}
             String uploadURI = request.getRequestURI();
             if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
-              uploadURI =getServiceUrl(uploadURI, request) + "?" + request.getQueryString();
+              //uploadURI =getServiceUrl(uploadURI, request) + "?" + request.getQueryString();
+                uploadURI =getServiceUrl(uploadURI, request);
             } else {
               uploadURI = getServiceUrl(uploadURI, request);
             }
@@ -167,9 +171,12 @@ public class GatewayController {
                 files.add(requestfile);
                 map.put(fileName, requestfile.getPath());
               }
+            logger.trace("Map contains :" + map);
+            logger.trace("uploadURI :" + uploadURI);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", request.getHeader("Authorization"));
+            headers.set("directoryPath", filePath);
             HttpEntity<Object> uploadHttptEntity = new HttpEntity<Object>(map, headers);
             RestTemplate uploadrestTemplate = new RestTemplate();
             uploadResponseEntity = uploadrestTemplate.exchange(uploadURI, HttpMethod.POST, uploadHttptEntity, String.class);
