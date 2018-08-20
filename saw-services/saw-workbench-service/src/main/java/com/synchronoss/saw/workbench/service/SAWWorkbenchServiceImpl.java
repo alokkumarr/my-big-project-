@@ -444,12 +444,12 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       String id = UUID.randomUUID().toString() + delimiter + "esData" + delimiter + System.currentTimeMillis();
       ObjectNode node = JsonNodeFactory.instance.objectNode();
       node.put("_id", id);
-      node.put(DataSetProperties.PhysicalLocation.toString(), perAliasResponse.getBody().getIndexRelativePath());
       ObjectNode system = node.putObject(DataSetProperties.System.toString());
       system.put(DataSetProperties.Name.toString(), name); 
       system.put(DataSetProperties.Catalog.toString(), MetadataBase.DEFAULT_CATALOG);
       system.put("project", "workbench");
       system.put(DataSetProperties.Format.toString(), "json");
+      system.put(DataSetProperties.PhysicalLocation.toString(), perAliasResponse.getBody().getIndexRelativePath());
       ObjectNode userData = node.putObject(DataSetProperties.UserData.toString());
       userData.put(DataSetProperties.Description.toString(), "Data Structure for "+ name);
       userData.put("component", "esData");
@@ -529,25 +529,25 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectNode userDataNode = (ObjectNode) rootNode.get(DataSetProperties.UserData.toString());
     userDataNode.put("category", category);
     userDataNode.put("component", dataSet.getComponent());
-    userDataNode.put("scriptLocation", rootNode.get("userData").get("script").toString());
-    Preconditions.checkNotNull(rootNode.get("system"), "system cannot be null");
-    ObjectNode systemNode = (ObjectNode) rootNode.get("system");
+    userDataNode.put("scriptLocation", rootNode.get(DataSetProperties.UserData.toString()).get("script").toString());
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()), "system cannot be null");
+    ObjectNode systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
     systemNode.put("project", project);
     systemNode.put("outputFormat",
         systemNode.get(DataSetProperties.Format.toString()) != null
             ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
             : format);
     systemNode.put("inputFormat",
-        rootNode.get(DataSetProperties.System.toString()).get("inputFormat").toString());
+        rootNode.get(DataSetProperties.System.toString()).get("inputFormat").textValue());
     systemNode.put(DataSetProperties.PhysicalLocation.toString(),
         workbenchExecutionService.createDatasetDirectory(project,
-            rootNode.get(DataSetProperties.System.toString()).get("name").toString()));
+            rootNode.get(DataSetProperties.System.toString()).get("name").textValue()));
     ArrayNode inputPath = objectMapper.createArrayNode();
     inputPath
         .addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
     systemNode.put(DataSetProperties.Catalog.toString(),
         systemNode.get(DataSetProperties.Catalog.toString()) != null
-            ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
+            ? systemNode.get(DataSetProperties.Catalog.toString()).textValue()
             : catalog);
     systemNode.putArray("inputPath").addAll(inputPath);
     DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);

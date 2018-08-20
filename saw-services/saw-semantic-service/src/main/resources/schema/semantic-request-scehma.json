@@ -97,7 +97,6 @@
     "username",
     "module",
     "metricName",
-    "supports",
     "artifacts",
     "esRepository",
     "repository"
