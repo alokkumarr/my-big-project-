@@ -174,7 +174,7 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
-    // Gerenate test data
+    // Generate test data
     token = generate.token(browser.baseUrl);
     generate.usersRolesPrivilegesCategories(token);
 
