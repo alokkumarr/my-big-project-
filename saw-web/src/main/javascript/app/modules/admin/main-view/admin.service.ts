@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {tap} from 'rxjs/operators/tap';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';
@@ -36,7 +36,8 @@ export class AdminService {
   request<T>(path, params, options: RequestOptions = {}) {
     const { toast } = options
     this._headerProgress.show();
-    return this.http.post<T>(`${loginUrl}/auth/admin/cust/manage/${path}`, params)
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    return this.http.post<T>(`${loginUrl}/auth/admin/cust/manage/${path}`, params, {headers})
       .pipe(
         tap(this.showToastMessageIfNeeded(toast)),
         tap(() => this._headerProgress.hide())
