@@ -454,7 +454,7 @@ export class DesignerService {
     };
   }
 
-  getPartialEsReportSqlBuilder(
+  getPartialReportSqlBuilder(
     artifactColumns: ArtifactColumns
   ): Partial<SqlBuilderEsReport> {
     return {
