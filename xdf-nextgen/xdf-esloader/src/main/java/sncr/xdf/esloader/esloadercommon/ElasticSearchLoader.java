@@ -2,8 +2,6 @@ package sncr.xdf.esloader.esloadercommon;
 
 import com.synchronoss.bda.xdf.datasetutils.filterutils.FilterUtils;
 import com.synchronoss.bda.xdf.datasetutils.filterutils.RowFilter;
-import io.netty.util.internal.StringUtil;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -50,7 +48,7 @@ public class ElasticSearchLoader {
         this.esLoader = esLoader;
 
         // Extract all the config information
-        String esHost = esLoader.getEsNodes();
+        List<String> esHost = esLoader.getEsNodes();
         int esPort = esLoader.getEsPort();
         String esUser = esLoader.getEsUser();
         String esPass = esLoader.getEsPass();
@@ -81,7 +79,11 @@ public class ElasticSearchLoader {
     public static Map<String, String> generateESParamMap(ESConfig config) {
         Map<String, String> configMap = new HashMap<>();
 
-        configMap.put(ES_PARAM_NODES, config.getEsHost());
+        //TODO: Should be fixed as part of high-availability story
+        List<String> esNodes = config.getEsHosts();
+        String esHost = esNodes.get(0);
+
+        configMap.put(ES_PARAM_NODES, esHost);
         configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
         configMap.put(ES_PARAM_USER, config.getEsUser());
         configMap.put(ES_PARAM_PASSWORD, config.getEsPassword());
