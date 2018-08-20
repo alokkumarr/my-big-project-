@@ -159,7 +159,8 @@ exports.config = {
       // pivots tests
       testBaseDir + 'pivots/pivotFilters.test.js',
       // Observe module test cases
-      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js'
+      testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js'
     ],
     /**
      * This suite is for devlopment envirobment and always all dev tests will be executed.

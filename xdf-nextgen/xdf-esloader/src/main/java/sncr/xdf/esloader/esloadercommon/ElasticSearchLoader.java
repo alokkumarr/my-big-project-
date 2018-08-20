@@ -2,8 +2,6 @@ package sncr.xdf.esloader.esloadercommon;
 
 import com.synchronoss.bda.xdf.datasetutils.filterutils.FilterUtils;
 import com.synchronoss.bda.xdf.datasetutils.filterutils.RowFilter;
-import io.netty.util.internal.StringUtil;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -39,6 +37,7 @@ public class ElasticSearchLoader {
     public final static String ES_PARAM_NODES = ES_PARAM_PREFIX + "nodes";
     public final static String ES_PARAM_USER = ES_PARAM_PREFIX + "net.http.auth.user";
     public final static String ES_PARAM_PASSWORD = ES_PARAM_PREFIX + "net.http.auth.pass";
+    public final static String ES_MAPPING_ID = ES_PARAM_PREFIX + "mapping.id";
     public final static String ES_PARAM_PORT = ES_PARAM_PREFIX + "port";
 
     private ESLoader esLoader;
@@ -49,7 +48,7 @@ public class ElasticSearchLoader {
         this.esLoader = esLoader;
 
         // Extract all the config information
-        String esHost = esLoader.getEsNodes();
+        List<String> esHost = esLoader.getEsNodes();
         int esPort = esLoader.getEsPort();
         String esUser = esLoader.getEsUser();
         String esPass = esLoader.getEsPass();
@@ -60,6 +59,14 @@ public class ElasticSearchLoader {
         config.setEsClusterName(esClusterName);
 
         this.esConfig = generateESParamMap(config);
+
+        // If documentIDField is specified, configure that as document mapping id
+        if (esLoader.getDocumentIDField() != null) {
+            logger.debug("DocumentIDField = " + esLoader.getDocumentIDField());
+            this.esConfig.put(ES_MAPPING_ID, esLoader.getDocumentIDField());
+        }
+
+        logger.debug("ES Config = " + this.esConfig);
 
 
         this.esClient = new ESHttpClient(config);
@@ -72,7 +79,11 @@ public class ElasticSearchLoader {
     public static Map<String, String> generateESParamMap(ESConfig config) {
         Map<String, String> configMap = new HashMap<>();
 
-        configMap.put(ES_PARAM_NODES, config.getEsHost());
+        //TODO: Should be fixed as part of high-availability story
+        List<String> esNodes = config.getEsHosts();
+        String esHost = esNodes.get(0);
+
+        configMap.put(ES_PARAM_NODES, esHost);
         configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
         configMap.put(ES_PARAM_USER, config.getEsUser());
         configMap.put(ES_PARAM_PASSWORD, config.getEsPassword());
