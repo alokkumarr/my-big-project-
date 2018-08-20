@@ -163,7 +163,7 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js'
     ],
     /**
-     * This suite is for devlopment envirobment and always all dev tests will be executed.
+     * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
       testBaseDir + 'login.test.js' // TCs linked
