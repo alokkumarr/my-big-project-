@@ -227,7 +227,6 @@ exports.config = {
         done();
       })
     });
-    
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
     return browser.wait(() => {
