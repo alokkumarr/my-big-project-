@@ -187,7 +187,8 @@ exports.config = {
       appRoot + '/src/test/e2e-tests/login.test.js' // TCs linked
     ],
     observe: [
-      appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithCharts.test.js'
+      appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithCharts.test.js',
+      appRoot + '/src/test/e2e-tests/observe/createAndDeleteDashboardWithESReport.test.js'
     ]
   },
   onCleanUp: function (results) {
