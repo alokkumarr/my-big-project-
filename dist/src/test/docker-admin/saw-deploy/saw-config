@@ -107,6 +107,9 @@ saw_export_chunk_size=10000
 sip-app1
 sip-app2
 
+[saw-security-arbitrator]
+sip-app3
+
 [saw-security:vars]
 #
 # Outgoing email configuration
