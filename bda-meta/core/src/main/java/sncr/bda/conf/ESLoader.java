@@ -73,7 +73,7 @@ public class ESLoader {
      */
     @SerializedName("esPort")
     @Expose
-    private Integer esPort;
+    private int esPort;
     /**
      * Key column in the dataset to which the record in ES will be matched
      *
@@ -119,7 +119,7 @@ public class ESLoader {
      */
     public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField,
                     String filterString, List<Alias> aliases, List<String> esNodes,
-                    String esClusterName, Integer esPort, String esMappingId,
+                    String esClusterName, int esPort, String esMappingId,
                     String esUser, String esPass) {
         super();
         this.destinationIndexName = destinationIndexName;
@@ -255,7 +255,7 @@ public class ESLoader {
      * Connecting port for ElasticSearch server
      *
      */
-    public Integer getEsPort() {
+    public int getEsPort() {
         return esPort;
     }
 
@@ -263,7 +263,7 @@ public class ESLoader {
      * Connecting port for ElasticSearch server
      *
      */
-    public void setEsPort(Integer esPort) {
+    public void setEsPort(int esPort) {
         this.esPort = esPort;
     }
 
