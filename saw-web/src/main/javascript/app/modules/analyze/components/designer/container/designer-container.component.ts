@@ -448,13 +448,11 @@ export class DesignerContainerComponent {
       sortProp = 'sorts';
       break;
     case 'esReport':
-      partialSqlBuilder = this._designerService.getPartialEsReportSqlBuilder(this.artifacts[0].columns);
+      partialSqlBuilder = this._designerService.getPartialReportSqlBuilder(this.artifacts[0].columns);
       sortProp = 'sorts';
       break;
     case 'report':
-      partialSqlBuilder = {
-        joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
-      };
+      partialSqlBuilder = this._designerService.getPartialReportSqlBuilder(this.artifacts[0].columns);
       sortProp = 'orderByColumns';
       break;
     }

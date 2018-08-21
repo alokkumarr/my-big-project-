@@ -84,6 +84,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Input() query: string;
+  @Input() analysis;
   @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
@@ -108,7 +109,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = this.artifacts2Columns(artifacts);
+    this.columns = (isUndefined(this.analysis.sqlBuilder.dataFields)) ? this.artifacts2Columns(this.artifacts) : this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
