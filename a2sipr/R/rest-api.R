@@ -125,7 +125,7 @@ sip_get_dataset_details <- function(dataset_id,
 #'   type elements. list should not be named
 #' @param catalog catalog location for output dataset. Used in the dynamic file
 #'   path creation
-#' @param row_count ouput dataset record count. Default is NULL
+#' @param output_rows ouput dataset record count. Default is NULL
 #' @param component component name used to create dataset. Default is RComponent
 #' @param script path to executable R script
 #' @param desc description of dataset. Default is empty string
