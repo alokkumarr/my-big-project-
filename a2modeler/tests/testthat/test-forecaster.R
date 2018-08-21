@@ -8,6 +8,7 @@ library(forecast)
 library(dplyr)
 library(lubridate)
 library(sparklyr)
+library(foreach)
 
 context("forecaster unit tests")
 
@@ -114,12 +115,13 @@ test_that("Multiple Model with Test Holdout test case", {
 
   expect_class(f4, "forecaster")
   expect_class(f4$final_model, "forecast_model")
-  expect_equal(f4$final_model$id,
-               get_evalutions(f4) %>%
+  expect_equal(f4$final_model$uid,
+               f4$performance %>%
                  dplyr::filter(sample == "validation") %>%
                  dplyr::top_n(1, -rmse) %>%
                  .$model)
-  expect_data_frame(get_evalutions(f4), nrow=6)
+  expect_data_frame(f4$performance, nrow=2)
+  expect_data_frame(f4$final_model$test_performance, nrow=1)
   expect_data_frame(f4_preds$predictions, nrow=10)
 })
 
@@ -132,41 +134,41 @@ test_that("Multiple Model with Manual set final model method test case", {
                    index_var = "index",
                    name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
-    add_model(pipe = NULL, method = "auto.arima") %>%
-    add_model(pipe = NULL, method = "ets") %>%
+    add_model(pipe = NULL, method = "auto.arima", uid = "auto.arima") %>%
+    add_model(pipe = NULL, method = "ets", uid = "ets") %>%
     train_models(.) 
 
-  f5 <- set_final_model(f5, method = "manual", id = names(get_models(f5))[2],
-                        reevaluate = FALSE, refit = TRUE)
+  f5 <- set_final_model(f5, method = "manual", uid = "ets",
+                        reevaluate = FALSE, refit = FALSE)
   f5_preds <- predict(f5, periods = 10, level = c(80, 95))
 
   expect_class(f5, "forecaster")
   expect_class(f5$final_model, "forecast_model")
-  expect_equal(f5$final_model$id,names(get_models(f5))[2])
-  expect_data_frame(get_evalutions(f5), nrow=4)
+  expect_equal(f5$final_model$uid, "ets")
+  expect_data_frame(f5$performance, nrow=2)
   expect_data_frame(f5_preds$predictions, nrow=10)
 })
 
 
 
 test_that("Covariate test case", {
-
+  
   dat2 <- data.frame(dat1, x = rnorm(n))
-
+  
   f6 <- new_forecaster(df = dat2,
-                   target = "y",
-                   index_var = "index",
-                   name = "test") %>%
-    add_model(pipe = pipeline(), method = "auto.arima") %>%
+                       target = "y",
+                       index_var = "index",
+                       name = "test") %>%
+    add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
+  
   f6_preds <- predict(f6, periods = 10, data = data.frame(x=rnorm(10)))
-
+  
   expect_class(f6, "forecaster")
   expect_class(f6$final_model, "forecast_model")
-  expect_equal(f6$models[[names(get_models(f6))]]$fit, f6$final_model$fit)
-  expect_data_frame(get_evalutions(f6), nrow=1)
+  expect_subset("x", names(coef(f6$final_model$fit)))
+  expect_data_frame(f6$performance, nrow=1)
   expect_class(f6_preds, "predictions")
   expect_data_frame(f6_preds$predictions, nrow=10)
 })
@@ -174,17 +176,9 @@ test_that("Covariate test case", {
 
 
 test_that("Prediction index test case", {
-
-  f7 <- new_forecaster(df = dat1,
-                   target = "y",
-                   index_var = "index",
-                   name = "test") %>%
-    add_model(pipe = NULL, method = "auto.arima") %>%
-    train_models(.) %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
-    predict(periods = 10)
-
-  dat3 <- dat1 %>% mutate(index = seq(Sys.Date()-days(n-1), Sys.Date(), by="day"))
+  
+  dat3 <- dat1 %>% 
+    mutate(index = seq(Sys.Date()-days(n-1), Sys.Date(), by="day"))
 
   f8 <- new_forecaster(df = dat3,
                        target = "y",
@@ -196,9 +190,7 @@ test_that("Prediction index test case", {
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
     predict(periods = 10)
 
-  expect_data_frame(f7$predictions, nrow=10)
   expect_data_frame(f8$predictions, nrow=10)
-  expect_equal(f7$predictions$index, seq(n+1, n+10, by=1))
   expect_class(f8$predictions$index, "Date")
   expect_equal(f8$predictions$index, Sys.Date()+days(1:10))
 
@@ -222,9 +214,10 @@ test_that("Pipeline transformation test case", {
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
   
-  f9_preds <- predict(f9, 10)
+  f9_preds <- predict(f9, periods = 10)
   expect_data_frame(f9_preds$predictions, nrow=10)
-  expect_equal(f9$final_model$pipe$output$y, BoxCox(dat1$y, BoxCox.lambda(dat1$y)))
+  expect_equal(f9$pipelines[[1]]$output$y,
+               BoxCox(dat1$y, BoxCox.lambda(dat1$y)))
 })
 
 
@@ -237,33 +230,14 @@ test_that("Time Slice Sampling test case", {
                     name = "test") %>%
     add_time_slice_samples(., width = 190, horizon = 1, skip = 0) %>%
     add_model(pipe = pipeline(),
-              method = "auto.arima") %>%
+              method = "auto.arima",
+              uid = "auto.arima") %>%
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  expect_data_frame(get_evalutions(f10), nrow=20)
-})
-
-
-
-
-test_that("Add Models test case", {
-
-  f11 <- new_forecaster(df = dat1,
-                    target = "y",
-                    index_var = "index",
-                    name = "test") %>%
-    add_holdout_samples(., splits = c(.8, .2)) %>%
-    add_models(.,
-               pipe = pipeline(),
-               models = list(
-                 list(method = "auto.arima", method_args = list()),
-                 list(method = "ets", method_args = list()))) %>%
-    train_models(.) %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
-  expect_equal(length(f11$models), 2)
-  expect_data_frame(get_evalutions(f11), nrow=4)
+  expect_data_frame(f10$performance, nrow=1)
+  expect_class(f10$models$auto.arima$sub_models[[1]]$slice190, "Arima")
+  expect_number(length(f10$models$auto.arima$sub_models[[1]]), 10)
 })
 
 

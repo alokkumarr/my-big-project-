@@ -7,7 +7,8 @@
 \usage{
 new_forecaster(df, target, index_var, unit = NULL, frequency = NULL,
   prediction_conf_levels = c(80, 95), name = NULL, id = NULL,
-  version = NULL, desc = NULL, scientist = NULL, save_fits = TRUE,
+  version = NULL, desc = NULL, scientist = NULL,
+  execution_strategy = "sequential", refit = TRUE, save_submodels = TRUE,
   dir = NULL, ...)
 }
 \arguments{
@@ -36,6 +37,15 @@ seasonality}
 
 \item{scientist}{optional input for scientist building model. defaults to
 system user}
+
+\item{execution_strategy}{name of evaluation function to use for resolving a
+future. Used for model training execution. default is sequential}
+
+\item{refit}{logical option to refit model to entire training dataset sample.
+If grid parameters supplied, the best param set determined by validation
+sample performance will be used. Default is true}
+
+\item{save_submodels}{logical flag to save sub model fits. Default is TRUE}
 
 \item{dir}{optional directory path for saving reports, data and models}
 

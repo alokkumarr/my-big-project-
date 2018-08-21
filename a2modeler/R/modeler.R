@@ -419,10 +419,10 @@ train_models.modeler <- function(obj, uids = NULL) {
     # Check for holdout
     if (!is.null(obj$samples$test_holdout_prct)) {
       train_data <- train_data %>%
-        dplyr::mutate(index = 1) %>% 
-        dplyr::mutate(index = row_number(index)) %>%
-        dplyr::filter(!index %in% obj$samples$test_index) %>%
-        dplyr::select(-index)
+        dplyr::mutate(rn = 1) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::filter(! rn %in% obj$samples$test_index) %>%
+        dplyr::select(-rn)
     }
     
     obj$models[[uid]] <- train_model(mobj = obj$models[[uid]],
@@ -477,13 +477,12 @@ set_final_model.modeler <- function(obj,
       
       # Evaluate Model
       obj$models[[uid]] <- obj$pipelines[[obj$models[[uid]]$pipe]]$output %>%
-        dplyr::mutate(index = 1) %>% 
-        dplyr::mutate(index = row_number(index)) %>% 
-        dplyr::filter(index %in% obj$samples$test_index) %>%
-        dplyr::select(-index) %>% 
+        dplyr::mutate(rn = 1) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::filter(rn %in% obj$samples$test_index) %>%
+        dplyr::select(-rn) %>% 
         evaluate_model(mobj = obj$models[[uid]],
                        data = .,
-                       periods = nrow(.),
                        measure = obj$measure)
     }
   }
@@ -501,7 +500,8 @@ set_final_model.modeler <- function(obj,
         measure = obj$measure,
         samples = refit_sample,
         save_submodels = FALSE,
-        execution_strategy = obj$execution_strategy
+        execution_strategy = obj$execution_strategy,
+        level = obj$conf_levels
       )
     }
   } else{

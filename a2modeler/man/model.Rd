@@ -4,14 +4,16 @@
 \alias{model}
 \title{Model Class Helper}
 \usage{
-model(pipe, target, method, param_grid, desc = NULL, uid = NULL)
+model(pipe, target, method, method_args, param_map, desc = NULL, uid = NULL)
 }
 \arguments{
 \item{target}{column name of target variable. string input}
 
 \item{method}{string input of model method}
 
-\item{param_grid}{parameter grid for model tuning}
+\item{method_args}{required method arguments not in parameter grid}
+
+\item{param_map}{list of parameter values for model tuning}
 
 \item{desc}{optional model description}
 

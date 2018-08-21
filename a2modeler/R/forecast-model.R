@@ -52,14 +52,17 @@ train_model.forecast_model <- function(mobj,
     c("a2modeler", "dplyr") %>%
     unique()
   
-  # Performance Function:
-  perf_fun <- match.fun(measure$method)
+  # Covariates
+  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
+  
+  # Measurement Function:
+  measure_fun <- match.fun(measure$method)
   
   # Fit submodel to train data for each sample
   fits <- foreach(
     rn = 1:nrow(param_grid),
     .packages = packs,
-    .export = c("mobj", "data", "param_grid", "indicies", "measure", "level"),
+    .export = c("mobj", "data", "x_vars", "param_grid", "indicies", "measure_fun", "level"),
     .errorhandling = "pass") %dopar% {
       
       # Params
@@ -72,7 +75,7 @@ train_model.forecast_model <- function(mobj,
       
       # Set Method Args
       y <- as.numeric(train_smpl[[mobj$target]])
-      x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
+     
       if (length(x_vars) > 0) {
         train_xreg <- train_smpl[, x_vars, drop = FALSE]
       } else {
@@ -107,7 +110,7 @@ train_model.forecast_model <- function(mobj,
         
         # evalulate performance
         perf <- data.frame(
-          perf_fun(cbind(fcast, val_smpl[, mobj$target, drop=FALSE]),
+          measure_fun(cbind(fcast, val_smpl[, mobj$target, drop=FALSE]),
                    predicted = "mean",
                    actual = mobj$target),
           index = index,
@@ -164,7 +167,7 @@ train_model.forecast_model <- function(mobj,
     head(1)
   
   # Refit on full sample
-  if(is.null(indicies$validation)) {
+  if(samples$validation_method == "none") {
     
     mobj$fit <- fits[[1]]
   }else {
@@ -202,9 +205,8 @@ train_model.forecast_model <- function(mobj,
 #' @export
 evaluate_model.forecast_model <- function(mobj,
                                           data,
-                                          periods,
                                           measure,
-                                          prediction_col = "predicted",
+                                          prediction_col = "mean",
                                           ...){
   
   checkmate::assert_true(! is.null(mobj$fit))
@@ -214,11 +216,14 @@ evaluate_model.forecast_model <- function(mobj,
   # Measure Fun
   measure_fun <- match.fun(measure$method)
   
-  ### Needs work - need to extract y var and any covariates ###
-  
   # Make Predictions 
-  predictions <- predict(mobj, data, periods, prediction_col) %>% 
-    dplyr::bind_cols(data %>% select(!!mobj$target))
+  periods <- nrow(data)
+  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
+  
+  predictions <- data %>% 
+    dplyr::select_at(x_vars) %>% 
+    predict(mobj, data = ., periods) %>% 
+    dplyr::bind_cols(data %>% select(!!mobj$index_var, !!mobj$target))
   
   # Calculate Performance
   performance <- predictions %>%

@@ -4,13 +4,15 @@
 \alias{add_model}
 \title{Add Model to Modeler Object function}
 \usage{
-add_model(obj, pipe = NULL, method, ..., desc = NULL,
+add_model(obj, pipe = NULL, method, param_map = list(), ..., desc = NULL,
   uid = sparklyr::random_string("model"))
 }
 \arguments{
 \item{obj}{modeler object}
 
 \item{method}{string input of model method}
+
+\item{param_map}{list of parameters values to be used in model tuning}
 
 \item{desc}{optional model description}
 

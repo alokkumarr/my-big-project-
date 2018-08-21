@@ -75,7 +75,7 @@ new_forecaster <- function(df,
 predict.forecaster <- function(obj,
                                data = NULL,
                                periods,
-                               level = c(80, 95),
+                               uid = sparklyr::random_string(prefix = "pred"),
                                desc = "") {
   final_model <- obj$final_model
   if (is.null(final_model)) {
@@ -91,16 +91,16 @@ predict.forecaster <- function(obj,
   }
 
   pipe <- execute(data, obj$pipelines[[final_model$pipe]])
-  preds <- predict(final_model, data = pipe$output, periods, level)
+  preds <- predict(final_model, data = pipe$output, periods, obj$level)
   index_out <- extend(obj$index, length_out = periods)
   predictions <- data.frame(index_out, preds)
-  colnames(preds)[1] <- obj$index_var
+  colnames(predictions)[1] <- obj$index_var
 
   new_predictions(
-    predictions = preds,
+    predictions = predictions,
     model = final_model,
     type = "forecaster",
-    uid = sparklyr::random_string(prefix = "pred"),
+    uid = uid,
     desc = desc
   )
 }

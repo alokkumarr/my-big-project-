@@ -3,11 +3,14 @@
 \name{silhouette}
 \alias{silhouette}
 \alias{silhouette.tbl_spark}
+\alias{silhouette.spark_connection}
 \title{Generic silhouette function}
 \usage{
 silhouette(x, predicted)
 
 \method{silhouette}{tbl_spark}(x, predicted = "predicted")
+
+\method{silhouette}{spark_connection}(x, predicted = "predicted")
 }
 \arguments{
 \item{x}{dataframe object}

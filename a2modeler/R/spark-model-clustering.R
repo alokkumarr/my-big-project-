@@ -44,10 +44,10 @@ train_model.spark_model_clustering <- function(mobj,
 
       # Fit submodel to training sample
       train_smpl <- data %>%
-        dplyr::mutate(index = 1) %>%
-        dplyr::mutate(index = row_number(index)) %>%
-        dplyr::filter(index %in% index$train) %>%
-        dplyr::select(-index)
+        dplyr::mutate(rn = 1) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::filter(rn %in% obj$samples$test_index) %>%
+        dplyr::select(-rn)
 
       args <- c(list(x = train_smpl, formula = fn, uid = submodel_uid), params)
       submodel <- do.call(fun, args)
@@ -58,10 +58,10 @@ train_model.spark_model_clustering <- function(mobj,
 
         # Predict each validation sample
         val_smpl <- data %>%
-          dplyr::mutate(index = 1) %>%
-          dplyr::mutate(index = row_number(index)) %>%
-          dplyr::filter(index %in% index$validation) %>%
-          dplyr::select(-index)
+          dplyr::mutate(rn = 1) %>% 
+          dplyr::mutate(rn = row_number(rn)) %>% 
+          dplyr::filter(rn %in% obj$samples$test_index) %>%
+          dplyr::select(-rn) %>% 
 
         predictions <- sparklyr::ml_predict(submodel, val_smpl) %>%
           dplyr::rename(predicted = prediction)
