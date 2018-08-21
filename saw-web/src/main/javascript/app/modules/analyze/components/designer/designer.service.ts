@@ -10,6 +10,8 @@ import * as take from 'lodash/take';
 import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as isEmpty from 'lodash/isEmpty';
+
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../../services/analyze.service';
 import { AnalysisType, Analysis } from '../../types';
@@ -454,11 +456,31 @@ export class DesignerService {
     };
   }
 
-  getPartialReportSqlBuilder(
+  getPartialESReportSqlBuilder(
     artifactColumns: ArtifactColumns
   ): Partial<SqlBuilderEsReport> {
     return {
       dataFields: filter(artifactColumns, 'checked')
     };
+  }
+
+  generateReportDataField(columns) {
+    let dataFields = [];
+      forEach(columns, cols=> {
+        let checkedRows = this.getPartialReportSqlBuilder(cols.columns);
+        if (!isEmpty(checkedRows)) {
+          dataFields.push({
+            tableName: cols.artifactName,
+            columns: checkedRows
+          });
+        }
+      });
+     return dataFields;
+  }
+
+  getPartialReportSqlBuilder(
+    artifactColumns: ArtifactColumns
+  ): Partial<SqlBuilderEsReport> {
+    return filter(artifactColumns, 'checked');
   }
 }
