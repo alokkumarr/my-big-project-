@@ -1,19 +1,8 @@
 package model
 
-import java.text.SimpleDateFormat
-
-import com.synchronoss.DynamicConvertor
-import controllers.BaseController
 import org.json4s._
-import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
-import org.json4s.native.JsonMethods._
-import org.apache.log4j._
 import org.slf4j.{Logger, LoggerFactory}
-import play.mvc.Controller
-import play.api.Logger
-
-
 
 object QueryBuilder extends {
   implicit val formats = DefaultFormats
@@ -54,8 +43,27 @@ object QueryBuilder extends {
     whereClause
   }
 
+  def buildSelectfromsqlBuilder(sqlBuilder: JObject)  = {
+    val dataFields : List [String] = extractArray(sqlBuilder, "dataFields") match {
+        case Nil => null
+        case dataFields: List[JValue] => {
+          dataFields.flatMap((fields: JValue) => {
+            val tableName = (fields \ "tableName").extract[String]
+            val columns = extractArray(fields, "columns")
+            columns.filter(columnChecked(_)).map(column(tableName, _))
+          })
+        }
+      }
+    dataFields
+  }
+
   private def buildSelect(artifacts: List[JValue], sqlBuilder: JObject) = {
-    "SELECT " + buildSelectColumns(artifacts).map(
+    // Take the precedence of sqlBuilder dataFields to build select columns, if dataFields not found
+    // in sql builder then look in the artifacts to support the backward compatibility.
+    var selectColumn = buildSelectfromsqlBuilder(sqlBuilder)
+    if (selectColumn ==null || selectColumn.isEmpty)
+      selectColumn = buildSelectColumns(artifacts)
+     "SELECT " + selectColumn.map(
       columnAggregate(sqlBuilder, _)).mkString(", ")
   }
 
@@ -280,7 +288,12 @@ object QueryBuilder extends {
     if (groupBy.isEmpty) {
       ""
     } else {
-      val selectColumns = buildSelectColumns(artifacts).toSet
+      // Take the precedence of sqlBuilder dataFields to build select columns, if dataFields not found
+      // in sql builder then look in the artifacts to support the backward compatibility.
+      var columnList = buildSelectfromsqlBuilder(sqlBuilder)
+      if (columnList == null || columnList.isEmpty)
+       columnList = buildSelectColumns(artifacts)
+      val selectColumns = columnList.toSet
       val groupByColumns = groupBy.map(buildGroupByElement(_)).toSet
       "GROUP BY " + (selectColumns -- groupByColumns).mkString(", ")
     }
@@ -336,8 +349,6 @@ object QueryBuilder extends {
         name, expected, location))
   }
 }
-
-
 
 trait Relation {
   def relations: List[String]
