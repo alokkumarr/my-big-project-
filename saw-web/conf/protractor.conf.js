@@ -93,7 +93,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently 
+  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
   capabilities: {
@@ -169,7 +169,7 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js'
+      testBaseDir + 'login.test.js'
     ]
   },
   onCleanUp: function (results) {
