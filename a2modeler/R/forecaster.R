@@ -26,7 +26,9 @@ new_forecaster <- function(df,
                            version = NULL,
                            desc = NULL,
                            scientist = NULL,
-                           save_fits = TRUE,
+                           execution_strategy = "sequential",
+                           refit = TRUE,
+                           save_submodels = TRUE,
                            dir = NULL,
                            ...){
 
@@ -44,7 +46,9 @@ new_forecaster <- function(df,
                   version,
                   desc,
                   scientist,
-                  save_fits,
+                  execution_strategy,
+                  refit,
+                  save_submodels,
                   dir)
   mobj$index_var <- index_var
   mobj$index <- index(df[[index_var]], unit = unit)
@@ -69,8 +73,8 @@ new_forecaster <- function(df,
 #' @rdname predict
 #' @export
 predict.forecaster <- function(obj,
-                               periods,
                                data = NULL,
+                               periods,
                                level = c(80, 95),
                                desc = "") {
   final_model <- obj$final_model
@@ -86,17 +90,17 @@ predict.forecaster <- function(obj,
     }
   }
 
-  final_model$pipe <- execute(data, final_model$pipe)
-  preds <- predict(final_model, periods, data = final_model$pipe$output, level)
+  pipe <- execute(data, obj$pipelines[[final_model$pipe]])
+  preds <- predict(final_model, data = pipe$output, periods, level)
   index_out <- extend(obj$index, length_out = periods)
-  preds <- data.frame(index_out, preds)
+  predictions <- data.frame(index_out, preds)
   colnames(preds)[1] <- obj$index_var
 
   new_predictions(
     predictions = preds,
     model = final_model,
     type = "forecaster",
-    id = sparklyr::random_string(prefix = "pred"),
+    uid = sparklyr::random_string(prefix = "pred"),
     desc = desc
   )
 }

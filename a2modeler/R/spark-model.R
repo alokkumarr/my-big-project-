@@ -158,7 +158,11 @@ train_model.spark_model <- function(mobj,
 
 #' @rdname evaluate_model
 #' @export
-evaluate_model.spark_model <- function(mobj, data, measure, prediction_col = "predicted"){
+evaluate_model.spark_model <- function(mobj,
+                                       data,
+                                       measure,
+                                       prediction_col = "predicted",
+                                       ...){
   
   checkmate::assert_true(! is.null(mobj$fit))
   checkmate::assert_class(data, "tbl_spark")
@@ -169,13 +173,13 @@ evaluate_model.spark_model <- function(mobj, data, measure, prediction_col = "pr
   
   # Make Predictions 
   predictions <- predict(mobj, data, prediction_col) %>% 
-    sdf_bind_cols(data %>% select(!!mobj$target))
+    sparklyr::sdf_bind_cols(data %>% select(!!mobj$target))
   
   # Calculate Performance
   performance <- predictions %>%
     measure_fun(predicted = prediction_col, actual = mobj$target)
   
-  mobj$test_performance <- tibble(!! measure$method := performance)
+  mobj$test_performance <- tibble::tibble(!! measure$method := performance)
   mobj$test_predictions <- predictions
   mobj$status <- "evaluated"
   mobj$last_updated <- Sys.time()

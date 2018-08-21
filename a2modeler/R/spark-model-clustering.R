@@ -94,10 +94,9 @@ train_model.spark_model_clustering <- function(mobj,
                       .funs = ifelse(measure$minimize, identity, dplyr::desc)) %>%
     head(1)
 
+  # Refit on full sample
   params <- best_submodel %>%
     tidyr::unnest(param_grid)
-
-  # Refit on full sample
   args <- c(list(x = data, formula = fn, uid = best_submodel$submodel_uid), params)
   mobj$fit <- do.call(fun, args)
 

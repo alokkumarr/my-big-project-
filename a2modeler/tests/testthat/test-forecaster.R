@@ -35,15 +35,14 @@ test_that("No holdout sampling test case", {
                        name = "test") %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  f1_preds <- predict(f1, 10)
+  f1_preds <- predict(f1, periods = 10)
 
   expect_class(f1, "forecaster")
   expect_class(f1$final_model, "forecast_model")
   expect_equal(f1$models[[names(get_models(f1))]]$fit, f1$final_model$fit)
-  expect_data_frame(get_evalutions(f1), nrow=1)
+  expect_data_frame(f1$performance, nrow=1)
   expect_data_frame(f1_preds$predictions, nrow=10)
 })
 
@@ -59,7 +58,6 @@ test_that("Validation only holdout sampling test case", {
     add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   f2_preds <- predict(f2, periods = 10, level = c(80, 95))
@@ -67,7 +65,7 @@ test_that("Validation only holdout sampling test case", {
   expect_class(f2, "forecaster")
   expect_class(f2$final_model, "forecast_model")
   expect_equal(f2$models[[names(get_models(f2))]]$fit, f2$final_model$fit)
-  expect_data_frame(get_evalutions(f2), nrow=2)
+  expect_data_frame(f2$performance, nrow=1)
   expect_data_frame(f2_preds$predictions, nrow=10)
 })
 
@@ -83,19 +81,18 @@ test_that("Multiple Model test case", {
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
 
   f3_preds <- predict(f3, periods = 10, level = c(80, 95))
 
   expect_class(f3, "forecaster")
   expect_class(f3$final_model, "forecast_model")
-  expect_equal(f3$final_model$id,
-               get_evalutions(f3) %>%
+  expect_equal(f3$final_model$uid,
+               f3$performance %>%
                  dplyr::filter(sample == "validation") %>%
                  dplyr::top_n(1, -rmse) %>%
-                 .$model)
-  expect_data_frame(get_evalutions(f3), nrow=4)
+                 .$model_uid)
+  expect_data_frame(f3$performance, nrow=2)
   expect_data_frame(f3_preds$predictions, nrow=10)
 })
 
@@ -111,7 +108,6 @@ test_that("Multiple Model with Test Holdout test case", {
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
 
   f4_preds <- predict(f4, periods = 10, level = c(80, 95))
@@ -138,8 +134,7 @@ test_that("Multiple Model with Manual set final model method test case", {
     add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
-    train_models(.) %>%
-    evaluate_models(.)
+    train_models(.) 
 
   f5 <- set_final_model(f5, method = "manual", id = names(get_models(f5))[2],
                         reevaluate = FALSE, refit = TRUE)
@@ -164,7 +159,6 @@ test_that("Covariate test case", {
                    name = "test") %>%
     add_model(pipe = pipeline(), method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   f6_preds <- predict(f6, periods = 10, data = data.frame(x=rnorm(10)))
@@ -187,7 +181,6 @@ test_that("Prediction index test case", {
                    name = "test") %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
     predict(periods = 10)
 
@@ -200,7 +193,6 @@ test_that("Prediction index test case", {
                        name = "test") %>%
     add_model(pipe = NULL, method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
     predict(periods = 10)
 
@@ -220,17 +212,16 @@ test_that("Pipeline transformation test case", {
     bcl <- BoxCox.lambda(x[["y"]])
     x %>% mutate(y = BoxCox(y, bcl))
   })
-
+  
   f9 <- new_forecaster(df = dat1,
-                   target = "y",
-                   index_var = "index",
-                   name = "test") %>%
+                       target = "y",
+                       index_var = "index",
+                       name = "test") %>%
     add_model(pipe = box_cox_pipe,
               method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
+  
   f9_preds <- predict(f9, 10)
   expect_data_frame(f9_preds$predictions, nrow=10)
   expect_equal(f9$final_model$pipe$output$y, BoxCox(dat1$y, BoxCox.lambda(dat1$y)))
@@ -248,7 +239,6 @@ test_that("Time Slice Sampling test case", {
     add_model(pipe = pipeline(),
               method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   expect_data_frame(get_evalutions(f10), nrow=20)
@@ -270,7 +260,6 @@ test_that("Add Models test case", {
                  list(method = "auto.arima", method_args = list()),
                  list(method = "ets", method_args = list()))) %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   expect_equal(length(f11$models), 2)
@@ -367,7 +356,6 @@ test_that("Schema Check works as expected", {
                        name = "test") %>%
     add_model(pipe = pipeline(), method = "auto.arima") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   expect_error(predict(f12, periods = 10, data = data.frame(x1=rnorm(10))))
@@ -389,7 +377,6 @@ test_that("Deploy Function works as expected", {
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
     set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
 
   temp_path <- paste(tempdir(), "test.rds", sep="/")

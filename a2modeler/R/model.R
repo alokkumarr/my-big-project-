@@ -149,6 +149,7 @@ add_model <-function(obj,
              desc = desc,
              uid = uid)
   m$status <- "added"
+  m$index_var <- obj$index_var
   obj$models[[m$uid]] <- m
   obj
 }

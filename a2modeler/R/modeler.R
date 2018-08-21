@@ -430,7 +430,8 @@ train_models.modeler <- function(obj, uids = NULL) {
                                      measure = obj$measure,
                                      samples = obj$samples,
                                      save_submodels = obj$save_submodels,
-                                     execution_strategy = obj$execution_strategy)
+                                     execution_strategy = obj$execution_strategy,
+                                     level = obj$conf_levels)
     obj$models[[uid]]$status <- "trained"
     obj$models[[uid]]$last_updated <- Sys.time()
     obj$performance <- dplyr::bind_rows(
@@ -482,6 +483,7 @@ set_final_model.modeler <- function(obj,
         dplyr::select(-index) %>% 
         evaluate_model(mobj = obj$models[[uid]],
                        data = .,
+                       periods = nrow(.),
                        measure = obj$measure)
     }
   }
@@ -489,9 +491,10 @@ set_final_model.modeler <- function(obj,
   if (refit) {
     if (is.null(obj$samples$test_holdout_prct)) {
       warning("Missing Test Holdout Sample. Final Model does not need to be refit.")
+      obj$final_model <- obj$models[[uid]]
     } else{
       # Retrain Data
-      refit_sample <- add_default_samples(1:10)
+      refit_sample <- add_default_samples(obj$data)
       obj$final_model <- train_model(
         mobj = obj$models[[uid]],
         data = obj$pipelines[[obj$models[[uid]]$pipe]]$output,
