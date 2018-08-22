@@ -21,7 +21,7 @@
     </mat-slide-toggle>
 
     <mat-form-field class="select-form-field" appearance="outline" *ngIf="format.currency">
-      <mat-label>Currency Code</mat-label>
+      <mat-label i18n>Currency Code</mat-label>
       <mat-select (selectionChange)="onCurrencyCodeChange($event.value)"
                   [value]="format.currency">
         <mat-option *ngFor="let currencyCode of currencyCodes; trackBy: index"

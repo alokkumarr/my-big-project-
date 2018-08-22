@@ -1,0 +1,40 @@
+<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center" style="width: 100vw;">
+  <div fxLayout="row" fxFlex="10">
+    <div class="admin-title" e2e="category-title">Export Analysis</div>
+  </div>
+
+  <div fxLayout="row" fxLayoutAlign="center center" fxFlex="80">
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label i18n>Metric</mat-label>
+      <mat-chip-list #chipList>
+        <mat-chip
+          *ngFor="let metric of selectedMetrics; let i = index"
+          [selectable]="false"
+          [removable]="true"
+          (removed)="onRemove(i)">
+          {{metric.metricName}}
+          <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+        </mat-chip>
+        <input
+          #metricInput
+          [matAutocomplete]="auto"
+          [matChipInputFor]="chipList"
+          [formControl]="metricCtrl"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          [matChipInputAddOnBlur]="true"/>
+      </mat-chip-list>
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelect($event.option.value)">
+        <mat-option *ngFor="let metric of unSelectedMetrics | async" [value]="metric">
+          {{metric.metricName}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+
+  <div fxFlex="10">
+    <button mat-raised-button color="primary" i18n>Export</button>
+  </div>
+</mat-toolbar>
+
+<admin-export-list *ngIf="!isEmpty(analyses)" [analyses]="analyses">
+</admin-export-list>

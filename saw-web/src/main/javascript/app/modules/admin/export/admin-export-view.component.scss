@@ -1,0 +1,21 @@
+admin-export-view {
+  .mat-toolbar {
+    background-color: transparent;
+
+    .mat-form-field {
+      max-width: 100%;
+      width: auto;
+      margin: 0;
+      font-size: 16px;
+
+      .mat-form-field-infix {
+        width: unset;
+      }
+    }
+  }
+
+  admin-export-list {
+    padding: 10px 20px 0;
+    display: block;
+  }
+}
