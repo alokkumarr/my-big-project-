@@ -172,6 +172,7 @@ exports.config = {
       testBaseDir + 'login.test.js'
     ]
   },
+  suite:'regression',
   onCleanUp: function (results) {
     retry.onCleanUp(results);
   },
