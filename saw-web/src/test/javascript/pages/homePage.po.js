@@ -12,6 +12,8 @@ module.exports = {
   cardViewButton: element(by.css('[e2e="analyze-card-view"]')),
   cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
   listViewInput: element(by.css('[e2e="analyze-list-view"]')),
+  observeLink: element(by.xpath('//div[contains(text(),"OBSERVE")]')),
+
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
     return element(by.xpath(`//*[text() = "${analysisName}"]`));

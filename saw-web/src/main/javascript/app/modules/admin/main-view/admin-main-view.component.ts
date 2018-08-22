@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as map from 'lodash/map';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import {
   UserEditDialogComponent,
@@ -8,27 +10,45 @@ import {
 import {
   RoleEditDialogComponent
 } from '../role';
+import {
+  CategoryEditDialogComponent,
+  CategoryDeleteDialogComponent
+} from '../category';
 import { RoleService } from '../role/role.service';
+import { CategoryService } from '../category/category.service';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { ConfirmDialogData } from '../../../common/types';
-import { IAdminDataService } from '../admin-data-service.interface';
 import { StateService } from '@uirouter/angular';
 import { AdminMenuData } from '../consts';
 
 const template = require('./admin-main-view.component.html');
 require('./admin-main-view.component.scss');
 
-const SEARCH_CONFIG = [
+const USER_SEARCH_CONFIG = [
   {keyword: 'LOGIN ID', fieldName: 'masterLoginId'},
   {keyword: 'ROLE', fieldName: 'roleName'},
   {keyword: 'FIRST NAME', fieldName: 'firstName'},
   {keyword: 'LAST NAME', fieldName: 'lastName'},
   {keyword: 'EMAIL', fieldName: 'email'},
   {keyword: 'STATUS', fieldName: 'activeStatusInd'}
+];
+
+const ROLE_SEARCH_CONFIG = [
+  {keyword: 'ROLE NAME', fieldName: 'roleName'},
+  {keyword: 'ROLE TYPE', fieldName: 'roleType'},
+  {keyword: 'STATUS', fieldName: 'activeStatusInd'},
+  {keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc'}
+];
+
+const CATEGORY_SEARCH_CONFIG = [
+  {keyword: 'PRODUCT', fieldName: 'productName'},
+  {keyword: 'MODULE', fieldName: 'moduleName'},
+  {keyword: 'CATEGORY', fieldName: 'categoryName'},
+  {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
 ];
 
 const deleteConfirmation = (section, identifier, identifierValue) => ({
@@ -45,7 +65,7 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 export class AdminMainViewComponent {
 
   @Input() columns: any[];
-  @Input() section: 'user' | 'role' | 'privilege' | 'categories';
+  @Input() section: 'user' | 'role' | 'privilege' | 'category';
   data$: Observable<any[]>;
   roles$: any;
   data: any[];
@@ -59,6 +79,7 @@ export class AdminMainViewComponent {
   ticket: {custID: string, custCode: string};
 
   constructor(
+    private _categoryService: CategoryService,
     private _userService: UserService,
     private _roleService: RoleService,
     private _jwtService: JwtService,
@@ -85,11 +106,22 @@ export class AdminMainViewComponent {
     this.filterObj.searchTerm = value;
     const searchCriteria = this._localSearch.parseSearchTerm(this.filterObj.searchTerm);
     this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
-    this._localSearch.doSearch(searchCriteria, this.data, SEARCH_CONFIG).then(data => {
+    this._localSearch.doSearch(searchCriteria, this.data, this.getSearchConfig()).then(data => {
       this.filteredData = data;
     }, err => {
       this._toastMessage.error(err.message);
     });
+  }
+
+  getSearchConfig() {
+    switch(this.section) {
+    case 'user':
+      return USER_SEARCH_CONFIG;
+    case 'role':
+      return ROLE_SEARCH_CONFIG;
+    case 'category':
+      return CATEGORY_SEARCH_CONFIG;
+    }
   }
 
   onRowClick(row) {
@@ -119,6 +151,8 @@ export class AdminMainViewComponent {
       return this._userService;
     case 'role':
       return this._roleService;
+    case 'category':
+      return this._categoryService;
     default:
       break;
     }
@@ -131,6 +165,8 @@ export class AdminMainViewComponent {
       return {roles$: this._userService.getUserRoles(customerId)};
     case 'role':
       return {roleTypes$: this._roleService.getRoleTypes(customerId)};
+    case 'category':
+      return {customerId};
     default:
       break;
     }
@@ -154,7 +190,17 @@ export class AdminMainViewComponent {
     const modifiedRow = this.modifyRowForDeletion(row);
 
     const confirmation = this.getConfirmation(modifiedRow);
-    this.openConfirmationDialog(confirmation).afterClosed().subscribe(canDelete => {
+
+    let dialogAction;
+    switch(this.section) {
+    case 'category':
+      dialogAction = this.openCategoryDeletionDialog(row);
+      break;
+    default:
+      dialogAction = this.openConfirmationDialog(confirmation);
+    }
+
+    dialogAction.afterClosed().subscribe(canDelete => {
       if (canDelete) {
         this.removeListItem(modifiedRow);
       }
@@ -167,6 +213,8 @@ export class AdminMainViewComponent {
       return deleteConfirmation('user', 'User ID', row.masterLoginId);
     case 'role':
       return deleteConfirmation('role', 'Role Name', row.roleName);
+    case 'category':
+      return deleteConfirmation('category', 'Category Name', row.categoryName);
     }
   }
 
@@ -187,7 +235,7 @@ export class AdminMainViewComponent {
   }
 
   editRow(row) {
-    this.openRowModal(row, 'edit').afterClosed().subscribe(rows => {
+    this.openRowModal(cloneDeep(row), 'edit').afterClosed().subscribe(rows => {
       if (rows) {
         this.setData(rows);
       }
@@ -219,6 +267,11 @@ export class AdminMainViewComponent {
         masterLoginId: userId,
         myAnalysis: true
       }
+    case 'category':
+      return {
+        customerId: this.ticket.custID,
+        masterLoginId: this.ticket.masterLoginId
+      };
     }
   }
 
@@ -237,12 +290,30 @@ export class AdminMainViewComponent {
     } as MatDialogConfig);
   }
 
+  openCategoryDeletionDialog(category) {
+    const customerId = this.ticket.custID;
+    const masterLoginId = this.ticket.masterLoginId;
+    const data = {
+      category,
+      customerId,
+      masterLoginId
+    };
+    return this._dialog.open(CategoryDeleteDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      autoFocus: false,
+      data
+    } as MatDialogConfig);
+  }
+
   getModalComponent() {
     switch (this.section) {
     case 'user':
       return UserEditDialogComponent;
     case 'role':
       return RoleEditDialogComponent;
+    case 'category':
+      return CategoryEditDialogComponent;
     }
   }
 

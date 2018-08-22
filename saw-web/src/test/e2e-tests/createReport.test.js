@@ -167,8 +167,6 @@ describe('Create report type analysis: createReport.test.js', () => {
         main.doAnalysisAction(reportName, 'delete');
         commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
         main.confirmDeleteBtn.click();
-        commonFunctions.waitFor.cardsCountToUpdate(cards, count);
-        //expect(main.getAnalysisCards(reportName).isPresent()).toBe(false);
       });
   });
 

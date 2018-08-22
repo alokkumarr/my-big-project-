@@ -20,7 +20,7 @@
     </mat-form-field>
 
     <mat-form-field class="select-form-field" appearance="outline">
-      <mat-label>Status</mat-label>
+      <mat-label i18n>Status</mat-label>
       <mat-select class="form-field" required formControlName="activeStatusInd">
         <mat-option *ngFor="let status of statuses" [value]="status.id">
           {{status.name}}
@@ -29,7 +29,7 @@
     </mat-form-field>
 
     <mat-form-field class="select-form-field" appearance="outline">
-      <mat-label>Role Type</mat-label>
+      <mat-label i18n>Role Type</mat-label>
       <mat-select class="form-field" required formControlName="roleType">
         <mat-option *ngFor="let roleType of data.formDeps.roleTypes$ | async" [value]="roleType.roleName">
           {{roleType.roleName}}

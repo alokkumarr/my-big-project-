@@ -28,6 +28,7 @@ export class SingleTableDesignerLayout {
   @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;
   @Input() chartTitle: string;
+  @Input() fieldCount: number;
 
   onRemoveFilter(index) {
     this.filters.splice(index, 1);

@@ -32,9 +32,9 @@ import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
  */
 class SAWPivotTypeElasticSearchQueryBuilder {
 
-  String jsonString;
-  String dataSecurityString;
-  SearchSourceBuilder searchSourceBuilder;
+    String jsonString;
+    String dataSecurityString;
+    SearchSourceBuilder searchSourceBuilder;
 
   private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
     private final static String VALUE = "value";
@@ -46,7 +46,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     this.jsonString = jsonString;
     this.timeOut = timeOut;
   }
-  
+
   public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey, Integer timeOut) {
 	    super();
 	    this.dataSecurityString = dataSecurityKey;
@@ -65,11 +65,11 @@ public String getJsonString() {
   /**
    * This method is used to generate the query to build elastic search query for<br/>
    * pivot data set
-   * 
+   *
    * @return query
    * @throws IOException
    * @throws JsonProcessingException
-   * @throws ProcessingException 
+   * @throws ProcessingException
    */
   public String buildQuery() throws JsonProcessingException, IOException, ProcessingException {
     String query = null;
@@ -91,7 +91,7 @@ public String getJsonString() {
     }
     DataSecurityKey dataSecurityKeyNode = null;
     ObjectMapper objectMapper = null;
-    if (getDataSecurityString()!=null && !getDataSecurityString().trim().equals("")){		
+    if (getDataSecurityString()!=null && !getDataSecurityString().trim().equals("")){
 	    objectMapper= new ObjectMapper();
 	    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 	    JsonNode objectNode = objectMapper.readTree(getDataSecurityString());
@@ -103,7 +103,7 @@ public String getJsonString() {
     final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();;
     if (sqlBuilderNode.getBooleanCriteria() !=null ){
     List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
-    List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+    List<QueryBuilder> builder = new ArrayList<>();
 
     if (dataSecurityKeyNode!=null) {
   	  for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
@@ -112,7 +112,7 @@ public String getJsonString() {
   	      }
     }
 
-    for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) 
+    for (com.synchronoss.querybuilder.model.pivot.Filter item : filters)
     {
       if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
           && !item.getIsGloblFilter().value()){
@@ -143,14 +143,14 @@ public String getJsonString() {
         if (item.getType().value().equals(Type.STRING.value())) {
           builder = QueryBuilderUtil.stringFilterPivot(item, builder);
         }
-        
+
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
             .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
             || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
             builder = QueryBuilderUtil.numericFilterPivot(item, builder);
         }
-        
+
      }
       if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
       {
@@ -230,102 +230,102 @@ public String getJsonString() {
           });
 
       }
-    // Use case I: The below block is only when column & Data Field is not empty & row field is
-    // empty
-    if ((rowfield.isEmpty() && rowfield.size() == 0)) {
-      if ((columnFields != null && columnFields.size() <= 5)
-          && (dataFields != null && dataFields.size() <= 5)) {
-        searchSourceBuilder =
-            ColumnDataFieldsAvailable.columnDataFieldsAvailable(rowfield, columnFields, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      } else {
-        throw new IllegalArgumentException(
-            "Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
+      // Use case I: The below block is only when column & Data Field is not empty & row field is
+      // empty
+      if ((rowfield.isEmpty() && rowfield.size() == 0)) {
+          if ((columnFields != null && columnFields.size() <= 5)
+              && (dataFields != null && dataFields.size() >0 )) {
+              searchSourceBuilder =
+                  ColumnDataFieldsAvailable.columnDataFieldsAvailable(rowfield, columnFields, dataFields,
+                      searchSourceBuilder, boolQueryBuilder);
+          } else {
+              throw new IllegalArgumentException(
+                  "Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
+          }
       }
-    }
 
-    // Use case II: The below block is only when column & row Field
-    if (((dataFields.isEmpty()) && dataFields.size() == 0)) {
+      // Use case II: The below block is only when column & row Field
+      if (((dataFields.isEmpty()) && dataFields.size() == 0)) {
+          if ((rowfield != null && rowfield.size() <= 5)
+              && (columnFields != null && columnFields.size() <= 5)) {
+              searchSourceBuilder =
+                  RowColumnFieldsAvailable.rowColumnFieldsAvailable(rowfield, columnFields, dataFields,
+                      searchSourceBuilder, boolQueryBuilder);
+          } else {
+              throw new IllegalArgumentException(
+                  "Pivot in row/column wise are allowed until five levels. Please verify & recreate your request.");
+          }
+      }
+
+      // Use case III: The below block is only when row field with column field & data field
       if ((rowfield != null && rowfield.size() <= 5)
-          && (columnFields != null && columnFields.size() <= 5)) {
-        searchSourceBuilder =
-            RowColumnFieldsAvailable.rowColumnFieldsAvailable(rowfield, columnFields, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      } else {
-        throw new IllegalArgumentException(
-            "Pivot in row/column wise are allowed until five levels. Please verify & recreate your request.");
+          && ((columnFields != null && columnFields.size() <= 5) && ((dataFields != null && dataFields
+          .size() >0)))) {
+          searchSourceBuilder =
+              AllFieldsAvailablePivot.allFieldsAvailable(rowfield, columnFields, dataFields,
+                  searchSourceBuilder, boolQueryBuilder);
+      } // end of rowField, columnField & dataField
+      else {
+          throw new IllegalArgumentException(
+              "Pivot in row/column/datafield wise are allowed until five levels. Please verify & recreate your request.");
       }
-    }
 
-    // Use case III: The below block is only when row field with column field & data field
-    if ((rowfield != null && rowfield.size() <= 5)
-        && ((columnFields != null && columnFields.size() <= 5) && ((dataFields != null && dataFields
-            .size() <= 5)))) {
-      searchSourceBuilder =
-          AllFieldsAvailablePivot.allFieldsAvailable(rowfield, columnFields, dataFields,
-              searchSourceBuilder, boolQueryBuilder);
-    } // end of rowField, columnField & dataField
-    else {
-      throw new IllegalArgumentException(
-          "Pivot in row/column/datafield wise are allowed until five levels. Please verify & recreate your request.");
-    }
-
-    // Use case IV: The below block is only when row field is not empty but column field & data
-    // field are empty
-    if ((columnFields.isEmpty() && columnFields.size() == 0)
-        && (dataFields.isEmpty() && dataFields.size() == 0)) {
-      if ((!rowfield.isEmpty()) && rowfield.size() <= 5) {
-        searchSourceBuilder =
-            RowFieldsAvailable.rowFieldsAvailable(rowfield, columnFields, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      } else {
-        throw new IllegalArgumentException(
-            "Pivot in row wise are allowed until five levels. Please verify & recreate your request.");
+      // Use case IV: The below block is only when row field is not empty but column field & data
+      // field are empty
+      if ((columnFields.isEmpty() && columnFields.size() == 0)
+          && (dataFields.isEmpty() && dataFields.size() == 0)) {
+          if ((!rowfield.isEmpty()) && rowfield.size() <= 5) {
+              searchSourceBuilder =
+                  RowFieldsAvailable.rowFieldsAvailable(rowfield, columnFields, dataFields,
+                      searchSourceBuilder, boolQueryBuilder);
+          } else {
+              throw new IllegalArgumentException(
+                  "Pivot in row wise are allowed until five levels. Please verify & recreate your request.");
+          }
       }
-    }
 
 
-    // Use case V: The below block is only when row field is not empty but column field & data field
-    // are empty
-    if ((rowfield.isEmpty() && rowfield.size() == 0)
-        && (dataFields.isEmpty() && dataFields.size() == 0)) {
+      // Use case V: The below block is only when row field is not empty but column field & data field
+      // are empty
+      if ((rowfield.isEmpty() && rowfield.size() == 0)
+          && (dataFields.isEmpty() && dataFields.size() == 0)) {
 
-      if ((!columnFields.isEmpty()) && columnFields.size() <= 5) {
-        searchSourceBuilder =
-            ColumnFieldsAvailable.columnFieldsAvailable(rowfield, columnFields, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      } else {
-        throw new IllegalArgumentException(
-            "Pivot in column wise are allowed until five levels. Please verify & recreate your request.");
+          if ((!columnFields.isEmpty()) && columnFields.size() <= 5) {
+              searchSourceBuilder =
+                  ColumnFieldsAvailable.columnFieldsAvailable(rowfield, columnFields, dataFields,
+                      searchSourceBuilder, boolQueryBuilder);
+          } else {
+              throw new IllegalArgumentException(
+                  "Pivot in column wise are allowed until five levels. Please verify & recreate your request.");
+          }
       }
-    }
-    
-    // Use case VI: The below block is only when column & Data Field is not empty & row field is
-    // empty
-    if ((columnFields.isEmpty() && columnFields.size() == 0)) {
-      if ((rowfield != null && rowfield.size() <= 5)
-          && (dataFields != null && dataFields.size() <= 5)) {
-        searchSourceBuilder =
-            RowDataFieldsAvailable.rowDataFieldsAvailable(rowfield, columnFields, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      } else {
-        throw new IllegalArgumentException(
-            "Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
+
+      // Use case VI: The below block is only when column & Data Field is not empty & row field is
+      // empty
+      if ((columnFields.isEmpty() && columnFields.size() == 0)) {
+          if ((rowfield != null && rowfield.size() <= 5)
+              && (dataFields != null && dataFields.size() > 0)) {
+              searchSourceBuilder =
+                  RowDataFieldsAvailable.rowDataFieldsAvailable(rowfield, columnFields, dataFields,
+                      searchSourceBuilder, boolQueryBuilder);
+          } else {
+              throw new IllegalArgumentException(
+                  "Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
+          }
       }
-    }
-    
-    // Use case VII: The below block is only when data Field is not empty
-    // empty
-    if ((columnFields.isEmpty() && columnFields.size() == 0) && (rowfield.isEmpty() && rowfield.size() == 0)) 
-    {
-      if  (dataFields != null && dataFields.size() <= 5)
+
+      // Use case VII: The below block is only when data Field is not empty
+      // empty
+      if ((columnFields.isEmpty() && columnFields.size() == 0) && (rowfield.isEmpty() && rowfield.size() == 0))
       {
-       searchSourceBuilder = OnlyDataFieldsAvailable.dataFieldsAvailable(dataFields, searchSourceBuilder, boolQueryBuilder);
-      } else {
-        throw new IllegalArgumentException(
-            "In Pivot data fields wise are allowed until five levels. Please verify & recreate your request.");
+          if  (dataFields != null && dataFields.size() > 0)
+          {
+              searchSourceBuilder = OnlyDataFieldsAvailable.dataFieldsAvailable(dataFields, searchSourceBuilder, boolQueryBuilder);
+          } else {
+              throw new IllegalArgumentException(
+                  "In Pivot data fields wise are allowed until five levels. Please verify & recreate your request.");
+          }
       }
-    }
 
     // Generated Query
     setSearchSourceBuilder(searchSourceBuilder);

@@ -26,6 +26,7 @@ export class DesignerSettingsGroupComponent {
   @Input() public artifactColumns: ArtifactColumns;
   @Input() public groupAdapter: IDEsignerSettingGroupAdapter;
   @Input() public groupAdapters: Array<IDEsignerSettingGroupAdapter>;
+  @Input() fieldCount: number;
 
   public dndSortableContainerObj = {};
   public allowDropFn;

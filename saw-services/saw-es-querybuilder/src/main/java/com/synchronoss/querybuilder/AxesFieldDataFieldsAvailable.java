@@ -1,10 +1,17 @@
 package com.synchronoss.querybuilder;
 
+import java.util.Arrays;
 import java.util.List;
 
+import com.synchronoss.BuilderUtil;
+import com.synchronoss.querybuilder.model.chart.DataField;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortOrder;
+
+import static org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders.bucketSort;
 
 class AxesFieldDataFieldsAvailable {
 
@@ -70,13 +77,25 @@ class AxesFieldDataFieldsAvailable {
 		}
 		return searchSourceBuilder;
 	}
-	private static AggregationBuilder addSubaggregation(
-			List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, AggregationBuilder aggregation) {
-		for (int i = 0; i < dataFields.size(); i++) {
-			aggregation = aggregation
-					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(i)));
-		}
-		return aggregation;
-	}
-
+    private static AggregationBuilder addSubaggregation(
+        List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, AggregationBuilder aggregation) {
+        SortOrder sortOrder;
+        for (int i = 0; i < dataFields.size(); i++) {
+            aggregation = aggregation
+                .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(i)));
+            DataField.LimitType limitType = dataFields.get(i).getLimitType();
+            if(limitType!=null) {
+                // Default Order will be descending order.
+                sortOrder = SortOrder.DESC;
+                if (dataFields.get(i).getLimitType() == DataField.LimitType.BOTTOM)
+                    sortOrder = SortOrder.ASC;
+                Integer size = new Integer(BuilderUtil.SIZE);
+                if (dataFields.get(i).getLimitValue() != null && dataFields.get(i).getLimitValue() > 0)
+                    size = dataFields.get(i).getLimitValue();
+                aggregation.subAggregation(bucketSort("bucketSort", Arrays.asList(
+                    new FieldSortBuilder(dataFields.get(i).getColumnName()).order(sortOrder))).size(size));
+            }
+        }
+        return aggregation;
+    }
 }
