@@ -47,9 +47,9 @@ const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 3600000 : 36000
  */
 const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
 /**
- * number of failed retry, 3 times in bamboo and 2 times in local
+ * number of failed retry, retry failed test cases one more time in bamboo and local
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 2 : 2;
+const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 1;
 
 /**
  * Waits ms after page is loaded
