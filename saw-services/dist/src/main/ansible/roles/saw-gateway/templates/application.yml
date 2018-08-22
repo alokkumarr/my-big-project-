@@ -122,3 +122,6 @@ api:
         -   location: ${datapod.service.host}
             method: GET
             path: '[/]internal/semantic.*'
+        -   location: ${datapod.service.host}
+            method: PUT
+            path: '[/]internal/semantic.*'

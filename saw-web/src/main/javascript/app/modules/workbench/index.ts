@@ -49,7 +49,7 @@ import { ValidateSemanticComponent } from './components/semantic-management/vali
 import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
 import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
 
-import { CommonModule } from '../../common';
+import { CommonModule, CommonModuleTs } from '../../common';
 
 export const WorkbenchModule = 'WorkbenchModule';
 
@@ -94,7 +94,8 @@ const components = [
     FlexLayoutModule,
     TreeModule,
     AceEditorModule,
-    AngularSplitModule
+    AngularSplitModule,
+    CommonModuleTs
   ],
   declarations: components,
   entryComponents: components,

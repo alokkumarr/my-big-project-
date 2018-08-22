@@ -235,9 +235,39 @@ export class WorkbenchService {
    * @returns
    * @memberof WorkbenchService
    */
-  getListOfDatapods() {
+  getListOfSemantic() {
     return this.http
       .get(`${this.api}/internal/semantic/md?projectId=${userProject}`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Gets the detailed definition of particular semantic ID
+   *
+   * @param {*} id
+   * @returns
+   * @memberof WorkbenchService
+   */
+  getSemanticDetails(id) {
+    return this.http
+      .get(`${this.api}/internal/semantic/${userProject}/${id}`)
+      .pipe(catchError(this.handleError('data', {})));
+  }
+
+  /**
+   * Updates the definition of particular semantic ID
+   *
+   * @param {*} payload
+   * @returns
+   * @memberof WorkbenchService
+   */
+  updateSemanticDetails(payload) {
+    const semID = payload.id;
+    const endpoint = `${this.api}/internal/semantic/${userProject}/${semID}`;
+    payload.updatedBy = this.jwt.getUserName();
+
+    return this.http
+      .put(endpoint, payload)
       .pipe(catchError(this.handleError('data', {})));
   }
 

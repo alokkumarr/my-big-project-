@@ -1,4 +1,3 @@
-
 import { Component, Input, OnInit, Inject, OnDestroy } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 import { DatePipe } from '@angular/common';
@@ -11,6 +10,7 @@ import { HeaderProgressService } from '../../../../common/services/header-progre
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { CreateDatasetsComponent } from '../create-datasets/create-datasets.component';
+import { ToastService } from '../../../../common/services/toastMessage.service';
 
 const template = require('./datasets-page.component.html');
 require('./datasets-page.component.scss');
@@ -21,7 +21,6 @@ require('./datasets-page.component.scss');
   styles: [],
   providers: [DatePipe]
 })
-
 export class DatasetsComponent implements OnInit, OnDestroy {
   private availableSets: Array<any> = [];
   private viewState: string = 'card';
@@ -43,8 +42,9 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     private headerProgress: HeaderProgressService,
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
-    private datePipe: DatePipe
-  ) { }
+    private datePipe: DatePipe,
+    private _toastMessage: ToastService
+  ) {}
 
   ngOnInit() {
     this.getPageData();
@@ -54,14 +54,15 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     if (this.poll) {
       this.stopPolling();
     }
+    this.headerProgress.hide();
   }
 
   startPolling() {
     /**
-        * Calls list datasets api onInit and every 10 seconds or whatever set interval
-        * 
-        * @memberof DatasetsComponent
-        */
+     * Calls list datasets api onInit and every 10 seconds or whatever set interval
+     *
+     * @memberof DatasetsComponent
+     */
     this.timer = Observable.timer(0, this.interval);
     this.timerSubscription = this.timer.subscribe(() => {
       this.getPageData();
@@ -99,39 +100,62 @@ export class DatasetsComponent implements OnInit, OnDestroy {
 
   onViewChange(): void {
     if (this.states.searchTerm !== '') {
-      this.applySearchFilter();
+      this.applySearchFilter(this.states.searchTerm);
     } else {
       this.loadSets(this.availableSets);
     }
   }
 
-  applySearchFilter(): void {
+  applySearchFilter(value): void {
+    this.states.searchTerm = value;
+
     const SEARCH_CONFIG = [
-      { keyword: 'Data Set Name', fieldName: 'set' },
-      { keyword: 'Added By', fieldName: 'meta', accessor: input => input.addedBy },
-      { keyword: 'Data Pods', fieldName: 'meta', accessor: input => input.numFiles },
+      {
+        keyword: 'Data Set Name',
+        fieldName: 'system',
+        accessor: system => system.name
+      },
+      {
+        keyword: 'Added By',
+        fieldName: 'system',
+        accessor: system => system.createdBy
+      },
       {
         keyword: 'Last Updated',
-        fieldName: 'meta',
-        accessor: input => this.datePipe.transform(input.lastUpdated, 'MM/dd/yy @ HH:mm')
+        fieldName: 'system',
+        accessor: system =>
+          this.datePipe.transform(system.modifiedTime * 1000, 'short')
       },
-      { keyword: 'Updated By', fieldName: 'meta', accessor: input => input.updatedBy },
-      { keyword: 'Data Source', fieldName: 'src' }
+      {
+        keyword: 'Description',
+        fieldName: 'system',
+        accessor: system => system.description
+      }
     ];
-    const searchCriteria = this.LocalSearch.parseSearchTerm(this.states.searchTerm);
+    const searchCriteria = this.LocalSearch.parseSearchTerm(
+      this.states.searchTerm
+    );
     this.states.searchTermValue = searchCriteria.trimmedTerm;
-    this.LocalSearch.doSearch(searchCriteria, this.availableSets, SEARCH_CONFIG).then(data => {
-      this.loadSets(data);
-    });
+
+    this.LocalSearch.doSearch(
+      searchCriteria,
+      this.availableSets,
+      SEARCH_CONFIG
+    ).then(
+      data => {
+        this.loadSets(data);
+      },
+      err => {
+        this._toastMessage.error(err.message);
+      }
+    );
   }
 
   addDataSet(): void {
     this.router.stateService.go('workbench.add');
   }
 
-  onDataViewChange() {
-
-  }
+  onDataViewChange() {}
 
   onResize(event) {
     this.contentHeight = event.target.innerHeight - 165;

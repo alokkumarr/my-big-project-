@@ -18,9 +18,9 @@
                 <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDS" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
                     [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDSSelectionChanged($event)">
                     <dxo-selection selectAllMode="allMode" showCheckBoxesMode="always" [mode]="selectionMode"></dxo-selection>
-                    <dxi-column caption="Dataset Name" dataField="system?.name"></dxi-column>
-                    <dxi-column caption="Created By" dataField="system?.createdBy"></dxi-column>
-                    <dxi-column caption="Updated Time" dataField="system?.modifiedTime" dataType="date" cellTemplate="timeTemplate"></dxi-column>
+                    <dxi-column caption="Dataset Name" dataField="system.name"></dxi-column>
+                    <dxi-column caption="Created By" dataField="system.createdBy"></dxi-column>
+                    <dxi-column caption="Updated Time" dataField="system.modifiedTime" dataType="date" cellTemplate="timeTemplate"></dxi-column>
                     <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
                     <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
                     <div *dxTemplate="let data of 'timeTemplate'">

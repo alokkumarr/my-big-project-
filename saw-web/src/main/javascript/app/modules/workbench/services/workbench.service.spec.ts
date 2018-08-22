@@ -385,4 +385,31 @@ describe('Workbench Service', () => {
       ).to.equal(true);
     }
   ));
+
+  it('getSemanticList API should exist and return an Observable', inject(
+    [WorkbenchService],
+    (workbenchService: WorkbenchService) => {
+      expect(
+        workbenchService.getListOfSemantic() instanceof Observable
+      ).to.equal(true);
+    }
+  ));
+
+  it('getSemanticDetails API should exist and return an Observable', inject(
+    [WorkbenchService],
+    (workbenchService: WorkbenchService) => {
+      expect(
+        workbenchService.getSemanticDetails({}) instanceof Observable
+      ).to.equal(true);
+    }
+  ));
+
+  it('updateSemantic API should exist and return an Observable', inject(
+    [WorkbenchService],
+    (workbenchService: WorkbenchService) => {
+      expect(
+        workbenchService.updateSemanticDetails({}) instanceof Observable
+      ).to.equal(true);
+    }
+  ));
 });

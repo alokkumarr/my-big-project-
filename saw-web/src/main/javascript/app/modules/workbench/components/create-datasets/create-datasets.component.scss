@@ -12,7 +12,7 @@ create-datasets {
 
   mat-dialog-content {
     height: 100%;
-    background-color: #F5F9FC;
+    background-color: $background-color;
     padding: 3px !important;
     margin: 0 !important;
     max-height: 100% !important;
@@ -24,7 +24,7 @@ create-datasets {
   }
 
   .mat-horizontal-stepper-header-container {
-    background-color: #F5F9FC;
+    background-color: $background-color;
   }
 
   .mat-horizontal-stepper-content {

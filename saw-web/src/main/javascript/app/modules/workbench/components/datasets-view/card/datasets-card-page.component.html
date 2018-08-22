@@ -7,7 +7,7 @@
           <mat-icon *ngSwitchCase="'SUCCESS'" style="color: #73B421;" fontIcon="icon-exchange"></mat-icon>
           <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
         </div>
-        <a class="dataset-name" e2e="data-set-card" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name"></a>
+        <a class="dataset-name" e2e="data-set-card" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name | highlight: searchTerm"></a>
         <dataset-actions [dsMetadata]="sets"></dataset-actions>
       </mat-card-header>
       <mat-divider></mat-divider>
@@ -20,24 +20,24 @@
         </div>
         <div class="descr margin-btm-9">
           <div>Description:
-            <span [innerHTML]="sets?.system?.description"></span>
+            <span [innerHTML]="sets?.system?.description | highlight: searchTerm"></span>
           </div>
         </div>
         <div class="margin-btm-9" fxLayout="row">
           <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added by:
-            <span [innerHTML]="sets.system.createdBy"></span>
+            <span [innerHTML]="sets.system.createdBy | highlight: searchTerm"></span>
           </div>
           <div fxFlex="65
                     " fxLayout="column" fxLayoutAlign="center end">Last updated:
             <div fxLayout="row" style="align-items: baseline;">
-              <span> {{sets.system.modifiedTime * 1000 | date: 'short'}}</span>
+              <span [innerHTML]="sets.system.modifiedTime * 1000 | date: 'short' | highlight: searchTerm"> </span>
             </div>
           </div>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
-  <div class="dataSets-view_no-results" *ngIf="searchTerm && !cardsData.length">
-    <span translate="NO_MATCHING_RESULTS"></span>
+  <div class="dataSets-view_no-results" *ngIf="searchTerm && dataSets.length== 0">
+    <span i18n>NO MATCHING RESULTS</span>
   </div>
 </div>

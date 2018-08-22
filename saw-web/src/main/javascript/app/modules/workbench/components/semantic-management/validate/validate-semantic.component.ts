@@ -89,7 +89,7 @@ export class ValidateSemanticComponent implements OnDestroy {
       autoFocus: true,
       closeOnNavigation: true,
       disableClose: true,
-      height: '236px',
+      height: '250px',
       width: '350px'
     });
 
@@ -117,7 +117,8 @@ export class ValidateSemanticComponent implements OnDestroy {
               children: [],
               label: 'charts'
             }
-          ]
+          ],
+          parentDS: []
         };
         payload.metricName = name;
 
@@ -131,6 +132,7 @@ export class ValidateSemanticComponent implements OnDestroy {
             artifactName: ds.system.name,
             columns: filter(ds.schema.fields, 'include')
           });
+          payload.parentDS.push(ds.system.name);
         });
 
         this.headerProgress.show();

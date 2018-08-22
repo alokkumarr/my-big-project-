@@ -80,7 +80,7 @@
       <mat-tab  label="Data Preview" [disabled]="previewStatus === 'failed'">
         <div e2e="data-set-detial-preview" fxLayout="row" class="data-cont" fxFlex fxLayoutAlign="center center">
           <mat-card class="data-grid" fxFlex="100">
-            <dx-data-grid #dpGrid id="dpGrid" *ngIf="previewStatus === 'success'" fxFlex [dataSource]="previewData" [height]="'100%'" [width]="'100%'" [allowColumnResizing]="true" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
+            <dx-data-grid #dpGrid id="dpGrid" *ngIf="previewStatus === 'success'" fxFlex [dataSource]="previewData" [height]="'99.5%'" [width]="'100%'" [allowColumnResizing]="true" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
               [columnAutoWidth]="true" [rowAlternationEnabled]="true" [showBorders]="false">
               <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
               <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>

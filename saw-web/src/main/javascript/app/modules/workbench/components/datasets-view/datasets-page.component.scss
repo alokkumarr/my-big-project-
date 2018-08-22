@@ -20,6 +20,10 @@ datasets-page {
     padding-top: 5px;
   }
 
+  .icon-search {
+    font-size: 26px !important;
+  }
+
   .toolbar-white {
     background-color: #FFF;
     height: 45px !important;
@@ -67,11 +71,10 @@ datasets-page {
   }
 
   .page-content {
-    background-color: #F5F9FC;
-    overflow: auto;
+    background-color: $background-color;
 
     .grid-view {
-      padding: 3px;
+      padding: 5px;
     }
   }
 }
