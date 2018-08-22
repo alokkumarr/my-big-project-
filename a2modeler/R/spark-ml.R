@@ -9,7 +9,7 @@
 #' @param mobj spark_model object
 #' @rdname fitted
 #' @export
-fitted.spark_model <- function(mobj, prediction_col = "predicted") {
+fitted.spark_model <- function(mobj, prediction_col = "predicted", ...) {
   mobj$fit$stages[[2]]$summary$predictions %>%
     dplyr::rename(!!prediction_col := prediction) %>% 
     dplyr::select(!!prediction_col, features)

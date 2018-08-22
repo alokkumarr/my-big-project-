@@ -4,13 +4,15 @@
 
 
 #' @rdname train_model
+#' @importFrom stats as.formula
 #' @export
 train_model.spark_model_clustering <- function(mobj,
                                                data,
                                                measure,
                                                samples,
                                                save_submodels,
-                                               execution_strategy = "sequential") {
+                                               execution_strategy = "sequential",
+                                               ...) {
 
   checkmate::assert_class(data, "tbl_spark")
   checkmate::assert_class(measure, "measure")
@@ -46,7 +48,7 @@ train_model.spark_model_clustering <- function(mobj,
       train_smpl <- data %>%
         dplyr::mutate(rn = 1) %>% 
         dplyr::mutate(rn = row_number(rn)) %>% 
-        dplyr::filter(rn %in% obj$samples$test_index) %>%
+        dplyr::filter(rn %in% index$train) %>%
         dplyr::select(-rn)
 
       args <- c(list(x = train_smpl, formula = fn, uid = submodel_uid), params)
@@ -54,14 +56,14 @@ train_model.spark_model_clustering <- function(mobj,
 
       mobj$sub_models[[submodel_uid]][[i]] <- submodel
 
-      if(! is.null(index$validation)) {
+      if (!is.null(index$validation)) {
 
         # Predict each validation sample
         val_smpl <- data %>%
           dplyr::mutate(rn = 1) %>% 
-          dplyr::mutate(rn = row_number(rn)) %>% 
-          dplyr::filter(rn %in% obj$samples$test_index) %>%
-          dplyr::select(-rn) %>% 
+          dplyr::mutate(rn = dplyr::row_number(rn)) %>% 
+          dplyr::filter(rn %in% index$validation) %>%
+          dplyr::select(-rn)
 
         predictions <- sparklyr::ml_predict(submodel, val_smpl) %>%
           dplyr::rename(predicted = prediction)
@@ -69,7 +71,7 @@ train_model.spark_model_clustering <- function(mobj,
         # evalulate performance
         perf <- match.fun(measure$method)(predictions, "predicted") %>%
           tibble::as.tibble() %>%
-          dplyr::mutate(submodel_uid = uid,
+          dplyr::mutate(submodel_uid = submodel_uid,
                         index = names(indicies[i]),
                         sample = "validation") %>%
           dplyr::rename(!!measure$method := !!names(.)[1]) %>%
@@ -124,9 +126,9 @@ predict.spark_model_clustering <- function(mobj,
 
 
 #' Evaluate Method for Spark-Model Clustering Object
-#' @rdname evaluate
+#' @rdname evaluate_model
 #' @export
-evaluate.spark_ml_clustering <- function(mobj, measure) {
+evaluate_model.spark_ml_clustering <- function(mobj, measure) {
 
   mobj$evaluate <- purrr::map_df(mobj$performance,
                                  ~purrr::map_df(., match.fun(measure$method)),

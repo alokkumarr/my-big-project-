@@ -9,20 +9,26 @@
 \title{Train Model Generic Function}
 \usage{
 \method{train_model}{forecast_model}(mobj, data, measure, samples,
-  save_submodels, execution_strategy, level)
+  save_submodels, execution_strategy, level, ...)
 
 train_model(mobj, ...)
 
 \method{train_model}{spark_model_clustering}(mobj, data, measure, samples,
-  save_submodels, execution_strategy = "sequential")
+  save_submodels, execution_strategy = "sequential", ...)
 
 \method{train_model}{spark_model}(mobj, data, measure, samples, save_submodels,
-  execution_strategy)
+  execution_strategy, ...)
 }
 \arguments{
 \item{mobj}{model object}
 
-\item{...}{additional arguments to pass on}
+\item{data}{data to use for model training}
+
+\item{measure}{measure object}
+
+\item{samples}{samples object}
+
+\item{...}{additional arguments to pass to model class train_model method}
 }
 \value{
 updated modeler object

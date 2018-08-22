@@ -34,7 +34,7 @@ test_that("No holdout sampling test case", {
                        target = "y",
                        index_var = "index",
                        name = "test") %>%
-    add_model(pipe = NULL, method = "auto.arima") %>%
+    add_model(pipe = NULL, method = "auto.arima", uid = "auto_arima") %>%
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
@@ -61,7 +61,7 @@ test_that("Validation only holdout sampling test case", {
     train_models(.) %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  f2_preds <- predict(f2, periods = 10, level = c(80, 95))
+  f2_preds <- predict(f2, periods = 10)
 
   expect_class(f2, "forecaster")
   expect_class(f2$final_model, "forecast_model")
@@ -82,9 +82,9 @@ test_that("Multiple Model test case", {
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  f3_preds <- predict(f3, periods = 10, level = c(80, 95))
+  f3_preds <- predict(f3, periods = 10)
 
   expect_class(f3, "forecaster")
   expect_class(f3$final_model, "forecast_model")
@@ -109,9 +109,9 @@ test_that("Multiple Model with Test Holdout test case", {
     add_model(pipe = NULL, method = "auto.arima") %>%
     add_model(pipe = NULL, method = "ets") %>%
     train_models(.) %>%
-    set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
+    set_final_model(., method = "best", reevaluate = TRUE, refit = FALSE)
 
-  f4_preds <- predict(f4, periods = 10, level = c(80, 95))
+  f4_preds <- predict(f4, periods = 10)
 
   expect_class(f4, "forecaster")
   expect_class(f4$final_model, "forecast_model")
@@ -140,7 +140,7 @@ test_that("Multiple Model with Manual set final model method test case", {
 
   f5 <- set_final_model(f5, method = "manual", uid = "ets",
                         reevaluate = FALSE, refit = FALSE)
-  f5_preds <- predict(f5, periods = 10, level = c(80, 95))
+  f5_preds <- predict(f5, periods = 10)
 
   expect_class(f5, "forecaster")
   expect_class(f5$final_model, "forecast_model")
@@ -242,7 +242,7 @@ test_that("Time Slice Sampling test case", {
 
 
 
-test_that("Auto Forecaster data.frame test case", {
+test_that("Auto Forecaster with parallel execution test case", {
 
   af1 <- auto_forecaster(dat1,
                          target = "y",
@@ -250,24 +250,22 @@ test_that("Auto Forecaster data.frame test case", {
                          periods = 10,
                          unit = NULL,
                          models = list(
-                           list(method = "auto.arima", method_args = list()),
-                           list(method = "ets", method_args = list())))
+                           list(method = "auto.arima"),
+                           list(method = "ets")),
+                         execution_strategy = "multisession")
   expect_data_frame(af1$predictions, nrow=10)
 
-  dat3 <- rbind(dat1 %>% mutate(group = "A"),
-                dat1 %>% mutate(group = "B"))
 
-  af2 <- forecaster(dat3,
-                    index_var = "index",
-                    group_vars = "group",
-                    measure_vars = c("y"),
-                    periods = 10,
-                    unit = NULL,
-                    pipe = NULL,
-                    models = list(
-                      list(method = "auto.arima", method_args = list()),
-                      list(method = "ets", method_args = list())))
-  expect_data_frame(af2, nrow=20)
+  af2 <- auto_forecaster(dat1,
+                         target = "y",
+                         index_var = "index",
+                         periods = 10,
+                         unit = NULL,
+                         models = list(
+                           list(method = "auto.arima"),
+                           list(method = "ets")),
+                         execution_strategy = "sequential")
+  expect_data_frame(af2$predictions, nrow=10)
 })
 
 
@@ -289,9 +287,8 @@ test_that("Spark Forecaster test case", {
                      unit = NULL,
                      pipe = NULL,
                      models = list(
-                       list(method = "auto.arima", method_args = list()),
-                       list(method = "ets", method_args = list()))
-                     )
+                       list(method = "auto.arima"),
+                       list(method = "ets")))
 
   spk_f1 <- forecaster(dat3_tbl,
                        index_var = "index",
@@ -301,9 +298,8 @@ test_that("Spark Forecaster test case", {
                        unit = NULL,
                        pipe = NULL,
                        models = list(
-                         list(method = "auto.arima", method_args = list()),
-                         list(method = "ets", method_args = list()))
-                       )
+                         list(method = "auto.arima"),
+                         list(method = "ets")))
 
   expect_equal(
     spk_f1 %>%
@@ -318,6 +314,7 @@ test_that("Spark Forecaster test case", {
   )
 
 })
+
 
 
 test_that("Schema Check works as expected", {
@@ -360,7 +357,7 @@ test_that("Deploy Function works as expected", {
   f13 <- readRDS(temp_path)
   expect_equal(f12$created_on, f13$created_on)
   expect_equal(f12$name, f13$name)
-  expect_equal(f12$final_model$id, f13$final_model$id)
+  expect_equal(f12$final_model$uid, f13$final_model$uid)
 
   deploy(f12, path = temp_path, lighten = TRUE)
   f13 <- readRDS(temp_path)
@@ -370,3 +367,25 @@ test_that("Deploy Function works as expected", {
   p13 <- predict(f13, periods = 7)
   expect_class(p13, "predictions")
 })
+
+
+
+test_that("Parallel Execution Strategy Test Case", {
+  
+  f15 <- new_forecaster(df = dat1,
+                        target = "y",
+                        index_var = "index",
+                        name = "test",
+                        execution_strategy = "multisession") %>%
+    add_time_slice_samples(., width = 190, horizon = 1, skip = 0) %>%
+    add_model(method = "auto.arima", uid = "auto.arima") %>%
+    add_model(method = "ets", uid = "ets") %>%
+    train_models(.) %>%
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
+  
+  expect_data_frame(f15$performance, nrow=2)
+  expect_class(f15$models$auto.arima$sub_models[[1]]$slice190, "Arima")
+  expect_number(length(f15$models$auto.arima$sub_models[[1]]), 10)
+})
+
+

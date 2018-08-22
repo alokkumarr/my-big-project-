@@ -73,6 +73,22 @@ valid_samples <- function(x){
 
 
 #' Sample Class Helper function
+#'
+#' Creates a valid object of samples class
+#'
+#' @param validation_method name of validation method. examples are holdout,
+#'   cross-validation, etc...
+#' @param validation_args list of arguments to pass to validation method
+#' @param test_holdout_prct percent of total data records to use for test
+#'   dataset
+#' @param downsample_prct percent of total data to downsample and use for
+#'   analysis
+#' @param train_indicies list of numeric train indicies. each index contains
+#'   numeric vector pertaining to row numbers to use for model fitting
+#' @param validation_indicies list of numeric validation indicies. each index contains
+#'   numeric vector pertaining to row numbers to use for model validation
+#' @param indicies_names character vector of indicies names
+#' @param test_index  numeric index with records to use for model testing   
 samples <- function(validation_method,
                     validation_args,
                     test_holdout_prct,
@@ -290,7 +306,6 @@ add_default_samples.data.frame <- function(x){
 
 
 #' @rdname add_default_samples
-#' @export
 add_default_samples.tbl_spark <- function(x){
   z <- 1:sparklyr::sdf_nrow(x)
   add_default_samples(z)

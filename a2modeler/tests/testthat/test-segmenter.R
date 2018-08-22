@@ -62,67 +62,58 @@ test_that("Segmenter Train Model", {
               uid = "kmeans") %>%
     train_models()
 
-  expect_class(s1$models[[1]]$performance$train$train, "tbl_spark")
-  expect_class(s1$models[[1]]$fit, "ml_model")
+  expect_class(s1$models[["kmeans"]]$performance, "data.frame")
+  expect_class(s1$models[["kmeans"]]$fit, "ml_model_clustering")
+  expect_subset("data.frame", class(s1$performance))
+  expect_equal(nrow(s1$performance), 1)
+  expect_subset("silhouette", colnames(s1$performance))
 })
 
-
-test_that("Segmenter Evaluate Model", {
-
-  s1 <- new_segmenter(df = df, name = "test") %>%
-    add_holdout_samples(splits = c(.8, .2)) %>%
-    add_model(pipe = NULL,
-              method = "ml_kmeans",
-              k = 3,
-              uid = "kmeans") %>%
-    train_models() 
-
-  expect_subset("data.frame", class(s1$evaluate))
-  expect_equal(nrow(s1$evaluate), 1)
-  expect_subset("silhouette", colnames(s1$evaluate))
-})
 
 
 test_that("Segmenter set final model options work as expected", {
 
 
   s1 <- new_segmenter(df = df, name = "test_multi_model") %>%
-    add_holdout_samples(splits = c(.8, .2)) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
+              k = 3,
               desc = "model1-ml_kmeans ") %>%
     add_model(pipe = NULL,
               method = "ml_bisecting_kmeans",
+              k = 3,
               desc = "model2-ml_bisecting_kmeans") %>%
     add_model(pipe = NULL,
               method = "ml_gaussian_mixture",
+              k = 3,
               desc = "model4-ml_kmeans2") %>%
-    train_models() 
+    train_models()
 
   s1_best <- set_final_model(s1,
                              method = "best",
                              reevaluate = FALSE,
-                             refit = TRUE)
+                             refit = FALSE)
   s1_man <- set_final_model(s1,
                             method = "manual",
-                            id = s1$models[[1]]$id,
+                            uid = s1$models[[1]]$uid,
                             reevaluate = FALSE,
-                            refit = TRUE)
+                            refit = FALSE)
 
-  expect_subset("spark_ml", class(s1_best$final_model))
-  expect_equal(get_evalutions(s1_best) %>%
+  expect_subset("spark_model_clustering", class(s1_best$final_model))
+  expect_equal(s1_best$performance %>%
                  top_n(1, silhouette) %>%
-                 pull(model),
-               s1_best$final_model$id)
+                 dplyr::pull(model_uid),
+               s1_best$final_model$uid)
 
-  expect_equal(s1_man$final_model$id, s1$models[[1]]$id)
+  expect_equal(s1_man$final_model$uid, s1$models[[1]]$uid)
 })
 
 
 test_that("Segmenter Predicts New Data", {
 
   s1 <- new_segmenter(df = df, name = "test") %>%
-    add_holdout_samples(splits = c(.8, .2)) %>%
+    add_holdout_samples(splits = c(.6, .4)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
               k = 3) %>%
@@ -130,8 +121,7 @@ test_that("Segmenter Predicts New Data", {
               method = "ml_kmeans",
               k = 4) %>%
     train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   p1 <- predict(s1, data = df)
 
@@ -139,25 +129,25 @@ test_that("Segmenter Predicts New Data", {
 })
 
 
-test_that("Segmenter with add_model_grid", {
+test_that("Segmenter with param_map", {
 
   .k <- 3:5
   s1 <- new_segmenter(df = df, name = "test") %>%
-    add_default_samples() %>%
-    add_model_grid(pipe = NULL,
-                   method = "ml_kmeans",
-                   k = .k) %>%
+    add_holdout_samples(splits = c(.6, .4)) %>%
+    add_model(pipe = NULL,
+              method = "ml_kmeans",
+              uid = "kmeans",
+              param_map = list(k = .k)) %>%
     train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  expect_equal(length(s1$models), length(.k))
-  expect_equal(s1$models[[1]]$method_args[[1]], .k[1])
-  expect_equal(s1$models[[1]]$fit$summary$k, .k[1])
-  expect_equal(s1$models[[2]]$method_args[[1]], .k[2])
-  expect_equal(s1$models[[2]]$fit$summary$k, .k[2])
-  expect_equal(s1$models[[3]]$method_args[[1]], .k[3])
-  expect_equal(s1$models[[3]]$fit$summary$k, .k[3])
+  expect_equal(length(s1$models$kmeans$sub_models), length(.k))
+  expect_equal(nrow(s1$models$kmeans$sub_models[[1]][[1]]$centers), .k[1])
+  expect_equal(s1$models$kmeans$sub_models[[1]][[1]]$summary$k, .k[1])
+  expect_equal(nrow(s1$models$kmeans$sub_models[[2]][[1]]$centers), .k[2])
+  expect_equal(s1$models$kmeans$sub_models[[2]][[1]]$summary$k, .k[2])
+  expect_equal(nrow(s1$models$kmeans$sub_models[[3]][[1]]$centers), .k[3])
+  expect_equal(s1$models$kmeans$sub_models[[3]][[1]]$summary$k, .k[3])
 })
 
 

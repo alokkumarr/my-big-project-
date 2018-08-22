@@ -5,9 +5,9 @@
 \alias{fitted.spark_model}
 \title{Forecast Model Fitted Method}
 \usage{
-\method{fitted}{forecast_model}(mobj)
+\method{fitted}{forecast_model}(mobj, ...)
 
-\method{fitted}{spark_model}(mobj, prediction_col = "predicted")
+\method{fitted}{spark_model}(mobj, prediction_col = "predicted", ...)
 }
 \arguments{
 \item{mobj}{spark_model object}

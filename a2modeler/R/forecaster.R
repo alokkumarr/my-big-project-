@@ -14,6 +14,7 @@
 #'   95 percent CIs
 #' @family use cases
 #' @aliases forecaster
+#' @import forecast
 #' @export
 new_forecaster <- function(df,
                            target,
@@ -64,9 +65,6 @@ new_forecaster <- function(df,
 # Forecaster Class Methods ------------------------------------------------
 
 
-
-
-
 #' Forecaster Prediction Method
 #'
 #' Method makes predictions for Forecaster's final model
@@ -76,7 +74,8 @@ predict.forecaster <- function(obj,
                                data = NULL,
                                periods,
                                uid = sparklyr::random_string(prefix = "pred"),
-                               desc = "") {
+                               desc = "",
+                               ...) {
   final_model <- obj$final_model
   if (is.null(final_model)) {
     stop("Final model not set")
@@ -110,25 +109,24 @@ predict.forecaster <- function(obj,
 # Auto Forecaster ---------------------------------------------------------
 
 
-#' Auto Forecaster Function
+#'Auto Forecaster Function
 #'
-#' Creates automated forecasts for univariate time series.
+#'Creates automated forecasts for univariate time series.
 #'
-#' Convience wrapper to create complete forecaster pipeline
+#'Convience wrapper to create complete forecaster pipeline
 #'
-#' @param df dataframe
-#' @param target numeric variable to model and forecast
-#' @param index_var index variable
-#' @param periods number of periods to forecast
-#' @param unit unit of index variable default is null
-#' @param pipe pipeline object
-#' @param models nested list of models. each model list should have a method and
-#'   list of arguments
-#' @param splits holdout splits ratios default is 80-20 train to validation
-#' @param conf_levels forecast confidence levels. default is 80 and 90 percent
+#'@inheritParams new_forecaster
+#'@param periods number of periods to forecast
+#'@param unit unit of index variable default is null
+#'@param pipe pipeline object
+#'@param models nested list of arguments to pass to add_model function. Each
+#'  element in list requires at least a method argument. Pipe argument made
+#'  globally
+#'@param splits holdout splits ratios default is 80-20 train to validation
+#'@param conf_levels forecast confidence levels. default is 80 and 90 percent
 #'
-#' @return predictions object
-#' @export
+#'@return predictions object
+#'@export
 #'
 #' @examples
 #'
@@ -145,8 +143,8 @@ predict.forecaster <- function(obj,
 #'                        periods = 10,
 #'                        unit = NULL,
 #'                        models = list(
-#'                                      list(method = "auto.arima", method_args = list()),
-#'                                      list(method = "ets", method_args = list())
+#'                                      list(method = "auto.arima"),
+#'                                      list(method = "ets")
 #'                                      )
 #'   )
 auto_forecaster <- function(df,
@@ -155,12 +153,11 @@ auto_forecaster <- function(df,
                             periods,
                             unit = NULL,
                             pipe = NULL,
-                            models = list(list(method = "auto.arima",
-                                               method_args = list()),
-                                          list(method = "ets",
-                                               method_args = list())),
+                            models = list(list(method = "auto.arima"), 
+                                          list(method = "ets")),
                             splits = c(.8, .2),
-                            conf_levels = c(80, 95)) {
+                            conf_levels = c(80, 95),
+                            execution_strategy = "sequential") {
 
   df_names <- colnames(df)
   checkmate::assert_data_frame(df)
@@ -173,25 +170,39 @@ auto_forecaster <- function(df,
   checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
                             min.len = 1, max.len = 2)
 
-  new_forecaster(df,
+  f1 <- new_forecaster(df,
                  target = target,
                  index_var = index_var,
                  unit = unit,
-                 name = "auto-forecaster") %>%
-    add_holdout_samples(., splits = splits) %>%
-    add_models(pipe = pipe, models = models) %>%
+                 name = "auto-forecaster",
+                 save_submodels = FALSE,
+                 execution_strategy = execution_strategy) %>%
+    add_holdout_samples(., splits = splits) 
+  
+  for(i in seq_along(models)) {
+    f1 <- do.call("add_model", modifyList(list(obj = f1, pipe = pipe), models[[i]]))
+  }
+  
+  f1 %>%
     train_models(.) %>%
-    evaluate_models(.) %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE) %>%
-    predict(periods = periods, level = conf_levels)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE) %>%
+    predict(periods = periods)
 }
 
 
-
+#' Forecaster Component
+#'
+#' Component function creates forecasts by preparing the data and using the
+#' auto_forecast function
+#'
+#' Methods for spark and R data.frames. Spark method applies auto_forecast
+#' function with distributed R
+#'
 #' @inheritParams auto_forecaster
 #' @param group_vars optional column name of grouping variables. splits data and
 #'   applies auto_forecaster to each group
 #' @param measure_vars colname names of variables to forecast
+#' @param ... additional arguments to pass on. not currently implemented
 #' @export
 forecaster <- function(...){
   UseMethod("forecaster")
@@ -213,7 +224,8 @@ forecaster.data.frame <- function(df,
                                                 list(method = "ets",
                                                      method_args = list())),
                                   splits = c(.8, .2),
-                                  conf_levels = c(80, 95)) {
+                                  conf_levels = c(80, 95),
+                                  ...) {
 
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
@@ -270,12 +282,11 @@ forecaster.tbl_spark <- function(df,
                                  periods,
                                  unit = NULL,
                                  pipe = NULL,
-                                 models = list(list(method = "auto.arima",
-                                                    method_args = list()),
-                                               list(method = "ets",
-                                                    method_args = list())),
+                                 models = list(list(method = "auto.arima"),
+                                               list(method = "ets")),
                                  splits = c(.8, .2),
-                                 conf_levels = c(80, 95)) {
+                                 conf_levels = c(80, 95),
+                                 ...) {
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_subset(group_vars, df_names)
@@ -315,30 +326,35 @@ forecaster.tbl_spark <- function(df,
     dplyr::mutate_at("measure", as.character) %>%
     sparklyr::spark_apply(.,
                           function(e, l) {
-                            library(forecast)
+                            sparklyr::spark_apply_log("spark apply starting")
+                            
                             library(a2modeler)
-                            library(dplyr)
                             library(checkmate)
-                            library(lubridate)
-                            library(tidyr)
+                            library(forecast)
+                            library(future)
+                            library(doFuture)
                             library(purrr)
-
-                            f1 <- new_forecaster(e[, c(l$target, l$index_var)],
-                                                 target = l$target,
-                                                 index_var = l$index_var,
-                                                 unit = l$unit,
-                                                 name = "auto-forecaster") %>%
-                              add_holdout_samples(., splits = l$splits) %>%
-                              add_models(.,
-                                         pipe = l$pipe,
-                                         models = l$models) %>%
-                              train_models(.) %>%
-                              evaluate_models(.) %>%
-                              set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
-
-                            p1 <- predict(f1, periods = l$periods, level = l$conf_levels)
-                            p1$predictions
-
+                            library(tidyr)
+                            library(dplyr)
+                            library(lubridate)
+                            
+                            sparklyr::spark_apply_log("packages loaded")
+                            sparklyr::spark_apply_log(paste("data has", nrow(e), "records"))
+                            print(paste("data has", nrow(e), "records"))
+                            print(l)
+                            
+                            auto_forecaster(
+                              e[, c(l$target, l$index_var), drop = FALSE],
+                              target = l$target,
+                              index_var = l$index_var,
+                              periods  = l$periods,
+                              unit = l$unit,
+                              pipe = l$pipe,
+                              models = l$models,
+                              splits = l$splits,
+                              conf_levels = l$conf_levels,
+                              execution_strategy = "sequential"
+                            )$predictions
                           },
                           group_by = c(group_vars, "measure"),
                           names = spk_names,

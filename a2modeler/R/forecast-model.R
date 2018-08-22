@@ -2,7 +2,14 @@
 # Forecast Model Class Methods --------------------------------------------
 
 
+#' @importFrom future plan
+#' @importFrom doFuture registerDoFuture
 #' @importFrom foreach foreach %dopar%
+#' @inheritParams forecaster
+#' @param data data to use for model training
+#' @param measure measure object
+#' @param samples samples object
+#' 
 #' @rdname train_model
 #' @export
 train_model.forecast_model <- function(mobj, 
@@ -11,7 +18,8 @@ train_model.forecast_model <- function(mobj,
                                        samples,
                                        save_submodels,
                                        execution_strategy,
-                                       level){
+                                       level,
+                                       ...){
   
   checkmate::assert_class(data, "data.frame")
   checkmate::assert_class(measure, "measure")
@@ -20,7 +28,7 @@ train_model.forecast_model <- function(mobj,
   checkmate::assert_numeric(level, max.len = 2, upper = 100)
   
   # Set Execution Strategy
-  future::plan(obj$execution_strategy)
+  future::plan(execution_strategy)
   doFuture::registerDoFuture()
   
   # Set model function
@@ -47,7 +55,7 @@ train_model.forecast_model <- function(mobj,
   
   # Define packages for parallel computation
   packs <- model_methods %>%
-    dplyr::filter(type == obj$type) %>%
+    dplyr::filter(type == "forecaster") %>%
     dplyr::pull(package) %>%
     c("a2modeler", "dplyr") %>%
     unique()
@@ -62,7 +70,8 @@ train_model.forecast_model <- function(mobj,
   fits <- foreach(
     rn = 1:nrow(param_grid),
     .packages = packs,
-    .export = c("mobj", "data", "x_vars", "param_grid", "indicies", "measure_fun", "level"),
+    .export = c("mobj", "data", "x_vars", "param_grid", "param_vars", 
+                "indicies", "model_fun", "measure_fun", "level"),
     .errorhandling = "pass") %dopar% {
       
       # Params
@@ -85,12 +94,13 @@ train_model.forecast_model <- function(mobj,
       
       # Fit submodel to training sample
       fit <- do.call(model_fun, args)
+      fit$method_args <- params
       
+      # Make Predictions
       if(! is.null(indicies[[index]]$validation)) {
-        
         # Predict each validation sample
         val_index <- indicies[[index]]$validation
-        val_smpl <- data[val_index, , drop=FALSE]
+        val_smpl <- data[val_index, , drop = FALSE]
         
         # Set Forecast Args
         if (length(x_vars) > 0) {
@@ -107,38 +117,32 @@ train_model.forecast_model <- function(mobj,
         params)
         fun <- get("forecast", asNamespace("forecast"))
         fcast <- get_forecasts(do.call(fun, args))
-        
-        # evalulate performance
-        perf <- data.frame(
-          measure_fun(cbind(fcast, val_smpl[, mobj$target, drop=FALSE]),
-                   predicted = "mean",
-                   actual = mobj$target),
-          index = index,
-          sample = "validation"
-        )
-        names(perf)[1] <- measure$method
-        fit$performance <- perf
         fit$predictions <- fcast
-      } else {
+        perf_smpl <-
+          cbind(fcast, val_smpl[, mobj$target, drop = FALSE])
         
-        perf <- data.frame(
-          perf_fun(cbind(data.frame(mean = as.numeric(fit$fitted)),
-                         train_smpl[, mobj$target, drop=FALSE]),
-                   predicted = "mean",
-                   actual = mobj$target),
-          index = index,
-          sample = "train"
-        )
-        names(perf)[1] <- measure$method
-        fit$performance <- perf
+      } else {
+        perf_smpl <- cbind(data.frame(mean = as.numeric(fit$fitted)),
+                           train_smpl[, mobj$target, drop = FALSE])
       }
-      fit$method_args <- params
+      
+      # Evalulate Performance
+      perf <- data.frame(
+        measure = measure_fun(perf_smpl,
+                              predicted = "mean",
+                              actual = mobj$target),
+        index = index,
+        sample = "validation"
+      )
+      perf$index <- as.character(perf$index)
+      perf$sample <- as.character(perf$sample)
+      fit$performance <- perf
       fit
     }
   
-  
   # Calculate Final Performance
   fit_grid <- purrr::map_df(fits, "performance") %>%
+    dplyr::rename(!!measure$method := !!names(.)[1]) %>% 
     dplyr::bind_cols(purrr::map_df(fits, "method_args")) %>% 
     dplyr::mutate(method = mobj$method) %>% 
     dplyr::inner_join(submodel_grid, by = grid_vars) %>% 
@@ -167,26 +171,23 @@ train_model.forecast_model <- function(mobj,
     head(1)
   
   # Refit on full sample
-  if(samples$validation_method == "none") {
-    
+  if (samples$validation_method == "none") {
     mobj$fit <- fits[[1]]
-  }else {
-    
+  } else {
     params <- best_submodel$param_grid[[1]] %>% as.list()
-    y <- as.numeric(train_smpl[[mobj$target]])
+    y <- as.numeric(data[[mobj$target]])
     if (length(x_vars) > 0) {
       xreg <- data[, x_vars, drop = FALSE]
     } else{
       xreg <- NULL
     }
-    args <- c(list(y = y, xreg = xreg), params)
+    args <- modifyList(params, list(y = y, xreg = xreg))
     mobj$fit <- do.call(model_fun, args)
     
     # save submodels option
-    if(save_submodels) {
-      
+    if (save_submodels) {
       sub_models <- list()
-      for(uid in submodel_grid$submodel_uid) {
+      for (uid in submodel_grid$submodel_uid) {
         sub_model <- purrr::keep(fits, fit_grid$submodel_uid == uid)
         names(sub_model) <- samples$indicies_names
         sub_models[[uid]] <- sub_model
@@ -200,7 +201,7 @@ train_model.forecast_model <- function(mobj,
 }
 
 
-#' @param periods forecast horizon length
+
 #' @rdname evaluate_model
 #' @export
 evaluate_model.forecast_model <- function(mobj,
@@ -223,7 +224,7 @@ evaluate_model.forecast_model <- function(mobj,
   predictions <- data %>% 
     dplyr::select_at(x_vars) %>% 
     predict(mobj, data = ., periods) %>% 
-    dplyr::bind_cols(data %>% select(!!mobj$index_var, !!mobj$target))
+    dplyr::bind_cols(data %>% dplyr::select(!!mobj$index_var, !!mobj$target))
   
   # Calculate Performance
   performance <- predictions %>%
@@ -244,7 +245,8 @@ evaluate_model.forecast_model <- function(mobj,
 predict.forecast_model <- function(mobj,
                                    data = NULL,
                                    periods,
-                                   level = c(80, 95)) {
+                                   level = c(80, 95),
+                                   ...) {
   if (!is.null(data)) {
     if (nrow(data) != periods) {
       warning("number of data rows doesn't match forecast periods")
@@ -282,21 +284,21 @@ predict.forecast_model <- function(mobj,
 #'
 #' @rdname fitted
 #' @export
-fitted.forecast_model <- function(mobj) {
+fitted.forecast_model <- function(mobj, ...) {
   as.numeric(fitted(mobj$fit))
 }
 
 
 #' @export
 #' @rdname summary
-summary.forecast_model <- function(mobj){
+summary.forecast_model <- function(mobj, ...){
   mobj$fit
 }
 
 
 #' @export
 #' @rdname print
-print.forecast_model <- function(mobj){
+print.forecast_model <- function(mobj, ...){
   mobj$fit
 }
 

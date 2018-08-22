@@ -5,9 +5,9 @@
 \alias{summary.spark_model}
 \title{Summary Method for Spark Model Object}
 \usage{
-\method{summary}{forecast_model}(mobj)
+\method{summary}{forecast_model}(mobj, ...)
 
-\method{summary}{spark_model}(mobj)
+\method{summary}{spark_model}(mobj, ...)
 }
 \description{
 Summary Method for Spark Model Object

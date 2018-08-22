@@ -18,21 +18,3 @@ get_forecasts.forecast <- function(mobj){
   df
 }
 
-
-#' Convert Forecast object to data.frame
-#'
-#' @param mobj forecast model object
-#' @rdname as_data_frame
-#' @export
-as_data_frame.forecast <- function(mobj){
-
-  df <- as.data.frame(fobj)
-  cns <- tolower(colnames(df))
-  cns <- gsub("lo", "lower", cns)
-  cns <- gsub("hi", "upper", cns)
-  cns <- gsub(" ", "", cns)
-  cns[1] <- "mean"
-  cns <- paste("forecast", sep="_")
-  colnames(df) <- cns
-  df
-}

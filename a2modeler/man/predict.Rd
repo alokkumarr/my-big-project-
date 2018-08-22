@@ -16,10 +16,10 @@
 \method{predict}{classifier}(obj, data = NULL, desc = "", ...)
 
 \method{predict}{forecast_model}(mobj, data = NULL, periods, level = c(80,
-  95))
+  95), ...)
 
-\method{predict}{forecaster}(obj, data = NULL, periods, level = c(80, 95),
-  desc = "")
+\method{predict}{forecaster}(obj, data = NULL, periods,
+  uid = sparklyr::random_string(prefix = "pred"), desc = "", ...)
 
 \method{predict}{regressor}(obj, data = NULL, desc = "", ...)
 

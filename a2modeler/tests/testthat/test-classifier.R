@@ -115,13 +115,17 @@ test_that("Classifer with Multiple Methods, CV sampling, without saving submodel
 
 test_that("Classifier set final model options work as expected", {
 
-
+  test_pipe <- pipeline(expr = function(x) {
+    x %>%
+      select(am, mpg, cyl)
+  })
+  
   c1 <- new_classifier(df = df, target = "am", name = "test") %>%
-    add_holdout_samples(splits = c(.5, .5)) %>%
-    add_model(pipe = NULL,
+    add_holdout_samples(splits = c(.6, .4)) %>%
+    add_model(pipe = test_pipe,
               method = "ml_logistic_regression",
               uid = "logistic") %>%
-    add_model(pipe = NULL,
+    add_model(pipe = test_pipe,
               method = "ml_decision_tree_classifier",
               uid = "tree") %>%
     train_models() 

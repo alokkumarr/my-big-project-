@@ -10,9 +10,13 @@ add_model(obj, pipe = NULL, method, param_map = list(), ..., desc = NULL,
 \arguments{
 \item{obj}{modeler object}
 
+\item{pipe}{pipeline uid string}
+
 \item{method}{string input of model method}
 
 \item{param_map}{list of parameters values to be used in model tuning}
+
+\item{...}{additional method arguments}
 
 \item{desc}{optional model description}
 

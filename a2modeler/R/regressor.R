@@ -13,7 +13,7 @@
 new_regressor <- function(df,
                           target,
                           name = NULL,
-                          id = NULL,
+                          uid = NULL,
                           version = NULL,
                           desc = NULL,
                           scientist = NULL,
@@ -29,7 +29,7 @@ new_regressor <- function(df,
                   target = target,
                   type = "regressor",
                   name,
-                  id,
+                  uid,
                   version,
                   desc,
                   scientist,
@@ -62,7 +62,7 @@ predict.regressor <- function(obj,
   schema_check <- purrr::flatten(obj$schema) %>%
     tibble::as_tibble() %>%
     tidyr::gather() %>%
-    left_join(
+    dplyr::left_join(
       purrr::flatten(get_schema(data)) %>%
         tibble::as_tibble() %>%
         tidyr::gather(),

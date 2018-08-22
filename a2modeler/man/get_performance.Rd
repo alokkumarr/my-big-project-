@@ -3,13 +3,15 @@
 \name{get_performance}
 \alias{get_performance}
 \alias{get_performance}
-\title{Get Model Performance Generic}
+\title{Get Model Performance}
 \usage{
 get_performance(obj)
 
 get_performance(obj)
 }
+\arguments{
+\item{obj}{object to extract target from}
+}
 \description{
-Function to extract model performance on samples. Converts output to
-data.frame
+Returns data.frame with model performance
 }

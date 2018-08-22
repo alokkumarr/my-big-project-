@@ -7,12 +7,15 @@
 \usage{
 execute_pipelines(obj, ...)
 
-\method{execute_pipelines}{modeler}(obj, uids = NULL)
+\method{execute_pipelines}{modeler}(obj, uids = NULL, ...)
 }
 \arguments{
 \item{obj}{modeler object}
 
 \item{...}{additional arguments to pass to execute function}
+
+\item{uids}{optional string pipeline uid to execute. default is NULL which
+executes all pipelines}
 }
 \value{
 updated modeler object

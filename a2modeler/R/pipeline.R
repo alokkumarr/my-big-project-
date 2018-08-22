@@ -1,5 +1,4 @@
 
-#' Pipeline Class Constructer
 new_pipeline <- function(expr,
                          output,
                          desc,
@@ -56,7 +55,7 @@ pipeline <- function(expr = identity,
 
 #' @rdname print
 #' @export
-print.pipeline <- function(pipe) {
+print.pipeline <- function(pipe, ...) {
   cat("Pipeline:", pipe$uid, "---------------- \n\n")
   cat("Description:\n", pipe$desc, "\n\n")
   cat("Expression:\n")
@@ -228,22 +227,22 @@ clean <- function(pipe) {
 #' Function to clean pipelines for one or more models in modeler object
 #'
 #' @param obj modeler object
-#' @param ids one or more model ids. default is null which cleans all pipes
+#' @param uids one or more model ids. default is null which cleans all pipes
 #'
 #' @return updated modeler object
 #' @export
-clean_pipes <- function(obj, ids = NULL) {
+clean_pipes <- function(obj, uids = NULL) {
   checkmate::assert_class(obj, "modeler")
-  checkmate::assert_character(ids, null.ok = TRUE)
+  checkmate::assert_character(uids, null.ok = TRUE)
   
-  if(is.null(ids)) {
-    ids <- get_models(obj)
+  if(is.null(uids)) {
+    uids <- get_models(obj)
   }
   
   for(id in ids) {
-    model <- get_models(obj, ids = id)[[1]]
+    model <- get_models(obj, uids = uid)[[1]]
     model$pipe <- clean(model$pipe)
-    obj$models[[id]] <- model
+    obj$models[[uid]] <- model
   }
   
   obj

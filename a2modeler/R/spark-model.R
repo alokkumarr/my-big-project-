@@ -13,8 +13,8 @@
 #'
 #' @export
 #' @return updated modeler object
-set_evaluator <- function(mobj, sc, measure) {
-  setMethod("set_evaluator")
+set_evaluator <- function(mobj, sc, measure, ...) {
+  UseMethod("set_evaluator")
 }
 
 
@@ -29,7 +29,8 @@ train_model.spark_model <- function(mobj,
                                     measure,
                                     samples,
                                     save_submodels,
-                                    execution_strategy) {
+                                    execution_strategy,
+                                    ...) {
   
   checkmate::assert_class(data, "tbl_spark")
   checkmate::assert_class(measure, "measure")
@@ -173,7 +174,7 @@ evaluate_model.spark_model <- function(mobj,
   
   # Make Predictions 
   predictions <- predict(mobj, data, prediction_col) %>% 
-    sparklyr::sdf_bind_cols(data %>% select(!!mobj$target))
+    sparklyr::sdf_bind_cols(data %>% dplyr::select(!!mobj$target))
   
   # Calculate Performance
   performance <- predictions %>%
@@ -190,13 +191,13 @@ evaluate_model.spark_model <- function(mobj,
 #' Summary Method for Spark Model Object
 #' @export
 #' @rdname summary
-summary.spark_model <- function(mobj){
+summary.spark_model <- function(mobj, ...){
   print(mobj$fit)
 }
 
 
 #' @export
 #' @rdname print
-print.spark_model <- function(mobj){
+print.spark_model <- function(mobj, ...){
   print(mobj$fit)
 }

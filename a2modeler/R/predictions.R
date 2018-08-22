@@ -29,7 +29,7 @@ new_predictions <- function(predictions,
 
 # Print Function for Predictions Class Object
 #' @export
-print.predictions <- function(obj) {
+print.predictions <- function(obj, ...) {
   cat("---------------------------- \n")
   cat(obj$type, "predictions \n")
   cat("---------------------------- \n\n")

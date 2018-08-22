@@ -4,7 +4,7 @@
 \alias{set_evaluator}
 \title{Set Evaluator Function}
 \usage{
-set_evaluator(mobj, sc, measure)
+set_evaluator(mobj, sc, measure, ...)
 }
 \arguments{
 \item{mobj}{spark_model object}

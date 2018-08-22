@@ -6,7 +6,7 @@
 
 #' New Modeler Object Constructer function
 #' @import sparklyr
-#' @import forecast
+#' @inheritParams modeler
 new_modeler <- function(df,
                         schema,
                         target,
@@ -259,7 +259,7 @@ get_best_model <- function(obj) {
 #' @param lighten logical flag to lighten the memory footprint of modeler
 #'   objects by removing all fit and pipeline output from trained models. Note
 #'   the final model fit and pipeline are not impacted
-#' @inheritDotParams saveRDS -object -file
+#' @param ... additional arguments to pass to \link[base]{saveRDS} function
 #'
 #' @export
 deploy <- function(obj, path, lighten = FALSE, ...) {
@@ -270,7 +270,8 @@ deploy <- function(obj, path, lighten = FALSE, ...) {
   
   if(lighten) {
     for(i in seq_along(obj$models)) {
-      obj$models[[i]]$fits <- NULL
+      obj$models[[i]]$fit <- NULL
+      obj$models[[i]]$sub_models <- NULL
     }
     for(i in seq_along(obj$pipelines)) {
       obj$pipelines[[i]]$output <- NULL
@@ -311,11 +312,13 @@ execute_pipelines <- function(obj, ...) {
 #' any validation predictions
 #'
 #' @param obj modeler object
+#' @param uids optional input to train single model by its uid. default is NULL
+#'   which trains all previously un-trained models
 #' @param ... additional arguments to pass to train function
 #'
 #' @export
 #' @return updated modeler object
-train_models <- function(obj, ...) {
+train_models <- function(obj, uids, ...) {
   UseMethod("train_models")
 }
 
@@ -338,12 +341,14 @@ set_final_model <- function(obj, method, uid, reevaluate, refit) {
 }
 
 
-#' Get Model Performance Generic
+#' Get Model Performance
 #'
-#' Function to extract model performance on samples. Converts output to
-#' data.frame
-get_performance <- function(obj) {
-  UseMethod("get_performance")
+#' Returns data.frame with model performance
+#'
+#' @param obj object to extract target from
+#' @export
+get_performance <- function(obj){
+  UseMethod("get_performance", obj)
 }
 
 
@@ -378,9 +383,11 @@ get_schema <- function(df){
 # Modeler Class Methods ---------------------------------------------------
 
 
+#' @param uids optional string pipeline uid to execute. default is NULL which
+#'   executes all pipelines
 #' @rdname execute_pipelines
 #' @export
-execute_pipelines.modeler <- function(obj, uids = NULL) {
+execute_pipelines.modeler <- function(obj, uids = NULL, ...) {
   checkmate::assert_character(uids, null.ok = TRUE)
   
   if (is.null(uids))
@@ -397,7 +404,7 @@ execute_pipelines.modeler <- function(obj, uids = NULL) {
 
 #' @rdname train_models
 #' @export
-train_models.modeler <- function(obj, uids = NULL) {
+train_models.modeler <- function(obj, uids = NULL, ...) {
   checkmate::assert_character(uids, null.ok = TRUE)
   
   # Execute pipes
@@ -420,7 +427,7 @@ train_models.modeler <- function(obj, uids = NULL) {
     if (!is.null(obj$samples$test_holdout_prct)) {
       train_data <- train_data %>%
         dplyr::mutate(rn = 1) %>% 
-        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::mutate(rn = dplyr::row_number(rn)) %>% 
         dplyr::filter(! rn %in% obj$samples$test_index) %>%
         dplyr::select(-rn)
     }
@@ -478,7 +485,7 @@ set_final_model.modeler <- function(obj,
       # Evaluate Model
       obj$models[[uid]] <- obj$pipelines[[obj$models[[uid]]$pipe]]$output %>%
         dplyr::mutate(rn = 1) %>% 
-        dplyr::mutate(rn = row_number(rn)) %>% 
+        dplyr::mutate(rn = dplyr::row_number(rn)) %>% 
         dplyr::filter(rn %in% obj$samples$test_index) %>%
         dplyr::select(-rn) %>% 
         evaluate_model(mobj = obj$models[[uid]],
@@ -519,7 +526,7 @@ set_final_model.modeler <- function(obj,
 
 
 #' @export
-print.modeler <- function(obj) {
+print.modeler <- function(obj, ...) {
   cat("---------------------------- \n")
   cat(obj$name, obj$type, "\n")
   cat("---------------------------- \n\n")

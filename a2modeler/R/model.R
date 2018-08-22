@@ -5,6 +5,8 @@
 
 
 #' Model Class Constructer
+#' 
+#' @inheritParams model
 new_model <- function(pipe,
                       target,
                       method,
@@ -69,7 +71,7 @@ new_model <- function(pipe,
 #' Requires a pipeline object input, and a valid model method. Any method
 #' package dependencies need to be loaded prior to model call
 #'
-#' @param pipe_uid pipeline uid string
+#' @param pipe pipeline uid string
 #' @param target column name of target variable. string input
 #' @param method string input of model method
 #' @param method_args required method arguments not in parameter grid
@@ -114,6 +116,7 @@ model <- function(pipe,
 #'
 #' @param obj modeler object
 #' @param param_map list of parameters values to be used in model tuning
+#' @param ... additional method arguments
 #' @inheritParams model
 #' @export
 #' @return modeler object with model added
@@ -167,7 +170,7 @@ add_model <-function(obj,
 #' and param grid.
 #'
 #' @param mobj model object
-#' @param ... additional arguments to pass on
+#' @param ... additional arguments to pass to model class train_model method
 #'
 #' @export
 #' @return updated modeler object
@@ -175,40 +178,6 @@ train_model <- function(mobj, ...) {
   UseMethod("train_model")
 }
 
-
-#' Fit Model Generic Function
-#'
-#' Functions execues model method on its pipeline output for given param grid
-#' and sampling indicies
-#'
-#' Sub model fits are stored in sub-model list. sub-models given unique id. Each
-#' sub-model is fit on each training sample provided
-#'
-#' @param mobj model object
-#' @param ... additional arguments to pass to fit model function
-#' @export
-#' @return updated model object
-fit_model <- function(mobj, ...) {
-  UseMethod("fit_model")
-}
-
-
-
-#' Apply Model Generic Fuction
-#'
-#' Function applies model to make predictions for all samples
-#'
-#' Fitted values extracted for training data and predictions made for validation
-#' or test samples. Predictions stored with sub-model
-#'
-#' @param mobj model object
-#' @param ... additional arguments to pass to fit function
-#'
-#' @export
-#' @return updated model object
-apply_model <- function(mobj, ...) {
-  UseMethod("apply_model")
-}
 
 
 #' Evaluate Model Generic Function
@@ -219,8 +188,10 @@ apply_model <- function(mobj, ...) {
 #' model predictions
 #'
 #' @param mobj model object
-#' @param uids optional input for model uid. default is NULL and all trained
-#'   models evaluated
+#' @param data data with actual values used to compare predictions against
+#' @param measure measure object
+#' @param prediction_col colname of predicted values
+#' @param ... additional arguments to pass to method
 #'
 #' @export
 #' @return updated modeler object
@@ -244,7 +215,7 @@ get_fit <- function(mobj, ...) {
 #'
 #' @inheritParams get_fit
 #' @export
-get_coefs <- function(mobj, ...) {
+get_coefs <- function(mobj) {
   UseMethod("get_coefs", mobj)
 }
 
@@ -253,20 +224,8 @@ get_coefs <- function(mobj, ...) {
 #'
 #' @inheritParams get_fit
 #' @export
-get_forecasts <- function(mobj, ...) {
+get_forecasts <- function(mobj) {
   UseMethod("get_forecasts", mobj)
 }
-
-
-#' Return Tidy Dataset of Model Performance
-#'
-#' @export
-tidy_performance <- function(mobj) {
-  UseMethod("tidy_performance", mobj)
-}
-
-
-
-# Class Methods -----------------------------------------------------------
 
 

@@ -13,7 +13,7 @@
 new_classifier <- function(df,
                            target,
                            name = NULL,
-                           id = NULL,
+                           uid = NULL,
                            version = NULL,
                            desc = NULL,
                            scientist = NULL,
@@ -38,7 +38,7 @@ new_classifier <- function(df,
                   target = target,
                   type = "classifier",
                   name,
-                  id,
+                  uid,
                   version,
                   desc,
                   scientist,
@@ -72,7 +72,7 @@ predict.classifier <- function(obj,
   schema_check <- purrr::flatten(obj$schema) %>%
     tibble::as_tibble() %>%
     tidyr::gather() %>%
-    left_join(
+    dplyr::left_join(
       purrr::flatten(get_schema(data)) %>%
         tibble::as_tibble() %>%
         tidyr::gather(),

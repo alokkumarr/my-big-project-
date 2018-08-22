@@ -5,12 +5,15 @@
 \alias{train_models.modeler}
 \title{Train Models Generic Function}
 \usage{
-train_models(obj, ...)
+train_models(obj, uids, ...)
 
-\method{train_models}{modeler}(obj, uids = NULL)
+\method{train_models}{modeler}(obj, uids = NULL, ...)
 }
 \arguments{
 \item{obj}{modeler object}
+
+\item{uids}{optional input to train single model by its uid. default is NULL
+which trains all previously un-trained models}
 
 \item{...}{additional arguments to pass to train function}
 }
