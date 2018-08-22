@@ -4,7 +4,7 @@
   <span matPrefix>
     <mat-icon fontIcon="icon-search"></mat-icon>
   </span>
-  <input matInput placeholder="Search" [(ngModel)]="searchTerm" />
+  <input matInput e2e="dashboard-add-analysis-search" placeholder="Search" [(ngModel)]="searchTerm" />
 </mat-form-field>
 
 <div [hidden]="showProgress">
@@ -21,6 +21,7 @@
         <button mat-mini-fab
           color="primary"
           class="widget-action-button"
+          [attr.e2e]="'dashboard-add-analysis-button-' + analysis.id"
           *ngIf="!widgetLog[analysis.id] else removeButton"
           (click)="addAnalysis(analysis)">
           <mat-icon fontIcon="icon-plus"></mat-icon>
@@ -30,6 +31,7 @@
           <button mat-mini-fab
             color="warn"
             class="widget-action-button widget-action-remove"
+            [attr.e2e]="'dashboard-remove-analysis-button-' + analysis.id"
             (click)="removeAnalysis(analysis)">
             <mat-icon fontIcon="icon-close"></mat-icon>
           </button>

@@ -93,6 +93,7 @@
     "@types/chai": "4.1.0",
     "@types/jasmine": "2.8.6",
     "@types/mocha": "2.2.46",
+    "allure-commandline": "2.7.0",
     "angular-tslint-rules": "1.1.0",
     "app-root-path": "2.1.0",
     "async": "2.6.0",

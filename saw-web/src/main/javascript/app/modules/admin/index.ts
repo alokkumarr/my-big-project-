@@ -11,10 +11,15 @@ import {
   AdminExportViewComponent,
   AdminExportListComponent
 } from './export';
+import { CategoryService } from './category/category.service';
 import {
   UserEditDialogComponent,
   UserService
 } from './user';
+import {
+  CategoryEditDialogComponent,
+  CategoryDeleteDialogComponent
+} from './category';
 import {
   RoleEditDialogComponent
 } from './role';
@@ -116,7 +121,9 @@ const COMPONENTS = [
   UserEditDialogComponent,
   RoleEditDialogComponent,
   AdminExportViewComponent,
-  AdminExportListComponent
+  AdminExportListComponent,
+  CategoryEditDialogComponent,
+  CategoryDeleteDialogComponent
 ];
 @NgModule({
   imports: [
@@ -144,7 +151,8 @@ const COMPONENTS = [
     LocalSearchService,
     ToastService,
     RoleService,
-    ExportService
+    ExportService,
+    CategoryService
   ],
   exports: [
     AdminMainViewComponent

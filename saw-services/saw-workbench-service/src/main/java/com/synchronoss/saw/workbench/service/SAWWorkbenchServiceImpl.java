@@ -538,16 +538,16 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
             ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
             : format);
     systemNode.put("inputFormat",
-        rootNode.get(DataSetProperties.System.toString()).get("inputFormat").toString());
+        rootNode.get(DataSetProperties.System.toString()).get("inputFormat").textValue());
     systemNode.put(DataSetProperties.PhysicalLocation.toString(),
         workbenchExecutionService.createDatasetDirectory(project,
-            rootNode.get(DataSetProperties.System.toString()).get("name").toString()));
+            rootNode.get(DataSetProperties.System.toString()).get("name").textValue()));
     ArrayNode inputPath = objectMapper.createArrayNode();
     inputPath
         .addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
     systemNode.put(DataSetProperties.Catalog.toString(),
         systemNode.get(DataSetProperties.Catalog.toString()) != null
-            ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
+            ? systemNode.get(DataSetProperties.Catalog.toString()).textValue()
             : catalog);
     systemNode.putArray("inputPath").addAll(inputPath);
     DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);

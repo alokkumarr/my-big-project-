@@ -1,11 +1,14 @@
 {
   "private": true,
   "scripts": {
-    "webdriver-manager": "webdriver-manager update --standalone false --versions.chrome=2.36",
-    "protractor": "p() { protractor $* ../saw-web/conf/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p"
+    "webdriver-manager": "webdriver-manager update",
+    "protractor": "p() { protractor $* ../saw-web/conf/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p",
+    "generate-report": "allure generate target/allure-results --clean -o target/allure-report || true"
   },
   "devDependencies": {
-    "protractor": "5.2.2",
-    "jasmine-reporters": "2.3.0"
+    "allure-commandline": "2.7.0",
+    "jasmine-allure-reporter": "1.0.2",
+    "jasmine-reporters": "2.3.0",
+    "protractor": "5.4.0"
   }
 }

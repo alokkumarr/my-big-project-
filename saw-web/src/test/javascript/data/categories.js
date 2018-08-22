@@ -18,6 +18,13 @@ const categories = {
     id: nullValue,
     type: nullValue,
     code: nullValue
+  },
+  observe: {
+    name: 'AT observe Category ' + globalVariables.e2eId,
+    description: description,
+    id: nullValue,
+    type: nullValue,
+    code: nullValue
   }
 };
 

@@ -57,7 +57,7 @@ public class ESLoader {
      */
     @SerializedName("esNodes")
     @Expose
-    private String esNodes;
+    private List<String> esNodes = null;
     /**
      * Name of the ElasticSearch cluster. By default, the cluster name will be elasticsearch
      *
@@ -115,7 +115,9 @@ public class ESLoader {
      * @param aliases
      * @param esMappingId
      */
-    public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField, String filterString, List<Alias> aliases, String esNodes, String esClusterName, int esPort, String esMappingId, String esUser, String esPass) {
+    public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField,
+                    String filterString, List<Alias> aliases, List<String> esNodes, String
+                        esClusterName, int esPort, String esMappingId, String esUser, String esPass) {
         super();
         this.destinationIndexName = destinationIndexName;
         this.indexMappingfile = indexMappingfile;
@@ -214,7 +216,7 @@ public class ESLoader {
      * Comma separated list of host names or IP addresses
      *
      */
-    public String getEsNodes() {
+    public List<String> getEsNodes() {
         return esNodes;
     }
 
@@ -222,7 +224,7 @@ public class ESLoader {
      * Comma separated list of host names or IP addresses
      *
      */
-    public void setEsNodes(String esNodes) {
+    public void setEsNodes(List<String> esNodes) {
         this.esNodes = esNodes;
     }
 
