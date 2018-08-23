@@ -4,7 +4,7 @@ layout-header header {
   mat-toolbar {
     padding: 0 !important;
     background-color: transparent;
-    border-bottom: 1px solid #D1D3D3;
+    border-bottom: 1px solid $primary-grey-g1;
 
     &.app-toolbar {
       display: flex;
@@ -25,7 +25,6 @@ layout-header header {
 
       div mat-icon {
         margin-top: 7px;
-        font-size: 16px;
         margin-right: 16px;
       }
     }
@@ -57,6 +56,21 @@ layout-header header {
       margin-top: 5px !important;
       font-size: 20px !important;
     }
+
+    .user-avatar {
+      width: 25px;
+      height: 25px;
+      text-align: center;
+      color: rgb(255, 255, 255);
+      border-radius: 50%;
+      margin-right: 9px;
+      cursor: pointer;
+      display: block;
+      font-size: 14px;
+      line-height: 24px;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
   }
 }
 
@@ -80,6 +94,6 @@ header .company-logo {
 }
 
 .mat-icon-help {
-  color: #5C6670;
+  color: $primary-black;
   font-size: 20px;
 }
