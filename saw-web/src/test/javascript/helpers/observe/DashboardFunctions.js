@@ -386,6 +386,14 @@ class DashboardFunctions {
     }
   }
 
+  addNewDashBoardForActualVsTargetKPI(dashboardName, dashboardDescription, subCategory, metricName, kpiInfo, kpiName) {
+    try {
+
+    }catch (e) {
+      console.log(e);
+    }
+  }
+
 }
 
 module.exports = DashboardFunctions;

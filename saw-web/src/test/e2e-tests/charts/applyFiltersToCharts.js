@@ -23,14 +23,14 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -99,7 +99,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     commonFunctions.waitFor.elementToBeEnabledAndVisible(filters.applyBtn);
     commonFunctions.waitFor.elementToBeClickable(filters.applyBtn);
     filters.applyBtn.click();
-    
+
     //TODO: Need to check that filters applied or not.
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterText);
     commonFunctions.waitFor.elementToBeVisible(analyzePage.appliedFiltersDetails.filterClear);

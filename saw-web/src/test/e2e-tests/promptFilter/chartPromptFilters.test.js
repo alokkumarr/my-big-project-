@@ -74,7 +74,7 @@ describe('Prompt filter tests: chartPromptFilters.test.js', () => {
 
   beforeEach(function(done) {
     setTimeout(function() {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -82,8 +82,8 @@ describe('Prompt filter tests: chartPromptFilters.test.js', () => {
   afterEach(function(done) {
     setTimeout(function() {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
-      analyzePage.main.doAccountAction('logout');
-      commonFunctions.logOutByClearingLocalStorage();
+      //analyzePage.main.doAccountAction('logout');
+      //commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

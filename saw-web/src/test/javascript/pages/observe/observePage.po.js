@@ -42,5 +42,10 @@ module.exports = {
     kpiName: element(by.css('input[e2e="dashboard-add-kpi-name-input"]')),
     kpiByName: name => element(by.xpath(`//div[contains(text(),"${name}")]`)),
     filterByName: name => element(by.xpath(`//div[contains(text(),"${name}") and @class="filter-label"]`))
+  },
+  actualVsTargetKPI: {
+    measure1Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure1-input"]')),
+    measure2Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure2-input"]')),
+    metricTargetInput: element(by.css('input[e2e="dashboard-add-kpi-bullet-target-input"]'))
   }
 };

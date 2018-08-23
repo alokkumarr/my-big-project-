@@ -11,7 +11,7 @@ const DashboardFunctions = require('../../javascript/helpers/observe/DashboardFu
 const ObserveHelper = require('../../javascript/api/ObserveHelper');
 const dataSets = require('../../javascript/data/datasets');
 
-describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotKPI.test.js', () => {
+describe('Create & delete dashboard tests: createAndDeleteDashboardWithActualVsTargetKPI.test.js', () => {
   const subCategoryName = subCategories.observeSubCategory.name;
 
   let host;
@@ -21,15 +21,15 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotK
 
   const dataProvider = {
 
-    'dashboard with column by admin': {
+    'Long column by admin': {
       user: 'admin',
       kpiInfo: {
-          column: 'Long',
-          date: 'Date',
-          filter: 'This Week',
-          primaryAggregation: 'Sum',
-          secondaryAggregations: ['Sum', 'Average', 'Minimum', 'Maximum', 'Count'],
-          backgroundColor: 'green'
+        column: 'Long',
+        date: 'Date',
+        filter: 'This Week',
+        primaryAggregation: 'Average',
+        secondaryAggregations: ['Sum', 'Average', 'Minimum', 'Maximum', 'Count'],
+        backgroundColor: 'green'
       }
     },
     'dashboard with Float by user': {
@@ -86,18 +86,16 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotK
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
       oh.deleteDashboard(host, token, dashboardId);
-
-      //analyzePage.main.doAccountAction('logout');
       //commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
   afterAll(function() {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function(data, description) {
-    it('should able to create & delete dashboard for snapshot kpi ' + description, () => {
+    it('should able to create & delete dashboard for actual vs target kpi ' + description, () => {
       try {
 
         let currentTime = new Date().getTime();
@@ -111,8 +109,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithSnapshotK
         let dashboardDescription = 'AT Dashboard description ' + currentTime;
         let kpiName = 'AT kpi'+data.kpiInfo.column+ globalVariables.e2eId;
 
-        dashboardId = dashboardFunctions.addNewDashBoardForSnapshotKPI(dashboardName, dashboardDescription, subCategoryName, metricName, data.kpiInfo, kpiName);
-        dashboardFunctions.verifyKPIAndDelete(dashboardName, kpiName, data.kpiInfo, true);
+        //dashboardId = dashboardFunctions.addNewDashBoardForActualVsTargetKPI(dashboardName, dashboardDescription, subCategoryName, metricName, data.kpiInfo, kpiName);
+        //dashboardFunctions.verifyKPIAndDelete(dashboardName, kpiName, data.kpiInfo, true);
 
       } catch (e) {
         console.log(e);

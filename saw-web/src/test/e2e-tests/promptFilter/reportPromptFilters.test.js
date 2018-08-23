@@ -83,8 +83,8 @@ describe('Report Prompt filter tests: reportPromptFilters.test.js', () => {
   afterEach(function(done) {
     setTimeout(function() {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
-      analyzePage.main.doAccountAction('logout');
-      commonFunctions.logOutByClearingLocalStorage();
+      //analyzePage.main.doAccountAction('logout');
+      //commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

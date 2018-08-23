@@ -37,7 +37,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     'Line Chart by admin': {user: 'admin', chartType: 'chart:line'}, //SAWQA-1095
     'Line Chart by user': {user: 'userOne', chartType: 'chart:line'}, //SAWQA-4672
     'Area Chart by admin': {user: 'admin', chartType: 'chart:area'}, //SAWQA-1348
-    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676 
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'}, //SAWQA-4676
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'}, //SAWQA-1851
     'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}, //SAWQA-4679
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'}, //SAWQA-2100
@@ -50,14 +50,14 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      analyzePage.main.doAccountAction('logout');
+      //analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

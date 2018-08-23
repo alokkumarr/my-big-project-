@@ -52,7 +52,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
 
   beforeEach(function(done) {
     setTimeout(function() {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -70,8 +70,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
       let oh = new ObserveHelper();
       oh.deleteDashboard(host, token, dashboardId);
 
-      analyzePage.main.doAccountAction('logout');
-      commonFunctions.logOutByClearingLocalStorage();
+      //analyzePage.main.doAccountAction('logout');
+      //commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
