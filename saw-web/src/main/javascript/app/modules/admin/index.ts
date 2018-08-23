@@ -6,6 +6,11 @@ import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';
 import { AdminService } from './main-view/admin.service';
 import { RoleService } from './role/role.service';
+import { ExportService } from './export/export.service';
+import {
+  AdminExportViewComponent,
+  AdminExportListComponent
+} from './export';
 import { CategoryService } from './category/category.service';
 import {
   UserEditDialogComponent,
@@ -61,7 +66,7 @@ import {ExportListViewComponent} from './components/export/export-list/export-li
 import {ImportListViewComponent} from './components/import/import-list/import-list.component';
 import {ImportFileListViewComponent} from './components/import/import-file-list/import-file-list.component';
 
-import {ExportService} from './services/export.service';
+import {ExportService as OldExportService} from './services/export.service';
 import {ImportService} from './services/import.service';
 import {UsersManagementService} from './services/users.service';
 import {RolesManagementService} from './services/roles.service';
@@ -80,7 +85,7 @@ angular.module(OldAdminModule, [
   .factory('RolesManagementService', RolesManagementService)
   .factory('PrivilegesManagementService', PrivilegesManagementService)
   .factory('CategoriesManagementService', CategoriesManagementService)
-  .service('ExportService', ExportService)
+  .service('ExportService', OldExportService)
   .service('ImportService', ImportService)
   .component('usersView', UsersViewComponent)
   .component('usersListView', UsersListViewComponent)
@@ -115,6 +120,8 @@ const COMPONENTS = [
   AdminListViewComponent,
   UserEditDialogComponent,
   RoleEditDialogComponent,
+  AdminExportViewComponent,
+  AdminExportListComponent,
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
 ];
@@ -144,6 +151,7 @@ const COMPONENTS = [
     LocalSearchService,
     ToastService,
     RoleService,
+    ExportService,
     CategoryService
   ],
   exports: [
