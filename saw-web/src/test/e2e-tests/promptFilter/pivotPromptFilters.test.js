@@ -10,7 +10,7 @@ const Constants = require('../../javascript/api/Constants');
 const globalVariables = require('../../javascript/helpers/globalVariables');
 const PromptFilterFunctions = require('../../javascript/helpers/PromptFilterFunctions');
 
-describe('Prompt filter tests: promptFilters.test.js', () => {
+describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
   const defaultCategory = categories.privileges.name;
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
