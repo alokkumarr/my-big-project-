@@ -337,23 +337,18 @@ public class QueryBuilderUtil {
             boolQueryBuilder.should(termsQueryBuilder);
             boolQueryBuilder.should(termsQueryBuilder1);
             builder.add(boolQueryBuilder);
-            builder.add(termsQueryBuilder);
         }
 
         if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
             item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
             List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
             QueryBuilder qeuryBuilder =
-                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), item.getModel().getModelValues());
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
             BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
             boolQueryBuilder.mustNot(qeuryBuilder);
             QueryBuilder qeuryBuilder1 =
-                new TermsQueryBuilder(buildFilterColumn(buildFilterColumn(item.getColumnName())), modelValues);
-            BoolQueryBuilder boolQueryBuilder1 = new BoolQueryBuilder();
-            boolQueryBuilder1.mustNot(qeuryBuilder1);
-            BoolQueryBuilder boolQueryBuilderMain = new BoolQueryBuilder();
-            boolQueryBuilderMain.should(boolQueryBuilder);
-            boolQueryBuilderMain.should(boolQueryBuilder1);
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
             builder.add(boolQueryBuilder);
         }
 
@@ -541,23 +536,18 @@ public class QueryBuilderUtil {
             boolQueryBuilder.should(termsQueryBuilder);
             boolQueryBuilder.should(termsQueryBuilder1);
             builder.add(boolQueryBuilder);
-            builder.add(termsQueryBuilder);
         }
 
         if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
             item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
             List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
             QueryBuilder qeuryBuilder =
-                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), item.getModel().getModelValues());
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
             BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
             boolQueryBuilder.mustNot(qeuryBuilder);
             QueryBuilder qeuryBuilder1 =
-                new TermsQueryBuilder(buildFilterColumn(buildFilterColumn(item.getColumnName())), modelValues);
-            BoolQueryBuilder boolQueryBuilder1 = new BoolQueryBuilder();
-            boolQueryBuilder1.mustNot(qeuryBuilder1);
-            BoolQueryBuilder boolQueryBuilderMain = new BoolQueryBuilder();
-            boolQueryBuilderMain.should(boolQueryBuilder);
-            boolQueryBuilderMain.should(boolQueryBuilder1);
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
             builder.add(boolQueryBuilder);
         }
 
@@ -614,23 +604,18 @@ public class QueryBuilderUtil {
             boolQueryBuilder.should(termsQueryBuilder);
             boolQueryBuilder.should(termsQueryBuilder1);
             builder.add(boolQueryBuilder);
-            builder.add(termsQueryBuilder);
         }
 
         if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
             item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
             List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
             QueryBuilder qeuryBuilder =
-                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), item.getModel().getModelValues());
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
             BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
             boolQueryBuilder.mustNot(qeuryBuilder);
             QueryBuilder qeuryBuilder1 =
                 new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
-            BoolQueryBuilder boolQueryBuilder1 = new BoolQueryBuilder();
-            boolQueryBuilder1.mustNot(qeuryBuilder1);
-            BoolQueryBuilder boolQueryBuilderMain = new BoolQueryBuilder();
-            boolQueryBuilderMain.should(boolQueryBuilder);
-            boolQueryBuilderMain.should(boolQueryBuilder1);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
             builder.add(boolQueryBuilder);
         }
 
@@ -694,23 +679,18 @@ public class QueryBuilderUtil {
             boolQueryBuilder.should(termsQueryBuilder);
             boolQueryBuilder.should(termsQueryBuilder1);
             builder.add(boolQueryBuilder);
-            builder.add(termsQueryBuilder);
         }
 
         if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
             item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
             List<?> modelValues = buildStringTermsfilter(item.getModel().getModelValues());
             QueryBuilder qeuryBuilder =
-                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), item.getModel().getModelValues());
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
             BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
             boolQueryBuilder.mustNot(qeuryBuilder);
             QueryBuilder qeuryBuilder1 =
-                new TermsQueryBuilder(buildFilterColumn(buildFilterColumn(item.getColumnName())), modelValues);
-            BoolQueryBuilder boolQueryBuilder1 = new BoolQueryBuilder();
-            boolQueryBuilder1.mustNot(qeuryBuilder1);
-            BoolQueryBuilder boolQueryBuilderMain = new BoolQueryBuilder();
-            boolQueryBuilderMain.should(boolQueryBuilder);
-            boolQueryBuilderMain.should(boolQueryBuilder1);
+                new TermsQueryBuilder(buildFilterColumn(item.getColumnName()), modelValues);
+            boolQueryBuilder.mustNot(qeuryBuilder1);
             builder.add(boolQueryBuilder);
         }
 
