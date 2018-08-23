@@ -3,16 +3,30 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Observable } from 'rxjs/Observable';
 import { FormControl } from '@angular/forms';
 import { mergeMap, startWith, map } from 'rxjs/operators';
+import { JwtService } from '../../../../login/services/jwt.service';
+import * as JSZip from 'jszip';
+import * as FileSaver from 'file-saver';
+import * as moment from 'moment';
 import * as lowerCase from 'lodash/lowerCase';
 import * as includes from 'lodash/includes';
 import * as isEmpty from 'lodash/isEmpty';
 import * as lodashMap from 'lodash/map';
+import * as forEach from 'lodash/forEach';
+import * as reduce from 'lodash/reduce';
+import * as get from 'lodash/get';
 import * as difference from 'lodash/difference';
+import * as isUndefined from 'lodash/isUndefined';
 import * as fpFilter from 'lodash/fp/filter';
+import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as lodashFilter from 'lodash/filter';
+import * as debounce from 'lodash/debounce';
 import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
 import { ExportService } from './export.service';
+import { CategoryService } from '../category/category.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
+import { filter } from 'rxjs-compat/operator/filter';
 
 const template = require('./admin-export-view.component.html');
 require('./admin-export-view.component.scss');
@@ -24,9 +38,7 @@ require('./admin-export-view.component.scss');
 export class AdminExportViewComponent {
   @ViewChild('metricInput')
   metricInput: ElementRef;
-  @Input()
-  columns: any[];
-
+  @Input() columns: any[];
   data: any[];
   metrics: any[] = [];
   selectedMetrics: any[] = [];
@@ -35,22 +47,51 @@ export class AdminExportViewComponent {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   analyses: any[] = [];
   metrics$: Promise<any>;
+  categoriesMap;
+  isMetricSelectorFocused = false;
+  isAtLeastOneAnalysisSelected = false;
+  labelRequested = false;
 
   isEmpty = isEmpty;
 
   constructor(
     private _exportService: ExportService,
-    private _sidenav: SidenavMenuService
+    private _sidenav: SidenavMenuService,
+    private _categoryService: CategoryService,
+    private _jwtService: JwtService
   ) {
+    this.loadCategories();
     this.metrics$ = this._exportService.getMetricList();
     this.unSelectedMetrics = this.metricCtrl.valueChanges.pipe(
       startWith(''),
       mergeMap((searchTerm: string) => this._asyncFilter(searchTerm))
     );
+    this.loadAnalyses = debounce(this.loadAnalyses, 1000);
   }
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+  }
+
+  onFocus() {
+    this.isMetricSelectorFocused = true;
+  }
+
+  onBlur() {
+    this.isMetricSelectorFocused = false;
+  }
+
+  loadCategories() {
+    this._categoryService.getList().toPromise().then(categories => {
+      this.categoriesMap = reduce(categories, (acc, category) => {
+        if (category.moduleName === 'ANALYZE') {
+          forEach(category.subCategories, subCategory => {
+            acc[subCategory.subCategoryId] = subCategory.subCategoryName;
+          });
+        }
+        return acc;
+      }, {});
+    });
   }
 
   loadAnalyses() {
@@ -59,10 +100,17 @@ export class AdminExportViewComponent {
       this.analyses = [];
       return;
     }
-    console.log('metricIds', metricIds);
     this._exportService.getAnalysisByMetricIds(metricIds).then(analyses => {
-      console.log('analyses', analyses);
-      this.analyses = analyses;
+      this.analyses = fpPipe(
+        fpFilter(({categoryId, name}) => !isUndefined(categoryId) && !isUndefined(name) && name !== ''),
+        fpMap(analysis => {
+          return {
+            analysis,
+            selection: false,
+            categoryName: this.categoriesMap[analysis.categoryId]
+          }
+        })
+      )(analyses);
     });
   }
 
@@ -73,11 +121,58 @@ export class AdminExportViewComponent {
     }
   }
 
+  onValidityChange(isValid) {
+    this.isAtLeastOneAnalysisSelected = isValid;
+  }
+
   onSelect(metric) {
     this.selectedMetrics.push(metric);
     this.metricInput.nativeElement.value = '';
     this.metricCtrl.setValue(null);
     this.loadAnalyses();
+  }
+
+  export() {
+    const zip = new JSZip();
+    const groupedAnalyses = fpPipe(
+      fpFilter('selection'),
+      fpMap('analysis'),
+      fpGroupBy('metricName')
+    )(this.analyses);
+
+    forEach(groupedAnalyses, (analyses, metricName) => {
+      const fileName = this.getFileName(metricName);
+      zip.file(
+        `${fileName}.json`,
+        new Blob(
+          [JSON.stringify(analyses)],
+          {type: 'application/json;charset=utf-8'}
+        )
+      );
+    })
+    zip.generateAsync({type: 'blob'}).then(content => {
+      let zipFileName = this.getFileName('');
+      zipFileName = zipFileName.replace('_', '');
+      FileSaver.saveAs(content, `${zipFileName}.zip`);
+    });
+  }
+
+  getFileName(name) {
+    const formatedDate = moment().format('YYYYMMDDHHmmss');
+    const custCode = get(this._jwtService.getTokenObj(), 'ticket.custCode');
+    name = name.replace(' ', '_');
+    name = name.replace('\\', '-');
+    name = name.replace('/', '-');
+    return `${custCode}_${name}_${formatedDate}`;
+  }
+
+  splitAnalysisOnMetric(exportAnalysisList, metrics) {
+    return lodashMap(metrics, ({metricName}) => {
+      return {
+        fileName: this.getFileName(metricName),
+        analysisList: lodashFilter(exportAnalysisList, analysis => analysis.metricName === metricName)
+      };
+    })
   }
 
   private _asyncFilter(value) {

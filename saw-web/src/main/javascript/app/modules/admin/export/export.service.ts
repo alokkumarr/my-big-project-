@@ -32,10 +32,6 @@ export class ExportService {
       ['contents.context', 'Semantic']
     ]);
     return this._adminService.request<MetricResponse>('md', params, {forWhat: 'export'})
-      .map(resp => {
-        console.log('resposne metrics', resp);
-        return resp;
-      })
       .map(fpGet(`contents.[0].${MODULE_NAME}`))
       .toPromise();
   }

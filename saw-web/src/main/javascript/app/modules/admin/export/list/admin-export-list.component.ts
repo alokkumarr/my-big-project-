@@ -1,5 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as forEach from 'lodash/forEach';
+import * as some from 'lodash/some';
+import * as every from 'lodash/every';
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-export-list.component.html');
@@ -13,9 +15,7 @@ const template = require('./admin-export-list.component.html');
 export class AdminExportListComponent {
 
   @Input() analyses: any[];
-  @Output() editRow: EventEmitter<any> = new EventEmitter();
-  @Output() deleteRow: EventEmitter<any> = new EventEmitter();
-  @Output() rowClick: EventEmitter<any> = new EventEmitter();
+  @Output() validityChange: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
 
@@ -31,15 +31,21 @@ export class AdminExportListComponent {
 
   onChecked(analysis) {
     analysis.selection = !analysis.selection;
-    console.log('selection', analysis);
+    const isValid = some(this.analyses, 'selection');
+    if (analysis.selection) {
+      this.areAllSelected = every(this.analyses, 'selection');
+    } else {
+      this.areAllSelected = false;
+    }
+    this.validityChange.emit(isValid);
   }
 
   selectAll() {
     this.areAllSelected = !this.areAllSelected;
-    console.log('areAllSelected', this.areAllSelected);
     forEach(this.analyses, analysis => {
       analysis.selection = this.areAllSelected;
     });
+    this.validityChange.emit(this.areAllSelected);
   }
 
   getConfig() {
@@ -48,7 +54,7 @@ export class AdminExportListComponent {
       dataField: 'selection',
       allowSorting: false,
       alignment: 'center',
-      width: '10%',
+      width: '5%',
       headerCellTemplate: 'selectionHeaderCellTemplate',
       cellTemplate: 'selectionCellTemplate'
     }, {
@@ -77,7 +83,6 @@ export class AdminExportListComponent {
       width: '15%'
     }];
     return this._dxDataGridService.mergeWithDefaultConfig({
-      // onInitialized: this.onGridInitialized.bind(this),
       columns,
       width: '100%',
       height: '100%',

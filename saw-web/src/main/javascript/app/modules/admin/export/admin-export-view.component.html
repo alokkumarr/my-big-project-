@@ -1,11 +1,26 @@
 <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center" style="width: 100vw;">
   <div fxLayout="row" fxFlex="10">
-    <div class="admin-title" e2e="category-title">Export Analysis</div>
+    <div class="admin-title">Export Analysis</div>
   </div>
 
-  <div fxLayout="row" fxLayoutAlign="center center" fxFlex="80">
-    <mat-form-field class="select-form-field" appearance="outline">
-      <mat-label i18n>Metric</mat-label>
+  <div fxLayout="row" fxLayoutAlign="center center" fxFlex="87" style="height: auto;">
+    <mat-form-field class="select-form-field"
+                    appearance="outline"
+                    (mouseenter)= "onFocus()"
+                    (mouseleave)= "onBlur()"
+    >
+      <mat-label i18n>
+        <ng-container *ngIf="selectedMetrics.length === 0">
+          {{isMetricSelectorFocused ? 'Metric' : 'Select a metric'}}
+        </ng-container>
+        <ng-container *ngIf="selectedMetrics.length === 1">
+          Metric
+        </ng-container>
+        <ng-container *ngIf="selectedMetrics.length > 1">
+          Metrics
+        </ng-container>
+
+      </mat-label>
       <mat-chip-list #chipList>
         <mat-chip
           *ngFor="let metric of selectedMetrics; let i = index"
@@ -31,10 +46,14 @@
     </mat-form-field>
   </div>
 
-  <div fxFlex="10">
-    <button mat-raised-button color="primary" i18n>Export</button>
-  </div>
+  <button mat-raised-button color="primary"
+          (click)="export()"
+          [disabled]="isEmpty(analyses) || !isAtLeastOneAnalysisSelected"
+          i18n
+  >
+    Export
+  </button>
 </mat-toolbar>
 
-<admin-export-list *ngIf="!isEmpty(analyses)" [analyses]="analyses">
+<admin-export-list *ngIf="!isEmpty(analyses)" [analyses]="analyses" (validityChange)="onValidityChange($event)">
 </admin-export-list>

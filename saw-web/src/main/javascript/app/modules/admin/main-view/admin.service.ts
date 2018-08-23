@@ -40,8 +40,7 @@ export class AdminService {
     this._headerProgress.show();
     return this.http.post<T>(`${this.getBaseUrl(forWhat)}/${this.getIntermediaryPath(forWhat)}${path}`, params)
       .pipe(
-        tap(this.showToastMessageIfNeeded(toast)),
-        tap(() => this._headerProgress.hide())
+        tap(this.showToastMessageIfNeeded(toast))
       )
       .finally(() => this._headerProgress.hide());
   }

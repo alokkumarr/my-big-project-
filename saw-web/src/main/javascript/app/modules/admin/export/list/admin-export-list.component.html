@@ -22,14 +22,16 @@
 >
 
   <div *dxTemplate="let cell of 'selectionCellTemplate'">
-    <mat-checkbox (click)="onChecked(cell.data)"
-      [value]="cell.data">
+    <mat-checkbox (change)="onChecked(cell.data)"
+                  [checked]="cell.data.selection">
     </mat-checkbox>
   </div>
 
   <div *dxTemplate="let cell of 'selectionHeaderCellTemplate'">
-    <mat-checkbox (click)="selectAll()" [value]="areAllSelected">
-      Select All to Export
+    <mat-checkbox (change)="selectAll()"
+                  [checked]="areAllSelected"
+                  i18n>
+      All
     </mat-checkbox>
   </div>
 
