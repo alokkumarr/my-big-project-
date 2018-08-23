@@ -23,6 +23,8 @@ type elements. list should not be named}
 \item{catalog}{catalog location for output dataset. Used in the dynamic file
 path creation}
 
+\item{output_rows}{ouput dataset record count. Default is NULL}
+
 \item{component}{component name used to create dataset. Default is RComponent}
 
 \item{script}{path to executable R script}
@@ -50,8 +52,6 @@ inserts current time}
 \item{hostname}{hostname only of saw security location. No pathing required}
 
 \item{token}{valid SIP token. Result of sip_authenticate function}
-
-\item{row_count}{ouput dataset record count. Default is NULL}
 }
 \value{
 POST response content

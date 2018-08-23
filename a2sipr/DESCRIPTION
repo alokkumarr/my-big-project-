@@ -1,6 +1,6 @@
 Package: a2sipr
 Title: Synchronoss Insights Platform Advanced Analytics Intergration R Package
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: person("Chris", "Haarstick", email = "Chris.Haarstick@synchronoss.com", role = c("aut", "cre"))
 Description: Provides files and functionality to intregrate R software language and suite of Synchronoss Advanced Analytics R packages (a2munge, a2modler, and a2charter) to the Synchronoss Insights Platform (SIP). Package contains R component scripts to execute AA applications within SIP and be compliant with XDF-NG requirements.  
 Depends: R (>= 3.4.2)
@@ -13,7 +13,8 @@ Imports:
     magrittr,
     checkmate (>= 1.8.2),
     jsonlite,
-    httr
+    httr,
+    purrr
 Suggests: 
      testthat
 RoxygenNote: 6.0.1
