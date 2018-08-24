@@ -11,6 +11,7 @@ import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../../services/analyze.service';
@@ -43,8 +44,20 @@ export class DesignerService {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
+  generateRequestPayload(analysis) {
+    forEach(analysis.artifacts, cols=> {
+      forEach(cols.columns, col=>{
+        if (col.checked) {
+          delete col.checked;
+        }
+      })
+    })
+    return analysis;
+  }
+
   getDataForAnalysis(analysis) {
-    return this._analyzeService.getDataBySettings(analysis);
+    let analysisRequest = analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(analysis)) : analysis;
+    return this._analyzeService.getDataBySettings(analysisRequest);
   }
 
   getDataForAnalysisPreview(analysis, options) {
@@ -64,7 +77,8 @@ export class DesignerService {
   }
 
   saveAnalysis(analysis) {
-    return this._analyzeService.saveReport(analysis);
+    let analysisRequest = analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(analysis)) : analysis;
+    return this._analyzeService.saveReport(analysisRequest);
   }
 
   public getPivotGroupAdapters(

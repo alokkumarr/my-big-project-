@@ -8,7 +8,7 @@ import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
-import * as cloneDeep from 'lodash/cloneDeep';
+
 import {
   flattenPivotData,
   flattenChartData
@@ -301,9 +301,7 @@ export class DesignerContainerComponent {
       }
     })
 
-    let analysisRequest = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
-
-    this._designerService.getDataForAnalysis(analysisRequest).then(
+    this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
           this.isDataEmpty(
@@ -325,25 +323,6 @@ export class DesignerContainerComponent {
         this.data = [];
       }
     );
-  }
-
-  generateRequestPayload(analysis) {
-    forEach(analysis.artifacts, cols=> {
-      forEach(cols.columns, col=>{
-        if (col.checked) {
-          delete col.checked;
-        }
-      })
-    })
-
-    // let analysisDataFields = cloneDeep(analysis.sqlBuilder.dataFields);
-    // forEach(analysisDataFields, cols=> {
-    //   forEach(cols.columns, col=>{
-    //     col.checked = true;  
-    //   })
-    // })
-    // analysis.sqlBuilder.dataFields = cloneDeep(analysisDataFields);
-    return analysis;
   }
 
   flattenData(data, analysis: Analysis) {
