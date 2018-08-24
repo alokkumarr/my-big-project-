@@ -53,10 +53,10 @@
 #'                  smoother = TRUE, smooth_method="lm") # linear model
 #' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt",
 #'                  smoother = TRUE, smooth_method="lm",
-#'                  smooth_ci=F, smooth_color="red") # linear model without CI
+#'                  smooth_ci = FALSE, smooth_color="red") # linear model without CI
 #' gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt",
 #'                  smoother = TRUE, smooth_method="lm",
-#'                  smooth_ci=F, smooth_color="red",
+#'                  smooth_ci = FALSE, smooth_color="red",
 #'                  smooth_formula=y~splines::bs(x, degree=1, knots=2)) # linear spline model
 #' gg_scatter_chart(d, y_variable = "vs", x_variable = "wt",
 #'                  smoother = TRUE, smooth_method="glm",

@@ -60,6 +60,10 @@ GGplot2 Univariate Chart
 }
 \examples{
 
-gg_univariate_chart(mtcars, "mpg")
-gg_univariate_chart(mutate(mtcars, am = as.factor(am)), "am")
+# Create a data set
+library(dplyr)
+d <- mtcars \%>\% mutate(am = as.factor(am))
+
+gg_univariate_chart(d, "mpg")
+gg_univariate_chart(d, "am")
 }

@@ -23,8 +23,12 @@
 #'
 #' @examples
 #'
-#' gg_univariate_chart(mtcars, "mpg")
-#' gg_univariate_chart(mutate(mtcars, am = as.factor(am)), "am")
+#' # Create a data set
+#' library(dplyr)
+#' d <- mtcars %>% mutate(am = as.factor(am))
+#' 
+#' gg_univariate_chart(d, "mpg")
+#' gg_univariate_chart(d, "am")
 gg_univariate_chart <- function(df,
                                 x_variable,
                                 data_name = NULL,
