@@ -295,18 +295,23 @@ test_that("indexer differece between spark and R DS for months units", {
 
 # Test 8:Check for date difference when region and DS date --------
 
+origin_date <- today() - months(1)
+origin_name <- paste("months_since", origin_date, sep="_")
+
 ds_R <-
   indexer(dat,
           "date",
-          origin = "2018-05-31",
+          origin = origin_date,
           units = "months",
           periods = 1) %>%
-  select(index, date, `months_since_2018-05-31`)
+  select(index, date, !!origin_name) %>% 
+  mutate_at(origin_name, funs(round(., 1)))
 
 ds_sp <-
-  indexer(tbl, "date", origin = "2018-05-31", units = "months") %>%
+  indexer(tbl, "date", origin = origin_date, units = "months") %>%
   collect()  %>%
-  select(index, date, `months_since_2018-05-31`) %>%
+  select(index, date, !!origin_name) %>% 
+  mutate_at(origin_name, funs(round(., 1))) %>%
   as.data.frame()
 
 
@@ -323,8 +328,7 @@ Date_parter_check <- date_parter(systm_date, "today")
 sys_year <- as.numeric(format(systm_date, format = "%Y"))
 sys_month <- as.numeric(format(systm_date, format = "%m"))
 sys_date <- as.numeric(format(systm_date, format = "%d"))
-quater_val <- sys_month / 4
-quater_of_year <- ceiling(quater_val)
+quater_of_year <- lubridate::quarter(systm_date$today)
 week_of_d <- as.numeric(format(systm_date, format = "%W"))
 day_of_year <-  as.numeric(format(systm_date, format = "%j"))
 
@@ -347,7 +351,7 @@ remaining_days_of_month <- switch(
   "5" = remaining_days_of_month <- 31 - sys_date,
   "6" = remaining_days_of_month <- 30 - sys_date,
   "7" = remaining_days_of_month <- 31 - sys_date,
-  "8" = remaining_days_of_month <- 30 - sys_date,
+  "8" = remaining_days_of_month <- 31 - sys_date,
   "9" = remaining_days_of_month <- 30 - sys_date,
   "10" = remaining_days_of_month <- 31 - sys_date,
   "11" = remaining_days_of_month <- 30 - sys_date,
