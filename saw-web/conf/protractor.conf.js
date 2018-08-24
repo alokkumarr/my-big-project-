@@ -24,14 +24,14 @@ const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
  */
 
-const implicitlyWait = webpackHelper.distRun() ? 20000 : 15000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 30000 : 20000;//20000 // = 20 sec; Sometimes element will not
+const implicitlyWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 20000 : 15000;
+const fluentWait = webpackHelper.distRun() ? 40000 : 30000;
 
 /**
  * Default time to wait in ms before a test fails

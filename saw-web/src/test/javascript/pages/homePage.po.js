@@ -47,19 +47,19 @@ module.exports = {
  * @subCategoryName - desirable category to expand
  */
 const navigateToSubCategoryUpdated = (categoryName, subCategoryName, defaultCategory) => {
-
+  browser.sleep(1000);
   module.exports.mainMenuExpandBtn.click();
-  browser.sleep(500);
+  browser.sleep(1000);
   //Collapse default category
   commonFunctions.waitFor.elementToBeClickable(module.exports.expandedCategoryUpdated(defaultCategory));
   module.exports.expandedCategoryUpdated(defaultCategory).click();
-  browser.sleep(500);
+  browser.sleep(1000);
   commonFunctions.waitFor.elementToBePresent(module.exports.category(categoryName));
   commonFunctions.waitFor.elementToBeVisible(module.exports.category(categoryName));
   //Navigate to Category/Sub-category, expand category
   commonFunctions.waitFor.elementToBeClickable(module.exports.category(categoryName));
   module.exports.category(categoryName).click();
-  browser.sleep(500);
+  browser.sleep(1000);
   const subCategory = module.exports.subCategory(subCategoryName);
   commonFunctions.waitFor.elementToBeClickable(subCategory);
   subCategory.click();
