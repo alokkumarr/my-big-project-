@@ -27,6 +27,12 @@ a call to a position adjustment function.}
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
+\item{size}{controls the line size}
+
+\item{alpha}{controls the opacity of the fill and color}
+
+\item{linetype}{controls the linetype}
+
 \item{group}{a variable name to apply a group by operation and create
 subgroups of line charts}
 
@@ -108,17 +114,24 @@ This function takes any of the geom_line arguments
 \url{http://ggplot2.tidyverse.org/reference/geom_line.html}
 }
 \examples{
-library(ggplot2)
 library(dplyr)
+# Create a data set
 d <- mtcars \%>\% mutate(am = as.factor(am))
-gg_line_chart(d, "wt", "mpg", facet_formula = ".~cyl", facet_args = list(scales = "free"), color = "blue")
+gg_line_chart(d, "wt", "mpg",
+              facet_formula = ".~cyl",
+              facet_args = list(scales = "free"),
+              color = "blue")
 gg_line_chart(d, "wt", "mpg")
-gg_line_chart(d, "wt", "mpg", point = T)
-gg_line_chart(d, "wt", "mpg", point = T, point_args = list(size = 3))
-gg_line_chart(d, "wt", "mpg", color = "red", linetype = "dotdash")
-gg_line_chart(d, "wt", "mpg", color = "red", point = T, point_args = list(size = 3))
-gg_line_chart(d, "wt", "mpg", color = 'am', point = T, point_args = list(size = 3, shape = 15))
-gg_line_chart(d, "wt", "mpg", point = T, point_args = list(size = 3, shape = 15, color = 'red'))
+gg_line_chart(d, "wt", "mpg", points = TRUE)
+gg_line_chart(d, "wt", "mpg", points = TRUE, point_args = list(size = 3))
+gg_line_chart(d, "wt", "mpg", color = "red", linetype = 5)
+gg_line_chart(d, "wt", "mpg", color = "red",
+              points = TRUE, point_args = list(size = 3))
+gg_line_chart(d, "wt", "mpg", color = 'am',
+              points = TRUE, point_args = list(size = 3, shape = 15))
+gg_line_chart(d, "wt", "mpg",
+              points = TRUE,
+              point_args = list(size = 3, shape = 15, color = 'red'))
 }
 \seealso{
 geom_label arguments

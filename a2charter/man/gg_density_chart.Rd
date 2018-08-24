@@ -74,8 +74,6 @@ options}
 color is set to a variable. expects a palette name. default is "a2" for a2
 palette}
 
-\item{...}{}
-
 \item{...}{Arguments passed on to \code{ggplot2::geom_density}
 \describe{
   \item{mapping}{Set of aesthetic mappings created by \code{\link[=aes]{aes()}} or
@@ -127,23 +125,31 @@ but is also highly customizable to allow for more sophisicated charts.
 }
 \examples{
 # Create a data set
+library(dplyr)
 d <- mtcars \%>\% mutate(am = as.factor(am))
 
 # Create series of basic charts
 gg_density_chart(d, "mpg")
 gg_density_chart(d, "mpg", fill="steelblue", color="grey25")
-gg_density_chart(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message")
-gg_density_chart(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme=theme_minimal())
+gg_density_chart(d, "mpg", fill="steelblue", color="grey25",
+                 title="Crouching Plot", caption = "hidden message")
+gg_density_chart(d, "mpg", fill="steelblue", color="grey25",
+                 title="Crouching Plot", caption = "hidden message",
+                 theme="minimal")
 
 # A few charts with additional features
 gg_density_chart(d, "mpg", fill="am", color="am")
 gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2)
-gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2, palette = "virdis")
-gg_density_chart(d, "mpg", fill="am", facet_formula = "~am", adjust=1/2,alpha=0.1)
-gg_density_chart(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2, alpha=0.1)
-gg_density_chart(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), adjust=1/2,alpha=0.1)
+gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2, palette = "viridis")
+gg_density_chart(d, "mpg", fill="am", facet_formula = "~am",
+                 adjust=1/2, alpha=0.1)
+gg_density_chart(d, "mpg", fill="am", facet_formula = "~am",
+                 facet_args = list(scales="free"),
+                 adjust=1/2, alpha=0.1)
+gg_density_chart(d, "mpg", fill="am", facet_formula = "cyl~am",
+                 facet_args = list(scales="free_y"),
+                 adjust=1/2, alpha=0.1)
 gg_density_chart(d, "mpg", fill="am", color="am", coord="flip", adjust=1/2)
-
 }
 \seealso{
 For more details on the geom_density check out

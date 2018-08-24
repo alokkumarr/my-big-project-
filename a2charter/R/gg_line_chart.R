@@ -13,6 +13,9 @@
 #' @param x_variable x-variable to chart. expects a string. required input
 #' @param y_variable y-variable to chart. expects a string. required input
 #' @inheritParams ggplot2::geom_line
+#' @param alpha controls the opacity of the fill and color
+#' @param size controls the line size
+#' @param linetype controls the linetype 
 #' @param group a variable name to apply a group by operation and create
 #'   subgroups of line charts
 #' @param points TRUE/FALSE. If TRUE scatter plot points are added to the chart
@@ -31,17 +34,24 @@
 #' @importFrom ggplot2 guide_legend
 #'
 #' @examples
-#' library(ggplot2)
 #' library(dplyr)
+#' # Create a data set
 #' d <- mtcars %>% mutate(am = as.factor(am))
-#' gg_line_chart(d, "wt", "mpg", facet_formula = ".~cyl", facet_args = list(scales = "free"), color = "blue")
+#' gg_line_chart(d, "wt", "mpg",
+#'               facet_formula = ".~cyl",
+#'               facet_args = list(scales = "free"),
+#'               color = "blue")
 #' gg_line_chart(d, "wt", "mpg")
-#' gg_line_chart(d, "wt", "mpg", point = T)
-#' gg_line_chart(d, "wt", "mpg", point = T, point_args = list(size = 3))
-#' gg_line_chart(d, "wt", "mpg", color = "red", linetype = "dotdash")
-#' gg_line_chart(d, "wt", "mpg", color = "red", point = T, point_args = list(size = 3))
-#' gg_line_chart(d, "wt", "mpg", color = 'am', point = T, point_args = list(size = 3, shape = 15))
-#' gg_line_chart(d, "wt", "mpg", point = T, point_args = list(size = 3, shape = 15, color = 'red'))
+#' gg_line_chart(d, "wt", "mpg", points = TRUE)
+#' gg_line_chart(d, "wt", "mpg", points = TRUE, point_args = list(size = 3))
+#' gg_line_chart(d, "wt", "mpg", color = "red", linetype = 5)
+#' gg_line_chart(d, "wt", "mpg", color = "red",
+#'               points = TRUE, point_args = list(size = 3))
+#' gg_line_chart(d, "wt", "mpg", color = 'am',
+#'               points = TRUE, point_args = list(size = 3, shape = 15))
+#' gg_line_chart(d, "wt", "mpg",
+#'               points = TRUE,
+#'               point_args = list(size = 3, shape = 15, color = 'red'))
 gg_line_chart <- function(df,
                           x_variable,
                           y_variable,
