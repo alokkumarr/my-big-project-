@@ -4,12 +4,12 @@
 \alias{clean_pipes}
 \title{Flush Pipelines function}
 \usage{
-clean_pipes(obj, ids = NULL)
+clean_pipes(obj, uids = NULL)
 }
 \arguments{
 \item{obj}{modeler object}
 
-\item{ids}{one or more model ids. default is null which cleans all pipes}
+\item{uids}{one or more model ids. default is null which cleans all pipes}
 }
 \value{
 updated modeler object

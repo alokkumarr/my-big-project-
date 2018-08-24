@@ -4,18 +4,19 @@
 \alias{get_models}
 \title{Get All Modeler Models}
 \usage{
-get_models(obj, ids = NULL, status = NULL)
+get_models(obj, uids = NULL, status = NULL)
 }
 \arguments{
 \item{obj}{modeler object}
 
-\item{ids}{one or more model id characters}
+\item{uids}{one or more model uid characters}
 
-\item{status}{model status code. accepts "created", "added", "trained", "evaluated", or "selected"}
+\item{status}{model status code. accepts "created", "added", "trained", or
+"selected"}
 }
 \value{
 list of model objects
 }
 \description{
-Function to access all modeler models. Subsettable by either id or status
+Function to access all modeler models. Subsettable by either uid or status
 }

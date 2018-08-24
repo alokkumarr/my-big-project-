@@ -85,8 +85,11 @@ public class ElasticSearchLoader {
 
         configMap.put(ES_PARAM_NODES, esHost);
         configMap.put(ES_PARAM_ADMIN_PORT, String.valueOf(config.getEsPort()));
-        configMap.put(ES_PARAM_USER, config.getEsUser());
-        configMap.put(ES_PARAM_PASSWORD, config.getEsPassword());
+
+        if(config.getEsUser() != null && config.getEsPassword() != null) {
+            configMap.put(ES_PARAM_USER, config.getEsUser());
+            configMap.put(ES_PARAM_PASSWORD, config.getEsPassword());
+        }
         configMap.put(ES_PARAM_CLUSTER, config.getEsClusterName());
 
         configMap.put("es.index.auto.create", "false");

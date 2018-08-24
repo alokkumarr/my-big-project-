@@ -4,7 +4,7 @@
 \alias{new_predictions}
 \title{Predictions Class Constructor}
 \usage{
-new_predictions(predictions, model, type, id, desc)
+new_predictions(predictions, model, type, uid, desc)
 }
 \description{
 Predictions Class Constructor

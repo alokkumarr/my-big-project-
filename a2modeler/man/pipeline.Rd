@@ -4,12 +4,15 @@
 \alias{pipeline}
 \title{Pipeline Class Helper}
 \usage{
-pipeline(expr = identity, desc = NULL)
+pipeline(expr = identity, desc = NULL,
+  uid = sparklyr::random_string("pipe"))
 }
 \arguments{
 \item{expr}{pipeline function. default is identity function}
 
 \item{desc}{optional description input}
+
+\item{uid}{A character string used to uniquely identify the pipeline}
 }
 \description{
 Creates a pipeline object. The expression is set by default as the identity

@@ -2,12 +2,16 @@
 % Please edit documentation in R/sampling.R
 \name{time_slice}
 \alias{time_slice}
+\alias{time_slice.numeric}
 \alias{time_slice.integer}
 \alias{time_slice.data.frame}
 \alias{time_slice.tbl_spark}
 \title{Time Slice Sample function}
 \usage{
 time_slice(x, width, horizon, skip, fixed_width)
+
+\method{time_slice}{numeric}(x, width, horizon, skip = 0,
+  fixed_width = TRUE)
 
 \method{time_slice}{integer}(x, width, horizon, skip = 0,
   fixed_width = TRUE)
