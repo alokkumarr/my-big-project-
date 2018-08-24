@@ -50,7 +50,7 @@ object QueryBuilder extends {
           dataFields.flatMap((fields: JValue) => {
             val tableName = (fields \ "tableName").extract[String]
             val columns = extractArray(fields, "columns")
-            columns.filter(columnChecked(_)).map(column(tableName, _))
+            columns.map(column(tableName, _))
           })
         }
       }
@@ -105,8 +105,15 @@ object QueryBuilder extends {
 
   private def buildFrom(artifacts: List[JValue], sqlBuilder: JObject) = {
     val joins = buildFromJoins(sqlBuilder)
-    "FROM " + (if (joins.length > 0) joins else
-      buildFromArtifacts(artifacts).mkString(", "))
+    if (joins!=null && joins.isEmpty) {
+      val tableName = buildFromSqlBuilder(sqlBuilder)
+      "FROM " + (if (tableName!=null && tableName.length > 0) tableName else
+        buildFromArtifacts(artifacts).mkString(", "))
+    }
+    else {
+      "FROM " + (if (joins.length > 0) joins else
+        buildFromArtifacts(artifacts).mkString(", "))
+    }
   }
 
   private def buildFromJoins(sqlBuilder: JObject): String = {
@@ -116,6 +123,16 @@ object QueryBuilder extends {
         JoinRelation.toSQL(buildJoinTree(joins.map(JoinRelation(_))))
       }
     }
+  }
+
+  private def buildFromSqlBuilder(sqlBuilder: JObject): String = {
+    val tableName : String = extractArray(sqlBuilder, "dataFields") match {
+      case Nil => null
+      case dataFields: List[JValue] => {
+        ( dataFields(0) \ "tableName").extract[String]
+        }
+      }
+    tableName
   }
 
   private def buildJoinTree(joins: List[JoinRelation]) = {
