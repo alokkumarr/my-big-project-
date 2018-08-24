@@ -8,6 +8,7 @@ import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as cloneDeep from 'lodash/cloneDeep';
 import {
   flattenPivotData,
   flattenChartData
@@ -283,24 +284,15 @@ export class DesignerContainerComponent {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
 
-    forEach(this.analysis.sqlBuilder.dataFields, field=> {
-      if (field.checked === 'y') {
-        this.fieldCount++;
-      }
-
-      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
-        delete field.limitType;
-        delete field.limitValue;
-      }
-    })
-
     forEach(this.analysis.sqlBuilder.filters, filter=> {
       if (filter.isRuntimeFilter) {
         delete filter.model;
       }
     })
 
-    this._designerService.getDataForAnalysis(this.analysis).then(
+    let analysisRequest = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
+
+    this._designerService.getDataForAnalysis(analysisRequest).then(
       response => {
         if (
           this.isDataEmpty(
@@ -322,6 +314,25 @@ export class DesignerContainerComponent {
         this.data = [];
       }
     );
+  }
+
+  generateRequestPayload(analysis) {
+    forEach(analysis.artifacts, cols=> {
+      forEach(cols.columns, col=>{
+        if (col.checked) {
+          delete col.checked;
+        }
+      })
+    })
+
+    // let analysisDataFields = cloneDeep(analysis.sqlBuilder.dataFields);
+    // forEach(analysisDataFields, cols=> {
+    //   forEach(cols.columns, col=>{
+    //     col.checked = true;  
+    //   })
+    // })
+    // analysis.sqlBuilder.dataFields = cloneDeep(analysisDataFields);
+    return analysis;
   }
 
   flattenData(data, analysis: Analysis) {
@@ -699,6 +710,13 @@ export class DesignerContainerComponent {
         return false;
       }
     });
+
+    //If there are more than one table considered for generating reports then a join between them is mandatory. 
+    if (this.analysis.type === 'report') {
+      const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
+      atLeastOneIsChecked = sqlBuilder.dataFields.length > 1 && isEmpty(sqlBuilder.joins) ? false : true;
+    }
+    const { edit, type } = this.analysis;
     return atLeastOneIsChecked;
   }
 
