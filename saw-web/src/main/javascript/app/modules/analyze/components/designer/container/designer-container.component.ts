@@ -284,6 +284,17 @@ export class DesignerContainerComponent {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
 
+    forEach(this.analysis.sqlBuilder.dataFields, field=> {
+      if (field.checked === 'y') {
+        this.fieldCount++;
+      }
+
+      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
+        delete field.limitType;
+        delete field.limitValue;
+      }
+    })
+
     forEach(this.analysis.sqlBuilder.filters, filter=> {
       if (filter.isRuntimeFilter) {
         delete filter.model;
@@ -711,12 +722,11 @@ export class DesignerContainerComponent {
       }
     });
 
-    //If there are more than one table considered for generating reports then a join between them is mandatory. 
+    //If there are more than one tables considered for generating reports then a join between them is mandatory. 
     if (this.analysis.type === 'report') {
       const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
       atLeastOneIsChecked = sqlBuilder.dataFields.length > 1 && isEmpty(sqlBuilder.joins) ? false : true;
     }
-    const { edit, type } = this.analysis;
     return atLeastOneIsChecked;
   }
 
