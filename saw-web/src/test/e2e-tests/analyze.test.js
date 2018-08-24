@@ -10,8 +10,8 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
   const userDataProvider = {
-    'admin': {user: users.admin.loginId}, // SAWQA-76
-    'user': {user: users.userOne.loginId}, // SAWQA-4833
+    'admin': {user: users.admin.loginId, role:'admin'}, // SAWQA-76
+    'user': {user: users.userOne.loginId, role:'userOne'}, // SAWQA-4833
   };
 
   beforeAll(function () {
@@ -37,13 +37,12 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
     using(userDataProvider, function (data, description) {
       it('should display list view by default by ' + description, function () {
-        expect(browser.getCurrentUrl()).toContain('/login');
-        loginPage.userLogin(data.user, users.anyUser.password);
+        loginPage.loginAs(data.role);
         analyzePage.validateListView();
       });
 
     it(description + ' should land on analyze page', function () {
-      loginPage.userLogin(data.user, users.anyUser.password);
+      loginPage.loginAs(data.role);
       // the app should automatically navigate to the analyze page
       // and when its on there the current module link is disabled
       const alreadyOnAnalyzePage = ec.urlContains('/analyze');

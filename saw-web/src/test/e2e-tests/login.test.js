@@ -11,8 +11,8 @@ describe('Login Tests: login.test.js', () => {
 
   //Prerequisites: two users should exist with user types: admin and user
   const userDataProvider = {
-    'admin': {user: users.admin.loginId}, // SAWQA-1
-    'user': {user: users.userOne.loginId} // SAWQA-5
+    'admin': {user: users.admin.loginId, role:'admin'}, // SAWQA-1
+    'user': {user: users.userOne.loginId, role:'userOne'} // SAWQA-5
   };
 
   beforeAll(function () {
@@ -39,7 +39,7 @@ describe('Login Tests: login.test.js', () => {
 
   using(userDataProvider, function (data, description) {
     it('Should successfully logged in by ' + description, function () {
-      loginPage.userLogin(data.user, users.anyUser.password);
+      loginPage.loginAs(data.role);
       expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
     });
   });
