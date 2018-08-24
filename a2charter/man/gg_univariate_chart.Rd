@@ -10,76 +10,46 @@ gg_univariate_chart(df, x_variable, data_name = NULL, fill = "#1D3AB2",
   palette = "a2", plot_sizes = c(0.75, 0.25), ...)
 }
 \arguments{
+\item{df}{data.frame object with variable to chart}
+
+\item{x_variable}{x-variable to chart. expects a string. required input}
+
 \item{data_name}{name for dataset. added to title if provided. default input
   is NULL which defers to dataset object name
 
   \code{\link{gg_bar_chart}} \code{\link{gg_boxplot}}
   \code{\link{gg_histogram}}}
 
-\item{plot_sizes}{vector of two ratios that add to 1. Sets the size ratios of
-the two charts.}
-
-\item{...}{Arguments passed on to \code{gg_bar_chart}
-\describe{
-  \item{x_variable}{x-variable to chart. expects a string. required input}
-  \item{y_variable}{y-variable to chart. default is NULL. If NULL then the
-x-variable is summarized and either a count or proportion is rendered.
-expects a string}
-  \item{weight}{variable to sum the count of the x_variable by. Default is
-NULL. expects a string with column name}
-  \item{position}{name of position function to apply}
-  \item{proportion}{TRUE/FALSE. If TRUE, computes percentages, otherwise counts
-if y-variable not provided. default is FALSE}
-  \item{sort}{TRUE/FALSE. If TRUE, orders the bars by either the count in the
-case of x-variable only or by the y-variable provided. Default is FALSE}
-  \item{desc}{logical option to sort boxplots in descending order. Default is
-TRUE. Note sort has to be TRUE for desc option to apply}
-  \item{label}{logical. If TRUE creates a geom_label layer and sets the label
-variable to the y-variable}
-  \item{label_args}{list of arguments passed to the geom_label layer. default
-sets the vjust to 'bottom'}
-  \item{df}{data.frame object with variable to chart}
-  \item{fill}{either a variable name to apply a group by operation and create
+\item{fill}{either a variable name to apply a group by operation and create
 subgroups of histograms or color name or hex value to fill the histogram
 with color. expects a string. default is 'grey25'}
-  \item{color}{either a variable name to apply a group by operation and create
+
+\item{color}{either a variable name to apply a group by operation and create
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
-  \item{facet_formula}{a valid r formula comprised of column names to create
-facets. expects a string. formula can either be a '~rhs' formula for a
-facet_wrap or 'lhs~rhs' to create a facet_grid. Default is NULL which
-creates no facets}
-  \item{facet_labeller}{takes a string. expecting name of one of label_*
-functions. ex - "both" creates a facet label with both the column name and
-the value. The two most common examples are 'both' and
-'value'\url{http://ggplot2.tidyverse.org/reference/#section-facetting-labels}}
-  \item{facet_args}{a list of arguments to pass to either the facet_grid or
-facet_wrap functions. default is a list with only he labeller parameter set
-to both colname and field value.
-\url{http://ggplot2.tidyverse.org/reference/facet_grid.html} or
-\url{http://ggplot2.tidyverse.org/reference/facet_wrap.html}}
-  \item{coord}{name of coordinate transform. ex - 'flip' creates a coord_flip
-and a 'trans' creates a coord_trans. expects a string. default is NULL with
-creates no coordinate changes}
-  \item{coord_args}{list of arguments to pass to the coord_* function created.
-default is empty list.}
-  \item{title}{chart title. expects a string}
-  \item{subtitle}{chart subtitle. expects a string}
-  \item{x_axis_title}{x-axis title. expects a string}
-  \item{y_axis_title}{y-axis title. expects a string}
-  \item{caption}{chart caption. expects a string}
-  \item{legend_args}{list of arguments to pass to guide_legend function to
-control the legend formatting
-\url{http://ggplot2.tidyverse.org/reference/guide_legend.html}. default is
-empty list}
-  \item{theme}{argument to change the chart theme. expects a ggplot_theme name.
+
+\item{alpha}{controls the opacity of the fill and color}
+
+\item{bins}{number of bins used in histogram chart}
+
+\item{max_bars}{maximum number of unique factor or character levels displayed
+in chart}
+
+\item{y_axis_title}{y-axis title. expects a string}
+
+\item{caption}{chart caption. expects a string}
+
+\item{theme}{argument to change the chart theme. expects a ggplot_theme name.
 default is "sncr" which calls theme_sncr(). check out
 \url{http://ggplot2.tidyverse.org/reference/#section-themes} for more
 options}
-  \item{palette}{argument to change the color palette used is either the fill or
+
+\item{palette}{argument to change the color palette used is either the fill or
 color is set to a variable. expects a palette name. default is "a2" for a2
 palette}
-}}
+
+\item{plot_sizes}{vector of two ratios that add to 1. Sets the size ratios of
+the two charts.}
 }
 \value{
 returns a ggplot2 object as a result of a call to a gg_* charting

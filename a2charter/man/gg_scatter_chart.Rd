@@ -25,10 +25,18 @@ gg_scatter_chart(df, x_variable, y_variable, color = "grey25", size = 2,
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
+\item{size}{controls the line size}
+
+\item{alpha}{controls the opacity of the fill and color}
+
+\item{shape}{controls the shape of the point}
+
 \item{points}{TRUE/FALSE. If TRUE scatter plot points are added to the chart}
 
 \item{position}{Position adjustment, either as a string, or the result of
 a call to a position adjustment function.}
+
+\item{smoother}{logical option to add smoother to chart}
 
 \item{smooth_method}{string name for smoother method to apply. accepts "lm",
 "glm", "rlm", "loess", "gam", "rlm"}
@@ -95,8 +103,6 @@ palette}
 often aesthetics, used to set an aesthetic to a fixed value, like
 \code{color = "red"} or \code{size = 3}. They may also be parameters
 to the paired geom/stat.}
-
-\item{smooth}{logical option to add smoother to chart}
 }
 \value{
 returns a ggplot2 geom_smooth object
@@ -115,19 +121,29 @@ geom_smooth  \url{http://ggplot2.tidyverse.org/reference/geom_smooth.html}
 }
 \examples{
 # Create a data set
+library(dplyr)
 d <- mtcars \%>\% mutate(am = as.factor(am), cyl = as.factor(cyl))
 
 # Create series of basic charts
 gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt")
 gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt")
-gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", color="wt")
-gg_scatter_chart(d, y_variable ="mpg", x_variable = "wt", points=F)
+gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", color="am")
+gg_scatter_chart(d, y_variable ="mpg", x_variable = "wt", points = FALSE)
 
 # Smoother Options
-gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm") # linear model
-gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm", smooth_ci=F, smooth_color="red")
-gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt", smoother = TRUE, smooth_method="lm", smooth_ci=F, smooth_color="red", smooth_formula=y~splines::bs(x, degree=1, knots=2)) # linear spline model
-gg_scatter_chart(d, y_variable = "vs", x_variable = "wt", smoother = TRUE, smooth_method="glm", smooth_color="red", smooth_args=list(family = "binomial")) # binomial logistic model
+gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt",
+                 smoother = TRUE, smooth_method="lm") # linear model
+gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt",
+                 smoother = TRUE, smooth_method="lm",
+                 smooth_ci=F, smooth_color="red") # linear model without CI
+gg_scatter_chart(d, y_variable = "mpg", x_variable = "wt",
+                 smoother = TRUE, smooth_method="lm",
+                 smooth_ci=F, smooth_color="red",
+                 smooth_formula=y~splines::bs(x, degree=1, knots=2)) # linear spline model
+gg_scatter_chart(d, y_variable = "vs", x_variable = "wt",
+                 smoother = TRUE, smooth_method="glm",
+                 smooth_color="red",
+                 smooth_args=list(family = "binomial")) # binomial logistic model
 
 }
 \seealso{

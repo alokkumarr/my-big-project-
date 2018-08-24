@@ -23,6 +23,20 @@ gg_interval_chart(df, x_variable, y_variable, color = sncr_pal()(1),
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
+\item{alpha}{controls the opacity of the fill and color}
+
+\item{size}{controls the line size}
+
+\item{shape}{controls the shape of the point}
+
+\item{chart_type}{chart types. accepts errorbar, linerange, pointrange, or
+crossbar}
+
+\item{chart_fun}{summary function to apply. accepts mean_cl_normal, mean_sdl,
+mean, median, median_hilow, mean_se}
+
+\item{line}{logical option to overlay a line between mean/median point values}
+
 \item{lines_args}{list of arguments to pass to geom_line function. default is
 an empty list}
 
@@ -142,16 +156,28 @@ This function takes any of the geom_errorbar arguments
 }
 \examples{
 # Create a data set
+library(dplyr)
 d <- mtcars \%>\% mutate(am = as.factor(am), cyl = as.factor(cyl))
 
 # Create series of basic charts
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type= "linerange" ,size=1.1)
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type= "pointrange", size=1.1, shape=18)
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type="errorbar", size=1.1, width = 0.2,color='red',lines_args=list(color='blue'))
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type="crossbar", size=1.5, shape=18)
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type='errorbar',width=0.2,color='red')
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type='errorbar',width=0.2,facet_formula='~cyl',color='cyl',lines_args=list(color='blue'))
-gg_interval_chart(d, y_variable = "mpg", x_variable = "am",chart_type='errorbar',width=0.2,color='red',lines_args=list(color='blue'))
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type= "linerange" ,size=1.1)
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type= "pointrange", size=1.1, shape=18)
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type="errorbar", size=1.1, width = 0.2,
+                  color='red',lines_args=list(color='blue'))
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type="crossbar", size=1.5, shape=18)
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type='errorbar',width=0.2,color='red')
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type='errorbar',width=0.2,
+                  facet_formula='~cyl', color='cyl',
+                  lines_args=list(color='blue'))
+gg_interval_chart(d, y_variable = "mpg", x_variable = "am",
+                  chart_type='errorbar', width=0.2, color='red',
+                  lines_args=list(color='blue'))
 }
 \seealso{
 geom_line

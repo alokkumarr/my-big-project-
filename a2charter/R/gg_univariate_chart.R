@@ -1,7 +1,8 @@
 
 #' GGplot2 Univariate Chart
 #'
-#' @inheritDotParams gg_bar_chart
+#' @inheritParams gg_bar_chart
+#' @inheritParams gg_histogram
 #' @param data_name name for dataset. added to title if provided. default input
 #'   is NULL which defers to dataset object name
 #'
@@ -9,13 +10,16 @@
 #'   \code{\link{gg_histogram}}
 #' @param plot_sizes vector of two ratios that add to 1. Sets the size ratios of
 #'   the two charts.
+#' @param alpha controls the opacity of the fill and color
+#' @param max_bars maximum number of unique factor or character levels displayed
+#'   in chart
+#' @param bins number of bins used in histogram chart
 #'
 #' @return returns a ggplot2 object as a result of a call to a gg_* charting
 #'   function
 #' @export
 #' @importFrom dplyr top_n count_ select_
 #' @importFrom magrittr %>%
-#'
 #'
 #' @examples
 #'
