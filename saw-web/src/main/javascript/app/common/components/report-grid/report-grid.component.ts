@@ -81,11 +81,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
   private listeners: Array<Subscription> = [];
-  @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
-  @Input() query: string;
-  @Input() analysis;
-  @Input() dimensionChanged: BehaviorSubject<any>;
+  @Output()
+  change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
+  @ViewChild(DxDataGridComponent)
+  dataGrid: DxDataGridComponent;
+  @Input()
+  query: string;
+  @Input()
+  analysis;
+  @Input()
+  dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     this.sorts = reduce(
@@ -109,7 +114,9 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = (isUndefined(this.analysis.sqlBuilder.dataFields)) ? this.artifacts2Columns(this.artifacts) : this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
+    this.columns = isUndefined(this.analysis.sqlBuilder.dataFields)
+      ? this.artifacts2Columns(this.artifacts)
+      : this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -151,8 +158,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       throw new Error('Data loader requires a Function');
     }
   }
-  @Input() isEditable: boolean = false;
-  @Input() columnHeaders;
+  @Input()
+  isEditable: boolean = false;
+  @Input()
+  columnHeaders;
 
   public dataLoader: (
     options: {}
