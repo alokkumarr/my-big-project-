@@ -209,8 +209,18 @@ export class AdminMainViewComponent {
   removeListItem(row) {
     const service = this.getService();
     return service.remove(row).then(rows => {
-      if (rows) {
-        this.setData(rows);
+      switch (this.section) {
+      case 'privilege':
+        // for some reason, the backend doesn't return the new array of privileges
+        // so we have to delete it manually
+        const index = this.filteredData.indexOf(row);
+        this.filteredData.splice(index, 1);
+        break;
+      default:
+        if (rows) {
+          this.setData(rows);
+        }
+        break;
       }
     });
   }

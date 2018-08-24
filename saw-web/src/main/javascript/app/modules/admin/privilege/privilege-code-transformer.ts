@@ -33,17 +33,17 @@ export function boolArray2Decimal(boolArray) {
 }
 
 export function getPrivilegeFromBoolArray(privilegeCodeList) {
-  const hasAllPrivileges = privilegeCodeList[8];
-  if (hasAllPrivileges) {
-    return {
-      privilegeCode: 128
-    };
-  }
-
   const hasNoAccessPrivilege = !privilegeCodeList[0];
   if (hasNoAccessPrivilege) {
     return {
       privilegeCode: 0
+    };
+  }
+
+  const hasAllPrivileges = privilegeCodeList[8];
+  if (hasAllPrivileges) {
+    return {
+      privilegeCode: 128
     };
   }
 
