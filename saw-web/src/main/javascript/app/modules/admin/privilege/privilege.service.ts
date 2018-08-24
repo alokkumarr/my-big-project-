@@ -78,7 +78,8 @@ export class PrivilegeService implements IAdminDataService {
 
   getRoles(customerId) {
     return this._adminService.request<RolesResponse>('roles/list', customerId)
-      .map(resp => resp.roles);
+      .map(resp => resp.roles)
+      .toPromise();
   }
 
   getProducts(customerId) {
@@ -109,6 +110,13 @@ export class PrivilegeService implements IAdminDataService {
   }) {
     return this._adminService.request<CategoryResponse>('categories/parent/list', params)
       .map(resp => resp.category)
+      .pipe(
+        tap(categories => {
+          if (isEmpty(categories)) {
+            this._toastMessage.error('There are no Categories for this Module');
+          }
+        }
+      ))
       .toPromise();
   }
 

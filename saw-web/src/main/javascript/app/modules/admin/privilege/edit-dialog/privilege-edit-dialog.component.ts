@@ -3,8 +3,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as every from 'lodash/every';
+import * as isEmpty from 'lodash/isEmpty';
 import {
-  decimal2BoolArray,
   getPrivilegeDescription
 } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
@@ -51,7 +52,19 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     }
 
     this.products$ = this._privilegeService.getProducts(customerId);
+    this.products$.then(() => {
+      const productIdControl = this.formGroup.controls.productId;
+      if (productIdControl) {
+        productIdControl.enable();
+      }
+    });
     this.roles$ = this._privilegeService.getRoles(customerId);
+    this.roles$.then(() => {
+      const roleIdControl = this.formGroup.controls.roleId;
+      if (roleIdControl) {
+        roleIdControl.enable();
+      }
+    });
     this.privilegeId = this.data.model.privilegeId;
     this.createForm(this.data.model);
   }
@@ -115,8 +128,6 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   }
 
   createForm(formModel) {
-    const mode = this.data.mode;
-    const isInCreateMode = mode === 'create';
     const {
       productId = '',
       roleId = '',
@@ -124,10 +135,10 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       categoryCode = ''
     } = formModel;
 
-    const productIdControl = this._fb.control(productId, Validators.required);
-    const roleIdControl = this._fb.control(roleId, Validators.required);
-    const moduleIdControl = this._fb.control({value: moduleId, disabled: isInCreateMode}, Validators.required);
-    const categoryCodeControl = this._fb.control({value: categoryCode, disabled: isInCreateMode}, Validators.required);
+    const productIdControl = this._fb.control({value: productId, disabled: true}, Validators.required);
+    const roleIdControl = this._fb.control({value: roleId, disabled: true}, Validators.required);
+    const moduleIdControl = this._fb.control({value: moduleId, disabled: true}, Validators.required);
+    const categoryCodeControl = this._fb.control({value: categoryCode, disabled: true}, Validators.required);
 
     this.formGroup = this._fb.group({
       productId: productIdControl,
@@ -136,8 +147,12 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       categoryCode: categoryCodeControl
     });
 
-    this.formGroup.statusChanges.subscribe(change => {
-      if (change === 'VALID') {
+    this.formGroup.statusChanges.subscribe(() => {
+      // we have to use a manual validation because disabling a form control disables it's validation,
+      // and the form can't be validated properly
+      const isValid = every(this.formGroup.getRawValue(), Boolean);
+
+      if (isValid) {
         this.formIsValid = true;
       } else {
         this.formIsValid = false;
@@ -146,20 +161,17 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 
     productIdControl.valueChanges.subscribe(productId => {
       this.modules$ = this.loadModules(productId);
-      this.modules$.then(modules => {
-        moduleIdControl.enable();
-        return modules;
-      });
     });
 
     roleIdControl.valueChanges.subscribe(roleId => {
       const { moduleId, productId, categoryCode } = this.formGroup.value;
-      this.loadSubCategories(moduleId, roleId, productId, categoryCode)
-      categoryCodeControl.enable();
+      this.loadSubCategories(moduleId, roleId, productId, categoryCode);
     });
 
     moduleIdControl.valueChanges.subscribe(moduleId => {
       this.loadCategories(moduleId);
+      this.formGroup.controls.categoryCode.reset('');
+      this.subCategories = [];
     });
 
     categoryCodeControl.valueChanges.subscribe(categoryCode => {
@@ -175,7 +187,10 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       productId,
       moduleId: 0
     };
-    return this._privilegeService.getModules(moduleParams);
+    return this._privilegeService.getModules(moduleParams).then(modules => {
+      this.formGroup.controls.moduleId.enable({emitEvent: false});
+      return modules;
+    });
   }
 
   loadCategories(moduleId) {
@@ -187,6 +202,12 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     };
     return this._privilegeService.getParentCategories(categoryParams).then(categories => {
       this.categories = categories;
+      const categoryCodeControl = this.formGroup.controls.categoryCode;
+      if (isEmpty(categories)) {
+        categoryCodeControl.disable();
+      } else {
+        categoryCodeControl.enable();
+      }
     });
   }
 
