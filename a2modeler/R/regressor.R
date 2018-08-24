@@ -13,31 +13,30 @@
 new_regressor <- function(df,
                           target,
                           name = NULL,
-                          id = NULL,
+                          uid = NULL,
                           version = NULL,
                           desc = NULL,
                           scientist = NULL,
-                          save_fits = TRUE,
+                          execution_strategy = "sequential",
+                          refit = TRUE,
+                          save_submodels = TRUE,
                           dir = NULL,
                           ...){
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
-
-  df <- df %>%
-    dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
+  
   mobj <- modeler(df,
                   target = target,
                   type = "regressor",
                   name,
-                  id,
+                  uid,
                   version,
                   desc,
                   scientist,
-                  save_fits,
+                  execution_strategy,
+                  refit,
+                  save_submodels,
                   dir)
-  mobj$index_var <- "index"
-  mobj$index <- 1:sdf_nrow(df)
   mobj <- structure(mobj, class = c("regressor", class(mobj)))
   mobj <- set_measure(mobj, RMSE)
   mobj
@@ -53,29 +52,46 @@ predict.regressor <- function(obj,
                               data = NULL,
                               desc = "",
                               ...) {
-  final_model <- obj$final_model
-  if (is.null(final_model)) {
+  if (is.null(obj$final_model)) {
     stop("Final model not set")
+  } else {
+    final_model <- obj$final_model
   }
-
-  data <- data %>%
-    dplyr::mutate(index = 1) %>%
-    dplyr::mutate(index = row_number(index))
-
-  schema <- obj$schema[! names(obj$schema) %in% c(obj$target)]
-  schema_check <- all.equal(get_schema(data), obj$schema)
-  if(schema_check[1] != TRUE) {
-    stop(paste("New Data shema check failed:\n", schema_check))
+  
+  # Schema Check
+  schema_check <- purrr::flatten(obj$schema) %>%
+    tibble::as_tibble() %>%
+    tidyr::gather() %>%
+    dplyr::left_join(
+      purrr::flatten(get_schema(data)) %>%
+        tibble::as_tibble() %>%
+        tidyr::gather(),
+      by = "key") %>% 
+    dplyr::filter(value.x != value.y | is.na(value.y))
+  
+  if(nrow(schema_check) > 0) {
+    stop(paste("New Data schema check failed:",
+               "\n     columns missing:",
+               schema_check %>%
+                 dplyr::filter(is.na(value.y)) %>%
+                 dplyr::pull(key) %>% 
+                 paste(collapse = ", "),
+               "\n     columns with miss-matching type:",
+               schema_check %>%
+                 dplyr::filter(!is.na(value.y)) %>%
+                 dplyr::pull(key) %>% 
+                 paste(collapse = ", ")),
+         .call=FALSE)
   }
-
-  final_model$pipe <- execute(data, final_model$pipe)
-  preds <- predict(final_model, data = final_model$pipe$output, ...)
-
-  new_predictions(
-    predictions = preds,
-    model = final_model,
-    type = "regressor",
-    id = sparklyr::random_string(prefix = "pred"),
-    desc = desc
-  )
+  
+  pipe <- obj$pipelines[[final_model$pipe]] %>% 
+    execute(data, .) 
+  predict(final_model, data = pipe$output, ...) %>% 
+    new_predictions(
+      predictions = .,
+      model = final_model,
+      type = "regressor",
+      uid = sparklyr::random_string(prefix = "pred"),
+      desc = desc
+    )
 }

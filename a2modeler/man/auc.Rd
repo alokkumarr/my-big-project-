@@ -3,11 +3,14 @@
 \name{auc}
 \alias{auc}
 \alias{auc.tbl_spark}
+\alias{auc.spark_connection}
 \title{Generic auc function}
 \usage{
 auc(x, predicted, actual)
 
 \method{auc}{tbl_spark}(x, predicted, actual)
+
+\method{auc}{spark_connection}(x, predicted = "predicted", actual = "label")
 }
 \arguments{
 \item{x}{dataframe object}

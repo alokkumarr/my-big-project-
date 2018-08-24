@@ -179,6 +179,20 @@ rmse.tbl_spark <- function(x, predicted, actual) {
 }
 
 
+#' @export
+#' @rdname rmse
+rmse.spark_connection <- function(x, predicted = "prediction", actual = "label") {
+  checkmate::assert_character(predicted)
+  checkmate::assert_character(actual)
+  
+  sparklyr::ml_regression_evaluator(
+    x,
+    label_col = actual,
+    prediction_col = predicted,
+    metric_name = "rmse"
+  )
+}
+
 
 #' rmse.tbl_spark <- function(x, predicted, actual){
 #'   checkmate::assert_choice(predicted, colnames(x))
@@ -271,9 +285,21 @@ silhouette <- function(x, predicted){
 silhouette.tbl_spark <- function(x, predicted = "predicted") {
   checkmate::assert_choice(predicted, colnames(x))
 
-  sparklyr::ml_clustering_evaluator(x, prediction_col = predicted)
+  sparklyr::ml_clustering_evaluator(x,
+                                    prediction_col = predicted,
+                                    metric_name = "silhouette")
 }
 
+
+#' @export
+#' @rdname silhouette
+silhouette.spark_connection <- function(x, predicted = "predicted") {
+  checkmate::assert_character(predicted)
+  
+  sparklyr::ml_clustering_evaluator(x,
+                                    prediction_col = predicted,
+                                    metric_name = "silhouette")
+}
 
 
 # AUC ---------------------------------------------------------------------
@@ -312,6 +338,21 @@ auc.tbl_spark <- function(x, predicted, actual) {
     x,
     label_col = actual,
     raw_prediction_col = predicted,
+    metric_name = "areaUnderROC"
+  )
+}
+
+
+#' @export
+#' @rdname auc
+auc.spark_connection <- function(x, predicted = "predicted", actual = "label") {
+  checkmate::assert_character(predicted)
+  checkmate::assert_character(actual)
+  
+  sparklyr::ml_binary_classification_evaluator(
+    x,
+    label_col = actual,
+    prediction_col = predicted,
     metric_name = "areaUnderROC"
   )
 }

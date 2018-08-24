@@ -34,9 +34,9 @@ test_that("Classifier Constructer", {
 })
 
 
-test_that("Classifier Selects Best Model", {
+test_that("Classifier Selects Best Model and Makes Predictions", {
 
-  test_pipe <- pipeline(expr = function(x){select(x, index, am, mpg)})
+  test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
 
   c1 <- new_classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
@@ -45,60 +45,41 @@ test_that("Classifier Selects Best Model", {
     add_model(pipe = test_pipe,
               method = "ml_decision_tree_classifier") %>%
     train_models() %>%
-    evaluate_models() %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  expect_subset("spark_ml", class(c1$final_model))
-  expect_subset("spark_ml_classification", class(c1$final_model))
+ 
+  expect_subset("spark_model", class(c1$final_model))
+  expect_subset("spark_model_classification", class(c1$final_model))
   expect_subset(
-    c1$final_model$id,
-    c1$evaluate %>%
+    c1$final_model$uid,
+    c1$performance %>%
       dplyr::filter(sample == "validation") %>%
       dplyr::top_n(1, auc) %>%
-      dplyr::pull(model)
+      dplyr::pull(model_uid)
   )
-})
-
-
-
-test_that("Classifier Predicts New Data", {
-
-  c1 <- new_classifier(df = df, target = "am", name = "test") %>%
-    add_holdout_samples(splits = c(.5, .5)) %>%
-    add_model(pipe = NULL,
-              method = "ml_logistic_regression") %>%
-    add_model(pipe = NULL,
-              method = "ml_decision_tree_classifier") %>%
-    train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
+  expect_equal(c1$models[[1]]$pipe, c1$models[[2]]$pipe)
+  
+  
   p1 <- predict(c1, data = df)
-
-
-  c2 <- ml_logistic_regression(df %>% head(16), formula = "am~.")
-  p2 <- predict(c2, newdata = df)
-
   expect_class(p1, "predictions")
-  expect_equal(p1$predictions %>%
-                 dplyr::collect() %>%
-                 dplyr::pull(predicted),
-               as.numeric(p2))
 })
+
+
+
 
 
 
 # Advanced Tests ----------------------------------------------------------
 
 
-test_that("Classifer with Multiple Methods, CV sampling, without saving fits", {
+test_that("Classifer with Multiple Methods, CV sampling, without saving submodels", {
 
   test_pipe <- pipeline(expr = function(x) {
     x %>%
-      select(index, am, mpg, cyl, wt, hp, vs)
+      select(am, mpg, cyl, wt, hp, vs)
   })
 
-  c1 <- new_classifier(df = df, target = "am", name = "test", save_fits = FALSE) %>%
+  c1 <- new_classifier(df = df, target = "am", name = "test", save_submodels = TRUE) %>%
     add_cross_validation_samples(folds = 2) %>%
     add_model(pipe = test_pipe,
               method = "ml_multilayer_perceptron_classifier",
@@ -111,23 +92,21 @@ test_that("Classifer with Multiple Methods, CV sampling, without saving fits", {
               method = "ml_random_forest_classifier",
               desc = "model4-ml_random_forest_classifier-Test") %>%
     train_models() %>%
-    evaluate_models() %>%
     set_final_model(.,
                     method = "best",
                     reevaluate = FALSE,
-                    refit = TRUE)
+                    refit = FALSE)
 
-  expect_subset("spark_ml", class(c1$final_model))
-  expect_subset("spark_ml_classification", class(c1$final_model))
-  expect_subset(c1$final_model$id,
-                c1$evaluate %>%
+  expect_subset("spark_model", class(c1$final_model))
+  expect_subset("spark_model_classification", class(c1$final_model))
+  expect_subset(c1$final_model$uid,
+                c1$performance %>%
                   dplyr::filter(sample == "validation") %>%
                   dplyr::top_n(1, auc) %>%
-                  dplyr::pull(model)
+                  dplyr::pull(model_uid)
                 )
 
   pred_data <- predict(c1, data = df)
-
   expect_class(pred_data, "predictions")
 })
 
@@ -136,60 +115,93 @@ test_that("Classifer with Multiple Methods, CV sampling, without saving fits", {
 
 test_that("Classifier set final model options work as expected", {
 
-
+  test_pipe <- pipeline(expr = function(x) {
+    x %>%
+      select(am, mpg, cyl)
+  })
+  
   c1 <- new_classifier(df = df, target = "am", name = "test") %>%
-    add_holdout_samples(splits = c(.5, .5)) %>%
-    add_model(pipe = NULL,
-              method = "ml_logistic_regression") %>%
-    add_model(pipe = NULL,
-              method = "ml_decision_tree_classifier") %>%
-    train_models() %>%
-    evaluate_models()
+    add_holdout_samples(splits = c(.6, .4)) %>%
+    add_model(pipe = test_pipe,
+              method = "ml_logistic_regression",
+              uid = "logistic") %>%
+    add_model(pipe = test_pipe,
+              method = "ml_decision_tree_classifier",
+              uid = "tree") %>%
+    train_models() 
 
   c1_best <- set_final_model(c1,
                              method = "best",
                              reevaluate = FALSE,
-                             refit = TRUE)
+                             refit = FALSE)
   c1_man <- set_final_model(c1,
                             method = "manual",
-                            id = c1$models[[1]]$id,
+                            uid = c1$models[["tree"]]$uid,
                             reevaluate = FALSE,
-                            refit = TRUE)
+                            refit = FALSE)
 
-  expect_subset("spark_ml", class(c1_best$final_model))
-  expect_equal(get_evalutions(c1_best) %>%
+  expect_subset("spark_model", class(c1_best$final_model))
+  expect_equal(c1$performance %>%
                  dplyr::filter(sample == "validation") %>%
                  dplyr::top_n(1, auc) %>%
-                 dplyr::pull(model),
-               c1_best$final_model$id)
-
-  expect_equal(c1_man$final_model$id, c1$models[[1]]$id)
+                 dplyr::pull(model_uid),
+               c1_best$final_model$uid)
+  expect_equal(c1_man$final_model$uid, c1$models[["tree"]]$uid)
 })
 
 
 
 
-test_that("Classifier train model works on additional models", {
+test_that("Classifier set_final_model works on additional models", {
 
-
+  test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
+  
   c1 <- new_classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
-    add_model(pipe = NULL,
-              method = "ml_logistic_regression") %>%
+    add_model(pipe = test_pipe,
+              method = "ml_decision_tree_classifier",
+              uid = "tree") %>%
     train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
   c2 <- c1 %>%
-    add_model(pipe = NULL,
-              method = "ml_decision_tree_classifier") %>%
+    add_model(pipe = test_pipe,
+              method = "ml_logistic_regression",
+              uid = "logistic") %>%
     train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = TRUE)
+    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  expect_equal(c1$models[[1]]$fit$coefficients,
-               c2$models[[1]]$fit$coefficients)
-
-  expect_equal(c1$models[[1]]$last_updated,
-               c2$models[[1]]$last_updated)
+  expect_equal(c1$final_model$uid, "tree")
+  expect_equal(nrow(c2$performance), 2)
+  expect_equal(c2$final_model$uid, "logistic")
 })
+
+
+
+test_that("Classifier with parallel execution, test holdout and param_map", {
+  
+  test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
+  
+  c1 <- new_classifier(df = df,
+                       target = "am",
+                       name = "test", 
+                       save_submodels = FALSE,
+                       execution_strategy = "multisession") %>%
+    add_holdout_samples(splits = c(.5, .3, .2)) %>%
+    add_model(pipe = test_pipe,
+              method = "ml_logistic_regression",
+              param_map = list(reg_param = c(0, 0.01),
+                               elastic_net_param = c(0, 0.01)),
+              uid = "logistic") %>%
+    add_model(pipe = test_pipe,
+              method = "ml_decision_tree_classifier",
+              param_map = list(max_depth = c(2, 5)),
+              uid = "tree") %>%
+    train_models() %>%
+    set_final_model(., method = "best", reevaluate = TRUE, refit = TRUE)
+  
+  expect_equal(nrow(c1$performance), 6)
+  expect_true(!is.null(c1$final_model$test_performance))
+  expect_true(!is.null(c1$final_model$test_predictions))
+})
+
