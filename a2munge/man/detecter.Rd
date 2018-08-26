@@ -25,6 +25,8 @@ detecter(df, index_var, group_vars, measure_vars, frequency, direction, alpha,
 \item{group_vars}{optional vector of grouping variables to apply dectect
 function to. default is NULL - no grouping}
 
+\item{measure_vars}{numeric measure variables to analyze}
+
 \item{frequency}{numeric period length of seasonality. Ex - 7 for daily data
 with weekly seasonality. see
 \url{https://robjhyndman.com/hyndsight/seasonal-periods/} for more details}
