@@ -83,7 +83,7 @@ class AnalysisExecutions extends BaseController {
       })
 
       // Run the execution result cleanup as async execution,
-      // So, actual response will not be blocked by cleanp activity
+      // So, actual response will not be blocked by cleanup activity
       implicit val ec = ExecutionContext.global
       Future {
         analysis.deleteByID(junkExecution)
@@ -106,6 +106,7 @@ class AnalysisExecutions extends BaseController {
       // changed from Int to Long because stream returns long.
       var totalRows: Long = 0
       var pagingData: JValue = null
+      var queryBuilder : JValue=null
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       val execution = analysis.getExecution(executionId)
       var dataStream: java.util.stream.Stream[String] = null
@@ -172,17 +173,18 @@ class AnalysisExecutions extends BaseController {
             data.add(resultsRow)
           })
         pagingData = analysisController.processReportResult(data)
-        ("data", pagingData) ~ ("totalRows", totalRows)
+        ("data", pagingData) ~ ("totalRows", totalRows) ~ ("queryBuilder", queryBuilder)
       }
       else {
         val anares = AnalysisResult(analysisId, executionId)
         val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
         val desc = anares.getCachedData(MDObjectStruct.key_Definition.toString)
         val d_type = (desc.asInstanceOf[JValue] \ "type").extractOpt[String];
+        queryBuilder = (desc.asInstanceOf[JValue] \ "queryBuilder")
         if (d_type.isDefined) {
 
           if (d_type.get == "chart" || d_type.get == "pivot") {
-            ("data", execution.loadESExecutionData(anares))
+            ("data", execution.loadESExecutionData(anares)) ~ ("queryBuilder", queryBuilder)
           }
           else if (d_type.get == "esReport") {
             val data = execution.loadESExecutionData(anares)
@@ -193,14 +195,13 @@ class AnalysisExecutions extends BaseController {
                   row.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
                 })
                 results.add(resultsRow)
-              }
-              )
+              })
             pagingData = analysisController.processReportResult(results)
             PaginateDataSet.INSTANCE.putCache(executionId, results)
             pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
             totalRows = PaginateDataSet.INSTANCE.sizeOfData()
             m_log.trace("totalRows {}", totalRows)
-            ("data", pagingData) ~ ("totalRows", totalRows)
+            ("data", pagingData) ~ ("totalRows", totalRows) ~ ("queryBuilder", queryBuilder)
           }
           else throw new Exception("Unsupported data format")
         }

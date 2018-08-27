@@ -376,6 +376,14 @@ class Analysis extends BaseController {
     ("contents", ("analyze", JArray(analyses)))
   }
 
+  def unexpectedElement(
+                         json: JValue, expected: String, location: String): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new ClientException(
+      "Unexpected element: %s, expected %s, at %s".format(
+        name, expected, location))
+  }
+
   /**
     * Return the list of analysis created in my analysis category by requested user.
     *
@@ -403,8 +411,11 @@ class Analysis extends BaseController {
       case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
       case _ => null
     }
+    var analysisDefinition :JObject = null
+
     if (analysis == null) {
       analysisJSON = readAnalysisJson(analysisId); // reading from the store
+      analysisDefinition = analysisJson(analysisJSON,dataSecurityKeyStr)
       val analysisType = (analysisJSON \ "type");
       typeInfo = analysisType.extract[String];
       json = compact(render(analysisJSON));
@@ -412,7 +423,13 @@ class Analysis extends BaseController {
     else {
       val analysisType = (analysis \ "type");
       typeInfo = analysisType.extract[String];
+      analysisDefinition = analysisJson(reqJSON,dataSecurityKeyStr)
       json = compact(render(analysis));
+    }
+    val queryBuilder : JObject = (analysisDefinition \ "sqlBuilder") match {
+      case obj: JObject => obj
+      case JNothing => JObject()
+      case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
     val analysisNode = AnalysisNode(analysisId)
     val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -476,7 +493,8 @@ class Analysis extends BaseController {
             JField("execution_result", JString("success")),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -492,7 +510,8 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder)
           ))
         }
 
@@ -557,7 +576,8 @@ class Analysis extends BaseController {
             JField("execution_result", JString("success")),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -573,7 +593,8 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder)
           ))
         }
 
@@ -633,7 +654,9 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder)
+
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -649,7 +672,8 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder)
           ))
         }
 
