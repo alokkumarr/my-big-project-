@@ -16,6 +16,7 @@ module.exports = {
   dashboardDesc: element(by.css('textarea[e2e="dashboard-save-description-input"]')),
   subCategorySelect: name => element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`)),
   saveDialogBtn: element(by.css(`[e2e="dashboard-save-save-button"]`)),
+  metricFetchProgressBar:element(by.xpath('//div[contains(@class,"mat-progress-bar-element")]')),
   dashboard:{
     dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),

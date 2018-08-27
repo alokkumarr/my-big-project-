@@ -10,6 +10,7 @@ const loginPage = require('../../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../../javascript/helpers/observe/DashboardFunctions');
 const ObserveHelper = require('../../javascript/api/ObserveHelper');
 const dataSets = require('../../javascript/data/datasets');
+const homePage = require('../../javascript/pages/homePage.po.js');
 
 describe('Create & delete dashboard tests: createAndDeleteDashboardWithActualVsTargetKPI.test.js', () => {
   const subCategoryName = subCategories.observeSubCategory.name;
@@ -105,6 +106,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithActualVsT
         loginPage.loginAs(user);
 
         dashboardFunctions.goToObserve();
+        browser.sleep(2000);
+        commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar, protractorConf.timeouts.extendedFluentWait);
         let dashboardName = 'AT Dashboard Name' + currentTime;
         let dashboardDescription = 'AT Dashboard description ' + currentTime;
         let kpiName = 'AT kpi'+data.kpiInfo.column+ globalVariables.e2eId;

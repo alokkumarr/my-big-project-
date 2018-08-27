@@ -11,6 +11,7 @@ const globalVariables = require('../../javascript/helpers/globalVariables');
 const loginPage = require('../../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../../javascript/helpers/observe/DashboardFunctions');
 const ObserveHelper = require('../../javascript/api/ObserveHelper');
+const homePage = require('../../javascript/pages/homePage.po.js');
 
 describe('Create & delete dashboard tests: createAndDeleteDashboardWithESReport.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -86,6 +87,8 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithESReport.
         loginPage.loginAs(user);
 
         dashboardFunctions.goToObserve();
+        browser.sleep(2000);
+        commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar, protractorConf.timeouts.extendedFluentWait);
         let dashboardName = 'AT Dashboard Name' + currentTime;
         let dashboardDescription = 'AT Dashboard description ' + currentTime;
 
