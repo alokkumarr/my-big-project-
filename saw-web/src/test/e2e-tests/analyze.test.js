@@ -27,12 +27,12 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
     using(userDataProvider, function (data, description) {

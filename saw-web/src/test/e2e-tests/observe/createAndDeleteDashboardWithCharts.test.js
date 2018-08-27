@@ -69,14 +69,12 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
       oh.deleteDashboard(host, token, dashboardId);
-
-      //analyzePage.main.doAccountAction('logout');
-      //commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
   afterAll(function() {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function(data, description) {

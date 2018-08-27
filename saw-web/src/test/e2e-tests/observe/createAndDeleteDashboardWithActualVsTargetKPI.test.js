@@ -86,7 +86,7 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithActualVsT
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
       oh.deleteDashboard(host, token, dashboardId);
-      //commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

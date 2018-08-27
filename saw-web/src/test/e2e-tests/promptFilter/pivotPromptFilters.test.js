@@ -83,13 +83,12 @@ describe('pivot Prompt filter tests: pivotPromptFilters.test.js', () => {
   afterEach(function(done) {
     setTimeout(function() {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
-      //analyzePage.main.doAccountAction('logout');
-      //commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
   afterAll(function() {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(chartDataProvider, function(data, description) {

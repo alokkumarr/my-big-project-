@@ -52,13 +52,13 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to Report', () => { // SAWQA-4146

@@ -30,13 +30,13 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   it('Should apply filter to column chart', () => { // SAWQA-174

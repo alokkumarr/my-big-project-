@@ -67,14 +67,13 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
   afterEach(function (done) {
     setTimeout(function () {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
-    console.log('Completed edit and delte chart tests..');
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {

@@ -68,13 +68,13 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
     setTimeout(function () {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, forkedAnalysisId);
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
+    //commonFunctions.logOutByClearingLocalStorage();
   });
 
   using(dataProvider, function (data, description) {
