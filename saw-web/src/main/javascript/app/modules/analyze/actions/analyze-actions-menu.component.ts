@@ -94,9 +94,7 @@ export class AnalyzeActionsMenuComponent {
   generateRequestPayload(analysis) {
     forEach(analysis.artifacts, cols=> {
       forEach(cols.columns, col=>{
-        if (col.checked) {
-          delete col.checked;
-        }
+        delete col.checked;
       })
     })
     return analysis;
@@ -119,6 +117,7 @@ export class AnalyzeActionsMenuComponent {
   }
 
   execute() {
+    this.analysis = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
     this._analyzeActionsService.execute(this.analysis).then(analysis => {
       if (analysis) {
         this.afterExecute.emit(analysis);

@@ -210,6 +210,21 @@ export class DesignerContainerComponent {
         });
       });
       break;
+
+    case 'report':
+    forEach(artifacts, table=> {
+      table.columns = map(table.columns, column => {
+        forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+          forEach(fields.columns, field => {
+            if (field.columnName === column.columnName) {
+              column.checked = true;
+            }
+          })
+        })
+        return column;
+      })
+    })
+      break;
     }
     return artifacts;
   }

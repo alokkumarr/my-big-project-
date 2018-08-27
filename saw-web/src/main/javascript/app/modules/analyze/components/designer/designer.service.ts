@@ -47,9 +47,7 @@ export class DesignerService {
   generateRequestPayload(analysis) {
     forEach(analysis.artifacts, cols=> {
       forEach(cols.columns, col=>{
-        if (col.checked) {
-          delete col.checked;
-        }
+        delete col.checked;
       })
     })
     return analysis;
