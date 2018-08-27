@@ -8,6 +8,7 @@ import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 import {
   flattenPivotData,
@@ -399,7 +400,7 @@ export class DesignerContainerComponent {
           const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
             requestExecution: shouldClose,
-            analysis: result.analysis
+            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis    
           });
           if (!shouldClose) {
             this.requestDataIfPossible();
