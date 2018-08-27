@@ -1,12 +1,9 @@
 import * as angular from 'angular';
 
-import * as html2pdf from 'html2pdf.js';
 import 'angular-material/angular-material.css';
 
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
-
-window['html2pdf'] = html2pdf;
 
 import 'zone.js/dist/zone';
 import 'hammerjs';
