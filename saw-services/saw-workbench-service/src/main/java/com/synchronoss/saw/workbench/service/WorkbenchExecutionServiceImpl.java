@@ -155,7 +155,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Override
   public String createDatasetDirectory(String project, String catalog, String name) throws Exception {
     log.trace("generate data system path for starts here :" + project + " : " + name); 
-    catalog = catalog!=null? catalog : MetadataBase.DEFAULT_CATALOG;
     String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
         + catalog + Path.SEPARATOR + name + Path.SEPARATOR

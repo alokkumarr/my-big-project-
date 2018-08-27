@@ -200,7 +200,6 @@ public class WorkbenchExecutionController {
       throws JsonProcessingException, Exception {
     log.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
-    Preconditions.checkArgument(queryMap.get("catalog")!=null, "catalog cannot be null. Please catalog as part of queryString");
     String catalog = queryMap.get("catalog");
     String body = workbenchExecutionService.createDatasetDirectory(project, catalog, name);
     /*
