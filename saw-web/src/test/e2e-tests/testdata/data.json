@@ -22,5 +22,17 @@
         "role": "userOne_2"
       }
     }
+  },
+  "DEV3": {
+    "dataProviderName1": {
+      "admin": {
+        "user": "dev3User1_1",
+        "role": "admin_1"
+      },
+      "user": {
+        "user": "dev3User2_2",
+        "role": "userOne_2"
+      }
+    }
   }
 }

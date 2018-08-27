@@ -80,6 +80,8 @@ const customerCode = 'SYNCHRONOSS';
 let token;
 let testData;
 let isRetry = false;
+let processedFiles = [];
+let subsetTestdata;
 
 exports.timeouts = {
   fluentWait: fluentWait,
@@ -176,13 +178,15 @@ exports.config = {
     development: [
       testBaseDir + 'dev1.js',
       testBaseDir + 'dev2.js',
+      testBaseDir + 'dev3.js',
     ]
   },
   onCleanUp: function (results) {
     console.log('onLCeanup---results--->'+JSON.stringify(results))
     isRetry = true;
-    //generate retyr dataset retry files
-    fs.readdirSync(appRoot+'/target')
+    //generate retry data set retry files
+    webpackHelper.readAllFiles(appRoot+'/target/allure-results','xml');
+
     retry.onCleanUp(results);
   },
   onPrepare() {
