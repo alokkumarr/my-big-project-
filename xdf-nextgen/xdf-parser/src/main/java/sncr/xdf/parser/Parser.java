@@ -7,6 +7,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -29,7 +30,6 @@ import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
 import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.file.DLDataSetOperations;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
 import sncr.xdf.preview.CsvInspectorRowProcessor;
@@ -60,6 +60,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private String rejectedDatasetName;
     private String rejectedDatasetLocation;
     private String rejectedDataFormat;
+    private String rejectedDataSetMode;
 
     private LongAccumulator errCounter;
     private LongAccumulator recCounter;
@@ -74,7 +75,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
     private JavaRDD<Row> rejectedDataCollector;
 
-    private List<String> pkeys;
+    private List<String> outputDsPartitionKeys;
 
     {
         componentName = "parser";
@@ -133,7 +134,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         outputFormat = outputDataset.get(DataSetProperties.Format.name()).toString();
         outputNOF =  (Integer) outputDataset.get(DataSetProperties.NumberOfFiles.name());
-        pkeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
+        outputDsPartitionKeys = (List<String>) outputDataset.get(DataSetProperties.PartitionKeys.name());
 
         logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
@@ -146,6 +147,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             rejectedDatasetName = rejDs.get(DataSetProperties.Name.name()).toString();
             rejectedDatasetLocation = rejDs.get(DataSetProperties.PhysicalLocation.name()).toString();
             rejectedDataFormat = rejDs.get(DataSetProperties.Format.name()).toString();
+            rejectedDataSetMode = rejDs.get(DataSetProperties.Mode.name()).toString();
 
             logger.debug("Rejected dataset " + rejectedDatasetName + " at "
                 + rejectedDatasetLocation + " with format " + rejectedDataFormat);
@@ -187,9 +189,11 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             }
             //Write rejected data
             if (this.rejectedDataCollector != null) {
-                logger.debug("Writing rejected data in the end");
-                writeRdd(rejectedDataCollector.map(row -> row.mkString(String.valueOf(" | "))),
-                    rejectedDatasetLocation);
+                boolean status = writeRejectedData();
+
+                if (!status) {
+                    logger.warn("Unable to write rejected data");
+                }
             }
         }catch (IOException e){
             retval =  -1;
@@ -291,12 +295,12 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             return -1;
         }
 
-        status = collectRejectedData(parsedRdd, outputRdd, rejectedDatasetLocation);
+        status = collectRejectedData(parsedRdd, outputRdd);
         if (!status) {
             logger.error("Failed to write rejected data");
         }
 
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
 
         return 0;
     }
@@ -311,7 +315,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
 
 //                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, outputDataSetMode, DLDataSetOperations.FORMAT_PARQUET, null));
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat,pkeys));
+                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, outputFormat, outputDsPartitionKeys));
 
                 }
             }
@@ -344,7 +348,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         logger.debug("Dest dir for file " + file + " = " + destDir);
         writeDataset(df, outputFormat, destDir.toString());
 
-        collectRejectedData(parseRdd, outputRdd, rejectedDatasetLocation);
+        collectRejectedData(parseRdd, outputRdd);
 
         return 0;
     }
@@ -354,32 +358,26 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
      *
      * @param fullRdd Complete RDD which contains both output and rejected records
      * @param outputRdd Contains output records
-     * @param location Physical location to which rejected records need to be written
      * @return
      *      true - if write is successful
      *      false - if location is not specified or write operation fails
      *
      */
 
-    private boolean collectRejectedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd,
-                                        String location) {
+    private boolean collectRejectedData(JavaRDD<Row> fullRdd, JavaRDD<Row> outputRdd) {
         boolean status = true;
 
         try {
-            if(location != null) {
-                // Get all entries which are rejected
-                logger.debug("Collecting rejected data");
-                JavaRDD<Row> rejectedRdd = fullRdd.subtract(outputRdd)
-                    .map(record ->
-                        RowFactory.create(record.get(0), record.get(record.length() - 1)));
+            // Get all entries which are rejected
+            logger.debug("Collecting rejected data");
+            JavaRDD<Row> rejectedRdd = fullRdd.subtract(outputRdd)
+                .map(record ->
+                    RowFactory.create(record.get(0), record.get(record.length() - 1)));
 
-                if (this.rejectedDataCollector == null) {
-                    rejectedDataCollector = rejectedRdd;
-                } else {
-                    rejectedDataCollector = rejectedDataCollector.union(rejectedRdd);
-                }
+            if (this.rejectedDataCollector == null) {
+                rejectedDataCollector = rejectedRdd;
             } else {
-                status = false;
+                rejectedDataCollector = rejectedDataCollector.union(rejectedRdd);
             }
         } catch (Exception exception) {
             logger.error(exception);
@@ -407,7 +405,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
      */
     private boolean writeDataset(Dataset<Row> dataset, String format, String path) {
         try {
-            DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, pkeys);
+            DLBatchWriter xdfDW = new DLBatchWriter(format, outputNOF, outputDsPartitionKeys);
             xdfDW.writeToTempLoc(dataset,  path);
             Map<String, Object> outputDS = outputDataSets.get(outputDataSetName);
             outputDS.put(DataSetProperties.Schema.name(), xdfDW.extractSchema(dataset) );
@@ -421,7 +419,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     }
 
     private boolean writeRdd(JavaRDD rdd, String path) {
-        if (rdd != null && path != null) {
+        if (rdd != null && path != null && rdd.count() != 0) {
             logger.debug("Writing data to location " + path);
             rdd.coalesce(1).saveAsTextFile(path);
         } else {
@@ -429,6 +427,76 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         }
 
         return true;
+    }
+
+    private boolean writeRejectedData () {
+        boolean status = true;
+
+        logger.debug("Writing rejected data in the end");
+
+        try {
+//            JavaRDD<String> rejectedRecords = rejectedDataCollector.map(row -> row.mkString(" | "));
+
+            JavaRDD<String> rejectedRecords = rejectedDataCollector.map(new TransformRDDWithDelimiter(this.delimiter));
+            if (rejectedDatasetLocation != null) {
+                if (rejectedDataSetMode.equalsIgnoreCase(Output.Mode.APPEND.toString())) {
+                    /**
+                     * Check if rejected data already exists.
+                     * If yes, read the existing data from the rejected directory and created a rdd
+                     * Merge the existing dataset with current dataset
+                     *
+                     * If not, write the current rejected dataset
+                     *
+                     */
+                    if (HFileOperations.exists(rejectedDatasetLocation)) {
+                        JavaRDD<String> existingData = this.ctx.sparkSession
+                            .sparkContext()
+                            .textFile(rejectedDatasetLocation, 1).toJavaRDD();
+
+                        if (existingData != null || existingData.count() != 0) {
+                            rejectedRecords = existingData.union(rejectedRecords);
+                        }
+                    }
+
+                } else  {
+                    /**
+                     * Mode is replace by default
+                     * Check if rejected data already exists.
+                     * If yes, delete the existing data from the rejected location
+                     * Write the current data into the rejected location
+                     *
+                     * If no, write the current data into the rejected location
+                     */
+//                    if (HFileOperations.exists(rejectedDatasetLocation)) {
+//                        logger.debug("Deleting existing rejected records");
+//                        HFileOperations.deleteEnt(rejectedDatasetLocation);
+//                    }
+
+                }
+
+                logger.debug("Writing rejected data to temp directory " + rejectedDatasetLocation
+                    + "temp");
+                writeRdd(rejectedRecords, this.rejectedDatasetLocation + "temp");
+
+
+                if (HFileOperations.exists(this.rejectedDatasetLocation)) {
+                    logger.debug("Deleting existing rejected records");
+                    HFileOperations.deleteEnt(this.rejectedDatasetLocation);
+                }
+
+                this.ctx.fs.rename(new Path(this.rejectedDatasetLocation + "temp"),
+                    new Path(this.rejectedDatasetLocation));
+            }
+        } catch (Exception exception) {
+            logger.error("Error occurred while writing rejected records");
+            logger.error(exception);
+
+            status = false;
+        }
+
+
+
+        return status;
     }
 
     private static List<Column> createFieldList(List<Field> fields){
@@ -519,5 +587,18 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                 return DataTypes.StringType;
 
         }
+    }
+}
+
+class TransformRDDWithDelimiter implements Function<Row, String> {
+    final char delimiter;
+
+    TransformRDDWithDelimiter(char delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    @Override
+    public String call(Row row) {
+        return row.mkString(String.valueOf(delimiter));
     }
 }
