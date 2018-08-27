@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import sncr.bda.base.MetadataBase;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.Component;
 
@@ -200,7 +200,7 @@ public class WorkbenchExecutionController {
       throws JsonProcessingException, Exception {
     log.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
-    String catalog = queryMap.get("catalog");
+    String catalog = queryMap.get("catalog")!=null ? queryMap.get("catalog") : MetadataBase.DEFAULT_CATALOG ;
     String body = workbenchExecutionService.createDatasetDirectory(project, catalog, name);
     /*
      * If preview was not found, response to indicate that preview has not been created yet
