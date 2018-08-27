@@ -1,0 +1,26 @@
+{
+  "DEV1": {
+    "dataProviderName1": {
+      "admin": {
+        "user": "dev1User1_1",
+        "role": "admin_1"
+      },
+      "user": {
+        "user": "dev1User2_2",
+        "role": "userOne_2"
+      }
+    }
+  },
+  "DEV2": {
+    "dataProviderName1": {
+      "admin": {
+        "user": "dev2User1_1",
+        "role": "admin_1"
+      },
+      "user": {
+        "user": "dev2User2_2",
+        "role": "userOne_2"
+      }
+    }
+  }
+}

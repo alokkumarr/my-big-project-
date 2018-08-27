@@ -88,6 +88,8 @@ const navigateToSubCategory = (categoryName, subCategoryName, defaultCategory) =
 };
 
 const createAnalysis = (metricName, analysisType) => {
+
+  commonFunctions.waitFor.elementToBeVisible(analyzePage.analysisElems.addAnalysisBtn);
   commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.addAnalysisBtn);
   analyzePage.analysisElems.addAnalysisBtn.click();
   let count = 0;
@@ -106,6 +108,7 @@ const clickOnMetricRadioAndOnAnalysisType = (metricName, analysisType, i) => {
   const newDialog = analyzePage.newDialog;
   const metricElement = newDialog.getMetricRadioButtonElementByName(metricName);
   const analysisTypeElement = newDialog.getAnalysisTypeButtonElementByType(analysisType);
+  commonFunctions.waitFor.elementToBeVisible(metricElement);
   commonFunctions.waitFor.elementToBeClickable(metricElement);
   metricElement.click();
 

@@ -78,6 +78,8 @@ const tempts = 10;
 const customerCode = 'SYNCHRONOSS';
 
 let token;
+let testData;
+let isRetry = false;
 
 exports.timeouts = {
   fluentWait: fluentWait,
@@ -93,6 +95,9 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
+  isRetry:isRetry,
+  failedData:{},
+  testData:webpackHelper.getTestData(),
   //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
@@ -169,17 +174,23 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'login.test.js'
+      testBaseDir + 'dev1.js',
+      testBaseDir + 'dev2.js',
     ]
   },
   onCleanUp: function (results) {
+    console.log('onLCeanup---results--->'+JSON.stringify(results))
+    isRetry = true;
+    //generate retyr dataset retry files
+    fs.readdirSync(appRoot+'/target')
     retry.onCleanUp(results);
   },
   onPrepare() {
     retry.onPrepare();
+
     // Generate test data
-    token = generate.token(browser.baseUrl);
-    generate.usersRolesPrivilegesCategories(token);
+    //token = generate.token(browser.baseUrl);
+    //generate.usersRolesPrivilegesCategories(token);
 
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
@@ -221,6 +232,7 @@ exports.config = {
       resultsDir: 'target/allure-results'
     }));
     jasmine.getEnv().afterEach(function(done){
+
       browser.takeScreenshot().then(function (png) {
         allure.createAttachment('Screenshot', function () {
           return new Buffer(png, 'base64')
@@ -229,12 +241,12 @@ exports.config = {
       })
     });
     //browser.driver.manage().window().maximize(); // disable for Mac OS
-    browser.get(browser.baseUrl);
-    return browser.wait(() => {
-      return browser.getCurrentUrl().then(url => {
-        return /login/.test(url);
-      });
-    }, pageResolveTimeout);
+    // browser.get(browser.baseUrl);
+    // return browser.wait(() => {
+    //   return browser.getCurrentUrl().then(url => {
+    //     return /login/.test(url);
+    //   });
+    // }, pageResolveTimeout);
   },
   beforeLaunch: function () {
     //clean up any residual/leftover from a previous run. Ensure we have clean
