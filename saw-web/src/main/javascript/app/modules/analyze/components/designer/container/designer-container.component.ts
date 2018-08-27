@@ -715,12 +715,6 @@ export class DesignerContainerComponent {
         return false;
       }
     });
-
-    //If there are more than one tables considered for generating reports then a join between them is mandatory. 
-    if (this.analysis.type === 'report') {
-      const sqlBuilder = get(this.analysis, 'sqlBuilder') || {};
-      atLeastOneIsChecked = sqlBuilder.dataFields.length > 1 && isEmpty(sqlBuilder.joins) ? false : true;
-    }
     return atLeastOneIsChecked;
   }
 
