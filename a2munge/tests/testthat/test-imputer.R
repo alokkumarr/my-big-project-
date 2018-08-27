@@ -49,7 +49,7 @@ sc <- spark_connect(master = "local")
 
 
 
-dat <- sim_data(10, 10, 1, seed = 319) %>%
+dat <- sim_data(1000, 10, 1, seed = 319) %>%
   mutate(index = row_number())
 
 dat <- dat %>%
@@ -143,12 +143,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp), colnames(r_imp))
 })
@@ -187,12 +187,12 @@ test_that("imputer mode methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_mode %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_mode), colnames(r_imp_mode))
 })
@@ -222,12 +222,12 @@ test_that("imputer constant value replace methods consistent", {
       arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_const %>%
       arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
 
   expect_equal(colnames(spk_imp_const), colnames(r_imp_const))
@@ -293,12 +293,12 @@ test_that("imputer mean methods consistent", {
       arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_no_measure %>%
       arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_no_measure), colnames(r_imp_no_measure))
 })
@@ -318,19 +318,19 @@ r_mode_no_measure <- dat %>%
 
 # Compare both spark and R data set with mode function --------------------
 
-test_that("imputer mean methods consistent", {
+test_that("imputer mode methods consistent", {
   expect_equal(
     spk_mode_no_measure %>%
       collect() %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_mode_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_mode_no_measure),
                colnames(r_mode_no_measure))
@@ -358,12 +358,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_const_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_const_no_measure),
                colnames(r_const_no_measure))
@@ -402,12 +402,12 @@ test_that("imputer mean with group-by methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_ungroup_mean %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_ungroup_mean),
                colnames(r_imp_ungroup_mean))
@@ -447,12 +447,12 @@ test_that("imputer mean with group-by methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_ungroup_mode %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_ungroup_mode),
                colnames(r_imp_ungroup_mode))
@@ -494,12 +494,12 @@ test_that("imputer mean with group-by methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_ungroup_const %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_ungroup_const),
                colnames(r_imp_ungroup_const))
@@ -558,12 +558,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_mean %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_mean), colnames(r_imp_mean))
 })
@@ -592,12 +592,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_mean_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_mean_no_measure),
                colnames(r_imp_mean_no_measure))
@@ -626,12 +626,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_mean %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_mean), colnames(r_imp_mean))
 })
@@ -660,12 +660,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-       round(5) ,
+       round(3) ,
     r_imp_mode_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_mode_no_measure),
                colnames(r_imp_mode_no_measure))
@@ -695,12 +695,12 @@ test_that("imputer mean methods consistent", {
       arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_constant %>%
       arrange(index) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_constant), colnames(r_imp_constant))
 })
@@ -728,12 +728,12 @@ test_that("imputer mean methods consistent", {
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5) ,
+      round(3) ,
     r_imp_const_no_measure %>%
       arrange(id, date, cat1, cat2) %>%
       select_if(is.numeric) %>%
       as.data.frame() %>%
-      round(5)
+      round(3)
   )
   expect_equal(colnames(spk_imp_const_no_measure),
                colnames(r_imp_const_no_measure))

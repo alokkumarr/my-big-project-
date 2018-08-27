@@ -5,16 +5,18 @@
 \title{Auto Forecaster Function}
 \usage{
 auto_forecaster(df, target, index_var, periods, unit = NULL, pipe = NULL,
-  models = list(list(method = "auto.arima", method_args = list()), list(method
-  = "ets", method_args = list())), splits = c(0.8, 0.2), conf_levels = c(80,
-  95))
+  models = list(list(method = "auto.arima"), list(method = "ets")),
+  splits = c(0.8, 0.2), conf_levels = c(80, 95),
+  execution_strategy = "sequential")
 }
 \arguments{
-\item{df}{dataframe}
+\item{df}{dataframe with target variable and any potential predictors}
 
-\item{target}{numeric variable to model and forecast}
+\item{target}{target variable for supervised use cases such as forecaster,
+regressor, and classifier}
 
-\item{index_var}{index variable}
+\item{index_var}{column name of index variable. index variable should be
+either sequential numeric, date or datetime.}
 
 \item{periods}{number of periods to forecast}
 
@@ -22,12 +24,16 @@ auto_forecaster(df, target, index_var, periods, unit = NULL, pipe = NULL,
 
 \item{pipe}{pipeline object}
 
-\item{models}{nested list of models. each model list should have a method and
-list of arguments}
+\item{models}{nested list of arguments to pass to add_model function. Each
+element in list requires at least a method argument. Pipe argument made
+globally}
 
 \item{splits}{holdout splits ratios default is 80-20 train to validation}
 
 \item{conf_levels}{forecast confidence levels. default is 80 and 90 percent}
+
+\item{execution_strategy}{name of evaluation function to use for resolving a
+future. Used for model training execution. default is sequential}
 }
 \value{
 predictions object
@@ -53,8 +59,8 @@ af1 <- auto_forecaster(dat1,
                        periods = 10,
                        unit = NULL,
                        models = list(
-                                     list(method = "auto.arima", method_args = list()),
-                                     list(method = "ets", method_args = list())
+                                     list(method = "auto.arima"),
+                                     list(method = "ets")
                                      )
   )
 }

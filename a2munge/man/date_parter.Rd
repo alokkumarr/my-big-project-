@@ -6,12 +6,12 @@
 \alias{date_parter.tbl_spark}
 \title{Dataframe Date Parter Funtion}
 \usage{
-date_parter(df, measure_vars, label, abbr)
+date_parter(df, measure_vars, label, abbr, ...)
 
 \method{date_parter}{data.frame}(df, measure_vars, label = FALSE,
-  abbr = FALSE)
+  abbr = FALSE, ...)
 
-\method{date_parter}{tbl_spark}(df, measure_vars)
+\method{date_parter}{tbl_spark}(df, measure_vars, ...)
 }
 \arguments{
 \item{df}{data.frame}
@@ -23,6 +23,8 @@ be more than 1 column}
 default is FALSE}
 
 \item{abbr}{logical option to use abbreviate labels. default is FALSE}
+
+\item{...}{not currently implemented}
 }
 \value{
 data.frame

@@ -1,4 +1,17 @@
 {
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "analyzer_custom": {
+          "type": "custom",
+          "filter": [
+            "lowercase"
+          ],
+          "tokenizer": "keyword"
+        }
+      }
+    }
+  },
   "mappings" : {
     "sample" : {
       "dynamic_date_formats" : [
@@ -49,6 +62,10 @@
             "keyword" : {
               "type" : "keyword",
               "ignore_above" : 256
+            },
+            "filter" : {
+              "type": "text",
+              "analyzer": "analyzer_custom"
             }
           }
         }

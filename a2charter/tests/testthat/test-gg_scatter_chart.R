@@ -6,7 +6,7 @@ library(testthat)
 library(a2charter)
 library(dplyr)
 library(checkmate)
-library(proto)
+library(ggplot2)
 
 context("scatter_chart unit tests")
 
@@ -19,8 +19,8 @@ test_that("Basic Scatter Chart Unit Tests", {
   
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomPoint")
-  expect_equal(as.character(p1$mapping$x), "wt")
-  expect_equal(as.character(p1$mapping$y), "mpg")
+  expect_equal(as.character(p1$mapping$x)[2], "wt")
+  expect_equal(as.character(p1$mapping$y)[2], "mpg")
   expect_null(p1$mapping$color)
   expect_equal(p1$layers[[1]]$aes_params$colour, "grey25")
   expect_equal(p1$plot_env$title, "test")
@@ -43,8 +43,10 @@ test_that("Scatter Smoother Option Unit Tests", {
 
 
 test_that("Scatter Grouping Options Unit Tests", {
-  p2 <- gg_scatter_chart(dat, "wt", "mpg", color = "am", points = FALSE, smoother = TRUE, smooth_ci = FALSE)
-  expect_equal(as.character(p2$mapping$colour), "am")
+  p2 <- gg_scatter_chart(dat, "wt", "mpg",
+                         color = "am", points = FALSE,
+                         smoother = TRUE, smooth_ci = FALSE)
+  expect_equal(as.character(p2$mapping$colour)[2], "am")
 
 })
 

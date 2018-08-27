@@ -280,7 +280,8 @@
       "properties": {
         "destinationIndexName": {
           "description": "Index to which the data has to be loaded",
-          "type": "string"
+          "type": "string",
+          "required": true
         },
         "indexMappingfile": {
           "description": "Name of the file with index mapping (definition), optional",
@@ -288,7 +289,7 @@
           "required": false
         },
         "documentIDField": {
-          "description": "",
+          "description": "ES mapping id for the document. This data will be used for _id value",
           "type": "string",
           "required": false
         },
@@ -318,8 +319,12 @@
           }
         },
         "esNodes": {
-          "description": "Comma separated list of host names or IP addresses",
-          "type": "string"
+          "description": "List of host names or IP addresses",
+          "type": "array",
+          "required": true,
+          "items": {
+            "type": "string"
+          }
         },
         "esClusterName": {
           "description": "Name of the ElasticSearch cluster. By default, the cluster name will be elasticsearch",
@@ -335,11 +340,13 @@
         },
         "esUser": {
           "description": "User name for ElasticSearch",
-          "type": "string"
+          "type": "string",
+          "required": false
         },
         "esPass": {
           "description": "Password for the username mentioned for the ElasticSearch",
-          "type": "string"
+          "type": "string",
+          "required": false
         }
       }
     },
