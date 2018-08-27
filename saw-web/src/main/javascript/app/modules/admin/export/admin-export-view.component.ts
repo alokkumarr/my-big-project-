@@ -118,6 +118,8 @@ export class AdminExportViewComponent {
     if (index >= 0) {
       this.selectedMetrics.splice(index, 1);
       this.loadAnalyses();
+      this.metricCtrl.setValue(null);
+      this.metricInput.nativeElement.value = '';
     }
   }
 
