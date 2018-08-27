@@ -2,10 +2,9 @@ const path = require('path');
 var appRoot = require('app-root-path');
 var fs = require('fs');
 var convert = require('xml-js');
-const FileHound = require('filehound');
 
-var processedFiles = [];
 var subset={};
+var processedFiles = [];
 
 /* Return true if end-to-end tests are run against distribution
  * package built with Maven and deployed to a local Docker container
@@ -20,8 +19,9 @@ function distRun() {
 function readAllFiles(dir, extension) {
   const dirCont = fs.readdirSync( dir );
   const files = dirCont.filter( ( elm ) => /.*\.(xml)/gi.test(elm) );
+  // create processed file json
+  
   let mainTestData = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
-
   files.forEach(function(file) {
 
     let fileDataXlml = fs.readFileSync(dir+'/'+file,'utf8');
@@ -33,7 +33,6 @@ function readAllFiles(dir, extension) {
       if(testCase._attributes.status.toLocaleLowerCase() ==='failed') {
         // add them to retry tests
         let testMetaData = JSON.parse(testCase.name._text.split('testDataMetaInfo: ')[1]);
-        let mainTestData = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
 
         if(! subset[testMetaData['feature']]) {
           subset[testMetaData['feature']] = {}
@@ -44,10 +43,9 @@ function readAllFiles(dir, extension) {
         subset[testMetaData['feature']][testMetaData['dp']][testMetaData['test']] = mainTestData[testMetaData['feature']][testMetaData['dp']][testMetaData['test']];
       }
     });
-
-    console.log('failed_json----'+JSON.stringify(subset))
-
   })
+  console.log('failed_json----'+JSON.stringify(subset));
+  console.log('processed file----'+JSON.stringify(processedFiles));
 }
 
 function fromDir(startPath,filter){
