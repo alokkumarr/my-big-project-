@@ -169,6 +169,12 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     const elem = this.downloadContainer.nativeElement.getElementsByTagName(
       'gridster'
     )[0];
+
+    /* Set overflow to visible manually to fix safari's bug. Without this,
+     * safari downloads a blank image */
+    const overflow = elem.style.overflow;
+    elem.style.overflow = 'visible';
+
     html2pdf()
       .from(elem)
       .set({
@@ -191,7 +197,10 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       })
       // .save(); // comment this and uncomment following lines if png is needed instead of pdf
       .outputImg('datauristring')
-      .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri));
+      .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri))
+      .then(() => {
+        elem.style.overflow = overflow;
+      });
   }
 
   editDashboard(): void {

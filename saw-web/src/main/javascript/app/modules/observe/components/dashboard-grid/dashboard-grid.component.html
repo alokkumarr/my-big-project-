@@ -1,6 +1,4 @@
-<!-- Overflow: visible has been added inline to work with dashboard download in safari. -->
-<!-- The html2canvas plugin has trouble showing overflowed content without it. -->
-<gridster [ngStyle]="{'overflow': 'visible'}" [options]="options" #gridster class="dashboard-gridster">
+<gridster [options]="options" #gridster class="dashboard-gridster">
   <gridster-item [item]="item" *ngFor="let item of dashboard; index as idx" [ngClass]="item.kpi ? 'cell-kpi' : 'cell-analysis'">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <div class="backdrop" *ngIf="!isViewMode()">
