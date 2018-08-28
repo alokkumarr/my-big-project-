@@ -8,13 +8,13 @@ module.exports = {
     loginBtn: element(by.buttonText('Login')),
     invalidErr: element(by.css('.err-msg')),
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
+    btnSelector: element(by.css('[e2e="account-settings-menu-btn"]')),
     optionSelector: `button[e2e="account-settings-selector-logout"]`
   },
 
   // Wait after login is provided to prevent elements manipulation when page is not ready yet
   userLogin(user, password) {
-    console.log('user---->'+user)
+    console.log('user---->' + user);
     const userElem = this.loginElements.userNameField;
     const passwordElem = this.loginElements.passwordField;
     const loginElem = this.loginElements.loginBtn;

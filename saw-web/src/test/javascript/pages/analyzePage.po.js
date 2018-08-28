@@ -186,7 +186,7 @@ const doAccountAction = action => {
   browser.ignoreSynchronization = true
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
+    btnSelector: element(by.css('[e2e="account-settings-menu-btn"]')),
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.wait(() => {
@@ -329,7 +329,7 @@ module.exports = {
     filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
     selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
     cancleFilterPrompt: element(by.css(`button[e2e="designer-dialog-cancel"]`))
-    
+
   },
   listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 

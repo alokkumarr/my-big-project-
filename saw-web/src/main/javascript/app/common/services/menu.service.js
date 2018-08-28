@@ -68,6 +68,8 @@ export class MenuService {
 
         /* Since there are no subcategories in observe, don't add them if they're there */
         obj.children = map(feature.productModuleSubFeatures, subfeature => {
+          // Workbench uses defaultURL attribute value to navigate from side nav.
+          // 'WRK000001' is the module code for workbench.
           const url =
             subfeature.prodModCode === 'WRK000001' ?
               `#!/${moduleName.toLowerCase()}${subfeature.defaultURL}` :
