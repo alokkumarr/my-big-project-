@@ -138,7 +138,6 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation + " with format " + outputFormat);
 
-        //TODO: Extract the rejected dataset path and format here - Sunil
         Map<String, Object> rejDs = getRejectDatasetDetails();
 
         logger.debug("Rejected dataset details = " + rejDs);
@@ -288,7 +287,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         JavaRDD<Row> outputRdd = getOutputData(parsedRdd);
         Dataset<Row> outputDataset = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
-        logger.debug("Output dataset = " + outputDataset.count() );
+
         boolean status = writeDataset(outputDataset, outputFormat, tempDir);
 
         if (!status) {
@@ -419,7 +418,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     }
 
     private boolean writeRdd(JavaRDD rdd, String path) {
-        if (rdd != null && path != null && rdd.count() != 0) {
+        if (rdd != null && path != null && !rdd.isEmpty()) {
             logger.debug("Writing data to location " + path);
             rdd.coalesce(1).saveAsTextFile(path);
         } else {
@@ -453,7 +452,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
                             .sparkContext()
                             .textFile(rejectedDatasetLocation, 1).toJavaRDD();
 
-                        if (existingData != null || existingData.count() != 0) {
+                        if (existingData != null && !existingData.isEmpty()) {
                             rejectedRecords = existingData.union(rejectedRecords);
                         }
                     }
