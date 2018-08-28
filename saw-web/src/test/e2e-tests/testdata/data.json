@@ -1,37 +1,171 @@
 {
-  "DEV1": {
-    "dataProviderName1": {
+  "LOGIN": {
+    "loginDataProvider": {
       "admin": {
-        "user": "dev1User1_1",
-        "role": "admin_1"
+        "user": "admin",
+        "role": "admin"
       },
       "user": {
-        "user": "dev1User2_2",
-        "role": "userOne_2"
+        "user": "userOne",
+        "role": "userOne"
       }
     }
   },
-  "DEV2": {
-    "dataProviderName1": {
-      "admin": {
-        "user": "dev2User1_1",
-        "role": "admin_1"
+  "PRIVILEGES": {
+    "privilegeDataProvider": {
+      "AllPrivilegesForUser": {
+        "user": "userOne",
+        "subCategory": "all",
+        "cardOptions": true,
+        "viewOptions": true,
+        "create": true,
+        "edit": true,
+        "fork": true,
+        "publish": true,
+        "schedule": true,
+        "execute": true,
+        "export": true,
+        "delete": true
       },
-      "user": {
-        "user": "dev2User2_2",
-        "role": "userOne_2"
-      }
-    }
-  },
-  "DEV3": {
-    "dataProviderName1": {
-      "admin": {
-        "user": "dev3User1_1",
-        "role": "admin_1"
+      "CreatePrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "create",
+        "cardOptions": false,
+        "viewOptions": false,
+        "create": true,
+        "edit": false,
+        "fork": false,
+        "publish": false,
+        "schedule": false,
+        "execute": false,
+        "export": false,
+        "delete": false
       },
-      "user": {
-        "user": "dev3User2_2",
-        "role": "userOne_2"
+      "EditPrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "edit",
+        "cardOptions": true,
+        "viewOptions": false,
+        "create": false,
+        "edit": true,
+        "fork": false,
+        "publish": false,
+        "schedule": false,
+        "execute": false,
+        "export": false,
+        "delete": false
+      },
+      "ForkPrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "fork",
+        "cardOptions": false,
+        "viewOptions": false,
+        "create": false,
+        "edit": false,
+        "fork": true,
+        "publish": false,
+        "schedule": false,
+        "execute": false,
+        "export": false,
+        "delete": false
+      },
+      "PublishPrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "publish",
+        "cardOptions": true,
+        "viewOptions": true,
+        "create": false,
+        "edit": false,
+        "fork": false,
+        "publish": true,
+        "schedule": true,
+        "execute": false,
+        "export": false,
+        "delete": false
+      },
+      "ExecutePrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "execute",
+        "cardOptions": true,
+        "viewOptions": true,
+        "create": false,
+        "edit": false,
+        "fork": false,
+        "publish": false,
+        "schedule": false,
+        "execute": true,
+        "export": false,
+        "delete": false
+      },
+      "ExportPrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "export",
+        "cardOptions": false,
+        "viewOptions": true,
+        "create": false,
+        "edit": false,
+        "fork": false,
+        "publish": false,
+        "schedule": false,
+        "execute": false,
+        "export": true,
+        "delete": false
+      },
+      "DeletePrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "delete",
+        "cardOptions": true,
+        "viewOptions": true,
+        "create": false,
+        "edit": false,
+        "fork": false,
+        "publish": false,
+        "schedule": false,
+        "execute": false,
+        "export": false,
+        "delete": true
+      },
+      "ViewPrivilegeForUser": {
+        "user": "userOne",
+        "subCategory": "view",
+        "cardOptions": false,
+        "viewOptions": false,
+        "create": false,
+        "edit": false,
+        "fork": false,
+        "publish": false,
+        "schedule": false,
+        "execute": false,
+        "export": false,
+        "delete": false
+      },
+      "MultiplePrivilegesForUser": {
+        "user": "userOne",
+        "subCategory": "multiple",
+        "cardOptions": true,
+        "viewOptions": true,
+        "create": true,
+        "edit": false,
+        "fork": true,
+        "publish": true,
+        "schedule": true,
+        "execute": false,
+        "export": false,
+        "delete": false
+      },
+      "AllPrivilegesForAdmin": {
+        "user": "admin",
+        "subCategory": "all",
+        "cardOptions": true,
+        "viewOptions": true,
+        "create": true,
+        "edit": true,
+        "fork": true,
+        "publish": true,
+        "schedule": true,
+        "execute": true,
+        "export": true,
+        "delete": true
       }
     }
   }

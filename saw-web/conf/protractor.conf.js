@@ -112,7 +112,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless', // start on background
+        //'--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -176,25 +176,22 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'dev1.js',
-      testBaseDir + 'dev2.js',
-      testBaseDir + 'dev3.js',
+      //testBaseDir + 'login.test.js',
+      testBaseDir + 'priviliges.test.js'
+      // testBaseDir + 'dev2.js',
+      // testBaseDir + 'dev3.js',
     ]
   },
   onCleanUp: function (results) {
-    console.log('onLCeanup---results--->'+JSON.stringify(results))
-    isRetry = true;
-    //generate retry data set retry files
-    webpackHelper.readAllFiles(appRoot+'/target/allure-results','xml');
-
+    webpackHelper.generatefailedTests(appRoot+'/target/allure-results');
     retry.onCleanUp(results);
   },
   onPrepare() {
     retry.onPrepare();
 
     // Generate test data
-    //token = generate.token(browser.baseUrl);
-    //generate.usersRolesPrivilegesCategories(token);
+    token = generate.token(browser.baseUrl);
+    generate.usersRolesPrivilegesCategories(token);
 
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
@@ -235,32 +232,17 @@ exports.config = {
     jasmine.getEnv().addReporter(new AllureReporter({
       resultsDir: 'target/allure-results'
     }));
-    jasmine.getEnv().afterEach(function(done){
 
-      browser.takeScreenshot().then(function (png) {
-        allure.createAttachment('Screenshot', function () {
-          return new Buffer(png, 'base64')
-        }, 'image/png')();
-        done();
-      })
-    });
     //browser.driver.manage().window().maximize(); // disable for Mac OS
-    // browser.get(browser.baseUrl);
-    // return browser.wait(() => {
-    //   return browser.getCurrentUrl().then(url => {
-    //     return /login/.test(url);
-    //   });
-    // }, pageResolveTimeout);
+    browser.get(browser.baseUrl);
+    return browser.wait(() => {
+      return browser.getCurrentUrl().then(url => {
+        return /login/.test(url);
+      });
+    }, pageResolveTimeout);
   },
   beforeLaunch: function () {
-    //clean up any residual/leftover from a previous run. Ensure we have clean
-    //files for both locking and merging.
-    if (fs.existsSync('target/jasmine-results.json.lock')) {
-      fs.unlinkSync('target/jasmine-results.json.lock');
-    }
-    if (fs.existsSync('target/jasmine-results.json')) {
-      fs.unlink('target/jasmine-results.json');
-    }
+
   },
   afterLaunch: function() {
     return retry.afterLaunch(maxRetryForFailedTests);

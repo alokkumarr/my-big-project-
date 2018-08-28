@@ -1,3 +1,4 @@
+var testDataReader = require('../e2e-tests/testdata/testDataReader.js');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const homePage = require('../javascript/pages/homePage.po.js');
@@ -20,282 +21,282 @@ const utils = require('../javascript/helpers/utils');
 describe('Privileges tests: privileges.test.js', () => {
   const categoryName = categories.privileges.name;
 
-  const dataProvider = {
-    //TODO change user hardcode name to users object
-    'All privileges for user': { // SAWQA-4834
-      user: 'userOne',
-      subCategory: subCategories.all.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: true,
-      edit: true,
-      fork: true,
-      publish: true,
-      schedule: true,
-      execute: true,
-      export: true,
-      delete: true
-    },
-    'Create privilege for user': { // SAWQA-4835
-      user: 'userOne',
-      subCategory: subCategories.create.name,
-      cardOptions: false,
-      viewOptions: false,
-      create: true,
-      edit: false,
-      fork: false,
-      publish: false,
-      schedule: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Edit privilege for user': {  // SAWQA-4836
-      user: 'userOne',
-      subCategory: subCategories.edit.name,
-      cardOptions: true,
-      viewOptions: false,
-      create: false,
-      edit: true,
-      fork: false,
-      publish: false,
-      schedule: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Fork privilege for user': { // SAWQA-4837
-      user: 'userOne',
-      subCategory: subCategories.fork.name,
-      cardOptions: false,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: true,
-      publish: false,
-      schedule: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Publish privilege for user': { // SAWQA-4838
-      user: 'userOne',
-      subCategory: subCategories.publish.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: true,
-      schedule: true,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Execute privilege for user': { // SAWQA-4839
-      user: 'userOne',
-      subCategory: subCategories.execute.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      schedule: false,
-      execute: true,
-      export: false,
-      delete: false
-    },
-    'Export privilege for user': { // SAWQA-4840
-      user: 'userOne',
-      subCategory: subCategories.export.name,
-      cardOptions: false,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      schedule: false,
-      execute: false,
-      export: true,
-      delete: false
-    },
-    'Delete privilege for user': { // SAWQA-4841
-      user: 'userOne',
-      subCategory: subCategories.delete.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      schedule: false,
-      execute: false,
-      export: false,
-      delete: true
-    },
-    'View privilege for user': { // SAWQA-4842
-      user: 'userOne',
-      subCategory: subCategories.view.name,
-      cardOptions: false,
-      viewOptions: false,
-      create: false,
-      edit: false,
-      fork: false,
-      publish: false,
-      schedule: false,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'Multiple privileges for user': { // SAWQA-4843
-      user: 'userOne',
-      subCategory: subCategories.multiple.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: true,
-      edit: false,
-      fork: true,
-      publish: true,
-      schedule: true,
-      execute: false,
-      export: false,
-      delete: false
-    },
-    'All privileges for admin': { // SAWQA-4844
-      user: 'admin',
-      subCategory: subCategories.all.name,
-      cardOptions: true,
-      viewOptions: true,
-      create: true,
-      edit: true,
-      fork: true,
-      publish: true,
-      schedule: true,
-      execute: true,
-      export: true,
-      delete: true
-    },
-
-    //Failing due to product bugs.
-    // 'Create privilege for admin': { // SAWQA-4845
-    //   user: 'admin',
-    //   subCategory: subCategories.create.name,
-    //   cardOptions: false,
-    //   viewOptions: false,
-    //   create: true,
-    //   edit: false,
-    //   fork: false,
-    //   publish: false,
-    //   execute: false,
-    //   export: false,
-    //   delete: false
-    // },
-    // 'Edit privilege for admin': {  // SAWQA-4846
-    //   user: 'admin',
-    //   subCategory: subCategories.edit.name,
-    //   cardOptions: true,
-    //   viewOptions: false,
-    //   create: false,
-    //   edit: true,
-    //   fork: false,
-    //   publish: false,
-    //   execute: false,
-    //   export: false,
-    //   delete: false
-    // },
-    // 'Fork privilege for admin': {  // SAWQA-4847
-    //   user: 'admin',
-    //   subCategory: subCategories.fork.name,
-    //   cardOptions: false,
-    //   viewOptions: false,
-    //   create: false,
-    //   edit: false,
-    //   fork: true,
-    //   publish: false,
-    //   execute: false,
-    //   export: false,
-    //   delete: false
-    // },
-    // 'Publish privilege for admin': { // SAWQA-4848
-    //   user: 'admin',
-    //   subCategory: subCategories.publish.name,
-    //   cardOptions: true,
-    //   viewOptions: false,
-    //   create: false,
-    //   edit: false,
-    //   fork: false,
-    //   publish: true,
-    //   execute: false,
-    //   export: false,
-    //   delete: false
-    // },
-    // 'Execute privilege for admin': { // SAWQA-4849
-    //   user: 'admin',
-    //   subCategory: subCategories.execute.name,
-    //   cardOptions: true,
-    //   viewOptions: true,
-    //   create: false,
-    //   edit: false,
-    //   fork: false,
-    //   publish: false,
-    //   execute: true,
-    //   export: false,
-    //   delete: false
-    // },
-    // 'Export privilege for admin': { // SAWQA-4850
-    //   user: 'admin',
-    //   subCategory: subCategories.export.name,
-    //   cardOptions: false,
-    //   viewOptions: true,
-    //   create: false,
-    //   edit: false,
-    //   fork: false,
-    //   publish: false,
-    //   execute: false,
-    //   export: true,
-    //   delete: false
-    // },
-    // 'Delete privilege for admin': { // SAWQA-4851
-    //   user: 'admin',
-    //   subCategory: subCategories.delete.name,
-    //   cardOptions: true,
-    //   viewOptions: true,
-    //   create: false,
-    //   edit: false,
-    //   fork: false,
-    //   publish: false,
-    //   execute: false,
-    //   export: false,
-    //   delete: true
-    // },
-    // 'View privilege for admin': { // SAWQA-4852
-    //   user: 'admin',
-    //   subCategory: subCategories.view.name,
-    //   cardOptions: false,
-    //   viewOptions: false,
-    //   create: false,
-    //   edit: false,
-    //   fork: false,
-    //   publish: false,
-    //   execute: false,
-    //   export: false,
-    //   delete: false
-    // },
-    // 'Multiple privileges for admin': { // SAWQA-4853
-    //   user: 'admin',
-    //   subCategory: subCategories.multiple.name,
-    //   cardOptions: true,
-    //   viewOptions: false,
-    //   create: true,
-    //   edit: false,
-    //   fork: true,
-    //   publish: true,
-    //   execute: false,
-    //   export: false,
-    //   delete: false
-    // }
-  };
+  // const dataProvider = {
+  //   //TODO change user hardcode name to users object
+  //   'All privileges for user': { // SAWQA-4834
+  //     user: 'userOne',
+  //     subCategory: subCategories.all.name,
+  //     cardOptions: true,
+  //     viewOptions: true,
+  //     create: true,
+  //     edit: true,
+  //     fork: true,
+  //     publish: true,
+  //     schedule: true,
+  //     execute: true,
+  //     export: true,
+  //     delete: true
+  //   },
+  //   'Create privilege for user': { // SAWQA-4835
+  //     user: 'userOne',
+  //     subCategory: subCategories.create.name,
+  //     cardOptions: false,
+  //     viewOptions: false,
+  //     create: true,
+  //     edit: false,
+  //     fork: false,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: false,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'Edit privilege for user': {  // SAWQA-4836
+  //     user: 'userOne',
+  //     subCategory: subCategories.edit.name,
+  //     cardOptions: true,
+  //     viewOptions: false,
+  //     create: false,
+  //     edit: true,
+  //     fork: false,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: false,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'Fork privilege for user': { // SAWQA-4837
+  //     user: 'userOne',
+  //     subCategory: subCategories.fork.name,
+  //     cardOptions: false,
+  //     viewOptions: false,
+  //     create: false,
+  //     edit: false,
+  //     fork: true,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: false,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'Publish privilege for user': { // SAWQA-4838
+  //     user: 'userOne',
+  //     subCategory: subCategories.publish.name,
+  //     cardOptions: true,
+  //     viewOptions: true,
+  //     create: false,
+  //     edit: false,
+  //     fork: false,
+  //     publish: true,
+  //     schedule: true,
+  //     execute: false,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'Execute privilege for user': { // SAWQA-4839
+  //     user: 'userOne',
+  //     subCategory: subCategories.execute.name,
+  //     cardOptions: true,
+  //     viewOptions: true,
+  //     create: false,
+  //     edit: false,
+  //     fork: false,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: true,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'Export privilege for user': { // SAWQA-4840
+  //     user: 'userOne',
+  //     subCategory: subCategories.export.name,
+  //     cardOptions: false,
+  //     viewOptions: true,
+  //     create: false,
+  //     edit: false,
+  //     fork: false,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: false,
+  //     export: true,
+  //     delete: false
+  //   },
+  //   'Delete privilege for user': { // SAWQA-4841
+  //     user: 'userOne',
+  //     subCategory: subCategories.delete.name,
+  //     cardOptions: true,
+  //     viewOptions: true,
+  //     create: false,
+  //     edit: false,
+  //     fork: false,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: false,
+  //     export: false,
+  //     delete: true
+  //   },
+  //   'View privilege for user': { // SAWQA-4842
+  //     user: 'userOne',
+  //     subCategory: subCategories.view.name,
+  //     cardOptions: false,
+  //     viewOptions: false,
+  //     create: false,
+  //     edit: false,
+  //     fork: false,
+  //     publish: false,
+  //     schedule: false,
+  //     execute: false,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'Multiple privileges for user': { // SAWQA-4843
+  //     user: 'userOne',
+  //     subCategory: subCategories.multiple.name,
+  //     cardOptions: true,
+  //     viewOptions: true,
+  //     create: true,
+  //     edit: false,
+  //     fork: true,
+  //     publish: true,
+  //     schedule: true,
+  //     execute: false,
+  //     export: false,
+  //     delete: false
+  //   },
+  //   'All privileges for admin': { // SAWQA-4844
+  //     user: 'admin',
+  //     subCategory: subCategories.all.name,
+  //     cardOptions: true,
+  //     viewOptions: true,
+  //     create: true,
+  //     edit: true,
+  //     fork: true,
+  //     publish: true,
+  //     schedule: true,
+  //     execute: true,
+  //     export: true,
+  //     delete: true
+  //   },
+  //
+  //   //Failing due to product bugs.
+  //   // 'Create privilege for admin': { // SAWQA-4845
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.create.name,
+  //   //   cardOptions: false,
+  //   //   viewOptions: false,
+  //   //   create: true,
+  //   //   edit: false,
+  //   //   fork: false,
+  //   //   publish: false,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: false
+  //   // },
+  //   // 'Edit privilege for admin': {  // SAWQA-4846
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.edit.name,
+  //   //   cardOptions: true,
+  //   //   viewOptions: false,
+  //   //   create: false,
+  //   //   edit: true,
+  //   //   fork: false,
+  //   //   publish: false,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: false
+  //   // },
+  //   // 'Fork privilege for admin': {  // SAWQA-4847
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.fork.name,
+  //   //   cardOptions: false,
+  //   //   viewOptions: false,
+  //   //   create: false,
+  //   //   edit: false,
+  //   //   fork: true,
+  //   //   publish: false,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: false
+  //   // },
+  //   // 'Publish privilege for admin': { // SAWQA-4848
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.publish.name,
+  //   //   cardOptions: true,
+  //   //   viewOptions: false,
+  //   //   create: false,
+  //   //   edit: false,
+  //   //   fork: false,
+  //   //   publish: true,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: false
+  //   // },
+  //   // 'Execute privilege for admin': { // SAWQA-4849
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.execute.name,
+  //   //   cardOptions: true,
+  //   //   viewOptions: true,
+  //   //   create: false,
+  //   //   edit: false,
+  //   //   fork: false,
+  //   //   publish: false,
+  //   //   execute: true,
+  //   //   export: false,
+  //   //   delete: false
+  //   // },
+  //   // 'Export privilege for admin': { // SAWQA-4850
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.export.name,
+  //   //   cardOptions: false,
+  //   //   viewOptions: true,
+  //   //   create: false,
+  //   //   edit: false,
+  //   //   fork: false,
+  //   //   publish: false,
+  //   //   execute: false,
+  //   //   export: true,
+  //   //   delete: false
+  //   // },
+  //   // 'Delete privilege for admin': { // SAWQA-4851
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.delete.name,
+  //   //   cardOptions: true,
+  //   //   viewOptions: true,
+  //   //   create: false,
+  //   //   edit: false,
+  //   //   fork: false,
+  //   //   publish: false,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: true
+  //   // },
+  //   // 'View privilege for admin': { // SAWQA-4852
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.view.name,
+  //   //   cardOptions: false,
+  //   //   viewOptions: false,
+  //   //   create: false,
+  //   //   edit: false,
+  //   //   fork: false,
+  //   //   publish: false,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: false
+  //   // },
+  //   // 'Multiple privileges for admin': { // SAWQA-4853
+  //   //   user: 'admin',
+  //   //   subCategory: subCategories.multiple.name,
+  //   //   cardOptions: true,
+  //   //   viewOptions: false,
+  //   //   create: true,
+  //   //   edit: false,
+  //   //   fork: true,
+  //   //   publish: true,
+  //   //   execute: false,
+  //   //   export: false,
+  //   //   delete: false
+  //   // }
+  // };
 
   beforeAll(function () {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
@@ -303,24 +304,22 @@ describe('Privileges tests: privileges.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
   });
 
-  using(dataProvider, function (data, description) {
-    it('should check ' + description, () => {
+  using(testDataReader.testData['PRIVILEGES']['privilegeDataProvider'], function (data, description) {
+    it('should check ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'PRIVILEGES', dp:'privilegeDataProvider'}), () => {
 
         loginPage.loginAs(data.user);
         navigateToDefaultSubCategory();
@@ -400,7 +399,7 @@ describe('Privileges tests: privileges.test.js', () => {
               "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
           }
         }));
-      
+
       //This is not applicable after new change... when we introduced schedule button
       //  element(executedAnalysis.publishBtn.isPresent().then(function(isPresent) {
       //    if(isPresent) {
@@ -508,9 +507,9 @@ describe('Privileges tests: privileges.test.js', () => {
       commonFunctions.waitFor.elementToBeClickable(homePage.collapsedCategoryUpdated(categoryName));
       homePage.collapsedCategoryUpdated(categoryName).click();
       browser.sleep(500);
-      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(data.subCategory));
-      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(data.subCategory));
-      homePage.subCategory(data.subCategory).click();
+      commonFunctions.waitFor.elementToBeVisible(homePage.subCategory(subCategories[data.subCategory].name));
+      commonFunctions.waitFor.elementToBeClickable(homePage.subCategory(subCategories[data.subCategory].name));
+      homePage.subCategory(subCategories[data.subCategory].name).click();
       browser.sleep(500);
       //const doesDataNeedRefreshing = utils.hasClass(homePage.subCategory(data.subCategory), 'activeButton');
       //expect(doesDataNeedRefreshing).toBeTruthy();

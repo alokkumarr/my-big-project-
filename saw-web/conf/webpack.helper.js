@@ -16,13 +16,55 @@ function distRun() {
 }
 
 
-function readAllFiles(dir, extension) {
+function generatefailedTests(dir) {
+
+  if (!fs.existsSync(appRoot+'/target/testData')){
+    fs.mkdirSync(appRoot+'/target/testData');
+  }
+
+  if (!fs.existsSync(appRoot+'/target/testData/processed')){
+    fs.mkdirSync(appRoot+'/target/testData/processed');
+  }
+  if (!fs.existsSync(appRoot+'/target/testData/failed')){
+    fs.mkdirSync(appRoot+'/target/testData/failed');
+  }
+
   const dirCont = fs.readdirSync( dir );
   const files = dirCont.filter( ( elm ) => /.*\.(xml)/gi.test(elm) );
+  let filesToProcess= [];
   // create processed file json
-  
+  if (fs.existsSync(appRoot+'/target/testData/processed/processedFiles.json')) {
+    // Get all the files matching to json file
+    const processedDirCount = fs.readdirSync( appRoot+'/target/testData/processed' );
+    const oldProcessedFiles = processedDirCount.filter( ( elm ) => /.*\.(json)/gi.test(elm) );
+    // Get new files to process
+    let oldProcessedXmlFiles = [];
+    oldProcessedFiles.forEach(function(oldProcessedFile) {
+      oldProcessedXmlFiles.push(JSON.parse(fs.readFileSync(appRoot+'/target/testData/processed/'+oldProcessedFile,'utf8')));
+
+    });
+
+    files.forEach(function(file) {
+      if(!oldProcessedXmlFiles.includes(file)) {
+        filesToProcess.push(file);
+      }
+    });
+
+    let oldProcessedFile = 'processedFiles'+new Date().getTime()+'.json';
+    fs.writeFileSync(appRoot+'/target/testData/processed/'+oldProcessedFile, JSON.stringify(oldProcessedXmlFiles), { encoding: 'utf8' });
+
+    // Create new file which is actual failed tests
+    fs.writeFileSync(appRoot+'/target/testData/processed/processedFiles.json', JSON.stringify(filesToProcess), { encoding: 'utf8' });
+
+  } else {
+    filesToProcess = files;
+    // write processedFiles
+    fs.writeFileSync(appRoot+'/target/testData/processed/processedFiles.json', JSON.stringify(files), { encoding: 'utf8' });
+  }
+
   let mainTestData = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
-  files.forEach(function(file) {
+
+  filesToProcess.forEach(function(file) {
 
     let fileDataXlml = fs.readFileSync(dir+'/'+file,'utf8');
     let fileDataJson = JSON.parse(convert.xml2json(fileDataXlml, {compact: true, spaces: 4}));
@@ -43,61 +85,36 @@ function readAllFiles(dir, extension) {
         subset[testMetaData['feature']][testMetaData['dp']][testMetaData['test']] = mainTestData[testMetaData['feature']][testMetaData['dp']][testMetaData['test']];
       }
     });
-  })
-  console.log('failed_json----'+JSON.stringify(subset));
-  console.log('processed file----'+JSON.stringify(processedFiles));
-}
+  });
 
-function fromDir(startPath,filter){
-  if (!fs.existsSync(startPath)){
-    console.log("no dir ",startPath);
-    return;
+  if (fs.existsSync(appRoot+'/target/testData/failed/failedTests.json')) {
+
+    // Get all the files matching to json file
+    const failedDirCount = fs.readdirSync( appRoot+'/target/testData/failed' );
+    const oldFailedTests = failedDirCount.filter( ( elm ) => /.*\.(json)/gi.test(elm) );
+
+    let oldFailedJsonData = [];
+    oldFailedTests.forEach(function(oldFailedTest) {
+      oldFailedJsonData.push(JSON.parse(fs.readFileSync(appRoot+'/target/testData/failed/'+oldFailedTest,'utf8')));
+
+    });
+
+    let oldFailedFile = 'failedTests'+new Date().getTime()+'.json';
+    fs.writeFileSync(appRoot+'/target/testData/failed/'+oldFailedFile, JSON.stringify(oldFailedJsonData), { encoding: 'utf8' });
+
+    // Create new file which is actual failed tests
+    fs.writeFileSync(appRoot+'/target/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
+
+  } else {
+    fs.writeFileSync(appRoot+'/target/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
   }
-
-  var files=fs.readdirSync(startPath);
-  for(var i=0;i<files.length;i++){
-    var filename=path.join(startPath,files[i]);
-    var stat = fs.lstatSync(filename);
-    if (stat.isDirectory()){
-      fromDir(filename,filter); //recurse
-    }
-    else if (filename.indexOf(filter)>=0) {
-      console.log('-- found: ',filename);
-      console.error('Now create 2 files ... 1 processedFiles and subset of test data of failed tests');
-      let fileDataXlml = fs.readFileSync(filename,'utf8');
-      let fileDataJson = JSON.parse(convert.xml2json(fileDataXlml, {compact: true, spaces: 4}));
-      let testCases = fileDataJson['ns2\:test-suite']['test-cases'];
-
-      testCases['test-case'].forEach(function(testCase) {
-
-        if(testCase._attributes.status.toLocaleLowerCase() ==='failed') {
-          // add them to retry tests
-          let testMetaData = JSON.parse(testCase.name._text.split('testDataMetaInfo: ')[1]);
-          let mainTestData = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
-
-          if(! subset[testMetaData['feature']]) {
-            subset[testMetaData['feature']] = {}
-          }
-          if(!subset[testMetaData['feature']][testMetaData['dp']]) {
-            subset[testMetaData['feature']][testMetaData['dp']] = {}
-          }
-          subset[testMetaData['feature']][testMetaData['dp']][testMetaData['test']] = mainTestData[testMetaData['feature']][testMetaData['dp']][testMetaData['test']];
-
-        }
-      });
-
-      //let mainTestData = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
-
-    };
-  };
-};
+}
 
 module.exports = {
   root: (...args) => {
     return path.join(process.cwd(), ...args);
   },
-  readAllFiles:readAllFiles,
-  fromDir:fromDir,
+  generatefailedTests:generatefailedTests,
   sortChunks: (chunks) => {
     return (a, b) => {
       const c = chunks.indexOf(a.names[0]);
@@ -107,22 +124,17 @@ module.exports = {
     };
   },
   getTestData: () => {
-    //check if it is retry or first run
-    // if (browser.suite) {
-    //   console.log('I am coming from suite....')
-    // }else {
-    //   console.log('I am coming from retry....')
-    // }
 
-      if(Object.keys(subset).length > 0) {
-        console.log('executing Failed--tests with data:  -->'+JSON.stringify(subset));
-        return subset;
+    if (fs.existsSync(appRoot+'/target/testData/failed/failedTests.json')) {
+      console.log('executing failed--tests');
+      let data = JSON.parse(fs.readFileSync(appRoot+'/target/testData/failed/failedTests.json','utf8'));
+      console.log('Failed test data---'+JSON.stringify(data));
+      return data;
     }else {
-      console.log('executing fresh--tests');
-        console.log('subset data:  -->'+JSON.stringify(subset));
-      let data = fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8');
-      console.log(JSON.stringify(JSON.parse(data)))
-      return JSON.parse(data);
+       console.log('executing fresh--tests');
+      let data = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
+      console.log('Fresh data--->'+JSON.stringify(data));
+      return data;
     }
 
   },
