@@ -2,9 +2,9 @@
 
 # Pipeline Uint Tests -----------------------------------------------------
 
+library(a2modeler)
 library(testthat)
 library(checkmate)
-library(a2modeler)
 library(sparklyr)
 library(dplyr)
 
@@ -43,7 +43,8 @@ s1 <- new_pipeline(
   output = NULL,
   desc = "Example pipeline",
   created_on = Sys.time(),
-  runtime = NULL
+  runtime = NULL,
+  uid = "pipe-test"
 )
 
 test_that("Pipeliner Constructer", {
@@ -77,7 +78,8 @@ s1_id <- new_pipeline(
   output = NULL,
   desc = "Example pipeline",
   created_on = Sys.time(),
-  runtime = NULL
+  runtime = NULL,
+  uid = "pipe-test"
 )
 
 test_that("Pipeliner Constructer with expression=identity", {

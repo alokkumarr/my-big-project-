@@ -8,6 +8,8 @@ import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
+import * as cloneDeep from 'lodash/cloneDeep';
+
 import {
   flattenPivotData,
   flattenChartData
@@ -209,6 +211,21 @@ export class DesignerContainerComponent {
         });
       });
       break;
+
+    case 'report':
+    forEach(artifacts, table=> {
+      table.columns = map(table.columns, column => {
+        forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+          forEach(fields.columns, field => {
+            if (field.columnName === column.columnName) {
+              column.checked = true;
+            }
+          })
+        })
+        return column;
+      })
+    })
+      break;
     }
     return artifacts;
   }
@@ -383,7 +400,7 @@ export class DesignerContainerComponent {
           const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
             requestExecution: shouldClose,
-            analysis: result.analysis
+            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis    
           });
           if (!shouldClose) {
             this.requestDataIfPossible();
@@ -448,11 +465,12 @@ export class DesignerContainerComponent {
       sortProp = 'sorts';
       break;
     case 'esReport':
-      partialSqlBuilder = this._designerService.getPartialEsReportSqlBuilder(this.artifacts[0].columns);
+      partialSqlBuilder = this._designerService.getPartialESReportSqlBuilder(this.artifacts[0].columns);
       sortProp = 'sorts';
       break;
     case 'report':
       partialSqlBuilder = {
+        dataFields: this._designerService.generateReportDataField(this.artifacts),
         joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
       };
       sortProp = 'orderByColumns';

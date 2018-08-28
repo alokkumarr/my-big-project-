@@ -280,7 +280,8 @@
       "properties": {
         "destinationIndexName": {
           "description": "Index to which the data has to be loaded",
-          "type": "string"
+          "type": "string",
+          "required": true
         },
         "indexMappingfile": {
           "description": "Name of the file with index mapping (definition), optional",
@@ -288,7 +289,7 @@
           "required": false
         },
         "documentIDField": {
-          "description": "",
+          "description": "ES mapping id for the document. This data will be used for _id value",
           "type": "string",
           "required": false
         },
@@ -339,11 +340,13 @@
         },
         "esUser": {
           "description": "User name for ElasticSearch",
-          "type": "string"
+          "type": "string",
+          "required": false
         },
         "esPass": {
           "description": "Password for the username mentioned for the ElasticSearch",
-          "type": "string"
+          "type": "string",
+          "required": false
         }
       }
     },

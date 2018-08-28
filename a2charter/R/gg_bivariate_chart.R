@@ -32,13 +32,15 @@
 #' @export
 #' @importFrom dplyr summarise
 #' @importFrom ggplot2 element_blank
+#' @importFrom gridExtra grid.arrange
 #'
 #' @examples
-#' Create a data set
+#' # Create a data set
 #' library(dplyr)
 #' d <- mtcars %>% mutate(am = as.factor(am), cyl = as.factor(cyl))
+#' 
 #' gg_bivariate_chart(d, x_variable='cyl', y_variable='am')
-#' gg_bivariate_chart(d, x_variable='mpg', y_variable='am', smooth_ci = F)
+#' gg_bivariate_chart(d, x_variable='mpg', y_variable='am', smooth_ci = FALSE)
 #' gg_bivariate_chart(d, x_variable='cyl', y_variable='mpg', width=0.2)
 #' gg_bivariate_chart(d, x_variable='mpg', y_variable='wt')
 gg_bivariate_chart <- function(df,
@@ -116,7 +118,7 @@ gg_bivariate_chart <- function(df,
       
       # convert to y_variable to numeric
       df <- df %>%
-        mutate(!!y_variable :=  as.numeric(as.factor(!!as.name(y_variable))) - 1)
+        dplyr::mutate(!!y_variable :=  as.numeric(as.factor(!!as.name(y_variable))) - 1)
     }
   } else{
     y_axis_title <- y_variable

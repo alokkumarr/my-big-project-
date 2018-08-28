@@ -6,7 +6,7 @@ library(testthat)
 library(a2charter)
 library(dplyr)
 library(checkmate)
-library(proto)
+library(ggplot2)
 
 context("barchart unit tests")
 
@@ -20,7 +20,7 @@ test_that("Basic Bar Chart Unit Tests", {
   
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomBar")
-  expect_equal(as.character(p1$mapping$x), "am")
+  expect_equal(as.character(p1$mapping$x)[2], "am")
   expect_null(p1$mapping$fill)
   expect_equal(p1$layers[[1]]$aes_params$fill, sncr_pal()(1))
   expect_equal(p1$layers[[1]]$aes_params$colour, "black")
@@ -50,9 +50,9 @@ test_that("Label option Unit Tests", {
 
 test_that("Sort option Unit Tests", {
   p4 <- gg_bar_chart(dat, "am", sort = TRUE, desc = TRUE)
-  expect_equal(as.character(p4$mapping$x)[1], "fct_infreq")
+  expect_equal(as.character(p4$mapping$x)[2], "fct_infreq(am)")
   
   p5 <- gg_bar_chart(dat, "am", sort = TRUE, desc = FALSE)
-  expect_equal(as.character(p5$mapping$x)[1], "fct_inorder")
+  expect_equal(as.character(p5$mapping$x)[2], "fct_inorder(am)")
 })
 

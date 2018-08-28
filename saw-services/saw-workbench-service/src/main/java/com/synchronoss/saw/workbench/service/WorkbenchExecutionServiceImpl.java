@@ -138,7 +138,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     log.info("Executing dataset transformation starts here ");
     log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
-    createDatasetDirectory(project,name);
+    createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     log.info("execute name = " + name);
     log.info("execute root = " + root);
     log.info("execute component = " + component);
@@ -153,11 +153,11 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    * Execute a transformation component on a dataset to create a new dataset.
    */
   @Override
-  public String createDatasetDirectory(String project, String name) throws Exception {
+  public String createDatasetDirectory(String project, String catalog, String name) throws Exception {
     log.trace("generate data system path for starts here :" + project + " : " + name); 
     String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
-        + MetadataBase.DEFAULT_CATALOG + Path.SEPARATOR + name + Path.SEPARATOR
+        + catalog + Path.SEPARATOR + name + Path.SEPARATOR
         + MetadataBase.PREDEF_DATA_DIR;
     log.info("createDatasetDirectory path = " + path);
     if (!HFileOperations.exists(path)) {
@@ -190,7 +190,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     if (status == null || !status.equals("SUCCESS")) {
       throw new RuntimeException("Unhandled dataset status: " + status);
     }
-    String location = createDatasetDirectory(project, name);
+    String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     /* Submit job to Livy for reading out preview data */
     WorkbenchClient client = getWorkbenchClient();
     String id = UUID.randomUUID().toString();
