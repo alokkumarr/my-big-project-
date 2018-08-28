@@ -74,6 +74,25 @@ test_that("Check if catalog and output name are expected", {
   expect_equal(add_ds1$system$catalog, catalog1)
 })
 
+
+# Test the physical location is derived using catalog ---------------------
+
+exp_phys_loc <-
+  paste0("maprfs:///var/sip/",
+         project_id,
+         "/dl/fs/",
+         catalog1,
+         "/",
+         output_name1,
+         "/",
+         "data")
+
+actual_phys_loc <- add_ds1$system$physicalLocation
+
+test_that("Physical location matches with expected one", {
+  expect_equal(exp_phys_loc, actual_phys_loc)
+})
+
 # Test that the added dataset details match the correct catalog and physical loc --------
 
 get_ds_detail1 <- sip_get_dataset_details(
@@ -103,6 +122,8 @@ test_that("Newly added DS content matches with get DS details", {
   expect_equal(output_catalog, get_ds_catalog)
 })
 
+
+
 # Test 2: RestAPI-Add DS function test with catalog="temp" ----------------------------
 
 add_ds2 <- sip_add_dataset(
@@ -130,6 +151,25 @@ add_ds2 <- sip_add_dataset(
 test_that("Check if catalog and output name are expected", {
   expect_equal(add_ds2$system$name, output_name2)
   expect_equal(add_ds2$system$catalog, catalog2)
+})
+
+
+# Test the physical location is derived using catalog ---------------------
+
+exp_phys_loc <-
+  paste0("maprfs:///var/sip/",
+         project_id,
+         "/dl/fs/",
+         catalog2,
+         "/",
+         output_name2,
+         "/",
+         "data")
+
+actual_phys_loc <- add_ds2$system$physicalLocation
+
+test_that("Physical location matches with expected one", {
+  expect_equal(exp_phys_loc, actual_phys_loc)
 })
 
 # Test that the added dataset details match the correct catalog and physical loc --------
@@ -187,6 +227,24 @@ add_ds3 <- sip_add_dataset(
 test_that("Check if catalog and output name are expected", {
   expect_equal(add_ds3$system$name, output_name3)
   expect_equal(add_ds3$system$catalog, catalog3)
+})
+
+# Test the physical location is derived using catalog ---------------------
+
+exp_phys_loc <-
+  paste0("maprfs:///var/sip/",
+         project_id,
+         "/dl/fs/",
+         catalog3,
+         "/",
+         output_name3,
+         "/",
+         "data")
+
+actual_phys_loc <- add_ds3$system$physicalLocation
+
+test_that("Physical location matches with expected one", {
+  expect_equal(exp_phys_loc, actual_phys_loc)
 })
 
 # Test that the added dataset details match the correct catalog and physical loc --------
