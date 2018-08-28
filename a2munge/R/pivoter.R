@@ -22,6 +22,7 @@
 #'  value><sep><measure_var name>'
 #'@param fill optional fill value for structural missings. defaults to value
 #'  from applying fun to 0 length vector
+#'@param ... not currently implemented
 #'
 #'@return dataframe reshaped in wide format
 #'
@@ -55,7 +56,13 @@
 #'        fun = "sum",
 #'        fill=0)
 #'@export
-pivoter <- function(df, ...) {
+pivoter <- function(df, 
+                    id_vars,
+                    group_vars,
+                    measure_vars,
+                    fun = "sum",
+                    sep = "_",
+                    fill = NULL) {
   UseMethod("pivoter", df)
 }
 

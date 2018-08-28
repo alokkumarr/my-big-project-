@@ -27,11 +27,14 @@
 #'  NULL
 #'@param partition_by Partitions the output by the given columns on the file
 #'  system
+#'@param partitions Number of file partitions  
 #'@param temp_folder_name name of temp folder
 #'@param ... optional arguments passed to write function
 #'
+#'@importFrom utils write.table
 #'@export
-writer <- function(df, path,  dfs_mount, type, mode, partitions, partition_by, temp_folder_name) {
+writer <- function(df,
+                   ...) {
   UseMethod("writer")
 }
 

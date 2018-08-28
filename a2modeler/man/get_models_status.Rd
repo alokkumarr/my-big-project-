@@ -4,12 +4,12 @@
 \alias{get_models_status}
 \title{Get Models Status}
 \usage{
-get_models_status(obj, id = NULL)
+get_models_status(obj, uid = NULL)
 }
 \arguments{
 \item{obj}{modeler object}
 
-\item{id}{one or more model id characters}
+\item{uid}{one or more model uid characters}
 }
 \description{
 Function to return modeler's model statuses

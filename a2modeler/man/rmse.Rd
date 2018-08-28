@@ -4,6 +4,7 @@
 \alias{rmse}
 \alias{rmse.data.frame}
 \alias{rmse.tbl_spark}
+\alias{rmse.spark_connection}
 \title{Generic rmse function}
 \usage{
 rmse(x, predicted, actual)
@@ -11,6 +12,9 @@ rmse(x, predicted, actual)
 \method{rmse}{data.frame}(x, predicted, actual)
 
 \method{rmse}{tbl_spark}(x, predicted, actual)
+
+\method{rmse}{spark_connection}(x, predicted = "prediction",
+  actual = "label")
 }
 \arguments{
 \item{x}{dataframe object}

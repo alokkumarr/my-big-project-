@@ -492,7 +492,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     MetaDataStoreRequestAPI requestMetaDataStore = null;
     String category = Category.DataSet.name();
     String format = "parquet";
-    String catalog = MetadataBase.DEFAULT_CATALOG;
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -532,23 +531,21 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     userDataNode.put("scriptLocation", rootNode.get(DataSetProperties.UserData.toString()).get("script").toString());
     Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()), "system cannot be null");
     ObjectNode systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
+    String catalog = systemNode.get(DataSetProperties.Catalog.toString()) != null
+        ? systemNode.get(DataSetProperties.Catalog.toString()).textValue()
+        : MetadataBase.DEFAULT_CATALOG;
     systemNode.put("project", project);
     systemNode.put("outputFormat",
         systemNode.get(DataSetProperties.Format.toString()) != null
-            ? systemNode.get(DataSetProperties.Catalog.toString()).toString()
+            ? systemNode.get(DataSetProperties.Format.toString()).toString()
             : format);
     systemNode.put("inputFormat",
         rootNode.get(DataSetProperties.System.toString()).get("inputFormat").textValue());
-    systemNode.put(DataSetProperties.PhysicalLocation.toString(),
-        workbenchExecutionService.createDatasetDirectory(project,
+    systemNode.put(DataSetProperties.PhysicalLocation.toString(),workbenchExecutionService.createDatasetDirectory(project,catalog,
             rootNode.get(DataSetProperties.System.toString()).get("name").textValue()));
     ArrayNode inputPath = objectMapper.createArrayNode();
-    inputPath
-        .addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
-    systemNode.put(DataSetProperties.Catalog.toString(),
-        systemNode.get(DataSetProperties.Catalog.toString()) != null
-            ? systemNode.get(DataSetProperties.Catalog.toString()).textValue()
-            : catalog);
+    inputPath.addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
+    systemNode.put(DataSetProperties.Catalog.toString(),catalog);
     systemNode.putArray("inputPath").addAll(inputPath);
     DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);
     try {
