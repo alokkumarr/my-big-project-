@@ -7,6 +7,7 @@ import { AdminMainViewComponent } from './main-view';
 import { AdminService } from './main-view/admin.service';
 import { RoleService } from './role/role.service';
 import { ExportService } from './export/export.service';
+import { ImportService } from './import/import.service';
 import {
   AdminExportViewComponent,
   AdminExportListComponent
@@ -23,6 +24,11 @@ import {
 import {
   RoleEditDialogComponent
 } from './role';
+import {
+  AdminImportViewComponent,
+  AdminImportListComponent,
+  AdminImportFileListComponent
+} from './import';
 import {JwtService} from '../../../login/services/jwt.service';
 import {dxDataGridService} from '../../common/services/dxDataGrid.service';
 import {
@@ -67,7 +73,7 @@ import {ImportListViewComponent} from './components/import/import-list/import-li
 import {ImportFileListViewComponent} from './components/import/import-file-list/import-file-list.component';
 
 import {ExportService as OldExportService} from './services/export.service';
-import {ImportService} from './services/import.service';
+import {ImportService as OldImportService} from './services/import.service';
 import {UsersManagementService} from './services/users.service';
 import {RolesManagementService} from './services/roles.service';
 import {PrivilegesManagementService} from './services/privileges.service';
@@ -86,7 +92,7 @@ angular.module(OldAdminModule, [
   .factory('PrivilegesManagementService', PrivilegesManagementService)
   .factory('CategoriesManagementService', CategoriesManagementService)
   .service('ExportService', OldExportService)
-  .service('ImportService', ImportService)
+  .service('ImportService', OldImportService)
   .component('usersView', UsersViewComponent)
   .component('usersListView', UsersListViewComponent)
   .component('userDialog', UserDialogComponent)
@@ -123,7 +129,10 @@ const COMPONENTS = [
   AdminExportViewComponent,
   AdminExportListComponent,
   CategoryEditDialogComponent,
-  CategoryDeleteDialogComponent
+  CategoryDeleteDialogComponent,
+  AdminImportViewComponent,
+  AdminImportListComponent,
+  AdminImportFileListComponent
 ];
 @NgModule({
   imports: [
@@ -152,6 +161,7 @@ const COMPONENTS = [
     ToastService,
     RoleService,
     ExportService,
+    ImportService,
     CategoryService
   ],
   exports: [
