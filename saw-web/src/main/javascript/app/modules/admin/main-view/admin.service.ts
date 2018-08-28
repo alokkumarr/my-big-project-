@@ -6,10 +6,12 @@ import { HeaderProgressService } from '../../../common/services/header-progress.
 import AppConfig from '../../../../../../../appConfig';
 
 type RequestOptions = {
-  toast?: {successMsg: string, errorMsg?: string}
+  toast?: {successMsg: string, errorMsg?: string},
+  forWhat?: 'export' | 'user' | 'role' | 'privilege' | 'category';
 }
 
 const loginUrl = AppConfig.login.url;
+const apiUrl = AppConfig.api.url;
 
 @Injectable()
 export class AdminService {
@@ -34,14 +36,30 @@ export class AdminService {
   }
 
   request<T>(path, params, options: RequestOptions = {}) {
-    const { toast } = options
+    const { toast, forWhat } = options
     this._headerProgress.show();
-    const headers = new HttpHeaders().set('Content-Type', 'application/json');
-    return this.http.post<T>(`${loginUrl}/auth/admin/cust/manage/${path}`, params, {headers})
+    return this.http.post<T>(`${this.getBaseUrl(forWhat)}/${this.getIntermediaryPath(forWhat)}${path}`, params)
       .pipe(
-        tap(this.showToastMessageIfNeeded(toast)),
-        tap(() => this._headerProgress.hide())
+        tap(this.showToastMessageIfNeeded(toast))
       )
       .finally(() => this._headerProgress.hide());
+  }
+
+  getIntermediaryPath(forWhat) {
+    switch (forWhat) {
+    case 'export':
+      return '';
+    default:
+      return 'auth/admin/cust/manage/';
+    }
+  }
+
+  getBaseUrl(forWhat) {
+    switch (forWhat) {
+    case 'export':
+      return apiUrl;
+    default:
+      return loginUrl;
+    }
   }
 }

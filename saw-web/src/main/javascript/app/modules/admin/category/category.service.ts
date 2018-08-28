@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AdminService } from '../main-view/admin.service';
-import {tap} from 'rxjs/operators/tap';
+import { JwtService } from '../../../../login/services/jwt.service';
 import { IAdminDataService } from '../admin-data-service.interface';
 
 type CategoryResponse = {
@@ -22,9 +22,15 @@ type ModulesResponse = {
 @Injectable()
 export class CategoryService implements IAdminDataService {
 
+  customerId;
   constructor(
-    private _adminService: AdminService
-  ) {}
+    private _adminService: AdminService,
+    private _jwtService: JwtService
+  ) {
+    const token = _jwtService.getTokenObj();
+    const customerId = token.ticket.custID;
+    this.customerId = customerId;
+  }
 
   getList(customerId) {
     return this._adminService.request<CategoryResponse>('categories/fetch', customerId)
