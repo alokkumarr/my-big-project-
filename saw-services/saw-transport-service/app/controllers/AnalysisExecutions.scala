@@ -122,6 +122,9 @@ class AnalysisExecutions extends BaseController {
             totalRows = execution.getRowCount(executionId,outputLocation)
         }
         else {
+          val resultNode = AnalysisResult(analysisId, executionId)
+          val desc = resultNode.getCachedData(MDObjectStruct.key_Definition.toString)
+          queryBuilder = (desc.asInstanceOf[JValue] \ "queryBuilder")
           // since we are using streams, we don't have to use cache as it's exactly the same i.e. both are streams
           dataStream = execution.loadExecution(executionId)
           // stream can not be reused hence calling it again. Won't be any memory impact
@@ -133,7 +136,6 @@ class AnalysisExecutions extends BaseController {
             if (totalRows > 0) {
               log.info("recordCount" + totalRows)
               // if count not available in node and fetched from execution result, add count for next time reuse.
-              val resultNode = AnalysisResult(null, executionId)
               resultNode.getObject("dataLocation") match {
                 case Some(dir: String) => {
                   // Get list of all files in the execution result directory

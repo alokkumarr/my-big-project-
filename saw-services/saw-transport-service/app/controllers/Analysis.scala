@@ -415,7 +415,7 @@ class Analysis extends BaseController {
 
     if (analysis == null) {
       analysisJSON = readAnalysisJson(analysisId); // reading from the store
-      analysisDefinition = analysisJson(analysisJSON,dataSecurityKeyStr)
+      analysisDefinition = analysisJSON
       val analysisType = (analysisJSON \ "type");
       typeInfo = analysisType.extract[String];
       json = compact(render(analysisJSON));
@@ -718,18 +718,36 @@ class Analysis extends BaseController {
         case "publish" => ExecutionType.publish
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
-      val execution = analysis.executeAndWaitQueue(
-        executionTypeEnum, query, (analysisId, resultId, query) => {
-          val executorQueue = executionTypeEnum match {
-            case ExecutionType.preview => executorFastQueue
-            case ExecutionType.onetime => executorFastQueue
-            case ExecutionType.scheduled => executorRegularQueue
-            case ExecutionType.regularExecution => executorRegularQueue
-            case ExecutionType.publish => executorRegularQueue
-            case obj => throw new RuntimeException("Unknown execution type: " + obj)
-          }
-          executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
-        })
+      var resultNodeId :String = null
+      val execution = try {
+        analysis.executeAndWaitQueue(
+          executionTypeEnum, query, (analysisId, resultId, query) => {
+            val executorQueue = executionTypeEnum match {
+              case ExecutionType.preview => executorFastQueue
+              case ExecutionType.onetime => executorFastQueue
+              case ExecutionType.scheduled => executorRegularQueue
+              case ExecutionType.regularExecution => executorRegularQueue
+              case ExecutionType.publish => executorRegularQueue
+              case obj => throw new RuntimeException("Unknown execution type: " + obj)
+            }
+            executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
+            resultNodeId= resultId
+          })
+      } catch {
+        case throwable: Throwable =>
+          throw throwable
+      } finally {
+        // possibly execution timeOut exception, but still execution may running
+        // as background process, update the queryBuilder metadata, if resultNode exists.
+        resultNode = getResultNode(analysisId,resultNodeId)
+        if(resultNode!=null) {
+          val newDescriptor = JObject(resultNode.getObjectDescriptors.obj ++ List(
+            JField("queryBuilder", queryBuilder)
+          ))
+          resultNode.setDescriptor(compact(render(newDescriptor)))
+          resultNode.update()
+        }
+      }
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
@@ -875,5 +893,18 @@ class Analysis extends BaseController {
           case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
         }
       })
+  }
+
+  private def getResultNode(analysisID:String ,resultID:String): AnalysisResult =
+  {
+    var resultNode: AnalysisResult = null
+    try {
+      m_log debug s"Remove result: " + resultID
+      resultNode = AnalysisResult(analysisID, resultID)
+    }
+    catch {
+      case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+    }
+    resultNode
   }
 }
