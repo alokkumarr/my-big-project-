@@ -1,5 +1,5 @@
-import { AdminMainViewComponent } from './main-view';
-import { AdminExportViewComponent } from './export';
+import {AdminMainViewComponent} from './main-view';
+import {AdminExportViewComponent} from './export';
 import {
   UsersTableHeader,
   RolesTableHeader,
