@@ -34,7 +34,7 @@ test_that("Regressor Constructer", {
 
 test_that("Regressor Selects Best Model", {
 
-  test_pipe <- pipeline(expr = function(x){select(x, index, mpg, wt, hp)})
+  test_pipe <- pipeline(expr = function(x){select(x, mpg, wt, hp)})
 
   r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
@@ -43,91 +43,22 @@ test_that("Regressor Selects Best Model", {
     add_model(pipe = test_pipe,
               method = "ml_decision_tree_regressor") %>%
     train_models() %>%
-    evaluate_models() %>%
     set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
 
-  expect_subset("spark_ml", class(r1$final_model))
-  expect_subset("ml_model_regression", class(r1$final_model))
+  expect_subset("spark_model", class(r1$final_model))
+  expect_subset("spark_model_regression", class(r1$final_model))
   expect_subset(
-    r1$final_model$id,
-    r1$evaluate %>%
+    r1$final_model$uid,
+    r1$performance %>%
       dplyr::filter(sample == "validation") %>%
       dplyr::top_n(1, -rmse) %>%
-      dplyr::pull(model)
+      dplyr::pull(model_uid)
   )
-})
-
-
-r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
-  add_default_samples() %>%
-  add_model(pipe = NULL,
-            method = "ml_linear_regression") %>%
-  train_models() %>%
-  evaluate_models() %>%
-  set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
-
-test_that("Regressor Predicts New Data consistent with Method", {
-
+  
+  
   p1 <- predict(r1, data = df)
-  r2 <- ml_linear_regression(df, formula = "mpg~.")
-  p2 <- sparklyr::sdf_predict(df, r2)
-
   expect_class(p1, "predictions")
-  expect_equal(p1$predictions %>%
-                 dplyr::collect() %>%
-                 dplyr::pull(predicted),
-               p2 %>%
-                 dplyr::collect() %>%
-                 dplyr::pull(prediction))
+  expect_error(predict(r1, data = select(df, wt)))
 })
 
 
-test_that("Regressor Works with add_model_grid", {
-
-  enet_parm <- c(0, .5, 1)
-  lambda <- c(.1, .01, .001)
-
-  r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
-    add_default_samples() %>%
-    add_model_grid(pipe = NULL,
-                   method = "ml_linear_regression",
-                   elastic_net_param = enet_parm,
-                   reg_param = lambda) %>%
-    train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
-  param_grid <- expand.grid(elastic_net_param = enet_parm, reg_param = lambda)
-  expect_equal(length(r1$models), nrow(param_grid))
-  for(i in 1:nrow(param_grid)){
-    expect_equal(r1$models[[i]]$method_args[[1]], param_grid[i,1])
-    expect_equal(r1$models[[i]]$method_args[[2]], param_grid[i,2])
-    expect_equal(r1$models[[i]]$fit$model$param_map$elastic_net_param, param_grid$elastic_net_param[i])
-    expect_equal(r1$models[[i]]$fit$model$param_map$reg_param, param_grid$reg_param[i])
-  }
-})
-
-
-test_that("Prediction Schema Check Works as expected", {
-
-  expect_error(
-    df %>%
-      select(am, mpg) %>%
-      predict(r1, data = .))
-})
-
-
-test_that("Save Model Fits option works as expected", {
-
-  r2 <- new_regressor(df = df, target = "mpg", name = "test", save_fits = FALSE) %>%
-    add_default_samples() %>%
-    add_model(pipe = NULL,
-              method = "ml_linear_regression") %>%
-    train_models() %>%
-    evaluate_models() %>%
-    set_final_model(., method = "best", reevaluate = FALSE, refit = FALSE)
-
-  expect_lt(as.numeric(object.size(r2)), as.numeric(object.size(r1)))
-  expect_null(r2$models[[1]]$fit)
-})

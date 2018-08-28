@@ -158,6 +158,7 @@ indexer.tbl_spark <- function(df,
 #' @param label logical option to change month and day of week values to label.
 #'   default is FALSE
 #' @param abbr logical option to use abbreviate labels. default is FALSE
+#' @param ... not currently implemented
 #'
 #' @return data.frame
 #' @importFrom lubridate year quarter month week day hour minute wday yday days_in_month
@@ -166,14 +167,14 @@ indexer.tbl_spark <- function(df,
 #' @examples
 #' df <- data.frame(today = Sys.Date())
 #' date_parter(df, "today")
-date_parter <- function(df, measure_vars, label, abbr) {
+date_parter <- function(df, measure_vars, label, abbr, ...) {
   UseMethod("date_parter")
 }
 
 
 #' @export
 #' @rdname date_parter
-date_parter.data.frame <- function(df, measure_vars, label = FALSE, abbr = FALSE) {
+date_parter.data.frame <- function(df, measure_vars, label = FALSE, abbr = FALSE, ...) {
 
   date_names <- df %>%
     dplyr::summarise_all(class) %>%
@@ -202,7 +203,7 @@ date_parter.data.frame <- function(df, measure_vars, label = FALSE, abbr = FALSE
 
 #' @export
 #' @rdname date_parter
-date_parter.tbl_spark <- function(df, measure_vars) {
+date_parter.tbl_spark <- function(df, measure_vars, ...) {
 
   date_names <- df %>%
     sparklyr::sdf_schema() %>%

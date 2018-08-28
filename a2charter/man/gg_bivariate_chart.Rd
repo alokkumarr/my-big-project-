@@ -29,8 +29,7 @@ with color. expects a string. default is 'grey25'}
 subgroups of histograms or color name or hex value to color the outlines of
 the histogram. expects a string. default is 'black'}
 
-\item{alpha}{argument to change the colour transparency; It is a numeric in
-[0,1]. The default is 0.0.}
+\item{alpha}{controls the opacity of the fill and color}
 
 \item{interval_shape}{shape value to pass to interval chart}
 
@@ -79,11 +78,12 @@ gg_interval_chart. multi-class y-variables are a special case that need not
 be included for this story
 }
 \examples{
-Create a data set
+# Create a data set
 library(dplyr)
 d <- mtcars \%>\% mutate(am = as.factor(am), cyl = as.factor(cyl))
+
 gg_bivariate_chart(d, x_variable='cyl', y_variable='am')
-gg_bivariate_chart(d, x_variable='mpg', y_variable='am', smooth_ci = F)
+gg_bivariate_chart(d, x_variable='mpg', y_variable='am', smooth_ci = FALSE)
 gg_bivariate_chart(d, x_variable='cyl', y_variable='mpg', width=0.2)
 gg_bivariate_chart(d, x_variable='mpg', y_variable='wt')
 }

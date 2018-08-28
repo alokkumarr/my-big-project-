@@ -3,17 +3,29 @@
 \name{index}
 \alias{index}
 \alias{index.numeric}
+\alias{index.integer}
 \alias{index.Date}
 \alias{index.POSIXct}
+\alias{index.POSIXt}
 \title{Index Creation Function}
 \usage{
 index(x, unit)
 
 \method{index}{numeric}(x, unit = NULL)
 
+\method{index}{integer}(x, unit = NULL)
+
 \method{index}{Date}(x, unit = "days")
 
 \method{index}{POSIXct}(x, unit = "hours")
+
+\method{index}{POSIXt}(x, unit = "hours")
+}
+\arguments{
+\item{x}{index object}
+
+\item{unit}{index unit. can by time base units such as days, weeks or years
+or numerical unit such as 1}
 }
 \description{
 Creates new index object for sequential data management

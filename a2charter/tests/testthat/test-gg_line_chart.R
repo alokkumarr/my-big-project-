@@ -6,7 +6,7 @@ library(testthat)
 library(a2charter)
 library(dplyr)
 library(checkmate)
-library(proto)
+library(ggplot2)
 
 context("line_chart unit tests")
 
@@ -46,7 +46,7 @@ test_that("Basic Line Chart Unit Tests", {
   
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomLine")
-  expect_equal(as.character(p1$mapping$x), "date")
+  expect_equal(as.character(p1$mapping$x)[2], "date")
   expect_null(p1$mapping$color)
   expect_equal(p1$layers[[1]]$aes_params$colour, sncr_pal()(1))
   expect_equal(p1$plot_env$title, "test")
@@ -65,7 +65,7 @@ test_that("Grouping Options Unit Tests", {
     group_by(cat1) %>% 
     count(date) %>% 
     gg_line_chart(., "date", "n", color = "cat1", title = "test", caption = "caption")
-  expect_equal(as.character(p2$mapping$colour), "cat1")
+  expect_equal(as.character(p2$mapping$colour)[2], "cat1")
   expect_equal(p2$layers[[1]]$aes_params$linetype, 1)
   expect_equal(p2$layers[[1]]$aes_params$alpha, 1)
   expect_equal(p2$layers[[1]]$aes_params$size, 1)
