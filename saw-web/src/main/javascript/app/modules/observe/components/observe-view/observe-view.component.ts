@@ -189,9 +189,9 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
           format: [elem.scrollHeight + 50, elem.scrollWidth]
         }
       })
-      .save(); // comment this and uncomment following lines if png is needed instead of pdf
-    // .outputImg('datauristring')
-    // .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri));
+      // .save(); // comment this and uncomment following lines if png is needed instead of pdf
+      .outputImg('datauristring')
+      .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri));
   }
 
   editDashboard(): void {
