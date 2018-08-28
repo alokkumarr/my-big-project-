@@ -27,7 +27,7 @@ df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
 
 test_that("Regressor Constructer", {
 
-  r1 <- new_regressor(df = df, target = "mpg", name = "test")
+  r1 <- regressor(df = df, target = "mpg", name = "test")
   expect_class(r1, "regressor")
 })
 
@@ -36,7 +36,7 @@ test_that("Regressor Selects Best Model", {
 
   test_pipe <- pipeline(expr = function(x){select(x, mpg, wt, hp)})
 
-  r1 <- new_regressor(df = df, target = "mpg", name = "test") %>%
+  r1 <- regressor(df = df, target = "mpg", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = test_pipe,
               method = "ml_linear_regression") %>%

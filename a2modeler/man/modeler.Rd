@@ -6,7 +6,7 @@
 \usage{
 modeler(df, target, type, name = NULL, uid = NULL, version = NULL,
   desc = NULL, scientist = NULL, execution_strategy = "sequential",
-  refit = TRUE, save_submodels = TRUE, dir = NULL, ...)
+  refit = TRUE, save_submodels = TRUE, dir = NULL, seed = 319, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}
@@ -39,6 +39,8 @@ sample performance will be used. Default is true}
 
 \item{dir}{optional directory path for saving reports, data and models}
 
+\item{seed}{seed number of any random computations}
+
 \item{...}{any addtional parameters}
 }
 \value{
@@ -50,7 +52,7 @@ cases. Modeler is the base class from which the other more specific use cases
 like forecaster, regressor, segmenter, etc... inherit form
 }
 \seealso{
-Other use cases: \code{\link{new_classifier}},
-  \code{\link{new_forecaster}},
-  \code{\link{new_regressor}}, \code{\link{new_segmenter}}
+Other use cases: \code{\link{classifier}},
+  \code{\link{forecaster}}, \code{\link{regressor}},
+  \code{\link{segmenter}}
 }
