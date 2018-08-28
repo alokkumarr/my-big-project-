@@ -4,16 +4,15 @@
             <mat-icon fontIcon="icon-arrow-left" (click)="backToDS()"></mat-icon>
         </button>
         <div fxFlex>Update Datapod </div>
-        <span fxFlex>Select Datapod to update</span>
         <button mat-raised-button color="primary" [disabled]="!isSelected" i18n (click)="updateSemantic()">
             <span>Update</span>
         </button>
     </div>
     <div class="body" fxLayout="row" fxLayoutAlign="center stretch" fxLayoutGap="10px">
-        <mat-card fxFlex="25">
+        <mat-card fxFlex="25" *ngIf="!dpID">
             <mat-card-content>
                 <dx-data-grid #dsGrid fxFlex [dataSource]="gridDataAvailableDP" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
-                    keyExpr="id" [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDPSelectionChanged($event)">
+                    keyExpr="id" [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDPSelectionChanged($event.currentSelectedRowKeys[0])">
                     <dxo-selection mode="single"></dxo-selection>
                     <dxi-column caption="Datapod Name" dataField="metricName"></dxi-column>
                     <dxi-column caption="Created By" dataField="createdBy"></dxi-column>
@@ -23,7 +22,7 @@
                 </dx-data-grid>
             </mat-card-content>
         </mat-card>
-        <mat-card fxFlex="75">
+        <mat-card fxFlex>
             <mat-card-content fxLayout="row" fxLayoutAlign="center stretch">
                 <div class="results" fxLayout="row" fxLayoutAlign="center center" *ngIf="!selectedDPData?.length">
                     <span>Select Datapod from left pane to update</span>

@@ -1,5 +1,5 @@
 import {WorkbenchPageComponent} from './components/workbench-page/workbench-page.component';
-import {DatasetsComponent} from './components/datasets-view/datasets-page.component';
+import {DataobjectsComponent} from './components/data-objects-view/data-objects-page.component';
 import {CreateDatasetsComponent} from './components/create-datasets/create-datasets.component';
 import {SqlExecutorComponent} from './components/sql-executor/sql-executor.component';
 import {DatasetDetailViewComponent} from './components/dataset-detailedView/dataset-detail-view.component';
@@ -16,9 +16,9 @@ export function routesConfig($stateProvider) {
       url: '/workbench',
       component: WorkbenchPageComponent
     }, {
-      name: 'workbench.datasets',
-      url: '/datasets',
-      component: DatasetsComponent
+      name: 'workbench.dataobjects',
+      url: '/dataobjects',
+      component: DataobjectsComponent
     }, {
       name: 'workbench.add',
       url: '/dataset/add',

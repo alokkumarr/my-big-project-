@@ -28,9 +28,6 @@ import {
 import { jwtServiceProvider } from '../../../login/services/ajs-login-providers';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
-import { DatasetsComponent } from './components/datasets-view/datasets-page.component';
-import { DatasetsGridPageComponent } from './components/datasets-view/grid/datasets-grid-page.component';
-import { DatasetsCardPageComponent } from './components/datasets-view/card/datasets-card-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
 import { SelectRawdataComponent } from './components/create-datasets/select-rawdata/select-rawdata.component';
 import { DatasetDetailsComponent } from './components/create-datasets/dataset-details/dataset-details.component';
@@ -38,7 +35,6 @@ import { RawpreviewDialogComponent } from './components/create-datasets/rawprevi
 import { ParserPreviewComponent } from './components/create-datasets/parser-preview/parser-preview.component';
 import { DateformatDialogComponent } from './components/create-datasets/dateformat-dialog/dateformat-dialog.component';
 import { CreatefolderDialogComponent } from './components/create-datasets/createFolder-dialog/createfolder-dialog.component';
-import { DatasetActionsComponent } from './components/dataset-actions/dataset-actions.component';
 import { SqlExecutorComponent } from './components/sql-executor/sql-executor.component';
 import { SqlScriptComponent } from './components/sql-executor/query/sql-script.component';
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
@@ -48,6 +44,15 @@ import { CreateSemanticComponent } from './components/semantic-management/create
 import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
 import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
 import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
+import {
+  DataobjectsComponent,
+  DatapodsCardPageComponent,
+  DatapodsGridPageComponent,
+  DatasetsCardPageComponent,
+  DatasetsGridPageComponent,
+  DatasetActionsComponent,
+  DatapodActionsComponent
+} from './components/data-objects-view/index';
 
 import { CommonModule, CommonModuleTs } from '../../common';
 
@@ -60,7 +65,7 @@ angular
 
 const components = [
   WorkbenchPageComponent,
-  DatasetsComponent,
+  DataobjectsComponent,
   DatasetsCardPageComponent,
   DatasetsGridPageComponent,
   CreateDatasetsComponent,
@@ -79,7 +84,10 @@ const components = [
   CreateSemanticComponent,
   ValidateSemanticComponent,
   SemanticDetailsDialogComponent,
-  UpdateSemanticComponent
+  UpdateSemanticComponent,
+  DatapodsCardPageComponent,
+  DatapodsGridPageComponent,
+  DatapodActionsComponent
 ];
 
 @NgModule({

@@ -101,24 +101,13 @@ export class ValidateSemanticComponent implements OnDestroy {
           projectCode: '',
           metricName: '',
           artifacts: [],
-          esRepository: {
-            indexName: '',
-            storageType: '',
-            type: ''
-          },
+          esRepository: { indexName: '', storageType: '', type: '' },
           supports: [
-            {
-              category: 'table',
-              children: [],
-              label: 'tables'
-            },
-            {
-              category: 'charts',
-              children: [],
-              label: 'charts'
-            }
+            { category: 'table', children: [], label: 'tables' },
+            { category: 'charts', children: [], label: 'charts' }
           ],
-          parentDS: []
+          parentDataSetNames: [],
+          parentDataSetIds: []
         };
         payload.metricName = name;
 
@@ -132,7 +121,8 @@ export class ValidateSemanticComponent implements OnDestroy {
             artifactName: ds.system.name,
             columns: filter(ds.schema.fields, 'include')
           });
-          payload.parentDS.push(ds.system.name);
+          payload.parentDataSetNames.push(ds.system.name);
+          payload.parentDataSetIds.push(ds._id);
         });
 
         this.headerProgress.show();
@@ -141,7 +131,7 @@ export class ValidateSemanticComponent implements OnDestroy {
           this.notify.info('Datapod created successfully', 'Datapod', {
             hideDelay: 9000
           });
-          this.router.stateService.go('workbench.datasets');
+          this.router.stateService.go('workbench.dataobjects');
         });
         this.headerProgress.hide();
       }

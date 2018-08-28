@@ -1,6 +1,6 @@
-@import "themes/base/colors";
+@import 'themes/base/colors';
 
-datasets-page {
+data-objects-page {
   width: 100%;
 
   .action-buttons {
@@ -25,13 +25,13 @@ datasets-page {
   }
 
   .toolbar-white {
-    background-color: #FFF;
+    background-color: $primary-white;
     height: 45px !important;
     min-height: 45px !important;
   }
 
   .md-subhead {
-    color: #0096D5;
+    color: $primary-blue-b2;
     font-weight: 600;
     text-transform: uppercase;
   }
@@ -70,12 +70,13 @@ datasets-page {
     }
   }
 
-  .page-content {
+  .grid-view {
+    padding: 5px;
     background-color: $background-color;
+  }
 
-    .grid-view {
-      padding: 5px;
-    }
+  .card-view {
+    overflow: auto;
+    background-color: $background-color;
   }
 }
-

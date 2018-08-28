@@ -1,10 +1,10 @@
 <div class="dataSets-cardView" fxLayout="row wrap">
-  <div fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
+  <div class="ds-card" fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
     <mat-card class="datasets-card">
       <mat-card-header class="{{sets.asOfNow.status}}">
         <div class="status-icon" matTooltip="{{sets.asOfNow.status}}" [ngSwitch]="sets.asOfNow.status">
           <mat-icon *ngSwitchCase="'FAILED'" style="color: #AB0E27;" fontIcon="icon-warning"></mat-icon>
-          <mat-icon *ngSwitchCase="'SUCCESS'" style="color: #73B421;" fontIcon="icon-exchange"></mat-icon>
+          <mat-icon *ngSwitchCase="'SUCCESS'" fontIcon="icon-exchange"></mat-icon>
           <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
         </div>
         <a class="dataset-name" e2e="data-set-card" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name | highlight: searchTerm"></a>
@@ -19,9 +19,8 @@
           <div class="mat-caption" fxLayoutAlign="end end" fxFlex="30">Size: {{sets.system.numberOfFiles}}</div>
         </div>
         <div class="descr margin-btm-9">
-          <div>Description:
-            <span [innerHTML]="sets?.system?.description | highlight: searchTerm"></span>
-          </div>
+          Description:
+          <span [innerHTML]="sets?.system?.description | highlight: searchTerm"></span>
         </div>
         <div class="margin-btm-9" fxLayout="row">
           <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added by:

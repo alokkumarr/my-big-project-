@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
@@ -24,7 +24,7 @@ require('./update-semantic.component.scss');
   styles: [],
   template: template
 })
-export class UpdateSemanticComponent implements OnInit {
+export class UpdateSemanticComponent implements OnInit, OnDestroy {
   private availableDP: any;
   private gridDataAvailableDP: any;
   private isSelected: boolean = false;
@@ -32,35 +32,55 @@ export class UpdateSemanticComponent implements OnInit {
   private availableDS: any = [];
   private isJoinEligible: boolean = false;
   private selectedDPDetails: any = [];
+  private dpID: string = '';
 
   constructor(
     private router: UIRouter,
     private workBench: WorkbenchService,
     private headerProgress: HeaderProgressService,
     private notify: ToastService
-  ) {}
+  ) {
+    // Below is used when navigating from Datapod view
+    this.dpID = this.workBench.getDataFromLS('dpID');
+  }
 
   ngOnInit() {
-    this.headerProgress.show();
-    this.workBench.getListOfSemantic().subscribe((data: any[]) => {
-      this.availableDP = get(data, 'contents[0].ANALYZE');
-      this.gridDataAvailableDP = cloneDeep(this.availableDP);
-      this.headerProgress.hide();
-    });
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableDS = data;
+      if (this.dpID !== null) {
+        this.onDPSelectionChanged(this.dpID);
+      } else {
+        this.headerProgress.show();
+        this.workBench.getListOfSemantic().subscribe((data: any[]) => {
+          this.availableDP = get(data, 'contents[0].ANALYZE');
+          this.gridDataAvailableDP = cloneDeep(this.availableDP);
+          this.headerProgress.hide();
+        });
+      }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.dpID !== null) {
+      this.workBench.removeDataFromLS('dpID');
+    }
   }
 
   backToDS() {
-    this.router.stateService.go('workbench.datasets');
+    this.router.stateService.go('workbench.dataobjects');
   }
 
-  onDPSelectionChanged(event) {
+  /**
+   * Gets the detailed description of Datapod and its parent dataset/s.
+   * Merges all the fields and shows which are included.
+   *
+   * @param {*} id
+   * @memberof UpdateSemanticComponent
+   */
+  onDPSelectionChanged(id) {
     this.headerProgress.show();
     this.isSelected = true;
-    const datapodID = event.currentSelectedRowKeys[0];
-    this.workBench.getSemanticDetails(datapodID).subscribe((data: any) => {
+    this.workBench.getSemanticDetails(id).subscribe((data: any) => {
       this.selectedDPDetails = omit(data, 'statusMessage');
       this.selectedDPData = get(data, 'artifacts');
       forIn(this.selectedDPData, dp => {
@@ -109,6 +129,11 @@ export class UpdateSemanticComponent implements OnInit {
     return dsData;
   }
 
+  /**
+   * Updates the saemantic definition with user changes.
+   *
+   * @memberof UpdateSemanticComponent
+   */
   updateSemantic() {
     forIn(this.selectedDPData, ds => {
       this.selectedDPDetails.artifacts = [];
@@ -125,7 +150,7 @@ export class UpdateSemanticComponent implements OnInit {
         this.notify.info('Datapod Updated successfully', 'Datapod', {
           hideDelay: 9000
         });
-        this.router.stateService.go('workbench.datasets');
+        this.router.stateService.go('workbench.dataobjects');
       });
   }
 }
