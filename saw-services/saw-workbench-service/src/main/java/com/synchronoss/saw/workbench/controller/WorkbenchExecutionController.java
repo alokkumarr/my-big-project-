@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 import io.jsonwebtoken.Claims;
@@ -26,9 +27,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import sncr.bda.base.MetadataBase;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.Component;
 
@@ -194,11 +196,12 @@ public class WorkbenchExecutionController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public String generatePath(@PathVariable(name = "project", required = true) String project,
-                            @PathVariable(name = "name", required = true) String name)
+                            @PathVariable(name = "name", required = true) String name, @RequestParam Map<String, String> queryMap)
       throws JsonProcessingException, Exception {
     log.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
-    String body = workbenchExecutionService.createDatasetDirectory(project, name);
+    String catalog = queryMap.get("catalog")!=null ? queryMap.get("catalog") : MetadataBase.DEFAULT_CATALOG ;
+    String body = workbenchExecutionService.createDatasetDirectory(project, catalog, name);
     /*
      * If preview was not found, response to indicate that preview has not been created yet
      */
