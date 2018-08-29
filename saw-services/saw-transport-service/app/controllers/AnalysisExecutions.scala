@@ -126,9 +126,7 @@ class AnalysisExecutions extends BaseController {
           val resultNode = AnalysisResult(analysisId, executionId)
           val desc = resultNode.getCachedData(MDObjectStruct.key_Definition.toString)
           queryBuilder = (desc.asInstanceOf[JValue] \ "queryBuilder")
-          executedBy =   (desc.asInstanceOf[JValue] \ "executedBy").asInstanceOf[String]
-          if (executedBy==null || executedBy == None)
-            executedBy ="Anonymous"
+          executedBy =   (desc.asInstanceOf[JValue] \ "executedBy").extractOrElse("Anonymous")
           // since we are using streams, we don't have to use cache as it's exactly the same i.e. both are streams
           dataStream = execution.loadExecution(executionId)
           // stream can not be reused hence calling it again. Won't be any memory impact
@@ -187,9 +185,7 @@ class AnalysisExecutions extends BaseController {
         val desc = anares.getCachedData(MDObjectStruct.key_Definition.toString)
         val d_type = (desc.asInstanceOf[JValue] \ "type").extractOpt[String];
         queryBuilder = (desc.asInstanceOf[JValue] \ "queryBuilder")
-        executedBy =   (desc.asInstanceOf[JValue] \ "executedBy").asInstanceOf[String]
-        if (executedBy==null || executedBy == None)
-          executedBy ="Anonymous"
+        executedBy =   (desc.asInstanceOf[JValue] \ "executedBy").extractOrElse("Anonymous")
         if (d_type.isDefined) {
 
           if (d_type.get == "chart" || d_type.get == "pivot") {
