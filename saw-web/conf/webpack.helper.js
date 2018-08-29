@@ -47,7 +47,7 @@ function generateFailedTests(dir) {
 
     files.forEach(function(file) {
       if(!oldProcessedXmlFiles.includes(file)) {
-        console.log('new file adding into file to be proccessed...'+file)
+        //console.log('new file adding into file to be proccessed...'+file)
         filesToProcess.push(file);
       }
     });
@@ -94,7 +94,7 @@ function generateFailedTests(dir) {
     } else {
       // only 1 test failed
       let testCase = testCases['test-case'];
-        if(testCase._attributes.status.toLocaleLowerCase() ==='failed') {
+      if(testCase._attributes.status.toLocaleLowerCase() ==='failed') {
           // add them to retry tests
           let testMetaData = JSON.parse(testCase.name._text.split('testDataMetaInfo: ')[1]);
 
@@ -136,7 +136,7 @@ function generateFailedTests(dir) {
     }
   }
   if(Object.keys(subset).length > 0) {
-    console.log('failed data-->'+subset)
+    //console.log('failed data-->'+subset)
   }
 }
 
@@ -156,14 +156,14 @@ module.exports = {
   getTestData: () => {
 
     if (fs.existsSync(appRoot+'/target/testData/failed/failedTests.json')) {
-      console.log('executing failed--tests');
+      //console.log('executing failed--tests');
       let data = JSON.parse(fs.readFileSync(appRoot+'/target/testData/failed/failedTests.json','utf8'));
-      console.log('Failed test data---'+JSON.stringify(data));
+      //console.log('Failed test data---'+JSON.stringify(data));
       return data;
     }else {
-       console.log('executing fresh--tests');
+       //console.log('executing fresh--tests');
       let data = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
-      console.log('Fresh data--->'+JSON.stringify(data));
+      //console.log('Fresh data--->'+JSON.stringify(data));
       return data;
     }
 

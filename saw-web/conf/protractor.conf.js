@@ -243,7 +243,7 @@ exports.config = {
       retryCounter = ++argv.retry;
     }
     if (retryCounter <= maxRetryForFailedTests){
-      console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
+     // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
       webpackHelper.generateFailedTests(appRoot+'/target/allure-results');
     }
 
