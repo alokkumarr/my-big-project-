@@ -1,7 +1,8 @@
+var testDataReader = require('../e2e-tests/testdata/testDataReader.js');
+const using = require('jasmine-data-provider');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
-const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
 const protractorConf = require('../../../conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
@@ -20,29 +21,27 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
   beforeEach(function (done) {
     setTimeout(function () {
-      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
     setTimeout(function () {
-      //analyzePage.main.doAccountAction('logout');
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
-  afterAll(function () {
-    commonFunctions.logOutByClearingLocalStorage();
-  });
 
-    using(userDataProvider, function (data, description) {
-      it('should display list view by default by ' + description, function () {
-        loginPage.loginAs(data.role);
+  using(testDataReader.testData['ANALYZE']['analyzeDataProvider'], function (data, description) {
+      it('should display list view by default '+description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ANALYZE', dp:'analyzeDataProvider'}), function () {
+        loginPage.loginAs(data.user);
         analyzePage.validateListView();
       });
+  });
 
-    it(description + ' should land on analyze page', function () {
-      loginPage.loginAs(data.role);
+  using(testDataReader.testData['ANALYZE']['analyzeDataProvider2'], function (data, description) {
+    it('should land on analyze page' +description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ANALYZE', dp:'analyzeDataProvider2'}), function () {
+      loginPage.loginAs(data.user);
       // the app should automatically navigate to the analyze page
       // and when its on there the current module link is disabled
       const alreadyOnAnalyzePage = ec.urlContains('/analyze');

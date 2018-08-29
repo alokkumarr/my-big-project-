@@ -6,6 +6,7 @@ var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var HtmlReporter = require('protractor-beautiful-reporter');
+var argv = require('yargs').argv;
 
 /**
  * Note about intervals:
@@ -49,7 +50,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
  * number of failed retry
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 1;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 2 : 3;
 
 /**
  * Waits ms after page is loaded
@@ -78,10 +79,6 @@ const tempts = 10;
 const customerCode = 'SYNCHRONOSS';
 
 let token;
-let testData;
-let isRetry = false;
-let processedFiles = [];
-let subsetTestdata;
 
 exports.timeouts = {
   fluentWait: fluentWait,
@@ -97,7 +94,6 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  isRetry:isRetry,
   failedData:{},
   testData:webpackHelper.getTestData(),
   //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
@@ -112,7 +108,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        //'--headless', // start on background
+        '--headless', // start on background
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -176,10 +172,7 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      //testBaseDir + 'login.test.js',
       testBaseDir + 'priviliges.test.js'
-      // testBaseDir + 'dev2.js',
-      // testBaseDir + 'dev3.js',
     ]
   },
   onCleanUp: function (results) {
@@ -245,6 +238,16 @@ exports.config = {
 
   },
   afterLaunch: function() {
+
+    var retryCounter = 1;
+    if (argv.retry) {
+      retryCounter = ++argv.retry;
+    }
+    if (retryCounter <= maxRetryForFailedTests){
+      console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
+      webpackHelper.generateFailedTests(appRoot+'/target/allure-results');
+    }
+
     return retry.afterLaunch(maxRetryForFailedTests);
   }
 };

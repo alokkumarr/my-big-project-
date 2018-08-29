@@ -1,7 +1,7 @@
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const protractorConf = require('../../../../conf/protractor.conf');
+var testDataReader = require('../../e2e-tests/testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const protractorConf = require('../../../../conf/protractor.conf');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
@@ -24,25 +24,6 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
   let token;
   let dashboardId;
 
-  const dataProvider = {
-    'Combo Chart by admin': { user: 'admin', chartType: 'chart:combo' },
-    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
-    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
-    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
-    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
-    'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
-    'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
-    'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
-    'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
-    'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
-    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
-    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'},
-    'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
-    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
-    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
-  };
-
   beforeAll(function() {
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
@@ -52,7 +33,6 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
 
   beforeEach(function(done) {
     setTimeout(function() {
-      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -69,18 +49,13 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithCharts.te
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
       oh.deleteDashboard(host, token, dashboardId);
-
-      //analyzePage.main.doAccountAction('logout');
-      //commonFunctions.logOutByClearingLocalStorage();
+      commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
-  afterAll(function() {
-    commonFunctions.logOutByClearingLocalStorage();
-  });
 
-  using(dataProvider, function(data, description) {
-    it('should able to create & delete dashboard with charts: ' + description, () => {
+  using(testDataReader.testData['DASHBOARDWITHCHARTS']['dashboardWithChartsDataProvider'], function(data, description) {
+    it('should able to create & delete dashboard with charts: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARDWITHCHARTS', dp:'dashboardWithChartsDataProvider'}), () => {
       try {
 
         let currentTime = new Date().getTime();

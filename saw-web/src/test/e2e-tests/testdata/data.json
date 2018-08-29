@@ -1,4 +1,42 @@
 {
+  "CREATEREPORT": {
+    "createReportDataProvider": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
+  "APPLYFILTERSCHARTS": {
+    "applyFiltersChartsDataProvider": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
+  "ANALYZE": {
+    "analyzeDataProvider": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    },
+    "analyzeDataProvider2": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
   "LOGIN": {
     "loginDataProvider": {
       "admin": {
@@ -166,6 +204,615 @@
         "execute": true,
         "export": true,
         "delete": true
+      }
+    }
+  },
+  "CREATEDELETECHART":{
+    "createDeleteChartDataProvider":{
+      "ComboChartByAdmin": {"user": "admin", "chartType": "chart:combo"},
+      "ComboChartByUser": {"user": "userOne", "chartType": "chart:combo"},
+      "ColumnChartByAdmin": {"user": "admin", "chartType": "chart:column"},
+      "ColumnChartByUser": {"user": "userOne", "chartType": "chart:column"},
+      "BarChartByAdmin": {"user": "admin", "chartType": "chart:bar"},
+      "BarChartByUser": {"user": "userOne", "chartType": "chart:bar"},
+      "StackedChartByAdmin": {"user": "admin", "chartType": "chart:stack"},
+      "StackedChartByUser": {"user": "userOne", "chartType": "chart:stack"},
+      "LineChartByAdmin": {"user": "admin", "chartType": "chart:line"},
+      "LineChartByUser": {"user": "userOne", "chartType": "chart:line"},
+      "AreaChartByAdmin": {"user": "admin", "chartType": "chart:area"},
+      "AreaChartByUser": {"user": "userOne", "chartType": "chart:area"},
+      "ScatterPlotChartByAdmin": {"user": "admin", "chartType": "chart:scatter"},
+      "ScatterPlotChartByUser": {"user": "userOne", "chartType": "chart:scatter"},
+      "BubbleChartByAdmin": {"user": "admin", "chartType": "chart:bubble"},
+      "BubbleChartByUser": {"user": "userOne", "chartType": "chart:bubble"}
+    }
+  },
+  "PREVIEWCHARTS":{
+    "previewChartsDataProvider":{
+      "ComboChartByAdmin": {"user": "admin", "chartType": "chart:combo"},
+      "ComboChartByUser": {"user": "userOne", "chartType": "chart:combo"},
+      "ColumnChartByAdmin": {"user": "admin", "chartType": "chart:column"},
+      "ColumnChartByUser": {"user": "userOne", "chartType": "chart:column"},
+      "BarChartByAdmin": {"user": "admin", "chartType": "chart:bar"},
+      "BarChartByUser": {"user": "userOne", "chartType": "chart:bar"},
+      "StackedChartByAdmin": {"user": "admin", "chartType": "chart:stack"},
+      "StackedChartByUser": {"user": "userOne", "chartType": "chart:stack"},
+      "LineChartByAdmin": {"user": "admin", "chartType": "chart:line"},
+      "LineChartByUser": {"user": "userOne", "chartType": "chart:line"},
+      "AreaChartByAdmin": {"user": "admin", "chartType": "chart:area"},
+      "AreaChartByUser": {"user": "userOne", "chartType": "chart:area"},
+      "ScatterPlotChartByAdmin": {"user": "admin", "chartType": "chart:scatter"},
+      "ScatterPlotChartByUser": {"user": "userOne", "chartType": "chart:scatter"},
+      "BubbleChartByAdmin": {"user": "admin", "chartType": "chart:bubble"},
+      "BubbleChartByUser": {"user": "userOne", "chartType": "chart:bubble"}
+    }
+  },
+  "EDITDELETECHARTS":{
+    "editDeleteChartsDataProvider":{
+      "ComboChartByAdmin": {"user": "admin", "chartType": "chart:combo"},
+      "ComboChartByUser": {"user": "userOne", "chartType": "chart:combo"},
+      "ColumnChartByAdmin": {"user": "admin", "chartType": "chart:column"},
+      "ColumnChartByUser": {"user": "userOne", "chartType": "chart:column"},
+      "BarChartByAdmin": {"user": "admin", "chartType": "chart:bar"},
+      "BarChartByUser": {"user": "userOne", "chartType": "chart:bar"},
+      "StackedChartByAdmin": {"user": "admin", "chartType": "chart:stack"},
+      "StackedChartByUser": {"user": "userOne", "chartType": "chart:stack"},
+      "LineChartByAdmin": {"user": "admin", "chartType": "chart:line"},
+      "LineChartByUser": {"user": "userOne", "chartType": "chart:line"},
+      "AreaChartByAdmin": {"user": "admin", "chartType": "chart:area"},
+      "AreaChartByUser": {"user": "userOne", "chartType": "chart:area"},
+      "ScatterPlotChartByAdmin": {"user": "admin", "chartType": "chart:scatter"},
+      "ScatterPlotChartByUser": {"user": "userOne", "chartType": "chart:scatter"},
+      "BubbleChartByAdmin": {"user": "admin", "chartType": "chart:bubble"},
+      "BubbleChartByUser": {"user": "userOne", "chartType": "chart:bubble"}
+    }
+  },
+  "FORKDELETECHARTS":{
+    "forkDeleteChartsDataProvider":{
+      "ComboChartByAdmin": {"user": "admin", "chartType": "chart:combo"},
+      "ComboChartByUser": {"user": "userOne", "chartType": "chart:combo"},
+      "ColumnChartByAdmin": {"user": "admin", "chartType": "chart:column"},
+      "ColumnChartByUser": {"user": "userOne", "chartType": "chart:column"},
+      "BarChartByAdmin": {"user": "admin", "chartType": "chart:bar"},
+      "BarChartByUser": {"user": "userOne", "chartType": "chart:bar"},
+      "StackedChartByAdmin": {"user": "admin", "chartType": "chart:stack"},
+      "StackedChartByUser": {"user": "userOne", "chartType": "chart:stack"},
+      "LineChartByAdmin": {"user": "admin", "chartType": "chart:line"},
+      "LineChartByUser": {"user": "userOne", "chartType": "chart:line"},
+      "AreaChartByAdmin": {"user": "admin", "chartType": "chart:area"},
+      "AreaChartByUser": {"user": "userOne", "chartType": "chart:area"},
+      "ScatterPlotChartByAdmin": {"user": "admin", "chartType": "chart:scatter"},
+      "ScatterPlotChartByUser": {"user": "userOne", "chartType": "chart:scatter"},
+      "BubbleChartByAdmin": {"user": "admin", "chartType": "chart:bubble"},
+      "BubbleChartByUser": {"user": "userOne", "chartType": "chart:bubble"}
+    }
+  },
+  "CHARTPROMPTFILTER":{
+    "chartPromptFilterDataProvider":{
+      "DateDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "DateDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "NumberDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "NumberDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "StringDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      },
+      "StringDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      }
+    }
+  },
+  "ESREPORTPROMPTFILTER":{
+    "esReportPromptFilterDataProvider":{
+      "DateDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "DateDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "NumberDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "NumberDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "StringDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      },
+      "StringDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      }
+    }
+  },
+  "PIVOTPROMPTFILTER":{
+    "pivotPromptFilterDataProvider":{
+      "DateDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "DateDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "NumberDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "NumberDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "StringDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      },
+      "StringDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      }
+    }
+  },
+  "REPORTPROMPTFILTER":{
+    "reportPromptFilterDataProvider":{
+      "DateDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "DateDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "date",
+        "value": "This Week",
+        "fieldName": "Date"
+      },
+      "NumberDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "NumberDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "number",
+        "operator": "Equal to",
+        "value": 99999.33,
+        "fieldName": "Double"
+      },
+      "StringDataTypeFilterByAdmin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      },
+      "StringDataTypeFilterByUser": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": "string 450",
+        "fieldName": "String"
+      }
+    }
+  },
+  "PIVOTFILTER": {
+    "pivotFilterDataProvider":{
+      "Date_This_Week_Group_Interval_not_specified_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "This Week"
+      },
+      "Date_MTD_Month_to_Date_Group_Interval_Year_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Year",
+        "preset": "MTD Month to_Date"
+      },
+      "Date_YTD_Year_to_Date_Group_Interval_Quarter_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Quarter",
+        "preset": "YTD Year to_Date"
+      },
+      "Date_Last_Week_Group_Interval_Month_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Month",
+        "preset": "Last Week"
+      },
+      "Date_Last_2_Weeks_Group_Interval_Date_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Date",
+        "preset": "Last 2 Weeks"
+      },
+      "Date_Last_Month_Group_Interval_not_specified_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Month"
+      },
+      "Date_Last_Quarter_Group_Interval_not_specified_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Quarter"
+      },
+      "Date_Last_3_Months_Group_Interval_not_specified_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 3 Months"
+      },
+      "Date_Last_6_Months_Group_Interval_not_specified_as_admin": {
+        "user": "admin",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 6 Months"
+      },
+      "Date_This_Week_Group_Interval_not_specified_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "This Week"
+      },
+      "Date_MTD_Month_to_Date_Group_Interval_Year_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Year",
+        "preset": "MTD Month to_Date"
+      },
+      "Date_YTD_Year_to_Date_Group_Interval_Quarter_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Quarter",
+        "preset": "YTD Year to_Date"
+      },
+      "Date_Last_Week_Group_Interval_Month_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Month",
+        "preset": "Last Week"
+      },
+      "Date_Last_2_Weeks_Group_Interval_Date_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": true,
+        "groupInterval": "Date",
+        "preset": "Last 2 Weeks"
+      },
+      "Date_Last_Month_Group_Interval_not_specified_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Month"
+      },
+      "Date_Last_Quarter_Group_Interval_not_specified_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last Quarter"
+      },
+      "Date_Last_3_Months_Group_Interval_not_specified_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 3 Months"
+      },
+      "Date_Last_6_Months_Group_Interval_not_specified_as_user": {
+        "user": "userOne",
+        "fieldType": "date",
+        "groupIntervalSpecified": false,
+        "preset": "Last 6 Months"
+      },
+      "String_Equals_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": 10
+      },
+      "String_Not_equal_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Not equal",
+        "value": 10
+      },
+      "String_Is_in_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Is in",
+        "value": 10
+      },
+      "String_Is_not_in_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Is not in",
+        "value": 10
+      },
+      "String_Contains_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Contains",
+        "value": 10
+      },
+      "String_Starts_with_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Starts with",
+        "value": 10
+      },
+      "String_Ends_with_as_admin": {
+        "user": "admin",
+        "fieldType": "string",
+        "operator": "Ends with",
+        "value": 10
+      },
+      "String_Equals_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Equals",
+        "value": 10
+      },
+      "String_Not_equal_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Not equal",
+        "value": 10
+      },
+      "String_Is_in_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Is in",
+        "value": 10
+      },
+      "String_Is_not_in_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Is not in",
+        "value": 10
+      },
+      "String_Contains_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Contains",
+        "value": 10
+      },
+      "String_Starts_with_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Starts with",
+        "value": 10
+      },
+      "String_Ends_with_as_user": {
+        "user": "userOne",
+        "fieldType": "string",
+        "operator": "Ends with",
+        "value": 10
+      },
+      "Number_Greater_than_Aggregate_function_Average_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "AVG",
+        "operator": "Greater_than",
+        "value": 10
+      },
+      "Number_Less_than_Aggregate_function_Minimum_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "MIN",
+        "operator": "Less than",
+        "value": 10
+      },
+      "Number_Greater_than_or_equal_to_Aggregate_function_Maximum_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "MAX",
+        "operator": "Greater_than or equal to",
+        "value": 10
+      },
+      "Number_Less_than_or_equal_to_Aggregate_function_Count_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": "Count",
+        "operator": "Less than or equal to",
+        "value": 10
+      },
+      "Number_Greater_than_Aggregate_function_default_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Greater_than",
+        "value": 10
+      },
+      "Number_Less_than_Aggregate_function_default_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Less than",
+        "value": 10
+      },
+      "Number_Greater_than_to_equal_to_Aggregate_function_default_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Greater_than or equal to",
+        "value": 10
+      },
+      "Number_Less_than_or_equal_to_Aggregate_function_default_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Less than or equal to",
+        "value": 10
+      },
+      "Number_Equal_to_Aggregate_function_default_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Equal to",
+        "value": 10
+      },
+      "Number_Not_equal_to_Aggregate_function_default_as_admin": {
+        "user": "admin",
+        "fieldType": "number",
+        "aggregateFunction": false,
+        "operator": "Not equal to",
+        "value": 10
+      }
+    }
+  },
+  "DASHBOARDWITHCHARTS":{
+    "dashboardWithChartsDataProvider":{
+      "ComboChartByAdmin": {"user": "admin", "chartType": "chart:combo"},
+      "ComboChartByUser": {"user": "userOne", "chartType": "chart:combo"},
+      "ColumnChartByAdmin": {"user": "admin", "chartType": "chart:column"},
+      "ColumnChartByUser": {"user": "userOne", "chartType": "chart:column"},
+      "BarChartByAdmin": {"user": "admin", "chartType": "chart:bar"},
+      "BarChartByUser": {"user": "userOne", "chartType": "chart:bar"},
+      "StackedChartByAdmin": {"user": "admin", "chartType": "chart:stack"},
+      "StackedChartByUser": {"user": "userOne", "chartType": "chart:stack"},
+      "LineChartByAdmin": {"user": "admin", "chartType": "chart:line"},
+      "LineChartByUser": {"user": "userOne", "chartType": "chart:line"},
+      "AreaChartByAdmin": {"user": "admin", "chartType": "chart:area"},
+      "AreaChartByUser": {"user": "userOne", "chartType": "chart:area"},
+      "ScatterPlotChartByAdmin": {"user": "admin", "chartType": "chart:scatter"},
+      "ScatterPlotChartByUser": {"user": "userOne", "chartType": "chart:scatter"},
+      "BubbleChartByAdmin": {"user": "admin", "chartType": "chart:bubble"},
+      "BubbleChartByUser": {"user": "userOne", "chartType": "chart:bubble"}
+    }
+  },
+  "DASHBOARDWITHESREPORT": {
+    "dashboardWithESReportDataProvider": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
+
+  "DASHBOARDWITHSNAPSHOTKPI": {
+    "dashboardWithSnapshotKpiDataProvider": {
+      "dashboard_with_column_by_admin": {
+        "user": "admin",
+        "kpiInfo": {
+          "column": "Long",
+          "date":  "Date",
+          "filter": "This Week",
+          "primaryAggregation": "Sum",
+          "secondaryAggregations": ["Sum", "Average", "Minimum", "Maximum", "Count"],
+          "backgroundColor": "green"
+        }
+      },
+      "dashboard_with_Float_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date":  "Date",
+          "filter": "Yesterday",
+          "primaryAggregation": "Average",
+          "secondaryAggregations": ["Sum", "Average", "Minimum", "Maximum", "Count"],
+          "backgroundColor": "green"
+        }
+      },
+      "dashboard_with_Integer_by_admin": {
+        "user": "admin",
+        "kpiInfo": {
+          "column": "Integer",
+          "date":  "Date",
+          "filter": "MTD (Month to Date)",
+          "primaryAggregation": "Minimum",
+          "secondaryAggregations": ["Sum", "Average", "Minimum", "Maximum", "Count"],
+          "backgroundColor": "black"
+        }
+      },
+      "dashboard_with_Double_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Double",
+          "date":  "Date",
+          "filter": "Last Week",
+          "primaryAggregation": "Maximum",
+          "secondaryAggregations": ["Sum", "Average", "Minimum", "Maximum", "Count"],
+          "backgroundColor": "blue"
+        }
       }
     }
   }

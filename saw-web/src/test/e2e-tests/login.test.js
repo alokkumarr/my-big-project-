@@ -27,9 +27,6 @@ describe('Login Tests: login.test.js', () => {
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  afterAll(function () {
-  });
-
   using(testDataReader.testData['LOGIN']['loginDataProvider'], function (data, description) {
     it('Should successfully logged in by ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'LOGIN', dp:'loginDataProvider'}), function () {
       loginPage.loginAs(data.role);

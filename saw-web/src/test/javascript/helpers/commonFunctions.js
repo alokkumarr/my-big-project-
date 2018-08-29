@@ -70,7 +70,6 @@ module.exports = {
   logOutByClearingLocalStorage() {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');
-    browser.deleteAllCookies();
   },
   scrollIntoView(element) {
     arguments[0].scrollIntoView();
