@@ -2,55 +2,59 @@
 % Please edit documentation in R/forecaster.R
 \name{forecaster}
 \alias{forecaster}
-\alias{forecaster.data.frame}
-\alias{forecaster.tbl_spark}
-\title{Forecaster Component}
+\title{Forecaster Constructer Function}
 \usage{
-forecaster(...)
-
-\method{forecaster}{data.frame}(df, index_var, group_vars = NULL,
-  measure_vars, periods, unit = NULL, pipe = NULL,
-  models = list(list(method = "auto.arima", method_args = list()), list(method
-  = "ets", method_args = list())), splits = c(0.8, 0.2), conf_levels = c(80,
-  95), ...)
-
-\method{forecaster}{tbl_spark}(df, index_var, group_vars = NULL, measure_vars,
-  periods, unit = NULL, pipe = NULL, models = list(list(method =
-  "auto.arima"), list(method = "ets")), splits = c(0.8, 0.2),
-  conf_levels = c(80, 95), ...)
+forecaster(df, target, index_var, unit = NULL, frequency = NULL,
+  prediction_conf_levels = c(80, 95), name = NULL, id = NULL,
+  version = NULL, desc = NULL, scientist = NULL,
+  execution_strategy = "sequential", refit = TRUE, save_submodels = TRUE,
+  dir = NULL, ...)
 }
 \arguments{
-\item{...}{additional arguments to pass on. not currently implemented}
-
 \item{df}{dataframe with target variable and any potential predictors}
+
+\item{target}{target variable for supervised use cases such as forecaster,
+regressor, and classifier}
 
 \item{index_var}{column name of index variable. index variable should be
 either sequential numeric, date or datetime.}
 
-\item{group_vars}{optional column name of grouping variables. splits data and
-applies auto_forecaster to each group}
+\item{unit}{index variable unit for date or datetime variables. ex - days
+for date index variable.}
 
-\item{measure_vars}{colname names of variables to forecast}
+\item{frequency}{seasonaly frequency of target. Default is NULL - no
+seasonality}
 
-\item{periods}{number of periods to forecast}
+\item{prediction_conf_levels}{prediction confidence levels. Default is 80 and
+95 percent CIs}
 
-\item{unit}{unit of index variable default is null}
+\item{name}{optional name for use case. Default is to append target with type}
 
-\item{pipe}{pipeline object}
+\item{version}{optional version string. will default to '1.0'}
 
-\item{models}{nested list of arguments to pass to add_model function. Each
-element in list requires at least a method argument. Pipe argument made
-globally}
+\item{desc}{optional description of the use case.}
 
-\item{splits}{holdout splits ratios default is 80-20 train to validation}
+\item{scientist}{optional input for scientist building model. defaults to
+system user}
 
-\item{conf_levels}{forecast confidence levels. default is 80 and 90 percent}
+\item{execution_strategy}{name of evaluation function to use for resolving a
+future. Used for model training execution. default is sequential}
+
+\item{refit}{logical option to refit model to entire training dataset sample.
+If grid parameters supplied, the best param set determined by validation
+sample performance will be used. Default is true}
+
+\item{save_submodels}{logical flag to save sub model fits. Default is TRUE}
+
+\item{dir}{optional directory path for saving reports, data and models}
+
+\item{...}{any addtional parameters}
 }
 \description{
-Component function creates forecasts by preparing the data and using the
-auto_forecast function
+Creates a forecaster object which inherits from modeler class
 }
-\details{
-Methods for spark and R data.frames. Spark method applies auto_forecast
-function with distributed R
+\seealso{
+Other use cases: \code{\link{classifier}},
+  \code{\link{modeler}}, \code{\link{regressor}},
+  \code{\link{segmenter}}
 }

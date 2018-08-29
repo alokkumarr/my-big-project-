@@ -10,19 +10,19 @@
 #' @family use cases
 #' @aliases regression
 #' @export
-new_regressor <- function(df,
-                          target,
-                          name = NULL,
-                          uid = NULL,
-                          version = NULL,
-                          desc = NULL,
-                          scientist = NULL,
-                          execution_strategy = "sequential",
-                          refit = TRUE,
-                          save_submodels = TRUE,
-                          dir = NULL,
-                          seed = 319,
-                          ...){
+regressor <- function(df,
+                      target,
+                      name = NULL,
+                      uid = NULL,
+                      version = NULL,
+                      desc = NULL,
+                      scientist = NULL,
+                      execution_strategy = "sequential",
+                      refit = TRUE,
+                      save_submodels = TRUE,
+                      dir = NULL,
+                      seed = 319,
+                      ...){
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
   
