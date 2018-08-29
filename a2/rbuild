@@ -25,7 +25,7 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     Rscript -e 'deps <- devtools::dev_package_deps(dependencies = NA);devtools::install_deps(dependencies = TRUE);if (!all(deps$package %in% installed.packages())) { message("missing: ", paste(setdiff(deps$package, installed.packages()), collapse=", ")); q(status = 1, save = "no")}'
     R CMD build .
     # Note: Skip a2munge and a2modeler tests until fixed
-    if [ $dir != a2munge -a $dir != a2modeler ]; then
+    if [ $dir != a2modeler ]; then
         R CMD check *.tar.gz
     fi
     # Copy the R package build artifacts into the target directory,
