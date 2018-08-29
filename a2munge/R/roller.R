@@ -143,6 +143,7 @@ roller.data.frame <- function(df,
 
 
 #' @rdname roller
+#' @importFrom DBI dbSendQuery
 #' @export
 roller.tbl_spark <- function(df,
                              order_vars,

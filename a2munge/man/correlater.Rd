@@ -6,14 +6,15 @@
 \alias{correlater.tbl_spark}
 \title{DataFrame Correlater function}
 \usage{
-correlater(df, target_var, transform, output_col_names, remove_diag, collect)
+correlater(df, target_var, transform, output_col_names, remove_diag, collect,
+  ...)
 
 \method{correlater}{data.frame}(df, target_var = NULL, transform = NULL,
-  output_col_names = c("var1", "var2", "cor"), remove_diag = FALSE)
+  output_col_names = c("var1", "var2", "cor"), remove_diag = FALSE, ...)
 
 \method{correlater}{tbl_spark}(df, target_var = NULL, transform = NULL,
   output_col_names = c("var1", "var2", "cor"), remove_diag = FALSE,
-  collect = TRUE)
+  collect = TRUE, ...)
 }
 \arguments{
 \item{df}{DataFrame}
@@ -34,6 +35,8 @@ the correlation matrix}
 
 \item{collect}{logical option to collect transformed dataset into R prior to
 corr function. applies to Spark DataFrames only}
+
+\item{...}{not currently implemented}
 }
 \value{
 Dataframe with pairwise correlation values in narrow, long format
