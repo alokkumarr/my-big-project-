@@ -32,15 +32,15 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['ANALYZE']['analyzeDataProvider'], function (data, description) {
+  using(testDataReader.testData['ANALYZE']['analyzeDataProvider'] ? testDataReader.testData['ANALYZE']['analyzeDataProvider']: {}, function (data, description) {
       it('should display list view by default '+description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ANALYZE', dp:'analyzeDataProvider'}), function () {
         loginPage.loginAs(data.user);
         analyzePage.validateListView();
       });
   });
 
-  using(testDataReader.testData['ANALYZE']['analyzeDataProvider2'], function (data, description) {
-    it('should land on analyze page' +description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ANALYZE', dp:'analyzeDataProvider2'}), function () {
+  using(testDataReader.testData['ANALYZE']['analyzeDataProvider2'] ? testDataReader.testData['ANALYZE']['analyzeDataProvider2'] : {}, function (data, description) {
+    it('should land on analyze page ' +description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ANALYZE', dp:'analyzeDataProvider2'}), function () {
       loginPage.loginAs(data.user);
       // the app should automatically navigate to the analyze page
       // and when its on there the current module link is disabled

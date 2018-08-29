@@ -474,14 +474,14 @@
         "fieldType": "date",
         "groupIntervalSpecified": true,
         "groupInterval": "Year",
-        "preset": "MTD Month to_Date"
+        "preset": "MTD (Month to Date)"
       },
       "Date_YTD_Year_to_Date_Group_Interval_Quarter_as_admin": {
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": true,
         "groupInterval": "Quarter",
-        "preset": "YTD Year to_Date"
+        "preset": "YTD (Year to Date)"
       },
       "Date_Last_Week_Group_Interval_Month_as_admin": {
         "user": "admin",
@@ -503,7 +503,7 @@
         "groupIntervalSpecified": false,
         "preset": "Last Month"
       },
-      "Date_Last_Quarter_Group_Interval_not_specified_as_admin": {
+      "Date_Las_Quarter_Group_Interval_not_specified_as_admin": {
         "user": "admin",
         "fieldType": "date",
         "groupIntervalSpecified": false,
@@ -532,14 +532,14 @@
         "fieldType": "date",
         "groupIntervalSpecified": true,
         "groupInterval": "Year",
-        "preset": "MTD Month to_Date"
+        "preset": "MTD (Month to Date)"
       },
       "Date_YTD_Year_to_Date_Group_Interval_Quarter_as_user": {
         "user": "userOne",
         "fieldType": "date",
         "groupIntervalSpecified": true,
         "groupInterval": "Quarter",
-        "preset": "YTD Year to_Date"
+        "preset": "YTD (Year to Date)"
       },
       "Date_Last_Week_Group_Interval_Month_as_user": {
         "user": "userOne",
@@ -591,149 +591,148 @@
         "operator": "Not equal",
         "value": 10
       },
-      "String_Is_in_as_admin": {
-        "user": "admin",
-        "fieldType": "string",
-        "operator": "Is in",
-        "value": 10
-      },
-      "String_Is_not_in_as_admin": {
-        "user": "admin",
-        "fieldType": "string",
-        "operator": "Is not in",
-        "value": 10
-      },
-      "String_Contains_as_admin": {
-        "user": "admin",
-        "fieldType": "string",
-        "operator": "Contains",
-        "value": 10
-      },
-      "String_Starts_with_as_admin": {
-        "user": "admin",
-        "fieldType": "string",
-        "operator": "Starts with",
-        "value": 10
-      },
-      "String_Ends_with_as_admin": {
-        "user": "admin",
-        "fieldType": "string",
-        "operator": "Ends with",
-        "value": 10
-      },
-      "String_Equals_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Equals",
-        "value": 10
-      },
-      "String_Not_equal_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Not equal",
-        "value": 10
-      },
-      "String_Is_in_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Is in",
-        "value": 10
-      },
-      "String_Is_not_in_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Is not in",
-        "value": 10
-      },
-      "String_Contains_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Contains",
-        "value": 10
-      },
-      "String_Starts_with_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Starts with",
-        "value": 10
-      },
-      "String_Ends_with_as_user": {
-        "user": "userOne",
-        "fieldType": "string",
-        "operator": "Ends with",
-        "value": 10
-      },
-      "Number_Greater_than_Aggregate_function_Average_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": "AVG",
-        "operator": "Greater_than",
-        "value": 10
-      },
-      "Number_Less_than_Aggregate_function_Minimum_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": "MIN",
-        "operator": "Less than",
-        "value": 10
-      },
-      "Number_Greater_than_or_equal_to_Aggregate_function_Maximum_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": "MAX",
-        "operator": "Greater_than or equal to",
-        "value": 10
-      },
-      "Number_Less_than_or_equal_to_Aggregate_function_Count_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": "Count",
-        "operator": "Less than or equal to",
-        "value": 10
-      },
-      "Number_Greater_than_Aggregate_function_default_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": false,
-        "operator": "Greater_than",
-        "value": 10
-      },
-      "Number_Less_than_Aggregate_function_default_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": false,
-        "operator": "Less than",
-        "value": 10
-      },
-      "Number_Greater_than_to_equal_to_Aggregate_function_default_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": false,
-        "operator": "Greater_than or equal to",
-        "value": 10
-      },
-      "Number_Less_than_or_equal_to_Aggregate_function_default_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": false,
-        "operator": "Less than or equal to",
-        "value": 10
-      },
-      "Number_Equal_to_Aggregate_function_default_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": false,
-        "operator": "Equal to",
-        "value": 10
-      },
-      "Number_Not_equal_to_Aggregate_function_default_as_admin": {
-        "user": "admin",
-        "fieldType": "number",
-        "aggregateFunction": false,
-        "operator": "Not equal to",
-        "value": 10
-      }
-    }
+        "String_Is_in_as_admin": {
+          "user": "admin",
+          "fieldType": "string",
+          "operator": "Is in",
+          "value": 10
+        },
+        "String_Is_not_in_as_admin": {
+          "user": "admin",
+          "fieldType": "string",
+          "operator": "Is not in",
+          "value": 10
+        },
+        "String_Contains_as_admin": {
+          "user": "admin",
+          "fieldType": "string",
+          "operator": "Contains",
+          "value": 10
+        },
+        "String_Starts_with_as_admin": {
+          "user": "admin",
+          "fieldType": "string",
+          "operator": "Starts with",
+          "value": 10
+        },
+        "String_Ends_with_as_admin": {
+          "user": "admin",
+          "fieldType": "string",
+          "operator": "Ends with",
+          "value": 10
+        },
+        "String_Equals_as_user": {
+          "user": "userOne",
+          "fieldType": "string",
+          "operator": "Equals",
+          "value": 10
+        },
+        "String_Not_equal_as_user": {
+          "user": "userOne",
+          "fieldType": "string",
+          "operator": "Not equal",
+          "value": 10
+        },
+        "String_Is_in_as_user": {
+          "fieldType": "string",
+          "operator": "Is in",
+          "value": 10
+        },
+        "String_Is_not_in_as_user": {
+          "user": "userOne",
+          "fieldType": "string",
+          "operator": "Is not in",
+          "value": 10
+        },
+        "String_Contains_as_user": {
+          "user": "userOne",
+          "fieldType": "string",
+          "operator": "Contains",
+          "value": 10
+        },
+        "String_Starts_with_as_user": {
+          "user": "userOne",
+          "fieldType": "string",
+          "operator": "Starts with",
+          "value": 10
+        },
+        "String_Ends_with_as_user": {
+          "user": "userOne",
+          "fieldType": "string",
+          "operator": "Ends with",
+          "value": 10
+        },
+        "Number_Greater_than_Aggregate_function_Average_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": "AVG",
+          "operator": "Greater than",
+          "value": 10
+        },
+        "Number_Less_than_Aggregate_function_Minimum_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": "MIN",
+          "operator": "Less than",
+          "value": 10
+        },
+        "Number_Greater_than_or_equal_to_Aggregate_function_Maximum_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": "MAX",
+          "operator": "Greater than or equal to",
+          "value": 10
+        },
+        "Number_Less_than_or_equal_to_Aggregate_function_Count_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": "Count",
+          "operator": "Less than or equal to",
+          "value": 10
+        },
+        "Number_Greater_than_Aggregate_function_default_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": false,
+          "operator": "Greater than",
+          "value": 10
+        },
+        "Number_Less_than_Aggregate_function_default_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": false,
+          "operator": "Less than",
+          "value": 10
+        },
+        "Number_Greater_than_or_equal_to_Aggregate_function_default_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": false,
+          "operator": "Greater than or equal to",
+          "value": 10
+        },
+        "Number_Less_than_or_equal_to_Aggregate_function_default_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": false,
+          "operator": "Less than or equal to",
+          "value": 10
+        },
+        "Number_Equal_to_Aggregate_function_default_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": false,
+          "operator": "Equal to",
+          "value": 10
+        },
+        "Number_Not equal_to_Aggregate_function_default_as_admin": {
+          "user": "admin",
+          "fieldType": "number",
+          "aggregateFunction": false,
+          "operator": "Not equal to",
+          "value": 10
+        }
+    }      
   },
   "DASHBOARDWITHCHARTS":{
     "dashboardWithChartsDataProvider":{
