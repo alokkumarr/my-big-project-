@@ -6,11 +6,10 @@
 <div class="base-dialog__content dialog__content" fxLayout="column" fxLayoutAlign="start start">
   <strong class="delete-message">Category Name: {{data.category.categoryName}}</strong>
 
-  <div class="delete-message" *ngIf="data.category.subCategories.length > 0 && data.category.categoryName.toUpperCase() !== 'MY ANALYSIS'" i18n>
-      Please delete the below sub-categories before deleting the category.
+  <div class="delete-message" *ngIf="data.category.subCategories.length > 0 && data.category.categoryId !== MY_ANALYSIS_CATEGORY_ID" i18n>
+    Please delete the below sub-categories before deleting the category.
   </div>
-
-  <div class="delete-message" *ngIf="data.category.categoryName.toUpperCase() === 'MY ANALYSIS'" i18n>
+  <div class="delete-message" *ngIf="data.category.categoryId === MY_ANALYSIS_CATEGORY_ID" i18n>
     This Category cannot be deleted.
   </div>
 
@@ -33,7 +32,7 @@
 
 <div fxLayout="row" fxLayoutAlign="space-between center" class="base-dialog__actions">
   <button (click)="deleteCategory()"
-          [disabled]="data.category.subCategories.length > 0 || data.category.categoryName.toUpperCase() == 'MY ANALYSIS'"
+          [disabled]="data.category.subCategories.length > 0 || data.category.categoryId == MY_ANALYSIS_CATEGORY_ID"
           color="primary"
           mat-raised-button
           i18n>

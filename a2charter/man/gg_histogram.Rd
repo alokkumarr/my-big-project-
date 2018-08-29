@@ -74,8 +74,6 @@ options}
 color is set to a variable. expects a palette name. default is "a2" for a2
 palette}
 
-\item{...}{}
-
 \item{...}{Arguments passed on to \code{ggplot2::geom_histogram}
 \describe{
   \item{mapping}{Set of aesthetic mappings created by \code{\link[=aes]{aes()}} or
@@ -143,18 +141,22 @@ d <- mtcars \%>\% mutate(am = as.factor(am))
 # Create series of basic charts
 gg_histogram(d, "mpg")
 gg_histogram(d, "mpg", fill="steelblue", color="grey25")
-gg_histogram(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message")
-gg_histogram(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme="minimal")
+gg_histogram(d, "mpg", fill="steelblue", color="grey25",
+             title="Crouching Plot", caption = "hidden message")
+gg_histogram(d, "mpg", fill="steelblue", color="grey25",
+             title="Crouching Plot", caption = "hidden message", theme="minimal")
 
 # A few charts with additional features
 gg_histogram(d, "mpg", fill="am", color="am")
 gg_histogram(d, "mpg", fill="am", color="am", bins=7)
-gg_histogram(d, "mpg", fill="am", color="am", bins=7, palette = pals::viridis(2), alpha=.75)
+gg_histogram(d, "mpg", fill="am", color="am", bins=7,
+             palette = "viridis", alpha=.75)
 gg_histogram(d, "mpg", fill="am", facet_formula = "~am", bins=7)
-gg_histogram(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), bins=7)
-gg_histogram(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), bins=7)
+gg_histogram(d, "mpg", fill="am", facet_formula = "~am",
+             facet_args = list(scales="free"), bins=7)
+gg_histogram(d, "mpg", fill="am", facet_formula = "cyl~am",
+             facet_args = list(scales="free_y"), bins=7)
 gg_histogram(d, "mpg", fill="am", color="am", coord="flip", bins=7)
-
 }
 \seealso{
 For more details on the geom_histogram check out

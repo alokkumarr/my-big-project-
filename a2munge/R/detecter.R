@@ -31,6 +31,8 @@
 #' @return dataframe with same number of records as input dataframe. Appends
 #'   additional fields for seasonality, trend, residual, and anomaly. Anomalies
 #'   are coded with a binary flag of 1
+#'   
+#' @importFrom stats mad median qnorm stl ts
 #' @export
 detect <- function(df,
                    index_var,
@@ -185,7 +187,8 @@ detect.grouped_df <- function(df,
 #' Detecter is a wrapper function for the detect function. Detecter takes a
 #' normalized index based dataframe and reshapes for core detect function.
 #' Detecter allows for grouping and multiple measure variables
-#'
+#' 
+#' @param measure_vars numeric measure variables to analyze
 #' @param group_vars optional vector of grouping variables to apply dectect
 #'   function to. default is NULL - no grouping
 #' @inheritParams detect

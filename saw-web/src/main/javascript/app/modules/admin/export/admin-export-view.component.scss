@@ -1,0 +1,35 @@
+@import "themes/base/colors";
+$toolbar-height: 74px;
+
+admin-export-view {
+  max-height: calc(100vh - (63px + 55px));
+
+  .admin-title {
+    color: $grey-text-color;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .mat-toolbar {
+    background-color: transparent;
+    height: auto;
+    padding: 0 20px;
+
+    .mat-form-field {
+      max-width: 100%;
+      width: auto;
+      margin: 0;
+      font-size: 16px;
+
+      .mat-form-field-infix {
+        width: unset;
+      }
+    }
+  }
+
+  admin-export-list {
+    padding: 0 20px;
+    height: calc(100% - 74px);
+    display: block;
+  }
+}

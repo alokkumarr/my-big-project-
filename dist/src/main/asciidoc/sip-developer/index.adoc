@@ -68,7 +68,7 @@ The HTTP response:
 
 include::{snippets}/sso-authentication/http-response.adoc[]
 
-== Saw scheduler API :
+== SAW scheduler API :
 
 === Create schedule
 The HTTP request:
@@ -97,4 +97,54 @@ include::{snippets}/list-schedule/http-request.adoc[]
 The HTTP response:
 
 include::{snippets}/list-schedule/http-response.adoc[]
+
+== Enable case insensitive filter
+SAW supports the case insensitive filter options for data lake and elasticsearch
+data sources.
+
+=== Elasticsearch
+To support case insensitive filter in elasticsearch type analysis below settings
+needs to be included, while creating the elasticsearch index mapping to allow the
+search as case insensitive.
+
+    "settings": {
+        "analysis": {
+          "analyzer": {
+            "analyzer_custom": {
+              "type": "custom",
+              "filter": [
+                "lowercase"
+              ],
+              "tokenizer": "keyword"
+            }
+          }
+        }
+      }
+
+Update the ES fields mapping with custom analyzer as below for those fields,
+which are all eligible for case insensitive (String type fields)
+
+    "product" : {
+           "type" : "keyword",
+           "fields" : {
+             "keyword" : {
+               "type" : "keyword",
+               "ignore_above" : 256
+             },
+             "filter" : {
+               "type": "text",
+               "analyzer": "analyzer_custom"
+             }
+           }
+         }
+       }
+
+NOTE: The above settings are optional to support case insensitive filtering.
+ If these settings are not applied, elasticsearch analysis filters will be case
+  sensitive.
+
+=== Data Lake
+To support case insensitive filter for data lake analysis, there are no
+additional setting required. By default saw has native support for this option.
+
 

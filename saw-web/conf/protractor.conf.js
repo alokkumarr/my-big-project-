@@ -18,36 +18,36 @@ var HtmlReporter = require('protractor-beautiful-reporter');
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 600000;
+const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
  */
 
-const implicitlyWait = webpackHelper.distRun() ? 40000 : 40000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 60000 : 60000;//30000 // = 30 sec; Sometimes element will not
+const implicitlyWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedImplicitlyWait = webpackHelper.distRun() ? 50000 : 30000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 40000 : 40000;//20000
+const fluentWait = webpackHelper.distRun() ? 50000 : 30000;
 
 /**
  * Default time to wait in ms before a test fails
  * Fixes error: jasmine default timeout interval
  */
-const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 600000;//20000
+const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 300000;
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 3600000 : 3600000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 5400000 : 3600000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
+const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
- * number of failed retry, 3 times in bamboo and 2 times in local
+ * number of failed retry
  */
 const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 2;
 
@@ -93,7 +93,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently 
+  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
   capabilities: {
@@ -162,15 +162,17 @@ exports.config = {
       testBaseDir + 'pivots/pivotFilters.test.js',
       // Observe module test cases
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js'
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'priviliges.test.js'
+      testBaseDir + 'login.test.js'
     ]
   },
+  suite:'regression',
   onCleanUp: function (results) {
     retry.onCleanUp(results);
   },

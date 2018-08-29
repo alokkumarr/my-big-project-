@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# Preinstall R package dependencies
+#
+# Install manually enumerated packages from the SIP Advanced Analytics
+# R package DESCRIPTION files here, to speed up repeated builds by
+# using the Docker build image cache.
+#
+set -eu
+
+dir=$(dirname $0)
+cd $dir
+
+echo 'options(repos = c(CRAN = "http://cloud.r-project.org"))' > ~/.Rprofile
+
+# Workaround: Some R packages give an error when trying to install
+# documentation due to a missing directory, so create it here.
+mkdir -p /usr/share/doc/R-3.5.0/html
+
+precache='"testthat","dplyr","magrittr","tidyr","rlang","checkmate","ggplot2","forcats","Hmisc","scales","pals","gridExtra","proto","shiny","sparklyr","reshape2","zoo","lubridate","httr","purrr","jsonlite","forecast","doFuture","foreach","iterators","future"'
+
+# Install dependencies
+Rscript -e 'install.packages(c("devtools", '"$precache"')); if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'

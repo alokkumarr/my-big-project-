@@ -4,6 +4,8 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as isString from 'lodash/isString';
 import * as upperCase from 'lodash/upperCase';
+import * as forEach from 'lodash/forEach';
+import * as cloneDeep from 'lodash/cloneDeep';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { Analysis } from '../types';
 import { AnalyzeActionsService } from './analyze-actions.service';
@@ -85,6 +87,17 @@ export class AnalyzeActionsMenuComponent {
 
       return notExcluded && hasPriviledge;
     });
+
+    this.analysis = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
+  }
+
+  generateRequestPayload(analysis) {
+    forEach(analysis.artifacts, cols=> {
+      forEach(cols.columns, col=>{
+        delete col.checked;
+      })
+    })
+    return analysis;
   }
 
   edit() {
@@ -104,6 +117,7 @@ export class AnalyzeActionsMenuComponent {
   }
 
   execute() {
+    this.analysis = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
     this._analyzeActionsService.execute(this.analysis).then(analysis => {
       if (analysis) {
         this.afterExecute.emit(analysis);
