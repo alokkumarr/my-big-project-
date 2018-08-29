@@ -3,7 +3,6 @@ const using = require('jasmine-data-provider');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const protractorConf = require('../../../../conf/protractor.conf');
-const using = require('jasmine-data-provider');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
