@@ -40,11 +40,9 @@ will be of the class string.
 }
 \examples{
 
-library(crayon, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 library(dplyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 library(sparklyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 library(lubridate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
-library(checkmate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 
 date_func_df <- data.frame(TIME_COL = as.POSIXlt(c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59")), stringsAsFactors = FALSE)
 

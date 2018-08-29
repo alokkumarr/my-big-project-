@@ -22,11 +22,9 @@
 #'
 #'@examples
 #'
-#'library(crayon, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(dplyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(sparklyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(lubridate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
-#'library(checkmate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'
 #'date_func_df <- data.frame(STRING_COL = c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59"), stringsAsFactors = FALSE)
 #'
@@ -52,26 +50,26 @@ dateconverter.data.frame <- function(df,
                                      time_zone = "UTC",
                                      output_suffix = "CONV") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
-  
+
   checkmate::assert_choice(output_type,
                            c("date",
                              "datetime"))
-  
+
   # Derive Output colum name by adding a configured suffix
-  
+
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
-  
+
   # Get a list of columns to be extracted so that all intermediate columns are removed
   # from final result
-  
+
   select_vars <- c(colnames(df), output_col_name)
-  
+
   # Derive the Input & Output formats required for R data frames in the
   # format required for the lubridate functions
-  
+
   chk_input_format <- gsub("[^A-z0-9_ ]", "", input_format)
   inp_for_chk <- ""
-  
+
   inp_for_chk <-
     case_when(
       chk_input_format == "MMddyyyy HHmmss" ~ "mdy_hms",
@@ -82,10 +80,10 @@ dateconverter.data.frame <- function(df,
       chk_input_format == "ddMMyyyy HHmmss" ~ "dmy_hms",
       chk_input_format == "ddMMyyyy" ~ "dmy"
     )
-  
+
   # Update the DF with the output column which will have formatted
   # date value with collapsed period
-  
+
   if (output_type == "datetime") {
     df <- df %>%
       dplyr::rename(., DT_CHK_1 = !!measure_vars) %>%
@@ -97,7 +95,7 @@ dateconverter.data.frame <- function(df,
       mutate(., !!output_col_name := as.Date(do.call(inp_for_chk, list(DT_CHK_1)))) %>%
       dplyr::rename(., !!measure_vars := DT_CHK_1)
   }
-  
+
   df
 }
 
@@ -113,7 +111,7 @@ dateconverter.tbl_spark <- function(df,
                                     time_zone = "UTC",
                                     output_suffix = "CONV") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
-  
+
   checkmate::assert_choice(
     input_format,
     c(
@@ -135,23 +133,23 @@ dateconverter.tbl_spark <- function(df,
       "dd/MM/yyyy"
     )
   )
-  
+
   checkmate::assert_choice(output_type,
                            c("date",
                              "datetime"))
-  
+
   # Derive Output colum name by adding a configured suffix
-  
+
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
-  
+
   # Get a list of columns to be extracted so that all intermediate columns are removed
   # from final result
-  
+
   select_vars <- c(colnames(df), output_col_name)
-  
+
   # Important Note. More testing is required to check if Time zones might be
   # an issue here due to the usage of epoch time for date formatting.
-  
+
   if (output_type == "datetime") {
     df <- df %>%
       rename(., DT_CHK_1 = !!measure_vars) %>%
@@ -173,6 +171,6 @@ dateconverter.tbl_spark <- function(df,
       dplyr::rename(., !!measure_vars := DT_CHK_1) %>%
       select(., select_vars)
   }
-  
+
   df
 }

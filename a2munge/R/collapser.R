@@ -25,11 +25,9 @@
 #'
 #'@examples
 #'
-#'library(crayon, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(dplyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(sparklyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(lubridate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
-#'library(checkmate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'
 #'date_func_df <- data.frame(TIME_COL = as.POSIXlt(c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59")), stringsAsFactors = FALSE)
 #'
@@ -53,22 +51,22 @@ collapser.data.frame <- function(df,
                                  time_zone = "UTC",
                                  output_suffix = "CEI") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
-  
+
   checkmate::assert_choice(unit,
                            c("minute",
                              "hour",
                              "day",
                              "month",
                              "year"))
-  
+
   checkmate::assert_subset(side,
                            c("start",
                              "end"))
-  
+
   # Derive Output colum name by adding a configured suffix
-  
+
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
-  
+
   if (unit == "month" || unit == "year") {
     df <- df %>%
       dplyr::rename(., DT_CEI_1 = !!measure_vars) %>%
@@ -92,9 +90,9 @@ collapser.data.frame <- function(df,
       )) %>%
       dplyr::rename(.,!!measure_vars := DT_CEI_1)
   }
-  
+
   df
-  
+
 }
 
 
@@ -107,27 +105,27 @@ collapser.tbl_spark <- function(df,
                                 time_zone = "UTC",
                                 output_suffix = "CEI") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
-  
+
   checkmate::assert_choice(unit,
                            c("minute",
                              "hour",
                              "day",
                              "month",
                              "year"))
-  
+
   checkmate::assert_subset(side,
                            c("start",
                              "end"))
-  
+
   # Derive Output colum name by adding a configured suffix
-  
+
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
-  
+
   d_sub <- ifelse(side == "start", 0, 1)
-  
+
   if (unit %in% c("year", "month")) {
     m_add <- ifelse(side == "start", 0, ifelse(unit == "month", 1, 12))
-    
+
     df <- df %>%
       rename(., DT_CHK_1 = !!measure_vars) %>%
       mutate(., !!output_col_name := date_sub(trunc(add_months(DT_CHK_1, m_add), unit), d_sub)) %>%
@@ -135,7 +133,7 @@ collapser.tbl_spark <- function(df,
   } else {
     r_num <- ifelse(unit == "minute", 60,
                     ifelse(unit == "hour", 60 ^ 2, 60 ^ 2 * 24))
-    
+
     if (side == "start") {
       df <- df %>%
         rename(., DT_CHK_1 = !!measure_vars) %>%
@@ -155,7 +153,7 @@ collapser.tbl_spark <- function(df,
         rename(., !!measure_vars := DT_CHK_1)
     }
   }
-  
+
   df
-  
+
 }

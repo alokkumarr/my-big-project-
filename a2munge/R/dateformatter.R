@@ -22,11 +22,9 @@
 #'
 #'@examples
 #'
-#'library(crayon, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(dplyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(sparklyr, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'library(lubridate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
-#'library(checkmate, lib.loc = "/dfs/opt/aa-r-fw/libraries/")
 #'
 #'date_func_df <- data.frame(TIME_COL = as.POSIXlt(c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59")), stringsAsFactors = FALSE)
 #'
@@ -50,7 +48,7 @@ dateformatter.data.frame <- function(df,
                                      output_format = "yyyy-MM-dd HH:mm:ss",
                                      output_suffix = "FMT") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
-  
+
   checkmate::assert_choice(
     input_format,
     c(
@@ -72,7 +70,7 @@ dateformatter.data.frame <- function(df,
       "dd/MM/yyyy"
     )
   )
-  
+
   checkmate::assert_choice(
     output_format,
     c(
@@ -90,22 +88,22 @@ dateformatter.data.frame <- function(df,
       "dd/MM/yyyy"
     )
   )
-  
+
   # Derive Output colum name by adding a configured suffix
-  
+
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
-  
+
   # Get a list of columns to be extracted so that all intermediate columns are removed
   # from final result
-  
+
   select_vars <- c(colnames(df), output_col_name)
-  
+
   # Derive the Input & Output formats required for R data frames in the
   # format required for the lubridate functions
-  
+
   chk_input_format <- gsub("[^A-z0-9_ ]", "", input_format)
   inp_for_chk <- ""
-  
+
   inp_for_chk <-
     dplyr::case_when(
       chk_input_format == "MMddyyyy HHmmss" ~ "mdy_hms",
@@ -116,7 +114,7 @@ dateformatter.data.frame <- function(df,
       chk_input_format == "ddMMyyyy HHmmss" ~ "dmy_hms",
       chk_input_format == "ddMMyyyy" ~ "dmy"
     )
-  
+
   rdf_output_format <-
     dplyr::case_when(
       output_format == "MM/dd/yyyy HH:mm:ss" ~ "%m/%d/%Y %H:%M:%S",
@@ -136,17 +134,17 @@ dateformatter.data.frame <- function(df,
       output_format == "dd/MM/yyyy HH:mm:ss" ~ "%d/%m/%Y %H:%M:%S",
       output_format == "dd/MM/yyyy" ~ "%d/%m/%Y"
     )
-  
+
   # Update the DF with the output column which will have required
   # format date value
-  
+
   df <- df %>%
     dplyr::rename(., DT_CHK_1 = !!measure_vars) %>%
     mutate(., DT_CHK_2 = do.call(inp_for_chk, list(DT_CHK_1))) %>%
     mutate(.,!!output_col_name := format(DT_CHK_2, !!rdf_output_format)) %>%
     dplyr::rename(.,!!measure_vars := DT_CHK_1) %>%
     select(., select_vars)
-  
+
   df
 }
 
@@ -160,7 +158,7 @@ dateformatter.tbl_spark <- function(df,
                                     output_format = "yyyy-MM-dd HH:mm:ss",
                                     output_suffix = "FMT") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
-  
+
   checkmate::assert_choice(
     input_format,
     c(
@@ -182,7 +180,7 @@ dateformatter.tbl_spark <- function(df,
       "dd/MM/yyyy"
     )
   )
-  
+
   checkmate::assert_choice(
     output_format,
     c(
@@ -200,21 +198,21 @@ dateformatter.tbl_spark <- function(df,
       "dd/MM/yyyy"
     )
   )
-  
+
   # Derive Output colum name by adding a configured suffix
-  
+
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
-  
+
   # If period is Month & Collapse direction is end, Last_Day function has
   # to be used to get last day of the month.
   # Important Note. More testing is required to check if Time zones might be
   # an issue here due to the usage of epoch time for date formatting.
-  
+
   df <- df %>%
     rename(., DT_CHK_1 = !!measure_vars) %>%
     mutate(.,
            !!output_col_name := from_unixtime(unix_timestamp(DT_CHK_1,!!input_format),!!output_format)) %>%
     rename(.,!!measure_vars := DT_CHK_1)
-  
+
   df
 }
