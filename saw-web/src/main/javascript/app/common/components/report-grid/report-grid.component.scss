@@ -37,3 +37,44 @@
     }
   }
 }
+
+.dx-item-content.dx-menu-item-content {
+  height: 35px;
+}
+
+.cell-aggregate-icon {
+  float: left;
+  margin: 9px 5px 0 0;
+}
+
+.cell-caption {
+  float: left;
+  margin: 7px 0 0;
+}
+
+.cell-context-menu {
+  float: left;
+  margin: 8px 0 0 -70px;
+
+  .icon-menu {
+    font-size: 15px;
+  }
+}
+
+.icon-Count {
+  margin-top: -10px;
+}
+
+.icon-Count,
+.icon-Percentage {
+  margin-top: -10px;
+}
+
+.dx-menu-item-wrapper {
+  height: 35px !important;
+}
+
+.dx-context-menu.dx-datagrid.dx-menu-base {
+  top: 545px !important;
+  left: 154px !important;
+}

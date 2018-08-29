@@ -148,7 +148,7 @@ export class DesignerContainerComponent {
             joins: []
           };
         }
-        this.artifacts = this.analysis.artifacts;
+        this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
         this.initAuxSettings();
         this.analysis.edit = this.analysis.edit || false;
         unset(this.analysis, 'supports');
@@ -286,6 +286,23 @@ export class DesignerContainerComponent {
         };
       });
   }
+
+  loadGridWithoutData(column){
+    this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+    if(isEmpty(this.data)) {
+      this.data = [{}]
+    } else {
+      this.data.map(row => {
+        if (column.checked) {
+          row[column.name]='';
+        } else {
+          delete row[column.name];
+        }
+      });  
+    }
+    this.data = cloneDeep(this.data);
+  }
+
 
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
@@ -543,6 +560,7 @@ export class DesignerContainerComponent {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.areMinRequirmentsMet = this.canRequestData();
+      this.loadGridWithoutData(event.column);
       break;
     case 'removeColumn':
       this.cleanSorts();
@@ -551,6 +569,11 @@ export class DesignerContainerComponent {
       this.artifacts = [...this.artifacts];
       break;
     case 'aggregate':
+      forEach(this.analysis.artifacts[0].columns, col=> {
+        if(col.name == event.column.name) {
+          col.aggregate = event.column.aggregate;
+        }
+      })
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':

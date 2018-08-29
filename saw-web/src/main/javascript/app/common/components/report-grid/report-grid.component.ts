@@ -25,9 +25,17 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
-import { AGGREGATE_TYPES_OBJ, DATE_FORMATS_OBJ } from '../../consts.js';
+import { DATE_FORMATS_OBJ } from '../../consts.js';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as filter from 'lodash/filter';
+
+import {
+  AGGREGATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ,
+} from '../../consts';
+
 import {
   ArtifactColumnReport,
   Artifact,
@@ -66,6 +74,7 @@ type ReportGridField = {
   sortOrder?: 'asc' | 'desc';
   sortIndex?: number;
   changeColumnProp: Function;
+  headerCellTemplate: string;
 };
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -114,9 +123,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = isUndefined(this.analysis.sqlBuilder.dataFields)
-      ? this.artifacts2Columns(this.artifacts)
-      : this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
+    this.columns = this.artifacts2Columns(this.artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -139,6 +146,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
+    this.columns = this.artifacts2Columns(this.analysis.artifacts);
     this.data = data;
   }
   @Input('dataLoader')
@@ -199,6 +207,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     showPageSizeSelector: true
   };
   public loadPanel;
+  public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
     self = this;
@@ -313,6 +322,39 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (!this.isEditable || !this.columns) {
       return;
     }
+
+    let aggregations;
+    if (NUMBER_TYPES.includes(column.type)) {
+      aggregations = AGGREGATE_TYPES;
+    } else {
+      aggregations = filter(AGGREGATE_TYPES, type => {
+        return type.value === 'count';
+      });
+    }
+
+    let aggregateBasedOnType = [];
+    forEach(aggregations, aggregate=> {
+      aggregateBasedOnType.push({
+        text: aggregate.label,
+        icon: 'grid-menu-item ' + aggregate.icon,
+        onItemClick: () => {
+          column.payload.aggregate = aggregate.value;
+          this.aggregateColumn(column);
+        }
+      })
+    })
+
+    aggregateBasedOnType.push({
+      text: 'Reset to Default',
+      icon: 'grid-menu-item',
+      onItemClick: () => {
+        delete column.payload.aggregate;
+        this.aggregateColumn(column);
+      }
+    })
+
+
+
     event.items = [
       {
         text: 'Rename',
@@ -341,6 +383,29 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         }
       });
     }
+
+    if (this.analysis.type === 'esReport' && (
+      NUMBER_TYPES.includes(column.type) || 
+      column.dataType === 'string'
+    )) {
+      event.items.unshift({
+        text: 'Aggregation',
+        icon: 'grid-menu-item icon-more',
+        items: aggregateBasedOnType
+      });
+    }
+  }
+
+  aggregateColumn(payload, value) {
+    payload.aggregate = value;
+    if(value === 'clear') {
+      delete payload.aggregate;
+    }
+    console.log(payload)
+    this.change.emit({
+      subject: 'aggregate',
+      column: payload
+    });
   }
 
   removeColumn({ changeColumnProp, payload }: ReportGridField) {
@@ -352,6 +417,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   renameColumn({ payload, changeColumnProp }: ReportGridField) {
+    console.log("inside function");
+    console.log(payload);
     this.getNewDataThroughDialog(
       AliasRenameDialogComponent,
       { alias: payload.aliasName || '' },
@@ -426,6 +493,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
           visible: isUndefined(column.visible) ? true : column.visible,
           payload: column,
           format,
+          headerCellTemplate: 'headerCellTemplate',
           changeColumnProp: (prop, value) => {
             column[prop] = value;
           },
@@ -442,6 +510,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         return field;
       })
     )(artifacts);
+  }
+
+  onHeaderClick(cell) {
+    cell.cellElement.trigger('contextmenu');
   }
 
   preprocessFormatIfNeeded(format, type, aggregate) {
