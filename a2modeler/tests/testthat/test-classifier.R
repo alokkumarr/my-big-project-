@@ -59,7 +59,6 @@ test_that("Classifier Selects Best Model and Makes Predictions", {
   )
   expect_equal(c1$models[[1]]$pipe, c1$models[[2]]$pipe)
   
-  
   p1 <- predict(c1, data = df)
   expect_class(p1, "predictions")
 })
@@ -205,3 +204,38 @@ test_that("Classifier with parallel execution, test holdout and param_map", {
   expect_true(!is.null(c1$final_model$test_predictions))
 })
 
+
+test_that("The same seed value produces similar samples", {
+  
+  test_pipe <- pipeline(expr = function(df){select(df, y_bin, x)})
+  
+  d1 <- data.frame(x = rnorm(100)) %>%
+    mutate(y = -1 + 2 * x + rnorm(100, 0, sd = .5),
+           y_prob = gtools::inv.logit(y),
+           y_bin = rbinom(100, 1, y_prob)) %>% 
+    copy_to(sc, ., name = "d1", overwrite = TRUE)
+  
+  c1 <- new_classifier(df = d1, target = "y_bin", name = "test", seed = 1) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
+    add_model(pipe = test_pipe,
+              method ="ml_logistic_regression",
+              uid = "logistic") %>%
+    train_models()
+  
+  c2 <- new_classifier(df = d1, target = "y_bin", name = "test", seed = 1) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
+    add_model(pipe = test_pipe,
+              method ="ml_logistic_regression",
+              uid = "logistic") %>%
+    train_models()
+  
+  c3 <- new_classifier(df = d1, target = "y_bin", name = "test", seed = 101) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
+    add_model(pipe = test_pipe,
+              method ="ml_logistic_regression",
+              uid = "logistic") %>%
+    train_models()
+  
+  expect_equal(c1$performance$auc, c2$performance$auc)
+  expect_failure(expect_equal(c1$performance$auc, c3$performance$auc))
+})

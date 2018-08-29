@@ -20,6 +20,7 @@ new_segmenter <- function(df,
                           refit = TRUE,
                           save_submodels = TRUE,
                           dir = NULL,
+                          seed = 319,
                           ...){
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
