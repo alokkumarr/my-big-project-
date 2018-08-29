@@ -39,13 +39,11 @@
   },
   "LOGIN": {
     "loginDataProvider": {
-      "admin": {
-        "user": "admin",
-        "role": "admin"
+      "ByAdmin": {
+        "user": "admin"
       },
-      "user": {
-        "user": "userOne",
-        "role": "userOne"
+      "ByUser": {
+        "user": "userOne"
       }
     }
   },

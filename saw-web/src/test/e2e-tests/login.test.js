@@ -1,9 +1,7 @@
 var testDataReader = require('../e2e-tests/testdata/testDataReader.js');
+const using = require('jasmine-data-provider');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const header = require('../javascript/pages/components/header.co.js');
-const analyzePage = require('../javascript/pages/analyzePage.po.js');
-const users = require('../javascript/data/users.js');
-const using = require('jasmine-data-provider');
 const protractorConf = require('../../../conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 var fs = require('fs');
@@ -28,8 +26,8 @@ describe('Login Tests: login.test.js', () => {
   });
 
   using(testDataReader.testData['LOGIN']['loginDataProvider'], function (data, description) {
-    it('Should successfully logged in by ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'LOGIN', dp:'loginDataProvider'}), function () {
-      loginPage.loginAs(data.role);
+    it('Should successfully logged ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'LOGIN', dp:'loginDataProvider'}), function () {
+      loginPage.loginAs(data.user);
       expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
     });
   });

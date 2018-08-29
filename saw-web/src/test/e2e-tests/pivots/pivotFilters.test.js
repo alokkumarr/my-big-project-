@@ -1,7 +1,6 @@
 var testDataReader = require('../../e2e-tests/testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const loginPage = require('../../javascript/pages/loginPage.po.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonElementsPage = require('../../javascript/pages/commonElementsPage.po');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');

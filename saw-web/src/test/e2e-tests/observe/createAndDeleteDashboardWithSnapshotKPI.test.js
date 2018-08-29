@@ -2,7 +2,6 @@ var testDataReader = require('../../e2e-tests/testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../../../conf/protractor.conf');
-const using = require('jasmine-data-provider');
 const subCategories = require('../../javascript/data/subCategories');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
 let ApiUtils = require('../../javascript/api/APiUtils');

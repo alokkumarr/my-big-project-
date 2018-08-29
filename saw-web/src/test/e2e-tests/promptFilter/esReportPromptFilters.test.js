@@ -1,7 +1,6 @@
 var testDataReader = require('../../e2e-tests/testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const protractorConf = require('../../../../conf/protractor.conf');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
@@ -15,7 +14,6 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
   const defaultCategory = categories.privileges.name;
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const chartDesigner = analyzePage.designerDialog.chart;
 
   let analysisId;
   let host;
