@@ -19,9 +19,6 @@
 
         <div class="user-avatar" matTooltip="{{UserDetails.ticket.userFullName | uppercase}}" [ngStyle]="{'background': userBGColor.backgroundColor}"
           [matMenuTriggerFor]="menu" e2e="account-settings-menu-btn">{{userInitials}}</div>
-
-        <!-- <mat-icon fontIcon="icon-user-placeholder" class="md-icon-button" [matMenuTriggerFor]="menu" e2e="account-settings-menu-btn"
-          matTooltip="{{UserDetails.ticket.userFullName | uppercase}}"></mat-icon> -->
         <mat-menu #menu="matMenu">
           <button mat-menu-item (click)="changePwd()" e2e="account-settings-selector-change-password">
             <ng-container i18n>Change Password</ng-container>
