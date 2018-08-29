@@ -1,4 +1,4 @@
-# Setup instructions for using Docker Machine in the cloud using jumpbox
+# Setup instructions for using Docker Machine in the cloud with jumpbox
 
 Execute the following steps to deploy SIP using Docker Machine in the
 cloud with jumpbox :
@@ -22,9 +22,13 @@ cloud with jumpbox :
         ssh $host mvn -f $temp package -DskipTests
         ssh $host mvn -f $temp -Ddocker-start=cloud
         
-     Note: you can setup password less ssh connection between 
+     Tips : 
+     * You can setup password less ssh connection between 
      local machine and jumpbox to avoid multiple password prompt
      while running the above commands. 
+     * Above command can be stored as cloud-deployment.sh file in parent
+     directory of sip and can trigger as single script run command to avoid multiple command run.
+     
         
  5. Get the URL of the cloud SIP environment using:
  
