@@ -176,7 +176,6 @@ exports.config = {
     ]
   },
   onCleanUp: function (results) {
-    webpackHelper.generatefailedTests(appRoot+'/target/allure-results');
     retry.onCleanUp(results);
   },
   onPrepare() {
