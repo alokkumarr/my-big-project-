@@ -75,6 +75,55 @@ test_that("Check if catalog and output name are expected", {
 })
 
 
+# Test the physical location is derived using catalog ---------------------
+
+exp_phys_loc <-
+  paste0("maprfs:///var/sip/",
+         project_id,
+         "/dl/fs/",
+         catalog1,
+         "/",
+         output_name1,
+         "/",
+         "data")
+
+actual_phys_loc <- add_ds1$system$physicalLocation
+
+test_that("Physical location matches with expected one", {
+  expect_equal(exp_phys_loc, actual_phys_loc)
+})
+
+# Test that the added dataset details match the correct catalog and physical loc --------
+
+get_ds_detail1 <- sip_get_dataset_details(
+  dataset_id = add_ds1$`_id`,
+  project_id = project_id,
+  hostname = hostname,
+  token = jwt_token
+)
+
+output_ds <- add_ds1$system$name
+output_format <-  add_ds1$system$outputFormat
+output_phys_loc <- add_ds1$system$physicalLocation
+output_proj_id <- add_ds1$system$project
+output_catalog <- add_ds1$system$catalog
+get_ds <- get_ds_detail1$system$name
+get_ds_output_format <- get_ds_detail1$system$outputFormat
+get_ds_physical_loc <- get_ds_detail1$system$physicalLocation
+get_ds_project_id <- get_ds_detail1$system$project
+get_ds_catalog <- get_ds_detail1$system$catalog
+
+test_that("Newly added DS content matches with get DS details", {
+  expect_equal(output_ds, get_ds)
+  expect_equal(output_ds, get_ds)
+  expect_equal(output_format, get_ds_output_format)
+  expect_equal(output_phys_loc, get_ds_physical_loc)
+  expect_equal(output_proj_id, get_ds_project_id)
+  expect_equal(output_catalog, get_ds_catalog)
+})
+
+
+
 # Test 2: RestAPI-Add DS function test with catalog="temp" ----------------------------
 
 add_ds2 <- sip_add_dataset(
@@ -104,6 +153,53 @@ test_that("Check if catalog and output name are expected", {
   expect_equal(add_ds2$system$catalog, catalog2)
 })
 
+
+# Test the physical location is derived using catalog ---------------------
+
+exp_phys_loc <-
+  paste0("maprfs:///var/sip/",
+         project_id,
+         "/dl/fs/",
+         catalog2,
+         "/",
+         output_name2,
+         "/",
+         "data")
+
+actual_phys_loc <- add_ds2$system$physicalLocation
+
+test_that("Physical location matches with expected one", {
+  expect_equal(exp_phys_loc, actual_phys_loc)
+})
+
+# Test that the added dataset details match the correct catalog and physical loc --------
+
+get_ds_detail2 <- sip_get_dataset_details(
+  dataset_id = add_ds2$`_id`,
+  project_id = project_id,
+  hostname = hostname,
+  token = jwt_token
+)
+
+output_ds <- add_ds2$system$name
+output_format <-  add_ds2$system$outputFormat
+output_phys_loc <- add_ds2$system$physicalLocation
+output_proj_id <- add_ds2$system$project
+output_catalog <- add_ds2$system$catalog
+get_ds <- get_ds_detail2$system$name
+get_ds_output_format <- get_ds_detail2$system$outputFormat
+get_ds_physical_loc <- get_ds_detail2$system$physicalLocation
+get_ds_project_id <- get_ds_detail2$system$project
+get_ds_catalog <- get_ds_detail2$system$catalog
+
+test_that("Newly added DS content matches with get DS details", {
+  expect_equal(output_ds, get_ds)
+  expect_equal(output_format, get_ds_output_format)
+  expect_equal(output_phys_loc, get_ds_physical_loc)
+  expect_equal(output_proj_id, get_ds_project_id)
+  expect_equal(output_catalog, get_ds_catalog)
+})
+
 # Test 3: RestAPI-Add DS function test with catalog="dinp" ----------------------------
 
 add_ds3 <- sip_add_dataset(
@@ -131,4 +227,50 @@ add_ds3 <- sip_add_dataset(
 test_that("Check if catalog and output name are expected", {
   expect_equal(add_ds3$system$name, output_name3)
   expect_equal(add_ds3$system$catalog, catalog3)
+})
+
+# Test the physical location is derived using catalog ---------------------
+
+exp_phys_loc <-
+  paste0("maprfs:///var/sip/",
+         project_id,
+         "/dl/fs/",
+         catalog3,
+         "/",
+         output_name3,
+         "/",
+         "data")
+
+actual_phys_loc <- add_ds3$system$physicalLocation
+
+test_that("Physical location matches with expected one", {
+  expect_equal(exp_phys_loc, actual_phys_loc)
+})
+
+# Test that the added dataset details match the correct catalog and physical loc --------
+
+get_ds_detail3 <- sip_get_dataset_details(
+  dataset_id = add_ds3$`_id`,
+  project_id = project_id,
+  hostname = hostname,
+  token = jwt_token
+)
+
+output_ds <- add_ds3$system$name
+output_format <-  add_ds3$system$outputFormat
+output_phys_loc <- add_ds3$system$physicalLocation
+output_proj_id <- add_ds3$system$project
+output_catalog <- add_ds3$system$catalog
+get_ds <- get_ds_detail3$system$name
+get_ds_output_format <- get_ds_detail3$system$outputFormat
+get_ds_physical_loc <- get_ds_detail3$system$physicalLocation
+get_ds_project_id <- get_ds_detail3$system$project
+get_ds_catalog <- get_ds_detail3$system$catalog
+
+test_that("Newly added DS content matches with get DS details", {
+  expect_equal(output_ds, get_ds)
+  expect_equal(output_format, get_ds_output_format)
+  expect_equal(output_phys_loc, get_ds_physical_loc)
+  expect_equal(output_proj_id, get_ds_project_id)
+  expect_equal(output_catalog, get_ds_catalog)
 })
