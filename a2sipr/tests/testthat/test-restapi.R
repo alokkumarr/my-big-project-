@@ -97,7 +97,7 @@ new_dataset <- sip_get_dataset_details(add_ds$`_id`,
 
 
 test_that("Physical location matches with expected one", {
-  expect_equal(class(ds_get), "list")
+  expect_equal(class(new_dataset), "list")
   expect_gt(val, 0)
   expect_equal(new_dataset$`_id`, add_ds$`_id`)
   expect_equal(new_dataset$system$catalog, catalog)
