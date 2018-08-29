@@ -407,6 +407,7 @@ class Analysis extends BaseController {
     m_log.trace("json dataset: {}", reqJSON);
     val start = (reqJSON \ "contents" \ "page").extractOrElse(1)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
+    var executedBy = (reqJSON \ "contents" \ "pageSize").extractOrElse("Anonymous")
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
       case _ => null
@@ -419,6 +420,8 @@ class Analysis extends BaseController {
       val analysisType = (analysisJSON \ "type");
       typeInfo = analysisType.extract[String];
       json = compact(render(analysisJSON));
+      // If analysis is null it must be triggered via scheduled job.
+      executedBy="Scheduled"
     }
     else {
       val analysisType = (analysis \ "type");
@@ -494,7 +497,8 @@ class Analysis extends BaseController {
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -511,7 +515,8 @@ class Analysis extends BaseController {
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
             JField("error_message", JString(errorMsg)),
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -577,7 +582,8 @@ class Analysis extends BaseController {
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -594,7 +600,8 @@ class Analysis extends BaseController {
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
             JField("error_message", JString(errorMsg)),
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -655,7 +662,8 @@ class Analysis extends BaseController {
             JField("execution_result", JString("success")),
             JField("exec-code", JInt(0)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
 
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
@@ -673,7 +681,8 @@ class Analysis extends BaseController {
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
             JField("error_message", JString(errorMsg)),
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -742,7 +751,8 @@ class Analysis extends BaseController {
         resultNode = getResultNode(analysisId,resultNodeId)
         if(resultNode!=null) {
           val newDescriptor = JObject(resultNode.getObjectDescriptors.obj ++ List(
-            JField("queryBuilder", queryBuilder)
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           resultNode.setDescriptor(compact(render(newDescriptor)))
           resultNode.update()
