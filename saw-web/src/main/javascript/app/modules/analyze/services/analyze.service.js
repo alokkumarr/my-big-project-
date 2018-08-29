@@ -283,6 +283,7 @@ export class AnalyzeService {
 
     const payload = this.getRequestParams([
       ['contents.action', 'execute'],
+      ['contents.executedBy', this._JwtService.getUserId()],
       ['contents.page', page],
       ['contents.pageSize', options.take],
       ['contents.keys.[0].id', model.id],

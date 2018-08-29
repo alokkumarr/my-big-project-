@@ -73,7 +73,7 @@ export class DesignerContainerComponent {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
-  public fieldCount:number;
+  public fieldCount: number;
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -213,18 +213,18 @@ export class DesignerContainerComponent {
       break;
 
     case 'report':
-    forEach(artifacts, table=> {
-      table.columns = map(table.columns, column => {
-        forEach(this.analysis.sqlBuilder.dataFields, fields=> {
-          forEach(fields.columns, field => {
-            if (field.columnName === column.columnName) {
-              column.checked = true;
-            }
+      forEach(artifacts, table => {
+        table.columns = map(table.columns, column => {
+          forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+            forEach(fields.columns, field => {
+              if (field.columnName === column.columnName) {
+                column.checked = true;
+              }
+            })
           })
+          return column;
         })
-        return column;
       })
-    })
       break;
     }
     return artifacts;
@@ -300,7 +300,7 @@ export class DesignerContainerComponent {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
 
-    forEach(this.analysis.sqlBuilder.dataFields, field=> {
+    forEach(this.analysis.sqlBuilder.dataFields, field => {
       if (field.checked === 'y') {
         this.fieldCount++;
       }
@@ -309,13 +309,13 @@ export class DesignerContainerComponent {
         delete field.limitType;
         delete field.limitValue;
       }
-    })
+    });
 
-    forEach(this.analysis.sqlBuilder.filters, filter=> {
+    forEach(this.analysis.sqlBuilder.filters, filter => {
       if (filter.isRuntimeFilter) {
         delete filter.model;
       }
-    })
+    });
 
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
@@ -400,7 +400,7 @@ export class DesignerContainerComponent {
           const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
             requestExecution: shouldClose,
-            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis    
+            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis
           });
           if (!shouldClose) {
             this.requestDataIfPossible();
