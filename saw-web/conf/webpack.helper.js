@@ -96,16 +96,16 @@ function generateFailedTests(dir) {
       let testCase = testCases['test-case'];
       if(testCase._attributes.status.toLocaleLowerCase() ==='failed') {
           // add them to retry tests
-          let testMetaData = JSON.parse(testCase.name._text.split('testDataMetaInfo: ')[1]);
+        let testMetaData = JSON.parse(testCase.name._text.split('testDataMetaInfo: ')[1]);
 
-          if(! subset[testMetaData['feature']]) {
-            subset[testMetaData['feature']] = {}
-          }
-          if(!subset[testMetaData['feature']][testMetaData['dp']]) {
-            subset[testMetaData['feature']][testMetaData['dp']] = {}
-          }
-          subset[testMetaData['feature']][testMetaData['dp']][testMetaData['test']] = mainTestData[testMetaData['feature']][testMetaData['dp']][testMetaData['test']];
+        if(! subset[testMetaData['feature']]) {
+          subset[testMetaData['feature']] = {}
         }
+        if(!subset[testMetaData['feature']][testMetaData['dp']]) {
+          subset[testMetaData['feature']][testMetaData['dp']] = {}
+        }
+        subset[testMetaData['feature']][testMetaData['dp']][testMetaData['test']] = mainTestData[testMetaData['feature']][testMetaData['dp']][testMetaData['test']];
+      }
     }
 
   });
