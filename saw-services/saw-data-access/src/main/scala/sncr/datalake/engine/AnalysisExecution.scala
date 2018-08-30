@@ -9,11 +9,12 @@ import sncr.datalake.engine.ExecutionStatus.ExecutionStatus
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JObject, JValue}
 import sncr.metadata.engine.ProcessingResult
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
+
 
 import org.apache.hadoop.fs.FileStatus
 
@@ -50,12 +51,12 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     try {
       analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
       id = analysisNodeExecution.resId
-      m_log debug s"Started execution, result ID: $id"
+      m_log trace s"Started execution, result ID: $id"
       status = ExecutionStatus.STARTED
       analysisNodeExecution.loadObjects()
       analysisNodeExecution.setStartTime
       startTS = analysisNodeExecution.getStartTS
-      m_log debug s"Loaded objects, Started TS: $startTS "
+      m_log trace s"Loaded objects, Started TS: $startTS "
       status = ExecutionStatus.IN_PROGRESS
       /* Execute the query and use the execution ID also as the analysis
        * result node ID (and do not load any results into the Spark

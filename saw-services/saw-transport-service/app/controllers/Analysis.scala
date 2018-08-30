@@ -4,9 +4,8 @@ import java.time.Instant
 import java.util
 import java.util.UUID
 
-import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
 import model.{ClientException, PaginateDataSet, QueryBuilder, TransportUtils}
-import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
+import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue}
 import org.json4s.JsonDSL._
 import org.json4s._
 import org.json4s.native.JsonMethods._
@@ -29,10 +28,15 @@ import java.time.LocalDateTime
 
 import scala.collection.JavaConverters._
 import executor.ReportExecutorQueue
+
 import org.json4s
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
-import sncr.metadata.engine.{Fields, MDObjectStruct, MetadataDictionary}
+import sncr.metadata.engine.Fields
 import sncr.saw.common.config.SAWServiceConfig
+import org.json4s.native.Serialization.writePretty
+
+import sncr.service.InternalServiceClient
+import sncr.service.model.SemanticNodeObject
 
 import scala.reflect.io.File
 
@@ -41,6 +45,7 @@ class Analysis extends BaseController {
   val executorRegularQueue = new ReportExecutorQueue("regular")
   val executorFastQueue = new ReportExecutorQueue("fast")
   var totalRows: Int = 0;
+
 
   /**
     * List analyses.  At the moment only used by scheduler to list
@@ -123,7 +128,9 @@ class Analysis extends BaseController {
       case Some(ticket) =>
         (ticket.dataSecurityKey)
     }
-
+    val semanticHost = SAWServiceConfig.semanticService.getString("host")
+    val semanticEndpoint = SAWServiceConfig.semanticService.getString("endpoint")
+    m_log.trace("semanticHost url : {}",semanticHost + semanticEndpoint)
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
@@ -141,23 +148,81 @@ class Analysis extends BaseController {
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
-        val semanticJson = readSemanticJson(semanticId)
-        val mergeJson = contentsAnalyze(
-          semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
-        val responseJson = json merge mergeJson
-        val analysisJson = (responseJson \ "contents" \ "analyze") (0)
-        val analysisNode = new AnalysisNode(analysisJson)
-        val semanticNode = readSemanticNode(semanticId)
-        for ((category, id) <- semanticNode.getRelatedNodes) {
-          if (category == "DataObject") {
-            analysisNode.addNodeToRelation(id, category)
-          }
-        }
+
+        // TODO: construction of the URL from the property & invoke new method
+        // val semanticJson = readSemanticJson(semanticId)
+        // m_log.trace("only semanticJson read : {}", writePretty(semanticJson));
+
+        m_log.trace("semantic details : {}", semanticHost + semanticEndpoint + semanticId);
+        // TODO: The below block starts here which will be used in future integration
+        val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
+            .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
+        m_log.trace("only semanticJsonStore read from semantic service : {}", writePretty(semanticJsonMetaDataStore));
+
+        //val repository = (semanticJsonMetaDataStore \ "repository");
+        //m_log.info("repository : {}",  repository.extract[JArray]);
+
+        val mergeJsonMetaDataStore = contentsAnalyze(
+          semanticJsonMetaDataStore.merge(idJson).merge(instanceJson).merge(typeJson))
+        m_log.trace("only mergeJsonMetaDataStore read from semantic service : {}", writePretty(mergeJsonMetaDataStore));
+
+        val responseJsonMetaDataStore = json merge mergeJsonMetaDataStore
+        m_log.trace("only responseJsonMetaDataStore read from semantic service : {}", writePretty(responseJsonMetaDataStore));
+
+        val analysisJsonMetaDataStore = (responseJsonMetaDataStore \ "contents" \ "analyze") (0)
+        m_log.trace("only analysisJsonMetaDataStore read from semantic service : {}", writePretty(analysisJsonMetaDataStore));
+
+        // TODO: The above block ends here which will be used in future integration
+
+        //val mergeJson = contentsAnalyze(semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
+        //m_log.info("After merging of semanticJson to instanceJson: {}", writePretty(mergeJson));
+        //m_log.info("Actual json on create {}", writePretty(json));
+
+        //val responseJson = json merge mergeJson
+        //m_log.info("responseJson before adding to content: {}", writePretty(responseJson));
+
+        //val analysisJson = (responseJson \ "contents" \ "analyze") (0)
+        //m_log.info("analysisJson before adding to content: {}", writePretty(analysisJson));
+
+        // This section creating the node in analysis
+        val analysisNode = new AnalysisNode(analysisJsonMetaDataStore)
+
+        // TODO: Ideally this call shall be removed no need to attach node to analysis
+          // val semanticNode = readSemanticNode(semanticId)
+          // for ((category, id) <- semanticNode.getRelatedNodes) {
+          //  if (category == "DataObject") {
+          //    analysisNode.addNodeToRelation(id, category)
+          //  }
+          // }
+
+        // The below block should remain because it is creating a node in binary store
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new ClientException("Writing failed: " + message)
         }
-        responseJson
+        m_log.info("responseJson to user interface : {}", writePretty(responseJsonMetaDataStore))
+        val analysisStoreJsonLocation = readAnalysisJson(analysisId)
+        m_log.info("analysisStoreJsonLocation after saving the data : {}", analysisStoreJsonLocation);
+
+        // TODO: The below section will be removed
+        val repositories = analysisStoreJsonLocation \ "repository" match {
+          case repository: JArray => repository.arr
+          case JNothing => List()
+          case obj: JValue => Nil
+        }
+        var name : String =null
+        var location : String = null
+        var format : String = null
+        m_log.info("repositories : {}", repositories);
+        repositories.foreach(repo => {
+          name = (repo \ "name").extract[String]
+          m_log.info("name : {}", name);
+          location = (repo \ "physicalLocation").extract[String]
+          m_log.info("location : {}", location);
+          format = (repo \ "format").extract[String]
+          m_log.info("format : {}", format);
+        })
+        responseJsonMetaDataStore
       }
       case "update" => {
         m_log.trace("dataSecurityKey before processing in update: {}", dataSecurityKey);
@@ -167,7 +232,6 @@ class Analysis extends BaseController {
           dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
           m_log.trace("dskStr after processing in update: {}", dskStr);
         }
-
         val analysisId = extractAnalysisId(json)
         val analysisNode = AnalysisNode(analysisId)
         m_log.trace("dskStr after processing inside update block before analysisJson(json, dskStr) : {}", dskStr);
@@ -240,7 +304,7 @@ class Analysis extends BaseController {
                 val runtime = (executionType == ExecutionType.onetime.toString
                   || executionType == ExecutionType.regularExecution.toString
                   || executionType == ExecutionType.publish.toString)
-                m_log.debug("Execution type: {}", executionType)
+                m_log.info("Execution type: {}", executionType)
                 m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
                 m_log.trace("runtime execute block before queryRuntime: {}", runtime);
                 queryRuntime = (analysis \ "queryManual") match {
@@ -248,7 +312,7 @@ class Analysis extends BaseController {
                   case obj: JString => obj.extract[String]
                   case obj => unexpectedElement("string", obj)
                 }
-                m_log.info("RUNTIME_QUERY_RUNTIME" + queryRuntime)
+                m_log.info("RUNTIME_QUERY_RUNTIME : " + queryRuntime)
               }
             }
             case _ => {}
@@ -510,7 +574,6 @@ class Analysis extends BaseController {
 
       return (myArray ,analysisResultNodeID)
     }
-
     if (typeInfo.equals("esReport")) {
       var data: String = null
       val rowLimit: java.lang.Integer = if (SAWServiceConfig.es_conf.hasPath("inline-es-report-data-store-limit-rows"))
@@ -671,6 +734,7 @@ class Analysis extends BaseController {
       // This is the part of report type starts here
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
+      m_log.info("analysis retrieved while execution yet to begin : {}", analysis);
       m_log.trace("queryRuntime inside report block before executeAndWait: {}", queryRuntime);
       val query = if (queryRuntime != null) queryRuntime
       // In case of scheduled execution type if manual query exists take the precedence.

@@ -29,9 +29,13 @@ public class SemanticNode {
   @JsonProperty("updatedBy")
   private String updatedBy;
   @JsonProperty("createdAt")
-  private String createdAt;
+  private long createdAt;
   @JsonProperty("updatedAt")
-  private String updatedAt;
+  private long updatedAt;
+  @JsonProperty("parentDataSetNames")
+  private List<String> parentDataSetNames;
+  @JsonProperty("parentDataSetIds")
+  private List<String> parentDataSetIds;
 
 
   /**
@@ -135,7 +139,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("repository")
-  private Object repository;
+  private List<Object> repository;
   @JsonIgnore
   private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -433,7 +437,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("repository")
-  public Object getRepository() {
+  public List<Object> getRepository() {
     return repository;
   }
 
@@ -445,8 +449,31 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("repository")
-  public void setRepository(Object repository) {
+  public void setRepository(List<Object> repository) {
     this.repository = repository;
+  }
+  
+  
+  @JsonProperty("parentDataSetNames")
+  public List<String> getParentDataSetNames() {
+    return parentDataSetNames;
+  }
+  @JsonProperty("parentDataSetNames")
+  public void setParentDataSetNames(List<String> parentDataSetNames) {
+    this.parentDataSetNames = parentDataSetNames;
+  }
+  
+  @JsonProperty("parentDataSetIds")
+  public List<String> getParentDataSetIds() {
+    return parentDataSetIds;
+  }
+  @JsonProperty("parentDataSetIds")
+  public void setParentDataSetIds(List<String> parentDataSetIds) {
+    this.parentDataSetIds = parentDataSetIds;
+  }
+
+  public void setAdditionalProperties(Map<String, Object> additionalProperties) {
+    this.additionalProperties = additionalProperties;
   }
 
   @JsonAnyGetter
@@ -490,22 +517,22 @@ public class SemanticNode {
   }
 
   @JsonProperty("createdAt")
-  public String getCreatedAt() {
+  public long getCreatedAt() {
     return createdAt;
   }
 
   @JsonProperty("createdAt")
-  public void setCreatedAt(String createdAt) {
+  public void setCreatedAt(long createdAt) {
     this.createdAt = createdAt;
   }
 
   @JsonProperty("updatedAt")
-  public String getUpdatedAt() {
+  public long getUpdatedAt() {
     return updatedAt;
   }
 
   @JsonProperty("updatedAt")
-  public void setUpdatedAt(String updatedAt) {
+  public void setUpdatedAt(long updatedAt) {
     this.updatedAt = updatedAt;
   }
 

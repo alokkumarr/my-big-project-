@@ -102,7 +102,7 @@ public class SAWSemanticController {
       logger.trace("Semantic retrieved successfully : {}",
           objectMapper.writeValueAsString(responseObjectFuture));
     } catch (ReadEntitySAWException | JsonProcessingException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while creating an entity");
+      throw new ReadEntitySAWException("Problem on the storage while creating an entity",ex);
     }
     return responseObjectFuture;
   }

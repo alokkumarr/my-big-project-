@@ -8,6 +8,8 @@ import java.util.UUID
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import com.typesafe.config.Config
+import org.json.JSONException
+import org.json4s.{JArray, JNothing}
 import org.json4s.JsonAST.{JObject, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -41,9 +43,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
 
   val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
   private val conf: Config = SAWServiceConfig.spark_conf
-
+   
   dataObjects = an.loadRelationElements.map( _.asInstanceOf[DataObject])
-
+  m_log.info("AnalysisNodeExecutionHelper.dataObjects: {}", dataObjects)
   //TODO:: Should not be here, if consistency mechanism is in place -- remove it, unnecessary
   if (dataObjects.isEmpty) throw new DAException(ErrorCodes.DataObjectNotLoaded, "AnalysisNode")
 
@@ -94,9 +96,21 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     * Specific to AnalysisNode method to load data objects
     */
   def loadObjects() : Unit =
-    m_log debug "Start loading objects!"
-    try{
-      loadData(this)
+
+    m_log debug "Start loading objects!!"
+    val analysisJSON = an.getCachedData("content") match {
+        case content: JObject => content
+        case _ => throw new NullPointerException("no content found!!")
+    }
+   // Getting the repository details from content
+   repositories = analysisJSON \ "repository" match {
+        case repository: JArray => repository.arr
+        case JNothing => List()
+        case obj: JValue => Nil
+    }
+    try
+    { // Using overloaded method
+      loadData(repositories, this, DLConfiguration.rowLimit);
       isDataLoaded = true
     }
     catch {
@@ -104,7 +118,12 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       case t:Throwable => m_log error (s"Could not load data for analysis node: ${Bytes.toString(an.getRowKey)}, unexpected exception: ", t)
     }
 
-
+  def unexpectedElement(json: JValue, expected: String, location: String): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new JSONException(
+      "Unexpected element: %s, expected %s, at %s".format(
+        name, expected, location))
+  }
   var lastSQLExecMessage : String = null
 
   /**

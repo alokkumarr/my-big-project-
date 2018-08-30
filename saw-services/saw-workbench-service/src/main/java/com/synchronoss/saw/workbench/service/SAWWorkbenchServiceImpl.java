@@ -73,7 +73,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       "auditlog", "datapods", "datasegments", "datasets", "projects",
       "transformations"
   };
-
+  
   @Value("${workbench.project-key}")
   @NotNull
   private String defaultProjectId;
@@ -481,9 +481,10 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonElement dataset = mdtStore.read(dataSetId);
-    return objectMapper.readValue(dataset.toString(), DataSet.class);
+    DataSet returnData = objectMapper.readValue(dataset.toString(), DataSet.class);
+    return returnData;
   }
-  
+
   @Override
   public DataSet createDataSet(DataSet dataSet, String project) throws Exception {
     logger.trace("createDataSet starts here :  " + dataSet.toString());
@@ -590,6 +591,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     sets.add(objectMapper.readValue(row1, DataSet.class));
     sets.add(objectMapper.readValue(row2, DataSet.class));
     System.out.println(objectMapper.writeValueAsString(sets));
+    DataSet dataset = sets.get(0);
+    System.out.println("Dataset : " +dataset.getSystem());
     System.out.println(DataSetProperties.UserData.toString());
   }
 

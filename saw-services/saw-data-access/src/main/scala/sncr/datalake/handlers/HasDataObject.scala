@@ -1,7 +1,7 @@
 package sncr.datalake.handlers
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JArray, JValue}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.DLSession
@@ -15,6 +15,7 @@ import sncr.metadata.engine.MDObjectStruct._
 trait HasDataObject[H<:DLSession] {
 
   protected var dataObjects : List[DataObject] = null
+  protected var repositories : List[JValue] = null
   protected val m_log: Logger = LoggerFactory.getLogger("sncr.datalake.handlers.HasDataObject")
 
   def loadData(node:H): Unit =
@@ -23,9 +24,26 @@ trait HasDataObject[H<:DLSession] {
       val (nameDO, formatDO) = HasDataObject.loadDODescriptor(dataObject)
       node.lastUsed = System.currentTimeMillis()
       node.loadObject(nameDO.get, dataObject.getDLLocations(0), formatDO.get)
+      m_log.info("HasDataObject.node: {}", node)
     })
   }
 
+  def loadData(repositories: List[JValue], node:H, limit: Integer): Unit =
+  {
+    var name : String =null
+    var location : String = null
+    var format : String = null
+    repositories.foreach(repo => {
+      name = (repo \ "name").extract[String]
+      m_log.trace("name : {}", name);
+      location = (repo \ "physicalLocation").extract[String]
+      m_log.trace("location : {}", location);
+      format = (repo \ "format").extract[String]
+      m_log.trace("format : {}", format)
+      node.lastUsed = System.currentTimeMillis()
+      node.loadObject(name, location, format)
+    })
+  }
 }
 
 object HasDataObject {

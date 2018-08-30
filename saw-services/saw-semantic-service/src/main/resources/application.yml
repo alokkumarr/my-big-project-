@@ -27,3 +27,6 @@ application:
 
 metastore:
     base:  hdfs:///main/
+semantic:
+    workbench-url:  http://localhost:9800/
+    

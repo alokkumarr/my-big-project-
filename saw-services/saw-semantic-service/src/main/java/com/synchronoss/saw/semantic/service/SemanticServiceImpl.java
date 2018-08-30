@@ -1,39 +1,41 @@
 package com.synchronoss.saw.semantic.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
-
 import com.google.gson.JsonElement;
-
 import com.synchronoss.saw.semantic.SAWSemanticUtils;
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.semantic.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
-
+import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.Content;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
+import com.synchronoss.saw.semantic.model.request.SemanticNode.Module;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import sncr.bda.cli.MetaDataStoreRequestAPI;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.Filter;
@@ -47,18 +49,21 @@ public class SemanticServiceImpl implements SemanticService {
 
   private static final Logger logger = LoggerFactory.getLogger(SemanticServiceImpl.class);
 
-  private DateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-
   @Value("${metastore.base}")
   @NotNull
   private String basePath;
+  @Value("${semantic.workbench-url}")
+  @NotNull
+  private String workbenchURl;
+  
 
   @Override
   public SemanticNode addSemantic(SemanticNode node)
       throws JSONValidationSAWException, CreateEntitySAWException {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
     SemanticNode responseNode = new SemanticNode();
-    node.setCreatedAt(format.format(new Date()));
+    SemanticNode newSemanticNode = null;
+    node.setCreatedAt(new Date().getTime());
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -73,14 +78,64 @@ public class SemanticServiceImpl implements SemanticService {
       responseNode.setCreatedBy(node.getCreatedBy());
       responseNode.setSaved(true);
       responseNode.setStatusMessage("Entity is created successfully");
+      newSemanticNode = new SemanticNode();
+      org.springframework.beans.BeanUtils.copyProperties(responseNode, newSemanticNode,"_id");
+      newSemanticNode = setRepository(newSemanticNode);
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
       throw new CreateEntitySAWException("Problem on the storage while creating an entity.", ex);
     }
-    logger.debug("Response : " + node.toString());
-    return responseNode;
+    logger.trace("Response : " + node.toString());
+    return newSemanticNode;
   }
-
+  
+  /**
+   * This method to set the physicalLocation, format & name under repository section.
+   * when it is from DataLake
+   * @param node
+   * @return
+   * @throws IOException 
+   * @throws JsonProcessingException 
+   */
+  private SemanticNode setRepository(SemanticNode semanticNode) throws JsonProcessingException, IOException 
+  {
+    logger.trace("Setting repository starts here..");
+    String requestURL = workbenchURl + semanticNode.getProjectCode();
+      List<Object> dataSetDetailsObject = new ArrayList<>();
+      DataSet dataSet = null;
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      JsonNode node = null;
+      ObjectNode rootNode = null;
+      ObjectNode systemNode = null;
+      String physicalLocation = null;
+      String dataSetName = null;
+      String dataSetFormat = null;
+      ObjectNode repoNode = null;
+      ArrayNode respository = objectMapper.createArrayNode();
+      for (String dataSetId: semanticNode.getParentDataSetIds()) {
+        requestURL = requestURL + "/" + dataSetId;
+        RestTemplate restTemplate = new RestTemplate();
+        dataSet = restTemplate.getForObject(requestURL, DataSet.class);
+        node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
+        rootNode = (ObjectNode) node;
+        systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
+        physicalLocation = systemNode.get(DataSetProperties.PhysicalLocation.toString()).asText();
+        dataSetName = systemNode.get(DataSetProperties.Name.toString()).asText();
+        dataSetFormat = systemNode.get(DataSetProperties.Format.toString()).asText();
+        repoNode = objectMapper.createObjectNode();
+        repoNode.put("name", dataSetName);
+        repoNode.put("format", dataSetFormat);
+        repoNode.put("physicalLocation", physicalLocation);
+        dataSetDetailsObject.add(repoNode);
+        respository.add(repoNode);
+   }
+    semanticNode.setRepository(dataSetDetailsObject);
+    logger.trace("Setting repository ends here.");
+    logger.trace("Semantic node after adding repository for DL type: " + objectMapper.writeValueAsString(semanticNode));
+    return semanticNode;
+  }
 
 
   @Override
@@ -89,6 +144,7 @@ public class SemanticServiceImpl implements SemanticService {
     Preconditions.checkArgument(node.get_id() != null, "Id is mandatory attribute.");
     logger.trace("reading semantic from the store with an Id : {}", node.get_id());
     SemanticNode nodeRetrieved = null;
+    SemanticNode newSemanticNode = null;
     try {
       List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
           node.get_id(), Action.read, Category.Semantic);
@@ -101,11 +157,35 @@ public class SemanticServiceImpl implements SemanticService {
       logger.trace("Id: {}", nodeRetrieved.get_id());
       nodeRetrieved.setId(nodeRetrieved.get_id());
       nodeRetrieved.setStatusMessage("Entity has retrieved successfully");
+      newSemanticNode = new SemanticNode();
+      org.springframework.beans.BeanUtils.copyProperties(nodeRetrieved, newSemanticNode,"_id");
     } catch (Exception ex) {
       throw new ReadEntitySAWException("Problem on the storage while reading an entity", ex);
     }
-    return nodeRetrieved;
+    return newSemanticNode;
   }
+  // This method localDataStore will be removed
+  private SemanticNode localDataStore (SemanticNode semanticNode) throws JsonParseException, JsonMappingException, IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    semanticNode.setId("f02d1867-88c2-4689-9ea9-def040a9b62d::semanticDataSet::1534792341903");
+    semanticNode.setCreatedBy("Akhilesh  Obilineni");
+    semanticNode.setCreatedAt(new Date().getTime());
+    semanticNode.setCustomerCode("SYNCHRONOSS");
+    semanticNode.setProjectCode("workbench");
+    semanticNode.setSaved(true);
+    semanticNode.setUsername("Akhilesh  Obilineni");
+    semanticNode.setModule(Module.ANALYZE);
+    String supportArray = "[{\"category\":\"table\",\"label\":\"tables\"}]";
+    List<Object> supports = mapper.readValue(supportArray, new TypeReference<List<Object>>(){});
+    semanticNode.setSupports(supports);
+    String artifactsArray = "[{\"artifactName\":\"tc309_ES_data_latest_prc_batch\",\"columns\":[{\"aliasName\":\"URBANIZEDAREA\",\"columnName\":\"URBANIZEDAREA\",\"displayName\":\"URBANIZEDAREA\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"URBANIZEDAREA\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"},{\"aliasName\":\"ORGTYPE\",\"columnName\":\"ORGTYPE\",\"displayName\":\"ORGTYPE\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"ORGTYPE\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"},{\"aliasName\":\"STATE\",\"columnName\":\"STATE\",\"displayName\":\"STATE\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"STATE\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"},{\"aliasName\":\"NAME\",\"columnName\":\"NAME\",\"displayName\":\"NAME\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"NAME\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"}]}]";
+    List<Object> artifacts = mapper.readValue(artifactsArray, new TypeReference<List<Object>>(){});
+    semanticNode.setArtifacts(artifacts);
+    String repository = "[{\"physicalLocation\":\"maprfs://data\", \"name\":\"DataSetName\", \"format\":\"parquet\"}]";
+    semanticNode.setRepository(mapper.readValue(repository, new TypeReference<List<Object>>(){}));
+    return semanticNode;
+  }
+
 
   @Override
   public SemanticNode updateSemantic(SemanticNode node)
@@ -114,8 +194,9 @@ public class SemanticServiceImpl implements SemanticService {
     logger.trace("updating semantic from the store with an Id : {}", node.get_id());
     Preconditions.checkArgument(node.getUpdatedBy() != null, "Updated by mandatory attribute.");
     SemanticNode responseNode = new SemanticNode();
+    SemanticNode newSemanticNode = null;
     node.setUpdatedBy(node.getUpdatedBy());
-    node.setUpdatedAt(format.format(new Date()));
+    node.setUpdatedAt(new Date().getTime());
     try {
       List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
           node.get_id(), Action.update, Category.Semantic);
@@ -124,13 +205,15 @@ public class SemanticServiceImpl implements SemanticService {
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
       responseNode.setUpdatedBy(node.getUpdatedBy());
-      responseNode.setUpdatedAt(format.format(new Date()));
+      responseNode.setUpdatedAt(new Date().getTime());
       responseNode.setSaved(true);
       responseNode.setStatusMessage("Entity has been updated successfully");
+      newSemanticNode = new SemanticNode();
+      org.springframework.beans.BeanUtils.copyProperties(responseNode, newSemanticNode,"_id");
     } catch (Exception ex) {
       throw new UpdateEntitySAWException("Problem on the storage while updating an entity", ex);
     }
-    return responseNode;
+    return newSemanticNode;
   }
 
   @Override
@@ -152,6 +235,7 @@ public class SemanticServiceImpl implements SemanticService {
     }
     return newSemanticNode;
   }
+
 
   @Override
   public SemanticNodes search(SemanticNode node)
