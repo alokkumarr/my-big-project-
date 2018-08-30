@@ -70,14 +70,15 @@
     </div>
   </mat-card>
 
-  <mat-card *ngIf="analysis" style="padding: 5px;">
-    <mat-card-title>
-      <span class="mat-card-title" i18n>
-        Analysis Details
-      </span>
-    </mat-card-title>
-    <mat-card-content style="padding-left: 5px;">
-      <div>
+  <mat-card>
+    <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel-header>
+        <span class="expansion-title" i18n>Analysis Details</span>
+      </mat-expansion-panel-header>
+
+      <mat-divider></mat-divider>
+
+      <div class="detail-top">
         <strong *ngIf="analysis.userFullName">Created By:</strong>
         {{analysis.userFullName | changeCase:'title'}}
       </div>
@@ -85,17 +86,25 @@
         <strong *ngIf="analysis.scheduleHuman">Schedule:</strong>
         {{analysis.scheduleHuman}}
       </div>
+      <div>
+        <strong *ngIf="analysis.userFullName">Executed By:</strong>
+        {{executedBy}}
+      </div>
+      <div>
+        <strong *ngIf="analysis.userFullName">Executed At:</strong>
+        {{executedAt}}
+      </div>
       <div class="analysis-detail-description">
         <strong *ngIf="analysis.description">Description</strong>
         <p>{{analysis.description}}</p>
       </div>
-    </mat-card-content>
+    </mat-expansion-panel>
   </mat-card>
 
   <mat-card>
     <mat-expansion-panel [expanded]="false">
       <mat-expansion-panel-header>
-        <span class="previous-list-title" i18n>Previous Versions</span>
+        <span class="expansion-title" i18n>Previous Versions</span>
       </mat-expansion-panel-header>
 
       <mat-divider></mat-divider>

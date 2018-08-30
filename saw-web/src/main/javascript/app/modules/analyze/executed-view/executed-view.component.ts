@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
+import * as moment from 'moment';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -44,6 +46,8 @@ export class ExecutedViewComponent implements OnInit {
   executedAnalysis: Analysis; // the exact analysis that was executed
   analyses: Analysis[];
   onetimeExecution: boolean;
+  executedBy: string;
+  executedAt: any;
   data: any[];
   dataLoader: Function;
   canAutoRefresh: boolean;
@@ -276,6 +280,21 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
+  setExecutedAt(executionId) {
+    const finished = (
+      find(this.analyses, execution => execution.id === executionId) || {
+        finished: null
+      }
+    ).finished;
+
+    this.executedAt = finished
+      ? moment
+          .utc(finished)
+          .local()
+          .format('YYYY/MM/DD h:mm A')
+      : this.executedAt;
+  }
+
   loadExecutedAnalyses(analysisId) {
     this._headerProgressService.show();
     return this._analyzeService
@@ -283,6 +302,8 @@ export class ExecutedViewComponent implements OnInit {
       .then(
         analyses => {
           this.analyses = analyses;
+          this.setExecutedAt(this._executionId);
+
           this._headerProgressService.hide();
           return analyses;
         },
@@ -327,6 +348,12 @@ export class ExecutedViewComponent implements OnInit {
           sqlBuilder:
             executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
         };
+        this.executedBy = executeResponse.executedBy;
+        this.executedAt = moment
+          .utc(executeResponse.executedAt)
+          .local()
+          .format('YYYY/MM/DD h:mm A');
+
         let isItFirstTime = true;
         this.dataLoader = options => {
           if (isItFirstTime) {
@@ -364,6 +391,11 @@ export class ExecutedViewComponent implements OnInit {
           sqlBuilder:
             executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
         };
+        this.executedBy = executeResponse.executedBy;
+        this.executedAt = moment
+          .utc(executeResponse.executedAt)
+          .local()
+          .format('YYYY/MM/DD h:mm A');
         this.data = this.flattenData(
           executeResponse.data,
           this.executedAnalysis
@@ -397,11 +429,13 @@ export class ExecutedViewComponent implements OnInit {
     return this._analyzeService
       .getExecutionData(analysisId, executionId, options)
       .then(
-        ({ data, count, queryBuilder }) => {
+        ({ data, count, queryBuilder, executedBy }) => {
           this._headerProgressService.hide();
           if (this.executedAnalysis && queryBuilder) {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
+          this.executedBy = executedBy;
+          this.setExecutedAt(executionId);
           return { data, totalCount: count };
         },
         err => {
