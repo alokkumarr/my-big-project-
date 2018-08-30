@@ -277,7 +277,7 @@ test_that("Auto-Forecaster with Spark test case", {
                 dat1 %>% mutate(group = "B"))
   
   # Load data into Spark
-  dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
+ # dat3_tbl <- copy_to(sc, dat3, overwrite = TRUE)
   
   r_f1 <- auto_forecaster(dat3,
                           index_var = "index",
