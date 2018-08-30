@@ -12,33 +12,34 @@
 #'   seasonality
 #' @param prediction_conf_levels prediction confidence levels. Default is 80 and
 #'   95 percent CIs
+#'   
 #' @family use cases
 #' @aliases forecaster
 #' @import forecast
 #' @export
-new_forecaster <- function(df,
-                           target,
-                           index_var,
-                           unit = NULL,
-                           frequency = NULL,
-                           prediction_conf_levels = c(80, 95),
-                           name = NULL,
-                           id = NULL,
-                           version = NULL,
-                           desc = NULL,
-                           scientist = NULL,
-                           execution_strategy = "sequential",
-                           refit = TRUE,
-                           save_submodels = TRUE,
-                           dir = NULL,
-                           ...){
-
+forecaster <- function(df,
+                       target,
+                       index_var,
+                       unit = NULL,
+                       frequency = NULL,
+                       prediction_conf_levels = c(80, 95),
+                       name = NULL,
+                       id = NULL,
+                       version = NULL,
+                       desc = NULL,
+                       scientist = NULL,
+                       execution_strategy = "sequential",
+                       refit = TRUE,
+                       save_submodels = TRUE,
+                       dir = NULL,
+                       ...){
+  
   checkmate::assert_choice(index_var, colnames(df))
   checkmate::assert_numeric(frequency, lower = 1, null.ok = TRUE)
   checkmate::assert_numeric(prediction_conf_levels, lower = 50, upper = 100,
                             min.len = 1, max.len = 2)
   checkmate::assert_character(unit, null.ok = TRUE)
-
+  
   mobj <- modeler(df,
                   target,
                   type = "forecaster",
@@ -80,7 +81,7 @@ predict.forecaster <- function(obj,
   if (is.null(final_model)) {
     stop("Final model not set")
   }
-
+  
   if(! is.null(data)) {
     schema <- obj$schema[! names(obj$schema) %in% c(obj$target, obj$index_var)]
     schema_check <- all.equal(get_schema(data), schema)
@@ -88,13 +89,13 @@ predict.forecaster <- function(obj,
       stop(paste("New Data shema check failed:\n", schema_check))
     }
   }
-
+  
   pipe <- execute(data, obj$pipelines[[final_model$pipe]])
   preds <- predict(final_model, data = pipe$output, periods, obj$level)
   index_out <- extend(obj$index, length_out = periods)
   predictions <- data.frame(index_out, preds)
   colnames(predictions)[1] <- obj$index_var
-
+  
   new_predictions(
     predictions = predictions,
     model = final_model,
@@ -109,13 +110,13 @@ predict.forecaster <- function(obj,
 # Auto Forecaster ---------------------------------------------------------
 
 
-#'Auto Forecaster Function
+#'Auto Forecast Function
 #'
 #'Creates automated forecasts for univariate time series.
 #'
 #'Convience wrapper to create complete forecaster pipeline
 #'
-#'@inheritParams new_forecaster
+#'@inheritParams forecaster
 #'@param periods number of periods to forecast
 #'@param unit unit of index variable default is null
 #'@param pipe pipeline object
@@ -137,7 +138,7 @@ predict.forecaster <- function(obj,
 #'                                            list(order = c(1,0,0), ar = 0.7),
 #'                                            rand.gen = function(n, ...) rt(n, df = 2))))
 #'
-#' af1 <- auto_forecaster(dat1,
+#' af1 <- auto_forecast(dat1,
 #'                        target = "y",
 #'                        index_var = "index",
 #'                        periods = 10,
@@ -147,18 +148,18 @@ predict.forecaster <- function(obj,
 #'                                      list(method = "ets")
 #'                                      )
 #'   )
-auto_forecaster <- function(df,
-                            target,
-                            index_var,
-                            periods,
-                            unit = NULL,
-                            pipe = NULL,
-                            models = list(list(method = "auto.arima"), 
-                                          list(method = "ets")),
-                            splits = c(.8, .2),
-                            conf_levels = c(80, 95),
-                            execution_strategy = "sequential") {
-
+auto_forecast <- function(df,
+                          target,
+                          index_var,
+                          periods,
+                          unit = NULL,
+                          pipe = NULL,
+                          models = list(list(method = "auto.arima"), 
+                                        list(method = "ets")),
+                          splits = c(.8, .2),
+                          conf_levels = c(80, 95),
+                          execution_strategy = "sequential") {
+  
   df_names <- colnames(df)
   checkmate::assert_data_frame(df)
   checkmate::assert_choice(index_var, df_names)
@@ -169,14 +170,14 @@ auto_forecaster <- function(df,
   checkmate::assert_numeric(splits, lower=0, upper=1, min.len = 2, max.len = 3)
   checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
                             min.len = 1, max.len = 2)
-
-  f1 <- new_forecaster(df,
-                 target = target,
-                 index_var = index_var,
-                 unit = unit,
-                 name = "auto-forecaster",
-                 save_submodels = FALSE,
-                 execution_strategy = execution_strategy) %>%
+  
+  f1 <- forecaster(df,
+                   target = target,
+                   index_var = index_var,
+                   unit = unit,
+                   name = "auto-forecaster",
+                   save_submodels = FALSE,
+                   execution_strategy = execution_strategy) %>%
     add_holdout_samples(., splits = splits) 
   
   for(i in seq_along(models)) {
@@ -190,43 +191,43 @@ auto_forecaster <- function(df,
 }
 
 
-#' Forecaster Component
+#' Auto Forecaster Function
 #'
-#' Component function creates forecasts by preparing the data and using the
+#' Function creates forecasts by preparing the data and using the
 #' auto_forecast function
 #'
 #' Methods for spark and R data.frames. Spark method applies auto_forecast
 #' function with distributed R
 #'
-#' @inheritParams auto_forecaster
+#' @inheritParams auto_forecast
 #' @param group_vars optional column name of grouping variables. splits data and
 #'   applies auto_forecaster to each group
 #' @param measure_vars colname names of variables to forecast
 #' @param ... additional arguments to pass on. not currently implemented
 #' @export
-forecaster <- function(...){
-  UseMethod("forecaster")
+auto_forecaster <- function(...){
+  UseMethod("auto_forecaster")
 }
 
 
 
 #' @export
-#' @rdname forecaster
-forecaster.data.frame <- function(df,
-                                  index_var,
-                                  group_vars = NULL,
-                                  measure_vars,
-                                  periods,
-                                  unit = NULL,
-                                  pipe = NULL,
-                                  models = list(list(method = "auto.arima",
-                                                     method_args = list()),
-                                                list(method = "ets",
-                                                     method_args = list())),
-                                  splits = c(.8, .2),
-                                  conf_levels = c(80, 95),
-                                  ...) {
-
+#' @rdname auto_forecaster
+auto_forecaster.data.frame <- function(df,
+                                       index_var,
+                                       group_vars = NULL,
+                                       measure_vars,
+                                       periods,
+                                       unit = NULL,
+                                       pipe = NULL,
+                                       models = list(list(method = "auto.arima",
+                                                          method_args = list()),
+                                                     list(method = "ets",
+                                                          method_args = list())),
+                                       splits = c(.8, .2),
+                                       conf_levels = c(80, 95),
+                                       ...) {
+  
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_subset(group_vars, df_names)
@@ -236,12 +237,12 @@ forecaster.data.frame <- function(df,
   checkmate::assert_numeric(splits, lower=0, upper=1, min.len = 2, max.len = 3)
   checkmate::assert_numeric(conf_levels, lower = 50, upper = 100,
                             min.len = 1, max.len = 2)
-
+  
   conf_levels_names <- do.call("c",
                                lapply(conf_levels,
                                       function(x)
                                         paste(c("lower", "upper"), x, sep = "")))
-
+  
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
     a2munge::melter(
@@ -255,7 +256,7 @@ forecaster.data.frame <- function(df,
     tidyr::nest() %>%
     dplyr::mutate(predictions = purrr::map(
       data,
-      ~ auto_forecaster(
+      ~ auto_forecast(
         .,
         target = "y",
         index_var = index_var,
@@ -274,19 +275,19 @@ forecaster.data.frame <- function(df,
 
 #' @importFrom a2munge melter
 #' @export
-#' @rdname forecaster
-forecaster.tbl_spark <- function(df,
-                                 index_var,
-                                 group_vars = NULL,
-                                 measure_vars,
-                                 periods,
-                                 unit = NULL,
-                                 pipe = NULL,
-                                 models = list(list(method = "auto.arima"),
-                                               list(method = "ets")),
-                                 splits = c(.8, .2),
-                                 conf_levels = c(80, 95),
-                                 ...) {
+#' @rdname auto_forecaster
+auto_forecaster.tbl_spark <- function(df,
+                                      index_var,
+                                      group_vars = NULL,
+                                      measure_vars,
+                                      periods,
+                                      unit = NULL,
+                                      pipe = NULL,
+                                      models = list(list(method = "auto.arima"),
+                                                    list(method = "ets")),
+                                      splits = c(.8, .2),
+                                      conf_levels = c(80, 95),
+                                      ...) {
   df_names <- colnames(df)
   checkmate::assert_choice(index_var, df_names)
   checkmate::assert_subset(group_vars, df_names)
@@ -307,13 +308,13 @@ forecaster.tbl_spark <- function(df,
     min.len = 1,
     max.len = 2
   )
-
+  
   conf_levels_names <- do.call("c",
                                lapply(conf_levels,
                                       function(x)
                                         paste(c("lower", "upper"), x, sep = "")))
   spk_names <- c(index_var, "mean", conf_levels_names)
-
+  
   df %>%
     dplyr::select_at(c(index_var, group_vars, measure_vars)) %>%
     a2munge::melter(
@@ -338,12 +339,7 @@ forecaster.tbl_spark <- function(df,
                             library(dplyr)
                             library(lubridate)
                             
-                            sparklyr::spark_apply_log("packages loaded")
-                            sparklyr::spark_apply_log(paste("data has", nrow(e), "records"))
-                            print(paste("data has", nrow(e), "records"))
-                            print(l)
-                            
-                            auto_forecaster(
+                            auto_forecast(
                               e[, c(l$target, l$index_var), drop = FALSE],
                               target = l$target,
                               index_var = l$index_var,

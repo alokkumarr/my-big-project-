@@ -18,7 +18,9 @@ Imports:
     Hmisc,
     scales,
     pals,
-    gridExtra
+    gridExtra,
+    proto,
+    shiny
 Suggests: 
     testthat
 RoxygenNote: 6.0.1.9000

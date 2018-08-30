@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Build Advanced Analytics projects in Docker container to get the
+# required R build tools
+#
+set -eu
+
+dir=$(dirname $0)
+cd $dir
+
+# Copy the R packages to build into a TAR archive for inclusion in the
+# Docker image
+modules="a2charter a2modeler a2munge a2sipr"
+tar -cf a2modules.tar -C .. $modules
+
+# Build the Docker image for building R packages
+docker build -t rbuild .
+
+# Run the Docker container to build the R packages
+docker run --rm -v $PWD/target:/root/build/target rbuild \
+       /root/build/rbuild "$@"

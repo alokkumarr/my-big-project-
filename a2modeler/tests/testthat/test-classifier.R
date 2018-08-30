@@ -27,10 +27,10 @@ df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
 
 test_that("Classifier Constructer", {
 
-  c1 <- new_classifier(df = df, target = "am", name = "test")
+  c1 <- classifier(df = df, target = "am", name = "test")
   expect_class(c1, "classifier")
 
-  expect_error(new_classifier(df = df, target = "mpg", name = "test"))
+  expect_error(classifier(df = df, target = "mpg", name = "test"))
 })
 
 
@@ -38,7 +38,7 @@ test_that("Classifier Selects Best Model and Makes Predictions", {
 
   test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
 
-  c1 <- new_classifier(df = df, target = "am", name = "test") %>%
+  c1 <- classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = test_pipe,
               method = "ml_logistic_regression") %>%
@@ -59,7 +59,6 @@ test_that("Classifier Selects Best Model and Makes Predictions", {
   )
   expect_equal(c1$models[[1]]$pipe, c1$models[[2]]$pipe)
   
-  
   p1 <- predict(c1, data = df)
   expect_class(p1, "predictions")
 })
@@ -79,7 +78,7 @@ test_that("Classifer with Multiple Methods, CV sampling, without saving submodel
       select(am, mpg, cyl, wt, hp, vs)
   })
 
-  c1 <- new_classifier(df = df, target = "am", name = "test", save_submodels = TRUE) %>%
+  c1 <- classifier(df = df, target = "am", name = "test", save_submodels = TRUE) %>%
     add_cross_validation_samples(folds = 2) %>%
     add_model(pipe = test_pipe,
               method = "ml_multilayer_perceptron_classifier",
@@ -120,7 +119,7 @@ test_that("Classifier set final model options work as expected", {
       select(am, mpg, cyl)
   })
   
-  c1 <- new_classifier(df = df, target = "am", name = "test") %>%
+  c1 <- classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.6, .4)) %>%
     add_model(pipe = test_pipe,
               method = "ml_logistic_regression",
@@ -156,7 +155,7 @@ test_that("Classifier set_final_model works on additional models", {
 
   test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
   
-  c1 <- new_classifier(df = df, target = "am", name = "test") %>%
+  c1 <- classifier(df = df, target = "am", name = "test") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = test_pipe,
               method = "ml_decision_tree_classifier",
@@ -182,7 +181,7 @@ test_that("Classifier with parallel execution, test holdout and param_map", {
   
   test_pipe <- pipeline(expr = function(x){select(x, am, mpg)})
   
-  c1 <- new_classifier(df = df,
+  c1 <- classifier(df = df,
                        target = "am",
                        name = "test", 
                        save_submodels = FALSE,
@@ -205,3 +204,38 @@ test_that("Classifier with parallel execution, test holdout and param_map", {
   expect_true(!is.null(c1$final_model$test_predictions))
 })
 
+
+test_that("The same seed value produces similar samples", {
+  
+  test_pipe <- pipeline(expr = function(df){select(df, y_bin, x)})
+  
+  d1 <- data.frame(x = rnorm(100)) %>%
+    mutate(y = -1 + 2 * x + rnorm(100, 0, sd = .5),
+           y_prob = gtools::inv.logit(y),
+           y_bin = rbinom(100, 1, y_prob)) %>% 
+    copy_to(sc, ., name = "d1", overwrite = TRUE)
+  
+  c1 <- classifier(df = d1, target = "y_bin", name = "test", seed = 1) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
+    add_model(pipe = test_pipe,
+              method ="ml_logistic_regression",
+              uid = "logistic") %>%
+    train_models()
+  
+  c2 <- classifier(df = d1, target = "y_bin", name = "test", seed = 1) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
+    add_model(pipe = test_pipe,
+              method ="ml_logistic_regression",
+              uid = "logistic") %>%
+    train_models()
+  
+  c3 <- classifier(df = d1, target = "y_bin", name = "test", seed = 101) %>%
+    add_holdout_samples(splits = c(.5, .5)) %>%
+    add_model(pipe = test_pipe,
+              method ="ml_logistic_regression",
+              uid = "logistic") %>%
+    train_models()
+  
+  expect_equal(c1$performance$auc, c2$performance$auc)
+  expect_failure(expect_equal(c1$performance$auc, c3$performance$auc))
+})
