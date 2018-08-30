@@ -213,18 +213,18 @@ export class DesignerContainerComponent {
       break;
 
     case 'report':
-    forEach(artifacts, table=> {
-      table.columns = map(table.columns, column => {
-        forEach(this.analysis.sqlBuilder.dataFields, fields=> {
-          forEach(fields.columns, field => {
-            if (field.columnName === column.columnName) {
-              column.checked = true;
-            }
+      forEach(artifacts, table=> {
+        table.columns = map(table.columns, column => {
+          forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+            forEach(fields.columns, field => {
+              if (field.columnName === column.columnName) {
+                column.checked = true;
+              }
+            })
           })
+          return column;
         })
-        return column;
       })
-    })
       break;
     }
     return artifacts;
@@ -574,6 +574,14 @@ export class DesignerContainerComponent {
           col.aggregate = event.column.aggregate;
         }
       })
+      if(!isEmpty(this.data)) {
+        this.data.map(row => {
+          if(row[event.column.name]) {
+            row[event.column.name] = '';
+          }
+        });  
+      }
+      this.data = cloneDeep(this.data);
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':

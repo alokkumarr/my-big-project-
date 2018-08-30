@@ -38,31 +38,19 @@
   }
 }
 
-.dx-item-content.dx-menu-item-content {
-  height: 35px;
-}
-
 .cell-aggregate-icon {
   float: left;
-  margin: 9px 5px 0 0;
+  margin: 5px 5px 0 0;
+
+  mat-icon {
+    height: 0 !important;
+  }
 }
 
 .cell-caption {
   float: left;
-  margin: 7px 0 0;
-}
-
-.cell-context-menu {
-  float: left;
-  margin: 8px 0 0 -70px;
-
-  .icon-menu {
-    font-size: 15px;
-  }
-}
-
-.icon-Count {
-  margin-top: -10px;
+  margin: 3px 0 0;
+  text-transform: uppercase;
 }
 
 .icon-Count,
@@ -70,11 +58,16 @@
   margin-top: -10px;
 }
 
-.dx-menu-item-wrapper {
-  height: 35px !important;
+.dx-sort {
+  margin-top: 4px;
 }
 
-.dx-context-menu.dx-datagrid.dx-menu-base {
-  top: 545px !important;
-  left: 154px !important;
+.column-menu {
+  min-width: 35px !important;
+  line-height: 0 !important;
+
+  span mat-icon {
+    padding-top: 3px;
+    font-size: 16px;
+  }
 }
