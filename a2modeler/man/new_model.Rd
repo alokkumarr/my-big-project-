@@ -21,6 +21,10 @@ new_model(pipe, target, method, method_args, param_map, desc, uid, status,
 \item{desc}{optional model description}
 
 \item{uid}{model uid}
+
+\item{status}{model status. new models are givend added status}
+
+\item{created_on}{model creation timestamp}
 }
 \description{
 Model Class Constructer

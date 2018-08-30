@@ -207,13 +207,19 @@ test_that("Classifier with parallel execution, test holdout and param_map", {
 
 test_that("The same seed value produces similar samples", {
   
-  test_pipe <- pipeline(expr = function(df){select(df, y_bin, x)})
+ inv_logit <- function(x, min = 0, max = 1) {
+   p <- exp(x)/(1 + exp(x))
+   p <- ifelse(is.na(p) & !is.na(x), 1, p)
+   p * (max - min) + min
+ }
   
   d1 <- data.frame(x = rnorm(100)) %>%
     mutate(y = -1 + 2 * x + rnorm(100, 0, sd = .5),
-           y_prob = gtools::inv.logit(y),
+           y_prob = inv_logit(y),
            y_bin = rbinom(100, 1, y_prob)) %>% 
     copy_to(sc, ., name = "d1", overwrite = TRUE)
+  
+  test_pipe <- pipeline(expr = function(df){select(df, y_bin, x)})
   
   c1 <- classifier(df = d1, target = "y_bin", name = "test", seed = 1) %>%
     add_holdout_samples(splits = c(.5, .5)) %>%

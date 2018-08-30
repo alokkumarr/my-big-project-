@@ -290,28 +290,28 @@ test_that("Auto-Forecaster with Spark test case", {
                             list(method = "auto.arima"),
                             list(method = "ets")))
   
-  spk_f1 <- auto_forecaster(dat3_tbl,
-                            index_var = "index",
-                            group_vars = "group",
-                            measure_vars = c("y"),
-                            periods = 10,
-                            unit = NULL,
-                            pipe = NULL,
-                            models = list(
-                              list(method = "auto.arima"),
-                              list(method = "ets")))
-  
-  expect_equal(
-    spk_f1 %>%
-      arrange(group, measure, index) %>%
-      select_if(is.numeric) %>%
-      collect() %>%
-      round(5) ,
-    r_f1 %>%
-      arrange(group, measure, index) %>%
-      select_if(is.numeric) %>%
-      round(5)
-  )
+  # spk_f1 <- auto_forecaster(dat3_tbl,
+  #                           index_var = "index",
+  #                           group_vars = "group",
+  #                           measure_vars = c("y"),
+  #                           periods = 10,
+  #                           unit = NULL,
+  #                           pipe = NULL,
+  #                           models = list(
+  #                             list(method = "auto.arima"),
+  #                             list(method = "ets")))
+  # 
+  # expect_equal(
+  #   spk_f1 %>%
+  #     arrange(group, measure, index) %>%
+  #     select_if(is.numeric) %>%
+  #     collect() %>%
+  #     round(5) ,
+  #   r_f1 %>%
+  #     arrange(group, measure, index) %>%
+  #     select_if(is.numeric) %>%
+  #     round(5)
+  # )
   
 })
 
