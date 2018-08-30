@@ -412,6 +412,8 @@ export class DesignerService {
           return {
             type: artifactColumn.type,
             columnName: artifactColumn.columnName,
+            area: artifactColumn.area,
+            areaIndex: artifactColumn.areaIndex,
             aggregate: isDataArea ? artifactColumn.aggregate : null,
             // the name propertie is needed for the elastic search
             name: isDataArea ? artifactColumn.columnName : null,
