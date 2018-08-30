@@ -1,4 +1,5 @@
 var testDataReader = require('../e2e-tests/testdata/testDataReader.js');
+const using = require('jasmine-data-provider');
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const homePage = require('../javascript/pages/homePage.po.js');
@@ -6,7 +7,6 @@ const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
-const using = require('jasmine-data-provider');
 const protractorConf = require('../../../conf/protractor.conf');
 const categories = require('../javascript/data/categories');
 const subCategories = require('../javascript/data/subCategories');
