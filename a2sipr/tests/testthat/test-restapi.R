@@ -73,26 +73,32 @@ test_that("Physical location matches with expected one", {
 
 # Test2: Get all the Dataset list from MaprDB -----------------------------
 
-ds_get <- sip_get_datasets(project_id = project_id,
-                           hostname = hostname,
-                           token = jwt_token)
+# ds_get <- sip_get_datasets(project_id = project_id,
+#                            hostname = hostname,
+#                            token = jwt_token)
+# 
+# val <- length(ds_get)
+# 
+# for (i in 1:val)
+# {
+#   latest_DS <- getElement(ds_get, i)
+#   if (latest_DS$`_id` == add_ds$`_id`)
+#   {
+#     new_dataset <- getElement(ds_get, i)
+#     paste0("i value is", i)
+#     break
+#   }
+# }
 
-val <- length(ds_get)
+new_dataset <- sip_get_dataset_details(add_ds$`_id`,
+                                       project_id = add_ds$system$project,
+                                       hostname = hostname,
+                                       token = jwt_token)
 
-for (i in 1:val)
-{
-  latest_DS <- getElement(ds_get, i)
-  if (latest_DS$`_id` == add_ds$`_id`)
-  {
-    new_dataset <- getElement(ds_get, i)
-    paste0("i value is", i)
-    break
-  }
-}
 
 test_that("Physical location matches with expected one", {
-  expect_equal(class(ds_get), "list")
-  expect_gt(val, 0)
+  expect_equal(class(new_dataset), "list")
+  #expect_gt(val, 0)
   expect_equal(new_dataset$`_id`, add_ds$`_id`)
   expect_equal(new_dataset$system$catalog, catalog)
   expect_equal(new_dataset$system$outputFormat, output_format)

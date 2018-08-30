@@ -61,7 +61,7 @@ train_model.spark_model_clustering <- function(mobj,
         # Predict each validation sample
         val_smpl <- data %>%
           dplyr::mutate(rn = 1) %>% 
-          dplyr::mutate(rn = dplyr::row_number(rn)) %>% 
+          dplyr::mutate(rn = row_number(rn)) %>% 
           dplyr::filter(rn %in% index$validation) %>%
           dplyr::select(-rn)
 

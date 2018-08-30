@@ -17,7 +17,7 @@ train_model(mobj, ...)
   save_submodels, execution_strategy = "sequential", ...)
 
 \method{train_model}{spark_model}(mobj, data, measure, samples, save_submodels,
-  execution_strategy, ...)
+  execution_strategy, seed, ...)
 }
 \arguments{
 \item{mobj}{model object}
@@ -27,6 +27,11 @@ train_model(mobj, ...)
 \item{measure}{measure object}
 
 \item{samples}{samples object}
+
+\item{save_submodels}{logical flag to save sub model fits. Default is TRUE}
+
+\item{execution_strategy}{name of evaluation function to use for resolving a
+future. Used for model training execution. default is sequential}
 
 \item{...}{additional arguments to pass to model class train_model method}
 }

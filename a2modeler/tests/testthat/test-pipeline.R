@@ -146,7 +146,7 @@ test_that("Post clean up the output should be NULL", {
 # Test-4-Create a "modeler" to test-execute,clean and flow with pipeline -------
 
 add_mod <-
-  new_segmenter(df = dat_y, name = "test") %>%
+  segmenter(df = dat_y, name = "test") %>%
   add_model(pipe = pipeline(
     expr = function(dat_y)
       dat_y

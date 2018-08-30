@@ -6,11 +6,15 @@ import { BaseDialogComponent } from '../../../../common/base-dialog';
 const template = require('./category-delete-dialog.component.html');
 require('./category-delete-dialog.component.scss');
 
+const MY_ANALYSIS_CATEGORY_ID = 3;
+
 @Component({
   selector: 'delete-edit-dialog',
   template
 })
 export class CategoryDeleteDialogComponent extends BaseDialogComponent {
+
+  MY_ANALYSIS_CATEGORY_ID = MY_ANALYSIS_CATEGORY_ID;
 
   constructor(
     private _categoryService: CategoryService,

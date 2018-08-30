@@ -10,17 +10,18 @@
 #' @family use cases
 #' @aliases segmenter
 #' @export
-new_segmenter <- function(df,
-                          name = NULL,
-                          uid = NULL,
-                          version = NULL,
-                          desc = NULL,
-                          scientist = NULL,
-                          execution_strategy = "sequential",
-                          refit = TRUE,
-                          save_submodels = TRUE,
-                          dir = NULL,
-                          ...){
+segmenter <- function(df,
+                      name = NULL,
+                      uid = NULL,
+                      version = NULL,
+                      desc = NULL,
+                      scientist = NULL,
+                      execution_strategy = "sequential",
+                      refit = TRUE,
+                      save_submodels = TRUE,
+                      dir = NULL,
+                      seed = 319,
+                      ...){
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
   

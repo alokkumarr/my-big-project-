@@ -23,14 +23,14 @@ df <- copy_to(sc, mtcars, name = "df", overwrite = TRUE)
 
 test_that("Segmenter Constructer", {
 
-  s1 <- new_segmenter(df = df, name = "test")
+  s1 <- segmenter(df = df, name = "test")
   expect_class(s1, "segmenter")
 })
 
 
 test_that("Segmenter Add Model", {
 
-  s1 <- new_segmenter(df = df, name = "test") %>%
+  s1 <- segmenter(df = df, name = "test") %>%
     add_model(pipe = NULL, method = "ml_kmeans")
 
   expect_equal(s1$models[[names(get_models(s1))]]$method, "ml_kmeans")
@@ -40,7 +40,7 @@ test_that("Segmenter Add Model", {
 
 test_that("Segmenter Add Sampling", {
 
-  s1 <- new_segmenter(df = df, name = "test") %>%
+  s1 <- segmenter(df = df, name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
@@ -54,7 +54,7 @@ test_that("Segmenter Add Sampling", {
 
 test_that("Segmenter Train Model", {
 
-  s1 <- new_segmenter(df = df, name = "test") %>%
+  s1 <- segmenter(df = df, name = "test") %>%
     add_holdout_samples(splits = c(.8, .2)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
@@ -74,7 +74,7 @@ test_that("Segmenter Train Model", {
 test_that("Segmenter set final model options work as expected", {
 
 
-  s1 <- new_segmenter(df = df, name = "test_multi_model") %>%
+  s1 <- segmenter(df = df, name = "test_multi_model") %>%
     add_holdout_samples(splits = c(.5, .5)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
@@ -112,7 +112,7 @@ test_that("Segmenter set final model options work as expected", {
 
 test_that("Segmenter Predicts New Data", {
 
-  s1 <- new_segmenter(df = df, name = "test") %>%
+  s1 <- segmenter(df = df, name = "test") %>%
     add_holdout_samples(splits = c(.6, .4)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",
@@ -132,7 +132,7 @@ test_that("Segmenter Predicts New Data", {
 test_that("Segmenter with param_map", {
 
   .k <- 3:5
-  s1 <- new_segmenter(df = df, name = "test") %>%
+  s1 <- segmenter(df = df, name = "test") %>%
     add_holdout_samples(splits = c(.6, .4)) %>%
     add_model(pipe = NULL,
               method = "ml_kmeans",

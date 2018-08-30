@@ -10,18 +10,19 @@
 #' @family use cases
 #' @aliases classifier
 #' @export
-new_classifier <- function(df,
-                           target,
-                           name = NULL,
-                           uid = NULL,
-                           version = NULL,
-                           desc = NULL,
-                           scientist = NULL,
-                           execution_strategy = "sequential",
-                           refit = TRUE,
-                           save_submodels = TRUE,
-                           dir = NULL,
-                           ...){
+classifier <- function(df,
+                       target,
+                       name = NULL,
+                       uid = NULL,
+                       version = NULL,
+                       desc = NULL,
+                       scientist = NULL,
+                       execution_strategy = "sequential",
+                       refit = TRUE,
+                       save_submodels = TRUE,
+                       dir = NULL,
+                       seed = 319,
+                       ...){
   checkmate::assert_subset("tbl_spark", class(df))
   checkmate::assert_false("index" %in% colnames(df))
   
@@ -45,7 +46,8 @@ new_classifier <- function(df,
                   execution_strategy,
                   refit,
                   save_submodels,
-                  dir)
+                  dir,
+                  seed)
   mobj <- structure(mobj, class = c("classifier", class(mobj)))
   mobj <- set_measure(mobj, AUC)
   mobj
@@ -61,7 +63,7 @@ predict.classifier <- function(obj,
                                data = NULL,
                                desc = "",
                                ...) {
-   
+  
   if (is.null(obj$final_model)) {
     stop("Final model not set")
   } else {
