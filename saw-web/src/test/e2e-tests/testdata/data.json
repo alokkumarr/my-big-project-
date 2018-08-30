@@ -634,6 +634,7 @@
           "value": 10
         },
         "String_Is_in_as_user": {
+          "user": "userOne",
           "fieldType": "string",
           "operator": "Is in",
           "value": 10
@@ -732,7 +733,7 @@
           "operator": "Not equal to",
           "value": 10
         }
-    }      
+    }
   },
   "DASHBOARDWITHCHARTS":{
     "dashboardWithChartsDataProvider":{
