@@ -89,7 +89,7 @@ public interface WithDataSet {
     default Map<String, Map<String, Object>> discoverInputDataSetsWithMetadata(DataSetHelper aux) throws Exception {
 
         String project = aux.ctx.applicationID;
-        DataSetHelper.logger.debug("Set projects " + project);
+        DataSetHelper.logger.warn("Set projects " + project);
         Map<String, Map<String, Object>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
 
         for (Input in: aux.ctx.componentConfiguration.getInputs()) {
@@ -122,7 +122,7 @@ public interface WithDataSet {
 
         sb.append(Path.SEPARATOR + in.getDataSet()).append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
-        DataSetHelper.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
+        DataSetHelper.logger.warn(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
 
 
         Map<String, Object> res = aux.discoverAndValidateInputDS(in.getDataSet(), sb.toString(), null);
@@ -173,7 +173,7 @@ public interface WithDataSet {
                         + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR + catalog
                         + Path.SEPARATOR + datasetName + Path.SEPARATOR + dataDir;
 
-                DataSetHelper.logger.debug("Dataset location = " + location);
+                DataSetHelper.logger.warn("Dataset location = " + location);
 
                 String sampling = system.has(DataSetProperties.Sample.name()) ?
                         system.get(DataSetProperties.Sample.name()).getAsString() : DLDataSetOperations.SIMPLE_SAMPLING;
@@ -191,7 +191,7 @@ public interface WithDataSet {
                 res.put(DataSetProperties.Format.name(), format);
 
                 res.put(DataSetProperties.Sample.name(), sampling);
-                DataSetHelper.logger.debug("Result Map = " + res);
+                DataSetHelper.logger.warn("Result Map = " + res);
 
                 return res;
             }
@@ -280,7 +280,7 @@ public interface WithDataSet {
                 .append(Path.SEPARATOR + batchID)
                 .append(Path.SEPARATOR + componentName);
 
-        DataSetHelper.logger.debug(String.format("Generated temp location: %s", sb.toString()));
+        DataSetHelper.logger.warn(String.format("Generated temp location: %s", sb.toString()));
         return sb.toString();
     }
 
@@ -325,8 +325,9 @@ public interface WithDataSet {
                         .append(Path.SEPARATOR + output.getDataSet())
                         .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
-                logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
+                logger.warn(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
                 res_output.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+                logger.warn("Phyical location : " + sb.toString());
                 res_output.put(DataSetProperties.Name.name(), output.getDataSet());
 
                 Integer nof = (output.getNumberOfFiles() != null)? output.getNumberOfFiles() :1;
@@ -345,10 +346,10 @@ public interface WithDataSet {
 
                 String m = "Configured keys: [" + kl.size()+ "]";
                 for (String s : kl) m += s + " ";
-                logger.trace( m);
+                logger.warn( m);
                 res_output.put(DataSetProperties.PartitionKeys.name(), kl);
 
-                DataSetHelper.logger.debug("Output DS result Map = " + res_output);
+                DataSetHelper.logger.warn("Output DS result Map = " + res_output);
                 switch (ktype) {
                     case parameter:
                         if (output.getName() != null)
@@ -358,6 +359,7 @@ public interface WithDataSet {
                             resMap.put(output.getDataSet(), res_output); break;
                 }
             }
+            logger.warn("ngBuildDataSetMap : " + resMap);
             return resMap;
         }
 
@@ -377,7 +379,7 @@ public interface WithDataSet {
                     Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> srcPartitioning =
                             DLDataSetOperations.getPartitioningInfo(location);
 
-                    logger.debug(String.format("Check partition layout of input dataset %s --> type: %s, final location: %s", dataset, srcPartitioning._4(), srcPartitioning._1() ));
+                    logger.warn(String.format("Check partition layout of input dataset %s --> type: %s, final location: %s", dataset, srcPartitioning._4(), srcPartitioning._1() ));
                     //TODO::Potentially we can add DRILL support to read from DRILL partitions.
                     //Check partitioning structure and match it with metadata/input
                     if (srcPartitioning._4() != DLDataSetOperations.PARTITION_STRUCTURE.HIVE &&

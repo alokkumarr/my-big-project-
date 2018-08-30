@@ -3,7 +3,8 @@ package sncr.xdf.ngcomponent;
 import com.google.gson.JsonElement;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.spark.sql.Dataset;
 import org.joda.time.DateTime;
 import scala.Tuple3;
@@ -50,7 +51,7 @@ public interface WithDLBatchWriter {
             //TODO:: Instead of removing data - rename it to _old, _archived or anything else.
             for (MoveDataDescriptor moveTask : ctx.resultDataDesc) {
 
-                WithDLBatchWriterHelper.logger.debug(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
+                WithDLBatchWriterHelper.logger.warn(String.format("DS: %s\nSource: %s\nDest: %s\nFormat: %s\nMode: %s",
                         moveTask.objectName, moveTask.source, moveTask.dest, moveTask.format, moveTask.mode ));
 
                 // TODO:: Fix BDA Meta
@@ -64,15 +65,15 @@ public interface WithDLBatchWriter {
                     String sampleDirDest = helper.getSampleDestDir(moveTask);
 
 
-                    WithDLBatchWriterHelper.logger.info("Clean up sample for " + moveTask.objectName);
+                    WithDLBatchWriterHelper.logger.warn("Clean up sample for " + moveTask.objectName);
                     if (helper.createOrCleanUpDestDir(sampleDirDest, moveTask.objectName) < 0) return -1;
 
-                    WithDLBatchWriterHelper.logger.info("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
+                    WithDLBatchWriterHelper.logger.warn("Moving sample ( " + moveTask.objectName + ") from " + sampleDirSource + " to " + sampleDirDest);
                     helper.moveFilesForDataset(sampleDirSource, sampleDirDest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
 
                 }
                 else{
-                    WithDLBatchWriterHelper.logger.debug("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
+                    WithDLBatchWriterHelper.logger.warn("Sample data are not presented even if settings says otherwise - skip moving sample to permanent location");
                 }
 
                 moveTask.source = helper.getActualDatasetSourceDir(moveTask.source);
@@ -82,7 +83,7 @@ public interface WithDLBatchWriter {
                     if (moveTask.mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) {
                         if (helper.createOrCleanUpDestDir(moveTask.dest, moveTask.objectName) < 0) return -1;
                     }
-                    WithDLBatchWriterHelper.logger.info("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
+                    WithDLBatchWriterHelper.logger.warn("Moving data ( " + moveTask.objectName + ") from " + moveTask.source + " to " + moveTask.dest);
                     helper.moveFilesForDataset(moveTask.source, moveTask.dest, moveTask.objectName, moveTask.format, moveTask.mode, ctx);
                 }
                 else // else - move partitions result
@@ -92,11 +93,11 @@ public interface WithDLBatchWriter {
                     Path lp = new Path(moveTask.source);
 
                     String m = "/"; for (String s : moveTask.partitionList) m += s + "*/"; m += "*/";
-                    WithDLBatchWriterHelper.logger.trace("Glob depth: " + m);
+                    WithDLBatchWriterHelper.logger.warn("Glob depth: " + m);
 
 
                     FileStatus[] it = HFileOperations.fs.globStatus(new Path(moveTask.source + m ), DLDataSetOperations.FILEDIR_FILTER);
-                    WithDLBatchWriterHelper.logger.debug("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
+                    WithDLBatchWriterHelper.logger.warn("Got " + it.length + " files, enumerating partitions. Look for partitions into: " + lp);
                     for(FileStatus file : it){
                         if(file.isFile()){
                             // We also need list of partitions (directories) for reporting and appending/replacing
@@ -109,18 +110,18 @@ public interface WithDLBatchWriter {
                             // Store full partition path for future use in unique collection
                             // Should <set> to be used instead of <map>?
                             String p = file.getPath().getParent().toString().substring(i + lp.getName().length());
-                            WithDLBatchWriterHelper.logger.debug("Add partition to result set: " + p);
+                            WithDLBatchWriterHelper.logger.warn("Add partition to result set: " + p);
                             partitions.add(p);
                             // Update file counter for reporting purposes
                             ctx.globalFileCount++;
                         }
                     }
-                    WithDLBatchWriterHelper.logger.debug("Done.");
+                    WithDLBatchWriterHelper.logger.warn("Done.");
                     Integer completedFileCount = 0;
                     Map<String, Tuple3<Long, Integer, Integer>> partitionsInfo = new HashMap<>();
                     // Check if configuration asks data to be copied
                     // to final processed location
-                    WithDLBatchWriterHelper.logger.debug("Merge partitions (" + partitions.size() + ")...");
+                    WithDLBatchWriterHelper.logger.warn("Merge partitions (" + partitions.size() + ")...");
                     // Copy partitioned data to final location
                     // Process partition locations - relative paths
                     for(String e : partitions) {
@@ -144,7 +145,7 @@ public interface WithDLBatchWriter {
     }
 
     class WithDLBatchWriterHelper extends DLBatchWriter {
-        private static final Logger logger = Logger.getLogger(WithDLBatchWriter.class);
+        private static final Logger log = LoggerFactory.getLogger(WithDLBatchWriterHelper.class);
         private FileSystem fs = HFileOperations.getFileSystem();
         private FileContext fc = HFileOperations.getFileContext();
 
@@ -243,6 +244,7 @@ public interface WithDLBatchWriter {
             String name = (String) outputDS.get(DataSetProperties.Name.name());
 
             String loc = location + Path.SEPARATOR + name;
+            logger.warn("output write file location : " + loc);
 
             format = (String) outputDS.get(DataSetProperties.Format.name());
             numberOfFiles = (Integer) outputDS.get(DataSetProperties.NumberOfFiles.name());
@@ -268,7 +270,7 @@ public interface WithDLBatchWriter {
 
             if (mapType == DSMapKey.dataset) {
                 outputDS.put(DataSetProperties.Schema.name(), extractSchema(dataset));
-                logger.trace("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
+                logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS.get(DataSetProperties.Schema.name())).toString());
 
                 //Add record count
                 outputDS.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
@@ -280,7 +282,7 @@ public interface WithDLBatchWriter {
             else{
                 Map<String, Object> outputDS2 = ngctx.outputDataSets.get(name);
                 outputDS2.put(DataSetProperties.Schema.name(), extractSchema(dataset));
-                logger.trace("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
+                logger.warn("Dataset: " + name + ", Result schema: " + ((JsonElement) outputDS2.get(DataSetProperties.Schema.name())).toString());
 
                 //Add record count
                 outputDS2.put(DataSetProperties.RecordCount.name(), extractrecordCount(dataset));
@@ -317,7 +319,7 @@ public interface WithDLBatchWriter {
             //get list of files to be processed
             FileStatus[] files = fs.listStatus(new Path(source));
 
-            WithDLBatchWriterHelper.logger.debug("Prepare the list of the files, number of files: " + files.length);
+            WithDLBatchWriterHelper.logger.warn("Prepare the list of the files, number of files: " + files.length);
             for (int i = 0; i < files.length; i++) {
                 if (files[i].getLen() > 0) {
                     String srcFileName = source + Path.SEPARATOR + files[i].getPath().getName();
@@ -330,7 +332,7 @@ public interface WithDLBatchWriter {
                                             "." + format;
 
                     Path fdest = new Path(destFileName);
-                    WithDLBatchWriterHelper.logger.debug(String.format("move from: %s to %s", srcFileName, fdest.toString()));
+                    WithDLBatchWriterHelper.logger.warn(String.format("move from: %s to %s", srcFileName, fdest.toString()));
                     Options.Rename opt = (mode.equalsIgnoreCase(DLDataSetOperations.MODE_REPLACE)) ? Options.Rename.OVERWRITE : Options.Rename.NONE;
                     Path src = new Path(srcFileName);
                     Path dst = new Path(destFileName);
@@ -338,11 +340,11 @@ public interface WithDLBatchWriter {
                 }
                 ctx.globalFileCount++;
             }
-            logger.debug("Remove TMP directory if it Exists: " + source);
+            logger.warn("Remove TMP directory if it Exists: " + source);
             Path tmpDIR = new Path(source);
             if (fs.exists(tmpDIR))
                 fs.delete(tmpDIR, true);
-            logger.debug("Data Objects were successfully moved from " + source + " into " + dest);
+            logger.warn("Data Objects were successfully moved from " + source + " into " + dest);
 
         }
 

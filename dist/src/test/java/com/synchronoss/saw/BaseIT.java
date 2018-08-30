@@ -32,19 +32,21 @@ public class BaseIT {
   protected ObjectMapper mapper;
   protected String token;
 
-  @BeforeClass
-  public static void setUpClass() {
-    String host = System.getProperty("saw.docker.host");
-    String port = System.getProperty("saw.docker.port");
-    if (host == null) {
-      throw new RuntimeException("Property saw.docker.host unset");
+    @BeforeClass
+    public static void setUpClass() {
+        String host = System.getProperty("saw.docker.host");
+        String port = System.getProperty("saw.docker.port");
+        if (host == null) {
+            throw new RuntimeException("Property saw.docker.host unset");
+        }
+        if (port == null) {
+            throw new RuntimeException("Property saw.docker.port unset");
+        }
+        //RestAssured.baseURI = "http://" + host + ":" + port;
+        RestAssured.baseURI = "http://localhost:" + port;
+        RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
     }
-    if (port == null) {
-      throw new RuntimeException("Property saw.docker.port unset");
-    }
-    RestAssured.baseURI = "http://" + host + ":" + port + "/saw";
-    RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-  }
+    
 
   @Before
   public void setUp() throws JsonProcessingException {

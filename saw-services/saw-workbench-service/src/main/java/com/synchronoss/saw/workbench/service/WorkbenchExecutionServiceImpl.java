@@ -45,8 +45,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
-    
-  
+
   /**
    * Cached Workbench Livy client to be kept around for next operation to reduce startup time.
    */
@@ -54,13 +53,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
   @PostConstruct
   private void init() throws Exception {
-    /* Workaround: If the "/apps/spark" directory does not exist in
-     * the data lake, Apache Livy will fail with a file not found
-     * error.  So create the "/apps/spark" directory here.  */
-    String appsSparkPath = "/apps/spark";
-    if (!HFileOperations.exists(appsSparkPath)) {
-      HFileOperations.createDir(appsSparkPath);
-    }
     /* Initialize the previews MapR-DB table */
     try (Admin admin = MapRDB.newAdmin()) {
       if (!admin.tableExists(previewsTablePath)) {
@@ -83,9 +75,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
        * be able to recover by reattempting to create the client.  */
       log.warn("Unable to create Workbench client upon startup", e);
     }
-    
-    
-    
   }
 
   /**
@@ -117,20 +106,8 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     cachedClient = new WorkbenchClient(livyUri);
   }
 
-
-  //  /**
-  //   * execute a transformation component on a dataset to create a new
-  //   * dataset
-  //   */
-
   /**
-   * Runs the given component using XDF hooks.
-   * @param project Project ID
-   * @param name Name of the dataset
-   * @param component Component name
-   * @param config Conponent configuration
-   * @return Object Node
-   * @throws Exception Incase of failures
+   * Execute a transformation component on a dataset to create a new dataset.
    */
   @Override
   public ObjectNode execute(
@@ -172,7 +149,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   private String metastoreBase;
 
   /**
-   * Preview the output of a executing a transformation component on a dataset
+   * Preview the output of a executing a transformation component on a dataset.
    * Also used for simply viewing the contents of an existing dataset.
    */
   @Override
