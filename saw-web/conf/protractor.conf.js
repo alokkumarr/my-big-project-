@@ -174,7 +174,7 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'analyze.test.js',
+      testBaseDir + 'analyze.test.js'
     ]
   },
   onCleanUp: function (results) {
