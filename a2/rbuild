@@ -41,7 +41,3 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     R CMD INSTALL *.tar.gz
     popd > /dev/null
 done
-# Workaround: The files created by the container are owned by root, so
-# give write permissions to the regular user to clean them on the next
-# run
-chmod -R a+w target
