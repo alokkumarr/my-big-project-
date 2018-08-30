@@ -1,15 +1,26 @@
 <div class="filter-header-actions">
-  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button e2e="dashboard-global-filters-cancel-button" (click)="onCancel()">Cancel</button>
   <button mat-raised-button
+    e2e="dashboard-global-filters-apply-button"
     color="primary"
-    [disabled]="globalFilters.length <= 0"
+    [disabled]="globalFilters.length <= 0 && !showKPIFilter"
     (click)="onApply()">
     Apply Filters
   </button>
 </div>
 
 <div class="filter-content">
-  <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
+  <mat-expansion-panel expanded="true" *ngIf="showKPIFilter">
+    <mat-expansion-panel-header>
+      <mat-panel-title>KPI Filter</mat-panel-title>
+
+      <mat-panel-description>Applies to all the KPIs in this dashboard</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <kpi-filter (onModelChange)="onKPIFilterUpdate($event)"></kpi-filter>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters; index as idx" [ngSwitch]="gFilter.uiType" [attr.e2e]="'dashboard-global-filters-panel-' + idx">
     <mat-expansion-panel-header>
       <mat-panel-title [textContent]="gFilter.displayName"></mat-panel-title>
 
@@ -37,5 +48,5 @@
 </div>
 
 <div class="filter-footer-actions">
-  <button mat-button color="warn" (click)="onClearFilters()">Clear All Filters</button>
+  <button mat-button color="warn" e2e="dashboard-global-filters-clear-button" (click)="onClearFilters()">Clear All Filters</button>
 </div>

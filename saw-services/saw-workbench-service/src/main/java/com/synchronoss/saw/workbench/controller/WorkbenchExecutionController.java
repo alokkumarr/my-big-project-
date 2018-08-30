@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.service.WorkbenchExecutionService;
 
 import io.jsonwebtoken.Claims;
@@ -26,9 +27,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import sncr.bda.base.MetadataBase;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.component.Component;
 
@@ -66,6 +68,7 @@ public class WorkbenchExecutionController {
       @RequestBody ObjectNode body,
       @RequestHeader("Authorization") String authToken)
       throws JsonProcessingException, Exception {
+    log.info("Create dataset: body = {}", body);
     log.debug("Create dataset: project = {}", project);
     log.debug("Auth token = {}", authToken);
     if (authToken.startsWith("Bearer")) {
@@ -172,6 +175,33 @@ public class WorkbenchExecutionController {
     log.debug("Get dataset preview: project = {}", project);
     /* Get previously created preview */
     ObjectNode body = workbenchExecutionService.getPreview(previewId);
+    /*
+     * If preview was not found, response to indicate that preview has not been created yet
+     */
+    if (body == null) {
+      throw new NotFoundException();
+    }
+    /* Otherwise return the preview contents */
+    return body;
+  }
+  /**
+   * This method is to preview the data.
+   * @param project is of type String.
+   * @param previewId is of type String.
+   * @return ObjectNode is of type Object.
+   * @throws JsonProcessingException when this exceptional condition happens.
+   * @throws Exception when this exceptional condition happens.
+   */
+  @RequestMapping(value = "{project}/{name}/datapath", method = RequestMethod.GET,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  public String generatePath(@PathVariable(name = "project", required = true) String project,
+                            @PathVariable(name = "name", required = true) String name, @RequestParam Map<String, String> queryMap)
+      throws JsonProcessingException, Exception {
+    log.debug("Get dataset preview: project = {}", project);
+    /* Get previously created preview */
+    String catalog = queryMap.get("catalog")!=null ? queryMap.get("catalog") : MetadataBase.DEFAULT_CATALOG ;
+    String body = workbenchExecutionService.createDatasetDirectory(project, catalog, name);
     /*
      * If preview was not found, response to indicate that preview has not been created yet
      */

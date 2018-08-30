@@ -26,6 +26,7 @@ export class DesignerReportComponent {
   @Input() data;
   @Input() dataCount: number;
   @Input() sorts: Sort[];
+  @Input() analysis;
   @Input() filters: Filter[];
   @Input() designerState: DesignerStates;
   public DesignerStates = DesignerStates;

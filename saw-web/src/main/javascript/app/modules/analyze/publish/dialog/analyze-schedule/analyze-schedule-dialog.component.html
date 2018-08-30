@@ -1,0 +1,74 @@
+<header class="base-dialog__header">
+  <strong i18n>Schedule Analysis</strong>
+</header>
+<div class="base-dialog__content dialog__content"
+     fxLayout="column">
+
+    <div class="ars-content" layout-padding>
+      <!-- <div class="form-container" layout="column">
+        <mat-checkbox [(ngModel)]="hasSchedule">
+          <span i18n>Scheduled</span>
+        </mat-checkbox>
+      </div> -->
+
+      <div class="schedule-container" fxLayout="column">
+        <cron-job-schedular *ngIf="loadCron" [crondetails]="crondetails" (onCronChanged)="onCronChanged($event)"></cron-job-schedular>
+
+        <div class="form-container" fxLayout="column">
+          <label i18n>Publish to Email</label>
+          <mat-form-field flex="20">
+            <mat-chip-list #chipList>
+              <mat-chip *ngFor="let email of emails; trackBy: index; let i = index" (removed)="removeEmail(i)">
+                <div *ngIf="!validateThisEmail(email)" class="errorMsg">?</div>
+                {{email}}
+                <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>
+              </mat-chip>
+              <input placeholder="Emails separate by ';'"
+                     [matChipInputFor]="chipList"
+                     [matChipInputSeparatorKeyCodes]="separatorKeys"
+                     [matChipInputAddOnBlur]="true"
+                     (matChipInputTokenEnd)="addEmail($event)" />
+            </mat-chip-list>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="data.analysis.type !== 'chart'" class="form-container" fxLayout="column">
+
+          <label i18n>Publish to FTP</label>
+          <div class="publish-form" fxLayout="row" fxLayoutAlign="start center">
+            <div>
+              <mat-form-field class="select-form-field" appearance="outline">
+                <mat-label>FTP Location</mat-label>
+                <mat-select [value]="ftp"
+                            (selectionChange)="onLocationSelected($event.value)"
+                            multiple
+                >
+                  <mat-option *ngFor="let location of locations" [value]="location">{{ location }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="clear" (click)="ftp = [];">Clear</div>
+          </div>
+        </div>
+        <span *ngIf="emailValidateFlag" class="errorTextMsg" i18n>Invalid Email-Id Found: Please provide valid Email-Id's in list</span>
+        <span *ngIf="errorFlagMsg" class="errorTextMsg" i18n>Please enter valid Email ids or Select option for Publish</span>
+        <span *ngIf="cronValidateField" class="errorTextMsg" i18n>Please Select a valid Schedule</span>
+      </div>
+
+    </div>
+
+</div>
+<div class="base-dialog__actions">
+  <div fxLayout="row"
+       fxLayoutAlign="start center" class="form-buttons">
+    <button (click)="publish()"
+            mat-raised-button color="primary" i18n>
+      Schedule
+    </button>
+
+    <button mat-button i18n (click)="close()">Cancel</button>
+
+    <button mat-button i18n class="remove-schedule" [disabled]="!hasSchedule" (click)="removeSchedule()">Remove Schedule</button>
+  </div>
+</div>
+

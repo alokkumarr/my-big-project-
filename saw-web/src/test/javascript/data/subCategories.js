@@ -1,4 +1,4 @@
-const globalVariables = require('../helpers/globalVariables');
+const globalVariables = require('../../javascript/helpers/globalVariables');
 
 const description = 'Sub-category created for e2e testing';
 const nullValue = 'NULL';
@@ -91,6 +91,11 @@ const subCategories = {
   },
   createAnalysis: {
     name: 'Create Analysis ' + globalVariables.e2eId,
+    description: description,
+    id: nullValue
+  },
+  observeSubCategory: {
+    name: 'AT Observe SubCat' + globalVariables.e2eId,
     description: description,
     id: nullValue
   }

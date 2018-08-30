@@ -1,5 +1,14 @@
 package com.synchronoss.saw.workbench.service;
 
+import java.util.UUID;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.Path;
+import org.ojai.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,14 +17,7 @@ import com.mapr.db.FamilyDescriptor;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
-import java.util.UUID;
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-import org.ojai.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import sncr.bda.base.MetadataBase;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
 
@@ -40,7 +42,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
   @NotNull
   private Integer previewLimit;
 
-  @Value("${workbench.project-root}/previews")
+  @Value("${workbench.project-root}/services/metadata/previews")
   @NotNull
   private String previewsTablePath;
 
@@ -64,7 +66,15 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     /*
      * Cache a Workbench Livy client to reduce startup time for first operation
      */
-    cacheWorkbenchClient();
+    try {
+      cacheWorkbenchClient();
+    } catch (Exception e) {
+      /* If Apache Livy is not installed in the environment, fail
+       * gracefully by letting the Workbench Service still start up.
+       * If Apache Livy is later installed, the Workbench Service will
+       * be able to recover by reattempting to create the client.  */
+      log.warn("Unable to create Workbench client upon startup", e);
+    }
   }
 
   /**
@@ -100,23 +110,38 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    * Execute a transformation component on a dataset to create a new dataset.
    */
   @Override
-  public ObjectNode execute(String project, String name, String component, String config)
-      throws Exception {
-
-    log.info("Execute dataset transformation");
-
+  public ObjectNode execute(
+      String project, String name, String component, String config) throws Exception {
+    log.info("Executing dataset transformation starts here ");
+    log.info("XDF Configuration = " + config);
     WorkbenchClient client = getWorkbenchClient();
-    createDatasetDirectory(name);
-    client.submit(new WorkbenchExecuteJob(root, project, component, config));
+    createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
+    log.info("execute name = " + name);
+    log.info("execute root = " + root);
+    log.info("execute component = " + component);
+    client.submit(new WorkbenchExecuteJob(
+                root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
+    log.info("Executing dataset transformation ends here ");
     return root;
   }
 
-  private void createDatasetDirectory(String name) throws Exception {
-    String path = root + "/" + project + "/dl/fs/data/" + name + "/data";
+  /**
+   * Execute a transformation component on a dataset to create a new dataset.
+   */
+  @Override
+  public String createDatasetDirectory(String project, String catalog, String name) throws Exception {
+    log.trace("generate data system path for starts here :" + project + " : " + name); 
+    String path = root + Path.SEPARATOR + project + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR
+        + Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE + Path.SEPARATOR
+        + catalog + Path.SEPARATOR + name + Path.SEPARATOR
+        + MetadataBase.PREDEF_DATA_DIR;
+    log.info("createDatasetDirectory path = " + path);
     if (!HFileOperations.exists(path)) {
       HFileOperations.createDir(path);
     }
+    log.trace("generate data system path for starts here " + path);
+    return path;
   }
 
   @Value("${metastore.base}")
@@ -142,7 +167,7 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     if (status == null || !status.equals("SUCCESS")) {
       throw new RuntimeException("Unhandled dataset status: " + status);
     }
-    String location = getDatasetLocation(project, name);
+    String location = createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     /* Submit job to Livy for reading out preview data */
     WorkbenchClient client = getWorkbenchClient();
     String id = UUID.randomUUID().toString();
@@ -162,10 +187,6 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
     log.error("Creating preview failed");
     PreviewBuilder preview = new PreviewBuilder(previewsTablePath, previewId, "failed");
     preview.insert();
-  }
-
-  private String getDatasetLocation(String project, String name) {
-    return root + "/" + project + "/dl/fs/data/" + name + "/data";
   }
 
   @Override

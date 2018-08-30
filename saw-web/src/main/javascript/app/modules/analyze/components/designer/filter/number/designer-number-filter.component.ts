@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FilterModel } from '../../types';
+import { BETWEEN_NUMBER_FILTER_OPERATOR, NUMBER_FILTER_OPERATORS } from '../../../../consts';
 
 import * as isFinite from 'lodash/isFinite';
 import * as unset from 'lodash/unset';
@@ -7,44 +8,13 @@ import * as unset from 'lodash/unset';
 const template = require('./designer-number-filter.component.html');
 require('./designer-number-filter.component.scss');
 
-export const OPERATORS = [
-  {
-    value: 'GT',
-    label: 'Greater than'
-  },
-  {
-    value: 'LT',
-    label: 'Less than'
-  },
-  {
-    value: 'GTE',
-    label: 'Greater than or equal to'
-  },
-  {
-    value: 'LTE',
-    label: 'Less than or equal to'
-  },
-  {
-    value: 'EQ',
-    label: 'Equal to'
-  },
-  {
-    value: 'NEQ',
-    label: 'Not equal to'
-  },
-  {
-    value: 'BTW',
-    label: 'Between'
-  }
-];
-
 export const isValid = (model: FilterModel) => {
   model = model || {};
 
   return (
     model.operator &&
     isFinite(model.value) &&
-    (model.operator !== 'BTW' ? true : isFinite(model.otherValue))
+    (model.operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value ? true : isFinite(model.otherValue))
   );
 };
 
@@ -57,7 +27,8 @@ export class DesignerNumberFilterComponent {
   public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
   @Input() public filterModel: FilterModel;
 
-  public OPERATORS = OPERATORS;
+  public OPERATORS = NUMBER_FILTER_OPERATORS;
+  public BETWEEN_NUMBER_FILTER_OPERATOR = BETWEEN_NUMBER_FILTER_OPERATOR;
 
   init() {
     if (!this.filterModel) {
@@ -105,7 +76,7 @@ export class DesignerNumberFilterComponent {
 
   onOperatorChange(operator) {
     this.filterModel.operator = operator;
-    if (this.filterModel.operator !== 'BTW') {
+    if (this.filterModel.operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value) {
       this.filterModel.otherValue === null;
     }
     this.onFilterModelChange();

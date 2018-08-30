@@ -32,7 +32,11 @@
                "read",
                "execute",
                "aggregate",
-               "pivot"
+               "pivot",
+               "catIndices",
+               "catAliases",
+               "mappingsIndices",
+               "mappingsAliases"
                
             ]
          },

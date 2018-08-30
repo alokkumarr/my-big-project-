@@ -122,20 +122,31 @@ public class SQLComponent extends Component implements WithMovableResult, WithSp
         }
 
         resultDataSets = executor.getResultDataSets();
+
+        logger.debug("Result datasets " + resultDataSets);
+        logger.debug("Output datasets " + outputDataSets);
         outputDataSets.forEach(
             (on, obDesc) ->
             {
-                List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
-                String partKeys = on + ": "; for (String s : kl) partKeys += s + " ";
+                SQLDescriptor descriptor = resultDataSets.get(on);
+                logger.debug("SQL Descriptor for " + on + " = " + descriptor);
 
-                MoveDataDescriptor desc = new SQLMoveDataDescriptor(
-                        resultDataSets.get(on),         // SQLDescriptor
-                        (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
-                resultDataDesc.add(desc);
+                if (descriptor != null) {
+                    logger.info("Generating MoveDataDescriptor for " + on + " description " + obDesc);
+                    List<String> kl = (List<String>) obDesc.get(DataSetProperties.PartitionKeys.name());
+                    String partKeys = on + ": ";
 
-                logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
-                        obDesc.get(DataSetProperties.Name.name()),
-                        obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
+                    for (String s : kl) partKeys += s + " ";
+
+                    MoveDataDescriptor desc = new SQLMoveDataDescriptor(
+                            resultDataSets.get(on),         // SQLDescriptor
+                            (String) obDesc.get(DataSetProperties.PhysicalLocation.name()),kl);
+                    resultDataDesc.add(desc);
+
+                    logger.debug(String.format("DataSet %s will be moved to %s, Partitioning: %s",
+                            obDesc.get(DataSetProperties.Name.name()),
+                            obDesc.get(DataSetProperties.PhysicalLocation.name()), partKeys));
+                }
 
             }
         );

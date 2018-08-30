@@ -1,15 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import { Transition } from '@uirouter/angular';
 
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
+import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 
@@ -18,12 +25,16 @@ const template = require('./observe-view.component.html');
 @Component({
   selector: 'observe-view',
   template,
-  providers: [GlobalFilterService]
+  providers: [DashboardService, GlobalFilterService]
 })
-export class ObserveViewComponent implements OnInit {
+export class ObserveViewComponent implements OnInit, OnDestroy {
   private dashboardId: string;
   private subCategoryId: string;
   private dashboard: Dashboard;
+  public requester = new BehaviorSubject({});
+  private listeners: Array<Subscription> = [];
+  private hasAutoRefresh: boolean = false;
+  private shouldAutoRefresh: boolean = true;
   private privileges = {
     create: false,
     delete: false,
@@ -35,6 +46,7 @@ export class ObserveViewComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
+    private dashboardService: DashboardService,
     private filters: GlobalFilterService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
@@ -48,8 +60,54 @@ export class ObserveViewComponent implements OnInit {
 
   ngOnInit() {
     if (this.dashboardId) {
-      this.loadDashboard();
+      this.loadDashboard().subscribe(() => {
+        this.startAutoRefresh();
+      });
     }
+  }
+
+  ngOnDestroy() {
+    this.dashboardService.unsetAutoRefresh(
+      (this.dashboard || { entityId: null }).entityId
+    );
+    this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  stopAutoRefresh() {
+    this.dashboardService.unsetAutoRefresh(this.dashboard.entityId);
+  }
+
+  modifyAutoRefresh({ checked }) {
+    if (checked) {
+      this.startAutoRefresh();
+      this.refreshDashboard();
+    } else {
+      this.stopAutoRefresh();
+    }
+  }
+
+  startAutoRefresh() {
+    if (!this.dashboard.autoRefreshEnabled) {
+      this.hasAutoRefresh = false;
+      this.shouldAutoRefresh = false;
+      this.dashboardService.unsetAutoRefresh(this.dashboard.entityId);
+      return;
+    }
+
+    this.hasAutoRefresh = true;
+    this.shouldAutoRefresh = true;
+    this.dashboardService.setAutoRefresh(this.dashboard);
+    const autoRefreshListener = this.dashboardService
+      .getAutoRefreshSubject(this.dashboard.entityId)
+      .subscribe(({ dashboardId }) => {
+        if (dashboardId !== this.dashboard.entityId) return;
+        this.refreshDashboard();
+      });
+    this.listeners.push(autoRefreshListener);
+  }
+
+  refreshDashboard() {
+    this.requester.next({ action: 'refresh' });
   }
 
   confirmDelete() {
@@ -123,29 +181,32 @@ export class ObserveViewComponent implements OnInit {
    * @returns {void}
    * @memberof ObserveViewComponent
    */
-  onApplyGlobalFilter(globalFilters): void {
-    if (!globalFilters) {
+  onApplyGlobalFilter(data): void {
+    if (!data) {
       this.sidenav.close();
       return;
     }
 
-    this.filters.onApplyFilter.next(globalFilters);
+    this.filters.onApplyFilter.next(data.analysisFilters);
+    this.filters.onApplyKPIFilter.next(data.kpiFilters);
     this.sidenav.close();
   }
 
-  loadDashboard(): void {
+  loadDashboard(): Observable<Dashboard> {
     this.headerProgress.show();
-    this.observe.getDashboard(this.dashboardId).subscribe(
-      data => {
+    return this.observe
+      .getDashboard(this.dashboardId)
+      .map((data: Dashboard) => {
         this.dashboard = data;
         this.loadPrivileges();
         this.checkForKPIs();
         this.headerProgress.hide();
-      },
-      _ => {
+        return data;
+      })
+      .catch(error => {
         this.headerProgress.hide();
-      }
-    );
+        return Observable.of(error);
+      });
   }
 
   /**

@@ -2,7 +2,10 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Analysis, ArtifactColumns } from '../types';
 import { DesignerService } from '../designer.service';
-import { flattenPivotData, flattenChartData } from '../../../../../common/utils/dataFlattener';
+import {
+  flattenPivotData,
+  flattenChartData
+} from '../../../../../common/utils/dataFlattener';
 import { DesignerStates } from '../consts';
 
 import * as isEmpty from 'lodash/isEmpty';
@@ -39,10 +42,24 @@ export class DesignerPreviewDialogComponent {
       break;
     case 'report':
     case 'esReport':
-      this.dataLoader = (options = {}) =>
-        this._designerService
-          .getDataForAnalysisPreview(this.analysis, options)
-          .then(({ data, count }) => ({ data: data, totalCount: count }));
+      let execId: string;
+      this.dataLoader = (options = {}) => {
+        if (execId) {
+          return this._designerService.getDataForExecution(
+            this.analysis.id,
+            execId,
+            {...options, analysisType: this.analysis.type, executionType: 'onetime'}
+          )
+            .then(({data, count}) => ({data, totalCount: count}));
+        } else {
+          return this._designerService
+            .getDataForAnalysisPreview(this.analysis, options)
+            .then(({ data, executionId, count }) => {
+              execId = executionId
+              return { data: data, totalCount: count };
+            });
+        }
+      }
       break;
     }
   }

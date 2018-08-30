@@ -4,36 +4,63 @@
     (openedChange)="filterSidenavStateChange($event)"
     [opened]="false"
     position="end">
-    <global-filter (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
+    <global-filter [showKPIFilter]="hasKPIs" (onApplyFilter)="onApplyGlobalFilter($event)"></global-filter>
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="page-header-toolbar">
       <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
       <div class="page-header-actions">
-        <kpi-filter *ngIf="hasKPIs"></kpi-filter>
+
+        <mat-slide-toggle
+            *ngIf="dashboard && hasAutoRefresh"
+            color="primary"
+            e2e="dashboard-auto-refresh-toggle"
+            [checked]="shouldAutoRefresh"
+            (change)="modifyAutoRefresh($event)">
+          Auto Refresh
+        </mat-slide-toggle>
 
         <button mat-button
-        color="warn"
-        *ngIf="dashboard && privileges.delete"
-        (click)="confirmDelete()">Delete</button>
+                e2e="dashboard-manual-refresh-button"
+                *ngIf="dashboard && !hasAutoRefresh"
+                (click)="refreshDashboard()">
+          Refresh
+        </button>
 
         <button mat-button
-        *ngIf="dashboard && privileges.edit"
-        (click)="editDashboard()">Edit</button>
+                color="warn"
+                e2e="dashboard-delete-dashboard-button"
+                *ngIf="dashboard && privileges.delete"
+                (click)="confirmDelete()">
+          Delete
+        </button>
 
         <button mat-button
-        *ngIf="dashboard"
-        (click)="filterSidenav.toggle()">Filter</button>
+                e2e="dashboard-edit-dashboard-button"
+                *ngIf="dashboard && privileges.edit"
+                (click)="editDashboard()">
+          Edit
+        </button>
+
+        <button mat-button
+                e2e="dashboard-open-global-filters-button"
+                *ngIf="dashboard"
+                (click)="filterSidenav.toggle()">
+          Filter
+        </button>
 
         <button mat-raised-button
-        color="primary"
-        (click)="createDashboard()">+ DASHBOARD</button>
+                e2e="dashboard-new-dashboard-button"
+                color="primary"
+                (click)="createDashboard()">
+          + DASHBOARD
+        </button>
       </div>
     </div>
 
     <div class="page-content">
-      <dashboard-grid [model]="dashboard" mode="view" *ngIf="dashboard"></dashboard-grid>
-      <span *ngIf="!dashboard">No dashboards available.</span>
+      <dashboard-grid [model]="dashboard" [requester]="requester" mode="view" *ngIf="dashboard"></dashboard-grid>
+      <span class="no-dashboard-notice" *ngIf="!dashboard">No dashboards available.</span>
     </div>
   </mat-sidenav-content>
 

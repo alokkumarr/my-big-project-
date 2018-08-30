@@ -7,13 +7,18 @@
         </div>
     </md-toolbar>
     <div>
-        <md-input-container> <label
-                translate="SELECT_METRIC_EXPORT"></label> <md-select ng-model="$ctrl.seletedMetrics"
-                ng-change="$ctrl.getAnalysisByMetricIds($ctrl.seletedMetrics)"
-                multiple="{{false}}" required> <md-option
-                ng-repeat="metric in $ctrl.metrics" ng-value="metric.metricName"
-                ng-bind="::metric.metricName"></md-option> </md-select>
-        </md-input-container>
+        <div class="row" layout="column">
+            <md-input-container style="margin-right: 10px;"> 
+                    <label translate="SELECT_METRIC_EXPORT"></label> 
+                    <md-select ng-model="$ctrl.seletedMetrics" 
+                        ng-change="$ctrl.getAnalysisByMetricIds($ctrl.seletedMetrics)"
+                        multiple required>
+                                <md-option
+                                ng-repeat="metric in $ctrl.metrics" ng-value="metric.metricName"
+                                ng-bind="::metric.metricName"></md-option>
+                        </md-select>
+                </md-input-container>
+            </div>
         <div class="form-container" layout="column">
             <label translate="SELECTED_METRIC_EXPORT"></label>
               <md-chips ng-model="$ctrl.seletedMetrics"

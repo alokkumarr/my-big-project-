@@ -1,7 +1,9 @@
+<field-details *ngIf="showFieldDetails" [artifactColumns]="artifactColumns"></field-details>
 <dx-pivot-grid id="pivot-grid"
                [rowHeaderLayout]="rowHeaderLayout"
                [allowSortingBySummary]="allowSortingBySummary"
                [showBorders]="showBorders"
+               [height]="height"
                [allowSorting]="allowSorting"
                [allowFiltering]="allowFiltering"
                [allowExpandAll]="allowExpandAll"

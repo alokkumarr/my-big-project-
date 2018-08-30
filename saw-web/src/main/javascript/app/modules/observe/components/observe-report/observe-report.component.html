@@ -1,9 +1,11 @@
 <h1 class="report-title" [textContent]="analysis.name"></h1>
 <report-grid-upgraded (change)="onReportGridChange($event)"
                       [artifacts]="analysis.edit ? null : analysis.artifacts"
+                      [analysis]="analysis"
                       [query]="analysis.query"
                       [sorts]="analysis.sqlBuilder.sorts"
                       [dataLoader]="dataLoader"
                       [dimensionChanged]="updater"
-                      [isEditable]="false">
+                      [isEditable]="false"
+                      [columnHeaders]="false">
 </report-grid-upgraded>

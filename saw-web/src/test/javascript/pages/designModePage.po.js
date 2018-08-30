@@ -2,6 +2,8 @@ module.exports = {
   previewBtn: element(by.css('button[e2e="open-preview-modal"]')),
   filterBtn: element(by.xpath('//button/span[text()="Filter"]')),
   applyFiltersBtn: element(by.xpath('//span[contains(text(),"Apply Filters")]')),
+  backButton: element(by.css(' [fonticon="icon-arrow-left"]')),
+ 
   // available functions: Sum, AVG, MIN, MAX, Count
   aggregateFunctionButton: aggregateFunction => element(by.xpath(`//mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
   aggregateFunctionMenuItem: aggregateFunction => element(by.xpath(`//button[@role="menuitem"]/mat-icon[@class="mat-icon material-icons icon-${aggregateFunction}"]`)),
@@ -18,9 +20,9 @@ module.exports = {
       presetDropDownItem: presetName => element(by.xpath(`//mat-option[contains(text(),"${presetName}")]`))
     },
     string: {
-      operator: element(by.xpath('//mat-select[@placeholder="Operator"]')),
+      operator: element(by.css('[e2e="filter-string-select"]')),
       operatorDropDownItem: operator => element(by.css(`mat-option[e2e="filter-string-option-${operator}"]`)),
-      input: element(by.xpath(`(//input[contains(@id,"mat-input-")])[position()=3]`)),
+      input: element(by.xpath(`(//input[contains(@id,"mat-input-")])[position()=last()]`)),
       isInIsNotInInput: element(by.xpath(`//input[@e2e="designer-filter-string-input"]`)),
     },
     number: {
@@ -32,7 +34,8 @@ module.exports = {
   pivot: {
     addFieldButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/following-sibling::*)[1]`)),
     expandSelectedFieldPropertiesButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/preceding-sibling::*)[1]`)),
-    groupIntervalDropDown: element(by.xpath(`//mat-select[@placeholder='Group interval']`)),
+    groupIntervalDropDown: element(by.xpath(`//mat-label[contains(text(),"Group interval")]/parent::label`)),
+    groupIntervalDrop: id => element(by.xpath(`//mat-select[@aria-labelledby="${id}"]`)),
     groupIntervalDropDownElement: groupIntervalName => element(by.xpath(`//span[@class="mat-option-text" and contains(text(), '${groupIntervalName}')]`)),
     addFilter: filterObject => addFilter(filterObject)
   },

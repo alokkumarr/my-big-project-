@@ -8,10 +8,14 @@ import {
 } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
 import { AnalysisReport } from '../../../analyze/types';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES
+} from '../../../analyze/services/analyze.service';
 
 const template = require('./observe-report.component.html');
 require('./observe-report.component.scss');
@@ -28,12 +32,16 @@ export class ObserveReportComponent implements OnDestroy {
   @Output() onRefresh = new EventEmitter();
 
   data: Array<any> = [];
+  executionId: string;
 
   listeners: Array<Subscription> = [];
 
   dataLoader = this.loadData.bind(this);
 
-  constructor(private analyzeService: AnalyzeService) {}
+  constructor(
+    private analyzeService: AnalyzeService,
+    private progressService: HeaderProgressService
+  ) {}
 
   ngOnDestroy() {
     this.listeners.forEach(sub => sub.unsubscribe());
@@ -41,9 +49,30 @@ export class ObserveReportComponent implements OnDestroy {
 
   loadData(options = {}) {
     if ((this.analysis as any)._executeTile) {
-      return this.analyzeService
-        .previewExecution(this.analysis, options)
-        .then(({ data, count }) => ({ data, totalCount: count }));
+      if (this.executionId) {
+        return this.analyzeService
+          .getExecutionData(this.analysis.id, this.executionId, {
+            ...options,
+            executionType: 'onetime',
+            analysisType: this.analysis.type
+          })
+          .then(({ data, count }) => ({ data, totalCount: count }));
+      } else {
+        this.progressService.show();
+        return this.analyzeService
+          .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, options)
+          .then(
+            ({ data, executionId, count }) => {
+              this.progressService.hide();
+              this.executionId = executionId;
+              return { data, totalCount: count };
+            },
+            err => {
+              this.progressService.hide();
+              throw err;
+            }
+          );
+      }
     } else {
       return new Promise(resolve => {
         resolve({ data: [], totalCount: 0 });

@@ -10,8 +10,12 @@ import { GridsterItem } from 'angular-gridster2';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
-import { DesignerService } from '../../../analyze/components/designer/designer.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
+import {
+  AnalyzeService,
+  EXECUTION_MODES
+} from '../../../analyze/services/analyze.service';
+import { flattenPivotData } from '../../../../common/utils/dataFlattener';
 
 const template = require('./observe-pivot.component.html');
 require('./observe-pivot.component.scss');
@@ -31,17 +35,25 @@ export class ObservePivotComponent implements OnInit, OnDestroy {
 
   constructor(
     private analyzeService: AnalyzeService,
-    private designerService: DesignerService
+    private progressService: HeaderProgressService
   ) {}
 
   ngOnInit() {
     this.artifactColumns = [...this.analysis.artifacts[0].columns];
-    this.analyzeService.previewExecution(this.analysis).then(({ data }) => {
-      this.data = this.designerService.parseData(
-        data,
-        this.analysis.sqlBuilder
+    if (this.analysis._executeTile === false) return;
+    this.progressService.show();
+    this.analyzeService
+      .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, {})
+      .then(
+        ({ data }) => {
+          this.progressService.hide();
+          this.data = flattenPivotData(data, this.analysis.sqlBuilder);
+        },
+        err => {
+          this.progressService.hide();
+          throw err;
+        }
       );
-    });
   }
   ngOnDestroy() {}
 }

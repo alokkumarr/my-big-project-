@@ -8,7 +8,12 @@ import * as every from 'lodash/every';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
-import { flattenPivotData, flattenChartData } from '../../../../../common/utils/dataFlattener';
+import * as cloneDeep from 'lodash/cloneDeep';
+
+import {
+  flattenPivotData,
+  flattenChartData
+} from '../../../../../common/utils/dataFlattener';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -41,7 +46,7 @@ import { ChartService } from '../../../services/chart.service';
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
-const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport'];
+const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'designer-container',
@@ -51,6 +56,7 @@ export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
+
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
   public isInDraftMode: boolean = false;
@@ -66,6 +72,8 @@ export class DesignerContainerComponent {
   public booleanCriteria: string = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
+  public chartTitle = '';
+  public fieldCount:number;
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -171,6 +179,8 @@ export class DesignerContainerComponent {
         (<any>this.analysis).isInverted = (<any>this.analysis).chartType === 'bar';
         (<any>this.analysis).isStockChart = (<any>this.analysis).chartType.substring(0, 2) === 'ts';
       }
+      this.chartTitle = this.analysis.chartTitle || this.analysis.name;
+
       this.auxSettings = {
         ...this.auxSettings,
         ...(this.analysis.type === 'chart' ? {
@@ -200,6 +210,21 @@ export class DesignerContainerComponent {
           return column;
         });
       });
+      break;
+
+    case 'report':
+    forEach(artifacts, table=> {
+      table.columns = map(table.columns, column => {
+        forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+          forEach(fields.columns, field => {
+            if (field.columnName === column.columnName) {
+              column.checked = true;
+            }
+          })
+        })
+        return column;
+      })
+    })
       break;
     }
     return artifacts;
@@ -273,6 +298,25 @@ export class DesignerContainerComponent {
 
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
+    this.fieldCount = 0;
+
+    forEach(this.analysis.sqlBuilder.dataFields, field=> {
+      if (field.checked === 'y') {
+        this.fieldCount++;
+      }
+
+      if (this.analysis.sqlBuilder.dataFields.length > 1 && field.limitType) {
+        delete field.limitType;
+        delete field.limitValue;
+      }
+    })
+
+    forEach(this.analysis.sqlBuilder.filters, filter=> {
+      if (filter.isRuntimeFilter) {
+        delete filter.model;
+      }
+    })
+
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -351,16 +395,19 @@ export class DesignerContainerComponent {
         });
       break;
     case 'save':
-      if (this.isInQueryMode && !this.analysis.edit) {
-        this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
-          if (result) {
-            this.changeToQueryModePermanently();
-            this.openSaveDialog();
+      this.openSaveDialogIfNeeded().then((result: IToolbarActionResult) => {
+        if (result) {
+          const shouldClose = result.action === 'saveAndClose';
+          this.onSave.emit({
+            requestExecution: shouldClose,
+            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis    
+          });
+          if (!shouldClose) {
+            this.requestDataIfPossible();
           }
-        });
-      } else {
-        this.openSaveDialog();
-      }
+          this.isInDraftMode = false;
+        }
+      });
       break;
     case 'refresh':
       this.requestDataIfPossible();
@@ -371,19 +418,29 @@ export class DesignerContainerComponent {
     }
   }
 
-  openSaveDialog() {
-    this._analyzeDialogService
+  openSaveDialogIfNeeded(): Promise<any> {
+    return new Promise(resolve => {
+      if (this.isInQueryMode && !this.analysis.edit) {
+        this._analyzeDialogService
+          .openQueryConfirmationDialog()
+          .afterClosed()
+          .subscribe(result => {
+            if (result) {
+              this.changeToQueryModePermanently();
+              resolve(this.openSaveDialog());
+            }
+          });
+      } else {
+        resolve(this.openSaveDialog());
+      }
+    });
+  }
+
+  openSaveDialog(): Promise<any> {
+    return this._analyzeDialogService
       .openSaveDialog(this.analysis)
       .afterClosed()
-      .subscribe((result: IToolbarActionResult) => {
-        if (result) {
-          this.onSave.emit({
-            isSaveSuccessful: result.isSaveSuccessful,
-            analysis: result.analysis
-          });
-          this.isInDraftMode = false;
-        }
-      });
+      .toPromise();
   }
 
   toggleDesignerQueryModes() {
@@ -408,11 +465,12 @@ export class DesignerContainerComponent {
       sortProp = 'sorts';
       break;
     case 'esReport':
-      partialSqlBuilder = this._designerService.getPartialEsReportSqlBuilder(this.artifacts[0].columns);
+      partialSqlBuilder = this._designerService.getPartialESReportSqlBuilder(this.artifacts[0].columns);
       sortProp = 'sorts';
       break;
     case 'report':
       partialSqlBuilder = {
+        dataFields: this._designerService.generateReportDataField(this.artifacts),
         joins: (<SqlBuilderReport>this.analysis.sqlBuilder).joins
       };
       sortProp = 'orderByColumns';
@@ -590,6 +648,16 @@ export class DesignerContainerComponent {
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
+    case 'chartTitle':
+      if (!event.data) return;
+      this.analysis.chartTitle = event.data.title;
+      this.auxSettings = { ...this.auxSettings, ...event.data };
+      this.artifacts = [...this.artifacts];
+      break;
+    case 'fetchLimit':
+      this.analysis.sqlBuilder = this.getSqlBuilder();
+      this.requestDataIfPossible();
+      break;
     }
   }
 
@@ -658,7 +726,7 @@ export class DesignerContainerComponent {
       this.filters = [];
       this.sorts = [];
       forEach(artifacts, artifact => {
-        forEach(artifact.column, col => col.checked = false);
+        forEach(artifact.column, col => (col.checked = false));
       });
     }
     this.analysis.sqlBuilder = this.getSqlBuilder();

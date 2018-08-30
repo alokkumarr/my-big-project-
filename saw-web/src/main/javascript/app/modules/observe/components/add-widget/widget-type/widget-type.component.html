@@ -1,6 +1,7 @@
 <div>
   <button mat-button
     class="choose-widget-type"
+    [attr.e2e]="'dashboard-add-widget-type-' + type.label"
     *ngFor="let type of widgetTypes"
     [disabled]="type.disabled"
     (click)="onChooseType(type)">

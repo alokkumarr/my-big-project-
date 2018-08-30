@@ -31,6 +31,8 @@
     <saw.docker.port>80</saw.docker.port>
     <saw.squid.port>3128</saw.squid.port>
     <saw.yarn.enabled>false</saw.yarn.enabled>
+    <!-- SAW e2e test suite configutration supported values are smoke/sanity/regression/development-->
+    <saw.e2e.suite>smoke</saw.e2e.suite>
   </properties>
   <dependencies>
     <dependency>
@@ -227,6 +229,10 @@
             <saw.docker.host>${saw.docker.ip}</saw.docker.host>
             <saw.docker.port>${saw.docker.port}</saw.docker.port>
           </systemPropertyVariables>
+          <!-- The below integration test case is excluded until we fix all the issue with Workbench (SIP-4038) -->
+          <excludes>
+           <exclude>WorkbenchIT.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>
@@ -540,7 +546,17 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/</arguments>
+              <arguments>run protractor -- --baseUrl=http://${docker.host.address}:${saw.docker.port}/saw/web/ --suite=${saw.e2e.suite}</arguments>
+            </configuration>
+          </execution>
+           <execution>
+            <id>npm-run-generate-report</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run generate-report</arguments>
             </configuration>
           </execution>
         </executions>

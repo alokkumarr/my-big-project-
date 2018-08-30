@@ -4,34 +4,23 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockftpserver.core.session.SessionKeys.USERNAME;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.net.ftp.FTPClient;
@@ -42,9 +31,6 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
-import org.mockftpserver.fake.filesystem.WindowsFakeFileSystem;
-import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 
 /**
  * Integration test that lists metrics, creates an analysis, saves it,
@@ -53,11 +39,11 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 public class AnalyzeIT extends BaseIT {
   @Test(timeout=300000)
   public void testExecuteAnalysis() throws JsonProcessingException {
-    String metricId = listMetrics(token);
-    ObjectNode analysis = createAnalysis(token, metricId);
+    String metricId = listMetrics(token,"sample-elasticsearch");
+    ObjectNode analysis = createAnalysis(token, metricId,"pivot");
     String analysisId = analysis.get("id").asText();
     String analysisName = "Test (" + System.currentTimeMillis() + ")";
-    saveAnalysis(token, analysisId, analysisName, analysis);
+    savePivotAnalysis(token, analysisId, analysisName, analysis);
     listAnalyses(token, analysisName);
     executeAnalysis(token, analysisId);
     String executionId = listSingleExecution(token, analysisId);
@@ -73,11 +59,11 @@ public class AnalyzeIT extends BaseIT {
     public void exportData() throws JsonProcessingException, IOException {
 
         // create and save analysis
-        String metricId = listMetrics(token);
-        ObjectNode analysis = createAnalysis(token, metricId);
+        String metricId = listMetrics(token,"sample-spark");
+        ObjectNode analysis = createAnalysis(token, metricId,"report");
         String analysisId = analysis.get("id").asText();
-        String analysisName = "Test (" + System.currentTimeMillis() + ")";
-        saveAnalysis(token, analysisId, analysisName, analysis);
+        String analysisName = "Test DL Report (" + System.currentTimeMillis() + ")";
+        saveDLReportAnalysis(token, analysisId, analysisName, analysis);
 
         // create schedule
         ObjectNode node = scheduleData();
@@ -87,7 +73,7 @@ public class AnalyzeIT extends BaseIT {
         createSchedule(json);
 
         // execute the analysis and retrieve results
-        executeAnalysis(token, analysisId);
+        executeDLAnalysis(token, analysisId);
         String executionId = listSingleExecution(token, analysisId);
         List<Map<String, String>> data = getExecution(
             token, analysisId, executionId);
@@ -155,39 +141,45 @@ public class AnalyzeIT extends BaseIT {
         assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
     }
 
-  private String listMetrics(String token) throws JsonProcessingException {
-    ObjectNode node = mapper.createObjectNode();
-    ObjectNode contents = node.putObject("contents");
-    contents.put("action", "search");
-    contents.put("context", "Semantic");
-    contents.put("select", "headers");
-    ArrayNode keys = contents.putArray("keys");
-    ObjectNode key = keys.addObject();
-    key.put("customerCode", "SYNCHRONOSS");
-    key.put("module", "ANALYZE");
-    String json = mapper.writeValueAsString(node);
-    String path = "contents[0]['ANALYZE'].find "
-                  + "{it.metric == 'sample-elasticsearch'}.id";
-    Response response = given(spec)
-                        .header("Authorization", "Bearer " + token)
-                        .filter(document("list-metrics",
-                                         preprocessResponse(prettyPrint())))
-                        .body(json)
-                        .when().post("/services/md")
-                        .then().assertThat().statusCode(200)
-                        .extract().response();
-    try {
-      String metricId = response.path(path);
-      if (metricId == null) {
-        return retryListMetrics(token);
-      }
-      return metricId;
-    } catch (IllegalArgumentException e) {
-      return retryListMetrics(token);
+    /**
+     * List and find the metric ID
+     * @param token
+     * @return
+     * @throws JsonProcessingException
+     */
+    private String listMetrics(String token,String metricName) throws JsonProcessingException {
+        ObjectNode node = mapper.createObjectNode();
+        ObjectNode contents = node.putObject("contents");
+        contents.put("action", "search");
+        contents.put("context", "Semantic");
+        contents.put("select", "headers");
+        ArrayNode keys = contents.putArray("keys");
+        ObjectNode key = keys.addObject();
+        key.put("customerCode", "SYNCHRONOSS");
+        key.put("module", "ANALYZE");
+        String json = mapper.writeValueAsString(node);
+        String path = "contents[0]['ANALYZE'].find "
+            + "{it.metric == '"+metricName+"'}.id";
+        Response response = given(spec)
+            .header("Authorization", "Bearer " + token)
+            .filter(document("list-metrics",
+                preprocessResponse(prettyPrint())))
+            .body(json)
+            .when().post("/services/md")
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        try {
+            String metricId = response.path(path);
+            if (metricId == null) {
+                return retryListMetrics(token,metricName);
+            }
+            return metricId;
+        } catch (IllegalArgumentException e) {
+            return retryListMetrics(token,metricName);
+        }
     }
-  }
 
-  private String retryListMetrics(String token)
+  private String retryListMetrics(String token, String metricName)
       throws JsonProcessingException {
     /* Path was not found, so wait and retry.  The sample metrics
      * are loaded asynchronously, so wait until the loading
@@ -195,10 +187,10 @@ public class AnalyzeIT extends BaseIT {
     try {
       Thread.sleep(5000);
     } catch (InterruptedException e) {}
-    return listMetrics(token);
+    return listMetrics(token,metricName);
   }
 
-  private ObjectNode createAnalysis(String token, String metricId)
+  private ObjectNode createAnalysis(String token, String metricId, String analysisType)
       throws JsonProcessingException {
     ObjectNode node = mapper.createObjectNode();
     ObjectNode contents = node.putObject("contents");
@@ -208,7 +200,7 @@ public class AnalyzeIT extends BaseIT {
     key.put("customerCode", "SYNCHRONOSS");
     key.put("module", "ANALYZE");
     key.put("id", metricId);
-    key.put("analysisType", "pivot");
+    key.put("analysisType", analysisType);
     String json = mapper.writeValueAsString(node);
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
@@ -220,13 +212,13 @@ public class AnalyzeIT extends BaseIT {
     return (ObjectNode) root.get("contents").get("analyze").get(0);
   }
 
-  private void saveAnalysis(String token, String analysisId,
+  private void savePivotAnalysis(String token, String analysisId,
                             String analysisName, ObjectNode analysis)
       throws JsonProcessingException {
     analysis.put("saved", true);
     analysis.put("categoryId", 4);
     analysis.put("name", analysisName);
-    analysis.set("sqlBuilder", sqlBuilder());
+    analysis.set("sqlBuilder", sqlBuilderPivot());
     ArrayNode artifacts = (ArrayNode) analysis.get("artifacts");
     for (JsonNode artifactNode : artifacts) {
       ObjectNode artifact = (ObjectNode) artifactNode;
@@ -276,7 +268,40 @@ public class AnalyzeIT extends BaseIT {
         .then().assertThat().statusCode(200);
   }
 
-  private ObjectNode sqlBuilder() {
+
+  private void saveDLReportAnalysis(String token, String analysisId,
+      String analysisName, ObjectNode analysis)
+      throws JsonProcessingException {
+    analysis.put("saved", true);
+    analysis.put("categoryId", 4);
+    analysis.put("name", analysisName);
+    analysis.set("sqlBuilder", sqlBuilderDLReport());
+    ArrayNode artifacts = (ArrayNode) analysis.get("artifacts");
+      for (JsonNode artifactNode : artifacts) {
+          ObjectNode artifact = (ObjectNode) artifactNode;
+          ArrayNode columns = (ArrayNode) artifact.get("columns");
+          for (JsonNode columnNode : columns) {
+              ObjectNode column = (ObjectNode) columnNode;
+              column.put("checked", true);
+          }
+      }
+      ObjectNode node = mapper.createObjectNode();
+      ObjectNode contents = node.putObject("contents");
+      contents.put("action", "update");
+      ArrayNode keys = contents.putArray("keys");
+      ObjectNode key = keys.addObject();
+      key.put("id", analysisId);
+      ArrayNode analyze = contents.putArray("analyze");
+      analyze.add(analysis);
+      String json = mapper.writeValueAsString(node);
+      given(spec)
+          .header("Authorization", "Bearer " + token)
+          .body(json)
+          .when().post("/services/analysis")
+          .then().assertThat().statusCode(200);
+  }
+
+  private ObjectNode sqlBuilderPivot() {
     ObjectNode sqlBuilder = mapper.createObjectNode();
     sqlBuilder.put("booleanCriteria", "AND");
     sqlBuilder.putArray("filters");
@@ -296,6 +321,27 @@ public class AnalyzeIT extends BaseIT {
     dataField.put("columnName", "integer");
     dataField.put("aggregate", "sum");
     dataField.put("name", "integer");
+    return sqlBuilder;
+  }
+
+  private ObjectNode sqlBuilderDLReport() {
+    ObjectNode sqlBuilder = mapper.createObjectNode();
+    sqlBuilder.put("booleanCriteria", "AND");
+    sqlBuilder.putArray("filters");
+    sqlBuilder.putArray("orderByColumns");
+    ArrayNode joins = sqlBuilder.putArray("joins");
+    ObjectNode join = joins.addObject();
+    join.put("type","inner");
+    ArrayNode criteria = join.putArray("criteria");
+    ObjectNode criteria1 = criteria.addObject();
+      criteria1.put("columnName","string");
+      criteria1.put("side","right");
+      criteria1.put("tableName","SALES");
+      ObjectNode criteria2 = criteria.addObject();
+      criteria2.put("columnName","string_2");
+      criteria2.put("side","left");
+      criteria2.put("tableName","PRODUCT");
+      sqlBuilder.putArray("orderByColumns");
     return sqlBuilder;
   }
 
@@ -335,6 +381,24 @@ public class AnalyzeIT extends BaseIT {
         .then().assertThat().statusCode(200)
         .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
   }
+
+    private void executeDLAnalysis(String token, String analysisId)
+        throws JsonProcessingException {
+        ObjectNode node = mapper.createObjectNode();
+        ObjectNode contents = node.putObject("contents");
+        contents.put("action", "execute");
+        ArrayNode keys = contents.putArray("keys");
+        ObjectNode key = keys.addObject();
+        key.put("id", analysisId);
+        String json = mapper.writeValueAsString(node);
+        String buckets = "contents.analyze[0]";
+        given(spec)
+            .header("Authorization", "Bearer " + token)
+            .body(json)
+            .when().post("/services/analysis")
+            .then().assertThat().statusCode(200)
+            .body(buckets + ".totalRows", equalTo(200));
+    }
 
   private String listSingleExecution(String token, String analysisId) {
     Response response = request(token)
@@ -386,7 +450,7 @@ public class AnalyzeIT extends BaseIT {
     /* Use list metrics method, which waits for sample metrics to
      * be loaded before returning, to ensure sample metrics are
      * available before creating filters */
-    listMetrics(token);
+    listMetrics(token,"sample-elasticsearch");
     /* Proceed to creating filters */
     ObjectNode node = globalFilters();
     String json = mapper.writeValueAsString(node);

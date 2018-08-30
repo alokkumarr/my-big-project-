@@ -5,10 +5,12 @@ spring:
     banner-mode: 'off'
   application:
     name: saw-workbench-service
-  http:
+  servlet:
     multipart:
+      enabled : true
       max-request-size: 25MB
       max-file-size: 25MB
+      file-size-threshold: 2KB
 logging:
   level:
     com.synchronoss.saw.workbench: TRACE
@@ -28,9 +30,10 @@ application:
         queue-capacity: 10000
 workbench:
         project-key: "{{ saw_workbench_project_key | default('workbench') }}"
-        project-path: "{{ saw_workbench_project_path | default('/raw') }}"
-        project-root: "{{ sip_var_path | default('/var/sip') }}"
+        project-path: "{{ saw_workbench_project_path | default('/workbench') }}"
+        project-root: "{{ 'maprfs://' + sip_var_path | default('maprfs:///var/sip') }}"
         preview-limit: {{ saw_workbench_preview_limit | default('100') }}
         livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
+        storage-uri: "{{ saw_storage_proxy_uri | default('http://localhost:9800') }}"
 metastore:
-    base: "{{ sip_var_path | default('/var/sip') }}"
+    base: "{{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}"

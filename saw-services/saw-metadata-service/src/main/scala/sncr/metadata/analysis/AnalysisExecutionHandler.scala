@@ -31,7 +31,7 @@ class AnalysisExecutionHandler(val nodeId : String, sqlRuntime: String) {
   var analysisResultNodeID: String = null
 
   private val inlineDSLimitBytes: Int = conf.getInt("sql-executor.inline-data-store-limit-bytes")
-  private val inlineDSLimitRows: Int = conf.getInt("sql-executor.inline-data-store-limit-rows")
+  private val inlineDSLimitRows: Int = conf.getInt("sql-executor.preview-rows-limit")
 
 
   val sqlExecInputFilename = conf.getString("sql-executor.input-file-location") + Path.SEPARATOR + nodeId.replace(MetadataDictionary.separator, "-") + "_" + System.nanoTime() + ".in"

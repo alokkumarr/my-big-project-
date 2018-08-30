@@ -1,0 +1,20 @@
+
+@import "themes/base/colors";
+
+role-edit-dialog {
+  max-width: 500px;
+
+  .base-dialog__content {
+    padding: 10px 50px !important;
+    height: 260px;
+    width: 400px;
+
+    .mat-form-field {
+      width: 100%;
+    }
+
+    .form-field {
+      margin-bottom: 5px;
+    }
+  }
+}

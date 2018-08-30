@@ -13,9 +13,9 @@ cloud:
 
         $ mvn package
         $ mvn -Ddocker-start=cloud
-        
+
    Running docker machine in yarn mode.
-   
+
         $ mvn package
         $ mvn -Ddocker-start=cloud -Dsaw.yarn.enabled=true
 
@@ -49,6 +49,27 @@ To log in to the remote Docker Machine host, execute the following
 command:
 
         $ docker-machine ssh <name>
+
+# Accessing docker instances
+Once you log into the remote machine use the below command to switch into super user
+        $ sudo -s
+
+Then you can start executing local docker command to know the running docker containers
+         $ docker ps -a
+
+The output will be printed as below:
+
+For eg:
+
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                    PORTS                                        NAMES
+6300fb4bbd1e        sip-proxy:2         "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)   0.0.0.0:80->80/tcp, 0.0.0.0:3128->3128/tcp   sip-proxy
+2158dd1c3a93        sip-admin:2         "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-admin
+4f92d8f6be4c        sip-mapr:2          "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-mapr
+2afd122feb49        sip-elastic:2       "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-elastic
+55b7f38b2cb3        sip-app:2           "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-saw1
+
+Now you can log into docker containers using below command:
+            $ docker exec -it <names>  bash     
 
 # Automatic shutdown of remote Docker Machine host
 

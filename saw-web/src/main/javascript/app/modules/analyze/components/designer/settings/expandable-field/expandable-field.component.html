@@ -38,6 +38,6 @@
   <expand-detail-pivot *ngSwitchCase="'pivot'" (change)="change.emit($event)" [artifactColumn]="artifactColumn">
   </expand-detail-pivot>
 
-  <expand-detail-chart *ngSwitchCase="'chart'" (change)="change.emit($event)" [artifactColumn]="artifactColumn">
+  <expand-detail-chart *ngSwitchCase="'chart'" (change)="change.emit($event)" [artifactColumn]="artifactColumn" [fieldCount]="fieldCount">
   </expand-detail-chart>
 </div>

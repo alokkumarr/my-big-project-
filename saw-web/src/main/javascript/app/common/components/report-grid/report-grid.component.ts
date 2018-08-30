@@ -81,10 +81,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
   private listeners: Array<Subscription> = [];
-  @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
-  @Input() query: string;
-  @Input() dimensionChanged: BehaviorSubject<any>;
+  @Output()
+  change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
+  @ViewChild(DxDataGridComponent)
+  dataGrid: DxDataGridComponent;
+  @Input()
+  query: string;
+  @Input()
+  analysis;
+  @Input()
+  dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     this.sorts = reduce(
@@ -103,10 +109,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   @Input('artifacts')
   set setArtifactColumns(artifacts: Artifact[]) {
     if (!artifacts) {
+      this.artifacts = null;
+      this.columns = null;
       return;
     }
     this.artifacts = artifacts;
-    this.columns = this.artifacts2Columns(artifacts);
+    this.columns = isUndefined(this.analysis.sqlBuilder.dataFields)
+      ? this.artifacts2Columns(this.artifacts)
+      : this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -142,12 +152,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         load: options => this.dataLoader(options)
       });
       this.remoteOperations = { paging: true };
-      this.paging = { pageSize: this.pageSize };
+      /* Reset pager after a new dataLoader is set */
+      this.paging = { pageSize: DEFAULT_PAGE_SIZE, pageIndex: 0 };
     } else {
       throw new Error('Data loader requires a Function');
     }
   }
-  @Input() isEditable: boolean = false;
+  @Input()
+  isEditable: boolean = false;
+  @Input()
+  columnHeaders;
 
   public dataLoader: (
     options: {}
@@ -208,11 +222,10 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     if (this.dimensionChanged) {
       this.listeners.push(this.subscribeForRepaint());
     }
-
     // disable editing if needed
     if (!this.isEditable) {
       this.columnChooser = {
-        enabled: true,
+        enabled: isUndefined(this.columnHeaders) ? true : this.columnHeaders,
         mode: 'select'
       };
 
@@ -273,7 +286,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
         isVisibleIndexChanged = true;
       }
       if (isVisibleIndexChanged) {
-        this.change.emit({ subject: 'visibleIndex' });
+        // disabled this event so that refreshing data does not fire this event and triggers draft mode
+        // TODO find a better way to trigger this, and not on onContentReady
+        // currently devextreme has no event for when the columns of the grid get reordered
+        // so the onContentReady event was used for that
+        // this.change.emit({ subject: 'visibleIndex' });
       }
     });
   }

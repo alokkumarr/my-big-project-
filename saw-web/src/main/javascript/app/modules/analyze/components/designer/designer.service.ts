@@ -10,6 +10,9 @@ import * as take from 'lodash/take';
 import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
+
 import { Injectable } from '@angular/core';
 import { AnalyzeService } from '../../services/analyze.service';
 import { AnalysisType, Analysis } from '../../types';
@@ -41,12 +44,30 @@ export class DesignerService {
     return this._analyzeService.createAnalysis(semanticId, type);
   }
 
+  generateRequestPayload(analysis) {
+    forEach(analysis.artifacts, cols=> {
+      forEach(cols.columns, col=>{
+        delete col.checked;
+      })
+    })
+    return analysis;
+  }
+
   getDataForAnalysis(analysis) {
-    return this._analyzeService.getDataBySettings(analysis);
+    let analysisRequest = analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(analysis)) : analysis;
+    return this._analyzeService.getDataBySettings(analysisRequest);
   }
 
   getDataForAnalysisPreview(analysis, options) {
     return this._analyzeService.previewExecution(analysis, options);
+  }
+
+  getDataForExecution(analysisId, executionId, options) {
+    return this._analyzeService.getExecutionData(
+      analysisId,
+      executionId,
+      options
+    );
   }
 
   getCategories(privilege) {
@@ -54,7 +75,8 @@ export class DesignerService {
   }
 
   saveAnalysis(analysis) {
-    return this._analyzeService.saveReport(analysis);
+    let analysisRequest = analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(analysis)) : analysis;
+    return this._analyzeService.saveReport(analysisRequest);
   }
 
   public getPivotGroupAdapters(
@@ -75,7 +97,7 @@ export class DesignerService {
     const areLessThenMaxFields = (
       artifactColumns: ArtifactColumns
     ): boolean => {
-      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+      return (artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA);
     };
 
     const canAcceptNumberType = (
@@ -98,13 +120,19 @@ export class DesignerService {
       artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
+    const canAcceptData = (
+      groupAdapter: IDEsignerSettingGroupAdapter,
+      _
+    ) => ({ type }: ArtifactColumnPivot) =>
+      NUMBER_TYPES.includes(type);
+
     const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
       {
         title: 'Data',
         type: 'pivot',
         marker: 'data',
         artifactColumns: [],
-        canAcceptArtifactColumn: canAcceptNumberType,
+        canAcceptArtifactColumn: canAcceptData,
         transform(artifactColumn: ArtifactColumnPivot) {
           artifactColumn.area = 'data';
           artifactColumn.checked = true;
@@ -421,7 +449,9 @@ export class DesignerService {
             tableName: artifactColumn.table,
             name: artifactColumn.columnName,
             type: artifactColumn.type,
-            // the name propertie is needed for the elastic search
+            limitValue: artifactColumn.limitValue,
+            limitType: artifactColumn.limitType
+            // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {
               dateFormat:
@@ -438,11 +468,31 @@ export class DesignerService {
     };
   }
 
-  getPartialEsReportSqlBuilder(
+  getPartialESReportSqlBuilder(
     artifactColumns: ArtifactColumns
   ): Partial<SqlBuilderEsReport> {
     return {
       dataFields: filter(artifactColumns, 'checked')
     };
+  }
+
+  generateReportDataField(columns) {
+    let dataFields = [];
+      forEach(columns, cols=> {
+        let checkedRows = this.getPartialReportSqlBuilder(cols.columns);
+        if (!isEmpty(checkedRows)) {
+          dataFields.push({
+            tableName: cols.artifactName,
+            columns: checkedRows
+          });
+        }
+      });
+     return dataFields;
+  }
+
+  getPartialReportSqlBuilder(
+    artifactColumns: ArtifactColumns
+  ): Partial<SqlBuilderEsReport> {
+    return filter(artifactColumns, 'checked');
   }
 }

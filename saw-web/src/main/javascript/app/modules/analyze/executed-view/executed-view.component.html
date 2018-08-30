@@ -29,19 +29,11 @@
 
         <analyze-actions-menu-u *ngIf="analysis"
                                 [analysis]="analysis"
-                                exclude="publish-fork-edit"
+                                exclude="fork-edit"
                                 [actionsToDisable]="isExecuting ? 'execute' : ''"
                                 (afterDelete)="afterDelete(analysis)"
                                 (afterExport)="exportData()"
         ></analyze-actions-menu-u>
-
-        <button *ngIf="canUserPublish"
-                mat-raised-button
-                color="primary"
-                e2e="action-publish-btn"
-                (click)="publish()">
-          <span i18n>Publish</span>
-        </button>
       </div>
   </mat-toolbar>
   <mat-card>
@@ -51,7 +43,7 @@
                     [artifacts]="analysis.artifacts">
     </filter-chips-u>
 
-    <div *ngIf="analyses && !analyses.length">
+    <div *ngIf="analyses && !analyses.length && !onetimeExecution">
       <div class="prompt-execution-container" fxLayout="column" fxLayoutAlign="center center">
         <span i18n>This analysis hasn't been been executed yet. Execute it now?</span>
           <button mat-raised-button color="primary" [disabled]="!analysis" (click)="executeAnalysis(analysis)" i18n>
@@ -60,7 +52,7 @@
       </div>
     </div>
 
-    <div *ngIf="analysis && analyses && analyses.length" [ngSwitch]="analysis.type">
+    <div *ngIf="analysis && analyses && (analyses.length || onetimeExecution)" [ngSwitch]="analysis.type">
       <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
                             [analysis]="analysis"
                             [dataLoader]="dataLoader"
@@ -101,7 +93,7 @@
   </mat-card>
 
   <mat-card>
-    <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel [expanded]="false">
       <mat-expansion-panel-header>
         <span class="previous-list-title" i18n>Previous Versions</span>
       </mat-expansion-panel-header>

@@ -2,6 +2,7 @@
                    [analysisType]="analysisType"
                    [analysisSubtype]="analysisSubtype"
                    (change)="change.emit($event)"
+                   [fieldCount]="fieldCount"
                    [artifacts]="artifacts">
 </designer-settings-single-table>
 
@@ -10,6 +11,7 @@
                          [auxSettings]="auxSettings"
                          [analysisType]="analysisType"
                          [analysisSubtype]="analysisSubtype"
+                         [chartTitle]="chartTitle"
                          (change)="change.emit($event)"></designer-settings-aux>
 
   <ng-container [ngSwitch]="analysisType">

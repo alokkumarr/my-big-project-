@@ -1,12 +1,12 @@
 <gridster [options]="options" #gridster class="dashboard-gridster">
-  <gridster-item [item]="item" *ngFor="let item of dashboard" [ngClass]="item.kpi ? 'cell-kpi' : 'cell-analysis'">
+  <gridster-item [item]="item" *ngFor="let item of dashboard; index as idx" [ngClass]="item.kpi ? 'cell-kpi' : 'cell-analysis'">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
     <div class="backdrop" *ngIf="!isViewMode()">
       <div class="tile-actions">
-        <button mat-icon-button (click)="editTile(item)" *ngIf="(item.kpi || item.bullet)">
+        <button mat-icon-button [attr.e2e]="'dashboard-edit-tile-button-' + idx" (click)="editTile(item)" *ngIf="(item.kpi || item.bullet)">
           <mat-icon fontIcon="icon-edit-solid"></mat-icon>
         </button>
-        <button mat-icon-button (click)="removeTile(item)">
+        <button mat-icon-button [attr.e2e]="'dashboard-remove-tile-button-' + idx" (click)="removeTile(item)">
           <mat-icon fontIcon="icon-close"></mat-icon>
         </button>
       </div>

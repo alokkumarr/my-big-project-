@@ -1,7 +1,3 @@
-/*
- Created by Alex
- */
-
 const loginPage = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonElementsPage = require('../../javascript/pages/commonElementsPage.po');
@@ -314,7 +310,6 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   beforeEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -322,7 +317,6 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
 
   afterEach(function (done) {
     setTimeout(function () {
-      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
@@ -374,10 +368,15 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
       if (data.groupIntervalSpecified) {
         commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName));
         designModePage.pivot.expandSelectedFieldPropertiesButton(dateFieldName).click();
-        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDown);
-        designModePage.pivot.groupIntervalDropDown.click();
-        commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDownElement(data.groupInterval));
-        designModePage.pivot.groupIntervalDropDownElement(data.groupInterval).click();
+        browser.sleep(2000);
+        designModePage.pivot.groupIntervalDropDown.getAttribute('id').then(function(id) {
+          commonFunctions.waitFor.elementToBeVisible( designModePage.pivot.groupIntervalDrop(id));
+          designModePage.pivot.groupIntervalDrop(id).click();
+
+          commonFunctions.waitFor.elementToBeClickable(designModePage.pivot.groupIntervalDropDownElement(data.groupInterval));
+          designModePage.pivot.groupIntervalDropDownElement(data.groupInterval).click();
+
+        });
       }
 
       // Scenario for aggregate functions
@@ -434,7 +433,7 @@ describe('Check whether filters throw an error on pivots: pivotFilters.test.js',
         } else {
           commonFunctions.waitFor.elementToBeVisible(filterWindow.string.input);
           filterWindow.string.input.clear().sendKeys(data.value);
-        }        
+        }
       }
 
       commonFunctions.waitFor.elementToBeClickable(designModePage.applyFiltersBtn);

@@ -52,7 +52,8 @@ export const chartOptions = {
       'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
   },
   title: {
-    text: ''
+    text: '',
+    y: 5
   },
   lang: {
     noData: 'No data to display'

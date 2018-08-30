@@ -56,7 +56,8 @@ object DLConfiguration {
     * Row limit is configured/hardcoded value
     */
 
-  val rowLimit = if (cfg.hasPath("sql-executor.inline-data-store-limit-rows")) cfg.getInt("sql-executor.inline-data-store-limit-rows") else 100
+  val rowLimit = if (cfg.hasPath("sql-executor.preview-rows-limit")) cfg.getInt("sql-executor.preview-rows-limit") else 100
+  val publishRowLimit = if (cfg.hasPath("sql-executor.publish-rows-limit")) cfg.getInt("sql-executor.publish-rows-limit") else -1
   val jarLocation = cfg.getString ("sql-executor.jar-location")
   val commonLocation = cfg.getString ("sql-executor.output-location")
   val semanticLayerTempLocation = cfg.getString ("sql-executor.semantic-layer-tmp-location")
@@ -94,6 +95,7 @@ object DLConfiguration {
     setIfPathExists(sparkConf,"spark.hadoop.yarn.resourcemanager.hostname",cfg,"yarn.resourcemanager.hostname")
     setIfPathExists(sparkConf,"spark.yarn.jars",cfg,"yarn.spark.jars")
     setIfPathExists(sparkConf,"spark.yarn.archive",cfg,"yarn.spark.zips")
+    setIfPathExists(sparkConf,"spark.executor.instances",cfg,getPathByExecutor("executor.instances", executor))
     setIfPathExists(sparkConf, "spark.driver.port", cfg, "driver.port")
     setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host")
     setIfPathExists(sparkConf, "spark.driver.bindAddress", cfg, "driver.bindAddress")

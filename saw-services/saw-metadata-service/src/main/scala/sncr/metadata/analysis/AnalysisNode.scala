@@ -226,8 +226,22 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
     )
   }
 
-
-
+  def deleteAnalysisResults(executionIds: scala.collection.mutable.Buffer[String]): Unit = {
+    val id = Bytes.toString(rowKey)
+    executionIds.foreach(rowId => {
+      val analysisResult = new AnalysisResult(id)
+        try {
+          val ar = AnalysisResult(id, rowId)
+          ar.deleteObjects
+          ar.delete
+          m_log debug s"Removed analysis result for node $id, result ID: ${rowId} ]"
+        }
+        catch {
+          case x: Throwable => m_log.error(s"Could not remove data object [Row ID : $rowId ]", x)
+        }
+      }
+      )
+  }
 }
 
 object AnalysisNode{
@@ -272,7 +286,8 @@ object AnalysisNode{
       "productId"-> "String",
       "analysisName"-> "String",
       "displayStatus"-> "String",
-      "isScheduled"-> "String"
+      "isScheduled"-> "String",
+      "semanticId"->"String"
     )
 
   protected val requiredFields = Map(
@@ -286,7 +301,8 @@ object AnalysisNode{
       (analysisNode, "module"),
       (analysisNode, "categoryId"),
       (analysisNode, "customerCode"),
-      (analysisNode, "isScheduled"))
+      (analysisNode, "isScheduled"),
+      (analysisNode, "semanticId"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
