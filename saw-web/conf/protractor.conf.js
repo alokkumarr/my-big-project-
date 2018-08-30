@@ -33,6 +33,7 @@ const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 50000;//30000 /
  * Defines the maximum amount of time to wait for a condition
  */
 const fluentWait = webpackHelper.distRun() ? 40000 : 50000;
+const extendedFluentWait = webpackHelper.distRun() ? 60000 : 70000;
 
 /**
  * Default time to wait in ms before a test fails
@@ -85,6 +86,7 @@ exports.timeouts = {
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
   pageResolveTimeout: pageResolveTimeout,
+  extendedFluentWait:extendedFluentWait,
   tempts: tempts
 };
 
@@ -172,7 +174,7 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'pivots/pivotFilters.test.js'
+      testBaseDir + 'analyze.test.js',
     ]
   },
   onCleanUp: function (results) {

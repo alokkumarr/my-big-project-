@@ -25,7 +25,6 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
 
   beforeEach(function(done) {
     setTimeout(function() {
-      //expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });

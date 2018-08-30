@@ -95,7 +95,7 @@ const createAnalysis = (metricName, analysisType) => {
   analyzePage.analysisElems.addAnalysisBtn.click();
   let count = 0;
   browser.sleep(2000);
-  commonFunctions.waitFor.elementToBeNotVisible(module.exports.progressbar, protractorConf.timeouts.extendedFluentWait);
+  commonFunctions.waitFor.elementToBeNotVisible(module.exports.progressbar, 10);
   clickOnMetricRadioAndOnAnalysisType(metricName, analysisType, count);
 
   commonFunctions.waitFor.elementToBeEnabledAndVisible(analyzePage.newDialog.createBtn);
