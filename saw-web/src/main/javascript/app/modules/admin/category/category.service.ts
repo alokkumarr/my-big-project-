@@ -32,7 +32,8 @@ export class CategoryService implements IAdminDataService {
     this.customerId = customerId;
   }
 
-  getList(customerId) {
+  getList() {
+    const customerId = parseInt(this.customerId, 10);
     return this._adminService.request<CategoryResponse>('categories/fetch', customerId)
       .map(resp => resp.categories)
       .toPromise();
