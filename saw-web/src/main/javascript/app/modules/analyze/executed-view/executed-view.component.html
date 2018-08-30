@@ -38,7 +38,7 @@
   </mat-toolbar>
   <mat-card>
     <filter-chips-u *ngIf="analysis && !(analysis.type === 'report' && analysis.edit)"
-                    [filters]="analysis.sqlBuilder.filters"
+                    [filters]="executedAnalysis.sqlBuilder.filters"
                     [readonly]="true"
                     [artifacts]="analysis.artifacts">
     </filter-chips-u>
@@ -54,16 +54,16 @@
 
     <div *ngIf="analysis && analyses && (analyses.length || onetimeExecution)" [ngSwitch]="analysis.type">
       <executed-report-view *ngSwitchCase="(analysis.type === 'report' || analysis.type === 'esReport') ? analysis.type : ''"
-                            [analysis]="analysis"
+                            [analysis]="executedAnalysis"
                             [dataLoader]="dataLoader"
       ></executed-report-view>
       <executed-pivot-view *ngSwitchCase="'pivot'"
-                           [analysis]="analysis"
+                           [analysis]="executedAnalysis"
                            [data]="data"
                            [updater]="pivotUpdater$"
       ></executed-pivot-view>
       <executed-chart-view *ngSwitchCase="'chart'"
-                           [analysis]="analysis"
+                           [analysis]="executedAnalysis"
                            [data]="data"
                            [updater]="chartUpdater$"
       ></executed-chart-view>
