@@ -28,6 +28,10 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     if [ $dir != a2modeler ]; then
         R CMD check *.tar.gz
     fi
+    
+    # Print Check Log
+	  cat /root/build/$dir/$dir.Rcheck/00check.log
+	
     # Copy the R package build artifacts into the target directory,
     # which is used for copying them out of the Docker container
     cp *.tar.gz ../target
