@@ -213,18 +213,18 @@ export class DesignerContainerComponent {
       break;
 
     case 'report':
-    forEach(artifacts, table=> {
-      table.columns = map(table.columns, column => {
-        forEach(this.analysis.sqlBuilder.dataFields, fields=> {
-          forEach(fields.columns, field => {
-            if (field.columnName === column.columnName) {
-              column.checked = true;
-            }
+      forEach(artifacts, table=> {
+        table.columns = map(table.columns, column => {
+          forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+            forEach(fields.columns, field => {
+              if (field.columnName === column.columnName) {
+                column.checked = true;
+              }
+            })
           })
+          return column;
         })
-        return column;
       })
-    })
       break;
     }
     return artifacts;
@@ -400,7 +400,7 @@ export class DesignerContainerComponent {
           const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
             requestExecution: shouldClose,
-            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis    
+            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis
           });
           if (!shouldClose) {
             this.requestDataIfPossible();

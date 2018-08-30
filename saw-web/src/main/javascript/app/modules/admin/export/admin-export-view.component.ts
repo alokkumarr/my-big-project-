@@ -82,7 +82,7 @@ export class AdminExportViewComponent {
   }
 
   loadCategories() {
-    this._categoryService.getList().toPromise().then(categories => {
+    this._categoryService.getList().then(categories => {
       this.categoriesMap = reduce(categories, (acc, category) => {
         if (category.moduleName === 'ANALYZE') {
           forEach(category.subCategories, subCategory => {
