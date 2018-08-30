@@ -49,7 +49,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
       // wait for the app to automatically navigate to the default page
       browser
         .wait(() => alreadyOnAnalyzePage, protractorConf.timeouts.pageResolveTimeout)
-        .then(() => expect(browser.getCurrentUrl()).toContain('/analyze'));
+        .then(() => expect(browser.getCurrentUrl()).toContain('/analyze1'));
     });
   });
 });

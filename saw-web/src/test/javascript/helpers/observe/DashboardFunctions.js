@@ -66,6 +66,7 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeClickable(observePage.existingAnalysisLink);
       expect(observePage.existingAnalysisLink.isDisplayed).toBeTruthy();
       observePage.existingAnalysisLink.click();
+      browser.sleep(2000);
 
       _self.addAnalysesToDashboard(analysisCat, analysisSubCat, analysesToAdd);
       dashboardId = _self.saveDashboard(dashboardName, dashboardDescription, observeSubCat);
@@ -79,6 +80,8 @@ class DashboardFunctions {
 
   addAnalysesToDashboard(cat, subCat, analysesToAdd) {
     try {
+      // wait for progress bar to be hidden
+      commonFunctions.waitFor.elementToBeNotVisible(observePage.metricFetchProgressBar);
       // Click on category
       commonFunctions.waitFor.elementToBePresent(observePage.category(cat));
       commonFunctions.waitFor.elementToBeVisible(observePage.category(cat));

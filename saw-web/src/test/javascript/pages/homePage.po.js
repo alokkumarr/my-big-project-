@@ -13,6 +13,7 @@ module.exports = {
   cardViewInput: element(by.css('[e2e="analyze-card-view"]')),
   listViewInput: element(by.css('[e2e="analyze-list-view"]')),
   observeLink: element(by.xpath('//div[contains(text(),"OBSERVE")]')),
+  progressbar:element(by.css('mat-progress-bar[mode="indeterminate"]')),
 
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
@@ -93,6 +94,8 @@ const createAnalysis = (metricName, analysisType) => {
   commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.addAnalysisBtn);
   analyzePage.analysisElems.addAnalysisBtn.click();
   let count = 0;
+  browser.sleep(2000);
+  commonFunctions.waitFor.elementToBeNotVisible(module.exports.progressbar, protractorConf.timeouts.extendedFluentWait);
   clickOnMetricRadioAndOnAnalysisType(metricName, analysisType, count);
 
   commonFunctions.waitFor.elementToBeEnabledAndVisible(analyzePage.newDialog.createBtn);
@@ -115,6 +118,7 @@ const clickOnMetricRadioAndOnAnalysisType = (metricName, analysisType, i) => {
   // Check if metric selected
   browser.wait(EC.presenceOf(newDialog.getMetricSelectedRadioButtonElementByName(metricName)), 1000).then(
     function () {
+      commonFunctions.waitFor.elementToBeVisible(analysisTypeElement);
       commonFunctions.waitFor.elementToBeClickable(analysisTypeElement);
       analysisTypeElement.click();
     }, function (err) {
