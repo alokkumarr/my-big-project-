@@ -17,6 +17,7 @@ cd $dir
 # package
 for dir in a2charter a2munge a2modeler a2sipr; do
     pushd $dir > /dev/null
+    
     # If version is "2", skip updating the R package description as it
     # is an ad-hoc Maven invocation
     if [ "$version" != "2" ]; then
@@ -24,17 +25,19 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     fi
     Rscript -e 'deps <- devtools::dev_package_deps(dependencies = NA);devtools::install_deps(dependencies = TRUE);if (!all(deps$package %in% installed.packages())) { message("missing: ", paste(setdiff(deps$package, installed.packages()), collapse=", ")); q(status = 1, save = "no")}'
     R CMD build .
+    
     # Note: Skip a2munge and a2modeler tests until fixed
     if [ $dir != a2modeler ]; then
         R CMD check *.tar.gz
     fi
     
     # Print Check Log
-	  cat /root/build/$dir/$dir.Rcheck/00check.log
+	  cat /root/build/$dir/$dir.Rcheck/tests/testthat.Rout
 	
     # Copy the R package build artifacts into the target directory,
     # which is used for copying them out of the Docker container
     cp *.tar.gz ../target
+    
     # Install the built R package locally, for use by other R packages
     # later in the build process
     R CMD INSTALL *.tar.gz
