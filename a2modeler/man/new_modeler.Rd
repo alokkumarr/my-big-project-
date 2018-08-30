@@ -6,7 +6,7 @@
 \usage{
 new_modeler(df, schema, target, type, name, uid, version, desc, scientist, dir,
   execution_strategy, refit, save_submodels, samples, pipelines, models,
-  measure, performance, final_model, ...)
+  measure, performance, final_model, seed, ...)
 }
 \arguments{
 \item{df}{dataframe with target variable and any potential predictors}
@@ -38,6 +38,8 @@ If grid parameters supplied, the best param set determined by validation
 sample performance will be used. Default is true}
 
 \item{save_submodels}{logical flag to save sub model fits. Default is TRUE}
+
+\item{seed}{seed number of any random computations}
 
 \item{...}{any addtional parameters}
 }
