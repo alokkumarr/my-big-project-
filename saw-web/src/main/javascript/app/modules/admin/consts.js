@@ -116,17 +116,51 @@ export const RolesTableHeader = [{
 }];
 
 export const PrivilegesTableHeader = [{
-  name: 'All'
+  caption: 'PRODUCT',
+  dataField: 'productName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '10%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'PRODUCT'
+  caption: 'MODULE',
+  dataField: 'moduleName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '10%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'MODULE'
+  caption: 'CATEGORY',
+  dataField: 'categoryName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '12%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'CATEGORY'
+  caption: 'SUB CATEGORY',
+  dataField: 'subCategoryName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '15%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'ROLE'
+  caption: 'ROLE',
+  dataField: 'roleName',
+  allowSorting: true,
+  alignment: 'left',
+  width: '12%',
+  cellTemplate: 'highlightCellTemplate'
 }, {
-  name: 'PRIVILEGE DESC'
+  caption: 'PRIVILEGE DESC',
+  dataField: 'privilegeDesc',
+  allowSorting: true,
+  alignment: 'left',
+  width: '35%',
+  cellTemplate: 'highlightCellTemplate'
+}, {
+  caption: '',
+  width: '6%',
+  cellTemplate: 'actionCellTemplate'
 }];
 
 export const CategoriesTableHeader = [{

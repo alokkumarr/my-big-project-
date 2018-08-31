@@ -5,23 +5,24 @@
 \alias{set_final_model.modeler}
 \title{Set Final Model Generic}
 \usage{
-set_final_model(obj, method, id, reevaluate, refit)
+set_final_model(obj, method, uid, reevaluate, refit)
 
-\method{set_final_model}{modeler}(obj, method, id = NULL, reevaluate = TRUE,
-  refit = TRUE)
+\method{set_final_model}{modeler}(obj, method, uid = NULL,
+  reevaluate = TRUE, refit = TRUE)
 }
 \arguments{
 \item{obj}{forecaster object}
 
 \item{method}{selection method. Choices are 'manual' which requires a valid
-id or 'best' method which selects the best model based on the measure}
+uid or 'best' method which selects the best model based on the measure}
 
-\item{id}{optional model id input required for manual method}
+\item{uid}{optional model uid input required for manual method}
 
 \item{reevaluate}{logical option to re-evaluate the final model. Requires a
 test holdout sample}
 
-\item{refit}{logical option to re-fit final model on entire training dataset}
+\item{refit}{logical option to re-fit the final model. Requires a test
+holdout sample}
 }
 \description{
 Function to select the final model. See method argument for options

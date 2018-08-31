@@ -97,8 +97,6 @@ options}
 color is set to a variable. expects a palette name. default is "a2" for a2
 palette}
 
-\item{...}{additional arguments to pass to geom_bar}
-
 \item{...}{Arguments passed on to \code{ggplot2::geom_bar}
 \describe{
   \item{mapping}{Set of aesthetic mappings created by \code{\link[=aes]{aes()}} or
@@ -154,19 +152,22 @@ This function takes any of the geom_bar arguments
 }
 \examples{
 # Create a data set
+library(dplyr)
 d <- mtcars \%>\% mutate(am = as.factor(am), cyl = as.factor(cyl))
 
 # Create series of basic charts
 gg_bar_chart(d, "am")
 gg_bar_chart(d, "am", fill="steelblue", color="grey25")
-gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things")
-gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things", theme="minimal")
+gg_bar_chart(d, "am", fill="steelblue", color="grey25",
+             title="Stranger", subtitle="Things")
+gg_bar_chart(d, "am", fill="steelblue", color="grey25",
+             title="Stranger", subtitle="Things", theme="minimal")
 
 # A few charts with more features
-gg_bar_chart(d, "am", proportion = T)
+gg_bar_chart(d, "am", proportion = TRUE)
 gg_bar_chart(d, "am", fill="cyl")
 gg_bar_chart(d, "am", fill="cyl", position="fill")
-gg_bar_chart(d, "am", fill="cyl", label=T)
+gg_bar_chart(d, "am", fill="cyl", label=TRUE)
 
 # Example of x-variable and y-variable
 d1 <- mtcars \%>\% group_by(am = factor(am)) \%>\% summarise(count = n())

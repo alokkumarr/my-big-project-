@@ -1,7 +1,15 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
+import * as html2pdf from 'html2pdf.js';
 import { Transition } from '@uirouter/angular';
 
+import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
@@ -10,6 +18,7 @@ import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
+import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
@@ -21,6 +30,11 @@ import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 
 const template = require('./observe-view.component.html');
+
+function downloadDataUrlFromJavascript(filename, dataUrl) {
+  const blob = dataURItoBlob(dataUrl);
+  saveAs(blob, filename);
+}
 
 @Component({
   selector: 'observe-view',
@@ -41,6 +55,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     edit: false
   };
   @ViewChild('filterSidenav') sidenav: MatSidenav;
+  @ViewChild('downloadContainer') downloadContainer: ElementRef;
   hasKPIs: boolean = false;
 
   constructor(
@@ -147,6 +162,45 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
         this.headerProgress.hide();
       }
     );
+  }
+
+  downloadDashboard() {
+    const FILE_NAME = this.dashboard.name;
+    const elem = this.downloadContainer.nativeElement.getElementsByTagName(
+      'gridster'
+    )[0];
+
+    /* Set overflow to visible manually to fix safari's bug. Without this,
+     * safari downloads a blank image */
+    const overflow = elem.style.overflow;
+    elem.style.overflow = 'visible';
+
+    html2pdf()
+      .from(elem)
+      .set({
+        margin: 1,
+        filename: `${FILE_NAME}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+          backgroundColor: '#f4f5f4',
+          scale: 2,
+          width: elem.scrollWidth,
+          height: elem.scrollHeight,
+          windowWidth: elem.scrollWidth,
+          windowHeight: elem.scrollHeight
+        },
+        jsPDF: {
+          unit: 'px',
+          orientation: 'landscape',
+          format: [elem.scrollHeight + 50, elem.scrollWidth]
+        }
+      })
+      // .save(); // comment this and uncomment following lines if png is needed instead of pdf
+      .outputImg('datauristring')
+      .then(uri => downloadDataUrlFromJavascript(`${FILE_NAME}.png`, uri))
+      .then(() => {
+        elem.style.overflow = overflow;
+      });
   }
 
   editDashboard(): void {

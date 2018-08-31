@@ -127,7 +127,7 @@ scale_fill_sncr <- function(palette = "a2", discrete = TRUE, reverse = FALSE, ..
 theme_sncr <- function (base_size = 12,
                         base_family = "serif") {
   checkmate::assert_number(base_size)
-  checkmate::assert_choice(base_family, names(windowsFonts()))
+  checkmate::assert_choice(base_family, c("serif", "sans", "mono"))
   
   theme_minimal(base_size = base_size, base_family = base_family) %+replace%
     theme(

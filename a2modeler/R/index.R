@@ -29,6 +29,9 @@ new_index <- function(unit, periods, start, end) {
 #'
 #' Used by Forecaster to create forward looking indicies
 #'
+#' @param x index object
+#' @inheritParams new_index
+#' 
 #' @export
 index <- function(x, unit) {
   UseMethod("index")
@@ -53,16 +56,16 @@ index.numeric <- function(x, unit = NULL) {
   )
 }
 
+
 #' @rdname index
 #' @export
-
 index.integer <- index.numeric
+
 
 #' @rdname index
 #' @export
 index.Date <- function(x, unit = "days") {
   checkmate::assert_choice(unit, c("days", "weeks", "years"))
-  #checkmate::assert_numeric(periods, lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
   if (unit == "days")
   {
@@ -106,7 +109,6 @@ index.Date <- function(x, unit = "days") {
 #' @export
 index.POSIXct <- function(x, unit = "hours") {
   checkmate::assert_choice(unit, c("seconds", "minutes", "hours", "days"))
-  #checkmate::assert_numeric(lower = 1, null.ok = TRUE)
   periods <- abs(as.numeric(mean(diff(x))))
   if ((periods %% 1) != 0) {
     stop("index not regular")
