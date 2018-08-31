@@ -29,21 +29,15 @@ export class AdminImportListComponent {
     this.config = this.getConfig();
   }
 
-  displayError(error) {
-    console.log('displatError', error);
-  }
-
   overWrite(row) {
     row.selection = true;
-    row.overrideInd = !row.overrideInd;
-    console.log(row);
   }
 
-  onChecked(analysis) {
-    analysis.selection = !analysis.selection;
-    const isValid = some(this.analyses, 'selection');
-    if (analysis.selection) {
-      this.areAllSelected = every(this.analyses, 'selection');
+  onChecked(row) {
+    row.selection = !row.selection;
+    const isValid = some(this.analyses, row => !row.noMetricInd && row.selection);
+    if (row.selection) {
+      this.areAllSelected = every(this.analyses, row => !row.noMetricInd && row.selection);
     } else {
       this.areAllSelected = false;
     }
@@ -52,8 +46,10 @@ export class AdminImportListComponent {
 
   selectAll() {
     this.areAllSelected = !this.areAllSelected;
-    forEach(this.analyses, analysis => {
-      analysis.selection = this.areAllSelected;
+    forEach(this.analyses, row => {
+      if (!row.noMetricInd) {
+        row.selection = this.areAllSelected;
+      }
     });
     this.validityChange.emit(this.areAllSelected);
   }
@@ -64,7 +60,7 @@ export class AdminImportListComponent {
       dataField: 'selection',
       allowSorting: false,
       alignment: 'left',
-      width: '6%',
+      width: '7%',
       headerCellTemplate: 'selectionHeaderCellTemplate',
       cellTemplate: 'selectionCellTemplate'
     }, {
@@ -95,14 +91,19 @@ export class AdminImportListComponent {
     }];
     return this._dxDataGridService.mergeWithDefaultConfig({
       columns,
-      width: '100%',
-      height: '100%',
+      scrolling: {
+        mode: 'standard'
+      },
       paging: {
-        pageSize: 10
+        enabled: true,
+        pageSize: 10,
+        pageIndex: 0
       },
       pager: {
         showPageSizeSelector: true,
-        showInfo: true
+        showInfo: true,
+        showNavigationButtons: true,
+        allowedPageSizes: [5, 10, 20]
       }
     });
   }

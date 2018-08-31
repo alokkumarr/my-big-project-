@@ -64,8 +64,8 @@ export function routesConfig($stateProvider) {
     }, {
       name: 'admin.import',
       url: '/import',
-      component: 'importComponent'
-      // component: AdminImportViewComponent
+      // component: 'importComponent'
+      component: AdminImportViewComponent
     }
   ];
 

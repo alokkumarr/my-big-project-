@@ -28,10 +28,10 @@
     </mat-checkbox>
   </div>
 
-  <div *dxTemplate="let cell of 'selectionCellTemplate'" fxLayout="row">
+  <div *dxTemplate="let cell of 'selectionCellTemplate'" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-checkbox (change)="onChecked(cell.data)"
                   [checked]="cell.data.selection"
-                  [disabled]="cell.data.noMetricInd || (cell.data.duplicateAnalysisInd && !cell.data.overrideInd)">
+                  [disabled]="cell.data.noMetricInd || (cell.data.duplicateAnalysisInd && !cell.data.selection)">
     </mat-checkbox>
     <a *ngIf="cell.data.duplicateAnalysisInd"
        (click)="overWrite(cell.data)"

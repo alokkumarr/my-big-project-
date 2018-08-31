@@ -7,7 +7,7 @@ import AppConfig from '../../../../../../../appConfig';
 
 type RequestOptions = {
   toast?: {successMsg: string, errorMsg?: string},
-  forWhat?: 'export' | 'user' | 'role' | 'privilege' | 'category';
+  forWhat?: 'export' | 'import' | 'user' | 'role' | 'privilege' | 'category';
 }
 
 const loginUrl = AppConfig.login.url;
@@ -48,6 +48,7 @@ export class AdminService {
   getIntermediaryPath(forWhat) {
     switch (forWhat) {
     case 'export':
+    case 'import':
       return '';
     default:
       return 'auth/admin/cust/manage/';
@@ -57,6 +58,7 @@ export class AdminService {
   getBaseUrl(forWhat) {
     switch (forWhat) {
     case 'export':
+    case 'import':
       return apiUrl;
     default:
       return loginUrl;
