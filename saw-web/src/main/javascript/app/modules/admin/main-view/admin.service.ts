@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {tap} from 'rxjs/operators/tap';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { HeaderProgressService } from '../../../common/services/header-progress.service';

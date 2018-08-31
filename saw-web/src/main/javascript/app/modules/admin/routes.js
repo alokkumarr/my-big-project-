@@ -1,9 +1,10 @@
-import { AdminMainViewComponent } from './main-view';
-import { AdminExportViewComponent } from './export';
-import { AdminImportViewComponent } from './import';
+import {AdminMainViewComponent} from './main-view';
+import {AdminExportViewComponent} from './export';
+import {AdminImportViewComponent} from './import';
 import {
   UsersTableHeader,
   RolesTableHeader,
+  PrivilegesTableHeader,
   CategoriesTableHeader
 } from './consts';
 
@@ -49,13 +50,20 @@ export function routesConfig($stateProvider) {
         resolveFn: () => 'category'
       }]
     }, {
-    //   name: 'admin.categories',
-    //   url: '/categories',
-    //   component: 'categoriesView'
-    // }, {
       name: 'admin.privilege',
       url: '/privilege?role',
-      component: 'privilegesView'
+      component: AdminMainViewComponent,
+      resolve: [{
+        token: 'columns',
+        resolveFn: () => PrivilegesTableHeader
+      }, {
+        token: 'section',
+        resolveFn: () => 'privilege'
+      }]
+    // }, {
+    //   name: 'admin.privilege',
+    //   url: '/privilege',
+    //   component: 'privilegesView'
     }, {
       name: 'admin.export',
       url: '/export',

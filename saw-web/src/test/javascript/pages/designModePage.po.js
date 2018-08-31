@@ -34,7 +34,8 @@ module.exports = {
   pivot: {
     addFieldButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/following-sibling::*)[1]`)),
     expandSelectedFieldPropertiesButton: fieldName => element(by.xpath(`(//div[contains(text(), '${fieldName}')]/preceding-sibling::*)[1]`)),
-    groupIntervalDropDown: element(by.xpath(`//mat-select[@placeholder='Group interval']`)),
+    groupIntervalDropDown: element(by.xpath(`//mat-label[contains(text(),"Group interval")]/parent::label`)),
+    groupIntervalDrop: id => element(by.xpath(`//mat-select[@aria-labelledby="${id}"]`)),
     groupIntervalDropDownElement: groupIntervalName => element(by.xpath(`//span[@class="mat-option-text" and contains(text(), '${groupIntervalName}')]`)),
     addFilter: filterObject => addFilter(filterObject)
   },

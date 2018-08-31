@@ -7,12 +7,10 @@
 \usage{
 \method{get_forecasts}{forecast}(mobj)
 
-get_forecasts(mobj, ...)
+get_forecasts(mobj)
 }
 \arguments{
 \item{mobj}{model object}
-
-\item{...}{additional arguments to pass through}
 }
 \value{
 data.frame with forecats from forecast model

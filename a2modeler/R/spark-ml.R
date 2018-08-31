@@ -1,181 +1,57 @@
 
-# Spark ML Class Methods --------------------------------------------------
+# Spark Model Sub-Class Methods --------------------------------------------------
 
 
-#' @rdname fit
-#' @export
-fit.spark_ml <- function(mobj, data) {
-  checkmate::assert_class(data, "tbl_spark")
-
-  x_vars <- setdiff(colnames(data), c(mobj$target, mobj$index_var))
-  fn <- as.formula(paste(mobj$target, "~", paste(x_vars, collapse = "+")))
-  args <- modifyList(mobj$method_args, list(x = data, formula = fn))
-  fun <- get(mobj$method, asNamespace(mobj$package))
-  m <- do.call(fun, args)
-  mobj$fit <- m
-  mobj$last_updated <- Sys.time()
-  mobj$status <- "trained"
-  mobj
-}
-
-
-#' Fitted Method for Spark-ML Object
+#' Fitted Method for Spark Model Object
 #'
-#' Extracts fitted values from train step
+#' Extracts fitted values from train_model step
 #'
-#' @param mobj model object
+#' @param mobj spark_model object
 #' @rdname fitted
 #' @export
-fitted.spark_ml <- function(mobj) {
-  if(! is.null(mobj$fit$model$summary)){
-    mobj$fit$model$summary$predictions %>%
-      dplyr::select(index, predicted = prediction, features)
-  }else{
-    predict(mobj, mobj$pipe$output)
-  }
-}
-
-
-#' Fitted Method for Spark-ML Decision Tree Classification Model
-#' @rdname fitted
-#' @export
-fitted.ml_decision_tree_classification_model <- function(mobj) {
-  sparklyr::sdf_predict(mobj$fit, mobj$pipe$output) %>%
-    dplyr::select(index, predicted = prediction)
+fitted.spark_model <- function(mobj, prediction_col = "predicted", ...) {
+  mobj$fit$stages[[2]]$summary$predictions %>%
+    dplyr::rename(!!prediction_col := prediction) %>% 
+    dplyr::select(!!prediction_col, features)
 }
 
 
 
-#' Predict Method for Spark-ML Clustering Object
-#' @rdname predict
-#' @export
-predict.spark_ml_clustering <- function(mobj, data, ...) {
-  checkmate::assert_class(data, "tbl_spark")
-  sparklyr::sdf_predict(data, mobj$fit, ...) %>%
-    dplyr::select(index, predicted = prediction, features)
-}
 
 
 #' Predict Method for Spark-ML Classification Object
 #' @rdname predict
 #' @export
-predict.spark_ml_classification <- function(mobj, data, ...) {
+predict.spark_model_classification <- function(mobj,
+                                               data,
+                                               prediction_col = "predicted",
+                                               ...) {
   checkmate::assert_class(data, "tbl_spark")
-  sparklyr::sdf_predict(data, mobj$fit, ...) %>%
-    dplyr::select(index, predicted = prediction)
+  
+  sparklyr::ml_predict(mobj$fit, data,  ...) %>%
+    sparklyr::sdf_separate_column("probability", into = c("prob_0", "prob_1")) %>% 
+    dplyr::select(prediction, prob_0, prob_1) %>% 
+    dplyr::rename(!!prediction_col := prediction) %>% 
+    dplyr::select(!!prediction_col, prob_0, prob_1)
 }
 
 
 #' Predict Method for Spark-ML Regression Object
 #' @rdname predict
 #' @export
-predict.ml_model_regression <- predict.spark_ml_classification
-
-
-
-#' Train Method for Spark-ML Object
-#' @rdname train
-#' @export
-train.spark_ml <- function(mobj, indicies, ...) {
-  checkmate::assert_list(indicies)
-  mobj$performance <- indicies
-  for (i in seq_along(indicies)) {
-    index <- indicies[[i]]
-    checkmate::assert_subset(names(index), c("train", "validation", "test"))
-
-    # Fit model to training sample
-    mdl_df <- mobj$pipe$output %>%
-      dplyr::filter(index %in% index$train)
-    mobj <- fit(mobj, data = mdl_df)
-    train <- fitted(mobj)
-    perf <- list("train" = train)
-
-    # Add predictions for validation, test or both
-    samples <- names(index)[! sapply(index, is.null)]
-    for(smpl in setdiff(samples, "train")){
-      smpl_index <- index[[smpl]]
-      smpl_df <- mobj$pipe$output %>%
-        dplyr::filter(index %in% smpl_index)
-      predicted <- predict(mobj, data = smpl_df, ...)
-      smpl_list <- list(predicted)
-      names(smpl_list) <- smpl
-      perf <- c(perf, smpl_list)
-    }
-
-    mobj$performance[[i]] <- perf
-    mobj$status <- "trained"
-  }
-
-  mobj
+predict.spark_model_regression <- function(mobj,
+                                           data,
+                                           prediction_col = "predicted",
+                                           ...) {
+  checkmate::assert_class(data, "tbl_spark")
+  
+  sparklyr::ml_predict(mobj$fit, data,  ...) %>%
+    dplyr::select(prediction) %>% 
+    dplyr::rename(!!prediction_col := prediction) 
 }
 
 
 
-#' Evaluate Method for Spark-ML Clustering Object
-#' @rdname evaluate
-#' @export
-evaluate.spark_ml_clustering <- function(mobj, measure) {
 
-  mobj$evaluate <- purrr::map_df(mobj$performance,
-             ~purrr::map_df(., match.fun(measure$method)),
-             .id = "indicie") %>%
-    tidyr::gather(key = "sample", value = "value", -indicie) %>%
-    dplyr::rename_(.dots = setNames("value", measure$method)) %>%
-    dplyr::mutate(model = mobj$id) %>%
-    dplyr::select_at(c("model", "sample", "indicie", measure$method))
-
-  mobj
-}
-
-
-
-#' Evaluate Method for Spark-ML Binary Classification Object
-#' @rdname evaluate
-#' @export
-evaluate.spark_ml_classification <- function(mobj, measure) {
-
-  mobj$evaluate <- purrr::map(
-    mobj$performance,
-    ~ purrr::map(., ~ inner_join(., mobj$pipe$output %>%
-                                   select_at(
-                                     c(mobj$target, mobj$index_var)
-                                   ),
-                                 by = mobj$index_var))) %>%
-    purrr::map_df(.,
-                  ~ purrr::map_df(
-                    .,
-                    match.fun(measure$method),
-                    predicted = "predicted",
-                    actual = mobj$target
-                  ),
-                  .id = "indicie") %>%
-    tidyr::gather(key = "sample", value = "value",-indicie) %>%
-    dplyr::rename_(.dots = setNames("value", measure$method)) %>%
-    dplyr::mutate(model = mobj$id) %>%
-    dplyr::select_at(c("model", "sample", "indicie", measure$method))
-
-  mobj
-}
-
-
-#' Evaluate Method for Spark-ML Regression Object
-#' @rdname evaluate
-#' @export
-evaluate.ml_model_regression <- evaluate.spark_ml_classification
-
-
-#' Summary Method for Spark-ML Object
-#' @export
-#' @rdname summary
-summary.spark_ml <- function(mobj){
-  mobj$fit
-}
-
-
-#' @export
-#' @rdname print
-print.spark_ml <- function(mobj){
-  mobj$fit
-}
 
 

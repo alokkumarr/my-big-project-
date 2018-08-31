@@ -6,6 +6,7 @@ import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';
 import { AdminService } from './main-view/admin.service';
 import { RoleService } from './role/role.service';
+import { PrivilegeService } from './privilege/privilege.service';
 import { ExportService } from './export/export.service';
 import { ImportService } from './import/import.service';
 import {
@@ -29,6 +30,11 @@ import {
   AdminImportListComponent,
   AdminImportFileListComponent
 } from './import';
+import {
+  PrivilegeEditDialogComponent,
+  PrivilegeEditorComponent,
+  PrivilegeRowComponent
+} from './privilege';
 import {JwtService} from '../../../login/services/jwt.service';
 import {dxDataGridService} from '../../common/services/dxDataGrid.service';
 import {
@@ -126,6 +132,9 @@ const COMPONENTS = [
   AdminListViewComponent,
   UserEditDialogComponent,
   RoleEditDialogComponent,
+  PrivilegeEditDialogComponent,
+  PrivilegeEditorComponent,
+  PrivilegeRowComponent,
   AdminExportViewComponent,
   AdminExportListComponent,
   CategoryEditDialogComponent,
@@ -160,6 +169,7 @@ const COMPONENTS = [
     LocalSearchService,
     ToastService,
     RoleService,
+    PrivilegeService,
     ExportService,
     ImportService,
     CategoryService

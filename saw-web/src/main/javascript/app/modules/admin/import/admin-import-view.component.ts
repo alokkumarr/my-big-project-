@@ -56,7 +56,7 @@ export class AdminImportViewComponent {
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
-    this.categories$ = this._categoryService.getList().map(fpFilter(category => category.moduleName === 'ANALYZE'));
+    this.categories$ = this._categoryService.getList().then(fpFilter(category => category.moduleName === 'ANALYZE'));
     this.getMetrics();
   }
 

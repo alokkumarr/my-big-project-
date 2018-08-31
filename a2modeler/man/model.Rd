@@ -4,21 +4,22 @@
 \alias{model}
 \title{Model Class Helper}
 \usage{
-model(pipe, target, method, ..., desc = NULL, path = NULL)
+model(pipe, target, method, method_args, param_map, desc = NULL, uid = NULL)
 }
 \arguments{
-\item{pipe}{pipeline object. default is empty pipeline which applies no
-data transformations}
+\item{pipe}{pipeline uid string}
 
 \item{target}{column name of target variable. string input}
 
 \item{method}{string input of model method}
 
-\item{...}{additional arguments to pass to model method}
+\item{method_args}{required method arguments not in parameter grid}
+
+\item{param_map}{list of parameter values for model tuning}
 
 \item{desc}{optional model description}
 
-\item{path}{optional file path to save model}
+\item{uid}{model uid}
 }
 \description{
 Function to create a model object.
