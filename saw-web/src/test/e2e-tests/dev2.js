@@ -19,10 +19,10 @@ describe('dev dev2.js', () => {
 
   });
 
-  using(testDataReader.testData['DEV2']['dataProviderName1'], function (data, description) {
-    it('Dev1Test2 first IT_Block ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DEV2', dp:'dataProviderName1'}), function () {
+  using(testDataReader.testData['DEV2']['dp'], function (data, description) {
+    it('Dev1Test2 first IT_Block ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DEV2', dp:'dp'}), function () {
       console.log(JSON.stringify(data));
-      if(data.role ==='admin_1') {
+      if(data.user ==='admin') {
         expect(true).toBe(true);
       }else {
         expect(true).toBe(false);

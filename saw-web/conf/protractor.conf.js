@@ -174,7 +174,9 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'analyze.test.js'
+      //testBaseDir + 'analyze.test.js'
+      testBaseDir + 'dev1.js',
+      testBaseDir + 'dev2.js'
     ]
   },
   onCleanUp: function (results) {
@@ -254,7 +256,7 @@ exports.config = {
     }
     if (retryCounter <= maxRetryForFailedTests){
      // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
-      webpackHelper.generateFailedTests(appRoot+'/target/allure-results');
+      webpackHelper.generateFailedTests('target/allure-results');
     }
 
     return retry.afterLaunch(maxRetryForFailedTests);

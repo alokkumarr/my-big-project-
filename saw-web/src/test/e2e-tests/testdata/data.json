@@ -1,4 +1,24 @@
 {
+  "DEV1": {
+    "dp": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
+  "DEV2": {
+    "dp": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
   "CREATEREPORT": {
     "createReportDataProvider": {
       "ByAdmin": {

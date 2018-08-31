@@ -19,8 +19,8 @@ describe('dev test1 dev1.js', () => {
 
   });
 
-  using(testDataReader.testData['DEV1']['dataProviderName1'], function (data, description) {
-    it('Dev1Test1 first IT_Block ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DEV1', dp:'dataProviderName1'}), function () {
+  using(testDataReader.testData['DEV1']['dp'], function (data, description) {
+    it('Dev1Test1 first IT_Block ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DEV1', dp:'dp'}), function () {
       console.log(JSON.stringify(data));
       expect(true).toBe(true);
 

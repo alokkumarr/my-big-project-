@@ -1,5 +1,4 @@
 const path = require('path');
-var appRoot = require('app-root-path');
 var fs = require('fs');
 var convert = require('xml-js');
 
@@ -18,55 +17,54 @@ function distRun() {
 
 function generateFailedTests(dir) {
 
-  if (!fs.existsSync(appRoot+'/target/testData')){
-    fs.mkdirSync(appRoot+'/target/testData');
+  if (!fs.existsSync('target/testData')){
+    fs.mkdirSync('target/testData');
   }
 
-  if (!fs.existsSync(appRoot+'/target/testData/processed')){
-    fs.mkdirSync(appRoot+'/target/testData/processed');
+  if (!fs.existsSync('target/testData/processed')){
+    fs.mkdirSync('target/testData/processed');
   }
-  if (!fs.existsSync(appRoot+'/target/testData/failed')){
-    fs.mkdirSync(appRoot+'/target/testData/failed');
+  if (!fs.existsSync('target/testData/failed')){
+    fs.mkdirSync('target/testData/failed');
   }
 
   const dirCont = fs.readdirSync( dir );
   const files = dirCont.filter( ( elm ) => /.*\.(xml)/gi.test(elm) );
   let filesToProcess= [];
   // create processed file json
-  if (fs.existsSync(appRoot+'/target/testData/processed/processedFiles.json')) {
+  if (fs.existsSync('target/testData/processed/processedFiles.json')) {
     // Get all the files matching to json file
-    const processedDirCount = fs.readdirSync( appRoot+'/target/testData/processed' );
+    const processedDirCount = fs.readdirSync('target/testData/processed' );
     const oldProcessedFiles = processedDirCount.filter( ( elm ) => /.*\.(json)/gi.test(elm) );
     // Get new files to process
     let oldProcessedXmlFiles = [];
     oldProcessedFiles.forEach(function(oldProcessedFile) {
-      let filesInOld = JSON.parse(fs.readFileSync(appRoot+'/target/testData/processed/'+oldProcessedFile,'utf8'));
+      let filesInOld = JSON.parse(fs.readFileSync('target/testData/processed/'+oldProcessedFile,'utf8'));
       oldProcessedXmlFiles = [...oldProcessedXmlFiles, ...filesInOld];
 
     });
 
     files.forEach(function(file) {
       if(!oldProcessedXmlFiles.includes(file)) {
-        //console.log('new file adding into file to be proccessed...'+file)
+        //console.log('new file adding into file to be processed...'+file)
         filesToProcess.push(file);
       }
     });
 
     let oldProcessedFile = 'oldProcessedFiles_'+new Date().getTime()+'.json';
-    fs.writeFileSync(appRoot+'/target/testData/processed/'+oldProcessedFile, JSON.stringify(oldProcessedXmlFiles), { encoding: 'utf8' });
+    fs.writeFileSync('target/testData/processed/'+oldProcessedFile, JSON.stringify(oldProcessedXmlFiles), { encoding: 'utf8' });
 
     // delete old file
-    fs.unlinkSync(appRoot+'/target/testData/processed/processedFiles.json');
+    fs.unlinkSync('target/testData/processed/processedFiles.json');
     // Create new file which is actual failed tests
-    fs.writeFileSync(appRoot+'/target/testData/processed/processedFiles.json', JSON.stringify(filesToProcess), { encoding: 'utf8' });
+    fs.writeFileSync('target/testData/processed/processedFiles.json', JSON.stringify(filesToProcess), { encoding: 'utf8' });
 
   } else {
     filesToProcess = files;
     // write processedFiles
-    fs.writeFileSync(appRoot+'/target/testData/processed/processedFiles.json', JSON.stringify(files), { encoding: 'utf8' });
+    fs.writeFileSync('target/testData/processed/processedFiles.json', JSON.stringify(files), { encoding: 'utf8' });
   }
-
-  let mainTestData = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
+  let mainTestData = JSON.parse(fs.readFileSync('../saw-web/src/test/e2e-tests/testdata/data.json','utf8'));
 
   filesToProcess.forEach(function(file) {
 
@@ -110,29 +108,29 @@ function generateFailedTests(dir) {
 
   });
 
-  if (fs.existsSync(appRoot+'/target/testData/failed/failedTests.json')) {
+  if (fs.existsSync('target/testData/failed/failedTests.json')) {
 
     // Get all the files matching to json file
-    const failedDirCount = fs.readdirSync( appRoot+'/target/testData/failed' );
+    const failedDirCount = fs.readdirSync('target/testData/failed' );
     const oldFailedTests = failedDirCount.filter( ( elm ) => /.*\.(json)/gi.test(elm) );
 
     let oldFailedJsonData = [];
     oldFailedTests.forEach(function(oldFailedTest) {
 
-      oldFailedJsonData.push(JSON.parse(fs.readFileSync(appRoot+'/target/testData/failed/'+oldFailedTest,'utf8')));
+      oldFailedJsonData.push(JSON.parse(fs.readFileSync('target/testData/failed/'+oldFailedTest,'utf8')));
 
     });
 
     let oldFailedFile = 'oldFailedTests_'+new Date().getTime()+'.json';
-    fs.writeFileSync(appRoot+'/target/testData/failed/'+oldFailedFile, JSON.stringify(oldFailedJsonData), { encoding: 'utf8' });
+    fs.writeFileSync('target/testData/failed/'+oldFailedFile, JSON.stringify(oldFailedJsonData), { encoding: 'utf8' });
 
     // Create new file which is actual failed tests
-    fs.unlinkSync(appRoot+'/target/testData/failed/failedTests.json');
-    fs.writeFileSync(appRoot+'/target/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
+    fs.unlinkSync('target/testData/failed/failedTests.json');
+    fs.writeFileSync('target/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
 
   } else {
     if(Object.keys(subset).length > 0) {
-      fs.writeFileSync(appRoot+'/target/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
+      fs.writeFileSync('target/testData/failed/failedTests.json', JSON.stringify(subset), { encoding: 'utf8' });
     }
   }
   if(Object.keys(subset).length > 0) {
@@ -155,14 +153,14 @@ module.exports = {
   },
   getTestData: () => {
 
-    if (fs.existsSync(appRoot+'/target/testData/failed/failedTests.json')) {
+    if (fs.existsSync('target/testData/failed/failedTests.json')) {
       //console.log('executing failed--tests');
-      let data = JSON.parse(fs.readFileSync(appRoot+'/target/testData/failed/failedTests.json','utf8'));
+      let data = JSON.parse(fs.readFileSync('target/testData/failed/failedTests.json','utf8'));
       //console.log('Failed test data---'+JSON.stringify(data));
       return data;
     }else {
        //console.log('executing fresh--tests');
-      let data = JSON.parse(fs.readFileSync(appRoot+'/src/test/e2e-tests/testdata/data.json','utf8'));
+      let data = JSON.parse(fs.readFileSync('../saw-web/src/test/e2e-tests/testdata/data.json','utf8'));
       //console.log('Fresh data--->'+JSON.stringify(data));
       return data;
     }
