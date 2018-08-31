@@ -71,10 +71,10 @@ collapser.data.frame <- function(df,
     df <- df %>%
       dplyr::rename(., DT_CEI_1 = !!measure_vars) %>%
       mutate(.,!!output_col_name := case_when((
-        (!!side == "start") ~ as.Date(lubridate::floor_date(DT_CEI_1, unit = unit), tz = time_zone)
+        (!!side == "start") ~ as.Date(lubridate::floor_date(DT_CEI_1, unit = !!unit), tz = !!time_zone)
       ),
       (
-        !!side == "end" ~ as.Date(lubridate::ceiling_date(DT_CEI_1, unit = unit) - 1, tz = time_zone)
+        !!side == "end" ~ as.Date(lubridate::ceiling_date(DT_CEI_1, unit = !!unit) - 1, tz = !!time_zone)
       ))) %>%
       dplyr::rename(.,!!measure_vars := DT_CEI_1)
   } else {
@@ -82,10 +82,10 @@ collapser.data.frame <- function(df,
       dplyr::rename(., DT_CEI_1 = !!measure_vars) %>%
       mutate(.,!!output_col_name := case_when(
         (
-          (!!side == "start") ~ lubridate::floor_date(DT_CEI_1, unit = unit)
+          (!!side == "start") ~ lubridate::floor_date(DT_CEI_1, unit = !!unit)
         ),
         (
-          !!side == "end" ~ lubridate::ceiling_date(DT_CEI_1, unit = unit) - 1
+          !!side == "end" ~ lubridate::ceiling_date(DT_CEI_1, unit = !!unit) - 1
         )
       )) %>%
       dplyr::rename(.,!!measure_vars := DT_CEI_1)
@@ -128,7 +128,7 @@ collapser.tbl_spark <- function(df,
 
     df <- df %>%
       rename(., DT_CHK_1 = !!measure_vars) %>%
-      mutate(., !!output_col_name := date_sub(trunc(add_months(DT_CHK_1, m_add), unit), d_sub)) %>%
+      mutate(., !!output_col_name := date_sub(trunc(add_months(DT_CHK_1, !!m_add), !!unit), !!d_sub)) %>%
       rename(., !!measure_vars := DT_CHK_1)
   } else {
     r_num <- ifelse(unit == "minute", 60,
@@ -138,8 +138,8 @@ collapser.tbl_spark <- function(df,
       df <- df %>%
         rename(., DT_CHK_1 = !!measure_vars) %>%
         mutate(.,
-               !!output_col_name := to_utc_timestamp(from_unixtime(floor((unix_timestamp(DT_CHK_1)) / r_num
-               ) * r_num - d_sub), tz)) %>%
+               !!output_col_name := to_utc_timestamp(from_unixtime(floor((unix_timestamp(DT_CHK_1)) / !!r_num
+               ) * !!r_num - !!d_sub), !!time_zone)) %>%
         rename(., !!measure_vars := DT_CHK_1)
     } else {
       df <- df %>%
@@ -148,8 +148,8 @@ collapser.tbl_spark <- function(df,
                !!output_col_name := to_utc_timestamp(from_unixtime(
                  ceiling((unix_timestamp(
                    DT_CHK_1
-                 )) / r_num) * r_num - d_sub
-               ), tz)) %>%
+                 )) / !!r_num) * !!r_num - !!d_sub
+               ), !!time_zone)) %>%
         rename(., !!measure_vars := DT_CHK_1)
     }
   }
