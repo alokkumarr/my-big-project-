@@ -8,7 +8,7 @@ module.exports = {
     loginBtn: element(by.buttonText('Login')),
     invalidErr: element(by.css('.err-msg')),
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: element(by.css('[e2e="account-settings-menu-btn"]')),
+    btnSelector: 'div[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-logout"]`
   },
 
