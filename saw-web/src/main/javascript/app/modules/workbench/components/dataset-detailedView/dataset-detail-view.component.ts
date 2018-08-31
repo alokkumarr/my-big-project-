@@ -54,7 +54,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   }
 
   backToDS() {
-    this.router.stateService.go('workbench.datasets');
+    this.router.stateService.go('workbench.dataobjects');
   }
 
   triggerPreview() {

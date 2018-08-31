@@ -2,7 +2,8 @@
 
 .sidenav-container {
   position: fixed !important;
-  width: 300px;
+  width: 20%;
+  max-width: 300px !important;
   background-color: $primary-blue-b2 !important;
   color: white !important;
 
