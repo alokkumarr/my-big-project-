@@ -15,10 +15,7 @@ deploy(obj, path, lighten = FALSE, ...)
 objects by removing all fit and pipeline output from trained models. Note
 the final model fit and pipeline are not impacted}
 
-\item{...}{Arguments passed on to \code{saveRDS}
-\describe{
-  \item{}{}
-}}
+\item{...}{additional arguments to pass to \link[base]{saveRDS} function}
 }
 \description{
 Save Modeler object to file that can be restored later. Deploy uses

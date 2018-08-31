@@ -25,7 +25,6 @@
 #' @seealso  position functions
 #'   \url{http://ggplot2.tidyverse.org/reference/#section-layer-position-adjustment}
 #'
-#'
 #' @param proportion TRUE/FALSE. If TRUE, computes percentages, otherwise counts
 #'   if y-variable not provided. default is FALSE
 #' @param sort TRUE/FALSE. If TRUE, orders the bars by either the count in the
@@ -38,32 +37,37 @@
 #'   sets the vjust to 'bottom'
 #' @seealso geom_label arguments
 #'   \url{http://ggplot2.tidyverse.org/reference/geom_text.html}
-#' @param ... additional arguments to pass to geom_bar
 #'
 #' @return returns a ggplot2 object of a formatted bar chart
 #' @export
+#' 
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 position_identity position_jitter position_dodge
 #'   position_stack position_fill
 #' @importFrom ggplot2 label_both label_value label_context label_parsed
 #'   label_wrap_gen
-#' @importFrom scales percent   
+#' @importFrom scales percent
+#' @importFrom stats as.formula
+#' @importFrom utils modifyList
 #'
 #' @examples
 #' # Create a data set
+#' library(dplyr)
 #' d <- mtcars %>% mutate(am = as.factor(am), cyl = as.factor(cyl))
 #'
 #' # Create series of basic charts
 #' gg_bar_chart(d, "am")
 #' gg_bar_chart(d, "am", fill="steelblue", color="grey25")
-#' gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things")
-#' gg_bar_chart(d, "am", fill="steelblue", color="grey25", title="Stranger", subtitle="Things", theme="minimal")
+#' gg_bar_chart(d, "am", fill="steelblue", color="grey25",
+#'              title="Stranger", subtitle="Things")
+#' gg_bar_chart(d, "am", fill="steelblue", color="grey25",
+#'              title="Stranger", subtitle="Things", theme="minimal")
 #'
 #' # A few charts with more features
-#' gg_bar_chart(d, "am", proportion = T)
+#' gg_bar_chart(d, "am", proportion = TRUE)
 #' gg_bar_chart(d, "am", fill="cyl")
 #' gg_bar_chart(d, "am", fill="cyl", position="fill")
-#' gg_bar_chart(d, "am", fill="cyl", label=T)
+#' gg_bar_chart(d, "am", fill="cyl", label=TRUE)
 #'
 #' # Example of x-variable and y-variable
 #' d1 <- mtcars %>% group_by(am = factor(am)) %>% summarise(count = n())

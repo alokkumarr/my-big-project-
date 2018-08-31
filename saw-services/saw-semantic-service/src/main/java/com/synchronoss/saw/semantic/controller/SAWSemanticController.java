@@ -118,7 +118,7 @@ public class SAWSemanticController {
    */
   @RequestMapping(value = "/{projectId}/{Id}", method = RequestMethod.PUT,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.FOUND)
+  @ResponseStatus(HttpStatus.ACCEPTED)
   public SemanticNode updateSemantic(
       @PathVariable(name = "projectId", required = true) String projectId,
       @PathVariable(name = "Id", required = true) String Id, @RequestBody SemanticNode requestBody) throws JSONMissingSAWException {

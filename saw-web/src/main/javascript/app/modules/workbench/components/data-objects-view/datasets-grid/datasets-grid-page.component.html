@@ -1,0 +1,16 @@
+<div class="grid-container" fxFill>
+  <dx-data-grid id="gridContainer">
+    <div *dxTemplate="let data of 'nameCellTemplate'">
+      <a (click)="viewDetails(data.data)" [innerHTML]="data.value | highlight: searchTerm" e2e="data-set-grid-view-mode"></a>
+    </div>
+    <div *dxTemplate="let data of 'creatorCellTemplate'">
+      <span class="clickable" [innerHTML]="data.value | highlight: searchTerm"></span>
+    </div>
+    <div *dxTemplate="let data of 'timecreatedCellTemplate'">
+      <span class="clickable" [innerHTML]="data.value * 1000 | date: 'short' | highlight: searchTerm"></span>
+    </div>
+    <div *dxTemplate="let data of 'actionsCellTemplate'">
+      <dataset-actions [dsMetadata]="data.data"></dataset-actions>
+    </div>
+  </dx-data-grid>
+</div>

@@ -18,6 +18,7 @@ public class ESLoader {
 
     /**
      * Index to which the data has to be loaded
+     * (Required)
      *
      */
     @SerializedName("destinationIndexName")
@@ -31,7 +32,7 @@ public class ESLoader {
     @Expose
     private String indexMappingfile;
     /**
-     *
+     * ES mapping id for the document. This data will be used for _id value
      *
      */
     @SerializedName("documentIDField")
@@ -52,12 +53,13 @@ public class ESLoader {
     @Expose
     private List<Alias> aliases = null;
     /**
-     * Comma separated list of host names or IP addresses
+     * List of host names or IP addresses
+     * (Required)
      *
      */
     @SerializedName("esNodes")
     @Expose
-    private String esNodes;
+    private List<String> esNodes = null;
     /**
      * Name of the ElasticSearch cluster. By default, the cluster name will be elasticsearch
      *
@@ -115,7 +117,10 @@ public class ESLoader {
      * @param aliases
      * @param esMappingId
      */
-    public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField, String filterString, List<Alias> aliases, String esNodes, String esClusterName, int esPort, String esMappingId, String esUser, String esPass) {
+    public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField,
+                    String filterString, List<Alias> aliases, List<String> esNodes,
+                    String esClusterName, int esPort, String esMappingId,
+                    String esUser, String esPass) {
         super();
         this.destinationIndexName = destinationIndexName;
         this.indexMappingfile = indexMappingfile;
@@ -132,6 +137,7 @@ public class ESLoader {
 
     /**
      * Index to which the data has to be loaded
+     * (Required)
      *
      */
     public String getDestinationIndexName() {
@@ -140,6 +146,7 @@ public class ESLoader {
 
     /**
      * Index to which the data has to be loaded
+     * (Required)
      *
      */
     public void setDestinationIndexName(String destinationIndexName) {
@@ -163,7 +170,7 @@ public class ESLoader {
     }
 
     /**
-     *
+     * ES mapping id for the document. This data will be used for _id value
      *
      */
     public String getDocumentIDField() {
@@ -171,7 +178,7 @@ public class ESLoader {
     }
 
     /**
-     *
+     * ES mapping id for the document. This data will be used for _id value
      *
      */
     public void setDocumentIDField(String documentIDField) {
@@ -211,18 +218,20 @@ public class ESLoader {
     }
 
     /**
-     * Comma separated list of host names or IP addresses
+     * List of host names or IP addresses
+     * (Required)
      *
      */
-    public String getEsNodes() {
+    public List<String> getEsNodes() {
         return esNodes;
     }
 
     /**
-     * Comma separated list of host names or IP addresses
+     * List of host names or IP addresses
+     * (Required)
      *
      */
-    public void setEsNodes(String esNodes) {
+    public void setEsNodes(List<String> esNodes) {
         this.esNodes = esNodes;
     }
 
@@ -308,19 +317,7 @@ public class ESLoader {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
-                .append("destinationIndexName", destinationIndexName)
-                .append("indexMappingfile", indexMappingfile)
-                .append("documentIDField", documentIDField)
-                .append("filterString", filterString)
-                .append("aliases", aliases)
-                .append("esNodes", esNodes)
-                .append("esClusterName", esClusterName)
-                .append("esPort", esPort)
-                .append("esMappingId", esMappingId)
-                .append("esUser", esUser)
-                .append("esPass", esPass)
-                .toString();
+        return new ToStringBuilder(this).append("destinationIndexName", destinationIndexName).append("indexMappingfile", indexMappingfile).append("documentIDField", documentIDField).append("filterString", filterString).append("aliases", aliases).append("esNodes", esNodes).append("esClusterName", esClusterName).append("esPort", esPort).append("esMappingId", esMappingId).append("esUser", esUser).append("esPass", esPass).toString();
     }
 
     @Override

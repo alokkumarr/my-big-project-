@@ -119,6 +119,7 @@
       <modules>
         <module>bda-meta</module>
         <module>xdf-nextgen</module>
+        <module>a2</module>
         <module>rtis</module>
         <module>rtps</module>
         <module>saw-security</module>

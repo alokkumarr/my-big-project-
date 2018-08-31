@@ -25,23 +25,31 @@
 #'
 #' @examples
 #' # Create a data set
+#' library(dplyr)
 #' d <- mtcars %>% mutate(am = as.factor(am))
 #'
 #' # Create series of basic charts
 #' gg_density_chart(d, "mpg")
 #' gg_density_chart(d, "mpg", fill="steelblue", color="grey25")
-#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message")
-#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25", title="Crouching Plot", caption = "hidden message", theme=theme_minimal())
+#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25",
+#'                  title="Crouching Plot", caption = "hidden message")
+#' gg_density_chart(d, "mpg", fill="steelblue", color="grey25",
+#'                  title="Crouching Plot", caption = "hidden message",
+#'                  theme="minimal")
 #'
 #' # A few charts with additional features
 #' gg_density_chart(d, "mpg", fill="am", color="am")
 #' gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2)
-#' gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2, palette = "virdis")
-#' gg_density_chart(d, "mpg", fill="am", facet_formula = "~am", adjust=1/2,alpha=0.1)
-#' gg_density_chart(d, "mpg", fill="am", facet_formula = "~am", facet_args = list(scales="free"), adjust=1/2, alpha=0.1)
-#' gg_density_chart(d, "mpg", fill="am", facet_formula = "cyl~am", facet_args = list(scales="free_y"), adjust=1/2,alpha=0.1)
+#' gg_density_chart(d, "mpg", fill="am", color="am", adjust=1/2, palette = "viridis")
+#' gg_density_chart(d, "mpg", fill="am", facet_formula = "~am",
+#'                  adjust=1/2, alpha=0.1)
+#' gg_density_chart(d, "mpg", fill="am", facet_formula = "~am",
+#'                  facet_args = list(scales="free"),
+#'                  adjust=1/2, alpha=0.1)
+#' gg_density_chart(d, "mpg", fill="am", facet_formula = "cyl~am",
+#'                  facet_args = list(scales="free_y"),
+#'                  adjust=1/2, alpha=0.1)
 #' gg_density_chart(d, "mpg", fill="am", color="am", coord="flip", adjust=1/2)
-#'
 gg_density_chart<- function(df,
                             x_variable,
                             fill = sncr_pal()(1),
