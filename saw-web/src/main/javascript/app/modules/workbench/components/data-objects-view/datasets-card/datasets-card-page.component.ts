@@ -44,12 +44,9 @@ export class DatasetsCardPageComponent implements OnInit {
 
   onUpdate(data) {
     this.dataSets = data;
-    if (this.dataSets.length > 0) {
-
-    }
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 3000);
+    }, 1000);
   }
 
   viewDetails(metadata) {

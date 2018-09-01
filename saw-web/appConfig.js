@@ -9,7 +9,7 @@ if (__PRODUCTION__) {
   apiUrl = 'http://saw-rd601.ana.dev.vaste.sncrcorp.net';
 }
 /* eslint-enable */
-apiUrl = apiUrl + '/saw';
+apiUrl += '/saw';
 
 export default {
   login: {

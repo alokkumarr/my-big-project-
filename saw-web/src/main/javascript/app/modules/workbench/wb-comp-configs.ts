@@ -48,4 +48,19 @@ export const PARSER_CONFIG = {
   // }]
 };
 
-export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'isDirectory': true, 'path': 'root' }];
+export const STAGING_TREE = [
+  { name: 'Staging', size: 0, isDirectory: true, path: 'root' }
+];
+
+export const TYPE_CONVERSION = {
+  text: 'string',
+  string: 'string',
+  double: 'double',
+  integer: 'integer',
+  date: 'date',
+  float: 'float',
+  keyword: 'string',
+  long: 'long',
+  decimal: 'double',
+  timestamp: 'date'
+};

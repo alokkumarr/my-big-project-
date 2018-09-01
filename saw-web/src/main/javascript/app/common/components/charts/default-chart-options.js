@@ -179,7 +179,7 @@ export const bulletChartOptions = {
   chart: {
     type: 'bullet',
     inverted: true,
-    marginLeft: 135,
+    marginRight: 20,
     height: 170
   },
   exporting: {
