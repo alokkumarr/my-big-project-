@@ -51,7 +51,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
  * number of failed retry
  */
-let maxRetryForFailedTests = webpackHelper.distRun() ? 2 : 3;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 2;
 
 /**
  * Waits ms after page is loaded

@@ -18,10 +18,10 @@ module.exports = {
     },
     elementToBeEnabledAndVisible: element => {
      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-     },elementToBeNotVisible: element =>{
-      browser.wait(EC.not(EC.presenceOf(element)), fluentWait, "Element \"" + element.locator() + "\" is present");
+     },elementToBeNotVisible: (element, wait) =>{
+      return browser.wait(EC.not(EC.presenceOf(element)), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is present");
     },textToBePresent:(element, value)=>{
-      browser.wait(EC.textToBePresentInElement(element, value), fluentWait);
+      return browser.wait(EC.textToBePresentInElement(element, value), fluentWait);
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
