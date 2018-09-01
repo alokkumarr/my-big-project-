@@ -96,7 +96,6 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  failedData:{},
   testData:webpackHelper.getTestData(),
   //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
