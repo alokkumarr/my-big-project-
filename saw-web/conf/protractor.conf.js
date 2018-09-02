@@ -33,7 +33,7 @@ const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 50000;//30000 /
  * Defines the maximum amount of time to wait for a condition
  */
 const fluentWait = webpackHelper.distRun() ? 40000 : 50000;
-const extendedFluentWait = webpackHelper.distRun() ? 60000 : 70000;
+const extendedFluentWait = webpackHelper.distRun() ? 90000 : 60000;
 
 /**
  * Default time to wait in ms before a test fails
