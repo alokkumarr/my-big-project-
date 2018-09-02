@@ -25,15 +25,15 @@ const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
  */
 
-const implicitlyWait = webpackHelper.distRun() ? 40000 : 50000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 50000;//30000 // = 30 sec; Sometimes element will not
+const implicitlyWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 40000 : 50000;
-const extendedFluentWait = webpackHelper.distRun() ? 90000 : 60000;
+const fluentWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedFluentWait = webpackHelper.distRun() ? 60000 : 40000;
 
 /**
  * Default time to wait in ms before a test fails
@@ -51,7 +51,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
  * number of failed retry
  */
-let maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 2;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 4 : 3;
 
 /**
  * Waits ms after page is loaded
