@@ -33,8 +33,8 @@
         <div class="cell-caption">
             {{cell.column.caption}}
         </div>
-            <button *ngIf="isEditable" class="column-menu" fontIcon="icon-more" mat-button [matMenuTriggerFor]="menu">
-                <mat-icon [matMenuTriggerFor]="menu" fontIcon="icon-more"></mat-icon>
+            <button *ngIf="isEditable" class="column-menu" mat-button [matMenuTriggerFor]="menu">
+                <mat-icon [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
             </button>
             <mat-menu #menu="matMenu">
               <button *ngIf="analysis.type=='esReport'" class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.type)">
