@@ -417,7 +417,7 @@ export class DesignerContainerComponent {
           const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
             requestExecution: shouldClose,
-            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis    
+            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis
           });
           if (!shouldClose) {
             this.requestDataIfPossible();

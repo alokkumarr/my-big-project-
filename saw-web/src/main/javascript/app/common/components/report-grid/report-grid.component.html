@@ -25,7 +25,6 @@
     [loadPanel]="loadPanel"
     [pager]="pager"
     [paging]="paging">
-
     <div class="headerCellTemplate" *dxTemplate="let cell of 'headerCellTemplate'">
         <div *ngIf="cell.column.payload.aggregate" class="cell-aggregate-icon">
             <mat-icon [style.width.px]="26" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
@@ -55,4 +54,5 @@
               <button (click)="aggregateColumn(cell.column.payload, 'clear')" mat-menu-item>Reset To Default</button>
             </mat-menu> 
     </div>
+  <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
 </dx-data-grid>
