@@ -41,12 +41,17 @@ module.exports = {
     backgroundColorByName: name => element(by.xpath(`//*[@e2e="dashboard-add-kpi-color-${name}"]`)),
     applyKPIButton: element(by.css('button[e2e="dashboard-add-kpi-apply-button"]')),
     kpiName: element(by.css('input[e2e="dashboard-add-kpi-name-input"]')),
-    kpiByName: name => element(by.xpath(`//div[contains(text(),"${name}")]`)),
+    kpiByName: name => element(by.xpath(`//*[contains(text(),"${name}")]`)),
     filterByName: name => element(by.xpath(`//div[contains(text(),"${name}") and @class="filter-label"]`))
   },
   actualVsTargetKPI: {
+    metricByName: name => element(by.xpath(`//span[contains(text(),"${name}")]`)),
+    kpiColumnByName: name => element(by.xpath(`//button[@e2e="dashboard-add-kpi-column-${name}"]`)),
+    actualVsTagertKpiButton:element(by.css('button[e2e="dashboard-add-widget-type-bullet-kpi"]')),
     measure1Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure1-input"]')),
     measure2Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure2-input"]')),
-    metricTargetInput: element(by.css('input[e2e="dashboard-add-kpi-bullet-target-input"]'))
+    metricTargetInput: element(by.css('input[e2e="dashboard-add-kpi-bullet-target-input"]')),
+    bandColor: name => element(by.css(`[e2e="dashboard-add-kpi-bullet-color-${name}"]`))
+
   }
 };
