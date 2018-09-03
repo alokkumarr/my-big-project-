@@ -564,13 +564,15 @@ else:
                                                 sqlQuery = sqlQuery + line
                                                 curobj = cnxn.cursor()
                                                 curobj.execute(sqlQuery)
+                                                log1.debug("Execute query: " + sqlQuery)
                                                 print sqlQuery
                                                 cnxn.commit()
                                                 curobj.close()
                                                 sqlQuery = ''
 
-                                            except:
-                                                err_str_data = "SQL Execution failed: " + sqlQuery
+                                            except Exception as e:
+                                                err_str_data = "SQL Execution failed: " + str(e)
+                                                log1.info(err_str_data)
                                                 with open(app_stat_dt_log_file,'a') as outfile:
                                                     outfile.write(err_str_data)
                                                 outfile.close()

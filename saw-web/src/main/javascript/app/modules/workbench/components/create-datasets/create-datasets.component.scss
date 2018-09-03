@@ -12,7 +12,7 @@ create-datasets {
 
   mat-dialog-content {
     height: 100%;
-    background-color: #F5F9FC;
+    background-color: $background-color;
     padding: 3px !important;
     margin: 0 !important;
     max-height: 100% !important;
@@ -20,11 +20,11 @@ create-datasets {
 
   .mat-horizontal-content-container {
     padding: 0 !important;
-    height: calc(100% - 58px);
+    height: calc(100% - 56px);
   }
 
   .mat-horizontal-stepper-header-container {
-    background-color: #F5F9FC;
+    background-color: $background-color;
   }
 
   .mat-horizontal-stepper-content {
@@ -49,15 +49,8 @@ create-datasets {
     }
   }
 
-  .previous {
-    height: 38px;
-    border-radius: 2px;
-    background-color: white;
-    border: solid 1px $primary-blue-b2;
-  }
-
   .Outline {
-    color: $primary-blue-b2;
+    color: $primary-red;
   }
 
   .xBtn {
