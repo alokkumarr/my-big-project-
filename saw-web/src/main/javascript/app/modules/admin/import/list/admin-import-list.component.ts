@@ -5,7 +5,6 @@ import * as every from 'lodash/every';
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-import-list.component.html');
-// require('./admin-import-list.component.scss');
 
 @Component({
   selector: 'admin-import-list',
@@ -31,6 +30,7 @@ export class AdminImportListComponent {
 
   overWrite(row) {
     row.selection = true;
+    this.validityChange.emit(true);
   }
 
   onChecked(row) {
@@ -66,6 +66,12 @@ export class AdminImportListComponent {
     }, {
       caption: 'Analysis Name',
       dataField: 'analysis.name',
+      allowSorting: true,
+      alignment: 'left',
+      width: '30%'
+    }, {
+      caption: 'Description',
+      dataField: 'analysis.description',
       allowSorting: true,
       alignment: 'left',
       width: '30%'

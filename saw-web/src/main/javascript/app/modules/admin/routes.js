@@ -60,19 +60,13 @@ export function routesConfig($stateProvider) {
         token: 'section',
         resolveFn: () => 'privilege'
       }]
-    // }, {
-    //   name: 'admin.privilege',
-    //   url: '/privilege',
-    //   component: 'privilegesView'
     }, {
       name: 'admin.export',
       url: '/export',
-      // component: 'exportComponent'
       component: AdminExportViewComponent
     }, {
       name: 'admin.import',
       url: '/import',
-      // component: 'importComponent'
       component: AdminImportViewComponent
     }
   ];
