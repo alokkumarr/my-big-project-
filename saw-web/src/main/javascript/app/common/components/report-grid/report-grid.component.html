@@ -28,7 +28,7 @@
 
     <div class="headerCellTemplate" *dxTemplate="let cell of 'headerCellTemplate'">
         <div *ngIf="cell.column.payload.aggregate" class="cell-aggregate-icon">
-            <mat-icon [style.width.px]="40" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
+            <mat-icon [style.width.px]="26" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
         </div>
         <div class="cell-caption">
             {{cell.column.caption}}
@@ -37,16 +37,16 @@
                 <mat-icon [matMenuTriggerFor]="menu" fontIcon="icon-more"></mat-icon>
             </button>
             <mat-menu #menu="matMenu">
-              <button *ngIf="analysis.type=='esReport'" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.type)">
+              <button *ngIf="analysis.type=='esReport'" class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.type)">
               <mat-icon fontIcon="icon-more"></mat-icon>
               Aggregation</button>
-              <button (click)="renameColumn(cell.column)" mat-menu-item><mat-icon fontIcon="icon-edit"></mat-icon>  Rename</button>
-              <button (click)="removeColumn(cell.column)" mat-menu-item><mat-icon fontIcon="icon-eye-disabled"></mat-icon>  Remove {{cell.column.payload.displayName}}</button>
-              <button (click)="formatColumn(cell.column)" mat-menu-item><mat-icon fontIcon="icon-filter"></mat-icon>  Format Data</button>
+              <button (click)="renameColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-edit"></mat-icon>  Rename</button>
+              <button (click)="removeColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-eye-disabled"></mat-icon>  Remove {{cell.column.payload.displayName}}</button>
+              <button (click)="formatColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-filter"></mat-icon>  Format Data</button>
             </mat-menu>
 
             <mat-menu #aggregations="matMenu">
-              <button mat-menu-item
+              <button class="report-options" mat-menu-item
                       *ngFor="let aggregateType of aggregates; trackBy: index"
                       (click)="aggregateColumn(cell.column.payload, aggregateType.value)">
                 <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>

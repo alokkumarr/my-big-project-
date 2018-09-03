@@ -40,10 +40,20 @@
 
 .cell-aggregate-icon {
   float: left;
-  margin: 5px 5px 0 0;
 
   mat-icon {
-    height: 0 !important;
+    height: 26px !important;
+  }
+
+  .icon-MAX,
+  .icon-MIN,
+  .icon-AVG {
+    margin: 0 7px 0 0;
+  }
+
+  .icon-Count,
+  .icon-Percentage {
+    margin: -2px 7px 0 0;
   }
 }
 
@@ -70,4 +80,9 @@
     padding-top: 3px;
     font-size: 16px;
   }
+}
+
+.report-options {
+  line-height: 35px !important;
+  height: 35px !important;
 }
