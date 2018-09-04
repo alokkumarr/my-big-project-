@@ -5,90 +5,90 @@ import { SideNavService } from './sidenav.service';
 import { LocalSearchService } from './local-search.service';
 import { dxDataGridService } from './dxDataGrid.service';
 
-/* Menu Service */
-export function menuServiceFactory(i: any) {
-  return i.get('MenuService');
-}
+// /* Menu Service */
+// export function menuServiceFactory(i: any) {
+//   return i.get('MenuService');
+// }
 
-export const menuServiceProvider = {
-  provide: MenuService,
-  useFactory: menuServiceFactory,
-  deps: ['$injector']
-};
+// export const menuServiceProvider = {
+//   provide: MenuService,
+//   useFactory: menuServiceFactory,
+//   deps: ['$injector']
+// };
 
-/* ComponentHandler Service */
-export function componentHandlerFactory(i: any) {
-  return i.get('$componentHandler');
-}
+// /* ComponentHandler Service */
+// export function componentHandlerFactory(i: any) {
+//   return i.get('$componentHandler');
+// }
 
-export const componentHandlerProvider = {
-  provide: '$componentHandler',
-  useFactory: componentHandlerFactory,
-  deps: ['$injector']
-};
+// export const componentHandlerProvider = {
+//   provide: '$componentHandler',
+//   useFactory: componentHandlerFactory,
+//   deps: ['$injector']
+// };
 
-/* Header Progress Service */
-export function headerProgressFactory(i: any) {
-  return i.get('HeaderProgress');
-}
+// /* Header Progress Service */
+// export function headerProgressFactory(i: any) {
+//   return i.get('HeaderProgress');
+// }
 
-export const headerProgressProvider = {
-  provide: HeaderProgressService,
-  useFactory: headerProgressFactory,
-  deps: ['$injector']
-};
+// export const headerProgressProvider = {
+//   provide: HeaderProgressService,
+//   useFactory: headerProgressFactory,
+//   deps: ['$injector']
+// };
 
-/* Toast Service */
-export function toastFactory(i: any) {
-  return i.get('toastMessage');
-}
+// /* Toast Service */
+// export function toastFactory(i: any) {
+//   return i.get('toastMessage');
+// }
 
-export const toastProvider = {
-  provide: ToastService,
-  useFactory: toastFactory,
-  deps: ['$injector']
-};
+// export const toastProvider = {
+//   provide: ToastService,
+//   useFactory: toastFactory,
+//   deps: ['$injector']
+// };
 
-/* Sidenav Service */
-export function sidenavFactory(i: any) {
-  return i.get('SidenavService');
-}
+// /* Sidenav Service */
+// export function sidenavFactory(i: any) {
+//   return i.get('SidenavService');
+// }
 
-export const sidenavProvider = {
-  provide: SideNavService,
-  useFactory: sidenavFactory,
-  deps: ['$injector']
-};
+// export const sidenavProvider = {
+//   provide: SideNavService,
+//   useFactory: sidenavFactory,
+//   deps: ['$injector']
+// };
 
-/* Dialog Service */
-export function $mdDialogFactory(i: any) {
-  return i.get('$mdDialog');
-}
+// /* Dialog Service */
+// export function $mdDialogFactory(i: any) {
+//   return i.get('$mdDialog');
+// }
 
-export const $mdDialogProvider = {
-  provide: '$mdDialog',
-  useFactory: $mdDialogFactory,
-  deps: ['$injector']
-};
+// export const $mdDialogProvider = {
+//   provide: '$mdDialog',
+//   useFactory: $mdDialogFactory,
+//   deps: ['$injector']
+// };
 
-/* LocalSerach Service */
-export function localSearchFactory(i: any) {
-  return i.get('LocalSearchService');
-}
+// /* LocalSerach Service */
+// export function localSearchFactory(i: any) {
+//   return i.get('LocalSearchService');
+// }
 
-export const localSearchProvider = {
-  provide: LocalSearchService,
-  useFactory: localSearchFactory,
-  deps: ['$injector']
-};
+// export const localSearchProvider = {
+//   provide: LocalSearchService,
+//   useFactory: localSearchFactory,
+//   deps: ['$injector']
+// };
 
 /* Dxdatagrid Service */
-export function dxDataGridFactory(i: any) {
-  return i.get('dxDataGridService');
-}
+// export function dxDataGridFactory(i: any) {
+//   return i.get('dxDataGridService');
+// }
 
-export const dxDataGridProvider = {
-  provide: dxDataGridService,
-  useFactory: dxDataGridFactory,
-  deps: ['$injector']
-};
+// export const dxDataGridProvider = {
+//   provide: dxDataGridService,
+//   useFactory: dxDataGridFactory,
+//   deps: ['$injector']
+// };

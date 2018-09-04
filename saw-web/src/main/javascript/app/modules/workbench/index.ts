@@ -1,5 +1,3 @@
-import * as angular from 'angular';
-import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
@@ -9,21 +7,21 @@ import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
+import { UIRouterModule } from '@uirouter/angular';
 
-import { routesConfig } from './routes';
-import { i18nConfig } from './i18n';
+import { routes } from './routes';
 
 import { WorkbenchService } from './services/workbench.service';
-import { analyzeServiceProvider } from '../analyze/services/ajs-analyze-providers';
+import { AnalyzeService } from '../analyze/services/analyze.service';
 import {
-  menuServiceProvider,
-  componentHandlerProvider,
-  headerProgressProvider,
-  toastProvider,
-  sidenavProvider,
-  localSearchProvider,
-  dxDataGridProvider
-} from '../../common/services/ajs-common-providers';
+  MenuService,
+  ComponentHandler,
+  HeaderProgressService,
+  ToastService,
+  SideNavService,
+  LocalSearchService,
+  dxDataGridService
+} from '../../common/services';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component'
 import { DatasetsComponent } from './components/datasets-view/datasets-page.component';
@@ -43,15 +41,7 @@ import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-g
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
 
-import { CommonModule } from '../../common';
-
 export const WorkbenchModule = 'WorkbenchModule';
-
-angular.module(WorkbenchModule, [
-  CommonModule
-])
-  .config(routesConfig)
-  .config(i18nConfig);
 
 const components = [
   WorkbenchPageComponent,
@@ -79,7 +69,7 @@ const components = [
     FormsModule,
     MaterialModule,
     ReactiveFormsModule,
-    UIRouterUpgradeModule,
+    UIRouterModule.forChild({states: routes}),
     DxDataGridModule,
     DxTemplateModule,
     FlexLayoutModule,
@@ -91,14 +81,14 @@ const components = [
   entryComponents: components,
   providers: [
     WorkbenchService,
-    menuServiceProvider,
-    analyzeServiceProvider,
-    componentHandlerProvider,
-    headerProgressProvider,
-    toastProvider,
-    sidenavProvider,
-    localSearchProvider,
-    dxDataGridProvider
+    AnalyzeService,
+    MenuService,
+    ComponentHandler,
+    HeaderProgressService,
+    ToastService,
+    SideNavService,
+    LocalSearchService,
+    dxDataGridService
   ]
 })
-export class WorkbenchUpgradeModule { }  
+export class WorkbenchUpgradeModule { }

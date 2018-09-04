@@ -10,7 +10,6 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
-import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
@@ -65,7 +64,6 @@ export class ObserveChartComponent {
   constructor(
     public chartService: ChartService,
     public analyzeService: AnalyzeService,
-    public sortService: SortService,
     public filterService: FilterService,
     public progressService: HeaderProgressService
   ) {}
@@ -111,10 +109,6 @@ export class ObserveChartComponent {
     this.labels = { x: null, y: null, tempX: null, tempY: null };
     this.labels.tempX = this.labels.x = get(this.analysis, 'xAxis.title', null);
     this.labels.tempY = this.labels.y = get(this.analysis, 'yAxis.title', null);
-
-    const sortFields = this.sortService.getArtifactColumns2SortFieldMapper()(
-      this.analysis.artifacts[0].columns
-    );
     this.sorts = this.analysis.sqlBuilder.sorts;
 
     this.filters = map(

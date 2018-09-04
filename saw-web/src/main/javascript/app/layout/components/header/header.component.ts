@@ -12,13 +12,17 @@ require('./header.component.scss');
 })
 
 export class LayoutHeaderComponent {
-  constructor(private jwt: JwtService, private user: UserService, @Inject('$rootScope') private _rootScope: any, private cdRef:ChangeDetectorRef) { }
+  constructor(
+    private jwt: JwtService,
+    private user: UserService,
+    private cdRef:ChangeDetectorRef
+  ) { }
 
   public isLoading: false;
 
   ngAfterViewChecked() {
-    if (this.isLoading === this._rootScope.showProgress) return;
-    this.isLoading = this._rootScope.showProgress;
+    // if (this.isLoading === this._rootScope.showProgress) return;
+    // this.isLoading = this._rootScope.showProgress;
     this.cdRef.detectChanges();
   }
 
