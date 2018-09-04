@@ -41,7 +41,6 @@ require('./executed-view.component.scss');
   template
 })
 export class ExecutedViewComponent implements OnInit {
-  _executionId: string;
   analysis: Analysis; // the latest analysis definition
   executedAnalysis: Analysis; // the exact analysis that was executed
   analyses: Analysis[];
@@ -302,7 +301,7 @@ export class ExecutedViewComponent implements OnInit {
       .then(
         analyses => {
           this.analyses = analyses;
-          this.setExecutedAt(this._executionId);
+          this.setExecutedAt(this.executionId);
 
           this._headerProgressService.hide();
           return analyses;

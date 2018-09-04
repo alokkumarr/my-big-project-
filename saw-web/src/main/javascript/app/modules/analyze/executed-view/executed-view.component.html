@@ -70,7 +70,7 @@
     </div>
   </mat-card>
 
-  <mat-card>
+  <mat-card *ngIf="analysis">
     <mat-expansion-panel [expanded]="false">
       <mat-expansion-panel-header>
         <span class="expansion-title" i18n>Analysis Details</span>
@@ -87,11 +87,11 @@
         {{analysis.scheduleHuman}}
       </div>
       <div>
-        <strong *ngIf="analysis.userFullName">Executed By:</strong>
+        <strong *ngIf="executedBy">Executed By:</strong>
         {{executedBy}}
       </div>
       <div>
-        <strong *ngIf="analysis.userFullName">Executed At:</strong>
+        <strong *ngIf="executedAt">Executed At:</strong>
         {{executedAt}}
       </div>
       <div class="analysis-detail-description">
