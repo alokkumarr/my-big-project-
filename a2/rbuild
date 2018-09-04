@@ -23,13 +23,14 @@ for dir in a2charter a2munge a2modeler a2sipr; do
     if [ "$version" != "2" ]; then
         sed -i -e "s/0\.0\.0\.9000/$version/" DESCRIPTION
     fi
+
     Rscript -e 'deps <- devtools::dev_package_deps(dependencies = NA);devtools::install_deps(dependencies = TRUE);if (!all(deps$package %in% installed.packages())) { message("missing: ", paste(setdiff(deps$package, installed.packages()), collapse=", ")); q(status = 1, save = "no")}'
+
+    # Build package
     R CMD build .
     
-    # Note: Skip a2munge and a2modeler tests until fixed
-    if [ $dir != a2modeler ]; then
-        R CMD check *.tar.gz
-    fi
+    # Execute tests
+    R CMD check *.tar.gz
     
     # Copy the R package build artifacts into the target directory,
     # which is used for copying them out of the Docker container
