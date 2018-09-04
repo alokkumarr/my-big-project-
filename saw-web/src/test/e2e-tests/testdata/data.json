@@ -785,7 +785,6 @@
       }
     }
   },
-
   "DASHBOARDWITHSNAPSHOTKPI": {
     "dashboardWithSnapshotKpiDataProvider": {
       "dashboard_with_column_by_admin": {
@@ -830,6 +829,171 @@
           "primaryAggregation": "Maximum",
           "secondaryAggregations": ["Sum", "Average", "Minimum", "Maximum", "Count"],
           "backgroundColor": "blue"
+        }
+      }
+    }
+  },
+  "DASHBOARD_WITH_ACTUAL_VS_TARGET_KPI": {
+    "dashboard_with_actual_vs_target_DataProvider": {
+      "dashboard_with_column_by_admin": {
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "This Week",
+          "primaryAggregation": "Sum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        }
+      },
+      "dashboard_with_Float_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Yesterday",
+          "primaryAggregation": "Average",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        }
+      },
+      "dashboard_with_Integer_by_admin": {
+        "user": "admin",
+        "kpiInfo": {
+          "column": "Integer",
+          "date": "Date",
+          "filter": "MTD (Month to Date)",
+          "primaryAggregation": "Minimum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "blues"
+        }
+      },
+      "dashboard_with_Double_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Double",
+          "date": "Date",
+          "filter": "Last Week",
+          "primaryAggregation": "Maximum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        }
+      },
+      "dashboard_with_column_y_t_d_by_admin": {
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "YTD (Year to Date)",
+          "primaryAggregation": "Count",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        }
+      },
+      "dashboard_with_Float_last_week_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last Week",
+          "primaryAggregation": "Average",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        }
+      },
+      "dashboard_with_column_last_6_weeks_by_admin": {
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "Last 6 Weeks",
+          "primaryAggregation": "Minimum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        }
+      },
+      "dashboard_with_Float_last_2_week_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last 2 Weeks",
+          "primaryAggregation": "Maximum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        }
+      },
+      "dashboard_with_column_last_month_by_admin": {
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "Last Month",
+          "primaryAggregation": "Count",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        }
+      },
+      "dashboard_with_Float_last_quarter_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last Quarter",
+          "primaryAggregation": "Average",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
+        }
+      },
+      "dashboard_with_column_last_3_months_by_admin": {
+        "user": "admin",
+        "skip": false,
+        "kpiInfo": {
+          "column": "Long",
+          "date": "Date",
+          "filter": "Last 3 Months",
+          "primaryAggregation": "Sum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "rog"
+        }
+      },
+      "dashboard_with_Float_last_6_months_by_user": {
+        "user": "userOne",
+        "kpiInfo": {
+          "column": "Float",
+          "date": "Date",
+          "filter": "Last 6 Months",
+          "primaryAggregation": "Minimum",
+          "measure1": 11,
+          "measure2": 22,
+          "metricTarget": 33,
+          "bandColor": "greys"
         }
       }
     }

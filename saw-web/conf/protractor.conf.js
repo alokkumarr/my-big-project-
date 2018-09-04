@@ -167,7 +167,8 @@ exports.config = {
       // Observe module test cases
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js'
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
