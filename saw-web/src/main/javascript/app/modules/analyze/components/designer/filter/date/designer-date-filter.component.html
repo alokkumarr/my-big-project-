@@ -1,6 +1,6 @@
-<div fxLayout="column" fxLayoutAlign="space-between start">
+<div fxLayout="row" fxLayoutAlign="space-between start">
 
-  <mat-form-field class="select-form-field" appearance="outline">
+  <mat-form-field style="max-width: 150px" class="select-form-field" appearance="outline">
     <mat-label>Preset</mat-label>
     <mat-select e2e="filter-date-preset"
       [formControl]="datePreset"
@@ -13,7 +13,7 @@
   </mat-form-field>
 
   <div fxLayout="row" fxLayoutAlign="space-between center" *ngIf="showDateFields">
-    <mat-form-field e2e="filter-date-from">
+    <mat-form-field e2e="filter-date-from" style="max-width: 100px; margin-left: 10px">
       <input matInput
             (dateChange)="modelChange($event.value, 'gte')"
             [matDatepicker]="gte"
@@ -27,7 +27,7 @@
                       disabled="false">
       </mat-datepicker>
     </mat-form-field>
-    <mat-form-field e2e="filter-date-to">
+    <mat-form-field e2e="filter-date-to" style="max-width: 100px; margin-left: 10px">
       <input matInput
             (dateChange)="modelChange($event.value, 'lte')"
             [matDatepicker]="lte"

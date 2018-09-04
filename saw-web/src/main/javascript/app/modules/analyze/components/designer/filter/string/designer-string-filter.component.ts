@@ -3,9 +3,7 @@ import { MatChipInputEvent } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as filter from 'lodash/filter';
 import * as compact from 'lodash/compact';
-import {
-  FilterModel
-} from '../../types';
+import { FilterModel } from '../../types';
 import { STRING_FILTER_OPERATORS } from '../../../../consts';
 
 const template = require('./designer-string-filter.component.html');
