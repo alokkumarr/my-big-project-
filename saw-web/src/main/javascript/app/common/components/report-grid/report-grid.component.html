@@ -41,7 +41,7 @@
               Aggregation</button>
               <button (click)="renameColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-edit"></mat-icon>  Rename</button>
               <button (click)="removeColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-eye-disabled"></mat-icon>  Remove {{cell.column.payload.displayName}}</button>
-              <button (click)="formatColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-filter"></mat-icon>  Format Data</button>
+              <button *ngIf="checkFormatDataCondition(cell.column.type)" (click)="formatColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-filter"></mat-icon>  Format Data</button>
             </mat-menu>
 
             <mat-menu #aggregations="matMenu">
