@@ -287,19 +287,17 @@ export class DesignerContainerComponent {
       });
   }
 
-  loadGridWithoutData(column){
-    this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+  loadGridWithoutData(column, type){
     if(isEmpty(this.data)) {
-      this.data = [{}]
-    } else {
-      this.data.map(row => {
-        if (column.checked) {
-          row[column.name]='';
-        } else {
-          delete row[column.name];
-        }
-      });  
+      this.data = [{}];
     }
+    this.data.map(row => {
+      if (type === 'add') {
+        row[column.name]='';
+      } else {
+        delete row[column.name];
+      }
+    });
     this.data = cloneDeep(this.data);
   }
 
@@ -560,13 +558,15 @@ export class DesignerContainerComponent {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.areMinRequirmentsMet = this.canRequestData();
-      this.loadGridWithoutData(event.column);
+      this.loadGridWithoutData(event.column, 'add');
       break;
     case 'removeColumn':
       this.cleanSorts();
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
+      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
       forEach(this.analysis.artifacts[0].columns, col=> {

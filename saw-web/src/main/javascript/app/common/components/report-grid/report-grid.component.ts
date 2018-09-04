@@ -449,10 +449,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     )(artifacts);
   }
 
-  onHeaderClick(cell) {
-    cell.cellElement.trigger('contextmenu');
-  }
-
   preprocessFormatIfNeeded(format, type, aggregate) {
     const isPercentage = aggregate === 'percentage';
     const isAVG = aggregate === 'avg';
