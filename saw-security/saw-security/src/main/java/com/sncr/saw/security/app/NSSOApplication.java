@@ -17,7 +17,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import com.sncr.saw.security.common.bean.JwtFilter;
+import com.sncr.saw.security.common.util.JwtFilter;
 
 /**
  * @author gsan0003
