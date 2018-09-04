@@ -6,10 +6,10 @@
 sip-proxy
 
 [saw-web]
-sip-saw1
+sip-app1
 
 [saw-services]
-sip-saw1
+sip-app1
 
 [saw-services:vars]
 #
@@ -102,7 +102,7 @@ saw_ftp_export_size=1000000
 saw_export_chunk_size=10000
 
 [saw-security]
-sip-saw1
+sip-app1
 
 [saw-security:vars]
 #

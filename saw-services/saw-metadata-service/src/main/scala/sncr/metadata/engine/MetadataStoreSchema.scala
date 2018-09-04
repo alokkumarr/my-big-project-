@@ -4,6 +4,7 @@ import files.HFileOperations
 import org.apache.hadoop.hbase.HColumnDescriptor
 import org.apache.hadoop.hbase.HTableDescriptor
 import org.apache.hadoop.hbase.TableName
+import org.apache.hadoop.hbase.TableExistsException
 import org.apache.hadoop.hbase.client.Admin
 import org.slf4j.LoggerFactory
 import sncr.saw.common.config.SAWServiceConfig
@@ -51,11 +52,28 @@ object MetadataStoreSchema {
       "_objects")
   }
 
+  private def initTable(admin: Admin, name: String, familyNames: String*) {
+    initTableRetry(5, admin, name, familyNames: _*)
+  }
+
+  private def initTableRetry(retries: Integer, admin: Admin, name: String, familyNames: String*) {
+    try {
+      initTableTry(admin, name, familyNames: _*)
+    } catch {
+      case e: Exception => if (retries > 0) {
+        log.info("Table possibly already created by other instance", e);
+        initTableRetry(retries - 1, admin, name, familyNames: _*)
+      } else {
+        throw e
+      }
+    }
+  }
+
   /**
    * Creates MapR-DB binary table using the given name and adds the
    * given column families to it
    */
-  private def initTable(admin: Admin, name: String, familyNames: String*) {
+  private def initTableTry(admin: Admin, name: String, familyNames: String*) {
     val tablePath = TableHome + "/" + name
     if (!admin.tableExists(TableName.valueOf(tablePath))) {
       log.info("Table not found, so creating: {}", tablePath)
