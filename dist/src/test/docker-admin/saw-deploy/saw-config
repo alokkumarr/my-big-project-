@@ -43,6 +43,9 @@ saw_executor_result_wait_time=300
 
 #
 # Elasticsearch configuration
+# For the property saw_elasticsearch_port="8200,8200"
+# within quotes due to the way Jinja renders it in yaml file
+# When there is a single port, can be used without quotes
 #
 saw_elasticsearch_protocol=http
 saw_elasticsearch_host=sip-elastic
