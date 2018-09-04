@@ -66,6 +66,7 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeClickable(observePage.existingAnalysisLink);
       expect(observePage.existingAnalysisLink.isDisplayed).toBeTruthy();
       observePage.existingAnalysisLink.click();
+      browser.sleep(500);
 
       _self.addAnalysesToDashboard(analysisCat, analysisSubCat, analysesToAdd);
       dashboardId = _self.saveDashboard(dashboardName, dashboardDescription, observeSubCat);
@@ -383,6 +384,14 @@ class DashboardFunctions {
       console.log(e);
     }finally {
 
+    }
+  }
+
+  addNewDashBoardForActualVsTargetKPI(dashboardName, dashboardDescription, subCategory, metricName, kpiInfo, kpiName) {
+    try {
+
+    }catch (e) {
+      console.log(e);
     }
   }
 

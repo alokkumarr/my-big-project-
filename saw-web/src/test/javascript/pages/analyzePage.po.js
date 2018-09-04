@@ -1,26 +1,19 @@
-const {
-  doMdSelectOption,
-  getMdSelectOptions,
-  getMdSelectOptionsNew
-} = require('../../javascript/helpers/utils');
+const {doMdSelectOption, getMdSelectOptions, getMdSelectOptionsNew} = require('../../javascript/helpers/utils');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const protractorConf = require('../../../../conf/protractor.conf');
 const webpackHelper = require('../../../../conf/webpack.helper');
 const designModePage = require('../../javascript/pages/designModePage.po');
-const getCards = name =>
-  element.all(by.css('mat-card[e2e="analysis-card"]')).filter(elem => {
-    return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
-  });
+const getCards = name => element.all(by.css('mat-card[e2e="analysis-card"]')).filter(elem => {
+  return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
+});
 
 const getCard = name => getCards(name).first();
 
 const firstCard = element.all(by.css('mat-card[e2e="analysis-card"]')).first();
 
-const getForkBtn = parent =>
-  parent.element(by.css('button[e2e="action-fork-btn"]'));
+const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"]'));
 
-const getCardTitle = name =>
-  element(by.xpath(`//a[@e2e="analysis-name" and text() = "${name}"]`));
+const getCardTitle = name => element(by.xpath(`//a[@e2e="analysis-name" and text() = "${name}"]`));
 const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
 
 /**
@@ -29,29 +22,27 @@ const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
  * example: for pivot analysis it returns pivot
  *          for column chart analysis it returns chart:column
  */
-const getCardTypeByName = name =>
-  getCard(name)
-    .element(by.css('[e2e*="analysis-type:"]'))
-    .getAttribute('e2e')
-    .then(e2eAttribute => {
-      if (e2eAttribute) {
-        const [, type, chartType] = e2eAttribute.split(':');
-        return `${type}${chartType ? `:${chartType}` : ''}`;
-      }
-      return e2eAttribute;
-    });
+const getCardTypeByName = name => getCard(name)
+  .element(by.css('[e2e*="analysis-type:"]'))
+  .getAttribute('e2e')
+  .then(e2eAttribute => {
+    if (e2eAttribute) {
+      const [, type, chartType] = e2eAttribute.split(':');
+      return `${type}${chartType ? `:${chartType}` : ''}`;
+    }
+    return e2eAttribute;
+  });
 
 //Can be used in design mode
-const getAnalysisChartType = () =>
-  element(by.css('[e2e*="chart-type:'))
-    .getAttribute('e2e')
-    .then(e2e => {
-      if (e2e) {
-        const [, chartType] = e2e.split(':');
-        return chartType;
-      }
-      return e2e;
-    });
+const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
+  .getAttribute('e2e')
+  .then(e2e => {
+    if (e2e) {
+      const [, chartType] = e2e.split(':');
+      return chartType;
+    }
+    return e2e;
+  });
 
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
@@ -59,35 +50,19 @@ const doAnalysisAction = (name, action) => {
   commonFunctions.waitFor.elementToBeVisible(toggle);
   commonFunctions.waitFor.elementToBeClickable(toggle);
   toggle.click();
-  const menuItems = element(
-    by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div')
-  );
+  const menuItems = element(by.xpath('//div[contains(@class,"mat-menu-panel")]/parent::div'));
   menuItems.getAttribute('id').then(id => {
     if (id) {
-      const actionButton = element(by.id(id)).element(
-        by.css(`button[e2e="actions-menu-selector-${action}"]`)
-      );
+      const actionButton = element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
       commonFunctions.waitFor.elementToBeVisible(actionButton);
       commonFunctions.waitFor.elementToBeClickable(actionButton);
       actionButton.click();
     } else {
-      const menu = card.element(
-        by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu')
-      );
+      const menu = card.element(by.css('button[e2e="actions-menu-toggle"]' + 'mat-menu'));
       menu.getAttribute('class').then(className => {
-        commonFunctions.waitFor.elementToBeVisible(
-          element(by.css(`div.${className}`)).element(
-            by.css(`button[e2e="actions-menu-selector-${action}"]`)
-          )
-        );
-        commonFunctions.waitFor.elementToBeClickable(
-          element(by.css(`div.${className}`)).element(
-            by.css(`button[e2e="actions-menu-selector-${action}"]`)
-          )
-        );
-        element(by.css(`div.${className}`))
-          .element(by.css(`button[e2e="actions-menu-selector-${action}"]`))
-          .click();
+        commonFunctions.waitFor.elementToBeVisible(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        commonFunctions.waitFor.elementToBeClickable(element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)));
+        element(by.css(`div.${className}`)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)).click();
       });
     }
     // actionButton.click();
@@ -107,99 +82,63 @@ const getAnalysisActionOptions = name => {
   });
 };
 
-const getAnalysisOption = (parent, option) =>
-  parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
+const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
 
-const getAnalysisMenuButton = analysisName =>
-  element(
-    by.xpath(
-      "//a[text()='" +
-        analysisName +
-        "']/../../../..//*[@e2e='actions-menu-toggle']"
-    )
-  );
+const getAnalysisMenuButton = (analysisName) => element(by.xpath("//a[text()='" + analysisName + "']/../../../..//*[@e2e='actions-menu-toggle']"));
 
 const getChartSettingsItem = (axis, name) => {
-  return element(
-    by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`)
-  ).element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
+  return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
+    .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
 };
 
 const getChartSettingsRadio = (axis, name) => {
-  return element(
-    by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`)
-  ).element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
+  return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
+    .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
 };
 
 const getChartSettingsCheckBox = name => {
-  return element(
-    by.xpath(
-      `//md-checkbox[@ng-model="attr.checked"]/descendant::*[contains(text(),'${name}')]/parent::*`
-    )
-  );
+  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/descendant::*[contains(text(),'${name}')]/parent::*`));
 };
 
-const filtersBtn = element(
-  by.css('button[ng-click="$ctrl.openFiltersModal($event)"]')
-);
+const filtersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
 const filtersBtnUpgraded = element(by.css('button[e2e="open-filter-modal"]'));
 
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
 
-const getFilterRow = index =>
-  element.all(by.css('analyze-filter-row')).get(index);
-const getAllAnalysis = name =>
-  element(by.xpath(`//a[@e2e="analysis-name" and contains(text(),"${name}")]`));
-const geFilterRowUpgraded = index =>
-  element.all(by.css('designer-filter-row')).get(index);
+const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
+const getAllAnalysis = name => element(by.xpath(`//a[@e2e="analysis-name" and contains(text(),"${name}")]`));
+const geFilterRowUpgraded = index => element.all(by.css('designer-filter-row')).get(index);
 
-const getFilterAutocomplete = index =>
-  getFilterRow(index).element(
-    by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input')
-  );
+const getFilterAutocomplete = index => getFilterRow(index)
+  .element(by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input'));
 
-const getFilterAutocompleteUpgraded = index =>
-  geFilterRowUpgraded(index).element(
-    by.css('input[e2e="filter-autocomplete-input"]')
-  );
+const getFilterAutocompleteUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="filter-autocomplete-input"]'));
 
 // If filter value type is String
-const getStringFilterInput = index =>
-  getFilterRow(index)
-    .element(by.css('string-filter'))
-    .element(by.css('input[aria-label="Chips input."]'));
+const getStringFilterInput = index => getFilterRow(index)
+  .element(by.css('string-filter'))
+  .element(by.css('input[aria-label="Chips input."]'));
 
-const getStringFilterInputUpgraded = index =>
-  geFilterRowUpgraded(index).element(
-    by.css('input[e2e="designer-filter-string-input"]')
-  );
+const getStringFilterInputUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="designer-filter-string-input"]'));
 
 // If filter value type is Number
-const getNumberFilterInput = index =>
-  getFilterRow(index).element(
-    by.xpath("//input[@ng-model='$ctrl.tempModel.value']")
-  );
+const getNumberFilterInput = index => getFilterRow(index)
+  .element(by.xpath("//input[@ng-model='$ctrl.tempModel.value']"));
 
-const getNumberFilterInputUpgraded = index =>
-  geFilterRowUpgraded(index).element(
-    by.css('input[e2e="designer-number-filter-input"]')
-  );
+const getNumberFilterInputUpgraded = index => geFilterRowUpgraded(index)
+  .element(by.css('input[e2e="designer-number-filter-input"]'));
 
-const getAppliedFilter = name =>
-  element(by.css('filter-chips')).element(
-    by.cssContainingText('md-chip-template > span', name)
-  );
+const getAppliedFilter = name => element(by.css('filter-chips'))
+  .element(by.cssContainingText('md-chip-template > span', name));
 
-const getAppliedFilterUpgraded = name =>
-  element(by.css('filter-chips-u')).element(
-    by.cssContainingText('mat-chip', name)
-  );
+const getAppliedFilterUpgraded = name => element(by.css('filter-chips-u'))
+  .element(by.cssContainingText('mat-chip', name));
 
-const getPivotField = name =>
-  element(by.css(`md-list-item[e2e="pivot-field-${name}"]`));
+const getPivotField = name => element(by.css(`md-list-item[e2e="pivot-field-${name}"]`));
 
-const getPivotFieldCheckbox = name =>
-  getPivotField(name).element(by.css('md-checkbox'));
+const getPivotFieldCheckbox = name => getPivotField(name).element(by.css('md-checkbox'));
 
 const doSelectPivotArea = (name, area) => {
   doMdSelectOption({
@@ -223,16 +162,12 @@ const doSelectPivotGroupInterval = (name, groupInterval) => {
   });
 };
 
-const getReportField = (tableName, fieldName) =>
-  element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
-const getReportFieldCheckbox = (tableName, fieldName) =>
-  getReportField(tableName, fieldName).element(by.css('mat-checkbox'));
+const getReportField = (tableName, fieldName) => element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
+const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('mat-checkbox'));
 //const getReportFieldCheckbox = (tableName, fieldName) =>
 // element(by.xpath(`//md-checkbox/div/span[text()='${fieldName}']/ancestor::*[contains(@e2e, '${tableName}')]`));
 const getReportFieldEndPoint = (tableName, fieldName, side) => {
-  const endpoints = getReportField(tableName, fieldName).all(
-    by.css('js-plumb-endpoint')
-  );
+  const endpoints = getReportField(tableName, fieldName).all(by.css('js-plumb-endpoint'));
   switch (side) {
     case 'left':
       return endpoints.last();
@@ -241,27 +176,30 @@ const getReportFieldEndPoint = (tableName, fieldName, side) => {
       return endpoints.first();
   }
 };
-const getJoinlabel = (
-  tableNameA,
-  fieldNameA,
-  tableNameB,
-  fieldNameB,
-  joinType
-) => {
-  return element(
-    by.css(
-      `[e2e="join-label-${tableNameA}:${fieldNameA}-${joinType}-${tableNameB}:${fieldNameB}"]`
-    )
-  );
+const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) => {
+  return element(by.css(`[e2e="join-label-${tableNameA}:${fieldNameA}-${joinType}-${tableNameB}:${fieldNameB}"]`));
+};
+
+const logOut = () => {
+  doMdSelectOption({
+    parentElem: element(by.css('header > mat-toolbar')),
+    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
+    optionSelector: `button[e2e="account-settings-selector-logout"]`
+  });
+  return browser.wait(() => {
+    return browser.getCurrentUrl().then(url => {
+      return /login/.test(url);
+    });
+  }, protractorConf.timeouts.fluentWait);
 };
 
 const doAccountAction = action => {
-  browser.ignoreSynchronization = false;
+  browser.ignoreSynchronization = false
   navigateToHome();
-  browser.ignoreSynchronization = true;
+  browser.ignoreSynchronization = true
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: 'div[e2e="account-settings-menu-btn"]',
+    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.wait(() => {
@@ -271,6 +209,16 @@ const doAccountAction = action => {
   }, protractorConf.timeouts.fluentWait);
 };
 
+function goToHome() {
+  browser.get(browser.baseUrl);
+  return browser.wait(() => {
+    return browser.getCurrentUrl().then(url => {
+      return /saw/.test(url);
+    });
+  }, protractorConf.timeouts.fluentWait);
+};
+
+
 function navigateToHome() {
   browser.get(browser.baseUrl);
   return browser.wait(() => {
@@ -278,30 +226,22 @@ function navigateToHome() {
       return /analyze/.test(url);
     });
   }, protractorConf.timeouts.fluentWait);
-}
+};
 
-const selectFields = name => {
-  commonFunctions.waitFor.elementToBeVisible(
-    this.designerDialog.chart.fieldSearchInput
-  );
+const selectFields = (name) => {
+  commonFunctions.waitFor.elementToBeVisible(this.designerDialog.chart.fieldSearchInput);
   this.designerDialog.chart.fieldSearchInput.clear();
   this.designerDialog.chart.fieldSearchInput.sendKeys(name);
-  commonFunctions.waitFor.elementToBeClickableAndClick(
-    this.getFieldPlusIcon(name)
-  );
+  commonFunctions.waitFor.elementToBeClickableAndClick(this.getFieldPlusIcon(name));
 };
 
 module.exports = {
+  goToHome,
   navigateToHome,
   newDialog: {
-    getMetricRadioButtonElementByName: name =>
-      element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
-    getMetricSelectedRadioButtonElementByName: name =>
-      element(
-        by.css(`mat-radio-button.mat-radio-checked[e2e="metric-name-${name}"]`)
-      ),
-    getAnalysisTypeButtonElementByType: name =>
-      element(by.css(`[e2e="choice-group-item-type-${name}"]`)),
+    getMetricRadioButtonElementByName: name => element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
+    getMetricSelectedRadioButtonElementByName: name => element(by.css(`mat-radio-button.mat-radio-checked[e2e="metric-name-${name}"]`)),
+    getAnalysisTypeButtonElementByType: name => element(by.css(`[e2e="choice-group-item-type-${name}"]`)),
     createBtn: element(by.css('button[e2e="create-analysis-btn"]'))
   },
 
@@ -309,37 +249,16 @@ module.exports = {
     saveDialog: element(by.css('[e2e="save-dialog-save-analysis"]')),
     saveDialogUpgraded: element(by.css('designer-save')),
     chart: {
-      getFieldPlusIcon: value =>
-        element(
-          by.xpath(
-            `//button[@e2e="designer-add-btn-${value}"]/descendant::*[@ng-reflect-font-icon="icon-plus"]`
-          )
-        ),
-      getMetricsFields: item =>
-        element(
-          by.xpath(
-            `//span[@class="settings__group__title" and contains(text(),"Metrics")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`
-          )
-        ),
-      getDimensionFields: item =>
-        element(
-          by.xpath(
-            `//span[@class="settings__group__title" and contains(text(),"Dimension")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`
-          )
-        ),
-      getGroupByFields: item =>
-        element(
-          by.xpath(
-            `//span[@class="settings__group__title" and contains(text(),"Group By")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`
-          )
-        ),
+      getFieldPlusIcon: value => element(by.xpath(`//button[@e2e="designer-add-btn-${value}"]/descendant::*[@ng-reflect-font-icon="icon-plus"]`)),
+      getMetricsFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Metrics")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      getDimensionFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Dimension")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
+      getGroupByFields: item => element(by.xpath(`//span[@class="settings__group__title" and contains(text(),"Group By")]/parent::*/descendant::*[contains(@e2e,"designer-expandable-field-${item}")]`)),
       fieldSearchInput: element(by.xpath('//input[@id="mat-input-0"]')),
       selectFields: name => selectFields(name),
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
       getYCheckBox: name => getChartSettingsCheckBox(name),
-      getYCheckBoxParent: name =>
-        commonFunctions.find.parent(getChartSettingsCheckBox(name)),
+      getYCheckBoxParent: name => commonFunctions.find.parent(getChartSettingsCheckBox(name)),
       getZRadio: name => getChartSettingsRadio('z', name), // z - size by
       getGroupRadio: name => getChartSettingsRadio('g', name), // g - color by
       container: element(by.css('.highcharts-container ')),
@@ -375,41 +294,30 @@ module.exports = {
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
     getAppliedFilter: getAppliedFilterUpgraded
   },
-  filtersDialogUpgraded: {
+  filtersDialogUpgraded : {
     getFilterAutocomplete: getFilterAutocompleteUpgraded,
     getStringFilterInput: getStringFilterInputUpgraded,
     getNumberFilterInput: getNumberFilterInputUpgraded,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
-    getAppliedFilterUpdated: feild =>
-      element(by.xpath(`//mat-chip[contains(text(),"${feild}")]`)),
+    getAppliedFilterUpdated: feild => element(by.xpath(`//mat-chip[contains(text(),"${feild}")]`)),
     getAppliedFilter: getAppliedFilterUpgraded,
-    chartSectionWithData: element(
-      by.css('[ng-reflect-e2e="chart-type:column"]')
-    ),
+    chartSectionWithData: element(by.css('[ng-reflect-e2e="chart-type:column"]')),
     noDataInChart: element(by.css('[class="non-ideal-state__message"]')),
-    prompt: element(by.xpath(`//span[contains(text(),'Prompt')]/parent::*`))
+    prompt: element(by.xpath(`//span[contains(text(),'Prompt')]/parent::*`)),
   },
   appliedFiltersDetails: {
-    filterText: element(by.xpath('//span[@class="filter-counter"]')),
-    filterClear: element(
-      by.xpath('//button[contains(@class,"filter-clear-all")]')
-    ),
-    selectedFilters: element.all(
-      by.xpath('//filter-chips-u/descendant::mat-chip')
-    ),
-    selectedFiltersText: element(
-      by.xpath('//filter-chips-u/descendant::mat-chip')
-    )
+    filterText:element(by.xpath('//span[@class="filter-counter"]')),
+    filterClear:element(by.xpath('//button[contains(@class,"filter-clear-all")]')),
+    selectedFilters: element.all(by.xpath('//filter-chips-u/descendant::mat-chip')),
+    selectedFiltersText: element(by.xpath('//filter-chips-u/descendant::mat-chip')),
   },
   detail: {
     getAnalysisChartType
   },
   main: {
     getAllAnalysis,
-    actionMenuOptions: element(
-      by.xpath('//div[contains(@class,"mat-menu-panel")]')
-    ),
-    categoryTitle: element(by.css('span[e2e="category-title"]')),
+    actionMenuOptions : element(by.xpath('//div[contains(@class,"mat-menu-panel")]')),
+    categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
     getAnalysisCards: getCards,
     getCardTitle,
@@ -423,46 +331,32 @@ module.exports = {
     getAnalysisOption,
     firstCardTitle,
     getCardTypeByName: getCardTypeByName,
-    getAnalysisMenuButton: getAnalysisMenuButton
+    getAnalysisMenuButton: getAnalysisMenuButton,
+    logOut
   },
   saveDialogUpgraded: {
     selectedCategory: element(by.css('[e2e="save-dialog-selected-category"]')),
     nameInput: element(by.css('input[e2e="save-dialog-name"]')),
-    descriptionInput: element(
-      by.css('textarea[e2e="save-dialog-description"]')
-    ),
+    descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
     cancelBtn: element(by.css('button[e2e="designer-dialog-cancel"]'))
   },
   saveDialog: {
-    selectedCategory: element(
-      by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')
-    ),
-    selectedCategoryUpdated: element(
-      by.xpath(
-        '//mat-select[@e2e="save-dialog-selected-category"]/descendant::div[@class="mat-select-arrow-wrapper"]'
-      )
-    ),
+    selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
+    selectedCategoryUpdated: element(by.xpath('//mat-select[@e2e="save-dialog-selected-category"]/descendant::div[@class="mat-select-arrow-wrapper"]')),
     nameInput: element(by.css('input[e2e="save-dialog-name"]')),
-    descriptionInput: element(
-      by.css('textarea[e2e="save-dialog-description"]')
-    ),
+    descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
     cancelBtn: element(by.css('button[translate="CANCEL"]')),
-    selectCategoryToSave: name =>
-      element(
-        by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)
-      )
+    selectCategoryToSave: name => element(by.xpath(`//mat-option/descendant::span[contains(text(),"${name}")]`)),
   },
-  prompt: {
+  prompt:{
     filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
     selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
     cancleFilterPrompt: element(by.css(`button[e2e="designer-dialog-cancel"]`))
+
   },
-  listViewItem: name =>
-    element(
-      by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)
-    ),
+  listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 
   // OLD test elements
   analysisElems: {
@@ -474,20 +368,13 @@ module.exports = {
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
     designerDialog: element(by.css('.ard_canvas')),
     // analysis designer action buttons
-    editDescriptionAnalysisBtn: element(
-      by.css('button[e2e="open-description-modal"]')
-    ),
+    editDescriptionAnalysisBtn: element(by.css('button[e2e="open-description-modal"]')),
     previewAnalysisBtn: element(by.css('[e2e="open-preview-modal"]')),
     filterAnalysisBtn: element(by.css('[e2e="open-filter-modal"]')),
     sortAnalysisBtn: element(by.css('[e2e="open-sort-modal"]')),
     //
     // eventsMetric: element(by.cssContainingText('[ng-model="$ctrl.selectedMetric"]', 'MCT Events')),
-    reportsMetric: element(
-      by.cssContainingText(
-        'span[ng-bind="::metric.metricName"]',
-        'MBT Reporting'
-      )
-    ),
+    reportsMetric: element(by.cssContainingText('span[ng-bind="::metric.metricName"]', 'MBT Reporting')),
     designerView: element(by.css('.ard_canvas')),
     columnChartsView: element(by.css('.highcharts-container ')),
     //
@@ -512,22 +399,16 @@ module.exports = {
     productsProductTypes: element(by.css('.e2e-Products\\:PRODUCT_TYPES')),
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
     refreshDataBtn: element(by.css('[ng-click="$ctrl.onRefreshData()"]')),
-    toggleDetailsPanel: element(
-      by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')
-    ),
+    toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
     reportGridContainer: element(by.css('.ard_details-grid')),
     cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
   validateCardView() {
-    expect(this.analysisElems.cardView.getAttribute('class')).toContain(
-      'mat-radio-checked'
-    );
+    expect(this.analysisElems.cardView.getAttribute('class')).toContain('mat-radio-checked');
   },
 
   validateListView() {
-    expect(this.analysisElems.listView.getAttribute('class')).toContain(
-      'mat-radio-checked'
-    );
+    expect(this.analysisElems.listView.getAttribute('class')).toContain('mat-radio-checked');
   },
 
   validateNewAnalyze() {

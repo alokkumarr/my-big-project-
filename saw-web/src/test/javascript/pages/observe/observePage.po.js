@@ -16,6 +16,7 @@ module.exports = {
   dashboardDesc: element(by.css('textarea[e2e="dashboard-save-description-input"]')),
   subCategorySelect: name => element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`)),
   saveDialogBtn: element(by.css(`[e2e="dashboard-save-save-button"]`)),
+  metricFetchProgressBar:element(by.xpath('//div[contains(@class,"mat-progress-bar-element")]')),
   dashboard:{
     dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
@@ -42,5 +43,10 @@ module.exports = {
     kpiName: element(by.css('input[e2e="dashboard-add-kpi-name-input"]')),
     kpiByName: name => element(by.xpath(`//div[contains(text(),"${name}")]`)),
     filterByName: name => element(by.xpath(`//div[contains(text(),"${name}") and @class="filter-label"]`))
+  },
+  actualVsTargetKPI: {
+    measure1Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure1-input"]')),
+    measure2Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure2-input"]')),
+    metricTargetInput: element(by.css('input[e2e="dashboard-add-kpi-bullet-target-input"]'))
   }
 };
