@@ -750,7 +750,11 @@ class Analysis extends BaseController {
         // as background process, update the queryBuilder metadata, if resultNode exists.
         resultNode = getResultNode(analysisId,resultNodeId)
         if(resultNode!=null) {
-          val newDescriptor = JObject(resultNode.getObjectDescriptors.obj ++ List(
+          val content = resultNode.getCachedData("content") match {
+            case obj: JObject => obj
+            case obj: JValue => unexpectedElement("object", obj)
+          }
+          val newDescriptor = JObject( content.obj ++ List(
             JField("queryBuilder", queryBuilder),
             JField("executedBy", executedBy)
           ))

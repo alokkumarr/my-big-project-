@@ -206,7 +206,11 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     createAnalysisResultHeader(resId)
     saveData(analysisKey, outputLocation, outputType)
     finishedTS = System.currentTimeMillis
-    val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
+    val content = resultNode.getCachedData("content") match {
+      case obj: JObject => obj
+      case obj: JValue => unexpectedElement("object", obj)
+    }
+    val newDescriptor = JObject (content.obj ++ List(
       JField("execution_finish_ts", JLong(finishedTS)),
       JField("executionType", JString(executionType)),
       JField("exec-code", JLong(lastSQLExecRes)),
@@ -222,6 +226,12 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       out.write(pretty(render(descriptorPrintable)).getBytes())
       out.flush()
     }
+  }
+
+  protected def unexpectedElement(expected: String, obj: JValue): Nothing = {
+    val name = obj.getClass.getSimpleName
+    throw new RuntimeException(
+      "Expected %s but got: %s".format(expected, name))
   }
 
   /**
