@@ -30,6 +30,7 @@ train_model.spark_model <- function(mobj,
                                     samples,
                                     save_submodels,
                                     execution_strategy,
+                                    seed,
                                     ...) {
   
   checkmate::assert_class(data, "tbl_spark")
@@ -122,7 +123,8 @@ train_model.spark_model <- function(mobj,
       evaluator = evaluator,
       collect_sub_models = save_submodels,
       parallelism = cores,
-      uid = "validator"
+      uid = "validator",
+      seed = seed
     )
   )
   

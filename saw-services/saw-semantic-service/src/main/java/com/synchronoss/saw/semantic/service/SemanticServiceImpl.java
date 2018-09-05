@@ -58,7 +58,6 @@ public class SemanticServiceImpl implements SemanticService {
       throws JSONValidationSAWException, CreateEntitySAWException {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
     SemanticNode responseNode = new SemanticNode();
-    node.setCreatedAt(format.format(new Date()));
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -69,7 +68,6 @@ public class SemanticServiceImpl implements SemanticService {
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
-      responseNode.setCreatedAt(node.getCreatedAt());
       responseNode.setCreatedBy(node.getCreatedBy());
       responseNode.setSaved(true);
       responseNode.setStatusMessage("Entity is created successfully");
@@ -115,7 +113,6 @@ public class SemanticServiceImpl implements SemanticService {
     Preconditions.checkArgument(node.getUpdatedBy() != null, "Updated by mandatory attribute.");
     SemanticNode responseNode = new SemanticNode();
     node.setUpdatedBy(node.getUpdatedBy());
-    node.setUpdatedAt(format.format(new Date()));
     try {
       List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
           node.get_id(), Action.update, Category.Semantic);
@@ -124,7 +121,6 @@ public class SemanticServiceImpl implements SemanticService {
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
       responseNode.setUpdatedBy(node.getUpdatedBy());
-      responseNode.setUpdatedAt(format.format(new Date()));
       responseNode.setSaved(true);
       responseNode.setStatusMessage("Entity has been updated successfully");
     } catch (Exception ex) {

@@ -6,6 +6,7 @@
 
 #' New Modeler Object Constructer function
 #' @import sparklyr
+#' @import dplyr
 #' @inheritParams modeler
 new_modeler <- function(df,
                         schema,
@@ -26,6 +27,7 @@ new_modeler <- function(df,
                         measure,
                         performance,
                         final_model,
+                        seed,
                         ...){
   
   checkmate::assert_list(schema)
@@ -48,6 +50,7 @@ new_modeler <- function(df,
   checkmate::assert_list(measure)
   checkmate::assert_data_frame(performance)
   checkmate::assert_class(final_model, "model", null.ok = TRUE)
+  checkmate::assert_number(seed, lower = 1)
   
   structure(
     list(
@@ -71,6 +74,7 @@ new_modeler <- function(df,
       measure = measure,
       performance = performance,
       final_model = final_model,
+      seed = seed,
       ...
     ),
     class = "modeler")
@@ -120,6 +124,7 @@ valid_modeler <- function(obj){
 #'   sample performance will be used. Default is true
 #' @param save_submodels logical flag to save sub model fits. Default is TRUE
 #' @param dir optional directory path for saving reports, data and models
+#' @param seed seed number of any random computations
 #' @param ... any addtional parameters
 #'
 #' @return modeler object
@@ -140,6 +145,7 @@ modeler <- function(df,
                     refit = TRUE,
                     save_submodels = TRUE,
                     dir = NULL,
+                    seed = 319,
                     ...){
   
   if(is.null(name)) name <- paste(target, type, sep = "-")
@@ -177,6 +183,7 @@ modeler <- function(df,
       measure = measure,
       performance = performance,
       final_model = final_model,
+      seed = seed,
       ...)
   )
 }
@@ -427,7 +434,7 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
     if (!is.null(obj$samples$test_holdout_prct)) {
       train_data <- train_data %>%
         dplyr::mutate(rn = 1) %>% 
-        dplyr::mutate(rn = dplyr::row_number(rn)) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
         dplyr::filter(! rn %in% obj$samples$test_index) %>%
         dplyr::select(-rn)
     }
@@ -438,7 +445,8 @@ train_models.modeler <- function(obj, uids = NULL, ...) {
                                      samples = obj$samples,
                                      save_submodels = obj$save_submodels,
                                      execution_strategy = obj$execution_strategy,
-                                     level = obj$conf_levels)
+                                     level = obj$conf_levels,
+                                     seed = obj$seed)
     obj$models[[uid]]$status <- "trained"
     obj$models[[uid]]$last_updated <- Sys.time()
     obj$performance <- dplyr::bind_rows(
@@ -485,7 +493,7 @@ set_final_model.modeler <- function(obj,
       # Evaluate Model
       obj$models[[uid]] <- obj$pipelines[[obj$models[[uid]]$pipe]]$output %>%
         dplyr::mutate(rn = 1) %>% 
-        dplyr::mutate(rn = dplyr::row_number(rn)) %>% 
+        dplyr::mutate(rn = row_number(rn)) %>% 
         dplyr::filter(rn %in% obj$samples$test_index) %>%
         dplyr::select(-rn) %>% 
         evaluate_model(mobj = obj$models[[uid]],
@@ -508,7 +516,8 @@ set_final_model.modeler <- function(obj,
         samples = refit_sample,
         save_submodels = FALSE,
         execution_strategy = obj$execution_strategy,
-        level = obj$conf_levels
+        level = obj$conf_levels,
+        seed = obj$seed
       )
     }
   } else{

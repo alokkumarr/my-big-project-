@@ -21,6 +21,7 @@
           [hoverStateEnabled]= "true"
           [wordWrapEnabled]= "false"
           [dataSource]="chartToggleData">
+      <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
       <dxo-paging [pageSize]="25"></dxo-paging>
       <dxo-pager [showPageSizeSelector]="true" [allowedPageSizes]="[25,50,75,100]"></dxo-pager>
     </dx-data-grid>

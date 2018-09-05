@@ -1,0 +1,21 @@
+<button mat-icon-button class="triggerbtn" [matMenuTriggerFor]="datapodmenu">
+  <mat-icon fontIcon="icon-action-solid"></mat-icon>
+</button>
+<mat-menu #datapodmenu="matMenu">
+  <button mat-menu-item disabled (click)="openSQLEditor()">
+    <mat-icon style="margin-right: 0px !important; vertical-align: baseline;" fontIcon="icon-combo-chart"></mat-icon>
+    <span>Visualize</span>
+  </button>
+  <button mat-menu-item disabled (click)="openSQLEditor()">
+    <mat-icon style="margin-right: 0px !important; vertical-align: baseline;" fontIcon="icon-utilities-solid"></mat-icon>
+    <span>Inspect</span>
+  </button>
+  <button mat-menu-item (click)="gotoEdit()">
+    <mat-icon style="margin-right: 0px !important; vertical-align: baseline;" fontIcon="icon-edit"></mat-icon>
+    <span>Edit</span>
+  </button>
+  <button mat-menu-item disabled>
+    <mat-icon style="margin-right: 0px; vertical-align: baseline;" fontIcon="icon-delete"></mat-icon>
+    <span>delete</span>
+  </button>
+</mat-menu>

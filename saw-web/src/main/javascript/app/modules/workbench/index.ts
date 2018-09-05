@@ -3,7 +3,7 @@ import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
-import { FlexLayoutModule } from '@angular/flex-layout'
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
@@ -25,10 +25,9 @@ import {
   dxDataGridProvider
 } from '../../common/services/ajs-common-providers';
 
-import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component'
-import { DatasetsComponent } from './components/datasets-view/datasets-page.component';
-import { DatasetsGridPageComponent } from './components/datasets-view/grid/datasets-grid-page.component';
-import { DatasetsCardPageComponent } from './components/datasets-view/card/datasets-card-page.component';
+import { jwtServiceProvider } from '../../../login/services/ajs-login-providers';
+
+import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
 import { SelectRawdataComponent } from './components/create-datasets/select-rawdata/select-rawdata.component';
 import { DatasetDetailsComponent } from './components/create-datasets/dataset-details/dataset-details.component';
@@ -36,26 +35,37 @@ import { RawpreviewDialogComponent } from './components/create-datasets/rawprevi
 import { ParserPreviewComponent } from './components/create-datasets/parser-preview/parser-preview.component';
 import { DateformatDialogComponent } from './components/create-datasets/dateformat-dialog/dateformat-dialog.component';
 import { CreatefolderDialogComponent } from './components/create-datasets/createFolder-dialog/createfolder-dialog.component';
-import { DatasetActionsComponent } from './components/dataset-actions/dataset-actions.component';
 import { SqlExecutorComponent } from './components/sql-executor/sql-executor.component';
 import { SqlScriptComponent } from './components/sql-executor/query/sql-script.component';
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
+import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
+import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
+import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
+import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
+import {
+  DataobjectsComponent,
+  DatapodsCardPageComponent,
+  DatapodsGridPageComponent,
+  DatasetsCardPageComponent,
+  DatasetsGridPageComponent,
+  DatasetActionsComponent,
+  DatapodActionsComponent
+} from './components/data-objects-view/index';
 
-import { CommonModule } from '../../common';
+import { CommonModule, CommonModuleTs } from '../../common';
 
 export const WorkbenchModule = 'WorkbenchModule';
 
-angular.module(WorkbenchModule, [
-  CommonModule
-])
+angular
+  .module(WorkbenchModule, [CommonModule])
   .config(routesConfig)
   .config(i18nConfig);
 
 const components = [
   WorkbenchPageComponent,
-  DatasetsComponent,
+  DataobjectsComponent,
   DatasetsCardPageComponent,
   DatasetsGridPageComponent,
   CreateDatasetsComponent,
@@ -70,7 +80,14 @@ const components = [
   SqlpreviewGridPageComponent,
   DetailsDialogComponent,
   CreatefolderDialogComponent,
-  DatasetDetailViewComponent
+  DatasetDetailViewComponent,
+  CreateSemanticComponent,
+  ValidateSemanticComponent,
+  SemanticDetailsDialogComponent,
+  UpdateSemanticComponent,
+  DatapodsCardPageComponent,
+  DatapodsGridPageComponent,
+  DatapodActionsComponent
 ];
 
 @NgModule({
@@ -85,7 +102,8 @@ const components = [
     FlexLayoutModule,
     TreeModule,
     AceEditorModule,
-    AngularSplitModule
+    AngularSplitModule,
+    CommonModuleTs
   ],
   declarations: components,
   entryComponents: components,
@@ -98,7 +116,8 @@ const components = [
     toastProvider,
     sidenavProvider,
     localSearchProvider,
-    dxDataGridProvider
+    dxDataGridProvider,
+    jwtServiceProvider
   ]
 })
-export class WorkbenchUpgradeModule { }  
+export class WorkbenchUpgradeModule {}

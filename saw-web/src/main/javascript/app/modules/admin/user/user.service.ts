@@ -23,7 +23,8 @@ export class UserService implements IAdminDataService {
 
   getList(customerId) {
     return this._adminService.request<UserResponse>('users/fetch', customerId)
-      .map(resp => resp.users);
+      .map(resp => resp.users)
+      .toPromise();
   }
 
   save(user) {

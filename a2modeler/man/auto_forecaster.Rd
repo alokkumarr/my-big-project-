@@ -2,65 +2,36 @@
 % Please edit documentation in R/forecaster.R
 \name{auto_forecaster}
 \alias{auto_forecaster}
-\title{Auto Forecaster Function}
+\alias{auto_forecaster.data.frame}
+\alias{auto_forecaster.tbl_spark}
+\title{Auto Forecaster Component}
 \usage{
-auto_forecaster(df, target, index_var, periods, unit = NULL, pipe = NULL,
+auto_forecaster(...)
+
+\method{auto_forecaster}{data.frame}(df, index_var, group_vars = NULL,
+  measure_vars, periods, unit = NULL, pipe = NULL,
+  models = list(list(method = "auto.arima", method_args = list()), list(method
+  = "ets", method_args = list())), splits = c(0.8, 0.2), conf_levels = c(80,
+  95), ...)
+
+\method{auto_forecaster}{tbl_spark}(df, index_var, group_vars = NULL,
+  measure_vars, periods, unit = NULL, pipe = NULL,
   models = list(list(method = "auto.arima"), list(method = "ets")),
-  splits = c(0.8, 0.2), conf_levels = c(80, 95),
-  execution_strategy = "sequential")
+  splits = c(0.8, 0.2), conf_levels = c(80, 95), ...)
 }
 \arguments{
-\item{df}{dataframe with target variable and any potential predictors}
+\item{...}{additional arguments to pass on. not currently implemented}
 
-\item{target}{target variable for supervised use cases such as forecaster,
-regressor, and classifier}
+\item{group_vars}{optional column name of grouping variables. splits data and
+applies auto_forecaster to each group}
 
-\item{index_var}{column name of index variable. index variable should be
-either sequential numeric, date or datetime.}
-
-\item{periods}{number of periods to forecast}
-
-\item{unit}{unit of index variable default is null}
-
-\item{pipe}{pipeline object}
-
-\item{models}{nested list of arguments to pass to add_model function. Each
-element in list requires at least a method argument. Pipe argument made
-globally}
-
-\item{splits}{holdout splits ratios default is 80-20 train to validation}
-
-\item{conf_levels}{forecast confidence levels. default is 80 and 90 percent}
-
-\item{execution_strategy}{name of evaluation function to use for resolving a
-future. Used for model training execution. default is sequential}
-}
-\value{
-predictions object
+\item{measure_vars}{colname names of variables to forecast}
 }
 \description{
-Creates automated forecasts for univariate time series.
+Function creates forecasts by preparing the data and using the
+auto_forecast function
 }
 \details{
-Convience wrapper to create complete forecaster pipeline
-}
-\examples{
-
-# Create simulated dataset
-n <- 200
-dat1 <- data.frame(index = 1:n,
-                  y = as.numeric(arima.sim(n = n,
-                                           list(order = c(1,0,0), ar = 0.7),
-                                           rand.gen = function(n, ...) rt(n, df = 2))))
-
-af1 <- auto_forecaster(dat1,
-                       target = "y",
-                       index_var = "index",
-                       periods = 10,
-                       unit = NULL,
-                       models = list(
-                                     list(method = "auto.arima"),
-                                     list(method = "ets")
-                                     )
-  )
+Methods for spark and R data.frames. Spark method applies auto_forecast
+function with distributed R
 }

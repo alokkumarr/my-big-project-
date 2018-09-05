@@ -478,16 +478,16 @@ export class DesignerService {
 
   generateReportDataField(columns) {
     let dataFields = [];
-      forEach(columns, cols=> {
-        let checkedRows = this.getPartialReportSqlBuilder(cols.columns);
-        if (!isEmpty(checkedRows)) {
-          dataFields.push({
-            tableName: cols.artifactName,
-            columns: checkedRows
-          });
-        }
-      });
-     return dataFields;
+    forEach(columns, cols=> {
+      let checkedRows = this.getPartialReportSqlBuilder(cols.columns);
+      if (!isEmpty(checkedRows)) {
+        dataFields.push({
+          tableName: cols.artifactName,
+          columns: checkedRows
+        });
+      }
+    });
+    return dataFields;
   }
 
   getPartialReportSqlBuilder(
