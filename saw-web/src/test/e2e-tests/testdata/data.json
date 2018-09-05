@@ -997,5 +997,31 @@
         }
       }
     }
+  },
+  "DASHBOARD_FILTERS": {
+    "dashboardWithCharts": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    },
+    "dashboardWithESReport": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    },
+    "dashboardWithESPivot": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
   }
 }

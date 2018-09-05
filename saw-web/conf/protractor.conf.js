@@ -175,8 +175,9 @@ exports.config = {
      */
     development: [
       //testBaseDir + 'analyze.test.js'
-      testBaseDir + 'dev1.js',
-      testBaseDir + 'dev2.js'
+      // testBaseDir + 'dev1.js',
+      // testBaseDir + 'dev2.js'
+      testBaseDir + 'observe/dashboardFilter.test.js'
     ]
   },
   onCleanUp: function (results) {
