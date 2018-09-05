@@ -6,7 +6,7 @@ library(testthat)
 library(a2charter)
 library(dplyr)
 library(checkmate)
-library(proto)
+library(ggplot2)
 
 context("interval_chart unit tests")
 
@@ -20,8 +20,8 @@ test_that("Basic Interval Chart Unit Tests", {
   expect_class(p1$layers[[1]], "ggproto")
   expect_class(p1$layers[[1]]$geom, "GeomLine")
   expect_class(p1$layers[[2]]$geom, "GeomPointrange")
-  expect_equal(as.character(p1$mapping$x), "am")
-  expect_equal(as.character(p1$mapping$y), "mpg")
+  expect_equal(as.character(p1$mapping$x)[2], "am")
+  expect_equal(as.character(p1$mapping$y)[2], "mpg")
   expect_null(p1$mapping$color)
   expect_true(all.equal(p1$plot_env$theme_fun(), theme_sncr()))
   

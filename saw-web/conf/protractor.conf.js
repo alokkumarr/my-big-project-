@@ -6,6 +6,7 @@ var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var HtmlReporter = require('protractor-beautiful-reporter');
+var argv = require('yargs').argv;
 
 /**
  * Note about intervals:
@@ -18,38 +19,39 @@ var HtmlReporter = require('protractor-beautiful-reporter');
  * Sets the amount of time to wait for a page load to complete before returning an error.  If the timeout is negative,
  * page loads may be indefinite.
  */
-const pageLoadTimeout = webpackHelper.distRun() ? 1200000 : 600000;
+const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
 
 /**
  * Specifies the amount of time the driver should wait when searching for an element if it is not immediately present.
  */
 
-const implicitlyWait = webpackHelper.distRun() ? 600000 : 20000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 1200000 : 30000;//30000 // = 30 sec; Sometimes element will not
+const implicitlyWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 600000 : 20000;//20000
+const fluentWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedFluentWait = webpackHelper.distRun() ? 60000 : 40000;
 
 /**
  * Default time to wait in ms before a test fails
  * Fixes error: jasmine default timeout interval
  */
-const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 600000;//20000
+const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 300000;
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 3600000 : 3600000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 5400000 : 3600000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = webpackHelper.distRun() ? 10800000 : 10800000;
+const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
- * number of failed retry, 3 times in bamboo and 2 times in local
+ * number of failed retry
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 2;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 4 : 3;
 
 /**
  * Waits ms after page is loaded
@@ -84,6 +86,7 @@ exports.timeouts = {
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
   pageResolveTimeout: pageResolveTimeout,
+  extendedFluentWait:extendedFluentWait,
   tempts: tempts
 };
 
@@ -93,7 +96,8 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
-  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently 
+  testData:webpackHelper.getTestData(),
+  //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
   capabilities: {
@@ -162,13 +166,17 @@ exports.config = {
       testBaseDir + 'pivots/pivotFilters.test.js',
       // Observe module test cases
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js'
+      testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'login.test.js' // TCs linked
+      //testBaseDir + 'analyze.test.js'
+      testBaseDir + 'dev1.js',
+      testBaseDir + 'dev2.js'
     ]
   },
   onCleanUp: function (results) {
@@ -176,6 +184,7 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
+
     // Generate test data
     token = generate.token(browser.baseUrl);
     generate.usersRolesPrivilegesCategories(token);
@@ -227,6 +236,7 @@ exports.config = {
         done();
       })
     });
+
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
     return browser.wait(() => {
@@ -236,16 +246,19 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
-    //clean up any residual/leftover from a previous run. Ensure we have clean
-    //files for both locking and merging.
-    if (fs.existsSync('target/jasmine-results.json.lock')) {
-      fs.unlinkSync('target/jasmine-results.json.lock');
-    }
-    if (fs.existsSync('target/jasmine-results.json')) {
-      fs.unlink('target/jasmine-results.json');
-    }
+
   },
   afterLaunch: function() {
+
+    var retryCounter = 1;
+    if (argv.retry) {
+      retryCounter = ++argv.retry;
+    }
+    if (retryCounter <= maxRetryForFailedTests){
+     // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
+      webpackHelper.generateFailedTests('target/allure-results');
+    }
+
     return retry.afterLaunch(maxRetryForFailedTests);
   }
 };

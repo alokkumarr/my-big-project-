@@ -62,8 +62,10 @@
     "devextreme": "18.1.5",
     "devextreme-angular": "18.1.5",
     "file-saver": "1.3.3",
+    "filehound": "^1.16.4",
     "hammerjs": "2.0.8",
     "highcharts": "6.0.3",
+    "html2pdf.js": "0.9.0",
     "jasmine": "3.0.0",
     "jasmine-allure-reporter": "1.0.2",
     "jquery": "3.2.1",
@@ -71,6 +73,7 @@
     "jsplumb": "2.2.10",
     "jszip": "3.1.3",
     "lodash": "4.17.10",
+    "material-color-hash": "0.1.4",
     "messageformat": "1.0.2",
     "moment": "2.19.3",
     "moment-timezone": "0.5.14",
@@ -87,6 +90,7 @@
     "rxjs": "6.2.2",
     "rxjs-compat": "6.2.2",
     "toastr": "2.1.4",
+    "xml-js": "^1.6.7",
     "zone.js": "0.8.26"
   },
   "devDependencies": {

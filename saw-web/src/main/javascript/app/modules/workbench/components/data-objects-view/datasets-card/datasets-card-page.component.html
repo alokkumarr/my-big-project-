@@ -1,0 +1,42 @@
+<div class="dataSets-cardView" fxLayout="row wrap">
+  <div class="ds-card" fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
+    <mat-card class="datasets-card">
+      <mat-card-header class="{{sets.asOfNow.status}}">
+        <div class="status-icon" matTooltip="{{sets.asOfNow.status}}" [ngSwitch]="sets.asOfNow.status">
+          <mat-icon *ngSwitchCase="'FAILED'" style="color: #AB0E27;" fontIcon="icon-warning"></mat-icon>
+          <mat-icon *ngSwitchCase="'SUCCESS'" fontIcon="icon-exchange"></mat-icon>
+          <mat-icon *ngSwitchCase="'INIT'" fontIcon="icon-wip"></mat-icon>
+        </div>
+        <a class="dataset-name" e2e="data-set-card" (click)="viewDetails(sets)" fxFlex [innerHTML]="sets.system.name | highlight: searchTerm"></a>
+        <dataset-actions [dsMetadata]="sets"></dataset-actions>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="mat-body-1">
+        <div class="margin-btm-9" fxLayout="row wrap">
+          <div fxFlex="70" class="mat-body-1">Data Pods:
+            <span [innerHTML]="sets?.dataPods?.numberOfPods"></span>
+          </div>
+          <div class="mat-caption" fxLayoutAlign="end end" fxFlex="30">Size: {{sets.system.numberOfFiles}}</div>
+        </div>
+        <div class="descr margin-btm-9">
+          Description:
+          <span [innerHTML]="sets?.system?.description | highlight: searchTerm"></span>
+        </div>
+        <div class="margin-btm-9" fxLayout="row">
+          <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added by:
+            <span [innerHTML]="sets.system.createdBy | highlight: searchTerm"></span>
+          </div>
+          <div fxFlex="65
+                    " fxLayout="column" fxLayoutAlign="center end">Last updated:
+            <div fxLayout="row" style="align-items: baseline;">
+              <span [innerHTML]="sets.system.modifiedTime * 1000 | date: 'short' | highlight: searchTerm"> </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="dataSets-view_no-results" *ngIf="searchTerm && dataSets.length== 0">
+    <span i18n>NO MATCHING RESULTS</span>
+  </div>
+</div>

@@ -13,7 +13,8 @@ Imports:
     magrittr,
     checkmate (>= 1.8.2),
     jsonlite,
-    httr
+    httr,
+    purrr
 Suggests: 
      testthat
 RoxygenNote: 6.0.1

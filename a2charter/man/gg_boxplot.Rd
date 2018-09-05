@@ -102,8 +102,6 @@ options}
 color is set to a variable. expects a palette name. default is "a2" for a2
 palette}
 
-\item{...}{additional arguments passed to geom_boxplot}
-
 \item{...}{Arguments passed on to \code{ggplot2::geom_boxplot}
 \describe{
   \item{mapping}{Set of aesthetic mappings created by \code{\link[=aes]{aes()}} or
@@ -234,14 +232,15 @@ returns a ggplot2 boxplot object
 GGplot2 Boxplot Chart
 }
 \examples{
-#' # Create a data set
+# Create a data set
+library(dplyr)
 d <- mtcars \%>\% mutate(am = as.factor(am), cyl = as.factor(cyl))
 
 # Create series of basic charts
 gg_boxplot(d, y_variable = "mpg")
 gg_boxplot(d, y_variable = "mpg", x_variable = "am")
 gg_boxplot(d, y_variable = "mpg", x_variable = "am", fill="blue")
-gg_boxplot(d, y_variable ="mpg", notch=T)
+gg_boxplot(d, y_variable ="mpg", notch=TRUE)
 
 # Create boxplot from values
 y <- rnorm(100)
@@ -253,7 +252,9 @@ df <- data.frame(
  y75 = quantile(y, 0.75),
  y100 = max(y))
 
-gg_boxplot(df, ymin = "y0", lower = "y25", middle = "y50", upper = "y75", ymax = "y100", fill="darkorange")
+gg_boxplot(df, ymin = "y0", lower = "y25",
+           middle = "y50", upper = "y75",
+           ymax = "y100", fill="darkorange")
 }
 \seealso{
 position functions

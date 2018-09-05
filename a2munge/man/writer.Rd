@@ -6,16 +6,17 @@
 \alias{writer.data.frame}
 \title{DataFrame Writer Function}
 \usage{
-writer(df, path, dfs_mount, type, mode, partitions, partition_by,
-  temp_folder_name)
+writer(df, ...)
 
-\method{writer}{tbl_spark}(df, path, dfs_mount = "", type, mode = NULL,
+\method{writer}{tbl_spark}(df, path, dfs_mount = "/dfs", type, mode = NULL,
   partitions = NULL, partition_by = NULL, temp_folder_name = "tmp", ...)
 
 \method{writer}{data.frame}(df, path, type, mode = NULL, ...)
 }
 \arguments{
 \item{df}{DataFrame}
+
+\item{...}{optional arguments passed to write function}
 
 \item{path}{file path to write file to. Should include protocol if distributed
 path}
@@ -26,16 +27,16 @@ path}
 applicable for spark writer method}
 
 \item{mode}{Specifies the behavior when data or table already exists.
-Supported values include: 'error', 'append', 'overwrite' and 'ignore'.
-Notice that 'overwrite' will also change the column structure. default is
+Supported values include: 'error', 'append', 'replace' and 'ignore'.
+Notice that 'replace' will also change the column structure. default is
 NULL}
+
+\item{partitions}{Number of file partitions}
 
 \item{partition_by}{Partitions the output by the given columns on the file
 system}
 
 \item{temp_folder_name}{name of temp folder}
-
-\item{...}{optional arguments passed to write function}
 }
 \description{
 This is a function to write dataframes to files. Supports writing csv, text,

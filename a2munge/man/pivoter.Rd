@@ -6,7 +6,8 @@
 \alias{pivoter.data.frame}
 \title{DataFrame Pivoter Function}
 \usage{
-pivoter(df, ...)
+pivoter(df, id_vars, group_vars, measure_vars, fun = "sum", sep = "_",
+  fill = NULL)
 
 \method{pivoter}{tbl_spark}(df, id_vars, group_vars, measure_vars,
   fun = "sum", sep = "_", fill = NULL)
@@ -37,6 +38,8 @@ value><sep><measure_var name>'}
 
 \item{fill}{optional fill value for structural missings. defaults to value
 from applying fun to 0 length vector}
+
+\item{...}{not currently implemented}
 }
 \value{
 dataframe reshaped in wide format

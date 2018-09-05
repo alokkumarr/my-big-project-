@@ -143,6 +143,7 @@ roller.data.frame <- function(df,
 
 
 #' @rdname roller
+#' @importFrom DBI dbSendQuery
 #' @export
 roller.tbl_spark <- function(df,
                              order_vars,
@@ -254,9 +255,7 @@ roller_args <- function(col_names,
 
 
 
-#' Aggregation Function SQL Translation
-#'
-#' Helper function to translate native r function to spark sql syntax
+# Helper function to translate native r function to spark sql syntax
 sql_fun_translator <- function(fun) {
   ifelse(fun == "mean", "avg",
          ifelse(fun == "sd", "stddev",
@@ -264,9 +263,7 @@ sql_fun_translator <- function(fun) {
 }
 
 
-#' OVER SQL Translation funcion
-#'
-#' Helper function to create OVER sql statement
+# Helper function to create OVER sql statement
 sql_over_translator <- function(var,
                                 fun,
                                 group_vars,

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.synchronoss.saw</groupId>
+    <artifactId>saw</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>a2</artifactId>
+  <version>${revision}</version>
+  <packaging>jar</packaging>
+  <name>a2</name>
+  <profiles>
+    <profile>
+      <id>all-modules</id>
+      <activation>
+        <property>
+          <name>sip.modules</name>
+          <value>all</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.6.0</version>
+            <executions>
+              <execution>
+                <phase>compile</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${project.basedir}/build</executable>
+                  <arguments>
+                    <argument>${revision}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
+  </profiles>
+</project>

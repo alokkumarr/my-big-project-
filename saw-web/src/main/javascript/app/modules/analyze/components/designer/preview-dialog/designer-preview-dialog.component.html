@@ -24,6 +24,7 @@
   <report-grid-upgraded *ngIf="analysis.type === 'report' || analysis.type === 'esReport'"
                         [artifacts]="analysis.edit ? null : analysis.artifacts"
                         [query]="analysis.queryManual"
+                        [analysis]="analysis"
                         [sorts]="analysis.sqlBuilder.sorts"
                         [dataLoader]="dataLoader"
                         [isEditable]="false">
