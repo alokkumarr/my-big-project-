@@ -198,10 +198,11 @@ echo PreRemove done: ${app.nameVer}
        -->
   <profiles>
     <profile>
-      <id>legacy-rpmbuild</id>
+      <id>all-modules</id>
       <activation>
         <property>
-          <name>legacy-rpmbuild</name>
+          <name>sip.modules</name>
+          <value>all</value>
         </property>
       </activation>
       <build>
