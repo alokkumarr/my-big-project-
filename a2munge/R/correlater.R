@@ -110,10 +110,17 @@ corr.tbl_spark <- function(df,
 #'  "var2", "cor")
 #'@param remove_diag optional binary T/F input for removing diagonal values from
 #'  the correlation matrix
+#'@param ... not currently implemented  
 #'
 #'@return Dataframe with pairwise correlation values in narrow, long format
 #'@export
-correlater <- function(df, target_var, transform, output_col_names, remove_diag, collect) {
+correlater <- function(df,
+                       target_var,
+                       transform,
+                       output_col_names,
+                       remove_diag,
+                       collect,
+                       ...) {
   UseMethod("correlater")
 }
 
@@ -126,7 +133,8 @@ correlater.data.frame <- function(df,
                                   target_var = NULL,
                                   transform = NULL,
                                   output_col_names = c("var1", "var2", "cor"),
-                                  remove_diag = FALSE) {
+                                  remove_diag = FALSE,
+                                  ...) {
 
   checkmate::assert_choice(transform,
                            c("standardize", "standardizer", "normalize", "normalizer"),
@@ -183,7 +191,8 @@ correlater.tbl_spark <- function(df,
                                  transform = NULL,
                                  output_col_names = c("var1", "var2", "cor"),
                                  remove_diag = FALSE,
-                                 collect = TRUE){
+                                 collect = TRUE,
+                                 ...){
 
   # Select only numeric columns
   df <- df %>%

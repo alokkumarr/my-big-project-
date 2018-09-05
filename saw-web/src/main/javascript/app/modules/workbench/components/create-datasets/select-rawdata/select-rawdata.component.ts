@@ -191,6 +191,7 @@ export class SelectRawdataComponent implements OnInit {
         if (currFile) {
           this.filePath = `${currFile.path}/${currFile.name}`;
           this.fileMask = currFile.name;
+          this.fileMaskControl.setValue(this.fileMask);
         }
         this.selFiles = [];
         this.selFiles = selectedItems.selectedRowsData;
@@ -204,6 +205,7 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   maskSearch(mask) {
+    this.fileMask = this.fileMaskControl.value;
     const tempFiles = this.dataGrid.instance.option('dataSource');
     this.selFiles = this.workBench.filterFiles(mask, tempFiles);
     if (this.selFiles.length > 0) {

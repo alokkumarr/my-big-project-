@@ -1,4 +1,3 @@
-
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -16,10 +15,11 @@ require('./datasets-grid-page.component.scss');
   template,
   styles: []
 })
-
 export class DatasetsGridPageComponent implements OnInit {
-  @Input() searchTerm: string;
-  @Input() updater: BehaviorSubject<any>;
+  @Input()
+  searchTerm: string;
+  @Input()
+  updater: BehaviorSubject<any>;
   private gridConfig: Array<any>;
   private updaterSubscribtion: any;
 
@@ -27,9 +27,10 @@ export class DatasetsGridPageComponent implements OnInit {
     private dxDataGrid: dxDataGridService,
     private headerProgress: HeaderProgressService,
     private workbench: WorkbenchService
-  ) { }
+  ) {}
 
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent)
+  dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     this.gridConfig = this.getGridConfig();
@@ -54,53 +55,62 @@ export class DatasetsGridPageComponent implements OnInit {
 
   getGridConfig() {
     const dataSource = [];
-    const columns = [{
-      caption: 'Data Set Name',
-      dataField: 'system.name',
-      alignment: 'left',
-      width: '20%',
-      cellTemplate: 'nameCellTemplate',
-      cssClass: 'branded-column-name'
-    },{
-      dataField: 'system.description',
-      caption: 'Description',
-      width: '25%',
-      dataType: 'String',
-      cellTemplate: 'creatorCellTemplate'
-    }, {
-      caption: 'Size',
-      dataField: 'system.numberOfFiles',
-      dataType: 'number',
-      width: '10%'
-    }, {
-      dataField: 'system.createdBy',
-      caption: 'Added By',
-      width: '13%',
-      dataType: 'string',
-      cellTemplate: 'creatorCellTemplate'
-    }, {
-      dataField: 'dataPods.numberOfPods',
-      caption: 'Data Pods',
-      width: '8%',
-      dataType: 'number'
-    }, {
-      dataField: 'system.modifiedTime',
-      caption: 'Last Updated',
-      cellTemplate: 'timecreatedCellTemplate',
-      width: '12%',
-      dataType: 'date',
-      alignment: 'right'
-    }, {
-      dataField: 'asOfNow.status',
-      caption: 'Status',
-      width: '7%',
-      alignment: 'center'
-    }, {
-      dataField: '_id',
-      caption: 'Actions',
-      cellTemplate: 'actionsCellTemplate',
-      width: '5%'
-    }];
+    const columns = [
+      {
+        caption: 'Data Set Name',
+        dataField: 'system.name',
+        alignment: 'left',
+        width: '20%',
+        cellTemplate: 'nameCellTemplate',
+        cssClass: 'branded-column-name'
+      },
+      {
+        dataField: 'system.description',
+        caption: 'Description',
+        width: '25%',
+        dataType: 'String',
+        cellTemplate: 'creatorCellTemplate'
+      },
+      {
+        caption: 'Size',
+        dataField: 'system.numberOfFiles',
+        dataType: 'number',
+        width: '10%'
+      },
+      {
+        dataField: 'system.createdBy',
+        caption: 'Added By',
+        width: '13%',
+        dataType: 'string',
+        cellTemplate: 'creatorCellTemplate'
+      },
+      {
+        dataField: 'dataPods.numberOfPods',
+        caption: 'Data Pods',
+        width: '8%',
+        dataType: 'number'
+      },
+      {
+        dataField: 'system.modifiedTime',
+        caption: 'Last Updated',
+        cellTemplate: 'timecreatedCellTemplate',
+        width: '12%',
+        dataType: 'date',
+        alignment: 'right'
+      },
+      {
+        dataField: 'asOfNow.status',
+        caption: 'Status',
+        width: '7%',
+        alignment: 'center'
+      },
+      {
+        dataField: '_id',
+        caption: 'Actions',
+        cellTemplate: 'actionsCellTemplate',
+        width: '5%'
+      }
+    ];
 
     return this.dxDataGrid.mergeWithDefaultConfig({
       columns,
@@ -119,16 +129,14 @@ export class DatasetsGridPageComponent implements OnInit {
         useNative: false
       },
       filterRow: {
-        visible: true,
+        visible: false,
         applyFilter: 'auto'
       },
       showRowLines: false,
       showBorders: false,
       rowAlternationEnabled: true,
-      showColumnLines: true,
-      hoverStateEnabled: true,
-      onSelectionChanged: selectedItems => {
-      }
+      showColumnLines: false,
+      hoverStateEnabled: true
     });
   }
 
@@ -137,7 +145,7 @@ export class DatasetsGridPageComponent implements OnInit {
     this.dataGrid.instance.refresh();
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 3000);
+    }, 1000);
   }
 
   viewDetails(metadata) {

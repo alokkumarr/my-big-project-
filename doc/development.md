@@ -80,7 +80,7 @@ To list running containers, execute the following command:
         $ docker ps
         
 All SIP containers are named according to the pattern `sip-*`, for
-example `sip-admin`, `sip-saw1` and so on.  (The `sip-saw` containers
+example `sip-admin`, `sip-app1` and so on.  (The `sip-app` containers
 have a numeric suffix, because there can be multiple of them in high
 availability configurations.)
 

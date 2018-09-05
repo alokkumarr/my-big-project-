@@ -87,17 +87,6 @@ export class AnalyzeActionsMenuComponent {
 
       return notExcluded && hasPriviledge;
     });
-
-    this.analysis = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
-  }
-
-  generateRequestPayload(analysis) {
-    forEach(analysis.artifacts, cols=> {
-      forEach(cols.columns, col=>{
-        delete col.checked;
-      })
-    })
-    return analysis;
   }
 
   edit() {
@@ -117,7 +106,6 @@ export class AnalyzeActionsMenuComponent {
   }
 
   execute() {
-    this.analysis = this.analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(this.analysis)) : this.analysis;
     this._analyzeActionsService.execute(this.analysis).then(analysis => {
       if (analysis) {
         this.afterExecute.emit(analysis);

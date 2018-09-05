@@ -389,9 +389,9 @@
               <!-- Note: The node has a suffix "1", because additional
                    SAW nodes might be added for high availability
                    configurations -->
-              <alias>sip-saw1</alias>
+              <alias>sip-app1</alias>
               <run>
-                <hostname>sip-saw1</hostname>
+                <hostname>sip-app1</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
@@ -408,9 +408,9 @@
             </image>
             <image>
               <name>sip-app:${project.version}</name>
-              <alias>sip-saw2</alias>
+              <alias>sip-app2</alias>
               <run>
-                <hostname>sip-saw2</hostname>
+                <hostname>sip-app2</hostname>
                 <namingStrategy>alias</namingStrategy>
                 <network>
                   <name>saw</name>
