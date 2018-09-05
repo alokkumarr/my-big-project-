@@ -1,9 +1,8 @@
-
 import { Component, OnInit, Input } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 
-import { SqlExecutorComponent } from '../sql-executor/sql-executor.component';
-import { WorkbenchService } from '../../services/workbench.service';
+import { SqlExecutorComponent } from '../../sql-executor/sql-executor.component';
+import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./dataset-actions.component.html');
 require('./dataset-actions.component.scss');
@@ -12,16 +11,13 @@ require('./dataset-actions.component.scss');
   template,
   styles: []
 })
-
 export class DatasetActionsComponent implements OnInit {
-  @Input() dsMetadata: any;
+  @Input()
+  dsMetadata: any;
 
-  constructor(
-    private router: UIRouter,
-    private workBench: WorkbenchService
-  ) { }
+  constructor(private router: UIRouter, private workBench: WorkbenchService) {}
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   openSQLEditor(): void {
     if (this.dsMetadata.asOfNow.status === 'SUCCESS') {

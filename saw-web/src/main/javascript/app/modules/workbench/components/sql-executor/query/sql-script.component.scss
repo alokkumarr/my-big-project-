@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 sql-script {
   height: 100%;
   width: 100%;
@@ -17,6 +19,6 @@ sql-script {
   }
 
   .ace-sqlserver {
-    background-color: #F5F9FC;
+    background-color: $background-color;
   }
 }

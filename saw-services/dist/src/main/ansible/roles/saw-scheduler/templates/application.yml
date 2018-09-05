@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:mariadb://localhost:3306/saw_scheduler
     username: saw_scheduler
-    password: <db-password>
+    password: {{ saw_scheduler_db_password }}
     driver-class-name: org.mariadb.jdbc.Driver
     max-active: 25
     testOnBorrow: true

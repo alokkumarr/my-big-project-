@@ -32,7 +32,7 @@ export class WorkbenchPageComponent {
     * So on refresh re-routin to listing page 
     */
     if (this.router.stateService.current.name === 'workbench' || this.router.stateService.current.name === 'workbench.sql') {
-      this.router.stateService.go('workbench.datasets');
+      this.router.stateService.go('workbench.dataobjects');
     }
     this.headerProgress.hide();
   }

@@ -24,7 +24,7 @@ schema:
 elastic-search:
            cluster-name: {{ saw_elasticsearch_cluster_name }}
            transport-hosts: {{ saw_elasticsearch_host }}
-           transport-ports: {{ saw_elasticsearch_port }}
+           transport-ports: {{ saw_elasticsearch_port | default('9200') }}
 elastic-xpack :
           cluster-active: {{ saw_elasticsearch_xpack | default('false') }}
           cluster-username: {{ saw_elasticsearch_username | default('') }}

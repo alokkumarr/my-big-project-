@@ -2,7 +2,7 @@
   <div *ngIf="showLegendOpts">
     <mat-form-field class="select-form-field" appearance="outline">
       <mat-label>Legend Position</mat-label>
-      <mat-select [(ngModel)]="legend.align" (change)="onLegendChange()">
+      <mat-select [(ngModel)]="legend.align" (selectionChange)="onLegendChange()">
         <mat-option *ngFor="let pos of legend.options.align" [value]="pos.name">
           {{ pos.displayName }}
         </mat-option>
@@ -10,7 +10,7 @@
     </mat-form-field>
     <mat-form-field class="select-form-field" appearance="outline" style="margin-left: 10px;">
       <mat-label>Legend Layout</mat-label>
-      <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (change)="onLegendChange()">
+      <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (selectionChange)="onLegendChange()">
         <mat-option *ngFor="let layout of legend.options.layout" [value]="layout.name">
           {{ layout.displayName }}
         </mat-option>

@@ -108,7 +108,7 @@ export class JwtService {
       return '';
     }
 
-    return get(token, 'ticket.custCode', 'ATT');
+    return get(token, 'ticket.custCode', 'Synchronoss');
   }
 
   isValid(token) {
@@ -143,6 +143,10 @@ export class JwtService {
 
   getUserId() {
     return get(this.getTokenObj(), 'ticket.userId').toString();
+  }
+
+  getUserName() {
+    return get(this.getTokenObj(), 'ticket.userFullName').toString();
   }
 
   _isRole(token, role) {

@@ -487,8 +487,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @Override
   public DataSet createDataSet(DataSet dataSet, String project) throws Exception {
     logger.trace("createDataSet starts here :  " + dataSet.toString());
-    String id = UUID.randomUUID().toString() + delimiter + "rComponent" + delimiter
-        + System.currentTimeMillis();
+    String id = project + delimiter + "rComponent";
     MetaDataStoreRequestAPI requestMetaDataStore = null;
     String category = Category.DataSet.name();
     String format = "parquet";

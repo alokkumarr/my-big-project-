@@ -138,10 +138,10 @@ export class CreateDatasetsComponent implements OnInit {
     this.workBench.triggerParser(payload).subscribe(data => {
       this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 9000 });
     });
-    this.router.stateService.go('workbench.datasets');
+    this.router.stateService.go('workbench.dataobjects');
   }
 
   backtoLists() {
-    this.router.stateService.go('workbench.datasets');
+    this.router.stateService.go('workbench.dataobjects');
   }
 }
