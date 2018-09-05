@@ -38,34 +38,20 @@
   }
 }
 
-.header-details {
-  height: 24px;
+.selected-aggregate.icon-Sum {
+  margin-top: 6px;
 }
 
-.cell-aggregate-icon {
-  float: left;
+.selected-aggregate.icon-Count,
+.selected-aggregate.icon-Percentage, {
+  margin-top: -6px;
 }
 
-.cell-caption {
-  padding-top: 3px;
-  float: left;
+.column-name {
+  margin: 4px 10px 0 5px;
   text-transform: uppercase;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 152px;
 }
 
 .column-menu {
-  position: absolute;
-  padding-top: 6px;
-}
-
-.cell-aggregate-icon .icon-Sum {
-  padding-top: 6px;
-}
-
-.cell-aggregate-icon .icon-Count,
-.icon-Percentage {
-  margin-top: -5px;
+  padding-top: 7px;
 }

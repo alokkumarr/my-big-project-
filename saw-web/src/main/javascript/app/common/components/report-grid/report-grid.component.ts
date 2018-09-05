@@ -184,7 +184,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   // grid settings
   public columnAutoWidth = false;
-  public columnMinWidth = 200;
+  public columnMinWidth = 172;
   public columnResizingMode = 'widget';
   public allowColumnReordering = true;
   public allowColumnResizing = true;
