@@ -70,12 +70,6 @@ export class AdminImportListComponent {
       alignment: 'left',
       width: '30%'
     }, {
-      caption: 'Description',
-      dataField: 'analysis.description',
-      allowSorting: true,
-      alignment: 'left',
-      width: '30%'
-    }, {
       caption: 'Analysis Type',
       dataField: 'analysis.type',
       allowSorting: true,

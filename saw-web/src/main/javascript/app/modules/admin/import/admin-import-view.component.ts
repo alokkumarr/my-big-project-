@@ -74,12 +74,20 @@ export class AdminImportViewComponent {
   }
 
   splitFileContents(contents) {
+    let hasErrors = false;
     this.atLeast1AnalysisIsSelected = false;
     this.files = map(contents, ({name, count}) => ({name, count}));
     this.analyses = fpPipe(
       fpFlatMap(({analyses}) => analyses),
-      fpMap(analysis => this.getAnalysisObjectForGrid(analysis))
+      fpMap(analysis => {
+        const gridObj = this.getAnalysisObjectForGrid(analysis)
+        if (gridObj.errorInd) {
+          hasErrors = true;
+        }
+        return gridObj;
+      })
     )(contents);
+    this.userCanExportErrors = hasErrors;
   }
 
   readFiles(event) {
@@ -152,7 +160,7 @@ export class AdminImportViewComponent {
         log: 'Analysis exists. Please Override to delete existing data.',
         errorMsg: 'Analysis exists. Please Override to delete existing data.',
         duplicateAnalysisInd: true,
-        errorInd: true,
+        errorInd: false,
         noMetricInd: false,
         analysis: modifiedAnalysis
       };
@@ -259,7 +267,7 @@ export class AdminImportViewComponent {
 
   exportErrors() {
     const logMessages = fpPipe(
-      fpFilter('selection'),
+      fpFilter('errorInd'),
       fpMap(gridObj => {
         const { analysis, errorMsg } = gridObj;
         const { metricName, name, type } = analysis;
