@@ -50,10 +50,15 @@
   padding-top: 3px;
   float: left;
   text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 152px;
 }
 
-button.column-menu {
-  line-height: 32px !important;
+.column-menu {
+  position: absolute;
+  padding-top: 6px;
 }
 
 .cell-aggregate-icon .icon-Sum {

@@ -565,7 +565,7 @@ export class DesignerContainerComponent {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
-      this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      //this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':

@@ -141,6 +141,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
   @Input('data')
   set setData(data: any[]) {
+
     if (data || data.length < 7) {
       this.gridHeight = 'auto';
     } else {
@@ -183,7 +184,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   // grid settings
   public columnAutoWidth = false;
-  public columnMinWidth = 150;
+  public columnMinWidth = 200;
   public columnResizingMode = 'widget';
   public allowColumnReordering = true;
   public allowColumnResizing = true;

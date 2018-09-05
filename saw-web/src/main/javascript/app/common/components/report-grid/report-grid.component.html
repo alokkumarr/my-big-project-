@@ -34,9 +34,7 @@
             <span>{{cell.column.caption}}</span>
           </div> 
           <div class="dropdown-options">
-            <button *ngIf="isEditable" class="column-menu" mat-button [matMenuTriggerFor]="menu">
-              <mat-icon [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
-            </button>
+            <mat-icon *ngIf="isEditable" class="column-menu" [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
             <mat-menu #menu="matMenu">
               <button *ngIf="analysis.type=='esReport'" class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.payload.type)">
               <mat-icon fontIcon="icon-more"></mat-icon>
