@@ -25,7 +25,7 @@ spark_home_dir <- sparklyr::spark_installed_versions() %>%
   dplyr::filter(spark == "2.3.0") %>%
   dplyr::pull(dir)
 
-sc <- spark_connect(master = "local", spark_home = spark_home_dir)
+sc <- spark_connect(master = "local")
 
 
 test_that("No holdout sampling test case", {
