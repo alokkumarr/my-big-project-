@@ -326,14 +326,14 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   checkFormatDataCondition(type) {
-     if (
+    if (
       NUMBER_TYPES.includes(type) ||
       DATE_TYPES.includes(type)
     ) {
-       return true;
-     } else {
-       return false;
-     }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   aggregateColumn(payload, value) {

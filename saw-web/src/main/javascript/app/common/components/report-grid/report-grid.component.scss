@@ -38,51 +38,29 @@
   }
 }
 
+.header-details {
+  height: 24px;
+}
+
 .cell-aggregate-icon {
   float: left;
-
-  .icon-MAX,
-  .icon-MIN,
-  .icon-AVG {
-    margin: 2px 7px 0 0;
-  }
-
-  .icon-Count,
-  .icon-Percentage {
-    margin-top: -4px;
-  }
-
-  .icon-Sum {
-    padding-top: 9px;
-  }
 }
 
 .cell-caption {
+  padding-top: 3px;
   float: left;
-  padding-top: 6px;
   text-transform: uppercase;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  width: 100px;
 }
 
-.dx-sort {
-  margin-top: 3px;
+button.column-menu {
+  line-height: 32px !important;
 }
 
-.column-menu {
-  min-width: 35px !important;
-  line-height: 0 !important;
-
-  span mat-icon {
-    padding-top: 3px;
-    font-size: 16px;
-    padding-right: 12px;
-  }
+.cell-aggregate-icon .icon-Sum {
+  padding-top: 6px;
 }
 
-.report-options {
-  line-height: 35px !important;
-  height: 35px !important;
+.cell-aggregate-icon .icon-Count,
+.icon-Percentage {
+  margin-top: -5px;
 }
