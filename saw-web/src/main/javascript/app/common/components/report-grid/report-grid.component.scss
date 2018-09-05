@@ -41,14 +41,10 @@
 .cell-aggregate-icon {
   float: left;
 
-  mat-icon {
-    height: 26px !important;
-  }
-
   .icon-MAX,
   .icon-MIN,
   .icon-AVG {
-    margin: 0 12px 0 0;
+    margin: 2px 7px 0 0;
   }
 
   .icon-Count,
@@ -57,13 +53,13 @@
   }
 
   .icon-Sum {
-    padding-top: 7px;
+    padding-top: 9px;
   }
 }
 
 .cell-caption {
   float: left;
-  margin: 3px 0 0;
+  padding-top: 6px;
   text-transform: uppercase;
   text-overflow: ellipsis;
   white-space: nowrap;
