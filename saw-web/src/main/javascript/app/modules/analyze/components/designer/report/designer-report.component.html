@@ -50,7 +50,7 @@
                               [isEditable]="true">
         </report-grid-upgraded>
       </div>
-      <div class="data-count-limit">
+      <div *ngIf="dataCount > 0" class="data-count-limit">
         Showing {{data.length}} out of {{dataCount}} rows. Click on 'Preview' to see more.
       </div>
     </div>
