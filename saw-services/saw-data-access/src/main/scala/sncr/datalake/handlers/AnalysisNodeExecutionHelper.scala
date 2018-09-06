@@ -206,11 +206,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     createAnalysisResultHeader(resId)
     saveData(analysisKey, outputLocation, outputType)
     finishedTS = System.currentTimeMillis
-    val content = resultNode.getCachedData("content") match {
-      case obj: JObject => obj
-      case obj: JValue => unexpectedElement("object", obj)
-    }
-    val newDescriptor = JObject (content.obj ++ List(
+    val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JLong(finishedTS)),
       JField("executionType", JString(executionType)),
       JField("exec-code", JLong(lastSQLExecRes)),

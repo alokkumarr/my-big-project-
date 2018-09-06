@@ -754,7 +754,7 @@ class Analysis extends BaseController {
             case obj: JObject => obj
             case obj: JValue => unexpectedElement("object", obj)
           }
-          val newDescriptor = JObject( content.obj ++ List(
+          val newDescriptor = JObject(content.obj ++ List(
             JField("queryBuilder", queryBuilder),
             JField("executedBy", executedBy)
           ))
