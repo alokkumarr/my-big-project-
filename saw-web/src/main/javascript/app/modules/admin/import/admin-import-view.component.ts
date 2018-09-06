@@ -26,6 +26,23 @@ import { ExportService } from '../export/export.service';
 const template = require('./admin-import-view.component.html');
 require('./admin-import-view.component.scss');
 
+const DUPLICATE_GRID_OBJECT_PROPS = {
+  logColor: 'brown',
+  log: 'Analysis exists. Please Override to delete existing data.',
+  errorMsg: 'Analysis exists. Please Override to delete existing data.',
+  duplicateAnalysisInd: true,
+  errorInd: false,
+  noMetricInd: false
+}
+const NORMAL_GRID_OBJECT_PROPS = {
+  logColor: 'transparent',
+  log: '',
+  errorMsg: '',
+  duplicateAnalysisInd: false,
+  errorInd: false,
+  noMetricInd: false
+};
+
 type FileInfo = {name: string, count: number};
 type FileContent = {name: string, count: number, analyses: Array<Analysis>};
 @Component({
@@ -110,6 +127,8 @@ export class AdminImportViewComponent {
     Promise.all(contentPromises).then(contents => {
       this.fileContents = contents;
       this.splitFileContents(contents);
+      // clear the file input
+      event.target.value = '';
     });
   }
 
@@ -156,22 +175,12 @@ export class AdminImportViewComponent {
     case 'duplicate':
       const modifiedAnalysis = this.getModifiedAnalysis(analysis, analysisFromBE);
       return {
-        logColor: 'brown',
-        log: 'Analysis exists. Please Override to delete existing data.',
-        errorMsg: 'Analysis exists. Please Override to delete existing data.',
-        duplicateAnalysisInd: true,
-        errorInd: false,
-        noMetricInd: false,
+        ...DUPLICATE_GRID_OBJECT_PROPS,
         analysis: modifiedAnalysis
       };
     case 'normal':
       return {
-        logColor: 'transparent',
-        log: '',
-        errorMsg: '',
-        duplicateAnalysisInd: false,
-        errorInd: false,
-        noMetricInd: false,
+        ...NORMAL_GRID_OBJECT_PROPS,
         analysis
       };
     }
@@ -245,10 +254,12 @@ export class AdminImportViewComponent {
           const container = updatedAnalysesMap[id];
           // if analysis was updated
           if (container && container.analysis) {
-            gridObj.logColor = 'green';
-            gridObj.log = 'Successfully Imported';
+            gridObj.logColor = DUPLICATE_GRID_OBJECT_PROPS.logColor;
+            gridObj.log = DUPLICATE_GRID_OBJECT_PROPS.log;
+            gridObj.errorMsg = DUPLICATE_GRID_OBJECT_PROPS.errorMsg;
+            gridObj.duplicateAnalysisInd = DUPLICATE_GRID_OBJECT_PROPS.duplicateAnalysisInd;
             gridObj.errorInd = false;
-
+            gridObj.selection = false;
           } else {
             hasErrors = true;
             const error = container.error;
