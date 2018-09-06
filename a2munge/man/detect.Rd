@@ -57,5 +57,5 @@ parameters.
 \details{
 Function is similiar to Seasonl Hybrid ESD algorithm discussed here
 \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
-\code{\link[AnomalyDetection]{AnomalyDetectionTs}}
+AnomalyDetection R package
 }

@@ -59,7 +59,3 @@ if [ -f $root_password_f ] ; then
    mysql -u root -e "$create_user IDENTIFIED BY '$password'"
    mysql -u root -e "GRANT ALL ON saw_scheduler.* TO 'saw_scheduler'@'localhost'"
 fi
-#change DB password in configuration
-password=$(< /etc/bda/saw-scheduler-db-password)
-sed -i "s/<db-password>/${password}/" /opt/bda/saw-scheduler-service/conf/application.yml
-echo "db-password update successfully"

@@ -1,7 +1,7 @@
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const protractorConf = require('../../../../conf/protractor.conf');
+var testDataReader = require('../../e2e-tests/testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const protractorConf = require('../../../../conf/protractor.conf');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
@@ -14,58 +14,10 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
   const defaultCategory = categories.privileges.name;
   const categoryName = categories.analyses.name;
   const subCategoryName = subCategories.createAnalysis.name;
-  const chartDesigner = analyzePage.designerDialog.chart;
 
   let analysisId;
   let host;
   let token;
-  //Note: Commented test for other user because it took 1hr 6 min to execute all tests
-  const chartDataProvider = {
-    // DATES
-    'Date data type filter as admin': {
-      user: 'admin',
-      fieldType: 'date',
-      value: 'This Week',
-      fieldName: 'Date'
-    },
-    'Date data type filter': {
-      user: 'userOne',
-      fieldType: 'date',
-      value: 'This Week',
-      fieldName: 'Date'
-    },
-    //NUMBERS
-    'Number data type filter as admin': {
-      user: 'admin',
-      fieldType: 'number',
-      operator: 'Equal to',
-      value: 99999.33,
-      fieldName: 'Double'
-    },
-    'Number data type filter': {
-      user: 'userOne',
-      fieldType: 'number',
-      operator: 'Equal to',
-      value: 99999.33,
-      fieldName: 'Double'
-    },
-    //STRING
-    'String data type filter as admin': {
-      user: 'admin',
-      fieldType: 'string',
-      operator: 'Equals',
-      value: 'string 450',
-      fieldName: 'String'
-    },
-    'String data type filter': {
-      user: 'userOne',
-      fieldType: 'string',
-      operator: 'Equals',
-      value: 'string 450',
-      fieldName: 'String'
-    }
-  };
-
   beforeAll(function() {
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
@@ -75,7 +27,6 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
 
   beforeEach(function(done) {
     setTimeout(function() {
-      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -83,17 +34,13 @@ describe('Prompt filter tests: esReportPromptFilters.test.js', () => {
   afterEach(function(done) {
     setTimeout(function() {
       new AnalysisHelper().deleteAnalysis(host, token, protractorConf.config.customerCode, analysisId);
-      analyzePage.main.doAccountAction('logout');
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
-  afterAll(function() {
-    commonFunctions.logOutByClearingLocalStorage();
-  });
 
-  using(chartDataProvider, function(data, description) {
-    it('should able to apply prompt filter for esReport: ' + description, () => {
+  using(testDataReader.testData['ESREPORTPROMPTFILTER']['esReportPromptFilterDataProvider'], function(data, description) {
+    it('should able to apply prompt filter for esReport: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'ESREPORTPROMPTFILTER', dp:'esReportPromptFilterDataProvider'}), () => {
       try {
         let currentTime = new Date().getTime();
         let user = data.user;

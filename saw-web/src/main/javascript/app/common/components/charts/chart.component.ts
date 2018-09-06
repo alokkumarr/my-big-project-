@@ -36,7 +36,6 @@ export const CHART_SETTINGS_OBJ = [
 })
 export class ChartComponent {
   @Input() updater: any;
-  @Input() options: any;
   @Input() isStockChart: boolean;
   @Input() enableExport: boolean;
   @ViewChild('container') container: ElementRef;
@@ -44,6 +43,7 @@ export class ChartComponent {
   private highcharts: any = Highcharts;
   private highstocks: any = Highstock;
   private chart: any = null;
+  private _options: any;
   private config: any = {};
   private subscription: any;
   private clonedConfig: any = {};
@@ -53,16 +53,33 @@ export class ChartComponent {
     this.highcharts.setOptions(globalChartOptions);
   }
 
+  @Input()
+  set options(data) {
+    this._options = data;
+    this.updateOptions(this._options);
+  }
+
   ngAfterViewInit() {
     this.enableExport && this.enableExporting(this.config);
   }
 
   ngOnInit() {
+    this.updateOptions(this._options);
+    // if we have an updater$ observable, subscribe to it
+    if (this.updater) {
+      this.subscription = this.updater.subscribe({
+        next: this.onOptionsChartUpdate.bind(this)
+      });
+    }
+  }
+
+  updateOptions(options) {
+    if (!options) return;
     //set the appropriate config based on chart type
-    this.cType = this.isStockChart ? 'highStock' : this.options.chart.type;
+    this.cType = this.isStockChart ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
+      options,
       this.config,
-      this.options,
       get(
         find(CHART_SETTINGS_OBJ, ['type', this.cType]),
         'config',
@@ -72,14 +89,7 @@ export class ChartComponent {
     if (this.enableExport) {
       this.config.exporting = {
         enabled: true
-      }
-    }
-
-    // if we have an updater$ observable, subscribe to it
-    if (this.updater) {
-      this.subscription = this.updater.subscribe({
-        next: this.onOptionsChartUpdate.bind(this)
-      });
+      };
     }
   }
 
@@ -108,7 +118,11 @@ export class ChartComponent {
    * @memberof ChartComponent
    */
   addExportConfig(config) {
-    set(config, 'exporting.filename', get(config, 'title.exportFilename') || 'chart');
+    set(
+      config,
+      'exporting.filename',
+      get(config, 'title.exportFilename') || 'chart'
+    );
     set(config, 'exporting.chartOptions', {
       legend: {
         navigation: {

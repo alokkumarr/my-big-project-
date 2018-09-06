@@ -487,8 +487,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @Override
   public DataSet createDataSet(DataSet dataSet, String project) throws Exception {
     logger.trace("createDataSet starts here :  " + dataSet.toString());
-    String id = UUID.randomUUID().toString() + delimiter + "rComponent" + delimiter
-        + System.currentTimeMillis();
     MetaDataStoreRequestAPI requestMetaDataStore = null;
     String category = Category.DataSet.name();
     String format = "parquet";
@@ -497,7 +495,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
     ObjectNode rootNode = (ObjectNode) node;
-    rootNode.put("_id", id);
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
     Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
@@ -521,6 +518,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         "asOfNow.finished cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"),
         "asOfNow.batchId cannot be null");
+    String id = project + delimiter + rootNode.get(DataSetProperties.System.toString()).get("name").asText();
+    rootNode.put("_id", id);
     ObjectNode transformationNode =
         rootNode.putObject(DataSetProperties.Transformations.toString());
     transformationNode.put("asOutput", id);

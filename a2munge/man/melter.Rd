@@ -6,13 +6,13 @@
 \alias{melter.tbl_spark}
 \title{DataFrame Melter function}
 \usage{
-melter(df, id_vars, measure_vars, variable_name, value_name, type)
+melter(df, id_vars, measure_vars, variable_name, value_name, type, ...)
 
 \method{melter}{data.frame}(df, id_vars = NULL, measure_vars,
-  variable_name = "variable", value_name = "value")
+  variable_name = "variable", value_name = "value", ...)
 
 \method{melter}{tbl_spark}(df, id_vars = NULL, measure_vars,
-  variable_name = "variable", value_name = "value", type = "DOUBLE")
+  variable_name = "variable", value_name = "value", type = "DOUBLE", ...)
 }
 \arguments{
 \item{df}{dataframe}
@@ -31,6 +31,8 @@ values}
 
 \item{type}{measure_vars type. Used in spark.dataframe method only. default is
 DOUBLE}
+
+\item{...}{not currently implemented}
 }
 \description{
 Data munging function that reshapes wide data into long format. Similiar to
@@ -38,7 +40,6 @@ reshape2::melt
 }
 \examples{
 #'library(dplyr)
-
 
 # Create toy dataset
 set.seed(319)
