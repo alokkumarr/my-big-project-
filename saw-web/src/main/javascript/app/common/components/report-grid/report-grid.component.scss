@@ -59,3 +59,12 @@
 .dx-datagrid .dx-column-indicators {
   vertical-align: -webkit-baseline-middle;
 }
+
+button.report-options {
+  line-height: 35px !important;
+  height: 35px !important;
+
+  mat-icon {
+    padding-top: 6px;
+  }
+}
