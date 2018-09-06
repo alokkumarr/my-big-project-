@@ -65,7 +65,7 @@ public class SAWSemanticController {
     ObjectMapper objectMapper = new ObjectMapper();
     try {
       requestBody.setProjectCode(projectId);
-      requestBody.set_id(semanticService.generateId());
+      requestBody.set_id(semanticService.generateId(projectId, requestBody.getMetricName()));
       logger.trace("Invoking service with entity id : {} ", requestBody.get_id());
       responseObjectFuture = semanticService.addSemantic(requestBody);
       logger.trace("Semantic entity created : {}",

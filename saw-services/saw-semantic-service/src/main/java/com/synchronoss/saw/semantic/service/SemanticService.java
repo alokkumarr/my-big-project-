@@ -9,7 +9,6 @@ import com.synchronoss.saw.semantic.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
-import java.util.UUID;
 
 public interface SemanticService {
 
@@ -40,9 +39,9 @@ public interface SemanticService {
    * @return String Id for the row
    * @throws JSONValidationSAWException when JSON Parsing fails
    */
-  default String generateId() throws JSONValidationSAWException {
-    String id = UUID.randomUUID().toString() + delimiter + SemanticDataSet + delimiter
-        + System.currentTimeMillis();
+  default String generateId(String project, String metricName) throws JSONValidationSAWException {
+    String id = project + delimiter + SemanticDataSet + delimiter
+        + metricName;
     return id;
   }
 }

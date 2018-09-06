@@ -1,15 +1,15 @@
-package sncr.metadata.semantix
+package sncr.metadata.datalake
 
-import org.json4s.JsonAST.{JArray, JField, JObject, JValue}
+import org.json4s.JsonAST.{JArray, JField, JObject, JString, JValue}
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.{MDNodeUtil, ProcessingResult}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.engine.ihandlers.RequestProcessor
 import sncr.metadata.ui_components.UINode
-
+import sncr.metadata.engine.MDObjectStruct.formats
+import org.json4s.native.JsonMethods._
 
 /**
   * The semantic interaction handler is a layer that provides request translations from request to
@@ -20,12 +20,11 @@ import sncr.metadata.ui_components.UINode
   * Then executed it and packs operation result into JSON response.
   */
 
-import sncr.metadata.engine.MDObjectStruct.formats
-class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = true)
+class DataObjectRequestProcessor (a_docAsJson : JValue, a_printPretty: Boolean = true)
   extends RequestProcessor(a_docAsJson : JValue, a_printPretty) {
 
-  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticRequestProcessor].getName)
-  override def testUIComponent(uicomp: JObject) : Boolean = SemanticRequestProcessor.mandatoryAttributes.forall(attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[DataObjectRequestProcessor].getName)
+
 
   /**
     * Validates requests, if a request malformed, incorrectly structured or does not have
@@ -39,15 +38,14 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
 
     preProcessRequest()
 
-    if (!SemanticRequestProcessor.verbs.exists(_.equalsIgnoreCase(action))){
+    if (!DataObjectRequestProcessor.verbs.exists(_.equalsIgnoreCase(action))){
       val msg = s"Action is incorrect: $action"
       m_log error Rejected.id + " ==> " + msg
       return (Rejected.id, msg)
     }
-    m_log debug "Validate action and content section"
-
+    m_log trace "Validate action and content section"
     action match {
-      case "read" | "search" | "delete" =>
+      case "read" =>
       {
         if ( keys == null || keys.isEmpty) {
           val msg = s"Keys list (filter) is missing or empty"; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
@@ -57,21 +55,10 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
         }
         (Success.id, "Success")
       }
-      case "update" | "create" =>
-      {
-        if (!RequestProcessor.modules.exists( uic => ( elements \ uic ).extractOpt[JObject].isDefined) &&
-          !RequestProcessor.modules.exists( uic => ( elements \ uic ).extractOpt[JArray].isDefined)) {
-          val msg = s"At least one content element is required"
-          m_log debug Rejected.id + " ==> " + msg
-          return (Rejected.id, msg)
-        }
-
-      }
     }
     validated = true
     (Success.id, "Success")
   }
-
 
   /**
     * Executes the requests, return response as String in JSON format.
@@ -84,22 +71,10 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
     if (!validated) return "Internal error: Request has not been validated!"
     var responses : List[JValue] = Nil
 
-    select = if (select == SelectModels.everything.id) SelectModels.relation.id else select
-
     action match {
-      case "create" | "update" =>
-        moduleDesc.keySet.foreach( moduleName => {
-          val UIComponents: Map[String, List[JValue]] = moduleDesc(moduleName)
-          responses = responses ++ UIComponents.keySet.flatMap(
-            UIComponent => {
-              val content_elements = UIComponents(UIComponent)
-              content_elements.map(element => actionHandler(action, element, moduleName))
-            }
-          )
-        })
-      case "read" | "search" | "delete" => responses = responses :+ actionHandler(action, null, null)
+      case "read" => responses = responses :+ actionHandler(action)
     }
-
+    m_log.trace(" responses in DataObjectRequestProcessor : {}", responses)
     var cnt : JField = null
     if (responses.nonEmpty &&
       responses.head.extractOpt[JObject].isDefined &&
@@ -110,27 +85,65 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
     if (!printPretty) compact(render(JObject(List(cnt)))) else pretty(render(JObject(List(cnt)))) + "\n"
   }
 
+  /**
+    * Internal function re-structures response:
+    * from flat list of Maps, each map is a node to
+    * "module_name": { "type" : {} }
+    * @param data
+    * @return Map - restructured response
+    */
+  private def remapDataObject(data : List[Map[String, Any]]) : Map[String, List[JValue]] = {
+    val remappedData = new scala.collection.mutable.HashMap[String, List[JValue]]
+    data.foreach(d => {
+      m_log trace s"Content to re-map:   ${d.mkString("{", ", ", "}")}"
+      if (d.contains("DL_DataLocation")) {
+        val content: JValue =
+          d("DL_DataLocation") match {
+            case jv: JValue => jv
+            case s: String => parse(s, false, false)
+            case _ => val m = "Could not build content mapping, unsupported representation"
+              m_log error m
+              JObject(Nil)
+          }
+
+        val module = "dataLocation"
+        val locationJson = parse(compact(render(content)))
+        val location = (locationJson) \ "0"
+          //if (d.contains("id")) d("id").asInstanceOf[String] else (content \ "id").extractOrElse[String]("UNDEF_id")
+        val intermRes :List[JValue] = if (remappedData.contains(module)) remappedData(module) :+ location else List(location)
+        remappedData(module) = intermRes
+        m_log debug s"Remapped object: ${pretty(render(content))}"
+      }
+      else {
+        val m = "Error: No content to re-map"; m_log error m
+      }
+    })
+    remappedData.toMap
+  }
+
+  override def build_ui(data : Map[String, Any] ): JValue = {
+    val remappedData: Map[String, List[JValue]] = remapDataObject(List(data))
+    if (remappedData.isEmpty) return JObject(JField("result", JString("Node not found")))
+    if (remappedData.size > 1) return JObject(JField("result", JString("More than one node found with different module")))
+    val theOnlyNode_ModuleName = remappedData.keysIterator.next()
+    val nodeToResponse : List[JValue] = remappedData(theOnlyNode_ModuleName)
+    if (nodeToResponse.size > 1)  return JObject(JField("result", JString(s"More than one node found in one module: $theOnlyNode_ModuleName")))
+    if (nodeToResponse.isEmpty)  return JObject(JField("result", JString(s"Internal error: empty list for module: $theOnlyNode_ModuleName")))
+    JObject(JField(theOnlyNode_ModuleName, nodeToResponse.head))
+  }
 
   /**
     * Internal function, execute a piece of request
-    *
     * @param action
-    * @param semantic_definition
-    * @param module_name
     * @return
     */
-  private def actionHandler(action: String, semantic_definition : JValue, module_name: String ) : JValue =
+  private def actionHandler(action: String) : JValue =
   {
-    m_log trace s"Execute: $action select content: $select"
-    val sNode = new SemanticNode(semantic_definition, select)
+    val sNode = new DataObject;
     val response = action match {
-      case "create" => build(sNode.create)
       case "read" =>   build_ui(sNode.read(keys))
-      case "search" => build_ui(sNode.find(keys))
-      case "delete" => build(sNode.deleteAll(keys))
-      case "update" => build(sNode.update(keys))
     }
-    m_log debug s"Response: ${pretty(render(response))}\n"
+    m_log trace s"Response: ${pretty(render(response))}\n"
     response
   }
 
@@ -149,7 +162,7 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
 
     m_log trace s"Extracted keys: ${lkeys.mkString("{", ",", "}")}"
     lkeys.map(key_values => {
-      SemanticNode.searchFields(key_values._1) match {
+      DataObject.searchFields(key_values._1) match {
         case "String"  => key_values._1 -> key_values._2.extract[String]
         case "Int"     => key_values._1 -> key_values._2.extract[Int]
         case "Long"    => key_values._1 -> key_values._2.extract[Long]
@@ -159,12 +172,9 @@ class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = tr
   }
 
 
+
 }
-
-
-object SemanticRequestProcessor
-{
-
-  val verbs = List("create", "update", "delete", "read", "search", "scan")
-  val mandatoryAttributes =  List("type", "repository", "module")
-}
+  object DataObjectRequestProcessor
+  {
+    val verbs = List("read")
+  }

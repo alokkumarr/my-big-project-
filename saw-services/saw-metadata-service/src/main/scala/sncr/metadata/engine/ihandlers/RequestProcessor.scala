@@ -188,7 +188,7 @@ class RequestProcessor(val docAsJson : JValue, val printPretty: Boolean = true) 
 }
 
 object RequestProcessor{
-  val modules = List("analyze", "observe", "alert")
+  val modules = List("analyze", "observe", "alert", "dataobject")
 }
 
 

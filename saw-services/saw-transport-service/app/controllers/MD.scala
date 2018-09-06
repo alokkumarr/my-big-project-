@@ -11,6 +11,7 @@ import play.mvc.Result
 import sncr.metadata.engine.{Contexts, ProcessingResult}
 import sncr.metadata.engine.ihandlers.RequestProcessor
 import sncr.metadata.semantix.SemanticRequestProcessor
+import sncr.metadata.datalake.DataObjectRequestProcessor
 import sncr.metadata.ui_components.UIMDRequestProcessor
 
 /**
@@ -33,15 +34,17 @@ class MD extends BaseServiceProvider {
   }
 
   def process(json: JValue): Result = {
-    m_log trace("Validate and process request:  " + compact(render(json)))
+    m_log.trace("Validate and process request: {} " + compact(render(json)))
     val res: ObjectNode = Json.newObject
     try {
 
       val context = (json \ "contents" \ "context").extractOpt[String].getOrElse(Contexts.UndefContext.toString)
+      val Id = (json \ "contents" \ "id").extractOpt[String].getOrElse(Contexts.UndefContext.toString)
       var handler : RequestProcessor = null
       context match{
         case "UI" => handler = new UIMDRequestProcessor(json)
         case "Semantic" =>  handler = new SemanticRequestProcessor(json)
+        case "DataObject" =>  handler = new DataObjectRequestProcessor(json)
         case _ => res.put("reason", "Request context is undefined"); res.put("result", "failure"); return play.mvc.Results.ok(res)
       }
       handler.validate match {
