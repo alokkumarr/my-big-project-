@@ -119,10 +119,10 @@ class DashboardFunctions {
     }
   }
 
-  addAnalysisByApi(host, token, name, description, analysisType, subType) {
+  addAnalysisByApi(host, token, name, description, analysisType, subType, filters = null) {
 
     try {
-      let createdAnalysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, subType);
+      let createdAnalysis = new AnalysisHelper().createNewAnalysis(host, token, name, description, analysisType, subType, filters);
       let analysisId = createdAnalysis.contents.analyze[0].executionId.split('::')[0];
 
       let analysis = {
@@ -498,6 +498,85 @@ class DashboardFunctions {
       console.log(e);
     }finally {
 
+    }
+  }
+
+  applyAndVerifyGlobalFilters(dashboardGlobalFilters) {
+    try {
+      let _self = this;
+      commonFunctions.waitFor.elementToBeVisible(observePage.filterButton);
+      commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
+      observePage.filterButton.click();
+      let longSliderValue;
+      dashboardGlobalFilters.forEach(function(currentFilter) {
+
+        if(currentFilter.name.toLowerCase() === 'string'){
+          browser.sleep(1000);
+          commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.stringFilter);
+          observePage.globalFilters.stringFilter.clear();
+          observePage.globalFilters.stringFilter.sendKeys(currentFilter.value);
+          commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.stringFilterValue(currentFilter.value));
+          commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.stringFilterValue(currentFilter.value));
+          observePage.globalFilters.stringFilterValue(currentFilter.value).click();
+
+        } else if(currentFilter.name.toLowerCase() === 'date'){
+          browser.sleep(1000);
+          commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.dateFilterPreset);
+          commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.dateFilterPreset);
+          observePage.globalFilters.dateFilterPreset.click();
+          commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.dateFilterPresetValue(currentFilter.preset));
+          commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.dateFilterPresetValue(currentFilter.preset));
+          observePage.globalFilters.dateFilterPresetValue(currentFilter.preset).click();
+
+        } else if(currentFilter.name.toLowerCase() === 'long'
+          || currentFilter.name.toLowerCase() === 'integer'
+          || currentFilter.name.toLowerCase() === 'float'
+          || currentFilter.name.toLowerCase() === 'double'){
+          browser.sleep(1000);
+          commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.numberSlider);
+          commonFunctions.slideHorizontally(observePage.globalFilters.numberSlider, currentFilter.value);
+
+        }
+      });
+
+      commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.applyFilter);
+      commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.applyFilter);
+      observePage.globalFilters.applyFilter.click();
+
+      _self.verifyAppliedGlobalFilters(dashboardGlobalFilters);
+    }catch (e) {
+      console.log(e);
+
+    }
+  }
+
+  verifyAppliedGlobalFilters(dashboardGlobalFilters) {
+    try {
+      commonFunctions.waitFor.elementToBeNotVisible(homePage.progressbar);
+      commonFunctions.waitFor.elementToBeVisible(observePage.filterButton);
+      commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
+      observePage.filterButton.click();
+      dashboardGlobalFilters.forEach(function(currentFilter) {
+
+        if(currentFilter.name.toLowerCase() === 'string'){
+          browser.sleep(1000);
+          expect(observePage.globalFilters.stringFilter.getAttribute('value')).toBe(currentFilter.value);
+
+        } else if(currentFilter.name.toLowerCase() === 'date'){
+          browser.sleep(1000);
+          expect(observePage.globalFilters.selectedPreset.getAttribute('ng-reflect-value')).toBe(currentFilter.preset);
+        } else if(currentFilter.name.toLowerCase() === 'long'
+          || currentFilter.name.toLowerCase() === 'integer'
+          || currentFilter.name.toLowerCase() === 'float'
+          || currentFilter.name.toLowerCase() === 'double'){
+          browser.sleep(1000);
+          expect(observePage.globalFilters.numberSliderLow.getAttribute('aria-valuenow')).toBeGreaterThan(0.0);
+
+        }
+      });
+
+    }catch (e) {
+      console.log(e);
     }
   }
 
