@@ -507,11 +507,11 @@ class DashboardFunctions {
       commonFunctions.waitFor.elementToBeVisible(observePage.filterButton);
       commonFunctions.waitFor.elementToBeClickable(observePage.filterButton);
       observePage.filterButton.click();
-      let longSliderValue;
+      
       dashboardGlobalFilters.forEach(function(currentFilter) {
 
         if(currentFilter.name.toLowerCase() === 'string'){
-          browser.sleep(1000);
+          browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.stringFilter);
           observePage.globalFilters.stringFilter.clear();
           observePage.globalFilters.stringFilter.sendKeys(currentFilter.value);
@@ -520,7 +520,7 @@ class DashboardFunctions {
           observePage.globalFilters.stringFilterValue(currentFilter.value).click();
 
         } else if(currentFilter.name.toLowerCase() === 'date'){
-          browser.sleep(1000);
+          browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.dateFilterPreset);
           commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.dateFilterPreset);
           observePage.globalFilters.dateFilterPreset.click();
@@ -532,7 +532,7 @@ class DashboardFunctions {
           || currentFilter.name.toLowerCase() === 'integer'
           || currentFilter.name.toLowerCase() === 'float'
           || currentFilter.name.toLowerCase() === 'double'){
-          browser.sleep(1000);
+          browser.sleep(2000);
           commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.numberSlider);
           commonFunctions.slideHorizontally(observePage.globalFilters.numberSlider, currentFilter.value);
 
@@ -559,17 +559,17 @@ class DashboardFunctions {
       dashboardGlobalFilters.forEach(function(currentFilter) {
 
         if(currentFilter.name.toLowerCase() === 'string'){
-          browser.sleep(1000);
+          browser.sleep(2000);
           expect(observePage.globalFilters.stringFilter.getAttribute('value')).toBe(currentFilter.value);
 
         } else if(currentFilter.name.toLowerCase() === 'date'){
-          browser.sleep(1000);
+          browser.sleep(2000);
           expect(observePage.globalFilters.selectedPreset.getAttribute('ng-reflect-value')).toBe(currentFilter.preset);
         } else if(currentFilter.name.toLowerCase() === 'long'
           || currentFilter.name.toLowerCase() === 'integer'
           || currentFilter.name.toLowerCase() === 'float'
           || currentFilter.name.toLowerCase() === 'double'){
-          browser.sleep(1000);
+          browser.sleep(2000);
           expect(observePage.globalFilters.numberSliderLow.getAttribute('aria-valuenow')).toBeGreaterThan(0.0);
 
         }
