@@ -4,7 +4,7 @@
 \alias{auto_forecaster}
 \alias{auto_forecaster.data.frame}
 \alias{auto_forecaster.tbl_spark}
-\title{Auto Forecaster Component}
+\title{Auto Forecaster Function}
 \usage{
 auto_forecaster(...)
 
@@ -22,10 +22,29 @@ auto_forecaster(...)
 \arguments{
 \item{...}{additional arguments to pass on. not currently implemented}
 
+\item{df}{dataframe with target variable and any potential predictors}
+
+\item{index_var}{column name of index variable. index variable should be
+either sequential numeric, date or datetime.}
+
 \item{group_vars}{optional column name of grouping variables. splits data and
 applies auto_forecaster to each group}
 
 \item{measure_vars}{colname names of variables to forecast}
+
+\item{periods}{number of periods to forecast}
+
+\item{unit}{unit of index variable default is null}
+
+\item{pipe}{pipeline object}
+
+\item{models}{nested list of arguments to pass to add_model function. Each
+element in list requires at least a method argument. Pipe argument made
+globally}
+
+\item{splits}{holdout splits ratios default is 80-20 train to validation}
+
+\item{conf_levels}{forecast confidence levels. default is 80 and 90 percent}
 }
 \description{
 Function creates forecasts by preparing the data and using the
