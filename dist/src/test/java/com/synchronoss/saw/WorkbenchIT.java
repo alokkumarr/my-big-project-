@@ -262,7 +262,6 @@ public class WorkbenchIT extends BaseIT {
        // String id = "workbench::" + name;
        // waitForDataset(id, WAIT_RETRIES);
     //}
-   @Ignore("not yet ready, ignore for now. Its needs to fixed before merge to master")
     @Test
     public void testSQLDataset() throws IOException {
         String name = "test-sql-" + testId();
