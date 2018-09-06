@@ -28,8 +28,8 @@ require('./admin-import-view.component.scss');
 
 const DUPLICATE_GRID_OBJECT_PROPS = {
   logColor: 'brown',
-  log: 'Analysis exists. Please Override to delete existing data.',
-  errorMsg: 'Analysis exists. Please Override to delete existing data.',
+  log: 'Analysis exists. Please Overwrite to delete existing data.',
+  errorMsg: 'Analysis exists. Please Overwrite to delete existing data.',
   duplicateAnalysisInd: true,
   errorInd: false,
   noMetricInd: false
@@ -255,11 +255,10 @@ export class AdminImportViewComponent {
           const container = updatedAnalysesMap[id];
           // if analysis was updated
           if (container && container.analysis) {
-            gridObj.logColor = DUPLICATE_GRID_OBJECT_PROPS.logColor;
-            gridObj.log = DUPLICATE_GRID_OBJECT_PROPS.log;
-            gridObj.errorMsg = DUPLICATE_GRID_OBJECT_PROPS.errorMsg;
-            gridObj.duplicateAnalysisInd = DUPLICATE_GRID_OBJECT_PROPS.duplicateAnalysisInd;
+            gridObj.logColor = 'green';
+            gridObj.log = 'Successfully Imported';
             gridObj.errorInd = false;
+            gridObj.duplicateAnalysisInd = true;
             gridObj.selection = false;
             someImportsWereSuccesful = true;
           } else {
