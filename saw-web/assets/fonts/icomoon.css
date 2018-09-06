@@ -257,23 +257,14 @@
 .icon-filter:before {
   content: "\e9db";
 }
-.icon-MIN {
-  background-image:
-    url(
-      '../svg/ic-min.svg'
-    );
+.icon-MIN:before {
+  content: "\e9fa";
 }
-.icon-MAX {
-  background-image:
-    url(
-      '../svg/ic-max.svg'
-    );
+.icon-MAX:before {
+  content: "\e9f9";
 }
-.icon-AVG {
-  background-image:
-    url(
-      '../svg/ic-average.svg'
-    );
+.icon-AVG:before {
+  content: "\e98b";
 }
 .icon-search2:before {
   content: "\e9dc";
