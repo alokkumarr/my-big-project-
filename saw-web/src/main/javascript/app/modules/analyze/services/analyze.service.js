@@ -138,7 +138,7 @@ export class AnalyzeService {
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
       const queryBuilder = fpGet(`data.queryBuilder`, resp);
-      const executedBy = fpGet(`data.executedBy`, resp) || 'Scheduled';
+      const executedBy = fpGet(`data.executedBy`, resp);
       const count = fpGet(`data.totalRows`, resp) || data.length;
       return {data: options.forcePaginate ? this.forcePagination(data, options) : data, queryBuilder, executedBy, count};
     });

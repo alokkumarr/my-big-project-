@@ -279,6 +279,12 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
+  setExecutedBy(executedBy) {
+    this.executedBy =
+      executedBy ||
+      (this.onetimeExecution ? this._jwt.getLoginId() : 'Scheduled');
+  }
+
   setExecutedAt(executionId) {
     const finished = (
       find(this.analyses, execution => execution.id === executionId) || {
@@ -347,7 +353,7 @@ export class ExecutedViewComponent implements OnInit {
           sqlBuilder:
             executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
         };
-        this.executedBy = executeResponse.executedBy;
+        this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = moment
           .utc(executeResponse.executedAt)
           .local()
@@ -390,7 +396,7 @@ export class ExecutedViewComponent implements OnInit {
           sqlBuilder:
             executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
         };
-        this.executedBy = executeResponse.executedBy;
+        this.setExecutedBy(executeResponse.executedBy);
         this.executedAt = moment
           .utc(executeResponse.executedAt)
           .local()
@@ -433,7 +439,8 @@ export class ExecutedViewComponent implements OnInit {
           if (this.executedAnalysis && queryBuilder) {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
-          this.executedBy = executedBy;
+
+          this.setExecutedBy(executedBy);
           this.setExecutedAt(executionId);
           return { data, totalCount: count };
         },
