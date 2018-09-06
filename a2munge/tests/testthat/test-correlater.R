@@ -11,7 +11,7 @@ context("correlater function unit tests")
 
 
 # Create Spark Connection and read in some data
-cat("Spark Home:", Sys.getenv("SPARK_HOME"), "\n")
+cat("\nSpark Home:", Sys.getenv("SPARK_HOME"), "\n")
 cat("Spark Available Versions:\n")
 print(sparklyr::spark_available_versions())
 cat("\n")
