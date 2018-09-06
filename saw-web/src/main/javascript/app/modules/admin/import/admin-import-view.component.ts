@@ -247,6 +247,7 @@ export class AdminImportViewComponent {
       }, {});
 
       let hasErrors = false;
+      let someImportsWereSuccesful = false;
       // update the logs
       forEach(this.analyses, gridObj => {
         if (gridObj.selection) {
@@ -260,6 +261,7 @@ export class AdminImportViewComponent {
             gridObj.duplicateAnalysisInd = DUPLICATE_GRID_OBJECT_PROPS.duplicateAnalysisInd;
             gridObj.errorInd = false;
             gridObj.selection = false;
+            someImportsWereSuccesful = true;
           } else {
             hasErrors = true;
             const error = container.error;
@@ -272,6 +274,11 @@ export class AdminImportViewComponent {
       });
 
       this.userCanExportErrors = hasErrors;
+
+      if (someImportsWereSuccesful) {
+        this.analyses = [...this.analyses];
+      }
+      this.atLeast1AnalysisIsSelected = false;
     });
   }
 

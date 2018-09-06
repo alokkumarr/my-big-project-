@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, onChanges } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as some from 'lodash/some';
 import * as every from 'lodash/every';
@@ -11,7 +11,7 @@ const template = require('./admin-import-list.component.html');
   template
 })
 
-export class AdminImportListComponent {
+export class AdminImportListComponent implements onChanges {
 
   @Input() analyses: any[];
   @Output() validityChange: EventEmitter<boolean> = new EventEmitter();
@@ -26,6 +26,10 @@ export class AdminImportListComponent {
 
   ngOnInit() {
     this.config = this.getConfig();
+  }
+
+  ngOnChanges() {
+    this.areAllSelected = false;
   }
 
   overWrite(row) {
