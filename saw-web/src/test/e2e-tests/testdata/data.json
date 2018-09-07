@@ -785,6 +785,16 @@
       }
     }
   },
+  "DASHBOARD_WITH_PIVOT": {
+    "dashboardWithPivotDataProvider": {
+      "ByAdmin": {
+        "user": "admin"
+      },
+      "ByUser": {
+        "user": "userOne"
+      }
+    }
+  },
   "DASHBOARDWITHSNAPSHOTKPI": {
     "dashboardWithSnapshotKpiDataProvider": {
       "dashboard_with_column_by_admin": {

@@ -169,6 +169,7 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js'
     ],
     /**

@@ -19,10 +19,10 @@ df <- data.frame(x = x) %>%
 df_y <- data.frame(y = y)
 
 # Create Spark Connection
-spark_home_dir <- sparklyr::spark_installed_versions() %>%
-  as.data.frame() %>%
-  dplyr::filter(spark == "2.3.0") %>%
-  dplyr::pull(dir)
+# spark_home_dir <- sparklyr::spark_installed_versions() %>%
+#   as.data.frame() %>%
+#   dplyr::filter(spark == "2.3.0") %>%
+#   dplyr::pull(dir)
 sc <- spark_connect(master = "local")
 
 # Copy data to spark

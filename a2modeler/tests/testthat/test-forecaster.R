@@ -20,10 +20,10 @@ dat1 <- data.frame(index = 1:n,
                                             rand.gen = function(n, ...) rt(n, df = 2))))
 
 # Create Spark Connection
-spark_home_dir <- sparklyr::spark_installed_versions() %>%
-  as.data.frame() %>%
-  dplyr::filter(spark == "2.3.0") %>%
-  dplyr::pull(dir)
+# spark_home_dir <- sparklyr::spark_installed_versions() %>%
+#   as.data.frame() %>%
+#   dplyr::filter(spark == "2.3.0") %>%
+#   dplyr::pull(dir)
 
 sc <- spark_connect(master = "local")
 
