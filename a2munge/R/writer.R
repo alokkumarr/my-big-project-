@@ -16,18 +16,19 @@
 #'
 #'
 #'@param df DataFrame
-#'@param path file path to write file to. Should include protocol if distributed
-#'  path
-#'@param dfs_mount dfs mount file path. applicable for distributed files only
-#'@param type file type. type specifies the spark writer function. Only
-#'  applicable for spark writer method
+#'@param path file directory path to write files to. Should include protocol if
+#'  distributed path. Should not end with forward slash.
+#'@param name Output file name. Note for partitioned files, the file part number is
+#'  appended to this file name
+#'@param type Output file type. Specifies the writer function used
 #'@param mode Specifies the behavior when data or table already exists.
-#'  Supported values include: 'error', 'append', 'replace' and 'ignore'.
-#'  Notice that 'replace' will also change the column structure. default is
-#'  NULL
+#'  Supported values include: 'error', 'append', 'replace' and 'ignore'. Notice
+#'  that 'replace' will also change the column structure. default is NULL
 #'@param partition_by Partitions the output by the given columns on the file
 #'  system
-#'@param partitions Number of file partitions  
+#'@param partitions Number of file partitions
+#'@param dfs_mount dfs mount file path. applicable for distributed files only.
+#'  default is /dfs
 #'@param temp_folder_name name of temp folder
 #'@param ... optional arguments passed to write function
 #'
@@ -44,19 +45,22 @@ writer <- function(df,
 #' @rdname writer
 writer.tbl_spark <- function(df,
                              path,
-                             dfs_mount = "/dfs",
+                             name,
                              type,
                              mode = NULL,
                              partitions = NULL,
                              partition_by = NULL,
+                             dfs_mount = "/dfs",
                              temp_folder_name = "tmp",
                              ...) {
   checkmate::assert_character(path)
-  checkmate::assert_character(dfs_mount)
+  checkmate::assert_false(substr(path, nchar(path), nchar(path)) == "/")
+  checkmate::assert_character(name)
   checkmate::assert_choice(type, c("csv", "parquet", "json", "jdbc", "source", "table", "text"))
   checkmate::assert_choice(mode, c('error', 'append', 'replace', 'ignore'), null.ok = TRUE)
   checkmate::assert_number(partitions, lower = 0, null.ok = TRUE)
   checkmate::assert_subset(partition_by, colnames(df), empty.ok = TRUE)
+  checkmate::assert_character(dfs_mount)
   checkmate::assert_character(temp_folder_name)
 
   if(! is.null(mode)) {
@@ -81,17 +85,17 @@ writer.tbl_spark <- function(df,
     df <- sparklyr::sdf_repartition(df, partitions = partitions, partition_by = NULL)
   }
 
-  if( grepl("hdfs://|s3a://|file://", path)) {
+  if( grepl("hdfs://|s3a://|file://|maprfs://", path)) {
     protocol <- paste0(strsplit(path, "//")[[1]][1],  "//")
-    file_path <- paste0(dfs_mount, gsub(protocol, "", path))
+    file_path <- paste0(dfs_mount, gsub(protocol, "", path), "/", name)
   } else {
     protocol <- ""
-    file_path <- path
+    file_path <- paste(path, name, sep="/")
     dfs_mount <- ""
   }
 
-  name <- gsub(tools::file_ext(path), "", basename(path))
-  name <- gsub("\\.", "", name)
+  # name <- gsub(tools::file_ext(path), "", basename(path))
+  # name <- gsub("\\.", "", name)
   base_dir <- dirname(file_path)
   root_dir <- dirname(base_dir)
   #checkmate::assert_directory(root_dir, access = "w")
@@ -194,21 +198,24 @@ writer.tbl_spark <- function(df,
 #' @rdname writer
 writer.data.frame <- function(df,
                               path,
+                              name,
                               type,
                               mode = NULL,
                               ...) {
   checkmate::assert_character(path)
+  checkmate::assert_character(name)
   checkmate::assert_choice(type, c("csv", "txt"))
   checkmate::assert_choice(mode, c('error', 'append', 'replace', 'ignore'), null.ok = TRUE)
 
-  name <- gsub(tools::file_ext(path), "", basename(path))
-  name <- gsub("\\.", "", name)
-  base_dir <- dirname(path)
+  #name <- gsub(tools::file_ext(path), "", basename(path))
+  #name <- gsub("\\.", "", name)
+  file_path <- paste(path, paste(name, type, sep= "."), sep = "/")
+  base_dir <- dirname(file_path)
   append <- ifelse(!is.null(mode), ifelse(mode == "append", T, F), F)
   col_names <- ifelse(append, FALSE, TRUE)
   checkmate::assert_directory(base_dir, access = "w")
 
   suppressWarnings(
-    write.table(df, file = path, append = append, col.names = col_names, ...)
+    write.table(df, file = file_path, append = append, col.names = col_names, ...)
   )
 }
