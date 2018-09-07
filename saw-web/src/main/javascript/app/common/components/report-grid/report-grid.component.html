@@ -1,4 +1,3 @@
-
 <dx-data-grid class="report-dx-grid"
     #dataGrid
     (onContentReady)="onContentReady($event)"
@@ -27,29 +26,29 @@
     [pager]="pager"
     [paging]="paging">
     <div class="headerCellTemplate" *dxTemplate="let cell of 'headerCellTemplate'">
-        <div fxLayout="row" class="header-details">
-          <mat-icon class="selected-aggregate" *ngIf="cell.column.payload.aggregate" [style.width.px]="26" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
-          <span class="column-name">{{cell.column.caption}}</span>
-          <mat-icon *ngIf="isEditable" class="column-menu" [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
-          <mat-menu #menu="matMenu" class="menu-buttons">
-            <button *ngIf="analysis.type=='esReport'" class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.payload.type)">
-            <mat-icon fontIcon="icon-more"></mat-icon>
-            Aggregation</button>
-            <button (click)="renameColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-edit"></mat-icon>  Rename</button>
-            <button (click)="removeColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-delete"></mat-icon>  Remove {{cell.column.payload.displayName}}</button>
-            <button *ngIf="checkFormatDataCondition(cell.column.type)" (click)="formatColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-filter"></mat-icon>  Format Data</button>
-          </mat-menu>
+      <div fxLayout="row" class="header-details">
+        <mat-icon class="selected-aggregate" *ngIf="cell.column.payload.aggregate" [style.width.px]="26" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
+        <span class="column-name">{{cell.column.caption}}</span>
+        <mat-icon *ngIf="isEditable" class="column-menu" [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
+        <mat-menu #menu="matMenu" class="menu-buttons">
+          <button class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.payload.type)">
+          <mat-icon fontIcon="icon-more"></mat-icon>
+          Aggregation</button>
+          <button (click)="renameColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-edit"></mat-icon>  Rename</button>
+          <button (click)="removeColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-delete"></mat-icon>  Remove {{cell.column.payload.displayName}}</button>
+          <button *ngIf="checkFormatDataCondition(cell.column.type)" (click)="formatColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-filter"></mat-icon>  Format Data</button>
+        </mat-menu>
 
-          <mat-menu #aggregations="matMenu">
-            <button class="report-options" mat-menu-item
-                    *ngFor="let aggregateType of aggregates; trackBy: index"
-                    (click)="aggregateColumn(cell.column.payload, aggregateType.value)">
-              <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
-              <span style="margin-left: 20px;">{{aggregateType.label}}</span>
-            </button>
-            <button (click)="aggregateColumn(cell.column.payload, 'clear')" mat-menu-item>Reset To Default</button>
-          </mat-menu>
-        </div>       
+        <mat-menu #aggregations="matMenu">
+          <button class="report-options" mat-menu-item
+                  *ngFor="let aggregateType of aggregates; trackBy: index"
+                  (click)="aggregateColumn(cell.column.payload, aggregateType.value)">
+            <mat-icon [fontIcon]="aggregateType.icon"></mat-icon>
+            <span style="margin-left: 20px;">{{aggregateType.label}}</span>
+          </button>
+          <button (click)="aggregateColumn(cell.column.payload, 'clear')" mat-menu-item>Reset To Default</button>
+        </mat-menu>
+      </div>       
     </div>
   <dxo-scrolling showScrollbar="always" [useNative]="false"></dxo-scrolling>
 </dx-data-grid>
