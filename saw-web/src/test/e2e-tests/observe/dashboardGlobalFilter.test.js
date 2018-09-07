@@ -12,7 +12,6 @@ const loginPage = require('../../javascript/pages/loginPage.po.js');
 const DashboardFunctions = require('../../javascript/helpers/observe/DashboardFunctions');
 const ObserveHelper = require('../../javascript/api/ObserveHelper');
 const PromptFilterFunctions = require('../../javascript/helpers/PromptFilterFunctions');
-const AnalysisFilter = require('../../javascript/helpers/analyze/AnalysisFilter');
 
 describe('Global filters in dashboard with charts tests: dashboardGlobalFilter.test.js', () => {
   const defaultCategory = categories.privileges.name;
@@ -56,8 +55,8 @@ describe('Global filters in dashboard with charts tests: dashboardGlobalFilter.t
     }, protractorConf.timeouts.pageResolveTimeout);
   });
 
-  using(testDataReader.testData['DASHBOARD_GLOBAL_FILTERS']['dashboardWithCharts'], function(data, description) {
-    it('should able apply global filters in dashboard with charts: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARD_GLOBAL_FILTERS', dp:'dashboardWithCharts'}), () => {
+  using(testDataReader.testData['DASHBOARD_GLOBAL_FILTERS']['dashboardGlobalFiltersWithCharts'], function(data, description) {
+    it('should able apply global filters in dashboard with charts: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARD_GLOBAL_FILTERS', dp:'dashboardGlobalFiltersWithCharts'}), () => {
       try {
 
         let currentTime = new Date().getTime();
