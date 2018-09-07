@@ -123,7 +123,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = this.artifacts2Columns(this.artifacts);
+    this.columns = this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -147,7 +147,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    this.columns = this.artifacts2Columns(this.analysis.artifacts);
+    this.columns = this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
     this.data = data;
   }
   @Input('dataLoader')
@@ -403,7 +403,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
       fpFlatMap((artifact: Artifact) => artifact.columns),
-      fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
