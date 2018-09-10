@@ -38,7 +38,6 @@ import * as Highcharts from 'highcharts/highcharts';
 
 import { flattenChartData } from '../../../common/utils/dataFlattener';
 
-
 import {
   NUMBER_TYPES,
   FLOAT_TYPES,
@@ -892,29 +891,34 @@ export class ChartService {
     return changes;
   }
 
-  dataToChangeConfig(type, settings, gridData, opts) {
+  dataToChangeConfig(
+    type,
+    settings,
+    { dataFields, nodeFields },
+    gridData,
+    opts
+  ) {
+    const selectedFields = fpFlatMap(x => x, [dataFields, nodeFields]);
+
     let changes;
     const fields = {
       x:
         find(
-          settings.xaxis,
+          selectedFields,
           attr => attr.checked === 'x' || attr.area === 'x'
         ) || {},
       y: sortBy(
         filter(
-          settings.yaxis,
+          selectedFields,
           attr => attr.checked === 'y' || attr.area === 'y'
         ),
         'areaIndex'
       ),
       z: find(
-        settings.zaxis,
+        selectedFields,
         attr => attr.checked === 'z' || attr.area === 'z'
       ),
-      g: find(
-        settings.groupBy,
-        attr => attr.checked === 'g' || attr.area === 'g'
-      )
+      g: find(selectedFields, attr => attr.checked === 'g' || attr.area === 'g')
     };
 
     /* prettier-ignore */

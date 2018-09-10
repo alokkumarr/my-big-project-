@@ -216,10 +216,10 @@ class DashboardFunctions {
 
     try {
       // Delete created dashboard
-      commonFunctions.waitFor.elementToBePresent(observePage.dashboard.dashboardAction('Delete'));
-      commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.dashboardAction('Delete'));
-      commonFunctions.waitFor.elementToBeClickable(observePage.dashboard.dashboardAction('Delete'));
-      observePage.dashboard.dashboardAction('Delete').click();
+      commonFunctions.waitFor.elementToBePresent(observePage.dashboard.deleteButton);
+      commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.deleteButton);
+      commonFunctions.waitFor.elementToBeClickable(observePage.dashboard.deleteButton);
+      observePage.dashboard.deleteButton.click();
       // Delete popup
       commonFunctions.waitFor.elementToBePresent(observePage.dashboard.dashboardConfirmDeleteButton);
       commonFunctions.waitFor.elementToBeVisible(observePage.dashboard.dashboardConfirmDeleteButton);
@@ -574,6 +574,11 @@ class DashboardFunctions {
 
         }
       });
+
+      //Close the filter
+      commonFunctions.waitFor.elementToBeVisible(observePage.globalFilters.cancelButton);
+      commonFunctions.waitFor.elementToBeClickable(observePage.globalFilters.cancelButton);
+      observePage.globalFilters.cancelButton.click();
 
     }catch (e) {
       console.log(e);

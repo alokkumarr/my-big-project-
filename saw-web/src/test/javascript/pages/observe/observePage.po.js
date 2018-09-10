@@ -27,6 +27,7 @@ module.exports = {
     selectedPreset: element(by.css('[e2e="dasbhoard-global-filter-date-preset-select"]')),
     numberSlider: element(by.css('[e2e="dashboard-global-filter-number-slider"]')),
     numberSliderLow: element(by.xpath('//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]')),
+    cancelButton: element(by.css('[e2e="dashboard-global-filters-cancel-button"]'))
 
 
   },
@@ -34,6 +35,10 @@ module.exports = {
     dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
     dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]')),
+    refreshButton: element(by.css('[e2e="dashboard-manual-refresh-button"]')),
+    deleteButton: element(by.css('[e2e="dashboard-delete-dashboard-button"]')),
+    downloadButton: element(by.css('[e2e="dashboard-download-dashboard-button"]')),
+    editButton: element(by.css('[e2e="dashboard-edit-dashboard-button"]')),
     addedAnalysisByName : name => element(by.xpath(`//h1[text()="${name}"]`))
   },
   snapshotKPI: {
