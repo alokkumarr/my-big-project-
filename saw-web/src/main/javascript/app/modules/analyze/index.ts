@@ -2,7 +2,7 @@ import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UIRouterModule } from '@uirouter/angular';
+import { RouterModule }  from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AnalyzeViewModule } from './view';
 import { ExecutedViewModule } from './executed-view';
@@ -165,7 +165,7 @@ export const AnalyzeModule = 'AnalyzeModule';
       prefix: 'symmetra',
       storageType: 'localStorage'
     }),
-    UIRouterModule.forChild({states: routes}),
+    RouterModule.forChild(routes),
     CommonModuleTs,
     MaterialModule,
     FlexLayoutModule,

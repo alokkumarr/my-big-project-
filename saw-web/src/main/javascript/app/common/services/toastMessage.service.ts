@@ -29,7 +29,7 @@ export class ToastService {
     return toastr.error(msg, title, options);
   }
 
-  clear(toast) {
-    return toastr.clear(toast);
+  clear() {
+    return toastr.clear();
   }
 }

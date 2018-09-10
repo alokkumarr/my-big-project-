@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 
 import {
   SQLEXEC_SAMPLE,
@@ -27,7 +27,7 @@ export class WorkbenchService {
 
   constructor(
     private http: HttpClient,
-    private router: UIRouter) { }
+    private router: Router) { }
 
   /** GET datasets from the server */
   getDatasets(): Observable<any> {
@@ -144,10 +144,10 @@ export class WorkbenchService {
   }
   /**
    * Service to fetch meta data of a dataset
-   * 
-   * @param {string} projectName 
-   * @param {any} id 
-   * @returns {Observable<any>} 
+   *
+   * @param {string} projectName
+   * @param {any} id
+   * @returns {Observable<any>}
    * @memberof WorkbenchService
    */
   getDatasetDetails(id): Observable<any> {
@@ -165,8 +165,8 @@ export class WorkbenchService {
   /**
    * Following 3 functions
    * To store, retrive and remove data from localstorage
-   * 
-   * @param {any} metadata 
+   *
+   * @param {any} metadata
    * @memberof WorkbenchService
    */
   setDataToLS(key, value) {
@@ -197,7 +197,7 @@ export class WorkbenchService {
 
   navigateToDetails(metadata) {
     this.setDataToLS('dsMetadata', metadata);
-    this.router.stateService.go('workbench.datasetDetails');
+    this.router.navigate(['workbench', 'dataset', 'details']);
   }
 
   triggerDatasetPreview(name: string): Observable<any> {

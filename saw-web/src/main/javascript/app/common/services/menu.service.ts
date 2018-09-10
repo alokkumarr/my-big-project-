@@ -19,8 +19,8 @@ export class MenuService {
   _menuCache: Object = {};
 
   constructor(
-    _jwtService: JwtService,
-    _$componentHandler: ComponentHandler
+    private _jwtService: JwtService,
+    private _$componentHandler: ComponentHandler
   ) {}
 
   updateMenu(data, moduleName, componentId = 'left-side-nav') {
@@ -29,14 +29,16 @@ export class MenuService {
     this._menuCache[moduleName] = data;
   }
 
-  getCachedMenu(moduleName) {
-    return this._menuCache[moduleName];
-  }
-
   getMenu(moduleName) {
     const token = this._jwtService.getTokenObj();
 
-    return new Promise((resolve, reject) => {
+    const cachedMenu = this._menuCache[moduleName];
+
+    if (cachedMenu) {
+      return cachedMenu;
+    }
+
+    const menuPromise =  new Promise((resolve, reject) => {
       const error = (desc = 'Error occurred while getting menu.') => {
         reject(desc);
         return;
@@ -76,5 +78,8 @@ export class MenuService {
         return obj;
       }));
     });
+
+    this._menuCache[moduleName] = menuPromise;
+    return menuPromise;
   }
 }

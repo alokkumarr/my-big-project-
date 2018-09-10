@@ -1,11 +1,9 @@
 import { expect } from 'chai';
-import { UIRouter } from '@uirouter/angular'
+import { Router } from '@angular/router'
 
 import { configureTests } from '../helpers/configureTests';
 import { TestBed, inject } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
 import * as fpGet from 'lodash/fp/get';
 import APP_CONFIG from '../../../../appConfig';
 
@@ -27,7 +25,7 @@ describe('Workbench Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [WorkbenchService,
-        {provide: UIRouter, useValue: mockService}]
+        {provide: Router, useValue: mockService}]
     }).compileComponents();
     httpMock = TestBed.get(HttpClientTestingModule);
   });
@@ -255,7 +253,7 @@ describe('Workbench Service', () => {
         'batchId': 'batch-1521129162354'
       },'transformations': []
     }];
-    
+
     WorkbenchService.getParsedPreviewData(`${this.wbAPI}/${userProject}/raw/directory/inspect`).subscribe((res: any) => {
       expect(res[0]._id).to.be('workbench::Sample');
       expect(res[0].system.user).to.be('A_user');

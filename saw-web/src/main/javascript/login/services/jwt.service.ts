@@ -133,7 +133,10 @@ export class JwtService {
     };
   }
 
-  getValidityReason(token = this.getTokenObj()) {
+  getValidityReason(token) {
+    if (!token) {
+      token = this.getTokenObj();
+    }
     return token.ticket.validityReason;
   }
 

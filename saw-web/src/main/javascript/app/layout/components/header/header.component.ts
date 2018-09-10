@@ -1,5 +1,6 @@
 import { Component, Inject, ChangeDetectorRef } from '@angular/core';
 import * as get from 'lodash/get';
+import * as lowerCase from 'lodash/lowerCase';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
 
@@ -19,6 +20,7 @@ export class LayoutHeaderComponent {
   ) { }
 
   public isLoading: false;
+  lowerCase = lowerCase;
 
   ngAfterViewChecked() {
     // if (this.isLoading === this._rootScope.showProgress) return;

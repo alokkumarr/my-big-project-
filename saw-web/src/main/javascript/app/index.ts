@@ -4,11 +4,12 @@ import '../../../../assets/additional-icons.css';
 import 'zone.js/dist/zone';
 import 'hammerjs';
 import 'reflect-metadata';
+import '../../../../themes/_triton.scss';
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { UIRouterModule } from '@uirouter/angular';
+import { RouterModule }  from '@angular/router';
 import { MaterialModule } from './material.module';
 
 import { routes } from './routes';
@@ -22,7 +23,8 @@ import { WorkbenchUpgradeModule } from './modules/workbench';
 import {
   LayoutContentComponent,
   LayoutHeaderComponent,
-  LayoutFooterComponent
+  LayoutFooterComponent,
+  MainPageComponent
  } from './layout';
 
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
@@ -31,10 +33,19 @@ declare global {
   const require: any;
 }
 
+const COMPONENTS = [
+  ServiceBootstrapComponent,
+  LayoutContentComponent,
+  LayoutHeaderComponent,
+  LayoutFooterComponent,
+  MainPageComponent
+];
+const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
+
 @NgModule({
   imports: [
     BrowserModule,
-    UIRouterModule.forRoot({states: routes, useHash: true}),
+    RouterModule.forRoot(routes, {useHash: true}),
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
@@ -44,19 +55,11 @@ declare global {
     AdminModule
   ],
   exports: [FlexLayoutModule],
-  providers: [{ provide: LOCALE_ID, useValue: 'en' }],
-  declarations: [
-    ServiceBootstrapComponent,
-    LayoutContentComponent,
-    LayoutHeaderComponent,
-    LayoutFooterComponent
+  providers: [
+    ...SERVICES
   ],
-  entryComponents: [
-    ServiceBootstrapComponent,
-    LayoutContentComponent,
-    LayoutHeaderComponent,
-    LayoutFooterComponent
-  ],
+  declarations: COMPONENTS,
+  entryComponents: COMPONENTS,
   bootstrap: [LayoutContentComponent]
 })
 export class NewAppModule {

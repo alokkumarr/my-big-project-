@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Transition, StateService } from '@uirouter/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
@@ -54,8 +54,8 @@ export class AnalyzeViewComponent implements OnInit {
   constructor(
     private _analyzeService: AnalyzeService,
     private _headerProgress: HeaderProgressService,
-    private _transition: Transition,
-    private _state: StateService,
+    private _router: Router,
+    private _route: ActivatedRoute,
     private _localStorage: LocalStorageService,
     private _jwt: JwtService,
     private _localSearch: LocalSearchService,
@@ -65,7 +65,7 @@ export class AnalyzeViewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.analysisId = this._transition.params().id;
+    this.analysisId = this._route.snapshot.params.id;
     const savedView = <string>this._localStorage.get(VIEW_KEY);
     this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
     savedView : this.LIST_VIEW;
@@ -127,13 +127,23 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
-    this._state.go('analyze.executedDetail', {analysisId: analysis.id, analysis, awaitingExecution: true});
+    this._router.navigate(
+      ['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executedAnalysis: null,
+          awaitingExecution: true,
+          loadLastExecution: false
+        }
+      }
+    );
   }
 
   afterPublish(analysis) {
     this.getCronJobs();
     /* Update the new analysis in the current list */
-    this._state.go('analyze.view', {id: analysis.categoryId});
+    this._router.navigate(
+      ['analyze', analysis.categoryId]
+    );
   }
 
   spliceAnalyses(analysis, replace) {

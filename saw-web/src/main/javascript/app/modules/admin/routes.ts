@@ -1,3 +1,4 @@
+import { Routes }  from '@angular/router';
 import {AdminMainViewComponent} from './main-view';
 import {AdminExportViewComponent} from './export';
 import {AdminImportViewComponent} from './import';
@@ -8,13 +9,13 @@ import {
   CategoriesTableHeader
 } from './consts';
 
-export const routes = [{
-  name: 'admin',
-  url: '/admin',
+export const routes: Routes = [{
+  // name: 'admin',
+  path: 'admin',
   redirectTo: 'admin.user'
 }, {
-  name: 'admin.user',
-  url: '/user',
+  // name: 'admin.user',
+  path: 'admin/user',
   component: AdminMainViewComponent,
   resolve: [{
     token: 'columns',
@@ -24,8 +25,8 @@ export const routes = [{
     resolveFn: () => 'user'
   }]
 }, {
-  name: 'admin.role',
-  url: '/role',
+  // name: 'admin.role',
+  path: 'admin/role',
   component: AdminMainViewComponent,
   resolve: [{
     token: 'columns',
@@ -35,8 +36,8 @@ export const routes = [{
     resolveFn: () => 'role'
   }]
 }, {
-  name: 'admin.categories',
-  url: '/categories',
+  // name: 'admin.categories',
+  path: 'admin/categories',
   component: AdminMainViewComponent,
   resolve: [{
     token: 'columns',
@@ -46,8 +47,8 @@ export const routes = [{
     resolveFn: () => 'category'
   }]
 }, {
-  name: 'admin.privilege',
-  url: '/privilege?role',
+  // name: 'admin.privilege',
+  path: 'admin/privilege?role',
   component: AdminMainViewComponent,
   resolve: [{
     token: 'columns',
@@ -57,11 +58,11 @@ export const routes = [{
     resolveFn: () => 'privilege'
   }]
 }, {
-  name: 'admin.export',
-  url: '/export',
+  // name: 'admin.export',
+  path: 'admin/export',
   component: AdminExportViewComponent
 }, {
-  name: 'admin.import',
-  url: '/import',
+  // name: 'admin.import',
+  path: 'admin/import',
   component: AdminImportViewComponent
 }];

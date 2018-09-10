@@ -6,4 +6,7 @@ const template = require('./content.component.html');
   selector: 'layout-content',
   template
 })
-export class LayoutContentComponent {}
+export class LayoutContentComponent {
+  constructor(
+  ) {}
+}

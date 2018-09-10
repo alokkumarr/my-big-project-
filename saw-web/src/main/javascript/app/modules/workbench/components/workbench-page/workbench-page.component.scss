@@ -7,7 +7,7 @@ workbench-page {
   max-height: 100%;
   overflow: auto;
 
-  ui-view {
+  router-outlet {
     width: 100%;
 
     & > * {

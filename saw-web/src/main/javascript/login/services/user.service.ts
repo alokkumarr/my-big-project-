@@ -1,6 +1,6 @@
 import * as get from 'lodash/get';
 import { Injectable } from '@angular/core';
-import { StateService } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import AppConfig from '../../../../../appConfig';
 import { JwtService } from './jwt.service';
@@ -11,7 +11,7 @@ const refreshTokenEndpoint = 'getNewAccessToken';
 export class UserService {
   constructor(
     private _http : HttpClient,
-    private _state: StateService,
+    private _router: Router,
     private _jwtService: JwtService
   ) {}
 
@@ -25,16 +25,22 @@ export class UserService {
 
     return this._http.post(loginUrl + route, LoginDetails).toPromise()
       .then(response => {
-        const resp = this._jwtService.parseJWT(get(response, 'data.aToken'));
+        const resp = this._jwtService.parseJWT(get(response, 'aToken'));
 
         // Store the user's info for easy lookup
         if (this._jwtService.isValid(resp)) {
           // this._jwtService.destroy();
-          this._jwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+          this._jwtService.set(get(response, 'aToken'), get(response, 'rToken'));
         }
 
         return resp;
       });
+  }
+
+  isLoggedIn() {
+    const token = this._jwtService.getTokenObj();
+    const isTokenvalid = this._jwtService.isValid(token);
+    return isTokenvalid;
   }
 
   /**
@@ -52,12 +58,12 @@ export class UserService {
         jwt: token
       }
     }).toPromise().then(response => {
-      const resp = this._jwtService.parseJWT(get(response, 'data.aToken'));
+      const resp = this._jwtService.parseJWT(get(response, 'aToken'));
 
       // Store the user's info for easy lookup
       if (this._jwtService.isValid(resp)) {
         // this._jwtService.destroy();
-        this._jwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+        this._jwtService.set(get(response, 'aToken'), get(response, 'rToken'));
       }
 
       return true;
@@ -80,7 +86,8 @@ export class UserService {
       .then(() => {
         this._jwtService.destroy();
         if (path === 'logout') {
-          this._state.reload();
+          // TODO do something here for logout
+          // this._state.reload();
         }
       });
   }
@@ -107,7 +114,7 @@ export class UserService {
 
     return this._http.post(loginUrl + route, LoginDetails, httpOptions).toPromise()
       .then(res => {
-        if (res.data.valid) {
+        if (res.valid) {
           this.logout('change');
         }
 
@@ -176,11 +183,11 @@ export class UserService {
     const route = `/${refreshTokenEndpoint}`;
     return this._http.post(loginUrl + route, rtoken).toPromise()
       .then(response => {
-        const resp = this._jwtService.parseJWT(get(response, 'data.aToken'));
+        const resp = this._jwtService.parseJWT(get(response, 'aToken'));
         // Store the user's info for easy lookup
         if (this._jwtService.isValid(resp)) {
           // this._jwtService.destroy();
-          this._jwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+          this._jwtService.set(get(response, 'aToken'), get(response, 'rToken'));
         }
         return resp;
       }, err => {

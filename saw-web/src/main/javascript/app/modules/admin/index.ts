@@ -1,7 +1,7 @@
 
 import { NgModule } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { UIRouterModule } from '@uirouter/angular';
+import { RouterModule }  from '@angular/router';
 import { CommonModuleTs } from '../../common';
 import { AdminListViewComponent } from './list-view';
 import { AdminMainViewComponent } from './main-view';
@@ -67,7 +67,7 @@ const COMPONENTS = [
 @NgModule({
   imports: [
     CommonModuleTs,
-    UIRouterModule.forChild({states: routes})
+    RouterModule.forChild(routes)
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,

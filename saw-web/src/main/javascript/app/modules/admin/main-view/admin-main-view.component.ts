@@ -1,9 +1,8 @@
 import { Component, Input } from '@angular/core';
-import {Observable} from 'rxjs/Observable';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { Transition } from '@uirouter/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   UserEditDialogComponent,
   UserService
@@ -27,7 +26,6 @@ import { LocalSearchService } from '../../../common/services/local-search.servic
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { ConfirmDialogData } from '../../../common/types';
-import { StateService } from '@uirouter/angular';
 import { AdminMenuData } from '../consts';
 
 const template = require('./admin-main-view.component.html');
@@ -102,8 +100,8 @@ export class AdminMainViewComponent {
     private _toastMessage: ToastService,
     private _dialog: MatDialog,
     private _sidenav: SidenavMenuService,
-    private _state: StateService,
-    private _transition: Transition
+    private _router: Router,
+    private _route: ActivatedRoute
   ) { }
 
   ngOnInit() {
@@ -113,7 +111,7 @@ export class AdminMainViewComponent {
     this.data$ = this.getListData(customerId);
     this.data$.then(data => {
       if (this.section === 'privilege') {
-        const { role } = this._transition.params();
+        const { role } = this._route.snapshot.params;
         if (role) {
           this.filterObj.searchTerm = `role:"${role}"`;
         }
@@ -151,9 +149,10 @@ export class AdminMainViewComponent {
   onRowClick(row) {
     switch (this.section) {
     case 'role':
-      this._state.go('admin.privilege', {
-        role: row.roleName
-      });
+      this._router.navigate(
+        ['admin', 'privilege'],
+        {queryParams: {role: row.roleName}}
+      );
       break;
     default:
       break;

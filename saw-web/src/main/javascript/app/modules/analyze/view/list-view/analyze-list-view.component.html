@@ -24,8 +24,7 @@
 
     <div *dxTemplate="let cell of 'linkCellTemplate'">
       <a [innerHtml]="cell.text | highlight: searchTerm"
-         uiSref="analyze.executedDetail"
-         [uiParams]="{analysisId: cell.data.id, analysis: cell.data}"
+         routerLink="analyze/analysis/{{cell.data.id}}/executed"
       >
       </a>
 

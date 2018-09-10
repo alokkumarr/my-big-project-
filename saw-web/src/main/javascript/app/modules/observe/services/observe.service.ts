@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import { UIRouter } from '@uirouter/angular';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
@@ -10,7 +10,6 @@ import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
-import * as isUndefined from 'lodash/isUndefined';
 import * as add from 'lodash/add';
 
 import { JwtService } from '../../../../login/services/jwt.service';
@@ -26,7 +25,8 @@ export class ObserveService {
   constructor(
     private http: HttpClient,
     private jwt: JwtService,
-    private router: UIRouter,
+    private router: Router,
+    private route: ActivatedRoute,
     private menu: MenuService
   ) {}
 
@@ -200,7 +200,8 @@ export class ObserveService {
   /* Try to redirect to first dashboard or first empty subcategory */
   redirectToFirstDash(menu, force = false) {
     /* Only redirect if on root observe state */
-    if (this.router.stateService.current.name !== 'observe' && !force) {
+    const basePath = this.route.snapshot.url[0].path;
+    if (basePath !== 'observe' && !force) {
       return;
     }
 
@@ -220,16 +221,20 @@ export class ObserveService {
         return subCat.children.length > 0;
       });
 
-      this.router.stateService.go('observe.dashboard', {
-        subCategory: subCategory.id,
-        dashboard: subCategory.children[0].id
-      });
+      this.router.navigate(
+        ['observe', subCategory.id],
+        { queryParams: {
+          dashboard: subCategory.children[0].id
+        }}
+      );
     } else if (categoryWithSubCategory) {
       /* Otherwise, redirect to the first empty subcategory available. */
-      this.router.stateService.go('observe.dashboard', {
-        subCategory: categoryWithSubCategory.children[0].id,
-        dashboard: ''
-      });
+      this.router.navigate(
+        ['observe', categoryWithSubCategory.children[0].id],
+        { queryParams: {
+          dashboard: ''
+        }}
+      );
     }
   }
 

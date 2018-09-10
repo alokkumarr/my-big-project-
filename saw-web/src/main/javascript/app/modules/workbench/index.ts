@@ -7,7 +7,7 @@ import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
-import { UIRouterModule } from '@uirouter/angular';
+import { RouterModule }  from '@angular/router';
 
 import { routes } from './routes';
 
@@ -69,7 +69,7 @@ const components = [
     FormsModule,
     MaterialModule,
     ReactiveFormsModule,
-    UIRouterModule.forChild({states: routes}),
+    RouterModule.forChild(routes),
     DxDataGridModule,
     DxTemplateModule,
     FlexLayoutModule,

@@ -1,6 +1,6 @@
 
 import { Component, Input, OnInit, Inject, OnDestroy } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -38,7 +38,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   private interval = 20000;
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
     private LocalSearch: LocalSearchService,
@@ -59,7 +59,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   startPolling() {
     /**
         * Calls list datasets api onInit and every 10 seconds or whatever set interval
-        * 
+        *
         * @memberof DatasetsComponent
         */
     this.timer = Observable.timer(0, this.interval);
@@ -126,7 +126,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   }
 
   addDataSet(): void {
-    this.router.stateService.go('workbench.add');
+    this.router.navigate(['workbench' ,'add']);
   }
 
   onDataViewChange() {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Transition, StateService } from '@uirouter/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
@@ -61,8 +61,8 @@ export class ExecutedViewComponent implements OnInit {
     private _executeService: ExecuteService,
     private _headerProgressService: HeaderProgressService,
     private _analyzeService: AnalyzeService,
-    private _transition: Transition,
-    private _state: StateService,
+    private _router: Router,
+    private _route: ActivatedRoute,
     private _analyzeActionsService: AnalyzeActionsService,
     private _jwt: JwtService,
     private _analyzeExportService: AnalyzeExportService,
@@ -79,7 +79,8 @@ export class ExecutedViewComponent implements OnInit {
       executionId,
       awaitingExecution,
       loadLastExecution
-    } = this._transition.params();
+    } = this._route.snapshot.params;
+
 
     this.canAutoRefresh = this._jwt.hasCustomConfig(
       CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
@@ -211,16 +212,14 @@ export class ExecutedViewComponent implements OnInit {
   gotoLastPublished(analysis, { executionId }) {
     return () => {
       this._toastMessage.clear();
-      this._state.go(
-        'analyze.executedDetail',
-        {
-          analysisId: analysis.id,
-          analysis: analysis,
-          executionId,
-          awaitingExecution: false,
-          loadLastExecution: true
-        },
-        { reload: true }
+      this._router.navigate(
+        ['analyze', 'analysis', analysis.id, 'executed'], {
+          queryParams: {
+            executionId,
+            awaitingExecution: false,
+            loadLastExecution: true
+          }
+        }
       );
     };
   }
@@ -407,7 +406,9 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   goBackToMainPage(analysis) {
-    this._state.go('analyze.view', { id: get(analysis, 'categoryId') });
+    this._router.navigate(
+      ['analyze', get(analysis, 'categoryId')]
+    );
   }
 
   edit() {
@@ -442,13 +443,15 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   gotoForkedAnalysis(analysis) {
-    this._state.go('analyze.executedDetail', {
-      analysisId: analysis.id,
-      analysis: analysis,
-      executionId: null,
-      awaitingExecution: true,
-      loadLastExecution: false
-    });
+    this._router.navigate(
+      ['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executionId: null,
+          awaitingExecution: true,
+          loadLastExecution: false
+        }
+      }
+    );
   }
 
   afterDelete(analysis) {

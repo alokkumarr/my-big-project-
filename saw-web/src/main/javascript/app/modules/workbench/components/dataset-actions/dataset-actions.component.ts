@@ -1,8 +1,7 @@
 
 import { Component, OnInit, Input } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 
-import { SqlExecutorComponent } from '../sql-executor/sql-executor.component';
 import { WorkbenchService } from '../../services/workbench.service';
 
 const template = require('./dataset-actions.component.html');
@@ -17,7 +16,7 @@ export class DatasetActionsComponent implements OnInit {
   @Input() dsMetadata: any;
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     private workBench: WorkbenchService
   ) { }
 
@@ -26,7 +25,7 @@ export class DatasetActionsComponent implements OnInit {
   openSQLEditor(): void {
     if (this.dsMetadata.asOfNow.status === 'SUCCESS') {
       this.workBench.setDataToLS('dsMetadata', this.dsMetadata);
-      this.router.stateService.go('workbench.sql');
+      this.router.navigate(['workbench', 'create', 'sql']);
     }
   }
 }

@@ -1,20 +1,22 @@
 <div class="login-view">
   <div class="bg-container-wrapper"
-       layout="row" fxLayoutAlign="center center">
+       fxLayout="row"
+       fxLayoutAlign="center center"
+  >
     <div class="bg-container"
-         layout="row" fxLayoutAlign="center center">
+         fxLayout="row"
+         fxLayoutAlign="center center"
+    >
       <div class="login-container"
-           layout="column" fxLayoutAlign="space-around start">
+           fxLayout="column"
+           fxLayoutAlign="space-around start"
+      >
         <div class="brand-logo"></div>
-
-        <ui-view></ui-view>
+        <router-outlet></router-outlet>
       </div>
-
       <div class="middle-logo-container"></div>
     </div>
-
     <div class="white-container"></div>
   </div>
-
   <layout-footer></layout-footer>
 </div>

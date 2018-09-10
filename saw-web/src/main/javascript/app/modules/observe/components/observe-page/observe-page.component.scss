@@ -1,4 +1,4 @@
-ui-view-ng-upgrade {
+router-outlet-ng-upgrade {
   width: 100%;
 }
 
@@ -15,7 +15,7 @@ ui-view-ng-upgrade {
 observe-page {
   width: 100%;
 
-  ui-view {
+  router-outlet {
     width: 100%;
 
     & > * {

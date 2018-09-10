@@ -110,27 +110,22 @@ export class AnalyzeService {
 
   getExportData(analysisId, executionId, analysisType, executionType = EXECUTION_DATA_MODES.NORMAL) {
     const onetimeExecution = executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
-    return this.getRequest(`exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`)
-      .then(fpGet('data.data'));
+    return this.getRequest(`exports/${executionId}/executions/${analysisId}/data?analysisType=${analysisType}${onetimeExecution}`);
   }
 
   getAnalysesFor(subCategoryId/* , opts = {} */) {
-    /* Wait until the menu has been loaded. The menu payload contains the
-       analyses list from which we'll load the result for this function. */
-    return this._menu.then(() => {
-      const payload = this.getRequestParams([
-        ['contents.action', 'search'],
-        ['contents.keys.[0].categoryId', subCategoryId]
-      ]);
-      return this.postRequest(`analysis`, payload);
-    })
-      .then(fpGet('data.contents.analyze'))
+    const payload = this.getRequestParams([
+      ['contents.action', 'search'],
+      ['contents.keys.[0].categoryId', subCategoryId]
+    ]);
+    return this.postRequest(`analysis`, payload)
+      .then(fpGet('contents.analyze'))
       .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
 
   getPublishedAnalysesByAnalysisId(id) {
     return this.getRequest(`analysis/${id}/executions`)
-      .then(fpGet(`data.executions`))
+      .then(fpGet(`executions`))
       .then(fpSortBy([obj => -obj.finished]));
   }
 
@@ -150,8 +145,8 @@ export class AnalyzeService {
     return this.getRequest(
       `analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`
     ).then(resp => {
-      const data = fpGet(`data.data`, resp);
-      const count = fpGet(`data.totalRows`, resp) || data.length;
+      const data = fpGet(`data`, resp);
+      const count = fpGet(`totalRows`, resp) || data.length;
       return {data: options.forcePaginate ? this.forcePagination(data, options) : data, count};
     });
   }
@@ -161,7 +156,7 @@ export class AnalyzeService {
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return this.postRequest(`analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+    return this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
   }
 
   previewExecution(model, options = {}) {
@@ -206,11 +201,11 @@ export class AnalyzeService {
   }
 
   getCronDetails(requestBody) {
-    return this.postRequest(`scheduler/fetchJob`, requestBody).then(({data}) => data);
+    return this.postRequest(`scheduler/fetchJob`, requestBody);
   }
 
   getAllCronJobs(model) {
-    return this.postRequest(`scheduler/jobs`, model).then(({data}) => data);
+    return this.postRequest(`scheduler/jobs`, model);
   }
 
   getlistFTP(custCode) {
@@ -257,7 +252,7 @@ export class AnalyzeService {
   }
 
   getMethods() {
-    return this.getRequest('/api/analyze/methods').then(fpGet('data'));
+    return this.getRequest('/api/analyze/methods');
   }
 
   updateAnalysis(model) {
@@ -269,7 +264,7 @@ export class AnalyzeService {
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return this.postRequest(`analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+    return this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
   }
 
   applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options: ExecutionRequestOptions = {}) {
@@ -291,10 +286,10 @@ export class AnalyzeService {
     ]);
     return this.postRequest(`analysis`, payload).then(resp => {
       return {
-        data: fpGet(`data.contents.analyze.[0].data`, resp),
-        executionId: fpGet(`data.contents.analyze.[0].executionId`, resp),
+        data: fpGet(`contents.analyze.[0].data`, resp),
+        executionId: fpGet(`contents.analyze.[0].executionId`, resp),
         executionType: mode,
-        count: fpGet(`data.contents.analyze.[0].totalRows`, resp)
+        count: fpGet(`contents.analyze.[0].totalRows`, resp)
       };
     });
   }
@@ -320,7 +315,7 @@ export class AnalyzeService {
   }
 
   generateQuery(payload) {
-    return this.postRequest('/api/analyze/generateQuery', payload).then(fpGet('data'));
+    return this.postRequest('/api/analyze/generateQuery', payload);
   }
 
   saveReport(model) {
@@ -335,7 +330,7 @@ export class AnalyzeService {
       ['contents.select', 'headers'],
       ['contents.context', 'Semantic']
     ]);
-    return this.postRequest(`md`, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
+    return this.postRequest(`md`, params).then(fpGet(`contents.[0].${MODULE_NAME}`));
   }
 
   createAnalysis(metricId, type) {
@@ -344,7 +339,7 @@ export class AnalyzeService {
       ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return this.postRequest(`analysis`, params).then(fpGet('data.contents.analyze.[0]'));
+    return this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'));
   }
 
   getRequest(path) {

@@ -59,8 +59,6 @@ export const ENTRY_MODES = {
   NEW: 'new'
 };
 
-export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
-
 export const TYPE_MAP = reduce([
   ...map(NUMBER_TYPES, type => ({type, generalType: 'number'})),
   ...map(DATE_TYPES, type => ({type, generalType: 'date'})),
