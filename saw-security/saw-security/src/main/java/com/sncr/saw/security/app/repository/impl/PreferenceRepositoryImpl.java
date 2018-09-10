@@ -67,7 +67,7 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
                 ps.setString(2,CONFIG_VAL_OBJ_TYPE);
                 ps.setString(3, userPreferences.getUserID());
             });
-        return null;
+        return userPreferences;
     }
 
     @Override
@@ -91,6 +91,6 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
         userPreferences.setUserID(userID);
         userPreferences.setCustomerID(customerID);
         userPreferences.setPreferences(preferences);
-        return userPreferences;
+        return null;
     }
 }
