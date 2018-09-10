@@ -82,6 +82,11 @@ module.exports = {
   getAnalysisIdFromUrl(url){
     let ulrParts = url.split("analyze/analysis/")[1];
     return ulrParts.split("/")[0];
+  },slideHorizontally(element, x_axis) {
+    browser.actions().dragAndDrop(
+      element,
+      {x:x_axis, y:0}
+    ).perform();
   }
 };
 
