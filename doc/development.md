@@ -196,6 +196,20 @@ field mapping].
 [Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
 [Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
+# Testing upgrade and migration
+
+To test upgrading SIP from an old version, including database
+migration, add the `-Dsip.upgrade.skip=false` flag to the deploy
+command:
+
+        $ mvn package
+        $ mvn -Ddocker-start=cloud -Dsip.upgrade.skip=false
+
+This will first deploy the old SIP version (see the SIP package URL in
+`pom.xml`) and then deploy the new SIP version on top of it.  The flag
+can also be used in continuous integration, in which case integration
+tests will be run on top of the upgraded SIP version.
+
 # Running manual package upgrade/migration Tests
 
 To run the saw package upgrade and database migration manually with Local docker instance, execute the
