@@ -108,6 +108,7 @@ export type DesignerChangeEvent = {
     | 'visibleIndex'
     | 'submitQuery'
     | 'chartTitle'
+    | 'fetchLimit'
     | 'changeQuery';
   column?: ArtifactColumn;
   data?: any;

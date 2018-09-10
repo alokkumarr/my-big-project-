@@ -191,7 +191,21 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
           });
           //Verify updated details.
           expect(savedAlaysisPage.analysisViewPageElements.text(forkedName).getText()).toBe(forkedName);
-          expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
+
+          commonFunctions.waitFor.elementToBeVisible(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
+          commonFunctions.waitFor.elementToBeClickable(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
+          commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard);
+
+          element(utils.hasClass(savedAlaysisPage.analysisViewPageElements.analysisDetailsCard, 'mat-expanded').then(function(isPresent) {
+            if(!isPresent) {
+              savedAlaysisPage.analysisViewPageElements.analysisDetailsCard.click();
+              commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.text(forkedDescription));
+              expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
+            } else {
+              commonFunctions.scrollIntoView(savedAlaysisPage.analysisViewPageElements.text(forkedDescription));
+              expect(savedAlaysisPage.analysisViewPageElements.text(forkedDescription).getText()).toBe(forkedDescription);
+            }
+          }));
         }catch (e) {
           console.log(e);
         }
