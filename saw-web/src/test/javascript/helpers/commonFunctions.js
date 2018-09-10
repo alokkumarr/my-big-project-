@@ -72,7 +72,7 @@ module.exports = {
     browser.executeScript('window.localStorage.clear();');
   },
   scrollIntoView(element) {
-    arguments[0].scrollIntoView();
+    browser.executeScript('arguments[0].scrollIntoView()', element);
   },
   writeScreenShot(data, filename) {
     var stream = fs.createWriteStream(filename);

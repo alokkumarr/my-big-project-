@@ -11,6 +11,7 @@ import { AnalysisType } from './analysis-type.model';
 
 export interface Analysis {
   description: string;
+  metricId: string;
   checked: null | boolean | string;
   categoryId: number;
   artifacts: Artifact[];

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Transition, StateService } from '@uirouter/angular';
 import * as get from 'lodash/get';
+import * as find from 'lodash/find';
+import * as moment from 'moment';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -39,10 +41,12 @@ require('./executed-view.component.scss');
   template
 })
 export class ExecutedViewComponent implements OnInit {
-  _executionId: string;
-  analysis: Analysis;
+  analysis: Analysis; // the latest analysis definition
+  executedAnalysis: Analysis; // the exact analysis that was executed
   analyses: Analysis[];
   onetimeExecution: boolean;
+  executedBy: string;
+  executedAt: any;
   data: any[];
   dataLoader: Function;
   canAutoRefresh: boolean;
@@ -88,6 +92,7 @@ export class ExecutedViewComponent implements OnInit {
     this.executionId = executionId;
     if (analysis) {
       this.analysis = analysis;
+      this.executedAnalysis = { ...this.analysis };
       this.setPrivileges(analysis);
 
       this.executeIfNotWaiting(
@@ -226,18 +231,20 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   executeAnalysis(analysis, mode) {
-    this._analyzeActionsService.execute(analysis, mode).then(executionStarted => {
-      // this.afterExecuteLaunched(analysis);
-      if (!executionStarted && !this.analyses) {
-        // at least load the executed analyses if none are loaded
-        this.loadExecutedAnalysesAndExecutionData(
-          analysis.id,
-          null,
-          analysis.type,
-          null
-        );
-      }
-    });
+    this._analyzeActionsService
+      .execute(analysis, mode)
+      .then(executionStarted => {
+        // this.afterExecuteLaunched(analysis);
+        if (!executionStarted && !this.analyses) {
+          // at least load the executed analyses if none are loaded
+          this.loadExecutedAnalysesAndExecutionData(
+            analysis.id,
+            null,
+            analysis.type,
+            null
+          );
+        }
+      });
   }
 
   loadExecutedAnalysesAndExecutionData(
@@ -272,6 +279,27 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
+  setExecutedBy(executedBy) {
+    this.executedBy =
+      executedBy ||
+      (this.onetimeExecution ? this._jwt.getLoginId() : 'Scheduled');
+  }
+
+  setExecutedAt(executionId) {
+    const finished = (
+      find(this.analyses, execution => execution.id === executionId) || {
+        finished: null
+      }
+    ).finished;
+
+    this.executedAt = finished
+      ? moment
+          .utc(finished)
+          .local()
+          .format('YYYY/MM/DD h:mm A')
+      : this.executedAt;
+  }
+
   loadExecutedAnalyses(analysisId) {
     this._headerProgressService.show();
     return this._analyzeService
@@ -279,6 +307,8 @@ export class ExecutedViewComponent implements OnInit {
       .then(
         analyses => {
           this.analyses = analyses;
+          this.setExecutedAt(this.executionId);
+
           this._headerProgressService.hide();
           return analyses;
         },
@@ -294,6 +324,7 @@ export class ExecutedViewComponent implements OnInit {
     return this._analyzeService.readAnalysis(analysisId).then(
       analysis => {
         this.analysis = analysis;
+        this.executedAnalysis = { ...this.analysis };
         this._headerProgressService.hide();
         return analysis;
       },
@@ -317,6 +348,17 @@ export class ExecutedViewComponent implements OnInit {
       if (executeResponse) {
         // resolve the data that is sent by the execution
         // and the paginated data after that
+        this.executedAnalysis = {
+          ...this.analysis,
+          sqlBuilder:
+            executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
+        };
+        this.setExecutedBy(executeResponse.executedBy);
+        this.executedAt = moment
+          .utc(executeResponse.executedAt)
+          .local()
+          .format('YYYY/MM/DD h:mm A');
+
         let isItFirstTime = true;
         this.dataLoader = options => {
           if (isItFirstTime) {
@@ -349,11 +391,24 @@ export class ExecutedViewComponent implements OnInit {
       }
     } else {
       if (executeResponse) {
-        this.data = this.flattenData(executeResponse.data, this.analysis);
+        this.executedAnalysis = {
+          ...this.analysis,
+          sqlBuilder:
+            executeResponse.queryBuilder || this.executedAnalysis.sqlBuilder
+        };
+        this.setExecutedBy(executeResponse.executedBy);
+        this.executedAt = moment
+          .utc(executeResponse.executedAt)
+          .local()
+          .format('YYYY/MM/DD h:mm A');
+        this.data = this.flattenData(
+          executeResponse.data,
+          this.executedAnalysis
+        );
       } else {
         this.loadExecutionData(analysisId, executionId, analysisType).then(
           ({ data }) => {
-            this.data = this.flattenData(data, this.analysis);
+            this.data = this.flattenData(data, this.executedAnalysis);
           }
         );
       }
@@ -379,8 +434,14 @@ export class ExecutedViewComponent implements OnInit {
     return this._analyzeService
       .getExecutionData(analysisId, executionId, options)
       .then(
-        ({ data, count }) => {
+        ({ data, count, queryBuilder, executedBy }) => {
           this._headerProgressService.hide();
+          if (this.executedAnalysis && queryBuilder) {
+            this.executedAnalysis.sqlBuilder = queryBuilder;
+          }
+
+          this.setExecutedBy(executedBy);
+          this.setExecutedAt(executionId);
           return { data, totalCount: count };
         },
         err => {
@@ -415,9 +476,10 @@ export class ExecutedViewComponent implements OnInit {
       if (!result) {
         return;
       }
-      const {requestExecution, analysis} = result;
+      const { requestExecution, analysis } = result;
       if (analysis) {
         this.analysis = analysis;
+        this.executedAnalysis = { ...this.analysis };
       }
       if (requestExecution) {
         this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
@@ -430,9 +492,10 @@ export class ExecutedViewComponent implements OnInit {
       if (!result) {
         return;
       }
-      const {requestExecution, analysis} = result;
+      const { requestExecution, analysis } = result;
       if (analysis) {
         this.analysis = analysis;
+        this.executedAnalysis = { ...this.analysis };
       }
       if (requestExecution) {
         this.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
@@ -468,7 +531,7 @@ export class ExecutedViewComponent implements OnInit {
       this.chartUpdater$.next({ export: true });
       break;
     default:
-      this._analyzeExportService.export(this.analysis, this.executionId, this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL);
+      this._analyzeExportService.export(this.executedAnalysis, this.executionId, this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL);
     }
   }
 }

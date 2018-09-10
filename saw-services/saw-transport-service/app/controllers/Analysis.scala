@@ -376,6 +376,14 @@ class Analysis extends BaseController {
     ("contents", ("analyze", JArray(analyses)))
   }
 
+  def unexpectedElement(
+                         json: JValue, expected: String, location: String): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new ClientException(
+      "Unexpected element: %s, expected %s, at %s".format(
+        name, expected, location))
+  }
+
   /**
     * Return the list of analysis created in my analysis category by requested user.
     *
@@ -399,20 +407,32 @@ class Analysis extends BaseController {
     m_log.trace("json dataset: {}", reqJSON);
     val start = (reqJSON \ "contents" \ "page").extractOrElse(1)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
+    var executedBy = (reqJSON \ "contents" \ "executedBy").extractOrElse("Anonymous")
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
       case _ => null
     }
+    var analysisDefinition :JObject = null
+
     if (analysis == null) {
       analysisJSON = readAnalysisJson(analysisId); // reading from the store
+      analysisDefinition = analysisJSON
       val analysisType = (analysisJSON \ "type");
       typeInfo = analysisType.extract[String];
       json = compact(render(analysisJSON));
+      // If analysis is null it must be triggered via scheduled job.
+      executedBy="Scheduled"
     }
     else {
       val analysisType = (analysis \ "type");
       typeInfo = analysisType.extract[String];
+      analysisDefinition = analysisJson(reqJSON,dataSecurityKeyStr)
       json = compact(render(analysis));
+    }
+    val queryBuilder : JObject = (analysisDefinition \ "sqlBuilder") match {
+      case obj: JObject => obj
+      case JNothing => JObject()
+      case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
     val analysisNode = AnalysisNode(analysisId)
     val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -476,7 +496,9 @@ class Analysis extends BaseController {
             JField("execution_result", JString("success")),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -492,7 +514,9 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -557,7 +581,9 @@ class Analysis extends BaseController {
             JField("execution_result", JString("success")),
             JField("execution_finish_ts", JLong(finishedTS)),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -573,7 +599,9 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -633,7 +661,10 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
             JField("exec-code", JInt(0)),
-            JField("execution_start_ts", JString(timestamp))
+            JField("execution_start_ts", JString(timestamp)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
+
           ))
           m_log debug s"Create result: with content: ${compact(render(descriptor))}"
         }
@@ -649,7 +680,9 @@ class Analysis extends BaseController {
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
             JField("execution_start_ts", JString(timestamp)),
-            JField("error_message", JString(errorMsg))
+            JField("error_message", JString(errorMsg)),
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
           ))
         }
 
@@ -694,18 +727,41 @@ class Analysis extends BaseController {
         case "publish" => ExecutionType.publish
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
-      val execution = analysis.executeAndWaitQueue(
-        executionTypeEnum, query, (analysisId, resultId, query) => {
-          val executorQueue = executionTypeEnum match {
-            case ExecutionType.preview => executorFastQueue
-            case ExecutionType.onetime => executorFastQueue
-            case ExecutionType.scheduled => executorRegularQueue
-            case ExecutionType.regularExecution => executorRegularQueue
-            case ExecutionType.publish => executorRegularQueue
-            case obj => throw new RuntimeException("Unknown execution type: " + obj)
+      var resultNodeId :String = null
+      val execution = try {
+        analysis.executeAndWaitQueue(
+          executionTypeEnum, query, (analysisId, resultId, query) => {
+            val executorQueue = executionTypeEnum match {
+              case ExecutionType.preview => executorFastQueue
+              case ExecutionType.onetime => executorFastQueue
+              case ExecutionType.scheduled => executorRegularQueue
+              case ExecutionType.regularExecution => executorRegularQueue
+              case ExecutionType.publish => executorRegularQueue
+              case obj => throw new RuntimeException("Unknown execution type: " + obj)
+            }
+            executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
+            resultNodeId= resultId
+          })
+      } catch {
+        case throwable: Throwable =>
+          throw throwable
+      } finally {
+        // possibly execution timeOut exception, but still execution may running
+        // as background process, update the queryBuilder metadata, if resultNode exists.
+        resultNode = getResultNode(analysisId,resultNodeId)
+        if(resultNode!=null) {
+          val content = resultNode.getCachedData("content") match {
+            case obj: JObject => obj
+            case obj: JValue => unexpectedElement("object", obj)
           }
-          executorQueue.send(executionTypeEnum, analysisId, resultId, query, limit)
-        })
+          val newDescriptor = JObject(content.obj ++ List(
+            JField("queryBuilder", queryBuilder),
+            JField("executedBy", executedBy)
+          ))
+          resultNode.setDescriptor(compact(render(newDescriptor)))
+          resultNode.update()
+        }
+      }
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
@@ -851,5 +907,18 @@ class Analysis extends BaseController {
           case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
         }
       })
+  }
+
+  private def getResultNode(analysisID:String ,resultID:String): AnalysisResult =
+  {
+    var resultNode: AnalysisResult = null
+    try {
+      m_log debug s"Remove result: " + resultID
+      resultNode = AnalysisResult(analysisID, resultID)
+    }
+    catch {
+      case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+    }
+    resultNode
   }
 }
