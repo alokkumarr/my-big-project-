@@ -165,7 +165,7 @@ sip_add_dataset <- function(output_name,
                             token) {
   checkmate::assert_string(output_name)
   checkmate::assert_choice(output_format, c("parquet", "csv", "json", "rds"))
-  checkmate::assert_list(output_schema, names = "unnamed")
+  checkmate::assert_list(output_schema)
   checkmate::assert_string(catalog)
   checkmate::assert_number(output_rows, lower = 0)
   checkmate::assert_string(component)
