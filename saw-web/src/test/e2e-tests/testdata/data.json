@@ -1219,6 +1219,26 @@
           "isGlobalFilter": true
         }]
       }
+    },
+    "dashboardGlobalFiltersWithPivot": {
+      "pivotStringByAdmin": {
+        "user": "admin",
+        "chartType": "chart:line",
+        "dashboardGlobalFilters":[
+          {
+            "name":"float",
+            "value" : 30
+          }
+        ],
+        "filters":[{
+          "type": "float",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "float",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": true
+        }]
+      }
     }
   }
 }

@@ -79,6 +79,7 @@ describe('Global filters in dashboard with charts tests: dashboardGlobalFilter.t
 
         dashboardId = dashboardFunctions.addNewDashBoardFromExistingAnalysis(dashboardName, dashboardDescription, analysisCategoryName, analysisSubCategoryName, subCategoryName, analysesDetails);
         dashboardFunctions.applyAndVerifyGlobalFilters(data.dashboardGlobalFilters);
+        browser.refresh();
         dashboardFunctions.deleteDashboard(dashboardName);
 
       } catch (e) {
