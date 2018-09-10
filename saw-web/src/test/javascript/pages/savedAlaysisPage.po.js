@@ -21,6 +21,7 @@ module.exports = {
   analysisViewPageElements:{
     text: value => element(by.xpath(`//*[text()="${value}"]`)),
     title: element(by.binding('$ctrl.analysis.name')),
-    description: element(by.binding('$ctrl.analysis.description'))
+    description: element(by.binding('$ctrl.analysis.description')),
+    analysisDetailsCard: element(by.xpath(`//*[text()="Analysis Details"]/parent::*/parent::mat-expansion-panel-header`))
   }
 };
