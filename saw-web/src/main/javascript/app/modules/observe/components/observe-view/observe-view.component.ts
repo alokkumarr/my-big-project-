@@ -67,7 +67,9 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     private jwt: JwtService,
     private _route: ActivatedRoute
   ) {
-    const { dashboard, subCategory } = this._route.snapshot.params;
+    const snapshot = this._route.snapshot;
+    const { subCategory } = snapshot.params;
+    const { dashboard } = snapshot.queryParams;
     this.dashboardId = dashboard;
     this.subCategoryId = subCategory;
 

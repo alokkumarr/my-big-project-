@@ -73,14 +73,16 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   ngOnInit() {
+    const snapshot = this._route.snapshot;
     const {
       analysis,
-      analysisId,
-      executionId,
+      analysisId
+    } = snapshot.params;
+    const {
       awaitingExecution,
-      loadLastExecution
-    } = this._route.snapshot.params;
-
+      loadLastExecution,
+      executionId
+    } = snapshot.queryParams;
 
     this.canAutoRefresh = this._jwt.hasCustomConfig(
       CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH

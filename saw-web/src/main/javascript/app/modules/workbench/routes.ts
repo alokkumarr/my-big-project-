@@ -9,22 +9,25 @@ export const routes: Routes = [
   {
     // name: 'workbench',
     path: 'workbench',
-    component: WorkbenchPageComponent
-  }, {
-    // name: 'workbench.datasets',
-    path: 'workbench/datasets',
-    component: DatasetsComponent
-  }, {
-    // name: 'workbench.add',
-    path: 'workbench/add',
-    component: CreateDatasetsComponent
-  }, {
-    // name: 'workbench.sql',
-    path: 'workbench/create/sql',
-    component: SqlExecutorComponent
-  }, {
-    // name: 'workbench.datasetDetails',
-    path: 'workbench/dataset/details',
-    component: DatasetDetailViewComponent
+    component: WorkbenchPageComponent,
+    children: [
+      {
+        // name: 'workbench.datasets',
+        path: 'datasets',
+        component: DatasetsComponent
+      }, {
+        // name: 'workbench.add',
+        path: 'add',
+        component: CreateDatasetsComponent
+      }, {
+        // name: 'workbench.sql',
+        path: 'create/sql',
+        component: SqlExecutorComponent
+      }, {
+        // name: 'workbench.datasetDetails',
+        path: 'dataset/details',
+        component: DatasetDetailViewComponent
+      }
+    ]
   }
 ];

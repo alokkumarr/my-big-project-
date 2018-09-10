@@ -100,6 +100,8 @@ import { AnalyzeService } from './services/analyze.service';
 
 import { AnalyzeDialogService } from './services/analyze-dialog.service';
 
+import { AnalyzePageComponent } from './page';
+
 export const AnalyzeModule = 'AnalyzeModule';
 
 // angular
@@ -205,7 +207,8 @@ export const AnalyzeModule = 'AnalyzeModule';
     DesignerPreviewDialogComponent,
     ArtifactColumns2PivotFieldsPipe,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout
+    MultiTableDesignerLayout,
+    AnalyzePageComponent
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -231,7 +234,8 @@ export const AnalyzeModule = 'AnalyzeModule';
     DesignerSaveComponent,
     DesignerPreviewDialogComponent,
     SingleTableDesignerLayout,
-    MultiTableDesignerLayout
+    MultiTableDesignerLayout,
+    AnalyzePageComponent
   ],
   providers: [
     AnalyzeDialogService,
