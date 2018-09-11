@@ -16,7 +16,7 @@ export class LayoutContentComponent {
   constructor(
     private _jwt: JwtService,
     private _router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.goToAnalyzePage();
@@ -25,10 +25,10 @@ export class LayoutContentComponent {
   goToAnalyzePage() {
     const analyzeModuleName = 'ANALYZE';
     const modules = get(this._jwt.getTokenObj(), 'ticket.products[0].productModules');
-    const analyzeModuleExists = find(modules, ({productModName}) => productModName === analyzeModuleName);
+    const analyzeModuleExists = find(modules, ({ productModName }) => productModName === analyzeModuleName);
 
     if (analyzeModuleExists) {
-      this._router.navigate(['analyze']);
+      // this._router.navigate(['observe']);
     }
   }
 }

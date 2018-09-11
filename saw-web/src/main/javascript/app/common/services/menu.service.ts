@@ -7,12 +7,12 @@ import * as startsWith from 'lodash/startsWith';
 
 import { JwtService } from '../../../login/services/jwt.service';
 import { ComponentHandler } from './componentHandler';
-import { SidenavMenuService } from'../components/sidenav/sidenav-menu.service';
+import { SidenavMenuService } from '../components/sidenav/sidenav-menu.service';
 
 export const SAW_MODULES = {
-  OBSERVE: {name: 'OBSERVE', codePrefix: 'OBSR'},
-  ANALYZE: {name: 'ANALYZE', codePrefix: 'ANLYS'},
-  WORKBENCH: {name: 'WORKBENCH', codePrefix: 'WRK'}
+  OBSERVE: { name: 'OBSERVE', codePrefix: 'OBSR' },
+  ANALYZE: { name: 'ANALYZE', codePrefix: 'ANLYS' },
+  WORKBENCH: { name: 'WORKBENCH', codePrefix: 'WRK' }
 };
 
 @Injectable()
@@ -23,13 +23,16 @@ export class MenuService {
     private _jwtService: JwtService,
     private _$componentHandler: ComponentHandler,
     private _sidenavMenuService: SidenavMenuService
-  ) {}
+  ) { }
 
   updateMenu(data, moduleName, componentId = 'left-side-nav') {
     // const menu = this._$componentHandler.get(componentId)[0];
     // menu.update(data, moduleName);
     this._sidenavMenuService.updateMenu(data, moduleName);
-    this._menuCache[moduleName] = data;
+    const menuPromise = new Promise(resolve => {
+      resolve(data);
+    });
+    this._menuCache[moduleName] = menuPromise;
   }
 
   getMenu(moduleName) {
@@ -41,7 +44,7 @@ export class MenuService {
       return cachedMenu;
     }
 
-    const menuPromise =  new Promise((resolve, reject) => {
+    const menuPromise = new Promise((resolve, reject) => {
       const error = (desc = 'Error occurred while getting menu.') => {
         reject(desc);
         return;
@@ -63,7 +66,7 @@ export class MenuService {
       const features = filter(module.prodModFeature, category => startsWith(category.prodModCode, SAW_MODULES[moduleName].codePrefix));
 
       resolve(map(features, feature => {
-        const obj = {
+        const obj: any = {
           id: feature.prodModFeatureID,
           name: feature.prodModFeatureName || feature.prodModFeatureDesc,
           data: feature

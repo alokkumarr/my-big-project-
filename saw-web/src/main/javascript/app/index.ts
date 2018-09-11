@@ -9,7 +9,7 @@ import { NgModule, LOCALE_ID } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { RouterModule }  from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MaterialModule } from './material.module';
 
 import { routes } from './routes';
@@ -19,13 +19,14 @@ import { CommonModuleTs } from './common';
 import { AnalyzeModuleTs } from './modules/analyze';
 import { AdminModule } from './modules/admin';
 import { WorkbenchUpgradeModule } from './modules/workbench';
+import { DefaultHomePageGuard } from './common/guards';
 
 import {
   LayoutContentComponent,
   LayoutHeaderComponent,
   LayoutFooterComponent,
   MainPageComponent
- } from './layout';
+} from './layout';
 
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
@@ -41,11 +42,12 @@ const COMPONENTS = [
   MainPageComponent
 ];
 const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
+const GUARDS = [DefaultHomePageGuard];
 
 @NgModule({
   imports: [
     BrowserModule,
-    RouterModule.forRoot(routes, {useHash: true}),
+    RouterModule.forRoot(routes, { useHash: true }),
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
@@ -56,14 +58,15 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
   ],
   exports: [FlexLayoutModule],
   providers: [
-    ...SERVICES
+    ...SERVICES,
+    ...GUARDS
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   bootstrap: [LayoutContentComponent]
 })
 export class NewAppModule {
-  constructor() {}
+  constructor() { }
 }
 
 

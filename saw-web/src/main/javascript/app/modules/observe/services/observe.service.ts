@@ -28,7 +28,7 @@ export class ObserveService {
     private router: Router,
     private route: ActivatedRoute,
     private menu: MenuService
-  ) {}
+  ) { }
 
   addModelStructure(model) {
     return {
@@ -159,7 +159,7 @@ export class ObserveService {
                     name: dashboard.name,
                     url: `#!/observe/${subCategory.id}?dashboard=${
                       dashboard.entityId
-                    }`,
+                      }`,
                     data: dashboard
                   }))
                 );
@@ -223,17 +223,21 @@ export class ObserveService {
 
       this.router.navigate(
         ['observe', subCategory.id],
-        { queryParams: {
-          dashboard: subCategory.children[0].id
-        }}
+        {
+          queryParams: {
+            dashboard: subCategory.children[0].id
+          }
+        }
       );
     } else if (categoryWithSubCategory) {
       /* Otherwise, redirect to the first empty subcategory available. */
       this.router.navigate(
         ['observe', categoryWithSubCategory.children[0].id],
-        { queryParams: {
-          dashboard: ''
-        }}
+        {
+          queryParams: {
+            dashboard: ''
+          }
+        }
       );
     }
   }
