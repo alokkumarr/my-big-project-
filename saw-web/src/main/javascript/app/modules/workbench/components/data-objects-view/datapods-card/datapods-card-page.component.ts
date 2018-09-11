@@ -1,11 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { UIRouter } from '@uirouter/angular';
-
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
-import { SqlExecutorComponent } from '../../sql-executor/sql-executor.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datapods-card-page.component.html');
@@ -25,7 +22,6 @@ export class DatapodsCardPageComponent implements OnInit {
   private dataPods: Array<any> = [];
 
   constructor(
-    private router: UIRouter,
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
     private workbench: WorkbenchService

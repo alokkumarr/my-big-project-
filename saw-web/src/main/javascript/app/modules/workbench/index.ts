@@ -1,5 +1,3 @@
-import * as angular from 'angular';
-import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { MaterialModule } from '../../material.module';
@@ -9,23 +7,23 @@ import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
+import { RouterModule }  from '@angular/router';
 
-import { routesConfig } from './routes';
-import { i18nConfig } from './i18n';
+import { routes } from './routes';
 
 import { WorkbenchService } from './services/workbench.service';
-import { analyzeServiceProvider } from '../analyze/services/ajs-analyze-providers';
+import { AnalyzeService } from '../analyze/services/analyze.service';
 import {
-  menuServiceProvider,
-  componentHandlerProvider,
-  headerProgressProvider,
-  toastProvider,
-  sidenavProvider,
-  localSearchProvider,
-  dxDataGridProvider
-} from '../../common/services/ajs-common-providers';
+  MenuService,
+  ComponentHandler,
+  HeaderProgressService,
+  ToastService,
+  SideNavService,
+  LocalSearchService,
+  dxDataGridService
+} from '../../common/services';
 
-import { jwtServiceProvider } from '../../../login/services/ajs-login-providers';
+import { JwtService } from '../../../login/services/jwt.service';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';
@@ -54,14 +52,7 @@ import {
   DatapodActionsComponent
 } from './components/data-objects-view/index';
 
-import { CommonModule, CommonModuleTs } from '../../common';
-
-export const WorkbenchModule = 'WorkbenchModule';
-
-angular
-  .module(WorkbenchModule, [CommonModule])
-  .config(routesConfig)
-  .config(i18nConfig);
+import { CommonModuleTs } from '../../common';
 
 const components = [
   WorkbenchPageComponent,
@@ -96,7 +87,7 @@ const components = [
     FormsModule,
     MaterialModule,
     ReactiveFormsModule,
-    UIRouterUpgradeModule,
+    RouterModule.forChild(routes),
     DxDataGridModule,
     DxTemplateModule,
     FlexLayoutModule,
@@ -108,16 +99,16 @@ const components = [
   declarations: components,
   entryComponents: components,
   providers: [
+    JwtService,
     WorkbenchService,
-    menuServiceProvider,
-    analyzeServiceProvider,
-    componentHandlerProvider,
-    headerProgressProvider,
-    toastProvider,
-    sidenavProvider,
-    localSearchProvider,
-    dxDataGridProvider,
-    jwtServiceProvider
+    AnalyzeService,
+    MenuService,
+    ComponentHandler,
+    HeaderProgressService,
+    ToastService,
+    SideNavService,
+    LocalSearchService,
+    dxDataGridService
   ]
 })
 export class WorkbenchUpgradeModule {}

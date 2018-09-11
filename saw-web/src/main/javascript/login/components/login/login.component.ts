@@ -16,7 +16,7 @@ export class LoginComponent {
     private _JwtService: JwtService,
     private _UserService: UserService,
     private configService: ConfigService
-  ) {}
+  ) { }
 
   private dataHolder = {
     username: null,
@@ -30,19 +30,17 @@ export class LoginComponent {
   ngOnInit() {
     const changePassMsg = window.location.href;
     if (!isUndefined(changePassMsg.split('changePassMsg=')[1])) {
-      this.states.error = decodeURI(
-        changePassMsg.split('changePassMsg=')[1]
-      ).split('#!/')[0];
+      this.states.error = decodeURI(changePassMsg.split('changePassMsg=')[1]).split('#!/')[0];
     }
   }
 
   login() {
-    this._UserService
-      .attemptAuth({
-        masterLoginId: this.dataHolder.username,
-        authpwd: this.dataHolder.password
-      })
-      .then(data => {
+    const params = {
+      masterLoginId: this.dataHolder.username,
+      authpwd: this.dataHolder.password
+    };
+    this._UserService.attemptAuth(params).then(
+      data => {
         if (this._JwtService.isValid(data)) {
           this.configService
             .getConfig()

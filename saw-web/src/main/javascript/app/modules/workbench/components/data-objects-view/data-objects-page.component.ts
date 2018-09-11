@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -42,7 +42,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   searchBox: SearchBoxComponent;
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
     private LocalSearch: LocalSearchService,
@@ -195,7 +195,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   }
 
   addDataSet(): void {
-    this.router.stateService.go('workbench.add');
+    this.router.navigate(['workbench', 'dataset', 'add']);
   }
 
   /**

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { DxDataGridComponent } from 'devextreme-angular';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
@@ -25,7 +25,7 @@ export class CreateSemanticComponent implements OnInit {
   private selectedDSData: any = [];
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     private workBench: WorkbenchService,
     private headerProgress: HeaderProgressService
   ) {}
@@ -42,11 +42,11 @@ export class CreateSemanticComponent implements OnInit {
   }
 
   backToDS() {
-    this.router.stateService.go('workbench.dataobjects');
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 
   /**
-   * Only Datalake datasets are join eligible as of now. 
+   * Only Datalake datasets are join eligible as of now.
    *
    * @memberof CreateSemanticComponent
    */
@@ -75,6 +75,6 @@ export class CreateSemanticComponent implements OnInit {
 
   gotoValidate() {
     this.workBench.setDataToLS('selectedDS', this.selectedDSData);
-    this.router.stateService.go('workbench.validateSemantic');
+    this.router.navigate(['workbench', 'semantic', 'validate']);
   }
 }

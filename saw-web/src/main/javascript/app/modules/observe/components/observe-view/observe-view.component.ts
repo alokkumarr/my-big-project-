@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import * as html2pdf from 'html2pdf.js';
-import { Transition } from '@uirouter/angular';
+import { ActivatedRoute } from '@angular/router';
 
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -71,10 +71,13 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     private configService: ConfigService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
-    private transition: Transition
+    private _route: ActivatedRoute
   ) {
-    this.dashboardId = this.transition.params().dashboard;
-    this.subCategoryId = this.transition.params().subCategory;
+    const snapshot = this._route.snapshot;
+    const { subCategory } = snapshot.params;
+    const { dashboard } = snapshot.queryParams;
+    this.dashboardId = dashboard;
+    this.subCategoryId = subCategory;
 
     this.loadPrivileges();
   }

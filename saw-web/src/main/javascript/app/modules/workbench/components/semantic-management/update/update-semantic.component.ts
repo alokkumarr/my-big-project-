@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
@@ -35,7 +35,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   private dpID: string = '';
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     private workBench: WorkbenchService,
     private headerProgress: HeaderProgressService,
     private notify: ToastService
@@ -67,7 +67,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   }
 
   backToDS() {
-    this.router.stateService.go('workbench.dataobjects');
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 
   /**
@@ -150,7 +150,7 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         this.notify.info('Datapod Updated successfully', 'Datapod', {
           hideDelay: 9000
         });
-        this.router.stateService.go('workbench.dataobjects');
+        this.router.navigate(['workbench', 'dataobjects']);
       });
   }
 }

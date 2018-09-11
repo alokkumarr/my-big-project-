@@ -1,6 +1,6 @@
 
 import { Component } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { MenuService } from '../../../../common/services/menu.service';
@@ -16,7 +16,8 @@ require('./workbench-page.component.scss');
 export class WorkbenchPageComponent {
   constructor(
     private headerProgress: HeaderProgressService,
-    private router: UIRouter,
+    private router: Router,
+    private route: ActivatedRoute,
     private menu: MenuService
   ) { }
 
@@ -29,10 +30,11 @@ export class WorkbenchPageComponent {
       });
     /**
     * Temporary fix for routing of SQL component until the issue of editor initialization is figured out.
-    * So on refresh re-routin to listing page 
+    * So on refresh re-routin to listing page
     */
-    if (this.router.stateService.current.name === 'workbench' || this.router.stateService.current.name === 'workbench.sql') {
-      this.router.stateService.go('workbench.dataobjects');
+    const basePath = this.route.snapshot.url[0].path;
+    if (basePath === 'workbench') {
+      this.router.navigate(['workbench', 'dataobjects']);
     }
     this.headerProgress.hide();
   }

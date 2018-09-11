@@ -1,115 +1,64 @@
-import * as angular from 'angular';
-import '@uirouter/angular-hybrid';
-
-import 'angular-material';
-import 'angular-material/angular-material.css';
-
 import 'fonts/icomoon.css';
-
 import 'zone.js';
+import '../../../../themes/_triton.scss';
 import 'reflect-metadata';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import {
-  downgradeInjectable,
-  downgradeComponent
-} from '@angular/upgrade/static';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { MaterialModule } from '../app/material.module';
-
-import AppConfig from '../../../../appConfig';
-
-import { routesConfig } from './routes';
-import { themeConfig } from './theme';
-import { runConfig } from './run';
+import { RouterModule } from '@angular/router';
 
 import { AddTokenInterceptor } from '../app/common/interceptor';
 import { ConfigService } from '../app/common/services/configuration.service';
+import { routes } from './routes';
+import { MaterialModule } from '../app/material.module';
 import { JwtService } from './services/jwt.service';
 import { UserService } from './services/user.service';
-import { AuthServiceFactory } from './services/auth.service';
-import {
-  jwtServiceProvider,
-  userServiceProvider
-} from './services/ajs-login-providers';
+import { IsUserNotLoggedInGuard } from './guards/not-logged-in-guard.service';
 
 import { LayoutContentComponent, LayoutFooterComponent } from './layout';
 
-import { LoginComponent } from './components/login/login.component';
-import { PasswordChangeComponent } from './components/password-change/password-change.component';
-import { PasswordPreResetComponent } from './components/password-pre-reset/password-pre-reset.component';
-import { PasswordResetComponent } from './components/password-reset/password-reset.component';
+import {
+  LoginComponent,
+  PasswordChangeComponent,
+  PasswordPreResetComponent,
+  PasswordResetComponent
+} from './components';
 
-export const LoginModule = 'login';
+const COMPONENTS = [
+  LayoutContentComponent,
+  LoginComponent,
+  PasswordChangeComponent,
+  PasswordPreResetComponent,
+  PasswordResetComponent,
+  LayoutFooterComponent
+];
 
-angular
-  .module(LoginModule, ['ui.router', 'ui.router.upgrade', 'ngMaterial'])
-  .config(routesConfig)
-  .config(themeConfig)
-  .run(runConfig)
-  .value('AppConfig', AppConfig)
-  .factory('AuthService', AuthServiceFactory)
-  .service('JwtService', JwtService)
-  .service('UserService', UserService)
-  .component('layoutContent', LayoutContentComponent)
-  .directive('layoutFooter', downgradeComponent({
-    component: LayoutFooterComponent
-  }) as angular.IDirectiveFactory)
-  .directive('loginComponent', downgradeComponent({
-    component: LoginComponent
-  }) as angular.IDirectiveFactory)
-  .directive('passwordChangeComponent', downgradeComponent({
-    component: PasswordChangeComponent
-  }) as angular.IDirectiveFactory)
-  .directive('passwordPreResetComponent', downgradeComponent({
-    component: PasswordPreResetComponent
-  }) as angular.IDirectiveFactory)
-  .directive('passwordResetComponent', downgradeComponent({
-    component: PasswordResetComponent
-  }) as angular.IDirectiveFactory);
+const SERVICES = [JwtService, UserService, ConfigService];
 
+const INTERCEPTORS = [
+  { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true }
+];
+
+const GUARDS = [IsUserNotLoggedInGuard];
 @NgModule({
   imports: [
     BrowserModule,
+    RouterModule.forRoot(routes, { useHash: true }),
     UpgradeModule,
     HttpClientModule,
     FormsModule,
     MaterialModule,
     FlexLayoutModule
   ],
-  declarations: [
-    LoginComponent,
-    PasswordChangeComponent,
-    PasswordPreResetComponent,
-    PasswordResetComponent,
-    LayoutFooterComponent
-  ],
-  entryComponents: [
-    LoginComponent,
-    PasswordChangeComponent,
-    PasswordPreResetComponent,
-    PasswordResetComponent,
-    LayoutFooterComponent
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
-    jwtServiceProvider,
-    userServiceProvider,
-    ConfigService
-  ]
+  declarations: COMPONENTS,
+  entryComponents: COMPONENTS,
+  bootstrap: [LayoutContentComponent],
+  providers: [...SERVICES, ...INTERCEPTORS, ...GUARDS]
 })
-export class NewLoginModule {
-  constructor() {}
-  ngDoBootstrap() {}
-}
+export class NewLoginModule { }
 
-platformBrowserDynamic()
-  .bootstrapModule(NewLoginModule)
-  .then(platformRef => {
-    const upgrade = platformRef.injector.get(UpgradeModule) as UpgradeModule;
-    upgrade.bootstrap(document.documentElement, [LoginModule]);
-  });
+platformBrowserDynamic().bootstrapModule(NewLoginModule);

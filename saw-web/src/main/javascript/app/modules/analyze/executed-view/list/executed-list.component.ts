@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { StateService } from '@uirouter/angular';
-import * as forEach from 'lodash/forEach';
+import { Router } from '@angular/router';
 import * as moment from 'moment';
 
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
@@ -31,17 +30,19 @@ export class ExecutedListComponent {
 
   constructor(
     private _dxDataGridService: dxDataGridService,
-    private _state: StateService
+    private _router: Router
   ) {}
 
   goToExecution(executedAnalysis) {
-    this._state.go('analyze.executedDetail', {
-      executionId: executedAnalysis.id,
-      analysisId: this.analysis.id,
-      analysis: this.analysis,
-      awaitingExecution: false,
-      loadLastExecution: false
-    });
+    this._router.navigate(
+      ['analyze', 'analysis', this.analysis.id, 'executed'], {
+        queryParams: {
+          executedAnalysis,
+          awaitingExecution: false,
+          loadLastExecution: false
+        }
+      }
+    );
   }
 
   getGridConfig() {
