@@ -2,7 +2,6 @@ package com.synchronoss.saw.semantic.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,7 +205,6 @@ public class MigrationService {
   private void addSemantic(SemanticNode node, String basePath)
       throws JSONValidationSAWException, CreateEntitySAWException {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
-    node.setCreatedAt(new Date().getTime());
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {

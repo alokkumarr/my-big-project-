@@ -183,7 +183,6 @@ public class SemanticServiceImpl implements SemanticService {
     ObjectMapper mapper = new ObjectMapper();
     semanticNode.setId("f02d1867-88c2-4689-9ea9-def040a9b62d::semanticDataSet::1534792341903");
     semanticNode.setCreatedBy("Akhilesh  Obilineni");
-    semanticNode.setCreatedAt(new Date().getTime());
     semanticNode.setCustomerCode("SYNCHRONOSS");
     semanticNode.setProjectCode("workbench");
     semanticNode.setSaved(true);
