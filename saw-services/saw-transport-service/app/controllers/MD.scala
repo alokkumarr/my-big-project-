@@ -39,7 +39,6 @@ class MD extends BaseServiceProvider {
     try {
 
       val context = (json \ "contents" \ "context").extractOpt[String].getOrElse(Contexts.UndefContext.toString)
-      val Id = (json \ "contents" \ "id").extractOpt[String].getOrElse(Contexts.UndefContext.toString)
       var handler : RequestProcessor = null
       context match{
         case "UI" => handler = new UIMDRequestProcessor(json)

@@ -72,7 +72,7 @@ class DataObjectRequestProcessor (a_docAsJson : JValue, a_printPretty: Boolean =
     var responses : List[JValue] = Nil
 
     action match {
-      case "read" => responses = responses :+ actionHandler(action)
+      case "read" | "delete" => responses = responses :+ actionHandler(action)
     }
     m_log.trace(" responses in DataObjectRequestProcessor : {}", responses)
     var cnt : JField = null
@@ -142,6 +142,7 @@ class DataObjectRequestProcessor (a_docAsJson : JValue, a_printPretty: Boolean =
     val sNode = new DataObject;
     val response = action match {
       case "read" =>   build_ui(sNode.read(keys))
+      case "delete" => build(sNode.deleteAll(keys))
     }
     m_log trace s"Response: ${pretty(render(response))}\n"
     response
@@ -176,5 +177,5 @@ class DataObjectRequestProcessor (a_docAsJson : JValue, a_printPretty: Boolean =
 }
   object DataObjectRequestProcessor
   {
-    val verbs = List("read")
+    val verbs = List("read", "delete")
   }

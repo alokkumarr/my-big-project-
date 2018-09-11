@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SemanticNode {
+public class BinarySemanticNode {
 
 
   @JsonProperty("statusMessage")
@@ -98,7 +98,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("module")
-  private SemanticNode.Module module = SemanticNode.Module.fromValue("ANALYZE");
+  private BinarySemanticNode.Module module = BinarySemanticNode.Module.fromValue("ANALYZE");
   /**
    * The Metricname Schema
    * <p>
@@ -325,7 +325,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("module")
-  public SemanticNode.Module getModule() {
+  public BinarySemanticNode.Module getModule() {
     return module;
   }
 
@@ -337,7 +337,7 @@ public class SemanticNode {
    * 
    */
   @JsonProperty("module")
-  public void setModule(SemanticNode.Module module) {
+  public void setModule(BinarySemanticNode.Module module) {
     this.module = module;
   }
 
@@ -541,11 +541,11 @@ public class SemanticNode {
 
     ANALYZE("ANALYZE"), OBSERVE("OBSERVE"), ALERT("ALERT"), WORKBENCH("WORKBENCH");
     private final String value;
-    private final static Map<String, SemanticNode.Module> CONSTANTS =
-        new HashMap<String, SemanticNode.Module>();
+    private final static Map<String, BinarySemanticNode.Module> CONSTANTS =
+        new HashMap<String, BinarySemanticNode.Module>();
 
     static {
-      for (SemanticNode.Module c : values()) {
+      for (BinarySemanticNode.Module c : values()) {
         CONSTANTS.put(c.value, c);
       }
     }
@@ -565,8 +565,8 @@ public class SemanticNode {
     }
 
     @JsonCreator
-    public static SemanticNode.Module fromValue(String value) {
-      SemanticNode.Module constant = CONSTANTS.get(value);
+    public static BinarySemanticNode.Module fromValue(String value) {
+      BinarySemanticNode.Module constant = CONSTANTS.get(value);
       if (constant == null) {
         throw new IllegalArgumentException(value);
       } else {

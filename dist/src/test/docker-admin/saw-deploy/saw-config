@@ -29,6 +29,7 @@ saw_spark_master_url=local[*]
 #saw_spark_yarn_resource_manager=sip-mapr
 saw_zookeeper_quorum=sip-mapr
 saw_execution_history=2
+saw_binary_migration_requires=true
 
 #
 # Transport Service Executor configuration

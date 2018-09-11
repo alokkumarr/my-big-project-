@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +53,25 @@ public class SemanticServiceImpl implements SemanticService {
   @Value("${metastore.base}")
   @NotNull
   private String basePath;
+  
   @Value("${semantic.workbench-url}")
   @NotNull
   private String workbenchURl;
+ 
+  @Value("${semantic.transport-metadata-url}")
+  @NotNull
+  private String transportURI;
   
+  @Value("${semantic.binary-migration-requires}")
+  @NotNull
+  private boolean migrationRequires;
+
+  @PostConstruct
+  private void init() throws Exception {
+    if (migrationRequires) {
+      new MigrationService().convertHBaseBinaryToMaprDBStore(transportURI, basePath);
+    }
+  }
 
   @Override
   public SemanticNode addSemantic(SemanticNode node)
@@ -423,7 +439,7 @@ public class SemanticServiceImpl implements SemanticService {
             semanticNodes.add(newSemanticNode);
           }
         }
-        content.setContents(semanticNodes);
+        content.setAnalyze(semanticNodes);
         contents.add(content);
         structure.setContents(contents);
       } else {
@@ -435,6 +451,9 @@ public class SemanticServiceImpl implements SemanticService {
           "While retrieving it has been found that Entity does not exist");
     }
     return structure;
+  }
+  public static void main(String[] args) {
+    
   }
 }
 
