@@ -484,6 +484,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     return objectMapper.readValue(dataset.toString(), DataSet.class);
   }
   
+  //TODO: This method needs re-factoring in future once SIP-4218 & SIP-4217 is resolved
   @Override
   public DataSet createDataSet(DataSet dataSet, String project) throws Exception {
     logger.trace("createDataSet starts here :  " + dataSet.toString());
@@ -497,8 +498,8 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     ObjectNode rootNode = (ObjectNode) node;
     Preconditions.checkNotNull(rootNode.get("asInput"), "asInput cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow"), "asOfNow cannot be null");
-    Preconditions.checkNotNull(rootNode.get("recordCount"), "recordCount cannot be null");
-    Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString()).get("component"),
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.RecordCount.toString()), "recordCount cannot be null");
+    Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString()).get(DataSetProperties.Component.toString()),
         "userData.component cannot be null");
     Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString())
         .get(DataSetProperties.createdBy.toString()), "userData.createdBy cannot be null");
@@ -506,10 +507,6 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         "userdata.script cannot be null");
     Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()).get("name"),
         "system.name cannot be null");
-    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()).get("inputFormat"),
-        "system.inputFormat cannot be null");
-    Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()).get("inputPath"),
-        "system.inputPath cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("status"),
         "asOfNow.status cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("started"),
@@ -518,34 +515,32 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
         "asOfNow.finished cannot be null");
     Preconditions.checkNotNull(rootNode.get("asOfNow").get("batchId"),
         "asOfNow.batchId cannot be null");
-    String id = project + delimiter + rootNode.get(DataSetProperties.System.toString()).get("name").asText();
-    rootNode.put("_id", id);
+    String id = project + delimiter + rootNode.get(DataSetProperties.System.toString()).get(DataSetProperties.Name.toString()).asText();
+    rootNode.put(DataSetProperties.Id.toString(), id);
     ObjectNode transformationNode =
         rootNode.putObject(DataSetProperties.Transformations.toString());
     transformationNode.put("asOutput", id);
     Preconditions.checkNotNull(rootNode.get(DataSetProperties.UserData.toString()), "userData cannot be null");
     ObjectNode userDataNode = (ObjectNode) rootNode.get(DataSetProperties.UserData.toString());
-    userDataNode.put("category", category);
-    userDataNode.put("component", dataSet.getComponent());
-    userDataNode.put("scriptLocation", rootNode.get(DataSetProperties.UserData.toString()).get("script").toString());
+    userDataNode.put(DataSetProperties.Category.toString(), category);
+    userDataNode.put(DataSetProperties.Component.toString(), dataSet.getComponent());
+    userDataNode.put(DataSetProperties.ScriptLocation.toString(), rootNode.get(DataSetProperties.UserData.toString()).get(DataSetProperties.Script.toString()).toString());
     Preconditions.checkNotNull(rootNode.get(DataSetProperties.System.toString()), "system cannot be null");
     ObjectNode systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());
     String catalog = systemNode.get(DataSetProperties.Catalog.toString()) != null
         ? systemNode.get(DataSetProperties.Catalog.toString()).textValue()
         : MetadataBase.DEFAULT_CATALOG;
-    systemNode.put("project", project);
-    systemNode.put("outputFormat",
-        systemNode.get(DataSetProperties.Format.toString()) != null
+    systemNode.put(DataSetProperties.Project.toString(), project);
+    systemNode.put(DataSetProperties.Format.toString(),
+    systemNode.get(DataSetProperties.Format.toString()) != null
             ? systemNode.get(DataSetProperties.Format.toString()).toString()
             : format);
-    systemNode.put("inputFormat",
-        rootNode.get(DataSetProperties.System.toString()).get("inputFormat").textValue());
-    systemNode.put(DataSetProperties.PhysicalLocation.toString(),workbenchExecutionService.createDatasetDirectory(project,catalog,
-            rootNode.get(DataSetProperties.System.toString()).get("name").textValue()));
-    ArrayNode inputPath = objectMapper.createArrayNode();
-    inputPath.addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
+     systemNode.put(DataSetProperties.PhysicalLocation.toString(),workbenchExecutionService.createDatasetDirectory(project,catalog,
+            rootNode.get(DataSetProperties.System.toString()).get(DataSetProperties.Name.toString()).textValue()));
     systemNode.put(DataSetProperties.Catalog.toString(),catalog);
-    systemNode.putArray("inputPath").addAll(inputPath);
+    //ArrayNode inputPath = objectMapper.createArrayNode();
+    //inputPath.addAll((ArrayNode) rootNode.get(DataSetProperties.System.toString()).get("inputPath"));
+    //systemNode.putArray("inputPath").addAll(inputPath);
     DataSet dataSetNode = objectMapper.readValue(node.toString(), DataSet.class);
     try {
       List<MetaDataStoreStructure> structure = SAWWorkBenchUtils.node2JSONObject(dataSetNode,

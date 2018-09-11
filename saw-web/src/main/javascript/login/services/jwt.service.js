@@ -137,6 +137,10 @@ export class JwtService {
     return token.ticket.validityReason;
   }
 
+  getLoginId() {
+    return get(this.getTokenObj(), 'ticket.masterLoginId').toString();
+  }
+
   getUserId() {
     return get(this.getTokenObj(), 'ticket.userId').toString();
   }
