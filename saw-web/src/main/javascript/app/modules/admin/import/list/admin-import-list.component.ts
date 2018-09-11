@@ -1,25 +1,25 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as some from 'lodash/some';
 import * as every from 'lodash/every';
+import * as isEmpty from 'lodash/isEmpty';
 import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-import-list.component.html');
-// require('./admin-import-list.component.scss');
 
 @Component({
   selector: 'admin-import-list',
   template
 })
 
-export class AdminImportListComponent {
+export class AdminImportListComponent implements OnChanges {
 
   @Input() analyses: any[];
   @Output() validityChange: EventEmitter<boolean> = new EventEmitter();
 
   config: any;
-
   areAllSelected = false;
+  isEmpty = isEmpty;
 
   constructor(
     private _dxDataGridService: dxDataGridService
@@ -29,8 +29,13 @@ export class AdminImportListComponent {
     this.config = this.getConfig();
   }
 
+  ngOnChanges() {
+    this.areAllSelected = false;
+  }
+
   overWrite(row) {
     row.selection = true;
+    this.validityChange.emit(true);
   }
 
   onChecked(row) {
@@ -98,12 +103,6 @@ export class AdminImportListComponent {
         enabled: true,
         pageSize: 10,
         pageIndex: 0
-      },
-      pager: {
-        showPageSizeSelector: true,
-        showInfo: true,
-        showNavigationButtons: true,
-        allowedPageSizes: [5, 10, 20]
       }
     });
   }

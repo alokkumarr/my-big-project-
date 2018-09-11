@@ -125,7 +125,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     this.workBench.triggerParser(payload).subscribe(data => {
       this.notify.info('SQL_Executor_triggered_successfully', 'Creating Dataset', { hideDelay: 9000 });
     });
-    this.router.navigate(['workbench' ,'datasets']);
+    this.router.navigate(['workbench' ,'dataobjects']);
   }
 
   previewAction(action) {
@@ -133,6 +133,6 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
   }
 
   backToDS() {
-    this.router.navigate(['workbench', 'datasets']);
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 }

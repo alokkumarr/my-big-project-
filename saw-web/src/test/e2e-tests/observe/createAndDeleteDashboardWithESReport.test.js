@@ -1,7 +1,7 @@
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const protractorConf = require('../../../../conf/protractor.conf');
+var testDataReader = require('../../e2e-tests/testdata/testDataReader.js');
 const using = require('jasmine-data-provider');
+const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const protractorConf = require('../../../../conf/protractor.conf');
 const categories = require('../../javascript/data/categories');
 const subCategories = require('../../javascript/data/subCategories');
 let AnalysisHelper = require('../../javascript/api/AnalysisHelper');
@@ -24,16 +24,6 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithESReport.
   let token;
   let dashboardId;
 
-  const dataProvider = {
-
-    'dashboard with esReport by admin': {
-      user: 'admin'
-    },
-    'dashboard with esReport by user': {
-      user: 'userOne'
-    }
-  };
-
   beforeAll(function() {
     host = new ApiUtils().getHost(browser.baseUrl);
     token = new AnalysisHelper().getToken(host);
@@ -43,7 +33,6 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithESReport.
 
   beforeEach(function(done) {
     setTimeout(function() {
-      expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
@@ -60,18 +49,13 @@ describe('Create & delete dashboard tests: createAndDeleteDashboardWithESReport.
       //delete dashboard if ui failed.
       let oh = new ObserveHelper();
       oh.deleteDashboard(host, token, dashboardId);
-
-      analyzePage.main.doAccountAction('logout');
       commonFunctions.logOutByClearingLocalStorage();
       done();
     }, protractorConf.timeouts.pageResolveTimeout);
   });
-  afterAll(function() {
-    commonFunctions.logOutByClearingLocalStorage();
-  });
 
-  using(dataProvider, function(data, description) {
-    it('should able to create & delete dashboard with es-report: ' + description, () => {
+  using(testDataReader.testData['DASHBOARDWITHESREPORT']['dashboardWithESReportDataProvider'], function(data, description) {
+    it('should able to create & delete dashboard with es-report: ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'DASHBOARDWITHESREPORT', dp:'dashboardWithESReportDataProvider'}), () => {
       try {
 
         let currentTime = new Date().getTime();

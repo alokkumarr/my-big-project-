@@ -1,7 +1,7 @@
 <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center" style="width: 100vw;">
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
-    <div class="admin-title">Export Analysis</div>
+    <div class="admin-title" i18n>Import Analysis</div>
     <div fxLayout="row" fxLayoutAlign="start center" style="font-size: 16px; margin-left: 100px;">
       <div i18n style="margin-left: 10px;">
         Select package file(s)
@@ -38,7 +38,7 @@
 </mat-toolbar>
 <mat-card>
   <div i18n class="grid-title">
-    Imported files
+    Package file(s) details
   </div>
   <admin-import-file-list [files]="files" (remove)="onRemoveFile($event)"></admin-import-file-list>
 </mat-card>
@@ -47,12 +47,21 @@
     <div i18n class="grid-title">
       Analyses to import
     </div>
-    <button mat-raised-button color="primary" i18n
-            (click)="import()"
-            [disabled]="!(atLeast1AnalysisIsSelected && selectedCategory)"
-    >
-      Import
-    </button>
+    <div>
+      <button mat-raised-button color="primary" i18n
+              (click)="import()"
+              style="margin-right: 10px;"
+              [disabled]="!(atLeast1AnalysisIsSelected && selectedCategory)"
+      >
+        Import
+      </button>
+      <button mat-raised-button color="primary" i18n
+              (click)="exportErrors()"
+              [disabled]="!userCanExportErrors"
+      >
+        Export Error Logs
+      </button>
+    </div>
   </div>
   <admin-import-list [analyses]="analyses" (validityChange)="onAnalysesValiditychange($event)"></admin-import-list>
 </mat-card>

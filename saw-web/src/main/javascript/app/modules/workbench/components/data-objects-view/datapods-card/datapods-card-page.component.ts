@@ -1,4 +1,3 @@
-
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -6,31 +5,32 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./datasets-card-page.component.html');
-require('./datasets-card-page.component.scss');
+const template = require('./datapods-card-page.component.html');
+require('./datapods-card-page.component.scss');
 
 @Component({
-  selector: 'datasets-card-page',
+  selector: 'datapods-card-page',
   template,
   styles: []
 })
-
-export class DatasetsCardPageComponent implements OnInit {
-  @Input() searchTerm: string;
-  @Input() updater: BehaviorSubject<any>;
+export class DatapodsCardPageComponent implements OnInit {
+  @Input()
+  searchTerm: string;
+  @Input()
+  updater: BehaviorSubject<any>;
   private updaterSubscribtion: any;
-  private dataSets: Array<any> = [];
+  private dataPods: Array<any> = [];
 
   constructor(
     public dialog: MatDialog,
     private headerProgress: HeaderProgressService,
     private workbench: WorkbenchService
-  ) {  }
+  ) {}
 
   ngOnInit() {
     this.headerProgress.show();
     this.updaterSubscribtion = this.updater.subscribe(data => {
-      this.onUpdate(data)
+      this.onUpdate(data);
     });
   }
 
@@ -39,16 +39,13 @@ export class DatasetsCardPageComponent implements OnInit {
   }
 
   onUpdate(data) {
-    this.dataSets = data;
-    if (this.dataSets.length > 0) {
-
-    }
+    this.dataPods = data;
     setTimeout(() => {
       this.headerProgress.hide();
-    }, 3000);
+    }, 1000);
   }
 
   viewDetails(metadata) {
-    this.workbench.navigateToDetails(metadata);
+    // this.workbench.navigateToDetails(metadata);
   }
 }

@@ -10,16 +10,19 @@ const template = require('./executed-list.component.html');
 @Component({
   selector: 'executed-list',
   template,
-  styles: [`
+  styles: [
+    `
       :host {
         display: block;
-      }`]
+      }`
+  ]
 })
 export class ExecutedListComponent {
-  @Input('analyses') set setAnalyses(analyses: Analysis[]) {
+  @Input('analyses')
+  set setAnalyses(analyses: Analysis[]) {
     this.analyses = analyses;
     this.config = this.getGridConfig();
-  };
+  }
   @Input() analysis: Analysis;
 
   config: any;
@@ -43,35 +46,45 @@ export class ExecutedListComponent {
   }
 
   getGridConfig() {
-    const columns = [{
-      caption: 'ID',
-      dataField: 'id',
-      allowSorting: true,
-      alignment: 'left',
-      width: '40%'
-    }, {
-      caption: 'TYPE',
-      dataField: 'executionType',
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }, {
-      caption: 'DATE',
-      dataField: 'finished',
-      dataType: 'date',
-      calculateCellValue: rowData => {
-        return moment.utc(rowData.finished).local().format('YYYY/MM/DD h:mm A');
+    const columns = [
+      {
+        caption: 'ID',
+        dataField: 'id',
+        allowSorting: true,
+        alignment: 'left',
+        width: '40%'
       },
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }, {
-      caption: 'STATUS',
-      dataField: 'status',
-      allowSorting: true,
-      alignment: 'left',
-      width: '20%'
-    }];
+      {
+        caption: 'TYPE',
+        dataField: 'executionType',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      },
+      {
+        caption: 'DATE',
+        dataField: 'finished',
+        dataType: 'date',
+        calculateCellValue: rowData => {
+          return rowData.finished
+            ? moment
+                .utc(rowData.finished)
+                .local()
+                .format('YYYY/MM/DD h:mm A')
+            : null;
+        },
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      },
+      {
+        caption: 'STATUS',
+        dataField: 'status',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%'
+      }
+    ];
     return this._dxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
         this.goToExecution(row.data);

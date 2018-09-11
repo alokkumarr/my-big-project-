@@ -6,6 +6,7 @@ import { TestBed, inject } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import * as fpGet from 'lodash/fp/get';
 import APP_CONFIG from '../../../../appConfig';
+import { JwtService } from '../../../main/javascript/login/services/jwt.service';
 
 import { WorkbenchService } from '../../../main/javascript/app/modules/workbench/services/workbench.service';
 
@@ -13,6 +14,14 @@ import { WorkbenchService } from '../../../main/javascript/app/modules/workbench
 configureTests();
 
 const mockService =  {
+};
+
+const jwtMockService = {
+  customerCode: 'Synchronoss',
+
+  getUserName() {
+    return 'SIP Admin';
+  }
 };
 
 
@@ -25,6 +34,7 @@ describe('Workbench Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [WorkbenchService,
+        { provide: JwtService, useValue: jwtMockService },
         {provide: Router, useValue: mockService}]
     }).compileComponents();
     httpMock = TestBed.get(HttpClientTestingModule);

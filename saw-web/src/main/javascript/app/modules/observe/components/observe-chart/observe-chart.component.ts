@@ -176,14 +176,13 @@ export class ObserveChartComponent {
     let changes = this.chartService.dataToChangeConfig(
       this.analysis.chartType,
       settings,
+      this.analysis.sqlBuilder,
       deepClone(gridData),
       { labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts }
     );
 
     changes = changes.concat(this.getLegend());
-    changes = changes.concat([
-      { path: 'title.y', data: -10 }
-    ]);
+    changes = changes.concat([{ path: 'title.y', data: -10 }]);
 
     changes.push({
       path: 'chart.inverted',

@@ -34,7 +34,7 @@ export class WorkbenchPageComponent {
     */
     const basePath = this.route.snapshot.url[0].path;
     if (basePath === 'workbench') {
-      this.router.navigate(['workbench', 'datasets']);
+      this.router.navigate(['workbench', 'dataobjects']);
     }
     this.headerProgress.hide();
   }

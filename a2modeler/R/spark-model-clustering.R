@@ -128,7 +128,7 @@ predict.spark_model_clustering <- function(mobj,
 #' Evaluate Method for Spark-Model Clustering Object
 #' @rdname evaluate_model
 #' @export
-evaluate_model.spark_ml_clustering <- function(mobj, measure) {
+evaluate_model.spark_ml_clustering <- function(mobj, measure, ...) {
 
   mobj$evaluate <- purrr::map_df(mobj$performance,
                                  ~purrr::map_df(., match.fun(measure$method)),

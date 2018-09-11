@@ -8,6 +8,7 @@ import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as toString from 'lodash/toString';
 import * as get from 'lodash/get';
+import * as isEmpty from 'lodash/isEmpty';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as json2Csv from 'json-2-csv';
 import * as FileSaver from 'file-saver';
@@ -21,10 +22,26 @@ import { getFileContents } from '../../../common/utils/fileManager';
 import { AdminMenuData } from '../consts';
 import { Analysis } from '../../../models';
 import { ExportService } from '../export/export.service';
-import { ToastService } from '../../../common/services/toastMessage.service';
 
 const template = require('./admin-import-view.component.html');
 require('./admin-import-view.component.scss');
+
+const DUPLICATE_GRID_OBJECT_PROPS = {
+  logColor: 'brown',
+  log: 'Analysis exists. Please Overwrite to delete existing data.',
+  errorMsg: 'Analysis exists. Please Overwrite to delete existing data.',
+  duplicateAnalysisInd: true,
+  errorInd: false,
+  noMetricInd: false
+}
+const NORMAL_GRID_OBJECT_PROPS = {
+  logColor: 'transparent',
+  log: '',
+  errorMsg: '',
+  duplicateAnalysisInd: false,
+  errorInd: false,
+  noMetricInd: false
+};
 
 type FileInfo = {name: string, count: number};
 type FileContent = {name: string, count: number, analyses: Array<Analysis>};
@@ -50,7 +67,6 @@ export class AdminImportViewComponent {
     private _exportService: ExportService,
     private _categoryService: CategoryService,
     private _sidenav: SidenavMenuService,
-    private _toastMessage: ToastService,
     private _jwtService: JwtService
   ) {}
 
@@ -75,12 +91,20 @@ export class AdminImportViewComponent {
   }
 
   splitFileContents(contents) {
+    let hasErrors = false;
     this.atLeast1AnalysisIsSelected = false;
     this.files = map(contents, ({name, count}) => ({name, count}));
     this.analyses = fpPipe(
       fpFlatMap(({analyses}) => analyses),
-      fpMap(analysis => this.getAnalysisObjectForGrid(analysis))
+      fpMap(analysis => {
+        const gridObj = this.getAnalysisObjectForGrid(analysis)
+        if (gridObj.errorInd) {
+          hasErrors = true;
+        }
+        return gridObj;
+      })
     )(contents);
+    this.userCanExportErrors = hasErrors;
   }
 
   readFiles(event) {
@@ -103,6 +127,8 @@ export class AdminImportViewComponent {
     Promise.all(contentPromises).then(contents => {
       this.fileContents = contents;
       this.splitFileContents(contents);
+      // clear the file input
+      event.target.value = '';
     });
   }
 
@@ -110,7 +136,7 @@ export class AdminImportViewComponent {
     this.selectedCategory = categoryId;
     this._importService.getAnalysesFor(toString(categoryId)).then(analyses => {
       this.analysesFromBEMap = reduce(analyses, (acc, analysis) => {
-        acc[analysis.id] = analysis;
+        acc[`${analysis.name}:${analysis.metricName}:${analysis.type}`] = analysis;
         return acc;
       }, {});
       this.splitFileContents(this.fileContents);
@@ -122,7 +148,7 @@ export class AdminImportViewComponent {
     if (metric) {
       analysis.semanticId = metric.id;
     }
-    const analysisFromBE = this.analysesFromBEMap[analysis.id];
+    const analysisFromBE = this.analysesFromBEMap[`${analysis.name}:${analysis.metricName}:${analysis.type}`];
 
     const possibilitySelector = metric ? (analysisFromBE ? 'duplicate' : 'normal') : 'noMetric'
 
@@ -149,22 +175,12 @@ export class AdminImportViewComponent {
     case 'duplicate':
       const modifiedAnalysis = this.getModifiedAnalysis(analysis, analysisFromBE);
       return {
-        logColor: 'brown',
-        log: 'Analysis exists. Please Override to delete existing data.',
-        errorMsg: 'Analysis exists. Please Override to delete existing data.',
-        duplicateAnalysisInd: true,
-        errorInd: true,
-        noMetricInd: false,
+        ...DUPLICATE_GRID_OBJECT_PROPS,
         analysis: modifiedAnalysis
       };
     case 'normal':
       return {
-        logColor: 'transparent',
-        log: '',
-        errorMsg: '',
-        duplicateAnalysisInd: false,
-        errorInd: false,
-        noMetricInd: false,
+        ...NORMAL_GRID_OBJECT_PROPS,
         analysis
       };
     }
@@ -176,6 +192,7 @@ export class AdminImportViewComponent {
       scheduled,
       createdTimestamp,
       esRepository,
+      id,
       repository
     } = analysisFromBE;
     const {
@@ -189,6 +206,7 @@ export class AdminImportViewComponent {
       scheduled,
       createdTimestamp,
       userFullName,
+      id,
       userId,
       esRepository,
       repository
@@ -228,8 +246,8 @@ export class AdminImportViewComponent {
         return acc;
       }, {});
 
-      let errorsOccured = false;
-      const gridObjectsWithError = [];
+      let hasErrors = false;
+      let someImportsWereSuccesful = false;
       // update the logs
       forEach(this.analyses, gridObj => {
         if (gridObj.selection) {
@@ -240,10 +258,11 @@ export class AdminImportViewComponent {
             gridObj.logColor = 'green';
             gridObj.log = 'Successfully Imported';
             gridObj.errorInd = false;
-
+            gridObj.duplicateAnalysisInd = true;
+            gridObj.selection = false;
+            someImportsWereSuccesful = true;
           } else {
-            errorsOccured = true;
-            gridObjectsWithError.push(gridObj);
+            hasErrors = true;
             const error = container.error;
             gridObj.logColor = 'red';
             gridObj.log = 'Error While Importing'
@@ -253,37 +272,41 @@ export class AdminImportViewComponent {
         }
       });
 
-      if (errorsOccured) {
-        this._toastMessage.error('Error While Importing', 'Some errors occured while importing, click here to eport the errors.', {
-          timeOut: 0,
-          extendedTimeOut: 0,
-          closeButton: true,
-          onclick: () => this.exportErrors(gridObjectsWithError);
-        });
+      this.userCanExportErrors = hasErrors;
+
+      if (someImportsWereSuccesful) {
+        this.analyses = [...this.analyses];
       }
+      this.atLeast1AnalysisIsSelected = false;
     });
   }
 
 
-  exportErrors(gridObjectsWithError) {
-    const logMessages = map(gridObjectsWithError, gridObj => {
-      const { analysis, errorMsg } = gridObj;
-      const { metricName, name, type } = analysis;
-      return {
-        analysisName: name,
-        analysisType: type,
-        metricName,
-        errorLog: errorMsg
-      };
-    });
-    json2Csv.json2csv(logMessages, (err, csv) => {
-      if (err) {
-        throw err;
-      }
-      const logFileName = this.getLogFileName();
-      const newData = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-      FileSaver.saveAs(newData, logFileName);
-    });
+  exportErrors() {
+    const logMessages = fpPipe(
+      fpFilter('errorInd'),
+      fpMap(gridObj => {
+        const { analysis, errorMsg } = gridObj;
+        const { metricName, name, type } = analysis;
+        return {
+          analysisName: name,
+          analysisType: type,
+          metricName,
+          errorLog: errorMsg
+        };
+      })
+    )(this.analyses);
+
+    if (!isEmpty(logMessages)) {
+      json2Csv.json2csv(logMessages, (err, csv) => {
+        if (err) {
+          throw err;
+        }
+        const logFileName = this.getLogFileName();
+        const newData = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+        FileSaver.saveAs(newData, logFileName);
+      });
+    }
   }
 
   getLogFileName() {
@@ -326,6 +349,7 @@ export class AdminImportViewComponent {
   }
 
   importExistingAnalysis(analysis): Promise<Analysis> {
+    analysis.categoryId = toString(this.selectedCategory);
     return this._importService.updateAnalysis(analysis);
   }
 

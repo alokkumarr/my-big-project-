@@ -106,7 +106,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
   }
 
   onTitleChange() {
-    if(!isEmpty(this.chartTitle)) {
+    if (!isEmpty(this.chartTitle)) {
       this.EditMode = false;
       this.change.emit({
         subject: 'chartTitle',

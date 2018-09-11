@@ -18,10 +18,10 @@ module.exports = {
     },
     elementToBeEnabledAndVisible: element => {
      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-     },elementToBeNotVisible: element =>{
-      browser.wait(EC.not(EC.presenceOf(element)), fluentWait, "Element \"" + element.locator() + "\" is present");
+     },elementToBeNotVisible: (element, wait) =>{
+      return browser.wait(EC.not(EC.presenceOf(element)), wait ? wait : fluentWait, "Element \"" + element.locator() + "\" is present");
     },textToBePresent:(element, value)=>{
-      browser.wait(EC.textToBePresentInElement(element, value), fluentWait);
+      return browser.wait(EC.textToBePresentInElement(element, value), fluentWait);
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
@@ -68,11 +68,11 @@ module.exports = {
     browser.get(protractorConf.config.baseUrl);
   },
   logOutByClearingLocalStorage() {
-    //browser.executeScript('window.sessionStorage.clear();');
-     //browser.executeScript('window.localStorage.clear();')
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
   },
   scrollIntoView(element) {
-    arguments[0].scrollIntoView();
+    browser.executeScript('arguments[0].scrollIntoView()', element);
   },
   writeScreenShot(data, filename) {
     var stream = fs.createWriteStream(filename);
@@ -82,6 +82,11 @@ module.exports = {
   getAnalysisIdFromUrl(url){
     let ulrParts = url.split("analyze/analysis/")[1];
     return ulrParts.split("/")[0];
+  },slideHorizontally(element, x_axis) {
+    browser.actions().dragAndDrop(
+      element,
+      {x:x_axis, y:0}
+    ).perform();
   }
 };
 

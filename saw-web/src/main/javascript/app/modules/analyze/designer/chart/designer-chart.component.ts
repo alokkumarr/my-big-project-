@@ -126,6 +126,7 @@ export class DesignerChartComponent implements OnInit {
       ...this._chartService.dataToChangeConfig(
         this.chartType,
         this.settings,
+        this._sqlBuilder,
         map(data || [], clone),
         {
           labels: {},

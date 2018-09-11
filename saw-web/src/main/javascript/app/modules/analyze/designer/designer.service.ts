@@ -45,16 +45,19 @@ export class DesignerService {
   }
 
   generateRequestPayload(analysis) {
-    forEach(analysis.artifacts, cols=> {
-      forEach(cols.columns, col=>{
+    forEach(analysis.artifacts, cols => {
+      forEach(cols.columns, col => {
         delete col.checked;
-      })
-    })
+      });
+    });
     return analysis;
   }
 
   getDataForAnalysis(analysis) {
-    let analysisRequest = analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(analysis)) : analysis;
+    let analysisRequest =
+      analysis.type === 'report'
+        ? this.generateRequestPayload(cloneDeep(analysis))
+        : analysis;
     return this._analyzeService.getDataBySettings(analysisRequest);
   }
 
@@ -75,7 +78,10 @@ export class DesignerService {
   }
 
   saveAnalysis(analysis) {
-    let analysisRequest = analysis.type === 'report' ? this.generateRequestPayload(cloneDeep(analysis)) : analysis;
+    let analysisRequest =
+      analysis.type === 'report'
+        ? this.generateRequestPayload(cloneDeep(analysis))
+        : analysis;
     return this._analyzeService.saveReport(analysisRequest);
   }
 
@@ -97,7 +103,7 @@ export class DesignerService {
     const areLessThenMaxFields = (
       artifactColumns: ArtifactColumns
     ): boolean => {
-      return (artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA);
+      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
     };
 
     const canAcceptNumberType = (
@@ -120,11 +126,9 @@ export class DesignerService {
       artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
     };
 
-    const canAcceptData = (
-      groupAdapter: IDEsignerSettingGroupAdapter,
-      _
-    ) => ({ type }: ArtifactColumnPivot) =>
-      NUMBER_TYPES.includes(type);
+    const canAcceptData = (groupAdapter: IDEsignerSettingGroupAdapter, _) => ({
+      type
+    }: ArtifactColumnPivot) => NUMBER_TYPES.includes(type);
 
     const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> = [
       {
@@ -408,6 +412,8 @@ export class DesignerService {
           return {
             type: artifactColumn.type,
             columnName: artifactColumn.columnName,
+            area: artifactColumn.area,
+            areaIndex: artifactColumn.areaIndex,
             aggregate: isDataArea ? artifactColumn.aggregate : null,
             // the name propertie is needed for the elastic search
             name: isDataArea ? artifactColumn.columnName : null,
@@ -450,7 +456,7 @@ export class DesignerService {
             name: artifactColumn.columnName,
             type: artifactColumn.type,
             limitValue: artifactColumn.limitValue,
-            limitType: artifactColumn.limitType
+            limitType: artifactColumn.limitType,
             // the name propert is needed for the elastic search
             /* prettier-ignore */
             ...(isDateType ? {
@@ -478,7 +484,7 @@ export class DesignerService {
 
   generateReportDataField(columns) {
     let dataFields = [];
-    forEach(columns, cols=> {
+    forEach(columns, cols => {
       let checkedRows = this.getPartialReportSqlBuilder(cols.columns);
       if (!isEmpty(checkedRows)) {
         dataFields.push({

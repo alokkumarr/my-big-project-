@@ -16,10 +16,29 @@ module.exports = {
   dashboardDesc: element(by.css('textarea[e2e="dashboard-save-description-input"]')),
   subCategorySelect: name => element(by.xpath(`//span[@class="mat-option-text"and contains(text(),"${name}")]`)),
   saveDialogBtn: element(by.css(`[e2e="dashboard-save-save-button"]`)),
+  metricFetchProgressBar: element(by.xpath('//div[contains(@class,"mat-progress-bar-element")]')),
+  filterButton: element(by.css('button[e2e="dashboard-open-global-filters-button"]')),
+  globalFilters: {
+    stringFilter: element(by.css(`input[e2e="dashboard-global-filter-string-input"]`)),
+    stringFilterValue : value => element(by.css(`mat-option[ng-reflect-value="${value}"]`)),
+    applyFilter: element(by.css(`button[e2e="dashboard-global-filters-apply-button"]`)),
+    dateFilterPreset: element(by.css('[e2e="filter-date-preset"]')),
+    dateFilterPresetValue: value => element(by.css(`mat-option[ng-reflect-value="${value}"]`)),
+    selectedPreset: element(by.css('[e2e="dasbhoard-global-filter-date-preset-select"]')),
+    numberSlider: element(by.css('[e2e="dashboard-global-filter-number-slider"]')),
+    numberSliderLow: element(by.xpath('//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]')),
+    cancelButton: element(by.css('[e2e="dashboard-global-filters-cancel-button"]'))
+
+
+  },
   dashboard:{
     dashboardTitle: name => element(by.xpath(`//h2[text()="${name}"]`)),
     dashboardAction: action => element(by.xpath(`//span[contains(text(),"${action}")]`)),
     dashboardConfirmDeleteButton: element(by.css('[e2e="dashboard-confirm-dialog-confirm"]')),
+    refreshButton: element(by.css('[e2e="dashboard-manual-refresh-button"]')),
+    deleteButton: element(by.css('[e2e="dashboard-delete-dashboard-button"]')),
+    downloadButton: element(by.css('[e2e="dashboard-download-dashboard-button"]')),
+    editButton: element(by.css('[e2e="dashboard-edit-dashboard-button"]')),
     addedAnalysisByName : name => element(by.xpath(`//h1[text()="${name}"]`))
   },
   snapshotKPI: {
@@ -40,7 +59,17 @@ module.exports = {
     backgroundColorByName: name => element(by.xpath(`//*[@e2e="dashboard-add-kpi-color-${name}"]`)),
     applyKPIButton: element(by.css('button[e2e="dashboard-add-kpi-apply-button"]')),
     kpiName: element(by.css('input[e2e="dashboard-add-kpi-name-input"]')),
-    kpiByName: name => element(by.xpath(`//div[contains(text(),"${name}")]`)),
+    kpiByName: name => element(by.xpath(`//*[contains(text(),"${name}")]`)),
     filterByName: name => element(by.xpath(`//div[contains(text(),"${name}") and @class="filter-label"]`))
+  },
+  actualVsTargetKPI: {
+    metricByName: name => element(by.xpath(`//span[contains(text(),"${name}")]`)),
+    kpiColumnByName: name => element(by.xpath(`//button[@e2e="dashboard-add-kpi-column-${name}"]`)),
+    actualVsTagertKpiButton:element(by.css('button[e2e="dashboard-add-widget-type-bullet-kpi"]')),
+    measure1Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure1-input"]')),
+    measure2Input: element(by.css('input[e2e="dashboard-add-kpi-bullet-measure2-input"]')),
+    metricTargetInput: element(by.css('input[e2e="dashboard-add-kpi-bullet-target-input"]')),
+    bandColor: name => element(by.css(`[e2e="dashboard-add-kpi-bullet-color-${name}"]`))
+
   }
 };

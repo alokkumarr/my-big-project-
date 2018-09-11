@@ -21,6 +21,7 @@
                 [width]="config.width"
                 [height]="config.height"
     >
+    <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
 
     <div *dxTemplate="let cell of 'linkCellTemplate'">
       <a [innerHtml]="cell.text | highlight: searchTerm"

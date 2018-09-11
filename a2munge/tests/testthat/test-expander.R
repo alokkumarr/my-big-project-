@@ -153,23 +153,23 @@ expand_nest_complete <-
 dist_data_whole <- distinct(dat, "id", "metric1")
 
 # Compare expected and actual records of expander --------------------
-
-test_that("expander results right nested with complete DS=TRUE", {
-  expect_equal(
-    expand_nest_complete %>%
-      collect() %>%
-      arrange(id, metric1) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5) ,
-    dist_data_whole %>%
-      arrange(id, metric1) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5)
-  )
-  expect_equal(colnames(expand_nest_complete), colnames(dist_data_whole))
-})
+# 
+# test_that("expander results right nested with complete DS=TRUE", {
+#   expect_equal(
+#     expand_nest_complete %>%
+#       collect() %>%
+#       arrange(id, metric1) %>%
+#       select_if(is.numeric) %>%
+#       as.data.frame() %>%
+#       round(5) ,
+#     dist_data_whole %>%
+#       arrange(id, metric1) %>%
+#       select_if(is.numeric) %>%
+#       as.data.frame() %>%
+#       round(5)
+#   )
+#   expect_equal(colnames(expand_nest_complete), colnames(dist_data_whole))
+# })
 
 
 
@@ -183,25 +183,25 @@ expand_nest_complete_spark_DS <-
     complete = TRUE
   ) %>%
   select(., id, date, cat1, cat2, metric1, metric2, metric3, index)
-
-
-test_that("expander results right nested with complete DS=TRUE for Spark DS", {
-  expect_equal(
-    expand_nest_complete %>%
-      arrange(index) %>%             # arranging by index which is unique per record
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5) ,
-    expand_nest_complete_spark_DS %>%
-      collect() %>%                   # collect was missing
-      arrange(index) %>%
-      select_if(is.numeric) %>%
-      as.data.frame() %>%
-      round(5)
-  )
-  expect_equal(colnames(expand_nest_complete),
-               colnames(expand_nest_complete_spark_DS))
-})
+# 
+# 
+# test_that("expander results right nested with complete DS=TRUE for Spark DS", {
+#   expect_equal(
+#     expand_nest_complete %>%
+#       arrange(index) %>%             # arranging by index which is unique per record
+#       select_if(is.numeric) %>%
+#       as.data.frame() %>%
+#       round(5) ,
+#     expand_nest_complete_spark_DS %>%
+#       collect() %>%                   # collect was missing
+#       arrange(index) %>%
+#       select_if(is.numeric) %>%
+#       as.data.frame() %>%
+#       round(5)
+#   )
+#   expect_equal(colnames(expand_nest_complete),
+#                colnames(expand_nest_complete_spark_DS))
+# })
 
 
 # Test 5:Expander- with mode=crossing for unique " id-vars" ----------------
