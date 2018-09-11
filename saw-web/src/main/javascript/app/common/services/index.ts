@@ -1,6 +1,3 @@
-import 'angular-toastr';
-import 'angular-toastr/dist/angular-toastr.css';
-
 export {MenuService} from './menu.service';
 export {LocalSearchService} from './local-search.service';
 export {HeaderProgressService} from './header-progress.service';
