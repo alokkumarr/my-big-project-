@@ -2,7 +2,7 @@
 class RequestModel {
     //Payload to create,update,execute analysis
     getPayloadPivotChart(customerCode, chartID, action, dataSetName, semanticId, userId, loginId, analysisName,
-                analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType) {
+                analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filters = null) {
 
         let chartBody = {
             'contents': {
@@ -133,9 +133,7 @@ class RequestModel {
                   'scheduled': null,
                   'sqlBuilder': {
                     'booleanCriteria': 'AND',
-                    'filters': [
-
-                    ],
+                    'filters': filters ? filters :[],
                     'dataFields': [
                       {
                         'name': 'double',
@@ -216,7 +214,7 @@ class RequestModel {
     }
 
     getEsReportBody(customerCode, id, action, dataSetName, semanticId, userId, loginId, analysisName,
-      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType) {
+      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filters = null) {
       let body;
       let update = {
         'contents': {
@@ -341,7 +339,7 @@ class RequestModel {
               'repository': {
                 'storageType': 'DL',
                 'objects': [
-                  
+
                 ],
                 '_number_of_elements': 0
               },
@@ -350,11 +348,9 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'sorts': [
-                  
+
                 ],
                 'dataFields': [
                   {
@@ -570,7 +566,7 @@ class RequestModel {
             'repository': {
               'storageType': 'DL',
               'objects': [
-                
+
               ],
               '_number_of_elements': 0
             },
@@ -579,11 +575,9 @@ class RequestModel {
             'userFullName': loginId,
             'sqlBuilder': {
               'booleanCriteria': 'AND',
-              'filters': [
-                
-              ],
+              'filters': filters ? filters :[],
               'sorts': [
-                
+
               ],
               'dataFields': [
                 {
@@ -682,13 +676,13 @@ class RequestModel {
       } else {
         throw new Error('Invalid action: '+action);
       }
-     
+
       return body;
 
     }
 
     getPivotBody(customerCode, id, action, dataSetName, semanticId, userId, loginId, analysisName,
-      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType) {
+      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filters = null) {
       let body;
       let update = {
         'contents': {
@@ -812,7 +806,7 @@ class RequestModel {
               'repository': {
                 'storageType': 'DL',
                 'objects': [
-                  
+
                 ],
                 '_number_of_elements': 0
               },
@@ -821,11 +815,9 @@ class RequestModel {
               'userFullName':loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'sorts': [
-                  
+
                 ],
                 'rowFields': [
                   {
@@ -837,7 +829,7 @@ class RequestModel {
                   }
                 ],
                 'columnFields': [
-                  
+
                 ],
                 'dataFields': [
                   {
@@ -982,7 +974,7 @@ class RequestModel {
               'repository': {
                 'storageType': 'DL',
                 'objects': [
-                  
+
                 ],
                 '_number_of_elements': 0
               },
@@ -991,11 +983,9 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'sorts': [
-                  
+
                 ],
                 'rowFields': [
                   {
@@ -1007,7 +997,7 @@ class RequestModel {
                   }
                 ],
                 'columnFields': [
-                  
+
                 ],
                 'dataFields': [
                   {
@@ -1035,13 +1025,13 @@ class RequestModel {
       } else {
         throw new Error('Invalid action: '+action);
       }
-      return body;  
+      return body;
 
 
     }
 
     getReportBody(customerCode, id, action, dataSetName, semanticId, userId, loginId, analysisName,
-      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType) {
+      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filters = null) {
       let body;
 
       let update = {
@@ -1273,14 +1263,12 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'orderByColumns': [
-                  
+
                 ],
                 'joins': [
-                  
+
                 ]
               },
               'edit': false,
@@ -1523,14 +1511,12 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'orderByColumns': [
-                  
+
                 ],
                 'joins': [
-                  
+
                 ]
               },
               'edit': false,
@@ -1554,12 +1540,12 @@ class RequestModel {
       } else {
         throw new Error('Invalid action: '+action);
       }
-      return body; 
-      
+      return body;
+
     }
 
     getChartBody(customerCode, id, action, dataSetName, semanticId, userId, loginId, analysisName,
-      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType) {
+      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filters = null) {
 
       let body;
 
@@ -1682,7 +1668,7 @@ class RequestModel {
               'repository': {
                 'storageType': 'DL',
                 'objects': [
-                  
+
                 ],
                 '_number_of_elements': 0
               },
@@ -1691,9 +1677,7 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'sorts': [
                   {
                     'order': 'asc',
@@ -1880,7 +1864,7 @@ class RequestModel {
               'repository': {
                 'storageType': 'DL',
                 'objects': [
-                  
+
                 ],
                 '_number_of_elements': 0
               },
@@ -1889,9 +1873,7 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': [
-                  
-                ],
+                'filters': filters ? filters :[],
                 'sorts': [
                   {
                     'order': 'asc',
@@ -1964,7 +1946,7 @@ class RequestModel {
       } else {
         throw new Error('Invalid action: '+action);
       }
-      return body;      
+      return body;
     }
 
     /**

@@ -6,6 +6,7 @@ var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var HtmlReporter = require('protractor-beautiful-reporter');
+var argv = require('yargs').argv;
 
 /**
  * Note about intervals:
@@ -25,13 +26,14 @@ const pageLoadTimeout = webpackHelper.distRun() ? 600000 : 500000;
  */
 
 const implicitlyWait = webpackHelper.distRun() ? 40000 : 30000;
-const extendedImplicitlyWait = webpackHelper.distRun() ? 50000 : 30000;//30000 // = 30 sec; Sometimes element will not
+const extendedImplicitlyWait = webpackHelper.distRun() ? 40000 : 30000;//30000 // = 30 sec; Sometimes element will not
                                                                           // appear so fast
 
 /**
  * Defines the maximum amount of time to wait for a condition
  */
-const fluentWait = webpackHelper.distRun() ? 50000 : 30000;
+const fluentWait = webpackHelper.distRun() ? 40000 : 30000;
+const extendedFluentWait = webpackHelper.distRun() ? 60000 : 40000;
 
 /**
  * Default time to wait in ms before a test fails
@@ -49,7 +51,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
  * number of failed retry
  */
-const maxRetryForFailedTests = webpackHelper.distRun() ? 1 : 2;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 4 : 3;
 
 /**
  * Waits ms after page is loaded
@@ -84,6 +86,7 @@ exports.timeouts = {
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
   pageResolveTimeout: pageResolveTimeout,
+  extendedFluentWait:extendedFluentWait,
   tempts: tempts
 };
 
@@ -93,6 +96,7 @@ exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   customerCode:customerCode,
   useAllAngular2AppRoots: true,
+  testData:webpackHelper.getTestData(),
   //directConnect: true, // this runs selenium server on the fly and it has faster execution + parallel execution efficiently
   //and tests are more stable with local server started instead of directConnection.
   baseUrl: 'http://localhost:3000',
@@ -163,21 +167,25 @@ exports.config = {
       // Observe module test cases
       testBaseDir + 'observe/createAndDeleteDashboardWithCharts.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithESReport.test.js',
-      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js'
+      testBaseDir + 'observe/createAndDeleteDashboardWithSnapshotKPI.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
+      testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilter.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'login.test.js'
+      testBaseDir + 'dev1.js',
+      testBaseDir + 'dev2.js'
     ]
   },
-  suite:'regression',
   onCleanUp: function (results) {
     retry.onCleanUp(results);
   },
   onPrepare() {
     retry.onPrepare();
+
     // Generate test data
     token = generate.token(browser.baseUrl);
     generate.usersRolesPrivilegesCategories(token);
@@ -229,6 +237,7 @@ exports.config = {
         done();
       })
     });
+
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.get(browser.baseUrl);
     return browser.wait(() => {
@@ -238,16 +247,19 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
-    //clean up any residual/leftover from a previous run. Ensure we have clean
-    //files for both locking and merging.
-    if (fs.existsSync('target/jasmine-results.json.lock')) {
-      fs.unlinkSync('target/jasmine-results.json.lock');
-    }
-    if (fs.existsSync('target/jasmine-results.json')) {
-      fs.unlink('target/jasmine-results.json');
-    }
+
   },
   afterLaunch: function() {
+
+    var retryCounter = 1;
+    if (argv.retry) {
+      retryCounter = ++argv.retry;
+    }
+    if (retryCounter <= maxRetryForFailedTests){
+     // console.log('Generating failed tests supporting data if there are any failed tests then those will be retried again.....');
+      webpackHelper.generateFailedTests('target/allure-results');
+    }
+
     return retry.afterLaunch(maxRetryForFailedTests);
   }
 };

@@ -53,15 +53,15 @@ public class SemanticServiceImpl implements SemanticService {
   @Value("${metastore.base}")
   @NotNull
   private String basePath;
-  
+
   @Value("${semantic.workbench-url}")
   @NotNull
   private String workbenchURl;
- 
+
   @Value("${semantic.transport-metadata-url}")
   @NotNull
   private String transportURI;
-  
+
   @Value("${semantic.binary-migration-requires}")
   @NotNull
   private boolean migrationRequires;
@@ -79,7 +79,6 @@ public class SemanticServiceImpl implements SemanticService {
     logger.trace("Adding semantic with an Id : {}", node.get_id());
     SemanticNode responseNode = new SemanticNode();
     SemanticNode newSemanticNode = null;
-    node.setCreatedAt(new Date().getTime());
     node.setCreatedBy(node.getUsername());
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -90,7 +89,6 @@ public class SemanticServiceImpl implements SemanticService {
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
-      responseNode.setCreatedAt(node.getCreatedAt());
       responseNode.setCreatedBy(node.getCreatedBy());
       responseNode.setSaved(true);
       responseNode.setStatusMessage("Entity is created successfully");
@@ -104,16 +102,16 @@ public class SemanticServiceImpl implements SemanticService {
     logger.trace("Response : " + node.toString());
     return newSemanticNode;
   }
-  
+
   /**
    * This method to set the physicalLocation, format & name under repository section.
    * when it is from DataLake
    * @param node
    * @return
-   * @throws IOException 
-   * @throws JsonProcessingException 
+   * @throws IOException
+   * @throws JsonProcessingException
    */
-  private SemanticNode setRepository(SemanticNode semanticNode) throws JsonProcessingException, IOException 
+  private SemanticNode setRepository(SemanticNode semanticNode) throws JsonProcessingException, IOException
   {
     logger.trace("Setting repository starts here..");
     String requestURL = workbenchURl + semanticNode.getProjectCode();
@@ -212,7 +210,6 @@ public class SemanticServiceImpl implements SemanticService {
     SemanticNode responseNode = new SemanticNode();
     SemanticNode newSemanticNode = null;
     node.setUpdatedBy(node.getUpdatedBy());
-    node.setUpdatedAt(new Date().getTime());
     try {
       List<MetaDataStoreStructure> structure = SAWSemanticUtils.node2JSONObject(node, basePath,
           node.get_id(), Action.update, Category.Semantic);
@@ -221,7 +218,6 @@ public class SemanticServiceImpl implements SemanticService {
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
       responseNode.setUpdatedBy(node.getUpdatedBy());
-      responseNode.setUpdatedAt(new Date().getTime());
       responseNode.setSaved(true);
       responseNode.setStatusMessage("Entity has been updated successfully");
       newSemanticNode = new SemanticNode();
@@ -453,7 +449,6 @@ public class SemanticServiceImpl implements SemanticService {
     return structure;
   }
   public static void main(String[] args) {
-    
+
   }
 }
-

@@ -19,10 +19,10 @@
 #'  values
 #'@param type measure_vars type. Used in spark.dataframe method only. default is
 #'  DOUBLE
+#'@param ... not currently implemented 
 #'
 #'@examples
 #'#'library(dplyr)
-#'
 #'
 #'# Create toy dataset
 #'set.seed(319)
@@ -50,7 +50,13 @@
 #'       value_name = "value")
 #'
 #'@export
-melter <- function(df,id_vars, measure_vars, variable_name, value_name, type) {
+melter <- function(df, 
+                   id_vars,
+                   measure_vars,
+                   variable_name,
+                   value_name,
+                   type,
+                   ...) {
   UseMethod("melter")
 }
 
@@ -62,7 +68,8 @@ melter.data.frame <- function(df,
                               id_vars = NULL,
                               measure_vars,
                               variable_name = "variable",
-                              value_name = "value") {
+                              value_name = "value",
+                              ...) {
 
   variables <- colnames(df)
   checkmate::assert_subset(id_vars, variables, empty.ok = TRUE)
@@ -89,7 +96,8 @@ melter.tbl_spark <- function(df,
                              measure_vars,
                              variable_name = "variable",
                              value_name = "value",
-                             type = "DOUBLE") {
+                             type = "DOUBLE",
+                             ...) {
   variables <- colnames(df)
   checkmate::assert_subset(id_vars, variables, empty.ok = TRUE)
   checkmate::assert_subset(measure_vars, variables)

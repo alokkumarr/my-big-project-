@@ -57,19 +57,19 @@ class AnalysisHelper {
      * @param {*} description
      * @param {*} analysisType
      */
-    createNewAnalysis(url, token, name, description, analysisType, subType) {
+    createNewAnalysis(url, token, name, description, analysisType, subType, filters = null) {
 
       if(analysisType === Constants.ES_REPORT) {
-        return this.createEsReport(url, token, name, description, analysisType, subType);
+        return this.createEsReport(url, token, name, description, analysisType, subType, filters);
 
       } else if(analysisType === Constants.CHART) {
-        return this.createChart(url, token, name, description, analysisType, subType);
+        return this.createChart(url, token, name, description, analysisType, subType, filters);
       }
       else if(analysisType === Constants.PIVOT) {
-        return this.createPivot(url, token, name, description, analysisType, subType);
+        return this.createPivot(url, token, name, description, analysisType, subType, filters);
       }
       else if(analysisType === Constants.REPORT) {
-        return this.createReport(url, token, name, description, analysisType, subType);
+        return this.createReport(url, token, name, description, analysisType, subType, filters);
       }else {
         throw new Error('Invalid analysisType: '+analysisType);
       }
@@ -89,28 +89,28 @@ class AnalysisHelper {
     }
 
     //analysisType = esReport
-    createEsReport(url, token,name, description, analysisType, subType) {
+    createEsReport(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
 
      //analysisType = chart
-     createChart(url, token,name, description, analysisType, subType) {
+     createChart(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
     //analysisType = pivot
-    createPivot(url, token,name, description, analysisType, subType) {
+    createPivot(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.pivotChart;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
     //analysisType = report
-    createReport(url, token,name, description, analysisType, subType) {
+    createReport(url, token,name, description, analysisType, subType, filters = null) {
       let dataSetName = dataSets.report;
-      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName);
+      return this.createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters);
     }
 
-    createAnalysis(url, token,name, description, analysisType, subType, dataSetName) {
+    createAnalysis(url, token,name, description, analysisType, subType, dataSetName, filters = null) {
        // Get semanticId (dataset ID)
        let semanticId = this.getSemanticId(url,dataSetName, token);
        // Create
@@ -126,24 +126,24 @@ class AnalysisHelper {
 
        if(analysisType === Constants.ES_REPORT) {
         updatePayload = new RequestModel().getEsReportBody(customerCode,id,'update',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
         executePayload = new RequestModel().getEsReportBody(customerCode,id,'execute',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
        } else if (analysisType === Constants.CHART) {
           updatePayload = new RequestModel().getChartBody(customerCode,id,'update',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
           executePayload = new RequestModel().getChartBody(customerCode,id,'execute',
-                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                                dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
        } else if (analysisType === Constants.PIVOT) {
         updatePayload = new RequestModel().getPivotBody(customerCode,id,'update',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
         executePayload = new RequestModel().getPivotBody(customerCode,id,'execute',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
       } else if (analysisType === Constants.REPORT) {
         updatePayload = new RequestModel().getReportBody(customerCode,id,'update',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
         executePayload = new RequestModel().getReportBody(customerCode,id,'execute',
-                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType);
+                              dataSetName,semanticId,user.userId,user.loginId,name,description, subCategory.id, currentTimeStamp, analysisType, subType, filters);
       } else {
         throw new Error('Invalid analysis type: '+ analysisType);
       }

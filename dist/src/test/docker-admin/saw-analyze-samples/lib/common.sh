@@ -4,7 +4,7 @@
 
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
-mdcli="ssh sip-saw1 $sudo_mapr /opt/saw/service/bin/mdcli.sh"
+mdcli="ssh sip-app1 $sudo_mapr /opt/saw/service/bin/mdcli.sh"
 datalake_home=/var/sip/services/saw-analyze-samples
 
 wait_maprfs() {

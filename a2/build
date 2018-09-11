@@ -16,6 +16,13 @@ tar -cf a2modules.tar -C .. $modules
 # Build the Docker image for building R packages
 docker build -t rbuild .
 
+# Workaround: Docker volumes mounted from the host get files created
+# with root, so use a temporary directory to avoid creating root-owned
+# files in the build tree
+tmpdir="$(mktemp -d /tmp/sip-a2-XXXXXX)"
+
 # Run the Docker container to build the R packages
-docker run --rm -v $PWD/target:/root/build/target rbuild \
-       /root/build/rbuild "$@"
+set -x
+build=/root/build
+docker run --rm -v $tmpdir:$build/target rbuild $build/rbuild "$@"
+cp -r $tmpdir/ target

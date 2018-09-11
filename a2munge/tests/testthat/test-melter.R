@@ -48,5 +48,3 @@ test_that("melter methods return correct df dimensions", {
   expect_equal(sdf_nrow(spk_melt), nrow(Iris) * length(measure_vars))
 })
 
-
-spark_disconnect(sc)

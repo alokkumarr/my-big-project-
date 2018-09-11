@@ -65,7 +65,7 @@ saw_binary_migration_requires=true
 #
 saw_elasticsearch_protocol=http
 saw_elasticsearch_host=localhost1,localhost2
-saw_elasticsearch_port=9200,9200
+saw_elasticsearch_port="9200,9200"
 saw_elasticsearch_username=username
 saw_elasticsearch_password=password
 saw_elasticsearch_data_store_limit=10000

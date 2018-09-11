@@ -243,6 +243,12 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     }
   }
 
+  protected def unexpectedElement(expected: String, obj: JValue): Nothing = {
+    val name = obj.getClass.getSimpleName
+    throw new RuntimeException(
+      "Expected %s but got: %s".format(expected, name))
+  }
+
   /**
     * The method creates AnalysisResult for one time/preview execution:
     * 1. Creates result of SQL execution
