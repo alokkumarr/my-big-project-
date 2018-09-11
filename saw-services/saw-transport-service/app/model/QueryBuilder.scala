@@ -26,7 +26,7 @@ object QueryBuilder extends {
         buildSelect(artifacts, sqlBuilder),
         buildFrom(artifacts, sqlBuilder),
         buildWhere(sqlBuilder, runtime, DSK),
-        buildGroupBy(artifacts, sqlBuilder),
+        buildGroupBy(sqlBuilder),
         buildOrderBy(sqlBuilder)
       ).replaceAll("\\s+", " ").trim
     }
@@ -35,7 +35,7 @@ object QueryBuilder extends {
         buildSelect(artifacts, sqlBuilder),
         buildFrom(artifacts, sqlBuilder),
         buildWhere(sqlBuilder, runtime),
-        buildGroupBy(artifacts, sqlBuilder),
+        buildGroupBy(sqlBuilder),
         buildOrderBy(sqlBuilder)
       ).replaceAll("\\s+", " ").trim
 
@@ -67,9 +67,17 @@ object QueryBuilder extends {
       columnAggregate(sqlBuilder, _)).mkString(", ")
   }
 
+  /**
+    * This method is no more used, this has been kept to maintain
+    * the backward Compatibility.
+    * @param sqlBuilder
+    * @param column
+    * @return
+    */
+  @Deprecated
   def columnAggregate(sqlBuilder: JObject, column: String): String = {
     val groupBy = extractArray(sqlBuilder, "groupByColumns")
-    groupBy.find(buildGroupByElement(_) == column) match {
+    groupBy.find(buildGroupByElement(_,"") == column) match {
       case Some(groupBy) => {
         val function = (groupBy \ "function").extract[String]
         if (!List("sum", "avg", "min", "max").contains(function)) {
@@ -100,6 +108,10 @@ object QueryBuilder extends {
   }
 
   private def column(artifactName: String, column: JValue) = {
+    val aggregate = (column \ "aggregate")
+    if (!(aggregate ==JNothing || aggregate == None))
+      aggregate.extract[String] +"("+(artifactName + "." + (column \ "columnName").extract[String])+")"
+    else
     artifactName + "." + (column \ "columnName").extract[String]
   }
 
@@ -299,29 +311,44 @@ object QueryBuilder extends {
     }
   }
 
-  private def buildGroupBy(
-    artifacts: List[JValue], sqlBuilder: JObject): String = {
-    val groupBy = extractArray(sqlBuilder, "groupByColumns")
-    if (groupBy.isEmpty) {
-      ""
-    } else {
-      // Take the precedence of sqlBuilder dataFields to build select columns, if dataFields not found
-      // in sql builder then look in the artifacts to support the backward compatibility.
-      var columnList = buildSelectfromsqlBuilder(sqlBuilder)
-      if (columnList == null || columnList.isEmpty)
-       columnList = buildSelectColumns(artifacts)
-      val selectColumns = columnList.toSet
-      val groupByColumns = groupBy.map(buildGroupByElement(_)).toSet
-      "GROUP BY " + (selectColumns -- groupByColumns).mkString(", ")
+
+  private def buildGroupBy(sqlBuilder: JObject): String = {
+    val groupByColumns: List[String] = extractArray(sqlBuilder, "dataFields") match {
+      case Nil => null
+      case dataFields: List[JValue] => {
+        dataFields.flatMap((fields: JValue) => {
+          val tableName = (fields \ "tableName").extract[String]
+          val columns = extractArray(fields, "columns")
+          val aggregateColumns = columns.filter(col => {
+            val aggregate = (col \ "aggregate")
+           !(aggregate ==JNothing || aggregate == None)
+          })
+          if (aggregateColumns.size > 0 && columns.size > aggregateColumns.size) {
+            val groupByColumn = columns.filter(col => {
+              val groupBy = (col \ "aggregate")
+              (groupBy == JNothing || groupBy == None)
+            })
+            val groupByColumns = groupByColumn.map(buildGroupByElement(_, tableName)).toSet
+            // return groupByColumn
+            groupByColumns
+          }
+          // No aggregate column present return the empty string.
+          else
+            None
+        })
+      }
     }
+    if (groupByColumns != None && groupByColumns.size>0)
+      "GROUP BY " + (groupByColumns).mkString(", ")
+    else ""
   }
 
-  private def buildGroupByElement(groupBy: JValue): String = {
+  private def buildGroupByElement(groupBy: JValue, tableName :String): String = {
     def property(name: String) = {
       (groupBy \ name).extract[String]
     }
     "%s.%s".format(
-      property("tableName"),
+      tableName,
       property("columnName")
     )
   }
