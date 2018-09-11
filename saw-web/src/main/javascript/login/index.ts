@@ -27,6 +27,8 @@ import { routesConfig } from './routes';
 import { themeConfig } from './theme';
 import { runConfig } from './run';
 
+import { AddTokenInterceptor } from '../app/common/interceptor';
+import { ConfigService } from '../app/common/services/configuration.service';
 import { JwtService } from './services/jwt.service';
 import { UserService } from './services/user.service';
 import { AuthServiceFactory } from './services/auth.service';
@@ -79,9 +81,26 @@ angular
     MaterialModule,
     FlexLayoutModule
   ],
-  declarations: [LoginComponent, PasswordChangeComponent, PasswordPreResetComponent, PasswordResetComponent, LayoutFooterComponent],
-  entryComponents: [LoginComponent, PasswordChangeComponent, PasswordPreResetComponent, PasswordResetComponent, LayoutFooterComponent],
-  providers: [jwtServiceProvider, userServiceProvider]
+  declarations: [
+    LoginComponent,
+    PasswordChangeComponent,
+    PasswordPreResetComponent,
+    PasswordResetComponent,
+    LayoutFooterComponent
+  ],
+  entryComponents: [
+    LoginComponent,
+    PasswordChangeComponent,
+    PasswordPreResetComponent,
+    PasswordResetComponent,
+    LayoutFooterComponent
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
+    jwtServiceProvider,
+    userServiceProvider,
+    ConfigService
+  ]
 })
 export class NewLoginModule {
   constructor() {}

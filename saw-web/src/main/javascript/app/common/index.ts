@@ -45,7 +45,7 @@ import {
   DxDataGridComponent,
   DxTemplateModule
 } from 'devextreme-angular';
-import {downgradeComponent} from '@angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
 
@@ -62,10 +62,7 @@ import {
   AccordionMenuComponent,
   AccordionMenuLinkComponent
 } from './components/accordionMenu';
-import {
-  SidenavComponent,
-  SidenavMenuService
-} from './components/sidenav';
+import { SidenavComponent, SidenavMenuService } from './components/sidenav';
 import { ErrorDetailComponent } from './components/error-detail';
 import { DataFormatDialogComponent } from './components/data-format-dialog';
 import { ConfirmDialogComponent } from './components/confirm-dialog';
@@ -79,7 +76,7 @@ import {
   JsPlumbEndpointComponent
 } from './components/js-plumb';
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
-import {DateFormatDialogComponent} from './components/date-format-dialog';
+import { DateFormatDialogComponent } from './components/date-format-dialog';
 import { ChoiceGroupComponent } from './components/choice-group-u';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { E2eDirective } from './directives/e2e.directive';
@@ -87,6 +84,7 @@ import { UserService } from '../../login/services/user.service';
 import { JwtService } from '../../login/services/jwt.service';
 import { ErrorDetailService } from './services/error-detail.service';
 import { ErrorDetailDialogService } from './services/error-detail-dialog.service';
+import { ConfigService } from './services/configuration.service';
 import { ClickToCopyDirective } from './directives/clickToCopy.directive';
 import {
   toastProvider,
@@ -132,7 +130,7 @@ angular
   .factory('$componentHandler', () => {
     return new ComponentHandler();
   })
-  .directive('searchBox', downgradeComponent({component: SearchBoxComponent}))
+  .directive('searchBox', downgradeComponent({ component: SearchBoxComponent }))
   .factory('AuthService', AuthServiceFactory)
   .service('JwtService', JwtService)
   .service('UserService', UserService);
@@ -258,6 +256,7 @@ angular
     SidenavMenuService,
     ErrorDetailService,
     ErrorDetailDialogService,
+    ConfigService,
     toastProvider,
     ChartService,
     componentHandlerProvider,
