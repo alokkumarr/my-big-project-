@@ -569,11 +569,9 @@ export class DesignerContainerComponent {
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
-      console.log(this.analysis.artifacts);
       forEach(this.analysis.artifacts, artifactcolumns=> {
         forEach(artifactcolumns.columns, col=> {
           if(col.name == event.column.name) {
-            console.log("aggregate added");
             col.aggregate = event.column.aggregate;
           }
         })  

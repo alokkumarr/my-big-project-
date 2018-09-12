@@ -28,7 +28,6 @@ import { getFormatter } from '../../utils/numberFormatter';
 import { DATE_FORMATS_OBJ } from '../../consts.js';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
 
 import {
@@ -124,7 +123,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
+    this.columns = this.artifacts2Columns(this.analysis.artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -147,11 +146,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    this.columns = this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
-    console.log(data);
-    console.log(this.columns);
-    let checkData = cloneDeep(data);
-    this.data = this.trimDataWithAggregation(checkData); 
+    this.columns = this.artifacts2Columns(this.analysis.artifacts);
+    this.data = this.trimDataContainingAggregation(data);
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -330,10 +326,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   checkFormatDataCondition(type) {
-    if (
-      NUMBER_TYPES.includes(type) ||
-      DATE_TYPES.includes(type)
-    ) {
+    if (NUMBER_TYPES.includes(type) || DATE_TYPES.includes(type)) {
       return true;
     } else {
       return false;
@@ -342,7 +335,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   aggregateColumn(payload, value) {
     payload.aggregate = value;
-    if(value === 'clear') {
+    if (value === 'clear') {
       delete payload.aggregate;
     }
     this.change.emit({
@@ -406,8 +399,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
       fpFlatMap((artifact: Artifact) => artifact.columns),
+      fpFilter('checked'),
       fpMap((column: ArtifactColumnReport) => {
-        console.log(column);
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
         const aggregate = AGGREGATE_TYPES_OBJ[column.aggregate];
@@ -487,15 +480,19 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     return {};
   }
 
-  trimDataWithAggregation(data) {
+  trimDataContainingAggregation(data) {
     let intermediateData = [];
     data.map(row => {
       let obj = {};
-      for(var key in row) {
-        let aggregateKey = key.split("(");
+      for (var key in row) {
+        let aggregateKey = key.split('(');
         if (!isUndefined(aggregateKey[1])) {
-          forEach(this.columns, col=> {
-            if (col.payload.aggregate === aggregateKey[0] && col.payload.columnName === aggregateKey[1].substring(0, aggregateKey[1].length - 1)) {
+          forEach(this.columns, col => {
+            if (
+              col.payload.aggregate === aggregateKey[0] &&
+              col.payload.columnName ===
+                aggregateKey[1].substring(0, aggregateKey[1].length - 1)
+            ) {
               obj[col.payload.columnName] = row[key];
             }
           });
