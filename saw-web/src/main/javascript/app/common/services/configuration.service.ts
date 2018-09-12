@@ -39,34 +39,10 @@ export class ConfigService {
       preferenceValue: pref.value
     }));
 
-    return (this.loadConfig() as Observable<Configuration>).pipe(
-      flatMap((data: Configuration) => {
-        let action;
-        if (!data) return this.addConfig(payload);
-
-        const pref = find(
-          data.preferences,
-          p => p.preferenceName === payload[0].preferenceName
-        );
-
-        return pref ? this.updateConfig(payload) : this.addConfig(payload);
-      }),
-      tap(this.cacheConfig.bind(this))
-    );
-  }
-
-  addConfig(config: ConfigurationPreference[]): Observable<Configuration> {
-    return this.httpClient.post(
-      `${AppConfig.login.url}/auth/admin/user/preferences/add`,
-      config
-    ) as Observable<Configuration>;
-  }
-
-  updateConfig(config: ConfigurationPreference[]): Observable<Configuration> {
-    return this.httpClient.post(
-      `${AppConfig.login.url}/auth/admin/user/preferences/update`,
-      config
-    ) as Observable<Configuration>;
+    return (this.httpClient.post(
+      `${AppConfig.login.url}/auth/admin/user/preferences/upsert`,
+      payload
+    ) as Observable<Configuration>).pipe(tap(this.cacheConfig.bind(this)));
   }
 
   private cacheConfig(config: Configuration) {
