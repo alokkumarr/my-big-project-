@@ -52,9 +52,11 @@ import {
   DatapodActionsComponent
 } from './components/data-objects-view/index';
 
+import { DefaultWorkbenchPageGuard } from './guards';
+
 import { CommonModuleTs } from '../../common';
 
-const components = [
+const COMPONENTS = [
   WorkbenchPageComponent,
   DataobjectsComponent,
   DatasetsCardPageComponent,
@@ -81,6 +83,20 @@ const components = [
   DatapodActionsComponent
 ];
 
+const GUARDS = [DefaultWorkbenchPageGuard];
+
+const SERVICES = [
+  JwtService,
+  WorkbenchService,
+  AnalyzeService,
+  MenuService,
+  ComponentHandler,
+  HeaderProgressService,
+  ToastService,
+  SideNavService,
+  LocalSearchService,
+  dxDataGridService
+];
 @NgModule({
   imports: [
     AngularCommonModule,
@@ -96,19 +112,11 @@ const components = [
     AngularSplitModule,
     CommonModuleTs
   ],
-  declarations: components,
-  entryComponents: components,
+  declarations: COMPONENTS,
+  entryComponents: COMPONENTS,
   providers: [
-    JwtService,
-    WorkbenchService,
-    AnalyzeService,
-    MenuService,
-    ComponentHandler,
-    HeaderProgressService,
-    ToastService,
-    SideNavService,
-    LocalSearchService,
-    dxDataGridService
+    ...SERVICES,
+    ...GUARDS
   ]
 })
 export class WorkbenchUpgradeModule {}

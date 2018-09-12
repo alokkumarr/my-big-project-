@@ -6,6 +6,7 @@ import 'hammerjs';
 import 'reflect-metadata';
 import '../../../../themes/_triton.scss';
 import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -46,6 +47,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes, {useHash: true}),
+    NgIdleModule.forRoot(),
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,

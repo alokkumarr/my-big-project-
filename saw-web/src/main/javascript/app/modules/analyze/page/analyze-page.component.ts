@@ -1,11 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import * as split from 'lodash/split';
-import * as fpFirst from 'lodash/fp/first';
-import * as fpGet from 'lodash/fp/get';
-import * as fpPipe from 'lodash/fp/pipe';
+
 import { LAST_ANALYSES_CATEGORY_ID } from '../../../common/local-storage-keys';
-import { MenuService } from '../../../common/services/menu.service';
 import { JwtService } from '../../../../login/services/jwt.service';
 const template = require('./analyze-page.component.html');
 
@@ -14,9 +11,8 @@ const template = require('./analyze-page.component.html');
   template
 })
 
-export class AnalyzePageComponent implements OnInit {
+export class AnalyzePageComponent {
   constructor(
-    private _menu: MenuService,
     private _jwt: JwtService,
     private _router: Router
   ) {
@@ -24,12 +20,6 @@ export class AnalyzePageComponent implements OnInit {
       .subscribe(event => {
         this.saveAnalyzeCategoryId(event);
       });
-  }
-
-  ngOnInit() {
-    this._menu.getMenu('ANALYZE').then(menu => {
-      this.goToDefaultChildStateIfNeeded(menu);
-    });
   }
 
   saveAnalyzeCategoryId(event) {
@@ -42,14 +32,5 @@ export class AnalyzePageComponent implements OnInit {
     }
   }
 
-  goToDefaultChildStateIfNeeded(menu) {
-    const id = window.localStorage[LAST_ANALYSES_CATEGORY_ID] ||
-    fpPipe(
-      fpFirst,
-      fpGet('children'),
-      fpFirst,
-      fpGet('id')
-    )(menu);
-    this._router.navigate(['analyze', id]);
-  }
+
 }

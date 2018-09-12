@@ -7,11 +7,13 @@ import {DatasetDetailViewComponent} from './components/dataset-detailedView/data
 import {CreateSemanticComponent} from './components/semantic-management/create/create-semantic.component';
 import {ValidateSemanticComponent} from './components/semantic-management/validate/validate-semantic.component';
 import {UpdateSemanticComponent} from './components/semantic-management/update/update-semantic.component';
+import { DefaultWorkbenchPageGuard } from './guards';
 
 export const routes: Routes = [
   {
     // name: 'workbench',
     path: 'workbench',
+    canActivate: [DefaultWorkbenchPageGuard],
     component: WorkbenchPageComponent,
     children: [{
       // name: 'workbench.dataobjects',

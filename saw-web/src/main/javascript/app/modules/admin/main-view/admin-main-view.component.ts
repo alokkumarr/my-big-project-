@@ -24,9 +24,7 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
-import { SidenavMenuService } from '../../../common/components/sidenav';
 import { ConfirmDialogData } from '../../../common/types';
-import { AdminMenuData } from '../consts';
 
 const template = require('./admin-main-view.component.html');
 require('./admin-main-view.component.scss');
@@ -76,8 +74,8 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 })
 export class AdminMainViewComponent {
 
-  @Input() columns: any[];
-  @Input() section: 'user' | 'role' | 'privilege' | 'category';
+  columns: any[] = [];
+  section: 'user' | 'role' | 'privilege' | 'category';
   data$: Promise<any[]>;
   roles$: any;
   data: any[];
@@ -99,27 +97,30 @@ export class AdminMainViewComponent {
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
     private _dialog: MatDialog,
-    private _sidenav: SidenavMenuService,
     private _router: Router,
     private _route: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    this._route.data.subscribe(data => this.onDataChange(data));
     const token = this._jwtService.getTokenObj();
     this.ticket = token.ticket;
     const customerId = parseInt(this.ticket.custID, 10);
     this.data$ = this.getListData(customerId);
     this.data$.then(data => {
       if (this.section === 'privilege') {
-        const { role } = this._route.snapshot.params;
+        const { role } = this._route.snapshot.queryParams;
         if (role) {
           this.filterObj.searchTerm = `role:"${role}"`;
         }
       }
       this.setData(data);
     });
+  }
 
-    this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+  onDataChange({columns, section}) {
+    this.columns = columns;
+    this.section = section;
   }
 
   applySearchFilter(value) {

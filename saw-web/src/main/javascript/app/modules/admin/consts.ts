@@ -5,30 +5,30 @@ import * as fpJoin from 'lodash/fp/join';
 export const AdminMenuData = [{
   id: '',
   name: 'User',
-  url: '#!/admin/user'
+  url: '#/admin/user'
 }, {
   id: '',
   name: 'Role',
-  url: '#!/admin/role'
+  url: '#/admin/role'
 }, {
   id: '',
   name: 'Privilege',
-  url: '#!/admin/privilege'
+  url: '#/admin/privilege'
 }, {
   id: '',
   name: 'Category',
-  url: '#!/admin/categories'
+  url: '#/admin/categories'
 }, {
   id: '',
   name: 'Package Utility',
   children: [{
     id: '',
     name: 'Export',
-    url: '#!/admin/export'
+    url: '#/admin/export'
   }, {
     id: '',
     name: 'Import',
-    url: '#!/admin/import'
+    url: '#/admin/import'
   }]
 }];
 
