@@ -1,8 +1,9 @@
-import { Component, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import * as get from 'lodash/get';
 import * as lowerCase from 'lodash/lowerCase';
 import * as split from 'lodash/split';
 import toMaterialStyle from 'material-color-hash';
+import { HeaderProgressService } from '../../../common/services';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
 
@@ -14,26 +15,22 @@ require('./header.component.scss');
   template
 })
 export class LayoutHeaderComponent {
-  constructor(
-    private jwt: JwtService,
-    private user: UserService,
-    private cdRef: ChangeDetectorRef
-  ) {}
-
-  public isLoading: false;
-  lowerCase = lowerCase;
-
-  ngAfterViewChecked() {
-    // if (this.isLoading === this._rootScope.showProgress) return;
-    // this.isLoading = this._rootScope.showProgress;
-    this.cdRef.detectChanges();
-  }
-
   public UserDetails: any;
   public modules: any;
   public showAdmin: boolean;
+  public showProgress: boolean;
   private userInitials: string;
   private userBGColor: any;
+
+  lowerCase = lowerCase;
+
+  constructor(
+    private jwt: JwtService,
+    private user: UserService,
+    private _headerProress: HeaderProgressService
+  ) {
+    _headerProress.subscribe(showProgress => this.showProgress = showProgress);
+  }
 
   ngOnInit() {
     this.UserDetails = this.jwt.getTokenObj();
@@ -44,10 +41,6 @@ export class LayoutHeaderComponent {
     if (this.jwt.isAdmin(token)) {
       this.showAdmin = true;
     }
-  }
-
-  get showProgress() {
-    return this.isLoading;
   }
 
   logout() {
