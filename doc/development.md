@@ -210,19 +210,6 @@ This will first deploy the old SIP version (see the SIP package URL in
 can also be used in continuous integration, in which case integration
 tests will be run on top of the upgraded SIP version.
 
-# Running manual package upgrade/migration Tests
-
-To run the saw package upgrade and database migration manually with Local docker instance, execute the
-following command from saw working directory:
-       
-        sh utils/migration-package-upgrade-local.sh
-  
-Above script can be also edited as per the use cases for repeatedly upgrade
-test while development.
-
-Note: Above script is only applicable for local docker instance,
-for cloud docker instance script TBD.
-
 # Rendering documentation
 
 Documentation that describes the SAW implementation and design is
