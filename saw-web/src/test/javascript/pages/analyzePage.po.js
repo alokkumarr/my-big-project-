@@ -183,7 +183,7 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 const logOut = () => {
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
+    btnSelector: '[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-logout"]`
   });
   return browser.wait(() => {
@@ -199,7 +199,7 @@ const doAccountAction = action => {
   browser.ignoreSynchronization = true
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
+    btnSelector: '[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.wait(() => {

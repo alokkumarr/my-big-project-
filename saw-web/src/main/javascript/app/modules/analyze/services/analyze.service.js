@@ -137,8 +137,10 @@ export class AnalyzeService {
       `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
+      const queryBuilder = fpGet(`data.queryBuilder`, resp);
+      const executedBy = fpGet(`data.executedBy`, resp);
       const count = fpGet(`data.totalRows`, resp) || data.length;
-      return {data: options.forcePaginate ? this.forcePagination(data, options) : data, count};
+      return {data: options.forcePaginate ? this.forcePagination(data, options) : data, queryBuilder, executedBy, count};
     });
   }
 
@@ -167,9 +169,9 @@ export class AnalyzeService {
       this._executions[model.id] = deferred.promise;
 
       this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      this.applyAnalysis(model, executionType).then(({data, executionId, executionType, count}) => {
+      this.applyAnalysis(model, executionType).then(({data, executionId, executedBy, executedAt, queryBuilder, executionType, count}) => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
-        deferred.resolve({data, executionId, executionType, count});
+        deferred.resolve({data, executionId, executionType, count, executedBy, executedAt, queryBuilder});
       }, err => {
         this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);
@@ -283,6 +285,7 @@ export class AnalyzeService {
 
     const payload = this.getRequestParams([
       ['contents.action', 'execute'],
+      ['contents.executedBy', this._JwtService.getLoginId()],
       ['contents.page', page],
       ['contents.pageSize', options.take],
       ['contents.keys.[0].id', model.id],
@@ -294,13 +297,24 @@ export class AnalyzeService {
         data: fpGet(`data.contents.analyze.[0].data`, resp),
         executionId: fpGet(`data.contents.analyze.[0].executionId`, resp),
         executionType: mode,
+        executedBy: this._JwtService.getLoginId(),
+        executedAt: Date.now(),
+        queryBuilder: {...model.sqlBuilder},
         count: fpGet(`data.contents.analyze.[0].totalRows`, resp)
       };
     });
   }
 
   getDataBySettings(analysis, mode = EXECUTION_MODES.PREVIEW, options = {}) {
-    return this.applyAnalysis(analysis, mode, options).then(({data, executionId, executionType, count}) => {
+    return this.applyAnalysis(analysis, mode, options).then(({
+      data,
+      executionId,
+      executedBy,
+      executedAt,
+      queryBuilder,
+      executionType,
+      count
+    }) => {
       // forEach(analysis.artifacts[0].columns, column => {
       //   column.columnName = this.getColumnName(column.columnName);
       // });
@@ -315,7 +329,16 @@ export class AnalyzeService {
       //     data[key] = value;
       //   });
       // });
-      return {analysis, data, executionId, executionType, count};
+      return {
+        analysis,
+        data,
+        executionId,
+        executedBy,
+        executedAt,
+        queryBuilder,
+        executionType,
+        count
+      };
     });
   }
 

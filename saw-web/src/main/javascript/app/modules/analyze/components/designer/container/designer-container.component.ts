@@ -73,7 +73,7 @@ export class DesignerContainerComponent {
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
-  public fieldCount:number;
+  public fieldCount: number;
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -213,7 +213,7 @@ export class DesignerContainerComponent {
       break;
 
     case 'report':
-      forEach(artifacts, table=> {
+      forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
           forEach(this.analysis.sqlBuilder.dataFields, fields=> {
             forEach(fields.columns, field => {
@@ -315,7 +315,7 @@ export class DesignerContainerComponent {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
     this.fieldCount = 0;
 
-    forEach(this.analysis.sqlBuilder.dataFields, field=> {
+    forEach(this.analysis.sqlBuilder.dataFields, field => {
       if (field.checked === 'y') {
         this.fieldCount++;
       }
@@ -324,13 +324,13 @@ export class DesignerContainerComponent {
         delete field.limitType;
         delete field.limitValue;
       }
-    })
+    });
 
-    forEach(this.analysis.sqlBuilder.filters, filter=> {
+    forEach(this.analysis.sqlBuilder.filters, filter => {
       if (filter.isRuntimeFilter) {
         delete filter.model;
       }
-    })
+    });
 
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
