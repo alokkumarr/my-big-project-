@@ -1447,6 +1447,234 @@
           }
         ]
       }
+    },
+    "dashboardGlobalFiltersWithESReport": {
+      "esReportFloatByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters":[
+          {
+            "name":"float",
+            "value" : 30
+          }
+        ],
+        "filters":[{
+          "type": "float",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "float",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": true
+        }]
+      },
+      "esReportFloatByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters":[
+          {
+            "name":"float",
+            "value" : 30
+          }
+        ],
+        "filters":[{
+          "type": "float",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "float",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": true
+        }]
+      },
+      "esReportStringByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportStringByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportDoubleByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportDoubleByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportDateByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "TW"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportDateByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "TW"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportLongByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportLongByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportIntegerByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "esReportIntegerByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      }
     }
   }
 }
