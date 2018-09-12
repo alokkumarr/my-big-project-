@@ -15,13 +15,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PreferenceRepositoryImplTest {
-    @Autowired
+
     private PreferenceRepository preferenceRepository;
     private UserPreferences userPreferences = new UserPreferences();
 
     @Before
     public void setUp() {
-      //  preferenceRepository = mock(PreferenceRepositoryImpl.class);
+        preferenceRepository = mock(PreferenceRepositoryImpl.class);
         userPreferences.setUserID("1");
         userPreferences.setCustomerID("1");
         List<Preference> preferenceList = new ArrayList<>();
@@ -42,25 +42,15 @@ public class PreferenceRepositoryImplTest {
         preference4.setPreferenceValue("http://localhost/saw/observe/4");
         preferenceList.add(preference4);
         userPreferences.setPreferences(preferenceList);
-        when(preferenceRepository.createPreferences(userPreferences)).thenReturn(userPreferences);
-        when(preferenceRepository.updatePreferences(userPreferences)).thenReturn(userPreferences);
+        when(preferenceRepository.upsertPreferences(userPreferences)).thenReturn(userPreferences);
         when(preferenceRepository.deletePreferences(userPreferences)).thenReturn(userPreferences);
         when(preferenceRepository.fetchPreferences("1","1")).thenReturn(userPreferences);
     }
 
     @Test
-    public void TestAddPreferences(){
-        UserPreferences userPreferences1 =
-        preferenceRepository.createPreferences(userPreferences);
-        Assert.assertEquals(userPreferences.getUserID(),userPreferences1.getUserID());
-        Assert.assertEquals(userPreferences.getCustomerID(),userPreferences1.getCustomerID());
-        Assert.assertEquals(userPreferences.getPreferences().size(),userPreferences1.getPreferences().size());
-    }
-
-    @Test
     public void TestUpdatePreferences(){
         UserPreferences userPreferences1 =
-            preferenceRepository.updatePreferences(userPreferences);
+            preferenceRepository.upsertPreferences(userPreferences);
         Assert.assertEquals(userPreferences.getUserID(),userPreferences1.getUserID());
         Assert.assertEquals(userPreferences.getCustomerID(),userPreferences1.getCustomerID());
         Assert.assertEquals(userPreferences.getPreferences().size(),userPreferences1.getPreferences().size());

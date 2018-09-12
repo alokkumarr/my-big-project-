@@ -26,11 +26,11 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     private final String CONFIG_VAL_OBJ_TYPE = "USER_PREFERENCES";
 
     @Override
-    public UserPreferences createPreferences(UserPreferences userPreferences) {
-        String createSQL = "INSERT INTO CONFIG_VAL(`CONFIG_VAL_CODE`, `CONFIG_VALUE`, `CONFIG_VAL_DESC`, `CONFIG_VAL_OBJ_TYPE`," +
+    public UserPreferences upsertPreferences(UserPreferences userPreferences) {
+        String createSQL = "INSERT IGNORE INTO CONFIG_VAL(`CONFIG_VAL_CODE`, `CONFIG_VALUE`, `CONFIG_VAL_DESC`, `CONFIG_VAL_OBJ_TYPE`," +
             "`CONFIG_VAL_OBJ_GROUP`, `ACTIVE_STATUS_IND`, `CREATED_DATE` , CREATED_BY ) " +
             "VALUES( ?,?,?,?,?,'1',now(),?)";
-        jdbcTemplate.batchUpdate(createSQL, userPreferences.getPreferences(), 1000,
+         int[][] insertResult = jdbcTemplate.batchUpdate(createSQL, userPreferences.getPreferences(), 1000,
             (ps, preference) -> {
                 ps.setString(1,preference.getPreferenceName());
                 ps.setString(2,preference.getPreferenceValue());
@@ -39,14 +39,11 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
                 ps.setString(5,userPreferences.getUserID());
                 ps.setString(6,userPreferences.getUserID());
             });
-        return userPreferences;
-    }
-
-    @Override
-    public UserPreferences updatePreferences(UserPreferences userPreferences) {
+         logger.trace(insertResult.length + " Preferences created successfully.");
+        // update the sql .
         String updateSQL = "UPDATE CONFIG_VAL SET CONFIG_VALUE = ? , MODIFIED_DATE = now(), MODIFIED_BY =? " +
             " WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE=? AND CONFIG_VAL_OBJ_GROUP= ?";
-            jdbcTemplate.batchUpdate(updateSQL, userPreferences.getPreferences(), 1000,
+        int[][] updateResult = jdbcTemplate.batchUpdate(updateSQL, userPreferences.getPreferences(), 1000,
             (ps, preference) -> {
                 ps.setString(1,preference.getPreferenceValue());
                 ps.setString(2,userPreferences.getUserID());
@@ -54,6 +51,8 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
                 ps.setString(4,CONFIG_VAL_OBJ_TYPE);
                 ps.setString(5,userPreferences.getUserID());
             });
+        logger.trace(updateResult.length + " Preferences updated successfully.");
+        userPreferences.setMessage("Preferences updated successfully");
         return userPreferences;
     }
 
@@ -61,12 +60,14 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     public UserPreferences deletePreferences(UserPreferences userPreferences) {
         String deleteSql = "DELETE FROM CONFIG_VAL WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE =? AND " +
             "CONFIG_VAL_OBJ_GROUP= ?";
-        jdbcTemplate.batchUpdate(deleteSql, userPreferences.getPreferences(), 1000,
+        int[][] deleteResult =  jdbcTemplate.batchUpdate(deleteSql, userPreferences.getPreferences(), 1000,
             (ps, preference) -> {
                 ps.setString(1,preference.getPreferenceName());
                 ps.setString(2,CONFIG_VAL_OBJ_TYPE);
                 ps.setString(3, userPreferences.getUserID());
             });
+        logger.trace(deleteResult.length + " Preferences deleted successfully.");
+        userPreferences.setMessage(deleteResult.length +" Preferences deleted successfully");
         return userPreferences;
     }
 

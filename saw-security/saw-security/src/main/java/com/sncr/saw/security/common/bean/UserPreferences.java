@@ -8,7 +8,7 @@ public class UserPreferences {
    private String userID;
    private String customerID;
    private List<Preference> preferences = new ArrayList<>();
-
+   private String message ;
     /**
      * Gets userID
      *
@@ -57,4 +57,19 @@ public class UserPreferences {
         this.preferences = preferences;
     }
 
+    /**
+     * Gets message
+     *
+     * @return value of message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * Sets message
+     */
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
