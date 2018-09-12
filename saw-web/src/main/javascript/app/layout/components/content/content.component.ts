@@ -69,6 +69,7 @@ export class LayoutContentComponent {
       .subscribe(event => {
         if (event instanceof NavigationEnd) {
           this.setPageTitle(event);
+          this.loadMenuForProperModule(event);
         }
       });
     this.goToAnalyzePage();
