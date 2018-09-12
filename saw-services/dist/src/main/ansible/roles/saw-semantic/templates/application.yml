@@ -26,6 +26,6 @@ application:
 metastore:
     base:  {{ 'maprfs://'+ sip_var_path  | default('maprfs:///var/sip/') }}
 semantic:
-    workbench-url:  http://localhost:9700/
+    workbench-url:  http://localhost:9700
     transport-metadata-url:  http://localhost:9200
     binary-migration-requires: {{ saw_binary_migration_requires | default('true') }}

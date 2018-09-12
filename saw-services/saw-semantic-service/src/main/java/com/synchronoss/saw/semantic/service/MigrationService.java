@@ -1,8 +1,11 @@
 package com.synchronoss.saw.semantic.service;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -32,6 +35,7 @@ import com.synchronoss.saw.semantic.model.MetaDataObjects;
 import com.synchronoss.saw.semantic.model.request.BinarySemanticNode;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.bda.store.generic.schema.Action;
 import sncr.bda.store.generic.schema.Category;
 import sncr.bda.store.generic.schema.MetaDataStoreStructure;
@@ -101,10 +105,8 @@ public class MigrationService {
            String dataSetName  = repositoryNode.get("EnrichedDataObjectName").asText();
            logger.trace("dataObjectId : " + dataObjectId);
            logger.trace("dataSetName : " + dataSetName);
-           String format = "parquet";
            newRepoNode = objectMapper.createObjectNode();
-           newRepoNode.put("name", dataSetName);
-           newRepoNode.put("format", format);
+           newRepoNode.put(DataSetProperties.Name.toString(), dataSetName);
            requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
            dataObjectRequestEntity = new HttpEntity<Object>(dataObjectQuery(dataObjectId, "read"),requestHeaders);
            logger.trace("dataObjectRequestEntity : " + objectMapper.writeValueAsString(dataObjectRequestEntity));
@@ -113,7 +115,11 @@ public class MigrationService {
                dataObjectRequestEntity, DataSemanticObjects.class);
            dataObjectData = objectMapper.readTree(objectMapper.writeValueAsString(binaryDataObjectNode.getBody().getContents().get(0)));
            logger.trace("dataObjectData : " + objectMapper.writeValueAsString(dataObjectData));
-           newRepoNode.put("physicalLocation", dataObjectData.get("dataLocation").asText());
+           newRepoNode.put(DataSetProperties.PhysicalLocation.toString(), dataObjectData.get("dataLocation").asText());
+           Path file = Paths.get(dataObjectData.get("dataLocation").asText());
+           String format = (FilenameUtils.getExtension(file.getFileName().toString()).equals("") || 
+           FilenameUtils.getExtension(file.getFileName().toString()) != null) ? FilenameUtils.getExtension(file.getFileName().toString()) : "parquet" ;
+           newRepoNode.put(DataSetProperties.Format.toString(), format);
            repositoryObjects.add(newRepoNode);
            listOfDataObjectIds.add(dataObjectId);
          }
@@ -131,8 +137,9 @@ public class MigrationService {
              logger.trace("deleteSemanticBinaryRequestEntity {}", objectMapper.writeValueAsString(deleteSemanticBinaryRequestEntity));
              ResponseEntity<?> deleteSemanticBinaryNode = restTemplate.exchange(url, HttpMethod.POST,
                  deleteSemanticBinaryRequestEntity, MetaDataObjects.class);
-             logger.trace("deleteSemanticBinaryNode status code : "+ deleteSemanticBinaryNode.getStatusCodeValue());
+             logger.trace("deleteSemanticBinaryNode status code : "+ deleteSemanticBinaryNode.getStatusCodeValue() + " : " + objectMapper.writeValueAsString(deleteSemanticBinaryNode));
              if (!deleteSemanticBinaryNode.getStatusCode().is2xxSuccessful()) {
+               logger.trace("deleteSemanticBinaryNode inside if it is not successful : "+ deleteSemanticBinaryNode.getStatusCodeValue());
                deleteSemantic(semanticNode, basePath);
              }
              try {
@@ -145,8 +152,9 @@ public class MigrationService {
                logger.trace("deleteDataObjectBinaryRequestEntity {}", objectMapper.writeValueAsString(deleteDataObjectBinaryRequestEntity));
                ResponseEntity<?> deleteDataObjectNode = restTemplate.exchange(url, HttpMethod.POST,
                    deleteDataObjectBinaryRequestEntity, DataSemanticObjects.class);
-               logger.trace("deleteDataObjectNode status code : "+ deleteSemanticBinaryNode.getStatusCodeValue());
+               logger.trace("deleteDataObjectNode status code : "+ deleteDataObjectNode.getStatusCodeValue() + " : " + objectMapper.writeValueAsString(deleteDataObjectNode));
                if (!deleteDataObjectNode.getStatusCode().is2xxSuccessful()) {
+                 logger.trace("deleteDataObjectNode inside if it is not successful : "+ deleteDataObjectNode.getStatusCodeValue());
                  deleteSemantic(semanticNode, basePath);
                  break;
                }
@@ -154,17 +162,20 @@ public class MigrationService {
              }
              catch (Exception ex) {
                // Delete an entry from semantic store
+               logger.trace("Delete an entry from semantic store String dataObjectId: listOfDataObjectIds...");
                deleteSemantic(semanticNode, basePath);
                throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex); 
              }
            }
            catch (Exception ex) {
              // Delete an entry from semantic store
+             logger.trace("Delete an entry from semantic store while deleting from deleteSemanticBinaryRequestEntity..");
              deleteSemantic(semanticNode, basePath);
              throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex); 
            }
          }
          catch (Exception ex) {
+           logger.trace("Throwing an exception while adding the semantic to the new store");
            throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex);
          }
        } // end of Id check if it is there then ignore
@@ -323,7 +334,10 @@ public class MigrationService {
     }
     JsonNode data = objectMapper.readTree(objectMapper.writeValueAsString(contentDataLocation.getContents().get(0)));
     System.out.println(data.get("dataLocation"));
+    Path file = Paths.get("/var/sip/services/saw-analyze-samples/sample-spark/");
     
+    System.out.println(file.getFileName());
+    System.out.println((FilenameUtils.getExtension(file.getFileName().toString()).equals(""))? "empty" : "data" );
  
     
 

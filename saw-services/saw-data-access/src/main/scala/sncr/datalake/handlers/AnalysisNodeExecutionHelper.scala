@@ -34,7 +34,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   def setStartTime = { startTS =  System.currentTimeMillis }
 
   if (an.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "AnalysisNode")
-  if (an.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "AnalysisNode")
+  //if (an.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "AnalysisNode")
 
   private val dAnalysisDescRaw = an.getCachedData.get(key_Definition.toString)
 
@@ -44,10 +44,10 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
   private val conf: Config = SAWServiceConfig.spark_conf
    
-  dataObjects = an.loadRelationElements.map( _.asInstanceOf[DataObject])
-  m_log.info("AnalysisNodeExecutionHelper.dataObjects: {}", dataObjects)
+  //dataObjects = an.loadRelationElements.map( _.asInstanceOf[DataObject])
+  //m_log.info("AnalysisNodeExecutionHelper.dataObjects: {}", dataObjects)
   //TODO:: Should not be here, if consistency mechanism is in place -- remove it, unnecessary
-  if (dataObjects.isEmpty) throw new DAException(ErrorCodes.DataObjectNotLoaded, "AnalysisNode")
+  // if (dataObjects.isEmpty) throw new DAException(ErrorCodes.DataObjectNotLoaded, "AnalysisNode")
 
   //if (cacheIt) DLSession.pinToCache(this)
 

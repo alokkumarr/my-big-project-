@@ -40,8 +40,7 @@ public interface SemanticService {
    * @throws JSONValidationSAWException when JSON Parsing fails
    */
   default String generateId(String project, String metricName) throws JSONValidationSAWException {
-    String id = project + delimiter + SemanticDataSet + delimiter
-        + metricName;
+    String id = project + delimiter + metricName;
     return id;
   }
 }

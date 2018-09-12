@@ -29,7 +29,7 @@ application:
 metastore:
     base:  hdfs:///main/
 semantic:
-    workbench-url:  http://localhost:9700/
+    workbench-url:  http://localhost:9700
     transport-metadata-url:  http://localhost:9200
     binary-migration-requires: true
     

@@ -86,7 +86,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   def loadObject(name: String, location: String, format: String, limit:Int = DLConfiguration.rowLimit) : Unit  =
   {
     //Recycling
-    m_log debug s"Load object: $name at location: $location, sample size: $limit"
+    m_log info s"Load object: $name at location: $location, sample size: $limit"
 
     if (loadedData.get(name).isDefined) loadedData -= name
     if (nativeloadedData.get(name).isDefined) nativeloadedData -= name
@@ -96,6 +96,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
       case "parquet" => sparkSession.read.parquet(location);
       case "json" => sparkSession.read.json(location)
       case "cvs" =>  sparkSession.read.csv(location)
+      case "ndjson" =>  sparkSession.read.json(location)
       case _ =>  throw new DAException(ErrorCodes.UnsupportedFormat, format )
     }
     /* Note: Preloading of data objects into driver memory disabled for
@@ -103,6 +104,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     //val data = DLSession.convert(df, limit)
     df.createOrReplaceTempView(name)
     //loadedData += (name -> data)
+    m_log.info("loadObject name: " + name)
     nativeloadedData += (name -> df)
   }
 
@@ -209,10 +211,11 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     */
   protected def execute(viewName: String, sql: String,limit : Integer) : (Integer, String) = {
     try{
-      m_log debug s"Execute SQL: $sql, view name: $viewName"
+      m_log info s"Execute SQL: $sql, view name: $viewName"
       val newSql = createSQlWithLimit(sql,limit)
-      m_log.debug("Onetime/Preview sql : "+newSql)
+      m_log.info("Onetime/Preview sql : "+newSql)
       val newDf = sparkSession.sql(newSql)
+      m_log.info("execute viewName :" + viewName)
       newDf.createOrReplaceTempView(viewName)
       if (nativeloadedData.get(viewName).isDefined) nativeloadedData -= viewName
       nativeloadedData += (viewName -> newDf)
@@ -298,8 +301,11 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @param format - output format: parquet, json
     */
   def saveData(doName : String, location: String, format : String): (Int, String) = {
+    m_log.info("saveData doName: " + doName)
     val df1 = nativeloadedData(doName)
     val df = df1.coalesce(1)
+    m_log.info("saveData format: " + format)
+    m_log.info("saveData location: " + location)
     format match {
       case "parquet" => df.write.parquet(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
       case "json" =>

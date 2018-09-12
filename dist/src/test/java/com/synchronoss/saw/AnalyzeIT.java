@@ -148,6 +148,7 @@ public class AnalyzeIT extends BaseIT {
      * @throws JsonProcessingException
      */
     private String listMetrics(String token,String metricName) throws JsonProcessingException {
+        // The below section is not useful anymore
         ObjectNode node = mapper.createObjectNode();
         ObjectNode contents = node.putObject("contents");
         contents.put("action", "search");
@@ -158,14 +159,15 @@ public class AnalyzeIT extends BaseIT {
         key.put("customerCode", "SYNCHRONOSS");
         key.put("module", "ANALYZE");
         String json = mapper.writeValueAsString(node);
+     // The above section is not useful anymore
+        
         String path = "contents[0]['ANALYZE'].find "
-            + "{it.metric == '"+metricName+"'}.id";
+            + "{it.metricName == '"+metricName+"'}.id";
         Response response = given(spec)
             .header("Authorization", "Bearer " + token)
             .filter(document("list-metrics",
                 preprocessResponse(prettyPrint())))
-            .body(json)
-            .when().post("/services/md")
+            .when().get("/services/internal/semantic/md?projectId=workbench")
             .then().assertThat().statusCode(200)
             .extract().response();
         try {

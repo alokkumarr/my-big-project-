@@ -2,21 +2,18 @@ package com.synchronoss.saw.semantic.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -33,7 +30,6 @@ import com.synchronoss.saw.semantic.model.DataSet;
 import com.synchronoss.saw.semantic.model.request.BackCompatibleStructure;
 import com.synchronoss.saw.semantic.model.request.Content;
 import com.synchronoss.saw.semantic.model.request.SemanticNode;
-import com.synchronoss.saw.semantic.model.request.SemanticNode.Module;
 import com.synchronoss.saw.semantic.model.request.SemanticNodes;
 import sncr.bda.cli.MetaDataStoreRequestAPI;
 import sncr.bda.datasets.conf.DataSetProperties;
@@ -86,6 +82,7 @@ public class SemanticServiceImpl implements SemanticService {
           node.get_id(), Action.create, Category.Semantic);
       logger.trace("Before invoking request to MaprDB JSON store :{}",
           mapper.writeValueAsString(structure));
+      node = setRepository(node);
       MetaDataStoreRequestAPI requestMetaDataStore = new MetaDataStoreRequestAPI(structure);
       requestMetaDataStore.process();
       responseNode.setId(node.get_id());
@@ -94,7 +91,6 @@ public class SemanticServiceImpl implements SemanticService {
       responseNode.setStatusMessage("Entity is created successfully");
       newSemanticNode = new SemanticNode();
       org.springframework.beans.BeanUtils.copyProperties(responseNode, newSemanticNode,"_id");
-      newSemanticNode = setRepository(newSemanticNode);
     } catch (Exception ex) {
       logger.error("Problem on the storage while creating an entity", ex);
       throw new CreateEntitySAWException("Problem on the storage while creating an entity.", ex);
@@ -114,7 +110,7 @@ public class SemanticServiceImpl implements SemanticService {
   private SemanticNode setRepository(SemanticNode semanticNode) throws JsonProcessingException, IOException
   {
     logger.trace("Setting repository starts here..");
-    String requestURL = workbenchURl + semanticNode.getProjectCode();
+    String requestURL = workbenchURl + "/internal/workbench/projects/" + semanticNode.getProjectCode() + "/datasets/";
       List<Object> dataSetDetailsObject = new ArrayList<>();
       DataSet dataSet = null;
       ObjectMapper objectMapper = new ObjectMapper();
@@ -129,7 +125,8 @@ public class SemanticServiceImpl implements SemanticService {
       ObjectNode repoNode = null;
       ArrayNode respository = objectMapper.createArrayNode();
       for (String dataSetId: semanticNode.getParentDataSetIds()) {
-        requestURL = requestURL + "/" + dataSetId;
+        requestURL = requestURL + dataSetId;
+        logger.trace("Request URL to pull DataSet Details : " + requestURL);
         RestTemplate restTemplate = new RestTemplate();
         dataSet = restTemplate.getForObject(requestURL, DataSet.class);
         node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
@@ -139,9 +136,9 @@ public class SemanticServiceImpl implements SemanticService {
         dataSetName = systemNode.get(DataSetProperties.Name.toString()).asText();
         dataSetFormat = systemNode.get(DataSetProperties.Format.toString()).asText();
         repoNode = objectMapper.createObjectNode();
-        repoNode.put("name", dataSetName);
-        repoNode.put("format", dataSetFormat);
-        repoNode.put("physicalLocation", physicalLocation);
+        repoNode.put(DataSetProperties.Name.toString(), dataSetName);
+        repoNode.put(DataSetProperties.Format.toString(), dataSetFormat);
+        repoNode.put(DataSetProperties.PhysicalLocation.toString(), physicalLocation + Path.SEPARATOR);
         dataSetDetailsObject.add(repoNode);
         respository.add(repoNode);
    }
@@ -178,28 +175,6 @@ public class SemanticServiceImpl implements SemanticService {
     }
     return newSemanticNode;
   }
-  // This method localDataStore will be removed
-  private SemanticNode localDataStore (SemanticNode semanticNode) throws JsonParseException, JsonMappingException, IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    semanticNode.setId("f02d1867-88c2-4689-9ea9-def040a9b62d::semanticDataSet::1534792341903");
-    semanticNode.setCreatedBy("Akhilesh  Obilineni");
-    semanticNode.setCustomerCode("SYNCHRONOSS");
-    semanticNode.setProjectCode("workbench");
-    semanticNode.setSaved(true);
-    semanticNode.setUsername("Akhilesh  Obilineni");
-    semanticNode.setModule(Module.ANALYZE);
-    String supportArray = "[{\"category\":\"table\",\"label\":\"tables\"}]";
-    List<Object> supports = mapper.readValue(supportArray, new TypeReference<List<Object>>(){});
-    semanticNode.setSupports(supports);
-    String artifactsArray = "[{\"artifactName\":\"tc309_ES_data_latest_prc_batch\",\"columns\":[{\"aliasName\":\"URBANIZEDAREA\",\"columnName\":\"URBANIZEDAREA\",\"displayName\":\"URBANIZEDAREA\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"URBANIZEDAREA\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"},{\"aliasName\":\"ORGTYPE\",\"columnName\":\"ORGTYPE\",\"displayName\":\"ORGTYPE\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"ORGTYPE\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"},{\"aliasName\":\"STATE\",\"columnName\":\"STATE\",\"displayName\":\"STATE\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"STATE\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"},{\"aliasName\":\"NAME\",\"columnName\":\"NAME\",\"displayName\":\"NAME\",\"filterEligible\":true,\"include\":true,\"joinEligible\":false,\"kpiEligible\":false,\"name\":\"NAME\",\"table\":\"tc309_ES_data_latest_prc_batch\",\"type\":\"string\"}]}]";
-    List<Object> artifacts = mapper.readValue(artifactsArray, new TypeReference<List<Object>>(){});
-    semanticNode.setArtifacts(artifacts);
-    String repository = "[{\"physicalLocation\":\"maprfs://data\", \"name\":\"DataSetName\", \"format\":\"parquet\"}]";
-    semanticNode.setRepository(mapper.readValue(repository, new TypeReference<List<Object>>(){}));
-    return semanticNode;
-  }
-
-
   @Override
   public SemanticNode updateSemantic(SemanticNode node)
       throws JSONValidationSAWException, UpdateEntitySAWException {
