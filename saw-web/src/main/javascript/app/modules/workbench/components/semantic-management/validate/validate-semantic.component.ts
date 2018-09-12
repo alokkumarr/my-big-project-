@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { SemanticDetailsDialogComponent } from '../semantic-details-dialog/semantic-details-dialog.component';
@@ -29,7 +29,7 @@ export class ValidateSemanticComponent implements OnDestroy {
   private isJoinEligible: boolean = false;
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     private workBench: WorkbenchService,
     private headerProgress: HeaderProgressService,
     public dialog: MatDialog,
@@ -45,7 +45,7 @@ export class ValidateSemanticComponent implements OnDestroy {
   }
 
   showDSList() {
-    this.router.stateService.go('workbench.createSemantic');
+    this.router.navigate(['workbench', 'semantic', 'create']);
   }
 
   /**
@@ -131,7 +131,7 @@ export class ValidateSemanticComponent implements OnDestroy {
           this.notify.info('Datapod created successfully', 'Datapod', {
             hideDelay: 9000
           });
-          this.router.stateService.go('workbench.dataobjects');
+          this.router.navigate(['workbench' ,'dataobjects']);
         });
         this.headerProgress.hide();
       }

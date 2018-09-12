@@ -2,13 +2,16 @@
   <mat-toolbar class="app-toolbar">
     <div class="lh-toolbar" fxLayout="row" fxLayoutAlign="space-between center">
       <div fxLayout="row">
-        <sidenav style="position: fixed" id="left-side-nav" class="left-side-nav" flex="none"></sidenav>
+        <sidenav style="position: fixed;" id="left-side-nav" class="left-side-nav" flex="none"></sidenav>
         <div class="company-logo"></div>
       </div>
 
       <div layout="row" class="lh-links">
-        <div *ngFor="let module of modules" class="link" uiSref="{{module.productModName.toLowerCase()}}" uiSrefActive="m-active"
-          translate="{{module.productModName}}">{{module.productModName}}
+        <div *ngFor="let module of modules" class="link"
+             routerLink="{{lowerCase(module.productModName)}}"
+             [routerLinkActive]="'m-active'"
+        >
+          {{module.productModName}}
         </div>
       </div>
 
@@ -23,7 +26,7 @@
           <button mat-menu-item (click)="changePwd()" e2e="account-settings-selector-change-password">
             <ng-container i18n>Change Password</ng-container>
           </button>
-          <button mat-menu-item *ngIf="showAdmin" uiSref="admin" e2e="account-settings-selector-admin">
+          <button mat-menu-item *ngIf="showAdmin" routerLink="admin" e2e="account-settings-selector-admin">
             <ng-container i18n>Admin</ng-container>
           </button>
           <mat-divider></mat-divider>

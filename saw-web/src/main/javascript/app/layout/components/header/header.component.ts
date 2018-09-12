@@ -1,5 +1,6 @@
 import { Component, Inject, ChangeDetectorRef } from '@angular/core';
 import * as get from 'lodash/get';
+import * as lowerCase from 'lodash/lowerCase';
 import * as split from 'lodash/split';
 import toMaterialStyle from 'material-color-hash';
 import { JwtService } from '../../../../login/services/jwt.service';
@@ -16,15 +17,15 @@ export class LayoutHeaderComponent {
   constructor(
     private jwt: JwtService,
     private user: UserService,
-    @Inject('$rootScope') private _rootScope: any,
     private cdRef: ChangeDetectorRef
   ) {}
 
   public isLoading: false;
+  lowerCase = lowerCase;
 
   ngAfterViewChecked() {
-    if (this.isLoading === this._rootScope.showProgress) return;
-    this.isLoading = this._rootScope.showProgress;
+    // if (this.isLoading === this._rootScope.showProgress) return;
+    // this.isLoading = this._rootScope.showProgress;
     this.cdRef.detectChanges();
   }
 

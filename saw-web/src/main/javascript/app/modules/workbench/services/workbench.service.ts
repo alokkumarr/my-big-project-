@@ -6,7 +6,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { JwtService } from '../../../../login/services/jwt.service';
 
 import { SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
@@ -23,7 +23,7 @@ export class WorkbenchService {
   constructor(
     private http: HttpClient,
     private jwt: JwtService,
-    private router: UIRouter
+    private router: Router
   ) {}
 
   /** GET datasets from the server */
@@ -200,7 +200,7 @@ export class WorkbenchService {
 
   navigateToDetails(metadata) {
     this.setDataToLS('dsMetadata', metadata);
-    this.router.stateService.go('workbench.datasetDetails');
+    this.router.navigate(['workbench', 'dataset', 'details']);
   }
 
   triggerDatasetPreview(name: string): Observable<any> {

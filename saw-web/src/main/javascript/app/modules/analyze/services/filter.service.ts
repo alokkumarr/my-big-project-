@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material';
 import * as map from 'lodash/fp/map';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as get from 'lodash/get';
@@ -11,7 +10,6 @@ import * as isNumber from 'lodash/isNumber';
 import * as values from 'lodash/values';
 import * as find from 'lodash/find';
 
-import {OPERATORS} from '../components/filter/filters/number-filter.component';
 import { AnalyzeDialogService } from './analyze-dialog.service';
 
 export const BOOLEAN_CRITERIA = [{
@@ -140,36 +138,6 @@ export class FilterService {
   }
 
   /**
-   * Get the lazy filter evaluator for ever row
-   */
-  getFilterEvaluator(row) {
-    return map(filter => {
-      let isValid;
-
-      switch (filter.type) {
-      case 'string':
-        isValid = Boolean(filter.model[row[filter.name]]);
-        break;
-      case 'int':
-      case 'integer':
-      case 'timestamp':
-      case 'double':
-      case 'long':
-        isValid = Boolean(this.isNumberValid(row[filter.name], filter.model, filter.operator));
-        break;
-      default:
-        isValid = false;
-        break;
-      }
-
-      return {
-        booleanCriteria: filter.booleanCriteria,
-        value: isValid
-      };
-    });
-  }
-
-  /**
    * reduce the array of evaluated filters and their booleanCriteria( AND | OR )
   */
   getEvaluatedFilterReducer() {
@@ -203,31 +171,6 @@ export class FilterService {
 
     if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return a || b;
-    }
-  }
-
-  isNumberValid(number, numberFilterModel, operator) {
-    const a = number;
-    const b = numberFilterModel.value;
-    const c = numberFilterModel.otherValue;
-
-    switch (operator) {
-    case OPERATORS.GREATER.value:
-      return a > b;
-    case OPERATORS.LESS.value:
-      return a < b;
-    case OPERATORS.GREATER_OR_EQUAL.value:
-      return a >= b;
-    case OPERATORS.LESS_OR_EQUAL.value:
-      return a <= b;
-    case OPERATORS.NOT_EQUALS.value:
-      return a !== b;
-    case OPERATORS.EQUALS.value:
-      return a === b;
-    case OPERATORS.BETWEEN.value:
-      return c <= a && a <= b;
-    default:
-      return false;
     }
   }
 

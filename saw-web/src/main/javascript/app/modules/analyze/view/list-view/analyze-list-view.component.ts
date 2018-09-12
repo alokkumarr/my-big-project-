@@ -8,7 +8,7 @@ import {
   ExecuteService,
   EXECUTION_STATES
 } from '../../services/execute.service';
-import { DesignerSaveEvent } from '../../components/designer/types';
+import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../../login/services/jwt.service';
 

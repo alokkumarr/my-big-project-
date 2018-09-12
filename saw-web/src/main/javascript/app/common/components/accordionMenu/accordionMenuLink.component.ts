@@ -30,6 +30,13 @@ export class AccordionMenuLinkComponent {
     this.active = false;
   }
 
+  checkDefault({ id }) {
+    return (
+      id ===
+      'd7e4f939-94c9-4e31-b1d2-e8f51f2640e7::PortalDataSet::1532634613604'
+    );
+  }
+
   checkActiveMenu(linkUrl) {
     this.url = location.hash;
     if (this.url === linkUrl) {

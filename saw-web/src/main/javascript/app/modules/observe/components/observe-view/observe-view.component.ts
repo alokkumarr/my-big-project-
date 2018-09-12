@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import * as html2pdf from 'html2pdf.js';
-import { Transition } from '@uirouter/angular';
+import { ActivatedRoute } from '@angular/router';
 
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -17,6 +17,10 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
+import {
+  ConfigService,
+  PREFERENCES
+} from '../../../../common/services/configuration.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
@@ -49,6 +53,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   private listeners: Array<Subscription> = [];
   private hasAutoRefresh: boolean = false;
   private shouldAutoRefresh: boolean = true;
+  private isDefault = false;
   private privileges = {
     create: false,
     delete: false,
@@ -63,12 +68,16 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     private observe: ObserveService,
     private dashboardService: DashboardService,
     private filters: GlobalFilterService,
+    private configService: ConfigService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
-    private transition: Transition
+    private _route: ActivatedRoute
   ) {
-    this.dashboardId = this.transition.params().dashboard;
-    this.subCategoryId = this.transition.params().subCategory;
+    const snapshot = this._route.snapshot;
+    const { subCategory } = snapshot.params;
+    const { dashboard } = snapshot.queryParams;
+    this.dashboardId = dashboard;
+    this.subCategoryId = subCategory;
 
     this.loadPrivileges();
   }
@@ -79,6 +88,8 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
         this.startAutoRefresh();
       });
     }
+
+    this.checkDefaultDashboard();
   }
 
   ngOnDestroy() {
@@ -86,6 +97,36 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
       (this.dashboard || { entityId: null }).entityId
     );
     this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  toggleDefault() {
+    this.isDefault = !this.isDefault;
+    this.configService
+      .saveConfig([
+        {
+          key: PREFERENCES.DEFAULT_DASHBOARD,
+          value: this.isDefault ? this.dashboardId : null
+        },
+        {
+          key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
+          value: this.isDefault ? this.subCategoryId : null
+        }
+      ])
+      .subscribe(
+        () => this.checkDefaultDashboard(),
+        () => this.checkDefaultDashboard()
+      );
+  }
+
+  /**
+   * Checks if current dashboard is set as default dashboard
+   *
+   * @returns {undefined}
+   */
+  checkDefaultDashboard() {
+    this.isDefault =
+      this.configService.getPreference(PREFERENCES.DEFAULT_DASHBOARD) ===
+      this.dashboardId;
   }
 
   stopAutoRefresh() {
