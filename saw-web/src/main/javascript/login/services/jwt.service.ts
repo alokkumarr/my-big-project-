@@ -157,7 +157,8 @@ export class JwtService {
     return roleType === role;
   }
 
-  isAdmin(token) {
+  isAdmin() {
+    const token = this.getTokenObj();
     return this._isRole(token, 'ADMIN');
   }
 
@@ -214,14 +215,14 @@ export class JwtService {
     case 'EDIT':
       return (
         this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
-        (this.isOwner(token, opts.creatorId) || this.isAdmin(token))
+        (this.isOwner(token, opts.creatorId) || this.isAdmin())
       );
     case 'EXPORT':
       return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
     case 'DELETE':
       return (
         this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
-        (this.isOwner(token, opts.creatorId) || this.isAdmin(token))
+        (this.isOwner(token, opts.creatorId) || this.isAdmin())
       );
     default:
       return false;

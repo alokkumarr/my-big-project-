@@ -2,7 +2,7 @@ import 'fonts/icomoon.css';
 import 'zone.js';
 import '../../../../themes/_triton.scss';
 import 'reflect-metadata';
-import { NgModule } from '@angular/core';
+import { NgModule, enableProdMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -15,7 +15,7 @@ import { routes } from './routes';
 import { MaterialModule } from '../app/material.module';
 import { JwtService } from './services/jwt.service';
 import { UserService } from './services/user.service';
-import { IsUserNotLoggedInGuard } from './guards/not-logged-in-guard.service';
+import { IsUserNotLoggedInGuard } from './guards';
 
 import { LayoutContentComponent, LayoutFooterComponent } from './layout';
 
@@ -55,4 +55,7 @@ const GUARDS = [IsUserNotLoggedInGuard];
 })
 export class NewLoginModule {}
 
+if (__PRODUCTION__) {
+  enableProdMode();
+}
 platformBrowserDynamic().bootstrapModule(NewLoginModule);

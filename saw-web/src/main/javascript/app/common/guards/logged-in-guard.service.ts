@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
+import { CanActivateChild } from '@angular/router';
 import { UserService } from '../../../login/services/user.service';
 
 @Injectable()
-export class IsUserLoggedInGuard implements CanActivate {
+export class IsUserLoggedInGuard implements CanActivateChild {
   constructor(private _user: UserService) {}
 
-  canActivate() {
+  canActivateChild() {
     if (this._user.isLoggedIn()) {
       return true;
     }

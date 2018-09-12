@@ -5,7 +5,7 @@ import 'zone.js/dist/zone';
 import 'hammerjs';
 import 'reflect-metadata';
 import '../../../../themes/_triton.scss';
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, enableProdMode } from '@angular/core';
 import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
@@ -68,5 +68,7 @@ export class NewAppModule {
   constructor() {}
 }
 
-
+if (__PRODUCTION__) {
+  enableProdMode();
+}
 platformBrowserDynamic().bootstrapModule(NewAppModule);

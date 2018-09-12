@@ -39,15 +39,15 @@ import {
   PrivilegeRowComponent
 } from './privilege';
 import {JwtService} from '../../../login/services/jwt.service';
-import {dxDataGridService} from '../../common/services/dxDataGrid.service';
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,
   RefreshTokenInterceptor
 } from '../../common/interceptor';
 import { SidenavMenuService } from '../../common/components/sidenav';
-import { ToastService } from '../../common/services/toastMessage.service';
-import { LocalSearchService } from '../../common/services/local-search.service';
+import { dxDataGridService, ToastService, LocalSearchService } from '../../common/services';
+
+import { isAdminGuard, GoToDefaultAdminPageGuard} from './guards';
 
 const COMPONENTS = [
   AdminPageComponent,
@@ -81,6 +81,8 @@ const INTERCEPTORS = [
   }
 ];
 
+const GUARDS = [isAdminGuard, GoToDefaultAdminPageGuard];
+
 const SERVICES = [
   SidenavMenuService,
   AdminService,
@@ -104,7 +106,8 @@ const SERVICES = [
   entryComponents: COMPONENTS,
   providers: [
     ...INTERCEPTORS,
-    ...SERVICES
+    ...SERVICES,
+    ...GUARDS
   ],
   exports: [
     AdminPageComponent

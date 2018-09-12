@@ -5,8 +5,6 @@
     "build": "webpack --config conf/webpack.conf.js --env production",
     "start": "node --max_old_space_size=4096 node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --config conf/webpack.conf.js --env development",
     "start:prod": "webpack-dev-server --config conf/webpack.conf.js --env production",
-    "styleguide": "webpack-dev-server --config conf/webpack.styleguide.js",
-    "styleguide:build": "webpack --config conf/webpack.styleguide.js",
     "pretest": "npm run -s eslint lint",
     "test": "karma start conf/karma.conf.js --single-run",
     "test:watch": "karma start conf/karma.conf.js --watch",

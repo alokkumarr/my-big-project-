@@ -40,7 +40,7 @@ export class LayoutHeaderComponent {
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
     this.modules = product.productModules;
-    if (this.jwt.isAdmin(token)) {
+    if (this.jwt.isAdmin()) {
       this.showAdmin = true;
     }
   }
