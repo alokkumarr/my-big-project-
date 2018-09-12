@@ -18,7 +18,6 @@ import {
   IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../services/execute.service';
-import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import {
   flattenPivotData,
@@ -63,7 +62,6 @@ export class ExecutedViewComponent implements OnInit {
 
   constructor(
     private _executeService: ExecuteService,
-    private _headerProgressService: HeaderProgressService,
     private _analyzeService: AnalyzeService,
     private _router: Router,
     private _route: ActivatedRoute,
@@ -302,35 +300,28 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   loadExecutedAnalyses(analysisId) {
-    this._headerProgressService.show();
     return this._analyzeService
       .getPublishedAnalysesByAnalysisId(analysisId)
       .then(
         analyses => {
           this.analyses = analyses;
           this.setExecutedAt(this.executionId);
-
-          this._headerProgressService.hide();
           return analyses;
         },
         err => {
-          this._headerProgressService.hide();
           throw err;
         }
       );
   }
 
   loadAnalysisById(analysisId) {
-    this._headerProgressService.show();
     return this._analyzeService.readAnalysis(analysisId).then(
       analysis => {
         this.analysis = analysis;
         this.executedAnalysis = { ...this.analysis };
-        this._headerProgressService.hide();
         return analysis;
       },
       err => {
-        this._headerProgressService.hide();
         throw err;
       }
     );
@@ -429,14 +420,12 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
-    this._headerProgressService.show();
     options.analysisType = analysisType;
 
     return this._analyzeService
       .getExecutionData(analysisId, executionId, options)
       .then(
         ({ data, count, queryBuilder, executedBy }) => {
-          this._headerProgressService.hide();
           if (this.executedAnalysis && queryBuilder) {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
@@ -446,7 +435,6 @@ export class ExecutedViewComponent implements OnInit {
           return { data, totalCount: count };
         },
         err => {
-          this._headerProgressService.hide();
           throw err;
         }
       );

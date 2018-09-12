@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
@@ -37,7 +36,6 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private workBench: WorkbenchService,
-    private headerProgress: HeaderProgressService,
     private notify: ToastService
   ) {
     // Below is used when navigating from Datapod view
@@ -50,11 +48,9 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
       if (this.dpID !== null) {
         this.onDPSelectionChanged(this.dpID);
       } else {
-        this.headerProgress.show();
         this.workBench.getListOfSemantic().subscribe((data: any[]) => {
           this.availableDP = get(data, 'contents[0].ANALYZE');
           this.gridDataAvailableDP = cloneDeep(this.availableDP);
-          this.headerProgress.hide();
         });
       }
     });
@@ -78,7 +74,6 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
    * @memberof UpdateSemanticComponent
    */
   onDPSelectionChanged(id) {
-    this.headerProgress.show();
     this.isSelected = true;
     this.workBench.getSemanticDetails(id).subscribe((data: any) => {
       this.selectedDPDetails = omit(data, 'statusMessage');
@@ -98,7 +93,6 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
           }
         });
       });
-      this.headerProgress.hide();
     });
   }
 
@@ -142,11 +136,9 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
         columns: filter(ds.columns, 'include')
       });
     });
-    this.headerProgress.show();
     this.workBench
       .updateSemanticDetails(this.selectedDPDetails)
       .subscribe((data: any[]) => {
-        this.headerProgress.hide();
         this.notify.info('Datapod Updated successfully', 'Datapod', {
           hideDelay: 9000
         });

@@ -8,7 +8,7 @@ export class HeaderProgressService {
   private _subject$ = new Subject<boolean>();
 
   subscribe(fn) {
-    this._subject$.subscribe(fn);
+    return this._subject$.subscribe(fn);
   }
 
   show() {
@@ -18,16 +18,6 @@ export class HeaderProgressService {
 
   hide() {
     this._progressCounter--;
-    this._showProgress = this._get();
-  }
-
-  toggle() {
-    this._showProgress = !this._showProgress;
-    if (this._showProgress) {
-      this._progressCounter--;
-    } else {
-      this._progressCounter++;
-    }
     this._showProgress = this._get();
   }
 

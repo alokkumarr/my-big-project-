@@ -23,7 +23,8 @@ import { DndModule } from './dnd';
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,
-  RefreshTokenInterceptor
+  RefreshTokenInterceptor,
+  ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
 import { IsUserLoggedInGuard } from './guards';
@@ -132,6 +133,11 @@ const INTERCEPTORS = [
   {
     provide: HTTP_INTERCEPTORS,
     useClass: RefreshTokenInterceptor,
+    multi: true
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: ProgressIndicatorInterceptor,
     multi: true
   }
 ];

@@ -4,7 +4,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
 import * as findIndex from 'lodash/findIndex';
-import { HeaderProgressService } from '../../../common/services/header-progress.service';
+
 import { JwtService } from '../../../../login/services/jwt.service';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
@@ -53,7 +53,6 @@ export class AnalyzeViewComponent implements OnInit {
   };
   constructor(
     private _analyzeService: AnalyzeService,
-    private _headerProgress: HeaderProgressService,
     private _router: Router,
     private _route: ActivatedRoute,
     private _localStorage: LocalStorageService,
@@ -159,9 +158,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   openNewAnalysisModal() {
-    this._headerProgress.show();
     this._analyzeService.getSemanticLayerData().then(metrics => {
-      this._headerProgress.hide();
       this._dialog.open(AnalyzeNewDialogComponent, {
         width: 'auto',
         height: 'auto',
@@ -180,19 +177,13 @@ export class AnalyzeViewComponent implements OnInit {
           });
         }
       });
-    }).catch(() => {
-      this._headerProgress.hide();
     });
   }
 
   loadAnalyses() {
-    this._headerProgress.show();
     return this._analyzeService.getAnalysesFor(this.analysisId).then(analyses => {
       this.analyses = analyses;
       this.filteredAnalyses = [...analyses];
-      this._headerProgress.hide();
-    }).catch(() => {
-      this._headerProgress.hide();
     });
   }
 

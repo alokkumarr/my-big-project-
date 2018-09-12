@@ -21,15 +21,17 @@ export class LayoutHeaderComponent {
   public showProgress: boolean;
   private userInitials: string;
   private userBGColor: any;
-
+  progressSub;
   lowerCase = lowerCase;
 
   constructor(
     private jwt: JwtService,
     private user: UserService,
-    private _headerProress: HeaderProgressService
+    private _headerProgress: HeaderProgressService
   ) {
-    _headerProress.subscribe(showProgress => this.showProgress = showProgress);
+    this.progressSub = _headerProgress.subscribe(showProgress => {
+      this.showProgress = showProgress
+    });
   }
 
   ngOnInit() {
@@ -41,6 +43,10 @@ export class LayoutHeaderComponent {
     if (this.jwt.isAdmin(token)) {
       this.showAdmin = true;
     }
+  }
+
+  ngOnDestroy() {
+    this.progressSub.unsubscribe();
   }
 
   logout() {

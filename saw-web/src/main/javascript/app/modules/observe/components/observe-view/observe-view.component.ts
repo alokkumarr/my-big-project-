@@ -17,7 +17,6 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -63,7 +62,6 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     private observe: ObserveService,
     private dashboardService: DashboardService,
     private filters: GlobalFilterService,
-    private headerProgress: HeaderProgressService,
     private jwt: JwtService,
     private _route: ActivatedRoute
   ) {
@@ -147,22 +145,14 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   deleteDashboard(): void {
-    this.headerProgress.show();
     this.observe.deleteDashboard(this.dashboard).subscribe(
       () => {
         this.observe.reloadMenu().subscribe(
           menu => {
-            this.headerProgress.hide();
             this.observe.updateSidebar(menu);
             this.observe.redirectToFirstDash(menu, true);
-          },
-          () => {
-            this.headerProgress.hide();
           }
         );
-      },
-      () => {
-        this.headerProgress.hide();
       }
     );
   }
@@ -250,18 +240,15 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   loadDashboard(): Observable<Dashboard> {
-    this.headerProgress.show();
     return this.observe
       .getDashboard(this.dashboardId)
       .map((data: Dashboard) => {
         this.dashboard = data;
         this.loadPrivileges();
         this.checkForKPIs();
-        this.headerProgress.hide();
         return data;
       })
       .catch(error => {
-        this.headerProgress.hide();
         return Observable.of(error);
       });
   }

@@ -1,11 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
+
 import { IToolbarActionData, IToolbarActionResult } from '../types';
-import * as filter from 'lodash/filter';
 import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
-import { DEFAULT_ANALYSIS_NAME } from '../consts';
+import { HeaderProgressService } from '../../../../common/services';
 
 const template = require('./toolbar-action-dialog.component.html');
 require('./toolbar-action-dialog.component.scss');
@@ -15,13 +15,19 @@ require('./toolbar-action-dialog.component.scss');
   template
 })
 export class ToolbarActionDialogComponent {
-  showProgressBar = false;
+  showProgress = false;
+  progressSub;
   filterValid: boolean = true;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
-    private _designerService: DesignerService
-  ) {}
+    private _designerService: DesignerService,
+    private _headerProgress: HeaderProgressService
+  ) {
+    this.progressSub = _headerProgress.subscribe(showProgress => {
+      this.showProgress = showProgress
+    });
+  }
 
   ngOnInit() {
     /* prettier-ignore */
@@ -30,6 +36,10 @@ export class ToolbarActionDialogComponent {
       this.data.sorts = cloneDeep(this.data.sorts);
       break;
     }
+  }
+
+  ngOnDestroy() {
+    this.progressSub.unsubscribe();
   }
 
   validateSaving() {
@@ -77,7 +87,6 @@ export class ToolbarActionDialogComponent {
   }
 
   save(action) {
-    this.showProgressBar = true;
     this._designerService
       .saveAnalysis(this.data.analysis)
       .then(response => {
@@ -92,8 +101,5 @@ export class ToolbarActionDialogComponent {
         };
         this.dialogRef.close(result);
       })
-      .finally(() => {
-        this.showProgressBar = false;
-      });
   }
 }

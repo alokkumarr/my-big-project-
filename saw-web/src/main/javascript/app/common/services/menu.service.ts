@@ -6,7 +6,6 @@ import * as find from 'lodash/find';
 import * as startsWith from 'lodash/startsWith';
 
 import { JwtService } from '../../../login/services/jwt.service';
-import { ComponentHandler } from './componentHandler';
 import { SidenavMenuService } from'../components/sidenav/sidenav-menu.service';
 
 export const SAW_MODULES = {
@@ -21,15 +20,11 @@ export class MenuService {
 
   constructor(
     private _jwtService: JwtService,
-    private _$componentHandler: ComponentHandler,
     private _sidenavMenuService: SidenavMenuService
   ) {}
 
-  updateMenu(data, moduleName, componentId = 'left-side-nav') {
-    // const menu = this._$componentHandler.get(componentId)[0];
-    // menu.update(data, moduleName);
+  updateMenu(data, moduleName) {
     this._sidenavMenuService.updateMenu(data, moduleName);
-    this._menuCache[moduleName] = data;
   }
 
   getMenu(moduleName) {

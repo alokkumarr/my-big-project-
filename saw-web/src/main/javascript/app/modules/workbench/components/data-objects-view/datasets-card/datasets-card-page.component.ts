@@ -3,7 +3,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datasets-card-page.component.html');
@@ -23,12 +22,10 @@ export class DatasetsCardPageComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private headerProgress: HeaderProgressService,
     private workbench: WorkbenchService
   ) {  }
 
   ngOnInit() {
-    this.headerProgress.show();
     this.updaterSubscribtion = this.updater.subscribe(data => {
       this.onUpdate(data)
     });
@@ -40,9 +37,6 @@ export class DatasetsCardPageComponent implements OnInit {
 
   onUpdate(data) {
     this.dataSets = data;
-    setTimeout(() => {
-      this.headerProgress.hide();
-    }, 1000);
   }
 
   viewDetails(metadata) {

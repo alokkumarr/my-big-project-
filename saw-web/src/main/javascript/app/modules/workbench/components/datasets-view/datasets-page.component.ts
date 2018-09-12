@@ -1,16 +1,13 @@
 
-import { Component, Input, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-import * as map from 'lodash/map';
 
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
-import { CreateDatasetsComponent } from '../create-datasets/create-datasets.component';
 
 const template = require('./datasets-page.component.html');
 require('./datasets-page.component.scss');
@@ -40,7 +37,6 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     public dialog: MatDialog,
-    private headerProgress: HeaderProgressService,
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private datePipe: DatePipe
@@ -75,7 +71,6 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   }
 
   getPageData(): void {
-    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.loadSets(this.availableSets);

@@ -1,20 +1,16 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatDialog, MatDialogRef } from '@angular/material';
-
-import { SemanticDetailsDialogComponent } from '../semantic-details-dialog/semantic-details-dialog.component';
-
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
-import { ToastService } from '../../../../../common/services/toastMessage.service';
-
-import { WorkbenchService } from '../../../services/workbench.service';
-import { TYPE_CONVERSION } from '../../../wb-comp-configs';
-
+import { MatDialog } from '@angular/material';
 import * as forIn from 'lodash/forIn';
 import * as map from 'lodash/map';
 import * as toLower from 'lodash/toLower';
 import * as filter from 'lodash/filter';
 import * as trim from 'lodash/trim';
+
+import { SemanticDetailsDialogComponent } from '../semantic-details-dialog/semantic-details-dialog.component';
+import { ToastService } from '../../../../../common/services/toastMessage.service';
+import { WorkbenchService } from '../../../services/workbench.service';
+import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 
 const template = require('./validate-semantic.component.html');
 require('./validate-semantic.component.scss');
@@ -31,7 +27,6 @@ export class ValidateSemanticComponent implements OnDestroy {
   constructor(
     private router: Router,
     private workBench: WorkbenchService,
-    private headerProgress: HeaderProgressService,
     public dialog: MatDialog,
     private notify: ToastService
   ) {
@@ -125,15 +120,12 @@ export class ValidateSemanticComponent implements OnDestroy {
           payload.parentDataSetIds.push(ds._id);
         });
 
-        this.headerProgress.show();
         this.workBench.createSemantic(payload).subscribe((data: any[]) => {
-          this.headerProgress.hide();
           this.notify.info('Datapod created successfully', 'Datapod', {
             hideDelay: 9000
           });
           this.router.navigate(['workbench' ,'dataobjects']);
         });
-        this.headerProgress.hide();
       }
     });
   }
