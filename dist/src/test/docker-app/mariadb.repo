@@ -1,0 +1,4 @@
+[mariadb]
+baseurl = http://yum.mariadb.org/10.3/centos7-amd64
+gpgcheck = 0
+name = MariaDB repository
