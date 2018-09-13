@@ -157,9 +157,8 @@ export class ObserveService {
                   map(dashboards, dashboard => ({
                     id: dashboard.entityId,
                     name: dashboard.name,
-                    url: `#!/observe/${subCategory.id}?dashboard=${
-                      dashboard.entityId
-                    }`,
+                    url: [`/observe`, subCategory.id],
+                    queryParams: { dashboard: dashboard.entityId },
                     data: dashboard
                   }))
                 );
@@ -221,19 +220,20 @@ export class ObserveService {
         return subCat.children.length > 0;
       });
 
-      this.router.navigate(
-        ['observe', subCategory.id],
-        { queryParams: {
+      this.router.navigate(['observe', subCategory.id], {
+        queryParams: {
           dashboard: subCategory.children[0].id
-        }}
-      );
+        }
+      });
     } else if (categoryWithSubCategory) {
       /* Otherwise, redirect to the first empty subcategory available. */
       this.router.navigate(
         ['observe', categoryWithSubCategory.children[0].id],
-        { queryParams: {
-          dashboard: ''
-        }}
+        {
+          queryParams: {
+            dashboard: ''
+          }
+        }
       );
     }
   }
@@ -248,7 +248,7 @@ export class ObserveService {
   }
 
   buildPlotBandsForBullet(bandColVal, b1, b2, bulletVal, bullTarget) {
-    const cb = find(BULLET_CHART_COLORS, { 'value': bandColVal });
+    const cb = find(BULLET_CHART_COLORS, { value: bandColVal });
     const plotBands = [];
     const seriesData = [{ y: bulletVal, target: bullTarget }];
     if (b1 === 0 || b2 === 0) {
