@@ -26,7 +26,7 @@ import {
   LayoutHeaderComponent,
   LayoutFooterComponent,
   MainPageComponent
- } from './layout';
+} from './layout';
 
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 

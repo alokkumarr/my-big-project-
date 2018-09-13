@@ -4,6 +4,8 @@ import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs/Subscription';
+import { combineLatest, timer } from 'rxjs';
+import { debounce } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -75,25 +77,33 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    const snapshot = this._route.snapshot;
-    const {
-      analysis,
-      analysisId
-    } = snapshot.params;
-    const {
-      awaitingExecution,
-      loadLastExecution,
-      executionId
-    } = snapshot.queryParams;
+    combineLatest(
+      this._route.params,
+      this._route.queryParams
+    ).pipe(
+      debounce(() => timer(100))
+    ).subscribe(([params, queryParams]) => {
+      this.onParamsChange(params, queryParams);
+    });
 
     this.canAutoRefresh = this._jwt.hasCustomConfig(
       CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
     );
+  }
+
+  onParamsChange(params, queryParams) {
+    const {
+      analysisId
+    } = params;
+    const {
+      awaitingExecution,
+      loadLastExecution,
+      executionId
+    } = queryParams;
 
     this.executionId = executionId;
-    if (analysis) {
-      this.analysis = analysis;
-      this.executedAnalysis = { ...this.analysis };
+
+    this.loadAnalysisById(analysisId).then(analysis => {
       this.setPrivileges(analysis);
 
       this.executeIfNotWaiting(
@@ -102,18 +112,8 @@ export class ExecutedViewComponent implements OnInit {
         loadLastExecution,
         executionId
       );
-    } else {
-      this.loadAnalysisById(analysisId).then(analysis => {
-        this.setPrivileges(analysis);
+    });
 
-        this.executeIfNotWaiting(
-          analysis,
-          awaitingExecution,
-          loadLastExecution,
-          executionId
-        );
-      });
-    }
     this.executionsSub = this._executeService.subscribe(
       analysisId,
       this.onExecutionsEvent

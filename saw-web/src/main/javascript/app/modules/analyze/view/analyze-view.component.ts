@@ -64,18 +64,22 @@ export class AnalyzeViewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.analysisId = this._route.snapshot.params.id;
+    this._route.params.subscribe(params => {
+      this.analysisId = params.id;
+
+      this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
+        subCategoryId: this.analysisId
+      });
+
+      this.categoryName = this._analyzeService.getCategory(this.analysisId)
+        .then(category => category.name);
+
+      this.loadAnalyses(this.analysisId);
+      this.getCronJobs(this.analysisId);
+    });
     const savedView = <string>this._localStorage.get(VIEW_KEY);
     this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
     savedView : this.LIST_VIEW;
-
-    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
-      subCategoryId: this.analysisId
-    });
-
-    this.categoryName = this._analyzeService.getCategory(this.analysisId).then(category => category.name);
-    this.loadAnalyses();
-    this.getCronJobs();
   }
 
   onAction(event: AnalyzeViewActionEvent) {
@@ -83,7 +87,7 @@ export class AnalyzeViewComponent implements OnInit {
     case 'fork': {
       const { analysis, requestExecution } = event;
       if (analysis) {
-        this.loadAnalyses().then(() => {
+        this.loadAnalyses(this.analysisId).then(() => {
           if (requestExecution) {
             this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
           }
@@ -138,7 +142,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
-    this.getCronJobs();
+    this.getCronJobs(this.analysisId);
     /* Update the new analysis in the current list */
     this._router.navigate(
       ['analyze', analysis.categoryId]
@@ -170,7 +174,7 @@ export class AnalyzeViewComponent implements OnInit {
       } as MatDialogConfig).afterClosed().subscribe(event => {
         const { analysis, requestExecution } = event;
         if (analysis) {
-          this.loadAnalyses().then(() => {
+          this.loadAnalyses(this.analysisId).then(() => {
             if (requestExecution) {
               this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
             }
@@ -180,17 +184,17 @@ export class AnalyzeViewComponent implements OnInit {
     });
   }
 
-  loadAnalyses() {
-    return this._analyzeService.getAnalysesFor(this.analysisId).then(analyses => {
+  loadAnalyses(analysisId) {
+    return this._analyzeService.getAnalysesFor(analysisId).then(analyses => {
       this.analyses = analyses;
       this.filteredAnalyses = [...analyses];
     });
   }
 
-  getCronJobs() {
+  getCronJobs(analysisId) {
     const token = this._jwt.getTokenObj();
     const requestModel = {
-      categoryId: this.analysisId,
+      categoryId: analysisId,
       groupkey: token.ticket.custCode
     };
     this._analyzeService.getAllCronJobs(requestModel).then(response => {
