@@ -65,21 +65,25 @@ export class AnalyzeViewComponent implements OnInit {
 
   ngOnInit() {
     this._route.params.subscribe(params => {
-      this.analysisId = params.id;
-
-      this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
-        subCategoryId: this.analysisId
-      });
-
-      this.categoryName = this._analyzeService.getCategory(this.analysisId)
-        .then(category => category.name);
-
-      this.loadAnalyses(this.analysisId);
-      this.getCronJobs(this.analysisId);
+      this.onParamsChange(params);
     });
     const savedView = <string>this._localStorage.get(VIEW_KEY);
     this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
     savedView : this.LIST_VIEW;
+  }
+
+  onParamsChange(params) {
+    this.analysisId = params.id;
+
+    this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
+      subCategoryId: this.analysisId
+    });
+
+    this.categoryName = this._analyzeService.getCategory(this.analysisId)
+      .then(category => category.name);
+
+    this.loadAnalyses(this.analysisId);
+    this.getCronJobs(this.analysisId);
   }
 
   onAction(event: AnalyzeViewActionEvent) {

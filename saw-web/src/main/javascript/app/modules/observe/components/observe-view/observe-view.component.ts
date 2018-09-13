@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import * as html2pdf from 'html2pdf.js';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -61,32 +61,43 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private observe: ObserveService,
     private dashboardService: DashboardService,
+    private router: Router,
     private filters: GlobalFilterService,
     private jwt: JwtService,
     private _route: ActivatedRoute
   ) {
-    const snapshot = this._route.snapshot;
-    const { subCategory } = snapshot.params;
-    const { dashboard } = snapshot.queryParams;
-    this.dashboardId = dashboard;
-    this.subCategoryId = subCategory;
+    const navigationListener = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        this.initialise();
+      }
+    });
 
-    this.loadPrivileges();
+    this.listeners.push(navigationListener);
   }
 
-  ngOnInit() {
-    if (this.dashboardId) {
-      this.loadDashboard().subscribe(() => {
-        this.startAutoRefresh();
-      });
-    }
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.dashboardService.unsetAutoRefresh(
       (this.dashboard || { entityId: null }).entityId
     );
     this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  initialise() {
+    const snapshot = this._route.snapshot;
+    const { subCategory } = snapshot.params;
+    const { dashboard } = snapshot.queryParams;
+    this.dashboardId = dashboard;
+    this.subCategoryId = subCategory;
+    this.dashboard = null;
+
+    this.loadPrivileges();
+    if (this.dashboardId) {
+      this.loadDashboard().subscribe(() => {
+        this.startAutoRefresh();
+      });
+    }
   }
 
   stopAutoRefresh() {
@@ -145,16 +156,12 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   deleteDashboard(): void {
-    this.observe.deleteDashboard(this.dashboard).subscribe(
-      () => {
-        this.observe.reloadMenu().subscribe(
-          menu => {
-            this.observe.updateSidebar(menu);
-            this.observe.redirectToFirstDash(menu, true);
-          }
-        );
-      }
-    );
+    this.observe.deleteDashboard(this.dashboard).subscribe(() => {
+      this.observe.reloadMenu().subscribe(menu => {
+        this.observe.updateSidebar(menu);
+        this.observe.redirectToFirstDash(menu, true);
+      });
+    });
   }
 
   downloadDashboard() {
