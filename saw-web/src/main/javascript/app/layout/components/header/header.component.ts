@@ -56,7 +56,7 @@ export class LayoutHeaderComponent {
   }
 
   changePwd() {
-    window.location.assign('./login.html#!/changePwd');
+    window.location.assign('./login.html#/changePwd');
   }
 
   getInitials(usrName: string) {

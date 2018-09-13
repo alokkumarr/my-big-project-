@@ -69,7 +69,7 @@ export class MenuService {
           return {
             id: subfeature.prodModFeatureID,
             name: subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
-            url: `#!/${moduleName.toLowerCase()}/${subfeature.prodModFeatureID}`,
+            url: `#/${moduleName.toLowerCase()}/${subfeature.prodModFeatureID}`,
             data: subfeature
           };
         });

@@ -157,7 +157,7 @@ export class ObserveService {
                   map(dashboards, dashboard => ({
                     id: dashboard.entityId,
                     name: dashboard.name,
-                    url: `#!/observe/${subCategory.id}?dashboard=${
+                    url: `#/observe/${subCategory.id}?dashboard=${
                       dashboard.entityId
                     }`,
                     data: dashboard
