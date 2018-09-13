@@ -10,7 +10,7 @@ import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { RouterModule }  from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MaterialModule } from './material.module';
 
 import { routes } from './routes';
@@ -26,7 +26,7 @@ import {
   LayoutHeaderComponent,
   LayoutFooterComponent,
   MainPageComponent
- } from './layout';
+} from './layout';
 
 import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
@@ -46,7 +46,10 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
 @NgModule({
   imports: [
     BrowserModule,
-    RouterModule.forRoot(routes, {useHash: true}),
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      onSameUrlNavigation: 'reload'
+    }),
     NgIdleModule.forRoot(),
     CommonModuleTs,
     AnalyzeModuleTs,
@@ -57,9 +60,7 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     AdminModule
   ],
   exports: [FlexLayoutModule],
-  providers: [
-    ...SERVICES
-  ],
+  providers: [...SERVICES],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   bootstrap: [LayoutContentComponent]
