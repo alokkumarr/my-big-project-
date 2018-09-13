@@ -47,6 +47,13 @@
         <groupId>com.googlecode.maven-download-plugin</groupId>
         <artifactId>download-maven-plugin</artifactId>
         <version>1.4.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <!-- Package for old SIP version to test upgrading from -->
           <!-- Workaround: The SIP 3.0 package fails to deploy on
