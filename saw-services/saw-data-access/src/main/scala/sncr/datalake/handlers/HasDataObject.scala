@@ -41,7 +41,7 @@ trait HasDataObject[H<:DLSession] {
       format = (repo \ "format").extract[String]
       m_log.trace("format : {}", format)
       node.lastUsed = System.currentTimeMillis()
-      m_log.info("node.loadObject name: {}", name + " location :" + location + "format :" + format)
+      m_log.info("node.loadObject name: {}", name + " location :" + location + " format :" + format)
       node.loadObject(name, location, format)
     })
   }

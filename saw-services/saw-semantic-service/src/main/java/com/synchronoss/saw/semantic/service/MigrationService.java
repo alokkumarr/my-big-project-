@@ -130,55 +130,62 @@ public class MigrationService {
          try {
            logger.trace("semanticNode description which is going to migrate :"+ objectMapper.writeValueAsString(semanticNode));
            addSemantic(semanticNode, basePath);
-           try {
-             requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-             HttpEntity<?> deleteSemanticBinaryRequestEntity = new HttpEntity<Object>(semanticNodeQuery("delete"),requestHeaders);
-             logger.trace("transportMetadataURIL server URL {}", transportURI + "/md");
-             logger.trace("deleteSemanticBinaryRequestEntity {}", objectMapper.writeValueAsString(deleteSemanticBinaryRequestEntity));
-             ResponseEntity<?> deleteSemanticBinaryNode = restTemplate.exchange(url, HttpMethod.POST,
-                 deleteSemanticBinaryRequestEntity, MetaDataObjects.class);
-             logger.trace("deleteSemanticBinaryNode status code : "+ deleteSemanticBinaryNode.getStatusCodeValue() + " : " + objectMapper.writeValueAsString(deleteSemanticBinaryNode));
-             if (!deleteSemanticBinaryNode.getStatusCode().is2xxSuccessful()) {
-               logger.trace("deleteSemanticBinaryNode inside if it is not successful : "+ deleteSemanticBinaryNode.getStatusCodeValue());
-               deleteSemantic(semanticNode, basePath);
-             }
-             try {
-               for (String dataObjectId: listOfDataObjectIds) 
-               {
-               logger.trace("dataObjectId will be deleted : "+ dataObjectId);
-               requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-               HttpEntity<?> deleteDataObjectBinaryRequestEntity = new HttpEntity<Object>(dataObjectQuery(dataObjectId,"delete"),requestHeaders);
-               logger.trace("transportMetadataURIL server URL {}", transportURI + "/md");
-               logger.trace("deleteDataObjectBinaryRequestEntity {}", objectMapper.writeValueAsString(deleteDataObjectBinaryRequestEntity));
-               ResponseEntity<?> deleteDataObjectNode = restTemplate.exchange(url, HttpMethod.POST,
-                   deleteDataObjectBinaryRequestEntity, DataSemanticObjects.class);
-               logger.trace("deleteDataObjectNode status code : "+ deleteDataObjectNode.getStatusCodeValue() + " : " + objectMapper.writeValueAsString(deleteDataObjectNode));
-               if (!deleteDataObjectNode.getStatusCode().is2xxSuccessful()) {
-                 logger.trace("deleteDataObjectNode inside if it is not successful : "+ deleteDataObjectNode.getStatusCodeValue());
-                 deleteSemantic(semanticNode, basePath);
-                 break;
-               }
-               }
-             }
-             catch (Exception ex) {
-               // Delete an entry from semantic store
-               logger.trace("Delete an entry from semantic store String dataObjectId: listOfDataObjectIds...");
-               deleteSemantic(semanticNode, basePath);
-               throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex); 
-             }
-           }
-           catch (Exception ex) {
-             // Delete an entry from semantic store
-             logger.trace("Delete an entry from semantic store while deleting from deleteSemanticBinaryRequestEntity..");
-             deleteSemantic(semanticNode, basePath);
-             throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex); 
-           }
          }
          catch (Exception ex) {
            logger.trace("Throwing an exception while adding the semantic to the new store");
            throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex);
          }
+         
+        /*finally {
+          try {
+            requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+            HttpEntity<?> deleteSemanticBinaryRequestEntity = new HttpEntity<Object>(semanticNodeQuery("delete"),requestHeaders);
+            logger.trace("transportMetadataURIL server URL {}", transportURI + "/md");
+            logger.trace("deleteSemanticBinaryRequestEntity {}", objectMapper.writeValueAsString(deleteSemanticBinaryRequestEntity));
+            ResponseEntity<?> deleteSemanticBinaryNode = restTemplate.exchange(url, HttpMethod.POST,
+                deleteSemanticBinaryRequestEntity, MetaDataObjects.class);
+            logger.trace("deleteSemanticBinaryNode status code : "+ deleteSemanticBinaryNode.getStatusCodeValue() + " : " + objectMapper.writeValueAsString(deleteSemanticBinaryNode));
+            if (!deleteSemanticBinaryNode.getStatusCode().is2xxSuccessful()) {
+              logger.trace("deleteSemanticBinaryNode inside if it is not successful : "+ deleteSemanticBinaryNode.getStatusCodeValue());
+              deleteSemantic(semanticNode, basePath);
+            }
+            
+            try {
+              for (String dataObjectId: listOfDataObjectIds) 
+              {
+              logger.trace("dataObjectId will be deleted : "+ dataObjectId);
+              requestHeaders.set("Content-type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+              HttpEntity<?> deleteDataObjectBinaryRequestEntity = new HttpEntity<Object>(dataObjectQuery(dataObjectId,"delete"),requestHeaders);
+              logger.trace("transportMetadataURIL server URL {}", transportURI + "/md");
+              logger.trace("deleteDataObjectBinaryRequestEntity {}", objectMapper.writeValueAsString(deleteDataObjectBinaryRequestEntity));
+              ResponseEntity<?> deleteDataObjectNode = restTemplate.exchange(url, HttpMethod.POST,
+                  deleteDataObjectBinaryRequestEntity, DataSemanticObjects.class);
+              logger.trace("deleteDataObjectNode status code : "+ deleteDataObjectNode.getStatusCodeValue() + " : " + objectMapper.writeValueAsString(deleteDataObjectNode));
+              if (!deleteDataObjectNode.getStatusCode().is2xxSuccessful()) {
+                logger.trace("deleteDataObjectNode inside if it is not successful : "+ deleteDataObjectNode.getStatusCodeValue());
+                deleteSemantic(semanticNode, basePath);
+                break;
+              }
+              }
+            }
+            catch (Exception ex) {
+              // Delete an entry from semantic store
+              logger.trace("Delete an entry from semantic store String dataObjectId: listOfDataObjectIds...");
+              deleteSemantic(semanticNode, basePath);
+              throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex); 
+            }
+          }
+          catch (Exception ex) {
+            // Delete an entry from semantic store
+            logger.trace("Delete an entry from semantic store while deleting from deleteSemanticBinaryRequestEntity..");
+            deleteSemantic(semanticNode, basePath);
+            throw new CreateEntitySAWException("Exception generated during migration while creating an semantic entity ", ex); 
+          }
+        }*/ // end of finally 
        } // end of Id check if it is there then ignore
+         
+         
+         
         else {
            logger.info("This " + semanticNode.get_id() + " already exists on the store");
          }
