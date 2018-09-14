@@ -167,7 +167,6 @@ angular
   .component('analyzeChartSettings', AnalyzeChartSettingsComponent)
   .component('analyzeChartPreview', AnalyzeChartPreviewComponent)
   .component('analyzeSaveDialog', AnalyzeSaveDialogComponent);
-
 @NgModule({
   imports: [
     CommonModuleAngular4,
