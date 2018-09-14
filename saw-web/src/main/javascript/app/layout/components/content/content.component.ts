@@ -75,7 +75,8 @@ export class LayoutContentComponent {
 
   setPageTitle(event) {
     const [, basePath] = split(event.url, '/');
-    const title = startCase(basePath);
+    const moduleName = startCase(basePath);
+    const title = `Synchronoss - ${moduleName}`;
     this._title.setTitle(title);
   }
 
