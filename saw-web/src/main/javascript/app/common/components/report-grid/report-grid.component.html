@@ -32,7 +32,7 @@
         <mat-icon *ngIf="isEditable && !isInQueryMode" class="column-menu" [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
         <mat-menu #menu="matMenu" class="menu-buttons">
           <button class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.payload.type)">
-          <mat-icon fontIcon="icon-more"></mat-icon>
+          <mat-icon fontIcon="icon-Sum"></mat-icon>
           Aggregation</button>
           <button (click)="renameColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-edit"></mat-icon>  Rename</button>
           <button (click)="removeColumn(cell.column)" class="report-options" mat-menu-item><mat-icon fontIcon="icon-delete"></mat-icon>  Remove {{cell.column.payload.displayName}}</button>
