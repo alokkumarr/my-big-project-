@@ -1,0 +1,5 @@
+- name: restart mariadb
+  # Stop service, to let the MariaDB Galera cluster initialization
+  # start it using the cluster initialization flags in case it is chosen
+  # as the bootstrap node
+  systemd: name=mariadb state=stopped daemon_reload=true
