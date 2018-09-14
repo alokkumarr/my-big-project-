@@ -384,6 +384,7 @@
                 </wait>
               </run>
             </image>
+            <!-- First SIP application node -->
             <image>
               <name>sip-app:${project.version}</name>
               <!-- Note: The node has a suffix "1", because additional
@@ -406,6 +407,8 @@
                 </wait>
               </run>
             </image>
+            <!-- Second SIP application node: runs same services as
+                 first node, to provide redundancy -->
             <image>
               <name>sip-app:${project.version}</name>
               <alias>sip-app2</alias>
@@ -419,12 +422,33 @@
                 <restartPolicy>
                   <name>always</name>
                 </restartPolicy>
+                <wait>
+                  <healthy>true</healthy>
+                  <time>${sip.docker.wait.time}</time>
+                </wait>
+              </run>
+            </image>
+            <!-- Third SIP application node: only used for MariaDB
+                 Galera cluster arbitrator node to resolve split brain
+                 situations-->
+            <image>
+              <name>sip-app:${project.version}</name>
+              <alias>sip-app3</alias>
+              <run>
+                <hostname>sip-app3</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <privileged>true</privileged>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
                 <!-- Development environments are for now by default
                      only single SAW node environments, at least until
                      everyone has moved to cloud deployments with more
                      memory.  So skip running the second SAW container
                      by default. -->
-                <skip>true</skip>
                 <wait>
                   <healthy>true</healthy>
                   <time>${sip.docker.wait.time}</time>

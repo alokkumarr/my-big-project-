@@ -4,3 +4,8 @@
   roles:
     - saw-security-db
     - saw-security-web
+- name: SAW Security (MariaDB Galera cluster arbitrator)
+  hosts: saw-security-arbitrator
+  become: true
+  roles:
+    - saw-security-db-arbitrator
