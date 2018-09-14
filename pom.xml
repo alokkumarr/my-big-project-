@@ -152,7 +152,7 @@
       <build>
         <defaultGoal>
           enforcer:enforce properties:read-project-properties
-          download:wget docker:stop docker:build docker:start
+          docker:stop docker:build docker:start
         </defaultGoal>
       </build>
     </profile>
