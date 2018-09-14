@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router, NavigationEnd } from '@angular/router';
-import {Idle, DEFAULT_INTERRUPTSOURCES} from '@ng-idle/core';
+import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as split from 'lodash/split';
@@ -65,14 +65,12 @@ export class LayoutContentComponent {
   }
 
   ngOnInit() {
-    this._router.events
-      .subscribe(event => {
-        if (event instanceof NavigationEnd) {
-          this.setPageTitle(event);
-          this.loadMenuForProperModule(event);
-        }
-      });
-    this.goToAnalyzePage();
+    this._router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.setPageTitle(event);
+        this.loadMenuForProperModule(event);
+      }
+    });
   }
 
   setPageTitle(event) {
@@ -85,6 +83,7 @@ export class LayoutContentComponent {
     const [, basePath] = split(event.url, '/');
     const moduleName = upperCase(basePath);
 
+    /* prettier-ignore */
     switch (moduleName) {
     case 'ADMIN':
       this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
@@ -97,16 +96,6 @@ export class LayoutContentComponent {
         this._sidenav.updateMenu(menu, moduleName);
       });
       break;
-    }
-  }
-
-  goToAnalyzePage() {
-    const analyzeModuleName = 'ANALYZE';
-    const modules = get(this._jwt.getTokenObj(), 'ticket.products[0].productModules');
-    const analyzeModuleExists = find(modules, ({productModName}) => productModName === analyzeModuleName);
-
-    if (analyzeModuleExists) {
-      this._router.navigate(['analyze']);
     }
   }
 }
