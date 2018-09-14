@@ -205,7 +205,7 @@ module.exports = function (env) {
   }
 
   if (isProduction) {
-    const commonVendorKeys = ['jquery', '@angular/material', '@angular/core'];
+    const commonVendorKeys = ['@angular/material', '@angular/core'];
     const pkg = require(webpackHelper.root('package.json'));
 
     const appChunks = ['commonVendor', 'app'];

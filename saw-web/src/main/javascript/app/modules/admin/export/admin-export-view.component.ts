@@ -26,7 +26,6 @@ import { ExportService } from './export.service';
 import { CategoryService } from '../category/category.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
-import { filter } from 'rxjs-compat/operator/filter';
 
 const template = require('./admin-export-view.component.html');
 require('./admin-export-view.component.scss');

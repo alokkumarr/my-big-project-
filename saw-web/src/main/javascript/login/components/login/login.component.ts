@@ -30,7 +30,7 @@ export class LoginComponent {
   ngOnInit() {
     const changePassMsg = window.location.href;
     if (!isUndefined(changePassMsg.split('changePassMsg=')[1])) {
-      this.states.error = decodeURI(changePassMsg.split('changePassMsg=')[1]).split('#!/')[0];
+      this.states.error = decodeURI(changePassMsg.split('changePassMsg=')[1]).split('#/')[0];
     }
   }
 

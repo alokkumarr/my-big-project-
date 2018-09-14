@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DxDataGridComponent } from 'devextreme-angular';
 
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 import * as filter from 'lodash/filter';
@@ -26,18 +25,15 @@ export class CreateSemanticComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private workBench: WorkbenchService,
-    private headerProgress: HeaderProgressService
+    private workBench: WorkbenchService
   ) {}
 
   @ViewChild('dsGrid') dataGrid: DxDataGridComponent;
 
   ngOnInit() {
-    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableDS = data;
       this.gridDataAvailableDS = cloneDeep(data);
-      this.headerProgress.hide();
     });
   }
 

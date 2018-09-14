@@ -12,7 +12,7 @@
     </div>
   </mat-expansion-panel>
   <div class="no-children" [class.activeButton]="checkActiveMenu(metadata.url)" fxLayout="row" fxLayoutAlign="end center" *ngIf="hasChildren()">
-    <a fxFlex class="child-item" [attr.href]="metadata.url" (click)="closeSideNav()" [class.active]="active">
+    <a fxFlex class="child-item" [routerLink]="metadata.url" [queryParams]="metadata.queryParams" (click)="closeSideNav()" [class.active]="active">
       {{metadata.name}}
       <mat-icon fontIcon="icon-star-solid" *ngIf="checkDefault(metadata)" [style.margin]="0"></mat-icon>
     </a>

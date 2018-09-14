@@ -1,9 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
 import { DxDataGridComponent } from 'devextreme-angular';
 
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
@@ -25,7 +23,6 @@ export class DatasetsGridPageComponent implements OnInit {
 
   constructor(
     private dxDataGrid: dxDataGridService,
-    private headerProgress: HeaderProgressService,
     private workbench: WorkbenchService
   ) {}
 
@@ -143,9 +140,6 @@ export class DatasetsGridPageComponent implements OnInit {
   reloadDataGrid(data) {
     this.dataGrid.instance.option('dataSource', data);
     this.dataGrid.instance.refresh();
-    setTimeout(() => {
-      this.headerProgress.hide();
-    }, 1000);
   }
 
   viewDetails(metadata) {

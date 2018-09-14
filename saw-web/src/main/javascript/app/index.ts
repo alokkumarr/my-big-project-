@@ -5,7 +5,8 @@ import 'zone.js/dist/zone';
 import 'hammerjs';
 import 'reflect-metadata';
 import '../../../../themes/_triton.scss';
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, enableProdMode } from '@angular/core';
+import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -34,6 +35,8 @@ declare global {
   const require: any;
 }
 
+declare const __PRODUCTION__: any;
+
 const COMPONENTS = [
   ServiceBootstrapComponent,
   LayoutContentComponent,
@@ -47,7 +50,11 @@ const GUARDS = [DefaultHomePageGuard];
 @NgModule({
   imports: [
     BrowserModule,
-    RouterModule.forRoot(routes, { useHash: true }),
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      onSameUrlNavigation: 'reload'
+    }),
+    NgIdleModule.forRoot(),
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
@@ -57,17 +64,16 @@ const GUARDS = [DefaultHomePageGuard];
     AdminModule
   ],
   exports: [FlexLayoutModule],
-  providers: [
-    ...SERVICES,
-    ...GUARDS
-  ],
+  providers: [...SERVICES, ...GUARDS],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   bootstrap: [LayoutContentComponent]
 })
 export class NewAppModule {
-  constructor() { }
+  constructor() {}
 }
 
-
+if (__PRODUCTION__) {
+  enableProdMode();
+}
 platformBrowserDynamic().bootstrapModule(NewAppModule);

@@ -1,18 +1,12 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
 import { MatDialog, MatDialogConfig } from '@angular/material';
-import { ActivatedRoute, Router } from '@angular/router';
-import {
-  UserEditDialogComponent,
-  UserService
-} from '../user';
-import {
-  RoleEditDialogComponent
-} from '../role';
-import {
-  PrivilegeEditDialogComponent
-} from '../privilege';
+import { Subscription } from 'rxjs/Subscription';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { UserEditDialogComponent, UserService } from '../user';
+import { RoleEditDialogComponent } from '../role';
+import { PrivilegeEditDialogComponent } from '../privilege';
 import {
   CategoryEditDialogComponent,
   CategoryDeleteDialogComponent
@@ -24,43 +18,45 @@ import { JwtService } from '../../../../login/services/jwt.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { LocalSearchService } from '../../../common/services/local-search.service';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
-import { SidenavMenuService } from '../../../common/components/sidenav';
 import { ConfirmDialogData } from '../../../common/types';
-import { AdminMenuData } from '../consts';
 
 const template = require('./admin-main-view.component.html');
 require('./admin-main-view.component.scss');
 
 const USER_SEARCH_CONFIG = [
-  {keyword: 'LOGIN ID', fieldName: 'masterLoginId'},
-  {keyword: 'ROLE', fieldName: 'roleName'},
-  {keyword: 'FIRST NAME', fieldName: 'firstName'},
-  {keyword: 'LAST NAME', fieldName: 'lastName'},
-  {keyword: 'EMAIL', fieldName: 'email'},
-  {keyword: 'STATUS', fieldName: 'activeStatusInd'}
+  { keyword: 'LOGIN ID', fieldName: 'masterLoginId' },
+  { keyword: 'ROLE', fieldName: 'roleName' },
+  { keyword: 'FIRST NAME', fieldName: 'firstName' },
+  { keyword: 'LAST NAME', fieldName: 'lastName' },
+  { keyword: 'EMAIL', fieldName: 'email' },
+  { keyword: 'STATUS', fieldName: 'activeStatusInd' }
 ];
 
 const ROLE_SEARCH_CONFIG = [
-  {keyword: 'ROLE NAME', fieldName: 'roleName'},
-  {keyword: 'ROLE TYPE', fieldName: 'roleType'},
-  {keyword: 'STATUS', fieldName: 'activeStatusInd'},
-  {keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc'}
+  { keyword: 'ROLE NAME', fieldName: 'roleName' },
+  { keyword: 'ROLE TYPE', fieldName: 'roleType' },
+  { keyword: 'STATUS', fieldName: 'activeStatusInd' },
+  { keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc' }
 ];
 
 const CATEGORY_SEARCH_CONFIG = [
-  {keyword: 'PRODUCT', fieldName: 'productName'},
-  {keyword: 'MODULE', fieldName: 'moduleName'},
-  {keyword: 'CATEGORY', fieldName: 'categoryName'},
-  {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
+  { keyword: 'PRODUCT', fieldName: 'productName' },
+  { keyword: 'MODULE', fieldName: 'moduleName' },
+  { keyword: 'CATEGORY', fieldName: 'categoryName' },
+  {
+    keyword: 'SUB CATEGORIES',
+    fieldName: 'subCategories',
+    accessor: input => map(input, sc => sc.subCategoryName)
+  }
 ];
 
 const PRIVILEGE_SEARCH_CONFIG = [
-  {keyword: 'PRODUCT', fieldName: 'productName'},
-  {keyword: 'MODULE', fieldName: 'moduleName'},
-  {keyword: 'CATEGORY', fieldName: 'categoryName'},
-  {keyword: 'ROLE', fieldName: 'roleName'},
-  {keyword: 'PRIVILEGE DESC', fieldName: 'privilegeDesc'},
-  {keyword: 'SUB CATEGORY', fieldName: 'subCategoryName'}
+  { keyword: 'PRODUCT', fieldName: 'productName' },
+  { keyword: 'MODULE', fieldName: 'moduleName' },
+  { keyword: 'CATEGORY', fieldName: 'categoryName' },
+  { keyword: 'ROLE', fieldName: 'roleName' },
+  { keyword: 'PRIVILEGE DESC', fieldName: 'privilegeDesc' },
+  { keyword: 'SUB CATEGORY', fieldName: 'subCategoryName' }
 ];
 
 const deleteConfirmation = (section, identifier, identifierValue) => ({
@@ -74,21 +70,21 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
   selector: 'admin-main-view',
   template
 })
-export class AdminMainViewComponent {
-
-  @Input() columns: any[];
-  @Input() section: 'user' | 'role' | 'privilege' | 'category';
+export class AdminMainViewComponent implements OnDestroy {
+  columns: any[] = [];
+  section: 'user' | 'role' | 'privilege' | 'category';
   data$: Promise<any[]>;
   roles$: any;
   data: any[];
   filteredData: any[];
+  listeners: Subscription[] = [];
   customer: string;
   filterObj = {
     searchTerm: '',
     searchTermValue: ''
   };
 
-  ticket: {custID: string, custCode: string};
+  ticket: { custID: string; custCode: string; masterLoginId?: string };
 
   constructor(
     private _privilegeService: PrivilegeService,
@@ -99,42 +95,67 @@ export class AdminMainViewComponent {
     private _localSearch: LocalSearchService,
     private _toastMessage: ToastService,
     private _dialog: MatDialog,
-    private _sidenav: SidenavMenuService,
     private _router: Router,
     private _route: ActivatedRoute
-  ) { }
+  ) {
+    const dataListener = this._route.data.subscribe((data: any) =>
+      this.onDataChange(data)
+    );
+    const navigationListener = this._router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        this.initialise();
+      }
+    });
+    this.listeners.push(dataListener);
+    this.listeners.push(navigationListener);
+  }
 
-  ngOnInit() {
+  initialise() {
     const token = this._jwtService.getTokenObj();
     this.ticket = token.ticket;
     const customerId = parseInt(this.ticket.custID, 10);
     this.data$ = this.getListData(customerId);
     this.data$.then(data => {
       if (this.section === 'privilege') {
-        const { role } = this._route.snapshot.params;
+        const { role } = this._route.snapshot.queryParams;
         if (role) {
           this.filterObj.searchTerm = `role:"${role}"`;
         }
       }
       this.setData(data);
     });
+  }
 
-    this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
+  ngOnDestroy() {
+    this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  onDataChange({ columns, section }) {
+    this.columns = columns;
+    this.section = section;
   }
 
   applySearchFilter(value) {
     this.filterObj.searchTerm = value;
-    const searchCriteria = this._localSearch.parseSearchTerm(this.filterObj.searchTerm);
+    const searchCriteria = this._localSearch.parseSearchTerm(
+      this.filterObj.searchTerm
+    ) as any;
     this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
-    this._localSearch.doSearch(searchCriteria, this.data, this.getSearchConfig()).then(data => {
-      this.filteredData = data;
-    }, err => {
-      this._toastMessage.error(err.message);
-    });
+    this._localSearch
+      .doSearch(searchCriteria, this.data, this.getSearchConfig())
+      .then(
+        (data: any[]) => {
+          this.filteredData = data;
+        },
+        err => {
+          this._toastMessage.error(err.message);
+        }
+      );
   }
 
   getSearchConfig() {
-    switch(this.section) {
+    /* prettier-ignore */
+    switch (this.section) {
     case 'user':
       return USER_SEARCH_CONFIG;
     case 'role':
@@ -147,12 +168,12 @@ export class AdminMainViewComponent {
   }
 
   onRowClick(row) {
+    /* prettier-ignore */
     switch (this.section) {
     case 'role':
-      this._router.navigate(
-        ['admin', 'privilege'],
-        {queryParams: {role: row.roleName}}
-      );
+      this._router.navigate(['/admin/privilege'], {
+        queryParams: { role: row.roleName }
+      });
       break;
     default:
       break;
@@ -169,6 +190,7 @@ export class AdminMainViewComponent {
   }
 
   getService() {
+    /* prettier-ignore */
     switch (this.section) {
     case 'user':
       return this._userService;
@@ -185,14 +207,15 @@ export class AdminMainViewComponent {
 
   getFormDeps() {
     const customerId = parseInt(this.ticket.custID, 10);
-    const { masterLoginId } = this.ticket;
+    const { masterLoginId } = this.ticket as any;
+    /* prettier-ignore */
     switch (this.section) {
     case 'user':
-      return {roles$: this._userService.getUserRoles(customerId)};
+      return { roles$: this._userService.getUserRoles(customerId) };
     case 'role':
-      return {roleTypes$: this._roleService.getRoleTypes(customerId)};
+      return { roleTypes$: this._roleService.getRoleTypes(customerId) };
     case 'category':
-      return {customerId};
+      return { customerId };
     case 'privilege':
       return { customerId, masterLoginId };
     default:
@@ -201,13 +224,14 @@ export class AdminMainViewComponent {
   }
 
   getListData(customerId) {
-    const service = this.getService();
+    const service = this.getService() as any;
     return service.getList(customerId);
   }
 
   removeListItem(row) {
-    const service = this.getService();
+    const service = this.getService() as any;
     return service.remove(row).then(rows => {
+      /* prettier-ignore */
       switch (this.section) {
       case 'privilege':
         // for some reason, the backend doesn't return the new array of privileges
@@ -230,7 +254,8 @@ export class AdminMainViewComponent {
     const confirmation = this.getConfirmation(modifiedRow);
 
     let dialogAction;
-    switch(this.section) {
+    /* prettier-ignore */
+    switch (this.section) {
     case 'category':
       dialogAction = this.openCategoryDeletionDialog(row);
       break;
@@ -246,56 +271,73 @@ export class AdminMainViewComponent {
   }
 
   getConfirmation(row) {
-    switch(this.section) {
+    /* prettier-ignore */
+    switch (this.section) {
     case 'user':
       return deleteConfirmation('user', 'User ID', row.masterLoginId);
     case 'role':
       return deleteConfirmation('role', 'Role Name', row.roleName);
     case 'category':
-      return deleteConfirmation('category', 'Category Name', row.categoryName);
+      return deleteConfirmation(
+        'category',
+        'Category Name',
+        row.categoryName
+      );
     case 'privilege':
-      const identifiervalue = `${row.productName} --> ${row.moduleName} --> ${row.categoryName} --> ${row.subCategoryName} --> ${row.roleName}.`;
-      return deleteConfirmation('privilege', 'Privilege Details', identifiervalue);
+      const identifiervalue = `${row.productName} --> ${row.moduleName} --> ${
+        row.categoryName
+      } --> ${row.subCategoryName} --> ${row.roleName}.`;
+      return deleteConfirmation(
+        'privilege',
+        'Privilege Details',
+        identifiervalue
+      );
     }
   }
 
   modifyRowForDeletion(row) {
-    switch(this.section) {
+    /* prettier-ignore */
+    switch (this.section) {
     case 'role':
       const customerId = parseInt(this.ticket.custID, 10);
-      const { masterLoginId } = this.ticket;
+      const { masterLoginId } = this.ticket as any;
       return {
         ...row,
         roleId: row.roleSysId,
         customerId,
         masterLoginId
-      }
+      };
     default:
       return row;
     }
   }
 
   editRow(row) {
-    this.openRowModal(cloneDeep(row), 'edit').afterClosed().subscribe(rows => {
-      if (rows) {
-        this.setData(rows);
-      }
-    });
+    this.openRowModal(cloneDeep(row), 'edit')
+      .afterClosed()
+      .subscribe(rows => {
+        if (rows) {
+          this.setData(rows);
+        }
+      });
   }
 
   createRow() {
     const newRow = this.getNewRow();
-    this.openRowModal(newRow, 'create').afterClosed().subscribe(rows => {
-      if (rows) {
-        this.setData(rows);
-      }
-    });
+    this.openRowModal(newRow, 'create')
+      .afterClosed()
+      .subscribe(rows => {
+        if (rows) {
+          this.setData(rows);
+        }
+      });
   }
 
   getNewRow() {
     const custId = parseInt(this.ticket.custID, 10);
-    const {custCode, masterLoginId} = this.ticket
-    switch(this.section) {
+    const { custCode, masterLoginId } = this.ticket as any;
+    /* prettier-ignore */
+    switch (this.section) {
     case 'user':
       return {
         customerId: custId
@@ -306,7 +348,7 @@ export class AdminMainViewComponent {
         customerCode: custCode,
         masterLoginId,
         myAnalysis: true
-      }
+      };
     case 'category':
       return {
         customerId: custId,
@@ -327,7 +369,7 @@ export class AdminMainViewComponent {
       formDeps,
       mode
     };
-    const component = this.getModalComponent();
+    const component = this.getModalComponent() as any;
     return this._dialog.open(component, {
       width: 'auto',
       height: 'auto',
@@ -353,6 +395,7 @@ export class AdminMainViewComponent {
   }
 
   getModalComponent() {
+    /* prettier-ignore */
     switch (this.section) {
     case 'user':
       return UserEditDialogComponent;
@@ -372,5 +415,4 @@ export class AdminMainViewComponent {
       data
     } as MatDialogConfig);
   }
-
 }

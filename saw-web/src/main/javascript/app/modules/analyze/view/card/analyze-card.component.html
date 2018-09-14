@@ -18,7 +18,7 @@
   >
     <div class="saw-ac-placeholder"
           [ngClass]="placeholderClass"
-          routerLink="analyze/analysis/{{analysis.id}}/executed"
+          routerLink="../analysis/{{analysis.id}}/executed"
     ></div>
   </mat-card-content>
   <mat-divider></mat-divider>
@@ -26,7 +26,7 @@
     <div>
       <mat-card-title>
         <a [innerHtml]="analysis.name | highlight: highlightTerm"
-           routerLink="analyze/analysis/{{analysis.id}}/executed"
+           routerLink="../analysis/{{analysis.id}}/executed"
            e2e="analysis-name"
         ></a>
       </mat-card-title>

@@ -3,7 +3,7 @@
   <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
   <strong *ngSwitchCase="'description'" i18n>Description</strong>
   <strong *ngSwitchCase="'save'" i18n>Save</strong>
-  <mat-progress-bar [style.visibility]="showProgressBar ? 'visible' : 'hidden'"
+  <mat-progress-bar [style.visibility]="showProgress ? 'visible' : 'hidden'"
                     mode="indeterminate"></mat-progress-bar>
 </header>
 <div [ngSwitch]="data.action"

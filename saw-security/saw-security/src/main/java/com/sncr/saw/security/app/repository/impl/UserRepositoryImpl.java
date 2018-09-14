@@ -2854,6 +2854,7 @@ public class UserRepositoryImpl implements UserRepository {
 		featureCode.append(category.getModuleId());
 		logger.info(""+category.getCustomerId());
 		featureCode.append(category.getCustomerId());
+        featureCode.append(category.getProductId());
 		StringBuffer featureType = new StringBuffer();
 		if (category.isSubCategoryInd()) {
 			featureType.append("CHILD_" + category.getCategoryCode());
@@ -2888,18 +2889,31 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public boolean checkCatExists(CategoryDetails category) {
 		Boolean catExists;
-		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
-				+ " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?"
-				+ " AND CUST_PROD_SYS_ID = ?";
+        String sql = "SELECT cust_prod_mod_feature_sys_id, " +
+            "       CPMF.cust_prod_mod_sys_id " +
+            "FROM   customer_product_module_features CPMF, " +
+            "       customer_product_modules CPM, " +
+            "       product_modules PM, " +
+            "       customer_products CP " +
+            "WHERE  CP.customer_sys_id = ? " +
+            "       AND CP.product_sys_id = PM.product_sys_id " +
+            "       AND PM.module_sys_id = ? " +
+            "       AND CP.cust_prod_sys_id = CPM.cust_prod_sys_id " +
+            "       AND PM.prod_mod_sys_id = CPM.prod_mod_sys_id " +
+            "       AND CP.cust_prod_sys_id = ? " +
+            "       AND CPMF.cust_prod_mod_sys_id = CPM.cust_prod_mod_sys_id " +
+            "       AND feature_name = ? " +
+            "       AND cust_prod_mod_feature_sys_id != 0 " ;
 		try {
 			// SAW-1932 and SAW-1950 fix:
 			// include checking moduleID as well while testing for creating new categories.
-			catExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
+			catExists = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, category.getModuleId());
-					preparedStatement.setString(2, category.getCategoryName());
-					preparedStatement.setLong(3, category.getCategoryId());
-					preparedStatement.setLong(4, category.getProductId());
+					preparedStatement.setLong(1, category.getCustomerId());
+                    preparedStatement.setLong(2, category.getModuleId());
+                    preparedStatement.setLong(3, category.getProductId());
+					preparedStatement.setString(4, category.getCategoryName());
+
 				}
 			}, new UserRepositoryImpl.CatExistsExtractor());
 		} catch (Exception e) {

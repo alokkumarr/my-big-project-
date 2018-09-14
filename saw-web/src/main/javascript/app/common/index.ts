@@ -1,12 +1,10 @@
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
-import 'devextreme/integration/angular';
-import 'devextreme/integration/jquery';
 import 'devextreme/localization';
 import 'devextreme/localization/messages/en.json';
 import 'devextreme/ui/data_grid';
-import 'jquery';
 import 'mottle';
+
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -21,15 +19,15 @@ import {
   DxDataGridComponent,
   DxTemplateModule
 } from 'devextreme-angular';
-
 import { DndModule } from './dnd';
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,
-  RefreshTokenInterceptor
+  RefreshTokenInterceptor,
+  ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
-import { IsUserLoggedInGuard } from './guards/logged-in-guard.service';
+import { IsUserLoggedInGuard } from './guards';
 import { MaterialModule } from '../material.module';
 import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -137,6 +135,11 @@ const INTERCEPTORS = [
   {
     provide: HTTP_INTERCEPTORS,
     useClass: RefreshTokenInterceptor,
+    multi: true
+  },
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: ProgressIndicatorInterceptor,
     multi: true
   }
 ];

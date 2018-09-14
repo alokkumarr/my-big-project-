@@ -1,8 +1,9 @@
-import { Component, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component } from '@angular/core';
 import * as get from 'lodash/get';
 import * as lowerCase from 'lodash/lowerCase';
 import * as split from 'lodash/split';
 import toMaterialStyle from 'material-color-hash';
+import { HeaderProgressService } from '../../../common/services';
 import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
 
@@ -14,26 +15,24 @@ require('./header.component.scss');
   template
 })
 export class LayoutHeaderComponent {
-  constructor(
-    private jwt: JwtService,
-    private user: UserService,
-    private cdRef: ChangeDetectorRef
-  ) {}
-
-  public isLoading: false;
-  lowerCase = lowerCase;
-
-  ngAfterViewChecked() {
-    // if (this.isLoading === this._rootScope.showProgress) return;
-    // this.isLoading = this._rootScope.showProgress;
-    this.cdRef.detectChanges();
-  }
-
   public UserDetails: any;
   public modules: any;
   public showAdmin: boolean;
+  public showProgress: boolean;
   private userInitials: string;
   private userBGColor: any;
+  progressSub;
+  lowerCase = lowerCase;
+
+  constructor(
+    private jwt: JwtService,
+    private user: UserService,
+    private _headerProgress: HeaderProgressService
+  ) {
+    this.progressSub = _headerProgress.subscribe(showProgress => {
+      this.showProgress = showProgress
+    });
+  }
 
   ngOnInit() {
     this.UserDetails = this.jwt.getTokenObj();
@@ -41,13 +40,13 @@ export class LayoutHeaderComponent {
     const token = this.jwt.getTokenObj();
     const product = get(token, 'ticket.products.[0]');
     this.modules = product.productModules;
-    if (this.jwt.isAdmin(token)) {
+    if (this.jwt.isAdmin()) {
       this.showAdmin = true;
     }
   }
 
-  get showProgress() {
-    return this.isLoading;
+  ngOnDestroy() {
+    this.progressSub.unsubscribe();
   }
 
   logout() {
@@ -57,7 +56,7 @@ export class LayoutHeaderComponent {
   }
 
   changePwd() {
-    window.location.assign('./login.html#!/changePwd');
+    window.location.assign('./login.html#/changePwd');
   }
 
   getInitials(usrName: string) {

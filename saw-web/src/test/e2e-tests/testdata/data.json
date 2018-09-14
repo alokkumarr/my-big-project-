@@ -1219,6 +1219,234 @@
           "isGlobalFilter": true
         }]
       }
+    },
+    "dashboardGlobalFiltersWithPivot": {
+      "pivotFloatByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters":[
+          {
+            "name":"float",
+            "value" : 30
+          }
+        ],
+        "filters":[{
+          "type": "float",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "float",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": true
+        }]
+      },
+      "pivotFloatByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters":[
+          {
+            "name":"float",
+            "value" : 30
+          }
+        ],
+        "filters":[{
+          "type": "float",
+          "tableName": "sample",
+          "isOptional": false,
+          "columnName": "float",
+          "isRuntimeFilter": false,
+          "isGlobalFilter": true
+        }]
+      },
+      "pivotStringByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotStringByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "string",
+            "value": "string 499"
+          }
+        ],
+        "filters": [
+          {
+            "type": "string",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "string.keyword",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotDoubleByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotDoubleByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "double",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "double",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "double",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotDateByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "TW"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotDateByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "date",
+            "value": null,
+            "preset": "TW"
+          }
+        ],
+        "filters": [
+          {
+            "type": "date",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "date",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotLongByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotLongByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "long",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "long",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "long",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotIntegerByUser": {
+        "user": "userOne",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      },
+      "pivotIntegerByAdmin": {
+        "user": "admin",
+        "dashboardGlobalFilters": [
+          {
+            "name": "integer",
+            "value": 30
+          }
+        ],
+        "filters": [
+          {
+            "type": "integer",
+            "tableName": "sample",
+            "isOptional": false,
+            "columnName": "integer",
+            "isRuntimeFilter": false,
+            "isGlobalFilter": true
+          }
+        ]
+      }
     }
   }
 }

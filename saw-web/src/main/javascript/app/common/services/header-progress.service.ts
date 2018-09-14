@@ -1,31 +1,29 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class HeaderProgressService {
-  progressCounter = 0;
-  showProgress = false;
+  private _progressCounter = 0;
+  private _showProgress = false;
+  private _subject$ = new Subject<boolean>();
+
+  subscribe(fn) {
+    return this._subject$.subscribe(fn);
+  }
 
   show() {
-    this.progressCounter++;
-    this.showProgress = this.get();
+    this._progressCounter++;
+    this._showProgress = this._get();
   }
 
   hide() {
-    this.progressCounter--;
-    this.showProgress = this.get();
+    this._progressCounter--;
+    this._showProgress = this._get();
   }
 
-  toggle() {
-    this.showProgress = !this.showProgress;
-    if (this.showProgress) {
-      this.progressCounter--;
-    } else {
-      this.progressCounter++;
-    }
-    this.showProgress = this.get();
-  }
-
-  get() {
-    return this.progressCounter > 0;
+  private _get() {
+    const showProgress = this._progressCounter > 0;
+    this._subject$.next(showProgress);
+    return showProgress;
   }
 }

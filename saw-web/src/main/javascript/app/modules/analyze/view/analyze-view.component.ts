@@ -4,7 +4,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
 import * as findIndex from 'lodash/findIndex';
-import { HeaderProgressService } from '../../../common/services/header-progress.service';
+
 import { JwtService } from '../../../../login/services/jwt.service';
 import { AnalyzeService, EXECUTION_MODES } from '../services/analyze.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
@@ -53,7 +53,6 @@ export class AnalyzeViewComponent implements OnInit {
   };
   constructor(
     private _analyzeService: AnalyzeService,
-    private _headerProgress: HeaderProgressService,
     private _router: Router,
     private _route: ActivatedRoute,
     private _localStorage: LocalStorageService,
@@ -65,18 +64,26 @@ export class AnalyzeViewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.analysisId = this._route.snapshot.params.id;
+    this._route.params.subscribe(params => {
+      this.onParamsChange(params);
+    });
     const savedView = <string>this._localStorage.get(VIEW_KEY);
     this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
     savedView : this.LIST_VIEW;
+  }
+
+  onParamsChange(params) {
+    this.analysisId = params.id;
 
     this.canUserCreate = this._jwt.hasPrivilege('CREATE', {
       subCategoryId: this.analysisId
     });
 
-    this.categoryName = this._analyzeService.getCategory(this.analysisId).then(category => category.name);
-    this.loadAnalyses();
-    this.getCronJobs();
+    this.categoryName = this._analyzeService.getCategory(this.analysisId)
+      .then(category => category.name);
+
+    this.loadAnalyses(this.analysisId);
+    this.getCronJobs(this.analysisId);
   }
 
   onAction(event: AnalyzeViewActionEvent) {
@@ -84,7 +91,7 @@ export class AnalyzeViewComponent implements OnInit {
     case 'fork': {
       const { analysis, requestExecution } = event;
       if (analysis) {
-        this.loadAnalyses().then(() => {
+        this.loadAnalyses(this.analysisId).then(() => {
           if (requestExecution) {
             this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
           }
@@ -139,7 +146,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   afterPublish(analysis) {
-    this.getCronJobs();
+    this.getCronJobs(this.analysisId);
     /* Update the new analysis in the current list */
     this._router.navigate(
       ['analyze', analysis.categoryId]
@@ -159,9 +166,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   openNewAnalysisModal() {
-    this._headerProgress.show();
     this._analyzeService.getSemanticLayerData().then(metrics => {
-      this._headerProgress.hide();
       this._dialog.open(AnalyzeNewDialogComponent, {
         width: 'auto',
         height: 'auto',
@@ -173,33 +178,27 @@ export class AnalyzeViewComponent implements OnInit {
       } as MatDialogConfig).afterClosed().subscribe(event => {
         const { analysis, requestExecution } = event;
         if (analysis) {
-          this.loadAnalyses().then(() => {
+          this.loadAnalyses(this.analysisId).then(() => {
             if (requestExecution) {
               this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
             }
           });
         }
       });
-    }).catch(() => {
-      this._headerProgress.hide();
     });
   }
 
-  loadAnalyses() {
-    this._headerProgress.show();
-    return this._analyzeService.getAnalysesFor(this.analysisId).then(analyses => {
+  loadAnalyses(analysisId) {
+    return this._analyzeService.getAnalysesFor(analysisId).then(analyses => {
       this.analyses = analyses;
       this.filteredAnalyses = [...analyses];
-      this._headerProgress.hide();
-    }).catch(() => {
-      this._headerProgress.hide();
     });
   }
 
-  getCronJobs() {
+  getCronJobs(analysisId) {
     const token = this._jwt.getTokenObj();
     const requestModel = {
-      categoryId: this.analysisId,
+      categoryId: analysisId,
       groupkey: token.ticket.custCode
     };
     this._analyzeService.getAllCronJobs(requestModel).then(response => {

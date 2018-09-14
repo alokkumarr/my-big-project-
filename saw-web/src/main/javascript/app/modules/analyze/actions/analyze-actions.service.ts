@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
 import * as clone from 'lodash/clone';
-import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
 import { AnalyzeDialogService } from '../services/analyze-dialog.service';
@@ -25,7 +24,6 @@ export class AnalyzeActionsService {
     private _executeService: ExecuteService,
     private _publishService: PublishService,
     private _analyzeDialogService: AnalyzeDialogService,
-    private _headerProgress: HeaderProgressService,
     private _toastMessage: ToastService,
     public dialog: MatDialog
   ) {}
@@ -104,10 +102,8 @@ export class AnalyzeActionsService {
           .subscribe(analysis => {
             if (analysis) {
               const execute = true;
-              this._headerProgress.show();
               this._publishService.publishAnalysis(analysis, execute, type).then(
                 updatedAnalysis => {
-                  this._headerProgress.hide();
                   this._toastMessage.info(
                     execute
                       ? 'Analysis has been updated.'
@@ -116,7 +112,6 @@ export class AnalyzeActionsService {
                   resolve(updatedAnalysis);
                 },
                 () => {
-                  this._headerProgress.hide();
                   reject();
                 }
               );
@@ -137,10 +132,8 @@ export class AnalyzeActionsService {
           .subscribe(analysis => {
             if (analysis) {
               const execute = false;
-              this._headerProgress.show();
               this._publishService.publishAnalysis(analysis, execute, type).then(
                 updatedAnalysis => {
-                  this._headerProgress.hide();
                   this._toastMessage.info(
                     execute
                       ? 'Analysis has been updated.'
@@ -149,7 +142,6 @@ export class AnalyzeActionsService {
                   resolve(updatedAnalysis);
                 },
                 () => {
-                  this._headerProgress.hide();
                   reject();
                 }
               );
@@ -161,15 +153,12 @@ export class AnalyzeActionsService {
   }
 
   removeAnalysis(analysis) {
-    this._headerProgress.show();
     return this._analyzeService.deleteAnalysis(analysis).then(
       () => {
-        this._headerProgress.hide();
         this._toastMessage.info('Analysis deleted.');
         return true;
       },
       err => {
-        this._headerProgress.hide();
         this._toastMessage.error(err.message || 'Analysis not deleted.');
       }
     );

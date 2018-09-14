@@ -18,6 +18,7 @@ import { FilterService } from './services/filter.service';
 import { ChartService } from './services/chart.service';
 
 import { AnalyzeActionsService } from './actions/analyze-actions.service';
+import { DefaultAnalyzeCategoryGuard } from './guards';
 
 import { CommonModuleTs } from '../../common';
 import { UChartModule } from '../../common/components/charts';
@@ -59,6 +60,46 @@ import { AnalyzeDialogService } from './services/analyze-dialog.service';
 
 import { AnalyzePageComponent } from './page';
 
+const COMPONENTS = [
+  AnalyzeReportQueryComponent,
+  DesignerDialogComponent,
+  DesignerContainerComponent,
+  DesignerHeaderComponent,
+  DesignerToolbarComponent,
+  DesignerPivotComponent,
+  DesignerChartComponent,
+  DesignerReportComponent,
+  DesignerSettingsSingleTableComponent,
+  DesignerSettingsMultiTableComponent,
+  DesignerSettingsQueryComponent,
+  DesignerSettingsGroupComponent,
+  DesignerSettingsAuxComponent,
+  DesignerSettingsAuxChartComponent,
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent,
+  ExpandDetailChartComponent,
+  ToolbarActionDialogComponent,
+  DesignerSortComponent,
+  DesignerDescriptionComponent,
+  DesignerSaveComponent,
+  DesignerPreviewDialogComponent,
+  SingleTableDesignerLayout,
+  MultiTableDesignerLayout,
+  AnalyzePageComponent
+];
+
+const PIPES = [ArtifactColumns2PivotFieldsPipe];
+
+const SERVICES = [
+  AnalyzeDialogService,
+  AnalyzeService,
+  DesignerService,
+  FilterService,
+  ChartService,
+  AnalyzeActionsService
+];
+
+const GUARDS = [DefaultAnalyzeCategoryGuard];
 @NgModule({
   imports: [
     CommonModuleAngular4,
@@ -82,67 +123,13 @@ import { AnalyzePageComponent } from './page';
     AnalyzePublishDialogModule
   ],
   declarations: [
-    AnalyzeReportQueryComponent,
-    DesignerDialogComponent,
-    DesignerContainerComponent,
-    DesignerHeaderComponent,
-    DesignerToolbarComponent,
-    DesignerPivotComponent,
-    DesignerChartComponent,
-    DesignerReportComponent,
-    DesignerSettingsSingleTableComponent,
-    DesignerSettingsMultiTableComponent,
-    DesignerSettingsQueryComponent,
-    DesignerSettingsGroupComponent,
-    DesignerSettingsAuxComponent,
-    DesignerSettingsAuxChartComponent,
-    ExpandableFieldComponent,
-    ExpandDetailPivotComponent,
-    ExpandDetailChartComponent,
-    ToolbarActionDialogComponent,
-    DesignerSortComponent,
-    DesignerDescriptionComponent,
-    DesignerSaveComponent,
-    DesignerPreviewDialogComponent,
-    ArtifactColumns2PivotFieldsPipe,
-    SingleTableDesignerLayout,
-    MultiTableDesignerLayout,
-    AnalyzePageComponent
+    ...COMPONENTS,
+    ...PIPES
   ],
-  entryComponents: [
-    AnalyzeReportQueryComponent,
-    DesignerDialogComponent,
-    DesignerContainerComponent,
-    DesignerHeaderComponent,
-    DesignerToolbarComponent,
-    DesignerPivotComponent,
-    DesignerChartComponent,
-    DesignerReportComponent,
-    ExpandableFieldComponent,
-    ExpandDetailPivotComponent,
-    ExpandDetailChartComponent,
-    DesignerSettingsSingleTableComponent,
-    DesignerSettingsMultiTableComponent,
-    DesignerSettingsQueryComponent,
-    DesignerSettingsGroupComponent,
-    DesignerSettingsAuxComponent,
-    DesignerSettingsAuxChartComponent,
-    ToolbarActionDialogComponent,
-    DesignerSortComponent,
-    DesignerDescriptionComponent,
-    DesignerSaveComponent,
-    DesignerPreviewDialogComponent,
-    SingleTableDesignerLayout,
-    MultiTableDesignerLayout,
-    AnalyzePageComponent
-  ],
+  entryComponents: COMPONENTS,
   providers: [
-    AnalyzeDialogService,
-    AnalyzeService,
-    DesignerService,
-    FilterService,
-    ChartService,
-    AnalyzeActionsService
+    ...SERVICES,
+    ...GUARDS
   ]
 })
 export class AnalyzeModuleTs {}

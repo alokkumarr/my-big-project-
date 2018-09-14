@@ -13,7 +13,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { JwtService } from '../../../../login/services/jwt.service';
-import { ToastService } from '../../../common/services/toastMessage.service';
+import {
+  ToastService,
+  MenuService
+} from '../../../common/services';
 import AppConfig from '../../../../../../../appConfig';
 
 const apiUrl = AppConfig.api.url;
@@ -49,28 +52,15 @@ const MODULE_NAME = 'ANALYZE';
 @Injectable()
 export class AnalyzeService {
 
-  _menuResolver: any;
-  _menu: any;
   _executingAnalyses: Object = {};
   _executions: Object = {};
 
   constructor(
     private _http : HttpClient,
     private _jwtService: JwtService,
-    private _toastMessage: ToastService
-  ) {
-    this._menu = new Promise(resolve => {
-      this._menuResolver = resolve;
-    });
-  }
-
-  /* Maintains a list of analyses being executed.
-     Allows showing of execution badge across pages and possibly block
-     executions until current ones get completed */
-
-  updateMenu(menu) {
-    this._menuResolver(menu);
-  }
+    private _toastMessage: ToastService,
+    private _menu: MenuService
+  ) {}
 
   isExecuting(analysisId) {
     return EXECUTION_STATES.EXECUTING === this._executingAnalyses[analysisId];
@@ -229,11 +219,12 @@ export class AnalyzeService {
   }
 
   getCategories(privilege) {
+    const menuPromise = this._menu.getMenu(MODULE_NAME);
     if (!privilege) {
-      return this._menu;
+      return menuPromise;
     }
 
-    return this._menu.then(menu => {
+    return menuPromise.then(menu => {
       const menuClone = cloneDeep(menu);
       forEach(menuClone, menuFeature => {
         menuFeature.children = filter(menuFeature.children, menuSubFeature => {
@@ -247,7 +238,7 @@ export class AnalyzeService {
   getCategory(id) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
-    return this._menu.then(menu => {
+    return this._menu.getMenu(MODULE_NAME).then(menu => {
       const subCategories = flatMap(menu, category => category.children);
       return find(subCategories, sc => sc.id.toString() === id);
     });
