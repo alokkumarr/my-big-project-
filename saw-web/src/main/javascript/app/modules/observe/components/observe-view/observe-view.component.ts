@@ -26,6 +26,7 @@ import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { flatMap } from 'rxjs/operators';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -194,12 +195,36 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   deleteDashboard(): void {
-    this.observe.deleteDashboard(this.dashboard).subscribe(() => {
-      this.observe.reloadMenu().subscribe(menu => {
-        this.observe.updateSidebar(menu);
-        this.observe.redirectToFirstDash(menu, true);
+    const dashboardId = this.dashboard.entityId;
+    this.observe
+      .deleteDashboard(this.dashboard)
+      .pipe(
+        flatMap(() => {
+          if (
+            this.configService.getPreference(PREFERENCES.DEFAULT_DASHBOARD) ===
+            dashboardId
+          ) {
+            return this.configService.saveConfig([
+              {
+                key: PREFERENCES.DEFAULT_DASHBOARD,
+                value: null
+              },
+              {
+                key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
+                value: null
+              }
+            ]);
+          } else {
+            return Observable.of(true);
+          }
+        })
+      )
+      .subscribe(() => {
+        this.observe.reloadMenu().subscribe(menu => {
+          this.observe.updateSidebar(menu);
+          this.observe.redirectToFirstDash(menu, true);
+        });
       });
-    });
   }
 
   downloadDashboard() {
