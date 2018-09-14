@@ -1,4 +1,5 @@
 import { Component, Input, Inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { DOCUMENT } from '@angular/platform-browser';
 import * as isUndefined from 'lodash/isUndefined';
 import { SidenavComponent } from '../sidenav';
@@ -21,13 +22,13 @@ export class AccordionMenuLinkComponent {
   constructor(
     @Inject(DOCUMENT) private document: any,
     private configService: ConfigService,
-    public leftSideNav: SidenavComponent
+    public leftSideNav: SidenavComponent,
+    private router: Router
   ) {}
 
   public url: string;
   public expanded: boolean;
   public active: boolean;
-  public pathUrl: string;
 
   ngOnInit() {
     this.expanded = false;
@@ -48,27 +49,26 @@ export class AccordionMenuLinkComponent {
     return id === defaultDashboard;
   }
 
-  checkActiveMenu(linkUrl) {
+  checkActiveMenu(linkUrl, queryParams) {
     this.url = location.hash;
-    if (this.url === linkUrl) {
-      return true;
-    }
-    return false;
+    const urlTree = this.router.createUrlTree(linkUrl, { queryParams });
+    return this.url === `#${this.router.serializeUrl(urlTree)}`;
   }
 
   expandLoadedPanel() {
-    const url = location.hash.split('#')[1];
+    const path = location.hash.split('#')[1];
 
-    if (/^\/observe/.test(url) || /^\/workbench/.test(url)) {
+    if (/^\/observe/.test(path) || /^\/workbench/.test(path)) {
       /* If observe module / workbench, open all levels by default */
       this.expanded = true;
       return;
     }
 
-    this.pathUrl = '#' + url;
     if (this.checkPanel()) {
-      for (let i = 0; i < this.metadata.children.length - 1; i++) {
-        if (this.pathUrl === this.metadata.children[i].url) {
+      for (let i = 0; i < this.metadata.children.length; i++) {
+        const { url, queryParams } = this.metadata.children[i];
+        const urlTree = this.router.createUrlTree(url, { queryParams });
+        if (path === this.router.serializeUrl(urlTree)) {
           this.expanded = true;
         }
       }
