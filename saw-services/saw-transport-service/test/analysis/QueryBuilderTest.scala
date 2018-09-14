@@ -1,8 +1,7 @@
-import org.json4s.native.JsonMethods._
 
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
-import org.json4s.native.JsonMethods.parse
+
 import org.scalatest.FunSpec
 import org.scalatest.MustMatchers
 
@@ -93,30 +92,33 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(orderBy(orderByA, orderByB)
       ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
     }
+    it("should only have sqlBuilders dataFields columns in SELECT") {
+      query(artifactT)(sqlBuilderPrep(dataFields("t")()("a","b","c")(""))
+      ) must be ("SELECT t.a, t.b, t.c FROM t")
+    }
   }
 
   describe("Query built from analysis with group by") {
     it("with sum should have aggregate function in FROM clause") {
-      query(artifactT)(groupBy(groupByColumn("t", "b", "sum"))
-      ) must be ("SELECT t.a, SUM(t.b) FROM t GROUP BY t.a")
+      query(artifactT)(sqlBuilderPrep(dataFields("t")("a")("b","c")("SUM"))
+      ) must be ("SELECT SUM(t.a), t.b, t.c FROM t GROUP BY t.b, t.c")
     }
     it("with avg should have aggregate function in FROM clause") {
-      query(artifactT)(groupBy(groupByColumn("t", "b", "avg"))
-      ) must be ("SELECT t.a, AVG(t.b) FROM t GROUP BY t.a")
+      query(artifactT)(sqlBuilderPrep(dataFields("t")("b")("a")("AVG"))
+      ) must be ("SELECT AVG(t.b), t.a FROM t GROUP BY t.a")
     }
     it("with min should have aggregate function in FROM clause") {
-      query(artifactT)(groupBy(groupByColumn("t", "b", "min"))
-      ) must be ("SELECT t.a, MIN(t.b) FROM t GROUP BY t.a")
+      query(artifactT)(sqlBuilderPrep(dataFields("t")("b","c")("a")("MIN"))
+      ) must be ("SELECT MIN(t.b), MIN(t.c), t.a FROM t GROUP BY t.a")
     }
     it("with max should have aggregate function in FROM clause") {
-      query(artifactT)(groupBy(groupByColumn("t", "b", "max"))
-      ) must be ("SELECT t.a, MAX(t.b) FROM t GROUP BY t.a")
+      query(artifactT)(sqlBuilderPrep(dataFields("t")("b")()("MAX"))
+      ) must be ("SELECT MAX(t.b) FROM t")
     }
     it("with multiple columns should have aggregates in FROM clause") {
-      query(artifactW)(groupBy(
-        groupByColumn("w", "g", "min"),
-        groupByColumn("w", "h", "max"))
-      ) must be ("SELECT MIN(w.g), MAX(w.h), w.i FROM w GROUP BY w.i")
+      query(artifactW)(sqlBuilderPrep(dataFields("w")("a")("b","c")("AVG"),
+        dataFields("w")("d")("e","f")("COUNT"))
+      ) must be ("SELECT AVG(w.a), w.b, w.c, COUNT(w.d), w.e, w.f FROM w GROUP BY w.b, w.c, w.e, w.f")
     }
   }
 
@@ -224,14 +226,14 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     ("order", order)
   }
 
-  private def groupBy(columns: JObject*) = {
-    ("groupByColumns", columns)
+  private def sqlBuilderPrep(dataFields: JObject*): JObject = {
+    ("dataFields",dataFields)
   }
 
-  private def groupByColumn(tableName: String, columnName: String,
-    function: String) = {
-    ("tableName", tableName) ~
-    ("columnName", columnName) ~
-    ("function", function)
+  private def dataFields(name: String)(aggColumns: String*)
+                        (nonAggColumns : String*)(agg:String): JObject = {
+    ("tableName", name) ~
+      ("columns", aggColumns.map(("columnName", _) ~ ("checked", true)~ ("aggregate",agg)) ++
+        nonAggColumns.map(("columnName", _) ~ ("checked", true)))
   }
 }
