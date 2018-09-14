@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
+import * as orderBy from 'lodash/orderBy';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { startWith } from 'rxjs/operators/startWith';
@@ -26,33 +27,40 @@ export class DesignerFilterRowComponent {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
   @Output() public filterModelChange: EventEmitter<null> = new EventEmitter();
-  @Input() public artifactColumns: ArtifactColumn[];
   @Input() public filter: Filter;
   @Input() public isInRuntimeMode: boolean;
   @Input() public supportsGlobalFilters: boolean;
 
   @ViewChild('auto', { read: ViewContainerRef })
   _autoComplete: ViewContainerRef;
+  artifactColumns: ArtifactColumn[];
   public TYPE_MAP = TYPE_MAP;
   formControl: FormControl;
   filteredColumns: Observable<ArtifactColumn[]>;
+
+  @Input('artifactColumns')
+  set _artifactColumns(data: ArtifactColumn[]) {
+    this.artifactColumns = orderBy(data, 'displayName');
+  }
 
   constructor() {
     this.displayWith = this.displayWith.bind(this);
   }
 
   ngOnInit() {
-    const target = find(this.artifactColumns, ({columnName}) => columnName === this.filter.columnName);
+    const target = find(
+      this.artifactColumns,
+      ({ columnName }) => columnName === this.filter.columnName
+    );
     this.formControl = new FormControl({
       value: target,
       disabled: this.isInRuntimeMode
     });
-    this.filteredColumns = this.formControl.valueChanges
-      .pipe(
-        startWith<string | ArtifactColumn>(''),
-        map(value => typeof value === 'string' ? value : value.displayName),
-        map(name => name ? this.nameFilter(name) : this.artifactColumns.slice())
-      );
+    this.filteredColumns = this.formControl.valueChanges.pipe(
+      startWith<string | ArtifactColumn>(''),
+      map(value => (typeof value === 'string' ? value : value.displayName)),
+      map(name => (name ? this.nameFilter(name) : this.artifactColumns.slice()))
+    );
 
     if (this.filter.isRuntimeFilter) {
       delete this.filter.model;

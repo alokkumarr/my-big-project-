@@ -7,9 +7,11 @@ sip-proxy
 
 [saw-web]
 sip-app1
+sip-app2
 
 [saw-services]
 sip-app1
+sip-app2
 
 [saw-services:vars]
 #
@@ -103,6 +105,10 @@ saw_export_chunk_size=10000
 
 [saw-security]
 sip-app1
+sip-app2
+
+[saw-security-arbitrator]
+sip-app3
 
 [saw-security:vars]
 #
