@@ -96,6 +96,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   dataGrid: DxDataGridComponent;
   @Input()
   query: string;
+  @Input() isInQueryMode;
   @Input()
   analysis;
   @Input()
@@ -146,7 +147,9 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    this.columns = this.artifacts2Columns(this.analysis.artifacts);
+    if (!this.isInQueryMode) {
+      this.columns = this.artifacts2Columns(this.analysis.artifacts);
+    }
     this.data = this.trimDataContainingAggregation(data);
   }
   @Input('dataLoader')
@@ -209,6 +212,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public loadPanel;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
+  public isQueryMode;
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
     self = this;
