@@ -25,6 +25,8 @@ const CONFIG_KEY = 'sipConfig';
 
 @Injectable()
 export class ConfigService {
+  private cache: Configuration;
+
   constructor(private httpClient: HttpClient) {}
 
   private loadConfig(): Observable<Configuration> {
@@ -47,6 +49,7 @@ export class ConfigService {
 
   private cacheConfig(config: Configuration) {
     window.localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    this.cache = config;
   }
 
   /**
@@ -65,13 +68,15 @@ export class ConfigService {
    * @returns {string}
    */
   getPreference(preferenceName: string): string {
-    const rawConfig = window.localStorage.getItem(CONFIG_KEY);
-    const config = rawConfig ? JSON.parse(rawConfig) : null;
+    if (!this.cache) {
+      const rawConfig = window.localStorage.getItem(CONFIG_KEY);
+      this.cache = rawConfig ? JSON.parse(rawConfig) : null;
+    }
 
-    if (!config) return null;
+    if (!this.cache) return null;
 
     const pref = find(
-      config.preferences,
+      this.cache.preferences,
       p => p.preferenceName === preferenceName
     );
 

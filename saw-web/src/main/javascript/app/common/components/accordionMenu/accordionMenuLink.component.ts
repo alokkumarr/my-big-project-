@@ -2,6 +2,10 @@ import { Component, Input, Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/platform-browser';
 import * as isUndefined from 'lodash/isUndefined';
 import { SidenavComponent } from '../sidenav';
+import {
+  ConfigService,
+  PREFERENCES
+} from '../../services/configuration.service';
 
 const template = require('./accordionMenuLink.component.html');
 require('./accordionMenuLink.component.scss');
@@ -16,6 +20,7 @@ export class AccordionMenuLinkComponent {
 
   constructor(
     @Inject(DOCUMENT) private document: any,
+    private configService: ConfigService,
     public leftSideNav: SidenavComponent
   ) {}
 
@@ -30,11 +35,17 @@ export class AccordionMenuLinkComponent {
     this.active = false;
   }
 
-  checkDefault({ id }) {
-    return (
-      id ===
-      'd7e4f939-94c9-4e31-b1d2-e8f51f2640e7::PortalDataSet::1532634613604'
+  /**
+   * Check whether this link is to a default dashboard
+   *
+   * @param {id} Id of the dashboard
+   * @returns {boolean}
+   */
+  checkDefault({ id }): boolean {
+    const defaultDashboard = this.configService.getPreference(
+      PREFERENCES.DEFAULT_DASHBOARD
     );
+    return id === defaultDashboard;
   }
 
   checkActiveMenu(linkUrl) {
