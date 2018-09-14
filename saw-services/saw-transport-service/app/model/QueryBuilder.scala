@@ -324,6 +324,9 @@ object QueryBuilder extends {
             val aggregate = (col \ "aggregate")
            !(aggregate ==JNothing || aggregate == None)
           })
+          // In case of multiple artifacts join if one artifacts contains the
+          // aggregate then another artifacts columns should be considered as
+          // group by columns. initialise the flag to detect that.
           if (aggregateColumns.size > 0 && columns.size > aggregateColumns.size)
             aggregateFlag=true;
           if (aggregateFlag) {
@@ -335,13 +338,13 @@ object QueryBuilder extends {
             // return groupByColumn
             groupByColumns
           }
-          // No aggregate column present return the empty string.
           else
+          // No aggregate column present return the empty string.
             None
         })
       }
     }
-    if (groupByColumns != None && groupByColumns.size>0)
+    if (groupByColumns!=null && groupByColumns != None && groupByColumns.size>0)
       "GROUP BY " + (groupByColumns).mkString(", ")
     else ""
   }

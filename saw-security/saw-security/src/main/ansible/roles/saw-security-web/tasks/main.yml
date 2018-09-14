@@ -17,5 +17,7 @@
   command: /opt/bda/saw-security/bin/conf_init
 - name: Run SAW Security initial database setup
   command: /opt/bda/saw-security/db/setup/init
+  # Note: Run database initialization only on one of the nodes
+  when: "groups['saw-security'].index(inventory_hostname) == 0"
 - name: Enable SAW Security service
   systemd: name=saw-security enabled=true daemon_reload=true
