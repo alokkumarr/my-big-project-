@@ -27,9 +27,9 @@
     [paging]="paging">
     <div class="headerCellTemplate" *dxTemplate="let cell of 'headerCellTemplate'">
       <div fxLayout="row" class="header-details">
-        <mat-icon class="selected-aggregate" *ngIf="cell.column.payload.aggregate" [style.width.px]="26" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
+        <mat-icon class="selected-aggregate" *ngIf="cell.column.payload.aggregate && !isInQueryMode" [style.width.px]="26" [fontIcon]="cell.column.payload.aggregate ? AGGREGATE_TYPES_OBJ[cell.column.payload.aggregate].icon : ''"></mat-icon>
         <span class="column-name">{{cell.column.caption}}</span>
-        <mat-icon *ngIf="isEditable" class="column-menu" [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
+        <mat-icon *ngIf="isEditable && !isInQueryMode" class="column-menu" [matMenuTriggerFor]="menu" fontIcon="icon-expand"></mat-icon>
         <mat-menu #menu="matMenu" class="menu-buttons">
           <button class="report-options" mat-menu-item [matMenuTriggerFor]="aggregations" (mouseenter)="fetchAggregation(cell.column.payload.type)">
           <mat-icon fontIcon="icon-more"></mat-icon>
