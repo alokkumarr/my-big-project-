@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.synchronoss.querybuilder.model.report.Column;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,6 @@ import com.squareup.okhttp.Response;
 
 import com.synchronoss.querybuilder.ReportAggregationBuilder;
 import com.synchronoss.querybuilder.model.kpi.KPIExecutionObject;
-import com.synchronoss.querybuilder.model.report.DataField;
 import com.synchronoss.querybuilder.model.report.SqlBuilder;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
@@ -172,9 +172,11 @@ public class SAWElasticTransportService {
       JsonNode node =null;
       try {
           SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(reportDefinition, "sqlBuilder");
-         List<DataField> aggregationField = ReportAggregationBuilder.getAggregationField(sqlBuilderNode.getDataFields());
+
+         List<Column> aggregationField = ReportAggregationBuilder.getAggregationField(
+             sqlBuilderNode.getDataFields().get(0).getColumns());
           ESReportAggregationParser esReportAggregationParser = new ESReportAggregationParser(
-                  sqlBuilderNode.getDataFields(),aggregationField);
+                  sqlBuilderNode.getDataFields().get(0).getColumns(),aggregationField);
           List<Object> data = esReportAggregationParser.parseData(jsonNode);
           ObjectMapper mapper = new ObjectMapper();
            node = mapper.valueToTree(data);
