@@ -4,6 +4,7 @@
     dest: "{{ inventory_dir + '/sip-security-db-password' }}"
     flat: yes
     fail_on_missing: no
+  when: "groups['saw-security'].index(inventory_hostname) == 0"
 - name: Look up Security Service database password
   set_fact:
     saw_security_db_password: >-
