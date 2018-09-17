@@ -1,0 +1,15 @@
+# Workaround: See related comment about MariaDB version in
+# "../../saw-security/tasks/main.yml".  Remove the MariaDB repository
+# when CentOS defaults to MariaDB 10 or higher.
+- name: Install MariaDB package repository
+  yum_repository:
+    name: mariadb
+    description: MariaDB repository
+    baseurl: http://yum.mariadb.org/10.3/centos7-amd64
+    gpgcheck: no
+- name: Install MariaDB package
+  yum: name=mariadb-server state=present
+- name: Install MariaDB Galera cluster arbitrator configuration
+  template: src=garb.sh dest=/etc/sysconfig/garb
+- name: Enable and start MariaDB Galera cluster arbitrator service
+  systemd: name=garb enabled=true state=started
