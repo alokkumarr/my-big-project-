@@ -152,7 +152,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       const artifact = this.fetchColumsUponCheck();
       this.columns = this.artifacts2Columns(artifact);
     }
-    this.data = this.trimDataContainingAggregation(data);
+    this.data = this.trimColumnName(data);
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -485,7 +485,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     return {};
   }
 
-  trimDataContainingAggregation(data) {
+  trimColumnName(data) {
     let intermediateData = [];
     data.map(row => {
       let obj = {};

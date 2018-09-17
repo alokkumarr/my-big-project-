@@ -429,7 +429,7 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
-  trimDataContainingAggregation(data) {
+  trimColumnName(data) {
     let intermediateData = [];
     data.map(row => {
       let obj = {};
@@ -471,7 +471,7 @@ export class ExecutedViewComponent implements OnInit {
 
           this.setExecutedBy(executedBy);
           this.setExecutedAt(executionId);
-          return { data: this.trimDataContainingAggregation(data), totalCount: count };
+          return { data: this.trimColumnName(data), totalCount: count };
         },
         err => {
           this._headerProgressService.hide();
