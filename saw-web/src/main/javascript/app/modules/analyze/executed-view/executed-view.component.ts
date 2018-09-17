@@ -22,12 +22,11 @@ import { HeaderProgressService } from '../../../common/services/header-progress.
 import { ToastService } from '../../../common/services/toastMessage.service';
 import {
   flattenPivotData,
-  flattenChartData
+  flattenChartData,
+  flattenReportData
 } from '../../../common/utils/dataFlattener';
 import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeActionsService } from '../actions';
-import * as isUndefined from 'lodash/isUndefined';
-import * as forEach from 'lodash/forEach';
 
 import { Analysis } from '../types';
 import {
@@ -429,32 +428,6 @@ export class ExecutedViewComponent implements OnInit {
     }
   }
 
-  trimColumnName(data) {
-    let intermediateData = [];
-    data.map(row => {
-      let obj = {};
-      for (var key in row) {
-        let aggregateKey = key.split('(');
-        if (!isUndefined(aggregateKey[1])) {
-          forEach(this.analysis.artifacts, artifactscolumns => {
-            forEach(artifactscolumns.columns, col =>  {
-              if (
-                col.aggregate === aggregateKey[0] &&
-                col.columnName ===
-                  aggregateKey[1].substring(0, aggregateKey[1].length - 1)
-              ) {
-                obj[col.columnName] = row[key];
-              }
-            });    
-          });
-        } else {
-          obj[key] = row[key];
-        }
-      }
-      intermediateData.push(obj);
-    });
-    return intermediateData;
-  }
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     this._headerProgressService.show();
@@ -471,7 +444,7 @@ export class ExecutedViewComponent implements OnInit {
 
           this.setExecutedBy(executedBy);
           this.setExecutedAt(executionId);
-          return { data: this.trimColumnName(data), totalCount: count };
+          return { data: flattenReportData(data, this.analysis), totalCount: count };
         },
         err => {
           this._headerProgressService.hide();

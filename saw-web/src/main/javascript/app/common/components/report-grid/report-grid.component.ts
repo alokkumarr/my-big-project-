@@ -53,6 +53,10 @@ import {
 import { componentFactoryName } from '@angular/compiler';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
+import {
+  flattenReportData
+} from '../../../common/utils/dataFlattener';
+
 const template = require('./report-grid.component.html');
 require('./report-grid.component.scss');
 
@@ -152,7 +156,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       const artifact = this.fetchColumsUponCheck();
       this.columns = this.artifacts2Columns(artifact);
     }
-    this.data = this.trimColumnName(data);
+    this.data = flattenReportData(data, this.analysis)
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -483,31 +487,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     }
     return {};
-  }
-
-  trimColumnName(data) {
-    let intermediateData = [];
-    data.map(row => {
-      let obj = {};
-      for (var key in row) {
-        let aggregateKey = key.split('(');
-        if (!isUndefined(aggregateKey[1])) {
-          forEach(this.columns, col => {
-            if (
-              col.payload.aggregate === aggregateKey[0] &&
-              col.payload.columnName ===
-                aggregateKey[1].substring(0, aggregateKey[1].length - 1)
-            ) {
-              obj[col.payload.columnName] = row[key];
-            }
-          });
-        } else {
-          obj[key] = row[key];
-        }
-      }
-      intermediateData.push(obj);
-    });
-    return intermediateData;
   }
 
   fetchColumsUponCheck() {

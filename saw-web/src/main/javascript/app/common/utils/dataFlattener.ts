@@ -10,6 +10,7 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
+import * as forEach from 'lodash/forEach';
 
 
 export function flattenPivotData(data, sqlBuilder) {
@@ -118,6 +119,33 @@ export function flattenChartData(data, sqlBuilder) {
       return flattenedData;
     }
   )(data);
+}
+
+export function flattenReportData(data, analysis) {
+  let intermediateData = [];
+    data.map(row => {
+      let obj = {};
+      for (var key in row) {
+        let aggregateKey = key.split('(');
+        if (!isUndefined(aggregateKey[1])) {
+          forEach(this.analysis.artifacts, artifactscolumns => {
+            forEach(artifactscolumns.columns, col =>  {
+              if (
+                col.aggregate === aggregateKey[0] &&
+                col.columnName ===
+                  aggregateKey[1].substring(0, aggregateKey[1].length - 1)
+              ) {
+                obj[col.columnName] = row[key];
+              }
+            });    
+          });
+        } else {
+          obj[key] = row[key];
+        }
+      }
+      intermediateData.push(obj);
+    });
+    return intermediateData;
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
