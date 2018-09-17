@@ -13,7 +13,7 @@ export class ExecutedReportViewComponent {
     this.analysis = analysis;
     // if in query mode, don't send the artifacts, just use the column names in the data
     // TODO use the columns from the query
-    const isEsReport = analysis.esRepository.storageType === 'ES';
+    const isEsReport = analysis.type === 'esReport';
     const isInQueryMode = analysis.edit;
     const dataFields = analysis.sqlBuilder.dataFields;
 

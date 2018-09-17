@@ -29,6 +29,7 @@ import { DATE_FORMATS_OBJ } from '../../consts.js';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
 
 import {
   AGGREGATE_TYPES,
@@ -147,8 +148,9 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    if (!this.isInQueryMode) {
-      this.columns = this.artifacts2Columns(this.artifacts);
+    if (!this.isInQueryMode) {      
+      const artifact = this.fetchColumsUponCheck();
+      this.columns = this.artifacts2Columns(artifact);
     }
     this.data = this.trimDataContainingAggregation(data);
   }
@@ -506,5 +508,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       intermediateData.push(obj);
     });
     return intermediateData;
+  }
+
+  fetchColumsUponCheck() {
+     return map(this.analysis.artifacts, artifact => {
+      const columns = filter(artifact.columns, 'checked');
+      return {
+        ...artifact,
+        columns
+      };
+    })
   }
 }
