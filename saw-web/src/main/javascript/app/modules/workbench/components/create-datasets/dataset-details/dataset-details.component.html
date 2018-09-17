@@ -85,7 +85,7 @@
         <section class="input-section">
           <mat-form-field class="margin20">
             <mat-chip-list #chipList>
-              <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" removable="true" (remove)="removeFormat(format)">
+              <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" [removable]="true" (removed)="removeFormat(format)">
                 {{format}}
                 <mat-icon fontIcon="icon-remove" matChipRemove></mat-icon>
               </mat-chip>
