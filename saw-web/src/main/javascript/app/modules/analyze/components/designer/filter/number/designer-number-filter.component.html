@@ -1,11 +1,12 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-form-field *ngIf="filterModel.operator === BETWEEN_NUMBER_FILTER_OPERATOR.value">
+  <mat-form-field style="margin-right: 10px; max-width: 100px"
+                  *ngIf="filterModel.operator === BETWEEN_NUMBER_FILTER_OPERATOR.value">
     <input matInput type="number"
             (input)="onOtherValueChange($event.target.value)"
             [value]="filterModel.otherValue"/>
   </mat-form-field>
 
-  <mat-form-field class="select-form-field" appearance="outline">
+  <mat-form-field class="select-form-field" style="max-width: 150px" appearance="outline">
     <mat-label>Operator</mat-label>
     <mat-select e2e="filter-number-operator-select"
                 (selectionChange)="onOperatorChange($event.value)"
@@ -17,7 +18,7 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field style="margin-left: 10px;">
+  <mat-form-field style="margin-left: 10px; max-width: 100px;">
     <input matInput type="number"
             e2e="designer-number-filter-input"
             (input)="onValueChange($event.target.value)"

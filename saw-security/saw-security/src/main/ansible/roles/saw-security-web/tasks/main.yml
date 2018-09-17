@@ -1,3 +1,19 @@
+- name: Migrate Security Service database password from old location
+  fetch:
+    src: /etc/bda/saw-security-db-password
+    dest: "{{ inventory_dir + '/sip-security-db-password' }}"
+    flat: yes
+    fail_on_missing: no
+- name: Look up Security Service database password
+  set_fact:
+    saw_security_db_password: >-
+      {{ lookup('password', inventory_dir + '/sip-security-db-password') }}
+- name: Create the /etc/bda directory
+  file: path=/etc/bda state=directory mode=0755
+- name: Set the SAW Security Service database password
+  copy:
+    content: "{{ saw_security_db_password }}"
+    dest: /etc/bda/saw-security-db-password
 - name: Create SAW Security group
   group: name=saw
 - name: Create SAW Security user
