@@ -185,14 +185,14 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             searchSourceBuilder.query(boolQueryBuilder);
         }
 
-        List<DataField> dataFields =
-                sqlBuilderNode.getDataFields();
+        List<Column> dataFields =
+                sqlBuilderNode.getDataFields().get(0).getColumns();
         ReportAggregationBuilder reportAggregationBuilder = new ReportAggregationBuilder(size);
-        List<DataField> aggregationFields = ReportAggregationBuilder.getAggregationField(dataFields);
+        List<Column> aggregationFields = ReportAggregationBuilder.getAggregationField(dataFields);
         AggregationBuilder finalAggregationBuilder =null;
 
         boolean isPercentage = dataFields.stream().anyMatch(dataField ->
-                dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
+                dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(Column.Aggregate.PERCENTAGE.value()));
 
         //pre-calculation for percentage.
         if(isPercentage)
@@ -208,7 +208,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             JsonNode objectNode = objectMapper.readTree(result);
             dataFields.forEach (dataField -> {
                 String columnName = dataField.getColumnName();
-                if(dataField.getAggregate()!=null && dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
+                if(dataField.getAggregate()!=null && dataField.getAggregate().equals(Column.Aggregate.PERCENTAGE))
                 dataField.getAdditionalProperties()
                         .put(columnName+SUM, String.valueOf(objectNode.get(columnName
                         ).get(VALUE)));
@@ -254,12 +254,12 @@ public class SAWReportTypeElasticSearchQueryBuilder {
      * This method will return all the list of columns which required for ES report.
      * @param dataFields
      */
-    private String [] getFieldsInclude( List<DataField> dataFields)
+    private String [] getFieldsInclude( List<Column> dataFields)
     {
         String [] fieldsIncludes = new String[dataFields.size()];
         int count =0;
         /** Iterate the Data fields to include */
-        for (DataField dataField : dataFields)
+        for (Column dataField : dataFields)
         {
            String columnName = dataField.getColumnName();
             /** .keyword may present in the es-mapping fields
