@@ -1,7 +1,7 @@
 package sncr.datalake.handlers
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.{JArray, JValue}
+import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.DLSession
@@ -27,7 +27,7 @@ trait HasDataObject[H<:DLSession] {
       m_log.info("HasDataObject.node: {}", node)
     })
   }
-
+  // This overloaded method has been introduced to the change related to SIP-4226 & SIP-4220
   def loadData(repositories: List[JValue], node:H, limit: Integer): Unit =
   {
     var name : String =null
@@ -41,7 +41,7 @@ trait HasDataObject[H<:DLSession] {
       format = (repo \ "format").extract[String]
       m_log.trace("format : {}", format)
       node.lastUsed = System.currentTimeMillis()
-      m_log.info("node.loadObject name: {}", name + " location :" + location + " format :" + format)
+      m_log.trace("node.loadObject name: {}", name + " location :" + location + " format :" + format)
       node.loadObject(name, location, format)
     })
   }
@@ -59,7 +59,7 @@ object HasDataObject {
       throw new DAException(ErrorCodes.InvalidDataObject, s"Definition not found, Row ID: ${Bytes.toString(dataObject.getRowKey)}")
     val ldesc: JValue = dRaw.get match {
       case x: JValue => x
-      case s: String => parse(s, false, false)
+      case s: String => parse(s, false)
     }
     val formatDO = (ldesc \ "type").extractOpt[String]
     val nameDO = (ldesc \ "name").extractOpt[String]

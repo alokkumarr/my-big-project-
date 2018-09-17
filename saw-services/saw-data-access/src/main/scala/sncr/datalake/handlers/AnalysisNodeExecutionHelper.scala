@@ -9,7 +9,6 @@ import java.util.UUID
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import com.typesafe.config.Config
 import org.json.JSONException
-import org.json4s.{JArray, JNothing}
 import org.json4s.JsonAST.{JObject, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -29,11 +28,12 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
   resId = if (resId == null || resId.isEmpty) UUID.randomUUID().toString else resId
-
-  def setFinishTime = { finishedTS =  System.currentTimeMillis }
-  def setStartTime = { startTS =  System.currentTimeMillis }
+  // This has been modified due to version incompatibility issue with json4s 3.3.0 version
+  def setFinishTime = { finishedTS =  java.math.BigInteger.valueOf(System.currentTimeMillis())   }
+  def setStartTime = { startTS =  java.math.BigInteger.valueOf(System.currentTimeMillis())   }
 
   if (an.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "AnalysisNode")
+  // The below has been commented due to the change related to SIP-4226 & SIP-4220
   //if (an.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "AnalysisNode")
 
   private val dAnalysisDescRaw = an.getCachedData.get(key_Definition.toString)
@@ -43,10 +43,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
 
   val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
   private val conf: Config = SAWServiceConfig.spark_conf
-   
+
+  // The below has been commented due to the change related to SIP-4226 & SIP-4220
   //dataObjects = an.loadRelationElements.map( _.asInstanceOf[DataObject])
-  //m_log.info("AnalysisNodeExecutionHelper.dataObjects: {}", dataObjects)
-  //TODO:: Should not be here, if consistency mechanism is in place -- remove it, unnecessary
   // if (dataObjects.isEmpty) throw new DAException(ErrorCodes.DataObjectNotLoaded, "AnalysisNode")
 
   //if (cacheIt) DLSession.pinToCache(this)
@@ -54,7 +53,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   val definition: JValue =
     dAnalysisDescRaw.get match {
       case x: JValue => x
-      case s: String => parse(s, false, false)
+      case s: String => parse(s, false)
       case _  =>
         val m = "Incorrect AnalysisNode representation"; m_log error m
         throw new Exception(m)
@@ -90,8 +89,8 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   var lastSQLExecRes = -1
   var execResult : java.util.List[java.util.Map[String, (String, Object)]] = null
   var isDataLoaded = false
-  var startTS : java.lang.Long = System.currentTimeMillis()
-  var finishedTS: Long =  System.currentTimeMillis()
+  var startTS : java.math.BigInteger = java.math.BigInteger.valueOf(System.currentTimeMillis())
+  var finishedTS: java.math.BigInteger = java.math.BigInteger.valueOf(System.currentTimeMillis())
   /**
     * Specific to AnalysisNode method to load data objects
     */
@@ -110,6 +109,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     }
     try
     { // Using overloaded method
+      // This overloaded method has been introduced to the change related to SIP-4226 & SIP-4220
       loadData(repositories, this, DLConfiguration.rowLimit);
       isDataLoaded = true
     }
@@ -224,11 +224,11 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
 
     createAnalysisResultHeader(resId)
     saveData(analysisKey, outputLocation, outputType)
-    finishedTS = System.currentTimeMillis
+    finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
-      JField("execution_finish_ts", JLong(finishedTS)),
+      JField("execution_finish_ts", JInt(finishedTS)),
       JField("executionType", JString(executionType)),
-      JField("exec-code", JLong(lastSQLExecRes)),
+      JField("exec-code", JInt(lastSQLExecRes)),
       JField("exec-msg", JString(lastSQLExecMessage))
     ))
     resultNode.setDescriptor(compact(render(newDescriptor)))
@@ -259,7 +259,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     val previewLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(initOutputLocation)+
       File.separator+ "preview-"+resId
     saveData(analysisKey,previewLocation , outputType)
-    finishedTS = System.currentTimeMillis
+    finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     m_log debug("finishedTS:"+ finishedTS)
   }
 
@@ -272,10 +272,10 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     */
   def completeAnalysisResult: Unit = {
     saveData(analysisKey, outputLocation, outputType)
-    finishedTS = System.currentTimeMillis
+    finishedTS = java.math.BigInteger.valueOf(System.currentTimeMillis())
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
-      JField("execution_finish_ts", JLong(finishedTS)),
-      JField("exec-code", JLong(lastSQLExecRes)),
+      JField("execution_finish_ts", JInt(finishedTS)),
+      JField("exec-code", JInt(lastSQLExecRes)),
       JField("exec-msg", JString(lastSQLExecMessage))
     ))
     resultNode.setDescriptor(compact(render(newDescriptor)))
@@ -288,7 +288,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   def setPreDefinedResultKey(resultId : String) : Unit =  analysisResultNodeID = resultId
 
 
-  def getStartTS: Long = startTS
+  def getStartTS: java.math.BigInteger   = startTS
 
 
   /**
@@ -335,7 +335,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       JField("id", JString(analysisId.get)),
       JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
       JField("sql", JString(sql)),
-      JField("execution_start_ts", JLong(startTS)),
+      JField("execution_start_ts", JInt(startTS)),
       JField("outputType", JString(outputType)),
       JField("outputLocation", JString(outputLocation))
     ))

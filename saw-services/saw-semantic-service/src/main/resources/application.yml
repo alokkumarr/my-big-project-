@@ -32,4 +32,5 @@ semantic:
     workbench-url:  http://localhost:9700
     transport-metadata-url:  http://localhost:9200
     binary-migration-requires: true
+    migration-metadata-home: /var/sip/
     

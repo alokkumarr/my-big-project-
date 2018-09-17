@@ -100,7 +100,7 @@ class DataObjectRequestProcessor (a_docAsJson : JValue, a_printPretty: Boolean =
         val content: JValue =
           d("DL_DataLocation") match {
             case jv: JValue => jv
-            case s: String => parse(s, false, false)
+            case s: String => parse(s, false)
             case _ => val m = "Could not build content mapping, unsupported representation"
               m_log error m
               JObject(Nil)

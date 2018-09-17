@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID
 
 import model.{ClientException, PaginateDataSet, QueryBuilder, TransportUtils}
-import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue}
+import org.json4s.JsonAST.{JArray, JObject, JString, JValue}
 import org.json4s.JsonDSL._
 import org.json4s._
 import org.json4s.native.JsonMethods._
@@ -149,51 +149,41 @@ class Analysis extends BaseController {
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
 
-        // TODO: construction of the URL from the property & invoke new method
+        // This block has been commented change related to SIP-4226 & SIP-4220
         // val semanticJson = readSemanticJson(semanticId)
         // m_log.trace("only semanticJson read : {}", writePretty(semanticJson));
-
-        m_log.trace("semantic details : {}", semanticHost + semanticEndpoint + semanticId);
-        // TODO: The below block starts here which will be used in future integration
-        val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
-            .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
-        m_log.trace("only semanticJsonStore read from semantic service : {}", writePretty(semanticJsonMetaDataStore));
-
         //val repository = (semanticJsonMetaDataStore \ "repository");
         //m_log.info("repository : {}",  repository.extract[JArray]);
 
+        m_log.trace("semantic details : {}", semanticHost + semanticEndpoint + semanticId);
+        val semanticJsonMetaDataStore = parse(new InternalServiceClient(semanticHost + semanticEndpoint + semanticId)
+            .retrieveObject(new SemanticNodeObject())).asInstanceOf[JObject];
+        m_log.trace("only semanticJsonStore read from semantic service : {}", writePretty(semanticJsonMetaDataStore));
         val mergeJsonMetaDataStore = contentsAnalyze(
           semanticJsonMetaDataStore.merge(idJson).merge(instanceJson).merge(typeJson))
         m_log.trace("only mergeJsonMetaDataStore read from semantic service : {}", writePretty(mergeJsonMetaDataStore));
-
         val responseJsonMetaDataStore = json merge mergeJsonMetaDataStore
         m_log.trace("only responseJsonMetaDataStore read from semantic service : {}", writePretty(responseJsonMetaDataStore));
-
         val analysisJsonMetaDataStore = (responseJsonMetaDataStore \ "contents" \ "analyze") (0)
         m_log.trace("only analysisJsonMetaDataStore read from semantic service : {}", writePretty(analysisJsonMetaDataStore));
+         val analysisNode = new AnalysisNode(analysisJsonMetaDataStore)
 
-        // TODO: The above block ends here which will be used in future integration
-
-        //val mergeJson = contentsAnalyze(semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
-        //m_log.info("After merging of semanticJson to instanceJson: {}", writePretty(mergeJson));
-        //m_log.info("Actual json on create {}", writePretty(json));
-
-        //val responseJson = json merge mergeJson
-        //m_log.info("responseJson before adding to content: {}", writePretty(responseJson));
-
-        //val analysisJson = (responseJson \ "contents" \ "analyze") (0)
-        //m_log.info("analysisJson before adding to content: {}", writePretty(analysisJson));
-
-        // This section creating the node in analysis
-        val analysisNode = new AnalysisNode(analysisJsonMetaDataStore)
-
-        // TODO: Ideally this call shall be removed no need to attach node to analysis
-          // val semanticNode = readSemanticNode(semanticId)
-          // for ((category, id) <- semanticNode.getRelatedNodes) {
-          //  if (category == "DataObject") {
-          //    analysisNode.addNodeToRelation(id, category)
-          //  }
-          // }
+        // This block has been commented change related to SIP-4226 & SIP-4220
+       /**
+       val mergeJson = contentsAnalyze(semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
+        m_log.info("After merging of semanticJson to instanceJson: {}", writePretty(mergeJson));
+        m_log.info("Actual json on create {}", writePretty(json));
+        val responseJson = json merge mergeJson
+        m_log.info("responseJson before adding to content: {}", writePretty(responseJson));
+        val analysisJson = (responseJson \ "contents" \ "analyze") (0)
+        m_log.info("analysisJson before adding to content: {}", writePretty(analysisJson));
+           val semanticNode = readSemanticNode(semanticId)
+           for ((category, id) <- semanticNode.getRelatedNodes) {
+            if (category == "DataObject") {
+              analysisNode.addNodeToRelation(id, category)
+            }
+           }
+        */
 
         // The below block should remain because it is creating a node in binary store
         val (result, message) = analysisNode.write
@@ -558,7 +548,7 @@ class Analysis extends BaseController {
             JField("type", JString("pivot")),
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
-            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("execution_finish_ts", JInt(finishedTS)),
             JField("exec-code", JInt(0)),
             JField("execution_start_ts", JString(timestamp)),
             JField("queryBuilder", queryBuilder),
@@ -573,7 +563,7 @@ class Analysis extends BaseController {
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("failed")),
-            JField("execution_finish_ts", JLong(-1L)),
+            JField("execution_finish_ts", JInt(-1)),
             JField("type", JString("pivot")),
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
@@ -642,7 +632,7 @@ class Analysis extends BaseController {
             JField("type", JString("esReport")),
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
-            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("execution_finish_ts", JInt(finishedTS)),
             JField("exec-code", JInt(0)),
             JField("execution_start_ts", JString(timestamp)),
             JField("queryBuilder", queryBuilder),
@@ -657,7 +647,7 @@ class Analysis extends BaseController {
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("failed")),
-            JField("execution_finish_ts", JLong(-1L)),
+            JField("execution_finish_ts", JInt(-1)),
             JField("type", JString("esReport")),
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
@@ -719,7 +709,7 @@ class Analysis extends BaseController {
             JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-            JField("execution_finish_ts", JLong(finishedTS)),
+            JField("execution_finish_ts", JInt(finishedTS)),
             JField("type", JString("chart")),
             JField("executionType", JString(executionType)),
             JField("execution_result", JString("success")),
@@ -738,7 +728,7 @@ class Analysis extends BaseController {
             JField("id", JString(analysisId)),
             JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
             JField("execution_result", JString("failed")),
-            JField("execution_finish_ts", JLong(-1L)),
+            JField("execution_finish_ts", JInt(-1)),
             JField("type", JString("chart")),
             JField("executionType", JString(executionType)),
             JField("exec-code", JInt(1)),
@@ -893,7 +883,7 @@ class Analysis extends BaseController {
           case "StringType" => JString(m.get(k)._2.asInstanceOf[String])
           case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
           case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
-          case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+          case "LongType" => JInt(m.get(k)._2.asInstanceOf[java.math.BigInteger])
           case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
           /* It is possible that the data type information returned from the
            * Spark SQL Executor might not always come through
@@ -902,12 +892,13 @@ class Analysis extends BaseController {
           case dataType => m.get(k)._2 match {
             case obj: String => JString(obj)
             case obj: java.lang.Integer => JInt(obj.intValue())
-            case obj: java.lang.Long => JLong(obj.longValue())
+            case obj: java.lang.Long => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj: java.lang.Float => JDouble(obj.floatValue())
             case obj: java.lang.Double => JDouble(obj.doubleValue())
             case obj: java.lang.Boolean => JBool(obj.booleanValue())
-            case obj: java.sql.Date => JLong(obj.getTime())
-            case obj: scala.math.BigInt => JLong(obj.toLong)
+            case obj: java.sql.Date => JInt(java.math.BigInteger.valueOf(obj.getTime()))
+            case obj: java.math.BigInteger => JInt(java.math.BigInteger.valueOf(obj.longValue()))
+            case obj: scala.math.BigInt => JInt(java.math.BigInteger.valueOf(obj.longValue()))
             case obj =>
               throw new RuntimeException(
                 "Unsupported data type in result: " + dataType

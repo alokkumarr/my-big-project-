@@ -9,7 +9,7 @@ spring:
       max-file-size: 25MB
 logging:
   level:
-    com.synchronoss.saw.semantic: TRACE
+    com.synchronoss.saw.semantic: INFO
 server:
   address: localhost
   port: 9901
@@ -29,3 +29,4 @@ semantic:
     workbench-url:  http://localhost:9700
     transport-metadata-url:  http://localhost:9200
     binary-migration-requires: {{ saw_binary_migration_requires | default('true') }}
+    migration-metadata-home: {{  sip_var_path | default('/var/sip/') }}

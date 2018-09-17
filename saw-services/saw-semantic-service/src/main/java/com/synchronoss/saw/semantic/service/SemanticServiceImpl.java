@@ -62,10 +62,14 @@ public class SemanticServiceImpl implements SemanticService {
   @NotNull
   private boolean migrationRequires;
 
+  @Value("${semantic.migration-metadata-home}")
+  @NotNull
+  private String migrationMetadataHome;
+
   @PostConstruct
   private void init() throws Exception {
     if (migrationRequires) {
-      new MigrationService().convertHBaseBinaryToMaprDBStore(transportURI, basePath);
+      new MigrationService().convertHBaseBinaryToMaprDBStore(transportURI, basePath, migrationMetadataHome);
     }
   }
 

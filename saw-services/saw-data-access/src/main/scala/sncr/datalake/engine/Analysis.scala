@@ -28,8 +28,9 @@ class Analysis(val analysisId : String) {
   private val executor : ExecutorService = Executors.newFixedThreadPool(1)
   private var task     : Future[util.List[util.Map[String, (String, Object)]]] = null
   private var status : String = ExecutionStatus.STARTED.toString
-  private var startTS : Long = 0
-  private var finishedTS : Long = 0
+  // This has been modified due to version incompatibility issue with json4s 3.3.0 version
+  private var startTS : java.math.BigInteger = java.math.BigInteger.ZERO
+  private var finishedTS : java.math.BigInteger = java.math.BigInteger.ZERO
 
   def getStatus = status
   def getStartTS = startTS

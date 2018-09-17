@@ -38,8 +38,9 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
   protected var executionMessage : String = null
   protected var executionCode : Integer = -1
   protected var status : ExecutionStatus = ExecutionStatus.INIT
-  protected var startTS : java.lang.Long = null
-  protected var finishTS : java.lang.Long = null
+  // This has been modified due to version incompatibility issue with json4s 3.3.0 version
+  protected var startTS : java.math.BigInteger = null
+  protected var finishTS : java.math.BigInteger = null
 
   implicit val formats = new DefaultFormats {
     override def dateFormatter = new SimpleDateFormat(
@@ -133,12 +134,12 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
   /**
     * Returns execution start timestamp as milliseconds since epoch
     */
-  def getStartedTimestamp : java.lang.Long =  if (startTS == null ) -1L else startTS
+  def getStartedTimestamp : java.math.BigInteger =  if (startTS == null ) java.math.BigInteger.valueOf(-1L) else startTS
 
   /**
     * Returns execution finished timestamp as milliseconds since epoch
     */
-  def getFinishedTimestamp : java.lang.Long = if (finishTS == null ) -1L else finishTS
+  def getFinishedTimestamp : java.math.BigInteger = if (finishTS == null ) java.math.BigInteger.valueOf(-1L) else finishTS
 
   /**
     * Returns Futute with the query execution result
