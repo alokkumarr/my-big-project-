@@ -574,14 +574,14 @@ export class DesignerContainerComponent {
           if(col.name == event.column.name) {
             col.aggregate = event.column.aggregate;
           }
-        })  
-      }) 
+        })
+      })
       if(!isEmpty(this.data)) {
         this.data.map(row => {
           if(row[event.column.name]) {
             row[event.column.name] = '';
           }
-        });  
+        });
       }
       this.data = cloneDeep(this.data);
     case 'filterRemove':
