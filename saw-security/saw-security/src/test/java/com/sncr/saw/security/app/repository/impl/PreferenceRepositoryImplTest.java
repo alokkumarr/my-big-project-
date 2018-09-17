@@ -43,7 +43,7 @@ public class PreferenceRepositoryImplTest {
         preferenceList.add(preference4);
         userPreferences.setPreferences(preferenceList);
         when(preferenceRepository.upsertPreferences(userPreferences)).thenReturn(userPreferences);
-        when(preferenceRepository.deletePreferences(userPreferences)).thenReturn(userPreferences);
+        when(preferenceRepository.deletePreferences(userPreferences,true)).thenReturn(userPreferences);
         when(preferenceRepository.fetchPreferences("1","1")).thenReturn(userPreferences);
     }
 
@@ -59,7 +59,7 @@ public class PreferenceRepositoryImplTest {
     @Test
     public void TestDeletePreferences(){
         UserPreferences userPreferences1 =
-            preferenceRepository.deletePreferences(userPreferences);
+            preferenceRepository.deletePreferences(userPreferences,true);
         Assert.assertEquals(userPreferences.getUserID(),userPreferences1.getUserID());
         Assert.assertEquals(userPreferences.getCustomerID(),userPreferences1.getCustomerID());
         Assert.assertEquals(userPreferences.getPreferences().size(),userPreferences1.getPreferences().size());

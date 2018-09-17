@@ -1468,14 +1468,19 @@ public class SecurityController {
      * @return
      */
     @RequestMapping(value= "/auth/admin/user/preferences/delete", method = RequestMethod.DELETE)
-    public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,@RequestBody List<Preference> preferenceList) {
+    public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
+                                        @RequestBody List<Preference> preferenceList,
+                                        @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
         UserPreferences userPreferences = new UserPreferences();
         String jwtToken = JWTUtils.getToken(request);
         String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
         userPreferences.setUserID(extractValuesFromToken[0]);
         userPreferences.setCustomerID(extractValuesFromToken[1]);
         userPreferences.setPreferences(preferenceList);
-        return preferenceRepository.deletePreferences(userPreferences);
+        if (inactivateAll!=null && inactivateAll)
+            return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
+        else
+            return preferenceRepository.deletePreferences(userPreferences,false);
     }
 
     /**

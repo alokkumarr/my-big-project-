@@ -57,24 +57,43 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     }
 
     @Override
-    public UserPreferences deletePreferences(UserPreferences userPreferences) {
-        String deleteSql = "DELETE FROM CONFIG_VAL WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE =? AND " +
-            "CONFIG_VAL_OBJ_GROUP= ?";
-        int[][] deleteResult =  jdbcTemplate.batchUpdate(deleteSql, userPreferences.getPreferences(), 1000,
-            (ps, preference) -> {
-                ps.setString(1,preference.getPreferenceName());
-                ps.setString(2,CONFIG_VAL_OBJ_TYPE);
-                ps.setString(3, userPreferences.getUserID());
-            });
-        logger.trace(deleteResult.length + " Preferences deleted successfully.");
-        userPreferences.setMessage(deleteResult.length +" Preferences deleted successfully");
+    public UserPreferences deletePreferences(UserPreferences userPreferences, boolean inactivateAll) {
+        if (!inactivateAll) {
+            String deleteSql = "DELETE FROM CONFIG_VAL WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE =? AND " +
+                "CONFIG_VAL_OBJ_GROUP= ?";
+            int[][] deleteResult = jdbcTemplate.batchUpdate(deleteSql, userPreferences.getPreferences(), 1000,
+                (ps, preference) -> {
+                    ps.setString(1, preference.getPreferenceName());
+                    ps.setString(2, CONFIG_VAL_OBJ_TYPE);
+                    ps.setString(3, userPreferences.getUserID());
+                });
+
+            logger.trace(deleteResult.length + " Preferences removed successfully.");
+            userPreferences.setMessage(deleteResult.length + " Preferences removed successfully");
+        }
+        else {
+            // In case of remove the preferences for configured for any user.
+          String inActivateSql = "UPDATE CONFIG_VAL SET ACTIVE_STATUS_IND = '0', INACTIVATED_DATE = now() , " +
+                "INACTIVATED_BY = ? , MODIFIED_DATE = now(), MODIFIED_BY =? " +
+                " WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE=? AND CONFIG_VALUE= ?";
+            int[][] Result = jdbcTemplate.batchUpdate(inActivateSql, userPreferences.getPreferences(), 1000,
+                (ps, preference) -> {
+                    ps.setString(1, userPreferences.getUserID());
+                    ps.setString(2, userPreferences.getUserID());
+                    ps.setString(3, preference.getPreferenceName());
+                    ps.setString(4, CONFIG_VAL_OBJ_TYPE);
+                    ps.setString(5, preference.getPreferenceValue());
+                });
+            logger.trace(Result.length + " Preferences inactivated successfully.");
+            userPreferences.setMessage(Result.length + " Preferences inactivated successfully");
+        }
         return userPreferences;
     }
 
     @Override
     public UserPreferences fetchPreferences(String userID, String customerID) {
       String fetchSQL ="SELECT CONFIG_VAL_CODE,CONFIG_VALUE FROM CONFIG_VAL WHERE CONFIG_VAL_OBJ_TYPE =?" +
-          " AND CONFIG_VAL_OBJ_GROUP=?";
+          " AND CONFIG_VAL_OBJ_GROUP=? AND ACTIVE_STATUS_IND = '1'";
        List<Preference> preferences = jdbcTemplate.query(fetchSQL, ps -> {
             ps.setString(1,CONFIG_VAL_OBJ_TYPE);
             ps.setString(2,userID);
