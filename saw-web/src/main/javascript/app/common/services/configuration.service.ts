@@ -4,6 +4,7 @@ import AppConfig from '../../../../../../appConfig';
 import { Observable } from 'rxjs/Observable';
 import { tap, flatMap } from 'rxjs/operators';
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
 
 export interface ConfigurationPreference {
   preferenceName: string;
@@ -35,7 +36,7 @@ export class ConfigService {
     ) as Observable<Configuration>;
   }
 
-  saveConfig(config: [{ key: string; value }]): Observable<Configuration> {
+  saveConfig(config: { key: string; value }[]): Observable<Configuration> {
     const payload: ConfigurationPreference[] = config.map(pref => ({
       preferenceName: pref.key,
       preferenceValue: pref.value
@@ -47,9 +48,57 @@ export class ConfigService {
     ) as Observable<Configuration>).pipe(tap(this.cacheConfig.bind(this)));
   }
 
+  /**
+   * Deletes config
+   *
+   * @config - Configuration to be deleted
+   * @allUsers: boolean - whether this configuration needs to be deleted for all
+   * users. Default: false
+   *
+   * @returns {undefined}
+   */
+  deleteConfig(
+    config: { key: string; value }[],
+    allUsers = false
+  ): Observable<Configuration> {
+    const payload: ConfigurationPreference[] = config.map(pref => ({
+      preferenceName: pref.key,
+      preferenceValue: pref.value
+    }));
+
+    return (this.httpClient.post(
+      `${
+        AppConfig.login.url
+      }/auth/admin/user/preferences/delete?inactiveAll=${allUsers}`,
+      payload
+    ) as Observable<Configuration>).pipe(tap(this.removeCache.bind(this)));
+  }
+
   private cacheConfig(config: Configuration) {
     window.localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
     this.cache = config;
+  }
+
+  /**
+   * removeCache - Removes supplied preferences from cache
+   *
+   * @param {Configuration} config
+   * @returns {undefined}
+   */
+  private removeCache(config: Configuration) {
+    const rawConfig = window.localStorage.getItem(CONFIG_KEY);
+    const cachedConfig: Configuration = rawConfig
+      ? JSON.parse(rawConfig)
+      : null;
+
+    cachedConfig.preferences = filter(cachedConfig.preferences, cachedPref => {
+      return !find(
+        config.preferences,
+        pref => pref.preferenceName === cachedPref.preferenceName
+      );
+    });
+
+    this.cacheConfig(cachedConfig);
   }
 
   /**

@@ -111,17 +111,19 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
 
   toggleDefault() {
     this.isDefault = !this.isDefault;
+    const payload = [
+      {
+        key: PREFERENCES.DEFAULT_DASHBOARD,
+        value: this.isDefault ? this.dashboardId : null
+      },
+      {
+        key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
+        value: this.isDefault ? this.subCategoryId : null
+      }
+    ];
+
     this.configService
-      .saveConfig([
-        {
-          key: PREFERENCES.DEFAULT_DASHBOARD,
-          value: this.isDefault ? this.dashboardId : null
-        },
-        {
-          key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
-          value: this.isDefault ? this.subCategoryId : null
-        }
-      ])
+      .saveConfig(payload)
       .subscribe(
         () => this.checkDefaultDashboard(),
         () => this.checkDefaultDashboard()
@@ -204,16 +206,15 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
             this.configService.getPreference(PREFERENCES.DEFAULT_DASHBOARD) ===
             dashboardId
           ) {
-            return this.configService.saveConfig([
-              {
-                key: PREFERENCES.DEFAULT_DASHBOARD,
-                value: null
-              },
-              {
-                key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
-                value: null
-              }
-            ]);
+            return this.configService.deleteConfig(
+              [
+                {
+                  key: PREFERENCES.DEFAULT_DASHBOARD,
+                  value: dashboardId
+                }
+              ],
+              true
+            );
           } else {
             return Observable.of(true);
           }

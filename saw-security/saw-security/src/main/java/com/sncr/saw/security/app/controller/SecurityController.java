@@ -1467,7 +1467,7 @@ public class SecurityController {
      *
      * @return
      */
-    @RequestMapping(value= "/auth/admin/user/preferences/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value= "/auth/admin/user/preferences/delete", method = RequestMethod.POST)
     public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
                                         @RequestBody List<Preference> preferenceList,
                                         @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
