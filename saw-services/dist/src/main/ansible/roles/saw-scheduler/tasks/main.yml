@@ -11,6 +11,7 @@
     dest: "{{ inventory_dir + '/sip-scheduler-db-password' }}"
     flat: yes
     fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
 - name: Look up Scheduler Service database password
   set_fact:
     saw_scheduler_db_password: >-
@@ -25,6 +26,8 @@
     dest: /etc/bda/saw-scheduler-db-password
 - name: Run SAW scheduler initial database setup
   command: /opt/bda/saw-scheduler-service/db-setup/init
+  # Note: Run database initialization only on one of the nodes
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
 # Workaround: The service restart handler will run only after all
 # tasks have completed.  This causes the service to remain running
 # using the old port when the new socket activation proxy starts up,
