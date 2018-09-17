@@ -490,7 +490,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   fetchColumsUponCheck() {
-     return map(this.analysis.artifacts, artifact => {
+    return map(this.analysis.artifacts, artifact => {
       const columns = filter(artifact.columns, 'checked');
       return {
         ...artifact,
