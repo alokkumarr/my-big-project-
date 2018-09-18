@@ -396,7 +396,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
-      fpFlatMap((artifact: Artifact) => artifact.columns),
+      fpFlatMap((artifact: Artifact) => artifact.columns || [artifact]),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
