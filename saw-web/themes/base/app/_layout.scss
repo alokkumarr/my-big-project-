@@ -2,23 +2,27 @@ $header-bar-height: 64px;
 
 @mixin flex-properties-for-name($name: null) {
   $flexName: 'flex';
+
   @if $name != null {
     $flexName: 'flex-#{$name}';
     $name : '-#{$name}';
   } @else {
     $name : '';
   }
+
   @for $i from 0 through 20 {
     $value : #{$i * 5 + '%'};
 
     .#{$flexName}-#{$i * 5} {
-        flex: 1 1 $value;
+      flex: 1 1 $value;
     }
+
     .layout-row > .#{$flexName}-#{$i * 5} {
-        flex: 1 1 $value;
+      flex: 1 1 $value;
     }
+
     .layout-column > .#{$flexName}-#{$i * 5} {
-        flex: 1 1 $value;
+      flex: 1 1 $value;
     }
   }
 }
@@ -91,4 +95,10 @@ $header-bar-height: 64px;
 .render-content {
   width: 100%;
   overflow: hidden;
+
+  ui-view {
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
 }

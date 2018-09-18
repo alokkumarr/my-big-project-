@@ -2,12 +2,21 @@
 #
 # Start SAW deployment for container
 #
-set -eu
+set -eux
 
 # Save SAW system logs to build directory in case needed for
 # troubleshooting after a failed run
 trap "journalctl -u saw-\* > /build/saw-system.log" EXIT
 
+# Install old SIP version for upgrade testing purposes, if provided
+sip_old=/maven/sip-old
+if [ -d $sip_old ]; then
+    cd $sip_old
+    tar -xzf saw-*.tgz
+    saw/saw-deploy /root/saw-config
+fi
+
+# Install new SIP version
 cd /maven
 tar -xzf saw-*.tgz
 

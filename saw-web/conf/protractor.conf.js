@@ -171,7 +171,8 @@ exports.config = {
       testBaseDir + 'observe/createAndDeleteDashboardWithActualVsTargetKpi.test.js',
       testBaseDir + 'observe/createAndDeleteDashboardWithPivot.test.js',
       testBaseDir + 'observe/dashboardGlobalFilter.test.js',
-      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js'
+      testBaseDir + 'observe/dashboardGlobalFilterWithPivot.test.js',
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
     ],
     /**
      * This suite is for development environment and always all dev tests will be executed.

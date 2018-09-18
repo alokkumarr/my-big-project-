@@ -14,12 +14,6 @@
              e2e="filter-autocomplete-input"
              [matAutocomplete]="auto"
              [formControl]="formControl"/>
-      <button *ngIf="autoInput.value && !isInRuntimeMode"
-              (click)="clearInput()"
-              matSuffix mat-icon-button mat-button
-      >
-        <mat-icon fontIcon="icon-close"></mat-icon>
-      </button>
       <mat-autocomplete #auto="matAutocomplete"
                         [displayWith]="displayWith"
                         (optionSelected)="onArtifactColumnSelected($event.option.value.columnName)">
