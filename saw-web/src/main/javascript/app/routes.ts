@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
-import { IsUserLoggedInGuard } from './common/guards';
+import { IsUserLoggedInGuard, DefaultModuleGuard } from './common/guards';
 import { MainPageComponent } from './layout';
 
 export const routes: Routes = [
   {
     // name: 'root',
     path: '',
+    canActivate: [IsUserLoggedInGuard, DefaultModuleGuard],
     canActivateChild: [IsUserLoggedInGuard],
-    redirectTo: '/analyze',
+    // redirectTo: 'analyze',
+    component: MainPageComponent,
     pathMatch: 'full'
   }
 ];

@@ -27,7 +27,10 @@ import {
   ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
-import { IsUserLoggedInGuard } from './guards';
+import {
+  IsUserLoggedInGuard,
+  DefaultModuleGuard
+} from './guards';
 import { MaterialModule } from '../material.module';
 import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -142,7 +145,7 @@ const INTERCEPTORS = [
   }
 ];
 
-const GUARDS = [IsUserLoggedInGuard];
+const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
 @NgModule({
   imports: MODULES,
   declarations: [...COMPONENTS, ...DIRECTIVES],

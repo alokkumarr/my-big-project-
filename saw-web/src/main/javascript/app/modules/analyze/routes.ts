@@ -2,12 +2,14 @@ import { Routes }  from '@angular/router';
 import {AnalyzeViewComponent} from './view';
 import {ExecutedViewComponent} from './executed-view';
 import { AnalyzePageComponent } from './page';
+import { IsUserLoggedInGuard } from '../../common/guards';
 import { DefaultAnalyzeCategoryGuard } from './guards';
 
 export const routes: Routes = [{
   // name: 'analyze',
   path: 'analyze',
-  canActivate: [DefaultAnalyzeCategoryGuard],
+  canActivate: [IsUserLoggedInGuard, DefaultAnalyzeCategoryGuard],
+  canActivateChild: [IsUserLoggedInGuard],
   component: AnalyzePageComponent,
   children: [
     {
