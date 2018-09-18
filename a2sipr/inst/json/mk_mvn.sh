@@ -59,6 +59,15 @@ wnum=
     wnum=_w$ydu.$(( $dsu % 86400 / 60 ))
 }
 
+# Download R packages as tarball files from 
+# Central repository to packages folder
+
+while IFS='|' read -r -a input; do
+ url="${input[2]}"/"${input[0]}"_"${input[1]}".tar.gz
+ file_name=../pkgs/"${input[0]}"_"${input[1]}".tar.gz
+ curl $url --output $file_name
+done < pkgs.txt
+
 # RPM release number:
 # ( b<BAMBOO_BUILD> / c<COMMIT_COUNT> / u999 )_g<HEAD_HASH>[ _w<DAY_OF_YEAR>.<MIN_OF_DAY> ]
 rpm_release=${btyp}${bnum}_g${git_head}${wnum:-}

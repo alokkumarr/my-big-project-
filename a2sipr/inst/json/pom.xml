@@ -199,6 +199,9 @@ $a2sipr_cmd || {
   echo '# a2sipr package installation failed'
   echo '###############################'
 }
+echo '###############################'
+echo '# a2sipr package installation succeeded'
+echo '###############################'
 #
 #
 echo '###############################'
@@ -207,7 +210,8 @@ echo '###############################'
 r_inst_cmd=''
 if [[ ${pkg.inst.switch} -eq "zip" ]]; then
   #r_inst_cmd='Rscript package-zip-install.R ${r.lib.home}/inst/pkgs ${r.lib.home}'
-  for z in ${r.home}/inst/pkgs/*.zip; do unzip $z -d ${r.lib.home}; done
+  for z in ${r.home}/inst/pkgs/*.tar.gz; do dqt='"'; bash -c "R -e 'install.packages(pkgs=${dqt}$z${dqt},lib.loc=${dqt}${r.lib.home}${dqt}repos=NULL)'"; done
+  #for z in ${r.home}/inst/pkgs/*.tar.gz; do 'Rscript package-repo-install.R -p $z -l ${r.lib.home} -r NULL'; done
 else
   r_inst_cmd='Rscript package-repo-install.R ${r.home}/inst/json/r-package-dependencies.json ${r.lib.home}'
   $r_inst_cmd || {
