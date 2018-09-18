@@ -792,7 +792,7 @@ public class QueryBuilderUtil {
                                 preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
-                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.DataField) {
+                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.Column) {
                             Column data =
                                     (Column) dataField;
                             if (data.getAggregate()!=null && data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
