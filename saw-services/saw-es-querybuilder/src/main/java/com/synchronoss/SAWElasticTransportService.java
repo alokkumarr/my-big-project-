@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.synchronoss.querybuilder.SAWReportTypeElasticSearchQueryBuilder;
 import com.synchronoss.querybuilder.model.report.Column;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +173,8 @@ public class SAWElasticTransportService {
       JsonNode node =null;
       try {
           SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(reportDefinition, "sqlBuilder");
-
+          if (sqlBuilderNode.getDataFields().get(0).getColumns()==null)
+              SAWReportTypeElasticSearchQueryBuilder.chnageOldEsReportStructureintoNewStructure(sqlBuilderNode);
          List<Column> aggregationField = ReportAggregationBuilder.getAggregationField(
              sqlBuilderNode.getDataFields().get(0).getColumns());
           ESReportAggregationParser esReportAggregationParser = new ESReportAggregationParser(
