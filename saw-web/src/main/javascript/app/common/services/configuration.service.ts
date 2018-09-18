@@ -22,7 +22,7 @@ export const PREFERENCES = {
   DEFAULT_DASHBOARD_CAT: 'defaultDashboardCategory'
 };
 
-const CONFIG_KEY = 'sipConfig';
+export const CONFIG_KEY = 'sipConfig';
 
 @Injectable()
 export class ConfigService {

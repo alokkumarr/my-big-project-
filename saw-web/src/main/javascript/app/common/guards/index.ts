@@ -1,2 +1,2 @@
 export { IsUserLoggedInGuard } from './logged-in-guard.service';
-export { DefaultHomePageGuard } from './default-home.service';
+export { DefaultModuleGuard } from './default-module-redirect.guard';

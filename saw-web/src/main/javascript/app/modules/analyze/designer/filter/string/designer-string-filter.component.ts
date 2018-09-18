@@ -25,7 +25,8 @@ export const isValid = (model: FilterModel = {}) => {
 export class DesignerStringFilterComponent {
   @Output()
   public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
-  @Input() public filterModel: FilterModel;
+  @Input()
+  public filterModel: FilterModel;
 
   public separatorKeysCodes = [ENTER, COMMA, SEMICOLON];
   public OPERATORS = STRING_FILTER_OPERATORS;

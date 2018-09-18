@@ -8,12 +8,14 @@ import {CreateSemanticComponent} from './components/semantic-management/create/c
 import {ValidateSemanticComponent} from './components/semantic-management/validate/validate-semantic.component';
 import {UpdateSemanticComponent} from './components/semantic-management/update/update-semantic.component';
 import { DefaultWorkbenchPageGuard } from './guards';
+import { IsUserLoggedInGuard } from '../../common/guards';
 
 export const routes: Routes = [
   {
     // name: 'workbench',
     path: 'workbench',
-    canActivate: [DefaultWorkbenchPageGuard],
+    canActivate: [IsUserLoggedInGuard, DefaultWorkbenchPageGuard],
+    canActivateChild: [IsUserLoggedInGuard],
     component: WorkbenchPageComponent,
     children: [{
       // name: 'workbench.dataobjects',

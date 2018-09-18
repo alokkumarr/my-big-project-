@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, NavigationStart, ActivatedRoute } from '@angular/router';
 import { Idle, DEFAULT_INTERRUPTSOURCES } from '@ng-idle/core';
-import * as get from 'lodash/get';
-import * as find from 'lodash/find';
+import * as includes from 'lodash/includes';
 import * as split from 'lodash/split';
+import * as replace from 'lodash/replace';
 import * as startCase from 'lodash/startCase';
 import * as upperCase from 'lodash/upperCase';
 
-import { JwtService } from '../../../../login/services/jwt.service';
 import { UserService } from '../../../../login/services/user.service';
 import { MenuService } from '../../../common/services/menu.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
@@ -30,7 +29,6 @@ export class LayoutContentComponent {
 
   constructor(
     private _user: UserService,
-    private _jwt: JwtService,
     private _router: Router,
     private _title: Title,
     private _sidenav: SidenavMenuService,
@@ -66,7 +64,14 @@ export class LayoutContentComponent {
 
   ngOnInit() {
     this._router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
+      if (event instanceof NavigationStart) {
+        // remove the exclamation mark from the url
+        const hasBang = includes(event.url, '!');
+        if (hasBang) {
+          const newUrl = replace(event.url, '!', '');
+          this._router.navigateByUrl(newUrl);
+        }
+      } else if (event instanceof NavigationEnd) {
         this.setPageTitle(event);
         this.loadMenuForProperModule(event);
       }
@@ -75,7 +80,8 @@ export class LayoutContentComponent {
 
   setPageTitle(event) {
     const [, basePath] = split(event.url, '/');
-    const title = startCase(basePath);
+    const moduleName = startCase(basePath);
+    const title = `Synchronoss - ${moduleName}`;
     this._title.setTitle(title);
   }
 

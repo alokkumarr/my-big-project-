@@ -20,7 +20,6 @@ import { CommonModuleTs } from './common';
 import { AnalyzeModuleTs } from './modules/analyze';
 import { AdminModule } from './modules/admin';
 import { WorkbenchUpgradeModule } from './modules/workbench';
-import { DefaultHomePageGuard } from './common/guards';
 
 import {
   LayoutContentComponent,
@@ -45,7 +44,6 @@ const COMPONENTS = [
   MainPageComponent
 ];
 const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
-const GUARDS = [DefaultHomePageGuard];
 
 @NgModule({
   imports: [
@@ -64,7 +62,7 @@ const GUARDS = [DefaultHomePageGuard];
     AdminModule
   ],
   exports: [FlexLayoutModule],
-  providers: [...SERVICES, ...GUARDS],
+  providers: [...SERVICES],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
   bootstrap: [LayoutContentComponent]
