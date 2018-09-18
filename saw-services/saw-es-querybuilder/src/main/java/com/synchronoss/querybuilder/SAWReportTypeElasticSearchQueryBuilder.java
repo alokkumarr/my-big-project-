@@ -61,6 +61,8 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(getJsonString(), "sqlBuilder");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.from(0);
+        if (sqlBuilderNode.getDataFields().get(0).getColumns()==null)
+             chnageOldEsReportStructureintoNewStructure(sqlBuilderNode);
         searchSourceBuilder.size(size);
         if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
             throw new NullPointerException(
@@ -272,5 +274,37 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             fieldsIncludes[count++]= columnName;
         }
         return fieldsIncludes;
+    }
+
+    /**
+     * This method will convert the old es-report structure into new structure for
+     * backward compatibility .
+     * this change is made to make es-report structure consistent with DL report.
+     * @param sqlBuilder
+     * @return
+     */
+    private void chnageOldEsReportStructureintoNewStructure(SqlBuilder sqlBuilder){
+        List<Column> columns = new ArrayList<>();
+        String tableName = null;
+        for (DataField dataField : sqlBuilder.getDataFields())
+        {
+            Column column = new Column();
+            column.setColumnName((String) dataField.getAdditionalProperties().get("columnName"));
+            column.setName((String) dataField.getAdditionalProperties().get("name"));
+            column.setType(Column.Type.fromValue((String)
+                dataField.getAdditionalProperties().get("type")));
+            if (dataField.getAdditionalProperties().get("aggregate") !=null)
+            column.setAggregate(Column.Aggregate.fromValue(
+                (String)dataField.getAdditionalProperties().get("aggregate")));
+            else column.setAggregate(null);
+            tableName = (String) dataField.getAdditionalProperties().get("table");
+            columns.add(column);
+        }
+        DataField dataField = new DataField();
+        dataField.setColumns(columns);
+        dataField.setTableName(tableName);
+        List<DataField> dataFields = new ArrayList<>();
+        dataFields.add(dataField);
+        sqlBuilder.setDataFields(dataFields);
     }
 }
