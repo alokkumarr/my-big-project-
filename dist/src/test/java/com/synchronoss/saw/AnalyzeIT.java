@@ -37,7 +37,7 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
  * executes it and lists the execution results.
  */
 public class AnalyzeIT extends BaseIT {
-  @Test(timeout=300000)
+ @Test(timeout=300000)
   public void testExecuteAnalysis() throws JsonProcessingException {
     String metricId = listMetrics(token,"sample-elasticsearch");
     ObjectNode analysis = createAnalysis(token, metricId,"pivot");
@@ -168,10 +168,12 @@ public class AnalyzeIT extends BaseIT {
             .filter(document("list-metrics",
                 preprocessResponse(prettyPrint())))
             .when().get("/services/internal/semantic/md?projectId=workbench")
-            .then().assertThat().statusCode(200)
+            .then().assertThat().statusCode(202)
             .extract().response();
         try {
             String metricId = response.path(path);
+            System.out.println("metricId : "  + metricId);
+            System.out.println("metricName : " + metricName);
             if (metricId == null) {
                 return retryListMetrics(token,metricName);
             }
@@ -357,7 +359,7 @@ public class AnalyzeIT extends BaseIT {
     key.put("categoryId", "4");
     String json = mapper.writeValueAsString(node);
     String path = "contents.analyze.find { it.name == '"
-                  + analysisName + "' }.metric";
+                  + analysisName + "' }.metricName";
     given(spec)
         .header("Authorization", "Bearer " + token)
         .body(json)
@@ -439,7 +441,7 @@ public class AnalyzeIT extends BaseIT {
     filter1.put("size","10");
     filter1.put("order","asc");
     ObjectNode es = mapper.createObjectNode();
-    es.put("storageType","es");
+    es.put("storageType","ES");
     es.put("indexName","sample");
     es.put("type","sample");
     globalFilter.putPOJO("esRepository",
@@ -456,6 +458,7 @@ public class AnalyzeIT extends BaseIT {
     /* Proceed to creating filters */
     ObjectNode node = globalFilters();
     String json = mapper.writeValueAsString(node);
+    System.out.println("JSON testGlobalFilter :" + json);
     String field = "string.keyword";
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
@@ -489,7 +492,7 @@ public class AnalyzeIT extends BaseIT {
         .compact();
   }
 
-  @Test
+  //@Test
   public void schedulerTest() throws JsonProcessingException
   {
     ObjectNode node = scheduleData();
@@ -560,7 +563,7 @@ public class AnalyzeIT extends BaseIT {
      return objectNode;
     }
 
-  @Test
+  //@Test
   public void kpiExecuteTest() throws JsonProcessingException
   {
     ObjectNode node = kpiData();
