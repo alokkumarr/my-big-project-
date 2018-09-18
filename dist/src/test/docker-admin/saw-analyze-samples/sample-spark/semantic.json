@@ -10,7 +10,7 @@
         "type": "semantic",
         "module": "ANALYZE",
         "metric": "sample-spark",
-        "metricName": "Sample (report) - new",
+        "metricName": "sample-spark",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
         "checked": "false",
