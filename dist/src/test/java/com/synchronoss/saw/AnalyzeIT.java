@@ -148,19 +148,6 @@ public class AnalyzeIT extends BaseIT {
      * @throws JsonProcessingException
      */
     private String listMetrics(String token,String metricName) throws JsonProcessingException {
-        // The below section is not useful anymore
-        ObjectNode node = mapper.createObjectNode();
-        ObjectNode contents = node.putObject("contents");
-        contents.put("action", "search");
-        contents.put("context", "Semantic");
-        contents.put("select", "headers");
-        ArrayNode keys = contents.putArray("keys");
-        ObjectNode key = keys.addObject();
-        key.put("customerCode", "SYNCHRONOSS");
-        key.put("module", "ANALYZE");
-        String json = mapper.writeValueAsString(node);
-     // The above section is not useful anymore
-        
         String path = "contents[0]['ANALYZE'].find "
             + "{it.metricName == '"+metricName+"'}.id";
         Response response = given(spec)
@@ -172,8 +159,6 @@ public class AnalyzeIT extends BaseIT {
             .extract().response();
         try {
             String metricId = response.path(path);
-            System.out.println("metricId : "  + metricId);
-            System.out.println("metricName : " + metricName);
             if (metricId == null) {
                 return retryListMetrics(token,metricName);
             }
@@ -458,7 +443,6 @@ public class AnalyzeIT extends BaseIT {
     /* Proceed to creating filters */
     ObjectNode node = globalFilters();
     String json = mapper.writeValueAsString(node);
-    System.out.println("JSON testGlobalFilter :" + json);
     String field = "string.keyword";
     Response response = given(spec)
                         .header("Authorization", "Bearer " + token)
@@ -492,7 +476,7 @@ public class AnalyzeIT extends BaseIT {
         .compact();
   }
 
-  //@Test
+  @Test
   public void schedulerTest() throws JsonProcessingException
   {
     ObjectNode node = scheduleData();
@@ -563,7 +547,7 @@ public class AnalyzeIT extends BaseIT {
      return objectNode;
     }
 
-  //@Test
+  @Test
   public void kpiExecuteTest() throws JsonProcessingException
   {
     ObjectNode node = kpiData();

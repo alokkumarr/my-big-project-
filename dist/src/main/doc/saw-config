@@ -58,7 +58,6 @@ saw_zookeeper_quorum=localhost
 #saw_spark_executor_instances_regular=2
 #saw_spark_executor_instances_fast=1
 saw_executor_result_wait_time=300
-saw_binary_migration_requires=true
 
 #
 # Elasticsearch configuration

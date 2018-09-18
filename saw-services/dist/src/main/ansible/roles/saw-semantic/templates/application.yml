@@ -28,5 +28,5 @@ metastore:
 semantic:
     workbench-url:  http://localhost:9700
     transport-metadata-url:  http://localhost:9200
-    binary-migration-requires: {{ saw_binary_migration_requires | default('true') }}
+    binary-migration-requires: true
     migration-metadata-home: {{  sip_var_path | default('/var/sip/') }}
