@@ -111,6 +111,15 @@ export class DragnDropService {
       this._moveEventAccumulator.from = event;
       break;
     }
+
+    if (this._moveEventAccumulator.from) {
+      if (this._moveEventAccumulator.from.container) {
+        if (this._moveEventAccumulator.from.container.marker === this._moveEventAccumulator.to.container.marker) {
+          return false;
+        }
+      }
+    }
+
     if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
       const {
         container: fromContainer,
