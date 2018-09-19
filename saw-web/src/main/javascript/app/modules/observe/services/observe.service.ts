@@ -198,9 +198,16 @@ export class ObserveService {
 
   /* Try to redirect to first dashboard or first empty subcategory */
   redirectToFirstDash(menu, force = false) {
-    /* Only redirect if on root observe state */
+
     const basePath = this.route.snapshot.children[0].url[0].path;
-    if (basePath !== 'observe' && !force) {
+    const { dashboard } = this.route.snapshot.queryParams;
+
+    /* If not on observe page, or a dashboard is being provided in url, don't
+     * load first dashboard automatically.
+     * If force is set, this behaviour is overrided, and first dashboard is
+     * loaded regardless.
+     */
+    if ((basePath !== 'observe' || dashboard) && !force) {
       return;
     }
 
