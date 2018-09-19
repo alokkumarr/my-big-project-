@@ -33,7 +33,8 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor') editor: AceEditorComponent;
 
   private _artifacts: Array<any>;
-  private editorOptions = { // tslint:disable-line
+  private editorOptions = {
+    // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
@@ -61,7 +62,8 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
     ]);
   }
 
-  @Input() set artifacts (tables) {
+  @Input()
+  set artifacts(tables) {
     if (!isEmpty(tables)) {
       this._artifacts = tables;
       this.generateCompletions();
@@ -79,7 +81,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
       });
 
       table.columns.forEach(column => {
-        const caption = column.alias || column.aliasName || column.displayName || column.columnName;
+        const caption = column.displayName || column.columnName;
         this.completions.push({
           name: caption,
           value: caption,
@@ -113,16 +115,21 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
         }
 
         var matchingCompletions = withCompleter.filter(
-          match => (match.caption || match.name).toLowerCase().indexOf(prefix.toLowerCase()) >= 0
-        )
+          match =>
+            (match.caption || match.name)
+              .toLowerCase()
+              .indexOf(prefix.toLowerCase()) >= 0
+        );
 
         return callback(null, cloneDeep(matchingCompletions));
       },
 
       insertMatch: (editor, data) => {
-        editor.completer.insertMatch({value: data.insertValue || data.value || data});
+        editor.completer.insertMatch({
+          value: data.insertValue || data.value || data
+        });
       }
-    }
+    };
     this.langTools.addCompleter(artifactsCompleter);
   }
 
