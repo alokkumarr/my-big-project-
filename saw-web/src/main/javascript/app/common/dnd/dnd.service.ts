@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as isFunction from 'lodash/isFunction';
+import * as get from 'lodash/get';
 import {
   IDragPayload,
   IDroppableOptions,
@@ -112,12 +113,8 @@ export class DragnDropService {
       break;
     }
 
-    if (this._moveEventAccumulator.from) {
-      if (this._moveEventAccumulator.from.container) {
-        if (this._moveEventAccumulator.from.container.marker === this._moveEventAccumulator.to.container.marker) {
-          return false;
-        }
-      }
+    if (get(this._moveEventAccumulator, 'from.container.marker') === get(this._moveEventAccumulator, 'to.container.marker')) {
+      return false;
     }
 
     if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
