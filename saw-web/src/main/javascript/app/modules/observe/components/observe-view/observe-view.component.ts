@@ -114,20 +114,22 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     const payload = [
       {
         key: PREFERENCES.DEFAULT_DASHBOARD,
-        value: this.isDefault ? this.dashboardId : null
+        value: this.dashboardId
       },
       {
         key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
-        value: this.isDefault ? this.subCategoryId : null
+        value: this.subCategoryId
       }
     ];
 
-    this.configService
-      .saveConfig(payload)
-      .subscribe(
-        () => this.checkDefaultDashboard(),
-        () => this.checkDefaultDashboard()
-      );
+    const action = this.isDefault
+      ? this.configService.saveConfig(payload)
+      : this.configService.deleteConfig(payload, false);
+
+    action.subscribe(
+      () => this.checkDefaultDashboard(),
+      () => this.checkDefaultDashboard()
+    );
   }
 
   /**
