@@ -41,7 +41,7 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
             });
          logger.trace(insertResult.length + " Preferences created successfully.");
         // update the sql .
-        String updateSQL = "UPDATE CONFIG_VAL SET CONFIG_VALUE = ? , MODIFIED_DATE = now(), MODIFIED_BY =? " +
+        String updateSQL = "UPDATE CONFIG_VAL SET CONFIG_VALUE = ? ,ACTIVE_STATUS_IND = '1', MODIFIED_DATE = now(), MODIFIED_BY =? " +
             " WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE=? AND CONFIG_VAL_OBJ_GROUP= ?";
         int[][] updateResult = jdbcTemplate.batchUpdate(updateSQL, userPreferences.getPreferences(), 1000,
             (ps, preference) -> {
