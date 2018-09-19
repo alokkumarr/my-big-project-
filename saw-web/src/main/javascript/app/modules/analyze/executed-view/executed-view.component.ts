@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as clone from 'lodash/clone';
 
 import {
   AnalyzeService,
@@ -347,6 +348,7 @@ export class ExecutedViewComponent implements OnInit {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
+        executeResponse.data = clone(flattenReportData(executeResponse.data, this.executedAnalysis));
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
@@ -402,14 +404,11 @@ export class ExecutedViewComponent implements OnInit {
           .utc(executeResponse.executedAt)
           .local()
           .format('YYYY/MM/DD h:mm A');
-        this.data = this.flattenData(
-          executeResponse.data,
-          this.executedAnalysis
-        );
+        this.data = executeResponse.data;
       } else {
         this.loadExecutionData(analysisId, executionId, analysisType).then(
           ({ data }) => {
-            this.data = this.flattenData(data, this.executedAnalysis);
+            this.data = data;
           }
         );
       }
@@ -442,9 +441,14 @@ export class ExecutedViewComponent implements OnInit {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
 
+          const isReportType = ['report', 'esReport'].includes(analysisType);
+          if (isReportType) {
+            data = clone(flattenReportData(data, this.analysis));
+          }
+
           this.setExecutedBy(executedBy);
           this.setExecutedAt(executionId);
-          return { data: flattenReportData(data, this.analysis), totalCount: count };
+          return { data: data, totalCount: count };
         },
         err => {
           this._headerProgressService.hide();
