@@ -636,7 +636,7 @@ public class AnalyzeIT extends BaseIT {
           .header("Authorization", "Bearer " + token)
           .header("Content-Type","application/json")
           .body(json1)
-          .when().delete("/security/auth/admin/user/preferences/delete")
+          .when().post("/security/auth/admin/user/preferences/delete")
           .then().assertThat().statusCode(200).extract().response();
 
       Response fetch = given(spec)
