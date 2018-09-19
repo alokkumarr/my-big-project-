@@ -174,7 +174,7 @@ public class SAWElasticTransportService {
       try {
           SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(reportDefinition, "sqlBuilder");
           if (sqlBuilderNode.getDataFields().get(0).getColumns()==null)
-              SAWReportTypeElasticSearchQueryBuilder.chnageOldEsReportStructureintoNewStructure(sqlBuilderNode);
+              SAWReportTypeElasticSearchQueryBuilder.changeOldEsReportStructureintoNewStructure(sqlBuilderNode);
          List<Column> aggregationField = ReportAggregationBuilder.getAggregationField(
              sqlBuilderNode.getDataFields().get(0).getColumns());
           ESReportAggregationParser esReportAggregationParser = new ESReportAggregationParser(

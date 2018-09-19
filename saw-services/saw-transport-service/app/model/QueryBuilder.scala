@@ -376,11 +376,22 @@ object QueryBuilder extends {
     def property(name: String) = {
       (orderBy \ name).extract[String]
     }
-    "%s.%s %s".format(
-      property("tableName"),
-      property("columnName"),
-      property("order")
-    )
+    val aggregate = (orderBy \ "aggregate")
+    if (aggregate!=null && aggregate!=None
+      && aggregate!= JNothing ) {
+      "%s(%s.%s) %s".format(
+        property("aggregate"),
+        property("tableName"),
+        property("columnName"),
+        property("order")
+      )
+    }else {
+       "%s.%s %s".format(
+        property("tableName"),
+        property("columnName"),
+        property("order")
+       )
+    }
   }
 
   def extractArray(json: JValue, name: String): List[JValue] = {

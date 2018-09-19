@@ -62,7 +62,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.from(0);
         if (sqlBuilderNode.getDataFields().get(0).getColumns()==null)
-             chnageOldEsReportStructureintoNewStructure(sqlBuilderNode);
+             changeOldEsReportStructureintoNewStructure(sqlBuilderNode);
         searchSourceBuilder.size(size);
         if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
             throw new NullPointerException(
@@ -283,7 +283,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
      * @param sqlBuilder
      * @return
      */
-    public static void chnageOldEsReportStructureintoNewStructure(SqlBuilder sqlBuilder){
+    public static void changeOldEsReportStructureintoNewStructure(SqlBuilder sqlBuilder){
         List<Column> columns = new ArrayList<>();
         String tableName = null;
         for (DataField dataField : sqlBuilder.getDataFields())
