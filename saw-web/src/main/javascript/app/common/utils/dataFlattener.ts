@@ -11,6 +11,12 @@ import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpReduce from 'lodash/fp/reduce';
+import * as mapKeys from 'lodash/mapKeys';
+import * as fpSplit from 'lodash/fp/split';
+import * as trimEnd from 'lodash/trimEnd';
+import * as fpMap from 'lodash/fp/map';
 
 
 export function flattenPivotData(data, sqlBuilder) {
@@ -122,30 +128,35 @@ export function flattenChartData(data, sqlBuilder) {
 }
 
 export function flattenReportData(data, analysis) {
-  let intermediateData = [];
-  data.map(row => {
-    let obj = {};
-    for (var key in row) {
-      let aggregateKey = key.split('(');
-      if (!isUndefined(aggregateKey[1])) {
-        forEach(analysis.artifacts, artifactscolumns => {
-          forEach(artifactscolumns.columns, col =>  {
-            if (
-              col.aggregate === aggregateKey[0] &&
-              col.columnName ===
-                aggregateKey[1].substring(0, aggregateKey[1].length - 1)
-            ) {
-              obj[col.columnName] = row[key];
-            }
-          });    
-        });
-      } else {
-        obj[key] = row[key];
+  const columnMap = fpPipe(
+    fpFlatMap(artifact => artifact.columns),
+    fpReduce((accumulator, column) => {
+      const {columnName, aggregate} = column;
+      const key = `${columnName})-${aggregate}`;
+      accumulator[key] = column;
+      return accumulator;
+    }, {})
+  )(analysis.artifacts);
+  return data.map(row => {
+    return mapKeys(row, (value, key) => {
+      const hasAggregateFunction = key.includes('(') && key.includes(')');
+
+      if (!hasAggregateFunction) {
+        return key;
       }
-    }
-    intermediateData.push(obj);
-  });
-  return intermediateData;
+      const [aggregate, columnName] = fpPipe(
+        fpSplit('(')
+      )(key);
+
+      const columnMapKey = `${columnName}-${aggregate}`;
+      const isInArtifactColumn = Boolean(columnMap[columnMapKey]);
+
+      if (isInArtifactColumn) {
+        return columnName.split(')')[0];
+      }
+      return key;
+    })
+  })
 }
 
 function parseNodeChart(node, dataObj, nodeFieldMap, level) {
