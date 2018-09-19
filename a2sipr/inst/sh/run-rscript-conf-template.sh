@@ -18,7 +18,7 @@ prep_conf_name
 
 # run_stage <XDF-COMP> <ICTL_NAME> ..
 Rscript \
-  $APPL_HOME/scripts/r_subscr_mms_script.R \
+  $APPL_HOME/scripts/RComp.R \
   -b $BATCH_ID \
   -a $APPL_NAME \
   -c $CONF_FILE \

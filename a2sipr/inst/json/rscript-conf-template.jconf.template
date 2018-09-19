@@ -1,22 +1,22 @@
 {
     "inputs":[
         {
-            "name":"MESSAGE_ENTITY_AGGR_DATA",
-            "dataSet":"MESSAGE_ENTITY_AGGR_DATA",
-	    "catalog": "dout"
+            "name":"CHANGEME_INP",
+            "dataSet":"CHANGEME_INP",
+	        "catalog": "dout"
         }
     ],
 	"outputs":[
 				{
-				"name":"SUBSCR_MMS_TBL",
-				"dataSet":"SUBSCR_MMS_TBL",
+				"name":"CHANGEME_OUT",
+				"dataSet":"CHANGEME_OUT",
 				"catalog":"dout",
 				"format":"parquet",
 				"numberOfFiles":100,
 				"mode" : "replace",
 				"metadata" : {
 					"createdBy" : "Vinnie",
-					"description" : "SB Subscriber MMS Details",
+					"description" : "Change Description for Output dataset to be created",
 					"category" : "aa",
 					"subCategory" : "r_component"
 				}}
@@ -101,8 +101,6 @@
     ],
     "r_component": {
 				"datasetType" : "component",
-				"createTemporaryDataset" : false,
-				"rLibraryLocation" : "/dfs/opt/aa-r-fw/libraries",
-                                "rLibraryList" : ["sparklyr","a2munge"]
+				"createTemporaryDataset" : false
         }
 }

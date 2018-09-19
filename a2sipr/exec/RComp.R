@@ -18,6 +18,9 @@
 #                       d. Config File name with all required info filled up
 #						e. R Home path on which Libraries are installed
 #                       f. XDF Root
+# Please update your business logic within the code block indicated as 
+# "Add Business Logic R Script here". The dataframe names should correspond
+# to the input & output dataset names with "_DF" added as suffix
 
 # Import Docopt libraries to read input
 # command line parameters
@@ -58,7 +61,10 @@ r_lib_home <- paste(r_home, "libraries", sep = "/")
 
 library(jsonlite, lib.loc = r_lib_home)
 library(dplyr, lib.loc = r_lib_home)
+library(sparklyr, lib.loc = r_lib_home)
+library(lubridate, lib.loc = r_lib_home)
 library(a2sipr, lib.loc = r_lib_home)
+library(a2munge, lib.loc = r_lib_home)
 
 conf_json <- jsonlite::fromJSON(readLines(conf_file))
 
@@ -70,16 +76,6 @@ conf_json <- jsonlite::fromJSON(readLines(conf_file))
 #     by R script are to be created in dout or temp catalog folders
 
 rcomp_conf_df <- as.data.frame(conf_json$r_component)
-
-# Read parameters for R Libraries location & list
-
-r_lib_loc <- as.character(rcomp_conf_df$rLibraryLocation)
-r_libraries <- rcomp_conf_df$rLibraryList
-
-for (lib_name in unlist(r_libraries))
-{
-  suppressMessages(library(lib_name, character.only = T, lib.loc =  r_lib_loc))
-}
 
 # Configure Spark connection ----------------------------------------
 # Get Spark configuration parameters using the main
@@ -189,9 +185,16 @@ for (inps in rcomp_inputs_df$dataSet) {
 
 # Add Business Logic R Script here ---------------------------------------
 
+# Update script name to be used in the below parameter
 
+r_script_name <- "R_Script_Component.R"
 
+# Apply Input & Output Dataset names as per requirement with "_DF" suffix 
+# added to the data frame names. In the below example CHANGEME_INP is the input 
+# dataset name & CHANGEME_OUT is the output dataset name
 
+CHANGEME_OUT_DF <- CHANGEME_INP_DF %>%
+  mutate(., COL1 = LOGIC1)
 
 #### End of Business Logic ####
 
@@ -208,7 +211,7 @@ outputs_df <- as.data.frame(conf_json$outputs)
 # Load Output datasets
 
 for (row in 1:nrow(outputs_df)) {
-   
+  
   output_dataset_name <- as.character(outputs_df[row, "dataSet"])
   
   output_dataset_ms <- paste(project, output_dataset_name, sep = "::")
@@ -217,19 +220,23 @@ for (row in 1:nrow(outputs_df)) {
   output_mode <- as.character(outputs_df[row, "mode"])
   output_data_format <- as.character(outputs_df[row, "format"])
   output_repart_numb <- as.numeric(outputs_df[row, "numberOfFiles"])
-
+  output_partit_by <- as.character(outputs_df[row, "partitionKeys"])
+  
+  if (is.na(output_partit_by) || output_partit_by == "" || identical(output_partit_by, character(0))) {
+    output_partit_by <- NULL
+  }
+  
   output_schema <- list(
     list(name = "ID", type = "long"),
-    list(name = "KEY", type = "string"),
-    list(name = "SECRETS", type = "string")
+    list(name = "KEY", type = "string")
   )
   
   sip_add_dataset(
     output_format = output_data_format,
     output_name = output_dataset_name,
     output_schema = output_schema,
-    script = "R_Script_Component.R",
-    created_by = "sipuser",
+    script = r_script_name,
+    created_by = Sys.info()["user"],
     batch_id = batch_id,
     started = format(as.POSIXct(Sys.time()), "%Y%m%d-%H%M%S"),
     catalog = output_catalog,
@@ -257,32 +264,26 @@ for (row in 1:nrow(outputs_df)) {
     mode = output_mode,
     type = output_data_format,
     partitions = output_repart_numb,
+    partition_by = output_partit_by,
     name = output_dataset_name
   )
-
-  if (class(eval(parse(text = output_df_name)))[1] == "data.frame") {
-    output_schema <- lapply(eval(parse(text = output_df_name)), class)
-  } else {
-    output_schema <- sdf_schema(eval(parse(text = output_df_name)))
-  }
-
-  #output_schema <- list(
-  #   list(name = "ID", type = "string")
-  #)
-
+  
+  # Get Dataset schema using the helpers function
+  
+  output_schema <- a2munge::schema(eval(parse(text = output_df_name)))
   
   #sip_add_dataset_details()
   sip_add_dataset(
     output_format = output_data_format,
     output_name = output_dataset_name,
     output_schema = output_schema,
-    script = "R_Script_Component.R",
-    created_by = "sipuser",
+    script = r_script_name,
+    created_by = Sys.info()["user"],
     batch_id = batch_id,
     started = format(as.POSIXct(Sys.time()), "%Y%m%d-%H%M%S"),
     catalog = output_catalog,
     project_id = project,
-    status = "In Progress",
+    status = "Success",
     hostname = saw_host_name,
     token = saw_login_token,
     input_paths = input_dataset_folder,
@@ -290,6 +291,8 @@ for (row in 1:nrow(outputs_df)) {
     input_ids = input_dataset_ms,
     component = "A2 R Script Component"
   )
+  
+  rm(output_df_name)
   
 }
 
