@@ -283,7 +283,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
      * @param sqlBuilder
      * @return
      */
-    private void chnageOldEsReportStructureintoNewStructure(SqlBuilder sqlBuilder){
+    public static void chnageOldEsReportStructureintoNewStructure(SqlBuilder sqlBuilder){
         List<Column> columns = new ArrayList<>();
         String tableName = null;
         for (DataField dataField : sqlBuilder.getDataFields())
