@@ -182,7 +182,7 @@ module.exports = {
   },
   distRun: distRun,
   sawWebUrl: () => {
-    if (!distRun()) {
+    if (distRun()) {
       var host = browser.params.saw.docker.host;
       var port = browser.params.saw.docker.port;
       return 'http://' + host + ':' + port + '/saw/web/';
