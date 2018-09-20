@@ -155,13 +155,26 @@ module.exports = {
     };
   },
   getSawWebUrl: () => {
-    let url = null;
-    process.argv.forEach(function (val) {
-      if(val.includes('--baseUrl')) {
-        url =  val.split('=')[1];
-        return;
-      }
-    });
+    let url;
+
+    if (!fs.existsSync('target')){
+      fs.mkdirSync('target');
+    }
+
+    if (fs.existsSync('target/url.json')) {
+      url = JSON.parse(fs.readFileSync('target/url.json','utf8')).baseUrl;
+    } else {
+      process.argv.forEach(function (val) {
+        if(val.includes('--baseUrl')) {
+          url =  val.split('=')[1];url
+          let urlObject = {
+            baseUrl:url
+          }
+          fs.writeFileSync('target/url.json', JSON.stringify(urlObject), { encoding: 'utf8' });
+          return;
+        }
+      });
+    }
     return url;
   },
   getTestData: () => {
