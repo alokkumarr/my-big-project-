@@ -42,9 +42,10 @@ provided in the environment:
   deploy command and store the environment configuration.  The deploy
   host is typically common to the entire environment.
 
-. Provision a host for running SIP (the target host), with 32 GB of
-  memory and CentOS 7.4 as the operating system.  The host should be
-  dedicated to SIP and not run other applications.
+. Provision hosts for running SIP (the target host), with 32 GB of
+  memory and CentOS 7.4 as the operating system.  The hosts should be
+  dedicated to SIP and not run other applications.  The hosts should
+  have time synchronization enabled.
 
 . Install and configure MapR client on the SAW target host.
 
