@@ -274,3 +274,80 @@ context("A2Sipr catalog function unit tests")
 #   expect_equal(output_proj_id, get_ds_project_id)
 #   expect_equal(output_catalog, get_ds_catalog)
 # })
+#
+# # Test 4: RestAPI-Add DS function test with no catalog option ----------------------------
+# 
+# add_ds1 <- sip_add_dataset(
+#   output_name = output_name1,
+#   output_format = output_format,
+#   output_schema = output_schema_list,
+#   output_rows = output_rows,
+#   component = component,
+#   script = script,
+#   desc = desc,
+#   created_by = created_by,
+#   project_id = project_id,
+#   batch_id = batch_id,
+#   input_paths = input_paths,
+#   input_formats = input_formats,
+#   input_ids = input_ids,
+#   started = started,
+#   finished = finished,
+#   status = status,
+#   hostname = hostname,
+#   token = jwt_token
+# )
+# 
+# test_that("Check if catalog and output name are expected", {
+#   expect_equal(add_ds1$system$name, output_name1)
+#   expect_equal(add_ds1$system$catalog, catalog1)
+# })
+# 
+# 
+# # Test the physical location is derived using catalog ---------------------
+# 
+# exp_phys_loc <-
+#   paste0("maprfs:///var/sip/",
+#          project_id,
+#          "/dl/fs/",
+#          catalog1,
+#          "/",
+#          output_name1,
+#          "/",
+#          "data")
+# 
+# actual_phys_loc <- add_ds1$system$physicalLocation
+# 
+# test_that("Physical location matches with expected one", {
+#   expect_equal(exp_phys_loc, actual_phys_loc)
+# })
+# 
+# # Test that the added dataset details match the correct catalog and physical loc --------
+# 
+# get_ds_detail1 <- sip_get_dataset_details(
+#   dataset_id = add_ds1$`_id`,
+#   project_id = project_id,
+#   hostname = hostname,
+#   token = jwt_token
+# )
+# 
+# output_ds <- add_ds1$system$name
+# output_format <-  add_ds1$system$outputFormat
+# output_phys_loc <- add_ds1$system$physicalLocation
+# output_proj_id <- add_ds1$system$project
+# output_catalog <- add_ds1$system$catalog
+# get_ds <- get_ds_detail1$system$name
+# get_ds_output_format <- get_ds_detail1$system$outputFormat
+# get_ds_physical_loc <- get_ds_detail1$system$physicalLocation
+# get_ds_project_id <- get_ds_detail1$system$project
+# get_ds_catalog <- get_ds_detail1$system$catalog
+# 
+# test_that("Newly added DS content matches with get DS details", {
+#   expect_equal(output_ds, get_ds)
+#   expect_equal(output_ds, get_ds)
+#   expect_equal(output_format, get_ds_output_format)
+#   expect_equal(output_phys_loc, get_ds_physical_loc)
+#   expect_equal(output_proj_id, get_ds_project_id)
+#   expect_equal(output_catalog, get_ds_catalog)
+# })
+# 
