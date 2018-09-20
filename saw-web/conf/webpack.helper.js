@@ -17,6 +17,9 @@ function distRun() {
 
 function generateFailedTests(dir) {
 
+  if (!fs.existsSync('target')){
+    fs.mkdirSync('target');
+  }
   if (!fs.existsSync('target/testData')){
     fs.mkdirSync('target/testData');
   }
@@ -138,6 +141,7 @@ function generateFailedTests(dir) {
   }
 }
 
+
 module.exports = {
   root: (...args) => {
     return path.join(process.cwd(), ...args);
@@ -150,6 +154,16 @@ module.exports = {
 
       return (c > d) ? 1 : (c < d) ? -1 : 0;
     };
+  },
+  getSawWebUrl: () => {
+    let url = null;
+    process.argv.forEach(function (val) {
+      if(val.includes('--baseUrl')) {
+        url =  val.split("=")[1];
+        return;
+      }
+    });
+    return url;
   },
   getTestData: () => {
 
@@ -168,7 +182,7 @@ module.exports = {
   },
   distRun: distRun,
   sawWebUrl: () => {
-    if (distRun()) {
+    if (!distRun()) {
       var host = browser.params.saw.docker.host;
       var port = browser.params.saw.docker.port;
       return 'http://' + host + ':' + port + '/saw/web/';

@@ -188,10 +188,6 @@ exports.config = {
   onPrepare() {
     retry.onPrepare();
 
-    // Generate test data
-    token = generate.token(browser.baseUrl);
-    generate.usersRolesPrivilegesCategories(token);
-
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,
@@ -249,7 +245,9 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
-
+    // Generate test data
+    token = generate.token(webpackHelper.getSawWebUrl());
+    generate.usersRolesPrivilegesCategories(token);
   },
   afterLaunch: function() {
 
