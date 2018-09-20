@@ -147,8 +147,11 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    this.columns = this.artifacts2Columns(this.analysis.artifacts);
     this.data = data;
+    if (!this.artifacts) {
+      return;
+    }
+    this.columns = this.artifacts2Columns(this.artifacts);
   }
   @Input('dataLoader')
   set setDataLoader(
