@@ -141,7 +141,6 @@ function generateFailedTests(dir) {
   }
 }
 
-
 module.exports = {
   root: (...args) => {
     return path.join(process.cwd(), ...args);
