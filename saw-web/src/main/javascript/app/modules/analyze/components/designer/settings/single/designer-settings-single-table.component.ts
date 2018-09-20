@@ -14,7 +14,6 @@ import {
   ArtifactColumn,
   ArtifactColumns,
   ArtifactColumnFilter,
-  ArtifactColumnPivot,
   DesignerChangeEvent
 } from '../../types';
 import { TYPE_ICONS_OBJ, TYPE_ICONS, TYPE_MAP } from '../../../../consts';
