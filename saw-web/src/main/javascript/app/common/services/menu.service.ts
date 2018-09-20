@@ -1,11 +1,4 @@
-import { Injectable } from '@angular/core';
-import * as map from 'lodash/map';
-import * as get from 'lodash/get';
-import * as filter from 'lodash/filter';
-import * as find from 'lodash/find';
-import * as startsWith from 'lodash/startsWith';
-
-import { JwtService } from '../../../login/services/jwt.service';
+import { Injectable } from '@angular/core'; import * as map from 'lodash/map'; import * as get from 'lodash/get'; import * as filter from 'lodash/filter'; import * as find from 'lodash/find'; import * as startsWith from 'lodash/startsWith'; import { JwtService } from '../../../login/services/jwt.service';
 import { SidenavMenuService } from '../components/sidenav/sidenav-menu.service';
 
 export const SAW_MODULES = {
@@ -72,14 +65,20 @@ export class MenuService {
 
           /* Since there are no subcategories in observe, don't add them if they're there */
           obj.children = map(feature.productModuleSubFeatures, subfeature => {
+            // Workbench uses defaultURL attribute value to navigate from side nav.
+            // 'WRK000001' is the module code for workbench.
+            const url =
+            subfeature.prodModCode === 'WRK000001' ? [
+              `/${moduleName.toLowerCase()}`,
+              `${subfeature.defaultURL}`
+            ] : [
+              `/${moduleName.toLowerCase()}`,
+              `${subfeature.prodModFeatureID}`
+            ];
             return {
               id: subfeature.prodModFeatureID,
-              name:
-                subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
-              url: [
-                `/${moduleName.toLowerCase()}`,
-                `${subfeature.prodModFeatureID}`
-              ],
+              name: subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
+              url,
               data: subfeature
             };
           });
