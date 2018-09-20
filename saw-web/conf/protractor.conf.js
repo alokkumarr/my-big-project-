@@ -246,8 +246,12 @@ exports.config = {
   },
   beforeLaunch: function () {
     // Generate test data
-    token = generate.token(webpackHelper.getSawWebUrl());
-    generate.usersRolesPrivilegesCategories(token);
+    if(webpackHelper.getSawWebUrl()) {
+      token = generate.token(webpackHelper.getSawWebUrl());
+      generate.usersRolesPrivilegesCategories(token);
+    } else {
+      throw new Error('saw web url can not be null');
+    }
   },
   afterLaunch: function() {
 
