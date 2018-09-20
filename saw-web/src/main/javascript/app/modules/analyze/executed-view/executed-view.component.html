@@ -46,7 +46,7 @@
     <div *ngIf="analyses && !analyses.length && !onetimeExecution">
       <div class="prompt-execution-container" fxLayout="column" fxLayoutAlign="center center">
         <span i18n>This analysis hasn't been been executed yet. Execute it now?</span>
-          <button mat-raised-button color="primary" [disabled]="!analysis" (click)="executeAnalysis(analysis)" i18n>
+          <button mat-raised-button color="primary" [disabled]="isExecuting" (click)="executeAnalysis(analysis)" i18n>
             Execute
           </button>
       </div>

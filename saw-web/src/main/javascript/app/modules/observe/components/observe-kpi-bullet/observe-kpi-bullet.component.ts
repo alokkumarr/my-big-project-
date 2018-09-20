@@ -16,7 +16,6 @@ import * as defaults from 'lodash/defaults';
 import { DATE_PRESETS_OBJ, BULLET_CHART_OPTIONS } from '../../consts';
 import { ObserveService } from '../../services/observe.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 
 import { Observable } from 'rxjs/Observable';
@@ -55,8 +54,7 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
 
   constructor(
     private observe: ObserveService,
-    private globalFilterService: GlobalFilterService,
-    private progressService: HeaderProgressService
+    private globalFilterService: GlobalFilterService
   ) {}
 
   ngOnInit() {
@@ -138,10 +136,8 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
     const kpiFilter = this.filterLabel();
     const primaryAggregate = get(kpi, 'dataFields.0.aggregate', []);
     const categories = get(kpi, 'dataFields.0.displayName', '');
-    this.progressService.show();
     this.observe.executeKPI(kpi).subscribe(
       res => {
-        this.progressService.hide();
         const count: number = get(
           res,
           `data.current.${dataFieldName}._${primaryAggregate}`
@@ -177,9 +173,6 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
         );
         this.reloadChart(changes);
         this.item && this.onRefresh.emit(this.item);
-      },
-      () => {
-        this.progressService.hide();
       }
     );
   }

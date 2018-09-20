@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 
 import { configureTests } from '../../../../../../test/javascript/helpers/configureTests';
 import { TestBed } from '@angular/core/testing';
@@ -28,7 +28,7 @@ describe('Workbench Service', () => {
       providers: [
         WorkbenchService,
         { provide: JwtService, useValue: jwtMockService },
-        { provide: UIRouter, useValue: mockService }
+        { provide: Router, useValue: mockService }
       ]
     }).compileComponents();
     workbenchService = TestBed.get(WorkbenchService);

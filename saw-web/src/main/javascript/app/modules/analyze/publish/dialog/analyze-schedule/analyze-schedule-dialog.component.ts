@@ -12,7 +12,6 @@ import * as moment from 'moment';
 
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../../login/services/jwt.service';
-import {HeaderProgressService} from '../../../../../common/services/header-progress.service';
 import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
@@ -75,8 +74,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       analysis: Analysis;
     },
     private _analyzeService: AnalyzeService,
-    private _jwt: JwtService,
-    private _headerProgress: HeaderProgressService
+    private _jwt: JwtService
   ) {}
 
   ngOnInit() {
@@ -107,7 +105,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
 
   fetchCronDetails() {
     const {type, id, categoryId} = this.data.analysis;
-    this._headerProgress.show();
     if (type !== 'chart') {
       this.getFTPLocations();
     }
@@ -120,7 +117,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       this.loadCron = true;
       if (response.statusCode === 200) {
         this.loadCronLayout = true;
-        this._headerProgress.hide();
         const jobDetails = response.data.jobDetails;
 
         if (jobDetails) {
@@ -155,7 +151,6 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       }
     }, () => {
       this.loadCronLayout = true;
-      this._headerProgress.hide();
     });
   }
 
@@ -164,7 +159,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       jobGroup: this.token.ticket.custCode
     };
     this._analyzeService.getlistFTP(request).then(response => {
-      this.locations = response.data.ftp;
+      this.locations = response.ftp;
     });
   }
 

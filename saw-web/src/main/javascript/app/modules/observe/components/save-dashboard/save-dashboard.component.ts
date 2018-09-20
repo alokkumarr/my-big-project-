@@ -1,19 +1,22 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Dashboard } from '../../models/dashboard.interface';
-import { ObserveService } from '../../services/observe.service';
-import { MenuService } from '../../../../common/services/menu.service';
-import { JwtService } from '../../../../../login/services/jwt.service';
-import { requireIf } from '../../validators/required-if.validator';
 import { Subscription } from 'rxjs/Subscription';
-
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
 import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
+
+import { Dashboard } from '../../models/dashboard.interface';
+import { ObserveService } from '../../services/observe.service';
+import {
+  MenuService,
+  HeaderProgressService
+} from '../../../../common/services';
+import { JwtService } from '../../../../../login/services/jwt.service';
+import { requireIf } from '../../validators/required-if.validator';
 
 const template = require('./save-dashboard.component.html');
 require('./save-dashboard.component.scss');
@@ -72,6 +75,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   private refreshIntervals = REFRESH_INTERVALS;
   public showProgress = false;
   private listeners: Array<Subscription> = [];
+  progressSub;
 
   constructor(
     private dialogRef: MatDialogRef<SaveDashboardComponent>,
@@ -79,8 +83,12 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private menu: MenuService,
     private observe: ObserveService,
-    private jwt: JwtService
+    private jwt: JwtService,
+    private _headerProgress: HeaderProgressService
   ) {
+    this.progressSub = _headerProgress.subscribe(showProgress => {
+      this.showProgress = showProgress
+    });
     this.createForm();
   }
 
@@ -97,6 +105,10 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     });
 
     this.disableIntervalConditionally();
+  }
+
+  ngOnDestroy() {
+    this.progressSub.unsubscribe();
   }
 
   disableIntervalConditionally() {
@@ -180,15 +192,10 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showProgress = true;
     assign(this.dashboard, this.dashboardForm.value);
     this.observe.saveDashboard(this.dashboard).subscribe(
       data => {
-        this.showProgress = false;
         this.closeDashboard(data);
-      },
-      err => {
-        this.showProgress = false;
       }
     );
   }
