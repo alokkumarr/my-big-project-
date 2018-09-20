@@ -158,7 +158,7 @@ module.exports = {
     let url = null;
     process.argv.forEach(function (val) {
       if(val.includes('--baseUrl')) {
-        url =  val.split("=")[1];
+        url =  val.split('=')[1];
         return;
       }
     });
