@@ -10,9 +10,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
-import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { ChartComponent } from '../../../../common/components/charts/chart.component';
 import { flattenChartData } from '../../../../common/utils/dataFlattener';
 import * as isUndefined from 'lodash/isUndefined';
@@ -65,9 +63,7 @@ export class ObserveChartComponent {
   constructor(
     public chartService: ChartService,
     public analyzeService: AnalyzeService,
-    public sortService: SortService,
-    public filterService: FilterService,
-    public progressService: HeaderProgressService
+    public filterService: FilterService
   ) {}
 
   ngOnInit() {
@@ -111,10 +107,6 @@ export class ObserveChartComponent {
     this.labels = { x: null, y: null, tempX: null, tempY: null };
     this.labels.tempX = this.labels.x = get(this.analysis, 'xAxis.title', null);
     this.labels.tempY = this.labels.y = get(this.analysis, 'yAxis.title', null);
-
-    const sortFields = this.sortService.getArtifactColumns2SortFieldMapper()(
-      this.analysis.artifacts[0].columns
-    );
     this.sorts = this.analysis.sqlBuilder.sorts;
 
     this.filters = map(
@@ -242,12 +234,10 @@ export class ObserveChartComponent {
 
   onRefreshData() {
     const payload = this.generatePayload(this.analysis);
-    this.progressService.show();
     return this.analyzeService
       .getDataBySettings(payload, EXECUTION_MODES.LIVE)
       .then(
         ({ data }) => {
-          this.progressService.hide();
           const parsedData = flattenChartData(data, payload.sqlBuilder);
           if (this.ViewMode) {
             this.chartToggleData = this.trimKeyword(parsedData);
@@ -255,7 +245,6 @@ export class ObserveChartComponent {
           return parsedData || [];
         },
         err => {
-          this.progressService.hide();
           throw err;
         }
       );

@@ -1,12 +1,11 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import * as get from 'lodash/get';
 
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
@@ -42,9 +41,8 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   searchBox: SearchBoxComponent;
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     public dialog: MatDialog,
-    private headerProgress: HeaderProgressService,
     private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private datePipe: DatePipe,
@@ -80,7 +78,6 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   }
 
   getDatasets(): void {
-    this.headerProgress.show();
     this.workBench.getDatasets().subscribe((data: any[]) => {
       this.availableSets = data;
       this.updateData(this.availableSets);
@@ -88,11 +85,9 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   }
 
   getDatapods(): void {
-    this.headerProgress.show();
     this.workBench.getListOfSemantic().subscribe((data: any[]) => {
       this.availableDP = get(data, 'contents[0].ANALYZE');
       this.updateData(this.availableDP);
-      this.headerProgress.hide();
     });
   }
 
@@ -195,7 +190,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   }
 
   addDataSet(): void {
-    this.router.stateService.go('workbench.add');
+    this.router.navigate(['workbench', 'dataset', 'add']);
   }
 
   /**

@@ -1,12 +1,11 @@
 
-import { Component, Inject, ViewChild, OnInit, Input, AfterViewInit, OnDestroy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
-import { UIRouter } from '@uirouter/angular';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { Router } from '@angular/router';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
-import * as get from 'lodash/get';
 import * as endsWith from 'lodash/endsWith';
 
 import { SQL_AQCTIONS } from '../../sample-data';
@@ -34,7 +33,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
   private query: string = '';
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     public dialog: MatDialog,
     private workBench: WorkbenchService,
     private notify: ToastService
@@ -103,15 +102,15 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Constructs the payload for SQL executor component. 
-   * 
-   * @param {any} data 
+   * Constructs the payload for SQL executor component.
+   *
+   * @param {any} data
    * @memberof SqlExecutorComponent
    */
   triggerSQL(data) {
     /**
-     * Temporary workaround to construct user friendly SQL script. 
-     * Will be handled in BE in upcoming release  
+     * Temporary workaround to construct user friendly SQL script.
+     * Will be handled in BE in upcoming release
      */
     const appendedScript = `CREATE TABLE ${data.name} AS ${this.query}`;
     const script = endsWith(appendedScript, ';') === true ? `${appendedScript}` : `${appendedScript};`
@@ -126,7 +125,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     this.workBench.triggerParser(payload).subscribe(data => {
       this.notify.info('SQL_Executor_triggered_successfully', 'Creating Dataset', { hideDelay: 9000 });
     });
-    this.router.stateService.go('workbench.dataobjects');
+    this.router.navigate(['workbench' ,'dataobjects']);
   }
 
   previewAction(action) {
@@ -134,6 +133,6 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
   }
 
   backToDS() {
-    this.router.stateService.go('workbench.dataobjects');
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 }

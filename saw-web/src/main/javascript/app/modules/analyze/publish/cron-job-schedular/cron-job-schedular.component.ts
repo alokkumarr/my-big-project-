@@ -1,6 +1,4 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
-import { MatTabChangeEvent } from '@angular/material';
-import {FormControl} from '@angular/forms';
 import * as clone from 'lodash/clone';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
