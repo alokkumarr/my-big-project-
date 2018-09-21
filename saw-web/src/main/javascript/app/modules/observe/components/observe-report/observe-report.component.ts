@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
 import { AnalysisReport } from '../../../analyze/types';
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -39,8 +38,7 @@ export class ObserveReportComponent implements OnDestroy {
   dataLoader = this.loadData.bind(this);
 
   constructor(
-    private analyzeService: AnalyzeService,
-    private progressService: HeaderProgressService
+    private analyzeService: AnalyzeService
   ) {}
 
   ngOnDestroy() {
@@ -58,17 +56,14 @@ export class ObserveReportComponent implements OnDestroy {
           })
           .then(({ data, count }) => ({ data, totalCount: count }));
       } else {
-        this.progressService.show();
         return this.analyzeService
           .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, options)
           .then(
             ({ data, executionId, count }) => {
-              this.progressService.hide();
               this.executionId = executionId;
               return { data, totalCount: count };
             },
             err => {
-              this.progressService.hide();
               throw err;
             }
           );

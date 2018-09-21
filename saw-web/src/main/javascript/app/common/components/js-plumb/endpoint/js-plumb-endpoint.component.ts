@@ -1,37 +1,27 @@
-import {
-  Directive,
-  Input,
-  Output,
-  ElementRef
-} from '@angular/core';
-import {
-  Artifact,
-  JoinCriterion,
-  ArtifactColumnReport,
-  EndpointPayload,
-  EndpointSide
-} from '../types';
+import { Directive, Input, ElementRef } from '@angular/core';
+import { ArtifactColumnReport, EndpointPayload, EndpointSide } from '../types';
 import { JS_PLUMB_DEFAULT_SETTINGS } from '../settings';
 
 const ENDPOINT_ANCHORS = {
   left: 'LeftMiddle',
   right: 'RightMiddle'
-
-}
+};
 @Directive({
   selector: 'js-plumb-endpoint-u'
 })
 export class JsPlumbEndpointComponent {
-  @Input() column: ArtifactColumnReport;
-  @Input() artifactName: string;
-  @Input() side: EndpointSide;
-  @Input() plumbInstance: any;
+  @Input()
+  column: ArtifactColumnReport;
+  @Input()
+  artifactName: string;
+  @Input()
+  side: EndpointSide;
+  @Input()
+  plumbInstance: any;
 
   private _endpointInstance: any;
 
-  constructor (
-    private _elementRef: ElementRef
-  ) {}
+  constructor(private _elementRef: ElementRef) {}
 
   ngOnInit() {
     setTimeout(() => {
@@ -43,7 +33,11 @@ export class JsPlumbEndpointComponent {
     this.removeEndpoint();
   }
 
-  addEndpoint(column: ArtifactColumnReport, side: EndpointSide, artifactName: string) {
+  addEndpoint(
+    column: ArtifactColumnReport,
+    side: EndpointSide,
+    artifactName: string
+  ) {
     const endpointSettings = JS_PLUMB_DEFAULT_SETTINGS.endpoints.source;
 
     const endPointIdentifier = `${artifactName}:${column.columnName}:${side}`;
@@ -65,7 +59,11 @@ export class JsPlumbEndpointComponent {
 
     element.classList.add(`jsp-endpoint-${options.anchor}`);
 
-    this._endpointInstance = this.plumbInstance.addEndpoint(element, endpointSettings, options);
+    this._endpointInstance = this.plumbInstance.addEndpoint(
+      element,
+      endpointSettings,
+      options
+    );
     this._endpointInstance.setParameter('endpointPayload', endpointPayload);
   }
 

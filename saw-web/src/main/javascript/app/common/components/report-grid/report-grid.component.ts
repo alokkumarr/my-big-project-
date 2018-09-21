@@ -25,7 +25,6 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
-import { DATE_FORMATS_OBJ } from '../../consts.js';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as filter from 'lodash/filter';
@@ -33,7 +32,6 @@ import * as map from 'lodash/map';
 
 import {
   AGGREGATE_TYPES,
-  DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ
 } from '../../consts';
 
@@ -45,12 +43,8 @@ import {
 } from './types';
 import {
   DATE_TYPES,
-  NUMBER_TYPES,
-  FLOAT_TYPES,
-  INT_TYPES,
-  DATE_INTERVALS_OBJ
+  NUMBER_TYPES
 } from '../../../modules/analyze/consts';
-import { componentFactoryName } from '@angular/compiler';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 import {
@@ -152,11 +146,16 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
+
     if (!this.isInQueryMode) {      
       const artifact = this.fetchColumsUponCheck();
+      if (!this.artifacts) {
+        return;
+      }
       this.columns = this.artifacts2Columns(artifact);
     }
     this.data = flattenReportData(data, this.analysis)
+    
   }
   @Input('dataLoader')
   set setDataLoader(

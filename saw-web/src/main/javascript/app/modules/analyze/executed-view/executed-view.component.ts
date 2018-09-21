@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Transition, StateService } from '@uirouter/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 import * as moment from 'moment';
 import { Subscription } from 'rxjs/Subscription';
+import { combineLatest, timer } from 'rxjs';
+import { debounce } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as clone from 'lodash/clone';
@@ -19,7 +21,6 @@ import {
   IExecuteEventEmitter,
   EXECUTION_STATES
 } from '../services/execute.service';
-import { HeaderProgressService } from '../../../common/services/header-progress.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import {
   flattenPivotData,
@@ -65,10 +66,9 @@ export class ExecutedViewComponent implements OnInit {
 
   constructor(
     private _executeService: ExecuteService,
-    private _headerProgressService: HeaderProgressService,
     private _analyzeService: AnalyzeService,
-    private _transition: Transition,
-    private _state: StateService,
+    private _router: Router,
+    private _route: ActivatedRoute,
     private _analyzeActionsService: AnalyzeActionsService,
     private _jwt: JwtService,
     private _analyzeExportService: AnalyzeExportService,
@@ -79,22 +79,33 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    const {
-      analysis,
-      analysisId,
-      executionId,
-      awaitingExecution,
-      loadLastExecution
-    } = this._transition.params();
+    combineLatest(
+      this._route.params,
+      this._route.queryParams
+    ).pipe(
+      debounce(() => timer(100))
+    ).subscribe(([params, queryParams]) => {
+      this.onParamsChange(params, queryParams);
+    });
 
     this.canAutoRefresh = this._jwt.hasCustomConfig(
       CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
     );
+  }
+
+  onParamsChange(params, queryParams) {
+    const {
+      analysisId
+    } = params;
+    const {
+      awaitingExecution,
+      loadLastExecution,
+      executionId
+    } = queryParams;
 
     this.executionId = executionId;
-    if (analysis) {
-      this.analysis = analysis;
-      this.executedAnalysis = { ...this.analysis };
+
+    this.loadAnalysisById(analysisId).then(analysis => {
       this.setPrivileges(analysis);
 
       this.executeIfNotWaiting(
@@ -103,18 +114,8 @@ export class ExecutedViewComponent implements OnInit {
         loadLastExecution,
         executionId
       );
-    } else {
-      this.loadAnalysisById(analysisId).then(analysis => {
-        this.setPrivileges(analysis);
+    });
 
-        this.executeIfNotWaiting(
-          analysis,
-          awaitingExecution,
-          loadLastExecution,
-          executionId
-        );
-      });
-    }
     this.executionsSub = this._executeService.subscribe(
       analysisId,
       this.onExecutionsEvent
@@ -218,16 +219,14 @@ export class ExecutedViewComponent implements OnInit {
   gotoLastPublished(analysis, { executionId }) {
     return () => {
       this._toastMessage.clear();
-      this._state.go(
-        'analyze.executedDetail',
-        {
-          analysisId: analysis.id,
-          analysis: analysis,
-          executionId,
-          awaitingExecution: false,
-          loadLastExecution: true
-        },
-        { reload: true }
+      this._router.navigate(
+        ['analyze', 'analysis', analysis.id, 'executed'], {
+          queryParams: {
+            executionId,
+            awaitingExecution: false,
+            loadLastExecution: true
+          }
+        }
       );
     };
   }
@@ -303,35 +302,28 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   loadExecutedAnalyses(analysisId) {
-    this._headerProgressService.show();
     return this._analyzeService
       .getPublishedAnalysesByAnalysisId(analysisId)
       .then(
         analyses => {
           this.analyses = analyses;
           this.setExecutedAt(this.executionId);
-
-          this._headerProgressService.hide();
           return analyses;
         },
         err => {
-          this._headerProgressService.hide();
           throw err;
         }
       );
   }
 
   loadAnalysisById(analysisId) {
-    this._headerProgressService.show();
     return this._analyzeService.readAnalysis(analysisId).then(
       analysis => {
         this.analysis = analysis;
         this.executedAnalysis = { ...this.analysis };
-        this._headerProgressService.hide();
         return analysis;
       },
       err => {
-        this._headerProgressService.hide();
         throw err;
       }
     );
@@ -429,14 +421,12 @@ export class ExecutedViewComponent implements OnInit {
 
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
-    this._headerProgressService.show();
     options.analysisType = analysisType;
 
     return this._analyzeService
       .getExecutionData(analysisId, executionId, options)
       .then(
         ({ data, count, queryBuilder, executedBy }) => {
-          this._headerProgressService.hide();
           if (this.executedAnalysis && queryBuilder) {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
@@ -451,7 +441,6 @@ export class ExecutedViewComponent implements OnInit {
           return { data: data, totalCount: count };
         },
         err => {
-          this._headerProgressService.hide();
           throw err;
         }
       );
@@ -474,7 +463,9 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   goBackToMainPage(analysis) {
-    this._state.go('analyze.view', { id: get(analysis, 'categoryId') });
+    this._router.navigate(
+      ['analyze', get(analysis, 'categoryId')]
+    );
   }
 
   edit() {
@@ -511,13 +502,15 @@ export class ExecutedViewComponent implements OnInit {
   }
 
   gotoForkedAnalysis(analysis) {
-    this._state.go('analyze.executedDetail', {
-      analysisId: analysis.id,
-      analysis: analysis,
-      executionId: null,
-      awaitingExecution: true,
-      loadLastExecution: false
-    });
+    this._router.navigate(
+      ['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executionId: null,
+          awaitingExecution: true,
+          loadLastExecution: false
+        }
+      }
+    );
   }
 
   afterDelete(analysis) {

@@ -85,7 +85,7 @@ module.exports = function (env) {
       new HappyPack({
         id: 'ts',
         threads: 4,
-        loaders: ['ng-annotate-loader', {
+        loaders: [{
           loader: 'ts-loader',
           options: {
             happyPackMode: true,
