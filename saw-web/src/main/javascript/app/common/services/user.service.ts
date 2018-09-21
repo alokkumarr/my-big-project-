@@ -2,7 +2,7 @@ import * as get from 'lodash/get';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import AppConfig from '../../../../../appConfig';
+import AppConfig from '../../../../../../appConfig';
 import { JwtService } from './jwt.service';
 const loginUrl = AppConfig.login.url;
 const refreshTokenEndpoint = 'getNewAccessToken';

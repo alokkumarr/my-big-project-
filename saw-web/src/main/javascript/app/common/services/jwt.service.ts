@@ -4,7 +4,7 @@ import * as isArray from 'lodash/isArray';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
-import AppConfig from '../../../../../appConfig';
+import AppConfig from '../../../../../../appConfig';
 import { Injectable } from '@angular/core';
 
 const PRIVILEGE_CODE_LENGTH = 16;

@@ -8,8 +8,7 @@ import * as replace from 'lodash/replace';
 import * as startCase from 'lodash/startCase';
 import * as upperCase from 'lodash/upperCase';
 
-import { UserService } from '../../../../login/services/user.service';
-import { MenuService } from '../../../common/services/menu.service';
+import { UserService, MenuService} from '../../../common/services';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../../../modules/admin/consts';
 

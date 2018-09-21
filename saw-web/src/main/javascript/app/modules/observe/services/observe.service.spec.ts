@@ -8,8 +8,7 @@ import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { ObserveService } from './observe.service';
-import { JwtService } from '../../../../login/services/jwt.service';
-import { MenuService } from '../../../common/services/menu.service';
+import { JwtService, MenuService } from '../../../common/services';
 import { Observable } from 'rxjs/Observable';
 
 configureTests();

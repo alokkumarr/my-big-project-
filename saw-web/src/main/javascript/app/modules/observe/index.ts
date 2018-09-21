@@ -14,8 +14,7 @@ import {
 } from 'devextreme-angular';
 
 import { MaterialModule } from '../../material.module';
-import { UserService } from '../../../login/services/user.service';
-import { JwtService } from '../../../login/services/jwt.service';
+import { JwtService, UserService } from '../../common/services';
 import { AnalyzeService } from '../analyze/services/analyze.service';
 import { FilterService } from '../analyze/services/filter.service';
 import {

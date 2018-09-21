@@ -9,7 +9,7 @@ import {
 } from '../../services/execute.service';
 import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
-import { JwtService } from '../../../../../login/services/jwt.service';
+import { JwtService } from '../../../../common/services';
 
 const template = require('./analyze-card.component.html');
 require('./analyze-card.component.scss');

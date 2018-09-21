@@ -13,8 +13,7 @@ import { RouterModule } from '@angular/router';
 
 import { routes } from './routes';
 import { MaterialModule } from '../app/material.module';
-import { JwtService } from './services/jwt.service';
-import { UserService } from './services/user.service';
+import { JwtService, UserService } from '../app/common/services';
 import { IsUserNotLoggedInGuard } from './guards';
 
 import { LayoutContentComponent, LayoutFooterComponent } from './layout';

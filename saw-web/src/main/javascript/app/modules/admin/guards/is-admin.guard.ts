@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, CanActivateChild } from '@angular/router';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 
 @Injectable()
 export class isAdminGuard implements CanActivate, CanActivateChild {

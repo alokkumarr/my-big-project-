@@ -38,7 +38,7 @@ import {
   PrivilegeEditorComponent,
   PrivilegeRowComponent
 } from './privilege';
-import {JwtService} from '../../../login/services/jwt.service';
+import {JwtService} from '../../common/services';
 import {
   AddTokenInterceptor,
   HandleErrorInterceptor,

@@ -13,9 +13,9 @@ import { Dashboard } from '../../models/dashboard.interface';
 import { ObserveService } from '../../services/observe.service';
 import {
   MenuService,
-  HeaderProgressService
+  HeaderProgressService,
+  JwtService
 } from '../../../../common/services';
-import { JwtService } from '../../../../../login/services/jwt.service';
 import { requireIf } from '../../validators/required-if.validator';
 
 const template = require('./save-dashboard.component.html');

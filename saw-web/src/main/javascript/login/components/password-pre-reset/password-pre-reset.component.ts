@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { JwtService } from '../../services/jwt.service';
-import { UserService } from '../../services/user.service';
-import * as isEmpty from 'lodash/isEmpty';
+import { JwtService, UserService } from '../../../app/common/services';
 
 const template = require('./password-pre-reset.component.html');
 require ('./password-pre-reset.component.scss');

@@ -6,7 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { WorkbenchService } from './workbench.service';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 import { Observable } from 'rxjs/Observable';
 
 configureTests();

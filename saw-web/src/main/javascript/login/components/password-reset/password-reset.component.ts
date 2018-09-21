@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { JwtService } from '../../services/jwt.service';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../../app/common/services';
 import * as isEmpty from 'lodash/isEmpty';
 
 const template = require('./password-reset.component.html');
@@ -11,7 +10,7 @@ const template = require('./password-reset.component.html');
 })
 
 export class PasswordResetComponent {
-  constructor(private _JwtService: JwtService, private _UserService: UserService) {}
+  constructor(private _UserService: UserService) {}
 
   private errorMsg;
   private username;

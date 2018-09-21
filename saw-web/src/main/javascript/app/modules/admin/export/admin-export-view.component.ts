@@ -3,7 +3,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Observable } from 'rxjs/Observable';
 import { FormControl } from '@angular/forms';
 import { mergeMap, startWith, map } from 'rxjs/operators';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 import * as JSZip from 'jszip';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';

@@ -58,12 +58,16 @@ import { DateFormatDialogComponent } from './components/date-format-dialog';
 import { ChoiceGroupComponent } from './components/choice-group';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
-import { ErrorDetailService } from './services/error-detail.service';
-import { ErrorDetailDialogService } from './services/error-detail-dialog.service';
-import { MenuService } from './services/menu.service';
-import { ToastService, ComponentHandler } from './services';
-import { UserService } from '../../login/services/user.service';
-import { JwtService } from '../../login/services/jwt.service';
+
+import {
+  ErrorDetailService,
+  ErrorDetailDialogService,
+  MenuService,
+  ToastService,
+  ComponentHandler,
+  UserService,
+  JwtService
+} from './services';
 
 const MODULES = [
   CommonModuleAngular4,

@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as map from 'lodash/map';
 
 const template = require('./widget-category.component.html');
-import { JwtService } from '../../../../../../login/services/jwt.service';
+import { JwtService } from '../../../../../common/services';
 
 @Component({
   selector: 'widget-category',

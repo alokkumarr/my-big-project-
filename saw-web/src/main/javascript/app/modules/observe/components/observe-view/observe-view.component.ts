@@ -16,7 +16,7 @@ import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.c
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
-import { JwtService } from '../../../../../login/services/jwt.service';
+import { JwtService } from '../../../../common/services';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';

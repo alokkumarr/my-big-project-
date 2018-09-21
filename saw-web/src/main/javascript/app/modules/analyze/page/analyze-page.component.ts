@@ -3,7 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import * as split from 'lodash/split';
 
 import { LAST_ANALYSES_CATEGORY_ID } from '../../../common/local-storage-keys';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 const template = require('./analyze-page.component.html');
 
 @Component({

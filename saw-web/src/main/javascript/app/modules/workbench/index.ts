@@ -20,10 +20,9 @@ import {
   ToastService,
   SideNavService,
   LocalSearchService,
-  dxDataGridService
+  dxDataGridService,
+  JwtService
 } from '../../common/services';
-
-import { JwtService } from '../../../login/services/jwt.service';
 
 import { WorkbenchPageComponent } from './components/workbench-page/workbench-page.component';
 import { CreateDatasetsComponent } from './components/create-datasets/create-datasets.component';

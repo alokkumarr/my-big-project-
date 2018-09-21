@@ -3,9 +3,11 @@ import * as get from 'lodash/get';
 import * as lowerCase from 'lodash/lowerCase';
 import * as split from 'lodash/split';
 import toMaterialStyle from 'material-color-hash';
-import { HeaderProgressService } from '../../../common/services';
-import { JwtService } from '../../../../login/services/jwt.service';
-import { UserService } from '../../../../login/services/user.service';
+import {
+  JwtService,
+  UserService,
+  HeaderProgressService
+} from '../../../common/services';
 
 const template = require('./header.component.html');
 require('./header.component.scss');
@@ -30,7 +32,7 @@ export class LayoutHeaderComponent {
     private _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress
+      this.showProgress = showProgress;
     });
   }
 

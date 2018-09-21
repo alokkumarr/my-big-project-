@@ -6,8 +6,7 @@ import 'rxjs/add/operator/catch';
 
 import * as get from 'lodash/get';
 
-import { JwtService } from '../../../login/services/jwt.service';
-import { UserService } from '../../../login/services/user.service';
+import { JwtService, UserService } from '../../common/services';
 
 @Injectable()
 export class RefreshTokenInterceptor implements HttpInterceptor {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivateChild, CanActivate } from '@angular/router';
-import { UserService } from '../../../login/services/user.service';
+import { UserService } from '../../common/services';
 
 @Injectable()
 export class IsUserLoggedInGuard implements CanActivate, CanActivateChild {

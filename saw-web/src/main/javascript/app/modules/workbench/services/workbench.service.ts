@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 
 import { SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
 

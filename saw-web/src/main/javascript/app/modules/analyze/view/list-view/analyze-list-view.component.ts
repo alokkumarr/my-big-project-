@@ -10,7 +10,7 @@ import {
 } from '../../services/execute.service';
 import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
-import { JwtService } from '../../../../../login/services/jwt.service';
+import { JwtService } from '../../../../common/services';
 
 
 const template = require('./analyze-list-view.component.html');

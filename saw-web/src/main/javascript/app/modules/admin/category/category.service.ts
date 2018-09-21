@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AdminService } from '../main-view/admin.service';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 import { IAdminDataService } from '../admin-data-service.interface';
 
 type CategoryResponse = {

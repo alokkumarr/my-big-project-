@@ -4,8 +4,7 @@ import { Observable } from 'rxjs';
 import 'rxjs/add/observable/throw'
 import 'rxjs/add/operator/catch';
 
-import { JwtService } from '../../../login/services/jwt.service';
-
+import { JwtService } from '../../common/services';
 @Injectable()
 export class AddTokenInterceptor implements HttpInterceptor {
   constructor(private jwt: JwtService) { }

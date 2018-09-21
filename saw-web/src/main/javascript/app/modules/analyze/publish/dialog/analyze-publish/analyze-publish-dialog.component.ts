@@ -4,7 +4,7 @@ import * as find from 'lodash/find';
 import * as first from 'lodash/first';
 
 import { AnalyzeService } from '../../../services/analyze.service';
-import { JwtService } from '../../../../../../login/services/jwt.service';
+import { JwtService } from '../../../../../common/services';
 import { BaseDialogComponent } from '../../../../../common/base-dialog/base-dialog.component';
 import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';

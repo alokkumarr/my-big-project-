@@ -12,8 +12,7 @@ import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as add from 'lodash/add';
 
-import { JwtService } from '../../../../login/services/jwt.service';
-import { MenuService } from '../../../common/services/menu.service';
+import { JwtService, MenuService } from '../../../common/services';
 import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../../../appConfig';
 import { BULLET_CHART_COLORS } from '../consts';

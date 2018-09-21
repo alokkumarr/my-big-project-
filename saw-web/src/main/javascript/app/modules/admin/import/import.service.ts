@@ -5,7 +5,7 @@ import { Analysis } from '../../../models';
 import * as fpGet from 'lodash/fp/get';
 
 import { AdminService } from '../main-view/admin.service';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 
 const MODULE_NAME = 'ANALYZE';
 

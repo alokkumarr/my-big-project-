@@ -13,7 +13,7 @@ import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as json2Csv from 'json-2-csv';
 import * as FileSaver from 'file-saver';
 import * as moment from 'moment';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 import { ImportService } from './import.service';
 import { CategoryService } from '../category/category.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';

@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
-import { JwtService } from '../../services/jwt.service';
-import { UserService } from '../../services/user.service';
+import { JwtService, UserService } from '../../../app/common/services';
 import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./login.component.html');

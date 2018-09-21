@@ -12,7 +12,7 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { JwtService } from '../../../../login/services/jwt.service';
+import { JwtService } from '../../../common/services';
 import {
   ToastService,
   MenuService

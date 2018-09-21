@@ -32,7 +32,7 @@ import { Analysis } from '../types';
 import {
   JwtService,
   CUSTOM_JWT_CONFIG
-} from '../../../../login/services/jwt.service';
+} from '../../../common/services';
 
 const template = require('./executed-view.component.html');
 require('./executed-view.component.scss');

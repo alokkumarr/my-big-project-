@@ -11,7 +11,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as moment from 'moment';
 
 import { AnalyzeService } from '../../../services/analyze.service';
-import { JwtService } from '../../../../../../login/services/jwt.service';
+import { JwtService } from '../../../../../common/services';
 import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
