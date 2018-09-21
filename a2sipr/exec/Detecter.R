@@ -145,7 +145,7 @@ input_mode <- as.character(input_dataset_details$system$mode)
 # Create Spark Data frame from Input dataset
 
 input_spk_df <-
-  reader(
+  a2munge::reader(
     sc,
     name = input_dataset_name,
     path = input_dataset_folder,
@@ -165,17 +165,22 @@ output_catalog <- as.character(outputs_df$catalog)
 output_mode <- as.character(outputs_df$mode)
 output_data_format <- as.character(outputs_df$format)
 output_repart_numb <- as.numeric(outputs_df$numberOfFiles)
+output_partit_by <- as.character(outputs_df[row, "partitionKeys"])
 
-output_schema <- list(
-  list(name = "ID", type = "string")
-)
+if (is.na(output_partit_by) ||
+    output_partit_by == "" ||
+    identical(output_partit_by, character(0))) {
+  output_partit_by <- NULL
+}
+
+output_schema <- list(list(name = "ID", type = "string"))
 
 sip_add_dataset(
   output_format = output_data_format,
   output_name = output_dataset_name,
   output_schema = output_schema,
   script = "Detecter.R",
-  created_by = "sipuser",
+  created_by = Sys.info()["user"],
   batch_id = batch_id,
   started = format(as.POSIXct(Sys.time()), "%Y%m%d-%H%M%S"),
   catalog = output_catalog,
@@ -224,36 +229,35 @@ if (is.na(.group_vars) || .group_vars == "") {
 # Run Detecter functionality & assign result to data frame
 
 rcomp_spk_df <- input_spk_df %>%
-  select(., .index_var, .measure_vars) %>%
-  dateconverter(
+  a2munge::dateconverter(
     .,
     measure_vars = .index_var,
     input_format = .field_format,
     output_type = .field_type,
     output_suffix = "CONV"
   ) %>%
-  collapser(
+  a2munge::collapser(
     .,
     measure_vars = paste(.index_var, "CONV", sep = "_"),
     unit = .unit,
     side = .side,
     output_suffix = "CEI"
   ) %>%
-  summariser(.,
-             group_vars = .summ_group_vars,
-             measure_vars = .measure_vars,
-             fun = .fun_var) %>%
+  a2munge::summariser(.,
+                      group_vars = .summ_group_vars,
+                      measure_vars = .measure_vars,
+                      fun = .fun_var) %>%
   #arrange(., desc(!!as.name(.index_var))) %>%
   #collect %>%
-  detecter(
+  a2munge::detecter(
     .,
     index_var = paste(.index_var, "CONV_CEI", sep = "_"),
     group_vars = if (is.na(.group_vars) ||
                      .group_vars == "") {
-                                          NULL
-                                        } else {
-                                          .group_vars
-                                        },
+      NULL
+    } else {
+      .group_vars
+    },
     measure_vars = paste(.measure_vars, .fun_var, sep = "_"),
     frequency = .frequency,
     direction = .direction,
@@ -262,40 +266,44 @@ rcomp_spk_df <- input_spk_df %>%
     trend_window = .trendWindow
   ) %>%
   mutate(., expected = value - resid) %>%
-  dateformatter(., 
+  a2munge::dateformatter(
+    .,
     measure_vars = paste(.index_var, "CONV_CEI", sep = "_"),
     input_format = .field_format,
     output_format = .field_format,
     output_suffix = "FMT"
   ) %>%
-  rename(., !!.index_var := paste(!!.index_var, "CONV_CEI_FMT", sep = "_")) %>%
-  select(., !!.index_var, measure, value, seasonal, trend, resid, lower, upper, anomaly, expected)
+  rename(.,!!.index_var := paste(!!.index_var, "CONV_CEI_FMT", sep = "_")) %>%
+  select(.,
+         !!.index_var,
+         measure,
+         value,
+         seasonal,
+         trend,
+         resid,
+         lower,
+         upper,
+         anomaly,
+         expected)
 
-writer(
+a2munge::writer(
   rcomp_spk_df,
   path = output_dataset_folder,
   mode = output_mode,
   type = output_data_format,
   partitions = output_repart_numb,
+  partition_by = output_partit_by,
   name = output_dataset_name
 )
 
-if (class(rcomp_spk_df)[1] == "data.frame") {
-  output_schema <- lapply(rcomp_spk_df, class)
-} else {
-  output_schema <- sdf_schema(rcomp_spk_df)
-}
-
-#output_schema <- list(
-#  list(name = "ID", type = "string")
-#)
+output_schema <- a2munge::schema(rcomp_spk_df)
 
 sip_add_dataset(
   output_format = output_data_format,
   output_name = output_dataset_name,
   output_schema = output_schema,
   script = "Detecter.R",
-  created_by = "sipuser",
+  created_by = Sys.info()["user"],
   batch_id = batch_id,
   finished = format(as.POSIXct(Sys.time()), "%Y%m%d-%H%M%S"),
   catalog = output_catalog,

@@ -1,22 +1,22 @@
 {
     "inputs":[
         {
-            "name":"MESSAGE_ENTITY_AGGR_DATA",
-            "dataSet":"MESSAGE_ENTITY_AGGR_DATA",
+            "name":"CHANGEME_INP",
+            "dataSet":"CHANGEME_INP",
             "catalog":"dout"
         }
     ],
         "outputs":[
                                 {
-                                "name":"MMS_DETECT_TBL",
-                                "dataSet":"MMS_DETECT_TBL",
+                                "name":"CHANGEME_OUT",
+                                "dataSet":"CHANGEME_OUT",
                                 "catalog":"dout",
                                 "format":"parquet",
                                 "numberOfFiles":50,
                                 "mode" : "replace",
                                 "metadata" : {
                                     "createdBy" : "Vinnie",
-                                    "description" : "Softbank Detecter Test",
+                                    "description" : "Detecter Test",
                                     "category" : "aa",
                                     "subCategory" : "detecter"
                                 }}
