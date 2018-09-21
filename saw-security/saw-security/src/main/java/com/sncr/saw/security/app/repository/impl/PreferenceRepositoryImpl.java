@@ -59,13 +59,18 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     @Override
     public UserPreferences deletePreferences(UserPreferences userPreferences, boolean inactivateAll) {
         if (!inactivateAll) {
-            String deleteSql = "DELETE FROM CONFIG_VAL WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE =? AND " +
-                "CONFIG_VAL_OBJ_GROUP= ?";
+            String deleteSql = "UPDATE CONFIG_VAL SET ACTIVE_STATUS_IND = '0', INACTIVATED_DATE = now() , " +
+                "INACTIVATED_BY = ? , MODIFIED_DATE = now(), MODIFIED_BY =? " +
+                " WHERE CONFIG_VAL_CODE = ? AND CONFIG_VAL_OBJ_TYPE=? AND CONFIG_VALUE= ? "+
+                " AND CONFIG_VAL_OBJ_GROUP= ?";
             int[][] deleteResult = jdbcTemplate.batchUpdate(deleteSql, userPreferences.getPreferences(), 1000,
                 (ps, preference) -> {
-                    ps.setString(1, preference.getPreferenceName());
-                    ps.setString(2, CONFIG_VAL_OBJ_TYPE);
-                    ps.setString(3, userPreferences.getUserID());
+                    ps.setString(1, userPreferences.getUserID());
+                    ps.setString(2, userPreferences.getUserID());
+                    ps.setString(3, preference.getPreferenceName());
+                    ps.setString(4, CONFIG_VAL_OBJ_TYPE);
+                    ps.setString(5, preference.getPreferenceValue());
+                    ps.setString(6, userPreferences.getUserID());
                 });
 
             logger.trace(deleteResult.length + " Preferences removed successfully.");
