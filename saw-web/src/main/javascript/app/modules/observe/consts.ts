@@ -26,6 +26,11 @@ export const DATE_PRESETS = [
     label: 'YTD (Year to Date)'
   },
   {
+    value: 'LY',
+    keyword: 'LAST_YEAR',
+    label: 'Last Year'
+  },
+  {
     value: 'LW',
     keyword: 'LAST_WEEK',
     label: 'Last Week'
