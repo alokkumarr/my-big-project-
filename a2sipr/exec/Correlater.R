@@ -15,7 +15,7 @@
 #						e. R Home path on which Libraries are installed
 #                       f. XDF Root
 
-# Import Docopt libraries to read input 
+# Import Docopt libraries to read input
 # command line parameters
 
 library(docopt)
@@ -35,8 +35,8 @@ doc <- "Usage: Correlater.R [options] [-h]
 opt <- docopt::docopt(doc)
 
 # Check inputs
-lapply(opt, function(o){
-  if(is.na(o)){
+lapply(opt, function(o) {
+  if (is.na(o)) {
     stop(paste(names(o), "input not provided", "\n"))
   }
 })
@@ -58,16 +58,14 @@ library(sparklyr, lib.loc = r_lib_home)
 library(a2sipr, lib.loc = r_lib_home)
 library(a2munge, lib.loc = r_lib_home)
 
-conf_json <- jsonlite::fromJSON(
-  readLines(conf_file)
-)
+conf_json <- jsonlite::fromJSON(readLines(conf_file))
 
 # Read R Script Component parameter values ---------------------------
 
 rcomp_conf_df <- as.data.frame(conf_json$correlater)
 
 # Configure Spark connection ----------------------------------------
-# Get Spark configuration parameters using the main 
+# Get Spark configuration parameters using the main
 # config file & configure spark connection
 
 # SAW login parameters are also included in the system parameters section
@@ -98,22 +96,22 @@ Sys.setenv(JAVA_HOME = java_home)
 Sys.setenv(HADOOP_HOME = hadoop_home)
 Sys.setenv(HADOOP_CONF_DIR = hadoop_conf_dir)
 
-# Check if Spark connection Flag is set. Set up spark context only if 
+# Check if Spark connection Flag is set. Set up spark context only if
 # Flag is True
 
 spk_conn_flag <- as.character((spark_conn_df[spark_conn_df$name == "spark.conn.flag", "value"]))
 
-if(spk_conn_flag == "TRUE"){
+if (spk_conn_flag == "TRUE") {
   conf <- spark_config()
   
   spark_master <- as.character((spark_conn_df[spark_conn_df$name == "spark.master", "value"]))
-
-  for(name in spark_conn_df$name) {
+  
+  for (name in spark_conn_df$name) {
     n <- name
     conf[[name]] <- spark_conn_df %>%
-    filter(name == n) %>%
-    dplyr::pull(value) %>%
-    as.character()
+      filter(name == n) %>%
+      dplyr::pull(value) %>%
+      as.character()
   }
   
   conf$sparklyr.log.console <- "TRUE"
@@ -148,9 +146,15 @@ input_mode <- as.character(input_dataset_details$system$mode)
 
 # Create Spark Data frame from Input dataset
 
-input_spk_df <- reader(sc, name = input_dataset_name, path = input_dataset_folder, type = input_data_format, 
-              repartition = input_repart_numb)
-			  
+input_spk_df <-
+  a2munge::reader(
+    sc,
+    name = input_dataset_name,
+    path = input_dataset_folder,
+    type = input_data_format,
+    repartition = input_repart_numb
+  )
+
 # Get Output dataset details from the config file
 
 outputs_df <- as.data.frame(conf_json$outputs)
@@ -163,17 +167,22 @@ output_catalog <- as.character(outputs_df$catalog)
 output_mode <- as.character(outputs_df$mode)
 output_data_format <- as.character(outputs_df$format)
 output_repart_numb <- as.numeric(outputs_df$numberOfFiles)
+output_partit_by <- as.character(outputs_df[row, "partitionKeys"])
 
-output_schema <- list(
-  list(name = "Dummy Column", type = "string")
-)
+if (is.na(output_partit_by) ||
+    output_partit_by == "" ||
+    identical(output_partit_by, character(0))) {
+  output_partit_by <- NULL
+}
+
+output_schema <- list(list(name = "Dummy Column", type = "string"))
 
 sip_add_dataset(
   output_format = output_data_format,
   output_name = output_dataset_name,
   output_schema = output_schema,
   script = "Correlater.R",
-  created_by = "sipuser",
+  created_by = Sys.info()["user"],
   batch_id = batch_id,
   started = format(as.POSIXct(Sys.time()), "%Y%m%d-%H%M%S"),
   catalog = output_catalog,
@@ -218,7 +227,7 @@ if (is.na(.collect) ||
 }
 
 rcomp_spk_df <- input_spk_df %>%
-  correlater(
+  a2munge::correlater(
     .,
     target_var = .target_var,
     transform = .transform,
@@ -227,31 +236,26 @@ rcomp_spk_df <- input_spk_df %>%
     collect = .collect
   )
 
-writer(
+a2munge::writer(
   rcomp_spk_df,
   path = output_dataset_folder,
   mode = output_mode,
   type = output_data_format,
   partitions = output_repart_numb,
+  partition_by = output_partit_by,
   name = output_dataset_name
 )
 
-if (class(rcomp_spk_df)[1] == "data.frame") {
-  output_schema <- lapply(rcomp_spk_df, class)
-} else {
-  output_schema <- sdf_schema(rcomp_spk_df)
-}
+# Get Dataset schema using the helpers function
 
-#output_schema <- list(
-#  list(name = "ID", type = "string")
-#)
+output_schema <- a2munge::schema(rcomp_spk_df)
 
 sip_add_dataset(
   output_format = output_data_format,
   output_name = output_dataset_name,
   output_schema = output_schema,
   script = "Correlater.R",
-  created_by = "sipuser",
+  created_by = Sys.info()["user"],
   batch_id = batch_id,
   finished = format(as.POSIXct(Sys.time()), "%Y%m%d-%H%M%S"),
   catalog = output_catalog,
