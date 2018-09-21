@@ -60,62 +60,6 @@ import { AnalyzeDialogService } from './services/analyze-dialog.service';
 
 import { AnalyzePageComponent } from './page';
 
-angular
-  .module(AnalyzeModule, [CommonModule])
-  .run(transitions)
-  .config(routesConfig)
-  .config(i18nConfig)
-  .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
-  .filter('uniqueFilter', uniqueFilter)
-  .factory('FilterService', downgradeInjectable(FilterService) as Function)
-  .service('AnalyzeService', AnalyzeService)
-  .factory('PivotService', PivotService)
-  .factory('AnalyzeActionsService', OldAnalyzeActionsService)
-  .factory('ChartService', downgradeInjectable(ChartService) as Function)
-  .factory('AnalyzeDialogService', downgradeInjectable(AnalyzeDialogService) as Function)
-  .service('SortService', SortService)
-  .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
-  .component('aggregateChooser', AggregateChooserComponent)
-  .component('reportGridContainer', ReportGridContainerComponent)
-  .component('reportGridNode', ReportGridNodeComponent)
-  .component('reportGrid', ReportGridComponent)
-  .component('reportRenameDialog', ReportRenameDialogComponent)
-  .component('reportFormatDialog', ReportFormatDialogComponent)
-  .component('analyzePage', AnalyzePageComponent)
-  .component('analyzeExecutedList', AnalyzeExecutedListComponent)
-  .component('analyzeReportDetail', AnalyzeReportDetailComponent)
-  .component('analyzePivotDetail', AnalyzePivotDetailComponent)
-  .component('analyzeChartDetail', AnalyzeChartDetailComponent)
-  .component('analyzeExecutedDetail', AnalyzeExecutedDetailComponent)
-  .component('analyzeNew', AnalyzeNewComponent)
-  .component('analyzePivotSettings', AnalyzePivotSettingsComponent)
-  .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
-  .component('analyzePivot', AnalyzePivotComponent)
-  .component('analyzeReport', AnalyzeReportComponent)
-  .directive('cronJobSchedular', downgradeComponent({
-    component: CronJobSchedularComponent
-  }) as angular.IDirectiveFactory)
-  .directive('cronDatePicker', downgradeComponent({
-    component: CronDatePickerComponent
-  }) as angular.IDirectiveFactory)
-  .directive('analyzeReportQuery', downgradeComponent({
-    component: AnalyzeReportQueryComponent
-  }) as angular.IDirectiveFactory)
-  .component('analyzeDialog', AnalyzeDialogComponent)
-  .component('analyzeSortDialog', AnalyzeSortDialogComponent)
-  .component('stringFilter', StringFilterComponent)
-  .component('numberFilter', NumberFilterComponent)
-  .component('dateFilter', DateFilterComponent)
-  .component('filterChips', FilterChipsComponent)
-  .component('analyzeFilterRow', AnalyzeFilterRowComponent)
-  .component('analyzeFilterModal', AnalyzeFilterModalComponent)
-  .component('analyzeDescriptionDialog', AnalyzeDescriptionDialogComponent)
-  .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
-  .component('analyzePublishDialog', AnalyzePublishDialogComponent)
-  .component('analyzeChart', AnalyzeChartComponent)
-  .component('analyzeChartSettings', AnalyzeChartSettingsComponent)
-  .component('analyzeChartPreview', AnalyzeChartPreviewComponent)
-  .component('analyzeSaveDialog', AnalyzeSaveDialogComponent);
 const COMPONENTS = [
   AnalyzeReportQueryComponent,
   DesignerDialogComponent,
@@ -156,6 +100,7 @@ const SERVICES = [
 ];
 
 const GUARDS = [DefaultAnalyzeCategoryGuard];
+
 @NgModule({
   imports: [
     CommonModuleAngular4,
