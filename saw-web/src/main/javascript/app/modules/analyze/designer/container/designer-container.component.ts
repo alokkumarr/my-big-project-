@@ -480,7 +480,9 @@ export class DesignerContainerComponent {
       sortProp = 'sorts';
       break;
     case 'esReport':
-      partialSqlBuilder = this._designerService.getPartialESReportSqlBuilder(this.artifacts[0].columns);
+      partialSqlBuilder = {
+        dataFields: this._designerService.generateReportDataField(this.artifacts)
+      };
       sortProp = 'sorts';
       break;
     case 'report':
@@ -569,17 +571,19 @@ export class DesignerContainerComponent {
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
-      forEach(this.analysis.artifacts[0].columns, col=> {
-        if(col.name == event.column.name) {
-          col.aggregate = event.column.aggregate;
-        }
+      forEach(this.analysis.artifacts, artifactcolumns=> {
+        forEach(artifactcolumns.columns, col=> {
+          if(col.name == event.column.name) {
+            col.aggregate = event.column.aggregate;
+          }
+        })
       })
       if(!isEmpty(this.data)) {
         this.data.map(row => {
           if(row[event.column.name]) {
             row[event.column.name] = '';
           }
-        });  
+        });
       }
       this.data = cloneDeep(this.data);
     case 'filterRemove':

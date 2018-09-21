@@ -3,6 +3,7 @@ package com.synchronoss.querybuilder;
 import java.util.*;
 
 import com.synchronoss.querybuilder.model.chart.DataField;
+import com.synchronoss.querybuilder.model.report.Column;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -153,7 +154,7 @@ public class QueryBuilderUtil {
         return aggregationBuilder;
     }
 
-	public static AggregationBuilder aggregationBuilderDataFieldReport(com.synchronoss.querybuilder.model.report.DataField data)
+	public static AggregationBuilder aggregationBuilderDataFieldReport(Column data)
 	{
 		AggregationBuilder aggregationBuilder = null;
 		switch (data.getAggregate())
@@ -791,9 +792,9 @@ public class QueryBuilderUtil {
                                 preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
                             }
-                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.DataField) {
-                            com.synchronoss.querybuilder.model.report.DataField data =
-                                    (com.synchronoss.querybuilder.model.report.DataField) dataField;
+                        } else if (dataField instanceof com.synchronoss.querybuilder.model.report.Column) {
+                            Column data =
+                                    (Column) dataField;
                             if (data.getAggregate()!=null && data.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value())) {
                                 preSearchSourceBuilder.aggregation(AggregationBuilders.sum(
                                         data.getName()).field(data.getColumnName()));
