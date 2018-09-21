@@ -106,6 +106,8 @@ writer.tbl_spark <- function(df,
     stop("temp folder exists")
   }
 
+  if(protocol != "")  dir.create(file_tmp_folder, recursive = TRUE)
+
   spark_write_fun <- match.fun(paste("spark_write", type, sep = "_"))
   spark_write_fun(x = df,
                   path = file_tmp_path,
