@@ -4,6 +4,6 @@ public class SAWQueryBuilder
 {
     public static void main( String[] args )
     {
-    		
+    		BuilderUtil.dynamicDecipher("LY");
     }
 }

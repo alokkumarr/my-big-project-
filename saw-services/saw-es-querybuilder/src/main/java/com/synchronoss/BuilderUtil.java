@@ -169,7 +169,6 @@ public class BuilderUtil
 
 
   public static DynamicConvertor dynamicDecipher(String dynamic)
-
   {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String DATE_FORMAT_LTE = "23:59:59";
@@ -207,6 +206,12 @@ public class BuilderUtil
         dynamicConvertor.setGte(last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
         break;
       }
+      case "LY": {
+          LocalDateTime currentDayOflastYearDate = now.minusMonths(12);
+          dynamicConvertor.setLte(currentDayOflastYearDate.with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+          dynamicConvertor.setGte(currentDayOflastYearDate.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+          break;
+        }
       case "LM": {
         LocalDateTime lastMonth = now.minusMonths(1);
         dynamicConvertor.setLte(lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
@@ -312,6 +317,13 @@ public class BuilderUtil
                 LocalDateTime lastMonth = priorLastMonth.minusMonths(1);
                 dynamicConvertor.setLte(lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                break;
+            }
+            case "LY":  {
+                LocalDateTime priorLastYear = now.minusYears(1);
+                LocalDateTime lastYear = priorLastYear.minusYears(1);
+                dynamicConvertor.setLte(priorLastYear.with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(lastYear.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
                 break;
             }
             case "LQ": {
