@@ -32,7 +32,8 @@ measure <- function(id,
   checkmate::assert_character(method)
   checkmate::assert_list(method_args)
   checkmate::assert_subset(properties,
-                           c("modeler","forecaster", "regressor", "classifier", "segmenter"))
+                           c("modeler","forecaster", "regressor",
+                             "classifier", "multiclassifier","segmenter"))
   checkmate::assert_character(name)
   checkmate::assert_flag(minimize)
 
@@ -356,3 +357,56 @@ auc.spark_connection <- function(x, predicted = "predicted", actual = "label") {
     metric_name = "areaUnderROC"
   )
 }
+
+
+
+# F1 ----------------------------------------------------------------------
+
+F1 <- measure(id = "F1",
+              method = "f1",
+              method_args = list("x", "predicted", "actual"),
+              minimize = FALSE,
+              best = 1,
+              worst = 0,
+              properties = c("modeler", "multiclassifier"),
+              name = "F1 Measure",
+              note = "F1 score conveys the balance between the precision and the recall. Defined as: 2 * tp/ (sum(truth == positive) + sum(response == positive)).")
+
+#' Generic f1 function
+#'
+#' @inheritParams rmse
+#' @export
+f1 <- function(x, predicted, actual) {
+  UseMethod("f1")
+}
+
+
+#' @export
+#' @rdname f1
+f1.tbl_spark <- function(x, predicted, actual) {
+  checkmate::assert_choice(predicted, colnames(x))
+  checkmate::assert_choice(actual, colnames(x))
+  
+  sparklyr::ml_multiclass_classification_evaluator(
+    x,
+    label_col = actual,
+    prediction_col = predicted,
+    metric_name = "f1"
+  )
+}
+
+
+#' @export
+#' @rdname f1
+f1.spark_connection <- function(x, predicted = "predicted", actual = "label") {
+  checkmate::assert_character(predicted)
+  checkmate::assert_character(actual)
+  
+  sparklyr::ml_multiclass_classification_evaluator(
+    x,
+    label_col = actual,
+    prediction_col = predicted,
+    metric_name = "f1"
+  )
+}
+
