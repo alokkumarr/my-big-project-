@@ -673,7 +673,7 @@ public class AnalyzeIT extends BaseIT {
         ArrayNode arrayNode = mapper.createArrayNode();
         ObjectNode objectNode1 = arrayNode.addObject();
         objectNode1.put("preferenceName","defaultURL1");
-        objectNode1.put("preferenceValue","http://localhost/saw/observe/11");
+        objectNode1.put("preferenceValue","http://localhost/saw/observe/1");
         ObjectNode objectNode2 = arrayNode.addObject();
         objectNode2.put("preferenceName","defaultURL3");
         objectNode2.put("preferenceValue","http://localhost/saw/observe/3");
