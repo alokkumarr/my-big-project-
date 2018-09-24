@@ -122,21 +122,25 @@
           ],
           "dataFields":[
             {
-              "type":"long",
-              "columnName":"units"
-            },
-            {
-              "type":"string",
-              "columnName":"country"
-            },
-            {
-              "type":"string",
-              "columnName":"product"
-            },
-            {
-              "type":"date",
-              "columnName":"date"
-            }
+              "tableName": "sales",
+              "columns" : [
+                {
+                  "type":"long",
+                  "columnName":"units"
+                },
+                {
+                  "type":"string",
+                  "columnName":"country"
+                },
+                {
+                  "type":"string",
+                  "columnName":"product"
+                },
+                {
+                  "type":"date",
+                  "columnName":"date"
+                }
+              ]}
           ]
         },
         "executionType":"preview"
