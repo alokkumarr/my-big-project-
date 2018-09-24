@@ -1,0 +1,117 @@
+{
+    "inputs":[
+        {
+            "name":"CHANGEME_INP",
+            "dataSet":"CHANGEME_INP",
+            "catalog":"dout"
+        }
+    ],
+        "outputs":[
+                                {
+                                "name":"CHANGEME_OUT",
+                                "dataSet":"CHANGEME_OUT",
+                                "catalog":"dout",
+                                "format":"parquet",
+                                "numberOfFiles":50,
+                                "mode" : "replace",
+                                "metadata" : {
+                                    "createdBy" : "Vinnie",
+                                    "description" : "Detecter Test",
+                                    "category" : "aa",
+                                    "subCategory" : "detecter"
+                                }}
+        ],
+    "parameters":[
+        {
+            "name":"spark.conn.flag",
+            "value":"TRUE"
+        },
+        {
+            "name":"spark.master",
+            "value":"${:spark.master:}"
+        },
+        {
+            "name":"spark.yarn.queue",
+            "value":"xdf"
+        },
+        {
+            "name":"spark.driver.memory",
+            "value":"${:spark.driver.memory:}"
+        },
+        {
+            "name":"spark.executor.memory",
+            "value":"${:spark.executor.memory:}"
+        },
+        {
+            "name":"spark.executor.cores",
+            "value":"${:spark.executor.cores:}"
+        },
+        {
+            "name":"spark.executor.instances",
+            "value":"${:spark.executor.instances:}"
+        },
+        {
+            "name":"spark.cores.max",
+            "value":"${:spark.cores.max:}"
+        },
+        {
+            "name":"spark.yarn.tags",
+            "value":"XDA-NG-DETECTER"
+        },
+        {
+            "name":"sparklyr.gateway.port",
+            "value":"6688"
+        },
+        {
+            "name":"spark.memory.fraction",
+            "value":"0.9"
+        }
+    ],
+    "system_env_parameters":[
+        {
+            "name":"spark.home",
+            "value":"${:spark.home:}"
+        },
+        {
+            "name":"java.home",
+            "value":"${:java.home:}"
+        },
+        {
+            "name":"hadoop.home",
+            "value":"${:hadoop.home:}"
+        },
+        {
+            "name":"hadoop.conf.dir",
+            "value":"${:hadoop.conf.dir:}"
+        }
+    ],
+    "saw_parameters":[
+        {
+            "name":"saw.login.user",
+            "value":"${:saw.login.user:}"
+        },
+        {
+            "name":"saw.login.password",
+            "value":"${:saw.login.password:}"
+        },
+        {
+            "name":"saw.host.name",
+            "value":"${:saw.host.name:}"
+        }
+    ],
+    "detecter": {
+                                "indexField": "EVENT_TIMESTAMP",
+                                "groupField": "",
+                                "measureField": "MESSAGE_SIZE",
+                                "functionName": "sum",
+                                "frequency": 4,
+                                "direction": "pos",
+                                "alpha": 0.05,
+                                "maxAnoms": 0.01,
+                                "trendWindow": 0.75,
+                                "dataUnit": "day",
+                                "collapseSide": "start",
+                                "fieldFormat": "yyyy-MM-dd HH:mm:ss",
+                                "fieldType": "datetime"
+        }
+}
