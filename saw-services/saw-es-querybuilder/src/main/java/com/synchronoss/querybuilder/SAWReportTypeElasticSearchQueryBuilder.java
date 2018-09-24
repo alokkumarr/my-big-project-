@@ -61,6 +61,8 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(getJsonString(), "sqlBuilder");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.from(0);
+        if (sqlBuilderNode.getDataFields().get(0).getColumns()==null)
+             changeOldEsReportStructureintoNewStructure(sqlBuilderNode);
         searchSourceBuilder.size(size);
         if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
             throw new NullPointerException(
@@ -185,14 +187,14 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             searchSourceBuilder.query(boolQueryBuilder);
         }
 
-        List<DataField> dataFields =
-                sqlBuilderNode.getDataFields();
+        List<Column> dataFields =
+                sqlBuilderNode.getDataFields().get(0).getColumns();
         ReportAggregationBuilder reportAggregationBuilder = new ReportAggregationBuilder(size);
-        List<DataField> aggregationFields = ReportAggregationBuilder.getAggregationField(dataFields);
+        List<Column> aggregationFields = ReportAggregationBuilder.getAggregationField(dataFields);
         AggregationBuilder finalAggregationBuilder =null;
 
         boolean isPercentage = dataFields.stream().anyMatch(dataField ->
-                dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(DataField.Aggregate.PERCENTAGE.value()));
+                dataField.getAggregate()!=null && dataField.getAggregate().value().equalsIgnoreCase(Column.Aggregate.PERCENTAGE.value()));
 
         //pre-calculation for percentage.
         if(isPercentage)
@@ -208,7 +210,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             JsonNode objectNode = objectMapper.readTree(result);
             dataFields.forEach (dataField -> {
                 String columnName = dataField.getColumnName();
-                if(dataField.getAggregate()!=null && dataField.getAggregate().equals(DataField.Aggregate.PERCENTAGE))
+                if(dataField.getAggregate()!=null && dataField.getAggregate().equals(Column.Aggregate.PERCENTAGE))
                 dataField.getAdditionalProperties()
                         .put(columnName+SUM, String.valueOf(objectNode.get(columnName
                         ).get(VALUE)));
@@ -254,12 +256,12 @@ public class SAWReportTypeElasticSearchQueryBuilder {
      * This method will return all the list of columns which required for ES report.
      * @param dataFields
      */
-    private String [] getFieldsInclude( List<DataField> dataFields)
+    private String [] getFieldsInclude( List<Column> dataFields)
     {
         String [] fieldsIncludes = new String[dataFields.size()];
         int count =0;
         /** Iterate the Data fields to include */
-        for (DataField dataField : dataFields)
+        for (Column dataField : dataFields)
         {
            String columnName = dataField.getColumnName();
             /** .keyword may present in the es-mapping fields
@@ -272,5 +274,37 @@ public class SAWReportTypeElasticSearchQueryBuilder {
             fieldsIncludes[count++]= columnName;
         }
         return fieldsIncludes;
+    }
+
+    /**
+     * This method will convert the old es-report structure into new structure for
+     * backward compatibility .
+     * this change is made to make es-report structure consistent with DL report.
+     * @param sqlBuilder
+     * @return
+     */
+    public static void changeOldEsReportStructureintoNewStructure(SqlBuilder sqlBuilder){
+        List<Column> columns = new ArrayList<>();
+        String tableName = null;
+        for (DataField dataField : sqlBuilder.getDataFields())
+        {
+            Column column = new Column();
+            column.setColumnName((String) dataField.getAdditionalProperties().get("columnName"));
+            column.setName((String) dataField.getAdditionalProperties().get("name"));
+            column.setType(Column.Type.fromValue((String)
+                dataField.getAdditionalProperties().get("type")));
+            if (dataField.getAdditionalProperties().get("aggregate") !=null)
+            column.setAggregate(Column.Aggregate.fromValue(
+                (String)dataField.getAdditionalProperties().get("aggregate")));
+            else column.setAggregate(null);
+            tableName = (String) dataField.getAdditionalProperties().get("table");
+            columns.add(column);
+        }
+        DataField dataField = new DataField();
+        dataField.setColumns(columns);
+        dataField.setTableName(tableName);
+        List<DataField> dataFields = new ArrayList<>();
+        dataFields.add(dataField);
+        sqlBuilder.setDataFields(dataFields);
     }
 }

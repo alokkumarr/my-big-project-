@@ -288,22 +288,27 @@
             "order":"asc"
          }
       ],
-      "dataFields":[
-         {
-            "type":"float",
-            "columnName":"AVAILABLE_MB",
-            "aggregate":"sum",
-            "name":"AVAILABLE_MB"
-         },
-         {
-            "type":"string",
-            "columnName":"SOURCE_OS"
-         },
-         {
-            "type":"string",
-            "columnName":"SERVER_DIM_DATE"
-         }
-      ]
+     "dataFields": [
+       {
+         "tableName": "SALES",
+         "columns": [
+           {
+             "type": "float",
+             "columnName": "AVAILABLE_MB",
+             "aggregate": "sum",
+             "name": "AVAILABLE_MB"
+           },
+           {
+             "type": "string",
+             "columnName": "SOURCE_OS"
+           },
+           {
+             "type": "string",
+             "columnName": "SERVER_DIM_DATE"
+           }
+         ]
+       }
+     ]
    },
    "saved":true,
    "executionType":"preview"
