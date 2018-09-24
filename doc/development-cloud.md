@@ -66,7 +66,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 2158dd1c3a93        sip-admin:2         "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-admin
 4f92d8f6be4c        sip-mapr:2          "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-mapr
 2afd122feb49        sip-elastic:2       "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-elastic
-55b7f38b2cb3        sip-app:2           "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-saw1
+55b7f38b2cb3        sip-app:2           "/usr/sbin/init"    18 minutes ago      Up 18 minutes (healthy)                                                sip-app1
 
 Now you can log into docker containers using below command:
             $ docker exec -it <names>  bash     

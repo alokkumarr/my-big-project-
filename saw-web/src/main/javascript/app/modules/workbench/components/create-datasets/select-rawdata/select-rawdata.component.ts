@@ -6,7 +6,6 @@ import * as trim from 'lodash/trim';
 import * as filter from 'lodash/filter';
 import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
-import { HeaderProgressService } from '../../../../../common/services/header-progress.service';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -41,7 +40,6 @@ export class SelectRawdataComponent implements OnInit {
   private nodeID = '';
 
   constructor(
-    private headerProgress: HeaderProgressService,
     public dialog: MatDialog,
     private dxDataGrid: dxDataGridService,
     private workBench: WorkbenchService,
@@ -76,11 +74,9 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   getPageData() {
-    this.headerProgress.show();
     this.workBench.getStagingData('/').subscribe(data => {
       const filteredDataFiles = filter(data.data, ['isDirectory', false]);
       this.reloadDataGrid(filteredDataFiles);
-      this.headerProgress.hide();
     });
   }
 
@@ -114,12 +110,10 @@ export class SelectRawdataComponent implements OnInit {
     const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
     this.currentPath = path;
     this.nodeID = node.id;
-    this.headerProgress.show();
     this.workBench.getStagingData(path).subscribe(data => {
       const filteredDataFiles = filter(data.data, ['isDirectory', false])
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
-      this.headerProgress.hide();
     });
   }
 
@@ -191,6 +185,7 @@ export class SelectRawdataComponent implements OnInit {
         if (currFile) {
           this.filePath = `${currFile.path}/${currFile.name}`;
           this.fileMask = currFile.name;
+          this.fileMaskControl.setValue(this.fileMask);
         }
         this.selFiles = [];
         this.selFiles = selectedItems.selectedRowsData;
@@ -204,6 +199,7 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   maskSearch(mask) {
+    this.fileMask = this.fileMaskControl.value;
     const tempFiles = this.dataGrid.instance.option('dataSource');
     this.selFiles = this.workBench.filterFiles(mask, tempFiles);
     if (this.selFiles.length > 0) {
@@ -245,12 +241,10 @@ export class SelectRawdataComponent implements OnInit {
     const validType = this.workBench.validateFileTypes(filesToUpload);
     if (validSize && validType) {
       const path = this.currentPath;
-      this.headerProgress.show();
       this.workBench.uploadFile(filesToUpload, path).subscribe(data => {
         const filteredDataFiles = filter(data.data, ['isDirectory', false])
         this.reloadDataGrid(filteredDataFiles);
         this.clearSelected();
-        this.headerProgress.hide();
       });
     } else {
       this.notify.warn('Only ".csv" or ".txt" extension files are supported', 'Unsupported file type');
@@ -277,7 +271,6 @@ export class SelectRawdataComponent implements OnInit {
       .subscribe(name => {
         if (trim(name) !== '' && name != 'null') {
           const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
-          this.headerProgress.show();
           this.workBench.createFolder(path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
             const currChilds = get(currentNode.data, 'children', []);
@@ -296,7 +289,6 @@ export class SelectRawdataComponent implements OnInit {
             }
             this.tree.treeModel.update();
             currentNode.expand();
-            this.headerProgress.hide();
           });
         }
       });

@@ -122,6 +122,9 @@
           ],
           "dataFields":[
             {
+            "tableName": "sales",
+            "columns" : [
+            {
               "type":"long",
               "columnName":"units"
             },
@@ -137,7 +140,7 @@
               "type":"date",
               "columnName":"date"
             }
-          ]
+          ]} ]
         },
         "executionType":"preview"
  }

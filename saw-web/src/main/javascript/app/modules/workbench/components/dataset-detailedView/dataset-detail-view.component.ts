@@ -1,7 +1,7 @@
 
-import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 
 import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../services/workbench.service';
@@ -28,10 +28,10 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   private previewStatus: string;
 
   constructor(
-    private router: UIRouter,
+    private router: Router,
     private dxDataGrid: dxDataGridService,
     private workBench: WorkbenchService
-  ) { 
+  ) {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
   }
 
@@ -54,7 +54,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   }
 
   backToDS() {
-    this.router.stateService.go('workbench.datasets');
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 
   triggerPreview() {
@@ -83,7 +83,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
 
   /**
    * Calls list datasets api onInit and every 10 seconds or whatever set interval
-   * 
+   *
    * @memberof DatasetsComponent
   */
   startPolling(id) {

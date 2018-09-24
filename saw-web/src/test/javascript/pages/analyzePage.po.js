@@ -180,13 +180,26 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
   return element(by.css(`[e2e="join-label-${tableNameA}:${fieldNameA}-${joinType}-${tableNameB}:${fieldNameB}"]`));
 };
 
+const logOut = () => {
+  doMdSelectOption({
+    parentElem: element(by.css('header > mat-toolbar')),
+    btnSelector: '[e2e="account-settings-menu-btn"]',
+    optionSelector: `button[e2e="account-settings-selector-logout"]`
+  });
+  return browser.wait(() => {
+    return browser.getCurrentUrl().then(url => {
+      return /login/.test(url);
+    });
+  }, protractorConf.timeouts.fluentWait);
+};
+
 const doAccountAction = action => {
   browser.ignoreSynchronization = false
   navigateToHome();
   browser.ignoreSynchronization = true
   doMdSelectOption({
     parentElem: element(by.css('header > mat-toolbar')),
-    btnSelector: 'mat-icon[e2e="account-settings-menu-btn"]',
+    btnSelector: '[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
   return browser.wait(() => {
@@ -195,6 +208,16 @@ const doAccountAction = action => {
     });
   }, protractorConf.timeouts.fluentWait);
 };
+
+function goToHome() {
+  browser.get(browser.baseUrl);
+  return browser.wait(() => {
+    return browser.getCurrentUrl().then(url => {
+      return /saw/.test(url);
+    });
+  }, protractorConf.timeouts.fluentWait);
+};
+
 
 function navigateToHome() {
   browser.get(browser.baseUrl);
@@ -213,6 +236,7 @@ const selectFields = (name) => {
 };
 
 module.exports = {
+  goToHome,
   navigateToHome,
   newDialog: {
     getMetricRadioButtonElementByName: name => element(by.css(`mat-radio-button[e2e="metric-name-${name}"]`)),
@@ -307,7 +331,8 @@ module.exports = {
     getAnalysisOption,
     firstCardTitle,
     getCardTypeByName: getCardTypeByName,
-    getAnalysisMenuButton: getAnalysisMenuButton
+    getAnalysisMenuButton: getAnalysisMenuButton,
+    logOut
   },
   saveDialogUpgraded: {
     selectedCategory: element(by.css('[e2e="save-dialog-selected-category"]')),
@@ -329,7 +354,7 @@ module.exports = {
     filterDialog: element(by.xpath(`//strong[text()='Filter']`)),
     selectedField: element(by.css(`[e2e="filter-autocomplete-input"]`)),
     cancleFilterPrompt: element(by.css(`button[e2e="designer-dialog-cancel"]`))
-    
+
   },
   listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
 

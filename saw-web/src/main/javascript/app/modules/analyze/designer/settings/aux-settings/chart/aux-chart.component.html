@@ -1,0 +1,50 @@
+<div fxLayout="row-reverse" fxLayoutAlign="space-between center">
+  <div *ngIf="showLegendOpts">
+    <mat-form-field class="select-form-field" appearance="outline">
+      <mat-label>Legend Position</mat-label>
+      <mat-select [(ngModel)]="legend.align" (selectionChange)="onLegendChange()">
+        <mat-option *ngFor="let pos of legend.options.align" [value]="pos.name">
+          {{ pos.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="select-form-field" appearance="outline" style="margin-left: 10px;">
+      <mat-label>Legend Layout</mat-label>
+      <mat-select placeholder="Legend Layout" [(ngModel)]="legend.layout" (selectionChange)="onLegendChange()">
+        <mat-option *ngFor="let layout of legend.options.layout" [value]="layout.name">
+          {{ layout.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="showLabelOpts" fxLayout="row" fxLayoutAlign="start center" class="aux__label__options">
+    <mat-checkbox [(ngModel)]="labelOptions.enabled" (change)="onLabelOptsChange($event)">Show Labels</mat-checkbox>
+    <mat-radio-group *ngIf="labelOptions.enabled" [(ngModel)]="labelOptions.value" (change)="onLabelOptsChange($event)">
+      <mat-radio-button value="data">Show Data</mat-radio-button>
+      <mat-radio-button value="percentage">Show Percentage</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="button-group" *ngIf="showInversion">
+    <button mat-icon-button [color]="isInverted === true ? 'primary': ''">
+      <mat-icon fontIcon="icon-hor-bar-chart"
+                (click)="setInversion(true)">
+      </mat-icon>
+    </button>
+    <button mat-icon-button [color]="isInverted === false ? 'primary': ''">
+      <mat-icon fontIcon="icon-vert-bar-chart"
+                (click)="setInversion(false)">
+      </mat-icon>
+    </button>
+  </div>
+</div>
+
+  <div class="chart-title">
+    <label class="chart-designer-title" *ngIf="!EditMode">{{chartTitle}}</label>
+    <mat-icon *ngIf="!EditMode" class="mat-icon material-icons icon-edit-solid" fonticon="icon-filter" (click)="EditMode = true"></mat-icon>
+    <mat-form-field *ngIf="EditMode" style="margin-bottom: 2px;">
+      <input style="width: 84%;padding-bottom: 8px;" matInput type="text" [(ngModel)]="chartTitle" maxlength="50" required/>
+      <button mat-button color="primary" class="mat-raised-button mat-primary chart-title-button" (click)="onTitleChange()" [disabled]="!chartTitle">Apply</button>
+    </mat-form-field>
+  </div>

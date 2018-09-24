@@ -37,3 +37,42 @@
     }
   }
 }
+
+.selected-aggregate.icon-Sum {
+  margin-top: 6px;
+}
+
+.selected-aggregate.icon-Count,
+.selected-aggregate.icon-Percentage, {
+  margin-top: -6px;
+}
+
+.column-name {
+  margin: 4px 10px 0 0;
+  text-transform: uppercase;
+}
+
+.column-menu {
+  padding-top: 7px;
+}
+
+.dx-datagrid .dx-column-indicators {
+  vertical-align: -webkit-baseline-middle;
+}
+
+button.report-options {
+  line-height: 35px !important;
+  height: 35px !important;
+
+  mat-icon {
+    padding-top: 6px;
+  }
+}
+
+//Global styles to align with other aggregate icons
+.icon-MAX,
+.icon-MIN,
+.icon-AVG {
+  padding-top: 2px;
+  font-size: 20px;
+}

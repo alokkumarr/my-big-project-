@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('fonts/icomoon.ttf?up1fxn') format('truetype'),
-    url('fonts/icomoon.woff?up1fxn') format('woff'),
-    url('fonts/icomoon.svg?up1fxn#icomoon') format('svg');
+    url('fonts/icomoon.ttf?uh8zk9') format('truetype'),
+    url('fonts/icomoon.woff?uh8zk9') format('woff'),
+    url('fonts/icomoon.svg?uh8zk9#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -23,6 +23,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-ic-average:before {
+  content: "\e98b";
+  color: #727272;
+}
+.icon-ic-max:before {
+  content: "\e9f9";
+  color: #727272;
+}
+.icon-ic-min:before {
+  content: "\e9fa";
+  color: #727272;
+}
 .icon-Candlestick-icon:before {
   content: "\e98c";
 }

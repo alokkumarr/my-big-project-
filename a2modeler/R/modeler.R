@@ -131,7 +131,7 @@ valid_modeler <- function(obj){
 #' @export
 #' @family use cases
 #' @aliases modeler
-#' @importFrom stats coef filter fitted predict setNames ts
+#' @importFrom stats coef fitted predict setNames ts
 #' @importFrom utils head modifyList
 modeler <- function(df,
                     target,

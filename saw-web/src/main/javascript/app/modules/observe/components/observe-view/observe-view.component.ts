@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatSidenav } from '@angular/material';
 import * as html2pdf from 'html2pdf.js';
-import { Transition } from '@uirouter/angular';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 
 import { saveAs } from 'file-saver/FileSaver';
 import { Dashboard } from '../../models/dashboard.interface';
@@ -17,7 +17,6 @@ import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
-import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -62,30 +61,43 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private observe: ObserveService,
     private dashboardService: DashboardService,
+    private router: Router,
     private filters: GlobalFilterService,
-    private headerProgress: HeaderProgressService,
     private jwt: JwtService,
-    private transition: Transition
+    private _route: ActivatedRoute
   ) {
-    this.dashboardId = this.transition.params().dashboard;
-    this.subCategoryId = this.transition.params().subCategory;
+    const navigationListener = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd) {
+        this.initialise();
+      }
+    });
 
-    this.loadPrivileges();
+    this.listeners.push(navigationListener);
   }
 
-  ngOnInit() {
-    if (this.dashboardId) {
-      this.loadDashboard().subscribe(() => {
-        this.startAutoRefresh();
-      });
-    }
-  }
+  ngOnInit() {}
 
   ngOnDestroy() {
     this.dashboardService.unsetAutoRefresh(
       (this.dashboard || { entityId: null }).entityId
     );
     this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  initialise() {
+    const snapshot = this._route.snapshot;
+    const { subCategory } = snapshot.params;
+    const { dashboard } = snapshot.queryParams;
+    this.dashboardId = dashboard;
+    this.subCategoryId = subCategory;
+    this.dashboard = null;
+
+    this.loadPrivileges();
+    if (this.dashboardId) {
+      this.loadDashboard().subscribe(() => {
+        this.startAutoRefresh();
+      });
+    }
   }
 
   stopAutoRefresh() {
@@ -144,24 +156,12 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   deleteDashboard(): void {
-    this.headerProgress.show();
-    this.observe.deleteDashboard(this.dashboard).subscribe(
-      () => {
-        this.observe.reloadMenu().subscribe(
-          menu => {
-            this.headerProgress.hide();
-            this.observe.updateSidebar(menu);
-            this.observe.redirectToFirstDash(menu, true);
-          },
-          () => {
-            this.headerProgress.hide();
-          }
-        );
-      },
-      () => {
-        this.headerProgress.hide();
-      }
-    );
+    this.observe.deleteDashboard(this.dashboard).subscribe(() => {
+      this.observe.reloadMenu().subscribe(menu => {
+        this.observe.updateSidebar(menu);
+        this.observe.redirectToFirstDash(menu, true);
+      });
+    });
   }
 
   downloadDashboard() {
@@ -247,18 +247,15 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   loadDashboard(): Observable<Dashboard> {
-    this.headerProgress.show();
     return this.observe
       .getDashboard(this.dashboardId)
       .map((data: Dashboard) => {
         this.dashboard = data;
         this.loadPrivileges();
         this.checkForKPIs();
-        this.headerProgress.hide();
         return data;
       })
       .catch(error => {
-        this.headerProgress.hide();
         return Observable.of(error);
       });
   }

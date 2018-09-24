@@ -13,13 +13,13 @@ import {
   Artifact,
   Format
 } from '../types';
-import { DesignerDialogComponent } from '../components/designer/dialog';
-import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
+import { DesignerDialogComponent } from '../designer/dialog';
+import { ToolbarActionDialogComponent } from '../designer/toolbar-action-dialog';
 import {
   DesignerFilterDialogComponent,
   DesignerFilterDialogData
-} from '../components/designer/filter';
-import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
+} from '../designer/filter';
+import { DesignerPreviewDialogComponent } from '../designer/preview-dialog';
 import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 import { DateFormatDialogComponent } from '../../../common/components/date-format-dialog';
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';

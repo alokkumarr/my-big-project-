@@ -1,9 +1,10 @@
-.icon-area-chart .path2:before {
+.icon-area-chart .path2::before {
   content: "\e9e2";
   margin-left: -1em;
   color: rgb(134, 143, 153);
 }
-.icon-area-chart .path3:before {
+
+.icon-area-chart .path3::before {
   content: "\e9e3";
   margin-left: -1em;
   color: rgb(134, 143, 153);
@@ -21,9 +22,17 @@
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAARElEQVQoz2P4z4AfMhClIOE/NkiSAl+ooG8CQwKIzwChEQpQlGBXgKYEwxeoSrB6k7ACfFYkYPgDXQGKdAItQpKi2AQAaDQFJxj4SdQAAAAASUVORK5CYII=);
 }
 
+.icon-string-type.mat-icon {
+  width: 30px;
+}
+
 .icon-string-type::before {
   content: 'abc';
   font-weight: bolder;
+}
+
+.icon-number-type.mat-icon {
+  width: 30px;
 }
 
 .icon-number-type::before {
@@ -43,85 +52,85 @@
   font-weight: bolder;
 }
 
-.icon-right-join .path1:before {
+.icon-right-join .path1::before {
   content: "\e9bc";
   color: rgb(189, 206, 215);
 }
 
-.icon-right-join .path2:before {
+.icon-right-join .path2::before {
   content: "\e9bd";
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
-.icon-right-join .path3:before {
+.icon-right-join .path3::before {
   content: "\e9be";
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
-.icon-left-join .path1:before {
+.icon-left-join .path1::before {
   content: "\e9b0";
   color: rgb(189, 206, 215);
 }
 
-.icon-left-join .path2:before {
+.icon-left-join .path2::before {
   content: "\e9b1";
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
-.icon-left-join .path3:before {
+.icon-left-join .path3::before {
   content: "\e9b2";
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
-.icon-inner-join .path1:before {
+.icon-inner-join .path1::before {
   content: "\e9ab";
   color: rgb(189, 206, 215);
 }
 
-.icon-inner-join .path2:before {
+.icon-inner-join .path2::before {
   content: "\e9ac";
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
-.icon-inner-join .path3:before {
+.icon-inner-join .path3::before {
   content: "\e9ad";
   margin-left: -1em;
   color: rgb(139, 156, 165);
 }
 
-.icon-arrow-down-circled .path1:before {
+.icon-arrow-down-circled .path1::before {
   content: "\e990";
   color: rgb(132, 150, 160);
 }
 
-.icon-arrow-down-circled .path2:before {
+.icon-arrow-down-circled .path2::before {
   content: "\e991";
   margin-left: -1em;
   color: rgb(255, 255, 255);
 }
 
-.icon-arrow-up-circles .path1:before {
+.icon-arrow-up-circles .path1::before {
   content: "\e993";
   color: rgb(132, 150, 160);
 }
 
-.icon-arrow-up-circles .path2:before {
+.icon-arrow-up-circles .path2::before {
   content: "\e994";
   margin-left: -1em;
   color: rgb(255, 255, 255);
 }
 
-.icon-column-options .path1:before {
+.icon-column-options .path1::before {
   content: "\e99e";
   color: rgb(92, 102, 112);
 }
 
-.icon-column-options .path2:before {
+.icon-column-options .path2::before {
   content: "\e99f";
   margin-left: -1em;
   color: rgb(209, 211, 211);

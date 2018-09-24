@@ -28,10 +28,10 @@ export class PasswordResetComponent {
       };
       this.rhcToken = rhc;
       this._UserService.verify(rData).then(res => {
-        if (res.data.valid) {
-          this.username = res.data.masterLoginID;
+        if (res.valid) {
+          this.username = res.masterLoginID;
         } else {
-          this.errorMsg = res.data.validityReason + '. Please regenerate the link once again';
+          this.errorMsg = res.validityReason + '. Please regenerate the link once again';
         }
       });
     }
@@ -43,10 +43,10 @@ export class PasswordResetComponent {
     } else {
       this._UserService.resetPwd(this)
       .then(res => {
-        this.errorMsg = res.data.validityMessage;
-      });  
+        this.errorMsg = res.validityMessage;
+      });
     }
-    
+
   }
 
   login() {

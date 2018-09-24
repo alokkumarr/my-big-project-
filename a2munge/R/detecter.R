@@ -6,7 +6,7 @@
 #'
 #' Function is similiar to Seasonl Hybrid ESD algorithm discussed here
 #' \url{https://arxiv.org/pdf/1704.07706.pdf} and implemented in the
-#' \code{\link[AnomalyDetection]{AnomalyDetectionTs}}
+#' AnomalyDetection R package
 #'
 #'
 #' @param df dataframe
@@ -31,7 +31,7 @@
 #' @return dataframe with same number of records as input dataframe. Appends
 #'   additional fields for seasonality, trend, residual, and anomaly. Anomalies
 #'   are coded with a binary flag of 1
-#'   
+#'
 #' @importFrom stats mad median qnorm stl ts
 #' @export
 detect <- function(df,

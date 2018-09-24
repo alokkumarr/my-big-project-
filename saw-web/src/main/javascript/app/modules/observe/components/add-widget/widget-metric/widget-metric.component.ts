@@ -1,19 +1,17 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-
-import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
 
 import { guid } from '../../../../../common/utils/guid';
 import { DATE_TYPES } from '../../../../../common/consts';
+import { AnalyzeService } from '../../../../analyze/services/analyze.service';
+import { ObserveService } from '../../../services/observe.service';
+import { HeaderProgressService } from '../../../../../common/services';
 
 const template = require('./widget-metric.component.html');
 require('./widget-metric.component.scss');
-
-import { AnalyzeService } from '../../../../analyze/services/analyze.service';
-import { ObserveService } from '../../../services/observe.service';
 
 @Component({
   selector: 'widget-metric',
@@ -21,40 +19,39 @@ import { ObserveService } from '../../../services/observe.service';
 })
 export class WidgetMetricComponent implements OnInit {
   @Output() onSelect = new EventEmitter();
-
+  progressSub;
   metrics: Array<any> = [];
   showProgress = false;
 
   constructor(
     private analyze: AnalyzeService,
-    private observe: ObserveService
-  ) {}
+    private observe: ObserveService,
+    private _headerProgress: HeaderProgressService
+  ) {
+    this. progressSub = _headerProgress.subscribe(showProgress => {
+      this.showProgress = showProgress
+    });
+  }
 
   ngOnInit() {
-    this.showProgress = true;
     Observable.fromPromise(this.analyze.getSemanticLayerData()).subscribe(
       (data: Array<any>) => {
         this.metrics = data;
-        this.showProgress = false;
-      },
-      error => {
-        this.showProgress = false;
       }
     );
+  }
+
+  ngOnDestroy() {
+    this.progressSub.unsubscribe();
   }
 
   onLoadMetricArtifacts(semanticId: string) {
     const metric = find(this.metrics, m => m.id === semanticId);
     if (!metric || metric.kpiColumns) return;
 
-    this.showProgress = true;
     this.observe.getArtifacts({ semanticId }).subscribe(
       data => {
         this.applyArtifactsToMetric(metric, data);
-        this.showProgress = false;
-      },
-      error => {
-        this.showProgress = false;
       }
     );
   }
