@@ -30,6 +30,13 @@ RUN yum -y -q install mapr-core mapr-cldb mapr-zookeeper mapr-webserver
 ENV warden_conf=/opt/mapr/conf/warden.conf
 RUN sed -i -e 's/^\(service.command.cldb.heapsize.max\)=.*$/\1=256/' \
   $warden_conf
+RUN sed -i -e 's/^\(service.command.cldb.heapsize.max\)=.*$/\1=256/' \
+    $warden_conf
+RUN sed -i -e 's/^\(service.command.mfs.heapsize.percent\)=.*$/\1=10/' \
+    $warden_conf
+RUN sed -i -e 's/^\(service.command.mfs.heapsize.maxpercent\)=.*$/\1=15/' \
+    $warden_conf
+
 
 # Install YARN, if enabled
 RUN if $yarn_enabled; then \
