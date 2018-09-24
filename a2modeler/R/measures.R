@@ -398,7 +398,7 @@ f1.tbl_spark <- function(x, predicted, actual) {
 
 #' @export
 #' @rdname f1
-f1.spark_connection <- function(x, predicted = "predicted", actual = "label") {
+f1.spark_connection <- function(x, predicted = "prediction", actual = "label") {
   checkmate::assert_character(predicted)
   checkmate::assert_character(actual)
   
