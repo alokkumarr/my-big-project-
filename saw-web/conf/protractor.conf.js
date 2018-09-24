@@ -1,12 +1,12 @@
 var appRoot = require('app-root-path');
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var HtmlReporter = require('protractor-beautiful-reporter');
 var argv = require('yargs').argv;
+var sleep = require('sleep');
 
 /**
  * Note about intervals:
@@ -51,7 +51,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
  * number of failed retry
  */
-let maxRetryForFailedTests = webpackHelper.distRun() ? 4 : 3;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 2 : 1;
 
 /**
  * Waits ms after page is loaded
@@ -178,8 +178,7 @@ exports.config = {
      * This suite is for development environment and always all dev tests will be executed.
      */
     development: [
-      testBaseDir + 'dev1.js',
-      testBaseDir + 'dev2.js'
+      testBaseDir + 'observe/dashboardGlobalFilterWithESReport.test.js'
     ]
   },
   onCleanUp: function (results) {
@@ -187,6 +186,15 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
+    //
+    // // Generate test data
+    // if(webpackHelper.getSawWebUrl()) {
+    //   token = generate.token(webpackHelper.getSawWebUrl());
+    //   generate.usersRolesPrivilegesCategories(token);
+    //   //sleep.sleep(30);
+    // } else {
+    //   throw new Error('saw web url can not be null');
+    // }
 
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
@@ -245,15 +253,25 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
+    console.log('beforeLaunch....generating the testdata...')
     // Generate test data
     if(webpackHelper.getSawWebUrl()) {
+      const generate = require('../src/test/javascript/data/generateTestData');
       token = generate.token(webpackHelper.getSawWebUrl());
       generate.usersRolesPrivilegesCategories(token);
     } else {
       throw new Error('saw web url can not be null');
+      process.exit(1);
     }
+
   },
   afterLaunch: function() {
+    console.log('afterLaunch....')
+    if (fs.existsSync('target/e2eId.json')) {
+      // delete and create new always
+      console.log('deleting e2e id json file....')
+      fs.unlinkSync('target/e2eId.json');
+    }
 
     var retryCounter = 1;
     if (argv.retry) {

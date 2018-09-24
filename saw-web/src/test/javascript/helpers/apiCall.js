@@ -7,13 +7,16 @@ const request = require('sync-request');
 module.exports = {
   post: (url, payload, token) => {
 
-    return JSON.parse(request('POST', url, {
+    let data = request('POST', url, {
       headers: {'Authorization': token},
       json: payload
-    }).getBody());
+    });
+    console.log('api response--->'+JSON.stringify(data));
+
+    return JSON.parse(data.getBody());
   },
   delete: (url, token) => {
-    
+
     return JSON.parse(request('DELETE', url, {
       headers: {'Authorization': token}
     }).getBody());

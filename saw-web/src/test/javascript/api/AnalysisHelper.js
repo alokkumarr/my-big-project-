@@ -38,16 +38,16 @@ class AnalysisHelper {
      */
     deletePivotChart(host, token, customerCode, id) {
 
-      let deletePayload = new RequestModel().getAnalyzeDeletePayload(customerCode, id);
-      //Make a delete api call
-      return apiCall.post(host + 'services/analysis', deletePayload, token);
+      // let deletePayload = new RequestModel().getAnalyzeDeletePayload(customerCode, id);
+      // //Make a delete api call
+      // return apiCall.post(host + 'services/analysis', deletePayload, token);
     }
 
     deleteAnalysis(host, token, customerCode, id) {
 
-      let deletePayload = new RequestModel().getAnalyzeDeletePayload(customerCode, id);
-      //Make a delete api call
-      return apiCall.post(host + 'services/analysis', deletePayload, token);
+      // let deletePayload = new RequestModel().getAnalyzeDeletePayload(customerCode, id);
+      // //Make a delete api call
+      // return apiCall.post(host + 'services/analysis', deletePayload, token);
     }
     /**
      *

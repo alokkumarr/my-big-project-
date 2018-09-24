@@ -1,6 +1,7 @@
 const path = require('path');
 var fs = require('fs');
 var convert = require('xml-js');
+const globalVariables = require('../src/test/javascript/helpers/globalVariables');
 
 var subset={};
 var processedFiles = [];
@@ -168,7 +169,8 @@ module.exports = {
         if(val.includes('--baseUrl')) {
           url =  val.split('=')[1];url
           let urlObject = {
-            baseUrl:url
+            baseUrl:url,
+            e2eId:globalVariables.generateE2eId
           }
           fs.writeFileSync('target/url.json', JSON.stringify(urlObject), { encoding: 'utf8' });
           return;

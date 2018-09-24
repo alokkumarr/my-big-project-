@@ -72,6 +72,7 @@
     "reflect-metadata": "0.1.10",
     "rxjs": "6.2.2",
     "rxjs-compat": "6.2.2",
+    "sleep": "^5.2.3",
     "toastr": "2.1.4",
     "xml-js": "^1.6.7",
     "zone.js": "0.8.26"
