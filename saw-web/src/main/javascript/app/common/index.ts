@@ -64,7 +64,6 @@ import {
   ErrorDetailDialogService,
   MenuService,
   ToastService,
-  ComponentHandler,
   UserService,
   JwtService
 } from './services';
@@ -124,7 +123,6 @@ const SERVICES = [
   ErrorDetailDialogService,
   ToastService,
   ChartService,
-  ComponentHandler,
   JwtService,
   UserService,
   MenuService

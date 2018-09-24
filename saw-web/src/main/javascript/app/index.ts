@@ -5,21 +5,22 @@ import 'zone.js/dist/zone';
 import 'hammerjs';
 import 'reflect-metadata';
 import '../../../../themes/_triton.scss';
-import { NgModule, LOCALE_ID, enableProdMode } from '@angular/core';
+import { NgModule, LOCALE_ID, enableProdMode, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgIdleModule } from '@ng-idle/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { RouterModule } from '@angular/router';
+import { CommonModuleTs } from './common';
 import { MaterialModule } from './material.module';
 
 import { routes } from './routes';
 
-import { ObserveUpgradeModule } from './modules/observe';
-import { CommonModuleTs } from './common';
-import { AnalyzeModuleTs } from './modules/analyze';
-import { AdminModule } from './modules/admin';
-import { WorkbenchUpgradeModule } from './modules/workbench';
+// import { ObserveUpgradeModule } from './modules/observe';
+// import { AnalyzeModuleTs } from './modules/analyze';
+// import { AdminModule } from './modules/admin';
+// import { WorkbenchUpgradeModule } from './modules/workbench';
+import { LoginModule } from './login';
 
 import {
   LayoutContentComponent,
@@ -52,18 +53,20 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     }),
     NgIdleModule.forRoot(),
     CommonModuleTs,
-    AnalyzeModuleTs,
-    ObserveUpgradeModule,
     FlexLayoutModule,
-    WorkbenchUpgradeModule,
     MaterialModule,
-    AdminModule
+    LoginModule
+    // AnalyzeModuleTs,
+    // ObserveUpgradeModule,
+    // WorkbenchUpgradeModule,
+    // AdminModule
   ],
   exports: [FlexLayoutModule],
   providers: [...SERVICES],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  bootstrap: [LayoutContentComponent]
+  bootstrap: [LayoutContentComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
 })
 export class NewAppModule {
   constructor() {}

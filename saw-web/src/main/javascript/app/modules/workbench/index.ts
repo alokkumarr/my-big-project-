@@ -15,7 +15,6 @@ import { WorkbenchService } from './services/workbench.service';
 import { AnalyzeService } from '../analyze/services/analyze.service';
 import {
   MenuService,
-  ComponentHandler,
   HeaderProgressService,
   ToastService,
   SideNavService,
@@ -89,7 +88,6 @@ const SERVICES = [
   WorkbenchService,
   AnalyzeService,
   MenuService,
-  ComponentHandler,
   HeaderProgressService,
   ToastService,
   SideNavService,

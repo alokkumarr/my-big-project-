@@ -43,7 +43,7 @@ export class LayoutContentComponent {
     this._idle.onTimeout.subscribe(() => {
       // log out user
       this._user.logout('logout').then(() => {
-        window.location.assign('./login.html');
+        this._router.navigate(['login']);
       });
     });
     this._idle.onIdleStart.subscribe(() => {

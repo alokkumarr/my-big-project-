@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as lowerCase from 'lodash/lowerCase';
 import * as split from 'lodash/split';
@@ -29,6 +30,7 @@ export class LayoutHeaderComponent {
   constructor(
     private jwt: JwtService,
     private user: UserService,
+    private _router: Router,
     private _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
@@ -53,12 +55,12 @@ export class LayoutHeaderComponent {
 
   logout() {
     this.user.logout('logout').then(() => {
-      window.location.assign('./login.html');
+      this._router.navigate(['login']);
     });
   }
 
   changePwd() {
-    window.location.assign('./login.html#/changePwd');
+    this._router.navigate(['login', 'changePwd']);
   }
 
   getInitials(usrName: string) {

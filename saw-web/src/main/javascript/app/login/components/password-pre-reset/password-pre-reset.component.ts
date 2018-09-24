@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { JwtService, UserService } from '../../../app/common/services';
+import { UserService } from '../../../common/services';
+import { Router } from '@angular/router';
 
 const template = require('./password-pre-reset.component.html');
 require ('./password-pre-reset.component.scss');
@@ -11,7 +12,10 @@ require ('./password-pre-reset.component.scss');
 
 export class PasswordPreResetComponent {
 
-  constructor(private _JwtService: JwtService, private _UserService: UserService) {}
+  constructor(
+    private _UserService: UserService,
+    private _router: Router
+    ) {}
 
   private dataHolder = {
     masterLoginId: null
@@ -27,6 +31,6 @@ export class PasswordPreResetComponent {
   }
 
   login() {
-    window.location.assign('./');
+    this._router.navigate(['login']);
   }
 }

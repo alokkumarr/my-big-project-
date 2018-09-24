@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
-import { CanActivateChild, CanActivate } from '@angular/router';
+import { CanActivateChild, CanActivate, Router } from '@angular/router';
 import { UserService } from '../../common/services';
 
 @Injectable()
 export class IsUserLoggedInGuard implements CanActivate, CanActivateChild {
-  constructor(private _user: UserService) {}
+  constructor(
+    private _user: UserService,
+    private _router: Router
+    ) {}
 
   canActivateChild() {
     return this.isUserLoggedIn();
@@ -20,7 +23,7 @@ export class IsUserLoggedInGuard implements CanActivate, CanActivateChild {
     }
 
     // redirect to login page
-    setTimeout(() => window.location.assign('./login.html'));
+    setTimeout(() => this._router.navigate(['login']));
     return false;
   }
 }

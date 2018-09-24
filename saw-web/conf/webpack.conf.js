@@ -40,8 +40,8 @@ module.exports = function (env) {
   const conf = {
     context: webpackHelper.root('src/main/javascript'),
     entry: {
-      app: './app/index',
-      login: './login/index'
+      app: './app/index'
+      // login: './login/index'
     },
 
     output: {
@@ -186,12 +186,12 @@ module.exports = function (env) {
       chunks: ['app']
     }));
 
-    conf.plugins.push(new HtmlWebpackPlugin({
-      template: 'login/index.html',
-      filename: 'login.html',
-      hash: true,
-      chunks: ['login']
-    }));
+    // conf.plugins.push(new HtmlWebpackPlugin({
+    //   template: 'login/index.html',
+    //   filename: 'login.html',
+    //   hash: true,
+    //   chunks: ['login']
+    // }));
 
     conf.devServer = {
       port: 3000,
@@ -209,7 +209,7 @@ module.exports = function (env) {
     const pkg = require(webpackHelper.root('package.json'));
 
     const appChunks = ['commonVendor', 'app'];
-    const loginChunks = ['commonVendor', 'login'];
+    // const loginChunks = ['commonVendor', 'login'];
 
     conf.entry.commonVendor = commonVendorKeys;
 
@@ -227,14 +227,14 @@ module.exports = function (env) {
       chunksSortMode: webpackHelper.sortChunks(appChunks)
     }));
 
-    conf.plugins.push(new HtmlWebpackPlugin({
-      template: 'login/index.html',
-      filename: 'login.html',
-      favicon: webpackHelper.root('assets/favicon/favicon.ico'),
-      hash: true,
-      chunks: loginChunks,
-      chunksSortMode: webpackHelper.sortChunks(loginChunks)
-    }));
+    // conf.plugins.push(new HtmlWebpackPlugin({
+    //   template: 'login/index.html',
+    //   filename: 'login.html',
+    //   favicon: webpackHelper.root('assets/favicon/favicon.ico'),
+    //   hash: true,
+    //   chunks: loginChunks,
+    //   chunksSortMode: webpackHelper.sortChunks(loginChunks)
+    // }));
 
     conf.plugins.push(new CommonsChunkPlugin({
       names: ['commonVendor'],

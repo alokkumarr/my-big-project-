@@ -1,7 +1,6 @@
-import { Component, Input, Inject, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 
 import { SidenavMenuService } from'./sidenav-menu.service';
-// import { ComponentHandler } from './../../utils/componentHandler';
 
 const template = require('./sidenav.component.html');
 require('./sidenav.component.scss');
@@ -18,7 +17,6 @@ export class SidenavComponent {
 
   constructor(
     private _sidenav: SidenavMenuService
-    // @Inject('$componentHandler') private chp: ComponentHandler
   ) { }
   @ViewChild('sidenav') public sidenav;
 
@@ -26,7 +24,6 @@ export class SidenavComponent {
   public _moduleName: string;
 
   ngOnInit() {
-    // this.unregister = this.chp.register(this.id, this);
     this._moduleName = '';
     this._sidenav.subscribe(({menu, module}) => this.update(menu, module));
   }

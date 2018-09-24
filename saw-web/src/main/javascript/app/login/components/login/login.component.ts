@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { JwtService, UserService } from '../../../app/common/services';
-import * as isUndefined from 'lodash/isUndefined';
+import { Router, ActivatedRoute } from '@angular/router';
+import { JwtService, UserService } from '../../../common/services';
 
 const template = require('./login.component.html');
 require ('./login.component.scss');
@@ -12,7 +12,12 @@ require ('./login.component.scss');
 
 export class LoginComponent {
 
-  constructor(private _JwtService: JwtService, private _UserService: UserService) {}
+  constructor(
+    private _JwtService: JwtService,
+    private _UserService: UserService,
+    private _router: Router,
+    private _route: ActivatedRoute
+    ) {}
 
   private dataHolder = {
     username: null,
@@ -24,10 +29,11 @@ export class LoginComponent {
   };
 
   ngOnInit() {
-    const changePassMsg = window.location.href;
-    if (!isUndefined(changePassMsg.split('changePassMsg=')[1])) {
-      this.states.error = decodeURI(changePassMsg.split('changePassMsg=')[1]).split('#/')[0];
-    }
+    this._route.queryParams.subscribe(({changePassMsg}) => {
+      if (changePassMsg) {
+        this.states.error = changePassMsg;
+      }
+    });
   }
 
   login() {
@@ -38,7 +44,7 @@ export class LoginComponent {
     this._UserService.attemptAuth(params).then(
       data => {
         if (this._JwtService.isValid(data)) {
-          window.location.assign('./');
+          this._router.navigate(['']);
         } else {
           this.states.error = this._JwtService.getValidityReason(data);
         }
@@ -47,6 +53,6 @@ export class LoginComponent {
   }
 
   reset() {
-    window.location.assign(window.location.href + 'preResetPwd');
+    this._router.navigate(['login', 'preResetPwd']);
   }
 }

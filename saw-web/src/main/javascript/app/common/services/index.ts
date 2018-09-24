@@ -7,6 +7,5 @@ export {ToastService} from './toastMessage.service';
 export {SideNavService} from './sidenav.service';
 export {ErrorDetailDialogService} from './error-detail-dialog.service';
 export {ErrorDetailService} from './error-detail.service';
-export {ComponentHandler} from './componentHandler';
 export {UserService} from './user.service';
 export {JwtService, CUSTOM_JWT_CONFIG} from './jwt.service';

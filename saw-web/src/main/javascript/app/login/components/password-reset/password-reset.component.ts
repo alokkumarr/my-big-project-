@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { UserService } from '../../../app/common/services';
 import * as isEmpty from 'lodash/isEmpty';
+import { Router, ActivatedRoute } from '@angular/router';
+import { UserService } from '../../../common/services';
 
 const template = require('./password-reset.component.html');
 
@@ -10,30 +11,28 @@ const template = require('./password-reset.component.html');
 })
 
 export class PasswordResetComponent {
-  constructor(private _UserService: UserService) {}
+  constructor(
+    private _UserService: UserService,
+    private _router: Router,
+    private _route: ActivatedRoute
+    ) {}
 
   private errorMsg;
   private username;
   private confNewPwd;
   private newPwd;
-  private rhcToken;
 
   ngOnInit() {
-    if (window.location.href.indexOf('/resetPassword?rhc') !== -1) {
-      const hashCode = window.location.href;
-      const rhc = hashCode.split('rhc=')[1];
-      const rData = {
-        rhc
-      };
-      this.rhcToken = rhc;
-      this._UserService.verify(rData).then(res => {
+    this._route.queryParams.subscribe(({rhc}) => {
+      const params = {rhc};
+      this._UserService.verify(params).then(res => {
         if (res.valid) {
           this.username = res.masterLoginID;
         } else {
           this.errorMsg = res.validityReason + '. Please regenerate the link once again';
         }
       });
-    }
+    });
   }
 
   resetPwd() {
@@ -49,6 +48,6 @@ export class PasswordResetComponent {
   }
 
   login() {
-    window.location.assign('./');
+    this._router.navigate(['login']);
   }
 }
