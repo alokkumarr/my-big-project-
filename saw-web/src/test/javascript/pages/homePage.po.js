@@ -31,11 +31,10 @@ module.exports = {
   collapsedCategory: categoryName => {
     return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
   },category: catName =>{
-    return element(by.xpath(`//span[text()="${catNacreateAndDeleteDashboardWithESReport.test.js
-      me}"]/parent::mat-panel-title`));
+    return element(by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`));
   },
   subCategory: subCategoryName => {
-    return element(by.xpath(`//a[contains(text(),"${subCategoryName}")][1]`));
+    return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
   },
   navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
   navigateToSubCategoryUpdated: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory),
