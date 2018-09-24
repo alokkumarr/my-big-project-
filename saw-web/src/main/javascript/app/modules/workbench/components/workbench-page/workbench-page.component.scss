@@ -7,14 +7,6 @@ workbench-page {
   max-height: 100%;
   overflow: auto;
 
-  ui-view {
-    width: 100%;
-
-    & > * {
-      width: 100%;
-    }
-  }
-
   .margin-btm-9 {
     margin-bottom: 9px !important;
   }

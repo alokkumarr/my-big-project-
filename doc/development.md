@@ -196,18 +196,17 @@ field mapping].
 [Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
 [Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
-# Running manual package upgrade/migration Tests
+# Testing upgrade and migration
 
-To run the saw package upgrade and database migration manually with Local docker instance, execute the
-following command from saw working directory:
-       
-        sh utils/migration-package-upgrade-local.sh
-  
-Above script can be also edited as per the use cases for repeatedly upgrade
-test while development.
+To test upgrading SIP from an old version, including database
+migration, add the `-Dsip.upgrade.skip=false` flag to the build
+command:
 
-Note: Above script is only applicable for local docker instance,
-for cloud docker instance script TBD.
+        $ mvn verify -Dsip.upgrade.skip=false
+
+This will first deploy the old SIP version (see the SIP package URL in
+`pom.xml`) and then deploy the new SIP version on top of it, after
+which integration tests will be executed on the upgraded environment.
 
 # Rendering documentation
 

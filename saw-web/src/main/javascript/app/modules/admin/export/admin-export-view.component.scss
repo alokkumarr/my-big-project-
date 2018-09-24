@@ -3,6 +3,7 @@ $toolbar-height: 74px;
 
 admin-export-view {
   max-height: calc(100vh - (63px + 55px));
+  width: 100%;
 
   .admin-title {
     color: $grey-text-color;

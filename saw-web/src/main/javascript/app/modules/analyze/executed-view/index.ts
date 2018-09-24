@@ -11,7 +11,7 @@ import { ExecuteService } from '../services/execute.service';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { UChartModule } from '../../../common/components/charts';
 import { AnalyzeExportService } from '../services/analyze-export.service';
-import { AnalyzeFilterModule } from '../components/designer/filter';
+import { AnalyzeFilterModule } from '../designer/filter';
 
 const COMPONENTS = [
   ExecutedViewComponent,

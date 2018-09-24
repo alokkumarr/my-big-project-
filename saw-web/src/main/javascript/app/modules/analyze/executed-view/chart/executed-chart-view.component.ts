@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as orderBy from 'lodash/orderBy';
 import * as isEmpty from 'lodash/isEmpty';
 import * as values from 'lodash/values';
@@ -21,28 +21,29 @@ const DEFAULT_PAGE_SIZE = 25;
 })
 export class ExecutedChartViewComponent {
   @Input() updater: BehaviorSubject<Object[]>;
-  @Input('analysis') set setAnalysis(analysis: AnalysisChart) {
+  @Input('analysis')
+  set setAnalysis(analysis: AnalysisChart) {
     this.analysis = analysis;
     this.initChartOptions(analysis);
-  };
-  @Input('data') set setData(data: any[]) {
+  }
+  @Input('data')
+  set setData(data: any[]) {
     this.toggleToGrid = false;
     this.updates = this.getChartUpdates(data, this.analysis);
     setTimeout(() => {
       // defer updating the chart so that the chart has time to initialize
       this.updater.next(this.updates);
     });
-  };
+  }
 
   analysis: AnalysisChart;
   isStockChart: boolean;
   chartOptions: Object;
   toggleToGrid: false;
   chartToggleData: any;
+  updates: any;
 
-  constructor(
-    private _chartService: ChartService
-  ) { }
+  constructor(private _chartService: ChartService) {}
 
   initChartOptions(analysis) {
     this.toggleToGrid = false;
@@ -58,33 +59,52 @@ export class ExecutedChartViewComponent {
     const chart = {
       height: 580
     };
-    this.chartOptions = this._chartService.getChartConfigFor(analysis.chartType, {chart, legend});
+    this.chartOptions = this._chartService.getChartConfigFor(
+      analysis.chartType,
+      { chart, legend }
+    );
     this.isStockChart = analysis.isStockChart;
   }
 
-  isFloat(n){
+  isFloat(n) {
     return Number(n) === n && n % 1 !== 0;
   }
 
   fetchColumnData(axisName, value) {
     let aliasName = axisName;
     forEach(this.analysis.artifacts[0].columns, column => {
-      if(axisName === column.name) {
+      if (axisName === column.name) {
         aliasName = column.aliasName || column.displayName;
-        value = column.type === 'date' ? moment.utc(value).format(column.dateFormat === 'MMM d YYYY' ? 'MMM DD YYYY' : (column.dateFormat === 'MMMM d YYYY, h:mm:ss a' ? 'MMMM DD YYYY, h:mm:ss a' : column.dateFormat) ) : value;
-        if((value) && (column.aggregate === 'percentage' || column.aggregate === 'avg')) {
-          value = value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
+        value =
+          column.type === 'date'
+            ? moment
+                .utc(value)
+                .format(
+                  column.dateFormat === 'MMM d YYYY'
+                    ? 'MMM DD YYYY'
+                    : column.dateFormat === 'MMMM d YYYY, h:mm:ss a'
+                      ? 'MMMM DD YYYY, h:mm:ss a'
+                      : column.dateFormat
+                )
+            : value;
+        if (
+          value &&
+          (column.aggregate === 'percentage' || column.aggregate === 'avg')
+        ) {
+          value =
+            value.toFixed(2) + (column.aggregate === 'percentage' ? '%' : '');
         }
         value = value === 'Undefined' ? '' : value;
       }
-    })
-    return {aliasName, value};
+    });
+    return { aliasName, value };
   }
 
   trimKeyword(data) {
+    if (!data) return;
     let trimData = data.map(row => {
       let obj = {};
-      for(var key in row) {
+      for (var key in row) {
         let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
         obj[trimKey.aliasName] = trimKey.value;
       }
@@ -101,7 +121,10 @@ export class ExecutedChartViewComponent {
   }
 
   getChartUpdates(data, analysis) {
-    const settings = this._chartService.fillSettings(analysis.artifacts, analysis);
+    const settings = this._chartService.fillSettings(
+      analysis.artifacts,
+      analysis
+    );
     const sorts = analysis.sqlBuilder.sorts;
     const labels = {
       x: get(analysis, 'xAxis.title', null),
@@ -122,11 +145,12 @@ export class ExecutedChartViewComponent {
       ...this._chartService.dataToChangeConfig(
         analysis.chartType,
         settings,
+        analysis.sqlBuilder,
         orderedData || data,
-        {labels, labelOptions: analysis.labelOptions, sorts}
+        { labels, labelOptions: analysis.labelOptions, sorts }
       ),
-      {path: 'title.exportFilename', data: analysis.name},
-      {path: 'chart.inverted', data: analysis.isInverted}
+      { path: 'title.exportFilename', data: analysis.name },
+      { path: 'chart.inverted', data: analysis.isInverted }
     ];
   }
 }

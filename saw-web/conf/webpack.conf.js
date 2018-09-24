@@ -152,7 +152,7 @@ module.exports = function (env) {
       new HappyPack({
         id: 'ts',
         threads: 4,
-        loaders: ['ng-annotate-loader', {
+        loaders: [{
           loader: 'ts-loader',
           options: {
             happyPackMode: true,
@@ -205,7 +205,7 @@ module.exports = function (env) {
   }
 
   if (isProduction) {
-    const commonVendorKeys = ['angular', 'angular-material', 'jquery', '@uirouter/angular-hybrid', 'angular-translate', '@angular/material', '@angular/core'];
+    const commonVendorKeys = ['@angular/material', '@angular/core'];
     const pkg = require(webpackHelper.root('package.json'));
 
     const appChunks = ['commonVendor', 'app'];

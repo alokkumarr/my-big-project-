@@ -39,7 +39,7 @@ export class AccordionMenuLinkComponent {
   }
 
   expandLoadedPanel() {
-    const url = location.hash.split('#!')[1];
+    const url = location.hash.split('#')[1];
 
     if (/^\/observe/.test(url) || /^\/workbench/.test(url)) {
       /* If observe module / workbench, open all levels by default */
@@ -47,7 +47,7 @@ export class AccordionMenuLinkComponent {
       return;
     }
 
-    this.pathUrl = '#!' + url;
+    this.pathUrl = '#' + url;
     if (this.checkPanel()) {
       for (let i = 0; i < this.metadata.children.length - 1; i++) {
         if (this.pathUrl === this.metadata.children[i].url) {
