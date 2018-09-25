@@ -8,33 +8,36 @@
 \usage{
 writer(df, ...)
 
-\method{writer}{tbl_spark}(df, path, dfs_mount = "/dfs", type, mode = NULL,
-  partitions = NULL, partition_by = NULL, temp_folder_name = "tmp", ...)
+\method{writer}{tbl_spark}(df, path, name, type, mode = NULL,
+  partitions = NULL, partition_by = NULL, dfs_mount = "/dfs",
+  temp_folder_name = "tmp", ...)
 
-\method{writer}{data.frame}(df, path, type, mode = NULL, ...)
+\method{writer}{data.frame}(df, path, name, type, mode = NULL, ...)
 }
 \arguments{
 \item{df}{DataFrame}
 
 \item{...}{optional arguments passed to write function}
 
-\item{path}{file path to write file to. Should include protocol if distributed
-path}
+\item{path}{file directory path to write files to. Should include protocol if
+distributed path. Should not end with forward slash.}
 
-\item{dfs_mount}{dfs mount file path. applicable for distributed files only}
+\item{name}{Output file name. Note for partitioned files, the file part number is
+appended to this file name}
 
-\item{type}{file type. type specifies the spark writer function. Only
-applicable for spark writer method}
+\item{type}{Output file type. Specifies the writer function used}
 
 \item{mode}{Specifies the behavior when data or table already exists.
-Supported values include: 'error', 'append', 'replace' and 'ignore'.
-Notice that 'replace' will also change the column structure. default is
-NULL}
+Supported values include: 'error', 'append', 'replace' and 'ignore'. Notice
+that 'replace' will also change the column structure. default is NULL}
 
 \item{partitions}{Number of file partitions}
 
 \item{partition_by}{Partitions the output by the given columns on the file
 system}
+
+\item{dfs_mount}{dfs mount file path. applicable for distributed files only.
+default is /dfs}
 
 \item{temp_folder_name}{name of temp folder}
 }
