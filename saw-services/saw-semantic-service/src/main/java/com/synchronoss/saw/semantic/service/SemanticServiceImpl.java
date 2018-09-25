@@ -129,10 +129,9 @@ public class SemanticServiceImpl implements SemanticService {
       ObjectNode repoNode = null;
       ArrayNode respository = objectMapper.createArrayNode();
       for (String dataSetId: semanticNode.getParentDataSetIds()) {
-        requestURL = requestURL + dataSetId;
-        logger.trace("Request URL to pull DataSet Details : " + requestURL);
+        logger.trace("Request URL to pull DataSet Details : " + requestURL + dataSetId);
         RestTemplate restTemplate = new RestTemplate();
-        dataSet = restTemplate.getForObject(requestURL, DataSet.class);
+        dataSet = restTemplate.getForObject(requestURL + dataSetId, DataSet.class);
         node = objectMapper.readTree(objectMapper.writeValueAsString(dataSet));
         rootNode = (ObjectNode) node;
         systemNode = (ObjectNode) rootNode.get(DataSetProperties.System.toString());

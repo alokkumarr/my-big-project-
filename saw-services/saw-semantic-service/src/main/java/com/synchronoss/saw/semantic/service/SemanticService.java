@@ -1,6 +1,7 @@
 package com.synchronoss.saw.semantic.service;
 
 
+import org.apache.commons.lang3.StringUtils;
 import com.synchronoss.saw.semantic.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.DeleteEntitySAWException;
 import com.synchronoss.saw.semantic.exceptions.JSONValidationSAWException;
@@ -41,6 +42,9 @@ public interface SemanticService {
    */
   default String generateId(String project, String metricName) throws JSONValidationSAWException {
     String id = project + delimiter + metricName;
+    if (StringUtils.containsWhitespace(id)) {
+      id = StringUtils.deleteWhitespace(id);
+    }
     return id;
   }
 }
