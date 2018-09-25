@@ -26,11 +26,6 @@ export const DATE_PRESETS = [
     label: 'YTD (Year to Date)'
   },
   {
-    value: 'LY',
-    keyword: 'LAST_YEAR',
-    label: 'Last Year'
-  },
-  {
     value: 'LW',
     keyword: 'LAST_WEEK',
     label: 'Last Week'
@@ -64,6 +59,11 @@ export const DATE_PRESETS = [
     value: 'LSM',
     keyword: 'LAST_6_MONTHS',
     label: 'Last 6 Months'
+  },
+  {
+    value: 'LY',
+    keyword: 'LAST_YEAR',
+    label: 'Last Year'
   },
   {
     value: CUSTOM_DATE_PRESET_VALUE,
