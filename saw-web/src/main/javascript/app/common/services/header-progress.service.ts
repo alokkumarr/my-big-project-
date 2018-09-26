@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
+import { debounceTime } from 'rxjs/operators';
 
 @Injectable()
 export class HeaderProgressService {
@@ -8,7 +9,7 @@ export class HeaderProgressService {
   private _subject$ = new Subject<boolean>();
 
   subscribe(fn) {
-    return this._subject$.subscribe(fn);
+    return this._subject$.pipe(debounceTime(100)).subscribe(fn);
   }
 
   show() {
