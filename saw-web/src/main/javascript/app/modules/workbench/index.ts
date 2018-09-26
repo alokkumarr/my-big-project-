@@ -51,6 +51,7 @@ import {
   DatasetActionsComponent,
   DatapodActionsComponent
 } from './components/data-objects-view/index';
+import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
 
 import { DefaultWorkbenchPageGuard } from './guards';
 
@@ -80,7 +81,8 @@ const COMPONENTS = [
   UpdateSemanticComponent,
   DatapodsCardPageComponent,
   DatapodsGridPageComponent,
-  DatapodActionsComponent
+  DatapodActionsComponent,
+  DatasourceComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard];

@@ -1,0 +1,43 @@
+@import 'themes/base/colors';
+
+datasource-page {
+  width: 100%;
+  background-color: $background-color;
+
+  .action-buttons {
+    .mat-icon-button {
+      font-size: 22px;
+      line-height: 32px !important;
+      height: 34px !important;
+    }
+
+    .mat-raised-button {
+      line-height: 32px !important;
+      vertical-align: middle;
+    }
+  }
+
+  .mat-slide-toggle {
+    padding-top: 5px;
+  }
+
+  .icon-search {
+    font-size: 26px !important;
+  }
+
+  .toolbar-white {
+    background-color: $primary-white;
+    height: 45px !important;
+    min-height: 45px !important;
+  }
+
+  .md-subhead {
+    color: $primary-blue-b2;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .gricontainer {
+    height: calc(100% - 46px);
+  }
+}
