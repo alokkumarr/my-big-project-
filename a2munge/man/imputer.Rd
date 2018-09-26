@@ -4,7 +4,8 @@
 \alias{imputer}
 \title{Dataframe Imputer}
 \usage{
-imputer(df, group_vars = NULL, measure_vars = NULL, fun = "mean", ...)
+imputer(df, group_vars = NULL, measure_vars = NULL, fun = "mean",
+  ...)
 }
 \arguments{
 \item{df}{Spark or R data.frame}
