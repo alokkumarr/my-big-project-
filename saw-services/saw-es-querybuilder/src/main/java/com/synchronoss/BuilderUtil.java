@@ -322,7 +322,7 @@ public class BuilderUtil
             case "LY":  {
                 LocalDateTime priorLastYear = now.minusYears(1);
                 LocalDateTime lastYear = priorLastYear.minusYears(1);
-                dynamicConvertor.setLte(priorLastYear.with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(lastYear.with(TemporalAdjusters.lastDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(lastYear.with(TemporalAdjusters.firstDayOfYear()).format(dateTimeFormatter) + SPACE + DATE_FORMAT_GTE);
                 break;
             }
