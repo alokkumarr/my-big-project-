@@ -5,7 +5,7 @@ import * as startsWith from 'lodash/startsWith';
 import * as replace from 'lodash/replace';
 import * as join from 'lodash/join';
 
-import { Format } from '../../models'
+import { Format } from '../../models';
 const commaRegex = /\B(?=(\d{3})+(?!\d))/g;
 
 export function formatNumber(number, format: Format) {
@@ -24,7 +24,7 @@ export function getFormatter(format: Format | string) {
     number => applyPercentageSymbolIfNeeded(<Format>format, number),
     numberString => applyCommasIfNeeded(<Format>format, numberString),
     numberString => applyCurrencyIfNeeded(<Format>format, numberString)
-  )
+  );
 }
 
 export function applyPercentageSymbolIfNeeded(format: Format, number) {
@@ -62,7 +62,7 @@ export function applyCommasIfNeeded(format: Format, numberString) {
         return integerPart;
       }
 
-    )(numberString)
+    )(numberString);
   }
   return numberString;
 }

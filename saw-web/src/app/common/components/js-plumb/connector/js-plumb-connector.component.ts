@@ -6,7 +6,9 @@ import {
   EventEmitter,
   ComponentFactoryResolver,
   ViewContainerRef,
-  ViewChild
+  ViewChild,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as find from 'lodash/find';
@@ -15,17 +17,15 @@ import {
   Join,
   JoinCriterion,
   EndpointPayload,
-  EndpointSide,
   ConnectionPayload,
   JoinChangeEvent
 } from '../types';
-import { JS_PLUMB_DEFAULT_SETTINGS } from '../settings';
 import { JsPlumbJoinLabelComponent } from '../join-label';
 
 const ENDPOINT_ANCHORS = {
   left: 'LeftMiddle',
   right: 'RightMiddle'
-}
+};
 
 @Component({
   selector: 'js-plumb-connector-u',
@@ -33,7 +33,7 @@ const ENDPOINT_ANCHORS = {
     <div #target></div>
     `
 })
-export class JsPlumbConnectorComponent {
+export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
   @Output() change: EventEmitter<JoinChangeEvent> = new EventEmitter();
   @Input() join: Join;
   @Input() index: number;
@@ -85,7 +85,7 @@ export class JsPlumbConnectorComponent {
 
       const connectionPayload: ConnectionPayload = {
         join: this.join
-      }
+      };
 
       this._connection.setParameter('connectionPayload', connectionPayload);
       this.addJoinlabel();

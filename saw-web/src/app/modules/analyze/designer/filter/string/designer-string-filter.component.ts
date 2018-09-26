@@ -58,8 +58,8 @@ export class DesignerStringFilterComponent {
   }
 
   add(event: MatChipInputEvent) {
-    let input = event.input;
-    let value = event.value;
+    const input = event.input;
+    const value = event.value;
     if (value) {
       this.filterModel.modelValues = [
         ...this.filterModel.modelValues,

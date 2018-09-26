@@ -22,7 +22,7 @@ require('./validate-semantic.component.scss');
 })
 export class ValidateSemanticComponent implements OnDestroy {
   private selectedDS: any;
-  private isJoinEligible: boolean = false;
+  private isJoinEligible = false;
 
   constructor(
     private router: Router,
@@ -124,7 +124,7 @@ export class ValidateSemanticComponent implements OnDestroy {
           this.notify.info('Datapod created successfully', 'Datapod', {
             hideDelay: 9000
           });
-          this.router.navigate(['workbench' ,'dataobjects']);
+          this.router.navigate(['workbench' , 'dataobjects']);
         });
       }
     });

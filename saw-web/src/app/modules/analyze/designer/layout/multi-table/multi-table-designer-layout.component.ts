@@ -37,9 +37,9 @@ export class MultiTableDesignerLayout {
       this.data = data;
       this.isGridPanelExpanded = true;
     }
-  };
+  }
   public data;
-  public isGridPanelExpanded: boolean = false;
+  public isGridPanelExpanded = false;
 
   toggleGridPanel() {
     this.isGridPanelExpanded = !this.isGridPanelExpanded;

@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   Output,
+  OnInit,
   EventEmitter
 } from '@angular/core';
 import * as filter from 'lodash/filter';
@@ -20,7 +21,7 @@ require('./aggregate-chooser.component.scss');
   selector: 'aggregate-chooser-u',
   template
 })
-export class AggregateChooserComponent {
+export class AggregateChooserComponent implements OnInit {
   @Output() public change: EventEmitter<string> = new EventEmitter();
   @Input() public aggregate: string;
   @Input() public type: AnalysisType;

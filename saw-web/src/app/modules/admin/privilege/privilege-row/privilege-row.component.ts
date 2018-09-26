@@ -15,23 +15,23 @@ require('./privilege-row.component.scss');
  * 128 => All
  * some number => View, Create, Execute, Publish, Export
  */
-type Privilege = {
-  privilegeCode: number
+interface Privilege {
+  privilegeCode: number;
 }
 
 @Component({
-  selector: 'tr[privilegeRow]',
+  selector: 'tr[privilege-row]',
   template
 })
 export class PrivilegeRowComponent implements OnChanges {
   @Output() categoryChange: EventEmitter<Privilege> = new EventEmitter();
   @Input() subCategory;
 
-  privilegeCodeList: Boolean[]
+  privilegeCodeList: Boolean[];
   PRIVILEGE_NAMES = PRIVILEGE_NAMES;
 
   ngOnChanges(changes) {
-    const subCategory = changes.subCategory.currentValue
+    const subCategory = changes.subCategory.currentValue;
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
   }

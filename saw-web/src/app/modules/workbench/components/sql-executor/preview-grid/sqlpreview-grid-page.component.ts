@@ -3,7 +3,7 @@ import { Component, Input, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmi
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { DxDataGridComponent } from 'devextreme-angular';
-import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
+import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 
 const template = require('./sqlpreview-grid-page.component.html');
 require('./sqlpreview-grid-page.component.scss');
@@ -22,7 +22,7 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
   private fullScreen: boolean = false; // tslint:disable-line
 
   constructor(
-    private dxDataGrid: dxDataGridService
+    private dxDataGrid: DxDataGridService
   ) {  }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
@@ -92,7 +92,7 @@ export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDes
         e.toolbarOptions.items.unshift({
           location: 'before',
           template: 'toggleViewTemplate'
-        })
+        });
       }
     });
   }

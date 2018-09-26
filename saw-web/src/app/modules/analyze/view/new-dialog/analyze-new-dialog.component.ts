@@ -5,7 +5,7 @@ import * as get from 'lodash/get';
 
 import { ANALYSIS_METHODS } from '../../consts';
 import { IAnalysisMethod } from '../../types';
-import { AnalyzeDialogService } from '../../services/analyze-dialog.service'
+import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 
 const template = require('./analyze-new-dialog.component.html');
 require('./analyze-new-dialog.component.scss');
@@ -21,7 +21,7 @@ export class AnalyzeNewDialogComponent {
   selectedMetric;
 
   constructor(
-    private _analyzeDialogService : AnalyzeDialogService,
+    private _analyzeDialogService: AnalyzeDialogService,
     private _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       metrics: any[],

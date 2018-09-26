@@ -1,5 +1,4 @@
-import { Component, Input, Inject } from '@angular/core';
-import { DOCUMENT } from '@angular/platform-browser';
+import { Component, Input, OnInit } from '@angular/core';
 import * as isUndefined from 'lodash/isUndefined';
 import { SidenavComponent } from '../sidenav';
 
@@ -10,12 +9,11 @@ require('./accordionMenuLink.component.scss');
   selector: 'accordion-menu-link',
   template
 })
-export class AccordionMenuLinkComponent {
+export class AccordionMenuLinkComponent implements OnInit {
   location: Location;
   @Input() public metadata: any;
 
   constructor(
-    @Inject(DOCUMENT) private document: any,
     public leftSideNav: SidenavComponent
   ) {}
 

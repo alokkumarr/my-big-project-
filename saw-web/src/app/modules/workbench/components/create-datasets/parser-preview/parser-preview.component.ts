@@ -15,8 +15,8 @@ import * as isUndefined from 'lodash/isUndefined';
 import { MatDialog } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
 
-import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
-import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component'
+import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
+import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./parser-preview.component.html');
@@ -36,11 +36,11 @@ export class ParserPreviewComponent implements OnInit {
   private fieldInfo = [];
   private parserData: any;
   private rawFile: any;
-  private inspectError: boolean = false;
-  private errMsg: string = '';
+  private inspectError = false;
+  private errMsg = '';
 
   constructor(
-    private dxDataGrid: dxDataGridService,
+    private dxDataGrid: DxDataGridService,
     private dialog: MatDialog,
     private workBench: WorkbenchService
   ) { }
@@ -53,7 +53,7 @@ export class ParserPreviewComponent implements OnInit {
     this.previewgridConfig = this.getPreviewGridConfig();
     setTimeout(() => {
       this.updaterSubscribtion = this.previewObj.subscribe(data => {
-        this.onUpdate(data)
+        this.onUpdate(data);
       });
     }, 100);
   }
@@ -183,7 +183,7 @@ export class ParserPreviewComponent implements OnInit {
     dateDialogRef
       .afterClosed()
       .subscribe(format => {
-        let index: number = -1;
+        let index = -1;
         if (event.type === 'click') {
           index = replace(event.target.id, 'edit_', '');
         } else {

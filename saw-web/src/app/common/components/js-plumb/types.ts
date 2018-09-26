@@ -10,22 +10,22 @@ export {
   ArtifactColumnReport,
   Join
 };
-export type JoinChangeEvent = {
+export interface JoinChangeEvent {
   join: Join;
   action: 'save' | 'delete';
   index?: number;
 }
 export type EndpointSide = 'left' | 'right';
-export type EndpointPayload = {
-  column: ArtifactColumnReport,
-  artifactName: string,
-  side: EndpointSide
+export interface EndpointPayload {
+  column: ArtifactColumnReport;
+  artifactName: string;
+  side: EndpointSide;
 }
-export type ConnectionPayload = {
-  join: Join
+export interface ConnectionPayload {
+  join: Join;
 }
 
-export type JsPlumbCanvasChangeEvent = {
+export interface JsPlumbCanvasChangeEvent {
   subject: 'joins' | 'artifactPosition' | 'column' | 'aggregate';
   column?: ArtifactColumnReport;
 }

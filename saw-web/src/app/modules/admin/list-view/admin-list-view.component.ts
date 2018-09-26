@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {dxDataGridService} from '../../../common/services/dxDataGrid.service';
+import {DxDataGridService} from '../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-list-view.component.html');
 require('./admin-list-view.component.scss');
@@ -22,7 +22,7 @@ export class AdminListViewComponent {
   config: any;
 
   constructor(
-    private _dxDataGridService: dxDataGridService
+    private _DxDataGridService: DxDataGridService
   ) { }
 
   ngOnInit() {
@@ -34,7 +34,7 @@ export class AdminListViewComponent {
   }
 
   getConfig() {
-    return this._dxDataGridService.mergeWithDefaultConfig({
+    return this._DxDataGridService.mergeWithDefaultConfig({
       columns: this.columns,
       width: '100%',
       height: '100%'

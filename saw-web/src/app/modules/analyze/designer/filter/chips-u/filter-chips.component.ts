@@ -32,8 +32,8 @@ require('./filter-chips.component.scss');
   `]
 })
 export class FilterChipsComponent {
-  @Output() remove: EventEmitter<number>= new EventEmitter();
-  @Output() removeAll: EventEmitter<null>= new EventEmitter();
+  @Output() remove: EventEmitter<number> = new EventEmitter();
+  @Output() removeAll: EventEmitter<null> = new EventEmitter();
   @Input() filters: Filter[];
   @Input('artifacts') set artifacts(artifacts: Artifact[]) {
     if (!artifacts) {
@@ -46,7 +46,7 @@ export class FilterChipsComponent {
       }, {});
       return acc;
     }, {});
-  };
+  }
   @Input() readonly: boolean;
 
   public nameMap;

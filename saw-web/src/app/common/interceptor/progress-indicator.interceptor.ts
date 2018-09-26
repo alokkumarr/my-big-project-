@@ -9,6 +9,7 @@ import {
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/do';
 
 import { HeaderProgressService } from '../../common/services';
 

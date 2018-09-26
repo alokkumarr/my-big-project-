@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
@@ -6,11 +6,11 @@ const template = require('./login.component.html');
 require ('./login.component.scss');
 
 @Component({
-  selector: 'login',
+  selector: 'login-form',
   template
 })
 
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   constructor(
     private _JwtService: JwtService,

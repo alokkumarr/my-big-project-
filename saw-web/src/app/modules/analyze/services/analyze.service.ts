@@ -11,6 +11,7 @@ import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Analysis } from '../../../models';
 
 import { JwtService } from '../../../common/services';
 import {
@@ -21,13 +22,13 @@ import AppConfig from '../../../../../appConfig';
 
 const apiUrl = AppConfig.api.url;
 
-type ExecutionRequestOptions = {
-  take?: number,
-  skip?: number,
-  executionType?: string,
-  forcePaginate?: boolean,
-  analysisType?: string
-};
+interface ExecutionRequestOptions {
+  take?: number;
+  skip?: number;
+  executionType?: string;
+  forcePaginate?: boolean;
+  analysisType?: string;
+}
 export const EXECUTION_MODES = {
   PREVIEW: 'preview',
   LIVE: 'regularExecution',
@@ -56,7 +57,7 @@ export class AnalyzeService {
   _executions: Object = {};
 
   constructor(
-    private _http : HttpClient,
+    private _http: HttpClient,
     private _jwtService: JwtService,
     private _toastMessage: ToastService,
     private _menu: MenuService
@@ -133,7 +134,9 @@ export class AnalyzeService {
     const page = floor(options.skip / options.take) + 1;
     const onetimeExecution = options.executionType === EXECUTION_DATA_MODES.ONETIME ? '&executionType=onetime' : '';
     return this.getRequest(
-      `analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}${onetimeExecution}`
+      `analysis/${analysisId}/executions/${executionId}/
+      data?page=${page}&pageSize=${options.take}&
+      analysisType=${options.analysisType}${onetimeExecution}`
     ).then(resp => {
       const data = fpGet(`data`, resp);
       const queryBuilder = fpGet(`queryBuilder`, resp);
@@ -155,7 +158,7 @@ export class AnalyzeService {
     return this.applyAnalysis(model, EXECUTION_MODES.PREVIEW, options);
   }
 
-  executeAnalysis(model, executionType = EXECUTION_MODES.LIVE) {
+  executeAnalysis(model, execType = EXECUTION_MODES.LIVE) {
     const promise = new Promise((resolve, reject) => {
       if (this.isExecuting(model.id)) {
         const msg = 'Analysis is executing already. Please try again in some time.';
@@ -165,7 +168,7 @@ export class AnalyzeService {
         this._executions[model.id] = promise;
 
         this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-        this.applyAnalysis(model, executionType).then(({data, executionId, executedBy, executedAt, queryBuilder, executionType, count}) => {
+        this.applyAnalysis(model, execType).then(({data, executionId, executedBy, executedAt, queryBuilder, executionType, count}) => {
           this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
           resolve({data, executionId, executionType, count, executedBy, executedAt, queryBuilder});
         }, err => {
@@ -301,20 +304,6 @@ export class AnalyzeService {
       executionType,
       count
     }) => {
-      // forEach(analysis.artifacts[0].columns, column => {
-      //   column.columnName = this.getColumnName(column.columnName);
-      // });
-
-      // forEach(analysis.sqlBuilder.dataFields, field => {
-      //   field.columnName = this.getColumnName(field.columnName);
-      // });
-
-      // forEach(data, row => {
-      //   forEach(row, (value, key) => {
-      //     key = this.getColumnName(key);
-      //     data[key] = value;
-      //   });
-      // });
       return {
         analysis,
         data,
@@ -347,13 +336,13 @@ export class AnalyzeService {
     return this.postRequest(`md`, params).then(fpGet(`contents.[0].${MODULE_NAME}`));
   }
 
-  createAnalysis(metricId, type) {
+  createAnalysis(metricId, type): Promise<Analysis> {
     const params = this.getRequestParams([
       ['contents.action', 'create'],
       ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'));
+    return <Promise<Analysis>>this.postRequest(`analysis`, params).then(fpGet('contents.analyze.[0]'));
   }
 
   getRequest(path) {

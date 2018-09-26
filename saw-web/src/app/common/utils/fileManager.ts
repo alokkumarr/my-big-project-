@@ -6,8 +6,9 @@ export function getFileContents(file) {
 
     const fr = new FileReader();
     fr.onload = e => {
-      resolve(e.target ? e.target.result : '');
-    }
+      const target = <any>e.target;
+      resolve(target ? target.result : '');
+    };
     fr.readAsText(file);
   });
 }

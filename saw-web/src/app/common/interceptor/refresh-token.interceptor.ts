@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import 'rxjs/add/observable/throw';
+import { Observable, throwError } from 'rxjs';
 import 'rxjs/add/operator/catch';
 
 import * as get from 'lodash/get';
@@ -18,7 +17,7 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
     // Clone the request to add the new header.
     // const authReq = req.clone({ headers: req.headers.set('Authorization', `Bearer ${this.jwt.getAccessToken()}`) });
 
-    //send the newly created request
+    // send the newly created request
     return next.handle(req)
       .catch((error: HttpErrorResponse, caught) => {
         const errorMessage = get(error, 'error.message', '');
@@ -27,12 +26,12 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
         const tokenMessageRegex = /token has expired|invalid token/i;
 
         if (!(error.status === 401 && tokenMessageRegex.test(errorMessage))) {
-          return Observable.throw(error);
+          return throwError(error);
         }
 
         if (refreshRegexp.test(get(error, 'url', ''))) {
           // response.config._hideError = true;
-          return Observable.throw(error);
+          return throwError(error);
         }
 
         if (!refreshRequest) {
@@ -59,10 +58,9 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
             /* If token wasn't refreshed successfully, delete the token and reload */
             this.jwt.destroy();
             window.location.reload();
-            return Observable.throw(new Error('Token can\'t be refreshed'));
+            return throwError(new Error('Token can\'t be refreshed'));
           }
         });
-        // return Observable.throw(error);
       }) as any;
   }
 }

@@ -3,7 +3,7 @@ import * as forEach from 'lodash/forEach';
 import * as some from 'lodash/some';
 import * as every from 'lodash/every';
 import * as isEmpty from 'lodash/isEmpty';
-import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
+import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-import-list.component.html');
 
@@ -22,7 +22,7 @@ export class AdminImportListComponent implements OnChanges {
   isEmpty = isEmpty;
 
   constructor(
-    private _dxDataGridService: dxDataGridService
+    private _DxDataGridService: DxDataGridService
   ) { }
 
   ngOnInit() {
@@ -94,7 +94,7 @@ export class AdminImportListComponent implements OnChanges {
       width: '20%',
       cellTemplate: 'logCellTemplate'
     }];
-    return this._dxDataGridService.mergeWithDefaultConfig({
+    return this._DxDataGridService.mergeWithDefaultConfig({
       columns,
       scrolling: {
         mode: 'standard'

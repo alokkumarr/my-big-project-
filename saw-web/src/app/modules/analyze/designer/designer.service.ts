@@ -54,7 +54,7 @@ export class DesignerService {
   }
 
   getDataForAnalysis(analysis) {
-    let analysisRequest =
+    const analysisRequest =
       analysis.type === 'report'
         ? this.generateRequestPayload(cloneDeep(analysis))
         : analysis;
@@ -78,7 +78,7 @@ export class DesignerService {
   }
 
   saveAnalysis(analysis) {
-    let analysisRequest =
+    const analysisRequest =
       analysis.type === 'report'
         ? this.generateRequestPayload(cloneDeep(analysis))
         : analysis;
@@ -205,7 +205,7 @@ export class DesignerService {
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => ({ type }: ArtifactColumnChart) => {
       const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) return false;
+      if (groupAdapter.artifactColumns.length >= maxAllowed) { return false; }
       return NUMBER_TYPES.includes(type);
     };
 
@@ -214,7 +214,7 @@ export class DesignerService {
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => ({ type }: ArtifactColumnChart) => {
       const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) return false;
+      if (groupAdapter.artifactColumns.length >= maxAllowed) { return false; }
       return DATE_TYPES.includes(type);
     };
 
@@ -223,7 +223,7 @@ export class DesignerService {
       groupAdapters: Array<IDEsignerSettingGroupAdapter>
     ) => () => {
       const maxAllowed = groupAdapter.maxAllowed(groupAdapter, groupAdapters);
-      if (groupAdapter.artifactColumns.length >= maxAllowed) return false;
+      if (groupAdapter.artifactColumns.length >= maxAllowed) { return false; }
       return true;
     };
 
@@ -483,9 +483,9 @@ export class DesignerService {
   }
 
   generateReportDataField(columns) {
-    let dataFields = [];
+    const dataFields = [];
     forEach(columns, cols => {
-      let checkedRows = this.getPartialReportSqlBuilder(cols.columns);
+      const checkedRows = this.getPartialReportSqlBuilder(cols.columns);
       if (!isEmpty(checkedRows)) {
         dataFields.push({
           tableName: cols.artifactName,

@@ -82,7 +82,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     const { customerId, masterLoginId } = this.data.formDeps;
 
     const targetCategory = find(this.categories, ({categoryCode}) => formValues.categoryCode === categoryCode);
-    const { categoryType, categoryId } = targetCategory
+    const { categoryType, categoryId } = targetCategory;
     const model = {
       ...this.data.model,
       ...formValues,
@@ -103,8 +103,8 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
         privilegeDesc,
         subCategoryId,
         privilegeId
-      }
-    })
+      };
+    });
   }
 
   save(model) {

@@ -87,7 +87,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     private _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress
+      this.showProgress = showProgress;
     });
     this.createForm();
   }
@@ -158,7 +158,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   /* Find the first category that has a subcategory, and assign that subcategory
      to dashboard */
   setDefaultCategory() {
-    if (this.dashboard.categoryId) return;
+    if (this.dashboard.categoryId) { return; }
 
     const category = find(
       this.categories,

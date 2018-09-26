@@ -26,14 +26,14 @@ export class DetailsDialogComponent {
     this.form = this.formBuilder.group({
       nameControl: ['', [Validators.required, Validators.pattern(this.folNamePattern), Validators.minLength(3), Validators.maxLength(18)]],
       descControl: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]]
-    })
+    });
   }
 
   submit(form) {
     const details = {
       name: form.value.nameControl,
       desc: form.value.descControl
-    }
+    };
     this.dialogRef.close(details);
   }
 

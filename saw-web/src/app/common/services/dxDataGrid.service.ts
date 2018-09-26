@@ -3,7 +3,7 @@ import * as forEach from 'lodash/forEach';
 import { Injectable } from '@angular/core';
 
 @Injectable()
-export class dxDataGridService {
+export class DxDataGridService {
   mergeWithDefaultConfig(config) {
     return defaults({}, config, this.getDefaultConfig());
   }

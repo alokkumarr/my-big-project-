@@ -75,7 +75,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
   subscribeToEdits() {
     this.editSubscription = this.dashboardService.onEditItem.subscribe(data => {
-      if (isEmpty(data)) return;
+      if (isEmpty(data)) { return; }
 
       this.sidebarWidget = 'edit';
       this.editItem = data;
@@ -144,7 +144,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     /* prettier-ignore */
     switch (action) {
     case 'ADD':
-      if (!data) return;
+      if (!data) { return; }
       const item = {
         cols: 16,
         rows: 16,
@@ -154,7 +154,7 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       this.requester.next({ action: 'add', data: item });
       break;
     case 'REMOVE':
-      if (!data) return;
+      if (!data) { return; }
       this.requester.next({ action: 'remove', data });
       break;
     }
@@ -162,9 +162,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
   onKPIAction(action, data) {
     /* prettier-ignore */
-    switch(action) {
+    switch (action) {
     case WIDGET_ACTIONS.ADD:
-      if (!data) return;
+      if (!data) { return; }
 
       const item = {
         cols: 13,
@@ -178,9 +178,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
   onBulletAction(action, data) {
     /* prettier-ignore */
-    switch(action) {
+    switch (action) {
     case WIDGET_ACTIONS.ADD:
-      if (!data) return;
+      if (!data) { return; }
 
       const item = {
         cols: 20,

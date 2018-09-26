@@ -4,8 +4,8 @@ import {tap} from 'rxjs/operators/tap';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import AppConfig from '../../../../../appConfig';
 
-type RequestOptions = {
-  toast?: {successMsg: string, errorMsg?: string},
+interface RequestOptions {
+  toast?: {successMsg: string, errorMsg?: string};
   forWhat?: 'export' | 'import' | 'user' | 'role' | 'privilege' | 'category';
 }
 
@@ -30,15 +30,15 @@ export class AdminService {
       } else {
         this._toastMessage.error(toast.errorMsg || resp.validityMessage);
       }
-    }
+    };
   }
 
   request<T>(path, params, options: RequestOptions = {}) {
-    const { toast, forWhat } = options
+    const { toast, forWhat } = options;
     return this.http.post<T>(`${this.getBaseUrl(forWhat)}/${this.getIntermediaryPath(forWhat)}${path}`, params)
       .pipe(
         tap(this.showToastMessageIfNeeded(toast))
-      )
+      );
   }
 
   getIntermediaryPath(forWhat) {

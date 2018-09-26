@@ -35,7 +35,7 @@ export class DateformatDialogComponent {
     }
     this.form = this.formBuilder.group({
       dateformat: this.data ? this.data.format : ''
-    })
+    });
   }
 
   submit(form) {

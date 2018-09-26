@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import 'rxjs/add/observable/throw'
+import { Observable, throwError } from 'rxjs';
 import 'rxjs/add/operator/catch';
 
 import { JwtService } from '../../common/services';
@@ -15,10 +14,10 @@ export class AddTokenInterceptor implements HttpInterceptor {
     const authReq = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${this.jwt.getAccessToken()}`)
     });
-    //send the newly created request
+    // send the newly created request
     return next.handle(authReq)
       .catch((error, caught) => {
-        return Observable.throw(error);
+        return throwError(error);
       }) as any;
   }
 }

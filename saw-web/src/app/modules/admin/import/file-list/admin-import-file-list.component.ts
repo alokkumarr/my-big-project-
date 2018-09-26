@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
+import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-import-file-list.component.html');
 require('./admin-import-file-list.component.scss');
@@ -17,7 +17,7 @@ export class AdminImportFileListComponent {
   config: any;
 
   constructor(
-    private _dxDataGridService: dxDataGridService
+    private _DxDataGridService: DxDataGridService
   ) { }
 
   ngOnInit() {
@@ -46,7 +46,7 @@ export class AdminImportFileListComponent {
       caption: '',
       cellTemplate: 'actionCellTemplate'
     }];
-    return this._dxDataGridService.mergeWithDefaultConfig({
+    return this._DxDataGridService.mergeWithDefaultConfig({
       columns,
       width: '100%',
       height: '100%',

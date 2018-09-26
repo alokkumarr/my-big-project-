@@ -5,7 +5,8 @@ import {
   EventEmitter,
   OnInit,
   ViewChild,
-  ElementRef
+  ElementRef,
+  OnDestroy
 } from '@angular/core';
 import * as debounce from 'lodash/debounce';
 
@@ -16,7 +17,7 @@ require('./search-box.component.scss');
   selector: 'search-box',
   template
 })
-export class SearchBoxComponent implements OnInit {
+export class SearchBoxComponent implements OnInit, OnDestroy {
 
   @Output() searchTermChange: EventEmitter<string> = new EventEmitter();
   @Input() value: string;
@@ -36,7 +37,7 @@ export class SearchBoxComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.delay = Number(this.delay) || 250
+    this.delay = Number(this.delay) || 250;
     this.onChangeDebounced = debounce(this.onChange, this.delay);
 
     document.body.addEventListener('click', this.onBodyClick);

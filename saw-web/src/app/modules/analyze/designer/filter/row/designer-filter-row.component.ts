@@ -104,7 +104,7 @@ export class DesignerFilterRowComponent {
   }
 
   onGlobalCheckboxToggle(filter: Filter, checked: boolean) {
-    if (!this.supportsGlobalFilters) return;
+    if (!this.supportsGlobalFilters) { return; }
     filter.isGlobalFilter = checked;
     if (checked) {
       delete filter.model;

@@ -13,6 +13,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class HighlightPipe implements PipeTransform {
 
+  static escapeRegexp(text) {
+    const ESCAPE_EXPR = /([.?*+^$[\]\\(){}|-])/g;
+
+    return text.replace(ESCAPE_EXPR, '\\$1');
+  }
+
   transform(input: string, term: string, modifiers = 'ig', className = 'highlight'): string {
     if (input && term) {
       const expr = HighlightPipe.escapeRegexp(term) + '(?!([^<]+)?>)';
@@ -22,11 +28,5 @@ export class HighlightPipe implements PipeTransform {
     }
 
     return input;
-  }
-
-  static escapeRegexp(text) {
-    const ESCAPE_EXPR = /([.?*+^$[\]\\(){}|-])/g;
-
-    return text.replace(ESCAPE_EXPR, '\\$1');
   }
 }

@@ -33,7 +33,7 @@ const DUPLICATE_GRID_OBJECT_PROPS = {
   duplicateAnalysisInd: true,
   errorInd: false,
   noMetricInd: false
-}
+};
 const NORMAL_GRID_OBJECT_PROPS = {
   logColor: 'transparent',
   log: '',
@@ -43,15 +43,15 @@ const NORMAL_GRID_OBJECT_PROPS = {
   noMetricInd: false
 };
 
-type FileInfo = {name: string, count: number};
-type FileContent = {name: string, count: number, analyses: Array<Analysis>};
+interface FileInfo {name: string; count: number; }
+interface FileContent {name: string; count: number; analyses: Array<Analysis>; }
 @Component({
   selector: 'admin-import-view',
   template
 })
 export class AdminImportViewComponent {
   files: Array<FileInfo>;
-  fileContents: Array<FileContent>
+  fileContents: Array<FileContent>;
   selectedCategory;
   categories$;
   metricsMap: Object = {};
@@ -82,7 +82,7 @@ export class AdminImportViewComponent {
         acc[metric.metricName] = metric;
         return acc;
       }, {});
-    })
+    });
   }
 
   onRemoveFile(fileName) {
@@ -97,7 +97,7 @@ export class AdminImportViewComponent {
     this.analyses = fpPipe(
       fpFlatMap(({analyses}) => analyses),
       fpMap(analysis => {
-        const gridObj = this.getAnalysisObjectForGrid(analysis)
+        const gridObj = this.getAnalysisObjectForGrid(analysis);
         if (gridObj.errorInd) {
           hasErrors = true;
         }
@@ -150,14 +150,14 @@ export class AdminImportViewComponent {
     }
     const analysisFromBE = this.analysesFromBEMap[`${analysis.name}:${analysis.metricName}:${analysis.type}`];
 
-    const possibilitySelector = metric ? (analysisFromBE ? 'duplicate' : 'normal') : 'noMetric'
+    const possibilitySelector = metric ? (analysisFromBE ? 'duplicate' : 'normal') : 'noMetric';
 
     const possibility = this.getPossibleGridObjects(possibilitySelector, analysis, analysisFromBE);
 
     return {
       ...possibility,
       selection: false
-    }
+    };
   }
 
   getPossibleGridObjects(selector: 'noMetric' | 'duplicate' | 'normal', analysis, analysisFromBE) {
@@ -210,7 +210,7 @@ export class AdminImportViewComponent {
       userId,
       esRepository,
       repository
-    }
+    };
   }
 
   import() {
@@ -265,7 +265,7 @@ export class AdminImportViewComponent {
             hasErrors = true;
             const error = container.error;
             gridObj.logColor = 'red';
-            gridObj.log = 'Error While Importing'
+            gridObj.log = 'Error While Importing';
             gridObj.errorMsg = get(error, 'error.error.message');
             gridObj.errorInd = true;
           }

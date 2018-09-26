@@ -115,7 +115,7 @@ export class DashboardGridComponent
   }
 
   getMinColumns() {
-    if (this.mode === DASHBOARD_MODES.CREATE) return 64;
+    if (this.mode === DASHBOARD_MODES.CREATE) { return 64; }
 
     const savedMinCols = get(this.model, 'options.0.minCols');
     return savedMinCols ? savedMinCols : 4;
@@ -175,7 +175,7 @@ export class DashboardGridComponent
   }
 
   editTile(item: GridsterItem) {
-    if (!item.kpi && !item.bullet) return;
+    if (!item.kpi && !item.bullet) { return; }
 
     this.dashboardService.onEditItem.next(item);
   }
@@ -256,7 +256,7 @@ export class DashboardGridComponent
   onApplyGlobalFilters(filterGroup = {}) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
-      if (this.tileType(tile) !== 'analysis') return;
+      if (this.tileType(tile) !== 'analysis') { return; }
 
       const gFilters = filterGroup[tile.analysis.semanticId] || [];
 

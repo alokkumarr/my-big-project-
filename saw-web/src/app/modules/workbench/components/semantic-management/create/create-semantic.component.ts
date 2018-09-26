@@ -17,10 +17,10 @@ require('./create-semantic.component.scss');
 })
 export class CreateSemanticComponent implements OnInit {
   private availableDS: any;
-  private joinToggleValue: boolean = false;
-  private selectionMode: string = 'single';
+  private joinToggleValue = false;
+  private selectionMode = 'single';
   private gridDataAvailableDS: any;
-  private isSelected: boolean = false;
+  private isSelected = false;
   private selectedDSData: any = [];
 
   constructor(

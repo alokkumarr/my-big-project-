@@ -169,6 +169,7 @@ export class JwtService {
 
   _isSet(code, bitIndex) {
     const fullCode = padStart(
+      // tslint:disable-next-line
       (code >>> 0).toString(2),
       PRIVILEGE_CODE_LENGTH,
       '0'
@@ -192,13 +193,13 @@ export class JwtService {
     opts.module = opts.module || 'ANALYZE';
 
     const token = this.getTokenObj();
-    const module =
+    const targetModule =
       find(
         get(token, 'ticket.products.[0].productModules'),
         module => module.productModName === opts.module
       ) || [];
 
-    const code = this.getCode(opts, module);
+    const code = this.getCode(opts, targetModule);
 
     /* prettier-ignore */
     switch (name) {

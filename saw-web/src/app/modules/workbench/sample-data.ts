@@ -165,4 +165,4 @@ export const SQL_AQCTIONS = [
   {statement: 'SELECT column1, column2 FROM table_name;'},
   { statement: 'SELECT CustomerName, City FROM Customers;' },
   { statement: 'SELECT Count(*) AS DistinctCountrie FROM (SELECT DISTINCT Country FROM Customers);' }
-]
+];

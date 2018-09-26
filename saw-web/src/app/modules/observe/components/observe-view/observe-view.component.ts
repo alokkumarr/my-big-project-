@@ -46,8 +46,8 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   private dashboard: Dashboard;
   public requester = new BehaviorSubject({});
   private listeners: Array<Subscription> = [];
-  private hasAutoRefresh: boolean = false;
-  private shouldAutoRefresh: boolean = true;
+  private hasAutoRefresh = false;
+  private shouldAutoRefresh = true;
   private privileges = {
     create: false,
     delete: false,
@@ -55,7 +55,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   };
   @ViewChild('filterSidenav') sidenav: MatSidenav;
   @ViewChild('downloadContainer') downloadContainer: ElementRef;
-  hasKPIs: boolean = false;
+  hasKPIs = false;
 
   constructor(
     public dialog: MatDialog,
@@ -127,7 +127,7 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     const autoRefreshListener = this.dashboardService
       .getAutoRefreshSubject(this.dashboard.entityId)
       .subscribe(({ dashboardId }) => {
-        if (dashboardId !== this.dashboard.entityId) return;
+        if (dashboardId !== this.dashboard.entityId) { return; }
         this.refreshDashboard();
       });
     this.listeners.push(autoRefreshListener);

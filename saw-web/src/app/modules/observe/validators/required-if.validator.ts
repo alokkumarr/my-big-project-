@@ -19,10 +19,11 @@ export const requireIf = (otherFieldName: string, fn: (any) => boolean) => {
 
     const otherControl = thisControl.parent.get(otherFieldName) as FormControl;
 
-    if (!otherControl)
+    if (!otherControl) {
       throw new Error(`${otherFieldName} not found in the form.`);
+    }
 
-    if (!fn(otherControl.value)) return null;
+    if (!fn(otherControl.value)) { return null; }
 
     return thisControl.value
       ? null

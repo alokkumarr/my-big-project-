@@ -25,7 +25,7 @@ const analysisStub = {
   template: '<h1> Pivot </h1>',
   inputs: ['artifactColumns', 'sorts', 'updater', 'mode', 'data']
 })
-class PivotGridStub {}
+class PivotGridStubComponent {}
 
 configureTests();
 
@@ -34,7 +34,7 @@ describe('Observe Pivot Component', () => {
   beforeEach(done => {
     TestBed.configureTestingModule({
       imports: [],
-      declarations: [ObservePivotComponent, PivotGridStub],
+      declarations: [ObservePivotComponent, PivotGridStubComponent],
       providers: [
         { provide: AnalyzeService, useValue: AnalyzeServiceStub }
       ]

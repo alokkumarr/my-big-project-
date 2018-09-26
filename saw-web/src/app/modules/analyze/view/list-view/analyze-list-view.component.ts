@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
-import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
+import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { AnalyzeActionsService } from '../../actions';
 import { generateSchedule } from '../../cron';
 import {
@@ -30,7 +30,7 @@ export class AnalyzeListViewComponent {
         subCategoryId: analyses[0].categoryId
       });
     }
-  };
+  }
   @Input() analysisType: string;
   @Input() searchTerm: string;
   @Input() cronJobs: any;
@@ -42,7 +42,7 @@ export class AnalyzeListViewComponent {
   public executingState = EXECUTION_STATES.EXECUTING;
 
   constructor(
-    private _dxDataGridService: dxDataGridService,
+    private _DxDataGridService: DxDataGridService,
     private _analyzeActionsService: AnalyzeActionsService,
     private _jwt: JwtService,
     private _executeService: ExecuteService
@@ -146,7 +146,7 @@ export class AnalyzeListViewComponent {
       caption: '',
       cellTemplate: 'actionCellTemplate'
     }];
-    return this._dxDataGridService.mergeWithDefaultConfig({
+    return this._DxDataGridService.mergeWithDefaultConfig({
       columns,
       paging: {
         pageSize: 10

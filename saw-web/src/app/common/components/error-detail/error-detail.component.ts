@@ -1,5 +1,6 @@
 import {
   Component,
+  Inject,
   Inject
 } from '@angular/core';
 import {
@@ -16,7 +17,7 @@ const template = require('./error-detail.component.html');
   selector: 'error-detail',
   template
 })
-export class ErrorDetailComponent {
+export class ErrorDetailComponent implements OnInit {
   public errorMessage: string;
   public errorBody: any;
   constructor(

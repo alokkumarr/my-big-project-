@@ -101,11 +101,11 @@ export class ExecutedChartViewComponent {
   }
 
   trimKeyword(data) {
-    if (!data) return;
-    let trimData = data.map(row => {
-      let obj = {};
-      for (var key in row) {
-        let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+    if (!data) { return; }
+    const trimData = data.map(row => {
+      const obj = {};
+      for (const key in row) {
+        const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
         obj[trimKey.aliasName] = trimKey.value;
       }
       return obj;

@@ -41,7 +41,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
     private _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress
+      this.showProgress = showProgress;
     });
     this.loadIcons();
   }

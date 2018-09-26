@@ -9,4 +9,4 @@ require('./workbench-page.component.scss');
 })
 export class WorkbenchPageComponent {
   constructor() { }
-};
+}

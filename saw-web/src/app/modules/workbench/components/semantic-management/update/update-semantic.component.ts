@@ -26,12 +26,12 @@ require('./update-semantic.component.scss');
 export class UpdateSemanticComponent implements OnInit, OnDestroy {
   private availableDP: any;
   private gridDataAvailableDP: any;
-  private isSelected: boolean = false;
+  private isSelected = false;
   private selectedDPData: any = [];
   private availableDS: any = [];
-  private isJoinEligible: boolean = false;
+  private isJoinEligible = false;
   private selectedDPDetails: any = [];
-  private dpID: string = '';
+  private dpID = '';
 
   constructor(
     private router: Router,

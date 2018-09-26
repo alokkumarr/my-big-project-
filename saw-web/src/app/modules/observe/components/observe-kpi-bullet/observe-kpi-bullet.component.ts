@@ -41,7 +41,7 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
 
   @Input()
   set bulletKpi(data) {
-    if (isEmpty(data)) return;
+    if (isEmpty(data)) { return; }
     this._kpi = data;
     this.executeKPI(this._kpi);
   }
@@ -90,9 +90,9 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
   }
 
   onFilterKPI(filterModel) {
-    if (!this._kpi || !filterModel) return;
+    if (!this._kpi || !filterModel) { return; }
 
-    if (!filterModel.preset) return this.executeKPI(this._kpi);
+    if (!filterModel.preset) { return this.executeKPI(this._kpi); }
 
     const filter = defaults(
       {},
@@ -107,7 +107,7 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
   }
 
   filterLabel() {
-    if (!this._executedKPI && !this._kpi) return '';
+    if (!this._executedKPI && !this._kpi) { return ''; }
 
     const preset = get(
       this._executedKPI || this._kpi,

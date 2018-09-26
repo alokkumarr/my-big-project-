@@ -9,13 +9,13 @@ import * as cloneDeep from 'lodash/cloneDeep';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
-import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
-import { ToastService } from '../../../../../common/services/toastMessage.service'
+import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
+import { ToastService } from '../../../../../common/services/toastMessage.service';
 
 import { CreatefolderDialogComponent } from '../createFolder-dialog/createfolder-dialog.component';
-import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component'
+import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
-import { STAGING_TREE } from '../../../wb-comp-configs'
+import { STAGING_TREE } from '../../../wb-comp-configs';
 
 const template = require('./select-rawdata.component.html');
 require('./select-rawdata.component.scss');
@@ -34,14 +34,14 @@ export class SelectRawdataComponent implements OnInit {
   private gridConfig: Array<any>;
   private selFiles: Array<any> = [];
   private filePath: string;
-  private fileMask: string = '';
+  private fileMask = '';
   private fileMaskControl = new FormControl('', Validators.required);
-  private currentPath: string = '';
+  private currentPath = '';
   private nodeID = '';
 
   constructor(
     public dialog: MatDialog,
-    private dxDataGrid: dxDataGridService,
+    private dxDataGrid: DxDataGridService,
     private workBench: WorkbenchService,
     private notify: ToastService
   ) { }
@@ -100,9 +100,9 @@ export class SelectRawdataComponent implements OnInit {
       animateExpand: true,
       animateSpeed: 30,
       animateAcceleration: 1.2
-    }
+    };
 
-    return this.treeOptions
+    return this.treeOptions;
   }
 
   openFolder(node) {
@@ -111,7 +111,7 @@ export class SelectRawdataComponent implements OnInit {
     this.currentPath = path;
     this.nodeID = node.id;
     this.workBench.getStagingData(path).subscribe(data => {
-      const filteredDataFiles = filter(data.data, ['isDirectory', false])
+      const filteredDataFiles = filter(data.data, ['isDirectory', false]);
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
     });
@@ -236,13 +236,13 @@ export class SelectRawdataComponent implements OnInit {
    * @memberof SelectRawdataComponent
    */
   fileInput(event) {
-    let filesToUpload = event.srcElement.files;
+    const filesToUpload = event.srcElement.files;
     const validSize = this.workBench.validateMaxSize(filesToUpload);
     const validType = this.workBench.validateFileTypes(filesToUpload);
     if (validSize && validType) {
       const path = this.currentPath;
       this.workBench.uploadFile(filesToUpload, path).subscribe(data => {
-        const filteredDataFiles = filter(data.data, ['isDirectory', false])
+        const filteredDataFiles = filter(data.data, ['isDirectory', false]);
         this.reloadDataGrid(filteredDataFiles);
         this.clearSelected();
       });
@@ -274,7 +274,7 @@ export class SelectRawdataComponent implements OnInit {
           this.workBench.createFolder(path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
             const currChilds = get(currentNode.data, 'children', []);
-            var uniqueResults = data.data.filter(obj => {
+            const uniqueResults = data.data.filter(obj => {
               return !currChilds.some(obj2 => {
                 return obj.name == obj2.name;
               });

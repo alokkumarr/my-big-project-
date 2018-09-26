@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as some from 'lodash/some';
 import * as every from 'lodash/every';
-import {dxDataGridService} from '../../../../common/services/dxDataGrid.service';
+import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-export-list.component.html');
 // require('./admin-export-list.component.scss');
@@ -22,7 +22,7 @@ export class AdminExportListComponent {
   areAllSelected = false;
 
   constructor(
-    private _dxDataGridService: dxDataGridService
+    private _DxDataGridService: DxDataGridService
   ) { }
 
   ngOnInit() {
@@ -82,7 +82,7 @@ export class AdminExportListComponent {
       alignment: 'left',
       width: '15%'
     }];
-    return this._dxDataGridService.mergeWithDefaultConfig({
+    return this._DxDataGridService.mergeWithDefaultConfig({
       columns,
       width: '100%',
       height: '100%',

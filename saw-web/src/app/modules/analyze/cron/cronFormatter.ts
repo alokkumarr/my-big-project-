@@ -29,7 +29,7 @@ function extractMinute(CronUTC) {
   if (UtcTime[0] === 'Invalid') {
     return CronUTC;
   } else {
-    return splitArray.join(' ');  
+    return splitArray.join(' ');
   }
 }
 

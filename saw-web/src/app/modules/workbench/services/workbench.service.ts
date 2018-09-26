@@ -13,7 +13,7 @@ import { SQLEXEC_SAMPLE, ARTIFACT_SAMPLE } from '../sample-data';
 
 import APP_CONFIG from '../../../../../appConfig';
 
-const userProject: string = 'workbench';
+const userProject = 'workbench';
 
 @Injectable()
 export class WorkbenchService {
@@ -62,7 +62,7 @@ export class WorkbenchService {
 
   /** File mask search */
   filterFiles(mask, temmpFiles) {
-    let selFiles = [];
+    const selFiles = [];
     if (isUndefined(mask)) {
       return;
     }
@@ -100,11 +100,11 @@ export class WorkbenchService {
 
   uploadFile(filesToUpload: FileList, path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${userProject}/raw/directory/upload/files`;
-    let headers = new HttpHeaders();
+    const headers = new HttpHeaders();
     headers.set('Content-Type', null);
     headers.set('Accept', 'multipart/form-data');
 
-    let params = new HttpParams();
+    const params = new HttpParams();
     const formData: FormData = new FormData();
     forEach(filesToUpload, file => {
       formData.append('files', file, file.name);
@@ -115,7 +115,7 @@ export class WorkbenchService {
 
   validateMaxSize(fileList: FileList) {
     let size = 0;
-    let maxSize = 26214400;
+    const maxSize = 26214400;
     forEach(fileList, file => {
       size += file.size;
     });

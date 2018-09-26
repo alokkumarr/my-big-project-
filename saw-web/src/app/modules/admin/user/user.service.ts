@@ -2,17 +2,17 @@ import { Injectable } from '@angular/core';
 import { AdminService } from '../main-view/admin.service';
 import { IAdminDataService } from '../admin-data-service.interface';
 
-type UserResponse = {
-  users: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface UserResponse {
+  users: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
-type RolesResponse = {
-  roles: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface RolesResponse {
+  roles: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
 @Injectable()
 export class UserService implements IAdminDataService {

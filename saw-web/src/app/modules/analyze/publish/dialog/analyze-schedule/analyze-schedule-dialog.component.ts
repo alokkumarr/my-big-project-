@@ -282,7 +282,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   addEmail(event) {
-    let { input, value } = event;
+    const { input, value } = event;
 
     // Add our fruit
     const trimmed = (value || '').trim();

@@ -59,7 +59,7 @@ export class DesignerContainerComponent {
 
   @Output() public onBack: EventEmitter<boolean> = new EventEmitter();
   @Output() public onSave: EventEmitter<DesignerSaveEvent> = new EventEmitter();
-  public isInDraftMode: boolean = false;
+  public isInDraftMode = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
   public artifacts: Artifact[] = [];
@@ -69,7 +69,7 @@ export class DesignerContainerComponent {
   public sorts: Sort[] = [];
   public sortFlag = [];
   public filters: Filter[] = [];
-  public booleanCriteria: string = 'AND';
+  public booleanCriteria = 'AND';
   public layoutConfiguration: 'single' | 'multi';
   public isInQueryMode = false;
   public chartTitle = '';
@@ -172,7 +172,7 @@ export class DesignerContainerComponent {
 
   initAuxSettings() {
     /* prettier-ignore */
-    switch(this.analysis.type) {
+    switch (this.analysis.type) {
     case 'chart':
       this._chartService.updateAnalysisModel(this.analysis);
       if (this.designerMode === 'new') {
@@ -195,7 +195,7 @@ export class DesignerContainerComponent {
 
   fixLegacyArtifacts(artifacts): Array<Artifact> {
     /* prettier-ignore */
-    switch(this.analysis.type) {
+    switch (this.analysis.type) {
     case 'chart':
       const indices = {};
       forEach(artifacts, table => {
@@ -215,26 +215,26 @@ export class DesignerContainerComponent {
     case 'report':
       forEach(artifacts, table => {
         table.columns = map(table.columns, column => {
-          forEach(this.analysis.sqlBuilder.dataFields, fields=> {
+          forEach(this.analysis.sqlBuilder.dataFields, fields => {
             forEach(fields.columns, field => {
               if (field.columnName === column.columnName) {
                 column.checked = true;
               }
-            })
-          })
+            });
+          });
           return column;
-        })
-      })
+        });
+      });
       break;
     }
     return artifacts;
   }
 
   checkNodeForSorts() {
-    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+    if ((this.analysisStarter || this.analysis).type !== 'chart') { return; }
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
     forEach(sqlBuilder.nodeFields, node => {
-      let identical = false;
+      const identical = false;
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
           sort => node.columnName === sort.columnName
@@ -251,7 +251,7 @@ export class DesignerContainerComponent {
   }
 
   addDefaultSorts() {
-    if ((this.analysisStarter || this.analysis).type !== 'chart') return;
+    if ((this.analysisStarter || this.analysis).type !== 'chart') { return; }
 
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
 
@@ -287,13 +287,13 @@ export class DesignerContainerComponent {
       });
   }
 
-  loadGridWithoutData(column, type){
-    if(isEmpty(this.data)) {
+  loadGridWithoutData(column, type) {
+    if (isEmpty(this.data)) {
       this.data = [{}];
     }
     this.data.map(row => {
       if (type === 'add') {
-        row[column.name]='';
+        row[column.name] = '';
       } else {
         delete row[column.name];
       }
@@ -565,21 +565,21 @@ export class DesignerContainerComponent {
       this.setColumnPropsToDefaultIfNeeded(event.column);
       this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
       this.artifacts = [...this.artifacts];
-      //this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
+      // this.artifacts = this.fixLegacyArtifacts(this.analysis.artifacts);
       this.loadGridWithoutData(event.column, 'remove');
       break;
     case 'aggregate':
-      forEach(this.analysis.artifacts[0].columns, col=> {
-        if(col.name == event.column.name) {
+      forEach(this.analysis.artifacts[0].columns, col => {
+        if (col.name == event.column.name) {
           col.aggregate = event.column.aggregate;
         }
-      })
-      if(!isEmpty(this.data)) {
+      });
+      if (!isEmpty(this.data)) {
         this.data.map(row => {
-          if(row[event.column.name]) {
+          if (row[event.column.name]) {
             row[event.column.name] = '';
           }
-        });  
+        });
       }
       this.data = cloneDeep(this.data);
     case 'filterRemove':
@@ -668,19 +668,19 @@ export class DesignerContainerComponent {
       this.refreshDataObject();
       break;
     case 'legend':
-      if (!event.data || !event.data.legend) return;
+      if (!event.data || !event.data.legend) { return; }
       (<any>this.analysis).legend = event.data.legend;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
     case 'inversion':
-      if (!event.data) return;
+      if (!event.data) { return; }
       (<any>this.analysis).isInverted = event.data.isInverted;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
       break;
     case 'chartTitle':
-      if (!event.data) return;
+      if (!event.data) { return; }
       this.analysis.chartTitle = event.data.title;
       this.auxSettings = { ...this.auxSettings, ...event.data };
       this.artifacts = [...this.artifacts];
@@ -722,7 +722,7 @@ export class DesignerContainerComponent {
         [
           find(sqlBuilder.dataFields || [], field => field.checked === 'z')
         ] : [])
-      ]
+      ];
       return every(requestCondition, Boolean);
     case 'report':
     case 'esReport':

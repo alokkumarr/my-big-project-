@@ -10,12 +10,12 @@ import { JwtService } from '../../../common/services';
 
 const MODULE_NAME = 'ANALYZE';
 
-type MetricResponse = {
-  data: {contents: Array<{}>}
-};
-type AnalysisResponse = {
+interface MetricResponse {
+  data: {contents: Array<{}>};
+}
+interface AnalysisResponse {
   data: {contents: {analyze: any[]}};
-};
+}
 
 @Injectable()
 export class ExportService {

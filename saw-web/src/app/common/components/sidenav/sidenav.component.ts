@@ -1,16 +1,16 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, OnInit } from '@angular/core';
 
-import { SidenavMenuService } from'./sidenav-menu.service';
+import { SidenavMenuService } from './sidenav-menu.service';
 
 const template = require('./sidenav.component.html');
 require('./sidenav.component.scss');
 
 @Component({
-  selector: 'sidenav',
+  selector: 'app-sidenav',
   template
 })
 
-export class SidenavComponent {
+export class SidenavComponent implements OnInit {
 
   @Input() menu: any;
   @Input() id: any;

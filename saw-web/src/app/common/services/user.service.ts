@@ -44,10 +44,6 @@ export class UserService {
 
   /**
    * Exchanges a single-sign-on token for actual login tokens
-   *
-   * @param {any} token
-   * @returns
-   * @memberof UserService
    */
   exchangeLoginToken(token) {
     const route = '/authentication';

@@ -58,7 +58,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   @Input()
   set kpi(data) {
-    if (isEmpty(data)) return;
+    if (isEmpty(data)) { return; }
     this._kpi = data;
     this.executeKPI(this._kpi);
   }
@@ -72,9 +72,9 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   onFilterKPI(filterModel) {
-    if (!this._kpi || !filterModel) return;
+    if (!this._kpi || !filterModel) { return; }
 
-    if (!filterModel.preset) return this.executeKPI(this._kpi);
+    if (!filterModel.preset) { return this.executeKPI(this._kpi); }
 
     const filter = defaults(
       {},
@@ -89,7 +89,7 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   getFilterLabel() {
-    if (!this._executedKPI && !this._kpi) return '';
+    if (!this._executedKPI && !this._kpi) { return ''; }
 
     const preset = get(
       this._executedKPI || this._kpi,

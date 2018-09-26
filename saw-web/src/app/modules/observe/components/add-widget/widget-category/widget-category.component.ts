@@ -32,7 +32,7 @@ export class WidgetCategoryComponent implements OnInit {
         )
       })
     );
-  };
+  }
 
   ngOnInit() {
   }

@@ -1,5 +1,6 @@
 import {
   Component,
+  OnInit,
   Inject
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
@@ -9,7 +10,7 @@ import * as has from 'lodash/has';
 import * as trim from 'lodash/trim';
 import * as isFinite from 'lodash/isFinite';
 
-import { Format } from '../../../models'
+import { Format } from '../../../models';
 import { FLOAT_TYPES } from '../../consts';
 import {
   formatNumber,
@@ -28,11 +29,11 @@ export const DEFAULT_PRECISION = 2;
   selector: 'data-format-dialog',
   template
 })
-export class DataFormatDialogComponent {
+export class DataFormatDialogComponent implements OnInit {
 
   public format: Format = {};
   public currencyCodes = currencyCodes;
-  public sample: string
+  public sample: string;
   public isFloat: boolean;
 
   constructor(
@@ -68,13 +69,13 @@ export class DataFormatDialogComponent {
   onCurrencyFlagChange(checked) {
     const format = this.format;
     format.currency = checked ? DEFAULT_CURRENCY : null;
-    format.currencySymbol= this.getSymbol(format.currency);
+    format.currencySymbol = this.getSymbol(format.currency);
     this.changeSample();
   }
 
   onCurrencyCodeChange(code) {
     this.format.currency = code;
-    this.format.currencySymbol= this.getSymbol(code);
+    this.format.currencySymbol = this.getSymbol(code);
     this.changeSample();
   }
 

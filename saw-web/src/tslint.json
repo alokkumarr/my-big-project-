@@ -1,5 +1,6 @@
 {
     "extends": "../tslint.json",
+    "exclude": "**/app/**",
     "rules": {
         "directive-selector": [
             true,

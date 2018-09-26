@@ -13,7 +13,7 @@ const COMPONENTS = [
   AnalyzeScheduleDialogComponent,
   CronJobSchedularComponent,
   CronDatePickerComponent
-]
+];
 
 @NgModule({
   imports: [

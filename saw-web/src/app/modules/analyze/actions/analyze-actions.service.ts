@@ -42,7 +42,7 @@ export class AnalyzeActionsService {
     return this.openEditModal(clone(analysis), 'edit');
   }
 
-  publish(analysis,type) {
+  publish(analysis, type) {
     return this.openPublishModal(clone(analysis), type);
   }
 

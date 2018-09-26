@@ -4,10 +4,10 @@ const template = require('./choice-group.component.html');
 require('./choice-group.component.scss');
 
 interface IChoiceGroupItem {
-  label: string,
-  disabled: boolean,
-  icon: {font?: string, svg?: string}
-};
+  label: string;
+  disabled: boolean;
+  icon: {font?: string, svg?: string};
+}
 
 @Component({
   selector: 'choice-group-u',

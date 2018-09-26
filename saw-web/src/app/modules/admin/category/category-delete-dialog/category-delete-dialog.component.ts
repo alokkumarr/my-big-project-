@@ -29,7 +29,7 @@ export class CategoryDeleteDialogComponent extends BaseDialogComponent {
   }
 
   deleteCategory() {
-    const { customerId, masterLoginId, category } = this.data
+    const { customerId, masterLoginId, category } = this.data;
     const params = {
       customerId,
       masterLoginId,
@@ -40,7 +40,7 @@ export class CategoryDeleteDialogComponent extends BaseDialogComponent {
   }
 
   deleteSubCategory(subCategory) {
-    const { customerId, masterLoginId, category } = this.data
+    const { customerId, masterLoginId, category } = this.data;
     const params = {
       customerId,
       masterLoginId,

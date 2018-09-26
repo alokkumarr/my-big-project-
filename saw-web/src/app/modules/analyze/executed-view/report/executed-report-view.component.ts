@@ -15,7 +15,7 @@ export class ExecutedReportViewComponent {
     // if in query mode, don't send the artifacts, just use the column names in the data
     // TODO use the columns from the query
     this.artifacts = analysis.edit ? null : analysis.artifacts;
-  };
+  }
   @Input() dataLoader: Function;
 
   analysis: Analysis;

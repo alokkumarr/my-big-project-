@@ -12,7 +12,7 @@ export class PublishService {
 
   publishAnalysis(model, execute = false, type) {
     if (type === 'schedule') {
-      this._analyzeService.changeSchedule(model);  
+      this._analyzeService.changeSchedule(model);
     }
 
     return this._analyzeService.updateAnalysis(model).then(analysis => {

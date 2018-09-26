@@ -34,7 +34,7 @@ export class AnalyzeActionsMenuComponent {
         return acc;
       }, {})
     )(actionsToDisable);
-  };
+  }
   public actionsToDisable = {};
 
   actions = [{
@@ -66,7 +66,7 @@ export class AnalyzeActionsMenuComponent {
     value: 'delete',
     fn: this.delete.bind(this),
     color: 'red'
-  }]
+  }];
 
   constructor(
     private _analyzeActionsService: AnalyzeActionsService,
@@ -121,7 +121,7 @@ export class AnalyzeActionsMenuComponent {
 
   publish(type) {
     const analysis = clone(this.analysis);
-    this._analyzeActionsService.publish(analysis,type).then(analysis => {
+    this._analyzeActionsService.publish(analysis, type).then(analysis => {
       this.analysis = analysis;
       this.afterPublish.emit(analysis);
     });

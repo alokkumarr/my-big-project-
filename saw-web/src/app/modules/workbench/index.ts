@@ -19,7 +19,7 @@ import {
   ToastService,
   SideNavService,
   LocalSearchService,
-  dxDataGridService,
+  DxDataGridService,
   JwtService
 } from '../../common/services';
 
@@ -92,7 +92,7 @@ const SERVICES = [
   ToastService,
   SideNavService,
   LocalSearchService,
-  dxDataGridService
+  DxDataGridService
 ];
 @NgModule({
   imports: [

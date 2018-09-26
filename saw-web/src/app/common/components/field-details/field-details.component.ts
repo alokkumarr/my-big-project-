@@ -15,7 +15,7 @@ export class FieldDetailsComponent {
 
   @Input()
   set artifactColumns(columns) {
-    if (!Array.isArray(columns)) return;
+    if (!Array.isArray(columns)) { return; }
 
     this.dataFields = [];
     this.columnFields = [];

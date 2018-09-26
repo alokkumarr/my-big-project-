@@ -30,7 +30,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
   @Output() change = new EventEmitter();
 
   showLegendOpts: boolean;
-  showLabelOpts: boolean = true;
+  showLabelOpts = true;
   showInversion: boolean;
 
   EditMode: false;
@@ -39,7 +39,7 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
 
   @Input('legend')
   set analysisLegend(data: any) {
-    if (!data) return;
+    if (!data) { return; }
 
     this.legend = this.legend || {};
     this.legend.align = data.align;

@@ -44,14 +44,14 @@ export class DesignerSortComponent {
       this.availableFields,
       ({ columnName }) => columnName !== artifactColumn.columnName
     );
-  };
+  }
 
   public removeFromSortedFields = (sort: Sort) => {
     this.sorts = filter(
       this.sorts,
       ({ columnName }) => columnName !== sort.columnName
     );
-  };
+  }
 
   public addToSortedFields = (item, index) => {
     const firstN = take(this.sorts, index);
@@ -63,7 +63,7 @@ export class DesignerSortComponent {
       ...lastN
     ];
     this.sortsChange.emit(this.sorts);
-  };
+  }
 
   isSort(item) {
     return has(item, 'order');

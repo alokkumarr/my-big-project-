@@ -3,21 +3,21 @@ import { AdminService } from '../main-view/admin.service';
 import { JwtService } from '../../../common/services';
 import { IAdminDataService } from '../admin-data-service.interface';
 
-type CategoryResponse = {
-  categories: any[],
-  valid: boolean,
-  validityMessage: string
-};
-type ProuctsResponse = {
-  categories: any[],
-  valid: boolean,
-  validityMessage: string
-};
-type ModulesResponse = {
-  categories: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface CategoryResponse {
+  categories: any[];
+  valid: boolean;
+  validityMessage: string;
+}
+interface ProuctsResponse {
+  categories: any[];
+  valid: boolean;
+  validityMessage: string;
+}
+interface ModulesResponse {
+  categories: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
 @Injectable()
 export class CategoryService implements IAdminDataService {
@@ -50,7 +50,7 @@ export class CategoryService implements IAdminDataService {
 
   remove(params: {
     categoryId: number,
-    customerId: number,s
+    customerId: number, s
     masterLoginId: string,
     categoryCode: number
   }) {

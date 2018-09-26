@@ -7,7 +7,6 @@ import {
   EventEmitter
 } from '@angular/core';
 import {
-  FormControl,
   FormGroup,
   FormBuilder,
   Validators
@@ -28,11 +27,9 @@ import * as toNumber from 'lodash/toNumber';
 
 import * as moment from 'moment';
 import { requireIf } from '../../../validators/required-if.validator';
-import { WIDGET_ACTIONS } from '../widget.model';
 import {
   DATE_FORMAT,
   CUSTOM_DATE_PRESET_VALUE,
-  DATE_PRESETS_OBJ,
   DATE_PRESETS,
   KPI_AGGREGATIONS,
   KPI_BG_COLORS
@@ -70,15 +67,16 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ngOnDestroy() {
-    this.datePresetSubscription && this.datePresetSubscription.unsubscribe();
-    this.primaryAggregationSubscription &&
+    if (this.datePresetSubscription) {
+      this.datePresetSubscription.unsubscribe();
+    }
+    if (this.primaryAggregationSubscription) {
       this.primaryAggregationSubscription.unsubscribe();
+    }
   }
 
   /**
    * Initialises form and adds listeners to individual form fields as required
-   *
-   * @memberof WidgetKPIComponent
    */
   createForm() {
     const secAggregateControls = {};
@@ -130,9 +128,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    * On every change to primary aggregation, disable that control
    * in secondary controls and clear its value. Primary aggregation
    * cannot also be a part of secondary aggregations.
-   *
-   * @param {string} primaryAggregation
-   * @memberof WidgetKPIComponent
    */
   updateSecondaryAggregations(primaryAggregation: string) {
     const secondaryAggregatesForm = this.kpiForm.get(
@@ -153,12 +148,10 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   /**
    * Metric is required to set default date field (if not present)
    * and to populate date field selector in form.
-   *
-   * @memberof WidgetKPIComponent
    */
   @Input()
   set metric(data: any) {
-    if (!data) return;
+    if (!data) { return; }
     this._metric = data;
     const kpiDateField = get(this._kpi, 'filters.0.columnName');
 
@@ -168,23 +161,19 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   }
   /**
    * Type is required to support normal KPI's and bullet KPI with the same component
-   *
-   * @memberof WidgetKPIComponent
    */
   @Input()
   set type(data: any) {
-    if (!data) return;
+    if (!data) { return; }
     this._kpiType = data;
   }
 
   /**
    * Updates the form with the data present in kpi structure
-   *
-   * @memberof WidgetKPIComponent
    */
   @Input()
   set kpi(data: any) {
-    if (!data) return;
+    if (!data) { return; }
 
     this._kpi = data;
 
@@ -245,16 +234,13 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   /**
    * Returns the model for date filter. If custom preset has been chosen,
    * includes the custom date range in result as well.
-   *
-   * @returns
-   * @memberof WidgetKPIComponent
    */
   prepareDateFilterModel() {
     const model = {
       preset: this.kpiForm.get('filter').value
     };
 
-    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) return model;
+    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) { return model; }
 
     // Adding static time signatures until we allow users to choose time
     // for `to` and `from` fields.
@@ -272,8 +258,6 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
   /**
    * Converts the form values to backend-valid structure and notifies parent.
    * Represensts the save/update operation.
-   *
-   * @memberof WidgetKPIComponent
    */
   applyKPI() {
     const dataField = get(this._kpi, 'dataFields.0');

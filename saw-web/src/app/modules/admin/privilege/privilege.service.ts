@@ -5,35 +5,35 @@ import { ToastService } from '../../../common/services/toastMessage.service';
 import {tap} from 'rxjs/operators/tap';
 import { IAdminDataService } from '../admin-data-service.interface';
 
-type PrivilegeResponse = {
-  privileges: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface PrivilegeResponse {
+  privileges: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
-type RolesResponse = {
-  roles: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface RolesResponse {
+  roles: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
-type ModulesResponse = {
-  modules: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface ModulesResponse {
+  modules: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
-type ProuctsResponse = {
-  products: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface ProuctsResponse {
+  products: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
-type CategoryResponse = {
-  categories: any[],
-  valid: boolean,
-  validityMessage: string
-};
+interface CategoryResponse {
+  categories: any[];
+  valid: boolean;
+  validityMessage: string;
+}
 
 @Injectable()
 export class PrivilegeService implements IAdminDataService {

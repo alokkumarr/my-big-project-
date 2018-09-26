@@ -1,6 +1,7 @@
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Observable } from 'rxjs/Observable';
+import { from } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { mergeMap, startWith, map } from 'rxjs/operators';
 import { JwtService } from '../../../common/services';
@@ -34,7 +35,7 @@ require('./admin-export-view.component.scss');
   selector: 'admin-export-view',
   template
 })
-export class AdminExportViewComponent {
+export class AdminExportViewComponent implements OnInit {
   @ViewChild('metricInput')
   metricInput: ElementRef;
   @Input() columns: any[];
@@ -107,7 +108,7 @@ export class AdminExportViewComponent {
             analysis,
             selection: false,
             categoryName: this.categoriesMap[analysis.categoryId]
-          }
+          };
         })
       )(analyses);
     });
@@ -150,7 +151,7 @@ export class AdminExportViewComponent {
           {type: 'application/json;charset=utf-8'}
         )
       );
-    })
+    });
     zip.generateAsync({type: 'blob'}).then(content => {
       let zipFileName = this.getFileName('');
       zipFileName = zipFileName.replace('_', '');
@@ -173,12 +174,12 @@ export class AdminExportViewComponent {
         fileName: this.getFileName(metricName),
         analysisList: lodashFilter(exportAnalysisList, analysis => analysis.metricName === metricName)
       };
-    })
+    });
   }
 
   private _asyncFilter(value) {
     const filterValue = lowerCase(value);
-    return Observable.fromPromise(this.metrics$).pipe(
+    return from(this.metrics$).pipe(
       map(metrics => {
         return fpPipe(
           fpFilter(metric => {

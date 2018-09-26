@@ -8,11 +8,11 @@ import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as isUndefined from 'lodash/isUndefined';
 
-import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs'
+import { CSV_CONFIG, PARSER_CONFIG } from '../../wb-comp-configs';
 
 import { ParserPreviewComponent } from './parser-preview/parser-preview.component';
 import { DatasetDetailsComponent } from './dataset-details/dataset-details.component';
-import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog.component'
+import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog.component';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
@@ -25,9 +25,9 @@ require('./create-datasets.component.scss');
   template
 })
 export class CreateDatasetsComponent implements OnInit {
-  private selectFullfilled: boolean = false;
-  private detailsFilled: boolean = false;
-  private previewDone: boolean = false;
+  private selectFullfilled = false;
+  private detailsFilled = false;
+  private previewDone = false;
   public selectedFiles: Array<any>;
   public details: any = [];
   private csvConfig: any;
@@ -36,7 +36,7 @@ export class CreateDatasetsComponent implements OnInit {
   private fieldsConf: any;
   private parserConf: any; // tslint:disable-line
   public nameFormGroup: FormGroup;
-  private selectedIndex: number = 0;
+  private selectedIndex = 0;
   private folNamePattern = '[A-Za-z0-9]+';
 
   constructor(

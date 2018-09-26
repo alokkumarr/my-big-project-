@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import * as moment from 'moment';
 
-import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
+import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { Analysis } from '../../types';
 
 const template = require('./executed-list.component.html');
@@ -29,7 +29,7 @@ export class ExecutedListComponent {
   analyses: Analysis[];
 
   constructor(
-    private _dxDataGridService: dxDataGridService,
+    private _DxDataGridService: DxDataGridService,
     private _router: Router
   ) {}
 
@@ -85,7 +85,7 @@ export class ExecutedListComponent {
         width: '20%'
       }
     ];
-    return this._dxDataGridService.mergeWithDefaultConfig({
+    return this._DxDataGridService.mergeWithDefaultConfig({
       onRowClick: row => {
         this.goToExecution(row.data);
       },

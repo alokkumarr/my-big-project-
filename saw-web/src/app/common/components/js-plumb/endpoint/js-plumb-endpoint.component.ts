@@ -1,4 +1,4 @@
-import { Directive, Input, ElementRef } from '@angular/core';
+import { Directive, Input, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { ArtifactColumnReport, EndpointPayload, EndpointSide } from '../types';
 import { JS_PLUMB_DEFAULT_SETTINGS } from '../settings';
 
@@ -7,9 +7,9 @@ const ENDPOINT_ANCHORS = {
   right: 'RightMiddle'
 };
 @Directive({
-  selector: 'js-plumb-endpoint-u'
+  selector: '[jsPlumbEndpoint]'
 })
-export class JsPlumbEndpointComponent {
+export class JsPlumbEndpointDirective implements OnInit, OnDestroy {
   @Input()
   column: ArtifactColumnReport;
   @Input()

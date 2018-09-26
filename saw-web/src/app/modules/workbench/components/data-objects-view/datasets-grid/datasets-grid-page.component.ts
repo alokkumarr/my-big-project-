@@ -2,7 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { DxDataGridComponent } from 'devextreme-angular';
 
-import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
+import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datasets-grid-page.component.html');
@@ -22,7 +22,7 @@ export class DatasetsGridPageComponent implements OnInit {
   private updaterSubscribtion: any;
 
   constructor(
-    private dxDataGrid: dxDataGridService,
+    private dxDataGrid: DxDataGridService,
     private workbench: WorkbenchService
   ) {}
 

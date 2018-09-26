@@ -55,11 +55,11 @@ export class DesignerPreviewDialogComponent {
           return this._designerService
             .getDataForAnalysisPreview(this.analysis, options)
             .then(({ data, executionId, count }) => {
-              execId = executionId
+              execId = executionId;
               return { data: data, totalCount: count };
             });
         }
-      }
+      };
       break;
     }
   }

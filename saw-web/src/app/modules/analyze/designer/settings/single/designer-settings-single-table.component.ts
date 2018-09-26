@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpSort from 'lodash/fp/sortBy';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -32,7 +32,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
   selector: 'designer-settings-single-table',
   template
 })
-export class DesignerSettingsSingleTableComponent {
+export class DesignerSettingsSingleTableComponent implements OnInit {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input('artifacts')
@@ -73,7 +73,7 @@ export class DesignerSettingsSingleTableComponent {
 
   ngOnInit() {
     /* prettier-ignore */
-    switch(this.type) {
+    switch (this.type) {
     case 'pivot':
       this.groupAdapters = this._designerService.getPivotGroupAdapters(
         this.artifactColumns
@@ -100,13 +100,13 @@ export class DesignerSettingsSingleTableComponent {
    */
   syncMaxAllowed() {
     forEach(this.groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (!adapter.maxAllowed) return;
+      if (!adapter.maxAllowed) { return; }
 
       const extraColumns: Array<ArtifactColumn> = adapter.artifactColumns.slice(
         adapter.maxAllowed(adapter, this.groupAdapters)
       );
 
-      if (!extraColumns.length) return;
+      if (!extraColumns.length) { return; }
 
       forEach(extraColumns, col => {
         this._designerService.removeArtifactColumnFromGroup(col, adapter);

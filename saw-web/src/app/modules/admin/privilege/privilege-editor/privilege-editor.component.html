@@ -12,6 +12,6 @@
   </tr>
   <tr *ngFor="let subCategory of subCategories; let i = index"
       [class.active]="subCategory.privilegeId === activePrivilegeId"
-      privilegeRow (categoryChange)="onCategoryChange(i, $event)" [subCategory]="subCategory">
+      privilege-row (categoryChange)="onCategoryChange(i, $event)" [subCategory]="subCategory">
   </tr>
 </table>

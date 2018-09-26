@@ -3,7 +3,9 @@ import {
   Input,
   Output,
   EventEmitter,
-  ElementRef
+  ElementRef,
+  OnInit,
+  AfterViewInit
 } from '@angular/core';
 import * as jsPlumb from 'jsplumb';
 import * as find from 'lodash/find';
@@ -25,7 +27,7 @@ require('./js-plumb-canvas.component.scss');
   selector: 'js-plumb-canvas-u',
   template
 })
-export class JsPlumbCanvasComponent {
+export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
   @Input() useAggregate: boolean;
   @Input() artifacts: Artifact[];
@@ -53,7 +55,7 @@ export class JsPlumbCanvasComponent {
   }
 
   onConnection(info) {
-    const sourcePayload= <EndpointPayload>info.sourceEndpoint.getParameter('endpointPayload');
+    const sourcePayload = <EndpointPayload>info.sourceEndpoint.getParameter('endpointPayload');
     const targetPayload = <EndpointPayload>info.targetEndpoint.getParameter('endpointPayload');
 
     if (sourcePayload && targetPayload) {
@@ -132,8 +134,7 @@ export class JsPlumbCanvasComponent {
   addJoin(type, sourceCriterion: JoinCriterion, targetCriterion: JoinCriterion) {
     if (!type ||
       !sourceCriterion.tableName || !sourceCriterion.columnName ||
-      !targetCriterion.tableName || !targetCriterion.columnName)
-    {
+      !targetCriterion.tableName || !targetCriterion.columnName) {
       return;
     }
 
@@ -143,7 +144,7 @@ export class JsPlumbCanvasComponent {
         sourceCriterion,
         targetCriterion
       ]
-    }
+    };
     this.joins.push(join);
     this.onChange({subject: 'joins'});
   }

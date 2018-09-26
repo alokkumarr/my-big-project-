@@ -221,10 +221,10 @@ export class ObserveChartComponent {
   }
 
   trimKeyword(data) {
-    let trimData = data.map(row => {
-      let obj = {};
-      for (let key in row) {
-        let trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
+    const trimData = data.map(row => {
+      const obj = {};
+      for (const key in row) {
+        const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
         obj[trimKey.aliasName] = trimKey.value;
       }
       return obj;

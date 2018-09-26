@@ -36,7 +36,7 @@ export class AnalyzeViewComponent implements OnInit {
   public cronJobs: any;
   public LIST_VIEW  = 'list';
   public CARD_VIEW  = 'card';
-  public analysisId : string;
+  public analysisId: string;
   public canUserCreate: boolean;
   public viewMode = this.LIST_VIEW;
   public analysisTypes = [
@@ -87,7 +87,7 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   onAction(event: AnalyzeViewActionEvent) {
-    switch(event.action) {
+    switch (event.action) {
     case 'fork': {
       const { analysis, requestExecution } = event;
       if (analysis) {

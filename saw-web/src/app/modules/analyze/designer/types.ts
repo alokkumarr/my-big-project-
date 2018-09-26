@@ -58,10 +58,10 @@ export {
   AnalysisDialogData
 };
 
-export type ArtifactColumnFilter = {
+export interface ArtifactColumnFilter {
   keyword: string;
   types: ('number' | 'date' | 'string')[];
-};
+}
 
 export type PivotArea = 'data' | 'row' | 'column';
 export type ChartArea = 'x' | 'y' | 'z' | 'g';
@@ -86,7 +86,7 @@ export interface IDEsignerSettingGroupAdapter {
   // a callback to change soomething when the indexes change in artifactColumns
   onReorder: (artifactColumns: ArtifactColumns) => void;
 }
-export type DesignerChangeEvent = {
+export interface DesignerChangeEvent {
   subject:
     | 'format'
     | 'aggregate'
@@ -112,9 +112,9 @@ export type DesignerChangeEvent = {
     | 'changeQuery';
   column?: ArtifactColumn;
   data?: any;
-};
+}
 
-export type DesignerSaveEvent = {
+export interface DesignerSaveEvent {
   requestExecution: boolean;
   analysis: Analysis;
-};
+}

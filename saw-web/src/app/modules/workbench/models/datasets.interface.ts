@@ -1,5 +1,5 @@
 export interface States {
-  view: string,
-  searchTerm: string,
-  searchTermValue: string
-};
+  view: string;
+  searchTerm: string;
+  searchTermValue: string;
+}

@@ -20,7 +20,7 @@ const namePattern = /^[a-zA-Z\s]*$/;
 })
 export class CategoryEditDialogComponent extends BaseDialogComponent {
 
-  @HostBinding('class.wide') isInWideMode: boolean = false;
+  @HostBinding('class.wide') isInWideMode = false;
   formGroup: FormGroup;
   subCategoryFormGroup: FormGroup;
   formIsValid = false;
@@ -71,7 +71,7 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
     const formValues = this.formGroup.getRawValue();
 
     let model;
-    switch(this.data.mode) {
+    switch (this.data.mode) {
     case 'create':
       model = {
         ...this.data.model,

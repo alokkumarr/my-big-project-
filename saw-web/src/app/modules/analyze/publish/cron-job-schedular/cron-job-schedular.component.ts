@@ -61,73 +61,73 @@ export class CronJobSchedularComponent {
     this.selectedMoments = [];
     this.selectedMoments.push(new Date(moment().local().format()));
 
-    this.hours = this.range(0,23);
-    this.minutes = this.range(0,59);
+    this.hours = this.range(0, 23);
+    this.minutes = this.range(0, 59);
     this.days = this.range(1, 31);
-    this.months = this.range(1,12);
+    this.months = this.range(1, 12);
     this.weeks = [{
-      value:'#1',
-      label:'first'
-    },{
-      value:'#2',
-      label:'second'
-    },{
-      value:'#3',
-      label:'third'
-    },{
-      value:'#4',
-      label:'fourth'
-    },{
-      value:'#5',
-      label:'fifth'
-    },{
-      value:'L',
-      label:'last'
+      value: '#1',
+      label: 'first'
+    }, {
+      value: '#2',
+      label: 'second'
+    }, {
+      value: '#3',
+      label: 'third'
+    }, {
+      value: '#4',
+      label: 'fourth'
+    }, {
+      value: '#5',
+      label: 'fifth'
+    }, {
+      value: 'L',
+      label: 'last'
     }];
-    this.dayStrings = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+    this.dayStrings = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     this.monthStrings = [{
       value: 1,
-      label:'January'
-    },{
+      label: 'January'
+    }, {
       value: 2,
-      label:'Febuary'
-    },{
+      label: 'Febuary'
+    }, {
       value: 3,
-      label:'March'
-    },{
+      label: 'March'
+    }, {
       value: 4,
-      label:'April'
-    },{
+      label: 'April'
+    }, {
       value: 5,
-      label:'May'
-    },{
+      label: 'May'
+    }, {
       value: 6,
-      label:'June'
-    },{
+      label: 'June'
+    }, {
       value: 7,
-      label:'July'
-    },{
+      label: 'July'
+    }, {
       value: 8,
-      label:'August'
-    },{
+      label: 'August'
+    }, {
       value: 9,
-      label:'September'
-    },{
+      label: 'September'
+    }, {
       value: 10,
-      label:'October'
-    },{
+      label: 'October'
+    }, {
       value: 11,
-      label:'November'
-    },{
+      label: 'November'
+    }, {
       value: 12,
-      label:'December'
+      label: 'December'
     }];
     this.scheduleType = 'immediate';
     this.immediate.immediatetype = '';
     if (!isEmpty(this.crondetails)) {
       this.loadData();
     }
-    //this.startDate = new Date();
+    // this.startDate = new Date();
   }
 
   private range(start: number, end: number): number[] {
@@ -161,7 +161,7 @@ export class CronJobSchedularComponent {
   openSchedule(scheduleType) {
     this.resetData();
     if (scheduleType.tab.textLabel.toLowerCase() === 'weekly') {
-      this.scheduleType = 'weeklybasis'
+      this.scheduleType = 'weeklybasis';
     } else {
       this.scheduleType = scheduleType.tab.textLabel.toLowerCase();
     }
@@ -192,7 +192,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'hourly':
-      //Generating Cron expression for selections made in hourly tab
+      // Generating Cron expression for selections made in hourly tab
       this.CronExpression = generateHourlyCron(this.hourly.hours, this.hourly.minutes);
       if (isValid(this.CronExpression)) {
         this.activeRadio = '';
@@ -200,7 +200,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'daily':
-      //Generating Cron expression for selections made in daily tab
+      // Generating Cron expression for selections made in daily tab
       this.CronExpression = generateDailyCron(this.daily, dateSelects);
       if (isValid(this.CronExpression)) {
         this.activeRadio = this.daily.dailyType;
@@ -208,7 +208,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'weeklybasis':
-      //Generating Cron expression for selections made in weekly tab
+      // Generating Cron expression for selections made in weekly tab
       const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
           .reduce((acc, day) => this.weekly[day] ? acc.concat([day]) : acc, [])
           .join(',');
@@ -219,7 +219,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'monthly':
-      //Generating Cron expression for selections made in monthly tab
+      // Generating Cron expression for selections made in monthly tab
       this.CronExpression = generateMonthlyCron(this.monthly, dateSelects);
       if (isValid(this.CronExpression)) {
         this.activeRadio = this.monthly.monthlyType;
@@ -227,7 +227,7 @@ export class CronJobSchedularComponent {
       }
       break;
     case 'yearly':
-      //Generating Cron expression for selections made in yearly tab
+      // Generating Cron expression for selections made in yearly tab
       this.CronExpression = generateYearlyCron(this.yearly, dateSelects);
       if (isValid(this.CronExpression)) {
         this.activeRadio = this.yearly.yearlyType;
@@ -250,7 +250,7 @@ export class CronJobSchedularComponent {
       activeRadio: this.activeRadio,
       startDate: this.startDate,
       endDate: this.endDate
-    }
+    };
     this.onCronChanged.emit(this.crondetails);
   }
 
@@ -269,13 +269,13 @@ export class CronJobSchedularComponent {
       return;
     }
     if (this.scheduleType === 'hourly') {
-      let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+      const parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
     } else {
       const localCronExpression = convertToLocal(this.crondetails.cronexp);
-      let parseCronValue = cronstrue.toString(localCronExpression).split(' ');
-      let fetchTime = parseCronValue[1].split(':');
-      let meridium = parseCronValue[2].split(',');
-      let modelDate = {
+      const parseCronValue = cronstrue.toString(localCronExpression).split(' ');
+      const fetchTime = parseCronValue[1].split(':');
+      const meridium = parseCronValue[2].split(',');
+      const modelDate = {
         hour: parseInt(fetchTime[0]),
         minute: fetchTime[1],
         hourType: meridium[0]
@@ -291,51 +291,51 @@ export class CronJobSchedularComponent {
         fetchLocalMinute = parseCronValue[1].split('/');
         this.hourly.minutes = (isNaN(parseInt(fetchLocalMinute[0])) ? 1 : parseInt(fetchLocalMinute[0]));
       } else {
-        //Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
+        // Loading/displying values for Cron expression for Hourly tab selection in UI Templete.
         this.hourly.hours = (isNaN(parseInt(parseCronValue[7])) ? 1 : parseInt(parseCronValue[7]));
         this.hourly.minutes = (isNaN(parseInt(parseCronValue[1])) ? 0 : getLocalMinute(parseInt(parseCronValue[1])));
       }
       break;
     case 'daily':
       this.selectedTab = 2;
-      //Loading/displying values for Cron expression for daily tab selection in UI Templete.
+      // Loading/displying values for Cron expression for daily tab selection in UI Templete.
       this.daily.dailyType = this.crondetails.activeRadio;
       if (this.daily.dailyType === 'everyDay') {
-        //First Radio Button: Under daily tab loading data when first radio button is selected.
-        this.dailyTypeDay = clone(modelDate); //Loading time values for daily tab under first radio button
+        // First Radio Button: Under daily tab loading data when first radio button is selected.
+        this.dailyTypeDay = clone(modelDate); // Loading time values for daily tab under first radio button
         if (isUndefined(parseCronValue[4])) {
           parseCronValue[4] = '1';
         }
         this.daily.days = parseInt(parseCronValue[4]);
       } else {
-        //Second Raio Button: Under daily tab loading data when second radio button is selected.
-        this.dailyTypeWeek = clone(modelDate);//Loading time values for daily tab under Second radio button
+        // Second Raio Button: Under daily tab loading data when second radio button is selected.
+        this.dailyTypeWeek = clone(modelDate); // Loading time values for daily tab under Second radio button
       }
       break;
     case 'weeklybasis':
       this.selectedTab = 3;
-      //Loading/displying values for Cron expression for daily tab selection in UI Templete.
-      let getWeekDays = this.crondetails.cronexp.split(' ');
+      // Loading/displying values for Cron expression for daily tab selection in UI Templete.
+      const getWeekDays = this.crondetails.cronexp.split(' ');
       forEach(getWeekDays[5].split(','), day => {
         this.weekly[day] = true;
-      })
+      });
 
-      this.weeklybasisDate = clone(modelDate); //Loading time values for weekly tab
+      this.weeklybasisDate = clone(modelDate); // Loading time values for weekly tab
       break;
     case 'monthly':
       this.selectedTab = 4;
-      //Loading/displying values for Cron expression for monthly tab selection in UI Templete.
+      // Loading/displying values for Cron expression for monthly tab selection in UI Templete.
       this.monthly.monthlyType = this.crondetails.activeRadio;
       if (this.monthly.monthlyType === 'monthlyDay') {
-        //First Radio Button: Under monthly tab loading data when first radio button is selected.
+        // First Radio Button: Under monthly tab loading data when first radio button is selected.
         this.monthly.specificDay = parseInt(parseCronValue[5]);
         if (isUndefined(parseCronValue[10])) {
           parseCronValue[10] = '1';
         }
         this.monthly.specificMonth = parseInt(parseCronValue[10]);
-        this.specificDayMonth = clone(modelDate); //Loading time values for monthly tab under first radio button
+        this.specificDayMonth = clone(modelDate); // Loading time values for monthly tab under first radio button
       } else {
-        //Second Raio Button: Under monthly tab loading data when second radio button is selected.
+        // Second Raio Button: Under monthly tab loading data when second radio button is selected.
         forEach(this.weeks, week => {
           if (week.label === parseCronValue[5]) {
             this.monthly.specificWeekDayMonth = week.value;
@@ -346,28 +346,28 @@ export class CronJobSchedularComponent {
         if (isNaN(parseInt(parseCronValue[11]))) {
           this.monthly.specificWeekDayMonthWeek = 1;
         }
-        this.specificWeekDayMonth = clone(modelDate); //Loading time values for monthly tab under second radio button
+        this.specificWeekDayMonth = clone(modelDate); // Loading time values for monthly tab under second radio button
       }
       break;
     case 'yearly':
       this.selectedTab = 5;
-      //Loading/displying values for Cron expression for yearly tab selection in UI Templete.
+      // Loading/displying values for Cron expression for yearly tab selection in UI Templete.
       this.yearly.yearlyType = this.crondetails.activeRadio;
       if (this.yearly.yearlyType === 'yearlyMonth') {
-        //First Radio Button: Under yearly tab loading data when first radio button is selected.
-        this.specificMonthDayYear = clone(modelDate); //Loading time values for yearly tab under first radio button
-        this.yearly.specificMonthDayMonth = new Date(Date.parse(parseCronValue[11] +' 1, 2018')).getMonth() + 1;
+        // First Radio Button: Under yearly tab loading data when first radio button is selected.
+        this.specificMonthDayYear = clone(modelDate); // Loading time values for yearly tab under first radio button
+        this.yearly.specificMonthDayMonth = new Date(Date.parse(parseCronValue[11] + ' 1, 2018')).getMonth() + 1;
         this.yearly.specificMonthDayDay = parseInt(parseCronValue[5]);
       } else {
-        //Second Raio Button: Under yearly tab loading data when second radio button is selected.
-        this.specificMonthWeekYear = clone(modelDate); //Loading time values for yearly tab under second radio button
+        // Second Raio Button: Under yearly tab loading data when second radio button is selected.
+        this.specificMonthWeekYear = clone(modelDate); // Loading time values for yearly tab under second radio button
         forEach(this.weeks, week => {
           if (week.label === parseCronValue[5]) {
             this.yearly.specificMonthWeekMonthWeek = week.value;
           }
         });
         this.yearly.specificMonthWeekDay = parseCronValue[6].substr(0, 3).toUpperCase();
-        this.yearly.specificMonthWeekMonth = new Date(Date.parse(parseCronValue[12] +' 1, 2018')).getMonth() + 1;
+        this.yearly.specificMonthWeekMonth = new Date(Date.parse(parseCronValue[12] + ' 1, 2018')).getMonth() + 1;
       }
       break;
     }

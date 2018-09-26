@@ -31,7 +31,7 @@ export class EditWidgetComponent implements OnInit {
 
   @Input()
   set model(data) {
-    if (!data) return;
+    if (!data) { return; }
     this._model = data;
     if (data.kpi || data.bullet) {
       this.kpiType = data.kpi ? 'kpi' : 'bullet';
@@ -59,7 +59,7 @@ export class EditWidgetComponent implements OnInit {
     this.observe
       .getArtifacts({ semanticId: semId })
       .map(metric => {
-        if (!metric) return;
+        if (!metric) { return; }
         metric.kpiColumns = flatMap(metric.artifacts, table => {
           return filter(
             table.columns,
@@ -80,7 +80,7 @@ export class EditWidgetComponent implements OnInit {
         return metric;
       })
       .subscribe(metric => {
-        if (!metric) return;
+        if (!metric) { return; }
         if (this.kpiType === 'bullet') {
           this.editItem = {
             bullet: clone(model.bullet),

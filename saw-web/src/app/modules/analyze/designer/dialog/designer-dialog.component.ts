@@ -6,7 +6,7 @@ import {
   MatDialogConfig
 } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
-import { AnalysisDialogData, DesignerSaveEvent, Analysis } from '../types'
+import { AnalysisDialogData, DesignerSaveEvent, Analysis } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 

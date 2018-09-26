@@ -13,7 +13,7 @@ export class AnalysesFilterPipe implements PipeTransform {
       return analyses;
     }
     return filter(analyses, analysis => {
-      switch(type) {
+      switch (type) {
       case 'scheduled':
         return this.isInCronJobs(cronJobs, analysis.id);
       case 'report':

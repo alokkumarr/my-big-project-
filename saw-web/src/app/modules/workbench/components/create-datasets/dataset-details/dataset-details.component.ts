@@ -7,7 +7,7 @@ import { ENTER, COMMA } from '@angular/cdk/keycodes';
 
 import * as isUndefined from 'lodash/isUndefined';
 
-import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component'
+import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./dataset-details.component.html');
@@ -56,8 +56,8 @@ export class DatasetDetailsComponent implements OnInit {
   }
 
   addFormat(event: MatChipInputEvent): void {
-    let input = event.input;
-    let value = event.value;
+    const input = event.input;
+    const value = event.value;
 
     // Add Format
     if ((value || '').trim()) {
@@ -71,7 +71,7 @@ export class DatasetDetailsComponent implements OnInit {
   }
 
   removeFormat(format: any): void {
-    let index = this.previewConfig.dateFormats.indexOf(format);
+    const index = this.previewConfig.dateFormats.indexOf(format);
 
     if (index >= 0) {
       this.previewConfig.dateFormats.splice(index, 1);

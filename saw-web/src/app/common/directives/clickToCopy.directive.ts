@@ -8,7 +8,7 @@ import { DOCUMENT } from '@angular/common';
 import { ToastService } from '../services/toastMessage.service';
 
 @Directive({
-  selector: '[click-to-copy]'
+  selector: '[clickToCopy]'
 })
 export class ClickToCopyDirective {
 
@@ -21,7 +21,7 @@ export class ClickToCopyDirective {
   @HostListener('click', ['$event'])
   onClick() {
     const elem = this._elemRef.nativeElement;
-    const elemText = elem.value || elem.textContent
+    const elemText = elem.value || elem.textContent;
     const status = copyTextToClipboard(this._doc, elemText);
     /* eslint-disable */
     status && this._toastMessage.info('Success', 'Error details copied to clipboard');

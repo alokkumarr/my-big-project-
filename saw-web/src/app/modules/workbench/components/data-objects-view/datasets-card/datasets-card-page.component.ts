@@ -27,7 +27,7 @@ export class DatasetsCardPageComponent implements OnInit {
 
   ngOnInit() {
     this.updaterSubscribtion = this.updater.subscribe(data => {
-      this.onUpdate(data)
+      this.onUpdate(data);
     });
   }
 

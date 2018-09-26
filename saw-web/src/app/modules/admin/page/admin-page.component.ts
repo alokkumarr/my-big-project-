@@ -7,4 +7,4 @@ const template = require('./admin-page.component.html');
   template: template
 })
 export class AdminPageComponent {
-};
+}

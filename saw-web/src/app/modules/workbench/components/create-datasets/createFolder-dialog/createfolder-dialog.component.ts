@@ -29,7 +29,7 @@ export class CreatefolderDialogComponent {
       folderNameControl: new FormControl('', [
         Validators.required, Validators.pattern(this.folNamePattern)
       ])
-    })
+    });
   }
 
   submit(form) {

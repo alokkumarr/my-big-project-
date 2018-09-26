@@ -5,8 +5,7 @@ import {
   HttpHandler,
   HttpRequest
 } from '@angular/common/http';
-import { Observable } from 'rxjs/Rx';
-import 'rxjs/add/observable/throw';
+import { Observable, throwError } from 'rxjs';
 import 'rxjs/add/operator/catch';
 
 import * as get from 'lodash/get';
@@ -23,10 +22,10 @@ export class HandleErrorInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    //send the newly created request
+    // send the newly created request
     return next.handle(req).catch((error, caught) => {
       this.toast.error(this.getTitle(error));
-      return Observable.throw(error);
+      return throwError(error);
     }) as any;
   }
 

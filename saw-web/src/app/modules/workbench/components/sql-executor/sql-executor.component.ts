@@ -28,9 +28,9 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
   private dsMetadata: any;
   private datasetDetails: Array<any>;
   private appliedActions: Array<any> = SQL_AQCTIONS;
-  private scriptHeight: number = 100;
-  private previewHeight: number = 0;
-  private query: string = '';
+  private scriptHeight = 100;
+  private previewHeight = 0;
+  private query = '';
 
   constructor(
     private router: Router,
@@ -61,7 +61,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     const table = {
       artifactName: this.dsMetadata.system.name,
       columns: this.dsMetadata.schema.fields
-    }
+    };
     this.artifacts.push(table);
   }
 
@@ -113,7 +113,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
      * Will be handled in BE in upcoming release
      */
     const appendedScript = `CREATE TABLE ${data.name} AS ${this.query}`;
-    const script = endsWith(appendedScript, ';') === true ? `${appendedScript}` : `${appendedScript};`
+    const script = endsWith(appendedScript, ';') === true ? `${appendedScript}` : `${appendedScript};`;
     const payload = {
       'name': data.name,
       'input': this.dsMetadata.system.name,
@@ -121,11 +121,11 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
       'configuration': {
         'script': script
       }
-    }
+    };
     this.workBench.triggerParser(payload).subscribe(data => {
       this.notify.info('SQL_Executor_triggered_successfully', 'Creating Dataset', { hideDelay: 9000 });
     });
-    this.router.navigate(['workbench' ,'dataobjects']);
+    this.router.navigate(['workbench' , 'dataobjects']);
   }
 
   previewAction(action) {

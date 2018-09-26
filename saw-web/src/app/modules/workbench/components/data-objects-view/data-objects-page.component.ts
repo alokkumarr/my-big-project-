@@ -23,18 +23,18 @@ require('./data-objects-page.component.scss');
 export class DataobjectsComponent implements OnInit, OnDestroy {
   private availableSets: Array<any> = [];
   private availableDP: Array<any> = [];
-  private viewState: string = 'card';
+  private viewState = 'card';
   private states = {
     searchTerm: '',
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
   private dpUpdater = new BehaviorSubject([]);
-  private dataView: string = 'sets';
+  private dataView = 'sets';
   private contentHeight: number;
   private timer;
   private timerSubscription;
-  private poll: boolean = false;
+  private poll = false;
   private interval = 20000;
 
   @ViewChild(SearchBoxComponent)

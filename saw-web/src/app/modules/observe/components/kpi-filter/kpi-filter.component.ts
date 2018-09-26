@@ -49,7 +49,7 @@ export class KPIFilter implements OnInit, OnDestroy {
   dateFilters = DATE_PRESETS;
   datePresetSubscription: Subscription;
   listeners: Array<Subscription> = [];
-  showDateFields: boolean = false;
+  showDateFields = false;
   @Output() onModelChange = new EventEmitter();
 
   constructor(
@@ -155,7 +155,7 @@ export class KPIFilter implements OnInit, OnDestroy {
       preset: this.kpiFilterForm.get('preset').value
     };
 
-    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) return model;
+    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) { return model; }
 
     // Adding static time signatures until we allow users to choose time
     // for `to` and `from` fields.

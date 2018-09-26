@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as cloneDeep from 'lodash/cloneDeep';
 
@@ -14,10 +14,10 @@ require('./toolbar-action-dialog.component.scss');
   selector: 'toolbar-action-dialog',
   template
 })
-export class ToolbarActionDialogComponent {
+export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;
   progressSub;
-  filterValid: boolean = true;
+  filterValid = true;
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
@@ -25,7 +25,7 @@ export class ToolbarActionDialogComponent {
     private _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress
+      this.showProgress = showProgress;
     });
   }
 
@@ -43,7 +43,7 @@ export class ToolbarActionDialogComponent {
   }
 
   validateSaving() {
-    let validateState =
+    const validateState =
       this.data.analysis.name.replace(/\s/g, '').length === 0 ? true : false;
     return validateState;
   }
@@ -73,7 +73,7 @@ export class ToolbarActionDialogComponent {
   }
 
   onOk() {
-    let result: IToolbarActionResult = {};
+    const result: IToolbarActionResult = {};
     /* prettier-ignore */
     switch (this.data.action) {
     case 'sort':
@@ -89,7 +89,7 @@ export class ToolbarActionDialogComponent {
   save(action) {
     this._designerService
       .saveAnalysis(this.data.analysis)
-      .then(response => {
+      .then((response: any) => {
         this.data.analysis.id = response.id;
 
         if (response.type === 'report') {
@@ -100,6 +100,6 @@ export class ToolbarActionDialogComponent {
           action
         };
         this.dialogRef.close(result);
-      })
+      });
   }
 }

@@ -49,7 +49,7 @@ import {
   JsPlumbTableComponent,
   JsPlumbJoinLabelComponent,
   JoinDialogComponent,
-  JsPlumbEndpointComponent
+  JsPlumbEndpointDirective
 } from './components/js-plumb';
 import { AliasRenameDialogComponent } from './components/alias-rename-dialog';
 import { DateFormatDialogComponent } from './components/date-format-dialog';
@@ -112,7 +112,7 @@ const THIRD_PARTY_COMPONENTS = [DxPivotGridComponent, DxDataGridComponent];
 const DIRECTIVES = [
   ClickToCopyDirective,
   E2eDirective,
-  JsPlumbEndpointComponent
+  JsPlumbEndpointDirective
 ];
 
 const SERVICES = [

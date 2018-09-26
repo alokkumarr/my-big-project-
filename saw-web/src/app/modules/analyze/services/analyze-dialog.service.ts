@@ -77,7 +77,7 @@ export class AnalyzeDialogService {
       booleanCriteria,
       supportsGlobalFilters,
       isInRuntimeMode: false
-    }
+    };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
       height: 'auto',
@@ -91,7 +91,7 @@ export class AnalyzeDialogService {
       filters,
       artifacts: analysis.artifacts,
       isInRuntimeMode: true
-    }
+    };
     return this.dialog.open(DesignerFilterDialogComponent, {
       width: 'auto',
       height: 'auto',

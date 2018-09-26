@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 
-import { dxDataGridService } from '../../../../common/services/dxDataGrid.service';
+import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { DxDataGridComponent } from 'devextreme-angular';
 
@@ -29,7 +29,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private dxDataGrid: dxDataGridService,
+    private dxDataGrid: DxDataGridService,
     private workBench: WorkbenchService
   ) {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
@@ -59,7 +59,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
 
   triggerPreview() {
     this.workBench.triggerDatasetPreview(this.dsMetadata.system.name).subscribe((data) => {
-      this.previewStatus = 'queued'
+      this.previewStatus = 'queued';
       if (!isUndefined(data.id)) {
         this.startPolling(data.id);
       }

@@ -3,16 +3,15 @@ import {
   Input,
   Output,
   EventEmitter,
-  ElementRef
+  ElementRef,
+  OnInit,
+  AfterViewInit
 } from '@angular/core';
-import * as find from 'lodash/find';
 import * as unset from 'lodash/unset';
 import * as sortBy from 'lodash/sortBy';
 
 import {
   Artifact,
-  Join,
-  JoinCriterion,
   ArtifactColumnReport,
   JsPlumbCanvasChangeEvent
 } from '../types';
@@ -24,14 +23,14 @@ require('./js-plumb-table.component.scss');
   selector: 'js-plumb-table-u',
   template
 })
-export class JsPlumbTableComponent {
+export class JsPlumbTableComponent implements OnInit, AfterViewInit {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
   @Input() plumbInstance: any;
   @Input() useAggregate: boolean;
   @Input('artifact') set setArtifact(artifact: Artifact) {
     this.artifact = artifact;
     this.columns = sortBy(artifact.columns, 'displayName');
-  };
+  }
 
   public columns: ArtifactColumnReport[];
   public artifact: Artifact;

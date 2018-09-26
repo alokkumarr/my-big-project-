@@ -9,9 +9,9 @@ import { JwtService } from '../../../common/services';
 
 const MODULE_NAME = 'ANALYZE';
 
-type AnalysisResponse = {
+interface AnalysisResponse {
   data: {contents: {analyze: Analysis[]}};
-};
+}
 
 @Injectable()
 export class ImportService {

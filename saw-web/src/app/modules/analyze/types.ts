@@ -47,7 +47,7 @@ export type ChartType =
 
 export type Analysis = AnalysisChart | AnalysisReport;
 
-export type AnalysisStarter = {
+export interface AnalysisStarter {
   name: string;
   description: string;
   scheduled: null;
@@ -56,13 +56,13 @@ export type AnalysisStarter = {
   metricName: string;
   type: AnalysisType;
   chartType?: ChartType;
-};
+}
 
-export type AnalysisDialogData = {
+export interface AnalysisDialogData {
   designerMode: DesignerMode;
   analysisStarter?: AnalysisStarter;
   analysis?: Analysis;
-};
+}
 
 export type DesignerToolbarAciton =
   | 'description'

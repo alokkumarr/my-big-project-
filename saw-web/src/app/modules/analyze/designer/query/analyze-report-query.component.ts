@@ -100,7 +100,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
 
   addCompletionsToEditor() {
     const self = this;
-    var artifactsCompleter = {
+    const artifactsCompleter = {
       getCompletions: (editor, session, pos, prefix, callback) => {
         /* Add reference to this completer in each match. Ace editor
         uses this reference to call the custom 'insertMatch' method of
@@ -114,7 +114,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
           return callback(null, cloneDeep(withCompleter));
         }
 
-        var matchingCompletions = withCompleter.filter(
+        const matchingCompletions = withCompleter.filter(
           match =>
             (match.caption || match.name)
               .toLowerCase()

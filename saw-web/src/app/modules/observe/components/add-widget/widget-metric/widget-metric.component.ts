@@ -1,5 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { from } from 'rxjs';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as flatMap from 'lodash/flatMap';
@@ -17,7 +17,7 @@ require('./widget-metric.component.scss');
   selector: 'widget-metric',
   template
 })
-export class WidgetMetricComponent implements OnInit {
+export class WidgetMetricComponent implements OnInit, OnDestroy {
   @Output() onSelect = new EventEmitter();
   progressSub;
   metrics: Array<any> = [];
@@ -29,12 +29,12 @@ export class WidgetMetricComponent implements OnInit {
     private _headerProgress: HeaderProgressService
   ) {
     this. progressSub = _headerProgress.subscribe(showProgress => {
-      this.showProgress = showProgress
+      this.showProgress = showProgress;
     });
   }
 
   ngOnInit() {
-    Observable.fromPromise(this.analyze.getSemanticLayerData()).subscribe(
+    from(this.analyze.getSemanticLayerData()).subscribe(
       (data: Array<any>) => {
         this.metrics = data;
       }
@@ -47,7 +47,7 @@ export class WidgetMetricComponent implements OnInit {
 
   onLoadMetricArtifacts(semanticId: string) {
     const metric = find(this.metrics, m => m.id === semanticId);
-    if (!metric || metric.kpiColumns) return;
+    if (!metric || metric.kpiColumns) { return; }
 
     this.observe.getArtifacts({ semanticId }).subscribe(
       data => {

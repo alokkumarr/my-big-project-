@@ -25,17 +25,17 @@ import {
 const template = require('./designer-filter-dialog.component.html');
 require('./designer-filter-dialog.component.scss');
 
-export type DesignerFilterDialogData = {
+export interface DesignerFilterDialogData {
   filters: Filter[];
   booleanCriteria?: string;
   artifacts: Artifact[];
   isInRuntimeMode: boolean;
   supportsGlobalFilters?: boolean;
 }
-export type DesignerFilterDialogResult = {
-  filters: Filter[],
+export interface DesignerFilterDialogResult {
+  filters: Filter[];
   booleanCriteria?: string;
-};
+}
 
 @Component({
   selector: 'designer-filter-dialog',
@@ -45,7 +45,7 @@ export class DesignerFilterDialogComponent implements OnInit {
   artifacts: Artifact[];
   filters: Filter[];
   groupedFilters;
-  areFiltersValid: boolean = false;
+  areFiltersValid = false;
 
   constructor(
     public dialogRef: MatDialogRef<DesignerFilterDialogData>,
@@ -80,7 +80,7 @@ export class DesignerFilterDialogComponent implements OnInit {
       isRuntimeFilter: false,
       isGlobalFilter: false,
       model: null
-    }
+    };
     if (!this.groupedFilters[tableName]) {
       this.groupedFilters[tableName] = [];
     }
@@ -116,7 +116,7 @@ export class DesignerFilterDialogComponent implements OnInit {
   }
 
   ok() {
-    let result: DesignerFilterDialogResult = {
+    const result: DesignerFilterDialogResult = {
       filters: filter(this.filters, 'columnName'),
       booleanCriteria:  this.data.booleanCriteria
     };
@@ -156,7 +156,7 @@ export class DesignerFilterDialogComponent implements OnInit {
     case 'BTW':
       return Boolean(isFinite(value) && isFinite(otherValue));
     default:
-      return Boolean(isFinite(value))
+      return Boolean(isFinite(value));
     }
   }
 

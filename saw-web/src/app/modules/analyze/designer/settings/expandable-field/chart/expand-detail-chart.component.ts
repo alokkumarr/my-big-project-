@@ -1,5 +1,4 @@
-declare const require: any;
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 import { ArtifactColumnChart, Format } from '../../../types';
@@ -26,7 +25,7 @@ const INT_SAMPLE = 1000;
   selector: 'expand-detail-chart',
   template
 })
-export class ExpandDetailChartComponent {
+export class ExpandDetailChartComponent implements OnInit {
   @Output()
   public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
@@ -35,8 +34,8 @@ export class ExpandDetailChartComponent {
 
   public DATE_INTERVALS = DATE_INTERVALS;
   public DATE_FORMATS_OBJ = CHART_DATE_FORMATS_OBJ;
-  public isDataField: boolean = false;
-  public hasDateInterval: boolean = false;
+  public isDataField = false;
+  public hasDateInterval = false;
   public numberSample: string;
   public dateSample: string;
   public isFloat: boolean;

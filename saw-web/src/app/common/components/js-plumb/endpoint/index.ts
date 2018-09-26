@@ -1,1 +1,1 @@
-export { JsPlumbEndpointComponent } from './js-plumb-endpoint.component';
+export { JsPlumbEndpointDirective } from './js-plumb-endpoint.component';

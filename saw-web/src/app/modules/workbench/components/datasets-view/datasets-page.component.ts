@@ -21,17 +21,17 @@ require('./datasets-page.component.scss');
 
 export class DatasetsComponent implements OnInit, OnDestroy {
   private availableSets: Array<any> = [];
-  private viewState: string = 'card';
+  private viewState = 'card';
   private states = {
     searchTerm: '',
     searchTermValue: ''
   };
   private updater = new BehaviorSubject([]);
-  private dataView: string = 'sets';
+  private dataView = 'sets';
   private contentHeight: number;
   private timer;
   private timerSubscription;
-  private poll: boolean = true;
+  private poll = true;
   private interval = 20000;
 
   constructor(
@@ -121,7 +121,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   }
 
   addDataSet(): void {
-    this.router.navigate(['workbench' ,'add']);
+    this.router.navigate(['workbench' , 'add']);
   }
 
   onDataViewChange() {

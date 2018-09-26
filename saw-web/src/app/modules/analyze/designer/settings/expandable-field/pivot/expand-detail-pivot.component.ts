@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   Output,
+  OnInit,
   EventEmitter
 } from '@angular/core';
 import * as moment from 'moment';
@@ -33,7 +34,7 @@ const INT_SAMPLE = 1000;
   selector: 'expand-detail-pivot',
   template
 })
-export class ExpandDetailPivotComponent {
+export class ExpandDetailPivotComponent implements OnInit {
   @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnPivot;
@@ -41,8 +42,8 @@ export class ExpandDetailPivotComponent {
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
   public DATE_INTERVALS = DATE_INTERVALS;
   public DATE_FORMATS_OBJ = DATE_FORMATS_OBJ;
-  public isDataField: boolean = false;
-  public hasDateInterval: boolean = false;
+  public isDataField = false;
+  public hasDateInterval = false;
   public numberSample: string;
   public dateSample: string;
   public isFloat: boolean;

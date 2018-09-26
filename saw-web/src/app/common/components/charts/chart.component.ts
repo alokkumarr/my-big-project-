@@ -1,7 +1,8 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 
 import * as Highcharts from 'highcharts/highcharts';
-import * as Highstock from 'highcharts/highstock'; // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
+import * as Highstock from 'highcharts/highstock';
+// Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
@@ -9,7 +10,6 @@ import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
-import * as isUndefined from 'lodash/isUndefined';
 import * as find from 'lodash/find';
 
 import {
@@ -34,7 +34,7 @@ export const CHART_SETTINGS_OBJ = [
   selector: 'chart',
   template: `<div #container></div>`
 })
-export class ChartComponent {
+export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() updater: any;
   @Input() isStockChart: boolean;
   @Input() enableExport: boolean;
@@ -60,7 +60,9 @@ export class ChartComponent {
   }
 
   ngAfterViewInit() {
-    this.enableExport && this.enableExporting(this.config);
+    if (this.enableExport) {
+      this.enableExporting(this.config);
+    }
   }
 
   ngOnInit() {
@@ -74,8 +76,8 @@ export class ChartComponent {
   }
 
   updateOptions(options) {
-    if (!options) return;
-    //set the appropriate config based on chart type
+    if (!options) { return; }
+    // set the appropriate config based on chart type
     this.cType = this.isStockChart ? 'highStock' : options.chart.type;
     this.config = defaultsDeep(
       options,
@@ -99,9 +101,6 @@ export class ChartComponent {
 
   /**
    * Enables exporting features for the chart.
-   *
-   * @param {any} config
-   * @memberof ChartComponent
    */
   enableExporting(config) {
     set(config, 'exporting', {
@@ -113,9 +112,6 @@ export class ChartComponent {
 
   /**
    * Sets the name of download file as chart title.
-   *
-   * @param {any} config
-   * @memberof ChartComponent
    */
   addExportConfig(config) {
     set(
@@ -134,10 +130,7 @@ export class ChartComponent {
 
   /**
    * Adds the size of chart to export config. There's a timeout because we
-   * want to calculate the chart size after it has been drawn, not before it.
-   *
-   * @param {any} config
-   * @memberof ChartComponent
+   * want to calculate the chart size after it has been drawn, not before it
    */
   addExportSize(config) {
     setTimeout(() => {
@@ -175,7 +168,8 @@ export class ChartComponent {
         this.config,
         'xAxis.0.title.text',
         get(this.config, 'xAxis.title.text')
-      ); // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
+      ); // Highstocks adding a default xAxis settings objects with title & categories.
+       // So have to populate them inorder the title to display.
       set(
         this.config,
         'xAxis.0.categories',

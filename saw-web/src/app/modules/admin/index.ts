@@ -45,7 +45,7 @@ import {
   RefreshTokenInterceptor
 } from '../../common/interceptor';
 import { SidenavMenuService } from '../../common/components/sidenav';
-import { dxDataGridService, ToastService, LocalSearchService } from '../../common/services';
+import { DxDataGridService, ToastService, LocalSearchService } from '../../common/services';
 
 import { isAdminGuard, GoToDefaultAdminPageGuard} from './guards';
 
@@ -88,7 +88,7 @@ const SERVICES = [
   AdminService,
   UserService,
   JwtService,
-  dxDataGridService,
+  DxDataGridService,
   LocalSearchService,
   ToastService,
   RoleService,

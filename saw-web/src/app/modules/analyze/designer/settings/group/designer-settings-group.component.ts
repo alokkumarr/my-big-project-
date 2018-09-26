@@ -36,12 +36,12 @@ export class DesignerSettingsGroupComponent {
   public removeFromCallback = (payload, index, container) => {
     this._designerService.removeArtifactColumnFromGroup(payload, container);
     this.fieldsChange.emit();
-  };
+  }
 
   public addToCallback = (payload, index, container) => {
     this._designerService.addArtifactColumnIntoGroup(payload, container, index);
     this.fieldsChange.emit();
-  };
+  }
 
   constructor(private _designerService: DesignerService) {}
 

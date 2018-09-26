@@ -53,7 +53,7 @@ export function getPrivilegeFromBoolArray(privilegeCodeList) {
 }
 
 export function getPrivilegeDescription(privilegeCode) {
-  switch(privilegeCode) {
+  switch (privilegeCode) {
   case 0:
     return 'No-Access';
   case 128:

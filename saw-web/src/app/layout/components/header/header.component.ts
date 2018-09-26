@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as lowerCase from 'lodash/lowerCase';
@@ -17,7 +17,7 @@ require('./header.component.scss');
   selector: 'layout-header',
   template
 })
-export class LayoutHeaderComponent {
+export class LayoutHeaderComponent implements OnInit, OnDestroy {
   public UserDetails: any;
   public modules: any;
   public showAdmin: boolean;
@@ -65,9 +65,9 @@ export class LayoutHeaderComponent {
 
   getInitials(usrName: string) {
     const names = split(usrName, ' ');
-    let initials = names[0].substring(0, 1).toUpperCase();
+    const initials = names[0].substring(0, 1).toUpperCase();
 
-    //Below block gets you last name initial too
+    // Below block gets you last name initial too
     // if (names.length > 1) {
     //   initials += names[names.length - 1].substring(0, 1).toUpperCase();
     // }

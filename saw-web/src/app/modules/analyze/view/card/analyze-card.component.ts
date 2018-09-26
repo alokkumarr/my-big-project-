@@ -27,7 +27,7 @@ export class AnalyzeCardComponent implements OnInit {
   @Input() highlightTerm: string;
   @Input() set cronJobs(cronJobs: any) {
     this.schedule = generateSchedule(cronJobs, this.analysis.id);
-  };
+  }
 
   placeholderClass: string;
   schedule: string;

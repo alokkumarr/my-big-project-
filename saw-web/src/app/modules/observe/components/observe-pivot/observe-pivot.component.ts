@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
   Input,
   Output,
   EventEmitter
@@ -22,7 +21,7 @@ require('./observe-pivot.component.scss');
   selector: 'observe-pivot',
   template
 })
-export class ObservePivotComponent implements OnInit, OnDestroy {
+export class ObservePivotComponent implements OnInit {
   public artifactColumns: Array<any> = [];
   public data: any;
 
@@ -37,7 +36,7 @@ export class ObservePivotComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.artifactColumns = [...this.analysis.artifacts[0].columns];
-    if (this.analysis._executeTile === false) return;
+    if (this.analysis._executeTile === false) { return; }
     this.analyzeService
       .getDataBySettings(this.analysis, EXECUTION_MODES.LIVE, {})
       .then(
@@ -49,5 +48,4 @@ export class ObservePivotComponent implements OnInit, OnDestroy {
         }
       );
   }
-  ngOnDestroy() {}
 }

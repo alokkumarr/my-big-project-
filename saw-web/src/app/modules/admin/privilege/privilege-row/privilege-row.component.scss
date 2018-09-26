@@ -1,6 +1,6 @@
 @import "src/themes/base/colors";
 
-tr[privilegerow] {
+tr[privilege-row] {
   min-height: 42px;
   height: 42px;
 
@@ -21,6 +21,6 @@ tr[privilegerow] {
   }
 }
 
-tr[privilegerow].active td {
+tr[privilege-row].active td {
   background-color: $grid-hover-color;
 }
