@@ -107,10 +107,6 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     this.disableIntervalConditionally();
   }
 
-  ngOnDestroy() {
-    this.progressSub.unsubscribe();
-  }
-
   disableIntervalConditionally() {
     const sub = this.dashboardForm
       .get('autoRefreshEnabled')
@@ -125,6 +121,7 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.progressSub.unsubscribe();
     this.listeners.forEach(sub => sub.unsubscribe());
   }
 

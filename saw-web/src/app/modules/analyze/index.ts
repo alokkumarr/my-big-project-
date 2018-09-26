@@ -2,7 +2,7 @@ import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule }  from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { LocalStorageModule } from 'angular-2-local-storage';
 import { AnalyzeViewModule } from './view';
 import { ExecutedViewModule } from './executed-view';
@@ -130,6 +130,7 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
   providers: [
     ...SERVICES,
     ...GUARDS
-  ]
+  ],
+  exports: [AnalyzePageComponent]
 })
 export class AnalyzeModuleTs {}

@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Observable } from 'rxjs/Observable';
+import { Observable, combineLatest } from 'rxjs';
 import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
@@ -139,12 +139,12 @@ export class UserEditDialogComponent extends BaseDialogComponent {
     });
 
     // combine firstname and lastName into masterLoginId
-    Observable.combineLatest(
+    combineLatest(
       firstNameControl.valueChanges,
       lastNameControl.valueChanges
     ).subscribe(([first, last]) => {
-      const masterLoginId = `${first}.${last}`;
-      this.formGroup.patchValue({masterLoginId});
+      const masterLoginIdValue = `${first}.${last}`;
+      this.formGroup.patchValue({masterLoginId: masterLoginIdValue});
     });
 
     // enable disable the create user/ save button

@@ -13,10 +13,6 @@ import {
 import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
-
-import 'brace/theme/sqlserver';
-import 'brace/ext/language_tools';
-import 'brace/mode/sql';
 import { AceEditorComponent } from 'ng2-ace-editor';
 import { WorkbenchService } from '../../../services/workbench.service';
 

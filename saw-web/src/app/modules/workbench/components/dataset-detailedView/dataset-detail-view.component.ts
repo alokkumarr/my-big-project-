@@ -1,6 +1,6 @@
 
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { timer } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
@@ -87,7 +87,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
    * @memberof DatasetsComponent
   */
   startPolling(id) {
-    this.timer = Observable.timer(0, this.interval);
+    this.timer = timer(0, this.interval);
     this.timerSubscription = this.timer.subscribe(() => {
       this.getPreview(id);
     });

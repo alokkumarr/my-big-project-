@@ -4,6 +4,7 @@ import * as isArray from 'lodash/isArray';
 import * as isFunction from 'lodash/isFunction';
 import * as trim from 'lodash/trim';
 import * as split from 'lodash/split';
+import { Analysis } from '../../models';
 import { Injectable } from '@angular/core';
 
 interface SearchResult {
@@ -40,7 +41,7 @@ export class LocalSearchService {
        accessor: (optional) use for getting properties that are nested or require some modification
     */
   doSearch(searchCriteria, data = [], fieldConfig = []) {
-    return new Promise((resolve, reject) => {
+    return new Promise<Analysis[]>((resolve, reject) => {
       if (!searchCriteria.trimmedTerm) {
         return resolve(data);
       }

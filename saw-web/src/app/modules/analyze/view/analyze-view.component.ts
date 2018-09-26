@@ -201,7 +201,7 @@ export class AnalyzeViewComponent implements OnInit {
       categoryId: analysisId,
       groupkey: token.ticket.custCode
     };
-    this._analyzeService.getAllCronJobs(requestModel).then(response => {
+    this._analyzeService.getAllCronJobs(requestModel).then((response: any) => {
       if (response.statusCode === 200) {
         if (!isUndefined(response)) {
           this.cronJobs = response.data;

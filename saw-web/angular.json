@@ -29,7 +29,12 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/ace-builds/src-min/ace.js",
+              "./node_modules/ace-builds/src-min/theme-eclipse.js",
+              "./node_modules/ace-builds/src-min/ext-language_tools.js",
+              "./node_modules/ace-builds/src-min/mode-sql.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -54,7 +59,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "saw-web:build"
+            "browserTarget": "saw-web:build",
+            "port": 3000
           },
           "configurations": {
             "production": {

@@ -7,7 +7,7 @@ import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
-import { RouterModule }  from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import { routes } from './routes';
 

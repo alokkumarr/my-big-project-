@@ -3,7 +3,9 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AnalyzeService, EXECUTION_MODES } from './analyze.service';
 import { FilterService } from '../services/filter.service';
-
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/scan';
 export enum EXECUTION_STATES {
   SUCCESS,
   ERROR,

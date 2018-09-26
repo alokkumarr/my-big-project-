@@ -113,7 +113,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       categoryId: categoryId,
       groupName: this.token.ticket.custCode
     };
-    this._analyzeService.getCronDetails(requestCron).then(response => {
+    this._analyzeService.getCronDetails(requestCron).then((response: any) => {
       this.loadCron = true;
       if (response.statusCode === 200) {
         this.loadCronLayout = true;
@@ -158,7 +158,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
     const request = {
       jobGroup: this.token.ticket.custCode
     };
-    this._analyzeService.getlistFTP(request).then(response => {
+    this._analyzeService.getlistFTP(request).then((response: any) => {
       this.locations = response.ftp;
     });
   }

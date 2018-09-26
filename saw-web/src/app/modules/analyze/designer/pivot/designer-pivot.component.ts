@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/Subject';
 
 import { Artifact, ArtifactColumnPivot } from '../types';
 import { DesignerStates } from '../consts';
-import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
+import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
 
 const template = require('./designer-pivot.component.html');
 require('./designer-pivot.component.scss');

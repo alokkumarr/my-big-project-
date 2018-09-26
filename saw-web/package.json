@@ -50,7 +50,7 @@
     "moment-timezone": "0.5.14",
     "mottle": "0.8.0",
     "ng-pick-datetime": "5.2.6",
-    "ng2-ace-editor": "0.3.4",
+    "ng2-ace-editor": "0.3.8",
     "ng2-nouislider": "1.7.7",
     "nouislider": "11.0.3",
     "reflect-metadata": "0.1.10",

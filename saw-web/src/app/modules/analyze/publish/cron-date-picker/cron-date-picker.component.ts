@@ -1,11 +1,11 @@
-import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, Input, EventEmitter, Output } from '@angular/core';
 const template = require('./cron-date-picker.component.html');
 
 @Component({
   selector: 'cron-date-picker',
   template
 })
-export class CronDatePickerComponent implements OnInit {
+export class CronDatePickerComponent {
 
   @Input() public model: any;
   @Output() onDateChange = new EventEmitter();

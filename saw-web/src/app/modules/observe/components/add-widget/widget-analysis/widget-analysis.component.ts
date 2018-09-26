@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
-import { Subscription } from 'rxjs/subscription';
 
 import { DashboardService } from '../../../services/dashboard.service';
 import { AnalyzeService } from '../../../../analyze/services/analyze.service';
@@ -32,7 +31,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   progressSub;
   searchTerm: string;
   widgetLog = {};
-  dashboardWidgetSubscription: Subscription;
+  dashboardWidgetSubscription;
   icons = {};
 
   constructor(

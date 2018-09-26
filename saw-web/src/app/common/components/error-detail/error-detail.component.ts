@@ -1,7 +1,7 @@
 import {
   Component,
   Inject,
-  Inject
+  OnInit
 } from '@angular/core';
 import {
   MatDialogRef,

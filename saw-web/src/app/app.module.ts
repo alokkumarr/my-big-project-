@@ -10,10 +10,10 @@ import { CommonModuleTs } from './common';
 import { MaterialModule } from './material.module';
 import { AppRoutingModule } from './app-routing.module';
 
-// import { ObserveUpgradeModule } from './modules/observe';
-// import { AnalyzeModuleTs } from './modules/analyze';
-// import { AdminModule } from './modules/admin';
-// import { WorkbenchUpgradeModule } from './modules/workbench';
+import { ObserveUpgradeModule } from './modules/observe';
+import { AnalyzeModuleTs } from './modules/analyze';
+import { AdminModule } from './modules/admin';
+import { WorkbenchUpgradeModule } from './modules/workbench';
 import { LoginModule } from './login';
 
 import {
@@ -40,10 +40,10 @@ const SERVICES = [{ provide: LOCALE_ID, useValue: 'en' }];
     FlexLayoutModule,
     MaterialModule,
     LoginModule,
-    // AnalyzeModuleTs,
-    // ObserveUpgradeModule,
-    // WorkbenchUpgradeModule,
-    // AdminModule
+    AnalyzeModuleTs,
+    ObserveUpgradeModule,
+    WorkbenchUpgradeModule,
+    AdminModule
   ],
   exports: [FlexLayoutModule],
   providers: [...SERVICES],

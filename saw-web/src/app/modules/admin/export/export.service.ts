@@ -36,7 +36,7 @@ export class ExportService {
       .toPromise();
   }
 
-  getAnalysisByMetricIds(metricIds: []) {
+  getAnalysisByMetricIds(metricIds) {
     const customerCode = get(this._jwtService.getTokenObj(), 'ticket.custCode');
     const params = {
       contents: {

@@ -1,9 +1,9 @@
-import { Component, Input, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { timer } from 'rxjs';
 import * as get from 'lodash/get';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
@@ -65,7 +65,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
      *
      * @memberof DatasetsComponent
      */
-    this.timer = Observable.timer(0, this.interval);
+    this.timer = timer(0, this.interval);
     this.timerSubscription = this.timer.subscribe(() => {
       this.getDatasets();
     });

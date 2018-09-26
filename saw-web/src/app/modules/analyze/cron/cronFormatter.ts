@@ -23,7 +23,8 @@ export function generateSchedule(cronJobs, id) {
 function extractMinute(CronUTC) {
   const splitArray = CronUTC.split(' ');
   const date = new Date();
-  date.setUTCHours(moment().format('HH'), splitArray[1]);
+  const hour = parseInt(moment().format('HH'), 10);
+  date.setUTCHours(hour, splitArray[1]);
   const UtcTime = moment.utc(date).local().format('mm').split(' ');
   splitArray[1] = UtcTime[0];
   if (UtcTime[0] === 'Invalid') {

@@ -9,14 +9,9 @@ import {
   ViewChild,
   EventEmitter
 } from '@angular/core';
-
 import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
-
-import 'brace/theme/eclipse';
-import 'brace/ext/language_tools';
-import 'brace/mode/sql';
 import { AceEditorComponent } from 'ng2-ace-editor';
 
 const template = require('./analyze-report-query.component.html');

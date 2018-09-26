@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material';
+import 'rxjs/add/operator/first';
 import * as clone from 'lodash/clone';
 import { ToastService } from '../../../common/services/toastMessage.service';
 import { AnalyseTypes } from '../consts';
@@ -10,7 +11,6 @@ import { PublishService } from '../services/publish.service';
 import { Analysis } from '../types';
 import { AnalyzePublishDialogComponent } from '../publish/dialog/analyze-publish';
 import { AnalyzeScheduleDialogComponent } from '../publish/dialog/analyze-schedule';
-
 
 import {
   EXECUTION_MODES,
@@ -51,7 +51,7 @@ export class AnalyzeActionsService {
   }
 
   openDeleteModal(analysis) {
-    return new Promise(resolve => {
+    return new Promise<boolean | void>(resolve => {
       this._analyzeDialogService
         .openDeleteConfirmationDialog()
         .afterClosed()
@@ -99,17 +99,17 @@ export class AnalyzeActionsService {
             data: { analysis }
           } as MatDialogConfig)
           .afterClosed()
-          .subscribe(analysis => {
+          .subscribe(modifiedAnalysis => {
             if (analysis) {
               const execute = true;
-              this._publishService.publishAnalysis(analysis, execute, type).then(
-                updatedAnalysis => {
+              this._publishService.publishAnalysis(modifiedAnalysis, execute, type).then(
+                publishedAnalysis => {
                   this._toastMessage.info(
                     execute
                       ? 'Analysis has been updated.'
                       : 'Analysis schedule changes have been updated.'
                   );
-                  resolve(updatedAnalysis);
+                  resolve(publishedAnalysis);
                 },
                 () => {
                   reject();

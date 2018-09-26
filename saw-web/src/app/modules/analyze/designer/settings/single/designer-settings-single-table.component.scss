@@ -15,6 +15,7 @@ designer-settings-single-table {
   }
 
   .settings__filters {
+    grid-area: filters;
     .mat-input-wrapper.mat-form-field-wrapper {
       padding-bottom: 0;
       margin-right: 10px;

@@ -109,13 +109,13 @@ export class AnalyzeService {
       ['contents.action', 'search'],
       ['contents.keys.[0].categoryId', subCategoryId]
     ]);
-    return this.postRequest(`analysis`, payload)
+    return <Promise<Analysis[]>>this.postRequest(`analysis`, payload)
       .then(fpGet('contents.analyze'))
       .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
 
   getPublishedAnalysesByAnalysisId(id) {
-    return this.getRequest(`analysis/${id}/executions`)
+    return <Promise<Analysis[]>>this.getRequest(`analysis/${id}/executions`)
       .then(fpGet(`executions`))
       .then(fpSortBy([obj => -obj.finished]));
   }
@@ -151,7 +151,7 @@ export class AnalyzeService {
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
   }
 
   previewExecution(model, options = {}) {
@@ -251,7 +251,7 @@ export class AnalyzeService {
     return this.getRequest('/api/analyze/methods');
   }
 
-  updateAnalysis(model) {
+  updateAnalysis(model): Promise<Analysis> {
     delete model.isScheduled;
     delete model.executionType;
     const payload = this.getRequestParams([
@@ -260,7 +260,7 @@ export class AnalyzeService {
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
+    return <Promise<Analysis>>this.postRequest(`analysis`, payload).then(fpGet(`contents.analyze.[0]`));
   }
 
   applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options: ExecutionRequestOptions = {}) {

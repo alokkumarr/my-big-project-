@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
@@ -41,7 +41,7 @@ require('./executed-view.component.scss');
   selector: 'executed-view',
   template
 })
-export class ExecutedViewComponent implements OnInit {
+export class ExecutedViewComponent implements OnInit, OnDestroy {
   analysis: Analysis; // the latest analysis definition
   executedAnalysis: Analysis; // the exact analysis that was executed
   analyses: Analysis[];
@@ -524,7 +524,8 @@ export class ExecutedViewComponent implements OnInit {
       this.chartUpdater$.next({ export: true });
       break;
     default:
-      this._analyzeExportService.export(this.executedAnalysis, this.executionId, this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL);
+      const executionType = this.onetimeExecution ? EXECUTION_DATA_MODES.ONETIME : EXECUTION_DATA_MODES.NORMAL;
+      this._analyzeExportService.export(this.executedAnalysis, this.executionId, executionType);
     }
   }
 }

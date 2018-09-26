@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
@@ -49,7 +49,7 @@ interface FileContent {name: string; count: number; analyses: Array<Analysis>; }
   selector: 'admin-import-view',
   template
 })
-export class AdminImportViewComponent {
+export class AdminImportViewComponent implements OnInit {
   files: Array<FileInfo>;
   fileContents: Array<FileContent>;
   selectedCategory;
@@ -110,7 +110,7 @@ export class AdminImportViewComponent {
   readFiles(event) {
     const files = event.target.files;
 
-    const contentPromises = fpPipe(
+    const contentPromises = <Promise<FileContent>[]>fpPipe(
       fpFilter(file => file.type === 'application/json'),
       fpMap(file => getFileContents(file)
         .then(content => {
