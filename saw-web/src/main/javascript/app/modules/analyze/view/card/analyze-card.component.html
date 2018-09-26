@@ -18,8 +18,7 @@
   >
     <div class="saw-ac-placeholder"
           [ngClass]="placeholderClass"
-          [uiParams]="{analysisId: analysis.id, analysis: analysis}"
-          uiSref="analyze.executedDetail"
+          routerLink="../analysis/{{analysis.id}}/executed"
     ></div>
   </mat-card-content>
   <mat-divider></mat-divider>
@@ -27,8 +26,7 @@
     <div>
       <mat-card-title>
         <a [innerHtml]="analysis.name | highlight: highlightTerm"
-           [uiParams]="{analysisId: analysis.id, analysis: analysis}"
-           uiSref="analyze.executedDetail"
+           routerLink="../analysis/{{analysis.id}}/executed"
            e2e="analysis-name"
         ></a>
       </mat-card-title>

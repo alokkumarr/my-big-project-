@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { UIRouter } from '@uirouter/angular';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { configureTests } from '../../../../../../test/javascript/helpers/configureTests';
 import { TestBed, inject } from '@angular/core/testing';
@@ -24,7 +24,8 @@ describe('Observe Service', () => {
         ObserveService,
         { provide: JwtService, useValue: mockService },
         { provide: MenuService, useValue: mockService },
-        { provide: UIRouter, useValue: mockService }
+        { provide: Router, useValue: mockService },
+        { provide: ActivatedRoute, useValue: mockService }
       ]
     }).compileComponents();
   });

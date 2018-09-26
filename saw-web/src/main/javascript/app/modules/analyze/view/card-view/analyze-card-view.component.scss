@@ -1,5 +1,7 @@
 analyze-card-view {
   display: block;
+  height: calc(100vh - 74px - 60px - 64px);
+  overflow: auto;
   background-color: whitesmoke;
 
   .analyze-card-view__no-results {

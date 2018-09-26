@@ -47,6 +47,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.*;
@@ -1450,10 +1452,21 @@ public class SecurityController {
 	 * instances of the service to provide high availability.
 	 */
 	@RequestMapping("/actuator/health")
-	public ObjectNode health() {
+	public ResponseEntity<ObjectNode> health() {
+		String status = "UP";
+		HttpStatus httpStatus = HttpStatus.OK;
+		try {
+			/* Execute sample read-only query to determine if database
+			 * is reachable */
+			userRepository.getRoletypesDropDownList();
+		} catch (Exception e) {
+			logger.error("Database health check failed", e);
+			status = "DOWN";
+			httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+		}
 		ObjectNode root = mapper.createObjectNode();
-		root.put("status", "UP");
-		return root;
+		root.put("status", status);
+		return new ResponseEntity<>(root, httpStatus);
 	}
 
 	/**

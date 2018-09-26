@@ -1,9 +1,7 @@
 
-import * as angular from 'angular';
-import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
@@ -191,22 +189,17 @@ export class ParserPreviewComponent implements OnInit {
         } else {
           index = event.srcElement.id;
         }
-        const editIcon = angular.element(document.getElementById(`edit_${index}`));
         if (format === '' && has(this.parserData.fields[index], 'format')) {
           if (this.parserData.fields[index].format.length === 0 || this.parserData.fields[index].format.length > 1) {
             event.srcElement.value = get(this.parserData.fields[index], 'type');
-            editIcon.css('visibility', 'hidden');
           } else if (this.parserData.fields[index].format.length === 1) {
             set(this.fieldInfo[index], 'format[0]', get(this.parserData.fields[index], 'format[0]'));
-            editIcon.css('visibility', 'visible');
           }
 
         } else if (format === '' && !has(this.parserData.fields[index], 'format')) {
           event.srcElement.value = get(this.parserData.fields[index], 'type');
-          editIcon.css('visibility', 'hidden');
         } else if (format !== '') {
           set(this.fieldInfo[index], 'format', [format]);
-          editIcon.css('visibility', 'visible');
         }
       });
   }

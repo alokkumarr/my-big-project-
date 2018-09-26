@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
+import { Router } from '@angular/router';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
@@ -14,12 +14,12 @@ export class DatapodActionsComponent implements OnInit {
   @Input()
   dpMetadata: any;
 
-  constructor(private router: UIRouter, private workBench: WorkbenchService) {}
+  constructor(private router: Router, private workBench: WorkbenchService) {}
 
   ngOnInit() {}
 
   gotoEdit(): void {
     this.workBench.setDataToLS('dpID', this.dpMetadata.id);
-    this.router.stateService.go('workbench.updateSemantic');
+    this.router.navigate(['workbench', 'semantic', 'update']);
   }
 }

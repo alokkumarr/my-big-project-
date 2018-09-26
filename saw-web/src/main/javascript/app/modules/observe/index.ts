@@ -1,14 +1,11 @@
-import * as angular from 'angular';
 import { NgModule } from '@angular/core';
-import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
 import { CountoModule } from 'angular2-counto';
-
-import { routesConfig } from './routes';
-import { i18nConfig } from './i18n';
+import { RouterModule }  from '@angular/router';
+import { routes } from './routes';
 
 import {
   DxDataGridModule,
@@ -17,23 +14,17 @@ import {
 } from 'devextreme-angular';
 
 import { MaterialModule } from '../../material.module';
-
-import {
-  jwtServiceProvider,
-  userServiceProvider
-} from '../../../login/services/ajs-login-providers';
-import {
-  analyzeServiceProvider,
-  sortServiceProvider
-} from '../analyze/services/ajs-analyze-providers';
+import { UserService } from '../../../login/services/user.service';
+import { JwtService } from '../../../login/services/jwt.service';
+import { AnalyzeService } from '../analyze/services/analyze.service';
 import { FilterService } from '../analyze/services/filter.service';
 import {
-  menuServiceProvider,
-  componentHandlerProvider,
-  headerProgressProvider,
-  toastProvider,
-  sidenavProvider
-} from '../../common/services/ajs-common-providers';
+  MenuService,
+  ComponentHandler,
+  HeaderProgressService,
+  ToastService,
+  SideNavService
+} from '../../common/services';
 import { ObserveService } from './services/observe.service';
 
 import {
@@ -65,14 +56,7 @@ import {
   GlobalStringFilterComponent
 } from './components/global-filter';
 import { DashboardService } from './services/dashboard.service';
-import { CommonModule, CommonModuleTs } from '../../common';
-
-export const ObserveModule = 'ObserveModule';
-
-angular
-  .module(ObserveModule, [CommonModule])
-  .config(routesConfig)
-  .config(i18nConfig);
+import { CommonModuleTs } from '../../common';
 
 const components = [
   ObservePageComponent,
@@ -96,12 +80,12 @@ const components = [
 @NgModule({
   imports: [
     AngularCommonModule,
+    RouterModule.forChild(routes),
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
     GridsterModule,
     HttpClientModule,
-    UIRouterUpgradeModule,
     CommonModuleTs,
     AddWidgetModule,
     EditWidgetModule,
@@ -131,15 +115,14 @@ const components = [
     },
     DashboardService,
     ObserveService,
-    jwtServiceProvider,
-    userServiceProvider,
-    analyzeServiceProvider,
-    menuServiceProvider,
-    componentHandlerProvider,
-    headerProgressProvider,
-    toastProvider,
-    sidenavProvider,
-    sortServiceProvider,
+    JwtService,
+    UserService,
+    AnalyzeService,
+    MenuService,
+    ComponentHandler,
+    HeaderProgressService,
+    ToastService,
+    SideNavService,
     FilterService
   ]
 })

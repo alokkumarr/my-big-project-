@@ -20,11 +20,11 @@ export class PasswordPreResetComponent {
   };
 
   private errorMsg;
-  
+
   resetPwd() {
     this._UserService.preResetPwd(this.dataHolder)
     .then(res => {
-      this.errorMsg = res.data.validityMessage;
+      this.errorMsg = res.validityMessage;
     });
   }
 
