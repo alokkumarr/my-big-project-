@@ -1,0 +1,17 @@
+@import "src/themes/base/colors";
+
+admin-main-view {
+  .mat-toolbar {
+    background-color: transparent;
+
+    .admin-title {
+      color: $grey-text-color;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .customer-name {
+      color: $grey-text-color;
+    }
+  }
+}

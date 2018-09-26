@@ -1,0 +1,21 @@
+@import "src/themes/base/colors";
+
+analyze-list-view {
+  .branded-column-name {
+    color: $primary-blue-b2;
+    font-weight: bolder;
+  }
+
+  .list-action__container {
+    max-height: 24px;
+    height: 24px;
+
+    .list-action__button {
+      display: inline-flex;
+      min-width: 24px;
+      min-height: 24px;
+      line-height: 24px;
+      height: 24px;
+    }
+  }
+}

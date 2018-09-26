@@ -1,0 +1,26 @@
+@import "src/themes/base/colors";
+
+analyze-publish-dialog {
+  .dialog__content {
+    width: 700px;
+    max-height: 500px;
+
+    .label-inline-with-select {
+      text-align: center;
+      line-height: 38px;
+    }
+
+    .form-container {
+      margin: 25px 0 25px -7px;
+
+      label {
+        font-weight: bold;
+        padding-bottom: 10px;
+      }
+
+      mat-input-container {
+        margin: 0;
+      }
+    }
+  }
+}

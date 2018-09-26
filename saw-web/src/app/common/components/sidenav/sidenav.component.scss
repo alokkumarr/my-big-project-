@@ -1,0 +1,51 @@
+@import 'src/themes/base/colors';
+
+.sidenav-container {
+  position: fixed !important;
+  width: 20%;
+  max-width: 300px !important;
+  background-color: $primary-blue-b2 !important;
+  color: white !important;
+
+  .menu-logo {
+    height: 63.9px;
+    border-bottom: 0.1px solid #D1D3D3;
+    padding-left: 18%;
+  }
+}
+
+sidenav {
+  z-index: 999;
+  height: 100%;
+
+  mat-sidenav-container {
+    // Fix for Safari
+    position: inherit !important;
+  }
+
+  .menu-icon-btn {
+    font-size: 24px !important;
+    position: fixed;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  @supports (-moz-transform: translate(0, 0)) {
+    .menu-icon-btn {
+      // Fix for alignment in FF
+      margin-top: 25px !important;
+    }
+  }
+
+  mat-sidenav {
+    &.sidenav-closed:not(.ng-animating) * {
+      display: none;
+    }
+  }
+}
+
+.sidemenu.backdrop {
+  width: 600%;
+  height: 100%;
+  margin-top: -22px;
+}

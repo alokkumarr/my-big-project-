@@ -1,0 +1,51 @@
+@import "src/themes/base/colors";
+
+save-dashboard {
+  display: block;
+  padding: 10px;
+  width: 400px;
+
+  .dialog__actions {
+    flex-direction: row-reverse;
+    padding-top: 10px;
+  }
+
+  .dialog__header {
+    border-bottom: 1px solid $primary-grey-g2;
+
+    strong {
+      font-size: 20px;
+    }
+
+    mat-progress-bar {
+      margin-top: 10px;
+    }
+  }
+
+  form {
+    .full-form-field {
+      width: 100%;
+    }
+
+    .no-underline {
+      .mat-form-field-underline {
+        display: none;
+      }
+    }
+
+    .has-select {
+      .mat-form-field-label.mat-empty {
+        top: 1.9em;
+        left: 5px;
+      }
+    }
+
+    mat-select {
+      width: 50%;
+    }
+
+    mat-checkbox[name="dashboardAutoRefresh"] {
+      margin-right: 10px;
+    }
+  }
+}

@@ -1,0 +1,26 @@
+@import "src/themes/base/colors";
+
+tr[privilegerow] {
+  min-height: 42px;
+  height: 42px;
+
+  .sub-category-label {
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+
+  mat-checkbox.mat-checkbox {
+    margin: 8px 5px;
+
+    label {
+      color: $primary-grey-g3 !important;
+      font-size: 14px !important;
+      font-weight: 600;
+    }
+  }
+}
+
+tr[privilegerow].active td {
+  background-color: $grid-hover-color;
+}

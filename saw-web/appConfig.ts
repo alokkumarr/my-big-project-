@@ -1,8 +1,10 @@
+import { environment } from './src/environments/environment';
+
 let apiUrl;
 const endpoints = {security: 'security', services: 'services'};
 
 /* eslint-disable */
-if (__PRODUCTION__) {
+if (environment.production) {
   apiUrl = window.location.origin;
 } else {
   // Note: To run against a local Docker environment, use localhost

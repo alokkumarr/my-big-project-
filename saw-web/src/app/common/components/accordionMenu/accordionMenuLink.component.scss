@@ -1,0 +1,79 @@
+@import 'src/themes/base/colors';
+
+.menu-panel-content.sidenav-mainmenu a {
+  display: block;
+  padding: 0 15px;
+  line-height: 40px;
+  max-height: 60px;
+  font-weight: 400;
+  color: #FFF;
+}
+
+.activeButton {
+  background-color: $primary-hover-blue !important;
+
+  .mat-icon {
+    height: 40px;
+  }
+}
+
+.no-children {
+  cursor: pointer;
+  line-height: 40px;
+  overflow: hidden;
+  padding-left: 25px;
+
+  a {
+    color: #FFF;
+    font-weight: normal;
+  }
+
+  &:hover {
+    background-color: $primary-hover-blue !important;
+  }
+
+  .mat-icon {
+    margin: 0 !important;
+    font-size: 41px !important;
+  }
+}
+
+mat-panel-title.sidenav-mainmenu {
+  border-radius: 0;
+  color: #FFF;
+  cursor: pointer;
+  display: block;
+  align-items: inherit;
+  line-height: 54px;
+  max-height: 54px;
+  margin: 0;
+  overflow: hidden;
+  padding: 0 2px;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+  width: 100%;
+  font-weight: 600;
+}
+
+mat-expansion-panel.sidenav-mainmenu {
+  box-shadow: none !important;
+  background-color: $primary-blue-b2 !important;
+  color: white !important;
+
+  .mat-expansion-indicator::after {
+    color: white;
+  }
+
+  .mat-expansion-panel-body {
+    padding: 0 0 24px 16px !important;
+  }
+}
+
+mat-expansion-panel-header.sidenav-mainmenu {
+  height: 40px !important;
+
+  &:hover {
+    background-color: $primary-hover-blue !important;
+  }
+}
