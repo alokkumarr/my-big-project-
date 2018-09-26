@@ -28,6 +28,7 @@
      class="designer__data-grid">
   <designer-report (change)="change.emit($event)"
                    [artifacts]="artifacts"
+                   [isInQueryMode]="isInQueryMode"
                    [data]="data"
                    [analysis]="analysis"
                    [dataCount]="dataCount"

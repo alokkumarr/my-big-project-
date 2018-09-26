@@ -9,10 +9,10 @@
 corr(df, target_var, target_var_name, ...)
 
 \method{corr}{data.frame}(df, target_var = NULL,
-  target_var_name = "target_variable")
+  target_var_name = "target_variable", ...)
 
 \method{corr}{tbl_spark}(df, target_var = NULL,
-  target_var_name = "target_variable", table_name = "corr")
+  target_var_name = "target_variable", table_name = "corr", ...)
 }
 \arguments{
 \item{df}{DataFrame}
@@ -25,6 +25,8 @@ produces a NxN matrix of values.}
 'target_variable'. this differs from stats::cor function which returns NxN
 matrix with column and row names. First column returned by corr is
 equivalent to rownames in cor function}
+
+\item{...}{not currently implemented}
 
 \item{table_name}{string input for spark table name created. Default is
 'corr'. Table is overwritten}
