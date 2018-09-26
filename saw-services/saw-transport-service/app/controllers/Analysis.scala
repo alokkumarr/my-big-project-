@@ -261,9 +261,10 @@ class Analysis extends BaseController {
 
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
           val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
-          if (typeInfo.equalsIgnoreCase("report") && executionType.equalsIgnoreCase("preview"))
-           return contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))~ ("query", queryRuntime)
-            contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))
+          if (typeInfo != null && typeInfo.equalsIgnoreCase("report")
+            && executionType.equalsIgnoreCase("preview"))
+            return contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2)) ~ ("query", queryRuntime)
+          contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))
         })
 
       }
