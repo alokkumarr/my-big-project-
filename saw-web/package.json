@@ -8,7 +8,7 @@
     "pretest": "npm run -s eslint lint",
     "test": "karma start conf/karma.conf.js --single-run",
     "test:watch": "karma start conf/karma.conf.js --watch",
-    "postinstall": "node node_modules/protractor/bin/webdriver-manager update",
+    "postinstall": "node node_modules/protractor/bin/webdriver-manager update --gecko=false",
     "e2e": "protractor conf/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js",
     "precommit": "node .githook-precommit.js",

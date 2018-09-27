@@ -28,6 +28,7 @@ import { getFormatter } from '../../utils/numberFormatter';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
 
 import {
   AGGREGATE_TYPES,
@@ -45,6 +46,10 @@ import {
   NUMBER_TYPES
 } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
+
+import {
+  flattenReportData
+} from '../../../common/utils/dataFlattener';
 
 const template = require('./report-grid.component.html');
 require('./report-grid.component.scss');
@@ -90,6 +95,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   dataGrid: DxDataGridComponent;
   @Input()
   query: string;
+  @Input() isInQueryMode;
   @Input()
   analysis;
   @Input()
@@ -117,7 +123,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       return;
     }
     this.artifacts = artifacts;
-    this.columns = this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
+    this.columns = this.artifacts2Columns(this.artifacts);
     // if there are less then 5 columns, divide the grid up into equal slices for the columns
     if (this.columns.length > 5) {
       this.columnAutoWidth = true;
@@ -135,14 +141,21 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
   @Input('data')
   set setData(data: any[]) {
-
     if (data || data.length < 7) {
       this.gridHeight = 'auto';
     } else {
       this.gridHeight = '100%';
     }
-    this.columns = this.artifacts2Columns(this.analysis.sqlBuilder.dataFields);
-    this.data = data;
+
+    if (!this.isInQueryMode) {      
+      const artifact = this.fetchColumsUponCheck();
+      if (!this.artifacts) {
+        return;
+      }
+      this.columns = this.artifacts2Columns(artifact);
+    }
+    this.data = flattenReportData(data, this.analysis)
+    
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -204,6 +217,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public loadPanel;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
+  public isQueryMode;
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
     self = this;
@@ -321,10 +335,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   checkFormatDataCondition(type) {
-    if (
-      NUMBER_TYPES.includes(type) ||
-      DATE_TYPES.includes(type)
-    ) {
+    if (NUMBER_TYPES.includes(type) || DATE_TYPES.includes(type)) {
       return true;
     } else {
       return false;
@@ -333,7 +344,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   aggregateColumn(payload, value) {
     payload.aggregate = value;
-    if(value === 'clear') {
+    if (value === 'clear') {
       delete payload.aggregate;
     }
     this.change.emit({
@@ -475,5 +486,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     }
     return {};
+  }
+
+  fetchColumsUponCheck() {
+    return map(this.analysis.artifacts, artifact => {
+      const columns = filter(artifact.columns, 'checked');
+      return {
+        ...artifact,
+        columns
+      };
+    })
   }
 }

@@ -42,11 +42,12 @@
     <div *ngIf="!isEmpty(data); else elseBlock" style="height: 100%; width: 100%;">
       <div style="height: calc(100% - 30px); width: 100%;">
         <report-grid-upgraded (change)="onReportGridChange($event)"
-                              [artifacts]="artifacts"
+                              [artifacts]="analysis.edit ? null : artifacts | checkedArtifactColumnFilter"
                               [analysis]="analysis"
                               [query]="query"
                               [sorts]="sorts"
                               [data]="data"
+                              [isInQueryMode]="isInQueryMode"
                               [isEditable]="true">
         </report-grid-upgraded>
       </div>

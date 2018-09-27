@@ -84,7 +84,8 @@ new_modeler <- function(df,
 #' Modeler Validation function
 valid_modeler <- function(obj){
   
-  if (! obj$type %in% c("forecaster", "segmenter", "regressor", "classifier")) {
+  if (! obj$type %in% c("forecaster", "segmenter", "regressor",
+                        "classifier", "multiclassifier")) {
     stop("modeler type supplied not supported. Please use one of following: ",
          "\n* forecaster",
          "\n* segmenter",

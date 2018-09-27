@@ -1,0 +1,106 @@
+{
+    "inputs":[
+        {
+            "name":"CHANGEME_INP",
+            "dataSet":"CHANGEME_INP",
+	        "catalog": "dout"
+        }
+    ],
+	"outputs":[
+				{
+				"name":"CHANGEME_OUT",
+				"dataSet":"CHANGEME_OUT",
+				"catalog":"dout",
+				"format":"parquet",
+				"numberOfFiles":100,
+				"mode" : "replace",
+				"metadata" : {
+					"createdBy" : "Vinnie",
+					"description" : "Change Description for Output dataset to be created",
+					"category" : "aa",
+					"subCategory" : "r_component"
+				}}
+        ],
+    "system_env_parameters":[
+        {
+            "name":"spark.home",
+            "value":"${:spark.home:}"
+        },
+        {
+            "name":"java.home",
+            "value":"${:java.home:}"
+        },
+        {
+            "name":"hadoop.home",
+            "value":"${:hadoop.home:}"
+        },
+        {
+            "name":"hadoop.conf.dir",
+            "value":"${:hadoop.conf.dir:}"
+        }
+    ],
+    "saw_parameters":[
+        {
+            "name":"saw.login.user",
+            "value":"sawadmin@synchronoss.com"
+        },
+        {
+            "name":"saw.login.password",
+            "value":"Sawsyncnewuser1!"
+        },
+        {
+            "name":"saw.host.name",
+            "value":"http://saw-rd601.ana.dev.vaste.sncrcorp.net"
+        }
+    ],
+    "parameters":[
+        {
+            "name":"spark.conn.flag",
+            "value":"TRUE"
+        },
+        {
+            "name":"spark.master",
+            "value":"${:spark.master:}"
+        },
+        {
+            "name":"spark.yarn.queue",
+            "value":"xdf"
+        },
+        {
+            "name":"spark.driver.memory",
+            "value":"${:spark.driver.memory:}"
+        },
+        {
+            "name":"spark.executor.memory",
+            "value":"${:spark.executor.memory:}"
+        },
+        {
+            "name":"spark.executor.cores",
+            "value":"${:spark.executor.cores:}"
+        },
+        {
+            "name":"spark.executor.instances",
+            "value":"${:spark.executor.instances:}"
+        },
+        {
+            "name":"spark.cores.max",
+            "value":"${:spark.cores.max:}"
+        },
+        {
+            "name":"spark.yarn.tags",
+            "value":"XDA-NG-DETECTER"
+        },
+        {
+            "name":"sparklyr.gateway.port",
+            "value":"6667"
+        },
+        {
+            "name":"spark.memory.fraction",
+            "value":"0.9"
+        }
+    ],
+    "r_component": {
+				"datasetType" : "component",
+				"createTemporaryDataset" : false
+        }
+}
