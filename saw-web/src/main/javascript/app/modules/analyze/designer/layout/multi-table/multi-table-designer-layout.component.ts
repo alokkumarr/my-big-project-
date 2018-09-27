@@ -32,6 +32,7 @@ export class MultiTableDesignerLayout {
   @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;
   @Input() dataCount: number;
+  @Input() designerQuery;
   @Input('data') set setData(data) {
     if (!isEmpty(data)) {
       this.data = data;

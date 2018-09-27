@@ -1,4 +1,4 @@
-<analyze-report-query [query]="analysis.queryManual"
+<analyze-report-query [query]="analysis.queryManual || designerQuery"
                       [artifacts]="artifacts"
                       (queryChange)="onQueryChange($event)"
                       style="padding: 20px; display: block;"
