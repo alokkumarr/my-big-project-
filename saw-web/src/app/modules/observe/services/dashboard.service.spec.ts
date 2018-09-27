@@ -1,10 +1,6 @@
-import { expect } from 'chai';
 
-import { configureTests } from '../../../../../../test/javascript/helpers/configureTests';
 import { TestBed } from '@angular/core/testing';
 import { DashboardService } from './dashboard.service';
-
-configureTests();
 
 describe('Dashboard Service', () => {
   let dashboardService;
@@ -18,7 +14,7 @@ describe('Dashboard Service', () => {
   });
 
   it('should exist', () => {
-    expect(dashboardService).to.not.be.null;
+    expect(dashboardService).not.toBeNull();
   });
 
   it('should add a dashboard auto refresh if enabled', () => {
@@ -27,7 +23,7 @@ describe('Dashboard Service', () => {
       autoRefreshEnabled: true,
       refreshIntervalSeconds: 1000
     });
-    expect(dashboardService.getAutoRefreshSubject('abc')).to.not.be.null;
+    expect(dashboardService.getAutoRefreshSubject('abc')).not.toBeNull();
     dashboardService.unsetAutoRefresh('abc');
   });
 
@@ -37,7 +33,7 @@ describe('Dashboard Service', () => {
       autoRefreshEnabled: false,
       refreshIntervalSeconds: 1000
     });
-    expect(dashboardService.getAutoRefreshSubject('xyz')).to.be.null;
+    expect(dashboardService.getAutoRefreshSubject('xyz')).toBeNull();
     dashboardService.unsetAutoRefresh('xyz');
   });
 
@@ -47,8 +43,8 @@ describe('Dashboard Service', () => {
       autoRefreshEnabled: true,
       refreshIntervalSeconds: 1000
     });
-    expect(dashboardService.getAutoRefreshSubject('123')).to.not.be.null;
+    expect(dashboardService.getAutoRefreshSubject('123')).not.toBeNull();
     dashboardService.unsetAutoRefresh('123');
-    expect(dashboardService.getAutoRefreshSubject('123')).to.be.null;
+    expect(dashboardService.getAutoRefreshSubject('123')).toBeNull();
   });
 });

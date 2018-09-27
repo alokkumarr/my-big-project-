@@ -1,21 +1,17 @@
-import { expect } from 'chai';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from "@angular/router";
 
-import { configureTests } from '../../../../../../test/javascript/helpers/configureTests';
-import { TestBed, inject } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { TestBed, inject } from "@angular/core/testing";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { By } from "@angular/platform-browser";
+import { DebugElement } from "@angular/core";
 
-import { ObserveService } from './observe.service';
-import { JwtService, MenuService } from '../../../common/services';
-import { Observable } from 'rxjs/Observable';
-
-configureTests();
+import { ObserveService } from "./observe.service";
+import { JwtService, MenuService } from "../../../common/services";
+import { Observable } from "rxjs/Observable";
 
 const mockService = {};
 
-describe('Observe Service', () => {
+describe("Observe Service", () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -29,17 +25,17 @@ describe('Observe Service', () => {
     }).compileComponents();
   });
 
-  it(
-    'getSubcategoryCount works for empty array',
-    inject([ObserveService], (observe: ObserveService) => {
-      expect(observe.getSubcategoryCount([])).to.equal(0);
-    })
-  );
+  it("getSubcategoryCount works for empty array", inject(
+    [ObserveService],
+    (observe: ObserveService) => {
+      expect(observe.getSubcategoryCount([])).toEqual(0);
+    }
+  ));
 
-  it(
-    'executeKPI should exist and return an Observable',
-    inject([ObserveService], (observe: ObserveService) => {
-      expect(observe.executeKPI({}) instanceof Observable).to.equal(true);
-    })
-  );
+  it("executeKPI should exist and return an Observable", inject(
+    [ObserveService],
+    (observe: ObserveService) => {
+      expect(observe.executeKPI({}) instanceof Observable).toEqual(true);
+    }
+  ));
 });

@@ -1,13 +1,9 @@
-import { expect } from 'chai';
 
-import { configureTests } from '../../../../../../../../test/javascript/helpers/configureTests';
 import { ReactiveFormsModule, FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-
+import 'hammerjs';
 import { MaterialModule } from '../../../../../material.module';
 import { WidgetKPIComponent } from './widget-kpi.component';
-
-configureTests();
 
 describe('KPI Form Widget', () => {
   let fixture: ComponentFixture<WidgetKPIComponent>, el: HTMLElement;
@@ -27,7 +23,7 @@ describe('KPI Form Widget', () => {
   });
 
   it('should exist', () => {
-    expect(typeof fixture.componentInstance.applyKPI).to.equal('function');
+    expect(typeof fixture.componentInstance.applyKPI).toEqual('function');
   });
 
   it('should disable secondary aggregation if it is selected in primary', done => {
@@ -43,7 +39,7 @@ describe('KPI Form Widget', () => {
       ) as FormGroup;
       const avgControl = sAggrForm.get('avg') as FormControl;
 
-      expect(avgControl.disabled).to.be.true;
+      expect(avgControl.disabled).toBe(true);
       done();
     }).catch(() => {
       done();
@@ -55,7 +51,7 @@ describe('KPI Form Widget', () => {
       'secAggregates'
     ) as FormGroup;
     const avgControl = sAggrForm.get('avg') as FormControl;
-    expect(avgControl.disabled).to.be.false;
+    expect(avgControl.disabled).toBe(false);
 
     avgControl.setValue(true);
 
@@ -66,8 +62,8 @@ describe('KPI Form Widget', () => {
 
     fixture.detectChanges();
     fixture.whenStable().then(() => {
-      expect(avgControl.disabled).to.be.true;
-      expect(avgControl.value).to.be.false;
+      expect(avgControl.disabled).toBe(true);
+      expect(avgControl.value).toBe(false);
       done();
     }).catch(() => {
       done();

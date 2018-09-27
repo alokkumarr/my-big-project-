@@ -1,19 +1,14 @@
-import { requireIf } from './required-if.validator';
+import { requireIf } from "./required-if.validator";
 import {
   FormGroup,
   FormControl,
   FormBuilder,
   ReactiveFormsModule
-} from '@angular/forms';
+} from "@angular/forms";
 
-import { expect } from 'chai';
+import { TestBed, inject } from "@angular/core/testing";
 
-import { configureTests } from '../../../../../../test/javascript/helpers/configureTests';
-import { TestBed, inject } from '@angular/core/testing';
-
-configureTests();
-
-describe('Required if Validator', () => {
+describe("Required if Validator", () => {
   let form: FormGroup;
 
   beforeEach(() => {
@@ -24,33 +19,35 @@ describe('Required if Validator', () => {
     });
     const fb: FormBuilder = TestBed.get(FormBuilder);
     form = fb.group({
-      field1: [''],
-      field2: ['', [requireIf('field1', val => Boolean(val))]]
+      field1: [""],
+      field2: ["", [requireIf("field1", val => Boolean(val))]]
     });
   });
 
-  it('should not validate if condition false', () => {
-    form.get('field1').setValue('');
-    form.get('field2').updateValueAndValidity();
+  it("should not validate if condition false", () => {
+    form.get("field1").setValue("");
+    form.get("field2").updateValueAndValidity();
 
-    expect(form.invalid).to.be.false;
+    expect(form.invalid).toBeFalsy();
   });
 
-  it('should validate if condition true', () => {
-    form.get('field1').setValue('abc');
-    form.get('field2').setValue('');
-
-    expect(form.invalid).to.be.true;
-    expect(form.get('field2').errors).to.have.property('required');
+  it("should validate if condition true", () => {
+    const expectedObj = { required: { value: "" } };
+    form.get("field1").setValue("abc");
+    form.get("field2").setValue("");
+    expect(form.invalid).toBeTruthy();
+    expect(form.get("field2").errors).toEqual(
+      jasmine.objectContaining(expectedObj)
+    );
   });
 
-  it('should update validity correctly', () => {
-    form.get('field1').setValue('abc');
-    form.get('field2').setValue('');
-    expect(form.invalid).to.be.true;
+  it("should update validity correctly", () => {
+    form.get("field1").setValue("abc");
+    form.get("field2").setValue("");
+    expect(form.invalid).toBeTruthy();
 
-    form.get('field1').setValue('');
-    form.get('field2').updateValueAndValidity();
-    expect(form.invalid).to.be.false;
+    form.get("field1").setValue("");
+    form.get("field2").updateValueAndValidity();
+    expect(form.invalid).toBeFalsy();
   });
 });

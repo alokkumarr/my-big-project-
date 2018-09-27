@@ -1,26 +1,22 @@
-import { expect } from 'chai';
-import { Router } from '@angular/router';
+import { Router } from "@angular/router";
 
-import { configureTests } from '../../../../../../test/javascript/helpers/configureTests';
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from "@angular/core/testing";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
 
-import { WorkbenchService } from './workbench.service';
-import { JwtService } from '../../../common/services';
-import { Observable } from 'rxjs/Observable';
-
-configureTests();
+import { WorkbenchService } from "./workbench.service";
+import { JwtService } from "../../../common/services";
+import { Observable } from "rxjs/Observable";
 
 const mockService = {};
 const jwtMockService = {
-  customerCode: 'Synchronoss',
+  customerCode: "Synchronoss",
 
   getUserName() {
-    return 'SIP Admin';
+    return "SIP Admin";
   }
 };
 
-describe('Workbench Service', () => {
+describe("Workbench Service", () => {
   let workbenchService: WorkbenchService;
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,55 +30,55 @@ describe('Workbench Service', () => {
     workbenchService = TestBed.get(WorkbenchService);
   });
 
-  it('getDatasets should exist and return an Observable', () => {
-    expect(workbenchService.getDatasets() instanceof Observable).to.equal(true);
+  it("getDatasets should exist and return an Observable", () => {
+    expect(workbenchService.getDatasets() instanceof Observable).toBeTruthy();
   });
 
-  it('getStagingData should exist and return an Observable', () => {
+  it("getStagingData should exist and return an Observable", () => {
     expect(
-      workbenchService.getStagingData('path') instanceof Observable
-    ).to.equal(true);
+      workbenchService.getStagingData("path") instanceof Observable
+    ).toBeTruthy();
   });
 
-  it('getRawPreviewData should exist and return an Observable', () => {
+  it("getRawPreviewData should exist and return an Observable", () => {
     expect(
-      workbenchService.getRawPreviewData('path') instanceof Observable
-    ).to.equal(true);
+      workbenchService.getRawPreviewData("path") instanceof Observable
+    ).toBeTruthy();
   });
 
-  it('getDatasetDetails should exist and return an Observable', () => {
+  it("getDatasetDetails should exist and return an Observable", () => {
     expect(
       workbenchService.getDatasetDetails(1) instanceof Observable
-    ).to.equal(true);
+    ).toBeTruthy();
   });
 
-  it('Data Inspect should exist and return an Observable', () => {
+  it("Data Inspect should exist and return an Observable", () => {
     expect(
       workbenchService.getParsedPreviewData({}) instanceof Observable
-    ).to.equal(true);
+    ).toBeTruthy();
   });
 
-  it('createSemantic API should exist and return an Observable', () => {
-    expect(workbenchService.createSemantic({}) instanceof Observable).to.equal(
-      true
-    );
+  it("createSemantic API should exist and return an Observable", () => {
+    expect(
+      workbenchService.createSemantic({}) instanceof Observable
+    ).toBeTruthy();
   });
 
-  it('getSemanticList API should exist and return an Observable', () => {
-    expect(workbenchService.getListOfSemantic() instanceof Observable).to.equal(
-      true
-    );
+  it("getSemanticList API should exist and return an Observable", () => {
+    expect(
+      workbenchService.getListOfSemantic() instanceof Observable
+    ).toBeTruthy();
   });
 
-  it('getSemanticDetails API should exist and return an Observable', () => {
+  it("getSemanticDetails API should exist and return an Observable", () => {
     expect(
       workbenchService.getSemanticDetails({}) instanceof Observable
-    ).to.equal(true);
+    ).toBeTruthy();
   });
 
-  it('updateSemantic API should exist and return an Observable', () => {
+  it("updateSemantic API should exist and return an Observable", () => {
     expect(
       workbenchService.updateSemanticDetails({}) instanceof Observable
-    ).to.equal(true);
+    ).toBeTruthy();
   });
 });

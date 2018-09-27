@@ -1,15 +1,12 @@
-import { expect } from 'chai';
-
-import { configureTests } from '../../../../../../../test/javascript/helpers/configureTests';
-import { Component } from '@angular/core';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-
-import { MaterialModule } from '../../../../material.module';
-import { ObservePivotComponent } from './observe-pivot.component';
-import { AnalyzeService } from '../../../analyze/services/analyze.service';
+import { Component } from "@angular/core";
+import { TestBed, ComponentFixture } from "@angular/core/testing";
+import "hammerjs";
+import { MaterialModule } from "../../../../material.module";
+import { ObservePivotComponent } from "./observe-pivot.component";
+import { AnalyzeService } from "../../../analyze/services/analyze.service";
 
 /* Stubs */
-const AnalyzeServiceStub: Partial<AnalyzeService> = {
+const AnalyzeServiceStub = {
   getDataBySettings: () => {
     return new Promise(res => res({ data: {} }));
   }
@@ -21,23 +18,19 @@ const analysisStub = {
 };
 
 @Component({
-  selector: 'pivot-grid',
-  template: '<h1> Pivot </h1>',
-  inputs: ['artifactColumns', 'sorts', 'updater', 'mode', 'data']
+  selector: "pivot-grid",
+  template: "<h1> Pivot </h1>",
+  inputs: ["artifactColumns", "sorts", "updater", "mode", "data"]
 })
 class PivotGridStubComponent {}
 
-configureTests();
-
-describe('Observe Pivot Component', () => {
+describe("Observe Pivot Component", () => {
   let fixture: ComponentFixture<ObservePivotComponent>, el: HTMLElement;
   beforeEach(done => {
     TestBed.configureTestingModule({
       imports: [],
       declarations: [ObservePivotComponent, PivotGridStubComponent],
-      providers: [
-        { provide: AnalyzeService, useValue: AnalyzeServiceStub }
-      ]
+      providers: [{ provide: AnalyzeService, useValue: AnalyzeServiceStub }]
     })
       .compileComponents()
       .then(() => {
@@ -52,7 +45,7 @@ describe('Observe Pivot Component', () => {
       });
   });
 
-  it('should exist', () => {
-    expect(fixture.componentInstance).to.not.be.null;
+  it("should exist", () => {
+    expect(fixture.componentInstance).not.toBeNull();
   });
 });
