@@ -2,6 +2,7 @@ package com.synchronoss.saw.export.generate;
 
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataField;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -126,6 +128,72 @@ public class XlsxExporter implements IFileExporter {
       cell.setCellValue(value);
     }
   }
+
+    /**
+     *
+      * @param exportBean
+     * @param workBook
+     * @param workSheet
+     * @param recordRow
+     */
+    public void addxlsxRow(ExportBean exportBean,
+                           Workbook workBook, XSSFSheet workSheet, Object recordRow) {
+        logger.debug(this.getClass().getName() + " addxlsxRows starts");
+        String[] header = null;
+
+        XSSFRow excelRow = workSheet.createRow(workSheet.getLastRowNum() + 1);
+        Object data = recordRow;
+
+        if (data instanceof LinkedHashMap) {
+
+            if (exportBean.getColumnHeader() == null || exportBean.getColumnHeader().length == 0) {
+                Object[] obj = ((LinkedHashMap) data).keySet().toArray();
+                header = Arrays.copyOf(obj,
+                    obj.length, String[].class);
+
+                DataField.Type[] columnDataType = new DataField.Type[header.length];
+                exportBean.setColumnHeader(header);
+
+                int i = 0;
+                for (String val : header) {
+                    if (i < header.length) {
+                        Object obj1 = ((LinkedHashMap) data).get(val);
+                        if (obj1 instanceof Date) {
+                            columnDataType[i] = DataField.Type.DATE;
+                        } else if (obj1 instanceof Float) {
+                            columnDataType[i] = DataField.Type.FLOAT;
+                        } else if (obj1 instanceof Double) {
+                            columnDataType[i] = DataField.Type.DOUBLE;
+                        } else if (obj1 instanceof Integer) {
+                            columnDataType[i] = DataField.Type.INT;
+                        } else if (obj1 instanceof Long) {
+                            columnDataType[i] = DataField.Type.LONG;
+                        } else if (obj1 instanceof String) {
+                            columnDataType[i] = DataField.Type.STRING;
+                        } else if (obj1 instanceof TimeStamp) {
+                            columnDataType[i] = DataField.Type.TIMESTAMP;
+                        }
+                        i++;
+                    }
+                }
+
+                exportBean.setColumnDataType(columnDataType);
+                addHeaderRow(exportBean, workBook, workSheet);
+            }
+            if (header == null || header.length <= 0)
+                header = exportBean.getColumnHeader();
+
+
+            int colNum = 0;
+            for (String val : header) {
+                if (val instanceof String) {
+                    String value = String.valueOf(((LinkedHashMap) data).get(val));
+                    addxlsxCell(value, colNum, excelRow, exportBean.getColumnDataType()[colNum], workBook);
+                    colNum++;
+                }
+            }
+        }
+    }
 
   private void addxlsxRows(ExportBean exportBean,
       Workbook workBook, XSSFSheet workSheet, List<Object> recordRowList) {

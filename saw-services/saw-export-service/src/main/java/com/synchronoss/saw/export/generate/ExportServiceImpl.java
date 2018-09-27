@@ -1,7 +1,6 @@
 package com.synchronoss.saw.export.generate;
 
-import java.io.FileInputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +16,8 @@ import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,6 @@ import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.DataResponse;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -429,6 +426,44 @@ public class ExportServiceImpl implements ExportService{
         }
     );
   }
+
+    /**
+     *
+     * @param entity
+     * @param LimittoExport
+     * @param exportBean
+     * @throws IOException
+     */
+    public void streamToXslxReport(ResponseEntity<DataResponse> entity, long LimittoExport, ExportBean exportBean) throws IOException {
+
+        BufferedOutputStream stream = null;
+        File xlsxFile = null;
+        xlsxFile = new File(exportBean.getFileName());
+        xlsxFile.createNewFile();
+        stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
+        XlsxExporter xlsxExporter = new XlsxExporter();
+        Workbook workBook = new XSSFWorkbook();
+        workBook.getSpreadsheetVersion();
+        XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
+
+        entity.getBody().getData()
+            .stream()
+            .limit(LimittoExport)
+            .forEach(
+                line -> {
+                    try {
+                        xlsxExporter.addxlsxRow(exportBean, workBook, sheet, line);
+
+                    } catch (Exception e) {
+                        logger.error("ERROR_Adding_Rows: " + e.getMessage());
+                    }
+                }
+            );
+
+        workBook.write(stream);
+        stream.flush();
+        stream.close();
+    }
 
   @Override
   @Async
