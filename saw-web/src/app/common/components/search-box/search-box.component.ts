@@ -16,7 +16,13 @@ const style = require('./search-box.component.scss');
 @Component({
   selector: 'search-box',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: inline-flex;
+      flex-grow: 1;
+    }`,
+    style
+  ]
 })
 export class SearchBoxComponent implements OnInit, OnDestroy {
 

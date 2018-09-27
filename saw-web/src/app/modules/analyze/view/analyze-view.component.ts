@@ -27,7 +27,10 @@ const SEARCH_CONFIG = [
 @Component({
   selector: 'analyze-view-u',
   template,
-  styles: [style]
+  styles: [
+    `:host {width: 100%;}`,
+    style
+  ]
 })
 export class AnalyzeViewComponent implements OnInit {
 

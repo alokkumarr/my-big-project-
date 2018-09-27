@@ -25,7 +25,7 @@ const TIMEOUT = 20 * 60;
 })
 export class LayoutContentComponent implements OnInit {
   title: string;
-
+  isOnLoginPage = false;
   constructor(
     private _user: UserService,
     private _router: Router,
@@ -71,6 +71,7 @@ export class LayoutContentComponent implements OnInit {
           this._router.navigateByUrl(newUrl);
         }
       } else if (event instanceof NavigationEnd) {
+        this.isOnLoginPage = event.url.includes('login');
         this.setPageTitle(event);
         this.loadMenuForProperModule(event);
       }

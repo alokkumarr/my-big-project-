@@ -11,21 +11,19 @@ export const routes: Routes = [{
   canActivate: [IsUserLoggedInGuard, DefaultAnalyzeCategoryGuard],
   canActivateChild: [IsUserLoggedInGuard],
   component: AnalyzePageComponent,
-  children: [
-    {
-      // name: 'analyze.view',
-      path: ':id',
-      component: AnalyzeViewComponent
-    }, {
-      // name: 'analyze.executedDetail',
-      path: 'analysis/:analysisId/executed',
-      component: ExecutedViewComponent
-      // params: {
-      //   analysis: null,
-      //   awaitingExecution: false,
-      //   loadLastExecution: false,
-      //   executionId: null
-      // }
-    }
-  ]
+  children: [{
+    // name: 'analyze.view',
+    path: ':id',
+    component: AnalyzeViewComponent
+  }, {
+    // name: 'analyze.executedDetail',
+    path: 'analysis/:analysisId/executed',
+    component: ExecutedViewComponent
+    // params: {
+    //   analysis: null,
+    //   awaitingExecution: false,
+    //   loadLastExecution: false,
+    //   executionId: null
+    // }
+  }]
 }];

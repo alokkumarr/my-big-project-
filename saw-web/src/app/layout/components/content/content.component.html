@@ -3,9 +3,15 @@
 
   <div fxLayout.gt-md="column" class="app-container">
     <div class="root-container">
-      <router-outlet></router-outlet>
+        <layout-header *ngIf="!isOnLoginPage"></layout-header>
 
-      <layout-footer></layout-footer>
+        <main class="main-content">
+          <div class="render-content">
+            <router-outlet></router-outlet>
+          </div>
+        </main>
+
+        <layout-footer></layout-footer>
     </div>
   </div>
 

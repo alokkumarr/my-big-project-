@@ -15,7 +15,7 @@ import { routes as AdminRoutes } from './modules/admin/routes';
 
 const routes: Routes = [{
   // name: 'root',
-  path: '',
+  path: 'app',
   canActivate: [IsUserLoggedInGuard, DefaultModuleGuard],
   canActivateChild: [IsUserLoggedInGuard],
   // redirectTo: 'analyze',
@@ -27,7 +27,13 @@ const routes: Routes = [{
     ...WorkbenchRoutes,
     ...AdminRoutes
   ]
-}, ...loginRoutes];
+},
+  ...loginRoutes,
+{
+  path: '**',
+  redirectTo: 'app'
+}
+];
 
 @NgModule({
   imports: [
