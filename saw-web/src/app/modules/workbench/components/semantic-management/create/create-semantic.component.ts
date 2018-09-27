@@ -8,12 +8,12 @@ import * as filter from 'lodash/filter';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 const template = require('./create-semantic.component.html');
-require('./create-semantic.component.scss');
+const style = require('./create-semantic.component.scss');
 
 @Component({
   selector: 'create-semantic',
-  styles: [],
-  template: template
+  template,
+  styles: [style]
 })
 export class CreateSemanticComponent implements OnInit {
   private availableDS: any;

@@ -36,7 +36,7 @@ const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   aggregate: 'summaryType'
 };
 
-require('./pivot-grid.component.scss');
+const style = require('./pivot-grid.component.scss');
 const template = require('./pivot-grid.component.html');
 
 export interface IPivotGridUpdate {
@@ -49,7 +49,8 @@ export interface IPivotGridUpdate {
 
 @Component({
   selector: 'pivot-grid',
-  template
+  template,
+  styles: [style]
 })
 export class PivotGridComponent implements OnInit, OnDestroy {
   @Input() updater: Subject<IPivotGridUpdate>;

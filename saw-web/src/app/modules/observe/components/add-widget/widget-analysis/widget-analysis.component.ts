@@ -16,13 +16,14 @@ import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
 const template = require('./widget-analysis.component.html');
-require('./widget-analysis.component.scss');
+const style = require('./widget-analysis.component.scss');
 
 const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'widget-analysis',
-  template
+  template,
+  styles: [style]
 })
 export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Output() onAnalysisAction = new EventEmitter();

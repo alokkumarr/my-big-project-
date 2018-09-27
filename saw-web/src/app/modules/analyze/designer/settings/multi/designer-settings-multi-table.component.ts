@@ -15,11 +15,12 @@ import {
 } from '../../types';
 
 const template = require('./designer-settings-multi-table.component.html');
-require('./designer-settings-multi-table.component.scss');
+const style = require('./designer-settings-multi-table.component.scss');
 
 @Component({
   selector: 'designer-settings-multi-table',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

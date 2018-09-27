@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 
 const template = require('./accordionMenu.component.html');
-require('./accordionMenu.component.scss');
+const style = require('./accordionMenu.component.scss');
 
 @Component({
   selector: 'accordion-menu',
-  template
+  template,
+  styles: [style]
 })
 
 export class AccordionMenuComponent {

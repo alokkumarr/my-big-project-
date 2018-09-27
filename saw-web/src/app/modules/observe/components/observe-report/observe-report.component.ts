@@ -17,11 +17,12 @@ import {
 } from '../../../analyze/services/analyze.service';
 
 const template = require('./observe-report.component.html');
-require('./observe-report.component.scss');
+const style = require('./observe-report.component.scss');
 
 @Component({
   selector: 'observe-report',
-  template
+  template,
+  styles: [style]
 })
 export class ObserveReportComponent implements OnDestroy {
   @Input() item: GridsterItem;

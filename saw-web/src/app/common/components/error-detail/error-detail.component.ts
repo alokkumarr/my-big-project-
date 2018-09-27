@@ -10,12 +10,13 @@ import {
 
 import { ErrorDetailService } from '../../services/error-detail.service';
 
-require('./error-detail.component.scss');
+const style = require('./error-detail.component.scss');
 const template = require('./error-detail.component.html');
 
 @Component({
   selector: 'error-detail',
-  template
+  template,
+  styles: [style]
 })
 export class ErrorDetailComponent implements OnInit {
   public errorMessage: string;

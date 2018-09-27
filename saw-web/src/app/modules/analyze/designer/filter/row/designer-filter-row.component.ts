@@ -17,11 +17,12 @@ import { ArtifactColumn, Filter, FilterModel } from '../../types';
 import { TYPE_MAP } from '../../../consts';
 
 const template = require('./designer-filter-row.component.html');
-require('./designer-filter-row.component.scss');
+const style = require('./designer-filter-row.component.scss');
 
 @Component({
   selector: 'designer-filter-row',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerFilterRowComponent {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();

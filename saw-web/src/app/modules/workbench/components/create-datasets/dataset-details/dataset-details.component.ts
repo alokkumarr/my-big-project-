@@ -11,12 +11,12 @@ import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialo
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./dataset-details.component.html');
-require('./dataset-details.component.scss');
+const style = require('./dataset-details.component.scss');
 
 @Component({
   selector: 'dataset-details',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class DatasetDetailsComponent implements OnInit {

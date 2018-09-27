@@ -15,11 +15,12 @@ import {
 import { flattenPivotData } from '../../../../common/utils/dataFlattener';
 
 const template = require('./observe-pivot.component.html');
-require('./observe-pivot.component.scss');
+const style = require('./observe-pivot.component.scss');
 
 @Component({
   selector: 'observe-pivot',
-  template
+  template,
+  styles: [style]
 })
 export class ObservePivotComponent implements OnInit {
   public artifactColumns: Array<any> = [];

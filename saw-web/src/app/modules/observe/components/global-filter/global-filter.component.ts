@@ -17,11 +17,12 @@ import * as find from 'lodash/find';
 import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
 
 const template = require('./global-filter.component.html');
-require('./global-filter.component.scss');
+const style = require('./global-filter.component.scss');
 
 @Component({
   selector: 'global-filter',
-  template
+  template,
+  styles: [style]
 })
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();

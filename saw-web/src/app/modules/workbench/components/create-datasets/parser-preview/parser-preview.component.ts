@@ -20,12 +20,12 @@ import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialo
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./parser-preview.component.html');
-require('./parser-preview.component.scss');
+const style = require('./parser-preview.component.scss');
 
 @Component({
   selector: 'parser-preview',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class ParserPreviewComponent implements OnInit {

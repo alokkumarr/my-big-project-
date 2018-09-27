@@ -17,11 +17,12 @@ import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs/Subscription';
 
 const template = require('./observe-kpi.component.html');
-require('./observe-kpi.component.scss');
+const style = require('./observe-kpi.component.scss');
 
 @Component({
   selector: 'observe-kpi',
-  template
+  template,
+  styles: [style]
 })
 export class ObserveKPIComponent implements OnInit, OnDestroy {
   _kpi: any;

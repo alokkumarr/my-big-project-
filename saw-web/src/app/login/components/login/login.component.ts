@@ -3,11 +3,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
 const template = require('./login.component.html');
-require ('./login.component.scss');
+const style = require ('./login.component.scss');
 
 @Component({
   selector: 'login-form',
-  template
+  template,
+  styles: [style]
 })
 
 export class LoginComponent implements OnInit {

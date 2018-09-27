@@ -6,12 +6,12 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import * as get from 'lodash/get';
 
 const template = require('./dateformat-dialog.component.html');
-require('./dateformat-dialog.component.scss');
+const style = require('./dateformat-dialog.component.scss');
 
 @Component({
   selector: 'dateformat-dialog',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class DateformatDialogComponent {

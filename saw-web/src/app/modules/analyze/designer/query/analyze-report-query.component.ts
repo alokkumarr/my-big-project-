@@ -15,11 +15,12 @@ import * as map from 'lodash/map';
 import { AceEditorComponent } from 'ng2-ace-editor';
 
 const template = require('./analyze-report-query.component.html');
-require('./analyze-report-query.component.scss');
+const style = require('./analyze-report-query.component.scss');
 
 @Component({
   selector: 'analyze-report-query',
-  template
+  template,
+  styles: [style]
 })
 export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @Input() query: string;

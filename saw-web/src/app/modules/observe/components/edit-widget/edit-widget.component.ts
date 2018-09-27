@@ -11,11 +11,12 @@ import { ObserveService } from '../../services/observe.service';
 import { DATE_TYPES } from '../../../../common/consts';
 
 const template = require('./edit-widget.component.html');
-require('./edit-widget.component.scss');
+const style = require('./edit-widget.component.scss');
 
 @Component({
   selector: 'edit-widget',
-  template
+  template,
+  styles: [style]
 })
 export class EditWidgetComponent implements OnInit {
   editItem: any;

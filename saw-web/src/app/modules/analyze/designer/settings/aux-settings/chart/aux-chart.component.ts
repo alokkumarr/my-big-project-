@@ -3,7 +3,7 @@ import { ChartService } from '../../../../services/chart.service';
 import * as isEmpty from 'lodash/isEmpty';
 
 const template = require('./aux-chart.component.html');
-require('./aux-chart.component.scss');
+const style = require('./aux-chart.component.scss');
 
 const INVERTING_OPTIONS = [
   {
@@ -20,7 +20,8 @@ const INVERTING_OPTIONS = [
 
 @Component({
   selector: 'designer-settings-aux-chart',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerSettingsAuxChartComponent implements OnInit {
   @Input() chartType: string;

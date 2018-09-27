@@ -11,11 +11,12 @@ import {
 } from '../../../common/services';
 
 const template = require('./header.component.html');
-require('./header.component.scss');
+const style = require('./header.component.scss');
 
 @Component({
   selector: 'layout-header',
-  template
+  template,
+  styles: [style]
 })
 export class LayoutHeaderComponent implements OnInit, OnDestroy {
   public UserDetails: any;

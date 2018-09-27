@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { FilterModel } from '../../types';
 import { BETWEEN_NUMBER_FILTER_OPERATOR, NUMBER_FILTER_OPERATORS } from '../../../consts';
 
@@ -6,7 +6,7 @@ import * as isFinite from 'lodash/isFinite';
 import * as unset from 'lodash/unset';
 
 const template = require('./designer-number-filter.component.html');
-require('./designer-number-filter.component.scss');
+const style = require('./designer-number-filter.component.scss');
 
 export const isValid = (model: FilterModel) => {
   model = model || {};
@@ -20,9 +20,10 @@ export const isValid = (model: FilterModel) => {
 
 @Component({
   selector: 'designer-number-filter',
-  template
+  template,
+  styles: [style]
 })
-export class DesignerNumberFilterComponent {
+export class DesignerNumberFilterComponent implements OnInit, OnChanges {
   @Output()
   public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
   @Input() public filterModel: FilterModel;

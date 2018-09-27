@@ -10,12 +10,12 @@ import { DxDataGridComponent } from 'devextreme-angular';
 import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./dataset-detail-view.component.html');
-require('./dataset-detail-view.component.scss');
+const style = require('./dataset-detail-view.component.scss');
 
 @Component({
   selector: 'dataset-detail-view',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class DatasetDetailViewComponent implements OnInit, OnDestroy {

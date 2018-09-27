@@ -22,11 +22,12 @@ import {
 import { TYPE_MAP } from '../../consts';
 
 const template = require('./designer-sort.component.html');
-require('./designer-sort.component.scss');
+const style = require('./designer-sort.component.scss');
 
 @Component({
   selector: 'designer-sort',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerSortComponent {
   @Output() public sortsChange: EventEmitter<Sort[]> = new EventEmitter();

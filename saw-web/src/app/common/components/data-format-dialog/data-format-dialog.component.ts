@@ -18,7 +18,7 @@ import {
 } from '../../../common/utils/numberFormatter';
 
 const template = require('./data-format-dialog.component.html');
-require('./data-format-dialog.component.scss');
+const style = require('./data-format-dialog.component.scss');
 
 const DEFAULT_CURRENCY = 'USD';
 const FLOAT_SAMPLE = 1000.33333;
@@ -27,7 +27,8 @@ export const DEFAULT_PRECISION = 2;
 
 @Component({
   selector: 'data-format-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class DataFormatDialogComponent implements OnInit {
 

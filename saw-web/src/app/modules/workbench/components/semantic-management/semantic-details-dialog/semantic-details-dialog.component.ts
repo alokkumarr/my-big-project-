@@ -8,12 +8,12 @@ import {
 } from '@angular/forms';
 
 const template = require('./semantic-details-dialog.component.html');
-require('./semantic-details-dialog.component.scss');
+const style = require('./semantic-details-dialog.component.scss');
 
 @Component({
   selector: 'createfolder-dialog',
   template,
-  styles: []
+  styles: [style]
 })
 export class SemanticDetailsDialogComponent {
   form: FormGroup;

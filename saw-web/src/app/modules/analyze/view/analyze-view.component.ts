@@ -14,7 +14,7 @@ import { Analysis, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 
 const template = require('./analyze-view.component.html');
-require('./analyze-view.component.scss');
+const style = require('./analyze-view.component.scss');
 
 const VIEW_KEY = 'analyseReportView';
 const SEARCH_CONFIG = [
@@ -26,7 +26,8 @@ const SEARCH_CONFIG = [
 ];
 @Component({
   selector: 'analyze-view-u',
-  template
+  template,
+  styles: [style]
 })
 export class AnalyzeViewComponent implements OnInit {
 

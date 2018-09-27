@@ -6,12 +6,12 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datasets-card-page.component.html');
-require('./datasets-card-page.component.scss');
+const style = require('./datasets-card-page.component.scss');
 
 @Component({
   selector: 'datasets-card-page',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class DatasetsCardPageComponent implements OnInit {

@@ -14,11 +14,12 @@ import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 
 const template = require('./designer-preview-dialog.component.html');
-require('./designer-preview-dialog.component.scss');
+const style = require('./designer-preview-dialog.component.scss');
 
 @Component({
   selector: 'designer-preview-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerPreviewDialogComponent {
   public previewData = null;

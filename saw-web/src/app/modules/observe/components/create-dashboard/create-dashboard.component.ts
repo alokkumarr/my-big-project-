@@ -28,13 +28,14 @@ import * as get from 'lodash/get';
 import { GlobalFilterService } from '../../services/global-filter.service';
 
 const template = require('./create-dashboard.component.html');
-require('./create-dashboard.component.scss');
+const style = require('./create-dashboard.component.scss');
 
 const MARGIN_BETWEEN_TILES = 10;
 
 @Component({
   selector: 'create-dashboard',
   template,
+  styles: [style],
   animations,
   providers: [DashboardService, GlobalFilterService]
 })

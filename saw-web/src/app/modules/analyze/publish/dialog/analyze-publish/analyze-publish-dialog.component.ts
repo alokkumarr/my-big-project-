@@ -10,11 +10,12 @@ import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
 const template = require('./analyze-publish-dialog.component.html');
-require('./analyze-publish-dialog.component.scss');
+const style = require('./analyze-publish-dialog.component.scss');
 
 @Component({
   selector: 'analyze-publish-dialog',
-  template
+  template,
+  styles: [style]
 })
 
 export class AnalyzePublishDialogComponent extends BaseDialogComponent implements OnInit {

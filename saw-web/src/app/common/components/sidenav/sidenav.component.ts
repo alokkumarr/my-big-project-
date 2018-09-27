@@ -3,11 +3,12 @@ import { Component, Input, ViewChild, OnInit } from '@angular/core';
 import { SidenavMenuService } from './sidenav-menu.service';
 
 const template = require('./sidenav.component.html');
-require('./sidenav.component.scss');
+const style = require('./sidenav.component.scss');
 
 @Component({
   selector: 'app-sidenav',
-  template
+  template,
+  styles: [style]
 })
 
 export class SidenavComponent implements OnInit {

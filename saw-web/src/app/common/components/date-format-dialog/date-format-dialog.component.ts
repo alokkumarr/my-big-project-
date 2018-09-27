@@ -5,11 +5,12 @@ import { DATE_FORMATS } from '../../consts';
 import * as isUndefined from 'lodash/isUndefined';
 
 const template = require('./date-format-dialog.component.html');
-require('./date-format-dialog.component.scss');
+const style = require('./date-format-dialog.component.scss');
 
 @Component({
   selector: 'date-format-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class DateFormatDialogComponent {
   public dateFormats;

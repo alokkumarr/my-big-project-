@@ -20,7 +20,7 @@ import {
 } from '../../../consts';
 
 const template = require('./filter-chips.component.html');
-require('./filter-chips.component.scss');
+const style = require('./filter-chips.component.scss');
 
 @Component({
   selector: 'filter-chips-u',
@@ -29,7 +29,7 @@ require('./filter-chips.component.scss');
     :host {
       display: block;
     }
-  `]
+  `, style]
 })
 export class FilterChipsComponent {
   @Output() remove: EventEmitter<number> = new EventEmitter();

@@ -2,7 +2,8 @@ import {
   Component,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnInit
 } from '@angular/core';
 import * as isUndefined from 'lodash/isUndefined';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
@@ -12,13 +13,14 @@ import {
 } from '../../types';
 
 const template = require('./designer-settings-query.component.html');
-require('./designer-settings-query.component.scss');
+const style = require('./designer-settings-query.component.scss');
 
 @Component({
   selector: 'designer-settings-query',
-  template
+  template,
+  styles: [style]
 })
-export class DesignerSettingsQueryComponent {
+export class DesignerSettingsQueryComponent implements OnInit {
   @Output() save = new EventEmitter<any>();
   @Output() change = new EventEmitter<string>();
   @Output() submit = new EventEmitter<any>();

@@ -7,7 +7,6 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ConfirmDialogData } from '../../types';
 
 const template = require('./confirm-dialog.component.html');
-// require('./confirm-dialog.component.scss');
 
 @Component({
   selector: 'confirm-dialog',

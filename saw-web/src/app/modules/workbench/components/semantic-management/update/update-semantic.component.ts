@@ -16,12 +16,12 @@ import * as findIndex from 'lodash/findIndex';
 import * as omit from 'lodash/omit';
 
 const template = require('./update-semantic.component.html');
-require('./update-semantic.component.scss');
+const style = require('./update-semantic.component.scss');
 
 @Component({
   selector: 'update-semantic',
-  styles: [],
-  template: template
+  template,
+  styles: [style]
 })
 export class UpdateSemanticComponent implements OnInit, OnDestroy {
   private availableDP: any;

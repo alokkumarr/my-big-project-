@@ -16,13 +16,14 @@ import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
 const template = require('./analyze-schedule-dialog.component.html');
-require('./analyze-schedule-dialog.component.scss');
+const style = require('./analyze-schedule-dialog.component.scss');
 
 const SEMICOLON = 186;
 
 @Component({
   selector: 'analyze-schedule-dialog',
-  template
+  template,
+  styles: [style]
 })
 
 export class AnalyzeScheduleDialogComponent implements OnInit {

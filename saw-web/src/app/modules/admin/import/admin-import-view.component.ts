@@ -24,7 +24,7 @@ import { Analysis } from '../../../models';
 import { ExportService } from '../export/export.service';
 
 const template = require('./admin-import-view.component.html');
-require('./admin-import-view.component.scss');
+const style = require('./admin-import-view.component.scss');
 
 const DUPLICATE_GRID_OBJECT_PROPS = {
   logColor: 'brown',
@@ -47,7 +47,8 @@ interface FileInfo {name: string; count: number; }
 interface FileContent {name: string; count: number; analyses: Array<Analysis>; }
 @Component({
   selector: 'admin-import-view',
-  template
+  template,
+  styles: [style]
 })
 export class AdminImportViewComponent implements OnInit {
   files: Array<FileInfo>;

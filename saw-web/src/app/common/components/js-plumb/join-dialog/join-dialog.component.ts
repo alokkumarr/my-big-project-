@@ -13,11 +13,12 @@ import {
 } from '../types';
 
 const template = require('./join-dialog.component.html');
-require('./join-dialog.component.scss');
+const style = require('./join-dialog.component.scss');
 
 @Component({
   selector: 'join-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class JoinDialogComponent {
 

@@ -2,11 +2,12 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MatHorizontalStepper } from '@angular/material/stepper';
 
 const template = require('./widget-header.component.html');
-require('./widget-header.component.scss');
+const style = require('./widget-header.component.scss');
 
 @Component({
   selector: 'widget-header',
-  template
+  template,
+  styles: [style]
 })
 
 export class WidgetHeaderComponent implements OnInit {

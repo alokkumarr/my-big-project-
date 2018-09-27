@@ -6,12 +6,12 @@ import { DxDataGridService } from '../../../../../common/services/dxDataGrid.ser
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datasets-grid-page.component.html');
-require('./datasets-grid-page.component.scss');
+const style = require('./datasets-grid-page.component.scss');
 
 @Component({
   selector: 'datasets-grid-page',
   template,
-  styles: []
+  styles: [style]
 })
 export class DatasetsGridPageComponent implements OnInit {
   @Input()

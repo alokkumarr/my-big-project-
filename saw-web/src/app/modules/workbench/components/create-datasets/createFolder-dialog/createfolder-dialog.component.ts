@@ -6,12 +6,12 @@ import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms'
 import * as get from 'lodash/get';
 
 const template = require('./createfolder-dialog.component.html');
-require('./createfolder-dialog.component.scss');
+const style = require('./createfolder-dialog.component.scss');
 
 @Component({
   selector: 'createfolder-dialog',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class CreatefolderDialogComponent {

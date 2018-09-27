@@ -12,11 +12,12 @@ import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
 const template = require('./privilege-edit-dialog.component.html');
-require('./privilege-edit-dialog.component.scss');
+const style = require('./privilege-edit-dialog.component.scss');
 
 @Component({
   selector: 'privilege-edit-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 

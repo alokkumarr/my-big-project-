@@ -44,13 +44,14 @@ import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../services/chart.service';
 
 const template = require('./designer-container.component.html');
-require('./designer-container.component.scss');
+const style = require('./designer-container.component.scss');
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'designer-container',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;

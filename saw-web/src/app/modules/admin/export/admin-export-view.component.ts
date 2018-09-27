@@ -29,11 +29,12 @@ import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
 
 const template = require('./admin-export-view.component.html');
-require('./admin-export-view.component.scss');
+const style = require('./admin-export-view.component.scss');
 
 @Component({
   selector: 'admin-export-view',
-  template
+  template,
+  styles: [style]
 })
 export class AdminExportViewComponent implements OnInit {
   @ViewChild('metricInput')

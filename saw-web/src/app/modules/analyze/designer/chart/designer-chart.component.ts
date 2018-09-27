@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 const template = require('./designer-chart.component.html');
-require('./designer-chart.component.scss');
+const style = require('./designer-chart.component.scss');
 
 import { DesignerStates, CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
@@ -8,15 +8,14 @@ import { ChartService } from '../../services/chart.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import * as get from 'lodash/get';
-import * as set from 'lodash/set';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
-import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 
 @Component({
   selector: 'designer-chart',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerChartComponent implements OnInit {
   _sqlBuilder: SqlBuilderChart;

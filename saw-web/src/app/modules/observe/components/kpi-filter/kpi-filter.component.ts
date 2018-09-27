@@ -26,7 +26,7 @@ import * as moment from 'moment';
 import 'rxjs/add/operator/debounceTime';
 
 const template = require('./kpi-filter.component.html');
-require('./kpi-filter.component.scss');
+const style = require('./kpi-filter.component.scss');
 
 interface KPIFilterType {
   preset: string;
@@ -36,7 +36,8 @@ interface KPIFilterType {
 
 @Component({
   selector: 'kpi-filter',
-  template
+  template,
+  styles: [style]
 })
 export class KPIFilter implements OnInit, OnDestroy {
   kpiFilterForm: FormGroup;

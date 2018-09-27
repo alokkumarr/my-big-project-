@@ -17,11 +17,12 @@ import {
 import { JoinDialogComponent } from '../join-dialog';
 
 const template = require('./js-plumb-join-label.component.html');
-require('./js-plumb-join-label.component.scss');
+const style = require('./js-plumb-join-label.component.scss');
 
 @Component({
   selector: 'js-plumb-join-label-u',
-  template
+  template,
+  styles: [style]
 })
 export class JsPlumbJoinLabelComponent {
   @Input() join: Join;

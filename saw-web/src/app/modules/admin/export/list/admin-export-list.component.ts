@@ -5,7 +5,6 @@ import * as every from 'lodash/every';
 import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-export-list.component.html');
-// require('./admin-export-list.component.scss');
 
 @Component({
   selector: 'admin-export-list',

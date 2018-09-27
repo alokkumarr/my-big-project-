@@ -2,11 +2,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 const template = require('./datapods-grid-page.component.html');
-require('./datapods-grid-page.component.scss');
+const style = require('./datapods-grid-page.component.scss');
 
 @Component({
   selector: 'datapods-grid-page',
-  template
+  template,
+  styles: [style]
 })
 export class DatapodsGridPageComponent implements OnInit {
   @Input()

@@ -5,13 +5,14 @@ import { RoleService } from '../role.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
 const template = require('./role-edit-dialog.component.html');
-require('./role-edit-dialog.component.scss');
+const style = require('./role-edit-dialog.component.scss');
 
 const namePattern = /^[a-zA-Z]*$/;
 
 @Component({
   selector: 'role-edit-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class RoleEditDialogComponent extends BaseDialogComponent {
 

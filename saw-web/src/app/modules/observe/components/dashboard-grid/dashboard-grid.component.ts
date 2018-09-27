@@ -36,7 +36,7 @@ import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 const template = require('./dashboard-grid.component.html');
-require('./dashboard-grid.component.scss');
+const style = require('./dashboard-grid.component.scss');
 
 const MARGIN_BETWEEN_TILES = 10;
 
@@ -48,7 +48,8 @@ export const DASHBOARD_MODES = {
 
 @Component({
   selector: 'dashboard-grid',
-  template
+  template,
+  styles: [style]
 })
 export class DashboardGridComponent
   implements OnInit, OnChanges, AfterViewInit, OnDestroy {

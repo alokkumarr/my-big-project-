@@ -14,11 +14,12 @@ import { JwtService } from '../../../../common/services';
 
 
 const template = require('./analyze-list-view.component.html');
-require('./analyze-list-view.component.scss');
+const style = require('./analyze-list-view.component.scss');
 
 @Component({
   selector: 'analyze-list-view',
-  template
+  template,
+  styles: [style]
 })
 export class AnalyzeListViewComponent {
 

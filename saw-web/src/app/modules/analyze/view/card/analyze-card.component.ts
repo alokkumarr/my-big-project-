@@ -12,11 +12,12 @@ import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
 
 const template = require('./analyze-card.component.html');
-require('./analyze-card.component.scss');
+const style = require('./analyze-card.component.scss');
 
 @Component({
   selector: 'analyze-card',
-  template
+  template,
+  styles: [style]
 })
 
 export class AnalyzeCardComponent implements OnInit {

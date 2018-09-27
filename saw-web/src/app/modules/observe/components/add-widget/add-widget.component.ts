@@ -12,7 +12,7 @@ import * as clone from 'lodash/clone';
 import { ObserveService } from '../../services/observe.service';
 
 const template = require('./add-widget.component.html');
-require('./add-widget.component.scss');
+const style = require('./add-widget.component.scss');
 
 import {
   widgetTypes as wTypes,
@@ -23,7 +23,8 @@ import {
 
 @Component({
   selector: 'add-widget',
-  template
+  template,
+  styles: [style]
 })
 export class AddWidgetComponent implements OnInit {
   widgetTypes = wTypes;

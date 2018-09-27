@@ -47,7 +47,7 @@ import {
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
 const template = require('./report-grid.component.html');
-require('./report-grid.component.scss');
+const style = require('./report-grid.component.scss');
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -78,7 +78,8 @@ let self; // needed to access component context from dx callbacks
 
 @Component({
   selector: 'report-grid-upgraded',
-  template
+  template,
+  styles: [style]
 })
 export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];

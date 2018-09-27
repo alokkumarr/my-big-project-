@@ -36,11 +36,12 @@ import {
 } from '../../../consts';
 
 const template = require('./widget-kpi.component.html');
-require('./widget-kpi.component.scss');
+const style = require('./widget-kpi.component.scss');
 
 @Component({
   selector: 'widget-kpi',
-  template
+  template,
+  styles: [style]
 })
 export class WidgetKPIComponent implements OnInit, OnDestroy {
   _kpi: any;

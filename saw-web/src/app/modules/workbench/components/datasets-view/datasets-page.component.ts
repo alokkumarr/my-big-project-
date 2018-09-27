@@ -10,12 +10,12 @@ import { LocalSearchService } from '../../../../common/services/local-search.ser
 import { WorkbenchService } from '../../services/workbench.service';
 
 const template = require('./datasets-page.component.html');
-require('./datasets-page.component.scss');
+const style = require('./datasets-page.component.scss');
 
 @Component({
   selector: 'datasets-page',
   template,
-  styles: [],
+  styles: [style]
   providers: [DatePipe]
 })
 

@@ -18,12 +18,12 @@ import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs';
 
 const template = require('./select-rawdata.component.html');
-require('./select-rawdata.component.scss');
+const style = require('./select-rawdata.component.scss');
 
 @Component({
   selector: 'select-rawdata',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class SelectRawdataComponent implements OnInit {

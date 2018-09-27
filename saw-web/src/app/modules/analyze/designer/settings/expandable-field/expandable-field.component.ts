@@ -21,10 +21,11 @@ import {
 } from '../../../consts';
 
 const template = require('./expandable-field.component.html');
-require('./expandable-field.component.scss');
+const style = require('./expandable-field.component.scss');
 @Component({
   selector: 'expandable-field',
-  template
+  template,
+  styles: [style]
 })
 export class ExpandableFieldComponent {
   @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

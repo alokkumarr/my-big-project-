@@ -11,11 +11,12 @@ import {
 import { DesignerStates } from '../consts';
 
 const template = require('./designer-header.component.html');
-require('./designer-header.component.scss');
+const style = require('./designer-header.component.scss');
 
 @Component({
   selector: 'designer-header',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerHeaderComponent {
   @Output() public onBack: EventEmitter<null> = new EventEmitter();

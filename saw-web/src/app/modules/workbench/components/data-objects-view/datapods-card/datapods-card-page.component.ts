@@ -5,12 +5,12 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./datapods-card-page.component.html');
-require('./datapods-card-page.component.scss');
+const style = require('./datapods-card-page.component.scss');
 
 @Component({
   selector: 'datapods-card-page',
   template,
-  styles: []
+  styles: [style]
 })
 export class DatapodsCardPageComponent implements OnInit {
   @Input()

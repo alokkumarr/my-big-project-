@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 
 const template = require('./workbench-page.component.html');
-require('./workbench-page.component.scss');
+const style = require('./workbench-page.component.scss');
 
 @Component({
   selector: 'workbench-page',
-  template: template
+  template: template,
+  styles: [style]
 })
 export class WorkbenchPageComponent {
   constructor() { }

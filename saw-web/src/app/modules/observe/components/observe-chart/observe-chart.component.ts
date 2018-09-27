@@ -30,11 +30,12 @@ import * as moment from 'moment';
 
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 const template = require('./observe-chart.component.html');
-require('./observe-chart.component.scss');
+const style = require('./observe-chart.component.scss');
 
 @Component({
   selector: 'observe-chart',
   template,
+  styles: [style],
   providers: [ChartService]
 })
 export class ObserveChartComponent {

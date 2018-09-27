@@ -4,7 +4,13 @@ const template = require('./login-page.component.html');
 
 @Component({
   selector: 'login-page',
-  template
+  template,
+  styles: [`
+    :host {
+      height: 100%;
+      display: block;
+    }
+  `]
 })
 
 export class LoginPageComponent implements OnInit {

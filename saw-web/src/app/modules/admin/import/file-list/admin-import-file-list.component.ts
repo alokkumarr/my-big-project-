@@ -1,15 +1,16 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-import-file-list.component.html');
-require('./admin-import-file-list.component.scss');
+const style = require('./admin-import-file-list.component.scss');
 
 @Component({
   selector: 'admin-import-file-list',
-  template
+  template,
+  styles: [style]
 })
 
-export class AdminImportFileListComponent {
+export class AdminImportFileListComponent implements OnInit {
 
   @Input() files: any[];
   @Output() remove = new EventEmitter<string>();

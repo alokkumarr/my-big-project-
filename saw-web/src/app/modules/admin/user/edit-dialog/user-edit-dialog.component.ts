@@ -6,7 +6,7 @@ import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
 const template = require('./user-edit-dialog.component.html');
-require('./user-edit-dialog.component.scss');
+const style = require('./user-edit-dialog.component.scss');
 
 const namePattern = /^[a-zA-Z]*$/;
 const loginIdPattern = /^[A-z\d_@.#$=!%^)(\]:\*;\?\/\,}{'\|<>\[&\+-`~]*$/;
@@ -14,7 +14,8 @@ const dummyPassword = '*********';
 
 @Component({
   selector: 'user-edit-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class UserEditDialogComponent extends BaseDialogComponent {
 

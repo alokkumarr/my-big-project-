@@ -8,11 +8,12 @@ import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
 
 const template = require('./toolbar-action-dialog.component.html');
-require('./toolbar-action-dialog.component.scss');
+const style = require('./toolbar-action-dialog.component.scss');
 
 @Component({
   selector: 'toolbar-action-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;

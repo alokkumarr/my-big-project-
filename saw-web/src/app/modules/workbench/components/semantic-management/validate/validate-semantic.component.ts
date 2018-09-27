@@ -13,12 +13,12 @@ import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 
 const template = require('./validate-semantic.component.html');
-require('./validate-semantic.component.scss');
+const style = require('./validate-semantic.component.scss');
 
 @Component({
   selector: 'validate-semantic',
-  styles: [],
-  template: template
+  template,
+  styles: [style]
 })
 export class ValidateSemanticComponent implements OnDestroy {
   private selectedDS: any;

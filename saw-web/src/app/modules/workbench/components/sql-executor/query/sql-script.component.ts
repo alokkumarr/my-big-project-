@@ -17,11 +17,12 @@ import { AceEditorComponent } from 'ng2-ace-editor';
 import { WorkbenchService } from '../../../services/workbench.service';
 
 const template = require('./sql-script.component.html');
-require('./sql-script.component.scss');
+const style = require('./sql-script.component.scss');
 
 @Component({
   selector: 'sql-script',
-  template
+  template,
+  styles: [style]
 })
 export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @Output() onExecute = new EventEmitter<any>();

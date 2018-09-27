@@ -12,12 +12,12 @@ import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
 
 const template = require('./data-objects-page.component.html');
-require('./data-objects-page.component.scss');
+const style = require('./data-objects-page.component.scss');
 
 @Component({
   selector: 'data-objects-page',
   template,
-  styles: [],
+  styles: [style],
   providers: [DatePipe]
 })
 export class DataobjectsComponent implements OnInit, OnDestroy {

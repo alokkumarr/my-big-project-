@@ -21,7 +21,7 @@ import { ConfirmDialogComponent } from '../../../common/components/confirm-dialo
 import { ConfirmDialogData } from '../../../common/types';
 
 const template = require('./admin-main-view.component.html');
-require('./admin-main-view.component.scss');
+const style = require('./admin-main-view.component.scss');
 
 const USER_SEARCH_CONFIG = [
   { keyword: 'LOGIN ID', fieldName: 'masterLoginId' },
@@ -68,7 +68,8 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 
 @Component({
   selector: 'admin-main-view',
-  template
+  template,
+  styles: [style]
 })
 export class AdminMainViewComponent implements OnDestroy {
   columns: any[] = [];

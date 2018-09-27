@@ -11,11 +11,12 @@ import {
 import * as debounce from 'lodash/debounce';
 
 const template = require('./search-box.component.html');
-require('./search-box.component.scss');
+const style = require('./search-box.component.scss');
 
 @Component({
   selector: 'search-box',
-  template
+  template,
+  styles: [style]
 })
 export class SearchBoxComponent implements OnInit, OnDestroy {
 

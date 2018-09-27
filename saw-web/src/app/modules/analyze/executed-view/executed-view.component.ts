@@ -35,11 +35,12 @@ import {
 } from '../../../common/services';
 
 const template = require('./executed-view.component.html');
-require('./executed-view.component.scss');
+const style = require('./executed-view.component.scss');
 
 @Component({
   selector: 'executed-view',
-  template
+  template,
+  styles: [style]
 })
 export class ExecutedViewComponent implements OnInit, OnDestroy {
   analysis: Analysis; // the latest analysis definition

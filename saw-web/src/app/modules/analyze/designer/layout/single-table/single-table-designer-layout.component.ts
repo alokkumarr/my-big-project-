@@ -10,11 +10,12 @@ import {
 import { DesignerStates } from '../../consts';
 
 const template = require('./single-table-designer-layout.component.html');
-require('./single-table-designer-layout.component.scss');
+const style = require('./single-table-designer-layout.component.scss');
 
 @Component({
   selector: 'single-table-designer-layout',
-  template
+  template,
+  styles: [style]
 })
 export class SingleTableDesignerLayout {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

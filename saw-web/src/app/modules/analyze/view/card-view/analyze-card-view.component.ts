@@ -10,11 +10,12 @@ import {
 } from '../types';
 
 const template = require('./analyze-card-view.component.html');
-require('./analyze-card-view.component.scss');
+const style = require('./analyze-card-view.component.scss');
 
 @Component({
   selector: 'analyze-card-view',
-  template
+  template,
+  styles: [style]
 })
 
 export class AnalyzeCardViewComponent {

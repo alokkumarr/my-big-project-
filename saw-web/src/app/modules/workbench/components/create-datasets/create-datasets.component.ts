@@ -18,11 +18,12 @@ import { ToastService } from '../../../../common/services/toastMessage.service';
 
 
 const template = require('./create-datasets.component.html');
-require('./create-datasets.component.scss');
+const style = require('./create-datasets.component.scss');
 
 @Component({
   selector: 'create-datasets',
-  template
+  template,
+  styles: [style]
 })
 export class CreateDatasetsComponent implements OnInit {
   private selectFullfilled = false;

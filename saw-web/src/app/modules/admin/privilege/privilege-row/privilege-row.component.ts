@@ -9,7 +9,7 @@ import {
 } from '../privilege-code-transformer';
 
 const template = require('./privilege-row.component.html');
-require('./privilege-row.component.scss');
+const style = require('./privilege-row.component.scss');
 /** privilegeCode privilegeDesc
  * 0 => No access
  * 128 => All
@@ -21,7 +21,8 @@ interface Privilege {
 
 @Component({
   selector: 'tr[privilege-row]',
-  template
+  template,
+  styles: [style]
 })
 export class PrivilegeRowComponent implements OnChanges {
   @Output() categoryChange: EventEmitter<Privilege> = new EventEmitter();

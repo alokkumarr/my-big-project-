@@ -3,11 +3,12 @@ import * as isUndefined from 'lodash/isUndefined';
 import { SidenavComponent } from '../sidenav';
 
 const template = require('./accordionMenuLink.component.html');
-require('./accordionMenuLink.component.scss');
+const style = require('./accordionMenuLink.component.scss');
 
 @Component({
   selector: 'accordion-menu-link',
-  template
+  template,
+  styles: [style]
 })
 export class AccordionMenuLinkComponent implements OnInit {
   location: Location;

@@ -1,15 +1,16 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import {DxDataGridService} from '../../../common/services/dxDataGrid.service';
 
 const template = require('./admin-list-view.component.html');
-require('./admin-list-view.component.scss');
+const style = require('./admin-list-view.component.scss');
 
 @Component({
   selector: 'admin-list-view',
-  template
+  template,
+  styles: [style]
 })
 
-export class AdminListViewComponent {
+export class AdminListViewComponent implements OnInit {
 
   @Input() data: any[];
   @Input() columns: any[];

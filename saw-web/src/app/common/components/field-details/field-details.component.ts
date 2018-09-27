@@ -2,11 +2,12 @@ import { Component, Input } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 
 const template = require('./field-details.component.html');
-require('./field-details.component.scss');
+const style = require('./field-details.component.scss');
 
 @Component({
   selector: 'field-details',
-  template
+  template,
+  styles: [style]
 })
 export class FieldDetailsComponent {
   public dataFields: any[] = [];

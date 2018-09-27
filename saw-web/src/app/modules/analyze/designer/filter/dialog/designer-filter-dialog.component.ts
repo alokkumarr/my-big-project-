@@ -16,14 +16,13 @@ import {
   NUMBER_TYPES
 } from '../../../consts';
 import {
-  IToolbarActionData,
   Artifact,
   FilterModel,
   Filter
 } from '../../types';
 
 const template = require('./designer-filter-dialog.component.html');
-require('./designer-filter-dialog.component.scss');
+const style = require('./designer-filter-dialog.component.scss');
 
 export interface DesignerFilterDialogData {
   filters: Filter[];
@@ -39,7 +38,8 @@ export interface DesignerFilterDialogResult {
 
 @Component({
   selector: 'designer-filter-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerFilterDialogComponent implements OnInit {
   artifacts: Artifact[];

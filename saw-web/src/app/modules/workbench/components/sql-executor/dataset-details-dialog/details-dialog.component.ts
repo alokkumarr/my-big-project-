@@ -5,12 +5,12 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 
 const template = require('./details-dialog.component.html');
-require('./details-dialog.component.scss');
+const style = require('./details-dialog.component.scss');
 
 @Component({
   selector: 'details-dialog',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class DetailsDialogComponent {

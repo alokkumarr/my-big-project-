@@ -11,11 +11,12 @@ import { ObserveService } from '../../../services/observe.service';
 import { HeaderProgressService } from '../../../../../common/services';
 
 const template = require('./widget-metric.component.html');
-require('./widget-metric.component.scss');
+const style = require('./widget-metric.component.scss');
 
 @Component({
   selector: 'widget-metric',
-  template
+  template,
+  styles: [style]
 })
 export class WidgetMetricComponent implements OnInit, OnDestroy {
   @Output() onSelect = new EventEmitter();

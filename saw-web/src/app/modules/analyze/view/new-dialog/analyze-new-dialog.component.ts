@@ -8,11 +8,12 @@ import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 
 const template = require('./analyze-new-dialog.component.html');
-require('./analyze-new-dialog.component.scss');
+const style = require('./analyze-new-dialog.component.scss');
 
 @Component({
   selector: 'analyze-new-dialog',
-  template
+  template,
+  styles: [style]
 })
 export class AnalyzeNewDialogComponent {
 

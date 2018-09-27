@@ -7,11 +7,12 @@ import {
 import { DesignerToolbarAciton } from '../types';
 
 const template = require('./designer-toolbar.component.html');
-require('./designer-toolbar.component.scss');
+const style = require('./designer-toolbar.component.scss');
 
 @Component({
   selector: 'designer-toolbar',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerToolbarComponent {
   @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();

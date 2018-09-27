@@ -16,11 +16,12 @@ import {
 import { DesignerStates } from '../../consts';
 
 const template = require('./multi-table-designer-layout.component.html');
-require('./multi-table-designer-layout.component.scss');
+const style = require('./multi-table-designer-layout.component.scss');
 
 @Component({
   selector: 'multi-table-designer-layout',
-  template
+  template,
+  styles: [style]
 })
 export class MultiTableDesignerLayout {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

@@ -6,12 +6,12 @@ import { DxDataGridComponent } from 'devextreme-angular';
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 
 const template = require('./sqlpreview-grid-page.component.html');
-require('./sqlpreview-grid-page.component.scss');
+const style = require('./sqlpreview-grid-page.component.scss');
 
 @Component({
   selector: 'sqlpreview-grid-page',
   template,
-  styles: []
+  styles: [style]
 })
 
 export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDestroy {

@@ -16,10 +16,11 @@ import {
 import { AnalysisType } from '../../types';
 
 const template = require('./aggregate-chooser.component.html');
-require('./aggregate-chooser.component.scss');
+const style = require('./aggregate-chooser.component.scss');
 @Component({
   selector: 'aggregate-chooser-u',
-  template
+  template,
+  styles: [style]
 })
 export class AggregateChooserComponent implements OnInit {
   @Output() public change: EventEmitter<string> = new EventEmitter();

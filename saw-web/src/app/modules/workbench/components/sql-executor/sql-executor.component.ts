@@ -15,11 +15,12 @@ import { DetailsDialogComponent } from './dataset-details-dialog/details-dialog.
 import { WorkbenchService } from '../../services/workbench.service';
 
 const template = require('./sql-executor.component.html');
-require('./sql-executor.component.scss');
+const style = require('./sql-executor.component.scss');
 
 @Component({
   selector: 'sql-executor',
-  template
+  template,
+  styles: [style]
 })
 export class SqlExecutorComponent implements OnInit, OnDestroy {
   private artifacts = [];

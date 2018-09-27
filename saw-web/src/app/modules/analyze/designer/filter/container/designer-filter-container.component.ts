@@ -1,6 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import * as get from 'lodash/get';
-import * as isFinite from 'lodash/isFinite';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as groupBy from 'lodash/groupBy';
 import * as forEach from 'lodash/forEach';
@@ -14,13 +12,14 @@ import { isValid as isStringFilterValid } from '../string/designer-string-filter
 import { isValid as isDateFilterValid } from '../date/designer-date-filter.component';
 
 const template = require('./designer-filter-container.component.html');
-require('./designer-filter-container.component.scss');
+const style = require('./designer-filter-container.component.scss');
 
 @Component({
   selector: 'designer-filter-container',
-  template
+  template,
+  styles: [style]
 })
-export class DesignerFilterContainerComponent {
+export class DesignerFilterContainerComponent implements OnInit {
   @Output()
   public filtersChange: EventEmitter<{
     filters: Filter[];

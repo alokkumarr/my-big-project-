@@ -14,11 +14,12 @@ import {
 import { DesignerStates } from '../consts';
 
 const template = require('./designer-report.component.html');
-require('./designer-report.component.scss');
+const style = require('./designer-report.component.scss');
 
 @Component({
   selector: 'designer-report',
-  template
+  template,
+  styles: [style]
 })
 export class DesignerReportComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

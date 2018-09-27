@@ -21,11 +21,12 @@ import {
 import { SCHEDULE_TYPES } from '../../../../common/consts';
 
 const template = require('./cron-job-schedular.component.html');
-require('./cron-job-schedular.component.scss');
+const style = require('./cron-job-schedular.component.scss');
 
 @Component({
   selector: 'cron-job-schedular',
-  template
+  template,
+  styles: [style]
 })
 
 export class CronJobSchedularComponent implements OnInit {
