@@ -2491,6 +2491,9 @@ public class UserRepositoryImpl implements UserRepository {
 					 + "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, ?, ?, ?, '1', sysdate(), ?) ";
 		List<SubCategoriesPrivilege> insertList = new ArrayList<>();
 		List<SubCategoriesPrivilege> updateList = new ArrayList<>();
+        // Insert privilege first entry if doesn't exists.
+        insertPMFAccessPrivilege(addPrivilegeDetails.getMasterLoginId(), addPrivilegeDetails.getRoleId()
+            , addPrivilegeDetails.getModuleId(), addPrivilegeDetails.getProductId());
 		for (SubCategoriesPrivilege subCategoriesPrivilege: addPrivilegeDetails.getSubCategoriesPrivilege()) {
 			if (subCategoriesPrivilege.getPrivilegeId()==0)
 				insertList.add(subCategoriesPrivilege);
