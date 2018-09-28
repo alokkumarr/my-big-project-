@@ -11,7 +11,6 @@ import { MatSidenav } from '@angular/material/sidenav';
 import * as clone from 'lodash/clone';
 import { ObserveService } from '../../services/observe.service';
 
-const template = require('./add-widget.component.html');
 const style = require('./add-widget.component.scss');
 
 import {
@@ -23,7 +22,7 @@ import {
 
 @Component({
   selector: 'add-widget',
-  template,
+  templateUrl: './add-widget.component.html',
   styles: [
     `:host {
       background-color: whitesmoke;

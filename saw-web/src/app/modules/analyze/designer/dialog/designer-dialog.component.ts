@@ -10,8 +10,6 @@ import { AnalysisDialogData, DesignerSaveEvent, Analysis } from '../types';
 import { ConfirmDialogComponent } from '../../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../../common/types';
 
-const template = require('./designer-dialog.component.html');
-
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
   content: 'Do you want to discard unsaved changes and go back?',
@@ -20,7 +18,7 @@ const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
 };
 @Component({
   selector: 'designer-dialog',
-  template,
+  templateUrl: './designer-dialog.component.html',
   styles: [`:host {
     display: block;
     margin: -20px;

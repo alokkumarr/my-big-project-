@@ -14,12 +14,11 @@ import {
 } from '../../../analyze/services/analyze.service';
 import { flattenPivotData } from '../../../../common/utils/dataFlattener';
 
-const template = require('./observe-pivot.component.html');
 const style = require('./observe-pivot.component.scss');
 
 @Component({
   selector: 'observe-pivot',
-  template,
+  templateUrl: './observe-pivot.component.html',
   styles: [
     `:host {
       display: block;

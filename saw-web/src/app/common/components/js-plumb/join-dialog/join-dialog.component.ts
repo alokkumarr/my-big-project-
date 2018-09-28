@@ -11,12 +11,11 @@ import {
   JoinChangeEvent
 } from '../types';
 
-const template = require('./join-dialog.component.html');
 const style = require('./join-dialog.component.scss');
 
 @Component({
   selector: 'join-dialog',
-  template,
+  templateUrl: './join-dialog.component.html',
   styles: [
     `:host {
       display: block;

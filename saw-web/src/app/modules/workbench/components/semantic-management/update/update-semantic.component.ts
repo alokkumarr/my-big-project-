@@ -15,12 +15,11 @@ import * as find from 'lodash/find';
 import * as findIndex from 'lodash/findIndex';
 import * as omit from 'lodash/omit';
 
-const template = require('./update-semantic.component.html');
 const style = require('./update-semantic.component.scss');
 
 @Component({
   selector: 'update-semantic',
-  template,
+  templateUrl: './update-semantic.component.html',
   styles: [
     `:host {
       'class': 'update-semantic'

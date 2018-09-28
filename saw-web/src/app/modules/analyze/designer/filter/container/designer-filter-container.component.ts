@@ -11,12 +11,11 @@ import { isValid as isNumberFilterValid } from '../number/designer-number-filter
 import { isValid as isStringFilterValid } from '../string/designer-string-filter.component';
 import { isValid as isDateFilterValid } from '../date/designer-date-filter.component';
 
-const template = require('./designer-filter-container.component.html');
 const style = require('./designer-filter-container.component.scss');
 
 @Component({
   selector: 'designer-filter-container',
-  template,
+  templateUrl: './designer-filter-container.component.html',
   styles: [style]
 })
 export class DesignerFilterContainerComponent implements OnInit {

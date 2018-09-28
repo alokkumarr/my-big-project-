@@ -9,12 +9,11 @@ import { BaseDialogComponent } from '../../../../../common/base-dialog/base-dial
 import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
-const template = require('./analyze-publish-dialog.component.html');
 const style = require('./analyze-publish-dialog.component.scss');
 
 @Component({
   selector: 'analyze-publish-dialog',
-  template,
+  templateUrl: './analyze-publish-dialog.component.html',
   styles: [style]
 })
 

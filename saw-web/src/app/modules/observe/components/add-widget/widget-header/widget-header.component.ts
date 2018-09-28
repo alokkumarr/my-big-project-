@@ -1,12 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatHorizontalStepper } from '@angular/material/stepper';
 
-const template = require('./widget-header.component.html');
 const style = require('./widget-header.component.scss');
 
 @Component({
   selector: 'widget-header',
-  template,
+  templateUrl: './widget-header.component.html',
   styles: [
     `:host {
       'class': 'widget-header'

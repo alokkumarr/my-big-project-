@@ -5,8 +5,6 @@ import { MAT_DATE_FORMATS } from '@angular/material/core';
 import { FilterModel } from '../../types';
 import { CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS } from '../../../consts';
 
-const template = require('./designer-date-filter.component.html');
-
 const DATE_FORMAT = 'YYYY-MM-DD';
 
 export const MY_FORMATS = {
@@ -30,7 +28,7 @@ export const isValid = (model: FilterModel): boolean => {
 
 @Component({
   selector: 'designer-date-filter',
-  template,
+  templateUrl: './designer-date-filter.component.html',
   providers: [{ provide: MAT_DATE_FORMATS, useValue: MY_FORMATS }]
 })
 export class DesignerDateFilterComponent {

@@ -12,12 +12,11 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 
-const template = require('./validate-semantic.component.html');
 const style = require('./validate-semantic.component.scss');
 
 @Component({
   selector: 'validate-semantic',
-  template,
+  templateUrl: './validate-semantic.component.html',
   styles: [
     `:host {
       'class': 'validate-semantic'

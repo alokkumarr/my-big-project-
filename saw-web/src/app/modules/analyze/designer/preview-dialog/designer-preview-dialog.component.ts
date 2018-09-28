@@ -13,12 +13,11 @@ import * as orderBy from 'lodash/orderBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 
-const template = require('./designer-preview-dialog.component.html');
 const style = require('./designer-preview-dialog.component.scss');
 
 @Component({
   selector: 'designer-preview-dialog',
-  template,
+  templateUrl: './designer-preview-dialog.component.html',
   styles: [
     `:host {
       width: 100vw;

@@ -17,7 +17,6 @@ import {
   isFormatted
 } from '../../../common/utils/numberFormatter';
 
-const template = require('./data-format-dialog.component.html');
 const style = require('./data-format-dialog.component.scss');
 
 const DEFAULT_CURRENCY = 'USD';
@@ -27,7 +26,7 @@ export const DEFAULT_PRECISION = 2;
 
 @Component({
   selector: 'data-format-dialog',
-  template,
+  templateUrl: './data-format-dialog.component.html',
   styles: [
     `:host {
       display: block;

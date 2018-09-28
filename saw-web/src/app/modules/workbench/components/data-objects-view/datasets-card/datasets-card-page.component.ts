@@ -5,12 +5,11 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./datasets-card-page.component.html');
 const style = require('./datasets-card-page.component.scss');
 
 @Component({
   selector: 'datasets-card-page',
-  template,
+  templateUrl: './datasets-card-page.component.html',
   styles: [
     `:host {
       width: 100%;

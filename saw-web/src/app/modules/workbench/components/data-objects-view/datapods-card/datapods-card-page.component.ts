@@ -4,12 +4,11 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./datapods-card-page.component.html');
 const style = require('./datapods-card-page.component.scss');
 
 @Component({
   selector: 'datapods-card-page',
-  template,
+  templateUrl: './datapods-card-page.component.html',
   styles: [
     `:host {
       width: 100%;

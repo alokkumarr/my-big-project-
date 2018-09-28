@@ -28,12 +28,11 @@ import { CategoryService } from '../category/category.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
 
-const template = require('./admin-export-view.component.html');
 const style = require('./admin-export-view.component.scss');
 
 @Component({
   selector: 'admin-export-view',
-  template,
+  templateUrl: './admin-export-view.component.html',
   styles: [
     `:host {
       max-height: calc(100vh - (63px + 55px));

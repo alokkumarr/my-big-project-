@@ -1,12 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
 
-const template = require('./admin-import-file-list.component.html');
 const style = require('./admin-import-file-list.component.scss');
 
 @Component({
   selector: 'admin-import-file-list',
-  template,
+  templateUrl: './admin-import-file-list.component.html',
   styles: [style]
 })
 

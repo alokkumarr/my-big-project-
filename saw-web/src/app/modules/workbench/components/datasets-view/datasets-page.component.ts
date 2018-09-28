@@ -9,12 +9,11 @@ import { Observable } from 'rxjs/Observable';
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 
-const template = require('./datasets-page.component.html');
 const style = require('./datasets-page.component.scss');
 
 @Component({
   selector: 'datasets-page',
-  template,
+  templateUrl: './datasets-page.component.html',
   styles: [style]
   providers: [DatePipe]
 })

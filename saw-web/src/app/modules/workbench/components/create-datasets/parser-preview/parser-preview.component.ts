@@ -19,12 +19,11 @@ import { DxDataGridService } from '../../../../../common/services/dxDataGrid.ser
 import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./parser-preview.component.html');
 const style = require('./parser-preview.component.scss');
 
 @Component({
   selector: 'parser-preview',
-  template,
+  templateUrl: './parser-preview.component.html',
   styles: [
     `:host {
       width: 100%;

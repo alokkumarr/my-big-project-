@@ -12,12 +12,11 @@ import {
   AnalysisReport
 } from '../../types';
 
-const template = require('./designer-settings-query.component.html');
 const style = require('./designer-settings-query.component.scss');
 
 @Component({
   selector: 'designer-settings-query',
-  template,
+  templateUrl: './designer-settings-query.component.html',
   styles: [
     `:host {
       'class': 'designer-settings-query'

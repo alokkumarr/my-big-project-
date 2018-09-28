@@ -17,12 +17,11 @@ import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
 
-const template = require('./create-datasets.component.html');
 const style = require('./create-datasets.component.scss');
 
 @Component({
   selector: 'create-datasets',
-  template,
+  templateUrl: './create-datasets.component.html',
   styles: [
     `:host {
       width: 100%;

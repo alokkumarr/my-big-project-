@@ -3,11 +3,10 @@ import { Router } from '@angular/router';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./datapod-actions.component.html');
 const style = require('./datapod-actions.component.scss');
 @Component({
   selector: 'datapod-actions',
-  template,
+  templateUrl: './datapod-actions.component.html',
   styles: [style]
 })
 export class DatapodActionsComponent implements OnInit {

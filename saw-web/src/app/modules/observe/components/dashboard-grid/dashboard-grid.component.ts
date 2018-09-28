@@ -35,7 +35,6 @@ import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
-const template = require('./dashboard-grid.component.html');
 const style = require('./dashboard-grid.component.scss');
 
 const MARGIN_BETWEEN_TILES = 10;
@@ -48,7 +47,7 @@ export const DASHBOARD_MODES = {
 
 @Component({
   selector: 'dashboard-grid',
-  template,
+  templateUrl: './dashboard-grid.component.html',
   styles: [
     `:host {
       display: block;

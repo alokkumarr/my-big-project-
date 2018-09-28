@@ -2,12 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
-const template = require('./login.component.html');
 const style = require ('./login.component.scss');
 
 @Component({
   selector: 'login-form',
-  template,
+  templateUrl: './login.component.html',
   styles: [style]
 })
 

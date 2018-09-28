@@ -10,12 +10,11 @@ import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ObserveService } from '../../../services/observe.service';
 import { HeaderProgressService } from '../../../../../common/services';
 
-const template = require('./widget-metric.component.html');
 const style = require('./widget-metric.component.scss');
 
 @Component({
   selector: 'widget-metric',
-  template,
+  templateUrl: './widget-metric.component.html',
   styles: [
     `:host {
       display: block;

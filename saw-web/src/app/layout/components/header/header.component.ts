@@ -10,12 +10,11 @@ import {
   HeaderProgressService
 } from '../../../common/services';
 
-const template = require('./header.component.html');
 const style = require('./header.component.scss');
 
 @Component({
   selector: 'layout-header',
-  template,
+  templateUrl: './header.component.html',
   styles: [style]
 })
 export class LayoutHeaderComponent implements OnInit, OnDestroy {

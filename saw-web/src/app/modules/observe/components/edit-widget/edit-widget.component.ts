@@ -7,12 +7,11 @@ import * as flatMap from 'lodash/flatMap';
 import { ObserveService } from '../../services/observe.service';
 import { DATE_TYPES } from '../../../../common/consts';
 
-const template = require('./edit-widget.component.html');
 const style = require('./edit-widget.component.scss');
 
 @Component({
   selector: 'edit-widget',
-  template,
+  templateUrl: './edit-widget.component.html',
   styles: [
     `:host {
       background-color: whitesmoke;

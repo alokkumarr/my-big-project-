@@ -7,12 +7,11 @@ import {
   Validators
 } from '@angular/forms';
 
-const template = require('./semantic-details-dialog.component.html');
 const style = require('./semantic-details-dialog.component.scss');
 
 @Component({
   selector: 'createfolder-dialog',
-  template,
+  templateUrl: './semantic-details-dialog.component.html',
   styles: [style]
 })
 export class SemanticDetailsDialogComponent {

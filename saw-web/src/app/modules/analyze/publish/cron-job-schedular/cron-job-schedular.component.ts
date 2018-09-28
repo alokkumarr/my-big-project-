@@ -20,12 +20,11 @@ import {
 
 import { SCHEDULE_TYPES } from '../../../../common/consts';
 
-const template = require('./cron-job-schedular.component.html');
 const style = require('./cron-job-schedular.component.scss');
 
 @Component({
   selector: 'cron-job-schedular',
-  template,
+  templateUrl: './cron-job-schedular.component.html',
   styles: [
     `:host {
       border: 1px solid #CCC;

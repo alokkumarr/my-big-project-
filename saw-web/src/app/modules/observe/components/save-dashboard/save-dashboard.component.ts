@@ -18,7 +18,6 @@ import {
 } from '../../../../common/services';
 import { requireIf } from '../../validators/required-if.validator';
 
-const template = require('./save-dashboard.component.html');
 const style = require('./save-dashboard.component.scss');
 
 export const REFRESH_INTERVALS = [
@@ -66,7 +65,7 @@ export const REFRESH_INTERVALS = [
 
 @Component({
   selector: 'save-dashboard',
-  template,
+  templateUrl: './save-dashboard.component.html',
   styles: [
     `:host {
       display: block;

@@ -1,20 +1,18 @@
 import { Component, OnInit, Input } from '@angular/core';
-const template = require('./designer-chart.component.html');
-const style = require('./designer-chart.component.scss');
-
-import { DesignerStates, CHART_TYPES_OBJ } from '../consts';
-import { SqlBuilderChart, Sort } from '../types';
-import { ChartService } from '../../services/chart.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-
 import * as get from 'lodash/get';
 import * as clone from 'lodash/clone';
 import * as map from 'lodash/map';
 import * as filter from 'lodash/filter';
 
+import { DesignerStates, CHART_TYPES_OBJ } from '../consts';
+import { SqlBuilderChart, Sort } from '../types';
+import { ChartService } from '../../services/chart.service';
+
+const style = require('./designer-chart.component.scss');
 @Component({
   selector: 'designer-chart',
-  template,
+  templateUrl: './designer-chart.component.html',
   styles: [
     `:host {
       display: block;

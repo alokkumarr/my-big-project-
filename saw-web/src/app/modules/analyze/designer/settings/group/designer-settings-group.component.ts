@@ -8,12 +8,11 @@ import {
 import { TYPE_ICONS_OBJ } from '../../../consts';
 import { DesignerService } from '../../designer.service';
 
-const template = require('./designer-settings-group.component.html');
 const style = require('./designer-settings-group.component.scss');
 
 @Component({
   selector: 'designer-settings-group',
-  template,
+  templateUrl: './designer-settings-group.component.html',
   styles: [style]
 })
 export class DesignerSettingsGroupComponent {

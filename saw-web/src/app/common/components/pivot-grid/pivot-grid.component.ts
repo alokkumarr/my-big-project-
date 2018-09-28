@@ -37,7 +37,6 @@ const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
 };
 
 const style = require('./pivot-grid.component.scss');
-const template = require('./pivot-grid.component.html');
 
 export interface IPivotGridUpdate {
   dataSource?: any;
@@ -49,7 +48,7 @@ export interface IPivotGridUpdate {
 
 @Component({
   selector: 'pivot-grid',
-  template,
+  templateUrl: './pivot-grid.component.html',
   styles: [
     `:host {
       height: 100%;

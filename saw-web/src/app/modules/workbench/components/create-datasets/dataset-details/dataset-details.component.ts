@@ -10,12 +10,11 @@ import * as isUndefined from 'lodash/isUndefined';
 import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./dataset-details.component.html');
 const style = require('./dataset-details.component.scss');
 
 @Component({
   selector: 'dataset-details',
-  template,
+  templateUrl: './dataset-details.component.html',
   styles: [
     `:host {
       width: 100%;

@@ -20,11 +20,9 @@ import {
   JsPlumbCanvasChangeEvent
 } from '../types';
 
-const template = require('./js-plumb-canvas.component.html');
-
 @Component({
   selector: 'js-plumb-canvas-u',
-  template,
+  templateUrl: './js-plumb-canvas.component.html',
   styles: [`:host {
     position: relative;
   }`]

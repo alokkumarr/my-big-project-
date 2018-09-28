@@ -3,11 +3,10 @@ import { Router } from '@angular/router';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./dataset-actions.component.html');
 const style = require('./dataset-actions.component.scss');
 @Component({
   selector: 'dataset-actions',
-  template,
+  templateUrl: './dataset-actions.component.html',
   styles: [style]
 })
 export class DatasetActionsComponent implements OnInit {

@@ -4,12 +4,11 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { DATE_FORMATS } from '../../consts';
 import * as isUndefined from 'lodash/isUndefined';
 
-const template = require('./date-format-dialog.component.html');
 const style = require('./date-format-dialog.component.scss');
 
 @Component({
   selector: 'date-format-dialog',
-  template,
+  templateUrl: './date-format-dialog.component.html',
   styles: [
     `:host {
       display: block;

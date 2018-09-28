@@ -7,12 +7,11 @@ import { ANALYSIS_METHODS } from '../../consts';
 import { IAnalysisMethod } from '../../types';
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 
-const template = require('./analyze-new-dialog.component.html');
 const style = require('./analyze-new-dialog.component.scss');
 
 @Component({
   selector: 'analyze-new-dialog',
-  template,
+  templateUrl: './analyze-new-dialog.component.html',
   styles: [
     `:host {
       z-index: 80;

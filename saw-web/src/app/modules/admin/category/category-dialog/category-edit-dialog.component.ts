@@ -8,14 +8,13 @@ import * as fpOmit from 'lodash/fp/omit';
 import { CategoryService } from '../category.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const template = require('./category-edit-dialog.component.html');
 const style = require('./category-edit-dialog.component.scss');
 
 const namePattern = /^[a-zA-Z\s]*$/;
 
 @Component({
   selector: 'category-edit-dialog',
-  template,
+  templateUrl: './category-edit-dialog.component.html',
   styles: [
     `:host {
       max-width: 500px;

@@ -2,7 +2,6 @@ import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { ChartService } from '../../../../services/chart.service';
 import * as isEmpty from 'lodash/isEmpty';
 
-const template = require('./aux-chart.component.html');
 const style = require('./aux-chart.component.scss');
 
 const INVERTING_OPTIONS = [
@@ -20,7 +19,7 @@ const INVERTING_OPTIONS = [
 
 @Component({
   selector: 'designer-settings-aux-chart',
-  template,
+  templateUrl: './aux-chart.component.html',
   styles: [
     `:host {
       display: block;

@@ -3,12 +3,11 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-const template = require('./createfolder-dialog.component.html');
 const style = require('./createfolder-dialog.component.scss');
 
 @Component({
   selector: 'createfolder-dialog',
-  template,
+  templateUrl: './createfolder-dialog.component.html',
   styles: [style]
 })
 

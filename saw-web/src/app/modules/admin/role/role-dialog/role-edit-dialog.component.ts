@@ -4,14 +4,13 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { RoleService } from '../role.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const template = require('./role-edit-dialog.component.html');
 const style = require('./role-edit-dialog.component.scss');
 
 const namePattern = /^[a-zA-Z]*$/;
 
 @Component({
   selector: 'role-edit-dialog',
-  template,
+  templateUrl: './role-edit-dialog.component.html',
   styles: [
     `:host {
       max-width: 500px;

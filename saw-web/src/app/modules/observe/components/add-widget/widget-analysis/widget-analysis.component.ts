@@ -15,14 +15,13 @@ import { HeaderProgressService } from '../../../../../common/services';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
-const template = require('./widget-analysis.component.html');
 const style = require('./widget-analysis.component.scss');
 
 const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'widget-analysis',
-  template,
+  templateUrl: './widget-analysis.component.html',
   styles: [style]
 })
 export class WidgetAnalysisComponent implements OnInit, OnDestroy {

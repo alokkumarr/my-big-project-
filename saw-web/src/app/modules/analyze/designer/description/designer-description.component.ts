@@ -5,12 +5,11 @@ import {
   EventEmitter
 } from '@angular/core';
 
-const template = require('./designer-description.component.html');
 const style = require('./designer-description.component.scss');
 
 @Component({
   selector: 'designer-description',
-  template,
+  templateUrl: './designer-description.component.html',
   styles: [style]
 })
 export class DesignerDescriptionComponent {

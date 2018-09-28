@@ -43,14 +43,13 @@ import {
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../services/chart.service';
 
-const template = require('./designer-container.component.html');
 const style = require('./designer-container.component.scss');
 
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'designer-container',
-  template,
+  templateUrl: './designer-container.component.html',
   styles: [
     `:host {
       background-color: white;

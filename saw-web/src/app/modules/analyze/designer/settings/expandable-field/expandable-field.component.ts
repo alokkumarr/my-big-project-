@@ -20,11 +20,10 @@ import {
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
 
-const template = require('./expandable-field.component.html');
 const style = require('./expandable-field.component.scss');
 @Component({
   selector: 'expandable-field',
-  template,
+  templateUrl: './expandable-field.component.html',
   styles: [
     `:host {
       display: block;

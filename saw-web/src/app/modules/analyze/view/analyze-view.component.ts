@@ -13,7 +13,6 @@ import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 
-const template = require('./analyze-view.component.html');
 const style = require('./analyze-view.component.scss');
 
 const VIEW_KEY = 'analyseReportView';
@@ -26,7 +25,7 @@ const SEARCH_CONFIG = [
 ];
 @Component({
   selector: 'analyze-view-u',
-  template,
+  templateUrl: './analyze-view.component.html',
   styles: [
     `:host {width: 100%;}`,
     style

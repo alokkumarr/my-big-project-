@@ -8,7 +8,6 @@ import {
   getPrivilegeFromBoolArray
 } from '../privilege-code-transformer';
 
-const template = require('./privilege-row.component.html');
 const style = require('./privilege-row.component.scss');
 /** privilegeCode privilegeDesc
  * 0 => No access
@@ -21,7 +20,7 @@ interface Privilege {
 
 @Component({
   selector: 'tr[privilege-row]',
-  template,
+  templateUrl: './privilege-row.component.html',
   styles: [style]
 })
 export class PrivilegeRowComponent implements OnChanges {

@@ -17,12 +17,11 @@ import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialo
 import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs';
 
-const template = require('./select-rawdata.component.html');
 const style = require('./select-rawdata.component.scss');
 
 @Component({
   selector: 'select-rawdata',
-  template,
+  templateUrl: './select-rawdata.component.html',
   styles: [
     `:host {
       width: 100%;

@@ -14,12 +14,11 @@ import { SqlScriptComponent } from './query/sql-script.component';
 import { DetailsDialogComponent } from './dataset-details-dialog/details-dialog.component';
 import { WorkbenchService } from '../../services/workbench.service';
 
-const template = require('./sql-executor.component.html');
 const style = require('./sql-executor.component.scss');
 
 @Component({
   selector: 'sql-executor',
-  template,
+  templateUrl: './sql-executor.component.html',
   styles: [
     `:host {
       'class': 'sql-executor'

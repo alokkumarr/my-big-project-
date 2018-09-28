@@ -34,12 +34,11 @@ import {
   CUSTOM_JWT_CONFIG
 } from '../../../common/services';
 
-const template = require('./executed-view.component.html');
 const style = require('./executed-view.component.scss');
 
 @Component({
   selector: 'executed-view',
-  template,
+  templateUrl: './executed-view.component.html',
   styles: [
     `:host {
       width: 100%;

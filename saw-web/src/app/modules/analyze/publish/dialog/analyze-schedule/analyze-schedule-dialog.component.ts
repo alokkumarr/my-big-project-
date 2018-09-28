@@ -15,14 +15,13 @@ import { JwtService } from '../../../../../common/services';
 import { Analysis } from '../../../types';
 import {PRIVILEGES} from '../../../consts';
 
-const template = require('./analyze-schedule-dialog.component.html');
 const style = require('./analyze-schedule-dialog.component.scss');
 
 const SEMICOLON = 186;
 
 @Component({
   selector: 'analyze-schedule-dialog',
-  template,
+  templateUrl: './analyze-schedule-dialog.component.html',
   styles: [
     `:host {
       'class': 'analyze-schedule-dialog'

@@ -1,11 +1,10 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Observable, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const template = require('./user-edit-dialog.component.html');
 const style = require('./user-edit-dialog.component.scss');
 
 const namePattern = /^[a-zA-Z]*$/;
@@ -14,7 +13,7 @@ const dummyPassword = '*********';
 
 @Component({
   selector: 'user-edit-dialog',
-  template,
+  templateUrl: './user-edit-dialog.component.html',
   styles: [
     `:host {
       max-width: 500px;

@@ -21,7 +21,6 @@ import {
   Filter
 } from '../../types';
 
-const template = require('./designer-filter-dialog.component.html');
 const style = require('./designer-filter-dialog.component.scss');
 
 export interface DesignerFilterDialogData {
@@ -38,7 +37,7 @@ export interface DesignerFilterDialogResult {
 
 @Component({
   selector: 'designer-filter-dialog',
-  template,
+  templateUrl: './designer-filter-dialog.component.html',
   styles: [
     `:host {
       display: block;

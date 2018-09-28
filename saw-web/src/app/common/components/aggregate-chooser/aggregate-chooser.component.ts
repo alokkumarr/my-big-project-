@@ -14,11 +14,10 @@ import {
 } from '../../consts';
 import { AnalysisType } from '../../types';
 
-const template = require('./aggregate-chooser.component.html');
 const style = require('./aggregate-chooser.component.scss');
 @Component({
   selector: 'aggregate-chooser-u',
-  template,
+  templateUrl: './aggregate-chooser.component.html',
   styles: [style]
 })
 export class AggregateChooserComponent implements OnInit {

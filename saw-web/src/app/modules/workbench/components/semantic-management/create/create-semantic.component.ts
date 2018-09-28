@@ -7,12 +7,11 @@ import { WorkbenchService } from '../../../services/workbench.service';
 import * as filter from 'lodash/filter';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-const template = require('./create-semantic.component.html');
 const style = require('./create-semantic.component.scss');
 
 @Component({
   selector: 'create-semantic',
-  template,
+  templateUrl: './create-semantic.component.html',
   styles: [
     `:host {
       'class': 'create-semantic'

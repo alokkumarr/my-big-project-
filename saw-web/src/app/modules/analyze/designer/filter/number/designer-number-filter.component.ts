@@ -5,7 +5,6 @@ import { BETWEEN_NUMBER_FILTER_OPERATOR, NUMBER_FILTER_OPERATORS } from '../../.
 import * as isFinite from 'lodash/isFinite';
 import * as unset from 'lodash/unset';
 
-const template = require('./designer-number-filter.component.html');
 const style = require('./designer-number-filter.component.scss');
 
 export const isValid = (model: FilterModel) => {
@@ -20,7 +19,7 @@ export const isValid = (model: FilterModel) => {
 
 @Component({
   selector: 'designer-number-filter',
-  template,
+  templateUrl: './designer-number-filter.component.html',
   styles: [style]
 })
 export class DesignerNumberFilterComponent implements OnInit, OnChanges {

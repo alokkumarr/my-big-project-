@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-const template = require('./choice-group.component.html');
 const style = require('./choice-group.component.scss');
 
 interface IChoiceGroupItem {
@@ -11,7 +10,7 @@ interface IChoiceGroupItem {
 
 @Component({
   selector: 'choice-group-u',
-  template,
+  templateUrl: './choice-group.component.html',
   styles: [style]
 })
 export class ChoiceGroupComponent {

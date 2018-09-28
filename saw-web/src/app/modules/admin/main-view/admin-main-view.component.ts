@@ -20,7 +20,6 @@ import { LocalSearchService } from '../../../common/services/local-search.servic
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../common/types';
 
-const template = require('./admin-main-view.component.html');
 const style = require('./admin-main-view.component.scss');
 
 const USER_SEARCH_CONFIG = [
@@ -68,7 +67,7 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 
 @Component({
   selector: 'admin-main-view',
-  template,
+  templateUrl: './admin-main-view.component.html',
   styles: [style]
 })
 export class AdminMainViewComponent implements OnDestroy {

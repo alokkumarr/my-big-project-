@@ -12,12 +12,11 @@ import {
 } from '../types';
 import { JoinDialogComponent } from '../join-dialog';
 
-const template = require('./js-plumb-join-label.component.html');
 const style = require('./js-plumb-join-label.component.scss');
 
 @Component({
   selector: 'js-plumb-join-label-u',
-  template,
+  templateUrl: './js-plumb-join-label.component.html',
   styles: [style]
 })
 export class JsPlumbJoinLabelComponent {

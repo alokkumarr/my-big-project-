@@ -9,12 +9,11 @@ import { DxDataGridComponent } from 'devextreme-angular';
 
 import * as isUndefined from 'lodash/isUndefined';
 
-const template = require('./dataset-detail-view.component.html');
 const style = require('./dataset-detail-view.component.scss');
 
 @Component({
   selector: 'dataset-detail-view',
-  template,
+  templateUrl: './dataset-detail-view.component.html',
   styles: [
     `:host {
       'class': 'dataset-detail-view'

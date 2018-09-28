@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-const template = require('./login-page.component.html');
 
 @Component({
   selector: 'login-page',
-  template,
+  templateUrl: './login-page.component.html',
   styles: [`
     :host {
       height: 100%;

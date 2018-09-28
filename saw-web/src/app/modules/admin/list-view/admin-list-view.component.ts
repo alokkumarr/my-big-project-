@@ -1,12 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import {DxDataGridService} from '../../../common/services/dxDataGrid.service';
 
-const template = require('./admin-list-view.component.html');
 const style = require('./admin-list-view.component.scss');
 
 @Component({
   selector: 'admin-list-view',
-  template,
+  templateUrl: './admin-list-view.component.html',
   styles: [style]
 })
 

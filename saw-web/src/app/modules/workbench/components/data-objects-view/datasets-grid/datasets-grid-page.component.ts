@@ -5,12 +5,11 @@ import { DxDataGridComponent } from 'devextreme-angular';
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./datasets-grid-page.component.html');
 const style = require('./datasets-grid-page.component.scss');
 
 @Component({
   selector: 'datasets-grid-page',
-  template,
+  templateUrl: './datasets-grid-page.component.html',
   styles: [
     `:host {
       width: 100%;

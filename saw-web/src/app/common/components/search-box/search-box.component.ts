@@ -10,12 +10,11 @@ import {
 } from '@angular/core';
 import * as debounce from 'lodash/debounce';
 
-const template = require('./search-box.component.html');
 const style = require('./search-box.component.scss');
 
 @Component({
   selector: 'search-box',
-  template,
+  templateUrl: './search-box.component.html',
   styles: [
     `:host {
       display: inline-flex;

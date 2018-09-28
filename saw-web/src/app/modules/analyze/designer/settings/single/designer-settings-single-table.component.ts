@@ -18,7 +18,6 @@ import {
 } from '../../types';
 import { TYPE_ICONS_OBJ, TYPE_ICONS, TYPE_MAP } from '../../../consts';
 
-const template = require('./designer-settings-single-table.component.html');
 const style = require('./designer-settings-single-table.component.scss');
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
@@ -30,7 +29,7 @@ const FILTER_CHANGE_DEBOUNCE_TIME = 300;
  */
 @Component({
   selector: 'designer-settings-single-table',
-  template,
+  templateUrl: './designer-settings-single-table.component.html',
   styles: [style]
 })
 export class DesignerSettingsSingleTableComponent implements OnInit {

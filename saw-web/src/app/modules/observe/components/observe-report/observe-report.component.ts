@@ -3,7 +3,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnInit,
   OnDestroy
 } from '@angular/core';
 import { GridsterItem } from 'angular-gridster2';
@@ -16,12 +15,11 @@ import {
   EXECUTION_MODES
 } from '../../../analyze/services/analyze.service';
 
-const template = require('./observe-report.component.html');
 const style = require('./observe-report.component.scss');
 
 @Component({
   selector: 'observe-report',
-  template,
+  templateUrl: './observe-report.component.html',
   styles: [
     `:host {
       display: flex;

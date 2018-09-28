@@ -7,16 +7,13 @@ import {
 } from '@angular/core';
 import {
   FormGroup,
-  FormControl,
-  FormBuilder,
-  Validators
+  FormBuilder
 } from '@angular/forms';
 
 import { requireIf } from '../../validators/required-if.validator';
 import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS,
-  DATE_PRESETS_OBJ,
   DATE_FORMAT
 } from '../../consts';
 
@@ -25,7 +22,6 @@ import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import 'rxjs/add/operator/debounceTime';
 
-const template = require('./kpi-filter.component.html');
 const style = require('./kpi-filter.component.scss');
 
 interface KPIFilterType {
@@ -36,7 +32,7 @@ interface KPIFilterType {
 
 @Component({
   selector: 'kpi-filter',
-  template,
+  templateUrl: './kpi-filter.component.html',
   styles: [style]
 })
 export class KPIFilter implements OnInit, OnDestroy {

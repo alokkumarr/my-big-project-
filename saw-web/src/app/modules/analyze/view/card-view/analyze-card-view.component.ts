@@ -9,12 +9,11 @@ import {
   AnalyzeViewActionEvent
 } from '../types';
 
-const template = require('./analyze-card-view.component.html');
 const style = require('./analyze-card-view.component.scss');
 
 @Component({
   selector: 'analyze-card-view',
-  template,
+  templateUrl: './analyze-card-view.component.html',
   styles: [
     `:host {
       display: block;

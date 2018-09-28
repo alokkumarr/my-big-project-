@@ -23,7 +23,6 @@ import { AdminMenuData } from '../consts';
 import { Analysis } from '../../../models';
 import { ExportService } from '../export/export.service';
 
-const template = require('./admin-import-view.component.html');
 const style = require('./admin-import-view.component.scss');
 
 const DUPLICATE_GRID_OBJECT_PROPS = {
@@ -47,7 +46,7 @@ interface FileInfo {name: string; count: number; }
 interface FileContent {name: string; count: number; analyses: Array<Analysis>; }
 @Component({
   selector: 'admin-import-view',
-  template,
+  templateUrl: './admin-import-view.component.html',
   styles: [
     `:host {
       width: 100%;

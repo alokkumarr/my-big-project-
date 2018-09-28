@@ -14,12 +14,11 @@ import {
   DesignerChangeEvent
 } from '../../types';
 
-const template = require('./designer-settings-multi-table.component.html');
 const style = require('./designer-settings-multi-table.component.scss');
 
 @Component({
   selector: 'designer-settings-multi-table',
-  template,
+  templateUrl: './designer-settings-multi-table.component.html',
   styles: [
     `:host {
       'class': 'designer-settings-multi-table'

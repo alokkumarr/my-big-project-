@@ -46,7 +46,6 @@ import {
 } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 
-const template = require('./report-grid.component.html');
 const style = require('./report-grid.component.scss');
 
 interface ReportGridSort {
@@ -78,7 +77,7 @@ let self; // needed to access component context from dx callbacks
 
 @Component({
   selector: 'report-grid-upgraded',
-  template,
+  templateUrl: './report-grid.component.html',
   styles: [style]
 })
 export class ReportGridComponent implements OnInit, OnDestroy {

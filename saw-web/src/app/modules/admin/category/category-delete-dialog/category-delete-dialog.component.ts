@@ -3,14 +3,13 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { CategoryService } from '../category.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const template = require('./category-delete-dialog.component.html');
 const style = require('./category-delete-dialog.component.scss');
 
 const MY_ANALYSIS_CATEGORY_ID = 3;
 
 @Component({
   selector: 'delete-edit-dialog',
-  template,
+  templateUrl: './category-delete-dialog.component.html',
   styles: [style]
 })
 export class CategoryDeleteDialogComponent extends BaseDialogComponent {

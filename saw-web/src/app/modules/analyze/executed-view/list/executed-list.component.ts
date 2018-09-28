@@ -5,11 +5,9 @@ import * as moment from 'moment';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { Analysis } from '../../types';
 
-const template = require('./executed-list.component.html');
-
 @Component({
   selector: 'executed-list',
-  template,
+  templateUrl: './executed-list.component.html',
   styles: [
     `
       :host {

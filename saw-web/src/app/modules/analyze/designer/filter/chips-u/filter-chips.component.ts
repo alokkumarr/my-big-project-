@@ -19,12 +19,11 @@ import {
   NUMBER_FILTER_OPERATORS_OBJ
 } from '../../../consts';
 
-const template = require('./filter-chips.component.html');
 const style = require('./filter-chips.component.scss');
 
 @Component({
   selector: 'filter-chips-u',
-  template,
+  templateUrl: './filter-chips.component.html',
   styles: [`
     :host {
       display: block;

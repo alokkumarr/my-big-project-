@@ -9,12 +9,11 @@ import {
 } from '../../types';
 import { DesignerStates } from '../../consts';
 
-const template = require('./single-table-designer-layout.component.html');
 const style = require('./single-table-designer-layout.component.scss');
 
 @Component({
   selector: 'single-table-designer-layout',
-  template,
+  templateUrl: './single-table-designer-layout.component.html',
   styles: [
     `:host {
       background-color: white;

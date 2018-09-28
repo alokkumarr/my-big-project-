@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 
-const template = require('./workbench-page.component.html');
 const style = require('./workbench-page.component.scss');
 
 @Component({
   selector: 'workbench-page',
-  template: template,
+  templateUrl: './workbench-page.component.html',
   styles: [
     `:host {
       width: 100%;

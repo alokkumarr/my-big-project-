@@ -1,10 +1,8 @@
 import { Component, Input } from '@angular/core';
 
-const template = require('./accordionMenu.component.html');
-
 @Component({
   selector: 'accordion-menu',
-  template,
+  templateUrl: './accordionMenu.component.html',
   styles: [`:host {display: block;}`]
 })
 

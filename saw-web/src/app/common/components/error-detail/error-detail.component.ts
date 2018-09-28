@@ -11,11 +11,10 @@ import {
 import { ErrorDetailService } from '../../services/error-detail.service';
 
 const style = require('./error-detail.component.scss');
-const template = require('./error-detail.component.html');
 
 @Component({
   selector: 'error-detail',
-  template,
+  templateUrl: './error-detail.component.html',
   styles: [style]
 })
 export class ErrorDetailComponent implements OnInit {

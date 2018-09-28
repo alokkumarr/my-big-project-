@@ -2,12 +2,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import * as isUndefined from 'lodash/isUndefined';
 import { SidenavComponent } from '../sidenav';
 
-const template = require('./accordionMenuLink.component.html');
 const style = require('./accordionMenuLink.component.scss');
 
 @Component({
   selector: 'accordion-menu-link',
-  template,
+  templateUrl: './accordionMenuLink.component.html',
   styles: [style]
 })
 export class AccordionMenuLinkComponent implements OnInit {

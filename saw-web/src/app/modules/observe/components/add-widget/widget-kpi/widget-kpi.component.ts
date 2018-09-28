@@ -35,12 +35,11 @@ import {
   KPI_BG_COLORS
 } from '../../../consts';
 
-const template = require('./widget-kpi.component.html');
 const style = require('./widget-kpi.component.scss');
 
 @Component({
   selector: 'widget-kpi',
-  template,
+  templateUrl: './widget-kpi.component.html',
   styles: [style]
 })
 export class WidgetKPIComponent implements OnInit, OnDestroy {

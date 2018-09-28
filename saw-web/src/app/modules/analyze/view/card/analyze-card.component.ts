@@ -11,12 +11,11 @@ import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
 
-const template = require('./analyze-card.component.html');
 const style = require('./analyze-card.component.scss');
 
 @Component({
   selector: 'analyze-card',
-  template,
+  templateUrl: './analyze-card.component.html',
   styles: [
     `:host {
       display: block;

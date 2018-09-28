@@ -3,13 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-
-const template = require('./details-dialog.component.html');
 const style = require('./details-dialog.component.scss');
 
 @Component({
   selector: 'details-dialog',
-  template,
+  templateUrl: './details-dialog.component.html',
   styles: [style]
 })
 

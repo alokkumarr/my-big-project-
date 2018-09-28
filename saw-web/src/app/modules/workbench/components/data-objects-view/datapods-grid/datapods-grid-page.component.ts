@@ -1,12 +1,11 @@
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-const template = require('./datapods-grid-page.component.html');
 const style = require('./datapods-grid-page.component.scss');
 
 @Component({
   selector: 'datapods-grid-page',
-  template,
+  templateUrl: './datapods-grid-page.component.html',
   styles: [
     `:host {
       width: 100%;

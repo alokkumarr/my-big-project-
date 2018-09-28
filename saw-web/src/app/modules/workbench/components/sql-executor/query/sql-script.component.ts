@@ -16,12 +16,11 @@ import * as map from 'lodash/map';
 import { AceEditorComponent } from 'ng2-ace-editor';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const template = require('./sql-script.component.html');
 const style = require('./sql-script.component.scss');
 
 @Component({
   selector: 'sql-script',
-  template,
+  templateUrl: './sql-script.component.html',
   styles: [
     `:host {
       height: 100%;

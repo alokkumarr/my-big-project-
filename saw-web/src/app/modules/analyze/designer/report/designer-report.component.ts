@@ -13,12 +13,11 @@ import {
 } from '../types';
 import { DesignerStates } from '../consts';
 
-const template = require('./designer-report.component.html');
 const style = require('./designer-report.component.scss');
 
 @Component({
   selector: 'designer-report',
-  template,
+  templateUrl: './designer-report.component.html',
   styles: [
     `:host {
       height: calc(100% - 20px);

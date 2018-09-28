@@ -2,12 +2,11 @@ import { Component, Input, ViewChild, OnInit } from '@angular/core';
 
 import { SidenavMenuService } from './sidenav-menu.service';
 
-const template = require('./sidenav.component.html');
 const style = require('./sidenav.component.scss');
 
 @Component({
   selector: 'app-sidenav',
-  template,
+  templateUrl: './sidenav.component.html',
   styles: [
     `:host {
       z-index: 999;

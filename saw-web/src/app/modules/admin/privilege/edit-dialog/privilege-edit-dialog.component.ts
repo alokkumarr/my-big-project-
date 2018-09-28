@@ -11,12 +11,11 @@ import {
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const template = require('./privilege-edit-dialog.component.html');
 const style = require('./privilege-edit-dialog.component.scss');
 
 @Component({
   selector: 'privilege-edit-dialog',
-  template,
+  templateUrl: './privilege-edit-dialog.component.html',
   styles: [
     `:host {
       max-width: 860px;

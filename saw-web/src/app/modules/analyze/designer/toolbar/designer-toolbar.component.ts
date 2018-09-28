@@ -6,12 +6,11 @@ import {
 
 import { DesignerToolbarAciton } from '../types';
 
-const template = require('./designer-toolbar.component.html');
 const style = require('./designer-toolbar.component.scss');
 
 @Component({
   selector: 'designer-toolbar',
-  template,
+  templateUrl: './designer-toolbar.component.html',
   styles: [style]
 })
 export class DesignerToolbarComponent {

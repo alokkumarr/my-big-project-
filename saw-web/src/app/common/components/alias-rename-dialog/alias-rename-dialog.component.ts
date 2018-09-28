@@ -4,12 +4,11 @@ import {
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
-const template = require('./alias-rename-dialog.component.html');
 const style = require('./alias-rename-dialog.component.scss');
 
 @Component({
   selector: 'alias-rename-dialog',
-  template,
+  templateUrl: './alias-rename-dialog.component.html',
   styles: [
     `:host {
       display: block;

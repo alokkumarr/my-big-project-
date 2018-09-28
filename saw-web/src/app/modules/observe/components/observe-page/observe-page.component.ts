@@ -3,12 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 
-const template = require('./observe-page.component.html');
 const style = require('./observe-page.component.scss');
 
 @Component({
   selector: 'observe-page',
-  template: template,
+  templateUrl: './observe-page.component.html',
   styles: [
     `:host {
       width: 100%;

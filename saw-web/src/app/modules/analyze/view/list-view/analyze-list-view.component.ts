@@ -12,13 +12,11 @@ import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
 
-
-const template = require('./analyze-list-view.component.html');
 const style = require('./analyze-list-view.component.scss');
 
 @Component({
   selector: 'analyze-list-view',
-  template,
+  templateUrl: './analyze-list-view.component.html',
   styles: [style]
 })
 export class AnalyzeListViewComponent {

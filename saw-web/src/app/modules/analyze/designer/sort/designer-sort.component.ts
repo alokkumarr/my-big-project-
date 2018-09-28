@@ -21,12 +21,11 @@ import {
 } from '../types';
 import { TYPE_MAP } from '../../consts';
 
-const template = require('./designer-sort.component.html');
 const style = require('./designer-sort.component.scss');
 
 @Component({
   selector: 'designer-sort',
-  template,
+  templateUrl: './designer-sort.component.html',
   styles: [style]
 })
 export class DesignerSortComponent {

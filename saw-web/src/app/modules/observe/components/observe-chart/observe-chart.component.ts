@@ -29,12 +29,12 @@ import * as concat from 'lodash/concat';
 import * as moment from 'moment';
 
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
-const template = require('./observe-chart.component.html');
+
 const style = require('./observe-chart.component.scss');
 
 @Component({
   selector: 'observe-chart',
-  template,
+  templateUrl: './observe-chart.component.html',
   styles: [style],
   providers: [ChartService]
 })

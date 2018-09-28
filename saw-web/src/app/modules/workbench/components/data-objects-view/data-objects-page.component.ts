@@ -11,12 +11,11 @@ import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
 
-const template = require('./data-objects-page.component.html');
 const style = require('./data-objects-page.component.scss');
 
 @Component({
   selector: 'data-objects-page',
-  template,
+  templateUrl: './data-objects-page.component.html',
   styles: [
     `:host {
       width: 100%;

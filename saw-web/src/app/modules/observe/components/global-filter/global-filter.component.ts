@@ -16,12 +16,11 @@ import * as find from 'lodash/find';
 
 import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
 
-const template = require('./global-filter.component.html');
 const style = require('./global-filter.component.scss');
 
 @Component({
   selector: 'global-filter',
-  template,
+  templateUrl: './global-filter.component.html',
   styles: [
     `:host {
       background-color: whitesmoke;

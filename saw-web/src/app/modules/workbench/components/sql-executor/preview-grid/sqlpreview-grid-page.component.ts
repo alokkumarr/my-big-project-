@@ -5,11 +5,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { DxDataGridComponent } from 'devextreme-angular';
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 
-const template = require('./sqlpreview-grid-page.component.html');
-
 @Component({
   selector: 'sqlpreview-grid-page',
-  template,
+  templateUrl: './sqlpreview-grid-page.component.html',
   styles: [`:host {
     width: 100%;
     height: 100%;

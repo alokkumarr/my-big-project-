@@ -16,12 +16,11 @@ import { map } from 'rxjs/operators/map';
 import { ArtifactColumn, Filter, FilterModel } from '../../types';
 import { TYPE_MAP } from '../../../consts';
 
-const template = require('./designer-filter-row.component.html');
 const style = require('./designer-filter-row.component.scss');
 
 @Component({
   selector: 'designer-filter-row',
-  template,
+  templateUrl: './designer-filter-row.component.html',
   styles: [style]
 })
 export class DesignerFilterRowComponent {

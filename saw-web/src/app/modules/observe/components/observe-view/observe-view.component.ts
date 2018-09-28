@@ -28,8 +28,6 @@ import 'rxjs/add/operator/catch';
 import * as get from 'lodash/get';
 import * as filter from 'lodash/filter';
 
-const template = require('./observe-view.component.html');
-
 function downloadDataUrlFromJavascript(filename, dataUrl) {
   const blob = dataURItoBlob(dataUrl);
   saveAs(blob, filename);
@@ -37,7 +35,7 @@ function downloadDataUrlFromJavascript(filename, dataUrl) {
 
 @Component({
   selector: 'observe-view',
-  template,
+  templateUrl: './observe-view.component.html',
   providers: [DashboardService, GlobalFilterService]
 })
 export class ObserveViewComponent implements OnInit, OnDestroy {

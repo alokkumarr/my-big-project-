@@ -10,12 +10,11 @@ import {
 } from '../types';
 import { DesignerStates } from '../consts';
 
-const template = require('./designer-header.component.html');
 const style = require('./designer-header.component.scss');
 
 @Component({
   selector: 'designer-header',
-  template,
+  templateUrl: './designer-header.component.html',
   styles: [
     `:host {
       background-color: white;

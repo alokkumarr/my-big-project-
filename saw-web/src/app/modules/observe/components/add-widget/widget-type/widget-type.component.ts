@@ -1,12 +1,12 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
-const template = require('./widget-type.component.html');
-const style = require('./widget-type.component.scss');
 
 import { WidgetType } from '../widget.model';
 
+const style = require('./widget-type.component.scss');
+
 @Component({
   selector: 'widget-type',
-  template,
+  templateUrl: './widget-type.component.html',
   styles: [style]
 })
 

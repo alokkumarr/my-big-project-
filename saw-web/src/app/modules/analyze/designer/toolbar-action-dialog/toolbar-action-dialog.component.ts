@@ -7,12 +7,11 @@ import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
 
-const template = require('./toolbar-action-dialog.component.html');
 const style = require('./toolbar-action-dialog.component.scss');
 
 @Component({
   selector: 'toolbar-action-dialog',
-  template,
+  templateUrl: './toolbar-action-dialog.component.html',
   styles: [
     `:host {
       display: block;
