@@ -19,7 +19,7 @@
     </button>
   </div>
 </mat-toolbar>
-<div *ngIf="data" style="padding: 0 20px;">
+<div *ngIf="data" class="admin-list-container">
   <admin-list-view (editRow)="editRow($event)"
                    (deleteRow)="deleteRow($event)"
                    (rowClick)="onRowClick($event)"
