@@ -27,7 +27,7 @@
     "@ng-idle/core": "6.0.0-beta.3",
     "core-js": "2.5.4",
     "angular-2-local-storage": "2.0.0",
-    "angular-gridster2": "4.6.1",
+    "angular-gridster2": "6.0.10",
     "angular-split": "1.0.0-rc.3",
     "angular-tree-component": "7.2.0",
     "angular2-counto": "1.2.5",
