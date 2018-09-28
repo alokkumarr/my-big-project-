@@ -100,6 +100,7 @@ const SERVICES = [
 ];
 
 const GUARDS = [DefaultAnalyzeCategoryGuard];
+
 @NgModule({
   imports: [
     CommonModuleAngular4,

@@ -16,6 +16,7 @@
 #'  'target_variable'. this differs from stats::cor function which returns NxN
 #'  matrix with column and row names. First column returned by corr is
 #'  equivalent to rownames in cor function
+#'@param ... not currently implemented  
 #'
 #'@return Dataframe of either 1xN vector or NxN martrix with pearson
 #'  correlation values with additional rowname id column
@@ -37,7 +38,8 @@ corr <- function(df, target_var, target_var_name, ...) {
 #' @export
 corr.data.frame <- function(df,
                             target_var = NULL,
-                            target_var_name = "target_variable"){
+                            target_var_name = "target_variable",
+                            ...){
   variables <- colnames(df)
   stopifnot(target_var %in% c(variables) | is.null(target_var))
   result <- cor(df) %>%
@@ -62,7 +64,8 @@ corr.data.frame <- function(df,
 corr.tbl_spark <- function(df,
                            target_var = NULL,
                            target_var_name = "target_variable",
-                           table_name = "corr") {
+                           table_name = "corr",
+                           ...) {
   variables <- colnames(df)
   checkmate::assert_choice(target_var, variables, null.ok = TRUE)
   checkmate::assert_string(target_var_name)

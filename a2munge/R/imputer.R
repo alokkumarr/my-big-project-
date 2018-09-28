@@ -35,7 +35,13 @@ imputer <- function(df,
 
   impute_fun <- match.fun(paste("impute", fun, sep="_"))
   impute_args <- modifyList(list(df = df, measure_vars = measure_vars), list(...))
-  do.call("impute_fun", impute_args)
+  result <- do.call("impute_fun", impute_args)
+  
+  if(! is.null(group_vars) & fun != "constant") {
+    result <- dplyr::ungroup(result)
+  }
+  
+  result
 }
 
 
