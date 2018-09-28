@@ -16,7 +16,12 @@ const style = require('./widget-metric.component.scss');
 @Component({
   selector: 'widget-metric',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+    }`,
+    style
+  ]
 })
 export class WidgetMetricComponent implements OnInit, OnDestroy {
   @Output() onSelect = new EventEmitter();

@@ -51,7 +51,18 @@ const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 @Component({
   selector: 'designer-container',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: white;
+      max-height: 100vh;
+      max-width: 100vw;
+      display: grid;
+      grid-template:
+        "header" 5vh
+        "content" 94vh;
+    }`,
+    style
+  ]
 })
 export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;

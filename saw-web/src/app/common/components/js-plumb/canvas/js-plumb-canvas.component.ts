@@ -21,12 +21,13 @@ import {
 } from '../types';
 
 const template = require('./js-plumb-canvas.component.html');
-const style = require('./js-plumb-canvas.component.scss');
 
 @Component({
   selector: 'js-plumb-canvas-u',
   template,
-  styles: [style]
+  styles: [`:host {
+    position: relative;
+  }`]
 })
 export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();

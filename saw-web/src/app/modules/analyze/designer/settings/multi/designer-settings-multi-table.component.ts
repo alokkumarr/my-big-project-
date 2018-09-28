@@ -20,7 +20,12 @@ const style = require('./designer-settings-multi-table.component.scss');
 @Component({
   selector: 'designer-settings-multi-table',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'designer-settings-multi-table'
+    }`,
+    style
+  ]
 })
 export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

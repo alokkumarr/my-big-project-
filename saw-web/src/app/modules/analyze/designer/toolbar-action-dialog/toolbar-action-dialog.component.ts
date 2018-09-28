@@ -13,7 +13,13 @@ const style = require('./toolbar-action-dialog.component.scss');
 @Component({
   selector: 'toolbar-action-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;

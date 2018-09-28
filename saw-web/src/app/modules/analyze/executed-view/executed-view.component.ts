@@ -40,7 +40,12 @@ const style = require('./executed-view.component.scss');
 @Component({
   selector: 'executed-view',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ]
 })
 export class ExecutedViewComponent implements OnInit, OnDestroy {
   analysis: Analysis; // the latest analysis definition

@@ -7,7 +7,12 @@ const style = require('./widget-header.component.scss');
 @Component({
   selector: 'widget-header',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'widget-header'
+    }`,
+    style
+  ]
 })
 
 export class WidgetHeaderComponent implements OnInit {

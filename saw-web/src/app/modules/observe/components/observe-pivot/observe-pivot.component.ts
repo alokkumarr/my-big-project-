@@ -20,7 +20,13 @@ const style = require('./observe-pivot.component.scss');
 @Component({
   selector: 'observe-pivot',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      height: 100%;
+    }`,
+    style
+  ]
 })
 export class ObservePivotComponent implements OnInit {
   public artifactColumns: Array<any> = [];

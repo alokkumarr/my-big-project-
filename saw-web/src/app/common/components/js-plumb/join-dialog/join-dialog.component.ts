@@ -1,6 +1,5 @@
 import {
   Component,
-  Input,
   Inject
 } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
@@ -18,7 +17,13 @@ const style = require('./join-dialog.component.scss');
 @Component({
   selector: 'join-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class JoinDialogComponent {
 

@@ -25,7 +25,13 @@ const style = require('./expandable-field.component.scss');
 @Component({
   selector: 'expandable-field',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      cursor: move;
+    }`,
+    style
+  ]
 })
 export class ExpandableFieldComponent {
   @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

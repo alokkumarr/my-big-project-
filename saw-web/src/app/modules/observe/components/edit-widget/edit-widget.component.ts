@@ -1,10 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { Observable } from 'rxjs/Observable';
-import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
 import * as filter from 'lodash/filter';
-import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
 
 import { ObserveService } from '../../services/observe.service';
@@ -16,7 +13,15 @@ const style = require('./edit-widget.component.scss');
 @Component({
   selector: 'edit-widget',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: whitesmoke;
+      display: block;
+      min-height: 100%;
+      width: 400px;
+    }`,
+    style
+  ]
 })
 export class EditWidgetComponent implements OnInit {
   editItem: any;

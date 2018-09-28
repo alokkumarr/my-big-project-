@@ -15,7 +15,18 @@ const style = require('./single-table-designer-layout.component.scss');
 @Component({
   selector: 'single-table-designer-layout',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: white;
+      max-height: 93vh;
+      max-width: 100vw;
+      display: grid;
+      grid-template:
+        "data-settings content" 93vh
+        / 25vw 75vw;
+    }`,
+    style
+  ]
 })
 export class SingleTableDesignerLayout {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

@@ -1,6 +1,3 @@
-import 'zone.js/dist/zone';
-import 'hammerjs';
-import 'reflect-metadata';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID, CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgIdleModule } from '@ng-idle/core';

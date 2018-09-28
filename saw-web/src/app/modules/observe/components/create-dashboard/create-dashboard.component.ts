@@ -35,7 +35,15 @@ const MARGIN_BETWEEN_TILES = 10;
 @Component({
   selector: 'create-dashboard',
   template,
-  styles: [style],
+  styles: [
+    `:host {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }`,
+    style
+  ],
   animations,
   providers: [DashboardService, GlobalFilterService]
 })

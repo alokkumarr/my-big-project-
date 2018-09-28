@@ -12,7 +12,12 @@ const namePattern = /^[a-zA-Z]*$/;
 @Component({
   selector: 'role-edit-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      max-width: 500px;
+    }`,
+    style
+  ]
 })
 export class RoleEditDialogComponent extends BaseDialogComponent {
 

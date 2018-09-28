@@ -17,7 +17,13 @@ const style = require('./privilege-edit-dialog.component.scss');
 @Component({
   selector: 'privilege-edit-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      max-width: 860px;
+      width: 860px;
+    }`,
+    style
+  ]
 })
 export class PrivilegeEditDialogComponent extends BaseDialogComponent {
 

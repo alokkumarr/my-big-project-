@@ -25,7 +25,12 @@ const style = require('./parser-preview.component.scss');
 @Component({
   selector: 'parser-preview',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ]
 })
 
 export class ParserPreviewComponent implements OnInit {

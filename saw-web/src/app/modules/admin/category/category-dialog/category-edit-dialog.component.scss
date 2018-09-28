@@ -1,62 +1,56 @@
-
 @import "src/themes/base/colors";
 
-category-edit-dialog {
-  max-width: 500px;
+.wide {
+  max-width: 700px;
   width: 700px;
+}
 
-  &.wide {
-    max-width: 700px;
-    width: 700px;
+strong {
+  font-weight: 600;
+}
+
+.base-dialog__content {
+  padding: 10px 40px !important;
+
+  .mat-button-toggle.mat-button-toggle-checked {
+    background-color: $grid-header-bg-color;
   }
 
-  strong {
-    font-weight: 600;
+  .sub-categories-form {
+    margin-top: 20px;
+    width: 620px;
   }
 
-  .base-dialog__content {
-    padding: 10px 40px !important;
+  .sub-categories-list {
+    overflow-y: auto;
+    max-height: 200px;
+  }
 
-    .mat-button-toggle.mat-button-toggle-checked {
-      background-color: $grid-header-bg-color;
-    }
+  .mat-form-field {
+    width: 100%;
+  }
 
-    .sub-categories-form {
-      margin-top: 20px;
-      width: 620px;
-    }
+  .form-field {
+    margin-bottom: 5px;
+  }
 
-    .sub-categories-list {
-      overflow-y: auto;
-      max-height: 200px;
-    }
+  .mat-radio-group {
+    margin-right: 5px;
+    min-width: 210px;
+    width: 210px;
+    overflow-y: auto;
+    max-height: 160px;
+    min-height: 160px;
 
-    .mat-form-field {
-      width: 100%;
-    }
-
-    .form-field {
+    .mat-radio-button {
+      margin-top: 5px;
       margin-bottom: 5px;
-    }
+      max-width: 190px;
 
-    .mat-radio-group {
-      margin-right: 5px;
-      min-width: 210px;
-      width: 210px;
-      overflow-y: auto;
-      max-height: 160px;
-      min-height: 160px;
-
-      .mat-radio-button {
-        margin-top: 5px;
-        margin-bottom: 5px;
-        max-width: 190px;
-
-        .mat-radio-label-content {
-          word-break: break-all;
-          width: 160px;
-          white-space: normal;
-        }
+      .mat-radio-label-content {
+        word-break: break-all;
+        width: 160px;
+        white-space: normal;
       }
     }
   }

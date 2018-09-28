@@ -19,7 +19,13 @@ const style = require('./designer-report.component.scss');
 @Component({
   selector: 'designer-report',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      height: calc(100% - 20px);
+      width: calc(100% - 20px);
+    }`,
+    style
+  ]
 })
 export class DesignerReportComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

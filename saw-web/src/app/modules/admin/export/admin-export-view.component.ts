@@ -34,7 +34,13 @@ const style = require('./admin-export-view.component.scss');
 @Component({
   selector: 'admin-export-view',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      max-height: calc(100vh - (63px + 55px));
+      width: 100%;
+    }`,
+    style
+  ]
 })
 export class AdminExportViewComponent implements OnInit {
   @ViewChild('metricInput')

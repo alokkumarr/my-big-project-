@@ -1,5 +1,5 @@
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
@@ -13,7 +13,7 @@ const style = require('./details-dialog.component.scss');
   styles: [style]
 })
 
-export class DetailsDialogComponent {
+export class DetailsDialogComponent implements OnInit {
   form: FormGroup;
   private folNamePattern = '[A-Za-z0-9]+';
 

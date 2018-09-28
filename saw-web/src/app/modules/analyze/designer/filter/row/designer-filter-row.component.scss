@@ -1,30 +1,28 @@
-designer-filter-row {
-  .filter__remove-button__icon {
-    color: red;
+.filter__remove-button__icon {
+  color: red;
+}
+
+.filter__data__space {
+  max-width: 80%;
+}
+
+.filter__action__space {
+  mat-checkbox:first-child {
+    margin-right: 10px;
   }
 
-  .filter__data__space {
-    max-width: 80%;
+  mat-checkbox:nth-child(2) {
+    margin-right: 10px;
   }
+}
 
-  .filter__action__space {
-    mat-checkbox:first-child {
-      margin-right: 10px;
-    }
+mat-select {
+  margin-right: 5px;
+}
 
-    mat-checkbox:nth-child(2) {
-      margin-right: 10px;
-    }
-  }
-
-  mat-select {
-    margin-right: 5px;
-  }
-
-  .mandatory-asterisk {
-    color: red;
-    position: absolute;
-    top: 3px;
-    left: -4px;
-  }
+.mandatory-asterisk {
+  color: red;
+  position: absolute;
+  top: 3px;
+  left: -4px;
 }

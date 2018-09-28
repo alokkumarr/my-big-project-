@@ -18,7 +18,12 @@ const style = require('./designer-settings-query.component.scss');
 @Component({
   selector: 'designer-settings-query',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'designer-settings-query'
+    }`,
+    style
+  ]
 })
 export class DesignerSettingsQueryComponent implements OnInit {
   @Output() save = new EventEmitter<any>();

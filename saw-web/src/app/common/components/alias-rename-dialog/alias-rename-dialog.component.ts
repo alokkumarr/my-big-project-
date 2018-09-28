@@ -10,7 +10,13 @@ const style = require('./alias-rename-dialog.component.scss');
 @Component({
   selector: 'alias-rename-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class AliasRenameDialogComponent {
 

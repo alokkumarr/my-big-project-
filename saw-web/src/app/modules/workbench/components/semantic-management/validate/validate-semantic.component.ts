@@ -18,7 +18,12 @@ const style = require('./validate-semantic.component.scss');
 @Component({
   selector: 'validate-semantic',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'validate-semantic'
+    }`,
+    style
+  ]
 })
 export class ValidateSemanticComponent implements OnDestroy {
   private selectedDS: any;

@@ -24,7 +24,15 @@ import {
 @Component({
   selector: 'add-widget',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: whitesmoke;
+      display: block;
+      min-height: 100%;
+      max-width: 400px;
+    }`,
+    style
+  ]
 })
 export class AddWidgetComponent implements OnInit {
   widgetTypes = wTypes;

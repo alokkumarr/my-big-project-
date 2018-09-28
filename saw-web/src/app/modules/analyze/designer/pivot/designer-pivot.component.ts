@@ -12,7 +12,13 @@ const style = require('./designer-pivot.component.scss');
 @Component({
   selector: 'designer-pivot',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      height: calc(100% - 20px);
+      width: calc(100% - 20px);
+    }`,
+    style
+  ]
 })
 export class DesignerPivotComponent {
   @Input('artifacts')

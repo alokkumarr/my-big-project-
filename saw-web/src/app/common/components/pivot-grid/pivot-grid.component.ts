@@ -50,7 +50,15 @@ export interface IPivotGridUpdate {
 @Component({
   selector: 'pivot-grid',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      height: 100%;
+      width: 100%;
+      display: block;
+      overflow: auto;
+    }`,
+    style
+  ]
 })
 export class PivotGridComponent implements OnInit, OnDestroy {
   @Input() updater: Subject<IPivotGridUpdate>;

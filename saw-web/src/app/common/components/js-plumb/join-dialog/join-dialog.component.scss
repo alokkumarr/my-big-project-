@@ -1,28 +1,23 @@
 @import "src/themes/base/colors";
 
-join-dialog {
-  display: block;
+.dialog__header {
   padding: 10px;
+  border-bottom: 1px solid $primary-grey-g2;
 
-  .dialog__header {
-    padding: 10px;
-    border-bottom: 1px solid $primary-grey-g2;
-
-    strong {
-      font-size: 20px;
-    }
+  strong {
+    font-size: 20px;
   }
+}
 
-  .dialog__content {
-    padding: 10px 0;
+.dialog__content {
+  padding: 10px 0;
 
-    mat-list-item.active {
-      background-color: $selection-highlight-col;
-    }
+  mat-list-item.active {
+    background-color: $selection-highlight-col;
   }
+}
 
-  .dialog__actions {
-    padding-top: 10px;
-    border-top: 1px solid $primary-grey-g2;
-  }
+.dialog__actions {
+  padding-top: 10px;
+  border-top: 1px solid $primary-grey-g2;
 }

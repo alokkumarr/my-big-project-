@@ -16,7 +16,12 @@ const style = require('./dataset-details.component.scss');
 @Component({
   selector: 'dataset-details',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ]
 })
 
 export class DatasetDetailsComponent implements OnInit {

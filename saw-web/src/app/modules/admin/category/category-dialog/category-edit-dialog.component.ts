@@ -1,5 +1,4 @@
-import { Component, Inject, HostBinding } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Component, Inject, HostBinding } from '@angular/core'; import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -17,7 +16,13 @@ const namePattern = /^[a-zA-Z\s]*$/;
 @Component({
   selector: 'category-edit-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      max-width: 500px;
+      width: 700px;
+    }`,
+    style
+  ]
 })
 export class CategoryEditDialogComponent extends BaseDialogComponent {
 

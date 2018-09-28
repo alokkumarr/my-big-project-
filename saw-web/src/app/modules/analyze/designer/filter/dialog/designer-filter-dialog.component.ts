@@ -39,7 +39,13 @@ export interface DesignerFilterDialogResult {
 @Component({
   selector: 'designer-filter-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class DesignerFilterDialogComponent implements OnInit {
   artifacts: Artifact[];

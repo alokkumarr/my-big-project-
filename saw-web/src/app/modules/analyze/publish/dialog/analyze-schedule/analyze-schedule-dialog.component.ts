@@ -23,7 +23,12 @@ const SEMICOLON = 186;
 @Component({
   selector: 'analyze-schedule-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'analyze-schedule-dialog'
+    }`,
+    style
+  ]
 })
 
 export class AnalyzeScheduleDialogComponent implements OnInit {

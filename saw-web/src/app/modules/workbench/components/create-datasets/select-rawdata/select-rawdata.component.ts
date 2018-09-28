@@ -23,7 +23,12 @@ const style = require('./select-rawdata.component.scss');
 @Component({
   selector: 'select-rawdata',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ]
 })
 
 export class SelectRawdataComponent implements OnInit {

@@ -21,7 +21,12 @@ const style = require('./update-semantic.component.scss');
 @Component({
   selector: 'update-semantic',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'update-semantic'
+    }`,
+    style
+  ]
 })
 export class UpdateSemanticComponent implements OnInit, OnDestroy {
   private availableDP: any;

@@ -11,7 +11,14 @@ const style = require('./datasets-card-page.component.scss');
 @Component({
   selector: 'datasets-card-page',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+    }`,
+    style
+  ]
 })
 
 export class DatasetsCardPageComponent implements OnInit {

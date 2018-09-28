@@ -22,7 +22,13 @@ const style = require('./sql-script.component.scss');
 @Component({
   selector: 'sql-script',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      height: 100%;
+      width: 100%;
+    }`,
+    style
+  ]
 })
 export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @Output() onExecute = new EventEmitter<any>();

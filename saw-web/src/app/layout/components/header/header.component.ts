@@ -22,7 +22,7 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
   public UserDetails: any;
   public modules: any;
   public showAdmin: boolean;
-  public showProgress: boolean;
+  public showProgress = false;
   private userInitials: string;
   private userBGColor: any;
   progressSub;

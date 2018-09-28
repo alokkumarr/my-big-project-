@@ -7,7 +7,13 @@ const style = require('./field-details.component.scss');
 @Component({
   selector: 'field-details',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: grid;
+      margin-bottom: 10px;
+    }`,
+    style
+  ]
 })
 export class FieldDetailsComponent {
   public dataFields: any[] = [];

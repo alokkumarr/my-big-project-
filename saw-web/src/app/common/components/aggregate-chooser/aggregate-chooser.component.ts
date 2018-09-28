@@ -9,7 +9,6 @@ import * as filter from 'lodash/filter';
 
 import {
   AGGREGATE_TYPES,
-  DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   NUMBER_TYPES
 } from '../../consts';

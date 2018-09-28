@@ -21,7 +21,16 @@ const style = require('./multi-table-designer-layout.component.scss');
 @Component({
   selector: 'multi-table-designer-layout',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: white;
+      max-height: 89vh;
+      height: 89vh;
+      max-width: 100vw;
+      display: block;
+    }`,
+    style
+  ]
 })
 export class MultiTableDesignerLayout {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

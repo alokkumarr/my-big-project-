@@ -28,7 +28,13 @@ export const DEFAULT_PRECISION = 2;
 @Component({
   selector: 'data-format-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class DataFormatDialogComponent implements OnInit {
 

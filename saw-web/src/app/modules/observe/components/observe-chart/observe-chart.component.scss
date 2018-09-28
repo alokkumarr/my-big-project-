@@ -17,7 +17,7 @@ $report-height: calc(100% - #{$header-padding-bottom} - #{$header-padding-top} -
   }
 }
 
-observe-chart.analysis-container .grid-view {
+.analysis-container .grid-view {
   height: $report-height;
 
   .toggle-grid {
@@ -34,7 +34,7 @@ observe-chart.analysis-container .grid-view {
   font-size: $header-font-size;
 }
 
-observe-chart div .toggle-icons {
+div .toggle-icons {
   height: 20px !important;
   margin: 14px 14px 0 0;
   float: right;

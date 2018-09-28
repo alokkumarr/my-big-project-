@@ -19,7 +19,13 @@ const style = require('./designer-preview-dialog.component.scss');
 @Component({
   selector: 'designer-preview-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100vw;
+      height: 100vh;
+    }`,
+    style
+  ]
 })
 export class DesignerPreviewDialogComponent {
   public previewData = null;

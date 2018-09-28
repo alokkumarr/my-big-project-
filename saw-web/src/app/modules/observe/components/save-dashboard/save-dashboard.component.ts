@@ -67,7 +67,14 @@ export const REFRESH_INTERVALS = [
 @Component({
   selector: 'save-dashboard',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+      width: 400px;
+    }`,
+    style
+  ]
 })
 export class SaveDashboardComponent implements OnInit, OnDestroy {
   private dashboardForm: FormGroup;

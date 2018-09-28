@@ -22,7 +22,14 @@ const style = require('./observe-report.component.scss');
 @Component({
   selector: 'observe-report',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }`,
+    style
+  ]
 })
 export class ObserveReportComponent implements OnDestroy {
   @Input() item: GridsterItem;

@@ -20,7 +20,12 @@ const style = require('./sql-executor.component.scss');
 @Component({
   selector: 'sql-executor',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'sql-executor'
+    }`,
+    style
+  ]
 })
 export class SqlExecutorComponent implements OnInit, OnDestroy {
   private artifacts = [];

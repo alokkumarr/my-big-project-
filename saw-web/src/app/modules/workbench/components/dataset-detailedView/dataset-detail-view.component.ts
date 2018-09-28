@@ -15,7 +15,12 @@ const style = require('./dataset-detail-view.component.scss');
 @Component({
   selector: 'dataset-detail-view',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'dataset-detail-view'
+    }`,
+    style
+  ]
 })
 
 export class DatasetDetailViewComponent implements OnInit, OnDestroy {

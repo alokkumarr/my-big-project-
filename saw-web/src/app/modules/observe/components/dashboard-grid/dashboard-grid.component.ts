@@ -49,7 +49,14 @@ export const DASHBOARD_MODES = {
 @Component({
   selector: 'dashboard-grid',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }`,
+    style
+  ]
 })
 export class DashboardGridComponent
   implements OnInit, OnChanges, AfterViewInit, OnDestroy {

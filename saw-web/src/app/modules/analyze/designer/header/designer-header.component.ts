@@ -16,7 +16,12 @@ const style = require('./designer-header.component.scss');
 @Component({
   selector: 'designer-header',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: white;
+    }`,
+    style
+  ]
 })
 export class DesignerHeaderComponent {
   @Output() public onBack: EventEmitter<null> = new EventEmitter();

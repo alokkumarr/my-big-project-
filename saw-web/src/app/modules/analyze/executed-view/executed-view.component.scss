@@ -2,75 +2,71 @@
 
 $back-button-size: 32px;
 
-executed-view {
-  width: 100%;
+filter-chips-u {
+  padding: 10px 0 10px 10px;
+}
 
-  filter-chips-u {
-    padding: 10px 0 10px 10px;
+.back-button-icon.mat-icon {
+  font-size: $back-button-size;
+  line-height: $back-button-size;
+  width: $back-button-size;
+  height: $back-button-size;
+}
+
+.prompt-execution-container {
+  padding: 50px;
+  text-align: center;
+  font-size: 14px;
+
+  button {
+    margin-top: 15px;
+  }
+}
+
+.mat-card {
+  color: $primary-grey-g4;
+  padding: 0;
+  margin: 10px;
+}
+
+.mat-toolbar {
+  background-color: transparent;
+  color: $primary-grey-g4;
+
+  .analysis__title {
+    font-size: 24px;
   }
 
-  .back-button-icon.mat-icon {
-    font-size: $back-button-size;
-    line-height: $back-button-size;
-    width: $back-button-size;
-    height: $back-button-size;
+  .analysis__subheader {
+    font-size: 16px;
   }
+}
 
-  .prompt-execution-container {
-    padding: 50px;
-    text-align: center;
-    font-size: 14px;
+.execution-tag {
+  padding: 0 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  background-color: $secondary-orange;
+  color: $primary-white;
+  vertical-align: top;
+}
 
-    button {
-      margin-top: 15px;
-    }
-  }
+.expansion-title {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: $primary-grey-g4;
+}
 
-  .mat-card {
-    color: $primary-grey-g4;
-    padding: 0;
-    margin: 10px;
-  }
+.detail-top {
+  padding-top: 10px;
+}
 
-  .mat-toolbar {
-    background-color: transparent;
-    color: $primary-grey-g4;
+.analysis-detail-description {
+  margin: 1em 0;
 
-    .analysis__title {
-      font-size: 24px;
-    }
-
-    .analysis__subheader {
-      font-size: 16px;
-    }
-  }
-
-  .execution-tag {
-    padding: 0 2px;
-    font-size: 11px;
-    text-transform: uppercase;
-    background-color: $secondary-orange;
-    color: $primary-white;
-    vertical-align: top;
-  }
-
-  .expansion-title {
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: 0.005em;
-    color: $primary-grey-g4;
-  }
-
-  .detail-top {
-    padding-top: 10px;
-  }
-
-  .analysis-detail-description {
-    margin: 1em 0;
-
-    p {
-      margin: 0;
-    }
+  p {
+    margin: 0;
   }
 }
 

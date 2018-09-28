@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 const template = require('./datapods-grid-page.component.html');
@@ -7,9 +7,16 @@ const style = require('./datapods-grid-page.component.scss');
 @Component({
   selector: 'datapods-grid-page',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }`,
+    style
+  ]
 })
-export class DatapodsGridPageComponent implements OnInit {
+export class DatapodsGridPageComponent implements OnInit, OnDestroy {
   @Input()
   searchTerm: string;
   @Input()
@@ -28,7 +35,7 @@ export class DatapodsGridPageComponent implements OnInit {
   }
 
   onUpdate(data) {
-    if (data.length != 0) {
+    if (data.length !== 0) {
       setTimeout(() => {
         this.reloadDataGrid(data);
       });

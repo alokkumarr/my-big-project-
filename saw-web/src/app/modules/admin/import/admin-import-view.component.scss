@@ -1,49 +1,45 @@
 @import "src/themes/base/colors";
 
-admin-import-view {
-  width: 100%;
+.mat-toolbar {
+  background-color: transparent;
+  padding: 0 20px;
 
-  .mat-toolbar {
-    background-color: transparent;
-    padding: 0 20px;
-
-    .admin-title {
-      color: $grey-text-color;
-      font-weight: bold;
-      margin-right: 10px;
-    }
-
-    .mat-form-field {
-      max-width: 100%;
-      width: auto;
-      margin: 0;
-      font-size: 14px;
-
-      .mat-form-field-infix {
-        width: unset;
-      }
-    }
-
-    .category-selector {
-      margin-left: 10px;
-      max-width: 180px;
-    }
-  }
-
-  .grid-title {
+  .admin-title {
     color: $grey-text-color;
-    font-size: 18px;
+    font-weight: bold;
     margin-right: 10px;
   }
 
-  admin-import-file-list {
-    padding: 10px 0 0;
-    display: block;
+  .mat-form-field {
+    max-width: 100%;
+    width: auto;
+    margin: 0;
+    font-size: 14px;
+
+    .mat-form-field-infix {
+      width: unset;
+    }
   }
 
-  admin-import-list {
-    padding: 10px 0 0;
-    height: calc(100% - 120px);
-    display: block;
+  .category-selector {
+    margin-left: 10px;
+    max-width: 180px;
   }
+}
+
+.grid-title {
+  color: $grey-text-color;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+admin-import-file-list {
+  padding: 10px 0 0;
+  display: block;
+}
+
+admin-import-list {
+  padding: 10px 0 0;
+  height: calc(100% - 120px);
+  display: block;
 }

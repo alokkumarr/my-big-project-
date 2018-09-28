@@ -13,7 +13,12 @@ const style = require('./create-semantic.component.scss');
 @Component({
   selector: 'create-semantic',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      'class': 'create-semantic'
+    }`,
+    style
+  ]
 })
 export class CreateSemanticComponent implements OnInit {
   private availableDS: any;

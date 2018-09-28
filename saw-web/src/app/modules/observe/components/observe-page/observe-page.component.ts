@@ -9,7 +9,12 @@ const style = require('./observe-page.component.scss');
 @Component({
   selector: 'observe-page',
   template: template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ]
 })
 export class ObservePageComponent implements OnInit {
   constructor(

@@ -15,7 +15,15 @@ const style = require('./analyze-card-view.component.scss');
 @Component({
   selector: 'analyze-card-view',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      height: calc(100vh - 74px - 60px - 64px);
+      overflow: auto;
+      background-color: whitesmoke;
+    }`,
+    style
+  ]
 })
 
 export class AnalyzeCardViewComponent {

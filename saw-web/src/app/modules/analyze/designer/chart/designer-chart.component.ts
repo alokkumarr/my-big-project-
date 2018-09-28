@@ -15,7 +15,14 @@ import * as filter from 'lodash/filter';
 @Component({
   selector: 'designer-chart',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      height: calc(100% - 20px);
+      width: calc(100% - 20px);
+    }`,
+    style
+  ]
 })
 export class DesignerChartComponent implements OnInit {
   _sqlBuilder: SqlBuilderChart;

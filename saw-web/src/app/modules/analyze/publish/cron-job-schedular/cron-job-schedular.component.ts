@@ -26,7 +26,12 @@ const style = require('./cron-job-schedular.component.scss');
 @Component({
   selector: 'cron-job-schedular',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      border: 1px solid #CCC;
+    }`,
+    style
+  ]
 })
 
 export class CronJobSchedularComponent implements OnInit {

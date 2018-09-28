@@ -13,7 +13,14 @@ const style = require('./analyze-new-dialog.component.scss');
 @Component({
   selector: 'analyze-new-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      z-index: 80;
+      display: block;
+      max-width: 700px;
+    }`,
+    style
+  ]
 })
 export class AnalyzeNewDialogComponent {
 

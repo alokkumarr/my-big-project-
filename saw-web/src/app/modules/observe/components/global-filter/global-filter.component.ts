@@ -22,7 +22,18 @@ const style = require('./global-filter.component.scss');
 @Component({
   selector: 'global-filter',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      background-color: whitesmoke;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 400px;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();

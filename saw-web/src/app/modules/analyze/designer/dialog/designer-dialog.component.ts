@@ -11,7 +11,6 @@ import { ConfirmDialogComponent } from '../../../../common/components/confirm-di
 import { ConfirmDialogData } from '../../../../common/types';
 
 const template = require('./designer-dialog.component.html');
-const style = require('./designer-dialog.component.scss');
 
 const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
   title: 'There are unsaved changes',
@@ -22,7 +21,11 @@ const CONFIRM_DIALOG_DATA: ConfirmDialogData = {
 @Component({
   selector: 'designer-dialog',
   template,
-  styles: [style]
+  styles: [`:host {
+    display: block;
+    margin: -20px;
+    overflow: hidden;
+  }`]
 })
 export class DesignerDialogComponent {
   analysis: Analysis;

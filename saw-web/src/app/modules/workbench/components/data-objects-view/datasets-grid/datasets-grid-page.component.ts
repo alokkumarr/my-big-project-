@@ -11,7 +11,14 @@ const style = require('./datasets-grid-page.component.scss');
 @Component({
   selector: 'datasets-grid-page',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }`,
+    style
+  ]
 })
 export class DatasetsGridPageComponent implements OnInit {
   @Input()

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -10,9 +10,16 @@ const style = require('./datapods-card-page.component.scss');
 @Component({
   selector: 'datapods-card-page',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+    }`,
+    style
+  ]
 })
-export class DatapodsCardPageComponent implements OnInit {
+export class DatapodsCardPageComponent implements OnInit, OnDestroy {
   @Input()
   searchTerm: string;
   @Input()

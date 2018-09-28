@@ -17,7 +17,13 @@ const style = require('./analyze-card.component.scss');
 @Component({
   selector: 'analyze-card',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      margin: 5px;
+    }`,
+    style
+  ]
 })
 
 export class AnalyzeCardComponent implements OnInit {

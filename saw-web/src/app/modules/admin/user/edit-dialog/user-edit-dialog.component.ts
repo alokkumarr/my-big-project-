@@ -15,7 +15,12 @@ const dummyPassword = '*********';
 @Component({
   selector: 'user-edit-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      max-width: 500px;
+    }`,
+    style
+  ]
 })
 export class UserEditDialogComponent extends BaseDialogComponent {
 

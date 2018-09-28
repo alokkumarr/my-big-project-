@@ -17,7 +17,12 @@ const style = require('./data-objects-page.component.scss');
 @Component({
   selector: 'data-objects-page',
   template,
-  styles: [style],
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ],
   providers: [DatePipe]
 })
 export class DataobjectsComponent implements OnInit, OnDestroy {

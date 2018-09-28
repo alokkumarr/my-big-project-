@@ -8,7 +8,13 @@ const style = require('./sidenav.component.scss');
 @Component({
   selector: 'app-sidenav',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      z-index: 999;
+      height: 100%;
+    }`,
+    style
+  ]
 })
 
 export class SidenavComponent implements OnInit {

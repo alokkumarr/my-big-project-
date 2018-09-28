@@ -21,7 +21,13 @@ const INVERTING_OPTIONS = [
 @Component({
   selector: 'designer-settings-aux-chart',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      margin: 0 10px;
+    }`,
+    style
+  ]
 })
 export class DesignerSettingsAuxChartComponent implements OnInit {
   @Input() chartType: string;

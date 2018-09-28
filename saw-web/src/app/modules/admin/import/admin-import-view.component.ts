@@ -48,7 +48,12 @@ interface FileContent {name: string; count: number; analyses: Array<Analysis>; }
 @Component({
   selector: 'admin-import-view',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+    }`,
+    style
+  ]
 })
 export class AdminImportViewComponent implements OnInit {
   files: Array<FileInfo>;

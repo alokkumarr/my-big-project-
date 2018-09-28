@@ -23,7 +23,15 @@ const style = require('./create-datasets.component.scss');
 @Component({
   selector: 'create-datasets',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }`,
+    style
+  ]
 })
 export class CreateDatasetsComponent implements OnInit {
   private selectFullfilled = false;

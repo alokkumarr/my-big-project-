@@ -1,28 +1,26 @@
-delete-edit-dialog {
-  .delete-message {
-    margin-top: 10px;
-    width: 395px;
-  }
+.delete-message {
+  margin-top: 10px;
+  width: 395px;
+}
 
-  strong {
-    font-weight: 600;
-  }
+strong {
+  font-weight: 600;
+}
 
-  .dialog__content {
-    min-height: 60px;
-    min-width: 400px;
+.dialog__content {
+  min-height: 60px;
+  min-width: 400px;
 
-    .categories-list {
-      p {
-        margin-bottom: 0;
-      }
+  .categories-list {
+    p {
+      margin-bottom: 0;
+    }
 
-      ul {
-        margin: 0 0 10px;
-        width: 350px;
-        max-height: 300px;
-        overflow-y: auto;
-      }
+    ul {
+      margin: 0 0 10px;
+      width: 350px;
+      max-height: 300px;
+      overflow-y: auto;
     }
   }
 }

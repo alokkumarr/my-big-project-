@@ -10,7 +10,13 @@ const style = require('./date-format-dialog.component.scss');
 @Component({
   selector: 'date-format-dialog',
   template,
-  styles: [style]
+  styles: [
+    `:host {
+      display: block;
+      padding: 10px;
+    }`,
+    style
+  ]
 })
 export class DateFormatDialogComponent {
   public dateFormats;

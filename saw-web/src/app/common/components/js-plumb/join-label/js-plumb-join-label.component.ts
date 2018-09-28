@@ -2,16 +2,12 @@ import {
   Component,
   Input,
   Output,
-  EventEmitter,
-  ElementRef
+  EventEmitter
 } from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 
 import {
-  Artifact,
   Join,
-  JoinCriterion,
-  EndpointPayload,
   JoinChangeEvent
 } from '../types';
 import { JoinDialogComponent } from '../join-dialog';
@@ -30,7 +26,6 @@ export class JsPlumbJoinLabelComponent {
   private _jsPlumbInst: any;
 
   constructor (
-    private _elementRef: ElementRef,
     private _dialog: MatDialog
   ) {
   }
