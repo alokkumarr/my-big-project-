@@ -11,6 +11,10 @@ cloud:
 3. Run the following commands to build and deploy SAW to the remote
    Docker Machine host:
 
+   Make sure env. variable SIP_CLOUD_KEY_SECRET is set  and property
+   `sip.cloud.name` matches with Active Directory userId
+
+
         $ mvn package
         $ mvn -Ddocker-start=cloud
 
