@@ -190,6 +190,7 @@ public class Model {
         LSM("LSM"),
         LM("LM"),
         LQ("LQ"),
+        LY("LY"),
         LW("LW"),
         TW("TW"),
         LSW("LSW"),
