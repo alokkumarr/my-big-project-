@@ -175,7 +175,7 @@ public class ExportServiceImpl implements ExportService{
             logger.debug("Email async success");
             logger.debug("[Success] Response :" + entity.getStatusCode());
             String fileType  = String.valueOf(((LinkedHashMap) dispatchBean).get("fileType"));
-            if(fileType.equalsIgnoreCase("csv"))    {
+            if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())    {
                 IFileExporter iFileExporter = new CSVReportDataExporter();
             }
             else {
@@ -200,7 +200,7 @@ public class ExportServiceImpl implements ExportService{
               FileOutputStream fos = new FileOutputStream(file);
               OutputStreamWriter osw = new OutputStreamWriter(fos);
 
-              if(fileType.equalsIgnoreCase("csv"))  {
+              if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())  {
                   streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
                   osw.close();
                   fos.close();
@@ -241,7 +241,8 @@ public class ExportServiceImpl implements ExportService{
         ExportBean exportBean = new ExportBean();
         String dir = UUID.randomUUID().toString();
         exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
-        if(exportBean.getFileType().equalsIgnoreCase("csv"))    {
+        String strFile = exportBean.getFileType();
+        if(exportBean.getFileType().equalsIgnoreCase("csv") || strFile == null || strFile.isEmpty() )    {
             exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
                 dispatchBean).get("name")) + "."
                 +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".csv"));
@@ -400,7 +401,7 @@ public class ExportServiceImpl implements ExportService{
       String fileType = exportBean.getFileType();
 
       // stream the page output to file.
-      if (fileType.equalsIgnoreCase("csv")) {
+      if (fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty()) {
           streamToCSVReport(entity, limitPerPage, exportBean, osw);
           osw.close();
           fos.close();
