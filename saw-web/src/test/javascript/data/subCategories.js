@@ -90,7 +90,7 @@ const subCategories = {
     id: nullValue
   },
   createAnalysis: {
-    name: 'Create Analysis ' + globalVariables.e2eId,
+    name: 'Create new Analysis ' + globalVariables.e2eId,
     description: description,
     id: nullValue
   },

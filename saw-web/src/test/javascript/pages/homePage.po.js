@@ -17,7 +17,7 @@ module.exports = {
 
   //In list view tag is "span". In card view tag is "a"
   savedAnalysis: analysisName => {
-    return element(by.xpath(`//*[text() = "${analysisName}"]`));
+    return element(by.xpath(`//*[contains(text(),"${analysisName}")]`));
   },
   expandedCategory: categoryName => {
     return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
@@ -34,7 +34,7 @@ module.exports = {
     return element(by.xpath(`//span[text()="${catName}"]/parent::mat-panel-title`));
   },
   subCategory: subCategoryName => {
-    return element(by.xpath(`(//a[text()='${subCategoryName}'])[1]`));
+    return element(by.xpath(`//a[contains(text(),"${subCategoryName}")]`));
   },
   navigateToSubCategory: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategory(categoryName, subCategoryName, defaultCategory),
   navigateToSubCategoryUpdated: (categoryName, subCategoryName, defaultCategory) => navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory),
@@ -50,10 +50,6 @@ module.exports = {
 const navigateToSubCategoryUpdated = (categoryName, subCategoryName, defaultCategory) => {
   browser.sleep(1000);
   module.exports.mainMenuExpandBtn.click();
-  browser.sleep(1000);
-  //Collapse default category
-  commonFunctions.waitFor.elementToBeClickable(module.exports.expandedCategoryUpdated(defaultCategory));
-  module.exports.expandedCategoryUpdated(defaultCategory).click();
   browser.sleep(1000);
   commonFunctions.waitFor.elementToBePresent(module.exports.category(categoryName));
   commonFunctions.waitFor.elementToBeVisible(module.exports.category(categoryName));

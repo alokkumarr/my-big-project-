@@ -356,7 +356,7 @@ module.exports = {
     cancleFilterPrompt: element(by.css(`button[e2e="designer-dialog-cancel"]`))
 
   },
-  listViewItem: name => element(by.xpath(`//a[@uisref="analyze.executedDetail" and text()="${name}"]`)),
+  listViewItem: name => element(by.xpath(`//a[contains(text(),"${name}")]`)),
 
   // OLD test elements
   analysisElems: {
