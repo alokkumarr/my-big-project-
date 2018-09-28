@@ -74,7 +74,6 @@ export class DesignerContainerComponent {
   public isInQueryMode = false;
   public chartTitle = '';
   public fieldCount: number;
-  public designerQuery: string;
   // minimum requirments for requesting data, obtained with: canRequestData()
   public areMinRequirmentsMet = false;
 
@@ -347,7 +346,7 @@ export class DesignerContainerComponent {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
-          this.designerQuery = response.designerQuery;
+          this.analysis.queryManual = response.designerQuery;
         }
       },
       err => {

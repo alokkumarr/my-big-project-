@@ -24,7 +24,6 @@ export class DesignerSettingsQueryComponent {
   @Output() submit = new EventEmitter<any>();
   @Input() analysis: AnalysisReport;
   @Input() artifacts: Artifact[];
-  @Input() designerQuery;
   constructor(
     private _analyzeDialogService: AnalyzeDialogService
   ) {}
