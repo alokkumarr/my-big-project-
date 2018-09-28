@@ -12,6 +12,23 @@ public class ExportBean {
 	private String reportDesc;
 	private String publishDate;
 	private String createdBy;
+	private String fileType;
+
+    /**
+     *
+     * @return
+     */
+	public String getFileType() {
+	    return fileType;
+    }
+
+    /**
+     *
+     * @param fileType
+     */
+    public void setFileType(String fileType)   {
+	    this.fileType = fileType;
+    }
 	
 	/**
 	 * @return the reportName

@@ -1,14 +1,19 @@
 package com.synchronoss.saw.export;
 
+import com.google.common.reflect.ClassPath;
 import com.synchronoss.saw.export.generate.ExportBean;
+import com.synchronoss.saw.export.generate.ExportServiceImpl;
 import com.synchronoss.saw.export.generate.XlsxExporter;
 import com.synchronoss.saw.export.model.DataResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tomcat.jni.Directory;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -26,8 +31,10 @@ public class XlsxExporterTest {
         exportBean = new ExportBean();
         LinkedHashMap dispatchBean = new LinkedHashMap();
         xlsxExporter = new XlsxExporter();
-        dispatchBean.put("fileType","xslx");
-        dispatchBean.put("description", "TestXslx");
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        dispatchBean.put("fileType","xlsx");
+        dispatchBean.put("description", "TestXlsx");
         dispatchBean.put("name","TestExcel");
         dispatchBean.put("publishedTime",System.currentTimeMillis());
 
@@ -36,6 +43,8 @@ public class XlsxExporterTest {
         exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
         exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
         exportBean.setReportName("MyTestAnalysis");
+        exportBean.setFileName(new File(classLoader.getResource("test").getPath())+File.separator+"abc.xlsx");
+        //Here we are creating /test dir under /Resources/ Dir to write mock xslx file.
 
         dataResponse = new DataResponse();
         LinkedHashMap obj1 = new LinkedHashMap();
@@ -63,7 +72,7 @@ public class XlsxExporterTest {
     }
 
     @Test
-    public void streamToXslxReport() {
+    public void mockTest() {
         Workbook workBook = new XSSFWorkbook();
         workBook.getSpreadsheetVersion();
         XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
@@ -84,4 +93,13 @@ public class XlsxExporterTest {
         assertEquals(sheet.getPhysicalNumberOfRows(),4);
     }
 
+    @Test
+    public void streamToXslxReportTest()    {
+        ExportServiceImpl exportService = new ExportServiceImpl();
+        try {
+            assertEquals(exportService.streamToXslxReport(dataResponse,LimittoExport,exportBean),Boolean.TRUE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
