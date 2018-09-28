@@ -41,7 +41,7 @@ setup instructions].
 
 To build and test the project execute the following commands:
 
-        $ cd saw
+        $ cd sip
         $ mvn verify
 
 This includes running both unit and integration tests.  The release
@@ -55,14 +55,14 @@ integration tests can run.
 To build and run the full SAW system locally in development mode,
 execute the following commands to start SAW in Docker containers:
 
-        $ cd saw
+        $ cd sip
         $ mvn package
         $ mvn -Ddocker-start=local
 
 SAW also Support data-lake report execution with YARN.
 To run SAW system locally with YARN execute the following commands:
            
-        $ cd saw
+        $ cd sip
         $ mvn package
         $ mvn -Ddocker-start=local -Dsaw.yarn.enabled=true
 
