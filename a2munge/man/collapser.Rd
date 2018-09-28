@@ -11,8 +11,8 @@ collapser(df, measure_vars, unit, side, time_zone, output_suffix)
 \method{collapser}{data.frame}(df, measure_vars, unit, side,
   time_zone = "UTC", output_suffix = "CEI")
 
-\method{collapser}{tbl_spark}(df, measure_vars, unit, side,
-  time_zone = "UTC", output_suffix = "CEI")
+\method{collapser}{tbl_spark}(df, measure_vars, unit, side, time_zone = "UTC",
+  output_suffix = "CEI")
 }
 \arguments{
 \item{df}{Dataframe}

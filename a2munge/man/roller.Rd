@@ -6,14 +6,13 @@
 \alias{roller.tbl_spark}
 \title{DataFrame Roller Function}
 \usage{
-roller(df, order_vars, group_vars, measure_vars, fun, width, by, partial,
-  ...)
+roller(df, order_vars, group_vars, measure_vars, fun, width, by, partial, ...)
 
-\method{roller}{data.frame}(df, order_vars, group_vars = NULL,
-  measure_vars, fun, width, by = 1, partial = TRUE, ...)
+\method{roller}{data.frame}(df, order_vars, group_vars = NULL, measure_vars,
+  fun, width, by = 1, partial = TRUE, ...)
 
-\method{roller}{tbl_spark}(df, order_vars, group_vars = NULL,
-  measure_vars, fun, width, ...)
+\method{roller}{tbl_spark}(df, order_vars, group_vars = NULL, measure_vars,
+  fun, width, ...)
 }
 \arguments{
 \item{df}{DataFrame}

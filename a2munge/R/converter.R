@@ -25,10 +25,19 @@
 #'library(dplyr)
 #'library(lubridate)
 #'
-#'date_func_df <- data.frame(STRING_COL = c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59"), stringsAsFactors = FALSE)
+#'date_func_df <-
+#' data.frame(STRING_COL = as.POSIXlt(
+#'  c(
+#'    "2017-01-01 10:15:15",
+#'    "2017-09-23 14:26:59",
+#'    "2017-11-15 05:05:05",
+#'    "2018-05-11 08:15:18",
+#'    "2018-03-27 23:59:59"
+#'  )
+#'), stringsAsFactors = FALSE)
 #'
 #'converter(date_func_df, "STRING_COL", "yyyy-MM-dd HH:mm:ss", "datetime")
-
+#'
 converter <-
   function(df,
            measure_vars,

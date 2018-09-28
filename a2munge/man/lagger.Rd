@@ -8,11 +8,11 @@
 \usage{
 lagger(df, order_vars, group_vars, measure_vars, lags)
 
-\method{lagger}{data.frame}(df, order_vars, group_vars = NULL,
-  measure_vars, lags = 1L)
+\method{lagger}{data.frame}(df, order_vars, group_vars = NULL, measure_vars,
+  lags = 1L)
 
-\method{lagger}{tbl_spark}(df, order_vars, group_vars = NULL,
-  measure_vars, lags = 1L)
+\method{lagger}{tbl_spark}(df, order_vars, group_vars = NULL, measure_vars,
+  lags = 1L)
 }
 \arguments{
 \item{df}{DataFrame}

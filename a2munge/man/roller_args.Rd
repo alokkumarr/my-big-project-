@@ -4,8 +4,8 @@
 \alias{roller_args}
 \title{Roller Arguments Constructor function}
 \usage{
-roller_args(col_names, order_vars, group_vars, measure_vars, fun, width,
-  by, partial, ...)
+roller_args(col_names, order_vars, group_vars, measure_vars, fun, width, by,
+  partial, ...)
 }
 \arguments{
 \item{col_names}{column names of dataframe}

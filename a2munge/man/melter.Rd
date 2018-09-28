@@ -12,8 +12,7 @@ melter(df, id_vars, measure_vars, variable_name, value_name, type, ...)
   variable_name = "variable", value_name = "value", ...)
 
 \method{melter}{tbl_spark}(df, id_vars = NULL, measure_vars,
-  variable_name = "variable", value_name = "value", type = "DOUBLE",
-  ...)
+  variable_name = "variable", value_name = "value", type = "DOUBLE", ...)
 }
 \arguments{
 \item{df}{dataframe}
