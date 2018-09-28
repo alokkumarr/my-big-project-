@@ -12,7 +12,7 @@ cloud:
    Docker Machine host:
 
    Make sure env. variable SIP_CLOUD_KEY_SECRET is set  and property
-   `sip.cloud.name` matches with Active Directory userId
+   `sip.cloud.name` matches with your Active Directory userId
 
 
         $ mvn package
