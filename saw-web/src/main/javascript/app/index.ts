@@ -34,6 +34,8 @@ declare global {
   const require: any;
 }
 
+declare const __PRODUCTION__: any;
+
 const COMPONENTS = [
   ServiceBootstrapComponent,
   LayoutContentComponent,
