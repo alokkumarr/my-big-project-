@@ -18,6 +18,12 @@ RUN systemctl enable systemd-journal-remote.socket
 # Disable the log sender on the admin node itself
 RUN systemctl disable systemd-journal-upload.service
 
+# Install mail server for testing
+RUN yum -y -q install postfix
+RUN echo "inet_interfaces = all" >> /etc/postfix/main.cf
+RUN echo "inet_protocols = ipv4" >> /etc/postfix/main.cf
+RUN systemctl enable postfix
+
 # Install Ansible from EPEL repository
 RUN yum -y -q install ansible rsync
 
