@@ -10,6 +10,14 @@
 # Start from SIP base image
 FROM sip-base-maprclient:${project.version}
 
+# Install log receiver
+COPY sip-journal-remote.conf \
+  /etc/systemd/system/systemd-journal-remote.service.d/
+COPY sip-tmpfiles-journal-remote.conf /etc/tmpfiles.d/
+RUN systemctl enable systemd-journal-remote.socket
+# Disable the log sender on the admin node itself
+RUN systemctl disable systemd-journal-upload.service
+
 # Install Ansible from EPEL repository
 RUN yum -y -q install ansible rsync
 
