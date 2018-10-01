@@ -3,13 +3,10 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import * as get from 'lodash/get';
 
-const template = require('./confirm-dialog.component.html');
-
 @Component({
   selector: 'confirm-dialog',
-  template
+  templateUrl: 'confirm-dialog.component.html'
 })
-
 export class ConfirmDialogComponent implements OnInit {
   private title = ''; // tslint:disable-line
   private message = 'Are you sure you want to proceed'; // tslint:disable-line
@@ -33,7 +30,7 @@ export class ConfirmDialogComponent implements OnInit {
     }
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   closeDashboard(confirm = false) {
     this.dialogRef.close(confirm);

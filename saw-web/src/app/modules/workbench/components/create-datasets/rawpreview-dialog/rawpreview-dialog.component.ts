@@ -1,17 +1,13 @@
-
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import * as get from 'lodash/get';
 import * as take from 'lodash/take';
 
-const template = require('./rawpreview-dialog.component.html');
-
 @Component({
   selector: 'rawpreview-dialog',
-  template
+  templateUrl: 'rawpreview-dialog.component.html'
 })
-
 export class RawpreviewDialogComponent implements OnInit {
   private title = ''; // tslint:disable-line
   private message = 'No Data'; // tslint:disable-line
@@ -29,7 +25,7 @@ export class RawpreviewDialogComponent implements OnInit {
     }
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   closeDashboard(confirm = false) {
     this.dialogRef.close(confirm);

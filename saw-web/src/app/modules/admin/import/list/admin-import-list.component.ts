@@ -1,19 +1,22 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges
+} from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as some from 'lodash/some';
 import * as every from 'lodash/every';
 import * as isEmpty from 'lodash/isEmpty';
-import {DxDataGridService} from '../../../../common/services/dxDataGrid.service';
-
-const template = require('./admin-import-list.component.html');
+import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 
 @Component({
   selector: 'admin-import-list',
-  template
+  templateUrl: 'admin-import-list.component.html'
 })
-
-export class AdminImportListComponent implements OnChanges {
-
+export class AdminImportListComponent implements OnInit, OnChanges {
   @Input() analyses: any[];
   @Output() validityChange: EventEmitter<boolean> = new EventEmitter();
 
@@ -21,9 +24,7 @@ export class AdminImportListComponent implements OnChanges {
   areAllSelected = false;
   isEmpty = isEmpty;
 
-  constructor(
-    private _DxDataGridService: DxDataGridService
-  ) { }
+  constructor(private _DxDataGridService: DxDataGridService) {}
 
   ngOnInit() {
     this.config = this.getConfig();
@@ -40,9 +41,15 @@ export class AdminImportListComponent implements OnChanges {
 
   onChecked(row) {
     row.selection = !row.selection;
-    const isValid = some(this.analyses, row => !row.noMetricInd && row.selection);
+    const isValid = some(
+      this.analyses,
+      row => !row.noMetricInd && row.selection
+    );
     if (row.selection) {
-      this.areAllSelected = every(this.analyses, row => !row.noMetricInd && row.selection);
+      this.areAllSelected = every(
+        this.analyses,
+        row => !row.noMetricInd && row.selection
+      );
     } else {
       this.areAllSelected = false;
     }
@@ -60,40 +67,46 @@ export class AdminImportListComponent implements OnChanges {
   }
 
   getConfig() {
-    const columns = [{
-      caption: 'All',
-      dataField: 'selection',
-      allowSorting: false,
-      alignment: 'left',
-      width: '7%',
-      headerCellTemplate: 'selectionHeaderCellTemplate',
-      cellTemplate: 'selectionCellTemplate'
-    }, {
-      caption: 'Analysis Name',
-      dataField: 'analysis.name',
-      allowSorting: true,
-      alignment: 'left',
-      width: '30%'
-    }, {
-      caption: 'Analysis Type',
-      dataField: 'analysis.type',
-      allowSorting: true,
-      alignment: 'left',
-      width: '10%'
-    }, {
-      caption: 'Metric Name',
-      dataField: 'analysis.metricName',
-      allowSorting: true,
-      alignment: 'left',
-      width: '30%'
-    }, {
-      caption: 'Logs',
-      dataField: 'log',
-      allowSorting: false,
-      alignment: 'left',
-      width: '20%',
-      cellTemplate: 'logCellTemplate'
-    }];
+    const columns = [
+      {
+        caption: 'All',
+        dataField: 'selection',
+        allowSorting: false,
+        alignment: 'left',
+        width: '7%',
+        headerCellTemplate: 'selectionHeaderCellTemplate',
+        cellTemplate: 'selectionCellTemplate'
+      },
+      {
+        caption: 'Analysis Name',
+        dataField: 'analysis.name',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
+      },
+      {
+        caption: 'Analysis Type',
+        dataField: 'analysis.type',
+        allowSorting: true,
+        alignment: 'left',
+        width: '10%'
+      },
+      {
+        caption: 'Metric Name',
+        dataField: 'analysis.metricName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
+      },
+      {
+        caption: 'Logs',
+        dataField: 'log',
+        allowSorting: false,
+        alignment: 'left',
+        width: '20%',
+        cellTemplate: 'logCellTemplate'
+      }
+    ];
     return this._DxDataGridService.mergeWithDefaultConfig({
       columns,
       scrolling: {

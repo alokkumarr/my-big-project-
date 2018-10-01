@@ -2,20 +2,14 @@ import { Component } from '@angular/core';
 import { UserService } from '../../../common/services';
 import { Router } from '@angular/router';
 
-const template = require('./password-pre-reset.component.html');
-require ('./password-pre-reset.component.scss');
+require('./password-pre-reset.component.scss');
 
 @Component({
   selector: 'password-pre-reset',
-  template
+  templateUrl: 'password-pre-reset.component.html'
 })
-
 export class PasswordPreResetComponent {
-
-  constructor(
-    private _UserService: UserService,
-    private _router: Router
-    ) {}
+  constructor(private _UserService: UserService, private _router: Router) {}
 
   private dataHolder = {
     masterLoginId: null
@@ -24,8 +18,7 @@ export class PasswordPreResetComponent {
   private errorMsg;
 
   resetPwd() {
-    this._UserService.preResetPwd(this.dataHolder)
-    .then((res: any) => {
+    this._UserService.preResetPwd(this.dataHolder).then((res: any) => {
       this.errorMsg = res.validityMessage;
     });
   }

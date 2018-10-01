@@ -11,13 +11,11 @@ import * as moment from 'moment';
 import { ChartService } from '../../services/chart.service';
 import { AnalysisChart, Sort } from '../../types';
 
-const template = require('./executed-chart-view.component.html');
-
 const DEFAULT_PAGE_SIZE = 25;
 
 @Component({
   selector: 'executed-chart-view',
-  template
+  templateUrl: 'executed-chart-view.component.html'
 })
 export class ExecutedChartViewComponent {
   @Input() updater: BehaviorSubject<Object[]>;
@@ -101,7 +99,9 @@ export class ExecutedChartViewComponent {
   }
 
   trimKeyword(data) {
-    if (!data) { return; }
+    if (!data) {
+      return;
+    }
     const trimData = data.map(row => {
       const obj = {};
       for (const key in row) {

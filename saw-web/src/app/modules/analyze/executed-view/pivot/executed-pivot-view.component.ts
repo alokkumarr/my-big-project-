@@ -8,11 +8,9 @@ import { SqlBuilderPivot } from '../../models';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 
-const template = require('./executed-pivot-view.component.html');
-
 @Component({
   selector: 'executed-pivot-view',
-  template
+  templateUrl: 'executed-pivot-view.component.html'
 })
 export class ExecutedPivotViewComponent {
   @Input('analysis')

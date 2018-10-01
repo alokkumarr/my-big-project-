@@ -1,10 +1,7 @@
 import { Component } from '@angular/core';
 
-const template = require('./admin-page.component.html');
-
 @Component({
   selector: 'admin-page',
-  template: template
+  templateUrl: 'admin-page.component.html'
 })
-export class AdminPageComponent {
-}
+export class AdminPageComponent {}

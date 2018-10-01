@@ -4,6 +4,7 @@ import {
   Input,
   Output,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   EventEmitter
 } from '@angular/core';
@@ -22,13 +23,12 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-const template = require('./observe-kpi-bullet.component.html');
-
 @Component({
   selector: 'observe-kpi-bullet',
-  template
+  templateUrl: 'observe-kpi-bullet.component.html'
 })
-export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
+export class ObserveKPIBulletComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   _kpi: any;
   _executedKPI: any;
 
@@ -41,14 +41,16 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
 
   @Input()
   set bulletKpi(data) {
-    if (isEmpty(data)) { return; }
+    if (isEmpty(data)) {
+      return;
+    }
     this._kpi = data;
     this.executeKPI(this._kpi);
   }
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
-  @Input('updater') requester: BehaviorSubject<Array<any>>;
+  @Input() updater: BehaviorSubject<Array<any>>;
   @Output() onRefresh = new EventEmitter<any>();
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
 
@@ -70,7 +72,7 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
   }
 
   subscribeToRequester() {
-    this.requesterSubscription = this.requester.subscribe(data => {
+    this.requesterSubscription = this.updater.subscribe(data => {
       if (!isEmpty(data)) {
         this.reloadChart(data);
       }
@@ -90,9 +92,13 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
   }
 
   onFilterKPI(filterModel) {
-    if (!this._kpi || !filterModel) { return; }
+    if (!this._kpi || !filterModel) {
+      return;
+    }
 
-    if (!filterModel.preset) { return this.executeKPI(this._kpi); }
+    if (!filterModel.preset) {
+      return this.executeKPI(this._kpi);
+    }
 
     const filter = defaults(
       {},
@@ -107,7 +113,9 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
   }
 
   filterLabel() {
-    if (!this._executedKPI && !this._kpi) { return ''; }
+    if (!this._executedKPI && !this._kpi) {
+      return '';
+    }
 
     const preset = get(
       this._executedKPI || this._kpi,
@@ -136,44 +144,42 @@ export class ObserveKPIBulletComponent implements OnInit, OnDestroy {
     const kpiFilter = this.filterLabel();
     const primaryAggregate = get(kpi, 'dataFields.0.aggregate', []);
     const categories = get(kpi, 'dataFields.0.displayName', '');
-    this.observe.executeKPI(kpi).subscribe(
-      res => {
-        const count: number = get(
-          res,
-          `data.current.${dataFieldName}._${primaryAggregate}`
-        );
-        const { plotBands, seriesData } = this.observe.buildPlotBandsForBullet(
-          this.item.bullet.bulletPalette,
-          this.item.bullet.measure1,
-          this.item.bullet.measure2,
-          toNumber(count),
-          this.item.bullet.target
-        );
-        changes.push(
-          {
-            path: 'title.text',
-            data: kpiTitle
-          },
-          {
-            path: 'subtitle.text',
-            data: kpiFilter
-          },
-          {
-            path: 'xAxis.categories',
-            data: [categories]
-          },
-          {
-            path: 'yAxis.plotBands',
-            data: plotBands
-          },
-          {
-            path: 'series[0].data',
-            data: seriesData
-          }
-        );
-        this.reloadChart(changes);
-        this.item && this.onRefresh.emit(this.item);
-      }
-    );
+    this.observe.executeKPI(kpi).subscribe(res => {
+      const count: number = get(
+        res,
+        `data.current.${dataFieldName}._${primaryAggregate}`
+      );
+      const { plotBands, seriesData } = this.observe.buildPlotBandsForBullet(
+        this.item.bullet.bulletPalette,
+        this.item.bullet.measure1,
+        this.item.bullet.measure2,
+        toNumber(count),
+        this.item.bullet.target
+      );
+      changes.push(
+        {
+          path: 'title.text',
+          data: kpiTitle
+        },
+        {
+          path: 'subtitle.text',
+          data: kpiFilter
+        },
+        {
+          path: 'xAxis.categories',
+          data: [categories]
+        },
+        {
+          path: 'yAxis.plotBands',
+          data: plotBands
+        },
+        {
+          path: 'series[0].data',
+          data: seriesData
+        }
+      );
+      this.reloadChart(changes);
+      this.item && this.onRefresh.emit(this.item);
+    });
   }
 }

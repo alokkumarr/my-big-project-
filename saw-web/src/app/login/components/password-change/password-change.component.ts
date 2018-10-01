@@ -2,21 +2,18 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
-const template = require('./password-change.component.html');
-require ('./password-change.component.scss');
+require('./password-change.component.scss');
 
 @Component({
   selector: 'password-change',
-  template
+  templateUrl: 'password-change.component.html'
 })
-
 export class PasswordChangeComponent {
-
   constructor(
     private _JwtService: JwtService,
     private _UserService: UserService,
     private _router: Router
-    ) {}
+  ) {}
 
   private formData = {
     oldPwd: null,
@@ -36,16 +33,17 @@ export class PasswordChangeComponent {
       return;
     }
 
-    this._UserService.changePwd(this)
-      .then((res: any) => {
-        if (res.valid) {
-          this._UserService.logout('logout').then(() => {
-            this._router.navigate(['login'], {queryParams: {changePassMsg: res.validityMessage}});
+    this._UserService.changePwd(this).then((res: any) => {
+      if (res.valid) {
+        this._UserService.logout('logout').then(() => {
+          this._router.navigate(['login'], {
+            queryParams: { changePassMsg: res.validityMessage }
           });
-        } else {
-          this.errorMsg = res.validityMessage;
-        }
-      });
+        });
+      } else {
+        this.errorMsg = res.validityMessage;
+      }
+    });
   }
 
   cancel() {

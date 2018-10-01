@@ -13,11 +13,9 @@ import { Subscription } from 'rxjs/Subscription';
 import * as get from 'lodash/get';
 import * as isUndefined from 'lodash/isUndefined';
 
-const template = require('./number-filter.component.html');
-
 @Component({
   selector: 'g-number-filter',
-  template
+  templateUrl: 'number-filter.component.html'
 })
 export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();

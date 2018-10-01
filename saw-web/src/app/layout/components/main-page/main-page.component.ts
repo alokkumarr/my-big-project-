@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-const template = require('./main-page.component.html');
 
 @Component({
   selector: 'main-page',
-  template
+  template: 'main-page.component.html'
 })
 export class MainPageComponent {}

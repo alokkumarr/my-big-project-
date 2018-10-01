@@ -17,13 +17,11 @@ import {
 
 import { DesignerChangeEvent } from '../../../types';
 
-const template = require('./expand-detail-chart.component.html');
-
 const FLOAT_SAMPLE = 1000.33333;
 const INT_SAMPLE = 1000;
 @Component({
   selector: 'expand-detail-chart',
-  template
+  templateUrl: 'expand-detail-chart.component.html'
 })
 export class ExpandDetailChartComponent implements OnInit {
   @Output()
@@ -46,7 +44,10 @@ export class ExpandDetailChartComponent implements OnInit {
 
   ngOnInit() {
     const type = this.artifactColumn.type;
-    this.limitType = this.artifactColumn.limitValue === null ? '' : this.artifactColumn.limitType;
+    this.limitType =
+      this.artifactColumn.limitValue === null
+        ? ''
+        : this.artifactColumn.limitType;
     this.limitValue = this.artifactColumn.limitValue;
 
     this.isDataField = ['y', 'z'].includes(this.artifactColumn.area);
@@ -106,7 +107,11 @@ export class ExpandDetailChartComponent implements OnInit {
 
   onLimitDataChange() {
     this.limitValue = this.limitValue < 0 ? '' : this.limitValue;
-    if (this.limitValue < 0 || isUndefined(this.limitType) || this.limitType === null) {
+    if (
+      this.limitValue < 0 ||
+      isUndefined(this.limitType) ||
+      this.limitType === null
+    ) {
       return false;
     }
     if (this.limitValue === null || isUndefined(this.limitValue)) {

@@ -1,10 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  OnInit,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as moment from 'moment';
 import {
   ArtifactColumnPivot,
@@ -26,16 +20,15 @@ import {
   isFormatted
 } from '../../../../../../common/utils/numberFormatter';
 
-const template = require('./expand-detail-pivot.component.html');
-
 const FLOAT_SAMPLE = 1000.33333;
 const INT_SAMPLE = 1000;
 @Component({
   selector: 'expand-detail-pivot',
-  template
+  templateUrl: 'expand-detail-pivot.component.html'
 })
 export class ExpandDetailPivotComponent implements OnInit {
-  @Output() public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
+  @Output()
+  public change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
 
   @Input() public artifactColumn: ArtifactColumnPivot;
 
@@ -48,7 +41,7 @@ export class ExpandDetailPivotComponent implements OnInit {
   public dateSample: string;
   public isFloat: boolean;
 
-  constructor(private _analyzeDialogService: AnalyzeDialogService) { }
+  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     const type = this.artifactColumn.type;

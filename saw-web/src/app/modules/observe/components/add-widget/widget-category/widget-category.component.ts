@@ -1,14 +1,12 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import * as map from 'lodash/map';
 
-const template = require('./widget-category.component.html');
 import { JwtService } from '../../../../../common/services';
 
 @Component({
   selector: 'widget-category',
-  template
+  templateUrl: 'widget-category.component.html'
 })
-
 export class WidgetCategoryComponent implements OnInit {
   categories: any;
   @Output() onSelect = new EventEmitter();
@@ -18,24 +16,17 @@ export class WidgetCategoryComponent implements OnInit {
   }
 
   getCategories() {
-    return map(
-      this.jwt.getCategories(),
-      cat => ({
-        name: cat.prodModFeatureName,
-        id: cat.prodModFeatureID,
-        subCategories: map(
-          cat.productModuleSubFeatures,
-          subCat => ({
-            name: subCat.prodModFeatureName,
-            id: subCat.prodModFeatureID
-          })
-        )
-      })
-    );
+    return map(this.jwt.getCategories(), cat => ({
+      name: cat.prodModFeatureName,
+      id: cat.prodModFeatureID,
+      subCategories: map(cat.productModuleSubFeatures, subCat => ({
+        name: subCat.prodModFeatureName,
+        id: subCat.prodModFeatureID
+      }))
+    }));
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   onSelectSubCategory(data) {
     this.onSelect.emit(data);

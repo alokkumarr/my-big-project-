@@ -8,11 +8,9 @@ import * as replace from 'lodash/replace';
 import * as startCase from 'lodash/startCase';
 import * as upperCase from 'lodash/upperCase';
 
-import { UserService, MenuService} from '../../../common/services';
+import { UserService, MenuService } from '../../../common/services';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../../../modules/admin/consts';
-
-const template = require('./content.component.html');
 
 // nr of seconds before timeout starts
 const TIMEOUT_TRIGGER = 60;
@@ -21,7 +19,7 @@ const TIMEOUT = 20 * 60;
 
 @Component({
   selector: 'layout-content',
-  template
+  templateUrl: 'content.component.html'
 })
 export class LayoutContentComponent implements OnInit {
   title: string;

@@ -1,11 +1,9 @@
 import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
 import { DesignerChangeEvent } from '../../types';
 
-const template = require('./designer-settings-aux.component.html');
-
 @Component({
   selector: 'designer-settings-aux',
-  template
+  templateUrl: 'designer-settings-aux.component.html'
 })
 export class DesignerSettingsAuxComponent implements OnInit {
   @Input() analysisType: string;

@@ -19,11 +19,10 @@ import {
   CUSTOM_DATE_PRESET_VALUE,
   DATE_PRESETS
 } from '../../../../analyze/consts';
-const template = require('./date-filter.component.html');
 
 @Component({
   selector: 'g-date-filter',
-  template
+  templateUrl: 'date-filter.component.html'
 })
 export class GlobalDateFilterComponent implements OnInit, OnDestroy {
   private _filter;

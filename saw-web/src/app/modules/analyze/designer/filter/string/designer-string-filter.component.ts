@@ -1,12 +1,17 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnChanges,
+  Input,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { MatChipInputEvent } from '@angular/material';
 import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as filter from 'lodash/filter';
 import * as compact from 'lodash/compact';
 import { FilterModel } from '../../types';
 import { STRING_FILTER_OPERATORS } from '../../../consts';
-
-const template = require('./designer-string-filter.component.html');
 
 const SEMICOLON = 186;
 
@@ -20,13 +25,12 @@ export const isValid = (model: FilterModel = {}) => {
 
 @Component({
   selector: 'designer-string-filter',
-  template
+  templateUrl: 'designer-string-filter.component.html'
 })
-export class DesignerStringFilterComponent {
+export class DesignerStringFilterComponent implements OnInit, OnChanges {
   @Output()
   public filterModelChange: EventEmitter<FilterModel> = new EventEmitter();
-  @Input()
-  public filterModel: FilterModel;
+  @Input() public filterModel: FilterModel;
 
   public separatorKeysCodes = [ENTER, COMMA, SEMICOLON];
   public OPERATORS = STRING_FILTER_OPERATORS;

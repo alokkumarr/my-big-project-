@@ -1,19 +1,13 @@
-import {
-  Component,
-  Inject
-} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { ConfirmDialogData } from '../../types';
 
-const template = require('./confirm-dialog.component.html');
-
 @Component({
   selector: 'confirm-dialog',
-  template
+  templateUrl: 'confirm-dialog.component.html'
 })
 export class ConfirmDialogComponent {
-
   public alias: string;
 
   constructor(

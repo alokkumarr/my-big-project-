@@ -18,11 +18,9 @@ import { map } from 'rxjs/operators/map';
 import { ObserveService } from '../../../services/observe.service';
 import { GlobalFilterService } from '../../../services/global-filter.service';
 
-const template = require('./string-filter.component.html');
-
 @Component({
   selector: 'g-string-filter',
-  template
+  templateUrl: 'string-filter.component.html'
 })
 export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
