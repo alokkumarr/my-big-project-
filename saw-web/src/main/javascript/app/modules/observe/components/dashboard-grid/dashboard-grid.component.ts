@@ -374,7 +374,10 @@ export class DashboardGridComponent
 
   arrangeTiles(tiles: any[]) {
     this.windowService.windowRef['mygrid'] = this.gridster;
-    if (!this.isViewMode() || this.windowService.isWiderThan(DEVICES.ipad))
+    if (
+      !this.isViewMode() ||
+      this.windowService.isWiderThan(DEVICES.ipadLandscape)
+    )
       return tiles;
 
     let sortedTiles = [

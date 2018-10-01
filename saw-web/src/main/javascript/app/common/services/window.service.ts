@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 
 export const DEVICES = {
-  ipad: { w: 768, h: 1024 }
+  ipadPortrait: { w: 768, h: 1024 },
+  ipadLandscape: { w: 1024, h: 768 }
 };
 
 @Injectable()
