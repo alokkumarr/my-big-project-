@@ -8,7 +8,18 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <div class="page-header-toolbar">
-      <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
+      <h2>
+        {{(dashboard ? dashboard.name : '') || 'Observe'}}
+        <button mat-icon-button e2e="dashboard-default-button"
+                    *ngIf="dashboard"
+                    class="dashboard-default-button"
+                    [ngClass]="{'default-selected': isDefault}"
+                    (click)="toggleDefault()"
+                    [matTooltip]="isDefault ? 'Remove Default' : 'Set as Default'"
+                    i18n-matTooltip>
+          <mat-icon [fontIcon]="isDefault ? 'icon-star-solid' : 'icon-star'"></mat-icon>
+        </button>
+      </h2>
       <div class="page-header-actions">
 
         <mat-slide-toggle
