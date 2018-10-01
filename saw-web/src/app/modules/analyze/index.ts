@@ -12,7 +12,6 @@ import { MaterialModule } from '../../material.module';
 import { AceEditorModule } from 'ng2-ace-editor';
 
 import { routes } from './routes';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { FilterService } from './services/filter.service';
 import { ChartService } from './services/chart.service';
@@ -115,22 +114,15 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
     FormsModule,
     ReactiveFormsModule,
     UChartModule,
-    BrowserModule,
     AnalyzeViewModule,
     ExecutedViewModule,
     AnalyzeActionsModule,
     AnalyzeFilterModule,
     AnalyzePublishDialogModule
   ],
-  declarations: [
-    ...COMPONENTS,
-    ...PIPES
-  ],
+  declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
-  providers: [
-    ...SERVICES,
-    ...GUARDS
-  ],
+  providers: [...SERVICES, ...GUARDS],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModuleTs {}

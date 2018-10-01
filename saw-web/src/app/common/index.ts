@@ -7,7 +7,6 @@ import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import {
@@ -68,7 +67,6 @@ import {
 
 const MODULES = [
   CommonModuleAngular4,
-  BrowserModule,
   RouterModule,
   FormsModule,
   ReactiveFormsModule,

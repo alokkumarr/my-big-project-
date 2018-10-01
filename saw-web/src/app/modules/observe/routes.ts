@@ -5,7 +5,7 @@ import { IsUserLoggedInGuard } from '../../common/guards';
 
 export const route: Route = {
   // name: 'observe',
-  path: 'observe',
+  path: '',
   component: ObservePageComponent,
   canActivate: [IsUserLoggedInGuard],
   canActivateChild: [IsUserLoggedInGuard],
