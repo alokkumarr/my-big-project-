@@ -1,26 +1,17 @@
-.full-screen-dialog {
-  width: 100%;
+:host {
   height: 100%;
-  max-width: 1600px;
 
-  mat-dialog-container {
-    max-width: 1600px;
-  }
 }
 
-observe-view {
+.mat-sidenav-container {
   height: 100%;
 
-  .mat-sidenav-container {
+  mat-sidenav-content {
     height: 100%;
-
-    mat-sidenav-content {
-      height: 100%;
-    }
   }
 }
 
-observe-view mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
+mat-sidenav-container .mat-drawer-backdrop.mat-drawer-shown {
   background: none;
 }
 

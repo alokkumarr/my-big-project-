@@ -1,3 +1,5 @@
+const style = require('./observe-view.component.scss');
+
 import {
   Component,
   OnInit,
@@ -35,6 +37,7 @@ function downloadDataUrlFromJavascript(filename, dataUrl) {
 
 @Component({
   selector: 'observe-view',
+  styles: [style],
   templateUrl: './observe-view.component.html',
   providers: [DashboardService, GlobalFilterService]
 })
@@ -125,7 +128,9 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
     const autoRefreshListener = this.dashboardService
       .getAutoRefreshSubject(this.dashboard.entityId)
       .subscribe(({ dashboardId }) => {
-        if (dashboardId !== this.dashboard.entityId) { return; }
+        if (dashboardId !== this.dashboard.entityId) {
+          return;
+        }
         this.refreshDashboard();
       });
     this.listeners.push(autoRefreshListener);
