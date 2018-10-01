@@ -120,13 +120,11 @@ following command:
 To follow logs aggregated from all SIP containers, execute the
 following command:
 
-        $ docker exec sip-admin journalctl -D /var/log/journal/remote -f
+        $ docker exec sip-admin journalctl -f
 
 The above will show logs from all containers except from the
 `sip-admin` container itself.  To follow those logs, simply execute
-`docker exec sip-admin journalctl -f`.  (Note: When systemd is
-upgraded to v233 or newer, `journalctl -m -f` can be used to view all
-logs, including those from the admin container).
+`docker exec sip-admin journalctl -f`.  
 
 # Running system tests using local deployment
 
