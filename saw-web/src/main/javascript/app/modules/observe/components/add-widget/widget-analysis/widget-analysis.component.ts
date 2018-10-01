@@ -7,18 +7,17 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as filter from 'lodash/filter';
-import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import { Subscription } from 'rxjs/subscription';
 
 import { DashboardService } from '../../../services/dashboard.service';
+import { AnalyzeService } from '../../../../analyze/services/analyze.service';
+import { HeaderProgressService } from '../../../../../common/services';
+import { ANALYSIS_METHODS } from '../../../../analyze/consts';
+import { WIDGET_ACTIONS } from '../widget.model';
 
 const template = require('./widget-analysis.component.html');
 require('./widget-analysis.component.scss');
-
-import { AnalyzeService } from '../../../../analyze/services/analyze.service';
-import { ANALYSIS_METHODS } from '../../../../analyze/consts';
-import { WIDGET_ACTIONS } from '../widget.model';
 
 const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot'];
 
@@ -30,6 +29,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Output() onAnalysisAction = new EventEmitter();
   analyses: Array<any> = [];
   showProgress = false;
+  progressSub;
   searchTerm: string;
   widgetLog = {};
   dashboardWidgetSubscription: Subscription;
@@ -37,8 +37,12 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
 
   constructor(
     private analyze: AnalyzeService,
-    private dashboard: DashboardService
+    private dashboard: DashboardService,
+    private _headerProgress: HeaderProgressService
   ) {
+    this.progressSub = _headerProgress.subscribe(showProgress => {
+      this.showProgress = showProgress
+    });
     this.loadIcons();
   }
 
@@ -52,6 +56,7 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.dashboardWidgetSubscription.unsubscribe();
+    this.progressSub.unsubscribe();
   }
 
   loadIcons() {
@@ -71,17 +76,12 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Input()
   set category(id: number | string) {
     this.searchTerm = '';
-    this.showProgress = true;
     this.analyze.getAnalysesFor(id.toString()).then(
       result => {
         this.analyses = filter(
           result,
           analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
         );
-        this.showProgress = false;
-      },
-      () => {
-        this.showProgress = false;
       }
     );
   }

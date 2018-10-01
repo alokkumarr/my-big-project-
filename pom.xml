@@ -9,11 +9,6 @@
   <name>saw</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- Test upgrading from old SIP version to new version by
-         disabling the upgrade skip.  The build works the same, except
-         the old SIP version is installed before installing the new
-         version, to simulate upgrading the environment.  -->
-    <sip.upgrade.skip>true</sip.upgrade.skip>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -35,32 +30,6 @@
           <skip>true</skip>
           <rules>
           </rules>
-        </configuration>
-      </plugin>
-      <!-- Workaround: The download plug-in and the sip.upgrade.skip
-           property should really be in the dist module.  However,
-           placing it there causes Maven to only run it at the parent
-           level (possibly related to the plug-in providing a task of
-           aggregating type), so perform the download here as a
-           workaround.  -->
-      <plugin>
-        <groupId>com.googlecode.maven-download-plugin</groupId>
-        <artifactId>download-maven-plugin</artifactId>
-        <version>1.4.1</version>
-        <configuration>
-          <!-- Package for old SIP version to test upgrading from -->
-          <!-- Workaround: The SIP 3.0 package fails to deploy on
-               multinode configurations, due to a race condition in
-               the Transport Service MapR-DB table initialization
-               which has been later fixed.  The old version to upgrade
-               from should preferably be a previous release.  However,
-               due to the aforementioned issue, use an intermediate
-               build instead.  When SIP 3.1 is release, use that
-               instead. -->
-          <!--<url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-882/artifact/shared/SIP-Package/saw-3.0.0.tgz</url>-->
-          <url>https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW-951/artifact/shared/SIP-Package/saw-3.0.0-734-g20fca86bd.tgz</url>
-          <outputDirectory>dist/target/docker/sip-admin/${revision}/build/maven/sip-old</outputDirectory>
-          <skip>${sip.upgrade.skip}</skip>
         </configuration>
       </plugin>
       <!-- Workaround: When activating "docker-start" profile, the
@@ -183,7 +152,7 @@
       <build>
         <defaultGoal>
           enforcer:enforce properties:read-project-properties
-          download:wget docker:stop docker:build docker:start
+          docker:stop docker:build docker:start
         </defaultGoal>
       </build>
     </profile>

@@ -11,6 +11,7 @@
     dest: "{{ inventory_dir + '/sip-scheduler-db-password' }}"
     flat: yes
     fail_on_missing: no
+  when: "groups['saw-services'].index(inventory_hostname) == 0"
 - name: Look up Scheduler Service database password
   set_fact:
     saw_scheduler_db_password: >-

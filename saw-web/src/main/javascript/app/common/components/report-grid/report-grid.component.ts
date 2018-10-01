@@ -25,14 +25,13 @@ import { DateFormatDialogComponent } from '../date-format-dialog';
 import { DataFormatDialogComponent } from '../data-format-dialog';
 import { AliasRenameDialogComponent } from '../alias-rename-dialog';
 import { getFormatter } from '../../utils/numberFormatter';
-import { DATE_FORMATS_OBJ } from '../../consts.js';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
 
 import {
   AGGREGATE_TYPES,
-  DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ
 } from '../../consts';
 
@@ -44,13 +43,13 @@ import {
 } from './types';
 import {
   DATE_TYPES,
-  NUMBER_TYPES,
-  FLOAT_TYPES,
-  INT_TYPES,
-  DATE_INTERVALS_OBJ
+  NUMBER_TYPES
 } from '../../../modules/analyze/consts';
-import { componentFactoryName } from '@angular/compiler';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
+
+import {
+  flattenReportData
+} from '../../../common/utils/dataFlattener';
 
 const template = require('./report-grid.component.html');
 require('./report-grid.component.scss');
@@ -96,6 +95,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   dataGrid: DxDataGridComponent;
   @Input()
   query: string;
+  @Input() isInQueryMode;
   @Input()
   analysis;
   @Input()
@@ -141,14 +141,21 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
   @Input('data')
   set setData(data: any[]) {
-
     if (data || data.length < 7) {
       this.gridHeight = 'auto';
     } else {
       this.gridHeight = '100%';
     }
-    this.columns = this.artifacts2Columns(this.analysis.artifacts);
-    this.data = data;
+
+    if (!this.isInQueryMode) {      
+      const artifact = this.fetchColumsUponCheck();
+      if (!this.artifacts) {
+        return;
+      }
+      this.columns = this.artifacts2Columns(artifact);
+    }
+    this.data = flattenReportData(data, this.analysis)
+    
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -210,6 +217,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public loadPanel;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
+  public isQueryMode;
 
   constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
     self = this;
@@ -327,10 +335,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   checkFormatDataCondition(type) {
-    if (
-      NUMBER_TYPES.includes(type) ||
-      DATE_TYPES.includes(type)
-    ) {
+    if (NUMBER_TYPES.includes(type) || DATE_TYPES.includes(type)) {
       return true;
     } else {
       return false;
@@ -339,7 +344,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   aggregateColumn(payload, value) {
     payload.aggregate = value;
-    if(value === 'clear') {
+    if (value === 'clear') {
       delete payload.aggregate;
     }
     this.change.emit({
@@ -402,8 +407,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
-      fpFlatMap((artifact: Artifact) => artifact.columns),
-      fpFilter('checked'),
+      fpFlatMap((artifact: Artifact) => artifact.columns || [artifact]),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
@@ -482,5 +486,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     }
     return {};
+  }
+
+  fetchColumsUponCheck() {
+    return map(this.analysis.artifacts, artifact => {
+      const columns = filter(artifact.columns, 'checked');
+      return {
+        ...artifact,
+        columns
+      };
+    })
   }
 }
