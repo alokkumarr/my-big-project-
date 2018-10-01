@@ -73,7 +73,7 @@ export class DatasetsGridPageComponent implements OnInit {
       },
       {
         caption: 'Size',
-        dataField: 'system.numberOfFiles',
+        dataField: '',
         dataType: 'number',
         width: '10%'
       },
@@ -150,5 +150,12 @@ export class DatasetsGridPageComponent implements OnInit {
 
   viewDetails(metadata) {
     this.workbench.navigateToDetails(metadata);
+  }
+
+  sizeCalculator(size) {
+    let a = size;
+
+
+    return a + " B";
   }
 }

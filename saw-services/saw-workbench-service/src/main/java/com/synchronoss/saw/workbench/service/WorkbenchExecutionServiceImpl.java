@@ -3,6 +3,8 @@ package com.synchronoss.saw.workbench.service;
 import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+
+import com.google.gson.Gson;
 import org.apache.hadoop.fs.Path;
 import org.ojai.Document;
 import org.slf4j.Logger;
@@ -18,8 +20,11 @@ import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import com.mapr.db.TableDescriptor;
 import sncr.bda.base.MetadataBase;
+import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.xdf.services.NGContextServices;
+import sncr.xdf.context.NGContext;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -111,16 +116,32 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
    */
   @Override
   public ObjectNode execute(
-      String project, String name, String component, String config) throws Exception {
+    String project, String name, String component, String cfg) throws Exception {
     log.info("Executing dataset transformation starts here ");
-    log.info("XDF Configuration = " + config);
+    log.info("XDF Configuration = " + cfg);
     WorkbenchClient client = getWorkbenchClient();
     createDatasetDirectory(project, MetadataBase.DEFAULT_CATALOG, name);
     log.info("execute name = " + name);
     log.info("execute root = " + root);
     log.info("execute component = " + component);
-    client.submit(new WorkbenchExecuteJob(
-                root, project, component, config));
+
+    ComponentConfiguration config = new Gson().fromJson(cfg, ComponentConfiguration.class);
+
+    log.info("Component Config = " + config);
+
+      NGContextServices contextServices = new NGContextServices(root, config, project, component, "batch1");
+      contextServices.initContext();
+
+      contextServices.registerOutputDataSet();
+
+//    NGContext workBenchcontext = new NGContext(root, config, project, component, "batch1");
+
+      NGContext workBenchcontext = contextServices.getNgctx();
+
+      workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
+    client.submit(new WorkbenchExecuteJob(workBenchcontext));
+//    client.submit(new WorkbenchExecuteJob(
+//                root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
     log.info("Executing dataset transformation ends here ");
     return root;

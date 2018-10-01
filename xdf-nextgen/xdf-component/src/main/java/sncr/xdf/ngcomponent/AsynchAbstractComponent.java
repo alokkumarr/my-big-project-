@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -28,7 +29,7 @@ import java.util.Map;
 
 /**
  *  The AbstractComponent class is base class for all XDF components.
- *  All component should be implemented as follow:
+ *  All component should be implemented as follows:
  *   - Component specific class inherits from AbstractComponent
  *   - Component specific class should implement interfaces with given functionality
  *   or using base classes:
@@ -506,6 +507,21 @@ public abstract class AsynchAbstractComponent implements WithContext{
                         JsonElement schema = (JsonElement) outDS.get(DataSetProperties.Schema.name());
 
                         if (schema != null) {
+                            Path outputLocation = null;
+                            if (outDS.get(DataSetProperties.PhysicalLocation.name()).toString() != null
+                                && !outDS.get(DataSetProperties.PhysicalLocation.name()).toString().trim()
+                                .equals("")) {
+                                outputLocation =
+                                    new Path(outDS.get(DataSetProperties.PhysicalLocation.name()).toString());
+                            }
+
+                            long size = 0;
+
+                            // Check if output location exists
+                            if (outputLocation != null && ctx.fs.exists(outputLocation)) {
+                                size = ctx.fs.getContentSummary(outputLocation).getSpaceConsumed();
+                            }
+                            logger.trace("Extracted size " + size);
 
                             logger.trace("Extracted schema: " + schema.toString());
 
@@ -513,10 +529,9 @@ public abstract class AsynchAbstractComponent implements WithContext{
                             long recordCount = (long)outDS.get(DataSetProperties.RecordCount.name());
                             logger.trace("Extracted record count " + recordCount);
 
-                            services.md.updateDS(id, ngctx, ds, schema, recordCount);
+                            services.md.updateDS(id, ngctx, ds, schema, recordCount, size);
 
-                            logger.warn("Extracted schema: " + schema.toString());
-                            services.md.updateDS(id, ngctx, ds, schema, recordCount);
+
 
                         }
                         else{

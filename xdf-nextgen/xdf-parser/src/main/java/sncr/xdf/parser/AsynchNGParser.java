@@ -62,6 +62,9 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
 
     private List<String> pkeys;
 
+    public static final String REJECTED_FLAG = "__REJ_FLAG";
+    public static final String REJ_REASON = "__REJ_REASON";
+
     public AsynchNGParser(NGContext ngctx, ComponentServices[] cs) { super(ngctx, cs); }
 
     {
@@ -91,11 +94,11 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
         errCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserErrorCounter");
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
-        schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false);
+        schema = createSchema(ngctx.componentConfiguration.getParser().getFields(), false, false);
         tsFormats = createTsFormatList(ngctx.componentConfiguration.getParser().getFields());
         logger.trace(tsFormats.toString());
 
-        internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true);
+        internalSchema = createSchema(ngctx.componentConfiguration.getParser().getFields(), true, true);
 
         // Output data set
         if(ngctx.outputDataSets.size() != 1){
@@ -201,17 +204,25 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
                                 errCounter));
 
 
-        Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
+        // Create output dataset
+        scala.collection.Seq<Column> outputColumns =
+            scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
+        JavaRDD<Row> outputRdd = getOutputData(rdd);
+        Dataset<Row> df = ctx.sparkSession.createDataFrame(outputRdd.rdd(), internalSchema).select(outputColumns);
+
+
+
+        //        Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
         // TODO: Filter out all rejected records
 //        logger.warn ( "Created rdd:  " + rdd.rdd().count());
-        logger.warn ( "Created df:  " + df.count() + " schema: " + df.schema().prettyJson());
+//        logger.warn ( "Created df:  " + df.count() + " schema: " + df.schema().prettyJson());
 
             scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ngctx.componentConfiguration.getParser().getFields())).toList();
-        Column cond = df.col("__REJ_FLAG").isNull().or(df.col("__REJ_FLAG").equalTo(0));
-        Dataset<Row> filteredDataset = df.select(scalaList).where(cond);
-        logger.warn ( "Filtered df:  " + filteredDataset.count());
-        int rc = commitDataSetFromDSMap(ngctx, filteredDataset, outputDataSetName, destDir.toString(), "append");
+//        Column cond = df.col(REJECTED_FLAG).isNull().or(df.col(REJECTED_FLAG).equalTo(0));
+//        Dataset<Row> filteredDataset = df.select(scalaList).where(cond);
+//        logger.warn ( "Filtered df:  " + filteredDataset.count());
+        int rc = commitDataSetFromDSMap(ngctx, df, outputDataSetName, destDir.toString(), "append");
         return rc;
     }
 
@@ -250,7 +261,7 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
         }
         return retval;
     }
-    private static StructType createSchema(List<Field> fields, boolean addRejectedFlag){
+    private static StructType createSchemaOld(List<Field> fields, boolean addRejectedFlag){
 
         StructField[] structFields = new StructField[fields.size() + (addRejectedFlag ? 1 : 0)];
         int i = 0;
@@ -262,8 +273,37 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
         }
 
         if(addRejectedFlag){
-            structFields[i] = new StructField("__REJ_FLAG", DataTypes.IntegerType, true, Metadata.empty());
+            structFields[i] = new StructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty());
         }
+        return  new StructType(structFields);
+    }
+
+    private JavaRDD<Row> getOutputData (JavaRDD<Row> parsedData) {
+        int rejectedColumn = internalSchema.length() - 2;
+        JavaRDD<Row> outputRdd = parsedData.filter(row -> (int)row.get(rejectedColumn) == 0);
+
+        return outputRdd;
+    }
+
+    private static StructType createSchema(List<Field> fields, boolean addRejectedFlag,boolean addReasonFlag){
+
+        StructField[] structFields = new StructField[fields.size() + (addRejectedFlag ? 1 : 0)
+            + (addReasonFlag ? 1 : 0)];
+        int i = 0;
+        for(Field field : fields){
+
+            StructField structField = new StructField(field.getName(), convertXdfToSparkType(field.getType()), true, Metadata.empty());
+            structFields[i] = structField;
+            i++;
+        }
+
+        if(addRejectedFlag){
+            structFields[i] = new StructField(REJECTED_FLAG, DataTypes.IntegerType, true, Metadata.empty());
+        }
+        if (addReasonFlag) {
+            structFields[i+1] = new StructField(REJ_REASON, DataTypes.StringType, true, Metadata.empty());
+        }
+
         return  new StructType(structFields);
     }
 
@@ -277,6 +317,8 @@ public class AsynchNGParser extends AsynchAbstractComponent implements WithDLBat
                 return DataTypes.DoubleType;
             case CsvInspectorRowProcessor.T_DATETIME:
                 return DataTypes.TimestampType;  // TODO: Implement proper format for timestamp
+            case CsvInspectorRowProcessor.T_INTEGER:
+                return DataTypes.IntegerType;
             default:
                 return DataTypes.StringType;
 
