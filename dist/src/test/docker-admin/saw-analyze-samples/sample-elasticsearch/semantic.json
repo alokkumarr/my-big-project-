@@ -95,7 +95,7 @@
         ],
         "esRepository": {
           "storageType":"ES",
-          "indexName":"sample",
+          "indexName":"sampleAlias",
           "type":"sample"
         },
         "artifacts": [
