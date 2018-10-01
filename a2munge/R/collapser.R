@@ -28,17 +28,8 @@
 #'library(dplyr)
 #'library(lubridate)
 #'
-#'date_func_df <-
-#' data.frame(TIME_COL = as.POSIXlt(
-#'  c(
-#'    "2017-01-01 10:15:15",
-#'    "2017-09-23 14:26:59",
-#'    "2017-11-15 05:05:05",
-#'    "2018-05-11 08:15:18",
-#'    "2018-03-27 23:59:59"
-#'  )
-#'), stringsAsFactors = FALSE)
-
+#'date_func_df <- data.frame(TIME_COL = as.POSIXlt(c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59")), stringsAsFactors = FALSE)
+#'
 #'collapser(date_func_df, "TIME_COL", "month", "end")
 
 collapser <- function(df,
@@ -75,28 +66,62 @@ collapser.data.frame <- function(df,
 
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
 
-  if (unit == "month" || unit == "year") {
-    df <- df %>%
-      dplyr::rename(., DT_CEI_1 = !!measure_vars) %>%
-      mutate(.,!!output_col_name := case_when((
-        (!!side == "start") ~ as.Date(lubridate::floor_date(DT_CEI_1, unit = !!unit), tz = !!time_zone)
-      ),
-      (
-        !!side == "end" ~ as.Date(lubridate::ceiling_date(DT_CEI_1, unit = !!unit) - 1, tz = !!time_zone)
-      ))) %>%
-      dplyr::rename(.,!!measure_vars := DT_CEI_1)
+  select_vars <- c(colnames(df), output_col_name)
+
+  if(length(measure_vars) == 1) {
+    f1_col_name <- "F1"
+    f2_col_name <- "F2"
+    f3_col_name <- "F3"
   } else {
-    df <- df %>%
-      dplyr::rename(., DT_CEI_1 = !!measure_vars) %>%
-      mutate(.,!!output_col_name := case_when(
-        (
-          (!!side == "start") ~ lubridate::floor_date(DT_CEI_1, unit = !!unit)
-        ),
-        (
-          !!side == "end" ~ lubridate::ceiling_date(DT_CEI_1, unit = !!unit) - 1
-        )
-      )) %>%
-      dplyr::rename(.,!!measure_vars := DT_CEI_1)
+    f1_col_name <- paste(measure_vars, "F1", sep = "_")
+    f2_col_name <- paste(f1_col_name, "F2", sep = "_")
+    f3_col_name <- paste(f2_col_name, "F3", sep = "_")
+  }
+
+  if (unit == "month" || unit == "year") {
+
+    if (side == "start") {
+      df <- df %>%
+        dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                              lubridate::floor_date, .args = list(unit))
+        ) %>%
+        dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = as.Date, .args = list(time_zone))
+        ) %>%
+        dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
+        select(., select_vars)
+    } else {
+      df <- df %>%
+        dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                              lubridate::ceiling_date, .args = list(unit))
+        ) %>%
+        dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 =
+                                                             . - 1)
+        ) %>%
+        dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = as.Date, .args = list(time_zone))
+        ) %>%
+        dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
+        select(., select_vars)
+    }
+  } else {
+
+    if (side == "start") {
+      df <- df %>%
+        dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                              lubridate::floor_date, .args = list(unit))
+        ) %>%
+        dplyr::rename_(., .dots = setNames(f1_col_name, output_col_name)) %>%
+        select(., select_vars)
+    } else {
+      df <- df %>%
+        dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                              lubridate::ceiling_date, .args = list(unit))
+        ) %>%
+        dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 =
+                                                             . - 1)
+        ) %>%
+        dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
+        select(., select_vars)
+    }
   }
 
   df
@@ -129,36 +154,72 @@ collapser.tbl_spark <- function(df,
 
   output_col_name <- paste(measure_vars, output_suffix, sep = "_")
 
+  # Get a list of columns to be extracted so that all intermediate columns are removed
+  # from final result
+
+  select_vars <- c(colnames(df), output_col_name)
+
+  if(length(measure_vars) == 1) {
+    f1_col_name <- "F1"
+    f2_col_name <- "F2"
+    f3_col_name <- "F3"
+    f4_col_name <- "F4"
+  } else {
+    f1_col_name <- paste(measure_vars, "F1", sep = "_")
+    f2_col_name <- paste(f1_col_name, "F2", sep = "_")
+    f3_col_name <- paste(f2_col_name, "F3", sep = "_")
+    f4_col_name <- paste(f3_col_name, "F4", sep = "_")
+  }
+
   d_sub <- ifelse(side == "start", 0, 1)
 
   if (unit %in% c("year", "month")) {
     m_add <- ifelse(side == "start", 0, ifelse(unit == "month", 1, 12))
 
     df <- df %>%
-      rename(., DT_CHK_1 = !!measure_vars) %>%
-      mutate(., !!output_col_name := date_sub(trunc(add_months(DT_CHK_1, !!m_add), !!unit), !!d_sub)) %>%
-      rename(., !!measure_vars := DT_CHK_1)
+      dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                            add_months, .args = list(m_add))
+      ) %>%
+      dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = trunc, .args = list(unit))
+      ) %>%
+      dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = date_sub, .args = list(d_sub))
+      ) %>%
+      dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
+      select(., select_vars)
+
   } else {
     r_num <- ifelse(unit == "minute", 60,
                     ifelse(unit == "hour", 60 ^ 2, 60 ^ 2 * 24))
 
     if (side == "start") {
+
       df <- df %>%
-        rename(., DT_CHK_1 = !!measure_vars) %>%
-        mutate(.,
-               !!output_col_name := to_utc_timestamp(from_unixtime(floor((unix_timestamp(DT_CHK_1)) / !!r_num
-               ) * !!r_num - !!d_sub), !!time_zone)) %>%
-        rename(., !!measure_vars := DT_CHK_1)
+        dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                              unix_timestamp(.)/r_num)
+        ) %>%
+        dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = floor(.) * r_num - d_sub)
+        ) %>%
+        dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = from_unixtime)
+        ) %>%
+        dplyr::mutate_at(.vars = f3_col_name, .funs = funs(F4 = to_utc_timestamp, .args = list(time_zone))
+        ) %>%
+        dplyr::rename_(., .dots = setNames(f4_col_name, output_col_name)) %>%
+        select(., select_vars)
+
     } else {
+
       df <- df %>%
-        rename(., DT_CHK_1 = !!measure_vars) %>%
-        mutate(.,
-               !!output_col_name := to_utc_timestamp(from_unixtime(
-                 ceiling((unix_timestamp(
-                   DT_CHK_1
-                 )) / !!r_num) * !!r_num - !!d_sub
-               ), !!time_zone)) %>%
-        rename(., !!measure_vars := DT_CHK_1)
+        dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                              unix_timestamp(.)/r_num)
+        ) %>%
+        dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = ceiling(.) * r_num - d_sub)
+        ) %>%
+        dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = from_unixtime)
+        ) %>%
+        dplyr::mutate_at(.vars = f3_col_name, .funs = funs(F4 = to_utc_timestamp, .args = list(time_zone))
+        ) %>%
+        dplyr::rename_(., .dots = setNames(f4_col_name, output_col_name)) %>%
+        select(., select_vars)
     }
   }
 

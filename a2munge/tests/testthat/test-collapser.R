@@ -556,3 +556,48 @@ test_that("compare output of both data R and Spark Dataframes", {
   expect_equal(class(R_df_collapser_min_end$dates_sec_CONV_COLAPSER),
                c("POSIXct", "POSIXt"))
 })
+
+# Test 11:Test for collapsing of multiple measure variables-------------------------------------------
+
+Convert_R_dtTime_sec <- Convert_R_dtTime_sec %>%
+  mutate(., dates_sec_CONV1 = dates_sec_CONV + duration(30, "days"))
+
+Convert_spk_dtTime_sec <- Convert_spk_dtTime_sec %>%
+  mutate(., dates_sec_CONV1 = date_add(dates_sec_CONV,30))
+
+R_df_collapser_min_end <-
+  collapser(
+    Convert_R_dtTime_sec,
+    measure_vars = c("dates_sec_CONV", "dates_sec_CONV1"),
+    unit = "minute",
+    side = "end",
+    time_zone = "UTC",
+    output_suffix = "COLAPSER"
+  )
+spk_df_collapser_min_end <-
+  collapser(
+    Convert_spk_dtTime_sec,
+    measure_vars = c("dates_sec_CONV", "dates_sec_CONV1"),
+    unit = "minute",
+    side = "end",
+    time_zone = "UTC",
+    output_suffix = "COLAPSER"
+  )
+
+test_that("compare output of both data R and Spark Dataframes", {
+  expect_equal(
+    as.character(R_df_collapser_min_end$dates_sec_CONV_COLAPSER),
+    as.character(Convert_R_dtTime$end_min)
+  )
+  # expect_equal(
+  # spk_df_collapser_min_end %>%
+  # collect() %>%
+  # select(dates_min_CONV_COLAPSER),
+  # R_df_collapser_min_end %>%
+  # collect() %>%
+  # select(dates_min_CONV_COLAPSER)
+  # )
+  expect_equal(spk_typ, "DateType")
+  expect_equal(class(R_df_collapser_min_end$dates_sec_CONV_COLAPSER),
+               c("POSIXct", "POSIXt"))
+})

@@ -25,19 +25,10 @@
 #'library(dplyr)
 #'library(lubridate)
 #'
-#'date_func_df <-
-#' data.frame(STRING_COL = as.POSIXlt(
-#'  c(
-#'    "2017-01-01 10:15:15",
-#'    "2017-09-23 14:26:59",
-#'    "2017-11-15 05:05:05",
-#'    "2018-05-11 08:15:18",
-#'    "2018-03-27 23:59:59"
-#'  )
-#'), stringsAsFactors = FALSE)
+#'date_func_df <- data.frame(STRING_COL = c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59"), stringsAsFactors = FALSE)
 #'
 #'converter(date_func_df, "STRING_COL", "yyyy-MM-dd HH:mm:ss", "datetime")
-#'
+
 converter <-
   function(df,
            measure_vars,
@@ -52,11 +43,11 @@ converter <-
 #' @rdname converter
 #' @export
 converter.data.frame <- function(df,
-                                     measure_vars,
-                                     input_format,
-                                     output_type = "datetime",
-                                     time_zone = "UTC",
-                                     output_suffix = "CONV") {
+                                 measure_vars,
+                                 input_format,
+                                 output_type = "datetime",
+                                 time_zone = "UTC",
+                                 output_suffix = "CONV") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
 
   checkmate::assert_choice(output_type,
@@ -71,6 +62,14 @@ converter.data.frame <- function(df,
   # from final result
 
   select_vars <- c(colnames(df), output_col_name)
+
+  if(length(measure_vars) == 1) {
+    f1_col_name <- "F1"
+    f2_col_name <- "F2"
+  } else {
+    f1_col_name <- paste(measure_vars, "F1", sep = "_")
+    f2_col_name <- paste(f1_col_name, "F2", sep = "_")
+  }
 
   # Derive the Input & Output formats required for R data frames in the
   # format required for the lubridate functions
@@ -89,19 +88,23 @@ converter.data.frame <- function(df,
       chk_input_format == "ddMMyyyy" ~ "dmy"
     )
 
+  dt_chk_fun <- match.fun(inp_for_chk)
+
   # Update the DF with the output column which will have formatted
   # date value with collapsed period
 
   if (output_type == "datetime") {
     df <- df %>%
-      dplyr::rename(., DT_CHK_1 = !!measure_vars) %>%
-      mutate(., !!output_col_name := do.call(inp_for_chk, list(DT_CHK_1))) %>%
-      dplyr::rename(., !!measure_vars := DT_CHK_1)
+      dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 = dt_chk_fun)
+      ) %>%
+      dplyr::rename_(., .dots = setNames(f1_col_name, output_col_name))
   } else {
     df <- df %>%
-      dplyr::rename(., DT_CHK_1 = !!measure_vars) %>%
-      mutate(., !!output_col_name := as.Date(do.call(inp_for_chk, list(DT_CHK_1)))) %>%
-      dplyr::rename(., !!measure_vars := DT_CHK_1)
+      dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 = dt_chk_fun)
+      ) %>%
+      dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = as.Date)
+      ) %>%
+      dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name))
   }
 
   df
@@ -113,11 +116,11 @@ converter.data.frame <- function(df,
 #' @rdname converter
 #' @export
 converter.tbl_spark <- function(df,
-                                    measure_vars,
-                                    input_format,
-                                    output_type = "datetime",
-                                    time_zone = "UTC",
-                                    output_suffix = "CONV") {
+                                measure_vars,
+                                input_format,
+                                output_type = "datetime",
+                                time_zone = "UTC",
+                                output_suffix = "CONV") {
   checkmate::assert_subset(measure_vars, colnames(df), empty.ok = TRUE)
 
   checkmate::assert_choice(
@@ -155,28 +158,40 @@ converter.tbl_spark <- function(df,
 
   select_vars <- c(colnames(df), output_col_name)
 
+  if(length(measure_vars) == 1) {
+    f1_col_name <- "F1"
+    f2_col_name <- "F2"
+    f3_col_name <- "F3"
+  } else {
+    f1_col_name <- paste(measure_vars, "F1", sep = "_")
+    f2_col_name <- paste(f1_col_name, "F2", sep = "_")
+    f3_col_name <- paste(f2_col_name, "F3", sep = "_")
+  }
+
   # Important Note. More testing is required to check if Time zones might be
   # an issue here due to the usage of epoch time for date formatting.
 
   if (output_type == "datetime") {
     df <- df %>%
-      rename(., DT_CHK_1 = !!measure_vars) %>%
-      mutate(., DER_TIME_1 = from_unixtime(
-        unix_timestamp(DT_CHK_1, !!input_format),
-        "yyyy-MM-dd HH:mm:ss"
-      )) %>%
-      mutate(.,!!output_col_name := to_utc_timestamp(DER_TIME_1,!!time_zone)) %>%
-      dplyr::rename(., !!measure_vars := DT_CHK_1) %>%
+      dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                            unix_timestamp, .args = list(input_format))
+      ) %>%
+      dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = from_unixtime, .args = list("yyyy-MM-dd HH:mm:ss"))
+      ) %>%
+      dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = to_utc_timestamp, .args = list(time_zone))
+      ) %>%
+      dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
       select(., select_vars)
   } else {
     df <- df %>%
-      rename(., DT_CHK_1 = !!measure_vars) %>%
-      mutate(., DER_TIME_1 = from_unixtime(
-        unix_timestamp(DT_CHK_1, !!input_format),
-        "yyyy-MM-dd HH:mm:ss"
-      )) %>%
-      mutate(., !!output_col_name := to_date(DER_TIME_1)) %>%
-      dplyr::rename(., !!measure_vars := DT_CHK_1) %>%
+      dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
+                                                            unix_timestamp, .args = list(input_format))
+      ) %>%
+      dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = from_unixtime, .args = list("yyyy-MM-dd HH:mm:ss"))
+      ) %>%
+      dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = to_date)
+      ) %>%
+      dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
       select(., select_vars)
   }
 
