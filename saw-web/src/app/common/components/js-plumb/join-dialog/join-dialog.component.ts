@@ -31,7 +31,7 @@ export class JoinDialogComponent {
   public join: Join;
 
   constructor(
-    private _dialogRef: MatDialogRef<JoinDialogComponent>,
+    public _dialogRef: MatDialogRef<JoinDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       join: Join
     }

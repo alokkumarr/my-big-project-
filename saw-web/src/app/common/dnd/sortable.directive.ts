@@ -34,18 +34,18 @@ export class DndSortableDirective {
     }
   }
   // tslint:disable
-  @HostBinding(`class.${dndClasses.draggedSortingOldPlace}`) private _isDragged = false;
+  @HostBinding(`class.${dndClasses.draggedSortingOldPlace}`) public _isDragged = false;
   // tslint:enable
 
-  private _data: any = null;
+  public _data: any = null;
   // counter for the enter and leave events of the containers children that bubble up
-  private _counter = 0;
-  private _enableEventPropagation = false;
+  public _counter = 0;
+  public _enableEventPropagation = false;
 
   constructor(
-    private _dragDropService: DragnDropService,
-    private _elemRef: ElementRef,
-    @Host() private _sortableContainer: DndSortableContainerDirective
+    public _dragDropService: DragnDropService,
+    public _elemRef: ElementRef,
+    @Host() public _sortableContainer: DndSortableContainerDirective
   ) {}
 
   @HostListener('dragenter', ['$event'])

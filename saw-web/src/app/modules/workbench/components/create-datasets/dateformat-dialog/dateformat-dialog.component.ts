@@ -15,13 +15,13 @@ const style = require('./dateformat-dialog.component.scss');
 
 export class DateformatDialogComponent {
   form: FormGroup;
-  private placeholder = ''; // tslint:disable-line
-  private formatArr = ''; // tslint:disable-line
+  public placeholder = ''; // tslint:disable-line
+  public formatArr = ''; // tslint:disable-line
 
   constructor(
-    private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<DateformatDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private data: any
+    public formBuilder: FormBuilder,
+    public dialogRef: MatDialogRef<DateformatDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     if (get(data, 'placeholder')) {
       this.placeholder = data.placeholder;

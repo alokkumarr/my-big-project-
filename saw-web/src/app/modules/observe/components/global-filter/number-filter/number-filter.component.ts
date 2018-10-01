@@ -20,22 +20,22 @@ import * as isUndefined from 'lodash/isUndefined';
 export class GlobalNumberFilterComponent implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
 
-  private _filter;
-  private step = 1; // tslint:disable-line
-  private defaults: { min; max } = { min: 1, max: 100 };
-  private filterCache: { operator?; start?; end? };
-  private value: Array<number>;
-  private config = {
+  public _filter;
+  public step = 1; // tslint:disable-line
+  public defaults: { min; max } = { min: 1, max: 100 };
+  public filterCache: { operator?; start?; end? };
+  public value: Array<number>;
+  public config = {
     // tslint:disable-line
     tooltips: true
   };
-  private clearFiltersListener: Subscription;
-  private applyFiltersListener: Subscription;
-  private closeFiltersListener: Subscription;
+  public clearFiltersListener: Subscription;
+  public applyFiltersListener: Subscription;
+  public closeFiltersListener: Subscription;
 
   constructor(
-    private observe: ObserveService,
-    private filters: GlobalFilterService
+    public observe: ObserveService,
+    public filters: GlobalFilterService
   ) {}
 
   ngOnInit() {

@@ -42,14 +42,14 @@ function downloadDataUrlFromJavascript(filename, dataUrl) {
   providers: [DashboardService, GlobalFilterService]
 })
 export class ObserveViewComponent implements OnInit, OnDestroy {
-  private dashboardId: string;
-  private subCategoryId: string;
-  private dashboard: Dashboard;
+  public dashboardId: string;
+  public subCategoryId: string;
+  public dashboard: Dashboard;
   public requester = new BehaviorSubject({});
-  private listeners: Array<Subscription> = [];
-  private hasAutoRefresh = false;
-  private shouldAutoRefresh = true;
-  private privileges = {
+  public listeners: Array<Subscription> = [];
+  public hasAutoRefresh = false;
+  public shouldAutoRefresh = true;
+  public privileges = {
     create: false,
     delete: false,
     edit: false
@@ -60,12 +60,12 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    private observe: ObserveService,
-    private dashboardService: DashboardService,
-    private router: Router,
-    private filters: GlobalFilterService,
-    private jwt: JwtService,
-    private _route: ActivatedRoute
+    public observe: ObserveService,
+    public dashboardService: DashboardService,
+    public router: Router,
+    public filters: GlobalFilterService,
+    public jwt: JwtService,
+    public _route: ActivatedRoute
   ) {
     const navigationListener = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {

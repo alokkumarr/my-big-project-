@@ -12,7 +12,7 @@ export class DashboardService {
   public dashboardWidgets = new BehaviorSubject({});
   public onEditItem = new Subject(); // use for signalling start of editing an item
   public onUpdateItem = new BehaviorSubject<any>({}); // use for signalling finishing editing of item
-  private autoRefreshListeners: {
+  public autoRefreshListeners: {
     [key: string]: {
       sub: Subject<{ dashboardId: string }>;
       interval: Subscription;

@@ -32,7 +32,7 @@ export class DesignerSettingsQueryComponent implements OnInit {
   @Input() artifacts: Artifact[];
 
   constructor(
-    private _analyzeDialogService: AnalyzeDialogService
+    public _analyzeDialogService: AnalyzeDialogService
   ) {}
 
   ngOnInit() {

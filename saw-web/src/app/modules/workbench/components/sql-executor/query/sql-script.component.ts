@@ -35,11 +35,11 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
 
   @ViewChild('editor') editor: AceEditorComponent;
 
-  private _artifacts: Array<any>;
-  private query: string;
-  private readOnlyMode: boolean = false; // tslint:disable-line
+  public _artifacts: Array<any>;
+  public query: string;
+  public readOnlyMode: boolean = false; // tslint:disable-line
 
-  private editorOptions = { // tslint:disable-line
+  public editorOptions = { // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true, // the editor completes the statement when you hit Ctrl + Space
     enableLiveAutocompletion: true, // the editor completes the statement while you are typing
@@ -50,8 +50,8 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
     wrapBehavioursEnabled: true,
     cursorStyle: 'ace'
   };
-  private langTools = ace.acequire('ace/ext/language_tools');
-  private completions = [];
+  public langTools = ace.acequire('ace/ext/language_tools');
+  public completions = [];
 
   constructor(private workBench: WorkbenchService) { }
 

@@ -9,7 +9,7 @@ import { JwtService, UserService } from '../../common/services';
 
 @Injectable()
 export class RefreshTokenInterceptor implements HttpInterceptor {
-  constructor(private jwt: JwtService, private user: UserService) { }
+  constructor(private jwt: JwtService, public user: UserService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 

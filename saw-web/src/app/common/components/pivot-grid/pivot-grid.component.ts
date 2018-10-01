@@ -112,9 +112,9 @@ export class PivotGridComponent implements OnInit, OnDestroy {
   showDataFields = false;
   showFilterFields = false;
   allowFieldDragging = false;
-  private _gridInstance: any;
-  private _preExportState: any;
-  private _subscription: any;
+  public _gridInstance: any;
+  public _preExportState: any;
+  public _subscription: any;
 
   ngOnInit() {
     setTimeout(() => {

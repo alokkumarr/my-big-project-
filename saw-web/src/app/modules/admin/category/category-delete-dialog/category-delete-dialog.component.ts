@@ -17,8 +17,8 @@ export class CategoryDeleteDialogComponent extends BaseDialogComponent {
   MY_ANALYSIS_CATEGORY_ID = MY_ANALYSIS_CATEGORY_ID;
 
   constructor(
-    private _categoryService: CategoryService,
-    private _dialogRef: MatDialogRef<CategoryDeleteDialogComponent>,
+    public _categoryService: CategoryService,
+    public _dialogRef: MatDialogRef<CategoryDeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       category: any,
       customerId: number,

@@ -17,8 +17,8 @@ interface AnalysisResponse {
 export class ImportService {
 
   constructor(
-    private _adminService: AdminService,
-    private _jwtService: JwtService
+    public _adminService: AdminService,
+    public _jwtService: JwtService
   ) {}
 
   getRequestParams(params = []) {

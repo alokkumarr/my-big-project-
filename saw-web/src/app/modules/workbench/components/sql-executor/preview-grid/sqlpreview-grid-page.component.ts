@@ -17,12 +17,12 @@ import { DxDataGridService } from '../../../../../common/services/dxDataGrid.ser
 export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() updater: BehaviorSubject<any>;
 
-  private gridConfig: Array<any>;
-  private updaterSubscribtion: any;
-  private fullScreen: boolean = false; // tslint:disable-line
+  public gridConfig: Array<any>;
+  public updaterSubscribtion: any;
+  public fullScreen: boolean = false; // tslint:disable-line
 
   constructor(
-    private dxDataGrid: DxDataGridService
+    public dxDataGrid: DxDataGridService
   ) {  }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;

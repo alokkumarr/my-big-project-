@@ -7,8 +7,8 @@ import { ExecuteService } from './execute.service';
 @Injectable()
 export class PublishService {
   constructor(
-    private _analyzeService: AnalyzeService,
-    private _executeService: ExecuteService
+    public _analyzeService: AnalyzeService,
+    public _executeService: ExecuteService
   ) {}
 
   publishAnalysis(model, execute = false, type): Promise<Analysis> {

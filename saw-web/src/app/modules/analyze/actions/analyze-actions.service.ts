@@ -20,11 +20,11 @@ import {
 @Injectable()
 export class AnalyzeActionsService {
   constructor(
-    private _analyzeService: AnalyzeService,
-    private _executeService: ExecuteService,
-    private _publishService: PublishService,
-    private _analyzeDialogService: AnalyzeDialogService,
-    private _toastMessage: ToastService,
+    public _analyzeService: AnalyzeService,
+    public _executeService: ExecuteService,
+    public _publishService: PublishService,
+    public _analyzeDialogService: AnalyzeDialogService,
+    public _toastMessage: ToastService,
     public dialog: MatDialog
   ) {}
 

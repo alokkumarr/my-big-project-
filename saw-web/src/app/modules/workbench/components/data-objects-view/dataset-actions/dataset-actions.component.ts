@@ -13,7 +13,7 @@ export class DatasetActionsComponent implements OnInit {
   @Input()
   dsMetadata: any;
 
-  constructor(private router: Router, private workBench: WorkbenchService) {}
+  constructor(private router: Router, public workBench: WorkbenchService) {}
 
   ngOnInit() {}
 

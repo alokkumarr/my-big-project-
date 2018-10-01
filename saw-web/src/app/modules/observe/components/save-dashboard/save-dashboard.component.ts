@@ -76,22 +76,22 @@ export const REFRESH_INTERVALS = [
   ]
 })
 export class SaveDashboardComponent implements OnInit, OnDestroy {
-  private dashboardForm: FormGroup;
-  private dashboard: Dashboard;
+  public dashboardForm: FormGroup;
+  public dashboard: Dashboard;
   public categories = [];
-  private refreshIntervals = REFRESH_INTERVALS;
+  public refreshIntervals = REFRESH_INTERVALS;
   public showProgress = false;
-  private listeners: Array<Subscription> = [];
+  public listeners: Array<Subscription> = [];
   progressSub;
 
   constructor(
-    private dialogRef: MatDialogRef<SaveDashboardComponent>,
-    @Inject(MAT_DIALOG_DATA) private data: any,
-    private fb: FormBuilder,
-    private menu: MenuService,
-    private observe: ObserveService,
-    private jwt: JwtService,
-    private _headerProgress: HeaderProgressService
+    public dialogRef: MatDialogRef<SaveDashboardComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    public fb: FormBuilder,
+    public menu: MenuService,
+    public observe: ObserveService,
+    public jwt: JwtService,
+    public _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;

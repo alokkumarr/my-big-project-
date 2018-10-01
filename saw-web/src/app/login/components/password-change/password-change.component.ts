@@ -10,20 +10,20 @@ require('./password-change.component.scss');
 })
 export class PasswordChangeComponent {
   constructor(
-    private _JwtService: JwtService,
-    private _UserService: UserService,
-    private _router: Router
+    public _JwtService: JwtService,
+    public _UserService: UserService,
+    public _router: Router
   ) {}
 
-  private formData = {
+  public formData = {
     oldPwd: null,
     newPwd: null,
     confNewPwd: null
   };
 
-  private errorMsg;
+  public errorMsg;
 
-  private formState: boolean;
+  public formState: boolean;
 
   changePwd() {
     const token = this._JwtService.get();

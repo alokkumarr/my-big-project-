@@ -35,9 +35,9 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   icons = {};
 
   constructor(
-    private analyze: AnalyzeService,
-    private dashboard: DashboardService,
-    private _headerProgress: HeaderProgressService
+    public analyze: AnalyzeService,
+    public dashboard: DashboardService,
+    public _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;

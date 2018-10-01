@@ -36,9 +36,9 @@ export class DesignerPreviewDialogComponent {
   ) => Promise<{ data: any[]; totalCount: number }>;
 
   constructor(
-    private _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
+    public _dialogRef: MatDialogRef<DesignerPreviewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { analysis: Analysis },
-    private _designerService: DesignerService
+    public _designerService: DesignerService
   ) {
     this.analysis = data.analysis;
     /* prettier-ignore */

@@ -23,12 +23,12 @@ export class DatapodsCardPageComponent implements OnInit, OnDestroy {
   searchTerm: string;
   @Input()
   updater: BehaviorSubject<any>;
-  private updaterSubscribtion: any;
-  private dataPods: Array<any> = [];
+  public updaterSubscribtion: any;
+  public dataPods: Array<any> = [];
 
   constructor(
     public dialog: MatDialog,
-    private workbench: WorkbenchService
+    public workbench: WorkbenchService
   ) {}
 
   ngOnInit() {

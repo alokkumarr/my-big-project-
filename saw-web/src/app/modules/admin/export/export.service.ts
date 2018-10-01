@@ -21,8 +21,8 @@ interface AnalysisResponse {
 export class ExportService {
 
   constructor(
-    private _adminService: AdminService,
-    private _jwtService: JwtService
+    public _adminService: AdminService,
+    public _jwtService: JwtService
   ) {}
 
   getMetricList() {

@@ -27,8 +27,8 @@ export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
-    private _designerService: DesignerService,
-    private _headerProgress: HeaderProgressService
+    public _designerService: DesignerService,
+    public _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;

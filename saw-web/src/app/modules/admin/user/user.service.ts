@@ -18,7 +18,7 @@ interface RolesResponse {
 export class UserService implements IAdminDataService {
 
   constructor(
-    private _adminService: AdminService
+    public _adminService: AdminService
   ) {}
 
   getList(customerId) {

@@ -61,10 +61,10 @@ export class AdminExportViewComponent implements OnInit {
   isEmpty = isEmpty;
 
   constructor(
-    private _exportService: ExportService,
-    private _sidenav: SidenavMenuService,
-    private _categoryService: CategoryService,
-    private _jwtService: JwtService
+    public _exportService: ExportService,
+    public _sidenav: SidenavMenuService,
+    public _categoryService: CategoryService,
+    public _jwtService: JwtService
   ) {
     this.loadCategories();
     this.metrics$ = this._exportService.getMetricList();
@@ -183,7 +183,7 @@ export class AdminExportViewComponent implements OnInit {
     });
   }
 
-  private _asyncFilter(value) {
+  public _asyncFilter(value) {
     const filterValue = lowerCase(value);
     return from(this.metrics$).pipe(
       map(metrics => {

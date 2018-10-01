@@ -13,18 +13,18 @@ const style = require ('./login.component.scss');
 export class LoginComponent implements OnInit {
 
   constructor(
-    private _JwtService: JwtService,
-    private _UserService: UserService,
-    private _router: Router,
-    private _route: ActivatedRoute
+    public _JwtService: JwtService,
+    public _UserService: UserService,
+    public _router: Router,
+    public _route: ActivatedRoute
     ) {}
 
-  private dataHolder = {
+  public dataHolder = {
     username: null,
     password: null
   };
 
-  private states = {
+  public states = {
     error: null
   };
 

@@ -87,16 +87,16 @@ export class AdminMainViewComponent implements OnDestroy {
   ticket: { custID: string; custCode: string; masterLoginId?: string };
 
   constructor(
-    private _privilegeService: PrivilegeService,
-    private _categoryService: CategoryService,
-    private _userService: UserService,
-    private _roleService: RoleService,
-    private _jwtService: JwtService,
-    private _localSearch: LocalSearchService,
-    private _toastMessage: ToastService,
-    private _dialog: MatDialog,
-    private _router: Router,
-    private _route: ActivatedRoute
+    public _privilegeService: PrivilegeService,
+    public _categoryService: CategoryService,
+    public _userService: UserService,
+    public _roleService: RoleService,
+    public _jwtService: JwtService,
+    public _localSearch: LocalSearchService,
+    public _toastMessage: ToastService,
+    public _dialog: MatDialog,
+    public _router: Router,
+    public _route: ActivatedRoute
   ) {
     const dataListener = this._route.data.subscribe((data: any) =>
       this.onDataChange(data)

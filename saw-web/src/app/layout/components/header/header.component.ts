@@ -22,16 +22,16 @@ export class LayoutHeaderComponent implements OnInit, OnDestroy {
   public modules: any;
   public showAdmin: boolean;
   public showProgress = false;
-  private userInitials: string;
-  private userBGColor: any;
+  public userInitials: string;
+  public userBGColor: any;
   progressSub;
   lowerCase = lowerCase;
 
   constructor(
-    private jwt: JwtService,
-    private user: UserService,
-    private _router: Router,
-    private _headerProgress: HeaderProgressService
+    public jwt: JwtService,
+    public user: UserService,
+    public _router: Router,
+    public _headerProgress: HeaderProgressService
   ) {
     this.progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;

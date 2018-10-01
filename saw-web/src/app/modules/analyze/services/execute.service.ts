@@ -34,8 +34,8 @@ export class ExecuteService {
   execs$: ReplaySubject<IExecuteEventEmitter>;
 
   constructor(
-    private _analyzeService: AnalyzeService,
-    private _filterService: FilterService
+    public _analyzeService: AnalyzeService,
+    public _filterService: FilterService
   ) {
     const bufferSize = 10;
     this.execs$ = new ReplaySubject<IExecuteEventEmitter>(bufferSize);

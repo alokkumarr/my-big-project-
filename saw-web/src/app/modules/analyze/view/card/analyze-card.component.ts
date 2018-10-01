@@ -43,9 +43,9 @@ export class AnalyzeCardComponent implements OnInit {
   isExecuting = false;
 
   constructor(
-    private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService,
-    private _executeService: ExecuteService
+    public _analyzeActionsService: AnalyzeActionsService,
+    public _jwt: JwtService,
+    public _executeService: ExecuteService
   ) {
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this.onExecutionsEvent = this.onExecutionsEvent.bind(this);

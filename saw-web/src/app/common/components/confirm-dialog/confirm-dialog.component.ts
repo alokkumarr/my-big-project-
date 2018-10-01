@@ -11,7 +11,7 @@ export class ConfirmDialogComponent {
   public alias: string;
 
   constructor(
-    private _dialogRef: MatDialogRef<ConfirmDialogComponent>,
+    public _dialogRef: MatDialogRef<ConfirmDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
   ) {}
 }

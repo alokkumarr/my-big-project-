@@ -32,10 +32,10 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   @Input() useAggregate: boolean;
   @Input() artifacts: Artifact[];
   @Input() joins: Join[] = [];
-  private _jsPlumbInst: any;
+  public _jsPlumbInst: any;
 
   constructor (
-    private _elementRef: ElementRef
+    public _elementRef: ElementRef
   ) {
     this.onConnection = this.onConnection.bind(this);
     this.onConnectionDetached = this.onConnectionDetached.bind(this);

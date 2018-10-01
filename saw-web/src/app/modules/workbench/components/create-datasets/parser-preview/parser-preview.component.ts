@@ -34,19 +34,19 @@ const style = require('./parser-preview.component.scss');
 
 export class ParserPreviewComponent implements OnInit {
   @Input() previewObj: BehaviorSubject<any>;
-  private gridListInstance: any;
-  private previewgridConfig: Array<any>;
-  private updaterSubscribtion: any;
-  private fieldInfo = [];
-  private parserData: any;
-  private rawFile: any;
-  private inspectError = false;
-  private errMsg = '';
+  public gridListInstance: any;
+  public previewgridConfig: Array<any>;
+  public updaterSubscribtion: any;
+  public fieldInfo = [];
+  public parserData: any;
+  public rawFile: any;
+  public inspectError = false;
+  public errMsg = '';
 
   constructor(
-    private dxDataGrid: DxDataGridService,
-    private dialog: MatDialog,
-    private workBench: WorkbenchService
+    public dxDataGrid: DxDataGridService,
+    public dialog: MatDialog,
+    public workBench: WorkbenchService
   ) { }
 
   @Output() parserConfig: EventEmitter<any> = new EventEmitter<any>();

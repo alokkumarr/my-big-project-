@@ -31,7 +31,7 @@ export class DesignerDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<DesignerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AnalysisDialogData,
-    private _dialog: MatDialog
+    public _dialog: MatDialog
   ) {
     this.analysis = cloneDeep(data.analysis);
   }

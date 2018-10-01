@@ -16,9 +16,9 @@ export class CreatefolderDialogComponent {
   folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
-    private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<CreatefolderDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private data: any
+    public formBuilder: FormBuilder,
+    public dialogRef: MatDialogRef<CreatefolderDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit() {

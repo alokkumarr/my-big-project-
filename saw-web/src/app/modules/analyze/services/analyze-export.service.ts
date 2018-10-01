@@ -22,8 +22,8 @@ import { ToastService } from '../../../common/services/toastMessage.service';
 @Injectable()
 export class AnalyzeExportService {
   constructor(
-    private _analyzeActionsService: AnalyzeActionsService,
-    private _toastMessage: ToastService
+    public _analyzeActionsService: AnalyzeActionsService,
+    public _toastMessage: ToastService
   ) {}
 
   export(analysis, executionId, executionType = 'normal') {

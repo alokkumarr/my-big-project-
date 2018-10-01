@@ -78,8 +78,8 @@ export class AnalyzeActionsMenuComponent {
   ];
 
   constructor(
-    private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService
+    public _analyzeActionsService: AnalyzeActionsService,
+    public _jwt: JwtService
   ) {}
 
   ngOnInit() {

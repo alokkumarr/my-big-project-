@@ -37,7 +37,7 @@ export class ObservePivotComponent implements OnInit {
   @Input() updater: BehaviorSubject<any>;
 
   constructor(
-    private analyzeService: AnalyzeService
+    public analyzeService: AnalyzeService
   ) {}
 
   ngOnInit() {

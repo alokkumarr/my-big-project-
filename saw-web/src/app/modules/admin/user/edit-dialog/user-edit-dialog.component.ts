@@ -36,9 +36,9 @@ export class UserEditDialogComponent extends BaseDialogComponent {
   }];
 
   constructor(
-    private _userService: UserService,
-    private _fb: FormBuilder,
-    private _dialogRef: MatDialogRef<UserEditDialogComponent>,
+    public _userService: UserService,
+    public _fb: FormBuilder,
+    public _dialogRef: MatDialogRef<UserEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       model: any,
       formDeps: {

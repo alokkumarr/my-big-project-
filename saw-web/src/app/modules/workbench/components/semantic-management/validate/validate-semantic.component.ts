@@ -25,14 +25,14 @@ const style = require('./validate-semantic.component.scss');
   ]
 })
 export class ValidateSemanticComponent implements OnDestroy {
-  private selectedDS: any;
-  private isJoinEligible = false;
+  public selectedDS: any;
+  public isJoinEligible = false;
 
   constructor(
-    private router: Router,
-    private workBench: WorkbenchService,
+    public router: Router,
+    public workBench: WorkbenchService,
     public dialog: MatDialog,
-    private notify: ToastService
+    public notify: ToastService
   ) {
     this.selectedDS = this.injectFieldProperties(
       this.workBench.getDataFromLS('selectedDS')

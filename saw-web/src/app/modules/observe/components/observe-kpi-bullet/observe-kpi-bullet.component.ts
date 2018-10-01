@@ -36,8 +36,8 @@ export class ObserveKPIBulletComponent
   primaryResult: { current?: number; prior?: number; change?: string } = {};
   kpiFilterSubscription: Subscription;
   chartOptions = BULLET_CHART_OPTIONS;
-  private chartUpdater = new BehaviorSubject([]);
-  private requesterSubscription: Subscription;
+  public chartUpdater = new BehaviorSubject([]);
+  public requesterSubscription: Subscription;
 
   @Input()
   set bulletKpi(data) {
@@ -55,8 +55,8 @@ export class ObserveKPIBulletComponent
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
 
   constructor(
-    private observe: ObserveService,
-    private globalFilterService: GlobalFilterService
+    public observe: ObserveService,
+    public globalFilterService: GlobalFilterService
   ) {}
 
   ngOnInit() {

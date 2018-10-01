@@ -27,15 +27,15 @@ export class DndDroppableDirective {
   // apply the classes needed for the droppable container to not
   // take dragenter and dragleave events from it's children
   // tslint:disable
-  @HostBinding(`class.${dndClasses.droppableContainer}`) private _droppableContainer = true;
-  @HostBinding(`class.${dndClasses.droppableContainerAfter}`) private _droppableContainerAfter = true;
+  @HostBinding(`class.${dndClasses.droppableContainer}`) public _droppableContainer = true;
+  @HostBinding(`class.${dndClasses.droppableContainerAfter}`) public _droppableContainerAfter = true;
 
-  @HostBinding(`class.${dndClasses.dropAreaDragOver}`) private _isDropAllowed = false;
+  @HostBinding(`class.${dndClasses.dropAreaDragOver}`) public _isDropAllowed = false;
   // tslint:enable
-  private _droppableOptions: IDroppableOptions;
+  public _droppableOptions: IDroppableOptions;
 
   constructor(
-    private _dragDropService: DragnDropService
+    public _dragDropService: DragnDropService
   ) {}
 
   @HostListener('dragenter', ['$event'])

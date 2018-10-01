@@ -165,7 +165,7 @@ export class CronJobSchedularComponent implements OnInit {
     // this.startDate = new Date();
   }
 
-  private range(start: number, end: number): number[] {
+  public range(start: number, end: number): number[] {
     const length = end - start + 1;
     return Array.apply(undefined, Array(length)).map((_, i) => i + start);
   }

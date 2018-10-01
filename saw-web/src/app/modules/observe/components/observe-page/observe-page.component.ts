@@ -13,7 +13,7 @@ import { MenuService } from '../../../../common/services/menu.service';
   ]
 })
 export class ObservePageComponent implements OnInit {
-  constructor(private menu: MenuService, private observe: ObserveService) {}
+  constructor(private menu: MenuService, public observe: ObserveService) {}
 
   ngOnInit() {
     /* Needed to get the analyze service working correctly */

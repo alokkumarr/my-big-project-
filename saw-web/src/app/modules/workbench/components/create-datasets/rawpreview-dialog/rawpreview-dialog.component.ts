@@ -9,12 +9,12 @@ import * as take from 'lodash/take';
   templateUrl: 'rawpreview-dialog.component.html'
 })
 export class RawpreviewDialogComponent implements OnInit {
-  private title = ''; // tslint:disable-line
-  private message = 'No Data'; // tslint:disable-line
+  public title = ''; // tslint:disable-line
+  public message = 'No Data'; // tslint:disable-line
 
   constructor(
-    private dialogRef: MatDialogRef<RawpreviewDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private params: any // tslint:disable-line
+    public dialogRef: MatDialogRef<RawpreviewDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public params: any // tslint:disable-line
   ) {
     if (get(params, 'rawData')) {
       this.message = take(params.rawData, 50);

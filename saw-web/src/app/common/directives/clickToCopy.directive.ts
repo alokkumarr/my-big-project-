@@ -13,9 +13,9 @@ import { ToastService } from '../services/toastMessage.service';
 export class ClickToCopyDirective {
 
   constructor(
-    private _toastMessage: ToastService,
-    private _elemRef: ElementRef,
-    @Inject(DOCUMENT) private _doc: any
+    public _toastMessage: ToastService,
+    public _elemRef: ElementRef,
+    @Inject(DOCUMENT) public _doc: any
   ) {}
 
   @HostListener('click', ['$event'])

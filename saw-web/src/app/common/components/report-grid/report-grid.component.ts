@@ -83,7 +83,7 @@ let self; // needed to access component context from dx callbacks
 export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
-  private listeners: Array<Subscription> = [];
+  public listeners: Array<Subscription> = [];
   @Output()
   change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
   @ViewChild(DxDataGridComponent)
@@ -208,7 +208,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
 
-  constructor(private _dialog: MatDialog, private _elemRef: ElementRef) {
+  constructor(private _dialog: MatDialog, public _elemRef: ElementRef) {
     self = this;
     this.onLoadPanelShowing = ({ component }) => {
       const instance = this.dataGrid.instance;

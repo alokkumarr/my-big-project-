@@ -10,9 +10,9 @@ import {
 import { dndClasses } from './consts';
 @Injectable()
 export class DragnDropService {
-  private _payload: IDragPayload = null;
-  private _element: HTMLElement = null;
-  private _moveEventAccumulator: {
+  public _payload: IDragPayload = null;
+  public _element: HTMLElement = null;
+  public _moveEventAccumulator: {
     from: IDndMoveEvent<any, any>;
     to: IDndMoveEvent<any, any>;
   } = {
@@ -77,7 +77,7 @@ export class DragnDropService {
     return true;
   }
 
-  private _isZoneOk(zone, zones): boolean {
+  public _isZoneOk(zone, zones): boolean {
     if (!zone && zones.length === 0) {
       return true;
     }
@@ -90,14 +90,14 @@ export class DragnDropService {
     return false;
   }
 
-  private _isAllowFnOk(allowFn, data): boolean {
+  public _isAllowFnOk(allowFn, data): boolean {
     if (isFunction(allowFn)) {
       return allowFn(data);
     }
     return true;
   }
 
-  private _onMove(event: IDndMoveEvent<any, any>) {
+  public _onMove(event: IDndMoveEvent<any, any>) {
     // because the onDragEnd event fires after the onDrop event
     // the moveFrom coms after the moveTo event
     // however we need the information from the moveFrom event first to take out the element

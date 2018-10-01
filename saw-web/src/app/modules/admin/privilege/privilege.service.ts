@@ -39,8 +39,8 @@ interface CategoryResponse {
 export class PrivilegeService implements IAdminDataService {
 
   constructor(
-    private _adminService: AdminService,
-    private _toastMessage: ToastService
+    public _adminService: AdminService,
+    public _toastMessage: ToastService
   ) {}
 
   getList(customerId) {

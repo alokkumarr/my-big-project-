@@ -22,10 +22,10 @@ const style = require('./js-plumb-join-label.component.scss');
 export class JsPlumbJoinLabelComponent {
   @Input() join: Join;
   @Output() change: EventEmitter<JoinChangeEvent> = new EventEmitter();
-  private _jsPlumbInst: any;
+  public _jsPlumbInst: any;
 
   constructor (
-    private _dialog: MatDialog
+    public _dialog: MatDialog
   ) {
   }
 

@@ -41,11 +41,11 @@ export class JsPlumbConnectorComponent implements OnInit, OnDestroy {
 
   @ViewChild('target', {read: ViewContainerRef}) _container: ViewContainerRef;
 
-  private _connection: any;
+  public _connection: any;
 
   constructor (
-    private _injector: Injector,
-    private _resolver: ComponentFactoryResolver
+    public _injector: Injector,
+    public _resolver: ComponentFactoryResolver
   ) {}
 
   ngOnInit() {

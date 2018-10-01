@@ -73,14 +73,14 @@ export class DashboardGridComponent
   public columns = 16;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
-  private listeners: Array<Subscription> = [];
+  public listeners: Array<Subscription> = [];
   public initialised = false;
 
   constructor(
-    private analyze: AnalyzeService,
-    private filters: GlobalFilterService,
-    private dashboardService: DashboardService,
-    private sidenav: SideNavService
+    public analyze: AnalyzeService,
+    public filters: GlobalFilterService,
+    public dashboardService: DashboardService,
+    public sidenav: SideNavService
   ) {}
 
   ngOnInit() {

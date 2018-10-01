@@ -8,14 +8,14 @@ import * as get from 'lodash/get';
   templateUrl: 'confirm-dialog.component.html'
 })
 export class ConfirmDialogComponent implements OnInit {
-  private title = ''; // tslint:disable-line
-  private message = 'Are you sure you want to proceed'; // tslint:disable-line
-  private actionButton = 'Proceed'; // tslint:disable-line
-  private actionColor = 'primary'; // tslint:disable-line
+  public title = ''; // tslint:disable-line
+  public message = 'Are you sure you want to proceed'; // tslint:disable-line
+  public actionButton = 'Proceed'; // tslint:disable-line
+  public actionColor = 'primary'; // tslint:disable-line
 
   constructor(
-    private dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private params: any // tslint:disable-line
+    public dialogRef: MatDialogRef<ConfirmDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public params: any // tslint:disable-line
   ) {
     if (get(params, 'message')) {
       this.message = params.message;

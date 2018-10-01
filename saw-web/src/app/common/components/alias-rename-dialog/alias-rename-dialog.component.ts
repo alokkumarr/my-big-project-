@@ -22,7 +22,7 @@ export class AliasRenameDialogComponent {
   public alias: string;
 
   constructor(
-    private _dialogRef: MatDialogRef<AliasRenameDialogComponent>,
+    public _dialogRef: MatDialogRef<AliasRenameDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       alias: string
     }

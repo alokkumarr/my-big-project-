@@ -10,7 +10,7 @@ import { JwtService } from '../../../common/services';
   templateUrl: 'analyze-page.component.html'
 })
 export class AnalyzePageComponent {
-  constructor(private _jwt: JwtService, private _router: Router) {
+  constructor(private _jwt: JwtService, public _router: Router) {
     this._router.events.subscribe(event => {
       this.saveAnalyzeCategoryId(event);
     });

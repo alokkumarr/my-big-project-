@@ -23,13 +23,13 @@ export class AnalyzePublishDialogComponent extends BaseDialogComponent implement
   token: any;
 
   constructor(
-    private _dialogRef: MatDialogRef<AnalyzePublishDialogComponent>,
+    public _dialogRef: MatDialogRef<AnalyzePublishDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       analysis: Analysis;
     },
-    private _analyzeService: AnalyzeService,
-    private _jwt: JwtService
+    public _analyzeService: AnalyzeService,
+    public _jwt: JwtService
   ) {
     super();
   }

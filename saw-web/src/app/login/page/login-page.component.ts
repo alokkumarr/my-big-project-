@@ -14,7 +14,7 @@ import { Title } from '@angular/platform-browser';
 
 export class LoginPageComponent implements OnInit {
   constructor(
-    private _title: Title
+    public _title: Title
   ) {}
 
   ngOnInit() {

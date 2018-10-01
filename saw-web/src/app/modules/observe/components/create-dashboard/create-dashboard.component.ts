@@ -60,12 +60,12 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
   constructor(
     public dialogRef: MatDialogRef<CreateDashboardComponent>,
-    private dialog: MatDialog,
-    private router: Router,
-    private menu: MenuService,
-    private globalFilterService: GlobalFilterService,
-    private dashboardService: DashboardService,
-    private observe: ObserveService,
+    public dialog: MatDialog,
+    public router: Router,
+    public menu: MenuService,
+    public globalFilterService: GlobalFilterService,
+    public dashboardService: DashboardService,
+    public observe: ObserveService,
     @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) {
     this.dashboard = get(this.dialogData, 'dashboard');

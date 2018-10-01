@@ -23,18 +23,18 @@ const style = require('./dataset-detail-view.component.scss');
 })
 
 export class DatasetDetailViewComponent implements OnInit, OnDestroy {
-  private dsMetadata;
-  private timer;
-  private timerSubscription;
-  private poll: boolean;
-  private interval = 5000;
-  private previewData: Array<any> = [];
-  private previewStatus: string;
+  public dsMetadata;
+  public timer;
+  public timerSubscription;
+  public poll: boolean;
+  public interval = 5000;
+  public previewData: Array<any> = [];
+  public previewStatus: string;
 
   constructor(
-    private router: Router,
-    private dxDataGrid: DxDataGridService,
-    private workBench: WorkbenchService
+    public router: Router,
+    public dxDataGrid: DxDataGridService,
+    public workBench: WorkbenchService
   ) {
     this.dsMetadata = this.workBench.getDataFromLS('dsMetadata');
   }

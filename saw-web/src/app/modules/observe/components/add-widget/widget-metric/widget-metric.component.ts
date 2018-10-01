@@ -29,9 +29,9 @@ export class WidgetMetricComponent implements OnInit, OnDestroy {
   showProgress = false;
 
   constructor(
-    private analyze: AnalyzeService,
-    private observe: ObserveService,
-    private _headerProgress: HeaderProgressService
+    public analyze: AnalyzeService,
+    public observe: ObserveService,
+    public _headerProgress: HeaderProgressService
   ) {
     this. progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;

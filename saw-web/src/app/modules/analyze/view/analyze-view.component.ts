@@ -55,15 +55,15 @@ export class AnalyzeViewComponent implements OnInit {
     searchTermValue: ''
   };
   constructor(
-    private _analyzeService: AnalyzeService,
-    private _router: Router,
-    private _route: ActivatedRoute,
-    private _localStorage: LocalStorageService,
-    private _jwt: JwtService,
-    private _localSearch: LocalSearchService,
-    private _toastMessage: ToastService,
+    public _analyzeService: AnalyzeService,
+    public _router: Router,
+    public _route: ActivatedRoute,
+    public _localStorage: LocalStorageService,
+    public _jwt: JwtService,
+    public _localSearch: LocalSearchService,
+    public _toastMessage: ToastService,
     public _dialog: MatDialog,
-    private _executeService: ExecuteService
+    public _executeService: ExecuteService
   ) { }
 
   ngOnInit() {

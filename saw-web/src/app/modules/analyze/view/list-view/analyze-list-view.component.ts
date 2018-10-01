@@ -41,10 +41,10 @@ export class AnalyzeListViewComponent {
   public executingState = EXECUTION_STATES.EXECUTING;
 
   constructor(
-    private _DxDataGridService: DxDataGridService,
-    private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService,
-    private _executeService: ExecuteService
+    public _DxDataGridService: DxDataGridService,
+    public _analyzeActionsService: AnalyzeActionsService,
+    public _jwt: JwtService,
+    public _executeService: ExecuteService
   ) { }
 
   ngOnInit() {

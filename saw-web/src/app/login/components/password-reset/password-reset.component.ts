@@ -9,15 +9,15 @@ import { UserService } from '../../../common/services';
 })
 export class PasswordResetComponent implements OnInit {
   constructor(
-    private _UserService: UserService,
-    private _router: Router,
-    private _route: ActivatedRoute
+    public _UserService: UserService,
+    public _router: Router,
+    public _route: ActivatedRoute
   ) {}
 
-  private errorMsg;
-  private username;
-  private confNewPwd;
-  private newPwd;
+  public errorMsg;
+  public username;
+  public confNewPwd;
+  public newPwd;
 
   ngOnInit() {
     this._route.queryParams.subscribe(({ rhc }) => {

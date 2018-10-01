@@ -21,7 +21,7 @@ export class DateFormatDialogComponent {
   public dateFormats;
 
   constructor(
-    private _dialogRef: MatDialogRef<DateFormatDialogComponent>,
+    public _dialogRef: MatDialogRef<DateFormatDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       format: string;

@@ -68,11 +68,11 @@ export class AdminImportViewComponent implements OnInit {
   @Input() columns: any[];
 
   constructor(
-    private _importService: ImportService,
-    private _exportService: ExportService,
-    private _categoryService: CategoryService,
-    private _sidenav: SidenavMenuService,
-    private _jwtService: JwtService
+    public _importService: ImportService,
+    public _exportService: ExportService,
+    public _categoryService: CategoryService,
+    public _sidenav: SidenavMenuService,
+    public _jwtService: JwtService
   ) {}
 
   ngOnInit() {

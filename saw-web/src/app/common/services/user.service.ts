@@ -10,8 +10,8 @@ const refreshTokenEndpoint = 'getNewAccessToken';
 export class UserService {
   static refreshTokenEndpoint = refreshTokenEndpoint;
   constructor(
-    private _http: HttpClient,
-    private _jwtService: JwtService
+    public _http: HttpClient,
+    public _jwtService: JwtService
   ) {}
 
   attemptAuth(formData) {

@@ -21,9 +21,9 @@ export class ErrorDetailComponent implements OnInit {
   public errorMessage: string;
   public errorBody: any;
   constructor(
-    private _dialogRef: MatDialogRef<ErrorDetailComponent>,
+    public _dialogRef: MatDialogRef<ErrorDetailComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {errorObj},
-    private _errorDetailService: ErrorDetailService
+    public _errorDetailService: ErrorDetailService
   ) { }
 
   ngOnInit() {

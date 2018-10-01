@@ -18,9 +18,9 @@ export class SemanticDetailsDialogComponent {
   form: FormGroup;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<SemanticDetailsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) private data: any
+    public formBuilder: FormBuilder,
+    public dialogRef: MatDialogRef<SemanticDetailsDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
   ngOnInit() {

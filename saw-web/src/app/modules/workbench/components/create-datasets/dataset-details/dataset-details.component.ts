@@ -26,13 +26,13 @@ const style = require('./dataset-details.component.scss');
 export class DatasetDetailsComponent implements OnInit {
   @Input() selFiles: Array<any>;
   @Input() previewConfig: any;
-  private separatorKeysCodes = [ENTER, COMMA]; // tslint:disable-line
+  public separatorKeysCodes = [ENTER, COMMA]; // tslint:disable-line
   public detailsFormGroup: FormGroup;
-  private lineSeperator = 'lineFeed';
+  public lineSeperator = 'lineFeed';
 
   constructor(
     public dialog: MatDialog,
-    private workBench: WorkbenchService
+    public workBench: WorkbenchService
   ) { }
 
   @Output() onDetailsFilled: EventEmitter<any> = new EventEmitter<any>();

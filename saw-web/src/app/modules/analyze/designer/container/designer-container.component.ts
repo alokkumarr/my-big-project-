@@ -89,9 +89,9 @@ export class DesignerContainerComponent {
   public areMinRequirmentsMet = false;
 
   constructor(
-    private _designerService: DesignerService,
-    private _analyzeDialogService: AnalyzeDialogService,
-    private _chartService: ChartService
+    public _designerService: DesignerService,
+    public _analyzeDialogService: AnalyzeDialogService,
+    public _chartService: ChartService
   ) {}
 
   ngOnInit() {

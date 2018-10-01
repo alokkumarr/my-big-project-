@@ -20,16 +20,16 @@ const style = require('./create-semantic.component.scss');
   ]
 })
 export class CreateSemanticComponent implements OnInit {
-  private availableDS: any;
-  private joinToggleValue = false;
-  private selectionMode = 'single';
-  private gridDataAvailableDS: any;
-  private isSelected = false;
-  private selectedDSData: any = [];
+  public availableDS: any;
+  public joinToggleValue = false;
+  public selectionMode = 'single';
+  public gridDataAvailableDS: any;
+  public isSelected = false;
+  public selectedDSData: any = [];
 
   constructor(
-    private router: Router,
-    private workBench: WorkbenchService
+    public router: Router,
+    public workBench: WorkbenchService
   ) {}
 
   @ViewChild('dsGrid') dataGrid: DxDataGridComponent;

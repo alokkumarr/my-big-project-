@@ -24,12 +24,12 @@ export class DatasetsGridPageComponent implements OnInit {
   searchTerm: string;
   @Input()
   updater: BehaviorSubject<any>;
-  private gridConfig: Array<any>;
-  private updaterSubscribtion: any;
+  public gridConfig: Array<any>;
+  public updaterSubscribtion: any;
 
   constructor(
-    private dxDataGrid: DxDataGridService,
-    private workbench: WorkbenchService
+    public dxDataGrid: DxDataGridService,
+    public workbench: WorkbenchService
   ) {}
 
   @ViewChild(DxDataGridComponent)

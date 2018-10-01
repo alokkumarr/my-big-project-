@@ -42,8 +42,8 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   filterLabel: string;
 
   constructor(
-    private observe: ObserveService,
-    private globalFilterService: GlobalFilterService
+    public observe: ObserveService,
+    public globalFilterService: GlobalFilterService
   ) {}
 
   ngOnInit() {

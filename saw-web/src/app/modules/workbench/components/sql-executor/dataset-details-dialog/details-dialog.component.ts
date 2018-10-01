@@ -13,11 +13,11 @@ const style = require('./details-dialog.component.scss');
 
 export class DetailsDialogComponent implements OnInit {
   form: FormGroup;
-  private folNamePattern = '[A-Za-z0-9]+';
+  public folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
-    private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<DetailsDialogComponent>
+    public formBuilder: FormBuilder,
+    public dialogRef: MatDialogRef<DetailsDialogComponent>
   ) {  }
 
   ngOnInit() {

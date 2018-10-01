@@ -44,7 +44,7 @@ export class ObserveReportComponent implements OnDestroy {
   dataLoader = this.loadData.bind(this);
 
   constructor(
-    private analyzeService: AnalyzeService
+    public analyzeService: AnalyzeService
   ) {}
 
   ngOnDestroy() {

@@ -57,10 +57,10 @@ export class AnalyzeService {
   _executions: Object = {};
 
   constructor(
-    private _http: HttpClient,
-    private _jwtService: JwtService,
-    private _toastMessage: ToastService,
-    private _menu: MenuService
+    public _http: HttpClient,
+    public _jwtService: JwtService,
+    public _toastMessage: ToastService,
+    public _menu: MenuService
   ) {}
 
   isExecuting(analysisId) {

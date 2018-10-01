@@ -33,29 +33,29 @@ const style = require('./create-datasets.component.scss');
   ]
 })
 export class CreateDatasetsComponent implements OnInit {
-  private selectFullfilled = false;
-  private detailsFilled = false;
-  private previewDone = false;
+  public selectFullfilled = false;
+  public detailsFilled = false;
+  public previewDone = false;
   public selectedFiles: Array<any>;
   public details: any = [];
-  private csvConfig: any;
-  private parsedPreview = new BehaviorSubject([]);
-  private previewData: any;
-  private fieldsConf: any;
-  private parserConf: any; // tslint:disable-line
+  public csvConfig: any;
+  public parsedPreview = new BehaviorSubject([]);
+  public previewData: any;
+  public fieldsConf: any;
+  public parserConf: any; // tslint:disable-line
   public nameFormGroup: FormGroup;
-  private selectedIndex = 0;
-  private folNamePattern = '[A-Za-z0-9]+';
+  public selectedIndex = 0;
+  public folNamePattern = '[A-Za-z0-9]+';
 
   constructor(
-    private router: Router,
-    private dialog: MatDialog,
-    private workBench: WorkbenchService,
-    private notify: ToastService
+    public router: Router,
+    public dialog: MatDialog,
+    public workBench: WorkbenchService,
+    public notify: ToastService
   ) { }
 
-  @ViewChild('previewComponent') private previewComponent: ParserPreviewComponent;
-  @ViewChild('detailsComponent') private detailsComponent: DatasetDetailsComponent;
+  @ViewChild('previewComponent') public previewComponent: ParserPreviewComponent;
+  @ViewChild('detailsComponent') public detailsComponent: DatasetDetailsComponent;
 
   ngOnInit() {
     this.csvConfig = cloneDeep(CSV_CONFIG);

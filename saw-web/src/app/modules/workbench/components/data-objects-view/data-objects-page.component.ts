@@ -25,32 +25,32 @@ const style = require('./data-objects-page.component.scss');
   providers: [DatePipe]
 })
 export class DataobjectsComponent implements OnInit, OnDestroy {
-  private availableSets: Array<any> = [];
-  private availableDP: Array<any> = [];
-  private viewState = 'card';
-  private states = {
+  public availableSets: Array<any> = [];
+  public availableDP: Array<any> = [];
+  public viewState = 'card';
+  public states = {
     searchTerm: '',
     searchTermValue: ''
   };
-  private updater = new BehaviorSubject([]);
-  private dpUpdater = new BehaviorSubject([]);
-  private dataView = 'sets';
-  private contentHeight: number;
-  private timer;
-  private timerSubscription;
-  private poll = false;
-  private interval = 20000;
+  public updater = new BehaviorSubject([]);
+  public dpUpdater = new BehaviorSubject([]);
+  public dataView = 'sets';
+  public contentHeight: number;
+  public timer;
+  public timerSubscription;
+  public poll = false;
+  public interval = 20000;
 
   @ViewChild(SearchBoxComponent)
   searchBox: SearchBoxComponent;
 
   constructor(
-    private router: Router,
+    public router: Router,
     public dialog: MatDialog,
-    private LocalSearch: LocalSearchService,
-    private workBench: WorkbenchService,
-    private datePipe: DatePipe,
-    private _toastMessage: ToastService
+    public LocalSearch: LocalSearchService,
+    public workBench: WorkbenchService,
+    public datePipe: DatePipe,
+    public _toastMessage: ToastService
   ) {}
 
   ngOnInit() {

@@ -16,8 +16,8 @@ const apiUrl = AppConfig.api.url;
 export class AdminService {
 
   constructor(
-    private http: HttpClient,
-    private _toastMessage: ToastService
+    public http: HttpClient,
+    public _toastMessage: ToastService
   ) {}
 
   showToastMessageIfNeeded(toast) {

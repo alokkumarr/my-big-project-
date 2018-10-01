@@ -28,14 +28,14 @@ export class DndDraggableDirective {
     }
   }
   // tslint:disable
-  @HostBinding(`class.${dndClasses.draggedOldPlace}`) private _isDragged = false;
+  @HostBinding(`class.${dndClasses.draggedOldPlace}`) public _isDragged = false;
   // tslint:enable
 
-  private _data: any = null;
+  public _data: any = null;
 
   constructor(
-    private _dragDropService: DragnDropService,
-    private _elemRef: ElementRef
+    public _dragDropService: DragnDropService,
+    public _elemRef: ElementRef
   ) {}
 
   @HostListener('dragstart', ['$event'])

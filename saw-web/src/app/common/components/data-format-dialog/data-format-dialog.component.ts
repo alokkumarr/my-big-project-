@@ -43,7 +43,7 @@ export class DataFormatDialogComponent implements OnInit {
   public isFloat: boolean;
 
   constructor(
-    private _dialogRef: MatDialogRef<DataFormatDialogComponent>,
+    public _dialogRef: MatDialogRef<DataFormatDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       format: Format,
       type: string

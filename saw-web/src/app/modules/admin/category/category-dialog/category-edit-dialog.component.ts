@@ -48,9 +48,9 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
   }];
 
   constructor(
-    private _categoryService: CategoryService,
-    private _fb: FormBuilder,
-    private _dialogRef: MatDialogRef<CategoryEditDialogComponent>,
+    public _categoryService: CategoryService,
+    public _fb: FormBuilder,
+    public _dialogRef: MatDialogRef<CategoryEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       model: any,
       formDeps: {customerId: string},

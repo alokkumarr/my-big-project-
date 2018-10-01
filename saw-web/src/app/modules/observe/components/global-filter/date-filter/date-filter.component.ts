@@ -25,21 +25,21 @@ import {
   templateUrl: 'date-filter.component.html'
 })
 export class GlobalDateFilterComponent implements OnInit, OnDestroy {
-  private _filter;
-  private model: any = {};
-  private filterCache: { gte?; lte?; preset? };
-  private presets = DATE_PRESETS; // tslint:disable-line
-  private defaults: { min; max };
-  private showDateFields: boolean; // tslint:disable-line
-  private clearFiltersListener: Subscription;
-  private applyFiltersListener: Subscription;
-  private closeFiltersListener: Subscription;
+  public _filter;
+  public model: any = {};
+  public filterCache: { gte?; lte?; preset? };
+  public presets = DATE_PRESETS; // tslint:disable-line
+  public defaults: { min; max };
+  public showDateFields: boolean; // tslint:disable-line
+  public clearFiltersListener: Subscription;
+  public applyFiltersListener: Subscription;
+  public closeFiltersListener: Subscription;
 
   @Output() onModelChange = new EventEmitter();
 
   constructor(
-    private observe: ObserveService,
-    private filters: GlobalFilterService
+    public observe: ObserveService,
+    public filters: GlobalFilterService
   ) {}
 
   ngOnInit() {

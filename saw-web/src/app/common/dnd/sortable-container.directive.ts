@@ -26,17 +26,17 @@ export class DndSortableContainerDirective {
   >();
 
   @HostBinding(`class.${dndClasses.dropAreaDragOver}`)
-  private _isDropAllowed = false;
+  public _isDropAllowed = false;
 
   // counter for the enter and leave events of the containers children that bubble up
-  private _counter = 0;
-  private _newSortableIndex: number;
-  private _insertionPlaceholder: HTMLElement;
-  private _placeholderPlace: any;
+  public _counter = 0;
+  public _newSortableIndex: number;
+  public _insertionPlaceholder: HTMLElement;
+  public _placeholderPlace: any;
 
   constructor(
-    private _dragDropService: DragnDropService,
-    private _elemRef: ElementRef
+    public _dragDropService: DragnDropService,
+    public _elemRef: ElementRef
   ) {}
 
   @HostListener('dragenter', ['$event'])

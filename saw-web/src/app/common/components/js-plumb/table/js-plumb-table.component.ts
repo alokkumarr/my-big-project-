@@ -38,7 +38,7 @@ export class JsPlumbTableComponent implements OnInit, AfterViewInit {
   public sides = ['left', 'right'];
 
   constructor (
-    private _elementRef: ElementRef
+    public _elementRef: ElementRef
   ) {}
 
   ngOnInit() {

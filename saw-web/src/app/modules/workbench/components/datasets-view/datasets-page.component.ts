@@ -19,26 +19,26 @@ const style = require('./datasets-page.component.scss');
 })
 
 export class DatasetsComponent implements OnInit, OnDestroy {
-  private availableSets: Array<any> = [];
-  private viewState = 'card';
-  private states = {
+  public availableSets: Array<any> = [];
+  public viewState = 'card';
+  public states = {
     searchTerm: '',
     searchTermValue: ''
   };
-  private updater = new BehaviorSubject([]);
-  private dataView = 'sets';
-  private contentHeight: number;
-  private timer;
-  private timerSubscription;
-  private poll = true;
-  private interval = 20000;
+  public updater = new BehaviorSubject([]);
+  public dataView = 'sets';
+  public contentHeight: number;
+  public timer;
+  public timerSubscription;
+  public poll = true;
+  public interval = 20000;
 
   constructor(
-    private router: Router,
+    public router: Router,
     public dialog: MatDialog,
-    private LocalSearch: LocalSearchService,
-    private workBench: WorkbenchService,
-    private datePipe: DatePipe
+    public LocalSearch: LocalSearchService,
+    public workBench: WorkbenchService,
+    public datePipe: DatePipe
   ) { }
 
   ngOnInit() {

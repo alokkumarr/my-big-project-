@@ -68,14 +68,14 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   chartUpdater$: BehaviorSubject<Object> = new BehaviorSubject<Object>({});
 
   constructor(
-    private _executeService: ExecuteService,
-    private _analyzeService: AnalyzeService,
-    private _router: Router,
-    private _route: ActivatedRoute,
-    private _analyzeActionsService: AnalyzeActionsService,
-    private _jwt: JwtService,
-    private _analyzeExportService: AnalyzeExportService,
-    private _toastMessage: ToastService
+    public _executeService: ExecuteService,
+    public _analyzeService: AnalyzeService,
+    public _router: Router,
+    public _route: ActivatedRoute,
+    public _analyzeActionsService: AnalyzeActionsService,
+    public _jwt: JwtService,
+    public _analyzeExportService: AnalyzeExportService,
+    public _toastMessage: ToastService
   ) {
     this.onExecutionEvent = this.onExecutionEvent.bind(this);
     this.onExecutionsEvent = this.onExecutionsEvent.bind(this);

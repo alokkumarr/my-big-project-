@@ -5,8 +5,8 @@ import { UserService } from '../../common/services';
 @Injectable()
 export class IsUserNotLoggedInGuard implements CanActivate, CanActivateChild {
   constructor(
-    private _user: UserService,
-    private _router: Router
+    public _user: UserService,
+    public _router: Router
     ) {}
 
   canActivate() {

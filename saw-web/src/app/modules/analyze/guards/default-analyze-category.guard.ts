@@ -9,7 +9,7 @@ import { LAST_ANALYSES_CATEGORY_ID } from '../../../common/local-storage-keys';
 
 @Injectable()
 export class DefaultAnalyzeCategoryGuard implements CanActivate {
-  constructor(private _router: Router, private _menu: MenuService) {}
+  constructor(private _router: Router, public _menu: MenuService) {}
 
   canActivate() {
     this._menu.getMenu('ANALYZE').then(menu => {

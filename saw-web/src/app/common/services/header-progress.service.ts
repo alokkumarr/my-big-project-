@@ -5,9 +5,9 @@ import { timer } from 'rxjs';
 
 @Injectable()
 export class HeaderProgressService {
-  private _progressCounter = 0;
-  private _showProgress = false;
-  private _subject$ = new Subject<boolean>();
+  public _progressCounter = 0;
+  public _showProgress = false;
+  public _subject$ = new Subject<boolean>();
 
   subscribe(fn) {
     return this._subject$.pipe(
@@ -26,7 +26,7 @@ export class HeaderProgressService {
     this._showProgress = this._get();
   }
 
-  private _get() {
+  public _get() {
     const showProgress = this._progressCounter > 0;
     this._subject$.next(showProgress);
     return showProgress;

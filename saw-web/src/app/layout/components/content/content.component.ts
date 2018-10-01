@@ -25,12 +25,12 @@ export class LayoutContentComponent implements OnInit {
   title: string;
   isOnLoginPage = false;
   constructor(
-    private _user: UserService,
-    private _router: Router,
-    private _title: Title,
-    private _sidenav: SidenavMenuService,
-    private _menu: MenuService,
-    private _idle: Idle
+    public _user: UserService,
+    public _router: Router,
+    public _title: Title,
+    public _sidenav: SidenavMenuService,
+    public _menu: MenuService,
+    public _idle: Idle
   ) {}
 
   setUpIdleTimer() {

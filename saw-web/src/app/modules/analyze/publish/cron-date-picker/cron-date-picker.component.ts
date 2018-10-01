@@ -79,7 +79,7 @@ export class CronDatePickerComponent {
     this.onDateChange.emit(this.model);
   }
 
-  private range(start: number, end: number): number[] {
+  public range(start: number, end: number): number[] {
     const length = end - start + 1;
     return Array.apply(undefined, Array(length)).map((_, i) => i + start);
   }

@@ -23,12 +23,12 @@ const style = require('./datasets-card-page.component.scss');
 export class DatasetsCardPageComponent implements OnInit {
   @Input() searchTerm: string;
   @Input() updater: BehaviorSubject<any>;
-  private updaterSubscribtion: any;
-  private dataSets: Array<any> = [];
+  public updaterSubscribtion: any;
+  public dataSets: Array<any> = [];
 
   constructor(
     public dialog: MatDialog,
-    private workbench: WorkbenchService
+    public workbench: WorkbenchService
   ) {  }
 
   ngOnInit() {

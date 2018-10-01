@@ -40,14 +40,14 @@ export class ChartComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() enableExport: boolean;
   @ViewChild('container') container: ElementRef;
 
-  private highcharts: any = Highcharts;
-  private highstocks: any = Highstock;
-  private chart: any = null;
-  private _options: any;
-  private config: any = {};
-  private subscription: any;
-  private clonedConfig: any = {};
-  private cType: string;
+  public highcharts: any = Highcharts;
+  public highstocks: any = Highstock;
+  public chart: any = null;
+  public _options: any;
+  public config: any = {};
+  public subscription: any;
+  public clonedConfig: any = {};
+  public cType: string;
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);

@@ -10,8 +10,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class GlobalFilterService {
-  private rawFilters = [];
-  private updatedFilters = [];
+  public rawFilters = [];
+  public updatedFilters = [];
   public onFilterChange = new Subject();
   public onSidenavStateChange = new Subject();
   public onApplyKPIFilter = new BehaviorSubject({ preset: '' });

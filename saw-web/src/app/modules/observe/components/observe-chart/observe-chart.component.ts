@@ -48,8 +48,8 @@ export class ObserveChartComponent {
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
-  private chartUpdater = new BehaviorSubject([]);
-  private requesterSubscription: Subscription;
+  public chartUpdater = new BehaviorSubject([]);
+  public requesterSubscription: Subscription;
   public legend: any;
   public chartOptions: any;
   public settings: any;

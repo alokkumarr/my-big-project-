@@ -328,7 +328,7 @@ export class DesignerService {
     return chartGroupAdapters;
   }
 
-  private _distributeArtifactColumnsIntoGroups(
+  public _distributeArtifactColumnsIntoGroups(
     artifactColumns: ArtifactColumns,
     groupAdapters: IDEsignerSettingGroupAdapter[],
     analysisType: 'chart' | 'pivot'

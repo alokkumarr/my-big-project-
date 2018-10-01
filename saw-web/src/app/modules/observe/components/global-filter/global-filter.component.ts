@@ -37,9 +37,9 @@ const style = require('./global-filter.component.scss');
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();
   @Input() showKPIFilter: boolean;
-  private globalFilters = [];
-  private kpiFilter;
-  private filterChangeSubscription: Subscription;
+  public globalFilters = [];
+  public kpiFilter;
+  public filterChangeSubscription: Subscription;
 
   constructor(private filters: GlobalFilterService) {}
 

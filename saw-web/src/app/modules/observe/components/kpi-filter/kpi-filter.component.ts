@@ -50,8 +50,8 @@ export class KPIFilter implements OnInit, OnDestroy {
   @Output() onModelChange = new EventEmitter();
 
   constructor(
-    private fb: FormBuilder,
-    private globalFilterService: GlobalFilterService
+    public fb: FormBuilder,
+    public globalFilterService: GlobalFilterService
   ) {
     this.createForm();
   }

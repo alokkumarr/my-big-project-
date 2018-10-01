@@ -27,24 +27,24 @@ const style = require('./sql-executor.component.scss');
   ]
 })
 export class SqlExecutorComponent implements OnInit, OnDestroy {
-  private artifacts = [];
-  private gridConfig: Array<any>;
-  private gridData = new BehaviorSubject([]);
-  private dsMetadata: any;
-  private datasetDetails: Array<any>;
-  private appliedActions: Array<any> = SQL_AQCTIONS;
-  private scriptHeight = 100;
-  private previewHeight = 0;
-  private query = '';
+  public artifacts = [];
+  public gridConfig: Array<any>;
+  public gridData = new BehaviorSubject([]);
+  public dsMetadata: any;
+  public datasetDetails: Array<any>;
+  public appliedActions: Array<any> = SQL_AQCTIONS;
+  public scriptHeight = 100;
+  public previewHeight = 0;
+  public query = '';
 
   constructor(
-    private router: Router,
+    public router: Router,
     public dialog: MatDialog,
-    private workBench: WorkbenchService,
-    private notify: ToastService
+    public workBench: WorkbenchService,
+    public notify: ToastService
   ) { }
 
-  @ViewChild('sqlscript') private scriptComponent: SqlScriptComponent;
+  @ViewChild('sqlscript') public scriptComponent: SqlScriptComponent;
 
   ngOnInit() {
     this.getPageData();

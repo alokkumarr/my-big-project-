@@ -22,7 +22,7 @@ export class SidenavComponent implements OnInit {
   @Input() id: any;
 
   constructor(
-    private _sidenav: SidenavMenuService
+    public _sidenav: SidenavMenuService
   ) { }
   @ViewChild('sidenav') public sidenav;
 

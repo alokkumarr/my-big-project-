@@ -33,9 +33,9 @@ export class RoleEditDialogComponent extends BaseDialogComponent {
   }];
 
   constructor(
-    private _roleService: RoleService,
-    private _fb: FormBuilder,
-    private _dialogRef: MatDialogRef<RoleEditDialogComponent>,
+    public _roleService: RoleService,
+    public _fb: FormBuilder,
+    public _dialogRef: MatDialogRef<RoleEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       model: any,
       formDeps: {

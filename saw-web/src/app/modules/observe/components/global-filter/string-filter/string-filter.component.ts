@@ -27,19 +27,19 @@ export class GlobalStringFilterComponent implements OnInit, OnDestroy {
   @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
 
   filterCtrl: FormControl;
-  private _filter;
-  private value: Array<string> = [];
-  private filterCache: { values?: Array<string>; textValue?: string };
-  private suggestions = [];
-  private valueChangeListener: Subscription;
-  private clearFiltersListener: Subscription;
-  private applyFiltersListener: Subscription;
-  private closeFiltersListener: Subscription;
-  private filteredSuggestions: Observable<any[]>; // tslint:disable-line
+  public _filter;
+  public value: Array<string> = [];
+  public filterCache: { values?: Array<string>; textValue?: string };
+  public suggestions = [];
+  public valueChangeListener: Subscription;
+  public clearFiltersListener: Subscription;
+  public applyFiltersListener: Subscription;
+  public closeFiltersListener: Subscription;
+  public filteredSuggestions: Observable<any[]>; // tslint:disable-line
 
   constructor(
-    private observe: ObserveService,
-    private filters: GlobalFilterService
+    public observe: ObserveService,
+    public filters: GlobalFilterService
   ) {
     this.filterCtrl = new FormControl();
     this.filteredSuggestions = this.filterCtrl.valueChanges.pipe(

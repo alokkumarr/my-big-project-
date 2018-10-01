@@ -28,8 +28,8 @@ export class AnalyzeNewDialogComponent {
   selectedMetric;
 
   constructor(
-    private _analyzeDialogService: AnalyzeDialogService,
-    private _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
+    public _analyzeDialogService: AnalyzeDialogService,
+    public _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       metrics: any[],
       id: string

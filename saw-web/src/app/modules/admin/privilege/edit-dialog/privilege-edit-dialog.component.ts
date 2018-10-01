@@ -37,9 +37,9 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   subCategories;
 
   constructor(
-    private _privilegeService: PrivilegeService,
-    private _fb: FormBuilder,
-    private _dialogRef: MatDialogRef<PrivilegeEditDialogComponent>,
+    public _privilegeService: PrivilegeService,
+    public _fb: FormBuilder,
+    public _dialogRef: MatDialogRef<PrivilegeEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {
       model: any,
       formDeps: {customerId: string, masterLoginId: string},

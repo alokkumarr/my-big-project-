@@ -9,13 +9,13 @@ require('./password-pre-reset.component.scss');
   templateUrl: 'password-pre-reset.component.html'
 })
 export class PasswordPreResetComponent {
-  constructor(private _UserService: UserService, private _router: Router) {}
+  constructor(private _UserService: UserService, public _router: Router) {}
 
-  private dataHolder = {
+  public dataHolder = {
     masterLoginId: null
   };
 
-  private errorMsg;
+  public errorMsg;
 
   resetPwd() {
     this._UserService.preResetPwd(this.dataHolder).then((res: any) => {

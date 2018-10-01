@@ -27,8 +27,8 @@ export class ExecutedListComponent {
   analyses: Analysis[];
 
   constructor(
-    private _DxDataGridService: DxDataGridService,
-    private _router: Router
+    public _DxDataGridService: DxDataGridService,
+    public _router: Router
   ) {}
 
   goToExecution(executedAnalysis) {

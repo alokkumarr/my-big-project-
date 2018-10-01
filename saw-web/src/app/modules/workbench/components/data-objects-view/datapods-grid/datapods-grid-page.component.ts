@@ -20,8 +20,8 @@ export class DatapodsGridPageComponent implements OnInit, OnDestroy {
   searchTerm: string;
   @Input()
   updater: BehaviorSubject<any>;
-  private gridData: Array<any>;
-  private updaterSubscribtion: any;
+  public gridData: Array<any>;
+  public updaterSubscribtion: any;
 
   ngOnInit() {
     this.updaterSubscribtion = this.updater.subscribe(data => {

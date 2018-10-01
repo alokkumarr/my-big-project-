@@ -13,7 +13,7 @@ export class DatapodActionsComponent implements OnInit {
   @Input()
   dpMetadata: any;
 
-  constructor(private router: Router, private workBench: WorkbenchService) {}
+  constructor(private router: Router, public workBench: WorkbenchService) {}
 
   ngOnInit() {}
 

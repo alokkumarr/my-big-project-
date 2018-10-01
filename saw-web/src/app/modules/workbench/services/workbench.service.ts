@@ -17,13 +17,13 @@ const userProject = 'workbench';
 
 @Injectable()
 export class WorkbenchService {
-  private api = fpGet('api.url', APP_CONFIG);
-  private wbAPI = `${this.api}/internal/workbench/projects`;
+  public api = fpGet('api.url', APP_CONFIG);
+  public wbAPI = `${this.api}/internal/workbench/projects`;
 
   constructor(
-    private http: HttpClient,
-    private jwt: JwtService,
-    private router: Router
+    public http: HttpClient,
+    public jwt: JwtService,
+    public router: Router
   ) {}
 
   /** GET datasets from the server */
@@ -277,7 +277,7 @@ export class WorkbenchService {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T>(operation = 'operation', result?: T) {
+  public handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       return of(result as T);
     };

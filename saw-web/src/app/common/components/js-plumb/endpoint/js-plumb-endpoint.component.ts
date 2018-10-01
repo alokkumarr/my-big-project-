@@ -19,7 +19,7 @@ export class JsPlumbEndpointDirective implements OnInit, OnDestroy {
   @Input()
   plumbInstance: any;
 
-  private _endpointInstance: any;
+  public _endpointInstance: any;
 
   constructor(private _elementRef: ElementRef) {}
 

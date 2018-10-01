@@ -17,7 +17,7 @@ export class AdminImportFileListComponent implements OnInit {
   config: any;
 
   constructor(
-    private _DxDataGridService: DxDataGridService
+    public _DxDataGridService: DxDataGridService
   ) { }
 
   ngOnInit() {

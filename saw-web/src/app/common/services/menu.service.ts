@@ -18,8 +18,8 @@ export class MenuService {
   _menuCache: Object = {};
 
   constructor(
-    private _jwtService: JwtService,
-    private _sidenavMenuService: SidenavMenuService
+    public _jwtService: JwtService,
+    public _sidenavMenuService: SidenavMenuService
   ) {}
 
   updateMenu(data, moduleName) {

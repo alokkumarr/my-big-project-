@@ -28,19 +28,19 @@ const style = require('./update-semantic.component.scss');
   ]
 })
 export class UpdateSemanticComponent implements OnInit, OnDestroy {
-  private availableDP: any;
-  private gridDataAvailableDP: any;
-  private isSelected = false;
-  private selectedDPData: any = [];
-  private availableDS: any = [];
-  private isJoinEligible = false;
-  private selectedDPDetails: any = [];
-  private dpID = '';
+  public availableDP: any;
+  public gridDataAvailableDP: any;
+  public isSelected = false;
+  public selectedDPData: any = [];
+  public availableDS: any = [];
+  public isJoinEligible = false;
+  public selectedDPDetails: any = [];
+  public dpID = '';
 
   constructor(
-    private router: Router,
-    private workBench: WorkbenchService,
-    private notify: ToastService
+    public router: Router,
+    public workBench: WorkbenchService,
+    public notify: ToastService
   ) {
     // Below is used when navigating from Datapod view
     this.dpID = this.workBench.getDataFromLS('dpID');

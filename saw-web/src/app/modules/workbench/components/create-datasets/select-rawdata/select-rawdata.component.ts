@@ -31,23 +31,23 @@ const style = require('./select-rawdata.component.scss');
 })
 
 export class SelectRawdataComponent implements OnInit {
-  private treeConfig: any; // tslint:disable-line
-  private treeNodes: Array<any>; // tslint:disable-line
-  private treeOptions: ITreeOptions;
-  private maskHelper: any; // tslint:disable-line
-  private gridConfig: Array<any>;
-  private selFiles: Array<any> = [];
-  private filePath: string;
-  private fileMask = '';
-  private fileMaskControl = new FormControl('', Validators.required);
-  private currentPath = '';
-  private nodeID = '';
+  public treeConfig: any; // tslint:disable-line
+  public treeNodes: Array<any>; // tslint:disable-line
+  public treeOptions: ITreeOptions;
+  public maskHelper: any; // tslint:disable-line
+  public gridConfig: Array<any>;
+  public selFiles: Array<any> = [];
+  public filePath: string;
+  public fileMask = '';
+  public fileMaskControl = new FormControl('', Validators.required);
+  public currentPath = '';
+  public nodeID = '';
 
   constructor(
     public dialog: MatDialog,
-    private dxDataGrid: DxDataGridService,
-    private workBench: WorkbenchService,
-    private notify: ToastService
+    public dxDataGrid: DxDataGridService,
+    public workBench: WorkbenchService,
+    public notify: ToastService
   ) { }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;

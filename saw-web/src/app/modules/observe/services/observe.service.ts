@@ -19,14 +19,14 @@ import { BULLET_CHART_COLORS } from '../consts';
 
 @Injectable()
 export class ObserveService {
-  private api = fpGet('api.url', APP_CONFIG);
+  public api = fpGet('api.url', APP_CONFIG);
 
   constructor(
-    private http: HttpClient,
-    private jwt: JwtService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private menu: MenuService
+    public http: HttpClient,
+    public jwt: JwtService,
+    public router: Router,
+    public route: ActivatedRoute,
+    public menu: MenuService
   ) {}
 
   addModelStructure(model) {

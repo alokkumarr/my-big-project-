@@ -27,8 +27,8 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
 
   @ViewChild('editor') editor: AceEditorComponent;
 
-  private _artifacts: Array<any>;
-  private editorOptions = {
+  public _artifacts: Array<any>;
+  public editorOptions = {
     // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true,
@@ -37,8 +37,8 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
     wrapBehavioursEnabled: true,
     fontSize: 16
   };
-  private langTools = ace.acequire('ace/ext/language_tools');
-  private completions = [];
+  public langTools = ace.acequire('ace/ext/language_tools');
+  public completions = [];
 
   ngAfterViewInit() {
     setTimeout(() => {
