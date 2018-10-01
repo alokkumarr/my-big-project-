@@ -259,7 +259,7 @@ public class DLDataSetService {
           ds.getAsJsonObject().add(DataSetProperties.Schema.toString(), schema);
       }
       ds.getAsJsonObject().addProperty(DataSetProperties.RecordCount.toString(), recordCount);
-      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), size);
+      ds.getAsJsonObject().addProperty(DataSetProperties.size.toString(), format(size, 2));
       ds.getAsJsonObject().add("transformations", trans);
       ds.getAsJsonObject().add("asOfNow", status);
 

@@ -23,8 +23,10 @@ import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.ComponentConfiguration;
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
-import sncr.xdf.services.NGContextServices;
 import sncr.xdf.context.NGContext;
+import sncr.xdf.services.NGContextServices;
+import sncr.xdf.context.ComponentServices;
+import static sncr.xdf.context.ComponentServices.*;
 
 @Service
 public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService {
@@ -129,19 +131,15 @@ public class WorkbenchExecutionServiceImpl implements WorkbenchExecutionService 
 
     log.info("Component Config = " + config);
 
-      NGContextServices contextServices = new NGContextServices(root, config, project, component, "batch1");
-      contextServices.initContext();
+    NGContextServices contextServices = new NGContextServices(root, config, project, component, "batch1");
+    contextServices.initContext();
 
-      contextServices.registerOutputDataSet();
+    contextServices.registerOutputDataSet();
 
-//    NGContext workBenchcontext = new NGContext(root, config, project, component, "batch1");
+    NGContext workBenchcontext = contextServices.getNgctx();
 
-      NGContext workBenchcontext = contextServices.getNgctx();
-
-      workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
+    workBenchcontext.serviceStatus.put(ComponentServices.InputDSMetadata, true);
     client.submit(new WorkbenchExecuteJob(workBenchcontext));
-//    client.submit(new WorkbenchExecuteJob(
-//                root, project, component, config));
     ObjectNode root = mapper.createObjectNode();
     log.info("Executing dataset transformation ends here ");
     return root;
