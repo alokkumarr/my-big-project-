@@ -4,10 +4,7 @@ import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import com.synchronoss.saw.export.model.DataField;
 import org.apache.commons.net.ntp.TimeStamp;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -32,15 +29,25 @@ public class XlsxExporter implements IFileExporter {
     logger.debug(this.getClass().getName() + " addHeaderRow starts");
     int col = 0;
     DataField.Type[] specialType = exportBean.getColumnDataType();
+
+    Font font=  wb.createFont();
+      font.setFontHeightInPoints((short)10);
+      font.setColor(IndexedColors.BLACK1.getIndex());
+      font.setBold(true);
+      font.setItalic(false);
+
     Row row = wsheet.createRow(0);
     for (String colHeader : exportBean.getColumnHeader()) {
       CellStyle cellStyle = wb.createCellStyle();
+      cellStyle.setFont(font);
+
       Cell cell = row.createCell(col);
       DataFormat format = wb.createDataFormat();
       if (specialType[col].toString().equalsIgnoreCase(DataField.Type.STRING.value())) {
         cellStyle.setAlignment(HorizontalAlignment.LEFT);
         cellStyle.setDataFormat((format.getFormat("General")));
         cell.setCellStyle(cellStyle);
+
       } else if (specialType[col].value().equalsIgnoreCase(DataField.Type.FLOAT.value())
           || specialType[col].value().equalsIgnoreCase(DataField.Type.DOUBLE.value())) {
         cellStyle.setAlignment(HorizontalAlignment.RIGHT);
