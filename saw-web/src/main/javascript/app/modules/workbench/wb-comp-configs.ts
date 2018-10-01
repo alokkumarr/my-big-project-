@@ -64,3 +64,51 @@ export const TYPE_CONVERSION = {
   decimal: 'double',
   timestamp: 'date'
 };
+
+export const sourceTypes: any[] = [
+  {
+    name: 'SFTP',
+    uid: 'sftp',
+    imgsrc: '../../../../../../../../../assets/img/sftp.png'
+  },
+  {
+    name: 'Amazon S3',
+    uid: 's3',
+    imgsrc: '../../../../../../../../../assets/img/s3.png'
+  },
+  {
+    name: 'MAPR',
+    uid: 'mapr',
+    imgsrc: '../../../../../../../../../assets/svg/mapr.svg'
+  },
+  {
+    name: 'Elastic Search',
+    uid: 'es',
+    imgsrc: '../../../../../../../../../assets/svg/elastic.svg'
+  },
+  {
+    name: 'HDFS',
+    uid: 'hdfs',
+    imgsrc: '../../../../../../../../../assets/img/hadoop.jpg'
+  },
+  {
+    name: 'MySQL',
+    uid: 'mysql',
+    imgsrc: '../../../../../../../../../assets/svg/mysql.svg'
+  },
+  {
+    name: 'SQL Server',
+    uid: 'sqlserver',
+    imgsrc: '../../../../../../../../../assets/img/sqlserver.png'
+  },
+  {
+    name: 'MongoDB',
+    uid: 'mongodb',
+    imgsrc: '../../../../../../../../../assets/img/mongodb.png'
+  },
+  {
+    name: 'Hive',
+    uid: 'hive',
+    imgsrc: '../../../../../../../../../assets/img/hive.png'
+  }
+];

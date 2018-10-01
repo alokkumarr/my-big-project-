@@ -25,12 +25,14 @@ import {
   MatTabsModule,
   MatDividerModule
 } from '@angular/material';
-import {MatStepperModule} from '@angular/material/stepper';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatCardModule} from '@angular/material/card';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
-import {ReactiveFormsModule} from '@angular/forms';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar } from '@angular/material';
+
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { ReactiveFormsModule } from '@angular/forms';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 require('nouislider/distribute/nouislider.min.css');
@@ -69,7 +71,8 @@ import '../../../../themes/_angular_next.scss';
     MatToolbarModule,
     MatSlideToggleModule,
     MatDividerModule,
-    NouisliderModule
+    NouisliderModule,
+    MatSnackBar
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -102,7 +105,8 @@ import '../../../../themes/_angular_next.scss';
     MatToolbarModule,
     MatSlideToggleModule,
     MatDividerModule,
-    NouisliderModule
+    NouisliderModule,
+    MatSnackBar
   ]
 })
-export class MaterialModule { }
+export class MaterialModule {}

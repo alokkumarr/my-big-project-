@@ -3,6 +3,7 @@
 datasource-page {
   width: 100%;
   background-color: $background-color;
+  height: 100%;
 
   .action-buttons {
     .mat-icon-button {
@@ -15,10 +16,6 @@ datasource-page {
       line-height: 32px !important;
       vertical-align: middle;
     }
-  }
-
-  .mat-slide-toggle {
-    padding-top: 5px;
   }
 
   .icon-search {
@@ -37,7 +34,16 @@ datasource-page {
     text-transform: uppercase;
   }
 
-  .gricontainer {
-    height: calc(100% - 46px);
+  .grid-container {
+    height: calc(100% - 52px);
+    margin: 3px;
+  }
+}
+
+.sourceDialogClass {
+  padding: 0;
+
+  .mat-dialog-container {
+    padding: 0 !important;
   }
 }

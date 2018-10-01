@@ -1,0 +1,98 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Create Data Source</mat-card-title>
+    <div fxFlex></div>
+    <button mat-icon-button color="warn" (click)="onCancelClick()">
+      <mat-icon fontIcon="icon-close"></mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+    <mat-horizontal-stepper linear>
+      <ng-template matStepperIcon="edit">
+        <mat-icon fontIcon="icon-checkmark"></mat-icon>
+      </ng-template>
+      <ng-template matStepperIcon="done">
+        <mat-icon fontIcon="icon-checkmark"></mat-icon>
+      </ng-template>
+      <mat-step label="Select Source Type" [stepControl]="firstStep">
+        <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="source-container">
+          <div fxFlex fxLayout="row wrap" fxLayoutAlign="space-around space-around" class="source-list">
+            <mat-card [class.selected]="selectedSource === source.uid" *ngFor="let source of sources" fxFlex="30"
+              fxLayout="row" fxLayoutAlign="start center" (click)="sourceSelected(source.uid)">
+              <div>{{source.name}}</div>
+              <div fxFlex></div>
+              <img [src]="source.imgsrc" />
+            </mat-card>
+          </div>
+        </div>
+        <div fxFlex fxLayout="row" fxLayoutAlign="end end" style="height: 20%;">
+          <button mat-raised-button color="primary" matStepperNext [disabled]="selectedSource === ''">Next</button>
+        </div>
+      </mat-step>
+      <mat-step label="Source Details">
+        <form fxFlex fxLayout="row wrap" class="source-container" #sourceDetails novalidate [formGroup]="detailsFormGroup"
+          autocomplete="false">
+          <section fxFlex fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label>Hostname</mat-label>
+              <input matInput placeholder="Host Name" name="hostName" formControlName="hostNameCtrl" required />
+              <mat-error *ngIf="detailsFormGroup.controls.hostNameCtrl.hasError('required')">
+                Host Name is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Port Number</mat-label>
+              <input type="number" matInput placeholder="Port Number" name="portNo" formControlName="portNoCtrl"
+                required />
+              <mat-error *ngIf="detailsFormGroup.controls.portNoCtrl.hasError('required')">
+                Port Number is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Access Type</mat-label>
+              <mat-select value="read">
+                <mat-option value="read">Read</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </section>
+          <section fxFlex fxLayout="row" fxLayoutAlign="space-around center">
+            <mat-form-field appearance="outline">
+              <mat-label>Username</mat-label>
+              <input type="text" matInput placeholder="Username" name="username" formControlName="userNameCtrl"
+                required />
+              <button mat-button matSuffix mat-icon-button>
+                <mat-icon fontIcon="icon-chat-bot"></mat-icon>
+              </button>
+              <mat-error *ngIf="detailsFormGroup.controls.userNameCtrl.hasError('required')">
+                Username is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input type="password" matInput placeholder="Password" name="password" formControlName="passwordCtrl"
+                required autocomplete="new-password" />
+              <button mat-button matSuffix mat-icon-button aria-label="show" (click)="value=''">
+                <mat-icon fontIcon="icon-show"></mat-icon>
+              </button>
+              <mat-error *ngIf="detailsFormGroup.controls.passwordCtrl.hasError('required')">
+                Password is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </section>
+        </form>
+        <div fxFlex fxLayout="row" fxLayoutAlign="space-between end" style="height: 20%;">
+          <button mat-raised-button color="primary" matStepperPrevious>Previous</button>
+          <button mat-stroked-button color="primary" (click)="testConnection()">
+            <mat-icon fontIcon="icon-query-mode" style="vertical-align: bottom;"></mat-icon> Test Connectivity
+          </button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="!detailsFormGroup.valid">Create</button>
+        </div>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </mat-card-content>
+</mat-card>

@@ -1,17 +1,40 @@
-<div class="dataSets-view" fxLayout="column">
+<div class="dataSets-view" fxLayout="column" fxFlex fxFill>
   <mat-toolbar class="toolbar-white">
     <mat-toolbar-row>
       <div fxFlex="47" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5px">
-        <span>Data Channel Management</span>
+        <span>Data Sources</span>
       </div>
       <span fxFlex></span>
       <div class="action-buttons" fxLayout="row" fxLayoutGap="10px">
-        <button mat-raised-button color="primary" (click)="addDataSet()">
-          <span>+ Channel</span>
+        <button mat-raised-button color="primary" (click)="createSource()">
+          <span>+ Source</span>
         </button>
       </div>
     </mat-toolbar-row>
   </mat-toolbar>
-  <div class="gricontainer">
+  <div class="grid-container">
+    <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
+       [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true">
+      <dxo-selection mode="single"></dxo-selection>
+      <dxi-column caption="Source Type" dataField="sourceType"></dxi-column>
+      <dxi-column caption="Datasource Name" dataField="dataSourceName" cellTemplate="nameTemplate"></dxi-column>
+      <dxi-column caption="Created By" dataField="createdBy" cellTemplate="cellTemplate"></dxi-column>
+      <dxi-column caption="Updated Time" dataField="createdAt" dataType="date" cellTemplate="dateTemplate"></dxi-column>
+      <dxi-column caption="Actions" dataField="id" cellTemplate="actionsTemplate" [allowFiltering]="false"
+        [allowSorting]="false"></dxi-column>
+      <div *dxTemplate="let data of 'nameTemplate'">
+        <a (click)="viewDetails(data.data)" [innerHTML]="data.value | highlight: searchTerm"></a>
+      </div>
+      <div *dxTemplate="let data of 'cellTemplate'">
+        <span [innerHTML]="data.value | highlight: searchTerm"></span>
+      </div>
+      <div *dxTemplate="let data of 'dateTemplate'">
+        <span [innerHTML]="data.value * 1000 | date: 'short' | highlight: searchTerm"></span>
+      </div>
+      <div *dxTemplate="let data of 'actionsTemplate'">
+        <datapod-actions [dpMetadata]="pod"></datapod-actions>
+      </div>
+      <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+    </dx-data-grid>
   </div>
 </div>

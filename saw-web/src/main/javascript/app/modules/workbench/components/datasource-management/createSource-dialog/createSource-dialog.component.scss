@@ -1,0 +1,52 @@
+@import 'themes/base/colors';
+
+createsource-dialog {
+  mat-card {
+    height: calc(100% - 48px);
+
+    .mat-card-content {
+      height: calc(100% - 36px);
+    }
+  }
+
+  .mat-stepper-horizontal {
+    height: 100%;
+  }
+
+  .mat-horizontal-content-container {
+    height: calc(100% - 100px);
+    background-color: $background-color;
+    border-radius: 1%;
+
+    .mat-horizontal-stepper-content {
+      height: 98%;
+    }
+  }
+
+  .mat-horizontal-stepper-content[aria-expanded='false'] {
+    height: 0 !important;
+  }
+
+  .source-container {
+    height: 80%;
+  }
+
+  .source-list {
+    & > mat-card {
+      margin: 15px 0;
+      border-radius: 4px;
+      padding: 9px 24px;
+    }
+  }
+
+  mat-card {
+    & > img {
+      height: 60px;
+      max-width: 70px;
+    }
+  }
+
+  .selected {
+    border: 3px $primary-blue-b1 solid;
+  }
+}

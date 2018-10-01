@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
+import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
 
 const template = require('./datasource-page.component.html');
 require('./datasource-page.component.scss');
@@ -16,7 +16,6 @@ require('./datasource-page.component.scss');
 export class DatasourceComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
-    private LocalSearch: LocalSearchService,
     private workBench: WorkbenchService,
     private _toastMessage: ToastService
   ) {}
@@ -24,4 +23,20 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ngOnDestroy() {}
+
+  createSource() {
+    const dateDialogRef = this.dialog.open(CreateSourceDialogComponent, {
+      hasBackdrop: true,
+      autoFocus: false,
+      closeOnNavigation: true,
+      disableClose: true,
+      height: '70%',
+      width: '70%',
+      maxWidth: '900px',
+      maxHeight: '700px',
+      panelClass: 'sourceDialogClass'
+    });
+
+    dateDialogRef.afterClosed().subscribe(data => {});
+  }
 }

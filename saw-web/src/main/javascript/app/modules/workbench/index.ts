@@ -7,7 +7,7 @@ import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { AngularSplitModule } from 'angular-split';
-import { RouterModule }  from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 import { routes } from './routes';
 
@@ -38,10 +38,12 @@ import { SqlScriptComponent } from './components/sql-executor/query/sql-script.c
 import { SqlpreviewGridPageComponent } from './components/sql-executor/preview-grid/sqlpreview-grid-page.component';
 import { DetailsDialogComponent } from './components/sql-executor/dataset-details-dialog/details-dialog.component';
 import { DatasetDetailViewComponent } from './components/dataset-detailedView/dataset-detail-view.component';
-import { CreateSemanticComponent } from './components/semantic-management/create/create-semantic.component';
-import { ValidateSemanticComponent } from './components/semantic-management/validate/validate-semantic.component';
-import { SemanticDetailsDialogComponent } from './components/semantic-management/semantic-details-dialog/semantic-details-dialog.component';
-import { UpdateSemanticComponent } from './components/semantic-management/update/update-semantic.component';
+import {
+  CreateSemanticComponent,
+  ValidateSemanticComponent,
+  SemanticDetailsDialogComponent,
+  UpdateSemanticComponent
+} from './components/semantic-management/index';
 import {
   DataobjectsComponent,
   DatapodsCardPageComponent,
@@ -52,6 +54,7 @@ import {
   DatapodActionsComponent
 } from './components/data-objects-view/index';
 import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
+import { CreateSourceDialogComponent } from './components/datasource-management/createSource-dialog/createSource-dialog.component';
 
 import { DefaultWorkbenchPageGuard } from './guards';
 
@@ -82,7 +85,8 @@ const COMPONENTS = [
   DatapodsCardPageComponent,
   DatapodsGridPageComponent,
   DatapodActionsComponent,
-  DatasourceComponent
+  DatasourceComponent,
+  CreateSourceDialogComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard];
@@ -116,9 +120,6 @@ const SERVICES = [
   ],
   declarations: COMPONENTS,
   entryComponents: COMPONENTS,
-  providers: [
-    ...SERVICES,
-    ...GUARDS
-  ]
+  providers: [...SERVICES, ...GUARDS]
 })
 export class WorkbenchUpgradeModule {}
