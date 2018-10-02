@@ -6,6 +6,12 @@
 \usage{
 a2_load(path, sc = NULL)
 }
+\arguments{
+\item{path}{directory path to write a2modeler object to}
+
+\item{sc}{optional spark connection argument. Required to load an a2modeler
+object with a spark_model final model type}
+}
 \description{
-Load a2 modeler object into memory
+Load a2 modeler object into memory to apply on new datasets
 }
