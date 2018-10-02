@@ -11,7 +11,7 @@ function getId() {
   }
   if (fs.existsSync('target/e2eId.json')) {
     let e2eId = JSON.parse(fs.readFileSync('target/e2eId.json', 'utf8')).uniqueId;
-    console.log('existing e2eid---@' + new Date() + ' is-->' + e2eId);
+    //console.log('existing e2eid---@' + new Date() + ' is-->' + e2eId);
     return e2eId;
   } else {
     let id = {
@@ -19,7 +19,7 @@ function getId() {
     };
 
     fs.writeFileSync('target/e2eId.json', JSON.stringify(id), { encoding: 'utf8' });
-    console.log('created e2eid---@' + new Date() + ' is-->' + id.uniqueId);
+    //console.log('created e2eid---@' + new Date() + ' is-->' + id.uniqueId);
     return id.uniqueId;
   }
 }
