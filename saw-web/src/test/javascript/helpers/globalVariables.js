@@ -1,7 +1,7 @@
 var fs = require('fs');
 const globalVariables = {
   // String which will be appended to all users and roles that we have to make tests independent
-  e2eId: getId(),
+  e2eId: getId()
 };
 
 function getId() {
