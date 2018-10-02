@@ -5,7 +5,6 @@ var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
 var argv = require('yargs').argv;
-var sleep = require('sleep');
 
 /**
  * Note about intervals:
