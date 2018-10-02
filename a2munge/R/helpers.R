@@ -71,6 +71,7 @@ get_schema <- function(df) {
 #' @export
 #' 
 #' @examples 
+#' library(dplyr)
 #' 
 #' # Schema Input Example
 #' schema_check(get_schema(mtcars), get_schema(select(mtcars, mpg, am)))
