@@ -11,7 +11,7 @@ body {
 //
 
 //Load fonts from this directory.
-$icon-font-path: "/src/assets/fonts";
+$icon-font-path: "/assets/fonts";
 // File name for all font files.
 $icon-font-name: "icomoon";
 
@@ -93,9 +93,9 @@ $link-color: $primary-blue-b2;
 $login-middle-logo-color: $primary-blue-b2;
 
 // Logos
-$company-logo-path: '/src/assets/img/synchronoss-transparent.svg';
-$powered-by-synchronoss-logo-path: '/src/assets/img/synchronoss_logo_360.png';
-$company-white-logo-path: '/src/assets/img/synchronoss-logo-white.png';
+$company-logo-path: '/assets/img/synchronoss-transparent.svg';
+$powered-by-synchronoss-logo-path: '/assets/img/synchronoss_logo_360.png';
+$company-white-logo-path: '/assets/img/synchronoss-logo-white.png';
 
 // tags
 $tag-bg-color: $primary-grey-g1;
