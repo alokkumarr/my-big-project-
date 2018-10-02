@@ -15,11 +15,7 @@ import {
   DATE_TYPES,
   NUMBER_TYPES
 } from '../../../consts';
-import {
-  Artifact,
-  FilterModel,
-  Filter
-} from '../../types';
+import { Artifact, FilterModel, Filter } from '../../types';
 
 const style = require('./designer-filter-dialog.component.scss');
 
@@ -69,6 +65,10 @@ export class DesignerFilterDialogComponent implements OnInit {
     this.onFiltersChange();
   }
 
+  trackByIndex(index) {
+    return index;
+  }
+
   onFilterModelChange() {
     this.onFilterChange();
   }
@@ -99,16 +99,17 @@ export class DesignerFilterDialogComponent implements OnInit {
   }
 
   removeFilter(targetIndex, tableName) {
-    this.groupedFilters[tableName] = filter(this.groupedFilters[tableName],
-      (_, index) => targetIndex !== index);
+    this.groupedFilters[tableName] = filter(
+      this.groupedFilters[tableName],
+      (_, index) => targetIndex !== index
+    );
     this.onFiltersChange();
   }
 
   onFiltersChange() {
-    this.filters = fpPipe(
-      fpToPairs,
-      fpFlatMap(([_, filters]) => filters)
-    )(this.groupedFilters);
+    this.filters = fpPipe(fpToPairs, fpFlatMap(([_, filters]) => filters))(
+      this.groupedFilters
+    );
     this.areFiltersValid = this.validateFilters(this.filters);
   }
 
@@ -123,54 +124,64 @@ export class DesignerFilterDialogComponent implements OnInit {
   ok() {
     const result: DesignerFilterDialogResult = {
       filters: filter(this.filters, 'columnName'),
-      booleanCriteria:  this.data.booleanCriteria
+      booleanCriteria: this.data.booleanCriteria
     };
     this.dialogRef.close(result);
   }
 
   validateFilters(filters) {
     let areValid = true;
-    forEach(filters, ({type, model, isRuntimeFilter, isGlobalFilter, isOptional}: Filter) => {
-      if (!isRuntimeFilter && isGlobalFilter) {
-        areValid = true;
-      } else if (!model) {
-        areValid = Boolean(this.data.isInRuntimeMode ?
-          isOptional && isRuntimeFilter :
-          isRuntimeFilter
-        );
-      } else if (type === 'string') {
-        areValid = this.isStringFilterValid(model);
-      } else if (NUMBER_TYPES.includes(type)) {
-        areValid = this.isNumberFilterValid(model);
-      } else if (DATE_TYPES.includes(type)) {
-        areValid = this.isDateFilterValid(model);
+    forEach(
+      filters,
+      ({
+        type,
+        model,
+        isRuntimeFilter,
+        isGlobalFilter,
+        isOptional
+      }: Filter) => {
+        if (!isRuntimeFilter && isGlobalFilter) {
+          areValid = true;
+        } else if (!model) {
+          areValid = Boolean(
+            this.data.isInRuntimeMode
+              ? isOptional && isRuntimeFilter
+              : isRuntimeFilter
+          );
+        } else if (type === 'string') {
+          areValid = this.isStringFilterValid(model);
+        } else if (NUMBER_TYPES.includes(type)) {
+          areValid = this.isNumberFilterValid(model);
+        } else if (DATE_TYPES.includes(type)) {
+          areValid = this.isDateFilterValid(model);
+        }
+        if (!areValid) {
+          return false;
+        }
       }
-      if (!areValid) {
-        return false;
-      }
-    });
+    );
     return areValid;
   }
 
-  isStringFilterValid({operator, modelValues}: FilterModel) {
+  isStringFilterValid({ operator, modelValues }: FilterModel) {
     return Boolean(operator && !isEmpty(modelValues));
   }
 
-  isNumberFilterValid({operator, value, otherValue}: FilterModel) {
+  isNumberFilterValid({ operator, value, otherValue }: FilterModel) {
     switch (operator) {
-    case 'BTW':
-      return Boolean(isFinite(value) && isFinite(otherValue));
-    default:
-      return Boolean(isFinite(value));
+      case 'BTW':
+        return Boolean(isFinite(value) && isFinite(otherValue));
+      default:
+        return Boolean(isFinite(value));
     }
   }
 
-  isDateFilterValid({preset, lte, gte}: FilterModel) {
+  isDateFilterValid({ preset, lte, gte }: FilterModel) {
     switch (preset) {
-    case CUSTOM_DATE_PRESET_VALUE:
-      return Boolean(lte && gte);
-    default:
-      return Boolean(preset);
+      case CUSTOM_DATE_PRESET_VALUE:
+        return Boolean(lte && gte);
+      default:
+        return Boolean(preset);
     }
   }
 

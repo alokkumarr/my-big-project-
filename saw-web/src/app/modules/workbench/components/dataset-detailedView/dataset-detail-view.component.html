@@ -70,7 +70,7 @@
                 <dxi-column caption="Field Name" dataField="name"></dxi-column>
                 <dxi-column caption="Data Type" dataField="type"></dxi-column>
                 <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-                <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
                 <dxo-header-filter [visible]="true"></dxo-header-filter>
               </dx-data-grid>
             </div>
@@ -83,7 +83,7 @@
             <dx-data-grid #dpGrid id="dpGrid" *ngIf="previewStatus === 'success'" fxFlex [dataSource]="previewData" [height]="'99.5%'" [width]="'100%'" [allowColumnResizing]="true" style="position:absolute;top:0;bottom:0;left:0;bottom:0;"
               [columnAutoWidth]="true" [rowAlternationEnabled]="true" [showBorders]="false">
               <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-              <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+              <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
               <dxo-header-filter [visible]="false"></dxo-header-filter>
               <dxo-load-panel [enabled]="false">
               </dxo-load-panel>

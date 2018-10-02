@@ -3,13 +3,13 @@
 </header>
 <div class="dialog__content">
   <div class="filter-container">
-    <div *ngFor="let artifact of data.artifacts; trackBy: index">
+    <div *ngFor="let artifact of data.artifacts; trackBy: trackByIndex">
       <div class="filter__table-name">
         {{artifact.artifactName}}
       </div>
       <mat-divider></mat-divider>
       <div class="filter__list">
-        <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: index"
+        <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: trackByIndex"
                              (removeRequest)="removeFilter(i, artifact.artifactName)"
                              (filterChange)="onFilterChange()"
                              (filterModelChange)="onFilterModelChange()"

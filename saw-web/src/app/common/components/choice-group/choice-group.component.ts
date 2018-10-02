@@ -5,7 +5,7 @@ const style = require('./choice-group.component.scss');
 interface IChoiceGroupItem {
   label: string;
   disabled: boolean;
-  icon: {font?: string, svg?: string};
+  icon: { font?: string; svg?: string };
 }
 
 @Component({
@@ -14,17 +14,20 @@ interface IChoiceGroupItem {
   styles: [style]
 })
 export class ChoiceGroupComponent {
-
   @Output() change: EventEmitter<IChoiceGroupItem> = new EventEmitter();
   @Input() items: IChoiceGroupItem[];
   @Input() value;
 
-  constructor() { }
+  constructor() {}
 
   onItemSelected(value) {
     if (value.disabled) {
       return;
     }
     this.change.emit(value);
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 }

@@ -52,8 +52,8 @@ export class UpdateSemanticComponent implements OnInit, OnDestroy {
       if (this.dpID !== null) {
         this.onDPSelectionChanged(this.dpID);
       } else {
-        this.workBench.getListOfSemantic().subscribe((data: any[]) => {
-          this.availableDP = get(data, 'contents[0].ANALYZE');
+        this.workBench.getListOfSemantic().subscribe((list: any[]) => {
+          this.availableDP = get(list, 'contents[0].ANALYZE');
           this.gridDataAvailableDP = cloneDeep(this.availableDP);
         });
       }

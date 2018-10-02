@@ -1,5 +1,5 @@
 <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
-<mat-accordion [multi]="true" [displayMode]="flat">
+<mat-accordion [multi]="true" displayMode="flat">
 
   <mat-expansion-panel [attr.e2e]="'dashboard-add-kpi-metric-' + metric.id" *ngFor="let metric of metrics" (opened)="onLoadMetricArtifacts(metric.id)">
     <mat-expansion-panel-header>

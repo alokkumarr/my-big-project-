@@ -18,7 +18,7 @@
           <label i18n>Publish to Email</label>
           <mat-form-field flex="20">
             <mat-chip-list #chipList>
-              <mat-chip *ngFor="let email of emails; trackBy: index; let i = index" (removed)="removeEmail(i)">
+              <mat-chip *ngFor="let email of emails; trackBy: trackByIndex; let i = index" (removed)="removeEmail(i)">
                 <div *ngIf="!validateThisEmail(email)" class="errorMsg">?</div>
                 {{email}}
                 <mat-icon matChipRemove fontIcon="icon-close"></mat-icon>

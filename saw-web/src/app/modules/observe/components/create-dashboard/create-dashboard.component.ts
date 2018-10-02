@@ -83,7 +83,9 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
 
   subscribeToEdits() {
     this.editSubscription = this.dashboardService.onEditItem.subscribe(data => {
-      if (isEmpty(data)) { return; }
+      if (isEmpty(data)) {
+        return;
+      }
 
       this.sidebarWidget = 'edit';
       this.editItem = data;
@@ -137,10 +139,8 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
     this.dashboardService.dashboardWidgets.next(newLog);
   }
 
-  ngOnInit() {}
-
-  exitCreator(data) {
-    this.dialogRef.close(data);
+  exitCreator() {
+    this.dialogRef.close();
   }
 
   chooseAnalysis() {
@@ -232,12 +232,11 @@ export class CreateDashboardComponent implements OnDestroy, AfterContentInit {
       if (result) {
         this.dialogRef.afterClosed().subscribe(() => {
           this.updateSideMenu(result);
-          this.router.navigate(
-            ['observe', result.categoryId],
-            {queryParams: {dashboard: result.entityId}}
-          );
+          this.router.navigate(['observe', result.categoryId], {
+            queryParams: { dashboard: result.entityId }
+          });
         });
-        this.dialogRef.close();
+        this.exitCreator();
       }
     });
   }

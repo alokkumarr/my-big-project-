@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import {ENTER, COMMA} from '@angular/cdk/keycodes';
+import { ENTER, COMMA } from '@angular/cdk/keycodes';
 import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
@@ -13,7 +13,7 @@ import * as moment from 'moment';
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../common/services';
 import { Analysis } from '../../../types';
-import {PRIVILEGES} from '../../../consts';
+import { PRIVILEGES } from '../../../consts';
 
 const style = require('./analyze-schedule-dialog.component.scss');
 
@@ -29,9 +29,7 @@ const SEMICOLON = 186;
     style
   ]
 })
-
 export class AnalyzeScheduleDialogComponent implements OnInit {
-
   categories: any[] = [];
   dateFormat = 'mm/dd/yyyy';
   hasSchedule = false;
@@ -43,7 +41,15 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   repeatInterval = this.repeatIntervals[0];
   repeatOrdinals = [1, 2, 3, 4, 5, 6, 7];
   repeatOrdinal = this.repeatOrdinals[0];
-  daysOfWeek = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+  daysOfWeek = [
+    'SUNDAY',
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY'
+  ];
   repeatOnDaysOfWeek = map(this.daysOfWeek, dayString => ({
     keyword: dayString,
     checked: false
@@ -85,12 +91,15 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   ngOnInit() {
     this.scheduleState = 'new';
     this.token = this._jwt.getTokenObj();
-    this._analyzeService.getCategories(PRIVILEGES.PUBLISH)
-      .then(response => {
-        this.categories = response;
-        this.setDefaultCategory();
-        this.fetchCronDetails();
-      });
+    this._analyzeService.getCategories(PRIVILEGES.PUBLISH).then(response => {
+      this.categories = response;
+      this.setDefaultCategory();
+      this.fetchCronDetails();
+    });
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 
   onCategorySelected(value) {
@@ -100,7 +109,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   setDefaultCategory() {
     const analysis = this.data.analysis;
     if (!analysis.categoryId) {
-      const defaultCategory = find(this.categories, category => category.children.length > 0);
+      const defaultCategory = find(
+        this.categories,
+        category => category.children.length > 0
+      );
 
       if (defaultCategory) {
         analysis.categoryId = first(defaultCategory.children).id;
@@ -109,7 +121,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   fetchCronDetails() {
-    const {type, id, categoryId} = this.data.analysis;
+    const { type, id, categoryId } = this.data.analysis;
     if (type !== 'chart') {
       this.getFTPLocations();
     }
@@ -118,45 +130,48 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
       categoryId: categoryId,
       groupName: this.token.ticket.custCode
     };
-    this._analyzeService.getCronDetails(requestCron).then((response: any) => {
-      this.loadCron = true;
-      if (response.statusCode === 200) {
-        this.loadCronLayout = true;
-        const jobDetails = response.data.jobDetails;
+    this._analyzeService.getCronDetails(requestCron).then(
+      (response: any) => {
+        this.loadCron = true;
+        if (response.statusCode === 200) {
+          this.loadCronLayout = true;
+          const jobDetails = response.data.jobDetails;
 
-        if (jobDetails) {
-          const {
-            cronExpression,
-            activeTab,
-            activeRadio,
-            jobScheduleTime,
-            endDate,
-            analysisID,
-            emailList,
-            ftp
-          } = jobDetails;
-          this.crondetails = {
-            cronexp: cronExpression,
-            startDate: jobScheduleTime,
-            activeTab,
-            activeRadio,
-            endDate
-          };
-          if (analysisID) {
-            this.scheduleState = 'exist';
+          if (jobDetails) {
+            const {
+              cronExpression,
+              activeTab,
+              activeRadio,
+              jobScheduleTime,
+              endDate,
+              analysisID,
+              emailList,
+              ftp
+            } = jobDetails;
+            this.crondetails = {
+              cronexp: cronExpression,
+              startDate: jobScheduleTime,
+              activeTab,
+              activeRadio,
+              endDate
+            };
+            if (analysisID) {
+              this.scheduleState = 'exist';
+            }
+            this.emails = emailList;
+            this.hasSchedule = true;
+            if (type !== 'chart') {
+              this.ftp = ftp;
+            }
+            this.emails = emailList;
+            this.hasSchedule = true;
           }
-          this.emails = emailList;
-          this.hasSchedule = true;
-          if (type !== 'chart') {
-            this.ftp = ftp;
-          }
-          this.emails = emailList;
-          this.hasSchedule = true;
         }
+      },
+      () => {
+        this.loadCronLayout = true;
       }
-    }, () => {
-      this.loadCronLayout = true;
-    });
+    );
   }
 
   getFTPLocations() {
@@ -173,7 +188,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   alphanumericUnique() {
-    return Math.random().toString(36).substring(7);
+    return Math.random()
+      .toString(36)
+      .substring(7);
   }
 
   removeSchedule() {
@@ -250,7 +267,11 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   validatePublishSelection() {
-    if (isEmpty(this.emails) && isEmpty(this.ftp) && this.data.analysis.type !== 'chart') {
+    if (
+      isEmpty(this.emails) &&
+      isEmpty(this.ftp) &&
+      this.data.analysis.type !== 'chart'
+    ) {
       this.errorFlagMsg = true;
       return false;
     }
@@ -258,7 +279,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   }
 
   validateSchedule() {
-    if (isEmpty(this.crondetails.cronexp) && this.crondetails.activeTab !== 'immediate') {
+    if (
+      isEmpty(this.crondetails.cronexp) &&
+      this.crondetails.activeTab !== 'immediate'
+    ) {
       this.cronValidateField = true;
       return false;
     }

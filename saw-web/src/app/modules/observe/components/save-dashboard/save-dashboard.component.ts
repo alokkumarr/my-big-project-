@@ -162,12 +162,11 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
   /* Find the first category that has a subcategory, and assign that subcategory
      to dashboard */
   setDefaultCategory() {
-    if (this.dashboard.categoryId) { return; }
+    if (this.dashboard.categoryId) {
+      return;
+    }
 
-    const category = find(
-      this.categories,
-      category => category.children.length > 0
-    );
+    const category = find(this.categories, cat => cat.children.length > 0);
     if (category) {
       this.dashboard.categoryId = category.children[0].id.toString();
     }
@@ -197,10 +196,8 @@ export class SaveDashboardComponent implements OnInit, OnDestroy {
     }
 
     assign(this.dashboard, this.dashboardForm.value);
-    this.observe.saveDashboard(this.dashboard).subscribe(
-      data => {
-        this.closeDashboard(data);
-      }
-    );
+    this.observe.saveDashboard(this.dashboard).subscribe(data => {
+      this.closeDashboard(data);
+    });
   }
 }

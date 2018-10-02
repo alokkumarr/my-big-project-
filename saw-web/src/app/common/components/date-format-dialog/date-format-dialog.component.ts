@@ -34,6 +34,10 @@ export class DateFormatDialogComponent {
     }
   }
 
+  trackByIndex(index) {
+    return index;
+  }
+
   close() {
     this._dialogRef.close();
   }

@@ -6,7 +6,7 @@
 
   <mat-divider></mat-divider>
 
-  <mat-list-item *ngFor="let column of columns; trackBy: index"
+  <mat-list-item *ngFor="let column of columns; trackBy: trackByIndex"
                  role="listitem">
     <div fxLayout="row"
          [attr.e2e]="getIdentifier(column)"
@@ -39,7 +39,7 @@
     </div>
 
     <div *ngIf="column.joinEligible">
-      <div jsPlumbEndpoint *ngFor="let side of sides; trackBy: index"
+      <div jsPlumbEndpoint *ngFor="let side of sides; trackBy: trackByIndex"
                            [column]="column"
                            [artifactName]="artifact.artifactName"
                            [side]="side"

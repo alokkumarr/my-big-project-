@@ -22,7 +22,6 @@ const style = require('./analyze-new-dialog.component.scss');
   ]
 })
 export class AnalyzeNewDialogComponent {
-
   methodCategories = ANALYSIS_METHODS;
   selectedMethod: IAnalysisMethod;
   selectedMetric;
@@ -30,9 +29,10 @@ export class AnalyzeNewDialogComponent {
   constructor(
     public _analyzeDialogService: AnalyzeDialogService,
     public _dialogRef: MatDialogRef<AnalyzeNewDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      metrics: any[],
-      id: string
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      metrics: any[];
+      id: string;
     }
   ) {}
 
@@ -45,15 +45,17 @@ export class AnalyzeNewDialogComponent {
     this.selectedMethod = method;
   }
 
+  trackByIndex(index) {
+    return index;
+  }
+
   setSupportedMethods(metric) {
     const metricType = get(metric, 'esRepository.storageType');
     const isEsMetric = metricType === 'ES';
 
     forEach(this.methodCategories, category => {
       forEach(category.children, method => {
-        const enableMethod = isEsMetric ?
-          true :
-          method.type === 'table:report';
+        const enableMethod = isEsMetric ? true : method.type === 'table:report';
 
         method.disabled = !enableMethod;
       });
@@ -69,26 +71,29 @@ export class AnalyzeNewDialogComponent {
   getAnalysisType(method, metric) {
     const [first, second] = method.type.split(':');
     switch (first) {
-    case 'chart':
-      return {
-        type: first,
-        chartType: second
-      };
-    case 'table':
-      // handle esReport edge case
-      const metricType = get(metric, 'esRepository.storageType');
-      const isEsMetric = metricType === 'ES';
-      if (second === 'report' && isEsMetric) {
-        return { type: 'esReport' };
-      }
-      return { type: second };
+      case 'chart':
+        return {
+          type: first,
+          chartType: second
+        };
+      case 'table':
+        // handle esReport edge case
+        const metricType = get(metric, 'esRepository.storageType');
+        const isEsMetric = metricType === 'ES';
+        if (second === 'report' && isEsMetric) {
+          return { type: 'esReport' };
+        }
+        return { type: second };
     }
   }
 
   createAnalysis() {
     const semanticId = this.selectedMetric.id;
     const metricName = this.selectedMetric.metricName;
-    const {type, chartType} = this.getAnalysisType(this.selectedMethod, this.selectedMetric);
+    const { type, chartType } = this.getAnalysisType(
+      this.selectedMethod,
+      this.selectedMetric
+    );
     const model = {
       type,
       chartType,
@@ -99,8 +104,10 @@ export class AnalyzeNewDialogComponent {
       description: '',
       scheduled: null
     };
-    this._analyzeDialogService.openNewAnalysisDialog(model)
-      .afterClosed().subscribe(successfullySaved => {
+    this._analyzeDialogService
+      .openNewAnalysisDialog(model)
+      .afterClosed()
+      .subscribe(successfullySaved => {
         if (successfullySaved) {
           this._dialogRef.close(successfullySaved);
         }

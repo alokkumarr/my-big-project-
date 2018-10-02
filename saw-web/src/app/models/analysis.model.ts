@@ -20,6 +20,7 @@ export interface Analysis {
   id: string;
   isScheduled: string;
   metric: string;
+  metrics?: string[];
   metricName: string;
   name: string;
   type: AnalysisType;

@@ -27,7 +27,8 @@ export class JsPlumbTableComponent implements OnInit, AfterViewInit {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
   @Input() plumbInstance: any;
   @Input() useAggregate: boolean;
-  @Input('artifact') set setArtifact(artifact: Artifact) {
+  @Input('artifact')
+  set setArtifact(artifact: Artifact) {
     this.artifact = artifact;
     this.columns = sortBy(artifact.columns, 'displayName');
   }
@@ -37,9 +38,7 @@ export class JsPlumbTableComponent implements OnInit, AfterViewInit {
 
   public sides = ['left', 'right'];
 
-  constructor (
-    public _elementRef: ElementRef
-  ) {}
+  constructor(public _elementRef: ElementRef) {}
 
   ngOnInit() {
     this.updatePosition();
@@ -53,9 +52,13 @@ export class JsPlumbTableComponent implements OnInit, AfterViewInit {
       drag: event => {
         artifactPosition[0] = event.pos[0];
         artifactPosition[1] = event.pos[1];
-        this.change.emit({subject: 'artifactPosition'});
+        this.change.emit({ subject: 'artifactPosition' });
       }
     });
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 
   updatePosition() {
@@ -80,12 +83,12 @@ export class JsPlumbTableComponent implements OnInit, AfterViewInit {
   onAggregateChange(column, aggregate) {
     column.aggregate = aggregate;
     unset(column, 'format');
-    this.change.emit({subject: 'aggregate', column});
+    this.change.emit({ subject: 'aggregate', column });
   }
 
   clearAggregate(column) {
     unset(column, 'aggregate');
     unset(column, 'format');
-    this.change.emit({subject: 'aggregate'});
+    this.change.emit({ subject: 'aggregate' });
   }
 }

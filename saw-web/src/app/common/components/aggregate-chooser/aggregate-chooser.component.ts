@@ -1,10 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  OnInit,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
 import * as filter from 'lodash/filter';
 
 import {
@@ -38,6 +32,10 @@ export class AggregateChooserComponent implements OnInit {
         return type.value === 'count';
       });
     }
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 
   onAggregateChange(value) {

@@ -1,6 +1,6 @@
 <div class="grid-container" fxFill>
   <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'" keyExpr="id"
-    [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true" (onSelectionChanged)="onDPSelectionChanged($event)">
+                                                                                                                         [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true">
     <dxo-selection mode="single"></dxo-selection>
     <dxi-column caption="Datapod Name" dataField="metricName" cellTemplate="nameTemplate"></dxi-column>
     <dxi-column caption="Created By" dataField="createdBy" cellTemplate="cellTemplate"></dxi-column>

@@ -28,6 +28,8 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   _executedKPI: any;
   primaryChange: number;
   bgColor: string;
+  countToChange: string;
+  countToCurrent: string;
 
   /* Used to dynamically adjust font-size based on tile height */
   fontMultipliers = {
@@ -58,7 +60,9 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
 
   @Input()
   set kpi(data) {
-    if (isEmpty(data)) { return; }
+    if (isEmpty(data)) {
+      return;
+    }
     this._kpi = data;
     this.executeKPI(this._kpi);
   }
@@ -72,9 +76,13 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   onFilterKPI(filterModel) {
-    if (!this._kpi || !filterModel) { return; }
+    if (!this._kpi || !filterModel) {
+      return;
+    }
 
-    if (!filterModel.preset) { return this.executeKPI(this._kpi); }
+    if (!filterModel.preset) {
+      return this.executeKPI(this._kpi);
+    }
 
     const filter = defaults(
       {},
@@ -89,7 +97,9 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
   }
 
   getFilterLabel() {
-    if (!this._executedKPI && !this._kpi) { return ''; }
+    if (!this._executedKPI && !this._kpi) {
+      return '';
+    }
 
     const preset = get(
       this._executedKPI || this._kpi,
@@ -145,22 +155,20 @@ export class ObserveKPIComponent implements OnInit, OnDestroy {
         return { primary, secondary };
       })
       /* Parse and calculate percentage change for primary aggregations */
-      .subscribe(
-        ({ primary, secondary }) => {
-          const currentParsed = parseFloat(primary.current) || 0;
-          const priorParsed = parseFloat(primary.prior);
-          let change =
-            round((currentParsed - priorParsed) * 100 / priorParsed) || 0;
-          change = isFinite(change) ? change : 0;
-          this.primaryChange = change;
-          this.primaryResult = {
-            current: round(currentParsed, 2),
-            prior: priorParsed,
-            change: trim(change, '-')
-          };
+      .subscribe(({ primary, secondary }) => {
+        const currentParsed = parseFloat(primary.current) || 0;
+        const priorParsed = parseFloat(primary.prior);
+        let change =
+          round((currentParsed - priorParsed) * 100 / priorParsed) || 0;
+        change = isFinite(change) ? change : 0;
+        this.primaryChange = change;
+        this.primaryResult = {
+          current: round(currentParsed, 2),
+          prior: priorParsed,
+          change: trim(change, '-')
+        };
 
-          this.secondaryResult = secondary;
-        }
-      );
+        this.secondaryResult = secondary;
+      });
   }
 }

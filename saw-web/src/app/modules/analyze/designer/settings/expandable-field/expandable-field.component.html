@@ -12,9 +12,9 @@
   </div>
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
-    <div *ngIf="artifactColumn.comboType">
+    <div *ngIf="asChartColumn(artifactColumn).comboType">
       <button mat-icon-button [matMenuTriggerFor]="comboTypeSelect" class="expandable-field__option-button">
-        <mat-icon [fontIcon]="getComboIcon(artifactColumn.comboType)"></mat-icon>
+        <mat-icon [fontIcon]="getComboIcon(asChartColumn(artifactColumn).comboType)"></mat-icon>
       </button>
       <mat-menu #comboTypeSelect="matMenu">
         <button mat-menu-item *ngFor="let comboType of comboTypes; trackBy: index" (click)="onComboTypeChange(comboType.value)">

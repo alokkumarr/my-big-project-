@@ -16,7 +16,7 @@
       </button>
     </mat-form-field>
     <mat-button-toggle-group multiple>
-      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: index"
+      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: trackByIndex"
                          (change)="onTypeFilterChange($event)"
                          [value]="typeIcon.value"
                          [checked]="filterObj.types.includes(typeIcon.value)">
@@ -30,7 +30,7 @@
        dndZone="designer-setting-zone">
     <div *ngIf="unselectedArtifactColumns">
       <div *ngIf="!isEmpty(unselectedArtifactColumns)">
-        <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: index"
+        <div *ngFor="let artifactColumn of unselectedArtifactColumns; trackBy: trackByIndex"
              [dndSortable]="artifactColumn"
              class="settings__list-item"
              fxLayout="row"
@@ -61,7 +61,7 @@
   </div>
 
   <div class="settings__selected-fields">
-    <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
+    <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: trackByIndex"
                              (fieldsChange)="onFieldsChange()"
                              (fieldPropChange)="onFieldPropChange($event)"
                              (removeField)="removeFromGroup($event, groupAdapter)"

@@ -1,15 +1,10 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 
 import {
   Artifact,
-  SqlBuilder,
+  SqlBuilderReport,
   JsPlumbCanvasChangeEvent,
   DesignerChangeEvent
 } from '../../types';
@@ -29,11 +24,12 @@ const style = require('./designer-settings-multi-table.component.scss');
 export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() useAggregate: boolean;
-  @Input('artifacts') set setArtifacts(artifacts: Artifact[]) {
+  @Input('artifacts')
+  set setArtifacts(artifacts: Artifact[]) {
     this.artifacts = this.setDefaultArtifactPosition(artifacts);
   }
   @Input() data;
-  @Input() sqlBuilder: SqlBuilder;
+  @Input() sqlBuilder: SqlBuilderReport;
   public artifacts: Artifact[];
 
   onChange(event: JsPlumbCanvasChangeEvent) {

@@ -1,4 +1,4 @@
-<js-plumb-table-u *ngFor="let artifact of artifacts; trackBy: index"
+<js-plumb-table-u *ngFor="let artifact of artifacts; trackBy: trackByIndex"
                   class="jsp-table"
                   (change)="onChange($event)"
                   [artifact]="artifact"
@@ -6,7 +6,7 @@
                   [plumbInstance]="_jsPlumbInst">
 </js-plumb-table-u>
 
-<js-plumb-connector-u *ngFor="let join of joins; trackBy: index; let i = index"
+<js-plumb-connector-u *ngFor="let join of joins; trackBy: trackByIndex; let i = index"
              (change)="onJoinChange($event)"
              [join]="join"
              [index]="i"

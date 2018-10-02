@@ -1,4 +1,3 @@
-
 import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
@@ -42,7 +41,7 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     public workBench: WorkbenchService,
     public notify: ToastService
-  ) { }
+  ) {}
 
   @ViewChild('sqlscript') public scriptComponent: SqlScriptComponent;
 
@@ -89,22 +88,19 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
       height: '300px'
     });
 
-    detailsDialogRef
-      .afterClosed()
-      .subscribe(data => {
-        if (data !== false) {
-          this.datasetDetails = data;
-          this.scriptComponent.onCreateEmitter();
-          this.triggerSQL(data);
-        }
-      });
+    detailsDialogRef.afterClosed().subscribe(data => {
+      if (data !== false) {
+        this.datasetDetails = data;
+        this.scriptComponent.onCreateEmitter();
+        this.triggerSQL(data);
+      }
+    });
   }
 
   toggleViewMode(fullScreenPreview) {
     this.previewHeight = fullScreenPreview ? 100 : 60;
     this.scriptHeight = fullScreenPreview ? 0 : 40;
   }
-
 
   /**
    * Constructs the payload for SQL executor component.
@@ -118,19 +114,26 @@ export class SqlExecutorComponent implements OnInit, OnDestroy {
      * Will be handled in BE in upcoming release
      */
     const appendedScript = `CREATE TABLE ${data.name} AS ${this.query}`;
-    const script = endsWith(appendedScript, ';') === true ? `${appendedScript}` : `${appendedScript};`;
+    const script =
+      endsWith(appendedScript, ';') === true
+        ? `${appendedScript}`
+        : `${appendedScript};`;
     const payload = {
-      'name': data.name,
-      'input': this.dsMetadata.system.name,
-      'component': 'sql',
-      'configuration': {
-        'script': script
+      name: data.name,
+      input: this.dsMetadata.system.name,
+      component: 'sql',
+      configuration: {
+        script: script
       }
     };
-    this.workBench.triggerParser(payload).subscribe(data => {
-      this.notify.info('SQL_Executor_triggered_successfully', 'Creating Dataset', { hideDelay: 9000 });
+    this.workBench.triggerParser(payload).subscribe(_ => {
+      this.notify.info(
+        'SQL_Executor_triggered_successfully',
+        'Creating Dataset',
+        { hideDelay: 9000 }
+      );
     });
-    this.router.navigate(['workbench' , 'dataobjects']);
+    this.router.navigate(['workbench', 'dataobjects']);
   }
 
   previewAction(action) {

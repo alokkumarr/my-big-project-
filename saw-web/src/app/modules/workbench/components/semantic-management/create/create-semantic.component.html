@@ -22,7 +22,7 @@
                     <dxi-column caption="Created By" dataField="system.createdBy"></dxi-column>
                     <dxi-column caption="Updated Time" dataField="system.modifiedTime" dataType="date" cellTemplate="timeTemplate"></dxi-column>
                     <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-                    <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                    <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
                     <div *dxTemplate="let data of 'timeTemplate'">
                         <span> {{data.value * 1000 | date: 'short'}}</span>
                     </div>
@@ -42,7 +42,7 @@
                             <dxi-column caption="Field Name" dataField="name"></dxi-column>
                             <dxi-column caption="Data Type" dataField="type"></dxi-column>
                             <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
-                            <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+                            <dxo-filter-row [visible]="true" applyFilter="auto"></dxo-filter-row>
                             <dxo-header-filter [visible]="false"></dxo-header-filter>
                             <div *dxTemplate="let data of 'NoTemplate'">
                                 <span> {{data.rowIndex + 1}}</span>

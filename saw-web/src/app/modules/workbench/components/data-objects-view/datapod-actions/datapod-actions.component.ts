@@ -10,8 +10,7 @@ const style = require('./datapod-actions.component.scss');
   styles: [style]
 })
 export class DatapodActionsComponent implements OnInit {
-  @Input()
-  dpMetadata: any;
+  @Input() dpMetadata: any;
 
   constructor(private router: Router, public workBench: WorkbenchService) {}
 
@@ -20,5 +19,12 @@ export class DatapodActionsComponent implements OnInit {
   gotoEdit(): void {
     this.workBench.setDataToLS('dpID', this.dpMetadata.id);
     this.router.navigate(['workbench', 'semantic', 'update']);
+  }
+
+  openSQLEditor(): void {
+    if (this.dpMetadata.asOfNow.status === 'SUCCESS') {
+      this.workBench.setDataToLS('dpMetadata', this.dpMetadata);
+      this.router.navigate(['workbench', 'create', 'sql']);
+    }
   }
 }

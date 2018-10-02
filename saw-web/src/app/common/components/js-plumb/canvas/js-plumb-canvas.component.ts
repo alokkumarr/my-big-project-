@@ -23,9 +23,11 @@ import {
 @Component({
   selector: 'js-plumb-canvas-u',
   templateUrl: './js-plumb-canvas.component.html',
-  styles: [`:host {
+  styles: [
+    `:host {
     position: relative;
-  }`]
+  }`
+  ]
 })
 export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();
@@ -34,9 +36,7 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
   @Input() joins: Join[] = [];
   public _jsPlumbInst: any;
 
-  constructor (
-    public _elementRef: ElementRef
-  ) {
+  constructor(public _elementRef: ElementRef) {
     this.onConnection = this.onConnection.bind(this);
     this.onConnectionDetached = this.onConnectionDetached.bind(this);
   }
@@ -50,13 +50,21 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
     this._jsPlumbInst.bind('connection', this.onConnection);
   }
 
+  trackByIndex(index) {
+    return index;
+  }
+
   onChange(event: JsPlumbCanvasChangeEvent) {
     this.change.emit(event);
   }
 
   onConnection(info) {
-    const sourcePayload = <EndpointPayload>info.sourceEndpoint.getParameter('endpointPayload');
-    const targetPayload = <EndpointPayload>info.targetEndpoint.getParameter('endpointPayload');
+    const sourcePayload = <EndpointPayload>info.sourceEndpoint.getParameter(
+      'endpointPayload'
+    );
+    const targetPayload = <EndpointPayload>info.targetEndpoint.getParameter(
+      'endpointPayload'
+    );
 
     if (sourcePayload && targetPayload) {
       const {
@@ -83,21 +91,27 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
       );
 
       if (!join) {
-        join = this.addJoin('inner', {
-          tableName: sourceArtifactName,
-          columnName: sourceColumn.columnName,
-          side: sourceSide
-        }, {
-          tableName: targetArtifactName,
-          columnName: targetColumn.columnName,
-          side: targetSide
-        });
+        join = this.addJoin(
+          'inner',
+          {
+            tableName: sourceArtifactName,
+            columnName: sourceColumn.columnName,
+            side: sourceSide
+          },
+          {
+            tableName: targetArtifactName,
+            columnName: targetColumn.columnName,
+            side: targetSide
+          }
+        );
       }
     }
   }
 
   onConnectionDetached(info) {
-    const connectionPayload = <ConnectionPayload>info.connection.getParameter('connectionPayload');
+    const connectionPayload = <ConnectionPayload>info.connection.getParameter(
+      'connectionPayload'
+    );
     this.removeJoin(connectionPayload.join);
   }
 
@@ -107,51 +121,70 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
     }
     const { action, index, join } = event;
     switch (action) {
-    case 'save':
-      this.changeJoin(index, join);
-      break;
-    case 'delete':
-      this.removeJoin(join);
-      break;
+      case 'save':
+        this.changeJoin(index, join);
+        break;
+      case 'delete':
+        this.removeJoin(join);
+        break;
     }
   }
 
-  findJoin(sourceTable: string, sourceColumnName: string, targetTable: string, targetColumnName: string) {
+  findJoin(
+    sourceTable: string,
+    sourceColumnName: string,
+    targetTable: string,
+    targetColumnName: string
+  ) {
     return find(this.joins, (join: Join) => {
-      const sourceCriterion = this.findCriterion(join.criteria, sourceTable, sourceColumnName);
-      const targetCriterion = this.findCriterion(join.criteria, targetTable, targetColumnName);
+      const sourceCriterion = this.findCriterion(
+        join.criteria,
+        sourceTable,
+        sourceColumnName
+      );
+      const targetCriterion = this.findCriterion(
+        join.criteria,
+        targetTable,
+        targetColumnName
+      );
       return sourceCriterion && targetCriterion;
     });
   }
 
   findCriterion(criteria, table, column) {
-    return find(criteria, (criterion: JoinCriterion) => (
-      criterion.tableName === table &&
-      criterion.columnName === column
-    ));
+    return find(
+      criteria,
+      (criterion: JoinCriterion) =>
+        criterion.tableName === table && criterion.columnName === column
+    );
   }
 
-  addJoin(type, sourceCriterion: JoinCriterion, targetCriterion: JoinCriterion) {
-    if (!type ||
-      !sourceCriterion.tableName || !sourceCriterion.columnName ||
-      !targetCriterion.tableName || !targetCriterion.columnName) {
+  addJoin(
+    type,
+    sourceCriterion: JoinCriterion,
+    targetCriterion: JoinCriterion
+  ) {
+    if (
+      !type ||
+      !sourceCriterion.tableName ||
+      !sourceCriterion.columnName ||
+      !targetCriterion.tableName ||
+      !targetCriterion.columnName
+    ) {
       return;
     }
 
     const join: Join = {
       type,
-      criteria: [
-        sourceCriterion,
-        targetCriterion
-      ]
+      criteria: [sourceCriterion, targetCriterion]
     };
     this.joins.push(join);
-    this.onChange({subject: 'joins'});
+    this.onChange({ subject: 'joins' });
   }
 
   changeJoin(index, newJoin) {
     this.joins[index] = newJoin;
-    this.onChange({subject: 'joins'});
+    this.onChange({ subject: 'joins' });
   }
 
   removeJoin(join) {
@@ -160,6 +193,6 @@ export class JsPlumbCanvasComponent implements OnInit, AfterViewInit {
     if (index !== -1) {
       this.joins.splice(index, 1);
     }
-    this.onChange({subject: 'joins'});
+    this.onChange({ subject: 'joins' });
   }
 }

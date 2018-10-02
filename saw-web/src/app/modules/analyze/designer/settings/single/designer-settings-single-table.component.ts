@@ -42,8 +42,8 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     }
   }
-  @Input('analysisType') type: string;
-  @Input('analysisSubtype') subType: string;
+  @Input() analysisType: string;
+  @Input() analysisSubtype: string;
   @Input() fieldCount: number;
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
@@ -73,7 +73,7 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
 
   ngOnInit() {
     /* prettier-ignore */
-    switch (this.type) {
+    switch (this.analysisType) {
     case 'pivot':
       this.groupAdapters = this._designerService.getPivotGroupAdapters(
         this.artifactColumns
@@ -81,9 +81,13 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
       break;
     case 'chart':
       this.groupAdapters = this._designerService.getChartGroupAdapters(
-        this.artifactColumns, this.subType
+        this.artifactColumns, this.analysisSubtype
       );
     }
+  }
+
+  trackByIndex(index) {
+    return index;
   }
 
   onFieldsChange() {
@@ -100,13 +104,17 @@ export class DesignerSettingsSingleTableComponent implements OnInit {
    */
   syncMaxAllowed() {
     forEach(this.groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (!adapter.maxAllowed) { return; }
+      if (!adapter.maxAllowed) {
+        return;
+      }
 
       const extraColumns: Array<ArtifactColumn> = adapter.artifactColumns.slice(
         adapter.maxAllowed(adapter, this.groupAdapters)
       );
 
-      if (!extraColumns.length) { return; }
+      if (!extraColumns.length) {
+        return;
+      }
 
       forEach(extraColumns, col => {
         this._designerService.removeArtifactColumnFromGroup(col, adapter);
