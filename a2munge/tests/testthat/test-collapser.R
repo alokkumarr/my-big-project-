@@ -65,7 +65,7 @@ dat_tbl <-
 dat <- dat %>% mutate(dates_min = as.character(dates_min))
 
 Convert_R_dtTime <-
-  dateconverter(
+  converter(
     dat,
     measure_vars = "dates_min",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -75,7 +75,7 @@ Convert_R_dtTime <-
   )
 
 Convert_spk_dttime <-
-  dateconverter(
+  converter(
     dat_tbl,
     measure_vars = "dates_min",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -86,7 +86,7 @@ Convert_spk_dttime <-
 
 
 Convert_R_dtTime_sec <-
-  dateconverter(
+  converter(
     dat,
     measure_vars = "dates_sec",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -96,7 +96,7 @@ Convert_R_dtTime_sec <-
   )
 
 Convert_spk_dtTime_sec <-
-  dateconverter(
+  converter(
     dat_tbl,
     measure_vars = "dates_sec",
     input_format = "yyyy-MM-dd HH:mm:ss",

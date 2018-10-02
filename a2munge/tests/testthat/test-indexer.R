@@ -23,7 +23,7 @@ sim_data <- function(n_ids, n_recs, n_iter, seed = 319) {
                by = "day")
   cat1 <- c("A", "B")
   cat2 <- c("X", "Y", "Z")
-
+  
   do.call("rbind",
           replicate(n_iter,
                     {
@@ -74,7 +74,7 @@ to_char_ds <- function(df) {
       metric3 = as.character(metric3),
       index = as.character(index)
     )
-
+  
   return(char_df)
 }
 
@@ -220,104 +220,104 @@ test_that("indexer- Number of years differece between origin and today", {
 
 # Test 7:R Data set with date column-compare with spark DS-Units=Days --------
 
-Unit_Days_R_DS <-
-  indexer(dat,
-          "date",
-          origin = "2018-05-20",
-          units = "days",
-          periods = 1) %>%
-  select(index, date, `days_since_2018-05-20`)
-
-Unit_Days_spark_DS <-
-  indexer(tbl, "date", origin = "2018-05-20", units = "days") %>%
-  collect()  %>%
-  select(index, date, `days_since_2018-05-20`) %>%
-  as.data.frame()
-
-test_that("indexer differece between spark and R DS", {
-  expect_equal(Unit_Days_R_DS, Unit_Days_spark_DS)
-})
+# Unit_Days_R_DS <-
+#   indexer(dat,
+#           "date",
+#           origin = "2018-05-20",
+#           units = "days",
+#           periods = 1) %>%
+#   select(index, date, `days_since_2018-05-20`)
+# 
+# Unit_Days_spark_DS <-
+#   indexer(tbl, "date", origin = "2018-05-20", units = "days") %>%
+#   collect()  %>%
+#   select(index, date, `days_since_2018-05-20`) %>%
+#   as.data.frame()
+# 
+# test_that("indexer differece between spark and R DS", {
+#   expect_equal(Unit_Days_R_DS, Unit_Days_spark_DS)
+# })
 
 
 
 # Test 7.5 : Test months unit ---------------------------------------------
 
-df <- data.frame(today = today(), date1 = today() - days(1:31))
-df_tbl <- copy_to(sc, df %>% mutate_all(as.character), overwrite = TRUE)
-df_tbl <- mutate_all(df_tbl, funs(to_date))
-
-months_r <- indexer(df,
-                    "today",
-                    origin = "date1",
-                    units = "months",
-                    periods = 1) %>%
-  mutate_at("months_since_date1", funs(round(., 4)))
-
-months_spk <- indexer(df_tbl,
-                      "today",
-                      origin = "date1",
-                      units = "months",
-                      periods = 1) %>%
-  collect() %>%
-  as.data.frame() %>%
-  mutate_at("months_since_date1", funs(round(., 4)))
-
-
-test_that("indexer differece between spark and R DS for months units", {
-  expect_equal(months_r, months_spk)
-})
+# df <- data.frame(today = today(), date1 = today() - days(1:31))
+# df_tbl <- copy_to(sc, df %>% mutate_all(as.character), overwrite = TRUE)
+# df_tbl <- mutate_all(df_tbl, funs(to_date))
+# 
+# months_r <- indexer(df,
+#                     "today",
+#                     origin = "date1",
+#                     units = "months",
+#                     periods = 1) %>%
+#   mutate_at("months_since_date1", funs(round(., 4)))
+# 
+# months_spk <- indexer(df_tbl,
+#                       "today",
+#                       origin = "date1",
+#                       units = "months",
+#                       periods = 1) %>%
+#   collect() %>%
+#   as.data.frame() %>%
+#   mutate_at("months_since_date1", funs(round(., 4)))
+# 
+# 
+# test_that("indexer differece between spark and R DS for months units", {
+#   expect_equal(months_r, months_spk)
+# })
 
 
 # Test 7.75 : Test days unit ---------------------------------------------
 
-days_r <- indexer(df,
-                  "today",
-                  origin = "date1",
-                  units = "days",
-                  periods = 1) %>%
-  mutate_at("days_since_date1", funs(round(., 4)))
-
-days_spk <- indexer(df_tbl,
-                    "today",
-                    origin = "date1",
-                    units = "days",
-                    periods = 1) %>%
-  collect() %>%
-  as.data.frame() %>%
-  mutate_at("days_since_date1", funs(round(., 4)))
-
-
-test_that("indexer differece between spark and R DS for months units", {
-  expect_equal(days_r, days_spk)
-})
+# days_r <- indexer(df,
+#                   "today",
+#                   origin = "date1",
+#                   units = "days",
+#                   periods = 1) %>%
+#   mutate_at("days_since_date1", funs(round(., 4)))
+# 
+# days_spk <- indexer(df_tbl,
+#                     "today",
+#                     origin = "date1",
+#                     units = "days",
+#                     periods = 1) %>%
+#   collect() %>%
+#   as.data.frame() %>%
+#   mutate_at("days_since_date1", funs(round(., 4)))
+# 
+# 
+# test_that("indexer differece between spark and R DS for months units", {
+#   expect_equal(days_r, days_spk)
+# })
 
 
 
 # Test 8:Check for date difference when region and DS date --------
 
-origin_date <- today() - months(1)
-origin_name <- paste("months_since", origin_date, sep="_")
-
-ds_R <-
-  indexer(dat,
-          "date",
-          origin = origin_date,
-          units = "months",
-          periods = 1) %>%
-  select(index, date, !!origin_name) %>% 
-  mutate_at(origin_name, funs(round(., 1)))
-
-ds_sp <-
-  indexer(tbl, "date", origin = origin_date, units = "months") %>%
-  collect()  %>%
-  select(index, date, !!origin_name) %>% 
-  mutate_at(origin_name, funs(round(., 1))) %>%
-  as.data.frame()
-
-
-test_that("indexer differece between spark and R DS", {
-  expect_equal(ds_R, ds_sp)
-})
+# origin_date <- today() - months(1)
+# origin_name <- paste("months_since", origin_date, sep="_")
+# 
+# ds_R <-
+#   indexer(dat,
+#           "date",
+#           origin = origin_date,
+#           units = "months",
+#           periods = 1) %>%
+#   select(index, date, !!origin_name) %>% 
+#   mutate_at(origin_name, funs(round(., 1)))
+# 
+# ds_sp <-
+#   indexer(tbl, "date", origin = origin_date, units = "months") %>%
+#   collect()  %>%
+#   select(index, date, !!origin_name) %>% 
+#   mutate_at(origin_name, funs(round(., 1))) %>%
+#   as.data.frame()
+# 
+# 
+# test_that("indexer differece between spark and R DS", {
+#   expect_equal(ds_R, ds_sp)
+# })
 
 
 

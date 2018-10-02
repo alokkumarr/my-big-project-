@@ -11,8 +11,11 @@
       </div>
     </div>
   </mat-expansion-panel>
-  <div class="no-children" [class.activeButton]="checkActiveMenu(metadata.url)" fxLayout="row" fxLayoutAlign="end center" *ngIf="hasChildren()">
-    <a fxFlex class="child-item" [routerLink]="metadata.url" [queryParams]="metadata.queryParams" (click)="closeSideNav()" [class.active]="active">{{metadata.name}}</a>
-    <mat-icon fxFlex="1 1 25px" *ngIf="checkActiveMenu(metadata.url)" [class.activeButton]="checkActiveMenu(metadata.url)" fontIcon="icon-caret-left"></mat-icon>
+  <div class="no-children" [class.activeButton]="checkActiveMenu(metadata.url, metadata.queryParams)" fxLayout="row" fxLayoutAlign="end center" *ngIf="hasChildren()">
+    <a fxFlex class="child-item" [routerLink]="metadata.url" [queryParams]="metadata.queryParams" (click)="closeSideNav()" [class.active]="active">
+      {{metadata.name}}
+      <mat-icon fontIcon="icon-star-solid" *ngIf="checkDefault(metadata)" [style.margin]="0"></mat-icon>
+    </a>
+    <mat-icon fxFlex="1 1 25px" *ngIf="checkActiveMenu(metadata.url, metadata.queryParams)" [class.activeButton]="checkActiveMenu(metadata.url, metadata.queryParams)" fontIcon="icon-caret-left"></mat-icon>
   </div>
 </mat-accordion>

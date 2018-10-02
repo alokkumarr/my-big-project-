@@ -1,4 +1,4 @@
-# Dateformatter Unit Tests -----------------------------------------------------
+# Formatter Unit Tests -----------------------------------------------------
 
 library(a2munge)
 library(testthat)
@@ -8,7 +8,7 @@ library(checkmate)
 library(tidyr)
 library(lubridate)
 
-context("Dateformatter unit tests")
+context("Date Formatter unit tests")
 
 n = 20
 
@@ -44,7 +44,7 @@ dat_tbl <- copy_to(sc, dat, overwrite = TRUE)
 # Test 1 : Input date to output format-yyyy-MM-dd HH:mm:ss ---------------
 
 Date1_R_dtTime <-
-  dateformatter(
+  formatter(
     dat,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -53,7 +53,7 @@ Date1_R_dtTime <-
   )
 
 Date1_spk_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -73,7 +73,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 # Test 2 : Input date to output format-dd-MM-yyyy HH:mm:ss ---------------
 
 Date1_R_dtTime <-
-  dateformatter(
+  formatter(
     dat,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -82,7 +82,7 @@ Date1_R_dtTime <-
   )
 
 Date1_spk_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -102,7 +102,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 # Test 3 : Input date to output format-MM-dd-yyyy HH:mm:ss ---------------
 
 Date1_R_dtTime <-
-  dateformatter(
+  formatter(
     dat,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -111,7 +111,7 @@ Date1_R_dtTime <-
   )
 
 Date1_spk_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -131,7 +131,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 # Test 4 : Input date to output format-MM-dd-yyyy ---------------
 
 Date1_R_dtTime <-
-  dateformatter(
+  formatter(
     dat,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -140,7 +140,7 @@ Date1_R_dtTime <-
   )
 
 Date1_spk_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -160,7 +160,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 # Test 5 : Input date to output format-dd-MM-yyyy ---------------
 
 Date1_R_dtTime <-
-  dateformatter(
+  formatter(
     dat,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -169,7 +169,7 @@ Date1_R_dtTime <-
   )
 
 Date1_spk_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -189,7 +189,7 @@ test_that("compare output of both data R and Spark Dataframes", {
 # Test 6 : Input date to output format-yyyy-MM-dd ---------------
 
 Date1_R_dtTime <-
-  dateformatter(
+  formatter(
     dat,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -198,7 +198,7 @@ Date1_R_dtTime <-
   )
 
 Date1_spk_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl,
     measure_vars = "date",
     input_format = "yyyy-MM-dd HH:mm:ss",
@@ -225,7 +225,7 @@ dat_tbl_format <-
   copy_to(sc, date_format1, overwrite = TRUE)
 
 Date1_R_format_dtTime <-
-  dateformatter(
+  formatter(
     date_format1,
     measure_vars = "date",
     input_format = "dd/MM/yyyy",
@@ -234,7 +234,7 @@ Date1_R_format_dtTime <-
   )
 
 Date1_spk_format_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl_format,
     measure_vars = "date",
     input_format = "dd/MM/yyyy",
@@ -261,7 +261,7 @@ dat_tbl_format_2 <-
   copy_to(sc, date_format2 %>% mutate(date = as.character(date)), overwrite = TRUE)
 
 Date1_R_format_dtTime <-
-  dateformatter(
+  formatter(
     date_format2,
     measure_vars = "date",
     input_format = "MM/dd/yyyy",
@@ -270,7 +270,7 @@ Date1_R_format_dtTime <-
   )
 
 Date1_spk_format_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl_format_2,
     measure_vars = "date",
     input_format = "MM/dd/yyyy",
@@ -297,7 +297,7 @@ dat_tbl_format_3 <-
   copy_to(sc, date_format3 %>% mutate(date = as.character(date)), overwrite = TRUE)
 
 Date1_R_format_dtTime <-
-  dateformatter(
+  formatter(
     date_format3,
     measure_vars = "date",
     input_format = "yyyy/MM/dd",
@@ -306,7 +306,7 @@ Date1_R_format_dtTime <-
   )
 
 Date1_spk_format_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl_format_3,
     measure_vars = "date",
     input_format = "yyyy/MM/dd",
@@ -334,7 +334,7 @@ dat_tbl_format_4 <-
   copy_to(sc, date_format4 %>% mutate(date = as.character(date)), overwrite = TRUE)
 
 Date1_R_format_dtTime <-
-  dateformatter(
+  formatter(
     date_format4,
     measure_vars = "date",
     input_format = "yyyy/MM/dd HH:mm:ss",
@@ -343,7 +343,7 @@ Date1_R_format_dtTime <-
   )
 
 Date1_spk_format_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl_format_4,
     measure_vars = "date",
     input_format = "yyyy/MM/dd HH:mm:ss",
@@ -371,7 +371,7 @@ dat_tbl_format_5 <-
   copy_to(sc, date_format5 %>% mutate(date = as.character(date)), overwrite = TRUE)
 
 Date1_R_format_dtTime <-
-  dateformatter(
+  formatter(
     date_format5,
     measure_vars = "date",
     input_format = "MM/dd/yyyy HH:mm:ss",
@@ -380,7 +380,7 @@ Date1_R_format_dtTime <-
   )
 
 Date1_spk_format_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl_format_5,
     measure_vars = "date",
     input_format = "MM/dd/yyyy HH:mm:ss",
@@ -408,7 +408,7 @@ dat_tbl_format_6 <-
   copy_to(sc, date_format6 %>% mutate(date = as.character(date)), overwrite = TRUE)
 
 Date1_R_format_dtTime <-
-  dateformatter(
+  formatter(
     date_format6,
     measure_vars = "date",
     input_format = "dd/MM/yyyy HH:mm:ss",
@@ -417,7 +417,7 @@ Date1_R_format_dtTime <-
   )
 
 Date1_spk_format_dttime <-
-  dateformatter(
+  formatter(
     dat_tbl_format_6,
     measure_vars = "date",
     input_format = "dd/MM/yyyy HH:mm:ss",

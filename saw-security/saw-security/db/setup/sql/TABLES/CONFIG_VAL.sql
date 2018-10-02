@@ -4,6 +4,7 @@ CREATE TABLE CONFIG_VAL
 (
   CONFIG_VAL_SYS_ID     BIGINT  NOT NULL,
   CONFIG_VAL_CODE      	VARCHAR(100)  NOT NULL COMMENT 'CONFIG_VAL_CODE uniquely identify the configuration name',
+  CONFIG_VALUE          VARCHAR(225) NULL COMMENT 'CONFIG_VALUE used for additional configuration value',
   CONFIG_VAL_DESC     	VARCHAR(255)  NOT NULL COMMENT 'CONFIG_VAL_DESC provides details about the configuration description',
   CONFIG_VAL_OBJ_TYPE	  VARCHAR(100) NOT NULL  COMMENT 'CONFIG_VAL_OBJ_TYPE column will be used to configure like which object type configuration belongs.For Ex. Customer ,User ,Product ,modules etc',
   CONFIG_VAL_OBJ_GROUP  VARCHAR(100) NOT NULL COMMENT 'CONFIG_VAL_OBJ_GROUP provides Object values like customer name if configuration is customer specific , Product name if configuration belongs to Product etc. ',
