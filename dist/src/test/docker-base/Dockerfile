@@ -59,9 +59,6 @@ RUN systemctl enable systemd-journal-upload.service
 RUN echo "URL=http://sip-admin:19532" >> /etc/systemd/journal-upload.conf
 RUN install -d -o systemd-journal-upload -g systemd-journal-upload \
   /var/lib/systemd/journal-upload        
-# Forward container system logs to Docker logs
-COPY saw-logger/saw-logger.service /etc/systemd/system/
-RUN systemctl enable saw-logger
 
 # Install SSH server in each container so that the deployment
 # automation can log in and perform installation steps
