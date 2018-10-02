@@ -14,9 +14,8 @@ createsource-dialog {
   }
 
   .mat-horizontal-content-container {
-    height: calc(100% - 100px);
-    background-color: $background-color;
-    border-radius: 1%;
+    height: calc(100% - 55px);
+    padding: 0;
 
     .mat-horizontal-stepper-content {
       height: 98%;
@@ -33,7 +32,7 @@ createsource-dialog {
 
   .source-list {
     & > mat-card {
-      margin: 15px 0;
+      margin: 9px 0;
       border-radius: 4px;
       padding: 9px 24px;
     }

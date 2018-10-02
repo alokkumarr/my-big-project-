@@ -53,8 +53,11 @@ import {
   DatasetActionsComponent,
   DatapodActionsComponent
 } from './components/data-objects-view/index';
-import { DatasourceComponent } from './components/datasource-management/datasource-page.component';
-import { CreateSourceDialogComponent } from './components/datasource-management/createSource-dialog/createSource-dialog.component';
+import {
+  DatasourceComponent,
+  CreateSourceDialogComponent,
+  TestConnectivityComponent
+} from './components/datasource-management/index';
 
 import { DefaultWorkbenchPageGuard } from './guards';
 
@@ -86,7 +89,8 @@ const COMPONENTS = [
   DatapodsGridPageComponent,
   DatapodActionsComponent,
   DatasourceComponent,
-  CreateSourceDialogComponent
+  CreateSourceDialogComponent,
+  TestConnectivityComponent
 ];
 
 const GUARDS = [DefaultWorkbenchPageGuard];
