@@ -1,0 +1,193 @@
+---
+title: "Regressor Template"
+author: "Change Me"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  html_document:
+    toc: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = TRUE, message = FALSE,
+                      fig.align = "center", fig.width = 9, fig.height = 5)
+```
+
+
+```{r r-config}
+
+# Library Path
+lib_path <- .libPaths()[1]
+
+# R packages
+packages <- c("a2munge", "a2modeler", "a2charter", "sparklyr", "dplyr", "purrr", "ggplot2")
+
+
+```
+
+
+```{r spark-config}
+
+## Spark Configuration Parameters
+
+# Create Spark Connection
+spark <- TRUE
+
+# Spark Master
+spark_master <- "local"
+
+# Spark Version
+spark_version <- "2.3.0"
+
+# Additional Spark Configuration Settings. Add configuration with named element
+# in list
+spark_config_args <- list(spark.memory.fraction = 0.9)
+
+```
+
+
+```{r input-data-params}
+
+## Input Data Parameters
+
+# Path to dataset
+dataset_path <- "CHANGEME"
+
+# Name to assign to Data
+dataset_name <- "df"
+
+# Dataset type
+dataset_type <- "CHANGEME"
+
+```
+
+
+```{r inputs}
+
+### Regressor Configuration Inputs 
+
+# target variable name
+target <- "changeme"
+
+# Optional Regressor name
+name <- NULL
+
+# Optional Regressor Unique ID
+uid <- NULL
+
+# Optional Regressor Version 
+version <- NULL
+
+# Optional Description of Regressor
+desc <- NULL
+
+# Optional Input for Data Scientist Author
+scientist <- NULL
+
+# Execution Strategy (sequential or multisession)
+execution_strategy <- "sequential"
+
+# Option to refit model on entire training and validation sample
+refit <- TRUE
+
+# Option to save sub-models used in tuning
+save_submodels <- TRUE
+
+# Optional random seed number
+seed <- 319
+
+```
+
+
+```{r measure}
+
+# Set Measure. RMSE is default
+measure <- RMSE
+
+```
+
+
+```{r sampling}
+
+# Set Sampling Method. Options include cross_validation, holdout, random or
+# default
+sampling_method <- "holdout"
+
+# Sampling Args
+sample_args <- list(splits = c(0.6, 0.2, 0.2))
+
+```
+
+
+```{r data-prep}
+
+# Create a data prep pipeline. Applied to data prior any feature generation
+# pipelines within a model
+prep_pipe <- pipeline(expr = identity,
+                      uid  = "Data-Prep-Pipe",
+                      desc = "Data preperation pipeline. Applied before any modeling or feature generation is applied")
+
+```
+
+
+```{r feature-generation}
+
+# Create one or more feature generation pipelines. Each can be applied in one or
+# more models
+feature_pipe1 <- pipeline(expr = identity,
+                          uid  = "Feature-Pipe-1",
+                          desc = "")
+
+```
+
+
+
+```{r r-setup}
+
+# Load Libraries
+for(pck in packages) library(pck, lib.loc = lib_path, character.only = TRUE)
+
+```
+
+
+```{r spark-setup}
+
+# If Spark Option True, create connection
+if(spark) {
+  
+  conf <- modifyList(spark_config(), spark_config_args)
+  sc <- spark_connect(master = spark_master,
+                      version = spark_version,
+                      config = conf)
+}
+```
+
+
+```{r data-import}
+
+# Read data into memory
+if(spark) {
+  df <- reader(sc, name = dataset_name, path = dataset_path, type = dataset_type)
+} else {
+  df <- read.csv(dataset_path)
+}
+
+```
+
+
+```{r regressor-creation}
+
+# Create Regressor
+r1 <- regressor(df,
+                target,
+                name = name,
+                uid = uid,
+                version = version,
+                desc = desc,
+                scientist = scientist,
+                execution_strategy = execution_strategy,
+                refit = refit,
+                save_submodels = save_submodels,
+                seed = seed)
+```
+
