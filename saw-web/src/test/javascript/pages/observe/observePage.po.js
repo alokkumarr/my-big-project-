@@ -20,11 +20,12 @@ module.exports = {
   filterButton: element(by.css('button[e2e="dashboard-open-global-filters-button"]')),
   globalFilters: {
     stringFilter: element(by.css(`input[e2e="dashboard-global-filter-string-input"]`)),
-    stringFilterValue : value => element(by.css(`mat-option[ng-reflect-value="${value}"]`)),
+    stringFilterValue : value => element(by.xpath(`//mat-option[contains(text(),"${value}")]`)),
     applyFilter: element(by.css(`button[e2e="dashboard-global-filters-apply-button"]`)),
     dateFilterPreset: element(by.css('[e2e="filter-date-preset"]')),
-    dateFilterPresetValue: value => element(by.css(`mat-option[ng-reflect-value="${value}"]`)),
+    dateFilterPresetValue: value => element(by.xpath(`//mat-option[contains(text(),"${value}")]`)),
     selectedPreset: element(by.css('[e2e="dasbhoard-global-filter-date-preset-select"]')),
+    selectedPresetValue: value => element(by.xpath(`//*[contains(text(),"${value}")]`)),
     numberSlider: element(by.css('[e2e="dashboard-global-filter-number-slider"]')),
     numberSliderLow: element(by.xpath('//*[@e2e="dashboard-global-filter-number-slider"]/descendant::*[contains(@class,"noUi-handle-lower")]')),
     cancelButton: element(by.css('[e2e="dashboard-global-filters-cancel-button"]'))
