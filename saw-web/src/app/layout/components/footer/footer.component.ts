@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-
-// declare const __VERSION__: string;
+import { VERSION } from '../../../../environments/version';
 
 @Component({
   selector: 'layout-footer',
   templateUrl: 'footer.component.html'
 })
 export class LayoutFooterComponent {
-  version = ''; // __VERSION__;
+  version = VERSION.semverString;
 }
