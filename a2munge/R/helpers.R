@@ -74,10 +74,10 @@ get_schema <- function(df) {
 #' library(dplyr)
 #' 
 #' # Schema Input Example
-#' schema_check(get_schema(mtcars), get_schema(select(mtcars, mpg, am)))
+#' schema_check(get_schema(mtcars), get_schema(mtcars))
 #' 
 #' # Dataframe Input Example
-#' schema_check(mtcars, select(mtcars, mpg, am))
+#' schema_check(select(mtcars, mpg, am), select(mtcars, mpg, am))
 schema_check <- function(x, y, validate = TRUE) {
   
   if(any(c("data.frame", "tbl_spark") %in% class(x))) {

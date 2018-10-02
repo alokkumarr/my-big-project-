@@ -18,10 +18,11 @@ type mismatch
 Function supports either dataframe inputs (R or Spark) or schema lists
 }
 \examples{
+library(dplyr)
 
 # Schema Input Example
-schema_check(get_schema(mtcars), get_schema(select(mtcars, mpg, am)))
+schema_check(get_schema(mtcars), get_schema(mtcars))
 
 # Dataframe Input Example
-schema_check(mtcars, select(mtcars, mpg, am))
+schema_check(select(mtcars, mpg, am), select(mtcars, mpg, am))
 }
