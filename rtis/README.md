@@ -1,10 +1,12 @@
 # Introduction
 
-This is the Sycnhronoss Real Time Ingestion Service(RTIS) source code
+This is Sycnhronoss Real Time Ingestion Service(RTIS) source code
 repository. It provides source code, documentation and tools to build
 and deply various RTIS services
 
 #   Development
+
+
 
 ##  Run in Local:
 
@@ -18,29 +20,38 @@ and deply various RTIS services
     
  5. Once server starts access [localhost:9100](http://localhost:9100) and
     the output should be "Your new application is ready”
+
+
+
+
     
- ## Errors:
+## Errors:
  
- 1. This application is already running (Or delete <path>/RUNNING_PID file):
+ 1. This application is already running (Or delete (path)/RUNNING_PID file):
     
-    Simply remove RUNNING_PID file. `rm RUNNING_PID` in the <path>
+    Simply remove RUNNING_PID file. `rm RUNNING_PID` in the (path)
     
  2. Configuration Error:  
     Make sure conf file is in class path and secret key is set. 
     Also make sure maven build is successful.
+
+
+
     
     
  
- ## Local changes:
+## Local changes:
  
  1. Download sbt to compile and generate routes:  `brew install sbt`
  2. Implement changes. 
     Ex: add new route in conf/routes file and update controller class
- 3. Delete all generated files inside app folder 
+ 3. Delete all generated files inside app folder
+ 
 		*Controllers/javascript folder and contents
-		*.ReverseRoutes.scala
+		*ReverseRoutes.scala
 		*Routes.java
-		* Router folder and contents
+		*Router folder and contents
+
  4. Open terminal and make sure in rtis folder and compile : sbt compile 
  
 	 Note: If you encounter multiple imports of ‘RoutesCompiler’ 
