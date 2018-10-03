@@ -1,24 +1,24 @@
 # Synchronoss Real Time Data Ingestion and Analytics
 
 
-Run in Local:
+#####Run in Local:
 
  1. Create applciation.conf file in conf folder by copying contents of
     applicaiton.conf.dev file
- 2. Make sure application.conf file has play.crypto.secret value set. 
+ 2. Make sure application.conf file has **play.crypto.secret** value set. 
     Value should be generated key and should be enclosed in quotes
- 3. Do maven build: mvn clean install
+ 3. Do maven build: **mvn clean install**
  4. Create a new run configuration with conf folder in class path and run
-    play.core.server.ProdServerStart
+    **play.core.server.ProdServerStart**
     
  5. Once server starts access localhost:9100 and the output should be
     "Your new application is ready.”
     
- Errors:
+ ######Errors:
  
  1. This application is already running (Or delete <path>/RUNNING_PID file):
     
-    Simply remove RUNNING_PID file. rm RUNNING_PID in the <path>
+    Simply remove RUNNING_PID file. `rm RUNNING_PID` in the <path>
     
  2. Configuration Error:  
     Make sure conf file is in class path and secret key is set. 
@@ -26,9 +26,9 @@ Run in Local:
     
     
  
- Working on changes:
+ ##### Local changes:
  
- 1. Download sbt to compile and generate routes:  brew install sbt
+ 1. Download sbt to compile and generate routes:  `brew install sbt`
  2. Implement changes. 
     Ex: add new route in conf/routes file and update controller class
  3. Delete all generated files inside app folder 
