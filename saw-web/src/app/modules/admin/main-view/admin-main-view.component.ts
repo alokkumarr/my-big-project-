@@ -20,8 +20,6 @@ import { LocalSearchService } from '../../../common/services/local-search.servic
 import { ConfirmDialogComponent } from '../../../common/components/confirm-dialog';
 import { ConfirmDialogData } from '../../../common/types';
 
-const style = require('./admin-main-view.component.scss');
-
 const USER_SEARCH_CONFIG = [
   { keyword: 'LOGIN ID', fieldName: 'masterLoginId' },
   { keyword: 'ROLE', fieldName: 'roleName' },
@@ -68,7 +66,7 @@ const deleteConfirmation = (section, identifier, identifierValue) => ({
 @Component({
   selector: 'admin-main-view',
   templateUrl: './admin-main-view.component.html',
-  styles: [style]
+  styleUrls: ['./admin-main-view.component.scss']
 })
 export class AdminMainViewComponent implements OnDestroy {
   columns: any[] = [];

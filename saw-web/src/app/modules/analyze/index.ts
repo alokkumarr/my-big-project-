@@ -46,8 +46,8 @@ import {
   DesignerDescriptionComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
-  SingleTableDesignerLayout,
-  MultiTableDesignerLayout,
+  SingleTableDesignerLayoutComponent,
+  MultiTableDesignerLayoutComponent,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './designer';
@@ -83,8 +83,8 @@ const COMPONENTS = [
   DesignerDescriptionComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
-  SingleTableDesignerLayout,
-  MultiTableDesignerLayout,
+  SingleTableDesignerLayoutComponent,
+  MultiTableDesignerLayoutComponent,
   AnalyzePageComponent
 ];
 
@@ -122,15 +122,9 @@ const GUARDS = [DefaultAnalyzeCategoryGuard];
     AnalyzeFilterModule,
     AnalyzePublishDialogModule
   ],
-  declarations: [
-    ...COMPONENTS,
-    ...PIPES
-  ],
+  declarations: [...COMPONENTS, ...PIPES],
   entryComponents: COMPONENTS,
-  providers: [
-    ...SERVICES,
-    ...GUARDS
-  ],
+  providers: [...SERVICES, ...GUARDS],
   exports: [AnalyzePageComponent]
 })
 export class AnalyzeModuleTs {}

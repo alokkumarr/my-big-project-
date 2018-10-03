@@ -3,11 +3,10 @@ import { Router } from '@angular/router';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./datapod-actions.component.scss');
 @Component({
   selector: 'datapod-actions',
   templateUrl: './datapod-actions.component.html',
-  styles: [style]
+  styleUrls: ['./datapod-actions.component.scss']
 })
 export class DatapodActionsComponent implements OnInit {
   @Input() dpMetadata: any;

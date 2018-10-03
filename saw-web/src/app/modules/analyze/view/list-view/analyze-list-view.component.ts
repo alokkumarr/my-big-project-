@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
@@ -12,17 +12,15 @@ import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
 
-const style = require('./analyze-list-view.component.scss');
-
 @Component({
   selector: 'analyze-list-view',
   templateUrl: './analyze-list-view.component.html',
-  styles: [style]
+  styleUrls: ['./analyze-list-view.component.scss']
 })
-export class AnalyzeListViewComponent {
-
+export class AnalyzeListViewComponent implements OnInit {
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
-  @Input('analyses') set setAnalyses(analyses: Analysis[]) {
+  @Input('analyses')
+  set setAnalyses(analyses: Analysis[]) {
     this.analyses = analyses;
     if (!isEmpty(analyses)) {
       this.canUserFork = this._jwt.hasPrivilege('FORK', {
@@ -45,7 +43,7 @@ export class AnalyzeListViewComponent {
     public _analyzeActionsService: AnalyzeActionsService,
     public _jwt: JwtService,
     public _executeService: ExecuteService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.config = this.getGridConfig();
@@ -78,7 +76,7 @@ export class AnalyzeListViewComponent {
     });
   }
 
-  afterEdit({analysis, requestExecution}: DesignerSaveEvent) {
+  afterEdit({ analysis, requestExecution }: DesignerSaveEvent) {
     this.action.emit({
       action: 'edit',
       analysis,
@@ -86,14 +84,16 @@ export class AnalyzeListViewComponent {
     });
   }
 
-  fork(analysis) {
-    this._analyzeActionsService.fork(analysis).then(({analysis, requestExecution}: DesignerSaveEvent) => {
-      this.action.emit({
-        action: 'fork',
-        analysis,
-        requestExecution
+  fork(an) {
+    this._analyzeActionsService
+      .fork(an)
+      .then(({ analysis, requestExecution }: DesignerSaveEvent) => {
+        this.action.emit({
+          action: 'fork',
+          analysis,
+          requestExecution
+        });
       });
-    });
   }
 
   getRowType(rowData) {
@@ -105,46 +105,54 @@ export class AnalyzeListViewComponent {
   }
 
   getGridConfig() {
-    const columns = [{
-      caption: 'NAME',
-      dataField: 'name',
-      width: '36%',
-      cellTemplate: 'linkCellTemplate',
-      cssClass: 'branded-column-name'
-    }, {
-      caption: 'METRICS',
-      dataField: 'metrics',
-      width: '21%',
-      calculateCellValue: rowData => (
-        rowData.metricName ||
-        (rowData.metrics || []).join(', ')
-      ),
-      cellTemplate: 'highlightCellTemplate'
-    }, {
-      caption: 'SCHEDULED',
-      calculateCellValue: rowData => generateSchedule(this.cronJobs, rowData.id),
-      width: '12%'
-    }, {
-      caption: 'TYPE',
-      dataField: 'type',
-      width: '8%',
-      calculateCellValue: rowData => this.getRowType(rowData),
-      cellTemplate: 'typeCellTemplate'
-    }, {
-      caption: 'CREATOR',
-      dataField: 'userFullName',
-      width: '20%',
-      calculateCellValue: rowData => (rowData.userFullName || '').toUpperCase(),
-      cellTemplate: 'highlightCellTemplate'
-    }, {
-      caption: 'CREATED',
-      dataField: 'createdTimestamp',
-      width: '8%',
-      cellTemplate: 'dateCellTemplate'
-    }, {
-      caption: '',
-      cellTemplate: 'actionCellTemplate'
-    }];
+    const columns = [
+      {
+        caption: 'NAME',
+        dataField: 'name',
+        width: '36%',
+        cellTemplate: 'linkCellTemplate',
+        cssClass: 'branded-column-name'
+      },
+      {
+        caption: 'METRICS',
+        dataField: 'metrics',
+        width: '21%',
+        calculateCellValue: rowData =>
+          rowData.metricName || (rowData.metrics || []).join(', '),
+        cellTemplate: 'highlightCellTemplate'
+      },
+      {
+        caption: 'SCHEDULED',
+        calculateCellValue: rowData =>
+          generateSchedule(this.cronJobs, rowData.id),
+        width: '12%'
+      },
+      {
+        caption: 'TYPE',
+        dataField: 'type',
+        width: '8%',
+        calculateCellValue: rowData => this.getRowType(rowData),
+        cellTemplate: 'typeCellTemplate'
+      },
+      {
+        caption: 'CREATOR',
+        dataField: 'userFullName',
+        width: '20%',
+        calculateCellValue: rowData =>
+          (rowData.userFullName || '').toUpperCase(),
+        cellTemplate: 'highlightCellTemplate'
+      },
+      {
+        caption: 'CREATED',
+        dataField: 'createdTimestamp',
+        width: '8%',
+        cellTemplate: 'dateCellTemplate'
+      },
+      {
+        caption: '',
+        cellTemplate: 'actionCellTemplate'
+      }
+    ];
     return this._DxDataGridService.mergeWithDefaultConfig({
       columns,
       paging: {
@@ -156,9 +164,9 @@ export class AnalyzeListViewComponent {
       },
       width: '100%',
       height: '100%',
-      customizeColumns: columns => {
-        const last = columns.length - 1;
-        forEach(columns, (col, i) => {
+      customizeColumns: cols => {
+        const last = cols.length - 1;
+        forEach(cols, (col, i) => {
           if (i === last) {
             col.allowSorting = false;
             col.alignment = 'center';

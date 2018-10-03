@@ -18,8 +18,6 @@ import {
 } from '../../../../common/services';
 import { requireIf } from '../../validators/required-if.validator';
 
-const style = require('./save-dashboard.component.scss');
-
 export const REFRESH_INTERVALS = [
   {
     label: '1 minute',
@@ -66,14 +64,7 @@ export const REFRESH_INTERVALS = [
 @Component({
   selector: 'save-dashboard',
   templateUrl: './save-dashboard.component.html',
-  styles: [
-    `:host {
-      display: block;
-      padding: 10px;
-      width: 400px;
-    }`,
-    style
-  ]
+  styleUrls: ['./save-dashboard.component.scss']
 })
 export class SaveDashboardComponent implements OnInit, OnDestroy {
   public dashboardForm: FormGroup;

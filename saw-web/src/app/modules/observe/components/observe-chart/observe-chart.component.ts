@@ -2,6 +2,9 @@ import {
   Component,
   Input,
   Output,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
   EventEmitter,
   ViewChild
 } from '@angular/core';
@@ -30,19 +33,17 @@ import * as moment from 'moment';
 
 import { EXECUTION_MODES } from '../../../analyze/services/analyze.service';
 
-const style = require('./observe-chart.component.scss');
-
 @Component({
   selector: 'observe-chart',
   templateUrl: './observe-chart.component.html',
-  styles: [style],
+  styleUrls: ['./observe-chart.component.scss'],
   providers: [ChartService]
 })
-export class ObserveChartComponent {
+export class ObserveChartComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() analysis: any;
   @Input() item: any;
   @Input() enableChartDownload: boolean;
-  @Input('updater') requester: BehaviorSubject<Array<any>>;
+  @Input() updater: BehaviorSubject<Array<any>>;
   @Input() ViewMode: boolean;
   @Output() onRefresh = new EventEmitter<any>();
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
@@ -89,7 +90,7 @@ export class ObserveChartComponent {
      Having separate requester and chartUpdater allows transforming
      changes coming from parent before passing them on. */
   subscribeToRequester() {
-    this.requesterSubscription = this.requester.subscribe(data => {
+    this.requesterSubscription = this.updater.subscribe(data => {
       let changes = this.getChangeConfig(
         this.settings,
         this.gridData,
@@ -224,7 +225,7 @@ export class ObserveChartComponent {
   trimKeyword(data) {
     const trimData = data.map(row => {
       const obj = {};
-      for (const key in row) {
+      for (const key of Object.keys(row)) {
         const trimKey = this.fetchColumnData(key.split('.')[0], row[key]);
         obj[trimKey.aliasName] = trimKey.value;
       }
@@ -260,10 +261,16 @@ export class ObserveChartComponent {
       map(this.filters, this.filterService.frontend2BackendFilter())
     );
 
-    const g = find(this.settings.groupBy, g => (g.area || g.checked) === 'g');
-    const x = find(this.settings.xaxis, x => (x.area || x.checked) === 'x');
-    const y = filter(this.settings.yaxis, y => (y.area || y.checked) === 'y');
-    const z = find(this.settings.zaxis, z => (z.area || z.checked) === 'z');
+    const g = find(
+      this.settings.groupBy,
+      gf => (gf.area || gf.checked) === 'g'
+    );
+    const x = find(this.settings.xaxis, xf => (xf.area || xf.checked) === 'x');
+    const y = filter(
+      this.settings.yaxis,
+      yf => (yf.area || yf.checked) === 'y'
+    );
+    const z = find(this.settings.zaxis, zf => (zf.area || zf.checked) === 'z');
 
     const allFields = [x, g, ...y, z];
 

@@ -9,25 +9,12 @@ import {
 } from '../../types';
 import { DesignerStates } from '../../consts';
 
-const style = require('./single-table-designer-layout.component.scss');
-
 @Component({
   selector: 'single-table-designer-layout',
   templateUrl: './single-table-designer-layout.component.html',
-  styles: [
-    `:host {
-      background-color: white;
-      max-height: 93vh;
-      max-width: 100vw;
-      display: grid;
-      grid-template:
-        "data-settings content" 93vh
-        / 25vw 75vw;
-    }`,
-    style
-  ]
+  styleUrls: ['./single-table-designer-layout.component.scss']
 })
-export class SingleTableDesignerLayout {
+export class SingleTableDesignerLayoutComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() data;

@@ -16,12 +16,10 @@ import {
   JsPlumbCanvasChangeEvent
 } from '../types';
 
-const style = require('./js-plumb-table.component.scss');
-
 @Component({
   selector: 'js-plumb-table-u',
   templateUrl: './js-plumb-table.component.html',
-  styles: [style]
+  styleUrls: ['./js-plumb-table.component.scss']
 })
 export class JsPlumbTableComponent implements OnInit, AfterViewInit {
   @Output() change: EventEmitter<JsPlumbCanvasChangeEvent> = new EventEmitter();

@@ -7,18 +7,10 @@ import { DesignerService } from '../designer.service';
 import { AnalysisReport } from '../types';
 import { HeaderProgressService } from '../../../../common/services';
 
-const style = require('./toolbar-action-dialog.component.scss');
-
 @Component({
   selector: 'toolbar-action-dialog',
   templateUrl: './toolbar-action-dialog.component.html',
-  styles: [
-    `:host {
-      display: block;
-      padding: 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./toolbar-action-dialog.component.scss']
 })
 export class ToolbarActionDialogComponent implements OnInit, OnDestroy {
   showProgress = false;

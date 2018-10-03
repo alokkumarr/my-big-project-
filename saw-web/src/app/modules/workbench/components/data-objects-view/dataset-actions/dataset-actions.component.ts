@@ -3,15 +3,13 @@ import { Router } from '@angular/router';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./dataset-actions.component.scss');
 @Component({
   selector: 'dataset-actions',
   templateUrl: './dataset-actions.component.html',
-  styles: [style]
+  styleUrls: ['./dataset-actions.component.scss']
 })
 export class DatasetActionsComponent implements OnInit {
-  @Input()
-  dsMetadata: any;
+  @Input() dsMetadata: any;
 
   constructor(private router: Router, public workBench: WorkbenchService) {}
 

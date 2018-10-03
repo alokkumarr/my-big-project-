@@ -14,12 +14,10 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
 import { AceEditorComponent } from 'ng2-ace-editor';
 
-const style = require('./analyze-report-query.component.scss');
-
 @Component({
   selector: 'analyze-report-query',
   templateUrl: './analyze-report-query.component.html',
-  styles: [style]
+  styleUrls: ['./analyze-report-query.component.scss']
 })
 export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @Input() query: string;

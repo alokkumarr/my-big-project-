@@ -1,20 +1,13 @@
-import {
-  Component,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 import { DesignerToolbarAciton } from '../types';
-
-const style = require('./designer-toolbar.component.scss');
 
 @Component({
   selector: 'designer-toolbar',
   templateUrl: './designer-toolbar.component.html',
-  styles: [style]
+  styleUrls: ['./designer-toolbar.component.scss']
 })
 export class DesignerToolbarComponent {
-  @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
-
-
+  @Output()
+  requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
 }

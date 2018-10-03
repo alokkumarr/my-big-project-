@@ -1,2 +1,2 @@
-export { SingleTableDesignerLayout } from './single-table';
-export { MultiTableDesignerLayout } from './multi-table';
+export { SingleTableDesignerLayoutComponent } from './single-table';
+export { MultiTableDesignerLayoutComponent } from './multi-table';

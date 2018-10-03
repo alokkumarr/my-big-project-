@@ -1,39 +1,24 @@
-import {
-  Component,
-  Inject
-} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as clone from 'lodash/clone';
 
-import {
-  Join,
-  JoinCriterion,
-  JoinChangeEvent
-} from '../types';
-
-const style = require('./join-dialog.component.scss');
+import { Join, JoinCriterion, JoinChangeEvent } from '../types';
 
 @Component({
   selector: 'join-dialog',
   templateUrl: './join-dialog.component.html',
-  styles: [
-    `:host {
-      display: block;
-      padding: 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./join-dialog.component.scss']
 })
 export class JoinDialogComponent {
-
   public left: JoinCriterion;
   public right: JoinCriterion;
   public join: Join;
 
   constructor(
     public _dialogRef: MatDialogRef<JoinDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      join: Join
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      join: Join;
     }
   ) {
     this.left = this.data.join.criteria[0];

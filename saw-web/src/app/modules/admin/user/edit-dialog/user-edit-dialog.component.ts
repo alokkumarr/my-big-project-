@@ -5,8 +5,6 @@ import { combineLatest } from 'rxjs';
 import { UserService } from '../user.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const style = require('./user-edit-dialog.component.scss');
-
 const namePattern = /^[a-zA-Z]*$/;
 const loginIdPattern = /^[A-z\d_@.#$=!%^)(\]:\*;\?\/\,}{'\|<>\[&\+-`~]*$/;
 const dummyPassword = '*********';
@@ -14,37 +12,35 @@ const dummyPassword = '*********';
 @Component({
   selector: 'user-edit-dialog',
   templateUrl: './user-edit-dialog.component.html',
-  styles: [
-    `:host {
-      max-width: 500px;
-    }`,
-    style
-  ]
+  styleUrls: ['./user-edit-dialog.component.scss']
 })
 export class UserEditDialogComponent extends BaseDialogComponent {
-
   formGroup: FormGroup;
   formIsValid = false;
-  statuses = [{
-    id: 1,
-    value: 'Active',
-    name: 'ACTIVE'
-  }, {
-    id: 0,
-    value: 'Inactive',
-    name: 'INACTIVE'
-  }];
+  statuses = [
+    {
+      id: 1,
+      value: 'Active',
+      name: 'ACTIVE'
+    },
+    {
+      id: 0,
+      value: 'Inactive',
+      name: 'INACTIVE'
+    }
+  ];
 
   constructor(
     public _userService: UserService,
     public _fb: FormBuilder,
     public _dialogRef: MatDialogRef<UserEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      model: any,
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      model: any;
       formDeps: {
-        roles$: any[]
-      },
-      mode: 'edit' | 'create'
+        roles$: any[];
+      };
+      mode: 'edit' | 'create';
     }
   ) {
     super();
@@ -67,34 +63,33 @@ export class UserEditDialogComponent extends BaseDialogComponent {
 
     let actionPromise;
     switch (this.data.mode) {
-    case 'edit':
-      actionPromise = this._userService.update(model);
-      break;
-    case 'create':
-      actionPromise = this._userService.save(model);
-      break;
+      case 'edit':
+        actionPromise = this._userService.update(model);
+        break;
+      case 'create':
+        actionPromise = this._userService.save(model);
+        break;
     }
 
-    actionPromise && actionPromise.then(
-      rows => {
+    actionPromise &&
+      actionPromise.then(rows => {
         if (rows) {
           this._dialogRef.close(rows);
         }
-      }
-    );
+      });
   }
 
   onPasswordFocus(event) {
     if (this.data.mode === 'edit' && event.target.value === dummyPassword) {
       const password = '';
-      this.formGroup.patchValue({password});
+      this.formGroup.patchValue({ password });
     }
   }
 
   onPasswordBlur(event) {
     if (this.data.mode === 'edit' && event.target.value === '') {
       const password = dummyPassword;
-      this.formGroup.patchValue({password});
+      this.formGroup.patchValue({ password });
     }
   }
 
@@ -122,8 +117,7 @@ export class UserEditDialogComponent extends BaseDialogComponent {
       Validators.pattern(namePattern)
     ]);
 
-    const passwordValue = mode === 'edit' ?
-      dummyPassword : '';
+    const passwordValue = mode === 'edit' ? dummyPassword : '';
     const passwordControl = this._fb.control(
       passwordValue,
       Validators.required
@@ -134,10 +128,10 @@ export class UserEditDialogComponent extends BaseDialogComponent {
       middleName: middleName,
       firstName: firstNameControl,
       lastName: lastNameControl,
-      masterLoginId: [masterLoginId, [
-        Validators.required,
-        Validators.pattern(loginIdPattern)
-      ]],
+      masterLoginId: [
+        masterLoginId,
+        [Validators.required, Validators.pattern(loginIdPattern)]
+      ],
       password: passwordControl,
       email: [email, [Validators.required, Validators.email]],
       activeStatusInd: [activeStatusInd, Validators.required]
@@ -149,7 +143,7 @@ export class UserEditDialogComponent extends BaseDialogComponent {
       lastNameControl.valueChanges
     ).subscribe(([first, last]) => {
       const masterLoginIdValue = `${first}.${last}`;
-      this.formGroup.patchValue({masterLoginId: masterLoginIdValue});
+      this.formGroup.patchValue({ masterLoginId: masterLoginIdValue });
     });
 
     // enable disable the create user/ save button

@@ -28,22 +28,13 @@ import { CategoryService } from '../category/category.service';
 import { SidenavMenuService } from '../../../common/components/sidenav';
 import { AdminMenuData } from '../consts';
 
-const style = require('./admin-export-view.component.scss');
-
 @Component({
   selector: 'admin-export-view',
   templateUrl: './admin-export-view.component.html',
-  styles: [
-    `:host {
-      max-height: calc(100vh - (63px + 55px));
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./admin-export-view.component.scss']
 })
 export class AdminExportViewComponent implements OnInit {
-  @ViewChild('metricInput')
-  metricInput: ElementRef;
+  @ViewChild('metricInput') metricInput: ElementRef;
   @Input() columns: any[];
   data: any[];
   metrics: any[] = [];
@@ -89,26 +80,33 @@ export class AdminExportViewComponent implements OnInit {
 
   loadCategories() {
     this._categoryService.getList().then(categories => {
-      this.categoriesMap = reduce(categories, (acc, category) => {
-        if (category.moduleName === 'ANALYZE') {
-          forEach(category.subCategories, subCategory => {
-            acc[subCategory.subCategoryId] = subCategory.subCategoryName;
-          });
-        }
-        return acc;
-      }, {});
+      this.categoriesMap = reduce(
+        categories,
+        (acc, category) => {
+          if (category.moduleName === 'ANALYZE') {
+            forEach(category.subCategories, subCategory => {
+              acc[subCategory.subCategoryId] = subCategory.subCategoryName;
+            });
+          }
+          return acc;
+        },
+        {}
+      );
     });
   }
 
   loadAnalyses() {
-    const metricIds = lodashMap(this.selectedMetrics, ({id}) => id);
+    const metricIds = lodashMap(this.selectedMetrics, ({ id }) => id);
     if (isEmpty(this.selectedMetrics)) {
       this.analyses = [];
       return;
     }
     this._exportService.getAnalysisByMetricIds(metricIds).then(analyses => {
       this.analyses = fpPipe(
-        fpFilter(({categoryId, name}) => !isUndefined(categoryId) && !isUndefined(name) && name !== ''),
+        fpFilter(
+          ({ categoryId, name }) =>
+            !isUndefined(categoryId) && !isUndefined(name) && name !== ''
+        ),
         fpMap(analysis => {
           return {
             analysis,
@@ -152,13 +150,12 @@ export class AdminExportViewComponent implements OnInit {
       const fileName = this.getFileName(metricName);
       zip.file(
         `${fileName}.json`,
-        new Blob(
-          [JSON.stringify(analyses)],
-          {type: 'application/json;charset=utf-8'}
-        )
+        new Blob([JSON.stringify(analyses)], {
+          type: 'application/json;charset=utf-8'
+        })
       );
     });
-    zip.generateAsync({type: 'blob'}).then(content => {
+    zip.generateAsync({ type: 'blob' }).then(content => {
       let zipFileName = this.getFileName('');
       zipFileName = zipFileName.replace('_', '');
       FileSaver.saveAs(content, `${zipFileName}.zip`);
@@ -175,10 +172,13 @@ export class AdminExportViewComponent implements OnInit {
   }
 
   splitAnalysisOnMetric(exportAnalysisList, metrics) {
-    return lodashMap(metrics, ({metricName}) => {
+    return lodashMap(metrics, ({ metricName }) => {
       return {
         fileName: this.getFileName(metricName),
-        analysisList: lodashFilter(exportAnalysisList, analysis => analysis.metricName === metricName)
+        analysisList: lodashFilter(
+          exportAnalysisList,
+          analysis => analysis.metricName === metricName
+        )
       };
     });
   }

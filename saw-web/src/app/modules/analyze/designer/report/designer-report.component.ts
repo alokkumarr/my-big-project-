@@ -1,30 +1,12 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
-import {
-  Artifact,
-  DesignerChangeEvent,
-  Sort,
-  Filter
-} from '../types';
+import { Artifact, DesignerChangeEvent, Sort, Filter } from '../types';
 import { DesignerStates } from '../consts';
-
-const style = require('./designer-report.component.scss');
 
 @Component({
   selector: 'designer-report',
   templateUrl: './designer-report.component.html',
-  styles: [
-    `:host {
-      height: calc(100% - 20px);
-      width: calc(100% - 20px);
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-report.component.scss']
 })
 export class DesignerReportComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
@@ -44,11 +26,11 @@ export class DesignerReportComponent {
 
   onRemoveFilter(index) {
     this.filters.splice(index, 1);
-    this.change.emit({subject: 'filterRemove'});
+    this.change.emit({ subject: 'filterRemove' });
   }
 
   onRemoveFilterAll() {
     this.filters.splice(0, this.filters.length);
-    this.change.emit({subject: 'filterRemove'});
+    this.change.emit({ subject: 'filterRemove' });
   }
 }

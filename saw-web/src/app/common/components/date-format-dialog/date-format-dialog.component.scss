@@ -1,5 +1,10 @@
 @import "src/themes/base/colors";
 
+:host {
+  display: block;
+  padding: 10px;
+}
+
 .dialog__header {
   padding: 10px;
   border-bottom: 1px solid $primary-grey-g2;

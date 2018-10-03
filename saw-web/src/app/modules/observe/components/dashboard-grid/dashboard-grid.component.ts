@@ -35,8 +35,6 @@ import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
-const style = require('./dashboard-grid.component.scss');
-
 const MARGIN_BETWEEN_TILES = 10;
 
 export const DASHBOARD_MODES = {
@@ -48,14 +46,7 @@ export const DASHBOARD_MODES = {
 @Component({
   selector: 'dashboard-grid',
   templateUrl: './dashboard-grid.component.html',
-  styles: [
-    `:host {
-      display: block;
-      height: 100%;
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./dashboard-grid.component.scss']
 })
 export class DashboardGridComponent
   implements OnInit, OnChanges, AfterViewInit, OnDestroy {
@@ -122,7 +113,9 @@ export class DashboardGridComponent
   }
 
   getMinColumns() {
-    if (this.mode === DASHBOARD_MODES.CREATE) { return 64; }
+    if (this.mode === DASHBOARD_MODES.CREATE) {
+      return 64;
+    }
 
     const savedMinCols = get(this.model, 'options.0.minCols');
     return savedMinCols ? savedMinCols : 4;
@@ -182,7 +175,9 @@ export class DashboardGridComponent
   }
 
   editTile(item: GridsterItem) {
-    if (!item.kpi && !item.bullet) { return; }
+    if (!item.kpi && !item.bullet) {
+      return;
+    }
 
     this.dashboardService.onEditItem.next(item);
   }
@@ -263,7 +258,9 @@ export class DashboardGridComponent
   onApplyGlobalFilters(filterGroup = {}) {
     this.dashboard.forEach((tile, id) => {
       // Only applies to analysis type tiles
-      if (this.tileType(tile) !== 'analysis') { return; }
+      if (this.tileType(tile) !== 'analysis') {
+        return;
+      }
 
       const gFilters = filterGroup[tile.analysis.semanticId] || [];
 

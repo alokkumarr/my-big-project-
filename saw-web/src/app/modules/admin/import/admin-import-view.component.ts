@@ -23,8 +23,6 @@ import { AdminMenuData } from '../consts';
 import { Analysis } from '../../../models';
 import { ExportService } from '../export/export.service';
 
-const style = require('./admin-import-view.component.scss');
-
 const DUPLICATE_GRID_OBJECT_PROPS = {
   logColor: 'brown',
   log: 'Analysis exists. Please Overwrite to delete existing data.',
@@ -42,17 +40,19 @@ const NORMAL_GRID_OBJECT_PROPS = {
   noMetricInd: false
 };
 
-interface FileInfo {name: string; count: number; }
-interface FileContent {name: string; count: number; analyses: Array<Analysis>; }
+interface FileInfo {
+  name: string;
+  count: number;
+}
+interface FileContent {
+  name: string;
+  count: number;
+  analyses: Array<Analysis>;
+}
 @Component({
   selector: 'admin-import-view',
   templateUrl: './admin-import-view.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./admin-import-view.component.scss']
 })
 export class AdminImportViewComponent implements OnInit {
   files: Array<FileInfo>;
@@ -77,30 +77,39 @@ export class AdminImportViewComponent implements OnInit {
 
   ngOnInit() {
     this._sidenav.updateMenu(AdminMenuData, 'ADMIN');
-    this.categories$ = this._categoryService.getList().then(fpFilter(category => category.moduleName === 'ANALYZE'));
+    this.categories$ = this._categoryService
+      .getList()
+      .then(fpFilter(category => category.moduleName === 'ANALYZE'));
     this.getMetrics();
   }
 
   getMetrics() {
     this._exportService.getMetricList().then(metrics => {
-      this.metricsMap = reduce(metrics, (acc, metric) => {
-        acc[metric.metricName] = metric;
-        return acc;
-      }, {});
+      this.metricsMap = reduce(
+        metrics,
+        (acc, metric) => {
+          acc[metric.metricName] = metric;
+          return acc;
+        },
+        {}
+      );
     });
   }
 
   onRemoveFile(fileName) {
-    this.fileContents = filter(this.fileContents, ({name}) => fileName !== name);
+    this.fileContents = filter(
+      this.fileContents,
+      ({ name }) => fileName !== name
+    );
     this.splitFileContents(this.fileContents);
   }
 
   splitFileContents(contents) {
     let hasErrors = false;
     this.atLeast1AnalysisIsSelected = false;
-    this.files = map(contents, ({name, count}) => ({name, count}));
+    this.files = map(contents, ({ name, count }) => ({ name, count }));
     this.analyses = fpPipe(
-      fpFlatMap(({analyses}) => analyses),
+      fpFlatMap(({ analyses }) => analyses),
       fpMap(analysis => {
         const gridObj = this.getAnalysisObjectForGrid(analysis);
         if (gridObj.errorInd) {
@@ -117,8 +126,8 @@ export class AdminImportViewComponent implements OnInit {
 
     const contentPromises = <Promise<FileContent>[]>fpPipe(
       fpFilter(file => file.type === 'application/json'),
-      fpMap(file => getFileContents(file)
-        .then(content => {
+      fpMap(file =>
+        getFileContents(file).then(content => {
           const analyses = JSON.parse(content);
           return {
             name: file.name,
@@ -140,10 +149,16 @@ export class AdminImportViewComponent implements OnInit {
   onCategoryChange(categoryId) {
     this.selectedCategory = categoryId;
     this._importService.getAnalysesFor(toString(categoryId)).then(analyses => {
-      this.analysesFromBEMap = reduce(analyses, (acc, analysis) => {
-        acc[`${analysis.name}:${analysis.metricName}:${analysis.type}`] = analysis;
-        return acc;
-      }, {});
+      this.analysesFromBEMap = reduce(
+        analyses,
+        (acc, analysis) => {
+          acc[
+            `${analysis.name}:${analysis.metricName}:${analysis.type}`
+          ] = analysis;
+          return acc;
+        },
+        {}
+      );
       this.splitFileContents(this.fileContents);
     });
   }
@@ -153,11 +168,19 @@ export class AdminImportViewComponent implements OnInit {
     if (metric) {
       analysis.semanticId = metric.id;
     }
-    const analysisFromBE = this.analysesFromBEMap[`${analysis.name}:${analysis.metricName}:${analysis.type}`];
+    const analysisFromBE = this.analysesFromBEMap[
+      `${analysis.name}:${analysis.metricName}:${analysis.type}`
+    ];
 
-    const possibilitySelector = metric ? (analysisFromBE ? 'duplicate' : 'normal') : 'noMetric';
+    const possibilitySelector = metric
+      ? analysisFromBE ? 'duplicate' : 'normal'
+      : 'noMetric';
 
-    const possibility = this.getPossibleGridObjects(possibilitySelector, analysis, analysisFromBE);
+    const possibility = this.getPossibleGridObjects(
+      possibilitySelector,
+      analysis,
+      analysisFromBE
+    );
 
     return {
       ...possibility,
@@ -165,29 +188,36 @@ export class AdminImportViewComponent implements OnInit {
     };
   }
 
-  getPossibleGridObjects(selector: 'noMetric' | 'duplicate' | 'normal', analysis, analysisFromBE) {
+  getPossibleGridObjects(
+    selector: 'noMetric' | 'duplicate' | 'normal',
+    analysis,
+    analysisFromBE
+  ) {
     switch (selector) {
-    case 'noMetric':
-      return {
-        logColor: 'red',
-        log: 'Metric doesn\'t exists.',
-        errorMsg: `${analysis.metricName}: Metric does not exists.`,
-        duplicateAnalysisInd: false,
-        errorInd: true,
-        noMetricInd: true,
-        analysis
-      };
-    case 'duplicate':
-      const modifiedAnalysis = this.getModifiedAnalysis(analysis, analysisFromBE);
-      return {
-        ...DUPLICATE_GRID_OBJECT_PROPS,
-        analysis: modifiedAnalysis
-      };
-    case 'normal':
-      return {
-        ...NORMAL_GRID_OBJECT_PROPS,
-        analysis
-      };
+      case 'noMetric':
+        return {
+          logColor: 'red',
+          log: `Metric doesn't exists.`,
+          errorMsg: `${analysis.metricName}: Metric does not exists.`,
+          duplicateAnalysisInd: false,
+          errorInd: true,
+          noMetricInd: true,
+          analysis
+        };
+      case 'duplicate':
+        const modifiedAnalysis = this.getModifiedAnalysis(
+          analysis,
+          analysisFromBE
+        );
+        return {
+          ...DUPLICATE_GRID_OBJECT_PROPS,
+          analysis: modifiedAnalysis
+        };
+      case 'normal':
+        return {
+          ...NORMAL_GRID_OBJECT_PROPS,
+          analysis
+        };
     }
   }
 
@@ -200,10 +230,7 @@ export class AdminImportViewComponent implements OnInit {
       id,
       repository
     } = analysisFromBE;
-    const {
-      userFullName,
-      userId
-    } = this._jwtService.getTokenObj().ticket;
+    const { userFullName, userId } = this._jwtService.getTokenObj().ticket;
 
     return {
       ...analysis,
@@ -222,7 +249,7 @@ export class AdminImportViewComponent implements OnInit {
     const importPromises = fpPipe(
       fpFilter('selection'),
       fpMap(gridObj => {
-        const {duplicateAnalysisInd, analysis} = gridObj;
+        const { duplicateAnalysisInd, analysis } = gridObj;
         if (duplicateAnalysisInd) {
           return this.importExistingAnalysis(analysis);
         } else {
@@ -234,22 +261,25 @@ export class AdminImportViewComponent implements OnInit {
       })
     )(this.analyses);
 
-    executeAllPromises(importPromises).then((results) => {
+    executeAllPromises(importPromises).then(results => {
       const selectedAnalyses = filter(this.analyses, 'selection');
 
-      const updatedAnalysesMap = reduce(results, (acc, result, index) => {
+      const updatedAnalysesMap = reduce(
+        results,
+        (acc, result, index) => {
+          if (result.result) {
+            const analysis = result.result;
+            acc[analysis.id] = { analysis };
+          } else {
+            const error = result.error;
+            const gridObj = selectedAnalyses[index];
+            acc[gridObj.analysis.id] = { error };
+          }
 
-        if (result.result) {
-          const analysis = result.result;
-          acc[analysis.id] = {analysis};
-        } else {
-          const error = result.error;
-          const gridObj = selectedAnalyses[index];
-          acc[gridObj.analysis.id] = {error};
-        }
-
-        return acc;
-      }, {});
+          return acc;
+        },
+        {}
+      );
 
       let hasErrors = false;
       let someImportsWereSuccesful = false;
@@ -286,7 +316,6 @@ export class AdminImportViewComponent implements OnInit {
     });
   }
 
-
   exportErrors() {
     const logMessages = fpPipe(
       fpFilter('errorInd'),
@@ -308,7 +337,7 @@ export class AdminImportViewComponent implements OnInit {
           throw err;
         }
         const logFileName = this.getLogFileName();
-        const newData = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+        const newData = new Blob([csv], { type: 'text/csv;charset=utf-8' });
         FileSaver.saveAs(newData, logFileName);
       });
     }
@@ -320,36 +349,37 @@ export class AdminImportViewComponent implements OnInit {
   }
 
   importNewAnalysis(analysis: Analysis) {
-    const {
-      semanticId,
-      type
-    } = analysis;
+    const { semanticId, type } = analysis;
     return new Promise<Analysis>((resolve, reject) => {
+      this._importService
+        .createAnalysis(semanticId, type)
+        .then((initializedAnalysis: Analysis) => {
+          const {
+            isScheduled,
+            scheduled,
+            createdTimestamp,
+            id,
+            userFullName,
+            userId,
+            esRepository,
+            repository
+          } = initializedAnalysis;
 
-      this._importService.createAnalysis(semanticId, type).then((initializedAnalysis: Analysis) => {
-        const {
-          isScheduled,
-          scheduled,
-          createdTimestamp,
-          id,
-          userFullName,
-          userId,
-          esRepository,
-          repository
-        } = initializedAnalysis;
-
-        this.importExistingAnalysis({
-          ...analysis,
-          isScheduled,
-          scheduled,
-          createdTimestamp,
-          id,
-          userFullName,
-          userId,
-          esRepository,
-          repository
-        }).then(updatedAnalysis => resolve(updatedAnalysis), err => reject(err));
-      });
+          this.importExistingAnalysis({
+            ...analysis,
+            isScheduled,
+            scheduled,
+            createdTimestamp,
+            id,
+            userFullName,
+            userId,
+            esRepository,
+            repository
+          }).then(
+            updatedAnalysis => resolve(updatedAnalysis),
+            err => reject(err)
+          );
+        });
     });
   }
 

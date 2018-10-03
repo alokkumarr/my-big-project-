@@ -1,4 +1,3 @@
-
 import { MatDialog } from '@angular/material';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import * as cloneDeep from 'lodash/cloneDeep';
@@ -16,21 +15,10 @@ import { RawpreviewDialogComponent } from './rawpreview-dialog/rawpreview-dialog
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 
-
-const style = require('./create-datasets.component.scss');
-
 @Component({
   selector: 'create-datasets',
   templateUrl: './create-datasets.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }`,
-    style
-  ]
+  styleUrls: ['./create-datasets.component.scss']
 })
 export class CreateDatasetsComponent implements OnInit {
   public selectFullfilled = false;
@@ -52,17 +40,28 @@ export class CreateDatasetsComponent implements OnInit {
     public dialog: MatDialog,
     public workBench: WorkbenchService,
     public notify: ToastService
-  ) { }
+  ) {}
 
-  @ViewChild('previewComponent') public previewComponent: ParserPreviewComponent;
-  @ViewChild('detailsComponent') public detailsComponent: DatasetDetailsComponent;
+  @ViewChild('previewComponent')
+  public previewComponent: ParserPreviewComponent;
+  @ViewChild('detailsComponent')
+  public detailsComponent: DatasetDetailsComponent;
 
   ngOnInit() {
     this.csvConfig = cloneDeep(CSV_CONFIG);
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
-      nameControl: new FormControl('', [Validators.required, Validators.pattern(this.folNamePattern), Validators.minLength(3), Validators.maxLength(25)]),
-      descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(99)])
+      nameControl: new FormControl('', [
+        Validators.required,
+        Validators.pattern(this.folNamePattern),
+        Validators.minLength(3),
+        Validators.maxLength(25)
+      ]),
+      descControl: new FormControl('', [
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(99)
+      ])
     });
   }
 
@@ -75,7 +74,10 @@ export class CreateDatasetsComponent implements OnInit {
       this.getParsedPreview();
     } else if (event.selectedIndex === 3) {
       this.previewComponent.toAdd();
-    } else if (event.selectedIndex === 2 && event.previouslySelectedIndex === 3) {
+    } else if (
+      event.selectedIndex === 2 &&
+      event.previouslySelectedIndex === 3
+    ) {
       this.previewDone = true;
     }
   }
@@ -125,23 +127,24 @@ export class CreateDatasetsComponent implements OnInit {
 
   triggerParser() {
     const payload = {
-      'name': this.nameFormGroup.value.nameControl,
-      'description': this.nameFormGroup.value.descControl,
-      'component': 'parser',
-      'configuration':
-      {
-        'fields': this.fieldsConf.fields,
-        'file': this.fieldsConf.info.file,
-        'lineSeparator': this.fieldsConf.lineSeparator,
-        'delimiter': this.fieldsConf.delimiter,
-        'quoteChar': this.fieldsConf.quoteChar,
-        'quoteEscape': this.fieldsConf.quoteEscapeChar,
-        'headerSize': this.fieldsConf.headerSize
+      name: this.nameFormGroup.value.nameControl,
+      description: this.nameFormGroup.value.descControl,
+      component: 'parser',
+      configuration: {
+        fields: this.fieldsConf.fields,
+        file: this.fieldsConf.info.file,
+        lineSeparator: this.fieldsConf.lineSeparator,
+        delimiter: this.fieldsConf.delimiter,
+        quoteChar: this.fieldsConf.quoteChar,
+        quoteEscape: this.fieldsConf.quoteEscapeChar,
+        headerSize: this.fieldsConf.headerSize
       }
     };
     this.parserConf.outputs[0].description = this.nameFormGroup.value.descControl;
     this.workBench.triggerParser(payload).subscribe(data => {
-      this.notify.info('Parser_triggered_successfully', 'Parsing', { hideDelay: 9000 });
+      this.notify.info('Parser_triggered_successfully', 'Parsing', {
+        hideDelay: 9000
+      });
     });
     this.router.navigate(['workbench', 'dataobjects']);
   }

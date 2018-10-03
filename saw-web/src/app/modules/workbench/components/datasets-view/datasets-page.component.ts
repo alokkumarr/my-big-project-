@@ -1,23 +1,20 @@
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/timer';
 
 import { LocalSearchService } from '../../../../common/services/local-search.service';
 import { WorkbenchService } from '../../services/workbench.service';
 
-const style = require('./datasets-page.component.scss');
-
 @Component({
   selector: 'datasets-page',
   templateUrl: './datasets-page.component.html',
-  styles: [style]
+  styleUrls: ['./datasets-page.component.scss'],
   providers: [DatePipe]
 })
-
 export class DatasetsComponent implements OnInit, OnDestroy {
   public availableSets: Array<any> = [];
   public viewState = 'card';
@@ -39,7 +36,7 @@ export class DatasetsComponent implements OnInit, OnDestroy {
     public LocalSearch: LocalSearchService,
     public workBench: WorkbenchService,
     public datePipe: DatePipe
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.startPolling();
@@ -53,10 +50,10 @@ export class DatasetsComponent implements OnInit, OnDestroy {
 
   startPolling() {
     /**
-        * Calls list datasets api onInit and every 10 seconds or whatever set interval
-        *
-        * @memberof DatasetsComponent
-        */
+     * Calls list datasets api onInit and every 10 seconds or whatever set interval
+     *
+     * @memberof DatasetsComponent
+     */
     this.timer = Observable.timer(0, this.interval);
     this.timerSubscription = this.timer.subscribe(() => {
       this.getPageData();
@@ -102,30 +99,47 @@ export class DatasetsComponent implements OnInit, OnDestroy {
   applySearchFilter(): void {
     const SEARCH_CONFIG = [
       { keyword: 'Data Set Name', fieldName: 'set' },
-      { keyword: 'Added By', fieldName: 'meta', accessor: input => input.addedBy },
-      { keyword: 'Data Pods', fieldName: 'meta', accessor: input => input.numFiles },
+      {
+        keyword: 'Added By',
+        fieldName: 'meta',
+        accessor: input => input.addedBy
+      },
+      {
+        keyword: 'Data Pods',
+        fieldName: 'meta',
+        accessor: input => input.numFiles
+      },
       {
         keyword: 'Last Updated',
         fieldName: 'meta',
-        accessor: input => this.datePipe.transform(input.lastUpdated, 'MM/dd/yy @ HH:mm')
+        accessor: input =>
+          this.datePipe.transform(input.lastUpdated, 'MM/dd/yy @ HH:mm')
       },
-      { keyword: 'Updated By', fieldName: 'meta', accessor: input => input.updatedBy },
+      {
+        keyword: 'Updated By',
+        fieldName: 'meta',
+        accessor: input => input.updatedBy
+      },
       { keyword: 'Data Source', fieldName: 'src' }
     ];
-    const searchCriteria = this.LocalSearch.parseSearchTerm(this.states.searchTerm);
+    const searchCriteria = this.LocalSearch.parseSearchTerm(
+      this.states.searchTerm
+    );
     this.states.searchTermValue = searchCriteria.trimmedTerm;
-    this.LocalSearch.doSearch(searchCriteria, this.availableSets, SEARCH_CONFIG).then(data => {
+    this.LocalSearch.doSearch(
+      searchCriteria,
+      this.availableSets,
+      SEARCH_CONFIG
+    ).then(data => {
       this.loadSets(data);
     });
   }
 
   addDataSet(): void {
-    this.router.navigate(['workbench' , 'add']);
+    this.router.navigate(['workbench', 'add']);
   }
 
-  onDataViewChange() {
-
-  }
+  onDataViewChange() {}
 
   onResize(event) {
     this.contentHeight = event.target.innerHeight - 165;

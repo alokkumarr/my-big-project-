@@ -1,11 +1,19 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges
+} from '@angular/core';
 import { FilterModel } from '../../types';
-import { BETWEEN_NUMBER_FILTER_OPERATOR, NUMBER_FILTER_OPERATORS } from '../../../consts';
+import {
+  BETWEEN_NUMBER_FILTER_OPERATOR,
+  NUMBER_FILTER_OPERATORS
+} from '../../../consts';
 
 import * as isFinite from 'lodash/isFinite';
 import * as unset from 'lodash/unset';
-
-const style = require('./designer-number-filter.component.scss');
 
 export const isValid = (model: FilterModel) => {
   model = model || {};
@@ -13,14 +21,16 @@ export const isValid = (model: FilterModel) => {
   return (
     model.operator &&
     isFinite(model.value) &&
-    (model.operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value ? true : isFinite(model.otherValue))
+    (model.operator !== BETWEEN_NUMBER_FILTER_OPERATOR.value
+      ? true
+      : isFinite(model.otherValue))
   );
 };
 
 @Component({
   selector: 'designer-number-filter',
   templateUrl: './designer-number-filter.component.html',
-  styles: [style]
+  styleUrls: ['./designer-number-filter.component.scss']
 })
 export class DesignerNumberFilterComponent implements OnInit, OnChanges {
   @Output()

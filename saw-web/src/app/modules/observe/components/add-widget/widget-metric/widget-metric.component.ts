@@ -1,4 +1,10 @@
-import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  OnDestroy
+} from '@angular/core';
 import { from } from 'rxjs';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
@@ -10,17 +16,10 @@ import { AnalyzeService } from '../../../../analyze/services/analyze.service';
 import { ObserveService } from '../../../services/observe.service';
 import { HeaderProgressService } from '../../../../../common/services';
 
-const style = require('./widget-metric.component.scss');
-
 @Component({
   selector: 'widget-metric',
   templateUrl: './widget-metric.component.html',
-  styles: [
-    `:host {
-      display: block;
-    }`,
-    style
-  ]
+  styleUrls: ['./widget-metric.component.scss']
 })
 export class WidgetMetricComponent implements OnInit, OnDestroy {
   @Output() onSelect = new EventEmitter();
@@ -33,17 +32,15 @@ export class WidgetMetricComponent implements OnInit, OnDestroy {
     public observe: ObserveService,
     public _headerProgress: HeaderProgressService
   ) {
-    this. progressSub = _headerProgress.subscribe(showProgress => {
+    this.progressSub = _headerProgress.subscribe(showProgress => {
       this.showProgress = showProgress;
     });
   }
 
   ngOnInit() {
-    from(this.analyze.getSemanticLayerData()).subscribe(
-      (data: Array<any>) => {
-        this.metrics = data;
-      }
-    );
+    from(this.analyze.getSemanticLayerData()).subscribe((data: Array<any>) => {
+      this.metrics = data;
+    });
   }
 
   ngOnDestroy() {
@@ -52,13 +49,13 @@ export class WidgetMetricComponent implements OnInit, OnDestroy {
 
   onLoadMetricArtifacts(semanticId: string) {
     const metric = find(this.metrics, m => m.id === semanticId);
-    if (!metric || metric.kpiColumns) { return; }
+    if (!metric || metric.kpiColumns) {
+      return;
+    }
 
-    this.observe.getArtifacts({ semanticId }).subscribe(
-      data => {
-        this.applyArtifactsToMetric(metric, data);
-      }
-    );
+    this.observe.getArtifacts({ semanticId }).subscribe(data => {
+      this.applyArtifactsToMetric(metric, data);
+    });
   }
 
   applyArtifactsToMetric(metric, metricData) {

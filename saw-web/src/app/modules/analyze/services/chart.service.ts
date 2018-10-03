@@ -287,12 +287,12 @@ export class ChartService {
     }
   }
 
-  splitToSeriesAndCategories(parsedData, fields, { sorts }, type) {
+  splitToSeriesAndCategories(parsedData, fields, { sorts }, chartType) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
-    const isHighStock = type.substring(0, 2) === 'ts';
+    const isHighStock = chartType.substring(0, 2) === 'ts';
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
     if (!isHighStock) {
@@ -303,13 +303,13 @@ export class ChartService {
       this.formatDatesIfNeeded(parsedData, dateFields);
     }
     if (areMultipleYAxes) {
-      series = this.splitSeriesByYAxes(parsedData, fields, type);
+      series = this.splitSeriesByYAxes(parsedData, fields, chartType);
     } else if (isGrouped) {
       series = this.splitSeriesByGroup(parsedData, fields);
     } else {
       const axesFieldNameMap = this.getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [this.getSerie(yField, 0, fields.y, type)];
+      series = [this.getSerie(yField, 0, fields.y, chartType)];
       series[0].data = map(parsedData, dataPoint =>
         mapValues(axesFieldNameMap, val => dataPoint[val])
       );
@@ -333,10 +333,7 @@ export class ChartService {
         const field =
           filter(
             fieldsArray,
-            field =>
-              (typeof field.checked === 'string'
-                ? field.checked
-                : field.area) === k
+            f => (typeof f.checked === 'string' ? f.checked : f.area) === k
           )[0] || {};
         const sortField =
           filter(
@@ -746,8 +743,8 @@ export class ChartService {
     return changes;
   }
 
-  getYAxesChanges(type, fields, opts) {
-    const panes = fields.length;
+  getYAxesChanges(type, axisFields, opts) {
+    const panes = axisFields.length;
     const labelHeight = 15;
     if (type !== 'tsPane') {
       const changes = fpPipe(
@@ -787,7 +784,7 @@ export class ChartService {
             }
           };
         })
-      )(fields);
+      )(axisFields);
 
       forEach(changes, (change, changeIndex) => {
         if (changeIndex === 0) {
@@ -795,7 +792,7 @@ export class ChartService {
         }
         if (change.columnName) {
           const fieldIndex = findIndex(
-            fields,
+            axisFields,
             ({ columnName }) => columnName === change.columnName
           );
           const style = { color: CHART_COLORS[fieldIndex] };
@@ -805,13 +802,13 @@ export class ChartService {
       });
       return changes;
     }
-    const changes = [];
-    forEach(fields, (field, index) => {
+    const chartChanges = [];
+    forEach(axisFields, (field, index) => {
       const titleText =
         field.alias ||
         field.aliasName ||
         `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
-      changes.push({
+      chartChanges.push({
         labels: {
           align: 'right',
           x: -3
@@ -833,7 +830,7 @@ export class ChartService {
         }
       });
     });
-    return changes;
+    return chartChanges;
   }
 
   paneTopPercent(panes, index) {
@@ -955,10 +952,10 @@ export class ChartService {
     return concat(changes, this.addTooltipsAndLegend(fields, type, opts));
   }
 
-  addTooltipsAndLegend(fields, type, opts) {
+  addTooltipsAndLegend(fields, chartType, opts) {
     const changes = [];
 
-    if (!this.getViewOptionsFor(type).customTooltip) {
+    if (!this.getViewOptionsFor(chartType).customTooltip) {
       return changes;
     }
 
@@ -1000,7 +997,7 @@ export class ChartService {
         ? xIsString ? point.key : xIsNumber ? round(point.x, 2) : point.x
         : xIsString ? 'point.key' : xIsNumber ? 'point.x:,.2f' : 'point.x';
 
-      const xAxisString = `<tr>
+      const xString = `<tr>
         <th>${fields.x.alias ||
           fields.x.aliasName ||
           get(opts, 'labels.x', '') ||
@@ -1008,7 +1005,7 @@ export class ChartService {
         <td>{${xStringValue}}</td>
       </tr>`;
 
-      const yAxisString = `<tr>
+      const yString = `<tr>
         <th>${fields.y.alias ||
           fields.y.aliasName ||
           get(opts, 'labels.y', '') ||
@@ -1027,7 +1024,7 @@ export class ChartService {
       }</td>
       </tr>`;
 
-      const zAxisString = fields.z
+      const zString = fields.z
         ? `<tr><th>${fields.z.alias ||
             fields.z.aliasName ||
             get(opts, 'labels.z', '') ||
@@ -1036,17 +1033,17 @@ export class ChartService {
           }</td></tr>`
         : '';
 
-      const groupString = fields.g
+      const gString = fields.g
         ? `<tr><th>Group:</th><td>${
             point ? point.g || point.name : '{point.g}'
           }</td></tr>`
         : '';
 
       return {
-        xAxisString,
-        yAxisString,
-        zAxisString,
-        groupString
+        xAxisString: xString,
+        yAxisString: yString,
+        zAxisString: zString,
+        groupString: gString
       };
     };
 
@@ -1065,23 +1062,18 @@ export class ChartService {
         ${zAxisString}
         ${groupString}`,
       pointFormatter: function() {
-        // eslint-disable-line
-        const {
-          xAxisString,
-          yAxisString,
-          zAxisString,
-          groupString
-        } = tooltipFormatter(this);
-        return `${xIsNumber ? xAxisString : ''}
-          ${yAxisString}
-          ${zAxisString}
-          ${groupString}`;
+        // tslint-disable-line
+        const axisStrings = tooltipFormatter(this);
+        return `${xIsNumber ? axisStrings.xAxisString : ''}
+          ${axisStrings.yAxisString}
+          ${axisStrings.zAxisString}
+          ${axisStrings.groupString}`;
       },
       footerFormat: '</table>',
       followPointer: true
     };
 
-    if (type.substring(0, 2) === 'ts') {
+    if (chartType.substring(0, 2) === 'ts') {
       tooltipObj = {
         enabled: true,
         useHTML: true,

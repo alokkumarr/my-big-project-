@@ -9,18 +9,10 @@ import { DesignerStates, CHART_TYPES_OBJ } from '../consts';
 import { SqlBuilderChart, Sort } from '../types';
 import { ChartService } from '../../services/chart.service';
 
-const style = require('./designer-chart.component.scss');
 @Component({
   selector: 'designer-chart',
   templateUrl: './designer-chart.component.html',
-  styles: [
-    `:host {
-      display: block;
-      height: calc(100% - 20px);
-      width: calc(100% - 20px);
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-chart.component.scss']
 })
 export class DesignerChartComponent implements OnInit {
   _sqlBuilder: SqlBuilderChart;

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
@@ -43,27 +43,14 @@ import {
 import { AnalyzeDialogService } from '../../services/analyze-dialog.service';
 import { ChartService } from '../../services/chart.service';
 
-const style = require('./designer-container.component.scss');
-
 const GLOBAL_FILTER_SUPPORTED = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'designer-container',
   templateUrl: './designer-container.component.html',
-  styles: [
-    `:host {
-      background-color: white;
-      max-height: 100vh;
-      max-width: 100vw;
-      display: grid;
-      grid-template:
-        "header" 5vh
-        "content" 94vh;
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-container.component.scss']
 })
-export class DesignerContainerComponent {
+export class DesignerContainerComponent implements OnInit {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
@@ -130,6 +117,7 @@ export class DesignerContainerComponent {
           this.requestDataIfPossible();
         }
       });
+      break;
     default:
       break;
     }
@@ -242,13 +230,15 @@ export class DesignerContainerComponent {
   }
 
   checkNodeForSorts() {
-    if ((this.analysisStarter || this.analysis).type !== 'chart') { return; }
+    if ((this.analysisStarter || this.analysis).type !== 'chart') {
+      return;
+    }
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
     forEach(sqlBuilder.nodeFields, node => {
       const identical = false;
       forEach(this.sorts || [], sort => {
         const hasSort = this.sorts.some(
-          sort => node.columnName === sort.columnName
+          sortCol => node.columnName === sortCol.columnName
         );
         if (!hasSort) {
           this.sorts.push({
@@ -262,7 +252,9 @@ export class DesignerContainerComponent {
   }
 
   addDefaultSorts() {
-    if ((this.analysisStarter || this.analysis).type !== 'chart') { return; }
+    if ((this.analysisStarter || this.analysis).type !== 'chart') {
+      return;
+    }
 
     const sqlBuilder = this.getSqlBuilder() as SqlBuilderChart;
 
@@ -312,7 +304,6 @@ export class DesignerContainerComponent {
     this.data = cloneDeep(this.data);
   }
 
-
   requestDataIfPossible() {
     this.areMinRequirmentsMet = this.canRequestData();
     if (this.areMinRequirmentsMet) {
@@ -337,9 +328,9 @@ export class DesignerContainerComponent {
       }
     });
 
-    forEach(this.analysis.sqlBuilder.filters, filter => {
-      if (filter.isRuntimeFilter) {
-        delete filter.model;
+    forEach(this.analysis.sqlBuilder.filters, filt => {
+      if (filt.isRuntimeFilter) {
+        delete filt.model;
       }
     });
 
@@ -426,7 +417,9 @@ export class DesignerContainerComponent {
           const shouldClose = result.action === 'saveAndClose';
           this.onSave.emit({
             requestExecution: shouldClose,
-            analysis: result.analysis.type === 'report' ? this._designerService.generateRequestPayload(cloneDeep(result.analysis)) : result.analysis
+            analysis: result.analysis.type === 'report' ?
+              this._designerService.generateRequestPayload(cloneDeep(result.analysis)) :
+              result.analysis
           });
           if (!shouldClose) {
             this.requestDataIfPossible();
@@ -581,7 +574,7 @@ export class DesignerContainerComponent {
       break;
     case 'aggregate':
       forEach(this.analysis.artifacts[0].columns, col => {
-        if (col.name == event.column.name) {
+        if (col.name === event.column.name) {
           col.aggregate = event.column.aggregate;
         }
       });
@@ -593,6 +586,9 @@ export class DesignerContainerComponent {
         });
       }
       this.data = cloneDeep(this.data);
+      this.areMinRequirmentsMet = this.canRequestData();
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+      break;
     case 'filterRemove':
     case 'joins':
     case 'changeQuery':
@@ -669,6 +665,9 @@ export class DesignerContainerComponent {
       this.cleanSorts();
       this.addDefaultSorts();
       this.requestDataIfPossible();
+      this.updateAnalysis();
+      this.refreshDataObject();
+      break;
     case 'comboType':
       this.updateAnalysis();
       this.refreshDataObject();

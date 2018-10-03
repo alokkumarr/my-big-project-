@@ -1,5 +1,9 @@
 @import "src/themes/base/colors";
 
+:host {
+  width: 100%;
+}
+
 mat-tab-group {
   max-width: 100%;
 }

@@ -16,18 +16,10 @@ import * as map from 'lodash/map';
 import { AceEditorComponent } from 'ng2-ace-editor';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./sql-script.component.scss');
-
 @Component({
   selector: 'sql-script',
   templateUrl: './sql-script.component.html',
-  styles: [
-    `:host {
-      height: 100%;
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./sql-script.component.scss']
 })
 export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @Output() onExecute = new EventEmitter<any>();
@@ -39,7 +31,8 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   public query: string;
   public readOnlyMode: boolean = false; // tslint:disable-line
 
-  public editorOptions = { // tslint:disable-line
+  public editorOptions = {
+    // tslint:disable-line
     displayIndentGuides: true,
     enableBasicAutocompletion: true, // the editor completes the statement when you hit Ctrl + Space
     enableLiveAutocompletion: true, // the editor completes the statement while you are typing
@@ -53,7 +46,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   public langTools = ace.acequire('ace/ext/language_tools');
   public completions = [];
 
-  constructor(private workBench: WorkbenchService) { }
+  constructor(private workBench: WorkbenchService) {}
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -72,7 +65,8 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
     ]);
   }
 
-  @Input() set artifacts(tables) {
+  @Input()
+  set artifacts(tables) {
     if (!isEmpty(tables)) {
       this._artifacts = tables;
       this.generateCompletions();
@@ -124,21 +118,25 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
         }
 
         const matchingCompletions = withCompleter.filter(
-          match => (match.caption || match.name).toLowerCase().indexOf(prefix.toLowerCase()) >= 0
+          match =>
+            (match.caption || match.name)
+              .toLowerCase()
+              .indexOf(prefix.toLowerCase()) >= 0
         );
 
         return callback(null, cloneDeep(matchingCompletions));
       },
 
       insertMatch: (editor, data) => {
-        editor.completer.insertMatch({ value: data.insertValue || data.value || data });
+        editor.completer.insertMatch({
+          value: data.insertValue || data.value || data
+        });
       }
     };
     this.langTools.addCompleter(artifactsCompleter);
   }
 
-  queryUpdated(query) {
-  }
+  queryUpdated(query) {}
 
   onCreateEmitter() {
     this.onCreate.emit(this.query);

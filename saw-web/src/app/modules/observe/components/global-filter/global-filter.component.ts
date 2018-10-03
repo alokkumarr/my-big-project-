@@ -16,23 +16,10 @@ import * as find from 'lodash/find';
 
 import { NUMBER_TYPES, DATE_TYPES } from '../../../../common/consts';
 
-const style = require('./global-filter.component.scss');
-
 @Component({
   selector: 'global-filter',
   templateUrl: './global-filter.component.html',
-  styles: [
-    `:host {
-      background-color: whitesmoke;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 400px;
-      padding: 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./global-filter.component.scss']
 })
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   @Output() onApplyFilter = new EventEmitter();

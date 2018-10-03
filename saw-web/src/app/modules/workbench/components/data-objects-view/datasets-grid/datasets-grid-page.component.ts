@@ -1,29 +1,26 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  ViewChild
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { DxDataGridComponent } from 'devextreme-angular';
 
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./datasets-grid-page.component.scss');
-
 @Component({
   selector: 'datasets-grid-page',
   templateUrl: './datasets-grid-page.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }`,
-    style
-  ]
+  styleUrls: ['./datasets-grid-page.component.scss']
 })
-export class DatasetsGridPageComponent implements OnInit {
-  @Input()
-  searchTerm: string;
-  @Input()
-  updater: BehaviorSubject<any>;
+export class DatasetsGridPageComponent
+  implements OnInit, AfterViewInit, OnDestroy {
+  @Input() searchTerm: string;
+  @Input() updater: BehaviorSubject<any>;
   public gridConfig: Array<any>;
   public updaterSubscribtion: any;
 
@@ -32,8 +29,7 @@ export class DatasetsGridPageComponent implements OnInit {
     public workbench: WorkbenchService
   ) {}
 
-  @ViewChild(DxDataGridComponent)
-  dataGrid: DxDataGridComponent;
+  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
 
   ngOnInit() {
     this.gridConfig = this.getGridConfig();

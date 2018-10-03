@@ -2,22 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
-const style = require ('./login.component.scss');
-
 @Component({
   selector: 'login-form',
   templateUrl: './login.component.html',
-  styles: [style]
+  styleUrls: ['./login.component.scss']
 })
-
 export class LoginComponent implements OnInit {
-
   constructor(
     public _JwtService: JwtService,
     public _UserService: UserService,
     public _router: Router,
     public _route: ActivatedRoute
-    ) {}
+  ) {}
 
   public dataHolder = {
     username: null,
@@ -29,7 +25,7 @@ export class LoginComponent implements OnInit {
   };
 
   ngOnInit() {
-    this._route.queryParams.subscribe(({changePassMsg}) => {
+    this._route.queryParams.subscribe(({ changePassMsg }) => {
       if (changePassMsg) {
         this.states.error = changePassMsg;
       }
@@ -41,15 +37,13 @@ export class LoginComponent implements OnInit {
       masterLoginId: this.dataHolder.username,
       authpwd: this.dataHolder.password
     };
-    this._UserService.attemptAuth(params).then(
-      data => {
-        if (this._JwtService.isValid(data)) {
-          this._router.navigate(['']);
-        } else {
-          this.states.error = this._JwtService.getValidityReason(data);
-        }
+    this._UserService.attemptAuth(params).then(data => {
+      if (this._JwtService.isValid(data)) {
+        this._router.navigate(['']);
+      } else {
+        this.states.error = this._JwtService.getValidityReason(data);
       }
-    );
+    });
   }
 
   reset() {

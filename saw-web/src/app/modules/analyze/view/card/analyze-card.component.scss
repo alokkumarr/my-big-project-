@@ -1,5 +1,10 @@
 @import "src/themes/base/colors";
 
+:host {
+  display: block;
+  margin: 5px;
+}
+
 .saw-ac-placeholder {
   height: 159px;
   width: 434px;

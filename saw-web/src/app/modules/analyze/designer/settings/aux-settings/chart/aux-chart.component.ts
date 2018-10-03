@@ -1,8 +1,13 @@
-import { Component, Output, EventEmitter, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  Output,
+  EventEmitter,
+  Input,
+  OnInit,
+  AfterViewInit
+} from '@angular/core';
 import { ChartService } from '../../../../services/chart.service';
 import * as isEmpty from 'lodash/isEmpty';
-
-const style = require('./aux-chart.component.scss');
 
 const INVERTING_OPTIONS = [
   {
@@ -20,15 +25,10 @@ const INVERTING_OPTIONS = [
 @Component({
   selector: 'designer-settings-aux-chart',
   templateUrl: './aux-chart.component.html',
-  styles: [
-    `:host {
-      display: block;
-      margin: 0 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./aux-chart.component.scss']
 })
-export class DesignerSettingsAuxChartComponent implements OnInit {
+export class DesignerSettingsAuxChartComponent
+  implements OnInit, AfterViewInit {
   @Input() chartType: string;
   @Input() isInverted: boolean;
   @Input() chartTitle: string;
@@ -45,7 +45,9 @@ export class DesignerSettingsAuxChartComponent implements OnInit {
 
   @Input('legend')
   set analysisLegend(data: any) {
-    if (!data) { return; }
+    if (!data) {
+      return;
+    }
 
     this.legend = this.legend || {};
     this.legend.align = data.align;

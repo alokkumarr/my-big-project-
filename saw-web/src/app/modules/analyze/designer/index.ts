@@ -21,8 +21,8 @@ import {
 } from './settings';
 import { DesignerSortComponent } from './sort';
 import {
-  SingleTableDesignerLayout,
-  MultiTableDesignerLayout
+  SingleTableDesignerLayoutComponent,
+  MultiTableDesignerLayoutComponent
 } from './layout';
 import { AnalyzeReportQueryComponent } from './query';
 import { DesignerSaveComponent } from './save';
@@ -54,8 +54,8 @@ export {
   DesignerDescriptionComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
-  SingleTableDesignerLayout,
-  MultiTableDesignerLayout,
+  SingleTableDesignerLayoutComponent,
+  MultiTableDesignerLayoutComponent,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 };
