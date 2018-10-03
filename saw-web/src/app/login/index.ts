@@ -1,5 +1,4 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -32,7 +31,6 @@ const GUARDS = [IsUserNotLoggedInGuard];
 @NgModule({
   imports: [
     RouterModule.forChild(routes),
-    BrowserModule,
     HttpClientModule,
     FormsModule,
     MaterialModule,

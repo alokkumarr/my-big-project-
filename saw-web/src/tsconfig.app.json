@@ -7,6 +7,11 @@
       "node"
     ]
   },
+  "files": [
+    "main.ts",
+    "polyfills.ts",
+    "app/modules/observe/observe.module.ts"
+  ],
   "exclude": [
     "test.ts",
     "**/*.spec.ts",
