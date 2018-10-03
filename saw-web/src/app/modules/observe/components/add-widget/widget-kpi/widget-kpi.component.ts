@@ -6,11 +6,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder,
-  Validators
-} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { nonEmpty } from '../../../validators/non-empty.validator';
 
@@ -35,12 +31,10 @@ import {
   KPI_BG_COLORS
 } from '../../../consts';
 
-const style = require('./widget-kpi.component.scss');
-
 @Component({
   selector: 'widget-kpi',
   templateUrl: './widget-kpi.component.html',
-  styles: [style]
+  styleUrls: ['./widget-kpi.component.scss']
 })
 export class WidgetKPIComponent implements OnInit, OnDestroy {
   _kpi: any;
@@ -151,7 +145,9 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    */
   @Input()
   set metric(data: any) {
-    if (!data) { return; }
+    if (!data) {
+      return;
+    }
     this._metric = data;
     const kpiDateField = get(this._kpi, 'filters.0.columnName');
 
@@ -164,7 +160,9 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    */
   @Input()
   set type(data: any) {
-    if (!data) { return; }
+    if (!data) {
+      return;
+    }
     this._kpiType = data;
   }
 
@@ -173,7 +171,9 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
    */
   @Input()
   set kpi(data: any) {
-    if (!data) { return; }
+    if (!data) {
+      return;
+    }
 
     this._kpi = data;
 
@@ -240,7 +240,9 @@ export class WidgetKPIComponent implements OnInit, OnDestroy {
       preset: this.kpiForm.get('filter').value
     };
 
-    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) { return model; }
+    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) {
+      return model;
+    }
 
     // Adding static time signatures until we allow users to choose time
     // for `to` and `from` fields.

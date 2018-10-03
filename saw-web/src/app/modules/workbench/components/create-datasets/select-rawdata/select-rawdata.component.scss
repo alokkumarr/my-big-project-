@@ -1,6 +1,10 @@
 @import "src/themes/base/colors";
 @import '~angular-tree-component/dist/angular-tree-component.css';
 
+:host {
+  width: 100%;
+}
+
 .select-view {
   height: calc(100% - 43px);
 

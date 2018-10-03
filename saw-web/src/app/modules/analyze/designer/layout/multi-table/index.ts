@@ -1,1 +1,3 @@
-export { MultiTableDesignerLayout } from './multi-table-designer-layout.component';
+export {
+  MultiTableDesignerLayoutComponent
+} from './multi-table-designer-layout.component';

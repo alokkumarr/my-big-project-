@@ -29,10 +29,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as filter from 'lodash/filter';
 
-import {
-  AGGREGATE_TYPES,
-  AGGREGATE_TYPES_OBJ
-} from '../../consts';
+import { AGGREGATE_TYPES, AGGREGATE_TYPES_OBJ } from '../../consts';
 
 import {
   ArtifactColumnReport,
@@ -40,13 +37,8 @@ import {
   Sort,
   ReportGridChangeEvent
 } from './types';
-import {
-  DATE_TYPES,
-  NUMBER_TYPES
-} from '../../../modules/analyze/consts';
+import { DATE_TYPES, NUMBER_TYPES } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
-
-const style = require('./report-grid.component.scss');
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -78,22 +70,17 @@ let self; // needed to access component context from dx callbacks
 @Component({
   selector: 'report-grid-upgraded',
   templateUrl: './report-grid.component.html',
-  styles: [style]
+  styleUrls: ['./report-grid.component.scss']
 })
 export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
   public listeners: Array<Subscription> = [];
-  @Output()
-  change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent)
-  dataGrid: DxDataGridComponent;
-  @Input()
-  query: string;
-  @Input()
-  analysis;
-  @Input()
-  dimensionChanged: BehaviorSubject<any>;
+  @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
+  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
+  @Input() query: string;
+  @Input() analysis;
+  @Input() dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     this.sorts = reduce(
@@ -135,7 +122,6 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
   @Input('data')
   set setData(data: any[]) {
-
     if (data || data.length < 7) {
       this.gridHeight = 'auto';
     } else {
@@ -164,10 +150,8 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       throw new Error('Data loader requires a Function');
     }
   }
-  @Input()
-  isEditable = false;
-  @Input()
-  columnHeaders;
+  @Input() isEditable = false;
+  @Input() columnHeaders;
 
   public dataLoader: (
     options: {}
@@ -324,10 +308,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   }
 
   checkFormatDataCondition(type) {
-    if (
-      NUMBER_TYPES.includes(type) ||
-      DATE_TYPES.includes(type)
-    ) {
+    if (NUMBER_TYPES.includes(type) || DATE_TYPES.includes(type)) {
       return true;
     } else {
       return false;

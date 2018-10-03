@@ -45,8 +45,8 @@ import {
   DesignerDescriptionComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
-  SingleTableDesignerLayout,
-  MultiTableDesignerLayout,
+  SingleTableDesignerLayoutComponent,
+  MultiTableDesignerLayoutComponent,
   DesignerService,
   ArtifactColumns2PivotFieldsPipe
 } from './designer';
@@ -82,8 +82,8 @@ const COMPONENTS = [
   DesignerDescriptionComponent,
   DesignerSaveComponent,
   DesignerPreviewDialogComponent,
-  SingleTableDesignerLayout,
-  MultiTableDesignerLayout,
+  SingleTableDesignerLayoutComponent,
+  MultiTableDesignerLayoutComponent,
   AnalyzePageComponent
 ];
 

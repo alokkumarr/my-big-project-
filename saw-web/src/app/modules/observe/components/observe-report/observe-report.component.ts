@@ -15,19 +15,10 @@ import {
   EXECUTION_MODES
 } from '../../../analyze/services/analyze.service';
 
-const style = require('./observe-report.component.scss');
-
 @Component({
   selector: 'observe-report',
   templateUrl: './observe-report.component.html',
-  styles: [
-    `:host {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./observe-report.component.scss']
 })
 export class ObserveReportComponent implements OnDestroy {
   @Input() item: GridsterItem;
@@ -43,9 +34,7 @@ export class ObserveReportComponent implements OnDestroy {
 
   dataLoader = this.loadData.bind(this);
 
-  constructor(
-    public analyzeService: AnalyzeService
-  ) {}
+  constructor(public analyzeService: AnalyzeService) {}
 
   ngOnDestroy() {
     this.listeners.forEach(sub => sub.unsubscribe());

@@ -11,27 +11,18 @@ import { DesignerSaveEvent } from '../../designer/types';
 import { Analysis, AnalysisChart, AnalyzeViewActionEvent } from '../types';
 import { JwtService } from '../../../../common/services';
 
-const style = require('./analyze-card.component.scss');
-
 @Component({
   selector: 'analyze-card',
   templateUrl: './analyze-card.component.html',
-  styles: [
-    `:host {
-      display: block;
-      margin: 5px;
-    }`,
-    style
-  ]
+  styleUrls: ['./analyze-card.component.scss']
 })
-
 export class AnalyzeCardComponent implements OnInit {
-
   @Output() action: EventEmitter<AnalyzeViewActionEvent> = new EventEmitter();
   @Input() analysis: Analysis;
   @Input() analysisType: string;
   @Input() highlightTerm: string;
-  @Input() set cronJobs(cronJobs: any) {
+  @Input()
+  set cronJobs(cronJobs: any) {
     this.schedule = generateSchedule(cronJobs, this.analysis.id);
   }
 
@@ -57,7 +48,9 @@ export class AnalyzeCardComponent implements OnInit {
     });
     const { type, id, chartType } = this.analysis as AnalysisChart;
     this.placeholderClass = `m-${type}${chartType ? `-${chartType}` : ''}`;
-    this.typeIdentifier = `analysis-type:${type}${chartType ? `:${chartType}` : ''}`;
+    this.typeIdentifier = `analysis-type:${type}${
+      chartType ? `:${chartType}` : ''
+    }`;
 
     this._executeService.subscribe(id, this.onExecutionsEvent);
   }
@@ -93,7 +86,7 @@ export class AnalyzeCardComponent implements OnInit {
     });
   }
 
-  afterEdit({analysis, requestExecution}: DesignerSaveEvent) {
+  afterEdit({ analysis, requestExecution }: DesignerSaveEvent) {
     this.action.emit({
       action: 'edit',
       analysis,
@@ -101,14 +94,16 @@ export class AnalyzeCardComponent implements OnInit {
     });
   }
 
-  fork(analysis) {
-    this._analyzeActionsService.fork(analysis).then(({analysis, requestExecution}: DesignerSaveEvent) => {
-      this.action.emit({
-        action: 'fork',
-        analysis,
-        requestExecution
+  fork(an) {
+    this._analyzeActionsService
+      .fork(an)
+      .then(({ analysis, requestExecution }: DesignerSaveEvent) => {
+        this.action.emit({
+          action: 'fork',
+          analysis,
+          requestExecution
+        });
       });
-    });
   }
 
   getType(type) {

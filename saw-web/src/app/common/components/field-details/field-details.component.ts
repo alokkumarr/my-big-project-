@@ -1,18 +1,10 @@
 import { Component, Input } from '@angular/core';
 import * as forEach from 'lodash/forEach';
 
-const style = require('./field-details.component.scss');
-
 @Component({
   selector: 'field-details',
   templateUrl: './field-details.component.html',
-  styles: [
-    `:host {
-      display: grid;
-      margin-bottom: 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./field-details.component.scss']
 })
 export class FieldDetailsComponent {
   public dataFields: any[] = [];
@@ -21,7 +13,9 @@ export class FieldDetailsComponent {
 
   @Input()
   set artifactColumns(columns) {
-    if (!Array.isArray(columns)) { return; }
+    if (!Array.isArray(columns)) {
+      return;
+    }
 
     this.dataFields = [];
     this.columnFields = [];

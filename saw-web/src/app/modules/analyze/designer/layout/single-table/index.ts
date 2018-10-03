@@ -1,1 +1,3 @@
-export { SingleTableDesignerLayout } from './single-table-designer-layout.component';
+export {
+  SingleTableDesignerLayoutComponent
+} from './single-table-designer-layout.component';

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Analysis, ArtifactColumns } from '../types';
 import { DesignerService } from '../designer.service';
@@ -13,20 +13,12 @@ import * as orderBy from 'lodash/orderBy';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 
-const style = require('./designer-preview-dialog.component.scss');
-
 @Component({
   selector: 'designer-preview-dialog',
   templateUrl: './designer-preview-dialog.component.html',
-  styles: [
-    `:host {
-      width: 100vw;
-      height: 100vh;
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-preview-dialog.component.scss']
 })
-export class DesignerPreviewDialogComponent {
+export class DesignerPreviewDialogComponent implements OnInit {
   public previewData = null;
   public artifactColumns: ArtifactColumns;
   public analysis: Analysis;
@@ -56,13 +48,13 @@ export class DesignerPreviewDialogComponent {
             execId,
             {...options, analysisType: this.analysis.type, executionType: 'onetime'}
           )
-            .then(({data, count}) => ({data, totalCount: count}));
+            .then(result => ({data: result.data, totalCount: result.count}));
         } else {
           return this._designerService
             .getDataForAnalysisPreview(this.analysis, options)
-            .then(({ data, executionId, count }) => {
-              execId = executionId;
-              return { data: data, totalCount: count };
+            .then(result => {
+              execId = result.executionId;
+              return { data: result.data, totalCount: result.count };
             });
         }
       };

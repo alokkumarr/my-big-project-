@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { timer } from 'rxjs';
 import { Router } from '@angular/router';
@@ -9,19 +8,11 @@ import { DxDataGridComponent } from 'devextreme-angular';
 
 import * as isUndefined from 'lodash/isUndefined';
 
-const style = require('./dataset-detail-view.component.scss');
-
 @Component({
   selector: 'dataset-detail-view',
   templateUrl: './dataset-detail-view.component.html',
-  styles: [
-    `:host {
-      'class': 'dataset-detail-view'
-    }`,
-    style
-  ]
+  styleUrls: ['./dataset-detail-view.component.scss']
 })
-
 export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   public dsMetadata;
   public timer;
@@ -51,7 +42,10 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (!isUndefined(this.timerSubscription) && !this.timerSubscription.isStopped) {
+    if (
+      !isUndefined(this.timerSubscription) &&
+      !this.timerSubscription.isStopped
+    ) {
       this.stopPolling();
     }
     this.workBench.removeDataFromLS('dsMetadata');
@@ -62,16 +56,18 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
   }
 
   triggerPreview() {
-    this.workBench.triggerDatasetPreview(this.dsMetadata.system.name).subscribe((data) => {
-      this.previewStatus = 'queued';
-      if (!isUndefined(data.id)) {
-        this.startPolling(data.id);
-      }
-    });
+    this.workBench
+      .triggerDatasetPreview(this.dsMetadata.system.name)
+      .subscribe(data => {
+        this.previewStatus = 'queued';
+        if (!isUndefined(data.id)) {
+          this.startPolling(data.id);
+        }
+      });
   }
 
   getPreview(id) {
-    this.workBench.getDatasetPreviewData(id).subscribe((data) => {
+    this.workBench.getDatasetPreviewData(id).subscribe(data => {
       this.previewStatus = data.status;
       if (this.previewStatus === 'success') {
         this.previewData = data.rows;
@@ -89,7 +85,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
    * Calls list datasets api onInit and every 10 seconds or whatever set interval
    *
    * @memberof DatasetsComponent
-  */
+   */
   startPolling(id) {
     this.timer = timer(0, this.interval);
     this.timerSubscription = this.timer.subscribe(() => {
@@ -103,7 +99,7 @@ export class DatasetDetailViewComponent implements OnInit, OnDestroy {
     this.poll = false;
   }
 
-  tabChanged = (event): void => {
+  tabChanged(event): void {
     if (event.index === 1 && this.previewStatus === 'success') {
       this.dataGrid.instance.refresh();
     }

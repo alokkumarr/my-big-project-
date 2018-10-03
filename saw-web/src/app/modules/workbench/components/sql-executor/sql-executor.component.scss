@@ -1,5 +1,9 @@
 @import "src/themes/base/colors";
 
+:host {
+  class: 'sql-executor'
+}
+
 sql-executor {
   width: 100%;
   height: calc(100% - 10px);

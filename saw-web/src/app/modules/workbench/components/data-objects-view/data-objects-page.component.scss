@@ -1,5 +1,9 @@
 @import 'src/themes/base/colors';
 
+:host {
+  width: 100%;
+}
+
 .action-buttons {
   .mat-icon-button {
     font-size: 22px;

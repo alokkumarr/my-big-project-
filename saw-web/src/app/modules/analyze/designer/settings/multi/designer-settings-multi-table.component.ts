@@ -9,17 +9,10 @@ import {
   DesignerChangeEvent
 } from '../../types';
 
-const style = require('./designer-settings-multi-table.component.scss');
-
 @Component({
   selector: 'designer-settings-multi-table',
   templateUrl: './designer-settings-multi-table.component.html',
-  styles: [
-    `:host {
-      'class': 'designer-settings-multi-table'
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-settings-multi-table.component.scss']
 })
 export class DesignerSettingsMultiTableComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();

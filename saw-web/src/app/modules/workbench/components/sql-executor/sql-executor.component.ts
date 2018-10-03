@@ -13,17 +13,10 @@ import { SqlScriptComponent } from './query/sql-script.component';
 import { DetailsDialogComponent } from './dataset-details-dialog/details-dialog.component';
 import { WorkbenchService } from '../../services/workbench.service';
 
-const style = require('./sql-executor.component.scss');
-
 @Component({
   selector: 'sql-executor',
   templateUrl: './sql-executor.component.html',
-  styles: [
-    `:host {
-      'class': 'sql-executor'
-    }`,
-    style
-  ]
+  styleUrls: ['./sql-executor.component.scss']
 })
 export class SqlExecutorComponent implements OnInit, OnDestroy {
   public artifacts = [];

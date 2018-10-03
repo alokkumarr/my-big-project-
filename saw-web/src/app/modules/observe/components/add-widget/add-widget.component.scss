@@ -1,5 +1,12 @@
 @import 'src/themes/base/colors';
 
+:host {
+  background-color: whitesmoke;
+  display: block;
+  min-height: 100%;
+  max-width: 400px;
+}
+
 mat-horizontal-stepper.mat-stepper-horizontal {
   background-color: transparent;
 

@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { JwtService, UserService } from '../../../common/services';
 
-require('./password-change.component.scss');
-
 @Component({
   selector: 'password-change',
-  templateUrl: 'password-change.component.html'
+  templateUrl: 'password-change.component.html',
+  styleUrls: ['./password-change.component.scss']
 })
 export class PasswordChangeComponent {
   constructor(

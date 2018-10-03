@@ -1,4 +1,3 @@
-
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -10,19 +9,11 @@ import * as isUndefined from 'lodash/isUndefined';
 import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./dataset-details.component.scss');
-
 @Component({
   selector: 'dataset-details',
   templateUrl: './dataset-details.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./dataset-details.component.scss']
 })
-
 export class DatasetDetailsComponent implements OnInit {
   @Input() selFiles: Array<any>;
   @Input() previewConfig: any;
@@ -30,10 +21,7 @@ export class DatasetDetailsComponent implements OnInit {
   public detailsFormGroup: FormGroup;
   public lineSeperator = 'lineFeed';
 
-  constructor(
-    public dialog: MatDialog,
-    public workBench: WorkbenchService
-  ) { }
+  constructor(public dialog: MatDialog, public workBench: WorkbenchService) {}
 
   @Output() onDetailsFilled: EventEmitter<any> = new EventEmitter<any>();
 
@@ -54,7 +42,10 @@ export class DatasetDetailsComponent implements OnInit {
       if (status === 'VALID') {
         this.onFormValid(this.detailsFormGroup.value);
       } else {
-        this.onDetailsFilled.emit({ detailsFilled: false, details: this.previewConfig });
+        this.onDetailsFilled.emit({
+          detailsFilled: false,
+          details: this.previewConfig
+        });
       }
     });
   }
@@ -98,7 +89,10 @@ export class DatasetDetailsComponent implements OnInit {
 
   onFormValid(data) {
     if (!isUndefined(this.selFiles)) {
-      this.onDetailsFilled.emit({ detailsFilled: true, details: this.previewConfig });
+      this.onDetailsFilled.emit({
+        detailsFilled: true,
+        details: this.previewConfig
+      });
     }
   }
 
@@ -115,6 +109,9 @@ export class DatasetDetailsComponent implements OnInit {
     this.previewConfig.headerSize = this.detailsFormGroup.value.hederSizeControl;
     this.previewConfig.quoteEscapeChar = this.detailsFormGroup.value.escapeCharControl;
     this.previewConfig.quoteChar = this.detailsFormGroup.value.quoteCharControl;
-    this.onDetailsFilled.emit({ detailsFilled: true, details: this.previewConfig });
+    this.onDetailsFilled.emit({
+      detailsFilled: true,
+      details: this.previewConfig
+    });
   }
 }

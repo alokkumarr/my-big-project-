@@ -2,6 +2,10 @@
 
 $back-button-size: 32px;
 
+:host {
+  width: 100%;
+}
+
 filter-chips-u {
   padding: 10px 0 10px 10px;
 }

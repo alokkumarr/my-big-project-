@@ -11,8 +11,6 @@ import { MatSidenav } from '@angular/material/sidenav';
 import * as clone from 'lodash/clone';
 import { ObserveService } from '../../services/observe.service';
 
-const style = require('./add-widget.component.scss');
-
 import {
   widgetTypes as wTypes,
   Widget,
@@ -23,15 +21,7 @@ import {
 @Component({
   selector: 'add-widget',
   templateUrl: './add-widget.component.html',
-  styles: [
-    `:host {
-      background-color: whitesmoke;
-      display: block;
-      min-height: 100%;
-      max-width: 400px;
-    }`,
-    style
-  ]
+  styleUrls: ['./add-widget.component.scss']
 })
 export class AddWidgetComponent implements OnInit {
   widgetTypes = wTypes;

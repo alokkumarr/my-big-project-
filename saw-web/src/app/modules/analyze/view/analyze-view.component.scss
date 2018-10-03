@@ -1,5 +1,9 @@
 @import "src/themes/base/colors";
 
+:host {
+  width: 100%;
+}
+
 .category-title {
   color: $grey-text-color;
   font-weight: bold;

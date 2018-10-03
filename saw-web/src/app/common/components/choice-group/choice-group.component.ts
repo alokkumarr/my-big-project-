@@ -1,7 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-const style = require('./choice-group.component.scss');
-
 interface IChoiceGroupItem {
   label: string;
   disabled: boolean;
@@ -11,7 +9,7 @@ interface IChoiceGroupItem {
 @Component({
   selector: 'choice-group-u',
   templateUrl: './choice-group.component.html',
-  styles: [style]
+  styleUrls: ['./choice-group.component.scss']
 })
 export class ChoiceGroupComponent {
   @Output() change: EventEmitter<IChoiceGroupItem> = new EventEmitter();

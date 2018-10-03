@@ -8,11 +8,10 @@ import {
 } from '../../consts';
 import { AnalysisType } from '../../types';
 
-const style = require('./aggregate-chooser.component.scss');
 @Component({
   selector: 'aggregate-chooser-u',
   templateUrl: './aggregate-chooser.component.html',
-  styles: [style]
+  styleUrls: ['./aggregate-chooser.component.scss']
 })
 export class AggregateChooserComponent implements OnInit {
   @Output() public change: EventEmitter<string> = new EventEmitter();

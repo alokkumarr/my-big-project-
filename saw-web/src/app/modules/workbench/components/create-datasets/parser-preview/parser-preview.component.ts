@@ -1,5 +1,13 @@
-
-import { Component, Input, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import * as set from 'lodash/set';
@@ -19,20 +27,13 @@ import { DxDataGridService } from '../../../../../common/services/dxDataGrid.ser
 import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component';
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./parser-preview.component.scss');
-
 @Component({
   selector: 'parser-preview',
   templateUrl: './parser-preview.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./parser-preview.component.scss']
 })
-
-export class ParserPreviewComponent implements OnInit {
+export class ParserPreviewComponent
+  implements OnInit, OnDestroy, AfterViewInit {
   @Input() previewObj: BehaviorSubject<any>;
   public gridListInstance: any;
   public previewgridConfig: Array<any>;
@@ -47,7 +48,7 @@ export class ParserPreviewComponent implements OnInit {
     public dxDataGrid: DxDataGridService,
     public dialog: MatDialog,
     public workBench: WorkbenchService
-  ) { }
+  ) {}
 
   @Output() parserConfig: EventEmitter<any> = new EventEmitter<any>();
 
@@ -75,7 +76,7 @@ export class ParserPreviewComponent implements OnInit {
         this.dataGrid.instance.beginCustomLoading('Loading...');
         this.reloadDataGrid(parsedData);
       });
-    } else if (data.length != 0 && !isUndefined(data[0].error)) {
+    } else if (data.length !== 0 && !isUndefined(data[0].error)) {
       this.inspectError = true;
       this.errMsg = data[0].error.message;
     } else if (data.length === 0) {
@@ -154,7 +155,11 @@ export class ParserPreviewComponent implements OnInit {
       formatEdit.style.visibility = 'hidden';
       const index = event.srcElement.id;
       if (has(this.parserData.fields[index], 'format')) {
-        set(this.fieldInfo[index], 'format', get(this.parserData.fields[index], 'format'));
+        set(
+          this.fieldInfo[index],
+          'format',
+          get(this.parserData.fields[index], 'format')
+        );
       }
     }
   }
@@ -184,34 +189,38 @@ export class ParserPreviewComponent implements OnInit {
       }
     });
 
-    dateDialogRef
-      .afterClosed()
-      .subscribe(format => {
-        let index = -1;
-        if (event.type === 'click') {
-          index = replace(event.target.id, 'edit_', '');
-        } else {
-          index = event.srcElement.id;
+    dateDialogRef.afterClosed().subscribe(format => {
+      let id = -1;
+      if (event.type === 'click') {
+        id = replace(event.target.id, 'edit_', '');
+      } else {
+        id = event.srcElement.id;
+      }
+      if (format === '' && has(this.parserData.fields[id], 'format')) {
+        if (
+          this.parserData.fields[id].format.length === 0 ||
+          this.parserData.fields[id].format.length > 1
+        ) {
+          event.srcElement.value = get(this.parserData.fields[id], 'type');
+        } else if (this.parserData.fields[id].format.length === 1) {
+          set(
+            this.fieldInfo[id],
+            'format[0]',
+            get(this.parserData.fields[id], 'format[0]')
+          );
         }
-        if (format === '' && has(this.parserData.fields[index], 'format')) {
-          if (this.parserData.fields[index].format.length === 0 || this.parserData.fields[index].format.length > 1) {
-            event.srcElement.value = get(this.parserData.fields[index], 'type');
-          } else if (this.parserData.fields[index].format.length === 1) {
-            set(this.fieldInfo[index], 'format[0]', get(this.parserData.fields[index], 'format[0]'));
-          }
-
-        } else if (format === '' && !has(this.parserData.fields[index], 'format')) {
-          event.srcElement.value = get(this.parserData.fields[index], 'type');
-        } else if (format !== '') {
-          set(this.fieldInfo[index], 'format', [format]);
-        }
-      });
+      } else if (format === '' && !has(this.parserData.fields[id], 'format')) {
+        event.srcElement.value = get(this.parserData.fields[id], 'type');
+      } else if (format !== '') {
+        set(this.fieldInfo[id], 'format', [format]);
+      }
+    });
   }
 
   toAdd() {
     const fieldsObj = map(this.fieldInfo, obj => {
       if (obj.format) {
-        obj.format = obj.format[0];  // Parser component expects format to be a string.
+        obj.format = obj.format[0]; // Parser component expects format to be a string.
       }
       return obj;
     });

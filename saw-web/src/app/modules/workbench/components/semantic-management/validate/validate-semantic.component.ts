@@ -12,17 +12,10 @@ import { ToastService } from '../../../../../common/services/toastMessage.servic
 import { WorkbenchService } from '../../../services/workbench.service';
 import { TYPE_CONVERSION } from '../../../wb-comp-configs';
 
-const style = require('./validate-semantic.component.scss');
-
 @Component({
   selector: 'validate-semantic',
   templateUrl: './validate-semantic.component.html',
-  styles: [
-    `:host {
-      'class': 'validate-semantic'
-    }`,
-    style
-  ]
+  styleUrls: ['./validate-semantic.component.scss']
 })
 export class ValidateSemanticComponent implements OnDestroy {
   public selectedDS: any;
@@ -58,18 +51,18 @@ export class ValidateSemanticComponent implements OnDestroy {
     forIn(dsData, value => {
       this.isJoinEligible = value.joinEligible;
       const artifactName = value.system.name;
-      value.schema.fields = map(value.schema.fields, value => {
+      value.schema.fields = map(value.schema.fields, val => {
         return {
-          aliasName: value.name,
-          columnName: value.name,
-          displayName: value.name,
+          aliasName: val.name,
+          columnName: val.name,
+          displayName: val.name,
           filterEligible: true,
           joinEligible: false,
           kpiEligible: false,
           include: true,
-          name: value.name,
+          name: val.name,
           table: artifactName,
-          type: TYPE_CONVERSION[toLower(value.type)]
+          type: TYPE_CONVERSION[toLower(val.type)]
         };
       });
     });
@@ -128,7 +121,7 @@ export class ValidateSemanticComponent implements OnDestroy {
           this.notify.info('Datapod created successfully', 'Datapod', {
             hideDelay: 9000
           });
-          this.router.navigate(['workbench' , 'dataobjects']);
+          this.router.navigate(['workbench', 'dataobjects']);
         });
       }
     });

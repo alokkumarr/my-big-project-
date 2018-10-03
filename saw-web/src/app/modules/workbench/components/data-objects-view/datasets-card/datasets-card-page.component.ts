@@ -1,35 +1,21 @@
-
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { WorkbenchService } from '../../../services/workbench.service';
 
-const style = require('./datasets-card-page.component.scss');
-
 @Component({
   selector: 'datasets-card-page',
   templateUrl: './datasets-card-page.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-      height: 100%;
-      max-height: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./datasets-card-page.component.scss']
 })
-
-export class DatasetsCardPageComponent implements OnInit {
+export class DatasetsCardPageComponent implements OnInit, OnDestroy {
   @Input() searchTerm: string;
   @Input() updater: BehaviorSubject<any>;
   public updaterSubscribtion: any;
   public dataSets: Array<any> = [];
 
-  constructor(
-    public dialog: MatDialog,
-    public workbench: WorkbenchService
-  ) {  }
+  constructor(public dialog: MatDialog, public workbench: WorkbenchService) {}
 
   ngOnInit() {
     this.updaterSubscribtion = this.updater.subscribe(data => {

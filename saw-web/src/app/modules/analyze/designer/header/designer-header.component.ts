@@ -1,30 +1,16 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
-import {
-  Analysis,
-  DesignerToolbarAciton
-} from '../types';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Analysis, DesignerToolbarAciton } from '../types';
 import { DesignerStates } from '../consts';
-
-const style = require('./designer-header.component.scss');
 
 @Component({
   selector: 'designer-header',
   templateUrl: './designer-header.component.html',
-  styles: [
-    `:host {
-      background-color: white;
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-header.component.scss']
 })
 export class DesignerHeaderComponent {
   @Output() public onBack: EventEmitter<null> = new EventEmitter();
-  @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
+  @Output()
+  requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
   @Input() public analysis: Analysis;
   @Input() public isInDraftMode: boolean;
   @Input() public isInQueryMode: boolean;

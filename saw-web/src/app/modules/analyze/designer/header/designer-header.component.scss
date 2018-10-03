@@ -2,6 +2,10 @@
 
 $back-button-size: 32px;
 
+:host {
+  background-color: white;
+}
+
 .header__container {
   height: 100%;
 

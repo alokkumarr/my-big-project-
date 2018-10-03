@@ -15,19 +15,12 @@ import { JwtService } from '../../../../../common/services';
 import { Analysis } from '../../../types';
 import { PRIVILEGES } from '../../../consts';
 
-const style = require('./analyze-schedule-dialog.component.scss');
-
 const SEMICOLON = 186;
 
 @Component({
   selector: 'analyze-schedule-dialog',
   templateUrl: './analyze-schedule-dialog.component.html',
-  styles: [
-    `:host {
-      'class': 'analyze-schedule-dialog'
-    }`,
-    style
-  ]
+  styleUrls: ['./analyze-schedule-dialog.component.scss']
 })
 export class AnalyzeScheduleDialogComponent implements OnInit {
   categories: any[] = [];

@@ -1,28 +1,12 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
-  OnInit
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import * as isUndefined from 'lodash/isUndefined';
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service';
-import {
-  Artifact,
-  AnalysisReport
-} from '../../types';
-
-const style = require('./designer-settings-query.component.scss');
+import { Artifact, AnalysisReport } from '../../types';
 
 @Component({
   selector: 'designer-settings-query',
   templateUrl: './designer-settings-query.component.html',
-  styles: [
-    `:host {
-      'class': 'designer-settings-query'
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-settings-query.component.scss']
 })
 export class DesignerSettingsQueryComponent implements OnInit {
   @Output() save = new EventEmitter<any>();
@@ -31,9 +15,7 @@ export class DesignerSettingsQueryComponent implements OnInit {
   @Input() analysis: AnalysisReport;
   @Input() artifacts: Artifact[];
 
-  constructor(
-    public _analyzeDialogService: AnalyzeDialogService
-  ) {}
+  constructor(public _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     if (isUndefined(this.analysis.queryManual)) {
@@ -58,11 +40,14 @@ export class DesignerSettingsQueryComponent implements OnInit {
 
   submitQuery() {
     if (!this.analysis.edit) {
-      this._analyzeDialogService.openQueryConfirmationDialog().afterClosed().subscribe(result => {
-        if (result) {
-          this.doSubmit();
-        }
-      });
+      this._analyzeDialogService
+        .openQueryConfirmationDialog()
+        .afterClosed()
+        .subscribe(result => {
+          if (result) {
+            this.doSubmit();
+          }
+        });
     } else {
       this.doSubmit();
     }

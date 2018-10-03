@@ -1,5 +1,10 @@
 @import "src/themes/base/colors";
 
+:host {
+  height: 100%;
+  width: 100%;
+}
+
 textarea {
   margin-bottom: 10px;
 }
