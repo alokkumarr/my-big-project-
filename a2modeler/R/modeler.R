@@ -161,7 +161,7 @@ modeler <- function(df,
   measure <- list()
   performance <- data.frame()
   final_model <- NULL
-  schema <- get_schema(df)
+  schema <- a2munge::get_schema(df)
   
   valid_modeler(
     new_modeler(
@@ -371,22 +371,6 @@ get_target <- function(obj) {
 }
 
 
-#' Get Dataset Schema
-#'
-#' Returns named list of column types. Names refer to column names
-#'
-#' @param df dataset
-#'
-#' @return named list of column types
-#' @export
-#'
-#' @examples
-#' get_schema(mtcars)
-get_schema <- function(df){
-  UseMethod("get_schema")
-}
-
-
 
 # Modeler Class Methods ---------------------------------------------------
 
@@ -593,17 +577,3 @@ get_performance <- function(obj){
 
 
 # Helper Functions --------------------------------------------------------
-
-
-#' @rdname get_schema
-#' @export
-get_schema.data.frame <- function(df) {
-  purrr::map(df, class)
-}
-
-
-#' @rdname get_schema
-#' @export
-get_schema.tbl_spark <- function(df) {
-  purrr::map(sparklyr::sdf_schema(df), "type")
-}
