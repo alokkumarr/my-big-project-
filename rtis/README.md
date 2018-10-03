@@ -31,7 +31,7 @@ and deply various RTIS services
     
     Simply remove RUNNING_PID file. 
     
-   ``` $  rm RUNNING_PID ```
+      ``` $  rm RUNNING_PID ```
 
 
     
@@ -48,7 +48,7 @@ and deply various RTIS services
  
  1. Download sbt to compile and generate routes:
      
-   ```  $  brew install sbt ```
+      ```  $  brew install sbt ```
 
 
  2. Implement changes. 
