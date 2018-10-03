@@ -47,10 +47,10 @@ and deply various RTIS services
     Ex: add new route in conf/routes file and update controller class
  3. Delete all generated files inside app folder
  
-		*Controllers/javascript folder and contents
-		*ReverseRoutes.scala
-		*Routes.java
-		*Router folder and contents
+		* Controllers/javascript folder and contents
+		* ReverseRoutes.scala
+		* Routes.java
+		* Router folder and contents
 
  4. Open terminal and make sure in rtis folder and compile : sbt compile 
  
