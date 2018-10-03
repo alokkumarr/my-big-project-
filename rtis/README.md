@@ -29,10 +29,12 @@ and deply various RTIS services
  
  1. This application is already running (Or delete (path)/RUNNING_PID file):
     
-    Simply remove RUNNING_PID file. `rm RUNNING_PID` in the (path)
+    Simply remove RUNNING_PID file. 
+    
+    $  rm RUNNING_PID
     
  2. Configuration Error:  
-    Make sure conf file is in class path and secret key is set. 
+    Make sure conf file is in classpath and secret key is set. 
     Also make sure maven build is successful.
 
 
@@ -42,7 +44,9 @@ and deply various RTIS services
  
 ## Local changes:
  
- 1. Download sbt to compile and generate routes:  `brew install sbt`
+ 1. Download sbt to compile and generate routes:
+     
+    $  brew install sbt
  2. Implement changes. 
     Ex: add new route in conf/routes file and update controller class
  3. Delete all generated files inside app folder
@@ -52,8 +56,7 @@ and deply various RTIS services
 		* Routes.java
 		* Router folder and contents
 
- 4. Open terminal and make sure in rtis folder and compile : sbt compile 
- 
+ 4. Open terminal and make sure in rtis folder and compile : sbt compile  
 	 Note: If you encounter multiple imports of ‘RoutesCompiler’ 
 	 then comment first import line in build.sbt
  
