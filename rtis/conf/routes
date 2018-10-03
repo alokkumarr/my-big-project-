@@ -11,6 +11,12 @@ POST    /publishevent    controllers.GenericHandler.event(APP_KEY:String, APP_VE
 # Swagger - Root Resources Listing
 GET     /api-docs        controllers.ApiHelpController.getResources
 
+GET   /docs             controllers.ApiHelpController.viewSwaggerUI
+GET   /docs/*file        controllers.Assets.at(path="/public/swagger-ui",file)
+
+
+
+
 # Control interface
 
 GET     /control        controllers.RTISControl.executeCmd(CMD:String, PARAMETERS:Option[String])
