@@ -20,6 +20,8 @@
 #'  function with funs()
 #'@param width size of rolling window. Window is aligned right and to current
 #'  row only
+#'@param temp_tbl_name optional string input for temp table name for spark
+#'  method only. Default is random string
 #'@param ... additional arguments to pass to the transformation function
 #'
 #'@return DataFrame with additional calculated columns appended
@@ -46,12 +48,13 @@
 #'  dat <- rbind(dat, d)
 #'}
 #'
-#'d1 <- dat %>% roller(.,
-#' order_vars = "date",
-#' group_vars = c("id", "cat1", "cat2"),
-#' measure_vars = c("metric1"),
-#' fun = "mean",
-#' width=5)
+#'d1 <- dat %>%
+#' roller(.,
+#'   order_vars = "date",
+#'   group_vars = c("id", "cat1", "cat2"),
+#'   measure_vars = c("metric1"),
+#'   fun = "mean",
+#'   width=5)
 roller <- function(df,
                    order_vars,
                    group_vars,
@@ -60,6 +63,7 @@ roller <- function(df,
                    width,
                    by,
                    partial,
+                   temp_tbl_name,
                    ...) {
   UseMethod("roller")
 }
@@ -151,13 +155,14 @@ roller.tbl_spark <- function(df,
                              measure_vars,
                              fun,
                              width,
+                             temp_tbl_name = sparklyr::random_string("tbl"),
                              ...) {
 
   stopifnot("tbl_spark" %in% class(df))
   sdf <-  sparklyr::spark_dataframe(df)
   sc <- sparklyr::spark_connection(sdf)
-  sdf %>% sparklyr::invoke("createOrReplaceTempView", "df")
-  new_tbl_name <- "df_roll"
+  sdf %>% sparklyr::invoke("createOrReplaceTempView", temp_tbl_name)
+  new_tbl_name <- sparklyr::random_string("roller")
 
   args <- roller_args(
     col_names = colnames(df),
@@ -182,9 +187,10 @@ roller.tbl_spark <- function(df,
   for(var in measure_vars){
     query <- paste0(query, ", ", sql_over_translator(var, fun, group_vars, order_vars, width))
   }
-  query <- paste(query, "FROM df")
+  query <- paste(query, "FROM", temp_tbl_name)
 
   DBI::dbSendQuery(sc, query)
+  dplyr::db_drop_table(sc, temp_tbl_name)
   dplyr::tbl(sc, new_tbl_name)
 }
 
