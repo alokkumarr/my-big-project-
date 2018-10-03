@@ -6,16 +6,15 @@ datasource-page {
   height: 100%;
 
   .action-buttons {
-    .mat-icon-button {
-      font-size: 22px;
-      line-height: 32px !important;
-      height: 34px !important;
-    }
-
     .mat-raised-button {
       line-height: 32px !important;
       vertical-align: middle;
     }
+  }
+
+  .mat-icon-button {
+    line-height: normal !important;
+    height: 25px !important;
   }
 
   .icon-search {
@@ -28,15 +27,20 @@ datasource-page {
     min-height: 45px !important;
   }
 
-  .md-subhead {
-    color: $primary-blue-b2;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
   .grid-container {
     height: calc(100% - 52px);
     margin: 3px;
+    padding: 5px 3px 0;
+  }
+
+  .master-detail-caption {
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .dx-virtual-row {
+    height: 0 !important;
   }
 }
 

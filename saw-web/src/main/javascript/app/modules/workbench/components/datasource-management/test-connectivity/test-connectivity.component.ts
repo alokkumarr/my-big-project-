@@ -17,7 +17,7 @@ export class TestConnectivityComponent implements OnInit {
     'Chef-Client: saw01.ana.demo.vaste.sncrcorp.net',
     'Node platform: centos 7.4.1708 (rhel)',
     'Node arch: x86_64',
-    'Hostname: saw01 (saw01.ana.demo.vaste.sncrcorp.net)',
+    'Hostnawme: saw01 (saw01.ana.demo.vaste.sncrcorp.net)',
 
     'Chef Server: https://chef02-itopscorpvaste.sncrcorp.net:443/organizations/sncr-sip',
     'Environment: sip-demo',

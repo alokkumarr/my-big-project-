@@ -12,29 +12,52 @@
       </div>
     </mat-toolbar-row>
   </mat-toolbar>
-  <div class="grid-container">
+  <div class="grid-container mat-elevation-z9">
     <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
-       [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="true">
-      <dxo-selection mode="single"></dxo-selection>
+      [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="false" [masterDetail]="{ enabled: true, template: 'routes' }">
+      <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+      <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
+      <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+
       <dxi-column caption="Source Type" dataField="sourceType"></dxi-column>
-      <dxi-column caption="Datasource Name" dataField="dataSourceName" cellTemplate="nameTemplate"></dxi-column>
-      <dxi-column caption="Created By" dataField="createdBy" cellTemplate="cellTemplate"></dxi-column>
-      <dxi-column caption="Updated Time" dataField="createdAt" dataType="date" cellTemplate="dateTemplate"></dxi-column>
-      <dxi-column caption="Actions" dataField="id" cellTemplate="actionsTemplate" [allowFiltering]="false"
+      <dxi-column caption="Source Name" dataField="sourceName" alignment="left" cellTemplate="nameTemplate"></dxi-column>
+      <dxi-column caption="Host Name" dataField="hostName" alignment="left"></dxi-column>
+      <dxi-column caption="Created By" dataField="createdBy" alignment="left"></dxi-column>
+      <dxi-column caption="Created TS" dataField="createdTS" alignment="left" dataType="date" cellTemplate="dateTemplate"></dxi-column>
+      <dxi-column caption="Actions" dataField="id" alignment="center" cellTemplate="actionsTemplate" [allowFiltering]="false"
         [allowSorting]="false"></dxi-column>
       <div *dxTemplate="let data of 'nameTemplate'">
-        <a (click)="viewDetails(data.data)" [innerHTML]="data.value | highlight: searchTerm"></a>
-      </div>
-      <div *dxTemplate="let data of 'cellTemplate'">
-        <span [innerHTML]="data.value | highlight: searchTerm"></span>
+        <a [innerHTML]="data.value"></a>
       </div>
       <div *dxTemplate="let data of 'dateTemplate'">
-        <span [innerHTML]="data.value * 1000 | date: 'short' | highlight: searchTerm"></span>
+        <span [innerHTML]="data.value * 1000 | date: 'short'"></span>
       </div>
       <div *dxTemplate="let data of 'actionsTemplate'">
-        <datapod-actions [dpMetadata]="pod"></datapod-actions>
+        <button mat-icon-button color="primary" (click)="testConnection()">
+          <mat-icon fontIcon="icon-query-mode"></mat-icon>
+        </button>
+        <button mat-icon-button color="primary" (click)="testConnection()">
+          <mat-icon color="primary" fontIcon="icon-edit"></mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="testConnection()">
+          <mat-icon color="warn" fontIcon="icon-delete"></mat-icon>
+        </button>
       </div>
-      <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
+
+      <div *dxTemplate="let route of 'routes'">
+        <dx-data-grid style="padding-bottom: 9px;" [dataSource]="route.data.routes" [showBorders]="true"
+          [columnAutoWidth]="true" (onToolbarPreparing)="onToolbarPreparing($event)">
+          <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
+          <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
+          <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+
+          <div *dxTemplate="let data of 'sourceNameTemplate'">
+            <div class="master-detail-caption">{{route.data.sourceName}}</div>
+          </div>
+
+        </dx-data-grid>
+      </div>
+
     </dx-data-grid>
   </div>
 </div>

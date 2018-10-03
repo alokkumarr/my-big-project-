@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 
 import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { CreateSourceDialogComponent } from './createSource-dialog/createSource-dialog.component';
+import { TestConnectivityComponent } from './test-connectivity/test-connectivity.component';
 
+import { SAMPLE_SOURCE_DATA } from '../../sample-data';
 const template = require('./datasource-page.component.html');
 require('./datasource-page.component.scss');
 
@@ -14,10 +17,13 @@ require('./datasource-page.component.scss');
   styles: []
 })
 export class DatasourceComponent implements OnInit, OnDestroy {
+  private gridData: any = SAMPLE_SOURCE_DATA;
+
   constructor(
     public dialog: MatDialog,
     private workBench: WorkbenchService,
-    private _toastMessage: ToastService
+    private _toastMessage: ToastService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {}
@@ -40,5 +46,19 @@ export class DatasourceComponent implements OnInit, OnDestroy {
     });
 
     dateDialogRef.afterClosed().subscribe(data => {});
+  }
+
+  testConnection() {
+    this.snackBar.openFromComponent(TestConnectivityComponent, {
+      horizontalPosition: 'center',
+      panelClass: ['mat-elevation-z9', 'testConnectivityClass']
+    });
+  }
+
+  onToolbarPreparing(e) {
+    e.toolbarOptions.items.unshift({
+      location: 'before',
+      template: 'sourceNameTemplate'
+    });
   }
 }

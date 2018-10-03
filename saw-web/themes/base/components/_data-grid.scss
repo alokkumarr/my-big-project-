@@ -8,7 +8,7 @@ tr.dx-row.dx-header-row[role="row"] {
 }
 
 .dx-datagrid-rowsview .dx-selection.dx-row > td, .dx-datagrid-rowsview .dx-selection.dx-row:hover > td {
-  background-color: $grid-header-bg-color !important;
+  background-color: $grid-hover-color !important;
 }
 
 .dx-datagrid {
