@@ -50,6 +50,15 @@ RUN sed -i -e 's/^#baseurl=/baseurl=/' /etc/yum.repos.d/epel.repo
 RUN yum -y -q install man less file iproute lsof nc bind-utils \
     smem sudo mlocate
 
+# Install log sender
+RUN yum -y -q install systemd-journal-gateway
+COPY sip-journal-upload.conf \
+  /etc/systemd/system/systemd-journal-upload.service.d/
+COPY sip-tmpfiles-journal.conf /etc/tmpfiles.d/
+RUN systemctl enable systemd-journal-upload.service
+RUN echo "URL=http://sip-admin:19532" >> /etc/systemd/journal-upload.conf
+RUN install -d -o systemd-journal-upload -g systemd-journal-upload \
+  /var/lib/systemd/journal-upload        
 # Forward container system logs to Docker logs
 COPY saw-logger/saw-logger.service /etc/systemd/system/
 RUN systemctl enable saw-logger

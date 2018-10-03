@@ -35,6 +35,21 @@ observe-page {
 
     h2 {
       flex-grow: 1;
+
+      .dashboard-default-button {
+        height: 30px;
+        line-height: 30px;
+        width: 30px;
+
+        mat-icon {
+          font-size: 20px;
+          vertical-align: baseline;
+        }
+
+        &.default-selected {
+          color: #FCD53E;
+        }
+      }
     }
 
     .page-header-actions {
