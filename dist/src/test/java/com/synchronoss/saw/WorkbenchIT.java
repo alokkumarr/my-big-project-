@@ -1,7 +1,9 @@
 package com.synchronoss.saw;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.io.IOException;
 
@@ -333,44 +335,44 @@ public class WorkbenchIT extends BaseIT {
             //.body("rows[0].field1", equalTo("foo"));
     }
 
-   // @Test
-   // public void testListDatasets() {
+    @Test
+    public void testListDatasets() {
         /* Note: Placeholder for Workbench list datasets integration
          * test.  To be done: Create a dataset and then make
          * assertions on it when listing available datasets. */
-     //   given(authSpec)
-       //     .when().get(WORKBENCH_PATH + "/datasets")
-         //   .then().assertThat().statusCode(200)
-           // .body(containsString(""));
-    //}
+        given(authSpec)
+            .when().get(WORKBENCH_PATH + "/datasets")
+            .then().assertThat().statusCode(200)
+            .body(containsString(""));
+    }
 
-    //@Test
-    //public void testPreviewDataset() throws IOException {
-      //  String name = "test-preview-" + testId();
+    @Test
+    public void testPreviewDataset() throws IOException {
+        String name = "test-preview-" + testId();
         /* Create dataset to be used for testing viewing dataset */
-        //parseDataset(name);
+        parseDataset(name);
         /* Workaround: Until the dataset creation API provides the
          * dataset ID, construct it manually here. */
-        //String id = "workbench::" + name;
-        //waitForDataset(id, WAIT_RETRIES);
+        String id = "workbench::" + name;
+        waitForDataset(id, WAIT_RETRIES);
         /* View dataset */
-        //ObjectNode root = mapper.createObjectNode();
-        //root.put("name", name);
-        //Response response = given(authSpec)
-          //  .body(root)
-           // .when().post(WORKBENCH_PATH + "/previews")
-           // .then().assertThat().statusCode(200)
-           // .extract().response();
-        //String previewId = response.path("id");
+        ObjectNode root = mapper.createObjectNode();
+        root.put("name", name);
+        Response response = given(authSpec)
+            .body(root)
+            .when().post(WORKBENCH_PATH + "/previews")
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        String previewId = response.path("id");
         /* Wait for preview to become available */
-        //waitForPreview(previewId, WAIT_RETRIES);
+        waitForPreview(previewId, WAIT_RETRIES);
         /* Assert preview rows exist */
-        //given(authSpec)
-          //  .when().get(WORKBENCH_PATH + "/previews/" + previewId)
-           // .then().assertThat().statusCode(200)
-            //.body("rows", hasSize(3))
-            //.body("rows[0].field1", equalTo("foo"));
-   // }
+        given(authSpec)
+            .when().get(WORKBENCH_PATH + "/previews/" + previewId)
+            .then().assertThat().statusCode(200)
+            .body("rows", hasSize(3))
+            .body("rows[0].field1", equalTo("foo"));
+   }
 
   /**
    * Wait until preview becomes visible in Workbench Services, using
