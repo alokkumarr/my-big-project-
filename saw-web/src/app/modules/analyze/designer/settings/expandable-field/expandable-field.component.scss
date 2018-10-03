@@ -1,5 +1,10 @@
 @import "src/themes/base/colors";
 
+:host {
+  display: block;
+  cursor: move;
+}
+
 .mat-form-field-wrapper {
   padding-bottom: 15px;
 }

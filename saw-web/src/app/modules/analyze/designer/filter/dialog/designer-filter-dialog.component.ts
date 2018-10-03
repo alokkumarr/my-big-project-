@@ -17,8 +17,6 @@ import {
 } from '../../../consts';
 import { Artifact, FilterModel, Filter } from '../../types';
 
-const style = require('./designer-filter-dialog.component.scss');
-
 export interface DesignerFilterDialogData {
   filters: Filter[];
   booleanCriteria?: string;
@@ -34,13 +32,7 @@ export interface DesignerFilterDialogResult {
 @Component({
   selector: 'designer-filter-dialog',
   templateUrl: './designer-filter-dialog.component.html',
-  styles: [
-    `:host {
-      display: block;
-      padding: 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-filter-dialog.component.scss']
 })
 export class DesignerFilterDialogComponent implements OnInit {
   artifacts: Artifact[];

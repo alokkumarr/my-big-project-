@@ -1,9 +1,4 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import {
   Artifact,
@@ -15,23 +10,12 @@ import {
 } from '../../types';
 import { DesignerStates } from '../../consts';
 
-const style = require('./multi-table-designer-layout.component.scss');
-
 @Component({
   selector: 'multi-table-designer-layout',
   templateUrl: './multi-table-designer-layout.component.html',
-  styles: [
-    `:host {
-      background-color: white;
-      max-height: 89vh;
-      height: 89vh;
-      max-width: 100vw;
-      display: block;
-    }`,
-    style
-  ]
+  styleUrls: ['./multi-table-designer-layout.component.scss']
 })
-export class MultiTableDesignerLayout {
+export class MultiTableDesignerLayoutComponent {
   @Output() change: EventEmitter<DesignerChangeEvent> = new EventEmitter();
   @Input() artifacts: Artifact[];
   @Input() analysis: Analysis;
@@ -41,7 +25,8 @@ export class MultiTableDesignerLayout {
   @Input() sqlBuilder: SqlBuilder;
   @Input() designerState: DesignerStates;
   @Input() dataCount: number;
-  @Input('data') set setData(data) {
+  @Input('data')
+  set setData(data) {
     if (!isEmpty(data)) {
       this.data = data;
       this.isGridPanelExpanded = true;
@@ -55,10 +40,10 @@ export class MultiTableDesignerLayout {
   }
 
   onQueryChange() {
-    this.change.emit({subject: 'changeQuery'});
+    this.change.emit({ subject: 'changeQuery' });
   }
 
   onSaveQuery(evt) {
-    this.change.emit({subject: 'submitQuery'});
+    this.change.emit({ subject: 'submitQuery' });
   }
 }

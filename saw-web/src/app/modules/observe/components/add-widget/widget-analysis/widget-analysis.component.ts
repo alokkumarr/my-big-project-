@@ -15,14 +15,12 @@ import { HeaderProgressService } from '../../../../../common/services';
 import { ANALYSIS_METHODS } from '../../../../analyze/consts';
 import { WIDGET_ACTIONS } from '../widget.model';
 
-const style = require('./widget-analysis.component.scss');
-
 const ALLOWED_ANALYSIS_TYPES = ['chart', 'esReport', 'pivot'];
 
 @Component({
   selector: 'widget-analysis',
   templateUrl: './widget-analysis.component.html',
-  styles: [style]
+  styleUrls: ['./widget-analysis.component.scss']
 })
 export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Output() onAnalysisAction = new EventEmitter();
@@ -75,14 +73,12 @@ export class WidgetAnalysisComponent implements OnInit, OnDestroy {
   @Input()
   set category(id: number | string) {
     this.searchTerm = '';
-    this.analyze.getAnalysesFor(id.toString()).then(
-      result => {
-        this.analyses = filter(
-          result,
-          analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
-        );
-      }
-    );
+    this.analyze.getAnalysesFor(id.toString()).then(result => {
+      this.analyses = filter(
+        result,
+        analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type)
+      );
+    });
   }
 
   sendAnalysisAction(action, analysis) {

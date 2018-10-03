@@ -1,5 +1,3 @@
-const style = require('./observe-view.component.scss');
-
 import {
   Component,
   OnInit,
@@ -37,7 +35,7 @@ function downloadDataUrlFromJavascript(filename, dataUrl) {
 
 @Component({
   selector: 'observe-view',
-  styles: [style],
+  styleUrls: ['./observe-view.component.scss'],
   templateUrl: './observe-view.component.html',
   providers: [DashboardService, GlobalFilterService]
 })

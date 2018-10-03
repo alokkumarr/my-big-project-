@@ -7,17 +7,10 @@ import { WorkbenchService } from '../../../services/workbench.service';
 import * as filter from 'lodash/filter';
 import * as cloneDeep from 'lodash/cloneDeep';
 
-const style = require('./create-semantic.component.scss');
-
 @Component({
   selector: 'create-semantic',
   templateUrl: './create-semantic.component.html',
-  styles: [
-    `:host {
-      'class': 'create-semantic'
-    }`,
-    style
-  ]
+  styleUrls: ['./create-semantic.component.scss']
 })
 export class CreateSemanticComponent implements OnInit {
   public availableDS: any;
@@ -27,10 +20,7 @@ export class CreateSemanticComponent implements OnInit {
   public isSelected = false;
   public selectedDSData: any = [];
 
-  constructor(
-    public router: Router,
-    public workBench: WorkbenchService
-  ) {}
+  constructor(public router: Router, public workBench: WorkbenchService) {}
 
   @ViewChild('dsGrid') dataGrid: DxDataGridComponent;
 

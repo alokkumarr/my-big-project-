@@ -7,20 +7,10 @@ import * as flatMap from 'lodash/flatMap';
 import { ObserveService } from '../../services/observe.service';
 import { DATE_TYPES } from '../../../../common/consts';
 
-const style = require('./edit-widget.component.scss');
-
 @Component({
   selector: 'edit-widget',
   templateUrl: './edit-widget.component.html',
-  styles: [
-    `:host {
-      background-color: whitesmoke;
-      display: block;
-      min-height: 100%;
-      width: 400px;
-    }`,
-    style
-  ]
+  styleUrls: ['./edit-widget.component.scss']
 })
 export class EditWidgetComponent implements OnInit {
   editItem: any;
@@ -36,7 +26,9 @@ export class EditWidgetComponent implements OnInit {
 
   @Input()
   set model(data) {
-    if (!data) { return; }
+    if (!data) {
+      return;
+    }
     this._model = data;
     if (data.kpi || data.bullet) {
       this.kpiType = data.kpi ? 'kpi' : 'bullet';
@@ -64,7 +56,9 @@ export class EditWidgetComponent implements OnInit {
     this.observe
       .getArtifacts({ semanticId: semId })
       .map(metric => {
-        if (!metric) { return; }
+        if (!metric) {
+          return;
+        }
         metric.kpiColumns = flatMap(metric.artifacts, table => {
           return filter(
             table.columns,
@@ -85,7 +79,9 @@ export class EditWidgetComponent implements OnInit {
         return metric;
       })
       .subscribe(metric => {
-        if (!metric) { return; }
+        if (!metric) {
+          return;
+        }
         if (this.kpiType === 'bullet') {
           this.editItem = {
             bullet: clone(model.bullet),

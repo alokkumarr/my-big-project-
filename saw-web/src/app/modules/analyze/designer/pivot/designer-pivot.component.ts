@@ -6,18 +6,10 @@ import { Artifact, ArtifactColumnPivot } from '../types';
 import { DesignerStates } from '../consts';
 import { IPivotGridUpdate } from '../../../../common/components/pivot-grid/pivot-grid.component';
 
-const style = require('./designer-pivot.component.scss');
-
 @Component({
   selector: 'designer-pivot',
   templateUrl: './designer-pivot.component.html',
-  styles: [
-    `:host {
-      height: calc(100% - 20px);
-      width: calc(100% - 20px);
-    }`,
-    style
-  ]
+  styleUrls: ['./designer-pivot.component.scss']
 })
 export class DesignerPivotComponent {
   @Input('artifacts')

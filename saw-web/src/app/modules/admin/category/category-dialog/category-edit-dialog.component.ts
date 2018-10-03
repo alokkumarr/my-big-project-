@@ -1,4 +1,5 @@
-import { Component, Inject, HostBinding } from '@angular/core'; import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { Component, Inject, HostBinding } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import * as find from 'lodash/find';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -8,23 +9,14 @@ import * as fpOmit from 'lodash/fp/omit';
 import { CategoryService } from '../category.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
 
-const style = require('./category-edit-dialog.component.scss');
-
 const namePattern = /^[a-zA-Z\s]*$/;
 
 @Component({
   selector: 'category-edit-dialog',
   templateUrl: './category-edit-dialog.component.html',
-  styles: [
-    `:host {
-      max-width: 500px;
-      width: 700px;
-    }`,
-    style
-  ]
+  styleUrls: ['./category-edit-dialog.component.scss']
 })
 export class CategoryEditDialogComponent extends BaseDialogComponent {
-
   @HostBinding('class.wide') isInWideMode = false;
   formGroup: FormGroup;
   subCategoryFormGroup: FormGroup;
@@ -37,24 +29,28 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
   isSubCategoryModified = false;
   subCategoryFlag = false;
   isNewSubCategorySelecting = false;
-  statuses = [{
-    id: 1,
-    value: 'Active',
-    name: 'ACTIVE'
-  }, {
-    id: 0,
-    value: 'Inactive',
-    name: 'INACTIVE'
-  }];
+  statuses = [
+    {
+      id: 1,
+      value: 'Active',
+      name: 'ACTIVE'
+    },
+    {
+      id: 0,
+      value: 'Inactive',
+      name: 'INACTIVE'
+    }
+  ];
 
   constructor(
     public _categoryService: CategoryService,
     public _fb: FormBuilder,
     public _dialogRef: MatDialogRef<CategoryEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      model: any,
-      formDeps: {customerId: string},
-      mode: 'edit' | 'create'
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      model: any;
+      formDeps: { customerId: string };
+      mode: 'edit' | 'create';
     }
   ) {
     super();
@@ -62,7 +58,10 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       this.formIsValid = true;
       const { productId, moduleId, subCategories } = this.data.model;
       this.modules$ = this.loadModules(productId, this.data.formDeps);
-      this.categories$ = this.loadParentCategories(moduleId, this.data.formDeps);
+      this.categories$ = this.loadParentCategories(
+        moduleId,
+        this.data.formDeps
+      );
       this.subCategories = subCategories;
       this.isInWideMode = subCategories && subCategories.length > 0;
     }
@@ -77,31 +76,34 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
 
     let model;
     switch (this.data.mode) {
-    case 'create':
-      model = {
-        ...this.data.model,
-        ...formValues
-      };
-      if (!model.subCategoryInd) {
-        model.categoryId = null;
-      }
-      break;
-    case 'edit':
-      const subCategories = fpPipe(
-        fpFilter('modifiedFlag'),
-        fpMap(fpOmit('modifiedFlag'))
-      )(this.subCategories);
-      model = {
-        ...this.data.model,
-        ...formValues,
-        subCategories
-      };
-      break;
+      case 'create':
+        model = {
+          ...this.data.model,
+          ...formValues
+        };
+        if (!model.subCategoryInd) {
+          model.categoryId = null;
+        }
+        break;
+      case 'edit':
+        const subCategories = fpPipe(
+          fpFilter('modifiedFlag'),
+          fpMap(fpOmit('modifiedFlag'))
+        )(this.subCategories);
+        model = {
+          ...this.data.model,
+          ...formValues,
+          subCategories
+        };
+        break;
     }
 
     if (model.subCategoryInd) {
       this.categories$.then(categories => {
-        const target = find(categories, ({categoryId}) => categoryId === model.categoryId);
+        const target = find(
+          categories,
+          ({ categoryId }) => categoryId === model.categoryId
+        );
         if (target) {
           model.categoryType = target.categoryType;
           model.categoryCode = target.categoryCode;
@@ -116,21 +118,20 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
   save(model) {
     let actionPromise;
     switch (this.data.mode) {
-    case 'edit':
-      actionPromise = this._categoryService.update(model);
-      break;
-    case 'create':
-      actionPromise = this._categoryService.save(model);
-      break;
+      case 'edit':
+        actionPromise = this._categoryService.update(model);
+        break;
+      case 'create':
+        actionPromise = this._categoryService.save(model);
+        break;
     }
 
-    actionPromise && actionPromise.then(
-      rows => {
+    actionPromise &&
+      actionPromise.then(rows => {
         if (rows) {
           this._dialogRef.close(rows);
         }
-      }
-    );
+      });
   }
 
   createForm(formModel) {
@@ -147,15 +148,24 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
 
     const productIdControl = this._fb.control(productId, Validators.required);
     const subCategoryIndControl = this._fb.control(subCategoryInd);
-    const moduleIdControl = this._fb.control({value: moduleId, disabled: true}, Validators.required);
-    const categoryIdControl = this._fb.control({value: categoryId, disabled: true});
+    const moduleIdControl = this._fb.control(
+      { value: moduleId, disabled: true },
+      Validators.required
+    );
+    const categoryIdControl = this._fb.control({
+      value: categoryId,
+      disabled: true
+    });
 
     this.formGroup = this._fb.group({
       subCategoryInd: subCategoryIndControl,
       productId: productIdControl,
       moduleId: moduleIdControl,
       categoryId: categoryIdControl,
-      categoryName: [categoryName, [Validators.required, Validators.pattern(namePattern)]],
+      categoryName: [
+        categoryName,
+        [Validators.required, Validators.pattern(namePattern)]
+      ],
       categoryDesc: categoryDesc,
       activeStatusInd: [activeStatusInd, Validators.required]
     });
@@ -168,15 +178,20 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
       }
     });
 
-    productIdControl.valueChanges.subscribe(productId => {
-      this.modules$ = this.loadModules(productId, this.data.formDeps).then(modules => {
-        moduleIdControl.enable();
-        return modules;
-      });
+    productIdControl.valueChanges.subscribe(pId => {
+      this.modules$ = this.loadModules(pId, this.data.formDeps).then(
+        modules => {
+          moduleIdControl.enable();
+          return modules;
+        }
+      );
     });
 
-    moduleIdControl.valueChanges.subscribe(moduleId => {
-      this.categories$ = this.loadParentCategories(moduleId, this.data.formDeps).then(categories => {
+    moduleIdControl.valueChanges.subscribe(mId => {
+      this.categories$ = this.loadParentCategories(
+        mId,
+        this.data.formDeps
+      ).then(categories => {
         categoryIdControl.enable();
         return categories;
       });
@@ -224,7 +239,10 @@ export class CategoryEditDialogComponent extends BaseDialogComponent {
     const selected = subCategories[0];
     const selectedControl = this._fb.control(selected);
     const categoryControl = this._fb.group({
-      subCategoryName: [selected.subCategoryName, [Validators.required, Validators.pattern(namePattern)]],
+      subCategoryName: [
+        selected.subCategoryName,
+        [Validators.required, Validators.pattern(namePattern)]
+      ],
       subCategoryDesc: selected.subCategoryDesc,
       activestatusInd: [selected.activestatusInd, Validators.required]
     });

@@ -1,16 +1,12 @@
-
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
-const style = require('./details-dialog.component.scss');
-
 @Component({
   selector: 'details-dialog',
   templateUrl: './details-dialog.component.html',
-  styles: [style]
+  styleUrls: ['./details-dialog.component.scss']
 })
-
 export class DetailsDialogComponent implements OnInit {
   form: FormGroup;
   public folNamePattern = '[A-Za-z0-9]+';
@@ -18,12 +14,23 @@ export class DetailsDialogComponent implements OnInit {
   constructor(
     public formBuilder: FormBuilder,
     public dialogRef: MatDialogRef<DetailsDialogComponent>
-  ) {  }
+  ) {}
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-      nameControl: ['', [Validators.required, Validators.pattern(this.folNamePattern), Validators.minLength(3), Validators.maxLength(18)]],
-      descControl: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]]
+      nameControl: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(this.folNamePattern),
+          Validators.minLength(3),
+          Validators.maxLength(18)
+        ]
+      ],
+      descControl: [
+        '',
+        [Validators.required, Validators.minLength(5), Validators.maxLength(50)]
+      ]
     });
   }
 

@@ -1,5 +1,9 @@
 @import "src/themes/base/colors";
 
+:host {
+  class: 'dataset-detail-view'
+}
+
 .dataset-detail-view {
   width: 100%;
   height: calc(100% - 3px);

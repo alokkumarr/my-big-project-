@@ -5,27 +5,16 @@ import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as every from 'lodash/every';
 import * as isEmpty from 'lodash/isEmpty';
-import {
-  getPrivilegeDescription
-} from '../privilege-code-transformer';
+import { getPrivilegeDescription } from '../privilege-code-transformer';
 import { PrivilegeService } from '../privilege.service';
 import { BaseDialogComponent } from '../../../../common/base-dialog';
-
-const style = require('./privilege-edit-dialog.component.scss');
 
 @Component({
   selector: 'privilege-edit-dialog',
   templateUrl: './privilege-edit-dialog.component.html',
-  styles: [
-    `:host {
-      max-width: 860px;
-      width: 860px;
-    }`,
-    style
-  ]
+  styleUrls: ['./privilege-edit-dialog.component.scss']
 })
 export class PrivilegeEditDialogComponent extends BaseDialogComponent {
-
   formGroup: FormGroup;
   subCategoryFormGroup: FormGroup;
   formIsValid = false;
@@ -40,10 +29,11 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     public _privilegeService: PrivilegeService,
     public _fb: FormBuilder,
     public _dialogRef: MatDialogRef<PrivilegeEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      model: any,
-      formDeps: {customerId: string, masterLoginId: string},
-      mode: 'edit' | 'create'
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      model: any;
+      formDeps: { customerId: string; masterLoginId: string };
+      mode: 'edit' | 'create';
     }
   ) {
     super();
@@ -75,7 +65,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     this.createForm(this.data.model);
   }
 
-  onPrivilegeChange({index, privilege}) {
+  onPrivilegeChange({ index, privilege }) {
     const oldSubCategoryPrivilege = this.subCategories[index];
     this.subCategories.splice(index, 1, {
       ...oldSubCategoryPrivilege,
@@ -87,14 +77,19 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
     const formValues = this.formGroup.getRawValue();
     const { customerId, masterLoginId } = this.data.formDeps;
 
-    const targetCategory = find(this.categories, ({categoryCode}) => formValues.categoryCode === categoryCode);
+    const targetCategory = find(
+      this.categories,
+      ({ categoryCode }) => formValues.categoryCode === categoryCode
+    );
     const { categoryType, categoryId } = targetCategory;
     const model = {
       ...this.data.model,
       ...formValues,
       categoryId,
       categoryType,
-      subCategoriesPrivilege: this.getSubCategoriesPrivilege(this.subCategories),
+      subCategoriesPrivilege: this.getSubCategoriesPrivilege(
+        this.subCategories
+      ),
       customerId,
       masterLoginId
     };
@@ -102,35 +97,37 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
   }
 
   getSubCategoriesPrivilege(subCategories) {
-    return map(subCategories, ({ privilegeCode, subCategoryId, privilegeId }) => {
-      const privilegeDesc = getPrivilegeDescription(privilegeCode);
-      return {
-        privilegeCode,
-        privilegeDesc,
-        subCategoryId,
-        privilegeId
-      };
-    });
+    return map(
+      subCategories,
+      ({ privilegeCode, subCategoryId, privilegeId }) => {
+        const privilegeDesc = getPrivilegeDescription(privilegeCode);
+        return {
+          privilegeCode,
+          privilegeDesc,
+          subCategoryId,
+          privilegeId
+        };
+      }
+    );
   }
 
   save(model) {
     let actionPromise;
     switch (this.data.mode) {
-    case 'edit':
-      actionPromise = this._privilegeService.update(model);
-      break;
-    case 'create':
-      actionPromise = this._privilegeService.save(model);
-      break;
+      case 'edit':
+        actionPromise = this._privilegeService.update(model);
+        break;
+      case 'create':
+        actionPromise = this._privilegeService.save(model);
+        break;
     }
 
-    actionPromise && actionPromise.then(
-      rows => {
+    actionPromise &&
+      actionPromise.then(rows => {
         if (rows) {
           this._dialogRef.close(rows);
         }
-      }
-    );
+      });
   }
 
   createForm(formModel) {
@@ -141,10 +138,22 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       categoryCode = ''
     } = formModel;
 
-    const productIdControl = this._fb.control({value: productId, disabled: true}, Validators.required);
-    const roleIdControl = this._fb.control({value: roleId, disabled: true}, Validators.required);
-    const moduleIdControl = this._fb.control({value: moduleId, disabled: true}, Validators.required);
-    const categoryCodeControl = this._fb.control({value: categoryCode, disabled: true}, Validators.required);
+    const productIdControl = this._fb.control(
+      { value: productId, disabled: true },
+      Validators.required
+    );
+    const roleIdControl = this._fb.control(
+      { value: roleId, disabled: true },
+      Validators.required
+    );
+    const moduleIdControl = this._fb.control(
+      { value: moduleId, disabled: true },
+      Validators.required
+    );
+    const categoryCodeControl = this._fb.control(
+      { value: categoryCode, disabled: true },
+      Validators.required
+    );
 
     this.formGroup = this._fb.group({
       productId: productIdControl,
@@ -194,7 +203,7 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       moduleId: 0
     };
     return this._privilegeService.getModules(moduleParams).then(modules => {
-      this.formGroup.controls.moduleId.enable({emitEvent: false});
+      this.formGroup.controls.moduleId.enable({ emitEvent: false });
       return modules;
     });
   }
@@ -206,19 +215,20 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       productId: 0,
       moduleId
     };
-    return this._privilegeService.getParentCategories(categoryParams).then(categories => {
-      this.categories = categories;
-      const categoryCodeControl = this.formGroup.controls.categoryCode;
-      if (isEmpty(categories)) {
-        categoryCodeControl.disable();
-      } else {
-        categoryCodeControl.enable();
-      }
-    });
+    return this._privilegeService
+      .getParentCategories(categoryParams)
+      .then(categories => {
+        this.categories = categories;
+        const categoryCodeControl = this.formGroup.controls.categoryCode;
+        if (isEmpty(categories)) {
+          categoryCodeControl.disable();
+        } else {
+          categoryCodeControl.enable();
+        }
+      });
   }
 
   loadSubCategories(moduleId, roleId, productId, categoryCode) {
-
     if (!(productId > 0 && roleId > 0 && moduleId > 0 && categoryCode !== '')) {
       return;
     }
@@ -230,8 +240,10 @@ export class PrivilegeEditDialogComponent extends BaseDialogComponent {
       moduleId,
       categoryCode
     };
-    return this._privilegeService.getSubCategories(categoryParams).then(subCategories => {
-      this.subCategories = subCategories;
-    });
+    return this._privilegeService
+      .getSubCategories(categoryParams)
+      .then(subCategories => {
+        this.subCategories = subCategories;
+      });
   }
 }

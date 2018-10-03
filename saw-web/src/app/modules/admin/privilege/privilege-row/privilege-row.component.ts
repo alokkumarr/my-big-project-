@@ -1,4 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnChanges
+} from '@angular/core';
 
 import {
   PRIVILEGE_NAMES,
@@ -8,7 +14,6 @@ import {
   getPrivilegeFromBoolArray
 } from '../privilege-code-transformer';
 
-const style = require('./privilege-row.component.scss');
 /** privilegeCode privilegeDesc
  * 0 => No access
  * 128 => All
@@ -21,7 +26,7 @@ interface Privilege {
 @Component({
   selector: 'tr[privilege-row]',
   templateUrl: './privilege-row.component.html',
-  styles: [style]
+  styleUrls: ['./privilege-row.component.scss']
 })
 export class PrivilegeRowComponent implements OnChanges {
   @Output() categoryChange: EventEmitter<Privilege> = new EventEmitter();
@@ -35,7 +40,6 @@ export class PrivilegeRowComponent implements OnChanges {
     const { privilegeCode } = subCategory;
     this.privilegeCodeList = decimal2BoolArray(privilegeCode);
   }
-
 
   onPrivilegeClicked(index) {
     this.privilegeCodeList[index] = !this.privilegeCodeList[index];

@@ -5,10 +5,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import {
-  FormGroup,
-  FormBuilder
-} from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { requireIf } from '../../validators/required-if.validator';
 import {
@@ -22,8 +19,6 @@ import { Subscription } from 'rxjs/Subscription';
 import * as moment from 'moment';
 import 'rxjs/add/operator/debounceTime';
 
-const style = require('./kpi-filter.component.scss');
-
 interface KPIFilterType {
   preset: string;
   lte?: string;
@@ -33,9 +28,9 @@ interface KPIFilterType {
 @Component({
   selector: 'kpi-filter',
   templateUrl: './kpi-filter.component.html',
-  styles: [style]
+  styleUrls: ['./kpi-filter.component.scss']
 })
-export class KPIFilter implements OnInit, OnDestroy {
+export class KPIFilterComponent implements OnInit, OnDestroy {
   kpiFilterForm: FormGroup;
   filterCache: KPIFilterType = {
     preset: '',
@@ -152,7 +147,9 @@ export class KPIFilter implements OnInit, OnDestroy {
       preset: this.kpiFilterForm.get('preset').value
     };
 
-    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) { return model; }
+    if (model.preset !== CUSTOM_DATE_PRESET_VALUE) {
+      return model;
+    }
 
     // Adding static time signatures until we allow users to choose time
     // for `to` and `from` fields.

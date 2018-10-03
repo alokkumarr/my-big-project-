@@ -15,17 +15,10 @@ import {
   TSCOMBO_TYPES_OBJ
 } from '../../../consts';
 
-const style = require('./expandable-field.component.scss');
 @Component({
   selector: 'expandable-field',
   templateUrl: './expandable-field.component.html',
-  styles: [
-    `:host {
-      display: block;
-      cursor: move;
-    }`,
-    style
-  ]
+  styleUrls: ['./expandable-field.component.scss']
 })
 export class ExpandableFieldComponent {
   @Output()

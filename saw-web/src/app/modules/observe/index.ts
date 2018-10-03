@@ -40,7 +40,7 @@ import { ObserveReportComponent } from './components/observe-report/observe-repo
 import { ObservePivotComponent } from './components/observe-pivot/observe-pivot.component';
 import { ObserveKPIComponent } from './components/observe-kpi/observe-kpi.component';
 import { ObserveKPIBulletComponent } from './components/observe-kpi-bullet/observe-kpi-bullet.component';
-import { KPIFilter } from './components/kpi-filter/kpi-filter.component';
+import { KPIFilterComponent } from './components/kpi-filter/kpi-filter.component';
 import { AddWidgetModule } from './components/add-widget/add-widget.module';
 import { EditWidgetModule } from './components/edit-widget/edit-widget.module';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
@@ -70,7 +70,7 @@ const components = [
   ObservePivotComponent,
   ObserveKPIComponent,
   ObserveKPIBulletComponent,
-  KPIFilter,
+  KPIFilterComponent,
   SaveDashboardComponent,
   ConfirmDialogComponent
 ];
@@ -94,11 +94,7 @@ const components = [
   ],
   declarations: components,
   entryComponents: components,
-  exports: [
-    DxDataGridModule,
-    DxDataGridComponent,
-    DxTemplateModule
-  ],
+  exports: [DxDataGridModule, DxDataGridComponent, DxTemplateModule],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
     {

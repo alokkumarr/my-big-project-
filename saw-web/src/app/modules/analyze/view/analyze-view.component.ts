@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material';
 import { LocalStorageService } from 'angular-2-local-storage';
 import * as isUndefined from 'lodash/isUndefined';
 import * as findIndex from 'lodash/findIndex';
@@ -13,32 +13,29 @@ import { AnalyzeNewDialogComponent } from './new-dialog';
 import { Analysis, AnalyzeViewActionEvent } from './types';
 import { ExecuteService } from '../services/execute.service';
 
-const style = require('./analyze-view.component.scss');
-
 const VIEW_KEY = 'analyseReportView';
 const SEARCH_CONFIG = [
-  {keyword: 'NAME', fieldName: 'name'},
-  {keyword: 'TYPE', fieldName: 'type'},
-  {keyword: 'CREATOR', fieldName: 'userFullName'},
-  {keyword: 'CREATED', fieldName: 'new Date(rowData.createdTimestamp).toDateString()'},
-  {keyword: 'METRIC', fieldName: 'metricName'}
+  { keyword: 'NAME', fieldName: 'name' },
+  { keyword: 'TYPE', fieldName: 'type' },
+  { keyword: 'CREATOR', fieldName: 'userFullName' },
+  {
+    keyword: 'CREATED',
+    fieldName: 'new Date(rowData.createdTimestamp).toDateString()'
+  },
+  { keyword: 'METRIC', fieldName: 'metricName' }
 ];
 @Component({
   selector: 'analyze-view-u',
   templateUrl: './analyze-view.component.html',
-  styles: [
-    `:host {width: 100%;}`,
-    style
-  ]
+  styleUrls: ['./analyze-view.component.scss']
 })
 export class AnalyzeViewComponent implements OnInit {
-
   public analyses: Analysis[] = [];
   public filteredAnalyses: Analysis[];
   public categoryName: Promise<string>;
   public cronJobs: any;
-  public LIST_VIEW  = 'list';
-  public CARD_VIEW  = 'card';
+  public LIST_VIEW = 'list';
+  public CARD_VIEW = 'card';
   public analysisId: string;
   public canUserCreate: boolean;
   public viewMode = this.LIST_VIEW;
@@ -48,7 +45,7 @@ export class AnalyzeViewComponent implements OnInit {
     ['report', 'Report'],
     ['pivot', 'Pivot'],
     ['scheduled', 'Scheduled']
-  ].map(([value, label]) => ({value, label}));
+  ].map(([value, label]) => ({ value, label }));
   public filterObj = {
     analysisType: this.analysisTypes[0].value,
     searchTerm: '',
@@ -64,15 +61,16 @@ export class AnalyzeViewComponent implements OnInit {
     public _toastMessage: ToastService,
     public _dialog: MatDialog,
     public _executeService: ExecuteService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this._route.params.subscribe(params => {
       this.onParamsChange(params);
     });
     const savedView = <string>this._localStorage.get(VIEW_KEY);
-    this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView) ?
-    savedView : this.LIST_VIEW;
+    this.viewMode = [this.LIST_VIEW, this.CARD_VIEW].includes(savedView)
+      ? savedView
+      : this.LIST_VIEW;
   }
 
   onParamsChange(params) {
@@ -82,7 +80,8 @@ export class AnalyzeViewComponent implements OnInit {
       subCategoryId: this.analysisId
     });
 
-    this.categoryName = this._analyzeService.getCategory(this.analysisId)
+    this.categoryName = this._analyzeService
+      .getCategory(this.analysisId)
       .then(category => category.name);
 
     this.loadAnalyses(this.analysisId);
@@ -91,39 +90,45 @@ export class AnalyzeViewComponent implements OnInit {
 
   onAction(event: AnalyzeViewActionEvent) {
     switch (event.action) {
-    case 'fork': {
-      const { analysis, requestExecution } = event;
-      if (analysis) {
-        this.loadAnalyses(this.analysisId).then(() => {
-          if (requestExecution) {
-            this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
-          }
-        });
+      case 'fork': {
+        const { analysis, requestExecution } = event;
+        if (analysis) {
+          this.loadAnalyses(this.analysisId).then(() => {
+            if (requestExecution) {
+              this._executeService.executeAnalysis(
+                analysis,
+                EXECUTION_MODES.PUBLISH
+              );
+            }
+          });
+        }
+        break;
       }
-      break;
-    }
-    case 'edit': {
-      const { analysis, requestExecution } = event;
-      if (analysis) {
-        this.spliceAnalyses(analysis, true);
+      case 'edit': {
+        const { analysis, requestExecution } = event;
+        if (analysis) {
+          this.spliceAnalyses(analysis, true);
+        }
+        if (requestExecution) {
+          this._executeService.executeAnalysis(
+            analysis,
+            EXECUTION_MODES.PUBLISH
+          );
+        }
+        break;
       }
-      if (requestExecution) {
-        this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
-      }
-      break;
-    }
-    case 'delete':
-      this.spliceAnalyses(event.analysis, false);
-      break;
-    case 'execute':
-      if (event.analysis) {
-        this.goToAnalysis(event.analysis);
-      }
-      break;
-    case 'publish':
-      this.afterPublish(event.analysis);
-      this.spliceAnalyses(event.analysis, true);
-      break;
+      case 'delete':
+        this.spliceAnalyses(event.analysis, false);
+        break;
+      case 'execute':
+        if (event.analysis) {
+          this.goToAnalysis(event.analysis);
+        }
+        break;
+      case 'publish':
+        this.afterPublish(event.analysis);
+        this.spliceAnalyses(event.analysis, true);
+        break;
     }
   }
 
@@ -137,28 +142,27 @@ export class AnalyzeViewComponent implements OnInit {
   }
 
   goToAnalysis(analysis) {
-    this._router.navigate(
-      ['analyze', 'analysis', analysis.id, 'executed'], {
-        queryParams: {
-          executedAnalysis: null,
-          awaitingExecution: true,
-          loadLastExecution: false
-        }
+    this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+      queryParams: {
+        executedAnalysis: null,
+        awaitingExecution: true,
+        loadLastExecution: false
       }
-    );
+    });
   }
 
   afterPublish(analysis) {
     this.getCronJobs(this.analysisId);
     /* Update the new analysis in the current list */
-    this._router.navigate(
-      ['analyze', analysis.categoryId]
-    );
+    this._router.navigate(['analyze', analysis.categoryId]);
   }
 
   spliceAnalyses(analysis, replace) {
-    const index = findIndex(this.analyses, ({id}) => id === analysis.id);
-    const filteredIndex = findIndex(this.filteredAnalyses, ({id}) => id === analysis.id);
+    const index = findIndex(this.analyses, ({ id }) => id === analysis.id);
+    const filteredIndex = findIndex(
+      this.filteredAnalyses,
+      ({ id }) => id === analysis.id
+    );
     if (replace) {
       this.analyses.splice(index, 1, analysis);
       this.filteredAnalyses.splice(filteredIndex, 1, analysis);
@@ -170,24 +174,30 @@ export class AnalyzeViewComponent implements OnInit {
 
   openNewAnalysisModal() {
     this._analyzeService.getSemanticLayerData().then(metrics => {
-      this._dialog.open(AnalyzeNewDialogComponent, {
-        width: 'auto',
-        height: 'auto',
-        autoFocus: false,
-        data: {
-          metrics,
-          id: this.analysisId
-        }
-      } as MatDialogConfig).afterClosed().subscribe(event => {
-        const { analysis, requestExecution } = event;
-        if (analysis) {
-          this.loadAnalyses(this.analysisId).then(() => {
-            if (requestExecution) {
-              this._executeService.executeAnalysis(analysis, EXECUTION_MODES.PUBLISH);
-            }
-          });
-        }
-      });
+      this._dialog
+        .open(AnalyzeNewDialogComponent, {
+          width: 'auto',
+          height: 'auto',
+          autoFocus: false,
+          data: {
+            metrics,
+            id: this.analysisId
+          }
+        } as MatDialogConfig)
+        .afterClosed()
+        .subscribe(event => {
+          const { analysis, requestExecution } = event;
+          if (analysis) {
+            this.loadAnalyses(this.analysisId).then(() => {
+              if (requestExecution) {
+                this._executeService.executeAnalysis(
+                  analysis,
+                  EXECUTION_MODES.PUBLISH
+                );
+              }
+            });
+          }
+        });
     });
   }
 
@@ -204,27 +214,37 @@ export class AnalyzeViewComponent implements OnInit {
       categoryId: analysisId,
       groupkey: token.ticket.custCode
     };
-    this._analyzeService.getAllCronJobs(requestModel).then((response: any) => {
-      if (response.statusCode === 200) {
-        if (!isUndefined(response)) {
-          this.cronJobs = response.data;
-        } else {
-          this.cronJobs = '';
+    this._analyzeService
+      .getAllCronJobs(requestModel)
+      .then((response: any) => {
+        if (response.statusCode === 200) {
+          if (!isUndefined(response)) {
+            this.cronJobs = response.data;
+          } else {
+            this.cronJobs = '';
+          }
         }
-      }
-    }).catch(err => {
-      this._toastMessage.error(err.message);
-    });
+      })
+      .catch(err => {
+        this._toastMessage.error(err.message);
+      });
   }
 
   applySearchFilter(value) {
     this.filterObj.searchTerm = value;
-    const searchCriteria = this._localSearch.parseSearchTerm(this.filterObj.searchTerm);
+    const searchCriteria = this._localSearch.parseSearchTerm(
+      this.filterObj.searchTerm
+    );
     this.filterObj.searchTermValue = searchCriteria.trimmedTerm;
-    this._localSearch.doSearch(searchCriteria, this.analyses, SEARCH_CONFIG).then(data => {
-      this.filteredAnalyses = data;
-    }, err => {
-      this._toastMessage.error(err.message);
-    });
+    this._localSearch
+      .doSearch(searchCriteria, this.analyses, SEARCH_CONFIG)
+      .then(
+        data => {
+          this.filteredAnalyses = data;
+        },
+        err => {
+          this._toastMessage.error(err.message);
+        }
+      );
   }
 }

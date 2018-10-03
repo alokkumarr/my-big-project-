@@ -1,5 +1,10 @@
 @import "src/themes/base/colors";
 
+:host {
+  width: 100vw;
+  height: 100vh;
+}
+
 .mat-dialog-title {
   margin: 0;
 }

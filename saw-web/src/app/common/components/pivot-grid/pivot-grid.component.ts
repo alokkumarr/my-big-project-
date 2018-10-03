@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
 import * as isArray from 'lodash/isArray';
 import * as unset from 'lodash/unset';
 import * as map from 'lodash/map';
@@ -36,8 +43,6 @@ const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   aggregate: 'summaryType'
 };
 
-const style = require('./pivot-grid.component.scss');
-
 export interface IPivotGridUpdate {
   dataSource?: any;
   fields?: any;
@@ -49,15 +54,7 @@ export interface IPivotGridUpdate {
 @Component({
   selector: 'pivot-grid',
   templateUrl: './pivot-grid.component.html',
-  styles: [
-    `:host {
-      height: 100%;
-      width: 100%;
-      display: block;
-      overflow: auto;
-    }`,
-    style
-  ]
+  styleUrls: ['./pivot-grid.component.scss']
 })
 export class PivotGridComponent implements OnInit, OnDestroy {
   @Input() updater: Subject<IPivotGridUpdate>;

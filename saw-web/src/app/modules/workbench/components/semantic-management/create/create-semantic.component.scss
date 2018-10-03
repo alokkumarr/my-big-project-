@@ -1,5 +1,9 @@
 @import 'src/themes/base/colors';
 
+:host {
+  class: 'create-semantic'
+}
+
 .create-semantic {
   width: 100%;
   height: calc(100% - 3px);

@@ -1,19 +1,15 @@
-
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 import * as get from 'lodash/get';
 
-const style = require('./dateformat-dialog.component.scss');
-
 @Component({
   selector: 'dateformat-dialog',
   templateUrl: './dateformat-dialog.component.html',
-  styles: [style]
+  styleUrls: ['./dateformat-dialog.component.scss']
 })
-
-export class DateformatDialogComponent {
+export class DateformatDialogComponent implements OnInit {
   form: FormGroup;
   public placeholder = ''; // tslint:disable-line
   public formatArr = ''; // tslint:disable-line

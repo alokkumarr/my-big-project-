@@ -1,5 +1,12 @@
-
-import { Component, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
+  ViewChild,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import * as trim from 'lodash/trim';
@@ -17,20 +24,13 @@ import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialo
 import { WorkbenchService } from '../../../services/workbench.service';
 import { STAGING_TREE } from '../../../wb-comp-configs';
 
-const style = require('./select-rawdata.component.scss');
-
 @Component({
   selector: 'select-rawdata',
   templateUrl: './select-rawdata.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./select-rawdata.component.scss']
 })
-
-export class SelectRawdataComponent implements OnInit {
+export class SelectRawdataComponent
+  implements OnInit, AfterViewInit, OnDestroy {
   public treeConfig: any; // tslint:disable-line
   public treeNodes: Array<any>; // tslint:disable-line
   public treeOptions: ITreeOptions;
@@ -48,7 +48,7 @@ export class SelectRawdataComponent implements OnInit {
     public dxDataGrid: DxDataGridService,
     public workBench: WorkbenchService,
     public notify: ToastService
-  ) { }
+  ) {}
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @ViewChild('tree') tree;
@@ -90,12 +90,14 @@ export class SelectRawdataComponent implements OnInit {
       hasChildrenField: 'isDirectory',
       getChildren: (node: TreeNode) => {
         const parentPath = node.data.path;
-        const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
+        const path =
+          parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
         // this.currentPath = path;
         // this.nodeID = node.id;
-        return this.workBench.getStagingData(path)
+        return this.workBench
+          .getStagingData(path)
           .toPromise()
-          .then(function (data) {
+          .then(function(data) {
             const dir = filter(data.data, ['isDirectory', true]);
             return dir;
           });
@@ -111,7 +113,8 @@ export class SelectRawdataComponent implements OnInit {
 
   openFolder(node) {
     const parentPath = node.data.path;
-    const path = parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
+    const path =
+      parentPath === 'root' ? '/' : `${parentPath}/${node.displayField}`;
     this.currentPath = path;
     this.nodeID = node.id;
     this.workBench.getStagingData(path).subscribe(data => {
@@ -129,29 +132,33 @@ export class SelectRawdataComponent implements OnInit {
 
   getGridConfig() {
     const dataSource = [];
-    const columns = [{
-      caption: 'File',
-      dataField: 'name',
-      dataType: 'string',
-      cellTemplate: 'dobjTemplate',
-      width: '66%',
-      allowSorting: true,
-      sortOrder: 'asc'
-    }, {
-      dataField: 'size',
-      caption: 'Size',
-      width: '15%',
-      dataType: 'number',
-      cellTemplate: 'sizeTemplate',
-      allowSorting: true
-    }, {
-      dataField: 'name',
-      caption: 'Preview',
-      alignment: 'right',
-      width: '14%',
-      allowFiltering: false,
-      cellTemplate: 'actionsTemplate'
-    }];
+    const columns = [
+      {
+        caption: 'File',
+        dataField: 'name',
+        dataType: 'string',
+        cellTemplate: 'dobjTemplate',
+        width: '66%',
+        allowSorting: true,
+        sortOrder: 'asc'
+      },
+      {
+        dataField: 'size',
+        caption: 'Size',
+        width: '15%',
+        dataType: 'number',
+        cellTemplate: 'sizeTemplate',
+        allowSorting: true
+      },
+      {
+        dataField: 'name',
+        caption: 'Preview',
+        alignment: 'right',
+        width: '14%',
+        allowFiltering: false,
+        cellTemplate: 'actionsTemplate'
+      }
+    ];
 
     return this.dxDataGrid.mergeWithDefaultConfig({
       columns,
@@ -208,9 +215,17 @@ export class SelectRawdataComponent implements OnInit {
     this.selFiles = this.workBench.filterFiles(mask, tempFiles);
     if (this.selFiles.length > 0) {
       this.filePath = `${this.selFiles[0].path}/${this.fileMask}`;
-      this.onSelectFullfilled.emit({ selectFullfilled: true, selectedFiles: this.selFiles, filePath: this.filePath });
+      this.onSelectFullfilled.emit({
+        selectFullfilled: true,
+        selectedFiles: this.selFiles,
+        filePath: this.filePath
+      });
     } else {
-      this.onSelectFullfilled.emit({ selectFullfilled: false, selectedFiles: this.selFiles, filePath: this.filePath });
+      this.onSelectFullfilled.emit({
+        selectFullfilled: false,
+        selectedFiles: this.selFiles,
+        filePath: this.filePath
+      });
     }
   }
 
@@ -251,7 +266,10 @@ export class SelectRawdataComponent implements OnInit {
         this.clearSelected();
       });
     } else {
-      this.notify.warn('Only ".csv" or ".txt" extension files are supported', 'Unsupported file type');
+      this.notify.warn(
+        'Only ".csv" or ".txt" extension files are supported',
+        'Unsupported file type'
+      );
     }
   }
   /**
@@ -270,31 +288,30 @@ export class SelectRawdataComponent implements OnInit {
       width: '350px'
     });
 
-    dateDialogRef
-      .afterClosed()
-      .subscribe(name => {
-        if (trim(name) !== '' && name != 'null') {
-          const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
-          this.workBench.createFolder(path).subscribe(data => {
-            const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
-            const currChilds = get(currentNode.data, 'children', []);
-            const uniqueResults = data.data.filter(obj => {
-              return !currChilds.some(obj2 => {
-                return obj.name == obj2.name;
-              });
+    dateDialogRef.afterClosed().subscribe(name => {
+      if (trim(name) !== '' && name !== 'null') {
+        const path =
+          this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
+        this.workBench.createFolder(path).subscribe(data => {
+          const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
+          const currChilds = get(currentNode.data, 'children', []);
+          const uniqueResults = data.data.filter(obj => {
+            return !currChilds.some(obj2 => {
+              return obj.name === obj2.name;
             });
-            const newDir = filter(uniqueResults, ['isDirectory', true]);
-            if (currChilds.length === 0) {
-              currentNode.data.children = newDir;
-            } else {
-              if (newDir.length > 0) {
-                currentNode.data.children.push(newDir[0]);
-              }
-            }
-            this.tree.treeModel.update();
-            currentNode.expand();
           });
-        }
-      });
+          const newDir = filter(uniqueResults, ['isDirectory', true]);
+          if (currChilds.length === 0) {
+            currentNode.data.children = newDir;
+          } else {
+            if (newDir.length > 0) {
+              currentNode.data.children.push(newDir[0]);
+            }
+          }
+          this.tree.treeModel.update();
+          currentNode.expand();
+        });
+      }
+    });
   }
 }

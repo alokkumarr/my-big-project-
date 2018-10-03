@@ -1,8 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Inject
-} from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import * as currencyCodes from 'currency-codes/data.js';
 import * as getCurrencySymbol from 'currency-symbol-map/currency-symbol-map.js';
@@ -17,8 +13,6 @@ import {
   isFormatted
 } from '../../../common/utils/numberFormatter';
 
-const style = require('./data-format-dialog.component.scss');
-
 const DEFAULT_CURRENCY = 'USD';
 const FLOAT_SAMPLE = 1000.33333;
 const INT_SAMPLE = 1000;
@@ -27,16 +21,9 @@ export const DEFAULT_PRECISION = 2;
 @Component({
   selector: 'data-format-dialog',
   templateUrl: './data-format-dialog.component.html',
-  styles: [
-    `:host {
-      display: block;
-      padding: 10px;
-    }`,
-    style
-  ]
+  styleUrls: ['./data-format-dialog.component.scss']
 })
 export class DataFormatDialogComponent implements OnInit {
-
   public format: Format = {};
   public currencyCodes = currencyCodes;
   public sample: string;
@@ -44,9 +31,10 @@ export class DataFormatDialogComponent implements OnInit {
 
   constructor(
     public _dialogRef: MatDialogRef<DataFormatDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      format: Format,
-      type: string
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      format: Format;
+      type: string;
     }
   ) {}
 
@@ -108,6 +96,4 @@ export class DataFormatDialogComponent implements OnInit {
       this.sample = null;
     }
   }
-
-
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpFilter from 'lodash/fp/filter';
@@ -21,14 +21,12 @@ import {
 } from '../types';
 import { TYPE_MAP } from '../../consts';
 
-const style = require('./designer-sort.component.scss');
-
 @Component({
   selector: 'designer-sort',
   templateUrl: './designer-sort.component.html',
-  styles: [style]
+  styleUrls: ['./designer-sort.component.scss']
 })
-export class DesignerSortComponent {
+export class DesignerSortComponent implements OnInit {
   @Output() public sortsChange: EventEmitter<Sort[]> = new EventEmitter();
   @Input() public artifacts: Artifact[];
   @Input() public sorts: Sort[];
@@ -39,21 +37,21 @@ export class DesignerSortComponent {
   public TYPE_MAP = TYPE_MAP;
   public isEmpty = isEmpty;
 
-  public removeFromAvailableFields = (artifactColumn: ArtifactColumn) => {
+  public removeFromAvailableFields(artifactColumn: ArtifactColumn) {
     this.availableFields = filter(
       this.availableFields,
       ({ columnName }) => columnName !== artifactColumn.columnName
     );
   }
 
-  public removeFromSortedFields = (sort: Sort) => {
+  public removeFromSortedFields(sort: Sort) {
     this.sorts = filter(
       this.sorts,
       ({ columnName }) => columnName !== sort.columnName
     );
   }
 
-  public addToSortedFields = (item, index) => {
+  public addToSortedFields(item, index) {
     const firstN = take(this.sorts, index);
     const lastN = takeRight(this.sorts, this.sorts.length - index);
 

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import {
   FormControl,
@@ -7,14 +7,12 @@ import {
   Validators
 } from '@angular/forms';
 
-const style = require('./semantic-details-dialog.component.scss');
-
 @Component({
   selector: 'createfolder-dialog',
   templateUrl: './semantic-details-dialog.component.html',
-  styles: [style]
+  styleUrls: ['./semantic-details-dialog.component.scss']
 })
-export class SemanticDetailsDialogComponent {
+export class SemanticDetailsDialogComponent implements OnInit {
   form: FormGroup;
 
   constructor(

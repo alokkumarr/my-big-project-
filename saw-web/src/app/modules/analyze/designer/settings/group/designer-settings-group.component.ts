@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import {
   ArtifactColumn,
   ArtifactColumns,
@@ -8,14 +8,12 @@ import {
 import { TYPE_ICONS_OBJ } from '../../../consts';
 import { DesignerService } from '../../designer.service';
 
-const style = require('./designer-settings-group.component.scss');
-
 @Component({
   selector: 'designer-settings-group',
   templateUrl: './designer-settings-group.component.html',
-  styles: [style]
+  styleUrls: ['./designer-settings-group.component.scss']
 })
-export class DesignerSettingsGroupComponent {
+export class DesignerSettingsGroupComponent implements OnInit {
   @Output() public fieldsChange: EventEmitter<null> = new EventEmitter();
   @Output()
   public fieldPropChange: EventEmitter<
@@ -33,12 +31,12 @@ export class DesignerSettingsGroupComponent {
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
 
-  public removeFromCallback = (payload, index, container) => {
+  public removeFromCallback(payload, index, container) {
     this._designerService.removeArtifactColumnFromGroup(payload, container);
     this.fieldsChange.emit();
   }
 
-  public addToCallback = (payload, index, container) => {
+  public addToCallback(payload, index, container) {
     this._designerService.addArtifactColumnIntoGroup(payload, container, index);
     this.fieldsChange.emit();
   }

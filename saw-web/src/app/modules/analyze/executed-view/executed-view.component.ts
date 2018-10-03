@@ -29,22 +29,12 @@ import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-gr
 import { AnalyzeActionsService } from '../actions';
 
 import { Analysis } from '../types';
-import {
-  JwtService,
-  CUSTOM_JWT_CONFIG
-} from '../../../common/services';
-
-const style = require('./executed-view.component.scss');
+import { JwtService, CUSTOM_JWT_CONFIG } from '../../../common/services';
 
 @Component({
   selector: 'executed-view',
   templateUrl: './executed-view.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`,
-    style
-  ]
+  styleUrls: ['./executed-view.component.scss']
 })
 export class ExecutedViewComponent implements OnInit, OnDestroy {
   analysis: Analysis; // the latest analysis definition
@@ -82,14 +72,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    combineLatest(
-      this._route.params,
-      this._route.queryParams
-    ).pipe(
-      debounce(() => timer(100))
-    ).subscribe(([params, queryParams]) => {
-      this.onParamsChange(params, queryParams);
-    });
+    combineLatest(this._route.params, this._route.queryParams)
+      .pipe(debounce(() => timer(100)))
+      .subscribe(([params, queryParams]) => {
+        this.onParamsChange(params, queryParams);
+      });
 
     this.canAutoRefresh = this._jwt.hasCustomConfig(
       CUSTOM_JWT_CONFIG.ES_ANALYSIS_AUTO_REFRESH
@@ -97,14 +84,8 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   onParamsChange(params, queryParams) {
-    const {
-      analysisId
-    } = params;
-    const {
-      awaitingExecution,
-      loadLastExecution,
-      executionId
-    } = queryParams;
+    const { analysisId } = params;
+    const { awaitingExecution, loadLastExecution, executionId } = queryParams;
 
     this.executionId = executionId;
 
@@ -222,15 +203,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   gotoLastPublished(analysis, { executionId }) {
     return () => {
       this._toastMessage.clear();
-      this._router.navigate(
-        ['analyze', 'analysis', analysis.id, 'executed'], {
-          queryParams: {
-            executionId,
-            awaitingExecution: false,
-            loadLastExecution: true
-          }
+      this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+        queryParams: {
+          executionId,
+          awaitingExecution: false,
+          loadLastExecution: true
         }
-      );
+      });
     };
   }
 
@@ -462,9 +441,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   goBackToMainPage(analysis) {
-    this._router.navigate(
-      ['analyze', get(analysis, 'categoryId')]
-    );
+    this._router.navigate(['analyze', get(analysis, 'categoryId')]);
   }
 
   edit() {
@@ -501,15 +478,13 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
   }
 
   gotoForkedAnalysis(analysis) {
-    this._router.navigate(
-      ['analyze', 'analysis', analysis.id, 'executed'], {
-        queryParams: {
-          executionId: null,
-          awaitingExecution: true,
-          loadLastExecution: false
-        }
+    this._router.navigate(['analyze', 'analysis', analysis.id, 'executed'], {
+      queryParams: {
+        executionId: null,
+        awaitingExecution: true,
+        loadLastExecution: false
       }
-    );
+    });
   }
 
   afterDelete(analysis) {

@@ -2,6 +2,7 @@ import {
   Component,
   Input,
   Output,
+  OnInit,
   EventEmitter,
   ViewContainerRef,
   ViewChild
@@ -16,14 +17,12 @@ import { map } from 'rxjs/operators/map';
 import { ArtifactColumn, Filter, FilterModel } from '../../types';
 import { TYPE_MAP } from '../../../consts';
 
-const style = require('./designer-filter-row.component.scss');
-
 @Component({
   selector: 'designer-filter-row',
   templateUrl: './designer-filter-row.component.html',
-  styles: [style]
+  styleUrls: ['./designer-filter-row.component.scss']
 })
-export class DesignerFilterRowComponent {
+export class DesignerFilterRowComponent implements OnInit {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Output() public filterChange: EventEmitter<null> = new EventEmitter();
   @Output() public filterModelChange: EventEmitter<null> = new EventEmitter();
@@ -104,7 +103,9 @@ export class DesignerFilterRowComponent {
   }
 
   onGlobalCheckboxToggle(filter: Filter, checked: boolean) {
-    if (!this.supportsGlobalFilters) { return; }
+    if (!this.supportsGlobalFilters) {
+      return;
+    }
     filter.isGlobalFilter = checked;
     if (checked) {
       delete filter.model;

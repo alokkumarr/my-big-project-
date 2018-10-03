@@ -1,5 +1,9 @@
 @import "src/themes/base/colors";
 
+:host {
+  border: 1px solid #CCC;
+}
+
 .dateDetails {
   float: left;
   margin: 12px;

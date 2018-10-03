@@ -1,16 +1,9 @@
-import {
-  Component,
-  Input,
-  Output,
-  EventEmitter
-} from '@angular/core';
-
-const style = require('./designer-description.component.scss');
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'designer-description',
   templateUrl: './designer-description.component.html',
-  styles: [style]
+  styleUrls: ['./designer-description.component.scss']
 })
 export class DesignerDescriptionComponent {
   @Output() public descriptionChange: EventEmitter<string> = new EventEmitter();

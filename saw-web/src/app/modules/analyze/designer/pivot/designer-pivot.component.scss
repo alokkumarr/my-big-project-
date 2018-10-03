@@ -1,5 +1,10 @@
 @import "src/themes/base/colors";
 
+:host {
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+}
+
 .non-ideal-state__container {
   margin-top: 50px;
 }

@@ -27,22 +27,12 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as get from 'lodash/get';
 import { GlobalFilterService } from '../../services/global-filter.service';
 
-const style = require('./create-dashboard.component.scss');
-
 const MARGIN_BETWEEN_TILES = 10;
 
 @Component({
   selector: 'create-dashboard',
   templateUrl: './create-dashboard.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }`,
-    style
-  ],
+  styleUrls: ['./create-dashboard.component.scss'],
   animations,
   providers: [DashboardService, GlobalFilterService]
 })

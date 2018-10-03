@@ -11,17 +11,10 @@ import { WorkbenchService } from '../../services/workbench.service';
 import { ToastService } from '../../../../common/services/toastMessage.service';
 import { SearchBoxComponent } from '../../../../common/components/search-box';
 
-const style = require('./data-objects-page.component.scss');
-
 @Component({
   selector: 'data-objects-page',
   templateUrl: './data-objects-page.component.html',
-  styles: [
-    `:host {
-      width: 100%;
-    }`,
-    style
-  ],
+  styleUrls: ['./data-objects-page.component.scss'],
   providers: [DatePipe]
 })
 export class DataobjectsComponent implements OnInit, OnDestroy {
@@ -41,8 +34,7 @@ export class DataobjectsComponent implements OnInit, OnDestroy {
   public poll = false;
   public interval = 20000;
 
-  @ViewChild(SearchBoxComponent)
-  searchBox: SearchBoxComponent;
+  @ViewChild(SearchBoxComponent) searchBox: SearchBoxComponent;
 
   constructor(
     public router: Router,

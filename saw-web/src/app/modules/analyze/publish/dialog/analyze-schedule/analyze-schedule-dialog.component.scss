@@ -1,99 +1,99 @@
 @import "src/themes/base/colors";
 
+:host {
+  display: block;
+  padding: 10px;
+  color: $primary-grey-g4;
+}
+
 .remove-schedule {
   color: red !important;
   margin-left: 51% !important;
   margin-right: 0 !important;
 }
 
-.analyze-schedule-dialog {
-  display: block;
-  padding: 10px;
-  color: $primary-grey-g4;
+header {
+  padding: 0 0 10px;
+  border-bottom: 1px solid #999;
+}
 
-  header {
-    padding: 0 0 10px;
-    border-bottom: 1px solid #999;
+.dialog__content {
+  width: 700px;
+  max-height: 550px;
+
+  .label-inline-with-select {
+    text-align: center;
+    line-height: 38px;
   }
 
-  .dialog__content {
-    width: 700px;
-    max-height: 550px;
+  .form-container {
+    padding-top: 16px;
 
-    .label-inline-with-select {
-      text-align: center;
-      line-height: 38px;
+    label {
+      font-weight: bold;
+      padding-bottom: 10px;
     }
 
-    .form-container {
-      padding-top: 16px;
-
-      label {
-        font-weight: bold;
-        padding-bottom: 10px;
-      }
-
-      mat-input-container {
-        margin: 0;
-      }
+    mat-input-container {
+      margin: 0;
     }
+  }
 
-    .schedule-container {
+  .schedule-container {
+    margin: 10px;
+  }
+
+  .days-of-week-checkboxes {
+    padding-top: 6px;
+  }
+
+  .end-criteria-radio {
+    line-height: 32px;
+  }
+
+  mat-chips input {
+    width: 250px;
+    font-size: 14px;
+    padding: 10px;
+    margin: -2px;
+  }
+
+  .errorTextMsg {
+    color: $secondary-red;
+  }
+
+  .errorMsg {
+    color: $primary-white;
+    background-color: $secondary-orange;
+    border-radius: 14px;
+    float: left;
+    height: 26px;
+    width: 24px;
+    text-align: center;
+    font-size: larger;
+    margin-top: 3px;
+    margin-right: 2px;
+  }
+
+  .schedule-container .form-container .publish-form {
+    div.clear {
       margin: 10px;
-    }
-
-    .days-of-week-checkboxes {
-      padding-top: 6px;
-    }
-
-    .end-criteria-radio {
-      line-height: 32px;
-    }
-
-    mat-chips input {
-      width: 250px;
-      font-size: 14px;
-      padding: 10px;
-      margin: -2px;
-    }
-
-    .errorTextMsg {
-      color: $secondary-red;
-    }
-
-    .errorMsg {
-      color: $primary-white;
-      background-color: $secondary-orange;
-      border-radius: 14px;
-      float: left;
-      height: 26px;
-      width: 24px;
-      text-align: center;
-      font-size: larger;
-      margin-top: 3px;
-      margin-right: 2px;
-    }
-
-    .schedule-container .form-container .publish-form {
-      div.clear {
-        margin: 10px;
-        top: 10px;
-        color: #0096D5;
-        cursor: pointer;
-      }
-    }
-
-    .ftp-select {
-      left: 459px !important;
+      top: 10px;
+      color: #0096D5;
+      cursor: pointer;
     }
   }
 
-  .base-dialog__actions {
-    padding: 10px 1px 10px 0;
-    border-top: 1px solid #999;
+  .ftp-select {
+    left: 459px !important;
+  }
+}
 
-    .form-buttons button {
-      margin-right: 10px;
-    }
+.base-dialog__actions {
+  padding: 10px 1px 10px 0;
+  border-top: 1px solid #999;
+
+  .form-buttons button {
+    margin-right: 10px;
   }
 }

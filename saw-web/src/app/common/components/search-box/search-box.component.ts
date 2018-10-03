@@ -10,21 +10,12 @@ import {
 } from '@angular/core';
 import * as debounce from 'lodash/debounce';
 
-const style = require('./search-box.component.scss');
-
 @Component({
   selector: 'search-box',
   templateUrl: './search-box.component.html',
-  styles: [
-    `:host {
-      display: inline-flex;
-      flex-grow: 1;
-    }`,
-    style
-  ]
+  styleUrls: ['./search-box.component.scss']
 })
 export class SearchBoxComponent implements OnInit, OnDestroy {
-
   @Output() searchTermChange: EventEmitter<string> = new EventEmitter();
   @Input() value: string;
   @Input() placeholder: string;
