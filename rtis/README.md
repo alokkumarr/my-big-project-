@@ -1,7 +1,7 @@
 # Synchronoss Real Time Data Ingestion and Analytics
 
 
-#####Run in Local:
+#####  Run in Local:
 
  1. Create applciation.conf file in conf folder by copying contents of
     applicaiton.conf.dev file
@@ -11,10 +11,10 @@
  4. Create a new run configuration with conf folder in class path and run
     **play.core.server.ProdServerStart**
     
- 5. Once server starts access localhost:9100 and the output should be
+ 5. Once server starts access [localhost:9100](http://localhost:9100) and the output should be
     "Your new application is ready.”
     
- ######Errors:
+ ##### Errors:
  
  1. This application is already running (Or delete <path>/RUNNING_PID file):
     
