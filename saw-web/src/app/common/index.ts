@@ -6,7 +6,11 @@ import 'mottle';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  NgModule,
+  CUSTOM_ELEMENTS_SCHEMA,
+  ModuleWithProviders
+} from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import {
@@ -24,10 +28,7 @@ import {
   ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
-import {
-  IsUserLoggedInGuard,
-  DefaultModuleGuard
-} from './guards';
+import { IsUserLoggedInGuard, DefaultModuleGuard } from './guards';
 import { MaterialModule } from '../material.module';
 import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -154,7 +155,18 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
     ...COMPONENTS,
     ...DIRECTIVES
   ],
-  providers: [...SERVICES, ...INTERCEPTORS, ...GUARDS],
+  providers: [...INTERCEPTORS, ...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class CommonModuleTs {}
+
+/* CommonModuleGlobal exposes services that are shared for lazy loaded components as well */
+@NgModule({})
+export class CommonModuleGlobal {
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: CommonModuleGlobal,
+      providers: [...SERVICES]
+    };
+  }
+}

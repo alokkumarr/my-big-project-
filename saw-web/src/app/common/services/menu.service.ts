@@ -77,9 +77,9 @@ export class MenuService {
               subfeature.prodModCode === 'WRK000001'
                 ? [`/${moduleName.toLowerCase()}`, `${subfeature.defaultURL}`]
                 : [
-                  `/${moduleName.toLowerCase()}`,
-                  `${subfeature.prodModFeatureID}`
-                ];
+                    `/${moduleName.toLowerCase()}`,
+                    `${subfeature.prodModFeatureID}`
+                  ];
             return {
               id: subfeature.prodModFeatureID,
               name:
