@@ -31,7 +31,9 @@ and deply various RTIS services
     
     Simply remove RUNNING_PID file. 
     
-    $  rm RUNNING_PID
+   ``` $  rm RUNNING_PID ```
+
+
     
  2. Configuration Error:  
     Make sure conf file is in classpath and secret key is set. 
@@ -46,7 +48,9 @@ and deply various RTIS services
  
  1. Download sbt to compile and generate routes:
      
-    $  brew install sbt
+   ```  $  brew install sbt ```
+
+
  2. Implement changes. 
     Ex: add new route in conf/routes file and update controller class
  3. Delete all generated files inside app folder
