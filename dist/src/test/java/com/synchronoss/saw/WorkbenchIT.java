@@ -252,15 +252,15 @@ public class WorkbenchIT extends BaseIT {
         log.debug("ID: " + id);
         waitForDataset(id, WAIT_RETRIES);
     }*/
-   // @Test
-   // public void testParseDataset() throws IOException {
-     //   String name = "test-parse-" + testId();
-       // parseDataset(name);
+    @Test
+    public void testParseDataset() throws IOException {
+        String name = "test-parse-" + testId();
+        parseDataset(name);
         /* Workaround: Until the dataset creation API provides the
          * dataset ID, construct it manually here. */
-       // String id = "workbench::" + name;
-       // waitForDataset(id, WAIT_RETRIES);
-    //}
+        String id = "workbench::" + name;
+        waitForDataset(id, WAIT_RETRIES);
+    }
     @Test
     public void testSQLDataset() throws IOException {
         String name = "test-sql-" + testId();
