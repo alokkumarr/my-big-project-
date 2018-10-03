@@ -25,7 +25,17 @@
 #'library(dplyr)
 #'library(lubridate)
 #'
-#'date_func_df <- data.frame(STRING_COL = c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59"), stringsAsFactors = FALSE)
+#' date_func_df <-
+#'   data.frame(
+#'     STRING_COL = c(
+#'       "2017-01-01 10:15:15",
+#'       "2017-09-23 14:26:59",
+#'       "2017-11-15 05:05:05",
+#'       "2018-05-11 08:15:18",
+#'       "2018-03-27 23:59:59"
+#'     ),
+#'     stringsAsFactors = FALSE
+#'   )
 #'
 #'converter(date_func_df, "STRING_COL", "yyyy-MM-dd HH:mm:ss", "datetime")
 
@@ -97,14 +107,16 @@ converter.data.frame <- function(df,
     df <- df %>%
       dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 = dt_chk_fun)
       ) %>%
-      dplyr::rename_(., .dots = setNames(f1_col_name, output_col_name))
+      dplyr::rename_(., .dots = setNames(f1_col_name, output_col_name)) %>%
+      dplyr::select(., select_vars)
   } else {
     df <- df %>%
       dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 = dt_chk_fun)
       ) %>%
       dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = as.Date)
       ) %>%
-      dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name))
+      dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
+      dplyr::select(., select_vars)
   }
 
   df
@@ -181,7 +193,7 @@ converter.tbl_spark <- function(df,
       dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = to_utc_timestamp, .args = list(time_zone))
       ) %>%
       dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
-      select(., select_vars)
+      dplyr::select(., select_vars)
   } else {
     df <- df %>%
       dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
@@ -192,7 +204,7 @@ converter.tbl_spark <- function(df,
       dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = to_date)
       ) %>%
       dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
-      select(., select_vars)
+      dplyr::select(., select_vars)
   }
 
   df

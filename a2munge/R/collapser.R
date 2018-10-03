@@ -28,7 +28,16 @@
 #'library(dplyr)
 #'library(lubridate)
 #'
-#'date_func_df <- data.frame(TIME_COL = as.POSIXlt(c("2017-01-01 10:15:15", "2017-09-23 14:26:59", "2017-11-15 05:05:05", "2018-05-11 08:15:18", "2018-03-27 23:59:59")), stringsAsFactors = FALSE)
+#' date_func_df <-
+#'   data.frame(TIME_COL = as.POSIXlt(
+#'     c(
+#'       "2017-01-01 10:15:15",
+#'       "2017-09-23 14:26:59",
+#'       "2017-11-15 05:05:05",
+#'       "2018-05-11 08:15:18",
+#'       "2018-03-27 23:59:59"
+#'     )
+#'   ), stringsAsFactors = FALSE)
 #'
 #'collapser(date_func_df, "TIME_COL", "month", "end")
 
@@ -88,7 +97,7 @@ collapser.data.frame <- function(df,
         dplyr::mutate_at(.vars = f1_col_name, .funs = funs(F2 = as.Date, .args = list(time_zone))
         ) %>%
         dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
-        select(., select_vars)
+        dplyr::select(., select_vars)
     } else {
       df <- df %>%
         dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
@@ -100,7 +109,7 @@ collapser.data.frame <- function(df,
         dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = as.Date, .args = list(time_zone))
         ) %>%
         dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
-        select(., select_vars)
+        dplyr::select(., select_vars)
     }
   } else {
 
@@ -110,7 +119,7 @@ collapser.data.frame <- function(df,
                                                               lubridate::floor_date, .args = list(unit))
         ) %>%
         dplyr::rename_(., .dots = setNames(f1_col_name, output_col_name)) %>%
-        select(., select_vars)
+        dplyr::select(., select_vars)
     } else {
       df <- df %>%
         dplyr::mutate_at(.vars = measure_vars, .funs = funs(F1 =
@@ -120,7 +129,7 @@ collapser.data.frame <- function(df,
                                                              . - 1)
         ) %>%
         dplyr::rename_(., .dots = setNames(f2_col_name, output_col_name)) %>%
-        select(., select_vars)
+        dplyr::select(., select_vars)
     }
   }
 
@@ -185,7 +194,7 @@ collapser.tbl_spark <- function(df,
       dplyr::mutate_at(.vars = f2_col_name, .funs = funs(F3 = date_sub, .args = list(d_sub))
       ) %>%
       dplyr::rename_(., .dots = setNames(f3_col_name, output_col_name)) %>%
-      select(., select_vars)
+      dplyr::select(., select_vars)
 
   } else {
     r_num <- ifelse(unit == "minute", 60,
@@ -204,7 +213,7 @@ collapser.tbl_spark <- function(df,
         dplyr::mutate_at(.vars = f3_col_name, .funs = funs(F4 = to_utc_timestamp, .args = list(time_zone))
         ) %>%
         dplyr::rename_(., .dots = setNames(f4_col_name, output_col_name)) %>%
-        select(., select_vars)
+        dplyr::select(., select_vars)
 
     } else {
 
@@ -219,7 +228,7 @@ collapser.tbl_spark <- function(df,
         dplyr::mutate_at(.vars = f3_col_name, .funs = funs(F4 = to_utc_timestamp, .args = list(time_zone))
         ) %>%
         dplyr::rename_(., .dots = setNames(f4_col_name, output_col_name)) %>%
-        select(., select_vars)
+        dplyr::select(., select_vars)
     }
   }
 
