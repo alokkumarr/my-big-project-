@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/projects/BDA/RTIS-logstash/frontend-server/conf/routes
-// @DATE:Wed Dec 06 11:51:19 EST 2017
+// @SOURCE:/Users/nareshgangishetty/swagger-work/sip/rtis/conf/routes
+// @DATE:Wed Oct 03 15:10:59 EDT 2018
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -15,7 +15,27 @@ import _root_.play.libs.F
 package controllers.javascript {
   import ReverseRouteContext.empty
 
-  // @LINE:16
+  // @LINE:15
+  class ReverseAssets(_prefix: => String) {
+
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:15
+    def at: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.Assets.at",
+      """
+        function(file1) {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "docs/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("file", file1)})
+        }
+      """
+    )
+  
+  }
+
+  // @LINE:22
   class ReverseRTISControl(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -23,7 +43,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:18
+    // @LINE:24
     def sr: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.RTISControl.sr",
       """
@@ -33,7 +53,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:16
+    // @LINE:22
     def executeCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.RTISControl.executeCmd",
       """
@@ -43,7 +63,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:17
+    // @LINE:23
     def executeExtendedCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.RTISControl.executeExtendedCmd",
       """
@@ -55,7 +75,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:22
+  // @LINE:28
   class ReverseGenericLog(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -63,7 +83,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:22
+    // @LINE:28
     def doPost: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.GenericLog.doPost",
       """
@@ -102,6 +122,16 @@ package controllers.javascript {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
+  
+    // @LINE:14
+    def viewSwaggerUI: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.ApiHelpController.viewSwaggerUI",
+      """
+        function() {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "docs"})
+        }
+      """
+    )
   
     // @LINE:12
     def getResources: JavaScriptReverseRoute = JavaScriptReverseRoute(
