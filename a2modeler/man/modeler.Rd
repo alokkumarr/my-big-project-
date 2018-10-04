@@ -53,6 +53,6 @@ like forecaster, regressor, segmenter, etc... inherit form
 }
 \seealso{
 Other use cases: \code{\link{classifier}},
-  \code{\link{forecaster}}, \code{\link{regressor}},
-  \code{\link{segmenter}}
+  \code{\link{forecaster}}, \code{\link{multiclassifier}},
+  \code{\link{regressor}}, \code{\link{segmenter}}
 }

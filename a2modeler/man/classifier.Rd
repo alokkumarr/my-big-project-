@@ -45,6 +45,6 @@ Creates a classifier object which inherits from modeler class
 }
 \seealso{
 Other use cases: \code{\link{forecaster}},
-  \code{\link{modeler}}, \code{\link{regressor}},
-  \code{\link{segmenter}}
+  \code{\link{modeler}}, \code{\link{multiclassifier}},
+  \code{\link{regressor}}, \code{\link{segmenter}}
 }

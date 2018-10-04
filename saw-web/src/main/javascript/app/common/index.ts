@@ -61,6 +61,7 @@ import {
   ErrorDetailDialogService,
   ErrorDetailService
 } from './services';
+import { ConfigService } from './services/configuration.service';
 import { ToastService, ComponentHandler } from './services';
 import { UserService } from '../../login/services/user.service';
 import { JwtService } from '../../login/services/jwt.service';
@@ -119,6 +120,7 @@ const SERVICES = [
   ErrorDetailService,
   ErrorDetailDialogService,
   ToastService,
+  ConfigService,
   ChartService,
   WindowService,
   ComponentHandler,
@@ -160,4 +162,4 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
   providers: [...SERVICES, ...INTERCEPTORS, ...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class CommonModuleTs {}
+export class CommonModuleTs { }
