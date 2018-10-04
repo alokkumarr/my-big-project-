@@ -246,35 +246,35 @@ public class WorkbenchIT extends BaseIT {
         return response.path(statusPath);
     }
 
-    @Test
-    public void testListPreregDatasets() throws IOException {
-        // id = parseDataset("test_list")
-        String id = parseDataset2();
-        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
-        log.debug("ID: " + id);
-        waitForDataset(id, WAIT_RETRIES);
-    }
-    @Test
-    public void testParseDataset() throws IOException {
-        String name = "test-parse-" + testId();
-        parseDataset(name);
-        /* Workaround: Until the dataset creation API provides the
-         * dataset ID, construct it manually here. */
-        String id = "workbench::" + name;
-        waitForDataset(id, WAIT_RETRIES);
-    }
-    @Test
-    public void testSQLDataset() throws IOException {
-        String name = "test-sql-" + testId();
-        /* Use only characters suitable for a SQL table name */
-        name = name.replace("-", "_");
-        /* Execute SQL */
-        executeSQLDataset(name);
-        /* Workaround: Until the dataset creation API provides the
-         * dataset ID, construct it manually here. */
-        String id = "workbench::" + name;
-        waitForDataset(id, WAIT_RETRIES);
-    }
+//    @Test
+//    public void testListPreregDatasets() throws IOException {
+//        // id = parseDataset("test_list")
+//        String id = parseDataset2();
+//        assert (id.equalsIgnoreCase("workbench::WBAPARSER01"));
+//        log.debug("ID: " + id);
+//        waitForDataset(id, WAIT_RETRIES);
+//    }
+//    @Test
+//    public void testParseDataset() throws IOException {
+//        String name = "test-parse-" + testId();
+//        parseDataset(name);
+//        /* Workaround: Until the dataset creation API provides the
+//         * dataset ID, construct it manually here. */
+//        String id = "workbench::" + name;
+//        waitForDataset(id, WAIT_RETRIES);
+//    }
+//    @Test
+//    public void testSQLDataset() throws IOException {
+//        String name = "test-sql-" + testId();
+//        /* Use only characters suitable for a SQL table name */
+//        name = name.replace("-", "_");
+//        /* Execute SQL */
+//        executeSQLDataset(name);
+//        /* Workaround: Until the dataset creation API provides the
+//         * dataset ID, construct it manually here. */
+//        String id = "workbench::" + name;
+//        waitForDataset(id, WAIT_RETRIES);
+//    }
 
     /**
      * Execute SQL on a dataset with given name using Workbench
@@ -346,33 +346,33 @@ public class WorkbenchIT extends BaseIT {
             .body(containsString(""));
     }
 
-    @Test
-    public void testPreviewDataset() throws IOException {
-        String name = "test-preview-" + testId();
-        /* Create dataset to be used for testing viewing dataset */
-        parseDataset(name);
-        /* Workaround: Until the dataset creation API provides the
-         * dataset ID, construct it manually here. */
-        String id = "workbench::" + name;
-        waitForDataset(id, WAIT_RETRIES);
-        /* View dataset */
-        ObjectNode root = mapper.createObjectNode();
-        root.put("name", name);
-        Response response = given(authSpec)
-            .body(root)
-            .when().post(WORKBENCH_PATH + "/previews")
-            .then().assertThat().statusCode(200)
-            .extract().response();
-        String previewId = response.path("id");
-        /* Wait for preview to become available */
-        waitForPreview(previewId, WAIT_RETRIES);
-        /* Assert preview rows exist */
-        given(authSpec)
-            .when().get(WORKBENCH_PATH + "/previews/" + previewId)
-            .then().assertThat().statusCode(200)
-            .body("rows", hasSize(3))
-            .body("rows[0].field1", equalTo("foo"));
-   }
+//    @Test
+//    public void testPreviewDataset() throws IOException {
+//        String name = "test-preview-" + testId();
+//        /* Create dataset to be used for testing viewing dataset */
+//        parseDataset(name);
+//        /* Workaround: Until the dataset creation API provides the
+//         * dataset ID, construct it manually here. */
+//        String id = "workbench::" + name;
+//        waitForDataset(id, WAIT_RETRIES);
+//        /* View dataset */
+//        ObjectNode root = mapper.createObjectNode();
+//        root.put("name", name);
+//        Response response = given(authSpec)
+//            .body(root)
+//            .when().post(WORKBENCH_PATH + "/previews")
+//            .then().assertThat().statusCode(200)
+//            .extract().response();
+//        String previewId = response.path("id");
+//        /* Wait for preview to become available */
+//        waitForPreview(previewId, WAIT_RETRIES);
+//        /* Assert preview rows exist */
+//        given(authSpec)
+//            .when().get(WORKBENCH_PATH + "/previews/" + previewId)
+//            .then().assertThat().statusCode(200)
+//            .body("rows", hasSize(3))
+//            .body("rows[0].field1", equalTo("foo"));
+//   }
 
   /**
    * Wait until preview becomes visible in Workbench Services, using
