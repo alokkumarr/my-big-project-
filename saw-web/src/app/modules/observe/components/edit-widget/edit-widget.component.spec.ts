@@ -4,20 +4,21 @@ import {
   ComponentFixture,
   fakeAsync,
   tick
-} from "@angular/core/testing";
+} from '@angular/core/testing';
 import 'hammerjs';
-import { MaterialModule } from "../../../../material.module";
-import { EditWidgetComponent } from "./edit-widget.component";
-import { AddWidgetModule } from "../add-widget/add-widget.module";
-import { ObserveService } from "../../services/observe.service";
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from '../../../../material.module';
+import { EditWidgetComponent } from './edit-widget.component';
+import { AddWidgetModule } from '../add-widget/add-widget.module';
+import { ObserveService } from '../../services/observe.service';
 
 const ObserveServiceStub: Partial<ObserveService> = {};
 
-describe("Edit Widget", () => {
+describe('Edit Widget', () => {
   let fixture: ComponentFixture<EditWidgetComponent>, el: HTMLElement;
   beforeEach(() => {
     return TestBed.configureTestingModule({
-      imports: [MaterialModule, AddWidgetModule],
+      imports: [NoopAnimationsModule, MaterialModule, AddWidgetModule],
       declarations: [EditWidgetComponent],
       providers: [{ provide: ObserveService, useValue: ObserveServiceStub }]
     })
@@ -31,16 +32,16 @@ describe("Edit Widget", () => {
       });
   });
 
-  it("should exist", () => {
-    expect(typeof fixture.componentInstance.prepareKPI).toEqual("function");
+  it('should exist', () => {
+    expect(typeof fixture.componentInstance.prepareKPI).toEqual('function');
   });
 
-  it("should not show kpi widget without input", () => {
+  it('should not show kpi widget without input', () => {
     expect(fixture.componentInstance.editItem).toBeUndefined();
-    expect(el.querySelector("widget-kpi")).toBeNull();
+    expect(el.querySelector('widget-kpi')).toBeNull();
   });
 
-  it("should show kpi widget if editItem present", done => {
+  it('should show kpi widget if editItem present', done => {
     fixture.componentInstance.editItem = {
       kpi: {},
       metric: { dateColumns: [{}] }
@@ -49,7 +50,7 @@ describe("Edit Widget", () => {
     fixture
       .whenStable()
       .then(() => {
-        expect(el.querySelector("widget-kpi")).toBeUndefined
+        expect(el.querySelector('widget-kpi')).toBeUndefined;
         done();
       })
       .catch(() => {
