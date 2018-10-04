@@ -15,7 +15,7 @@ import * as get from 'lodash/get';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
-import { DxDataGridComponent } from 'devextreme-angular';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { ToastService } from '../../../../../common/services/toastMessage.service';
 

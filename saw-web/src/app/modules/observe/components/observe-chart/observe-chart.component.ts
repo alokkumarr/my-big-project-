@@ -8,7 +8,7 @@ import {
   EventEmitter,
   ViewChild
 } from '@angular/core';
-import { DxDataGridComponent } from 'devextreme-angular';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';

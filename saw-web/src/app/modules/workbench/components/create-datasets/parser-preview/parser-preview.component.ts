@@ -21,7 +21,7 @@ import * as take from 'lodash/take';
 import * as isUndefined from 'lodash/isUndefined';
 
 import { MatDialog } from '@angular/material';
-import { DxDataGridComponent } from 'devextreme-angular';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component';

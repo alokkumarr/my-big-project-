@@ -1,29 +1,37 @@
-
-import { Component, Input, OnInit, ViewChild, AfterViewInit, OnDestroy, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+  EventEmitter,
+  Output
+} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { DxDataGridComponent } from 'devextreme-angular';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import { DxDataGridService } from '../../../../../common/services/dxDataGrid.service';
 
 @Component({
   selector: 'sqlpreview-grid-page',
   templateUrl: './sqlpreview-grid-page.component.html',
-  styles: [`:host {
+  styles: [
+    `:host {
     width: 100%;
     height: 100%;
-  }`]
+  }`
+  ]
 })
-
-export class SqlpreviewGridPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class SqlpreviewGridPageComponent
+  implements OnInit, AfterViewInit, OnDestroy {
   @Input() updater: BehaviorSubject<any>;
 
   public gridConfig: Array<any>;
   public updaterSubscribtion: any;
   public fullScreen: boolean = false; // tslint:disable-line
 
-  constructor(
-    public dxDataGrid: DxDataGridService
-  ) {  }
+  constructor(public dxDataGrid: DxDataGridService) {}
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
   @Output() onToggleScreenMode: EventEmitter<any> = new EventEmitter<any>();

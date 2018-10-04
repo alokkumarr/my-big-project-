@@ -14,12 +14,14 @@ import {
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
 import {
-  DxPivotGridModule,
   DxPivotGridComponent,
-  DxDataGridModule,
+  DxPivotGridModule
+} from 'devextreme-angular/ui/pivot-grid';
+import {
   DxDataGridComponent,
-  DxTemplateModule
-} from 'devextreme-angular';
+  DxDataGridModule
+} from 'devextreme-angular/ui/data-grid';
+import { DxTemplateModule } from 'devextreme-angular/core/template';
 import { DndModule } from './dnd';
 import {
   AddTokenInterceptor,

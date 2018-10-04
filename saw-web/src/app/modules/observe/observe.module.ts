@@ -7,11 +7,11 @@ import { CountoModule } from 'angular2-counto';
 import { RouterModule } from '@angular/router';
 import { routes } from './routes';
 
+import { DxTemplateModule } from 'devextreme-angular/core/template';
 import {
-  DxDataGridModule,
   DxDataGridComponent,
-  DxTemplateModule
-} from 'devextreme-angular';
+  DxDataGridModule
+} from 'devextreme-angular/ui/data-grid';
 
 import { MaterialModule } from '../../material.module';
 import { JwtService, UserService } from '../../common/services';

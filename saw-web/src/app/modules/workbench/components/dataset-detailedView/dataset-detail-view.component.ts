@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import { DxDataGridService } from '../../../../common/services/dxDataGrid.service';
 import { WorkbenchService } from '../../services/workbench.service';
-import { DxDataGridComponent } from 'devextreme-angular';
+import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 
 import * as isUndefined from 'lodash/isUndefined';
 
