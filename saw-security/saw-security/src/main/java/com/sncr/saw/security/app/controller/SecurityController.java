@@ -7,20 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
+import com.sncr.saw.security.app.repository.PreferenceRepository;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.app.sso.SSORequestHandler;
 import com.sncr.saw.security.app.sso.SSOResponse;
-import com.sncr.saw.security.common.bean.ChangePasswordDetails;
-import com.sncr.saw.security.common.bean.CustProdModule;
-import com.sncr.saw.security.common.bean.CustomerProductSubModule;
-import com.sncr.saw.security.common.bean.LoginDetails;
-import com.sncr.saw.security.common.bean.RandomHashcode;
-import com.sncr.saw.security.common.bean.RefreshToken;
-import com.sncr.saw.security.common.bean.ResetPwdDtls;
-import com.sncr.saw.security.common.bean.ResetValid;
-import com.sncr.saw.security.common.bean.Ticket;
-import com.sncr.saw.security.common.bean.User;
-import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.*;
 import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
 import com.sncr.saw.security.common.bean.repo.admin.DeletePrivilege;
@@ -39,6 +30,7 @@ import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
+import com.sncr.saw.security.common.util.JWTUtils;
 import com.sncr.saw.security.common.util.TicketHelper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -62,10 +54,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -84,6 +73,9 @@ public class SecurityController {
 
 	@Autowired
 	SSORequestHandler ssoRequestHandler;
+
+	@Autowired
+    PreferenceRepository preferenceRepository;
 
 	private final ObjectMapper mapper = new ObjectMapper();
 
@@ -1469,12 +1461,49 @@ public class SecurityController {
 		return new ResponseEntity<>(root, httpStatus);
 	}
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SecurityController sc = new SecurityController();
-		System.out.println(sc.randomString(160));
-	}
+    /**
+     *
+     * @return
+     */
+	@RequestMapping(value= "/auth/admin/user/preferences/upsert", method = RequestMethod.POST)
+    public Object addUserPreferences(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Preference> preferenceList) {
+	    UserPreferences userPreferences = new UserPreferences();
+	    String jwtToken = JWTUtils.getToken(request);
+	    String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        userPreferences.setUserID(extractValuesFromToken[0]);
+        userPreferences.setCustomerID(extractValuesFromToken[1]);
+        userPreferences.setPreferences(preferenceList);
+        return preferenceRepository.upsertPreferences(userPreferences);
+    }
+
+    /**
+     *
+     * @return
+     */
+    @RequestMapping(value= "/auth/admin/user/preferences/delete", method = RequestMethod.POST)
+    public Object deleteUserPreferences(HttpServletRequest request, HttpServletResponse response,
+                                        @RequestBody List<Preference> preferenceList,
+                                        @RequestParam(value = "inactiveAll",required=false) Boolean inactivateAll) {
+        UserPreferences userPreferences = new UserPreferences();
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        userPreferences.setUserID(extractValuesFromToken[0]);
+        userPreferences.setCustomerID(extractValuesFromToken[1]);
+        userPreferences.setPreferences(preferenceList);
+        if (inactivateAll!=null && inactivateAll)
+            return preferenceRepository.deletePreferences(userPreferences,inactivateAll);
+        else
+            return preferenceRepository.deletePreferences(userPreferences,false);
+    }
+
+    /**
+     *
+     * @return
+     */
+    @RequestMapping(value= "/auth/admin/user/preferences/fetch", method = RequestMethod.GET)
+    public Object fetchUserPreferences(HttpServletRequest request, HttpServletResponse response) {
+        String jwtToken = JWTUtils.getToken(request);
+        String [] extractValuesFromToken = JWTUtils.parseToken(jwtToken);
+        return preferenceRepository.fetchPreferences(extractValuesFromToken[0],extractValuesFromToken[1]);
+    }
 }

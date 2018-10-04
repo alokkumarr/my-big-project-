@@ -48,7 +48,11 @@
 }
 
 .column-name {
-  margin: 4px 10px 0 5px;
+  margin: 4px 10px 0 0;
+  text-transform: uppercase;
+}
+
+.dx-header-row td .dx-datagrid-text-content {
   text-transform: uppercase;
 }
 

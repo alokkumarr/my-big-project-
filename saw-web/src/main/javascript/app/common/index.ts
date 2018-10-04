@@ -60,6 +60,7 @@ import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
 import { ErrorDetailService } from './services/error-detail.service';
 import { ErrorDetailDialogService } from './services/error-detail-dialog.service';
+import { ConfigService } from './services/configuration.service';
 import { MenuService } from './services/menu.service';
 import { ToastService, ComponentHandler } from './services';
 import { UserService } from '../../login/services/user.service';
@@ -119,6 +120,7 @@ const SERVICES = [
   ErrorDetailService,
   ErrorDetailDialogService,
   ToastService,
+  ConfigService,
   ChartService,
   ComponentHandler,
   JwtService,
@@ -159,4 +161,4 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
   providers: [...SERVICES, ...INTERCEPTORS, ...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class CommonModuleTs {}
+export class CommonModuleTs { }

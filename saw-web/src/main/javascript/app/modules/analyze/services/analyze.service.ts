@@ -285,6 +285,7 @@ export class AnalyzeService {
         executionType: mode,
         executedBy: this._jwtService.getLoginId(),
         executedAt: Date.now(),
+        designerQuery: fpGet(`query`, resp),
         queryBuilder: {...model.sqlBuilder},
         count: fpGet(`contents.analyze.[0].totalRows`, resp)
       };
@@ -299,6 +300,7 @@ export class AnalyzeService {
       executedAt,
       queryBuilder,
       executionType,
+      designerQuery,
       count
     }) => {
       // forEach(analysis.artifacts[0].columns, column => {
@@ -323,6 +325,7 @@ export class AnalyzeService {
         executedAt,
         queryBuilder,
         executionType,
+        designerQuery,
         count
       };
     });
