@@ -10,6 +10,7 @@ sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
 hadoop_mkdir="hadoop fs -mkdir -p"
 datalake_raw=/var/sip/raw
+spark_app_dir=/apps/spark
 
 wait_maprfs() {
     # The MapR container might still be starting up, so wait until MapR-FS
@@ -26,6 +27,8 @@ init_datalake() {
 }
 
 load_data() {
+
+    $sudo_mapr $hadoop_mkdir spark_app_dir
     echo "Loading sample CSV data 1"
     $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
 
