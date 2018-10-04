@@ -24,6 +24,10 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
+management:
+  endpoint:
+    health:
+      show-details: always
 
 
 analysis:

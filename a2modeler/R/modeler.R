@@ -161,7 +161,7 @@ modeler <- function(df,
   measure <- list()
   performance <- data.frame()
   final_model <- NULL
-  schema <- get_schema(df)
+  schema <- a2munge::get_schema(df)
   
   valid_modeler(
     new_modeler(
@@ -259,35 +259,88 @@ get_best_model <- function(obj) {
 
 #' Deploy Modeler Object
 #'
-#' Save Modeler object to file that can be restored later. Deploy uses
-#' \code{\link{saveRDS}} function to serialize the R object
+#' Save Modeler object to file that can be restored later. Requires a final
+#' model to be set. Deploy uses \code{\link{saveRDS}} function to serialize the
+#' R object. Deploy uses \code{\link{sparklyr::ml_save}} to serialize final
+#' model fit.
+#'
+#' Deploy function creates a new directory at path location and writes a2modeler
+#' object and final model within
 #'
 #' @param obj modeler object to save
-#' @param path file path to save to. Extension should be .rds
-#' @param lighten logical flag to lighten the memory footprint of modeler
-#'   objects by removing all fit and pipeline output from trained models. Note
-#'   the final model fit and pipeline are not impacted
+#' @param path directory path to write a2modeler object to
 #' @param ... additional arguments to pass to \link[base]{saveRDS} function
 #'
 #' @export
-deploy <- function(obj, path, lighten = FALSE, ...) {
+deploy <- function(obj, path, ...) {
   checkmate::assert_class(obj, "modeler")
   checkmate::assert_directory(dirname(path))
-  checkmate::assert_character(path, pattern = ".rds")
-  checkmate::assert_flag(lighten)
+ 
+  # Check for final model
+  if(is.null(obj$final_model)) {
+    stop("Deployment failed - Final Model not set")
+  }
   
-  if(lighten) {
-    for(i in seq_along(obj$models)) {
+  # Created model label
+  label <- paste(obj$name, obj$version, sep="-")
+  modeler_path <- paste(path, label, sep="/")
+  modeler_file <- paste(modeler_path, paste0(label, ".rds"), sep="/")
+  model_path <- paste(modeler_path, obj$final_model$uid, sep="/")
+  obj$final_model$path <- model_path
+  
+  # Remove Spark objects from obj
+  if("tbl_spark" %in% class(obj$data)) obj$data <- NULL
+  for(i in seq_along(obj$models)) {
+    if("spark_model" %in% class(obj$models[[1]])){
       obj$models[[i]]$fit <- NULL
       obj$models[[i]]$sub_models <- NULL
     }
-    for(i in seq_along(obj$pipelines)) {
+  }
+  for(i in seq_along(obj$pipelines)) {
+    if("tbl_spark" %in% class(obj$pipelines[[i]]$output)) {
       obj$pipelines[[i]]$output <- NULL
     }
   }
   
-  saveRDS(object = obj, file = path, ...)
+  # Create directory & write modeler and Final Model
+  dir.create(modeler_path)
+  if("spark_model" %in% class(obj$final_model)) {
+    sparklyr::ml_save(obj$final_model$fit, model_path)
+  }
+  
+  saveRDS(object = obj, file = modeler_file, ...)
 }
+
+
+#' a2Model Load
+#'
+#' Load a2 modeler object into memory to apply on new datasets
+#'
+#' @param path directory path to write a2modeler object to
+#' @param sc optional spark connection argument. Required to load an a2modeler
+#'   object with a spark_model final model type
+#'
+#' @export
+a2_load <- function(path, sc = NULL) {
+  checkmate::assert_directory(dirname(path))
+  checkmate::assert_class(sc, "spark_connection", null.ok = TRUE)
+  
+  # Get modeler file
+  modeler_file <- list.files(path = path, pattern = ".rds", full.names = TRUE)
+  
+  if(length(modeler_file) == 0) {
+    stop("Model Meta-data file not found\nLooking for .rds file")
+  }
+  
+  # Load Meta-data and Model
+  obj <- readRDS(file = modeler_file)
+  if(! is.null(sc)) {
+    obj$final_model$fit <- sparklyr::ml_load(sc, path = obj$final_model$path)
+  }
+  
+  obj
+}
+
 
 
 # Modeler Class Generics --------------------------------------------------
@@ -368,22 +421,6 @@ get_performance <- function(obj){
 #' @export
 get_target <- function(obj) {
   UseMethod("get_target", obj)
-}
-
-
-#' Get Dataset Schema
-#'
-#' Returns named list of column types. Names refer to column names
-#'
-#' @param df dataset
-#'
-#' @return named list of column types
-#' @export
-#'
-#' @examples
-#' get_schema(mtcars)
-get_schema <- function(df){
-  UseMethod("get_schema")
 }
 
 
@@ -593,17 +630,3 @@ get_performance <- function(obj){
 
 
 # Helper Functions --------------------------------------------------------
-
-
-#' @rdname get_schema
-#' @export
-get_schema.data.frame <- function(df) {
-  purrr::map(df, class)
-}
-
-
-#' @rdname get_schema
-#' @export
-get_schema.tbl_spark <- function(df) {
-  purrr::map(sparklyr::sdf_schema(df), "type")
-}
