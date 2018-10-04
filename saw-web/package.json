@@ -6,6 +6,9 @@
     "start": "ng serve",
     "build": "run-s version build:only",
     "build:only": "ng build --prod",
+    "build:stats": "ng build --prod --stats-json",
+    "build:analyze": "run-s build:stats analyze:only",
+    "analyze:only": "webpack-bundle-analyzer dist/saw-web/stats.json",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
@@ -91,6 +94,7 @@
     "ts-node": "7.0.0",
     "tslint": "5.11.0",
     "typescript": "2.9.2",
+    "webpack-bundle-analyzer": "^3.0.2",
     "xml-js": "1.6.7"
   }
 }
