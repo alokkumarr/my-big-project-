@@ -8,6 +8,7 @@ import { combineLatest, timer } from 'rxjs';
 import { debounce } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import * as clone from 'lodash/clone';
 
 import {
   AnalyzeService,
@@ -23,7 +24,8 @@ import {
 import { ToastService } from '../../../common/services/toastMessage.service';
 import {
   flattenPivotData,
-  flattenChartData
+  flattenChartData,
+  flattenReportData
 } from '../../../common/utils/dataFlattener';
 import { IPivotGridUpdate } from '../../../common/components/pivot-grid/pivot-grid.component';
 import { AnalyzeActionsService } from '../actions';
@@ -322,6 +324,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
+        executeResponse.data = clone(flattenReportData(executeResponse.data, this.executedAnalysis));
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
@@ -377,14 +380,11 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           .utc(executeResponse.executedAt)
           .local()
           .format('YYYY/MM/DD h:mm A');
-        this.data = this.flattenData(
-          executeResponse.data,
-          this.executedAnalysis
-        );
+        this.data = executeResponse.data;
       } else {
         this.loadExecutionData(analysisId, executionId, analysisType).then(
           ({ data }) => {
-            this.data = this.flattenData(data, this.executedAnalysis);
+            this.data = data;
           }
         );
       }
@@ -403,6 +403,7 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     }
   }
 
+
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;
 
@@ -414,9 +415,14 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
             this.executedAnalysis.sqlBuilder = queryBuilder;
           }
 
+          const isReportType = ['report', 'esReport'].includes(analysisType);
+          if (isReportType) {
+            data = clone(flattenReportData(data, this.analysis));
+          }
+
           this.setExecutedBy(executedBy);
           this.setExecutedAt(executionId);
-          return { data, totalCount: count };
+          return { data: data, totalCount: count };
         },
         err => {
           throw err;

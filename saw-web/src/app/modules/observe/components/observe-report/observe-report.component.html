@@ -1,5 +1,5 @@
 <h1 class="report-title" [textContent]="analysis.name"></h1>
-<report-grid-upgraded [artifacts]="analysis.edit ? null : analysis.artifacts"
+<report-grid-upgraded [artifacts]="analysis.edit ? null : (analysis.artifacts | checkedArtifactColumnFilter)"
                       [analysis]="analysis"
                       [query]="analysis.query"
                       [sorts]="analysis.sqlBuilder.sorts"

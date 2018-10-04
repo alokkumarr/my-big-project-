@@ -8,3 +8,4 @@ export {ErrorDetailDialogService} from './error-detail-dialog.service';
 export {ErrorDetailService} from './error-detail.service';
 export {UserService} from './user.service';
 export {JwtService, CUSTOM_JWT_CONFIG} from './jwt.service';
+export { ConfigService } from './configuration.service';

@@ -54,7 +54,6 @@ export class DesignerSortComponent implements OnInit {
   public addToSortedFields(item, index) {
     const firstN = take(this.sorts, index);
     const lastN = takeRight(this.sorts, this.sorts.length - index);
-
     this.sorts = [
       ...firstN,
       this.isSort(item) ? item : this.transform(item),
@@ -109,9 +108,10 @@ export class DesignerSortComponent implements OnInit {
     this.sortsChange.emit(this.sorts);
   }
 
-  transform({ columnName, type, tableName }: ArtifactColumnReport): Sort {
+  transform({ columnName, aggregate, type, tableName }: ArtifactColumnReport): Sort {
     return {
       tableName,
+      aggregate,
       columnName,
       type,
       order: 'asc'

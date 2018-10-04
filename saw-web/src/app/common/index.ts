@@ -62,8 +62,10 @@ import {
   MenuService,
   ToastService,
   UserService,
-  JwtService
+  JwtService,
+  ConfigService
 } from './services';
+
 
 const MODULES = [
   CommonModuleAngular4,
@@ -118,6 +120,7 @@ const SERVICES = [
   ErrorDetailService,
   ErrorDetailDialogService,
   ToastService,
+  ConfigService,
   ChartService,
   JwtService,
   UserService,
@@ -157,4 +160,4 @@ const GUARDS = [IsUserLoggedInGuard, DefaultModuleGuard];
   providers: [...SERVICES, ...INTERCEPTORS, ...GUARDS],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class CommonModuleTs {}
+export class CommonModuleTs { }

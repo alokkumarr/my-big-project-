@@ -16,12 +16,16 @@ import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.c
 import { DashboardService } from '../../services/dashboard.service';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
-import { JwtService } from '../../../../common/services';
+import { JwtService, ConfigService } from '../../../../common/services';
+import {
+  PREFERENCES
+} from '../../../../common/services/configuration.service';
 import { dataURItoBlob } from '../../../../common/utils/dataURItoBlob';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { flatMap } from 'rxjs/operators';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
@@ -44,9 +48,10 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   public subCategoryId: string;
   public dashboard: Dashboard;
   public requester = new BehaviorSubject({});
-  public listeners: Array<Subscription> = [];
+  private listeners: Array<Subscription> = [];
   public hasAutoRefresh = false;
-  public shouldAutoRefresh = true;
+  private shouldAutoRefresh = true;
+  private isDefault = false;
   public privileges = {
     create: false,
     delete: false,
@@ -58,12 +63,13 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    public observe: ObserveService,
-    public dashboardService: DashboardService,
-    public router: Router,
-    public filters: GlobalFilterService,
-    public jwt: JwtService,
-    public _route: ActivatedRoute
+    private observe: ObserveService,
+    private dashboardService: DashboardService,
+    private router: Router,
+    private filters: GlobalFilterService,
+    private configService: ConfigService,
+    private jwt: JwtService,
+    private _route: ActivatedRoute
   ) {
     const navigationListener = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
@@ -75,13 +81,6 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {}
-
-  ngOnDestroy() {
-    this.dashboardService.unsetAutoRefresh(
-      (this.dashboard || { entityId: null }).entityId
-    );
-    this.listeners.forEach(l => l.unsubscribe());
-  }
 
   initialise() {
     const snapshot = this._route.snapshot;
@@ -97,6 +96,49 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
         this.startAutoRefresh();
       });
     }
+
+    this.checkDefaultDashboard();
+  }
+
+  ngOnDestroy() {
+    this.dashboardService.unsetAutoRefresh(
+      (this.dashboard || { entityId: null }).entityId
+    );
+    this.listeners.forEach(l => l.unsubscribe());
+  }
+
+  toggleDefault() {
+    this.isDefault = !this.isDefault;
+    const payload = [
+      {
+        key: PREFERENCES.DEFAULT_DASHBOARD,
+        value: this.dashboardId
+      },
+      {
+        key: PREFERENCES.DEFAULT_DASHBOARD_CAT,
+        value: this.subCategoryId
+      }
+    ];
+
+    const action = this.isDefault
+      ? this.configService.saveConfig(payload)
+      : this.configService.deleteConfig(payload, false);
+
+    action.subscribe(
+      () => this.checkDefaultDashboard(),
+      () => this.checkDefaultDashboard()
+    );
+  }
+
+  /**
+   * Checks if current dashboard is set as default dashboard
+   *
+   * @returns {undefined}
+   */
+  checkDefaultDashboard() {
+    this.isDefault =
+      this.configService.getPreference(PREFERENCES.DEFAULT_DASHBOARD) ===
+      this.dashboardId;
   }
 
   stopAutoRefresh() {
@@ -157,12 +199,35 @@ export class ObserveViewComponent implements OnInit, OnDestroy {
   }
 
   deleteDashboard(): void {
-    this.observe.deleteDashboard(this.dashboard).subscribe(() => {
-      this.observe.reloadMenu().subscribe(menu => {
-        this.observe.updateSidebar(menu);
-        this.observe.redirectToFirstDash(menu, true);
+    const dashboardId = this.dashboard.entityId;
+    this.observe
+      .deleteDashboard(this.dashboard)
+      .pipe(
+        flatMap(() => {
+          if (
+            this.configService.getPreference(PREFERENCES.DEFAULT_DASHBOARD) ===
+            dashboardId
+          ) {
+            return this.configService.deleteConfig(
+              [
+                {
+                  key: PREFERENCES.DEFAULT_DASHBOARD,
+                  value: dashboardId
+                }
+              ],
+              true
+            );
+          } else {
+            return Observable.of(true);
+          }
+        })
+      )
+      .subscribe(() => {
+        this.observe.reloadMenu().subscribe(menu => {
+          this.observe.updateSidebar(menu);
+          this.observe.redirectToFirstDash(menu, true);
+        });
       });
-    });
   }
 
   downloadDashboard() {

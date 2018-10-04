@@ -4,7 +4,8 @@ import { Analysis, ArtifactColumns } from '../types';
 import { DesignerService } from '../designer.service';
 import {
   flattenPivotData,
-  flattenChartData
+  flattenChartData,
+  flattenReportData
 } from '../../../../common/utils/dataFlattener';
 import { DesignerStates } from '../consts';
 
@@ -48,13 +49,13 @@ export class DesignerPreviewDialogComponent implements OnInit {
             execId,
             {...options, analysisType: this.analysis.type, executionType: 'onetime'}
           )
-            .then(result => ({data: result.data, totalCount: result.count}));
+            .then((result) => ({data: flattenReportData(result.data, this.analysis), totalCount: result.count}));
         } else {
           return this._designerService
             .getDataForAnalysisPreview(this.analysis, options)
-            .then(result => {
-              execId = result.executionId;
-              return { data: result.data, totalCount: result.count };
+            .then(({ data: previewData, executionId, count }) => {
+              execId = executionId;
+              return { data: flattenReportData(previewData, this.analysis), totalCount: count };
             });
         }
       };
