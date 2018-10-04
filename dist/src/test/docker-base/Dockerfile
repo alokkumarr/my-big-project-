@@ -84,5 +84,8 @@ RUN echo mapr | passwd --stdin mapr
 # Install Java
 RUN yum -y -q install java-1.8.0-openjdk-headless
 
+# Add SIP container health check command
+COPY sip-health-check /root/
+
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD systemctl is-system-running --quiet
+HEALTHCHECK --interval=5s CMD /root/sip-health-check
