@@ -58,7 +58,6 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
     it('should fork, edit and delete ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'FORKDELETECHARTS', dp:'forkDeleteChartsDataProvider'}), () => {
         try {
           let currentTime = new Date().getTime();
-          let user = data.user;
           let type = data.chartType.split(":")[1];
           let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
           let description ='Description:'+data.chartType+' for e2e ' + globalVariables.e2eId+'-'+currentTime;
