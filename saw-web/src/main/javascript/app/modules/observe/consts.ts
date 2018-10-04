@@ -61,6 +61,11 @@ export const DATE_PRESETS = [
     label: 'Last 6 Months'
   },
   {
+    value: 'LY',
+    keyword: 'LAST_YEAR',
+    label: 'Last Year'
+  },
+  {
     value: CUSTOM_DATE_PRESET_VALUE,
     keyword: 'CUSTOM',
     label: 'Custom'

@@ -1,4 +1,4 @@
-package com.sncr.saw.security.common.bean;
+package com.sncr.saw.security.common.util;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -11,6 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.sncr.saw.security.common.bean.Ticket;
 import org.springframework.web.filter.GenericFilterBean;
 
 import io.jsonwebtoken.Claims;
