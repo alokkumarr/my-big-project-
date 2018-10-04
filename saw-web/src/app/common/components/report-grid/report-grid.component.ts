@@ -12,7 +12,6 @@ import { DxDataGridComponent } from 'devextreme-angular/ui/data-grid';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpMap from 'lodash/fp/map';
-import * as fpFilter from 'lodash/fp/filter';
 import * as reduce from 'lodash/reduce';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
@@ -28,6 +27,7 @@ import { getFormatter } from '../../utils/numberFormatter';
 import { Subscription } from 'rxjs/Subscription';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
 
 import { AGGREGATE_TYPES, AGGREGATE_TYPES_OBJ } from '../../consts';
 
@@ -39,6 +39,13 @@ import {
 } from './types';
 import { DATE_TYPES, NUMBER_TYPES } from '../../../modules/analyze/consts';
 import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
+
+import {
+  flattenReportData
+} from '../../../common/utils/dataFlattener';
+
+const template = require('./report-grid.component.html');
+require('./report-grid.component.scss');
 
 interface ReportGridSort {
   order: 'asc' | 'desc';
@@ -75,12 +82,18 @@ let self; // needed to access component context from dx callbacks
 export class ReportGridComponent implements OnInit, OnDestroy {
   public columns: ReportGridField[];
   public data;
-  public listeners: Array<Subscription> = [];
-  @Output() change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
-  @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
-  @Input() query: string;
-  @Input() analysis;
-  @Input() dimensionChanged: BehaviorSubject<any>;
+  private listeners: Array<Subscription> = [];
+  @Output()
+  change: EventEmitter<ReportGridChangeEvent> = new EventEmitter();
+  @ViewChild(DxDataGridComponent)
+  dataGrid: DxDataGridComponent;
+  @Input()
+  query: string;
+  @Input() isInQueryMode;
+  @Input()
+  analysis;
+  @Input()
+  dimensionChanged: BehaviorSubject<any>;
   @Input('sorts')
   set setSorts(sorts: Sort[]) {
     this.sorts = reduce(
@@ -127,11 +140,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
     } else {
       this.gridHeight = '100%';
     }
-    this.data = data;
-    if (!this.artifacts) {
-      return;
+
+    if (!this.isInQueryMode) {
+      const artifact = this.fetchColumsUponCheck();
+      if (!this.artifacts) {
+        return;
+      }
+      this.columns = this.artifacts2Columns(artifact);
     }
-    this.columns = this.artifacts2Columns(this.artifacts);
+    this.data = flattenReportData(data, this.analysis);
   }
   @Input('dataLoader')
   set setDataLoader(
@@ -191,6 +208,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
   public loadPanel;
   public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
   public aggregates;
+  public isQueryMode;
 
   constructor(private _dialog: MatDialog, public _elemRef: ElementRef) {
     self = this;
@@ -380,8 +398,7 @@ export class ReportGridComponent implements OnInit, OnDestroy {
 
   artifacts2Columns(artifacts: Artifact[]): ReportGridField[] {
     return fpPipe(
-      fpFlatMap((artifact: Artifact) => artifact.columns),
-      fpFilter('checked'),
+      fpFlatMap((artifact: Artifact) => artifact.columns || [artifact]),
       fpMap((column: ArtifactColumnReport) => {
         let isNumberType = NUMBER_TYPES.includes(column.type);
 
@@ -460,5 +477,15 @@ export class ReportGridComponent implements OnInit, OnDestroy {
       };
     }
     return {};
+  }
+
+  fetchColumsUponCheck() {
+    return map(this.analysis.artifacts, artifact => {
+      const columns = filter(artifact.columns, 'checked');
+      return {
+        ...artifact,
+        columns
+      };
+    })
   }
 }

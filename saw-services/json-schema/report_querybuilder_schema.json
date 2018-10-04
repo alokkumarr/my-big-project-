@@ -8,164 +8,174 @@
   {
     "sqlBuilder":
     {
-    "id":"/properties/sqlBuilder",
-    "properties":
-    {
-        "dataFields":{
-          "id":"/properties/sqlBuilder/properties/dataFields",
-          "items":{
-            "id":"/properties/sqlBuilder/properties/dataFields/items",
-            "properties":{
-              "aggregate":{
-                "enum":[
-                  "avg",
-                  "sum",
-                  "min",
-                  "max",
-                  "count",
-                  "percentage"
-                ],
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/aggregate",
-                "type":"string"
-              },
-              "columnName":{
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/columnName",
-                "type":"string"
-              },
-              "name":{
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/name",
-                "type":"string"
-              },
-              "type":{
-                "enum":[
-                  "date",
-                  "timestamp",
-                  "long",
-                  "double",
-                  "integer",
-                  "string",
-                  "float"
-                ],
-                "id":"/properties/sqlBuilder/properties/dataFields/items/properties/type",
-                "type":"string"
-              }
-            },
-            "required":["columnName","type"]
+      "id":"/properties/sqlBuilder",
+      "properties":
+      {
+        "dataFields": {
+          "tableName": {
+            "id": "/properties/sqlBuilder/properties/dataFields/properties/tableName",
+            "type": "string"
           },
-          "type":"array"
+          "columns": {
+            "id": "/properties/sqlBuilder/properties/dataFields/properties/columns",
+            "items": {
+              "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items",
+              "properties": {
+                "aggregate": {
+                  "enum": [
+                    "avg",
+                    "sum",
+                    "min",
+                    "max",
+                    "count",
+                    "percentage"
+                  ],
+                  "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/aggregate",
+                  "type": "string"
+                },
+                "columnName": {
+                  "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/columnName",
+                  "type": "string"
+                },
+                "name": {
+                  "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/name",
+                  "type": "string"
+                },
+                "type": {
+                  "enum": [
+                    "date",
+                    "timestamp",
+                    "long",
+                    "double",
+                    "integer",
+                    "string",
+                    "float"
+                  ],
+                  "id": "/properties/sqlBuilder/properties/dataFields/properties/columns/items/properties/type",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "columnName",
+                "type"
+              ]
+            },
+            "type": "array"
+          },
+          "type": "array"
         },
         "booleanCriteria":{
-                "enum":["OR","AND"],
-                "id":"/properties/filters/items/properties/booleanCriteria",
-                "type":"string"
-              },
+          "enum":["OR","AND"],
+          "id":"/properties/filters/items/properties/booleanCriteria",
+          "type":"string"
+        },
         "filters":{
           "id":"/properties/filters",
           "items": {
             "id":"/properties/filters/items",
             "properties":{
-                "columnName":{
-                  "id":"/properties/filters/items/properties/columnName",
-                  "type":"string"
+              "columnName":{
+                "id":"/properties/filters/items/properties/columnName",
+                "type":"string"
               },
-                "isRuntimeFilter":{
-                  "enum":[
-                    false,
-                    true
-                  ],
-                  "id":"/properties/filters/items/properties/isRuntimeFilter",
-                  "type":"boolean"
+              "isRuntimeFilter":{
+                "enum":[
+                  false,
+                  true
+                ],
+                "id":"/properties/filters/items/properties/isRuntimeFilter",
+                "type":"boolean"
               },
-                "model":{
-                  "properties":{
-                    "booleanCriteria":{
-                      "enum":[
-                        "AND",
-                        "OR"
-                      ],
-                      "id":"/properties/filters/model/properties/booleanCriteria",
-                      "type":"string"
-                    },
-                    "operator":{
-                      "enum":[
-                        "GT",
-                        "LT",
-                        "GTE",
-                        "LTE",
-                        "EQ",
-                        "NEQ",
-                        "BTW",
-                        "SW",
-                        "EW",
-                        "CONTAINS",
-                        "ISIN",
-                        "ISNOTIN"
-                      ],
-                      "id":"/properties/filters/model/properties/booleanCriteria",
-                      "type":["integer", "string"]
-                    },
-                    "value":{
-                      "id":"/properties/filters/model/properties/value",
-                      "type":"number"
-                    },
-                    "otherValue":{
-                      "id":"/properties/filters/model/properties/otherValue",
-                      "type":"number"
-                    },
-                    "gte":{
-                      "id":"/properties/filters/model/properties/gte",
-                      "type":"string"
-                    },
-                    "lte":{
-                      "id":"/properties/filters/model/properties/lte",
-                      "type":"string"
-                    },
-	            "preset":{
-                      "id":"/properties/filters/model/properties/preset",
-                      "type":"string",
- 			"enum": [
-              "YTD",
-              "MTD",
-              "LTM",
-              "LSM",
-              "LM",
-              "LQ",
-              "LW",
-              "TW",
-              "LTW",
-              "LSW",
-              "NA"
-            ]
-                    },		
-                    "format":{
-                      "id":"/properties/filters/model/properties/format",
-                      "type":"string"
-                    },
-                    "modelValues" : 
-                    {
-                      "id":"/properties/filters/model/properties/modelValues",
-                      "type":"array"
-                    }
+              "model":{
+                "properties":{
+                  "booleanCriteria":{
+                    "enum":[
+                      "AND",
+                      "OR"
+                    ],
+                    "id":"/properties/filters/model/properties/booleanCriteria",
+                    "type":"string"
                   },
-                  "id":"/properties/filters/items/properties/model",
-                  "type":"object"
+                  "operator":{
+                    "enum":[
+                      "GT",
+                      "LT",
+                      "GTE",
+                      "LTE",
+                      "EQ",
+                      "NEQ",
+                      "BTW",
+                      "SW",
+                      "EW",
+                      "CONTAINS",
+                      "ISIN",
+                      "ISNOTIN"
+                    ],
+                    "id":"/properties/filters/model/properties/booleanCriteria",
+                    "type":["integer", "string"]
+                  },
+                  "value":{
+                    "id":"/properties/filters/model/properties/value",
+                    "type":"number"
+                  },
+                  "otherValue":{
+                    "id":"/properties/filters/model/properties/otherValue",
+                    "type":"number"
+                  },
+                  "gte":{
+                    "id":"/properties/filters/model/properties/gte",
+                    "type":"string"
+                  },
+                  "lte":{
+                    "id":"/properties/filters/model/properties/lte",
+                    "type":"string"
+                  },
+                  "preset":{
+                    "id":"/properties/filters/model/properties/preset",
+                    "type":"string",
+                    "enum": [
+                      "YTD",
+                      "MTD",
+                      "LTM",
+                      "LSM",
+                      "LM",
+                      "LQ",
+                      "LW",
+                      "TW",
+                      "LTW",
+                      "LSW",
+                      "NA"
+                    ]
+                  },
+                  "format":{
+                    "id":"/properties/filters/model/properties/format",
+                    "type":"string"
+                  },
+                  "modelValues" :
+                  {
+                    "id":"/properties/filters/model/properties/modelValues",
+                    "type":"array"
+                  }
+                },
+                "id":"/properties/filters/items/properties/model",
+                "type":"object"
               },
-                "tableName":{
-                  "id":"/properties/filters/items/properties/tableName",
-                  "type":"string"
+              "tableName":{
+                "id":"/properties/filters/items/properties/tableName",
+                "type":"string"
               },
-                "type":{
-                  "enum":[
-                    "long",
-                    "string",
-                    "integer",
-                    "double",
-                    "date",
-                    "timestamp",
-                    "float"
-                  ],
-                  "id":"/properties/filters/items/properties/type",
-                  "type":"string"
+              "type":{
+                "enum":[
+                  "long",
+                  "string",
+                  "integer",
+                  "double",
+                  "date",
+                  "timestamp",
+                  "float"
+                ],
+                "id":"/properties/filters/items/properties/type",
+                "type":"string"
               }
             }
           },
@@ -206,10 +216,9 @@
           },
           "type":"array"
         }
-    },
+      },
       "required":["sorts","filters", "dataFields"]
     }
   },
   "required":["sqlBuilder"]
-
 }

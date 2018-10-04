@@ -65,7 +65,8 @@ import {
   MenuService,
   ToastService,
   UserService,
-  JwtService
+  JwtService,
+  ConfigService
 } from './services';
 
 const MODULES = [
@@ -121,6 +122,7 @@ const SERVICES = [
   ErrorDetailService,
   ErrorDetailDialogService,
   ToastService,
+  ConfigService,
   ChartService,
   JwtService,
   UserService,
