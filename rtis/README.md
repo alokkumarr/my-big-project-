@@ -27,7 +27,7 @@ and deply various RTIS services
     
 ## Errors:
  
- 1. This application is already running (Or delete (path)/RUNNING_PID file):
+ 1. This application is already running (Or delete \<path\>/RUNNING_PID file):
     
     Simply remove RUNNING_PID file. 
     
