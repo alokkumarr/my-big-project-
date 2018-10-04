@@ -108,10 +108,10 @@ class ApiHelpController extends SwaggerBaseApiController {
   }
   
   def viewSwaggerUI() = Action {
-  val swaggerDocStream: java.io.InputStream =
-    this.getClass().getResourceAsStream("/public/swagger-ui/index.html")
-  val docs = scala.io.Source.fromInputStream(swaggerDocStream).mkString("")
-    Ok(docs) as HTML
+    val swaggerDocStream: java.io.InputStream =
+      this.getClass().getResourceAsStream("/public/swagger-ui/index.html")
+    val docs = scala.io.Source.fromInputStream(swaggerDocStream).mkString("")
+      Ok(docs) as HTML
   }
 }
 
