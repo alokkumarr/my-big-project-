@@ -74,11 +74,11 @@ export class TestConnectivityComponent implements OnInit {
 
       //only run this again if there are letters
       if (text.length) {
-        setTimeout(typer, 50);
+        setTimeout(typer, 10);
       } else {
         prompt.className = 'idle';
       }
     };
-    setTimeout(typer, 50);
+    setTimeout(typer, 10);
   }
 }

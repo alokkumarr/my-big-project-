@@ -39,6 +39,16 @@ datasource-page {
     font-weight: 600;
   }
 
+  .routes-grid {
+    margin: 9px 0;
+    padding: 3px;
+
+    .dx-datagrid-headers .dx-header-row {
+      background-color: $background-color !important;
+      border-bottom: 1px solid $primary-grey-g1;
+    }
+  }
+
   .dx-virtual-row {
     height: 0 !important;
   }

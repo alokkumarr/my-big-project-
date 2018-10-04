@@ -56,9 +56,9 @@ export class DatasourceComponent implements OnInit, OnDestroy {
   }
 
   onToolbarPreparing(e) {
-    e.toolbarOptions.items.unshift({
-      location: 'before',
-      template: 'sourceNameTemplate'
-    });
+    // e.toolbarOptions.items.unshift({
+    //   location: 'before',
+    //   template: 'sourceNameTemplate'
+    // });
   }
 }

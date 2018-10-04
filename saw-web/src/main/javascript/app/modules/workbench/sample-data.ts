@@ -184,6 +184,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
@@ -199,6 +200,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
@@ -214,6 +216,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
@@ -245,6 +248,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
@@ -260,6 +264,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
@@ -275,6 +280,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',
@@ -290,6 +296,7 @@ export const SAMPLE_SOURCE_DATA = [
       {
         id: 5,
         status: 'active',
+        routeName: 'route123',
         startDate: '2013/02/15',
         endDate: '2013/04/15',
         recurrenceRule: 'FREQ=WEEKLY;BYDAY=TU,FR;COUNT=10',

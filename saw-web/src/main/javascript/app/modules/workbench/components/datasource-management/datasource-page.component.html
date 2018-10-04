@@ -16,7 +16,7 @@
     <dx-data-grid #dsGrid fxFlex [dataSource]="gridData" [rowAlternationEnabled]="true" [height]="'100%'" [width]="'100%'"
       [showBorders]="false" [showColumnLines]="false" [hoverStateEnabled]="false" [masterDetail]="{ enabled: true, template: 'routes' }">
       <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
-      <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
+      <dxo-search-panel [visible]="false" [width]="240" placeholder="Search..."></dxo-search-panel>
       <dxo-scrolling mode="virtual" showScrollbar="always" [useNative]="false"></dxo-scrolling>
 
       <dxi-column caption="Source Type" dataField="sourceType"></dxi-column>
@@ -45,11 +45,11 @@
       </div>
 
       <div *dxTemplate="let route of 'routes'">
-        <dx-data-grid style="padding-bottom: 9px;" [dataSource]="route.data.routes" [showBorders]="true"
-          [columnAutoWidth]="true" (onToolbarPreparing)="onToolbarPreparing($event)">
+        <dx-data-grid class="mat-elevation-z1 routes-grid" [dataSource]="route.data.routes" [showBorders]="false"
+          [columnAutoWidth]="flase" [showColumnLines]="false" (onToolbarPreparing)="onToolbarPreparing($event)" [rowAlternationEnabled]="true">
           <dxo-filter-row [visible]="true" [applyFilter]="auto"></dxo-filter-row>
-          <dxo-search-panel [visible]="true" [width]="240" placeholder="Search..."></dxo-search-panel>
-          <dxo-scrolling mode="virtual" [useNative]="false"></dxo-scrolling>
+          <dxo-search-panel [visible]="false" [width]="240" placeholder="Search..."></dxo-search-panel>
+          <dxo-scrolling mode="virtual" showScrollbar="always"  [useNative]="false"></dxo-scrolling>
 
           <div *dxTemplate="let data of 'sourceNameTemplate'">
             <div class="master-detail-caption">{{route.data.sourceName}}</div>
