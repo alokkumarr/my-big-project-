@@ -16,7 +16,7 @@ public class ExportBean {
 
     /**
      *
-     * @return
+     * @return the filetype as csv or xlsx
      */
 	public String getFileType() {
 	    return fileType;
@@ -24,7 +24,7 @@ public class ExportBean {
 
     /**
      *
-     * @param fileType
+     * @param fileType : filtype will be either csv or xlsx
      */
     public void setFileType(String fileType)   {
 	    this.fileType = fileType;

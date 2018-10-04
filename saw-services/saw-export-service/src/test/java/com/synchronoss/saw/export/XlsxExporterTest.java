@@ -1,16 +1,19 @@
 package com.synchronoss.saw.export;
 
-import com.google.common.reflect.ClassPath;
+
 import com.synchronoss.saw.export.generate.ExportBean;
 import com.synchronoss.saw.export.generate.ExportServiceImpl;
 import com.synchronoss.saw.export.generate.XlsxExporter;
 import com.synchronoss.saw.export.model.DataResponse;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.tomcat.jni.Directory;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +27,7 @@ public class XlsxExporterTest {
     static DataResponse dataResponse;
     static Long LimittoExport = Long.valueOf(50000);
     XlsxExporter xlsxExporter;
+    private static final Logger logger = LoggerFactory.getLogger(XlsxExporterTest.class);
 
     @Before
     public void setUp() {
@@ -86,7 +90,8 @@ public class XlsxExporterTest {
                         xlsxExporter.addxlsxRow(exportBean, workBook, sheet, line);
 
                     } catch (Exception e) {
-
+                        logger.error(this.getClass().getName() + " Error in adding xlsxsRow : "
+                            + ExceptionUtils.getStackTrace(e));
                     }
                 }
             );
@@ -99,7 +104,8 @@ public class XlsxExporterTest {
         try {
             assertEquals(exportService.streamToXslxReport(dataResponse,LimittoExport,exportBean),Boolean.TRUE);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(this.getClass().getName() + " Error in streamToXslxReport : "
+                + ExceptionUtils.getStackTrace(e));
         }
     }
 }

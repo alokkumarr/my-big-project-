@@ -475,24 +475,22 @@ public class ExportServiceImpl implements ExportService{
         Workbook workBook = new XSSFWorkbook();
         workBook.getSpreadsheetVersion();
         XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
-
-        response.getData()
-            .stream()
-            .limit(LimittoExport)
-            .forEach(
-                line -> {
-                    try {
+        try {
+            response.getData()
+                .stream()
+                .limit(LimittoExport)
+                .forEach(
+                    line -> {
                         xlsxExporter.addxlsxRow(exportBean, workBook, sheet, line);
-
-                    } catch (Exception e) {
-                        logger.error("ERROR_Adding_Rows: " + e.getMessage());
                     }
-                }
-            );
-        autoSizeColumns(workBook);
-        workBook.write(stream);
-        stream.flush();
-        stream.close();
+                );
+            autoSizeColumns(workBook);
+            workBook.write(stream);
+        }
+        finally {
+            stream.flush();
+            stream.close();
+        }
         return true;
     }
 
