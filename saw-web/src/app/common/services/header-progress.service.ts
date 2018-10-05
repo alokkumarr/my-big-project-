@@ -10,10 +10,9 @@ export class HeaderProgressService {
   public _subject$ = new Subject<boolean>();
 
   subscribe(fn) {
-    return this._subject$.pipe(
-      distinctUntilChanged(),
-      debounce(() => timer(100))
-    ).subscribe(fn);
+    return this._subject$
+      .pipe(distinctUntilChanged(), debounce(() => timer(100)))
+      .subscribe(fn);
   }
 
   show() {
