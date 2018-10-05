@@ -1,8 +1,7 @@
 package com.synchronoss.saw.export.generate;
 
-import java.io.FileInputStream;
-import java.io.OutputStreamWriter;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,7 +15,12 @@ import com.synchronoss.saw.export.model.ftp.FTPDetails;
 import com.synchronoss.saw.export.model.ftp.FtpCustomer;
 import com.synchronoss.saw.export.pivot.CreatePivotTable;
 import com.synchronoss.saw.export.pivot.ElasticSearchAggeragationParser;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,18 +39,10 @@ import com.synchronoss.saw.export.exceptions.JSONValidationSAWException;
 import com.synchronoss.saw.export.generate.interfaces.ExportService;
 import com.synchronoss.saw.export.model.DataResponse;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -168,6 +164,7 @@ public class ExportServiceImpl implements ExportService{
           logger.trace("Recipients: " +recipients);
         String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +emailExportSize+"&analysisType="+ analysisType;
+
         ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
         String finalRecipients = recipients;
@@ -176,8 +173,15 @@ public class ExportServiceImpl implements ExportService{
           public void onSuccess(ResponseEntity<DataResponse> entity) {
             logger.debug("Email async success");
             logger.debug("[Success] Response :" + entity.getStatusCode());
-            IFileExporter iFileExporter = new CSVReportDataExporter();
+            String fileType  = String.valueOf(((LinkedHashMap) dispatchBean).get("fileType"));
+            if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())    {
+                IFileExporter iFileExporter = new CSVReportDataExporter();
+            }
+            else {
+                IFileExporter iFileExporter = new XlsxExporter();
+            }
             ExportBean exportBean = new ExportBean();
+            exportBean.setFileType(fileType);
             String dir = UUID.randomUUID().toString();
             MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
             exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
@@ -186,6 +190,7 @@ public class ExportServiceImpl implements ExportService{
             exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
             exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
             exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
             try {
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
@@ -193,10 +198,16 @@ public class ExportServiceImpl implements ExportService{
 
               FileOutputStream fos = new FileOutputStream(file);
               OutputStreamWriter osw = new OutputStreamWriter(fos);
-              streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
 
-              osw.close();
-              fos.close();
+              if(fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty())  {
+                  streamToCSVReport(entity, Long.parseLong(emailExportSize), exportBean, osw);
+                  osw.close();
+                  fos.close();
+              }
+              else {
+                  streamToXslxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+              }
+
 
               MailSender.sendMail(finalRecipients, exportBean.getReportName() + " | " +
                       exportBean.getPublishDate(), serviceUtils.prepareMailBody(exportBean, mailBody),
@@ -214,7 +225,8 @@ public class ExportServiceImpl implements ExportService{
           }
           @Override
           public void onFailure(Throwable t) {
-            logger.error("[Failed] Getting string response:" + t);
+
+              logger.error("[Failed] Getting string response:" + t);
           }
         });
       }
@@ -227,9 +239,19 @@ public class ExportServiceImpl implements ExportService{
         String finalJobGroup = jobGroup;
         ExportBean exportBean = new ExportBean();
         String dir = UUID.randomUUID().toString();
-        exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
-            dispatchBean).get("name")) + "."
-            +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".csv"));
+        exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
+        String strFile = exportBean.getFileType();
+        if(exportBean.getFileType().equalsIgnoreCase("csv") || strFile == null || strFile.isEmpty() )    {
+            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                dispatchBean).get("name")) + "."
+                +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".csv"));
+        }
+        else {
+            exportBean.setFileName(publishedPath + File.separator + dir + File.separator + String.valueOf(((LinkedHashMap)
+                dispatchBean).get("name")) + "."
+                +(((LinkedHashMap) dispatchBean).get("fileType") !=null ? ((LinkedHashMap) dispatchBean).get("fileType") : ".xlsx"));
+        }
+
         exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
         exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
         exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
@@ -375,12 +397,17 @@ public class ExportServiceImpl implements ExportService{
       // as no two executions are going to have same ID.
       FileOutputStream fos = new FileOutputStream(file, true);
       OutputStreamWriter osw = new OutputStreamWriter(fos);
+      String fileType = exportBean.getFileType();
 
       // stream the page output to file.
-      streamToCSVReport(entity, limitPerPage, exportBean, osw);
-
-      osw.close();
-      fos.close();
+      if (fileType.equalsIgnoreCase("csv") || fileType == null || fileType.isEmpty()) {
+          streamToCSVReport(entity, limitPerPage, exportBean, osw);
+          osw.close();
+          fos.close();
+      }
+      else {
+          streamToXslxReport(entity.getBody(), limitPerPage, exportBean);
+      }
 
 
     } catch (IOException e) {
@@ -430,7 +457,65 @@ public class ExportServiceImpl implements ExportService{
     );
   }
 
-  @Override
+    /**
+     *
+     * @param response
+     * @param LimittoExport
+     * @param exportBean
+     * @throws IOException
+     */
+    public Boolean streamToXslxReport(DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
+
+        BufferedOutputStream stream = null;
+        File xlsxFile = null;
+        xlsxFile = new File(exportBean.getFileName());
+        xlsxFile.createNewFile();
+        stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
+        XlsxExporter xlsxExporter = new XlsxExporter();
+        Workbook workBook = new XSSFWorkbook();
+        workBook.getSpreadsheetVersion();
+        XSSFSheet sheet = (XSSFSheet) workBook.createSheet(exportBean.getReportName());
+        try {
+            response.getData()
+                .stream()
+                .limit(LimittoExport)
+                .forEach(
+                    line -> {
+                        xlsxExporter.addxlsxRow(exportBean, workBook, sheet, line);
+                    }
+                );
+            autoSizeColumns(workBook);
+            workBook.write(stream);
+        }
+        finally {
+            stream.flush();
+            stream.close();
+        }
+        return true;
+    }
+
+    /**
+     *
+     * @param workbook
+     */
+    public void autoSizeColumns(Workbook workbook) {
+        int numberOfSheets = workbook.getNumberOfSheets();
+        for (int i = 0; i < numberOfSheets; i++) {
+            Sheet sheet = workbook.getSheetAt(i);
+            if (sheet.getPhysicalNumberOfRows() > 0) {
+                Row row = sheet.getRow(0);
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    int columnIndex = cell.getColumnIndex();
+                    sheet.autoSizeColumn(columnIndex);
+                }
+            }
+        }
+    }
+
+
+    @Override
   @Async
   public void pivotToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId) {
     HttpHeaders headers = new HttpHeaders();
@@ -474,6 +559,7 @@ public class ExportServiceImpl implements ExportService{
             exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
             exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
             exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
             try {
               // create a directory with unique name in published location to avoid file conflict for dispatch.
               File file = new File(exportBean.getFileName());
@@ -524,6 +610,7 @@ public class ExportServiceImpl implements ExportService{
             exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
             exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
             exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
+            exportBean.setFileType(String.valueOf(((LinkedHashMap) dispatchBean).get("fileType")));
 
             File cfile = new File(exportBean.getFileName());
             String zipFileName = cfile.getAbsolutePath().concat(".zip");
