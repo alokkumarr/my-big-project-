@@ -129,9 +129,9 @@ describe('Fork & Edit and delete charts: forkAndEditAndDeleteCharts.test.js', ()
             designModePage.chart.addFieldButton(yAxisName2).click();
           }
           //Verify chart axis and group by
-          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, metrics, "yaxis"));
-          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, dimension, "xaxis"));
-          commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy(type));
+          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(metrics, "yaxis"));
+          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(dimension, "xaxis"));
+          commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy);
 
           //Save
           const save = analyzePage.saveDialog;

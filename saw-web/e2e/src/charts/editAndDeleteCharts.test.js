@@ -57,7 +57,6 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
     it('should edit and delete ' + description +' testDataMetaInfo: '+ JSON.stringify({test:description,feature:'EDITDELETECHARTS', dp:'editDeleteChartsDataProvider'}), () => {
         try {
           let currentTime = new Date().getTime();
-          let user = data.user;
           let type = data.chartType.split(":")[1];
 
           let name = data.chartType+' ' + globalVariables.e2eId+'-'+currentTime;
@@ -101,6 +100,7 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
               commonFunctions.waitFor.elementToBeVisible(deleteElements[i]);
               commonFunctions.waitFor.elementToBeClickable(deleteElements[i]);
               deleteElements[i].click();
+              browser.sleep(2000);
             }
           });
           //Add new feilds.
@@ -127,9 +127,9 @@ describe('Edit and delete charts: editAndDeleteCharts.test.js', () => {
             designModePage.chart.addFieldButton(yAxisName2).click();
           }
           //Verify chart axis and group by
-          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, metrics, "yaxis"));
-          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(type, dimension, "xaxis"));
-          commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy(type));
+          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(metrics, "yaxis"));
+          commonFunctions.waitFor.elementToBePresent(designModePage.chart.getAxisLabel(dimension, "xaxis"));
+          commonFunctions.waitFor.elementToBePresent(designModePage.chart.groupBy);
 
           //Save
           const save = analyzePage.saveDialog;

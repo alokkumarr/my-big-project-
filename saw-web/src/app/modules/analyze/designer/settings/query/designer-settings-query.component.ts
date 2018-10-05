@@ -14,8 +14,7 @@ export class DesignerSettingsQueryComponent implements OnInit {
   @Output() submit = new EventEmitter<any>();
   @Input() analysis: AnalysisReport;
   @Input() artifacts: Artifact[];
-
-  constructor(public _analyzeDialogService: AnalyzeDialogService) {}
+  constructor(private _analyzeDialogService: AnalyzeDialogService) {}
 
   ngOnInit() {
     if (isUndefined(this.analysis.queryManual)) {

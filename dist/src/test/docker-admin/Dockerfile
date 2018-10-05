@@ -18,6 +18,11 @@ RUN systemctl enable systemd-journal-remote.socket
 # Disable the log sender on the admin node itself
 RUN systemctl disable systemd-journal-upload.service
 
+# Forward system logs to Docker logs (only needed on admin node as it
+# aggregates the logs of other nodes)
+COPY sip-logger/sip-logger.service /etc/systemd/system/
+RUN systemctl enable sip-logger
+
 # Install mail server for testing
 RUN yum -y -q install postfix
 RUN echo "inet_interfaces = all" >> /etc/postfix/main.cf

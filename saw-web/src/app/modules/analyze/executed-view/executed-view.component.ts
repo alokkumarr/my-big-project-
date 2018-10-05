@@ -324,7 +324,9 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
     if (isReportType) {
       /* The Execution data loader defers data loading to the report grid, so it can load the data needed depending on paging */
       if (executeResponse) {
-        executeResponse.data = clone(flattenReportData(executeResponse.data, this.executedAnalysis));
+        executeResponse.data = clone(
+          flattenReportData(executeResponse.data, this.executedAnalysis)
+        );
         // resolve the data that is sent by the execution
         // and the paginated data after that
         this.executedAnalysis = {
@@ -380,11 +382,14 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
           .utc(executeResponse.executedAt)
           .local()
           .format('YYYY/MM/DD h:mm A');
-        this.data = executeResponse.data;
+        this.data = this.flattenData(
+          executeResponse.data,
+          this.executedAnalysis
+        );
       } else {
         this.loadExecutionData(analysisId, executionId, analysisType).then(
           ({ data }) => {
-            this.data = data;
+            this.data = this.flattenData(data, this.executedAnalysis);
           }
         );
       }
@@ -402,7 +407,6 @@ export class ExecutedViewComponent implements OnInit, OnDestroy {
       return data;
     }
   }
-
 
   loadExecutionData(analysisId, executionId, analysisType, options: any = {}) {
     options.analysisType = analysisType;

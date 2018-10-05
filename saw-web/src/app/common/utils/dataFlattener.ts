@@ -17,6 +17,7 @@ import * as mapKeys from 'lodash/mapKeys';
 import * as fpSplit from 'lodash/fp/split';
 import * as trimEnd from 'lodash/trimEnd';
 import * as fpMap from 'lodash/fp/map';
+import * as get from 'lodash/get';
 
 
 export function flattenPivotData(data, sqlBuilder) {
@@ -128,6 +129,9 @@ export function flattenChartData(data, sqlBuilder) {
 }
 
 export function flattenReportData(data, analysis) {
+  if(analysis.edit) {
+    return data;
+  }
   const columnMap = fpPipe(
     fpFlatMap(artifact => artifact.columns),
     fpReduce((accumulator, column) => {

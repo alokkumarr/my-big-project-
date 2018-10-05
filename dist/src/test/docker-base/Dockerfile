@@ -59,9 +59,6 @@ RUN systemctl enable systemd-journal-upload.service
 RUN echo "URL=http://sip-admin:19532" >> /etc/systemd/journal-upload.conf
 RUN install -d -o systemd-journal-upload -g systemd-journal-upload \
   /var/lib/systemd/journal-upload        
-# Forward container system logs to Docker logs
-COPY saw-logger/saw-logger.service /etc/systemd/system/
-RUN systemctl enable saw-logger
 
 # Install SSH server in each container so that the deployment
 # automation can log in and perform installation steps
@@ -87,5 +84,8 @@ RUN echo mapr | passwd --stdin mapr
 # Install Java
 RUN yum -y -q install java-1.8.0-openjdk-headless
 
+# Add SIP container health check command
+COPY sip-health-check /root/
+
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD systemctl is-system-running --quiet
+HEALTHCHECK --interval=5s CMD /root/sip-health-check

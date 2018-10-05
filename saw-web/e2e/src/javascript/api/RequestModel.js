@@ -452,6 +452,7 @@ class RequestModel {
           }
         ],
         'action': action,
+        "executedBy": loginId,
         'page': 1,
         'pageSize': 10,
         'analyze': [
@@ -663,7 +664,7 @@ class RequestModel {
             'edit': false,
             'categoryId': subCategoryId,
             'saved': true,
-            'executionType': 'preview'
+            'executionType': 'publish'
           }
         ]
       }
@@ -842,7 +843,6 @@ class RequestModel {
                 ]
               },
               'edit': false,
-              'executionType': 'preview',
               'categoryId': subCategoryId,
               'saved': true
             }
@@ -861,6 +861,7 @@ class RequestModel {
             }
           ],
           'action': action,
+          "executedBy": loginId,
           'page': 1,
           'pageSize': 10,
           'analyze': [
@@ -1010,7 +1011,7 @@ class RequestModel {
                 ]
               },
               'edit': false,
-              'executionType': 'preview',
+              'executionType': 'publish',
               'categoryId': subCategoryId,
               'saved': true
             }
@@ -1272,7 +1273,6 @@ class RequestModel {
                 ]
               },
               'edit': false,
-              'executionType': 'preview',
               'categoryId': subCategoryId,
               'saved': true
             }
@@ -1291,6 +1291,7 @@ class RequestModel {
             }
           ],
           'action': action,
+          "executedBy": loginId,
           'page': 1,
           'pageSize': 10,
           'analyze': [
@@ -1545,7 +1546,7 @@ class RequestModel {
     }
 
     getChartBody(customerCode, id, action, dataSetName, semanticId, userId, loginId, analysisName,
-      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filters = null) {
+      analysisDesc, subCategoryId, currentTimeStamp, analysisType, subType, filtr = null) {
 
       let body;
 
@@ -1677,7 +1678,7 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': filters ? filters :[],
+                'filters': filtr ? filtr :[],
                 'sorts': [
                   {
                     'order': 'asc',
@@ -1735,7 +1736,6 @@ class RequestModel {
                 'align': 'right',
                 'layout': 'vertical'
               },
-              'executionType': 'preview',
               'categoryId': subCategoryId,
               'saved': true
             }
@@ -1754,6 +1754,7 @@ class RequestModel {
             }
           ],
           'action': action,
+          "executedBy": loginId,
           'page': 1,
           'pageSize': 10,
           'analyze': [
@@ -1873,7 +1874,7 @@ class RequestModel {
               'userFullName': loginId,
               'sqlBuilder': {
                 'booleanCriteria': 'AND',
-                'filters': filters ? filters :[],
+                'filters': filtr ? filtr :[],
                 'sorts': [
                   {
                     'order': 'asc',
@@ -1931,7 +1932,7 @@ class RequestModel {
                 'align': 'right',
                 'layout': 'vertical'
               },
-              'executionType': 'preview',
+              'executionType': 'publish',
               'categoryId': subCategoryId,
               'saved': true
             }
