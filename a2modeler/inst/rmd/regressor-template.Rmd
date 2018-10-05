@@ -13,42 +13,12 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = TRUE, message = FAL
                       fig.align = "center", fig.width = 9, fig.height = 5)
 ```
 
-
-```{r r-config}
-
-# Library Path
-lib_path <- .libPaths()[1]
-
-# R packages
-packages <- c("a2munge", "a2modeler", "a2charter", "sparklyr", "dplyr", "purrr", "ggplot2")
+## Version Notes
 
 
-```
+```{r input-data-params, eval = FALSE}
 
-
-```{r spark-config}
-
-## Spark Configuration Parameters
-
-# Create Spark Connection
-spark <- TRUE
-
-# Spark Master
-spark_master <- "local"
-
-# Spark Version
-spark_version <- "2.3.0"
-
-# Additional Spark Configuration Settings. Add configuration with named element
-# in list
-spark_config_args <- list(spark.memory.fraction = 0.9)
-
-```
-
-
-```{r input-data-params}
-
-## Input Data Parameters
+## Input Data Parameters for reader function
 
 # Path to dataset
 dataset_path <- "CHANGEME"
@@ -62,7 +32,7 @@ dataset_type <- "CHANGEME"
 ```
 
 
-```{r inputs}
+```{r inputs, eval = FALSE}
 
 ### Regressor Configuration Inputs 
 
@@ -99,30 +69,9 @@ seed <- 319
 ```
 
 
-```{r measure}
+```{r data-prep, eval = FALSE}
 
-# Set Measure. RMSE is default
-measure <- RMSE
-
-```
-
-
-```{r sampling}
-
-# Set Sampling Method. Options include cross_validation, holdout, random or
-# default
-sampling_method <- "holdout"
-
-# Sampling Args
-sample_args <- list(splits = c(0.6, 0.2, 0.2))
-
-```
-
-
-```{r data-prep}
-
-# Create a data prep pipeline. Applied to data prior any feature generation
-# pipelines within a model
+# Create a data prep pipeline. Applied to data prior to regressor creation
 prep_pipe <- pipeline(expr = identity,
                       uid  = "Data-Prep-Pipe",
                       desc = "Data preperation pipeline. Applied before any modeling or feature generation is applied")
@@ -130,7 +79,43 @@ prep_pipe <- pipeline(expr = identity,
 ```
 
 
-```{r feature-generation}
+```{r regressor-creation, eval = FALSE}
+
+# Create Regressor
+r1 <- df %>% 
+  flow(., prep_pipe) %>% 
+  regressor(.,
+            target,
+            name = name,
+            uid = uid,
+            version = version,
+            desc = desc,
+            scientist = scientist,
+            execution_strategy = execution_strategy,
+            refit = refit,
+            save_submodels = save_submodels,
+            seed = seed)
+```
+
+
+```{r measure, eval = FALSE}
+
+# Set Measure. RMSE is default
+r1 <- set_measure(r1, RMSE)
+
+```
+
+
+```{r sampling, eval = FALSE}
+
+# Set Sampling Method. Options include cross_validation, holdout, random or
+# default
+r1 <- add_holdout_samples(r1, splits = c(.6, .2, .2))
+
+```
+
+
+```{r feature-generation, eval = FALSE}
 
 # Create one or more feature generation pipelines. Each can be applied in one or
 # more models
@@ -141,8 +126,68 @@ feature_pipe1 <- pipeline(expr = identity,
 ```
 
 
+```{r models, eval = FALSE}
 
-```{r r-setup}
+# Add Regression Models
+r1 <- r1 %>% 
+  add_model(., 
+            method = "ml_linear_regression",
+            pipe = feature_pipe1,
+            param_map = list(standardization = TRUE),
+            uid = "linear-baseline",
+            desc = "Simple linear model to create baseline prediction accuracy")
+```
+
+
+```{r train-models, eval = FALSE}
+
+# Train models
+r1 <- train_models(r1)
+
+```
+
+
+```{r set-final, eval = FALSE}
+
+# Set Final Model 
+r1 <- set_final_model(r1, "best", reevaluate = TRUE, refit = TRUE)
+```
+
+
+
+```{r r-config, eval = FALSE}
+
+# Library Path
+lib_path <- .libPaths()[1]
+
+# R packages
+packages <- c("a2munge", "a2modeler", "a2charter", "sparklyr", "dplyr", "purrr", "ggplot2")
+
+
+```
+
+
+```{r spark-config, eval = FALSE}
+
+## Spark Configuration Parameters
+
+# Create Spark Connection
+spark <- TRUE
+
+# Spark Master
+spark_master <- "local"
+
+# Spark Version
+spark_version <- "2.3.0"
+
+# Additional Spark Configuration Settings. Add configuration with named element
+# in list
+spark_config_args <- list(spark.memory.fraction = 0.9)
+
+```
+
+
+```{r r-setup, eval = FALSE}
 
 # Load Libraries
 for(pck in packages) library(pck, lib.loc = lib_path, character.only = TRUE)
@@ -150,7 +195,7 @@ for(pck in packages) library(pck, lib.loc = lib_path, character.only = TRUE)
 ```
 
 
-```{r spark-setup}
+```{r spark-setup, eval = FALSE}
 
 # If Spark Option True, create connection
 if(spark) {
@@ -163,7 +208,7 @@ if(spark) {
 ```
 
 
-```{r data-import}
+```{r data-import, eval = FALSE}
 
 # Read data into memory
 if(spark) {
@@ -175,19 +220,26 @@ if(spark) {
 ```
 
 
-```{r regressor-creation}
+```{r execution, ref.label=c('r-config', 'r-setup', 'spark-config', 'spark-setup', 'input-data-params', 'data-import', 'data-pred',  'inputs', 'regressor-creation', 'measure', 'sampling', 'feature-generation', 'models', 'train-model', 'set-final')}
 
-# Create Regressor
-r1 <- regressor(df,
-                target,
-                name = name,
-                uid = uid,
-                version = version,
-                desc = desc,
-                scientist = scientist,
-                execution_strategy = execution_strategy,
-                refit = refit,
-                save_submodels = save_submodels,
-                seed = seed)
 ```
 
+## Regressor Configuration
+
+```{r regressor-config, echo=TRUE, eval=FALSE, ref.label=c('inputs', 'regressor-creation', 'measure', 'sampling', 'feature-generation', 'models', 'train-model', 'set-final')}
+
+```
+
+
+## Regressor Result
+
+```{r regressor-final}
+print(r1)
+```
+
+
+## Appendix
+
+```{r config, echo=TRUE, eval=FALSE, ref.label=c('r-config', 'spark-config')}
+
+```
