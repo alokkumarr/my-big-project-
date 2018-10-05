@@ -13,7 +13,7 @@ module.exports = {
     }).getBody());
   },
   delete: (url, token) => {
-    
+
     return JSON.parse(request('DELETE', url, {
       headers: {'Authorization': token}
     }).getBody());

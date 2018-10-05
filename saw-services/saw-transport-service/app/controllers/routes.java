@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:sip/saw-services/saw-transport-service/conf/routes
-// @DATE:Wed Jul 04 14:27:39 IST 2018
+// @SOURCE:saw-services/saw-transport-service/conf/routes
+// @DATE:Mon Oct 01 11:25:16 EDT 2018
 
 package controllers;
 
@@ -10,6 +10,7 @@ import router.RoutesPrefix;
 public class routes {
   
   public static final controllers.ReverseAnalysis Analysis = new controllers.ReverseAnalysis(RoutesPrefix.byNamePrefix());
+  public static final controllers.ReverseActuator Actuator = new controllers.ReverseActuator(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseGlobalFilter GlobalFilter = new controllers.ReverseGlobalFilter(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseKPIBuilder KPIBuilder = new controllers.ReverseKPIBuilder(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseSemantic Semantic = new controllers.ReverseSemantic(RoutesPrefix.byNamePrefix());
@@ -22,6 +23,7 @@ public class routes {
   public static class javascript {
     
     public static final controllers.javascript.ReverseAnalysis Analysis = new controllers.javascript.ReverseAnalysis(RoutesPrefix.byNamePrefix());
+    public static final controllers.javascript.ReverseActuator Actuator = new controllers.javascript.ReverseActuator(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseGlobalFilter GlobalFilter = new controllers.javascript.ReverseGlobalFilter(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseKPIBuilder KPIBuilder = new controllers.javascript.ReverseKPIBuilder(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseSemantic Semantic = new controllers.javascript.ReverseSemantic(RoutesPrefix.byNamePrefix());

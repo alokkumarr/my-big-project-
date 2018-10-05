@@ -151,7 +151,7 @@ export class ObserveService {
             this.getDashboardsForCategory(subCategory.id).subscribe(
               (dashboards: Array<Dashboard>) => {
                 dashboards = dashboards || [];
-                subCategory.children = subCategory.children || [];
+                subCategory.children = [];
 
                 subCategory.children = subCategory.children.concat(
                   map(dashboards, dashboard => ({

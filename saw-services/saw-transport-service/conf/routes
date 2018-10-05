@@ -38,3 +38,7 @@ GET     /control        controllers.MTSControl.executeCmd(CMD:String, PARAMETERS
 POST    /control        controllers.MTSControl.executeExtendedCmd(CMD:String)
 
 GET     /sr             controllers.MTSControl.sr( parameters:Option[String])
+
+# Monitoring
+
+GET     /actuator/health                  controllers.Actuator.health

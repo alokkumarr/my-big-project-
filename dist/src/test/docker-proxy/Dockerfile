@@ -9,7 +9,9 @@
 FROM sip-base:${project.version}
 
 # Add SAW start page with links to services
-COPY dev /usr/share/nginx/html/dev/
+ENV html_dev=/usr/share/nginx/html/dev
+COPY dev $html_dev/
+RUN chmod -R a+r $html_dev
 
 # Add Squid proxy server to access internal services during
 # development

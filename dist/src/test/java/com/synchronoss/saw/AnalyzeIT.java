@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.restassured.parsing.Parser;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.net.ftp.FTPClient;
@@ -267,7 +268,6 @@ public class AnalyzeIT extends BaseIT {
         .when().post("/services/analysis")
         .then().assertThat().statusCode(200);
   }
-
 
   private void saveDLReportAnalysis(String token, String analysisId,
       String analysisName, ObjectNode analysis)
@@ -617,4 +617,66 @@ public class AnalyzeIT extends BaseIT {
     objectNode.putPOJO("kpi",kpi);
     return objectNode;
   }
+
+  @Test
+    public void userPreferenceTest() throws JsonProcessingException {
+       String json = mapper.writeValueAsString(PreferenceData());
+     Response create = given(spec)
+          .header("Authorization", "Bearer " + token)
+         .header("Content-Type","application/json")
+          .body(json)
+          .when().post("/security/auth/admin/user/preferences/upsert")
+          .then().assertThat().statusCode(200).extract().response();
+      ObjectNode createNode = create.as(ObjectNode.class);
+      Assert.assertEquals(1,createNode.get("userID").asLong());
+      Assert.assertEquals(1,createNode.get("customerID").asLong());
+      Assert.assertEquals(4,createNode.get("preferences").size());
+      String json1 = mapper.writeValueAsString(deletePreferenceData());
+      given(spec)
+          .header("Authorization", "Bearer " + token)
+          .header("Content-Type","application/json")
+          .body(json1)
+          .when().post("/security/auth/admin/user/preferences/delete")
+          .then().assertThat().statusCode(200).extract().response();
+
+      Response fetch = given(spec)
+          .header("Authorization", "Bearer " + token)
+          .header("Content-Type","application/json")
+          .when().get("/security/auth/admin/user/preferences/fetch")
+          .then().defaultParser(Parser.JSON).assertThat().statusCode(200).extract().response();
+      ObjectNode fetchNode = fetch.as(ObjectNode.class);
+      Assert.assertEquals(1,fetchNode.get("userID").asLong());
+      Assert.assertEquals(1,fetchNode.get("customerID").asLong());
+      Assert.assertEquals(2,fetchNode.get("preferences").size());
+   }
+
+   private ArrayNode PreferenceData()
+   {
+       ArrayNode arrayNode = mapper.createArrayNode();
+       ObjectNode objectNode1 = arrayNode.addObject();
+       objectNode1.put("preferenceName","defaultURL1");
+       objectNode1.put("preferenceValue","http://localhost/saw/observe/1");
+       ObjectNode objectNode2 = arrayNode.addObject();
+       objectNode2.put("preferenceName","defaultURL2");
+       objectNode2.put("preferenceValue","http://localhost/saw/observe/2");
+       ObjectNode objectNode3 = arrayNode.addObject();
+       objectNode3.put("preferenceName","defaultURL3");
+       objectNode3.put("preferenceValue","http://localhost/saw/observe/3");
+       ObjectNode objectNode4 = arrayNode.addObject();
+       objectNode4.put("preferenceName","defaultURL4");
+       objectNode4.put("preferenceValue","http://localhost/saw/observe/4");
+       return arrayNode;
+   }
+
+    private ArrayNode deletePreferenceData()
+    {
+        ArrayNode arrayNode = mapper.createArrayNode();
+        ObjectNode objectNode1 = arrayNode.addObject();
+        objectNode1.put("preferenceName","defaultURL1");
+        objectNode1.put("preferenceValue","http://localhost/saw/observe/1");
+        ObjectNode objectNode2 = arrayNode.addObject();
+        objectNode2.put("preferenceName","defaultURL3");
+        objectNode2.put("preferenceValue","http://localhost/saw/observe/3");
+        return arrayNode;
+    }
 }

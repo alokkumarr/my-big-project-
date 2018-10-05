@@ -229,11 +229,12 @@ class Analysis extends BaseController {
           val analysisId = extractAnalysisId(json)
           var executionType: String = null
           var queryRuntime: String = null
+          var typeInfo : String = null
           (json \ "contents" \ "analyze") match {
             case obj: JArray => {
               val analysis = analysisJson(json, dskStr)
               val analysisType = (analysis \ "type")
-              val typeInfo = analysisType.extract[String]
+               typeInfo = analysisType.extract[String]
               executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
               if (typeInfo.equals("report")) {
                 /* Build query based on analysis supplied in request body */
@@ -260,6 +261,9 @@ class Analysis extends BaseController {
 
           m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
           val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
+          if (typeInfo != null && typeInfo.equalsIgnoreCase("report")
+            && executionType.equalsIgnoreCase("preview"))
+            return contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2)) ~ ("query", queryRuntime)
           contentsAnalyze(("data", data._1) ~ ("totalRows", totalRows) ~ ("executionId", data._2))
         })
 

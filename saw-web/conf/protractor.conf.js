@@ -1,11 +1,9 @@
 var appRoot = require('app-root-path');
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-const generate = require('../src/test/javascript/data/generateTestData');
 var retry = require('protractor-retry').retry;
 var JSONReporter = require('jasmine-bamboo-reporter');
 var fs = require('fs');
-var HtmlReporter = require('protractor-beautiful-reporter');
 var argv = require('yargs').argv;
 
 /**
@@ -41,7 +39,7 @@ const extendedFluentWait = webpackHelper.distRun() ? 60000 : 40000;
  */
 const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 300000;
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 5400000 : 3600000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 12600000 : 10800000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
@@ -51,7 +49,7 @@ const allScriptsTimeout = webpackHelper.distRun() ? 12600000 : 10800000;
 /**
  * number of failed retry
  */
-let maxRetryForFailedTests = webpackHelper.distRun() ? 4 : 3;
+let maxRetryForFailedTests = webpackHelper.distRun() ? 3 : 2;
 
 /**
  * Waits ms after page is loaded
@@ -103,7 +101,7 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     shardTestFiles: true,
-    maxInstances: 15,
+    maxInstances: 10,
     chromeOptions: {
       args: [
         'disable-extensions',
@@ -119,7 +117,7 @@ exports.config = {
     }
   },
   jasmineNodeOpts: {
-    defaultTimeoutInterval: defaultTimeoutInterval,
+    defaultTimeoutInterval: extendedDefaultTimeoutInterval,
     isVerbose: true,
     showTiming: true,
     includeStackTrace: true,
@@ -187,21 +185,23 @@ exports.config = {
   },
   onPrepare() {
     retry.onPrepare();
+    //
+    // // Generate test data
+    // if(webpackHelper.getSawWebUrl()) {
+    //   token = generate.token(webpackHelper.getSawWebUrl());
+    //   generate.usersRolesPrivilegesCategories(token);
+    //   //sleep.sleep(30);
+    // } else {
+    //   throw new Error('saw web url can not be null');
+    // }
 
-    // Generate test data
-    token = generate.token(browser.baseUrl);
-    generate.usersRolesPrivilegesCategories(token);
-
+    //console.log('Running instance at '+ new Date());
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,
       displaySuiteNumber: true
     }));
 
-    jasmine.getEnv().addReporter(new HtmlReporter({
-      baseDirectory: 'target/screenshots',
-      preserveDirectory: false
-    }).getJasmine2Reporter());
 
     browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
     browser.manage().timeouts().implicitlyWait(implicitlyWait);
@@ -249,9 +249,24 @@ exports.config = {
     }, pageResolveTimeout);
   },
   beforeLaunch: function () {
-
+    //console.log('beforeLaunch....generating the testdata...')
+    // Generate test data
+    if(webpackHelper.getSawWebUrl()) {
+      const generate = require('../src/test/javascript/data/generateTestData');
+      token = generate.token(webpackHelper.getSawWebUrl());
+      generate.usersRolesPrivilegesCategories(token);
+    } else {
+      throw new Error('saw web url can not be null');
+      process.exit(1);
+    }
   },
   afterLaunch: function() {
+    //console.log('afterLaunch....')
+    if (fs.existsSync('target/e2eId.json')) {
+      // delete and create new always
+      //console.log('deleting e2e id json file....')
+      fs.unlinkSync('target/e2eId.json');
+    }
 
     var retryCounter = 1;
     if (argv.retry) {
