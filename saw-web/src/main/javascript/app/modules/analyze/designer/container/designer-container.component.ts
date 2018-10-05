@@ -331,7 +331,6 @@ export class DesignerContainerComponent {
         delete filter.model;
       }
     });
-
     this._designerService.getDataForAnalysis(this.analysis).then(
       response => {
         if (
@@ -347,6 +346,7 @@ export class DesignerContainerComponent {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
+          this.analysis.queryManual = response.designerQuery;
         }
       },
       err => {

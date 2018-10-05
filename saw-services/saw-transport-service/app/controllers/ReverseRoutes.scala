@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE: sip/saw-services/saw-transport-service/conf/routes
-// @DATE:Wed Jul 04 14:27:39 IST 2018
+// @SOURCE:saw-services/saw-transport-service/conf/routes
+// @DATE:Mon Oct 01 11:25:16 EDT 2018
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -36,6 +36,21 @@ package controllers {
     def list(view:String): Call = {
       import ReverseRouteContext.empty
       Call("GET", _prefix + { _defaultPrefix } + "analysis" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("view", view)))))
+    }
+  
+  }
+
+  // @LINE:44
+  class ReverseActuator(_prefix: => String) {
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:44
+    def health(): Call = {
+      import ReverseRouteContext.empty
+      Call("GET", _prefix + { _defaultPrefix } + "actuator/health")
     }
   
   }
