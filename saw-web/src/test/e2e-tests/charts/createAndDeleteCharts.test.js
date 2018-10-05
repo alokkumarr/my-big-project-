@@ -50,7 +50,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
 
        homePage.navigateToSubCategoryUpdated(categoryName, subCategoryName, defaultCategory);
 
-       let chartName = `e2e ${description} ${(new Date()).toString()}`;
+       let chartName = `e2e ${description} ${(new Date()).toString()}-`+utils.getRandomInt(5,7);
        let chartDescription = `e2e ${description} : description ${(new Date()).toString()}`;
 
        // Create analysis
