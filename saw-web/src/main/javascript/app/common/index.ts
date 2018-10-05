@@ -27,10 +27,7 @@ import {
   ProgressIndicatorInterceptor
 } from './interceptor';
 import { SearchBoxComponent } from './components/search-box';
-import {
-  IsUserLoggedInGuard,
-  DefaultModuleGuard
-} from './guards';
+import { IsUserLoggedInGuard, DefaultModuleGuard } from './guards';
 import { MaterialModule } from '../material.module';
 import { ChartService } from './components/charts/chart.service';
 import { CommonPipesModule } from './pipes/common-pipes.module';
@@ -58,10 +55,13 @@ import { DateFormatDialogComponent } from './components/date-format-dialog';
 import { ChoiceGroupComponent } from './components/choice-group';
 import { AggregateChooserComponent } from './components/aggregate-chooser';
 import { ClickToCopyDirective, E2eDirective } from './directives';
-import { ErrorDetailService } from './services/error-detail.service';
-import { ErrorDetailDialogService } from './services/error-detail-dialog.service';
+import {
+  WindowService,
+  MenuService,
+  ErrorDetailDialogService,
+  ErrorDetailService
+} from './services';
 import { ConfigService } from './services/configuration.service';
-import { MenuService } from './services/menu.service';
 import { ToastService, ComponentHandler } from './services';
 import { UserService } from '../../login/services/user.service';
 import { JwtService } from '../../login/services/jwt.service';
@@ -122,6 +122,7 @@ const SERVICES = [
   ToastService,
   ConfigService,
   ChartService,
+  WindowService,
   ComponentHandler,
   JwtService,
   UserService,
