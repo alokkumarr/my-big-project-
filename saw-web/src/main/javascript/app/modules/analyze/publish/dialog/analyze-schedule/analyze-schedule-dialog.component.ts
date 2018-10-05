@@ -9,6 +9,7 @@ import * as first from 'lodash/first';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as moment from 'moment';
+import * as get from 'lodash/get';
 
 import { AnalyzeService } from '../../../services/analyze.service';
 import { JwtService } from '../../../../../../login/services/jwt.service';
@@ -66,6 +67,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
   errorFlagMsg = false;
   loadCron = false;
   emailValidateFlag = false;
+  isReport: boolean;
 
   constructor(
     private _dialogRef: MatDialogRef<AnalyzeScheduleDialogComponent>,
@@ -86,6 +88,9 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         this.setDefaultCategory();
         this.fetchCronDetails();
       });
+    this.isReport = ['report', 'esReport'].includes(
+      get(this.data.analysis, 'type'))
+    );
   }
 
   onCategorySelected(value) {
@@ -128,7 +133,8 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
             endDate,
             analysisID,
             emailList,
-            ftp
+            ftp,
+            fileType
           } = jobDetails;
           this.crondetails = {
             cronexp: cronExpression,
@@ -140,11 +146,10 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
           if (analysisID) {
             this.scheduleState = 'exist';
           }
-          this.emails = emailList;
-          this.hasSchedule = true;
           if (type !== 'chart') {
             this.ftp = ftp;
           }
+          this.fileType = fileType;
           this.emails = emailList;
           this.hasSchedule = true;
         }
@@ -205,7 +210,7 @@ export class AnalyzeScheduleDialogComponent implements OnInit {
         description: '',
         emailList: this.emails,
         ftp: this.ftp,
-        fileType: 'csv',
+        fileType: this.fileType,
         jobName: cronJobName,
         endDate: crondetails.endDate,
         metricName: analysis.metricName,
