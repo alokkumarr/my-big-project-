@@ -348,7 +348,10 @@ export class DesignerContainerComponent implements OnInit {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.dataCount = response.count;
           this.data = this.flattenData(response.data, this.analysis);
-          this.analysis.queryManual = response.designerQuery;
+          if (this.analysis.type === 'report') {
+            (this.analysis as AnalysisReport).queryManual =
+              response.designerQuery;
+          }
         }
       },
       err => {
