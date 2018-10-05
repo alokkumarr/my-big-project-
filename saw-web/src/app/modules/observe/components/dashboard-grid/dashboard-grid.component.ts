@@ -22,8 +22,10 @@ import { Subscription } from 'rxjs/Subscription';
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
+import * as cloneDeep from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
+import * as sortBy from 'lodash/sortBy';
 import * as flatMap from 'lodash/flatMap';
 import * as values from 'lodash/values';
 import * as forEach from 'lodash/forEach';
@@ -31,6 +33,10 @@ import * as forEach from 'lodash/forEach';
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { GlobalFilterService } from '../../services/global-filter.service';
+import {
+  WindowService,
+  DEVICES
+} from '../../../../common/services/window.service';
 import { DashboardService } from '../../services/dashboard.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
@@ -53,7 +59,15 @@ export class DashboardGridComponent
   @ViewChild('gridster') gridster: GridsterComponent;
   @ViewChildren(ObserveChartComponent) charts: QueryList<ObserveChartComponent>;
 
-  @Input() model: Dashboard;
+  model: Dashboard;
+  modelBak: Dashboard;
+
+  @Input('model')
+  set _model(data: Dashboard) {
+    this.modelBak = data;
+    this.model = cloneDeep(data);
+  }
+
   @Input() requester: BehaviorSubject<any>;
   @Input() mode: string;
 
@@ -68,10 +82,11 @@ export class DashboardGridComponent
   public initialised = false;
 
   constructor(
-    public analyze: AnalyzeService,
-    public filters: GlobalFilterService,
-    public dashboardService: DashboardService,
-    public sidenav: SideNavService
+    private analyze: AnalyzeService,
+    private filters: GlobalFilterService,
+    private dashboardService: DashboardService,
+    private windowService: WindowService,
+    private sidenav: SideNavService
   ) {}
 
   ngOnInit() {
@@ -85,7 +100,10 @@ export class DashboardGridComponent
       maxCols: 100,
       margin: MARGIN_BETWEEN_TILES,
       minRows: 4,
-      maxRows: 100,
+      maxRows: 10000,
+      maxItemCols: 100,
+      maxItemRows: 10000,
+      maxItemArea: 1000000,
       initCallback: this.onGridInit.bind(this),
       itemChangeCallback: this.itemChange.bind(this),
       draggable: {
@@ -100,12 +118,10 @@ export class DashboardGridComponent
     this.filters.initialise();
   }
 
-  ngAfterViewInit() {
-    setTimeout(_ => this.initialiseDashboard(), 100);
-  }
+  ngAfterViewInit() {}
 
   ngOnChanges() {
-    this.initialiseDashboard();
+    // this.initialiseDashboard();
   }
 
   ngOnDestroy() {
@@ -142,6 +158,8 @@ export class DashboardGridComponent
       }
     );
     this.listeners.push(globalFiltersSubscription);
+
+    setTimeout(_ => this.initialiseDashboard(), 100);
   }
 
   isViewMode() {
@@ -302,7 +320,9 @@ export class DashboardGridComponent
       return;
     }
 
-    let length = get(this.model, 'tiles', []).length;
+    const tiles = get(this.model, 'tiles', []);
+
+    let length = tiles.length;
 
     const tileLoaded = () => {
       if (--length > 0) {
@@ -316,7 +336,9 @@ export class DashboardGridComponent
       }, 500);
     };
 
-    forEach(get(this.model, 'tiles', []), tile => {
+    const arrangedTiles = this.arrangeTiles(tiles);
+
+    forEach(arrangedTiles, tile => {
       if (tile.bullet) {
         tile.updater = new BehaviorSubject({});
       }
@@ -352,6 +374,53 @@ export class DashboardGridComponent
     this.addGlobalFilters(tile.analysis);
     tile.updater = tile.updater || new BehaviorSubject({});
     this.dashboard.push(tile);
+  }
+
+  arrangeTiles(tiles: any[]) {
+    this.windowService.windowRef['mygrid'] = this.gridster;
+    if (
+      !this.isViewMode() ||
+      this.windowService.isWiderThan(DEVICES.ipadLandscape)
+    ) {
+      return tiles;
+    }
+
+    const sortedTiles = [
+      ...tiles.filter(t => t.type === 'kpi'),
+      ...tiles.filter(t => t.type === 'bullet'),
+      ...tiles.filter(t => t.type === 'analysis')
+    ];
+    const cols = this.gridster.columns;
+    const TILE_HEIGHT = 12;
+    let lastItem = { x: 0, y: 0, cols: 0, rows: 0 };
+    return sortedTiles.map(tile => {
+      const nextX = (lastItem.x + lastItem.cols) % cols;
+      if (tile.type === 'kpi') {
+        tile.cols = Math.floor(cols / 3);
+        tile.x = nextX + tile.cols > cols ? 0 : nextX;
+        tile.y = lastItem.y + (nextX + tile.cols > cols ? 1 : 0) * TILE_HEIGHT;
+        tile.cols = Math.floor(cols / 3);
+        tile.rows = TILE_HEIGHT;
+      } else if (tile.type === 'bullet') {
+        tile.x =
+          lastItem.x + lastItem.cols <= cols / 3
+            ? lastItem.x + lastItem.cols
+            : 0;
+        tile.y =
+          lastItem.x + lastItem.cols <= cols / 3
+            ? lastItem.y
+            : lastItem.y + lastItem.rows;
+        tile.cols = cols - tile.x;
+        tile.rows = TILE_HEIGHT;
+      } else {
+        tile.x = 0;
+        tile.y = lastItem.y + lastItem.rows;
+        tile.cols = cols;
+      }
+
+      lastItem = tile;
+      return tile;
+    });
   }
 
   refreshDashboard() {
@@ -438,18 +507,18 @@ export class DashboardGridComponent
   }
 
   prepareDashboard(): Dashboard {
-    this.model = this.model;
+    const model = this.isViewMode() ? this.modelBak : this.model;
     return {
-      entityId: get(this.model, 'entityId', ''),
-      categoryId: get(this.model, 'categoryId', ''),
-      autoRefreshEnabled: get(this.model, 'autoRefreshEnabled', false),
-      refreshIntervalSeconds: get(this.model, 'refreshIntervalSeconds'),
-      name: get(this.model, 'name', ''),
-      description: get(this.model, 'description', ''),
-      createdBy: get(this.model, 'createdBy', ''),
-      createdAt: get(this.model, 'createdAt', ''),
-      updatedBy: get(this.model, 'updatedBy', ''),
-      updatedAt: get(this.model, 'updatedAt', ''),
+      entityId: get(model, 'entityId', ''),
+      categoryId: get(model, 'categoryId', ''),
+      autoRefreshEnabled: get(model, 'autoRefreshEnabled', false),
+      refreshIntervalSeconds: get(model, 'refreshIntervalSeconds'),
+      name: get(model, 'name', ''),
+      description: get(model, 'description', ''),
+      createdBy: get(model, 'createdBy', ''),
+      createdAt: get(model, 'createdAt', ''),
+      updatedBy: get(model, 'updatedBy', ''),
+      updatedAt: get(model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
         type: this.tileType(tile),
         id: get(tile, 'analysis.id', ''),
@@ -464,7 +533,7 @@ export class DashboardGridComponent
       options: [
         {
           minCols:
-            get(this.model, 'options.0.minCols') || get(this.options, 'minCols')
+            get(model, 'options.0.minCols') || get(this.options, 'minCols')
         }
       ]
     };
