@@ -149,7 +149,7 @@ public class WorkbenchIT extends BaseIT {
         log.debug("Response: " + resp);
         JsonNode node = mapper.reader().readTree(resp);
         assert (node != null);
-        String id = node.get("_id").asText();
+        String id = node.get("id").asText();
         return id;
     }
     /**
