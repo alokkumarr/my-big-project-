@@ -9,7 +9,7 @@ dir=$(dirname $0)
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
 hadoop_mkdir="hadoop fs -mkdir -p"
-datalake_raw=/var/sip/raw
+datalake_raw=/var/sip/workbench
 spark_app_dir=/apps/spark
 
 wait_maprfs() {
@@ -33,7 +33,7 @@ init_datalake() {
 load_data() {
 
     echo "Loading sample CSV data 1"
-    $sudo_mapr $hadoop_put $dir/test.csv $datalake_raw
+    $sudo_mapr $hadoop_put $dir/test*.csv $datalake_raw
 
     echo "Loading sample CSV data 2"
     $sudo_mapr $hadoop_put $dir/RevenueVehicleMaintPerf2.csv $datalake_raw
