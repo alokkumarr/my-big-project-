@@ -205,7 +205,7 @@ public class ExportServiceImpl implements ExportService{
                   fos.close();
               }
               else {
-                  streamToXslxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
+                  streamToXlsxReport(entity.getBody(), Long.parseLong(emailExportSize), exportBean);
               }
 
 
@@ -406,7 +406,7 @@ public class ExportServiceImpl implements ExportService{
           fos.close();
       }
       else {
-          streamToXslxReport(entity.getBody(), limitPerPage, exportBean);
+          streamToXlsxReport(entity.getBody(), limitPerPage, exportBean);
       }
 
 
@@ -464,7 +464,7 @@ public class ExportServiceImpl implements ExportService{
      * @param exportBean
      * @throws IOException
      */
-    public Boolean streamToXslxReport(DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
+    public Boolean streamToXlsxReport(DataResponse response, long LimittoExport, ExportBean exportBean) throws IOException {
 
         BufferedOutputStream stream = null;
         File xlsxFile = null;

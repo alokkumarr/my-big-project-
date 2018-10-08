@@ -48,7 +48,7 @@ public class XlsxExporterTest {
         exportBean.setCreatedBy(String.valueOf(((LinkedHashMap) dispatchBean).get("userFullName")));
         exportBean.setReportName("MyTestAnalysis");
         exportBean.setFileName(new File(classLoader.getResource("test").getPath())+File.separator+"abc.xlsx");
-        //Here we are creating /test dir under /Resources/ Dir to write mock xslx file.
+        //Here we are creating /test dir under /Resources/ Dir to write mock xlsx file.
 
         dataResponse = new DataResponse();
         LinkedHashMap obj1 = new LinkedHashMap();
@@ -99,12 +99,12 @@ public class XlsxExporterTest {
     }
 
     @Test
-    public void streamToXslxReportTest()    {
+    public void streamToXlsxReportTest()    {
         ExportServiceImpl exportService = new ExportServiceImpl();
         try {
-            assertEquals(exportService.streamToXslxReport(dataResponse,LimittoExport,exportBean),Boolean.TRUE);
+            assertEquals(exportService.streamToXlsxReport(dataResponse,LimittoExport,exportBean),Boolean.TRUE);
         } catch (IOException e) {
-            logger.error(this.getClass().getName() + " Error in streamToXslxReport : "
+            logger.error(this.getClass().getName() + " Error in streamToXlsxReport : "
                 + ExceptionUtils.getStackTrace(e));
         }
     }
