@@ -253,7 +253,7 @@ exports.config = {
     //console.log('beforeLaunch....generating the testdata...')
     // Generate test data
     if(webpackHelper.getSawWebUrl()) {
-      const generate = require('../src/test/javascript/data/generateTestData');
+      const generate = require('./src/javascript/data/generateTestData');
       token = generate.token(webpackHelper.getSawWebUrl());
       generate.usersRolesPrivilegesCategories(token);
     } else {

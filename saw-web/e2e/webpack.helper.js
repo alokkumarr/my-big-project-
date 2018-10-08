@@ -1,7 +1,7 @@
 const path = require('path');
 var fs = require('fs');
 var convert = require('xml-js');
-const globalVariables = require('../src/test/javascript/helpers/globalVariables');
+const globalVariables = require('./src/javascript/helpers/globalVariables');
 
 var subset={};
 var processedFiles = [];
@@ -188,7 +188,7 @@ module.exports = {
       return data;
     }else {
        //console.log('executing fresh--tests');
-      let data = JSON.parse(fs.readFileSync('e2e/src/testdata/data.json','utf8'));
+      let data = JSON.parse(fs.readFileSync('../saw-web/e2e/src/testdata/data.json','utf8'));
       //console.log('Fresh data--->'+JSON.stringify(data));
       return data;
     }
