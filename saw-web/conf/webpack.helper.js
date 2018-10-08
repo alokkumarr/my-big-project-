@@ -207,7 +207,7 @@ module.exports = {
         });
       }
       if(suiteName !== undefined && suiteName ==='critical') {
-        console.log('Executing critical suite.....');
+        //console.log('Executing critical suite.....');
         let data = JSON.parse(fs.readFileSync('../saw-web/src/test/e2e-tests/testdata/data.critical.json','utf8'));
         return data;
       } else {
