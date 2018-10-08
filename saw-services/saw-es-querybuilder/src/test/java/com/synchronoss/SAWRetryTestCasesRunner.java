@@ -11,7 +11,13 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
-
+/**
+ * This class has been added to make 
+ * it sure to retry the beforeTest method.
+ * Because the resource are not being released by previous testClass.
+ * So on failure it will retry 5 times.
+ * @author spau0004
+ */
 public class SAWRetryTestCasesRunner extends BlockJUnit4ClassRunner {
 
     private final int retryCount = 5;
