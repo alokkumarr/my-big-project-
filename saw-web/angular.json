@@ -39,6 +39,7 @@
           },
           "configurations": {
             "production": {
+              "deployUrl": "/saw/web/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
