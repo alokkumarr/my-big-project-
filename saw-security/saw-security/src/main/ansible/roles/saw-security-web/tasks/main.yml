@@ -8,7 +8,8 @@
 - name: Look up Security Service database password
   set_fact:
     saw_security_db_password: >-
-      {{ lookup('password', inventory_dir + '/sip-security-db-password') }}
+      {{ lookup('password', inventory_dir
+        + '/sip-security-db-password chars=ascii_letters,digits') }}
 - name: Create the /etc/bda directory
   file: path=/etc/bda state=directory mode=0755
 - name: Set the SAW Security Service database password
