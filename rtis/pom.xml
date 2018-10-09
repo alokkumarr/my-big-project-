@@ -54,7 +54,6 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-   
     <repositories>
         <repository>
             <id>mapr-maven</id>
@@ -683,7 +682,6 @@ getent passwd rtis-user &gt;/dev/null || {
             </plugin>
         </plugins>
     </build>
-    
   <!-- Workaround: This project uses the rpm-maven-plugin, which
        requires RPM tools to be installed.  It should be migrated to
        using the Java RPM builder.  Until then, put building RPMs
